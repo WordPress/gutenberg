@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function core_block_navigation_build_css_colors( $attributes ) {
+function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -64,7 +64,7 @@ function core_block_navigation_build_css_colors( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function core_block_navigation_build_css_font_sizes( $attributes ) {
+function block_core_navigation_build_css_font_sizes( $attributes ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -91,7 +91,7 @@ function core_block_navigation_build_css_font_sizes( $attributes ) {
  * @param array $blocks Navigation link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
-function core_block_navigation_empty_navigation_links_recursive( $blocks ) {
+function block_core_navigation_empty_navigation_links_recursive( $blocks ) {
 	$blocks = array_filter(
 		$blocks,
 		function( $block ) {
@@ -102,7 +102,7 @@ function core_block_navigation_empty_navigation_links_recursive( $blocks ) {
 	if ( ! empty( $blocks ) ) {
 		foreach ( $blocks as $key => $block ) {
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
+				$blocks[ $key ]['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 			}
 		}
 	}
@@ -115,7 +115,7 @@ function core_block_navigation_empty_navigation_links_recursive( $blocks ) {
  *
  * @return string
  */
-function core_block_navigation_render_submenu_icon() {
+function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
 }
 
@@ -127,13 +127,13 @@ function core_block_navigation_render_submenu_icon() {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $content, $block ) {
+function render_block_core_navigation( $content, $block ) {
 
 	if ( 'core/navigation' !== $block['blockName'] ) {
 		return $content;
 	}
 
-	$block['innerBlocks'] = core_block_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
+	$block['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 	$attributes           = $block['attrs'];
 
 	/**
@@ -157,8 +157,8 @@ function render_block_navigation( $content, $block ) {
 		return '';
 	}
 
-	$colors          = core_block_navigation_build_css_colors( $attributes );
-	$font_sizes      = core_block_navigation_build_css_font_sizes( $attributes );
+	$colors          = block_core_navigation_build_css_colors( $attributes );
+	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
@@ -176,7 +176,7 @@ function render_block_navigation( $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
+		block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
 	);
 }
 
@@ -190,7 +190,7 @@ function render_block_navigation( $content, $block ) {
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
+function block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -257,14 +257,14 @@ function core_block_navigation_build_html( $attributes, $block, $colors, $font_s
 			) &&
 			$has_submenu
 		) {
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . core_block_navigation_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</a>';
 		// End anchor tag content.
 
 		if ( $has_submenu ) {
-			$html .= core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
+			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
@@ -275,7 +275,7 @@ function core_block_navigation_build_html( $attributes, $block, $colors, $font_s
 /**
  * Register the navigation block.
  *
- * @uses render_block_navigation()
+ * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
@@ -325,4 +325,4 @@ function register_block_core_navigation() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );
-add_filter( 'render_block', 'render_block_navigation', 10, 2 );
+add_filter( 'render_block', 'render_block_core_navigation', 10, 2 );

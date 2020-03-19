@@ -31,5 +31,5 @@ const options = [
 	},
 ];
 export const _default = () => (
-	<CustomSelectControl label="Font Size" options={ options } />
+	<CustomSelectControl label="Font size" options={ options } />
 );

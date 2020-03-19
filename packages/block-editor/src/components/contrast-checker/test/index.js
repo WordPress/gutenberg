@@ -2,16 +2,21 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { render } from 'react-dom';
+import { act } from 'react-dom/test-utils';
 
 /**
  * WordPress dependencies
  */
 import { Notice } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import ContrastChecker from '../';
+
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 describe( 'ContrastChecker', () => {
 	const backgroundColor = '#ffffff';
@@ -21,6 +26,10 @@ describe( 'ContrastChecker', () => {
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
 	const colorWithTransparency = 'rgba(102,102,102,0.5)';
+
+	beforeEach( () => {
+		speak.mockReset();
+	} );
 
 	test( 'should render null when no colors are provided', () => {
 		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
@@ -37,6 +46,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -51,6 +61,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )
@@ -72,6 +85,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -86,6 +100,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -102,6 +117,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )
@@ -121,6 +139,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperSmallText
 				.find( Notice )
@@ -150,6 +171,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperSmallFontSize
 				.find( Notice )
@@ -180,6 +204,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 
 		const wrapperNoLargeText = mount(
@@ -191,6 +216,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapperNoLargeText
 				.find( Notice )
@@ -210,6 +238,7 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).not.toHaveBeenCalled();
 		expect( wrapper.html() ).toBeNull();
 	} );
 
@@ -221,6 +250,9 @@ describe( 'ContrastChecker', () => {
 			/>
 		);
 
+		expect( speak ).toHaveBeenCalledWith(
+			'This color combination may be hard for people to read.'
+		);
 		expect(
 			wrapper
 				.find( Notice )
@@ -229,5 +261,31 @@ describe( 'ContrastChecker', () => {
 		).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
+	} );
+
+	test( 'should re-announce if colors change, but still insufficient contrast', () => {
+		const appRoot = document.createElement( 'div' );
+
+		act( () => {
+			render(
+				<ContrastChecker
+					textColor={ textColor }
+					fallbackBackgroundColor={ textColor }
+				/>,
+				appRoot
+			);
+		} );
+
+		act( () => {
+			render(
+				<ContrastChecker
+					textColor={ backgroundColor }
+					fallbackBackgroundColor={ backgroundColor }
+				/>,
+				appRoot
+			);
+		} );
+
+		expect( speak ).toHaveBeenCalledTimes( 2 );
 	} );
 } );

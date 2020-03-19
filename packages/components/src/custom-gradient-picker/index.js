@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import AnglePicker from '../angle-picker';
+import AnglePickerControl from '../angle-picker-control';
 import { LinearGradientIcon, RadialGradientIcon } from './icons';
 import CustomGradientBar from './custom-gradient-bar';
 import BaseControl from '../base-control';
@@ -41,7 +41,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		);
 	};
 	return (
-		<AnglePicker
+		<AnglePickerControl
 			value={ hasGradient ? angle : '' }
 			onChange={ onAngleChange }
 		/>
@@ -75,16 +75,17 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<BaseControl className="components-custom-gradient-picker__type-picker">
 			<BaseControl.VisualLabel>{ __( 'Type' ) }</BaseControl.VisualLabel>
 			<ToolbarGroup
+				className="components-custom-gradient-picker__toolbar"
 				controls={ [
 					{
 						icon: <LinearGradientIcon />,
-						title: 'Linear Gradient',
+						title: __( 'Linear Gradient' ),
 						isActive: hasGradient && type === 'linear-gradient',
 						onClick: onSetLinearGradient,
 					},
 					{
 						icon: <RadialGradientIcon />,
-						title: 'Radial Gradient',
+						title: __( 'Radial Gradient' ),
 						isActive: hasGradient && type === 'radial-gradient',
 						onClick: onSetRadialGradient,
 					},

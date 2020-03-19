@@ -20,5 +20,3 @@ module.exports = {
 		} ),
 	},
 };
-
-console.log( 'metro config ', module.exports );

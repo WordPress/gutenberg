@@ -12,6 +12,7 @@ import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { help, plugins } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,7 +48,7 @@ export class UnsupportedBlockEdit extends Component {
 					<Icon
 						className="unsupported-icon-help"
 						label={ __( 'Help icon' ) }
-						icon="editor-help"
+						icon={ help }
 						color={ infoIconStyle.color }
 					/>
 				</View>
@@ -89,7 +90,7 @@ export class UnsupportedBlockEdit extends Component {
 			>
 				<View style={ styles.infoContainer }>
 					<Icon
-						icon="editor-help"
+						icon={ help }
 						color={ infoSheetIconStyle.color }
 						size={ styles.infoSheetIcon.size }
 					/>
@@ -127,7 +128,7 @@ export class UnsupportedBlockEdit extends Component {
 
 		const icon = blockType
 			? normalizeIconObject( blockType.settings.icon )
-			: 'admin-plugins';
+			: plugins;
 		const iconStyle = getStylesFromColorScheme(
 			styles.unsupportedBlockIcon,
 			styles.unsupportedBlockIconDark

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	PanelBody,
-	__experimentalSlotFillConsumer,
+	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -30,6 +30,9 @@ const BlockInspector = ( {
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
 } ) => {
+	const slot = useSlot( InspectorAdvancedControls.slotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
 	}
@@ -69,21 +72,15 @@ const BlockInspector = ( {
 			) }
 			<InspectorControls.Slot bubblesVirtually />
 			<div>
-				<__experimentalSlotFillConsumer>
-					{ ( { hasFills } ) =>
-						hasFills( InspectorAdvancedControls.slotName ) && (
-							<PanelBody
-								className="block-editor-block-inspector__advanced"
-								title={ __( 'Advanced' ) }
-								initialOpen={ false }
-							>
-								<InspectorAdvancedControls.Slot
-									bubblesVirtually
-								/>
-							</PanelBody>
-						)
-					}
-				</__experimentalSlotFillConsumer>
+				{ hasFills && (
+					<PanelBody
+						className="block-editor-block-inspector__advanced"
+						title={ __( 'Advanced' ) }
+						initialOpen={ false }
+					>
+						<InspectorAdvancedControls.Slot bubblesVirtually />
+					</PanelBody>
+				) }
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>

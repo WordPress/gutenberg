@@ -8,6 +8,7 @@ const env = require( '../lib/env' );
 /**
  * Mocked dependencies
  */
+jest.spyOn( process, 'exit' ).mockImplementation( () => {} );
 jest.mock( 'ora', () => () => ( {
 	start() {
 		return { text: '', succeed: jest.fn(), fail: jest.fn() };
@@ -84,8 +85,6 @@ describe( 'env cli', () => {
 		/* eslint-disable no-console */
 		env.start.mockRejectedValueOnce( {
 			message: 'failure message',
-			out: 'failure message',
-			exitCode: 2,
 		} );
 		const consoleError = console.error;
 		console.error = jest.fn();
@@ -98,28 +97,37 @@ describe( 'env cli', () => {
 
 		expect( spinner.fail ).toHaveBeenCalledWith( 'failure message' );
 		expect( console.error ).toHaveBeenCalled();
-		expect( process.exit ).toHaveBeenCalledWith( 2 );
+		expect( process.exit ).toHaveBeenCalledWith( 1 );
 		console.error = consoleError;
 		process.exit = processExit;
 		/* eslint-enable no-console */
 	} );
-	it( 'handles failed commands with errors.', async () => {
+	it( 'handles failed docker commands with errors.', async () => {
 		/* eslint-disable no-console */
-		env.start.mockRejectedValueOnce( { err: 'failure error' } );
+		env.start.mockRejectedValueOnce( {
+			err: 'failure error',
+			out: 'message',
+			exitCode: 1,
+		} );
 		const consoleError = console.error;
 		console.error = jest.fn();
 		const processExit = process.exit;
 		process.exit = jest.fn();
+		const stderr = process.stderr.write;
+		process.stderr.write = jest.fn();
 
 		cli().parse( [ 'start' ] );
 		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
 		await env.start.mock.results[ 0 ].value.catch( () => {} );
 
-		expect( spinner.fail ).toHaveBeenCalledWith( 'failure error' );
-		expect( console.error ).toHaveBeenCalled();
+		expect( spinner.fail ).toHaveBeenCalledWith(
+			'Error while running docker-compose command.'
+		);
+		expect( process.stderr.write ).toHaveBeenCalledWith( 'failure error' );
 		expect( process.exit ).toHaveBeenCalledWith( 1 );
 		console.error = consoleError;
 		process.exit = processExit;
+		process.stderr.write = stderr;
 		/* eslint-enable no-console */
 	} );
 } );

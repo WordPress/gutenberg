@@ -5,10 +5,10 @@
 /*rtl:end:ignore*/
 
 .components-datetime {
-	padding: $grid-size-large;
+	padding: $grid-unit-20;
 
 	.components-datetime__calendar-help {
-		padding: $grid-size-large;
+		padding: $grid-unit-20;
 
 		h4 {
 			margin: 0;
@@ -94,7 +94,7 @@
 }
 
 .components-datetime__time {
-	padding-bottom: $grid-size-large;
+	padding-bottom: $grid-unit-20;
 
 	fieldset {
 		position: relative;

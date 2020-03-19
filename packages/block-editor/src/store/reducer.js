@@ -23,7 +23,6 @@ import {
  */
 import { combineReducers } from '@wordpress/data';
 import { isReusableBlock } from '@wordpress/blocks';
-
 /**
  * Internal dependencies
  */

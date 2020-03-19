@@ -80,12 +80,7 @@ class BlockListBlock extends Component {
 	}
 
 	applySelectedBlockStyle() {
-		const {
-			hasChildren,
-			getStylesFromColorScheme,
-			isSmallScreen,
-			isRootListInnerBlockHolder,
-		} = this.props;
+		const { hasChildren, getStylesFromColorScheme } = this.props;
 
 		const fullSolidBorderStyle = {
 			// define style for full border
@@ -99,16 +94,6 @@ class BlockListBlock extends Component {
 		if ( hasChildren ) {
 			// if block has children apply style for selected parent
 			return { ...styles.selectedParent, ...fullSolidBorderStyle };
-		}
-
-		// apply semi border selected style when screen is in vertical position
-		// and selected block does not have InnerBlock inside
-		if ( isSmallScreen && ! isRootListInnerBlockHolder ) {
-			return {
-				...styles.selectedRootLeaf,
-				...styles.semiSolidBordered,
-				...{ borderColor: fullSolidBorderStyle.borderColor },
-			};
 		}
 
 		/* selected block is one of below:
@@ -202,7 +187,6 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			showFloatingToolbar,
 			parentId,
 			isTouchable,
 		} = this.props;
@@ -214,27 +198,27 @@ class BlockListBlock extends Component {
 		);
 
 		return (
-			<>
-				{ showFloatingToolbar && (
-					<FloatingToolbar>
-						<Toolbar passedStyle={ styles.toolbar }>
-							<ToolbarButton
-								title={ __( 'Navigate Up' ) }
-								onClick={ () =>
-									this.props.onSelect( parentId )
-								}
-								icon={ NavigateUpSVG }
-							/>
-							<View style={ styles.pipe } />
-						</Toolbar>
-						<Breadcrumbs clientId={ clientId } />
-					</FloatingToolbar>
-				) }
-				<TouchableWithoutFeedback
-					onPress={ this.onFocus }
-					accessible={ ! isSelected }
-					accessibilityRole={ 'button' }
-				>
+			<TouchableWithoutFeedback
+				onPress={ this.onFocus }
+				accessible={ ! isSelected }
+				accessibilityRole={ 'button' }
+			>
+				<View accessibilityLabel={ accessibilityLabel }>
+					{ isSelected && (
+						<FloatingToolbar>
+							<Toolbar passedStyle={ styles.toolbar }>
+								<ToolbarButton
+									title={ __( 'Navigate Up' ) }
+									onClick={ () =>
+										this.props.onSelect( parentId )
+									}
+									icon={ NavigateUpSVG }
+								/>
+								<View style={ styles.pipe } />
+							</Toolbar>
+							<Breadcrumbs clientId={ clientId } />
+						</FloatingToolbar>
+					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -254,8 +238,8 @@ class BlockListBlock extends Component {
 							) }
 						</View>
 					</View>
-				</TouchableWithoutFeedback>
-			</>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
@@ -268,14 +252,11 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			getBlockCount,
 		} = select( 'core/block-editor' );
-
-		const { getGroupingBlockName } = select( 'core/blocks' );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -292,10 +273,6 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -337,10 +314,6 @@ export default compose( [
 			! isDescendantSelected &&
 			( isDescendantOfParentSelected || rootBlockId === clientId );
 
-		const isInnerBlockHolder = name === getGroupingBlockName();
-		const isRootListInnerBlockHolder =
-			! isSelectedBlockNested && isInnerBlockHolder;
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -351,7 +324,6 @@ export default compose( [
 			isLastBlock,
 			isSelected,
 			isValid,
-			showFloatingToolbar,
 			parentId,
 			isParentSelected,
 			firstToSelectId,
@@ -360,7 +332,6 @@ export default compose( [
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			isRootListInnerBlockHolder,
 			isUnregisteredBlock,
 		};
 	} ),

@@ -8,6 +8,7 @@ import React from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
+import { camera, wordpress } from '@wordpress/icons';
 import {
 	getOtherMediaOptions,
 	requestMediaPicker,
@@ -26,7 +27,7 @@ const cameraImageSource = {
 	value: mediaSources.deviceCamera + '-IMAGE', // This is needed to diferenciate image-camera from video-camera sources.
 	label: __( 'Take a Photo' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: 'camera',
+	icon: camera,
 };
 
 const cameraVideoSource = {
@@ -34,7 +35,7 @@ const cameraVideoSource = {
 	value: mediaSources.deviceCamera,
 	label: __( 'Take a Video' ),
 	types: [ MEDIA_TYPE_VIDEO ],
-	icon: 'camera',
+	icon: camera,
 };
 
 const deviceLibrarySource = {
@@ -49,7 +50,8 @@ const siteLibrarySource = {
 	value: mediaSources.siteMediaLibrary,
 	label: __( 'WordPress Media Library' ),
 	types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
-	icon: 'wordpress-alt',
+	icon: wordpress,
+	mediaLibrary: true,
 };
 
 const internalSources = [
@@ -93,23 +95,18 @@ export class MediaUpload extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { allowedTypes = [], multiple = false } = this.props;
-
-		// disable upload sources for now when multiple flag is set
-		// eslint-disable-next-line no-undef
-		if ( ! __DEV__ ) {
-			if ( allowedTypes.includes( MEDIA_TYPE_IMAGE ) && multiple ) {
-				return [ siteLibrarySource ];
-			}
-		}
+		const {
+			allowedTypes = [],
+			__experimentalOnlyMediaLibrary,
+		} = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				return (
-					allowedTypes.filter( ( allowedType ) =>
-						source.types.includes( allowedType )
-					).length > 0
-				);
+				return __experimentalOnlyMediaLibrary
+					? source.mediaLibrary
+					: allowedTypes.filter( ( allowedType ) =>
+							source.types.includes( allowedType )
+					  ).length > 0;
 			} )
 			.map( ( source ) => {
 				return {
@@ -147,6 +144,7 @@ export class MediaUpload extends React.Component {
 		const types = allowedTypes.filter( ( type ) =>
 			mediaSource.types.includes( type )
 		);
+
 		requestMediaPicker( mediaSource.id, types, multiple, ( media ) => {
 			if ( ( multiple && media ) || ( media && media.id ) ) {
 				onSelect( media );

@@ -25,6 +25,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
+	toggleProps,
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -46,6 +47,7 @@ const defaultRenderToggle = ( {
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
+			{ ...toggleProps }
 		/>
 	);
 };
@@ -83,6 +85,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			toggleProps,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
@@ -92,6 +95,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			toggleProps,
 		} );
 	}
 

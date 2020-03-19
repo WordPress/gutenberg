@@ -16,11 +16,13 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
+import { formatLtr } from '@wordpress/icons';
 
 /**
  * Browser dependencies
@@ -41,7 +43,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 			<ToolbarGroup
 				controls={ [
 					{
-						icon: 'editor-ltr',
+						icon: formatLtr,
 						title: _x( 'Left to right', 'editor button' ),
 						isActive: direction === 'ltr',
 						onClick() {
@@ -131,7 +133,7 @@ function ParagraphBlock( {
 						onChange={ setFontSize }
 					/>
 					<ToggleControl
-						label={ __( 'Drop Cap' ) }
+						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }
 						onChange={ () =>
 							setAttributes( { dropCap: ! dropCap } )
@@ -150,7 +152,7 @@ function ParagraphBlock( {
 					<RichText
 						ref={ ref }
 						identifier="content"
-						tagName="p"
+						tagName={ Block.p }
 						className={ classnames(
 							'wp-block-paragraph',
 							className,

@@ -11,14 +11,17 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
-import {
-	TableOfContents,
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-} from '@wordpress/editor';
+import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
+
+const inserterToggleProps = { isPrimary: true };
 
 function HeaderToolbar() {
-	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect(
+	const {
+		hasFixedToolbar,
+		showInserter,
+		isTextModeEnabled,
+		previewDeviceType,
+	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
@@ -29,12 +32,18 @@ function HeaderToolbar() {
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
+			previewDeviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const toolbarAriaLabel = hasFixedToolbar
+	const displayBlockToolbar =
+		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
+
+	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
@@ -49,13 +58,13 @@ function HeaderToolbar() {
 				disabled={ ! showInserter }
 				position="bottom right"
 				showInserterHelpPanel
+				toggleProps={ inserterToggleProps }
 			/>
+			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
-			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			<ToolSelector />
-			{ ( hasFixedToolbar || ! isLargeViewport ) && (
+			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
 				</div>

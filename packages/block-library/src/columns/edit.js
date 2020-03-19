@@ -9,6 +9,8 @@ import { dropRight, get, map, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
+
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -59,12 +61,21 @@ function ColumnsEditContainer( {
 		[ clientId ]
 	);
 
+	const ref = useRef();
 	const {
 		BackgroundColor,
 		InspectorControlsColorPanel,
-	} = __experimentalUseColors( [
-		{ name: 'backgroundColor', className: 'has-background' },
-	] );
+		TextColor,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
+			colorDetector: { targetRef: ref },
+		}
+	);
 
 	const classes = classnames( className, {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
@@ -91,12 +102,14 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
-				<div className={ classes }>
-					<InnerBlocks
-						templateLock="all"
-						allowedBlocks={ ALLOWED_BLOCKS }
-					/>
-				</div>
+				<TextColor>
+					<div className={ classes } ref={ ref }>
+						<InnerBlocks
+							allowedBlocks={ ALLOWED_BLOCKS }
+							__experimentalMoverDirection="horizontal"
+						/>
+					</div>
+				</TextColor>
 			</BackgroundColor>
 		</>
 	);

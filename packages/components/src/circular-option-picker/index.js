@@ -15,7 +15,13 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 
-function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
+function Option( {
+	className,
+	isSelected,
+	selectedIconProps,
+	tooltipText,
+	...additionalProps
+} ) {
 	const optionButton = (
 		<Button
 			isPressed={ isSelected }
@@ -33,7 +39,12 @@ function Option( { className, isSelected, tooltipText, ...additionalProps } ) {
 			) : (
 				optionButton
 			) }
-			{ isSelected && <Icon icon={ check } /> }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }

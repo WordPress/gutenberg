@@ -28,6 +28,8 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { pullLeft, pullRight } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -159,7 +161,7 @@ class MediaTextEdit extends Component {
 		} = attributes;
 		return (
 			<MediaContainer
-				className="block-library-media-text__media-container"
+				className="wp-block-media-text__media-container"
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
@@ -228,18 +230,18 @@ class MediaTextEdit extends Component {
 			{
 				value: backgroundColor.color,
 				onChange: setBackgroundColor,
-				label: __( 'Background Color' ),
+				label: __( 'Background color' ),
 			},
 		];
 		const toolbarControls = [
 			{
-				icon: 'align-pull-left',
+				icon: pullLeft,
 				title: __( 'Show media on left' ),
 				isActive: mediaPosition === 'left',
 				onClick: () => setAttributes( { mediaPosition: 'left' } ),
 			},
 			{
-				icon: 'align-pull-right',
+				icon: pullRight,
 				title: __( 'Show media on right' ),
 				isActive: mediaPosition === 'right',
 				onClick: () => setAttributes( { mediaPosition: 'right' } ),
@@ -275,7 +277,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ imageFill && (
 					<FocalPointPicker
-						label={ __( 'Focal Point Picker' ) }
+						label={ __( 'Focal point picker' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
 						onChange={ ( value ) =>
@@ -285,7 +287,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ mediaType === 'image' && (
 					<TextareaControl
-						label={ __( 'Alt Text (Alternative Text)' ) }
+						label={ __( 'Alt text (alternative text)' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
 						help={

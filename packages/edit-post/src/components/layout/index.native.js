@@ -15,11 +15,7 @@ import {
 	__experimentalWithPageTemplatePickerVisible,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import {
-	HTMLTextInput,
-	KeyboardAvoidingView,
-	ReadableContentView,
-} from '@wordpress/components';
+import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
@@ -41,7 +37,6 @@ class Layout extends Component {
 		this.state = {
 			rootViewHeight: 0,
 			safeAreaInsets: { top: 0, bottom: 0, right: 0, left: 0 },
-			isFullyBordered: true,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -75,20 +70,12 @@ class Layout extends Component {
 	onRootViewLayout( event ) {
 		if ( this._isMounted ) {
 			this.setHeightState( event );
-			this.setBorderStyleState();
 		}
 	}
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
-	}
-
-	setBorderStyleState() {
-		const isFullyBordered = ReadableContentView.isContentMaxWidth();
-		if ( isFullyBordered !== this.state.isFullyBordered ) {
-			this.setState( { isFullyBordered } );
-		}
 	}
 
 	renderHTML() {
@@ -102,12 +89,7 @@ class Layout extends Component {
 			return null;
 		}
 
-		return (
-			<VisualEditor
-				isFullyBordered={ this.state.isFullyBordered }
-				setTitleRef={ this.props.setTitleRef }
-			/>
-		);
+		return <VisualEditor setTitleRef={ this.props.setTitleRef } />;
 	}
 
 	render() {

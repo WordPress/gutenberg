@@ -91,7 +91,7 @@ export function getBlockClientId( node ) {
 		node = node.parentElement;
 	}
 
-	const blockNode = node.closest( '.wp-block' );
+	const blockNode = node.closest( '.block-editor-block-list__block' );
 
 	if ( ! blockNode ) {
 		return;

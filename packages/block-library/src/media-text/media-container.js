@@ -47,10 +47,11 @@ class MediaContainer extends Component {
 	}
 
 	renderToolbarEditButton() {
-		const { onSelectMedia, mediaUrl } = this.props;
+		const { onSelectMedia, mediaUrl, mediaId } = this.props;
 		return (
 			<BlockControls>
 				<MediaReplaceFlow
+					mediaId={ mediaId }
 					mediaURL={ mediaUrl }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					accept="image/*,video/*"

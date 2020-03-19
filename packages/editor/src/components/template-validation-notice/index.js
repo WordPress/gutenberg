@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Notice, Button } from '@wordpress/components';
+import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -29,20 +29,21 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 			className="editor-template-validation-notice"
 			isDismissible={ false }
 			status="warning"
+			actions={ [
+				{
+					label: __( 'Keep it as is' ),
+					onClick: props.resetTemplateValidity,
+				},
+				{
+					label: __( 'Reset the template' ),
+					onClick: confirmSynchronization,
+					isPrimary: true,
+				},
+			] }
 		>
-			<p>
-				{ __(
-					'The content of your post doesn’t match the template assigned to your post type.'
-				) }
-			</p>
-			<div>
-				<Button isSecondary onClick={ props.resetTemplateValidity }>
-					{ __( 'Keep it as is' ) }
-				</Button>
-				<Button onClick={ confirmSynchronization } isPrimary>
-					{ __( 'Reset the template' ) }
-				</Button>
-			</div>
+			{ __(
+				'The content of your post doesn’t match the template assigned to your post type.'
+			) }
 		</Notice>
 	);
 }

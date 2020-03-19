@@ -33,11 +33,11 @@ export default function QueryControls( {
 				value={ `${ orderBy }/${ order }` }
 				options={ [
 					{
-						label: __( 'Newest to Oldest' ),
+						label: __( 'Newest to oldest' ),
 						value: 'date/desc',
 					},
 					{
-						label: __( 'Oldest to Newest' ),
+						label: __( 'Oldest to newest' ),
 						value: 'date/asc',
 					},
 					{

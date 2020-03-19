@@ -2,6 +2,12 @@
 
 ### Bug Fixes
 
+- Ensure `packages-update` work when `dependencies` or `devDependencies` are missing in the `package.json` file ([#20408](https://github.com/WordPress/gutenberg/pull/20408)).
+
+## 7.1.0 (2020-02-10)
+
+### Bug Fixes
+
 - Ensure the default Prettier config is used in the `lint-js` script when no Prettier config is found in the project ([#20071](https://github.com/WordPress/gutenberg/pull/20071)).
 
 ## 7.0.0 (2020-02-04)

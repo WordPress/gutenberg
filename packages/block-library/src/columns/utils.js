@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { findIndex, sumBy, merge, mapValues } from 'lodash';
+import { sumBy, merge, mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -13,24 +13,6 @@ import { findIndex, sumBy, merge, mapValues } from 'lodash';
  */
 export const toWidthPrecision = ( value ) =>
 	Number.isFinite( value ) ? parseFloat( value.toFixed( 2 ) ) : undefined;
-
-/**
- * Returns the considered adjacent to that of the specified `clientId` for
- * resizing consideration. Adjacent blocks are those occurring after, except
- * when the given block is the last block in the set. For the last block, the
- * behavior is reversed.
- *
- * @param {WPBlock[]} blocks   Block objects.
- * @param {string}    clientId Client ID to consider for adjacent blocks.
- *
- * @return {WPBlock[]} Adjacent block objects.
- */
-export function getAdjacentBlocks( blocks, clientId ) {
-	const index = findIndex( blocks, { clientId } );
-	const isLastBlock = index === blocks.length - 1;
-
-	return isLastBlock ? blocks.slice( 0, index ) : blocks.slice( index + 1 );
-}
 
 /**
  * Returns an effective width for a given block. An effective width is equal to
@@ -115,7 +97,7 @@ export function getRedistributedColumnWidths(
  * @return {boolean} Whether columns have explicit widths.
  */
 export function hasExplicitColumnWidths( blocks ) {
-	return blocks.some( ( block ) =>
+	return blocks.every( ( block ) =>
 		Number.isFinite( block.attributes.width )
 	);
 }

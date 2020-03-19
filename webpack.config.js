@@ -32,11 +32,10 @@ const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE )
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
 	)
-	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) )
-	// exclude react-native packages from the main build
-	.filter( ( packageName ) => ! packageName.startsWith( 'react-native' ) );
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
 	mode,

@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { FlatList, View, Text, TouchableHighlight } from 'react-native';
+import {
+	FlatList,
+	View,
+	Text,
+	TouchableHighlight,
+	Dimensions,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -21,6 +27,8 @@ import { BottomSheet, Icon } from '@wordpress/components';
  */
 import styles from './style.scss';
 
+const MIN_COL_NUM = 3;
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -28,8 +36,10 @@ export class InserterMenu extends Component {
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.state = {
-			numberOfColumns: this.calculateNumberOfColumns(),
+			numberOfColumns: MIN_COL_NUM,
 		};
+
+		Dimensions.addEventListener( 'change', this.onLayout );
 	}
 
 	componentDidMount() {
@@ -38,23 +48,45 @@ export class InserterMenu extends Component {
 
 	componentWillUnmount() {
 		this.props.hideInsertionPoint();
+		Dimensions.removeEventListener( 'change', this.onLayout );
 	}
 
-	calculateNumberOfColumns() {
-		const bottomSheetWidth = BottomSheet.getWidth();
+	calculateMinItemWidth( bottomSheetWidth ) {
+		const { paddingLeft, paddingRight } = styles.columnPadding;
+		return (
+			( bottomSheetWidth - 2 * ( paddingLeft + paddingRight ) ) /
+			MIN_COL_NUM
+		);
+	}
+
+	calculateItemWidth() {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
 		} = styles.modalItem;
-		const {
-			paddingLeft: containerPaddingLeft,
-			paddingRight: containerPaddingRight,
-		} = styles.content;
 		const { width: itemWidth } = styles.modalIconWrapper;
-		const itemTotalWidth = itemWidth + itemPaddingLeft + itemPaddingRight;
+		return itemWidth + itemPaddingLeft + itemPaddingRight;
+	}
+
+	calculateColumnsProperties() {
+		const bottomSheetWidth = BottomSheet.getWidth();
+		const { paddingLeft, paddingRight } = styles.columnPadding;
+		const itemTotalWidth = this.calculateItemWidth();
 		const containerTotalWidth =
-			bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
-		return Math.floor( containerTotalWidth / itemTotalWidth );
+			bottomSheetWidth - ( paddingLeft + paddingRight );
+		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
+
+		if ( numofColumns < MIN_COL_NUM ) {
+			return {
+				numOfColumns: MIN_COL_NUM,
+				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
+				maxWidth: containerTotalWidth / MIN_COL_NUM,
+			};
+		}
+		return {
+			numOfColumns: numofColumns,
+			maxWidth: containerTotalWidth / numofColumns,
+		};
 	}
 
 	onClose() {
@@ -67,12 +99,16 @@ export class InserterMenu extends Component {
 	}
 
 	onLayout() {
-		const numberOfColumns = this.calculateNumberOfColumns();
+		const columnProperties = this.calculateColumnsProperties();
+		const numberOfColumns = columnProperties.numOfColumns;
+
 		this.setState( { numberOfColumns } );
 	}
 
 	render() {
-		const { getStylesFromColorScheme } = this.props;
+		const { getStylesFromColorScheme, items, onSelect } = this.props;
+		const { numberOfColumns } = this.state;
+
 		const bottomPadding = styles.contentBottomPadding;
 		const modalIconWrapperStyle = getStylesFromColorScheme(
 			styles.modalIconWrapper,
@@ -87,6 +123,8 @@ export class InserterMenu extends Component {
 			styles.modalItemLabelDark
 		);
 
+		const columnProperties = this.calculateColumnsProperties();
+
 		return (
 			<BottomSheet
 				isVisible={ true }
@@ -94,42 +132,57 @@ export class InserterMenu extends Component {
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
-				<FlatList
-					onLayout={ this.onLayout }
-					scrollEnabled={ false }
-					key={ `InserterUI-${ this.state.numberOfColumns }` } //re-render when numberOfColumns changes
-					keyboardShouldPersistTaps="always"
-					numColumns={ this.state.numberOfColumns }
-					data={ this.props.items }
-					ItemSeparatorComponent={ () => (
-						<View style={ styles.rowSeparator } />
-					) }
-					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) => (
-						<TouchableHighlight
-							style={ styles.touchableArea }
-							underlayColor="transparent"
-							activeOpacity={ 0.5 }
-							accessibilityLabel={ item.title }
-							onPress={ () => this.props.onSelect( item ) }
-						>
-							<View style={ styles.modalItem }>
-								<View style={ modalIconWrapperStyle }>
-									<View style={ modalIconStyle }>
-										<Icon
-											icon={ item.icon.src }
-											fill={ modalIconStyle.fill }
-											size={ modalIconStyle.width }
-										/>
+				<TouchableHighlight accessible={ false }>
+					<FlatList
+						onLayout={ this.onLayout }
+						scrollEnabled={ false }
+						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+						keyboardShouldPersistTaps="always"
+						numColumns={ numberOfColumns }
+						data={ items }
+						ItemSeparatorComponent={ () => (
+							<View style={ styles.rowSeparator } />
+						) }
+						keyExtractor={ ( item ) => item.name }
+						renderItem={ ( { item } ) => (
+							<TouchableHighlight
+								style={ styles.touchableArea }
+								underlayColor="transparent"
+								activeOpacity={ 0.5 }
+								accessibilityLabel={ item.title }
+								onPress={ () => onSelect( item ) }
+							>
+								<View
+									style={ [
+										styles.modalItem,
+										{ width: columnProperties.maxWidth },
+									] }
+								>
+									<View
+										style={ [
+											modalIconWrapperStyle,
+											columnProperties.itemWidth && {
+												width:
+													columnProperties.itemWidth,
+											},
+										] }
+									>
+										<View style={ modalIconStyle }>
+											<Icon
+												icon={ item.icon.src }
+												fill={ modalIconStyle.fill }
+												size={ modalIconStyle.width }
+											/>
+										</View>
 									</View>
+									<Text style={ modalItemLabelStyle }>
+										{ item.title }
+									</Text>
 								</View>
-								<Text style={ modalItemLabelStyle }>
-									{ item.title }
-								</Text>
-							</View>
-						</TouchableHighlight>
-					) }
-				/>
+							</TouchableHighlight>
+						) }
+					/>
+				</TouchableHighlight>
 			</BottomSheet>
 		);
 	}

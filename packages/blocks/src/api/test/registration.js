@@ -10,6 +10,7 @@ import { noop, get, omit, pick } from 'lodash';
  */
 import { addFilter, removeAllFilters } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
+import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -121,7 +122,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -266,7 +267,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				category: 'common',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -295,7 +296,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {
 						ok: {
@@ -506,7 +507,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -674,7 +675,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],
@@ -689,7 +690,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -765,7 +766,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -787,7 +788,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -816,7 +817,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],
@@ -829,7 +830,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],

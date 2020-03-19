@@ -13,11 +13,6 @@ import { switchToBlockType } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import { Group, Ungroup } from './icons';
-
 export function ConvertToGroupButton( {
 	onConvertToGroup,
 	onConvertFromGroup,
@@ -27,12 +22,12 @@ export function ConvertToGroupButton( {
 	return (
 		<Fragment>
 			{ isGroupable && (
-				<MenuItem icon={ Group } onClick={ onConvertToGroup }>
+				<MenuItem onClick={ onConvertToGroup }>
 					{ _x( 'Group', 'verb' ) }
 				</MenuItem>
 			) }
 			{ isUngroupable && (
-				<MenuItem icon={ Ungroup } onClick={ onConvertFromGroup }>
+				<MenuItem onClick={ onConvertFromGroup }>
 					{ _x(
 						'Ungroup',
 						'Ungrouping blocks from within a Group block back into individual blocks within the Editor '

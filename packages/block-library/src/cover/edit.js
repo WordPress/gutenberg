@@ -41,6 +41,7 @@ import { cover as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import {
+	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
@@ -159,44 +160,6 @@ function ResizableCover( {
 	);
 }
 
-function onCoverSelectMedia( setAttributes ) {
-	return ( media ) => {
-		if ( ! media || ! media.url ) {
-			setAttributes( { url: undefined, id: undefined } );
-			return;
-		}
-		let mediaType;
-		// for media selections originated from a file upload.
-		if ( media.media_type ) {
-			if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
-				mediaType = IMAGE_BACKGROUND_TYPE;
-			} else {
-				// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
-				// Videos contain the media type of 'file' in the object returned from the rest api.
-				mediaType = VIDEO_BACKGROUND_TYPE;
-			}
-		} else {
-			// for media selections originated from existing files in the media library.
-			if (
-				media.type !== IMAGE_BACKGROUND_TYPE &&
-				media.type !== VIDEO_BACKGROUND_TYPE
-			) {
-				return;
-			}
-			mediaType = media.type;
-		}
-
-		setAttributes( {
-			url: media.url,
-			id: media.id,
-			backgroundType: mediaType,
-			...( mediaType === VIDEO_BACKGROUND_TYPE
-				? { focalPoint: undefined, hasParallax: undefined }
-				: {} ),
-		} );
-	};
-}
-
 /**
  * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
  * background is dark or not.
@@ -258,6 +221,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		id,
 		backgroundType,
 		dimRatio,
 		focalPoint,
@@ -270,7 +234,7 @@ function CoverEdit( {
 		gradientValue,
 		setGradient,
 	} = __experimentalUseGradient();
-	const onSelectMedia = onCoverSelectMedia( setAttributes );
+	const onSelectMedia = attributesFromMedia( setAttributes );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -315,6 +279,7 @@ function CoverEdit( {
 			<BlockControls>
 				{ hasBackground && (
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ url }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*,video/*"
@@ -327,7 +292,7 @@ function CoverEdit( {
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 							<ToggleControl
-								label={ __( 'Fixed Background' ) }
+								label={ __( 'Fixed background' ) }
 								checked={ hasParallax }
 								onChange={ toggleParallax }
 							/>
@@ -335,7 +300,7 @@ function CoverEdit( {
 						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
 							! hasParallax && (
 								<FocalPointPicker
-									label={ __( 'Focal Point Picker' ) }
+									label={ __( 'Focal point picker' ) }
 									url={ url }
 									value={ focalPoint }
 									onChange={ ( newFocalPoint ) =>
@@ -388,13 +353,13 @@ function CoverEdit( {
 									gradientValue,
 									onColorChange: setOverlayColor,
 									onGradientChange: setGradient,
-									label: __( 'Overlay' ),
+									label: __( 'Color' ),
 								},
 							] }
 						>
 							{ !! url && (
 								<RangeControl
-									label={ __( 'Background Opacity' ) }
+									label={ __( 'Background opacity' ) }
 									value={ dimRatio }
 									onChange={ ( newDimRation ) =>
 										setAttributes( {

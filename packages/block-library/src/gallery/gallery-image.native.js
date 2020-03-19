@@ -14,16 +14,16 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { isURL } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import {
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from '@wordpress/react-native-bridge';
 import { close, arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**

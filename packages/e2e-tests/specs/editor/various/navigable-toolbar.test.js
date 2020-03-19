@@ -50,11 +50,12 @@ describe.each( [
 	if ( ! isUnifiedToolbar ) {
 		it( 'should not scroll page', async () => {
 			while (
-				await page.evaluate(
-					() =>
-						wp.dom.getScrollContainer( document.activeElement )
-							.scrollTop === 0
-				)
+				await page.evaluate( () => {
+					const scrollable = wp.dom.getScrollContainer(
+						document.activeElement
+					);
+					return ! scrollable || scrollable.scrollTop === 0;
+				} )
 			) {
 				await page.keyboard.press( 'Enter' );
 			}

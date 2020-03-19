@@ -53,12 +53,27 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	z-index: z-index(".components-popover.block-editor-rich-text__inline-format-toolbar");
 
 	.components-popover__content {
+		width: auto;
 		min-width: auto;
-		margin-bottom: 6px;
+		margin-bottom: $grid-unit;
+		box-shadow: none;
+
+		// Block UI appearance.
+		border: $border-width solid $dark-gray-primary;
+		border-radius: $radius-block-ui;
+		background-color: $white;
 	}
 
 	.components-toolbar {
 		// The popover already provides a border.
 		border: none;
+	}
+
+	.components-toolbar__control,
+	.components-dropdown-menu__toggle {
+		min-width: $block-toolbar-height;
+		min-height: $block-toolbar-height;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 }

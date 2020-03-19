@@ -28,8 +28,10 @@ class Sandbox extends Component {
 		this.trySandbox();
 	}
 
-	componentDidUpdate() {
-		this.trySandbox();
+	componentDidUpdate( prevProps ) {
+		const forceRerender = prevProps.html !== this.props.html;
+
+		this.trySandbox( forceRerender );
 	}
 
 	isFrameAccessible() {
@@ -69,13 +71,16 @@ class Sandbox extends Component {
 		}
 	}
 
-	trySandbox() {
+	trySandbox( forceRerender = false ) {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
 
 		const body = this.iframe.current.contentDocument.body;
-		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
+		if (
+			! forceRerender &&
+			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+		) {
 			return;
 		}
 

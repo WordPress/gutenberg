@@ -1,10 +1,14 @@
 /**
+ * External dependencies
+ */
+import React from 'react';
+
+/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Picker } from '@wordpress/components';
-import { update } from '@wordpress/icons';
+import { update, brush } from '@wordpress/icons';
 import {
 	requestMediaEditor,
 	mediaSources,
@@ -19,7 +23,7 @@ const editOption = {
 	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
 	types: [ MEDIA_TYPE_IMAGE ],
-	icon: 'admin-appearance',
+	icon: brush,
 };
 
 const replaceOption = {
@@ -32,7 +36,7 @@ const replaceOption = {
 
 const options = [ editOption, replaceOption ];
 
-export class MediaEdit extends Component {
+export class MediaEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );

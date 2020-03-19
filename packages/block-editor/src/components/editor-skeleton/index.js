@@ -6,8 +6,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useEffect } from '@wordpress/element';
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+function useHTMLClass( className ) {
+	useEffect( () => {
+		const element =
+			document && document.querySelector( `html:not(.${ className }` );
+		if ( ! element ) {
+			return;
+		}
+		element.classList.toggle( className );
+		return () => {
+			element.classList.toggle( className );
+		};
+	}, [ className ] );
+}
 
 function EditorSkeleton( {
 	footer,
@@ -17,17 +32,17 @@ function EditorSkeleton( {
 	publish,
 	className,
 } ) {
+	useHTMLClass( 'block-editor-editor-skeleton__html-container' );
 	return (
 		<div
 			className={ classnames(
 				className,
-				'block-editor-editor-skeleton',
-				'edit-post-editor-regions'
+				'block-editor-editor-skeleton'
 			) }
 		>
 			{ !! header && (
 				<div
-					className="block-editor-editor-skeleton__header edit-post-editor-regions__header"
+					className="block-editor-editor-skeleton__header"
 					role="region"
 					/* translators: accessibility text for the top bar landmark region. */
 					aria-label={ __( 'Editor top bar' ) }
@@ -36,9 +51,9 @@ function EditorSkeleton( {
 					{ header }
 				</div>
 			) }
-			<div className="block-editor-editor-skeleton__body edit-post-editor-regions__body">
+			<div className="block-editor-editor-skeleton__body">
 				<div
-					className="block-editor-editor-skeleton__content edit-post-editor-regions__content"
+					className="block-editor-editor-skeleton__content"
 					role="region"
 					/* translators: accessibility text for the content landmark region. */
 					aria-label={ __( 'Editor content' ) }
@@ -48,7 +63,7 @@ function EditorSkeleton( {
 				</div>
 				{ !! sidebar && (
 					<div
-						className="block-editor-editor-skeleton__sidebar edit-post-editor-regions__sidebar"
+						className="block-editor-editor-skeleton__sidebar"
 						role="region"
 						/* translators: accessibility text for the settings landmark region. */
 						aria-label={ __( 'Editor settings' ) }
@@ -59,7 +74,7 @@ function EditorSkeleton( {
 				) }
 				{ !! publish && (
 					<div
-						className="block-editor-editor-skeleton__publish edit-post-editor-regions__publish"
+						className="block-editor-editor-skeleton__publish"
 						role="region"
 						/* translators: accessibility text for the publish landmark region. */
 						aria-label={ __( 'Editor publish' ) }
@@ -71,7 +86,7 @@ function EditorSkeleton( {
 			</div>
 			{ !! footer && (
 				<div
-					className="block-editor-editor-skeleton__footer edit-post-editor-regions__footer"
+					className="block-editor-editor-skeleton__footer"
 					role="region"
 					/* translators: accessibility text for the footer landmark region. */
 					aria-label={ __( 'Editor footer' ) }

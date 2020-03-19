@@ -30,6 +30,7 @@ module.exports = async function( {
 		main: 'build/index.js',
 		scripts: {
 			build: 'wp-scripts build',
+			'format:js': 'wp-scripts format-js',
 			'lint:css': 'wp-scripts lint-style',
 			'lint:js': 'wp-scripts lint-js',
 			start: 'wp-scripts start',
@@ -40,6 +41,12 @@ module.exports = async function( {
 	info( '' );
 	info( 'Installing packages. It might take a couple of minutes.' );
 	await command( 'npm install @wordpress/scripts --save-dev', {
+		cwd,
+	} );
+
+	info( '' );
+	info( 'Formatting JavaScript files.' );
+	await command( 'npm run format:js', {
 		cwd,
 	} );
 

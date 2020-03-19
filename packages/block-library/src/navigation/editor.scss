@@ -50,9 +50,9 @@ $navigation-item-height: 46px;
 		height: 28px;
 
 		.block-editor-button-block-appender {
-			padding: $grid-size;
-			padding-bottom: $grid-size-small;
-			padding-top: $grid-size-small;
+			padding: $grid-unit-10;
+			padding-bottom: $grid-unit-05;
+			padding-top: $grid-unit-05;
 			outline: none;
 			background: none;
 		}
@@ -65,7 +65,7 @@ $navigation-item-height: 46px;
 }
 
 .wp-block-navigation__inserter-content {
-	padding: $grid-size-large;
+	padding: $grid-unit-20;
 }
 
 /**

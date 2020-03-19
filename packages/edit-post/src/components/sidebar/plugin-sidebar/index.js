@@ -6,6 +6,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
 import { compose } from '@wordpress/compose';
+import { starEmpty, starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -48,7 +49,7 @@ function PluginSidebar( props ) {
 					<strong>{ title }</strong>
 					{ isPinnable && (
 						<Button
-							icon={ isPinned ? 'star-filled' : 'star-empty' }
+							icon={ isPinned ? starFilled : starEmpty }
 							label={
 								isPinned
 									? __( 'Unpin from toolbar' )

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, pickBy } from 'lodash';
+import { get, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { Component, RawHTML } from '@wordpress/element';
 import {
+	BaseControl,
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -22,8 +23,14 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
-import { InspectorControls, BlockControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	BlockAlignmentToolbar,
+	BlockControls,
+	__experimentalImageSizeControl as ImageSizeControl,
+} from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
+import { pin, list, grid } from '@wordpress/icons';
 
 /**
  * Module Constants
@@ -63,9 +70,17 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, latestPosts } = this.props;
+		const {
+			attributes,
+			setAttributes,
+			imageSizeOptions,
+			latestPosts,
+			defaultImageWidth,
+			defaultImageHeight,
+		} = this.props;
 		const { categoriesList } = this.state;
 		const {
+			displayFeaturedImage,
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
@@ -76,13 +91,17 @@ class LatestPostsEdit extends Component {
 			categories,
 			postsToShow,
 			excerptLength,
+			featuredImageAlign,
+			featuredImageSizeSlug,
+			featuredImageSizeWidth,
+			featuredImageSizeHeight,
 		} = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
 				<PanelBody title={ __( 'Post content settings' ) }>
 					<ToggleControl
-						label={ __( 'Post Content' ) }
+						label={ __( 'Post content' ) }
 						checked={ displayPostContent }
 						onChange={ ( value ) =>
 							setAttributes( { displayPostContent: value } )
@@ -95,7 +114,7 @@ class LatestPostsEdit extends Component {
 							options={ [
 								{ label: __( 'Excerpt' ), value: 'excerpt' },
 								{
-									label: __( 'Full Post' ),
+									label: __( 'Full post' ),
 									value: 'full_post',
 								},
 							] }
@@ -128,6 +147,62 @@ class LatestPostsEdit extends Component {
 							setAttributes( { displayPostDate: value } )
 						}
 					/>
+				</PanelBody>
+
+				<PanelBody title={ __( 'Featured image settings' ) }>
+					<ToggleControl
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ ( value ) =>
+							setAttributes( { displayFeaturedImage: value } )
+						}
+					/>
+					{ displayFeaturedImage && (
+						<>
+							<ImageSizeControl
+								onChange={ ( value ) => {
+									const newAttrs = {};
+									if ( value.hasOwnProperty( 'width' ) ) {
+										newAttrs.featuredImageSizeWidth =
+											value.width;
+									}
+									if ( value.hasOwnProperty( 'height' ) ) {
+										newAttrs.featuredImageSizeHeight =
+											value.height;
+									}
+									setAttributes( newAttrs );
+								} }
+								slug={ featuredImageSizeSlug }
+								width={ featuredImageSizeWidth }
+								height={ featuredImageSizeHeight }
+								imageWidth={ defaultImageWidth }
+								imageHeight={ defaultImageHeight }
+								imageSizeOptions={ imageSizeOptions }
+								onChangeImage={ ( value ) =>
+									setAttributes( {
+										featuredImageSizeSlug: value,
+										featuredImageSizeWidth: undefined,
+										featuredImageSizeHeight: undefined,
+									} )
+								}
+							/>
+							<BaseControl>
+								<BaseControl.VisualLabel>
+									{ __( 'Image alignment' ) }
+								</BaseControl.VisualLabel>
+								<BlockAlignmentToolbar
+									value={ featuredImageAlign }
+									onChange={ ( value ) =>
+										setAttributes( {
+											featuredImageAlign: value,
+										} )
+									}
+									controls={ [ 'left', 'center', 'right' ] }
+									isCollapsed={ false }
+								/>
+							</BaseControl>
+						</>
+					) }
 				</PanelBody>
 
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
@@ -179,10 +254,7 @@ class LatestPostsEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder
-						icon="admin-post"
-						label={ __( 'Latest Posts' ) }
-					>
+					<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
 						{ ! Array.isArray( latestPosts ) ? (
 							<Spinner />
 						) : (
@@ -201,13 +273,13 @@ class LatestPostsEdit extends Component {
 
 		const layoutControls = [
 			{
-				icon: 'list-view',
+				icon: list,
 				title: __( 'List view' ),
 				onClick: () => setAttributes( { postLayout: 'list' } ),
 				isActive: postLayout === 'list',
 			},
 			{
-				icon: 'grid-view',
+				icon: grid,
 				title: __( 'Grid view' ),
 				onClick: () => setAttributes( { postLayout: 'grid' } ),
 				isActive: postLayout === 'grid',
@@ -231,17 +303,44 @@ class LatestPostsEdit extends Component {
 					} ) }
 				>
 					{ displayPosts.map( ( post, i ) => {
-						const titleTrimmed = post.title.rendered.trim();
+						const titleTrimmed = invoke( post, [
+							'title',
+							'rendered',
+							'trim',
+						] );
 						let excerpt = post.excerpt.rendered;
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
+
 						excerpt =
 							excerptElement.textContent ||
 							excerptElement.innerText ||
 							'';
+
+						const imageSourceUrl = post.featuredImageSourceUrl;
+
+						const imageClasses = classnames( {
+							'wp-block-latest-posts__featured-image': true,
+							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+						} );
+
 						return (
 							<li key={ i }>
+								{ displayFeaturedImage && (
+									<div className={ imageClasses }>
+										{ imageSourceUrl && (
+											<img
+												src={ imageSourceUrl }
+												alt=""
+												style={ {
+													maxWidth: featuredImageSizeWidth,
+													maxHeight: featuredImageSizeHeight,
+												} }
+											/>
+										) }
+									</div>
+								) }
 								<a
 									href={ post.link }
 									target="_blank"
@@ -314,8 +413,16 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const { getEntityRecords } = select( 'core' );
+	const {
+		featuredImageSizeSlug,
+		postsToShow,
+		order,
+		orderBy,
+		categories,
+	} = props.attributes;
+	const { getEntityRecords, getMedia } = select( 'core' );
+	const { getSettings } = select( 'core/block-editor' );
+	const { imageSizes, imageDimensions } = getSettings();
 	const latestPostsQuery = pickBy(
 		{
 			categories,
@@ -325,7 +432,37 @@ export default withSelect( ( select, props ) => {
 		},
 		( value ) => ! isUndefined( value )
 	);
+
+	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => slug !== 'full' )
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+
 	return {
-		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
+		defaultImageWidth: imageDimensions[ featuredImageSizeSlug ].width,
+		defaultImageHeight: imageDimensions[ featuredImageSizeSlug ].height,
+		imageSizeOptions,
+		latestPosts: ! Array.isArray( posts )
+			? posts
+			: posts.map( ( post ) => {
+					if ( post.featured_media ) {
+						const image = getMedia( post.featured_media );
+						let url = get(
+							image,
+							[
+								'media_details',
+								'sizes',
+								featuredImageSizeSlug,
+								'source_url',
+							],
+							null
+						);
+						if ( ! url ) {
+							url = get( image, 'source_url', null );
+						}
+						return { ...post, featuredImageSourceUrl: url };
+					}
+					return post;
+			  } ),
 	};
 } )( LatestPostsEdit );

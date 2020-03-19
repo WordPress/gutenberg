@@ -11,6 +11,11 @@ import {
 /**
  * WordPress dependencies
  */
+import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
 import { Icon, Button, ToolbarGroup, withNotices } from '@wordpress/components';
 import {
 	BlockControls,
@@ -26,12 +31,6 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from '@wordpress/react-native-bridge';
 import { pencil } from '@wordpress/icons';
 
 /**

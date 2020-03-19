@@ -81,24 +81,44 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @param array $block The root block to start traversing from.
  */
 function create_auto_draft_for_template_part_block( $block ) {
-	if ( 'core/template-part' === $block['blockName'] && ! isset( $block['attrs']['id'] ) ) {
-		$template_part_file_path =
-			get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
-		if ( ! file_exists( $template_part_file_path ) ) {
-			return;
+	global $_wp_current_template_part_ids;
+
+	if ( 'core/template-part' === $block['blockName'] ) {
+		if ( ! isset( $block['attrs']['postId'] ) ) {
+			$template_part_file_path =
+				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+			if ( ! file_exists( $template_part_file_path ) ) {
+				if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+					$template_part_file_path =
+						dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
+					if ( ! file_exists( $template_part_file_path ) ) {
+						return;
+					}
+				} else {
+					return;
+				}
+			}
+			$template_part_id = wp_insert_post(
+				array(
+					'post_content' => file_get_contents( $template_part_file_path ),
+					'post_title'   => $block['attrs']['slug'],
+					'post_status'  => 'auto-draft',
+					'post_type'    => 'wp_template_part',
+					'post_name'    => $block['attrs']['slug'],
+					'meta_input'   => array(
+						'theme' => $block['attrs']['theme'],
+					),
+				)
+			);
+		} else {
+			$template_part_id = $block['attrs']['postId'];
 		}
-		wp_insert_post(
-			array(
-				'post_content' => file_get_contents( $template_part_file_path ),
-				'post_title'   => ucfirst( $block['attrs']['slug'] ),
-				'post_status'  => 'auto-draft',
-				'post_type'    => 'wp_template_part',
-				'post_name'    => $block['attrs']['slug'],
-				'meta_input'   => array(
-					'theme' => $block['attrs']['theme'],
-				),
-			)
-		);
+
+		if ( isset( $_wp_current_template_part_ids ) ) {
+			$_wp_current_template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
+		} else {
+			$_wp_current_template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
+		}
 	}
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
@@ -114,7 +134,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * @return string Path to the canvas file to include.
  */
 function gutenberg_find_template( $template_file ) {
-	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_name, $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -173,7 +193,7 @@ function gutenberg_find_template( $template_file ) {
 		$post_name             = basename( $higher_priority_block_template_path, '.html' );
 		$current_template_post = array(
 			'post_content' => file_get_contents( $higher_priority_block_template_path ),
-			'post_title'   => ucfirst( $post_name ),
+			'post_title'   => $post_name,
 			'post_status'  => 'auto-draft',
 			'post_type'    => 'wp_template',
 			'post_name'    => $post_name,
@@ -192,6 +212,14 @@ function gutenberg_find_template( $template_file ) {
 		}
 	}
 
+	if ( isset( $_GET['_wp-find-template'] ) ) {
+		if ( $current_template_post ) {
+			wp_send_json_success( $current_template_post );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+		}
+	}
+
 	if ( $current_template_post ) {
 		if ( is_admin() ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
@@ -199,7 +227,8 @@ function gutenberg_find_template( $template_file ) {
 			}
 		}
 		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = $current_template_post->post_content;
+		$_wp_current_template_name    = $current_template_post->post_name;
+		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
 	}
 
 	// Add extra hooks for template canvas.

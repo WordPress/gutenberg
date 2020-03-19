@@ -31,7 +31,7 @@
 
 .components-notice__content {
 	flex-grow: 1;
-	margin: $grid-size-small #{ $icon-button-size-small + $border-width } $grid-size-small 0;
+	margin: $grid-unit-05 #{ $icon-button-size-small + $border-width } $grid-unit-05 0;
 }
 
 .components-notice__action.components-button {
@@ -70,8 +70,8 @@
 	z-index: z-index(".components-notice-list");
 
 	.components-notice__content {
-		margin-top: $grid-size + $grid-size-small;
-		margin-bottom: $grid-size + $grid-size-small;
+		margin-top: $grid-unit-15;
+		margin-bottom: $grid-unit-15;
 		line-height: 1.6;
 	}
 

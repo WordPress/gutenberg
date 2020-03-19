@@ -360,6 +360,7 @@ export class ImageEdit extends Component {
 				/>
 				{ url && (
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ url }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*"
@@ -445,7 +446,7 @@ export class ImageEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Image settings' ) }>
 						<TextareaControl
-							label={ __( 'Alt Text (Alternative Text)' ) }
+							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ this.updateAlt }
 							help={
@@ -476,7 +477,7 @@ export class ImageEdit extends Component {
 				</InspectorControls>
 				<InspectorAdvancedControls>
 					<TextControl
-						label={ __( 'Title Attribute' ) }
+						label={ __( 'Title attribute' ) }
 						value={ title || '' }
 						onChange={ this.onSetTitle }
 						help={

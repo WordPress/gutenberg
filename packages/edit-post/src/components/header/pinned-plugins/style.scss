@@ -21,8 +21,8 @@
 	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
 	.components-button:not(.is-pressed) svg,
 	.components-button:not(.is-pressed) svg * {
-		stroke: $dark-gray-500;
-		fill: $dark-gray-500;
+		stroke: $dark-gray-primary;
+		fill: $dark-gray-primary;
 		stroke-width: 0; // !important is omitted here, so stroke-only icons can override easily.
 	}
 
@@ -38,8 +38,8 @@
 
 	.components-button:hover svg,
 	.components-button:hover svg * {
-		stroke: $dark-gray-900 !important;
-		fill: $dark-gray-900 !important;
+		stroke: $blue-medium-focus !important;
+		fill: $blue-medium-focus !important;
 		stroke-width: 0; // !important is omitted here, so stroke-only icons can override easily.
 	}
 }

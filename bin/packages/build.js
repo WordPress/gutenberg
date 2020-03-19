@@ -132,7 +132,6 @@ if ( files.length ) {
 				`**/benchmark/**`,
 				`**/{__mocks__,__tests__,test}/**`,
 				`**/{storybook,stories}/**`,
-				`**/react-native-*/**`,
 			],
 			onlyFiles: true,
 		}

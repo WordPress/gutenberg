@@ -181,7 +181,7 @@ describe( 'Reusable blocks', () => {
 
 		// Check that its content is up to date
 		const text = await page.$eval(
-			'.block-editor-block-list__block[data-type="core/paragraph"] p',
+			'.block-editor-block-list__block[data-type="core/paragraph"]',
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );

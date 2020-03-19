@@ -28,7 +28,12 @@ function gutenberg_edit_site_page() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $_wp_current_template_id;
+	global
+		$_wp_current_template_id,
+		$_wp_current_template_name,
+		$_wp_current_template_content,
+		$_wp_current_template_hierarchy,
+		$_wp_current_template_part_ids;
 	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook ) {
 		return;
 	}
@@ -74,11 +79,58 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
-	// Get root template by trigerring `./template-loader.php`'s logic.
+	// Get all templates by triggering `./template-loader.php`'s logic.
+	$template_getters  = array(
+		'get_embed_template',
+		'get_404_template',
+		'get_search_template',
+		'get_home_template',
+		'get_privacy_policy_template',
+		'get_post_type_archive_template',
+		'get_taxonomy_template',
+		'get_attachment_template',
+		'get_single_template',
+		'get_page_template',
+		'get_singular_template',
+		'get_category_template',
+		'get_tag_template',
+		'get_author_template',
+		'get_date_template',
+		'get_archive_template',
+	);
+	$template_ids      = array();
+	$template_part_ids = array();
+	foreach ( $template_getters as $template_getter ) {
+		call_user_func( $template_getter );
+		apply_filters( 'template_include', null );
+		if ( isset( $_wp_current_template_id ) ) {
+			$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+		}
+		if ( isset( $_wp_current_template_part_ids ) ) {
+			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+		}
+		$_wp_current_template_id        = null;
+		$_wp_current_template_name      = null;
+		$_wp_current_template_content   = null;
+		$_wp_current_template_hierarchy = null;
+		$_wp_current_template_part_ids  = null;
+	}
 	get_front_page_template();
 	get_index_template();
 	apply_filters( 'template_include', null );
-	$settings['templateId'] = $_wp_current_template_id;
+	$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+	if ( isset( $_wp_current_template_part_ids ) ) {
+		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+	}
+	$settings['templateId']      = $_wp_current_template_id;
+	$settings['templateType']    = 'wp_template';
+	$settings['templateIds']     = array_values( $template_ids );
+	$settings['templatePartIds'] = array_values( $template_part_ids );
+
+	// This is so other parts of the code can hook their own settings.
+	// Example: Global Styles.
+	global $post;
+	$settings = apply_filters( 'block_editor_settings', $settings, $post );
 
 	// Initialize editor.
 	wp_add_inline_script(

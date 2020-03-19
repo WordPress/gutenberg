@@ -17,6 +17,7 @@ import { withSelect } from '@wordpress/data';
 import { InspectorControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { pin } from '@wordpress/icons';
 
 class CategoriesEdit extends Component {
 	constructor() {
@@ -176,17 +177,17 @@ class CategoriesEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Categories settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
 					/>
 					<ToggleControl
-						label={ __( 'Show Hierarchy' ) }
+						label={ __( 'Show hierarchy' ) }
 						checked={ showHierarchy }
 						onChange={ this.toggleShowHierarchy }
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ this.toggleShowPostCounts }
 					/>
@@ -198,7 +199,7 @@ class CategoriesEdit extends Component {
 			return (
 				<>
 					{ inspectorControls }
-					<Placeholder icon="admin-post" label={ __( 'Categories' ) }>
+					<Placeholder icon={ pin } label={ __( 'Categories' ) }>
 						<Spinner />
 					</Placeholder>
 				</>

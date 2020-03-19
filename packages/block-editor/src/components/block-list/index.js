@@ -14,7 +14,6 @@ import { useRef } from '@wordpress/element';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import __experimentalBlockListFooter from '../block-list-footer';
 import RootContainer from './root-container';
 import useBlockDropZone from '../block-drop-zone';
 
@@ -77,6 +76,9 @@ function BlockList( {
 		element: ref,
 		rootClientId,
 	} );
+	const __experimentalContainerProps = rootClientId
+		? {}
+		: { hasPopover: __experimentalUIParts.hasPopover };
 
 	return (
 		<Container
@@ -85,7 +87,7 @@ function BlockList( {
 				'block-editor-block-list__layout',
 				className
 			) }
-			hasPopover={ __experimentalUIParts.hasPopover }
+			{ ...__experimentalContainerProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
@@ -105,7 +107,7 @@ function BlockList( {
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
-							animateOnChange={ index }
+							index={ index }
 							enableAnimation={ enableAnimation }
 							hasSelectedUI={
 								__experimentalUIParts.hasSelectedUI
@@ -126,7 +128,6 @@ function BlockList( {
 					targetClientId === null ? 'is-drop-target' : undefined
 				}
 			/>
-			<__experimentalBlockListFooter.Slot />
 		</Container>
 	);
 }

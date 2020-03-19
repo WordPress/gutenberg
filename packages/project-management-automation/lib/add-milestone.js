@@ -41,7 +41,8 @@ async function addMilestone( payload, octokit ) {
 		return;
 	}
 
-	const [ , prNumber ] = payload.commits[ 0 ].message.match( /\(#(\d+)\)$/m );
+	const match = payload.commits[ 0 ].message.match( /\(#(\d+)\)$/m );
+	const prNumber = match && match[ 1 ];
 	if ( ! prNumber ) {
 		debug( 'add-milestone: Commit is not a squashed PR. Aborting' );
 		return;

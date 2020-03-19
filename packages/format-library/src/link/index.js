@@ -98,6 +98,7 @@ export const link = {
 
 			stopAddingLink() {
 				this.setState( { addingLink: false } );
+				this.props.onFocus();
 			}
 
 			onRemoveFormat() {
@@ -113,7 +114,6 @@ export const link = {
 					activeAttributes,
 					value,
 					onChange,
-					onFocus,
 				} = this.props;
 
 				return (
@@ -158,7 +158,6 @@ export const link = {
 								activeAttributes={ activeAttributes }
 								value={ value }
 								onChange={ onChange }
-								onFocus={ onFocus }
 							/>
 						) }
 					</>

@@ -25,15 +25,12 @@ export function ReusableBlockConvertButton( {
 	return (
 		<>
 			{ ! isReusable && (
-				<MenuItem
-					icon="controls-repeat"
-					onClick={ onConvertToReusable }
-				>
+				<MenuItem onClick={ onConvertToReusable }>
 					{ __( 'Add to Reusable blocks' ) }
 				</MenuItem>
 			) }
 			{ isReusable && (
-				<MenuItem icon="controls-repeat" onClick={ onConvertToStatic }>
+				<MenuItem onClick={ onConvertToStatic }>
 					{ __( 'Convert to Regular Block' ) }
 				</MenuItem>
 			) }

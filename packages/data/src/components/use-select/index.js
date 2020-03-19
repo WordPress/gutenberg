@@ -114,6 +114,9 @@ export default function useSelect( _mapSelect, deps ) {
 			errorMessage += 'Original stack trace:';
 
 			throw new Error( errorMessage );
+		} else {
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
 		}
 	}
 

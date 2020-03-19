@@ -1,5 +1,24 @@
 ## Master
 
+## 0.8.3 (2020-02-26)
+
+### Bug Fixes
+
+- Fixed buggy check for minimum system requirements when run with `npx` and `npm init` ([#20461](https://github.com/WordPress/gutenberg/pull/20461)).
+
+## 0.8.1 (2020-02-25)
+
+### Bug Fixes
+
+- Added error message when minimum system requirements not met ([#20398](https://github.com/WordPress/gutenberg/pull/20398/)).
+- Corrected the minimum `npm` version required to align with `@wordpress/scripts` package used internally ([#20398](https://github.com/WordPress/gutenberg/pull/20398/)).
+
+## 0.8.0 (2020-02-21)
+
+### New Features
+
+- Added support for `format:js` script to the block scaffolded with ESNext template ([#20335](https://github.com/WordPress/gutenberg/pull/20335)).
+
 ## 0.6.0 (2020-02-04)
 
 ### Enhancements

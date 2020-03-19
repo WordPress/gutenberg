@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const CliError = require( './cli-error' );
+const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 
 const namespace = 'create-block';
@@ -60,7 +60,7 @@ const templates = {
 
 const getTemplate = ( templateName ) => {
 	if ( ! templates[ templateName ] ) {
-		throw new CliError(
+		throw new CLIError(
 			`Invalid template type name. Allowed values: ${ Object.keys(
 				templates
 			).join( ', ' ) }.`

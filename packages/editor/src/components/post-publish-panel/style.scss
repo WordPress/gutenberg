@@ -117,7 +117,7 @@
 }
 
 .post-publish-panel__postpublish-post-address {
-	margin-bottom: $grid-size-large;
+	margin-bottom: $grid-unit-20;
 
 	input[readonly] {
 		padding: 10px;
@@ -132,7 +132,7 @@
 }
 
 .post-publish-panel__postpublish-subheader {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 }
 
 .post-publish-panel__tip {

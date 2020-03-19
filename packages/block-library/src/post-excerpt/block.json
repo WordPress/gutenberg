@@ -1,4 +1,17 @@
 {
 	"name": "core/post-excerpt",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"wordCount": {
+			"type": "number",
+			"default": 55
+		},
+		"moreText": {
+			"type": "string"
+		},
+		"showMoreOnNewLine": {
+			"type": "boolean",
+			"default": true
+		}
+	}
 }

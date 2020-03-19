@@ -160,6 +160,7 @@ function BlockPopover( {
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
+			__unstableBoundaryParent
 			// Allow subpixel positioning for the block movement animation.
 			__unstableAllowVerticalSubpixelPosition={
 				moverDirection !== 'horizontal' && node
@@ -169,6 +170,9 @@ function BlockPopover( {
 			}
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
+			// Popover calculates the width once. Trigger a reset by remounting
+			// the component.
+			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div

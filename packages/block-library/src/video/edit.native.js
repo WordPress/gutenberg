@@ -9,6 +9,11 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import {
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+} from '@wordpress/react-native-bridge';
+import {
 	Icon,
 	ToolbarButton,
 	ToolbarGroup,
@@ -29,11 +34,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from '@wordpress/react-native-bridge';
 import { video as SvgIcon, pencil } from '@wordpress/icons';
 
 /**

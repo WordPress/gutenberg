@@ -29,8 +29,8 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-
 import { __ } from '@wordpress/i18n';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -151,7 +151,7 @@ function Navigation( {
 			<Fragment>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon="menu"
+					icon={ menu }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -162,7 +162,7 @@ function Navigation( {
 						className="wp-block-navigation-placeholder__buttons"
 					>
 						<Button
-							isSecondary
+							isPrimary
 							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }

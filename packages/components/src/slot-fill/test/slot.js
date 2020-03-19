@@ -7,9 +7,7 @@ import ReactTestRenderer from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import Slot from '../slot';
-import Fill from '../fill';
-import Provider from '../context';
+import { Slot, Fill, Provider } from '../';
 
 /**
  * WordPress dependencies
@@ -261,10 +259,6 @@ describe( 'Slot', () => {
 				);
 
 				expect( testRenderer.toJSON() ).toMatchSnapshot();
-
-				expect( testRenderer.getInstance().slots ).toHaveProperty(
-					'egg'
-				);
 			} );
 		}
 	);

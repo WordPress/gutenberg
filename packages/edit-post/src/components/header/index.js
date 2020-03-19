@@ -15,6 +15,7 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import PreviewOptions from '../preview-options';
 
 function Header() {
 	const {
@@ -69,6 +70,10 @@ function Header() {
 						forceIsSaving={ isSaving }
 					/>
 				) }
+				<PreviewOptions
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }

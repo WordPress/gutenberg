@@ -24,6 +24,8 @@ const DEFAULT_NOTICES = [];
  *                                      `info`, `error`, or `warning`. Defaults
  *                                      to `info`.
  * @property {string}  content          Notice message.
+ * @property {string}  spokenMessage    Audibly announced message text used by
+ *                                      assistive technologies.
  * @property {string}  __unstableHTML   Notice message as raw HTML. Intended to
  *                                      serve primarily for compatibility of
  *                                      server-rendered notices, and SHOULD NOT

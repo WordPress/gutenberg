@@ -34,6 +34,11 @@ const { getComputedStyle, Node } = window;
 
 const DEFAULT_COLORS = [];
 
+const COMMON_COLOR_LABELS = {
+	textColor: __( 'Text Color' ),
+	backgroundColor: __( 'Background Color' ),
+};
+
 const resolveContrastCheckerColor = ( color, colorSettings, detectedColor ) => {
 	if ( typeof color === 'function' ) {
 		return color( colorSettings );
@@ -297,8 +302,10 @@ export default function __experimentalUseColors(
 				property = name, // E.g. 'backgroundColor'.
 				className,
 
-				panelLabel = startCase( name ), // E.g. 'Background Color'.
-				componentName = panelLabel.replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
+				panelLabel = colorConfig.label ||
+					COMMON_COLOR_LABELS[ name ] ||
+					startCase( name ), // E.g. 'Background color'.
+				componentName = startCase( name ).replace( /\s/g, '' ), // E.g. 'BackgroundColor'.
 
 				color = colorConfig.color,
 				colors = settingsColors,
