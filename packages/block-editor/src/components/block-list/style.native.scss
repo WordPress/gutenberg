@@ -46,12 +46,17 @@
 	height: 80px;
 }
 
-.paddingToContent {
-	margin-left: - 9;
-	margin-right: - 9;
-	margin-top: 10;
-}
-
 .defaultBlock {
 	margin: $block-edge-to-content;
+}
+
+.defaultAppender {
+	margin: $block-edge-to-content;
+}
+
+.paddingToContent {
+	margin-top: -6;
+	margin-left: $block-edge-to-content / 2;
+	margin-right: $block-edge-to-content / 2;
+	margin-bottom: $block-edge-to-content;
 }
