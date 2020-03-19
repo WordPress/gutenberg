@@ -170,9 +170,9 @@ class RichImage extends Component {
 								position: 'relative',
 								maxWidth: '100%',
 								width: imgSize.naturalWidth,
-								paddingBottom: `${
-									isPortrait ? aspect * 100 : 100 / aspect
-								}%`,
+								paddingBottom: `${ ( 100 *
+									imgSize.naturalHeight ) /
+									imgSize.naturalWidth }%`,
 							} }
 						>
 							<Cropper
