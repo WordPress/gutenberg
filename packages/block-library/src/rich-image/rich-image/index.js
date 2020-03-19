@@ -52,7 +52,7 @@ class RichImage extends Component {
 			isCrop: false,
 			inProgress: null,
 			imageSrc: null,
-			imgSize: { naturalHeight: 0, naturalWidth: 0 },
+			imageSize: { naturalHeight: 0, naturalWidth: 0 },
 			crop: null,
 			position: { x: 0, y: 0 },
 			zoom: 1,
@@ -62,10 +62,6 @@ class RichImage extends Component {
 
 		this.adjustImage = this.adjustImage.bind( this );
 		this.cropImage = this.cropImage.bind( this );
-		this.onCropChange = this.onCropChange.bind( this );
-		this.onZoomChange = this.onZoomChange.bind( this );
-		this.onCropComplete = this.onCropComplete.bind( this );
-		this.onMediaLoaded = this.onMediaLoaded.bind( this );
 	}
 
 	adjustImage( action, attrs ) {
@@ -109,22 +105,6 @@ class RichImage extends Component {
 		} );
 	}
 
-	onCropChange( position ) {
-		this.setState( { position } );
-	}
-
-	onCropComplete( crop ) {
-		this.setState( { crop } );
-	}
-
-	onZoomChange( zoom ) {
-		this.setState( { zoom } );
-	}
-
-	onMediaLoaded( imgSize ) {
-		this.setState( { imgSize } );
-	}
-
 	render() {
 		const {
 			isSelected,
@@ -138,7 +118,7 @@ class RichImage extends Component {
 			position,
 			zoom,
 			aspect,
-			imgSize,
+			imageSize,
 			isPortrait,
 		} = this.state;
 		const { url } = attributes;
@@ -169,10 +149,10 @@ class RichImage extends Component {
 							style={ {
 								position: 'relative',
 								maxWidth: '100%',
-								width: imgSize.naturalWidth,
+								width: imageSize.naturalWidth,
 								paddingBottom: `${ ( 100 *
-									imgSize.naturalHeight ) /
-									imgSize.naturalWidth }%`,
+									imageSize.naturalHeight ) /
+									imageSize.naturalWidth }%`,
 							} }
 						>
 							<Cropper
@@ -181,10 +161,20 @@ class RichImage extends Component {
 								crop={ position }
 								zoom={ zoom }
 								aspect={ isPortrait ? 1 / aspect : aspect }
-								onZoomChange={ this.onZoomChange }
-								onCropChange={ this.onCropChange }
-								onCropComplete={ this.onCropComplete }
-								onMediaLoaded={ this.onMediaLoaded }
+								onCropChange={ ( newPosition ) => {
+									this.setState( { position: newPosition } );
+								} }
+								onCropComplete={ ( newCrop ) => {
+									this.setState( { crop: newCrop } );
+								} }
+								onZoomChange={ ( newZoom ) => {
+									this.setState( { zoom: newZoom } );
+								} }
+								onMediaLoaded={ ( newImageSize ) => {
+									this.setState( {
+										imageSize: newImageSize,
+									} );
+								} }
 							/>
 						</div>
 					) : (
