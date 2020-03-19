@@ -304,6 +304,11 @@ $drag-handle-border: 1px solid rgba(255, 255, 255, 0.7) !default;
 	background-color: #ddd;
 }
 
+.richimage__crop-area {
+	position: relative;
+	max-width: 100%;
+}
+
 .richimage__crop-icon {
 	padding: 0 8px;
 	min-width: 48px;

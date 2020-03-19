@@ -18,6 +18,7 @@ import {
 	Button,
 	Snackbar,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -143,35 +144,47 @@ class RichImage extends Component {
 					) }
 
 					{ isCrop ? (
-						<div
-							style={ {
-								position: 'relative',
-								maxWidth: '100%',
-								width: imageSize.naturalWidth,
-								paddingBottom: `${ ( 100 *
-									imageSize.naturalHeight ) /
-									imageSize.naturalWidth }%`,
-							} }
-						>
-							<Cropper
-								image={ url }
-								disabled={ inProgress }
-								crop={ position }
-								zoom={ zoom }
-								aspect={ isPortrait ? 1 / aspect : aspect }
-								onCropChange={ ( newPosition ) => {
-									this.setState( { position: newPosition } );
+						<div className="richimage__crop-controls">
+							<div
+								className="richimage__crop-area"
+								style={ {
+									width: imageSize.naturalWidth,
+									paddingBottom: `${ ( 100 *
+										imageSize.naturalHeight ) /
+										imageSize.naturalWidth }%`,
 								} }
-								onCropComplete={ ( newCrop ) => {
-									this.setState( { crop: newCrop } );
-								} }
-								onZoomChange={ ( newZoom ) => {
+							>
+								<Cropper
+									image={ url }
+									disabled={ inProgress }
+									crop={ position }
+									zoom={ zoom }
+									aspect={ isPortrait ? 1 / aspect : aspect }
+									onCropChange={ ( newPosition ) => {
+										this.setState( {
+											position: newPosition,
+										} );
+									} }
+									onCropComplete={ ( newCrop ) => {
+										this.setState( { crop: newCrop } );
+									} }
+									onZoomChange={ ( newZoom ) => {
+										this.setState( { zoom: newZoom } );
+									} }
+									onMediaLoaded={ ( newImageSize ) => {
+										this.setState( {
+											imageSize: newImageSize,
+										} );
+									} }
+								/>
+							</div>
+							<RangeControl
+								min={ 1 }
+								max={ 3 }
+								step={ 0.1 }
+								value={ zoom }
+								onChange={ ( newZoom ) => {
 									this.setState( { zoom: newZoom } );
-								} }
-								onMediaLoaded={ ( newImageSize ) => {
-									this.setState( {
-										imageSize: newImageSize,
-									} );
 								} }
 							/>
 						</div>
