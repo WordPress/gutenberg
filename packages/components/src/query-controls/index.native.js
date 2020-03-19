@@ -6,15 +6,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl, FormTokenField } from '../';
+import { RangeControl, SelectControl } from '../';
+import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
-const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 export default function QueryControls( {
-	categorySuggestions,
-	selectedCategories,
+	categoriesList,
+	selectedCategoryId,
 	numberOfItems,
 	order,
 	orderBy,
@@ -28,7 +28,6 @@ export default function QueryControls( {
 	return [
 		onOrderChange && onOrderByChange && (
 			<SelectControl
-				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
 				value={ `${ orderBy }/${ order }` }
 				options={ [
@@ -60,33 +59,28 @@ export default function QueryControls( {
 						onOrderByChange( newOrderBy );
 					}
 				} }
+				{ ...{ separatorType: 'fullWidth' } }
 			/>
 		),
 		onCategoryChange && (
-			<FormTokenField
-				label={ __( 'Categories' ) }
-				value={
-					selectedCategories &&
-					selectedCategories.map( ( item ) => ( {
-						id: item.id,
-						value: item.name || item.value,
-					} ) )
-				}
-				suggestions={ Object.keys( categorySuggestions ) }
+			<CategorySelect
+				categoriesList={ categoriesList }
+				label={ __( 'Category' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
-				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
+				{ ...{ separatorType: 'fullWidth' } }
 			/>
 		),
-
 		onNumberOfItemsChange && (
 			<RangeControl
-				key="query-controls-range-control"
 				label={ __( 'Number of items' ) }
 				value={ numberOfItems }
 				onChange={ onNumberOfItemsChange }
 				min={ minItems }
 				max={ maxItems }
 				required
+				{ ...{ separatorType: 'none' } }
 			/>
 		),
 	];
