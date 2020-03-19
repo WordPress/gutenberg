@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Modal, CheckboxControl } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -26,17 +26,13 @@ import {
 	EnablePluginDocumentSettingPanelOption,
 	EnablePublishSidebarOption,
 	EnablePanelOption,
+	ShowIconLabels,
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( {
-	isModalActive,
-	isViewable,
-	closeModal,
-	toggleIconLabels,
-} ) {
+export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -98,10 +94,7 @@ export function OptionsModal( {
 			</Section>
 			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
 			<Section title={ __( 'Icon Labels' ) }>
-				<CheckboxControl
-					label="Show Icon Labels"
-					onChange={ toggleIconLabels }
-				/>
+				<ShowIconLabels label="Show Icon Labels" />
 			</Section>
 		</Modal>
 	);
