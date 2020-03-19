@@ -44,7 +44,7 @@ export default class EditorPage {
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
-	async getBlockAtPosition( position: number, blockName: string, options: { autoscroll: boolean } = { autoscroll: false } ) {
+	async getBlockAtPosition( blockName: string, position = 1, options: { autoscroll: boolean } = { autoscroll: false } ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
@@ -53,6 +53,7 @@ export default class EditorPage {
 			const lastBlockVisible = await this.getLastBlockVisible();
 			// exit if no block is found
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
+				await lastElementFound.click();
 				return lastElementFound;
 			}
 			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute( this.accessibilityIdKey );
@@ -63,6 +64,7 @@ export default class EditorPage {
 			const lastBlockRow = lastBlockRowMatch && Number( lastBlockRowMatch[ 1 ] );
 			if ( firstBlockRow && position < firstBlockRow ) {
 				if ( firstBlockRow === 1 ) { // we're at the top already stop recursing
+					await lastElementFound.click();
 					return lastElementFound;
 				}
 				// scroll up
@@ -73,6 +75,7 @@ export default class EditorPage {
 			}
 			return this.getBlockAtPosition( position, blockName, options );
 		}
+		await lastElementFound.click();
 		return lastElementFound;
 	}
 
