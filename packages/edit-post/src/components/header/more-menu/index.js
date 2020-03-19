@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -22,9 +27,11 @@ const TOGGLE_PROPS = {
 	tooltipPosition: 'bottom',
 };
 
-const MoreMenu = () => (
+const MoreMenu = ( { showIconLabel } ) => (
 	<DropdownMenu
-		className="edit-post-more-menu"
+		className={ classnames( 'edit-post-more-menu', {
+			'show-icon-label': showIconLabel,
+		} ) }
 		icon={ moreVertical }
 		label={ __( 'More tools & options' ) }
 		popoverProps={ POPOVER_PROPS }

@@ -7,6 +7,17 @@
 		padding: 0 2px;
 	}
 
+	&.show-icon-label {
+		button[aria-label] {
+			display: block;
+			&::after {
+				content: attr(aria-label);
+				display: block;
+				font-size: 12px;
+			}
+		}
+	}
+
 	@include break-small() {
 		margin-left: 0;
 
