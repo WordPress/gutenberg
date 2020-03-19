@@ -48,6 +48,10 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			code: `var number = ''; _nx('Singular', 'Plural', number, 'context', 'foo')`,
 			options: [ { allowedTextDomains: [ 'foo' ] } ],
 		},
+		{
+			code: `i18n.__('Hello World')`,
+			options: [ { allowedTextDomains: [ 'default' ] } ],
+		},
 	],
 	invalid: [
 		{
@@ -143,6 +147,12 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			output: `var number = ''; _nx('Singular', 'Plural', number, 'context')`,
 			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
+		},
+		{
+			code: `i18n.__('Hello World')`,
+			output: `i18n.__('Hello World', 'foo')`,
+			options: [ { allowedTextDomains: [ 'foo' ] } ],
+			errors: [ { messageId: 'missing' } ],
 		},
 	],
 } );

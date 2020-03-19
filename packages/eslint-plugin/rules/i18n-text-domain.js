@@ -62,11 +62,17 @@ module.exports = {
 		return {
 			CallExpression( node ) {
 				const { callee, arguments: args } = node;
-				if ( ! TRANSLATION_FUNCTIONS.includes( callee.name ) ) {
+
+				const functionName =
+					callee.property && callee.property.name
+						? callee.property.name
+						: callee.name;
+
+				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
 					return;
 				}
 
-				const textDomain = getTextDomain( callee.name, args );
+				const textDomain = getTextDomain( functionName, args );
 
 				if ( textDomain === undefined ) {
 					if ( ! allowDefault ) {

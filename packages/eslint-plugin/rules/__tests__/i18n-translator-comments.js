@@ -29,6 +29,11 @@ sprintf(
 	address
 );`,
 		},
+		{
+			code: `
+// translators: %s: Color
+i18n.sprintf( i18n.__( 'Color: %s' ), color );`,
+		},
 	],
 	invalid: [
 		{
@@ -68,6 +73,11 @@ console.log(
 		preference
 	)
 );`,
+			errors: [ { messageId: 'missing' } ],
+		},
+		{
+			code: `
+i18n.sprintf( i18n.__( 'Color: %s' ), color );`,
 			errors: [ { messageId: 'missing' } ],
 		},
 	],

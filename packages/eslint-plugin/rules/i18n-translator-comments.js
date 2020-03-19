@@ -26,11 +26,17 @@ module.exports = {
 					parent,
 					arguments: args,
 				} = node;
-				if ( ! TRANSLATION_FUNCTIONS.includes( callee.name ) ) {
+
+				const functionName =
+					callee.property && callee.property.name
+						? callee.property.name
+						: callee.name;
+
+				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
 					return;
 				}
 
-				const candidates = getTranslateStrings( callee.name, args );
+				const candidates = getTranslateStrings( functionName, args );
 
 				if ( ! candidates ) {
 					return;
