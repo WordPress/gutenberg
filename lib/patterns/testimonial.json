@@ -1,5 +1,0 @@
-{
-  "__file": "wp_block",
-  "title": "Testimonial",
-  "content": "<!-- wp:image {\"align\":\"center\",\"id\":1137,\"width\":113,\"height\":113,\"linkDestination\":\"custom\"} -->\n<div class=\"wp-block-image\"><figure class=\"aligncenter is-resized\"><a href=\"https://pixabay.com/en/idea-icon-light-business-design-1873540/\"><img src=\"https://wpdesignhub.com/designs/basic/055854/team-member-1.png\" alt=\"CC0 by Coffee Bean \nhttps://pixabay.com/en/users/coffeebeanworks-558718/?tab=about\" class=\"wp-image-1137\" width=\"113\" height=\"113\"/></a></figure></div>\n<!-- /wp:image -->\n\n<!-- wp:paragraph {\"align\":\"center\",\"customFontSize\":21} -->\n<p style=\"font-size:21px\" class=\"has-text-align-center\">“These guys are amazing! A very professional team that delivers excellent results every time we come for help. I highly recommend this company for your projects!”</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph {\"align\":\"center\",\"fontSize\":\"small\"} -->\n<p class=\"has-text-align-center has-small-font-size\"><strong>ANNA JANISON</strong><br><em>director at CYKO</em></p>\n<!-- /wp:paragraph -->"
-}

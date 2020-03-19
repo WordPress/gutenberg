@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import { default as Video } from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -21,6 +22,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
 	withColors,
@@ -29,7 +31,7 @@ import {
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { cover as icon } from '@wordpress/icons';
+import { cover as icon, replace } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,12 +43,11 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
-import { EditMediaIcon } from './edit-media-icon';
 
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE ];
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -116,11 +117,7 @@ const Cover = ( {
 				overlayColor && overlayColor.color
 					? overlayColor.color
 					: styles.overlay.color,
-			// Set opacity to 1 while video / theme color support is not available
-			opacity:
-				url && VIDEO_BACKGROUND_TYPE !== backgroundType
-					? dimRatio / 100
-					: 1,
+			opacity: dimRatio / 100,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -143,7 +140,7 @@ const Cover = ( {
 			<ToolbarGroup>
 				<ToolbarButton
 					title={ __( 'Edit cover media' ) }
-					icon={ EditMediaIcon }
+					icon={ replace }
 					onClick={ open }
 				/>
 			</ToolbarGroup>
@@ -207,6 +204,16 @@ const Cover = ( {
 							url={ url }
 						/>
 					) ) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						style={ styles.background }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -249,7 +256,7 @@ const Cover = ( {
 
 				<MediaUpload
 					__experimentalOnlyMediaLibrary
-					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
 					render={ ( { open, getMediaOptions } ) => {
 						return background( open, getMediaOptions );

@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { plusCircle } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,7 +39,7 @@ const defaultRenderToggle = ( {
 	}
 	return (
 		<Button
-			icon={ plusCircle }
+			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
 			onClick={ onToggle }

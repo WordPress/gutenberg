@@ -1,16 +1,5 @@
 .block-editor-format-toolbar {
 	.components-dropdown-menu__toggle {
 		justify-content: center;
-
-
-		// @todo: this should be the same icon as the DownArrow from the mover control.
-		&::after {
-			@include dropdown-arrow();
-
-			// The dropdown is 6px wide. To optically match the icons before it in the inline toolbar, we tweak the paddings.
-			// @todo: once this becomes an actual icon, and not SVG drawn, this should be unnecessary.
-			margin-left: 5px;
-			margin-right: 9px;
-		}
 	}
 }

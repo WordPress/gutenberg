@@ -43,3 +43,15 @@ exports[`Heading should create a paragraph block below when pressing enter at th
 <p></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`Heading should not work with the list input rule 1`] = `
+"<!-- wp:heading -->
+<h2>1. H</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`Heading should work with the format input rules 1`] = `
+"<!-- wp:heading -->
+<h2><code>code</code></h2>
+<!-- /wp:heading -->"
+`;

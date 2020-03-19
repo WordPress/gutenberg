@@ -716,6 +716,14 @@ attributes: {
 alignWide: false,
 ```
 
+-   `defaultStylePicker` (default `true`): When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
+
+```js
+// Remove the Default Style picker.
+defaultStylePicker: false,
+```
+
+
 -   `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js

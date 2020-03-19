@@ -7,7 +7,6 @@ import { getPhotoHtml } from './util';
 /**
  * External dependencies
  */
-import { parse } from 'url';
 import { includes } from 'lodash';
 import classnames from 'classnames/dedupe';
 
@@ -69,7 +68,7 @@ class EmbedPreview extends Component {
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = parse( url ).host.split( '.' );
+		const parsedHost = new URL( url ).host.split( '.' );
 		const parsedHostBaseUrl = parsedHost
 			.splice( parsedHost.length - 2, parsedHost.length - 1 )
 			.join( '.' );

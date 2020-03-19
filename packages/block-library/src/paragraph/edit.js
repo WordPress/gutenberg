@@ -75,7 +75,6 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 
 function ParagraphBlock( {
 	attributes,
-	className,
 	fontSize,
 	mergeBlocks,
 	onReplace,
@@ -153,15 +152,11 @@ function ParagraphBlock( {
 						ref={ ref }
 						identifier="content"
 						tagName={ Block.p }
-						className={ classnames(
-							'wp-block-paragraph',
-							className,
-							{
-								'has-drop-cap': dropCap,
-								[ `has-text-align-${ align }` ]: align,
-								[ fontSize.class ]: fontSize.class,
-							}
-						) }
+						className={ classnames( {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
 						style={ {
 							fontSize: fontSize.size
 								? fontSize.size + 'px'
