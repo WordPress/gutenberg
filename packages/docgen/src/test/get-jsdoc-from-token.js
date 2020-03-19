@@ -1,19 +1,33 @@
+const ts = require( 'typescript' );
+const { join } = require( 'path' );
+
 /**
  * Internal dependencies.
  */
 const getJSDocFromToken = require( '../get-jsdoc-from-token' );
 
 describe( 'JSDoc', () => {
-	it( 'extracts description and tags', () => {
+	const prepare = ( dir ) => {
+		const filePath = join( __dirname, 'fixtures', dir, 'code.js' );
+		const program = ts.createProgram( [ filePath ], {
+			allowJs: true,
+			target: ts.ScriptTarget.ES2020,
+		} );
+
+		const typeChecker = program.getTypeChecker();
+		const sourceFile = program.getSourceFile( filePath );
+
+		return {
+			typeChecker,
+			sourceFile,
+		};
+	};
+
+	it( 'extracts description and tags (from function)', () => {
+		const { typeChecker, sourceFile } = prepare( 'tags-function' );
+
 		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value:
-							'*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
-					},
-				],
-			} )
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
 		).toEqual( {
 			description: 'A function that adds two parameters.',
 			tags: [
@@ -30,7 +44,7 @@ describe( 'JSDoc', () => {
 					description: 'addition',
 				},
 				{
-					title: 'link',
+					title: 'see',
 					description:
 						'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
 				},
@@ -58,16 +72,13 @@ describe( 'JSDoc', () => {
 				},
 			],
 		} );
+	} );
+
+	it( 'extracts description and tags (from variable)', () => {
+		const { typeChecker, sourceFile } = prepare( 'tags-variable' );
 
 		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value:
-							'*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ',
-					},
-				],
-			} )
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
 		).toEqual( {
 			description:
 				'Constant to document the meaning of life,\nthe universe and everything else.',
@@ -79,26 +90,22 @@ describe( 'JSDoc', () => {
 				},
 			],
 		} );
+	} );
+
+	it( 'can extract types that are invalid in JSDoc but valid in TypeScript', () => {
+		const { typeChecker, sourceFile } = prepare( 'tags-ts-definition' );
 
 		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value:
-							'*\n * Function invoking callback after delay with current timestamp in milliseconds since epoch.\n * @param {(timestamp:number)=>void} callback Callback function.\n ',
-					},
-				],
-			} )
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
 		).toEqual( {
 			description:
-				'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
+				'Function invoking callback after delay with current timestamp in milliseconds\nsince epoch.',
 			tags: [
 				{
 					title: 'param',
-					errors: [ 'unexpected token' ],
 					description: 'Callback function.',
 					name: 'callback',
-					type: null,
+					type: '(timestamp: number) => void',
 				},
 			],
 		} );

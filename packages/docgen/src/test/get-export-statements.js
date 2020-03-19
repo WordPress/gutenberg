@@ -40,7 +40,6 @@ describe( 'export in different ways', () => {
 	testExport( 'default-import-default' );
 	testExport( 'default-import-named' );
 	testExport( 'default-named-export', 2 );
-	testExport( 'default-parse-error' );
 	testExport( 'default-undocumented-nocomments' );
 	testExport( 'default-undocumented-oneliner' );
 	testExport( 'default-variable' );
@@ -59,5 +58,6 @@ describe( 'export in different ways', () => {
 	testExport( 'namespace' );
 	testExport( 'namespace-commented' );
 	testExport( 'tags-function' );
+	testExport( 'tags-ts-definition' );
 	testExport( 'tags-variable' );
 } );
