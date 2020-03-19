@@ -169,7 +169,6 @@ export class BlockList extends Component {
 			__experimentalMoverDirection,
 			customOnDelete,
 			containerStyle,
-			disallowRemoveInnerBlocks,
 			columnsSettings,
 		} = this.props;
 
@@ -193,7 +192,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						disallowRemoveInnerBlocks={ disallowRemoveInnerBlocks }
 						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
 						columnsSettings={ columnsSettings }

@@ -146,7 +146,6 @@ function ColumnsEditContainer( {
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					disallowRemoveInnerBlocks
 					columnsSettings={ columnsSettings }
 					customOnAdd={ onAddNextColumn }
 					customOnDelete={ columnCount === 1 && onDelete }
@@ -195,9 +194,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		 */
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
-			const { replaceInnerBlocks, selectBlock } = dispatch(
-				'core/block-editor'
-			);
+			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
@@ -218,16 +215,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 					innerBlocks,
 					previousColumns - newColumns
 				);
-			}
-
-			if ( innerBlocks.length < MIN_COLUMNS_NUMBER ) {
-				innerBlocks = [
-					...innerBlocks,
-					...times( MIN_COLUMNS_NUMBER - innerBlocks.length, () => {
-						return createBlock( 'core/column' );
-					} ),
-				];
-				selectBlock( clientId );
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
