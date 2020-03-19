@@ -13,6 +13,13 @@ export const BASE = {
 	white: '#fff',
 };
 
+/**
+ * TODO: Continue to update values as "G2" design evolves.
+ *
+ * "G2" refers to the movement to advance the interface of the block editor.
+ * https://github.com/WordPress/gutenberg/issues/18667
+
+ */
 export const G2 = {
 	blue: {
 		medium: {
