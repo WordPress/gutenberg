@@ -29,8 +29,10 @@ export const settings = {
 	],
 	example: {
 		attributes: {
-			customBackgroundColor: '#ffffff',
-			customTextColor: '#000000',
+			style: {
+				textColor: '#000000',
+				backgroundColor: '#ffffff',
+			},
 		},
 		innerBlocks: [
 			{
@@ -88,6 +90,8 @@ export const settings = {
 		anchor: true,
 		html: false,
 		lightBlockWrapper: true,
+		__experimentalColor: true,
+		customClassName: false,
 	},
 	transforms: {
 		from: [
