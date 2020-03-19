@@ -277,6 +277,7 @@ function Navigation( {
 								className: 'wp-block-navigation__container',
 							} }
 							__experimentalCaptureToolbars={ true }
+							templateLock={ false }
 						/>
 					</Block.nav>
 				</BackgroundColor>

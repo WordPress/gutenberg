@@ -38,6 +38,7 @@
 		"@wordpress/deprecated": "file:packages/deprecated",
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
+		"@wordpress/edit-navigation": "file:packages/edit-navigation",
 		"@wordpress/edit-post": "file:packages/edit-post",
 		"@wordpress/edit-site": "file:packages/edit-site",
 		"@wordpress/edit-widgets": "file:packages/edit-widgets",
