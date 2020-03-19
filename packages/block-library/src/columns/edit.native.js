@@ -45,8 +45,7 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  * @type {number}
  */
 const DEFAULT_COLUMNS = 2;
-const MIN_COLUMNS_NUMBER = 2;
-const MAX_COLUMNS_NUMBER = 6;
+const MIN_COLUMNS_NUMBER = 1;
 
 function ColumnsEditContainer( {
 	attributes,
@@ -54,20 +53,24 @@ function ColumnsEditContainer( {
 	updateColumns,
 	columnCount,
 	isSelected,
+	onAddNextColumn,
+	onDelete,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsSettings, setColumnsSettings ] = useState( {
-		columnsInRow: 2,
+		columnsInRow: MIN_COLUMNS_NUMBER,
 	} );
 
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
 	useEffect( () => {
-		updateColumns(
-			columnCount,
-			Math.min( MAX_COLUMNS_NUMBER, columnCount || DEFAULT_COLUMNS )
-		);
+		const newColumnCount = ! columnCount ? DEFAULT_COLUMNS : columnCount;
+		updateColumns( columnCount, newColumnCount );
+		setColumnsSettings( {
+			...columnsSettings,
+			columnsInRow: getColumnsInRow( width, newColumnCount ),
+		} );
 	}, [ columnCount ] );
 
 	useEffect( () => {
@@ -87,6 +90,17 @@ function ColumnsEditContainer( {
 		return columnsNumber;
 	};
 
+	const renderAppender = () => {
+		if ( isSelected ) {
+			return (
+				<InnerBlocks.ButtonBlockAppender
+					customOnAdd={ onAddNextColumn }
+				/>
+			);
+		}
+		return null;
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -99,7 +113,7 @@ function ColumnsEditContainer( {
 							updateColumns( columnCount, value )
 						}
 						min={ MIN_COLUMNS_NUMBER }
-						max={ MAX_COLUMNS_NUMBER }
+						max={ columnCount + 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -113,6 +127,12 @@ function ColumnsEditContainer( {
 			<View style={ isSelected ? styles.blockSelected : styles.block }>
 				{ resizeListener }
 				<InnerBlocks
+					renderAppender={ renderAppender }
+					__experimentalMoverDirection={
+						getColumnsInRow( width, columnCount ) > 1
+							? 'horizontal'
+							: ''
+					}
 					flatListProps={ {
 						contentContainerStyle: {
 							...styles.columnsContainer,
@@ -126,6 +146,8 @@ function ColumnsEditContainer( {
 					allowedBlocks={ ALLOWED_BLOCKS }
 					disallowRemoveInnerBlocks
 					columnsSettings={ columnsSettings }
+					customOnAdd={ onAddNextColumn }
+					customOnDelete={ columnCount === 1 && onDelete }
 				/>
 			</View>
 		</>
@@ -207,6 +229,27 @@ const ColumnsEditContainerWrapper = withDispatch(
 			}
 
 			replaceInnerBlocks( clientId, innerBlocks, false );
+		},
+		onAddNextColumn: () => {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks, selectBlock } = dispatch(
+				'core/block-editor'
+			);
+			const { getBlocks } = registry.select( 'core/block-editor' );
+
+			const innerBlocks = getBlocks( clientId );
+
+			const insertedBlock = createBlock( 'core/column' );
+
+			innerBlocks.push( insertedBlock );
+
+			replaceInnerBlocks( clientId, innerBlocks, true );
+			selectBlock( insertedBlock.clientId );
+		},
+		onDelete: () => {
+			const { clientId } = ownProps;
+			const { removeBlock } = dispatch( 'core/block-editor' );
+			removeBlock( clientId );
 		},
 	} )
 )( ColumnsEditContainer );

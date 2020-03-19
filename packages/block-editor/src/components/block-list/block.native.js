@@ -116,6 +116,8 @@ class BlockListBlock extends Component {
 			isHorizontal,
 			isTouchable,
 			disallowRemoveInnerBlocks,
+			customOnDelete,
+			horizontalDirection,
 			hasParent,
 			isParentSelected,
 			onSelect,
@@ -200,6 +202,8 @@ class BlockListBlock extends Component {
 									disallowRemoveBlock={
 										disallowRemoveInnerBlocks
 									}
+									customOnDelete={ customOnDelete }
+									horizontalDirection={ horizontalDirection }
 								/>
 							) }
 						</View>

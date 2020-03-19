@@ -10,7 +10,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { arrowUp, arrowDown } from '@wordpress/icons';
+import { arrowUp, arrowDown, arrowLeft, arrowRight } from '@wordpress/icons';
 
 const BlockMover = ( {
 	isFirst,
@@ -20,7 +20,30 @@ const BlockMover = ( {
 	onMoveUp,
 	firstIndex,
 	rootClientId,
+	horizontalDirection,
 } ) => {
+	const firstButtonIcon = horizontalDirection ? arrowLeft : arrowUp;
+	const secondButtonIcon = horizontalDirection ? arrowRight : arrowDown;
+
+	const firstButtonHint = horizontalDirection
+		? __( 'Double tap to move the block to the left' )
+		: __( 'Double tap to move the block up' );
+	const secondButtonHint = horizontalDirection
+		? __( 'Double tap to move the block to the right' )
+		: __( 'Double tap to move the block down' );
+
+	const firstBlockTitle = horizontalDirection
+		? __( 'Move block left' )
+		: __( 'Move block up' );
+	const lastBlockTitle = horizontalDirection
+		? __( 'Move block right' )
+		: __( 'Move block down' );
+
+	const firstButtonDirection = horizontalDirection ? 'left' : 'up';
+	const secondButtonDirection = horizontalDirection ? 'right' : 'down';
+
+	const location = horizontalDirection ? 'position' : 'row';
+
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
@@ -31,37 +54,43 @@ const BlockMover = ( {
 				title={
 					! isFirst
 						? sprintf(
-								/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-								__( 'Move block up from row %1$s to row %2$s' ),
+								/* translators: accessibility text. %1: block moving direction (string). %2: location of block - row or order number (string). %3: current block position (number). %4: next block position (number) */
+								__(
+									'Move block %2$s from %1$s %3$s to %1$s %4$s'
+								),
+								location,
+								firstButtonDirection,
 								firstIndex + 1,
 								firstIndex
 						  )
-						: __( 'Move block up' )
+						: firstBlockTitle
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon={ arrowUp }
-				extraProps={ { hint: __( 'Double tap to move the block up' ) } }
+				icon={ firstButtonIcon }
+				extraProps={ { hint: firstButtonHint } }
 			/>
 
 			<ToolbarButton
 				title={
 					! isLast
 						? sprintf(
-								/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+								/* translators: accessibility text. %1: block moving direction (string). %2: location of block - row or order number (string). %3: current block position (number). %4: next block position (number) */
 								__(
-									'Move block down from row %1$s to row %2$s'
+									'Move block %2$s from %1$s %3$s to %1$s %4$s'
 								),
+								location,
+								secondButtonDirection,
 								firstIndex + 1,
 								firstIndex + 2
 						  )
-						: __( 'Move block down' )
+						: lastBlockTitle
 				}
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon={ arrowDown }
+				icon={ secondButtonIcon }
 				extraProps={ {
-					hint: __( 'Double tap to move the block down' ),
+					hint: secondButtonHint,
 				} }
 			/>
 		</>
