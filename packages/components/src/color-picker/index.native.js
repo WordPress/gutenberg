@@ -26,6 +26,7 @@ function ColorPicker( {
 	onNavigationBack,
 	clientId,
 	previousScreen,
+	onCloseBottomSheet,
 } ) {
 	const [ hue, setHue ] = useState( 0 );
 	const [ sat, setSaturation ] = useState( 0.5 );
@@ -72,6 +73,7 @@ function ColorPicker( {
 			setBackgroundColor( backgroundColor );
 			setGradient();
 		}
+		onCloseBottomSheet( resetColors );
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -83,14 +85,20 @@ function ColorPicker( {
 		setValue( v );
 	}
 
-	function onPressCancelButton() {
-		onNavigationBack();
+	function resetColors() {
 		setBackgroundColor( savedBgColor );
 		setTextColor( savedTextColor );
 	}
 
+	function onPressCancelButton() {
+		onNavigationBack();
+		onCloseBottomSheet( null );
+		resetColors();
+	}
+
 	function onPressApplyButton() {
 		onNavigationBack();
+		onCloseBottomSheet( null );
 		if ( isTextScreen ) {
 			return setTextColor( currentColor );
 		}

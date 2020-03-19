@@ -45,6 +45,10 @@ class BottomSheet extends Component {
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
+		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
+			this
+		);
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
@@ -55,6 +59,7 @@ class BottomSheet extends Component {
 			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
+			onCloseBottomSheet: null,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -180,6 +185,20 @@ class BottomSheet extends Component {
 		this.setState( { isScrolling: value } );
 	}
 
+	onHandleClosingBottomSheet( action ) {
+		this.setState( { onCloseBottomSheet: action } );
+	}
+
+	onCloseBottomSheet() {
+		const { onClose } = this.props;
+		const { onCloseBottomSheet } = this.state;
+		if ( onCloseBottomSheet ) {
+			onCloseBottomSheet();
+		}
+		onClose();
+		return this.onHandleClosingBottomSheet( null );
+	}
+
 	render() {
 		const {
 			title = '',
@@ -190,7 +209,6 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
-			onClose,
 			onDismiss,
 			children,
 			...rest
@@ -246,9 +264,9 @@ class BottomSheet extends Component {
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
-				onBackdropPress={ onClose }
-				onBackButtonPress={ onClose }
-				onSwipe={ onClose }
+				onBackdropPress={ this.onCloseBottomSheet }
+				onBackButtonPress={ this.onCloseBottomSheet }
+				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? onDismiss : undefined
@@ -262,7 +280,7 @@ class BottomSheet extends Component {
 					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
-				onAccessibilityEscape={ onClose }
+				onAccessibilityEscape={ this.onCloseBottomSheet }
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
@@ -297,6 +315,8 @@ class BottomSheet extends Component {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
 								isBottomSheetScrolling: isScrolling,
+								onCloseBottomSheet: this
+									.onHandleClosingBottomSheet,
 							} }
 						>
 							{ children }

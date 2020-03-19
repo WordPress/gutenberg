@@ -29,6 +29,7 @@ function ColorSettings( {
 	previousScreen,
 	shouldEnableBottomSheetScroll,
 	isBottomSheetScrolling,
+	onCloseBottomSheet,
 } ) {
 	const [ segment, setSegment ] = useState( 'Solid' );
 
@@ -112,6 +113,7 @@ function ColorSettings( {
 							changeBottomSheetContent( previousScreen )
 						}
 						clientId={ clientId }
+						onCloseBottomSheet={ onCloseBottomSheet }
 					/>
 				</View>
 			) }
