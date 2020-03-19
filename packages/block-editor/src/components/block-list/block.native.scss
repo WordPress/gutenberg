@@ -84,22 +84,3 @@
 	border-radius: 2px;
 	border-style: dashed;
 }
-
-.withMarginHorizontal {
-	margin-left: $block-edge-to-content;
-	margin-right: $block-edge-to-content;
-}
-
-.isVerticalMarginTop {
-	margin-top: $block-edge-to-content;
-}
-
-.isVerticalMarginBottom {
-	margin-bottom: $block-edge-to-content;
-}
-
-.isHorizontal {
-	margin-bottom: 2 * $block-edge-to-content;
-	margin-top: 0;
-	flex: 1;
-}

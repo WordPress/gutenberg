@@ -99,14 +99,22 @@ export class BlockList extends Component {
 			isRootList,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
+		const containerStyle = {
+			flex: isRootList ? 1 : 0,
+			marginVertical: isRootList ? 0 : -marginVertical,
+			marginHorizontal: isRootList ? 0 : -marginHorizontal,
+		};
+
 		return (
 			<View
-				style={ { flex: isRootList ? 1 : 0 } }
+				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				<KeyboardAwareFlatList
@@ -157,6 +165,8 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 
 		return (
@@ -169,6 +179,8 @@ export class BlockList extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange

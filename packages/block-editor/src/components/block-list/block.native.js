@@ -79,27 +79,6 @@ class BlockListBlock extends Component {
 		);
 	}
 
-	applyBlockStyle() {
-		const {
-			isDimmed,
-			hasParent,
-			isLastBlock,
-			isFirstBlock,
-			isHorizontal,
-			isSelected,
-		} = this.props;
-		return [
-			// Do not add horizontal margin in nested blocks
-			! hasParent && styles.withMarginHorizontal,
-			// remove margin bottom for the last block (the margin is added to the parent)
-			! isLastBlock && ! isSelected && styles.isVerticalMarginBottom,
-			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
-			! ( isFirstBlock && hasParent ) && styles.isVerticalMarginTop,
-			isHorizontal && styles.isHorizontal,
-			isDimmed && styles.dimmed,
-		];
-	}
-
 	render() {
 		const {
 			attributes,
@@ -111,14 +90,15 @@ class BlockListBlock extends Component {
 			order,
 			title,
 			parentId,
-			isFirstBlock,
-			isHorizontal,
+			isDimmed,
 			isTouchable,
 			hasParent,
 			isParentSelected,
 			onSelect,
 			showFloatingToolbar,
 			getStylesFromColorScheme,
+			marginVertical,
+			marginHorizontal,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -135,11 +115,7 @@ class BlockListBlock extends Component {
 			>
 				<View accessibilityLabel={ accessibilityLabel }>
 					{ showFloatingToolbar && (
-						<FloatingToolbar
-							isFirstBlock={
-								( hasParent && isFirstBlock ) || isHorizontal
-							}
-						>
+						<FloatingToolbar>
 							{ hasParent && (
 								<Toolbar passedStyle={ styles.toolbar }>
 									<ToolbarButton
@@ -156,7 +132,10 @@ class BlockListBlock extends Component {
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
-						style={ this.applyBlockStyle() }
+						style={ [
+							{ marginVertical, marginHorizontal },
+							isDimmed && styles.dimmed,
+						] }
 					>
 						{ isSelected && (
 							<View
@@ -217,7 +196,6 @@ export default compose( [
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
@@ -276,8 +254,6 @@ export default compose( [
 			! isDescendantSelected &&
 			( isDescendantOfParentSelected || rootBlockId === clientId );
 
-		const isHorizontal = false;
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -286,10 +262,8 @@ export default compose( [
 			attributes,
 			blockType,
 			isLastBlock,
-			isFirstBlock,
 			isSelected,
 			isValid,
-			isHorizontal,
 			parentId,
 			isParentSelected,
 			firstToSelectId,
