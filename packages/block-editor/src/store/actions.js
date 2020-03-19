@@ -992,7 +992,7 @@ export function* insertAfterBlock( clientId ) {
 }
 
 /**
- * Generator that toggles the highlighted block state.
+ * Returns an action object that toggles the highlighted block state.
  *
  * @param {string} clientId The block's clientId.
  * @param {boolean} isHighlighted The highlight state.
