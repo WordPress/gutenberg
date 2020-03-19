@@ -44,10 +44,13 @@ export function useSetAttributes() {
  */
 export function useBlockAttributes() {
 	const clientId = useSelectedBlockClientId();
-	const attributes = useSelect( ( select ) => {
-		const { getBlockAttributes } = select( 'core/block-editor' );
-		return getBlockAttributes( clientId ) || {};
-	}, [] );
+	const attributes = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = select( 'core/block-editor' );
+			return getBlockAttributes( clientId ) || {};
+		},
+		[ clientId ]
+	);
 
 	return attributes;
 }
