@@ -10,7 +10,7 @@ import styles from './block-mobile-floating-toolbar.scss';
 
 const FloatingToolbar = ( { children, isFirstBlock } ) => {
 	return (
-		<TouchableWithoutFeedback>
+		<TouchableWithoutFeedback accessible={ false }>
 			<View
 				style={ [
 					styles.floatingToolbar,

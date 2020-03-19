@@ -116,6 +116,7 @@ function ColumnsEditContainer( {
 						}
 						min={ MIN_COLUMNS_NUMBER }
 						max={ columnCount + 1 }
+						separatorType={ 'none' }
 					/>
 				</PanelBody>
 			</InspectorControls>

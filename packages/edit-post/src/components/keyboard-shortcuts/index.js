@@ -37,7 +37,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-mode',
 			category: 'global',
-			description: __( 'Switch between Visual editor and Code editor.' ),
+			description: __( 'Switch between visual editor and code editor.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',

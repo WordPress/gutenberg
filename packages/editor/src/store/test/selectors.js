@@ -171,6 +171,7 @@ const {
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
+	getEditedPostSlug,
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
@@ -2901,6 +2902,87 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getEditedPostSlug', () => {
+		it( 'should return the current post’s slug if one exists and has not been edited', () => {
+			const state = {
+				currentPost: {
+					slug: 'custom-slug',
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'custom-slug' );
+		} );
+
+		it( 'should return the edited post slug if it has been edited', () => {
+			const state = {
+				currentPost: {
+					slug: 'custom-slug',
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {
+							slug: 'edited-slug',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'edited-slug' );
+		} );
+
+		it( 'should return the cleaned title as slug if no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'sample-post' );
+		} );
+
+		it( 'should return cleaned, edited title as slug if it has been edited and no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'edited-title' );
+		} );
+
+		it( 'should return the post ID if no slug or post title exists', () => {
+			const state = {
+				postId: 123,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 123 );
 		} );
 	} );
 

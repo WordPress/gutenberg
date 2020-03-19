@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withFocusOutside } from '@wordpress/components';
+import { withFocusOutside, VisuallyHidden } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
 /**
@@ -91,12 +91,12 @@ class PostTitle extends Component {
 				<div className="editor-post-title">
 					<div className={ className }>
 						<div>
-							<label
+							<VisuallyHidden
+								as="label"
 								htmlFor={ `post-title-${ instanceId }` }
-								className="screen-reader-text"
 							>
 								{ decodedPlaceholder || __( 'Add title' ) }
-							</label>
+							</VisuallyHidden>
 							<Textarea
 								id={ `post-title-${ instanceId }` }
 								className="editor-post-title__input"

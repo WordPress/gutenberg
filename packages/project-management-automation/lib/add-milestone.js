@@ -3,6 +3,10 @@
  */
 const debug = require( './debug' );
 
+/** @typedef {import('@octokit/rest').HookError} HookError */
+/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
+
 // Milestone due dates are calculated from a known due date:
 // 6.3, which was due on August 12 2019.
 const REFERENCE_MAJOR = 6;
@@ -21,7 +25,7 @@ const DAYS_PER_RELEASE = 14;
  * @see https://developer.github.com/v3/#client-errors
  * @see https://github.com/octokit/request.js/blob/2a1d768/src/fetch-wrapper.ts#L79-L80
  *
- * @param {Error} error Error to test.
+ * @param {HookError} error Error to test.
  *
  * @return {boolean} Whether error is a duplicate validation request error.
  */
@@ -32,8 +36,8 @@ const isDuplicateValidationError = ( error ) =>
 /**
  * Assigns the correct milestone to PRs once merged.
  *
- * @param {Object} payload Push event payload, see https://developer.github.com/v3/activity/events/types/#pushevent.
- * @param {Object} octokit Initialized Octokit REST client, see https://octokit.github.io/rest.js/.
+ * @param {WebhookPayloadPush} payload Push event payload.
+ * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function addMilestone( payload, octokit ) {
 	if ( payload.ref !== 'refs/heads/master' ) {
