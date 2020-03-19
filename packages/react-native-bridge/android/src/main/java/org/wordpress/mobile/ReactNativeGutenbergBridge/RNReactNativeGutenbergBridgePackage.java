@@ -10,21 +10,26 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNReactNativeGutenbergBridgePackage implements ReactPackage {
-    private GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
+    private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
+    private final boolean mIsDarkMode;
+
     private RNReactNativeGutenbergBridgeModule mRNReactNativeGutenbergBridgeModule;
 
     public RNReactNativeGutenbergBridgeModule getRNReactNativeGutenbergBridgeModule() {
         return mRNReactNativeGutenbergBridgeModule;
     }
 
-    public RNReactNativeGutenbergBridgePackage(GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
+    public RNReactNativeGutenbergBridgePackage(GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent,
+                                               boolean isDarkMode) {
         mGutenbergBridgeJS2Parent = gutenbergBridgeJS2Parent;
+        mIsDarkMode = isDarkMode;
     }
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         mRNReactNativeGutenbergBridgeModule = new RNReactNativeGutenbergBridgeModule(reactContext,
-                mGutenbergBridgeJS2Parent);
+                mGutenbergBridgeJS2Parent,
+                mIsDarkMode);
         return Arrays.<NativeModule>asList(mRNReactNativeGutenbergBridgeModule);
     }
 

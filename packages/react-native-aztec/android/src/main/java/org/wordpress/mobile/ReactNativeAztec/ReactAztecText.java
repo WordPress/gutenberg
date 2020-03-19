@@ -18,7 +18,6 @@ import android.text.InputType;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -139,7 +138,6 @@ public class ReactAztecText extends AztecText {
                 ReactAztecText.this.propagateSelectionChanges(selStart, selEnd);
             }
         });
-        this.setImeOptions(getImeOptions() | EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
     }
 
