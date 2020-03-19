@@ -117,4 +117,17 @@ describe( 'JSDoc', () => {
 			],
 		} );
 	} );
+
+	it( 'can handle jsdoc comment without tags', () => {
+		const { typeChecker, sourceFile } = prepare(
+			'default-class-anonymous'
+		);
+
+		expect(
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
+		).toEqual( {
+			description: 'Class declaration example.',
+			tags: [],
+		} );
+	} );
 } );

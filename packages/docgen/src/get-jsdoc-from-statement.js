@@ -29,7 +29,7 @@ module.exports = function( statement, typeChecker ) {
 
 		return {
 			description: lastComment.comment,
-			tags: lastComment.tags.map( ( tag ) => {
+			tags: ( lastComment.tags || [] ).map( ( tag ) => {
 				const getType = () =>
 					typeChecker.typeToString(
 						typeChecker.getTypeFromTypeNode( tag.typeExpression )
