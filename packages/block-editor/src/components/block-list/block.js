@@ -230,7 +230,7 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
-			getIsBlockHighlighted,
+			isBlockHighlighted,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -251,7 +251,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
-			isHighlighted: getIsBlockHighlighted( clientId ),
+			isHighlighted: isBlockHighlighted( clientId ),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||

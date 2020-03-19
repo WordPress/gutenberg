@@ -395,19 +395,6 @@ _Properties_
 -   _utility_ `number`: How useful we think this item is, between 0 and 3.
 -   _frecency_ `number`: Hueristic that combines frequency and recency.
 
-<a name="getIsBlockHighlighted" href="#getIsBlockHighlighted">#</a> **getIsBlockHighlighted**
-
-Returns true if the current highlighted block matches the block clientId.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
--   _clientId_ `string`: The block to check.
-
-_Returns_
-
--   `boolean`: Whether the block is currently highlighted.
-
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -718,6 +705,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether an ancestor of the block is in multi-selection set.
+
+<a name="isBlockHighlighted" href="#isBlockHighlighted">#</a> **isBlockHighlighted**
+
+Returns true if the current highlighted block matches the block clientId.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block is currently highlighted.
 
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 

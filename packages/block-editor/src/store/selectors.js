@@ -1630,6 +1630,6 @@ export function didAutomaticChange( state ) {
  *
  * @return {boolean} Whether the block is currently highlighted.
  */
-export function getIsBlockHighlighted( state, clientId ) {
+export function isBlockHighlighted( state, clientId ) {
 	return state.highlightedBlock === clientId;
 }
