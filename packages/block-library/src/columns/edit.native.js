@@ -143,7 +143,6 @@ function ColumnsEditContainer( {
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					disallowRemoveInnerBlocks
 					columnsSettings={ columnsSettings }
 					customOnAdd={ onAddNextColumn }
 					customOnDelete={ columnCount === 1 && onDelete }
