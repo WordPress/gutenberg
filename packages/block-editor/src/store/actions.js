@@ -998,13 +998,9 @@ export function* insertAfterBlock( clientId ) {
  * @param {boolean} isHighlighted The highlight state.
  */
 export function toggleBlockHighlight( clientId, isHighlighted ) {
-	if ( isHighlighted ) {
-		return {
-			type: 'HIGHLIGHT_BLOCK',
-			clientId,
-		};
-	}
 	return {
-		type: 'UNHIGHLIGHT_BLOCK',
+		type: 'TOGGLE_BLOCK_HIGHLIGHT',
+		clientId,
+		isHighlighted,
 	};
 }
