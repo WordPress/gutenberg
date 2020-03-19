@@ -11,11 +11,6 @@
 	border: $border-width dashed $gray-70;
 }
 
-.marginVerticalDense {
-	margin-top: $block-selected-child-margin;
-	margin-bottom: $block-selected-child-margin;
-}
-
 .marginHorizontalNone {
 	margin-left: 0;
 	margin-right: 0;
@@ -32,12 +27,11 @@
 }
 
 .blockSelected {
-	margin-bottom: - 24;
+	margin-top: - 2 * $block-edge-to-content;
 }
 
 .block {
 	margin-bottom: - 2 * $block-edge-to-content;
-
 }
 
 .innerBlocks {

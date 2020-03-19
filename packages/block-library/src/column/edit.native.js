@@ -64,10 +64,8 @@ function ColumnEdit( {
 							styles.columnPlaceholderDark
 						),
 					applyBlockStyle( true ),
-					{
-						...styles.marginVerticalDense,
-						...styles.marginHorizontalNone,
-					},
+					styles.columnMargin,
+					styles.marginHorizontalNone,
 				] }
 			></View>
 		);

@@ -93,9 +93,11 @@ function ColumnsEditContainer( {
 	const renderAppender = () => {
 		if ( isSelected ) {
 			return (
-				<InnerBlocks.ButtonBlockAppender
-					customOnAdd={ onAddNextColumn }
-				/>
+				<View style={ !! columnCount && styles.blockSelected }>
+					<InnerBlocks.ButtonBlockAppender
+						customOnAdd={ onAddNextColumn }
+					/>
+				</View>
 			);
 		}
 		return null;
@@ -124,7 +126,7 @@ function ColumnsEditContainer( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View style={ isSelected ? styles.blockSelected : styles.block }>
+			<View style={ ! isSelected && styles.block }>
 				{ resizeListener }
 				<InnerBlocks
 					renderAppender={ renderAppender }
@@ -279,10 +281,7 @@ const ColumnsEdit = ( props ) => {
 						styles.columnsPlaceholder,
 						styles.columnsPlaceholderDark
 					),
-					! hasChildren && {
-						...styles.marginVerticalDense,
-						...styles.marginHorizontalNone,
-					},
+					! hasChildren && styles.marginHorizontalNone,
 				] }
 			/>
 		);
