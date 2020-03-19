@@ -101,12 +101,6 @@
 .isHorizontal {
 	margin-bottom: 2 * $block-edge-to-content;
 	margin-top: 0;
-	flex: 1;
-}
-
-.horizontal {
-	flex-direction: row;
-	flex-wrap: wrap;
 }
 
 .buttonsAppenderSpacer {

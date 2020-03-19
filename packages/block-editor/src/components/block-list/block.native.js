@@ -87,9 +87,10 @@ class BlockListBlock extends Component {
 			isDimmed,
 			hasParent,
 			isLastBlock,
+			horizontalDirection,
 			isFirstBlock,
-			isHorizontal,
 			isSelected,
+			blockStyle,
 		} = this.props;
 		return [
 			// Do not add horizontal margin in nested blocks
@@ -98,8 +99,10 @@ class BlockListBlock extends Component {
 			! isLastBlock && ! isSelected && styles.isVerticalMarginBottom,
 			// remove margin top for the first block that is not on the root level (the margin is added to the parent)
 			! ( isFirstBlock && hasParent ) && styles.isVerticalMarginTop,
-			isHorizontal && styles.isHorizontal,
+			horizontalDirection && styles.isHorizontal,
 			isDimmed && styles.dimmed,
+			blockStyle,
+			{ flex: 1 },
 		];
 	}
 
@@ -142,7 +145,10 @@ class BlockListBlock extends Component {
 					{ showFloatingToolbar && (
 						<FloatingToolbar
 							isFirstBlock={
-								( hasParent && isFirstBlock ) || isHorizontal
+								( hasParent &&
+									isFirstBlock &&
+									! horizontalDirection ) ||
+								isHorizontal
 							}
 						>
 							{ hasParent && (

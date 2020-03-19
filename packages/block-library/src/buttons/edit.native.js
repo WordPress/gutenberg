@@ -36,7 +36,6 @@ function ButtonsEdit( {
 	onDelete,
 	onAddNextButton,
 	shouldDelete,
-	isParentSelected,
 	isSelectedButton,
 } ) {
 	const { align } = attributes;
@@ -50,10 +49,12 @@ function ButtonsEdit( {
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
 			return (
-				<InnerBlocks.ButtonBlockAppender
-					flex={ false }
-					customOnAdd={ onAddNextButton }
-				/>
+				<View style={ styles.appenderContainer }>
+					<InnerBlocks.ButtonBlockAppender
+						flex={ false }
+						customOnAdd={ onAddNextButton }
+					/>
+				</View>
 			);
 		}
 		return null;
@@ -61,9 +62,7 @@ function ButtonsEdit( {
 
 	function onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
-		const { marginLeft: nestedSpacing } = styles.nestedButtons;
-		const parentWidth =
-			width + ( isParentSelected ? 2 * nestedSpacing : 0 );
+		const parentWidth = width + 4 * styles.buttonsContainer.marginLeft;
 
 		setMaxWidth( parentWidth );
 	}
@@ -81,7 +80,7 @@ function ButtonsEdit( {
 					onChange={ updateAlignment }
 				/>
 			</BlockControls>
-			<View onLayout={ onLayout }>
+			<View onLayout={ onLayout } style={ styles.buttonsContainer }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
 					template={ BUTTONS_TEMPLATE }
@@ -91,6 +90,7 @@ function ButtonsEdit( {
 					customOnDelete={ shouldDelete && onDelete }
 					customOnAdd={ onAddNextButton }
 					parentWidth={ maxWidth }
+					blockStyle={ styles.buttonBlock }
 					shouldRenderFooterAppender={ shouldRenderFooterAppender }
 				/>
 			</View>

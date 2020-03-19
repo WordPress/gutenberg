@@ -93,10 +93,11 @@ export class BlockList extends Component {
 			renderAppender,
 			shouldRenderFooterAppender = false,
 		} = this.props;
-		if ( ! shouldRenderFooterAppender ) {
-			return renderAppender && blockClientIds.length > 0;
-		}
-		return false;
+		return (
+			! shouldRenderFooterAppender &&
+			renderAppender &&
+			blockClientIds.length > 0
+		);
 	}
 
 	render() {
@@ -176,6 +177,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			customOnDelete,
 			customOnAdd,
+			blockStyle,
 			__experimentalMoverDirection,
 		} = this.props;
 
@@ -200,6 +202,7 @@ export class BlockList extends Component {
 						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
 						customOnAdd={ customOnAdd }
+						blockStyle={ blockStyle }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

@@ -114,6 +114,7 @@ class InnerBlocks extends Component {
 			customOnAdd,
 			parentWidth,
 			shouldRenderFooterAppender,
+			blockStyle,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -131,6 +132,7 @@ class InnerBlocks extends Component {
 						customOnDelete={ customOnDelete }
 						customOnAdd={ customOnAdd }
 						parentWidth={ parentWidth }
+						blockStyle={ blockStyle }
 						shouldRenderFooterAppender={
 							shouldRenderFooterAppender
 						}

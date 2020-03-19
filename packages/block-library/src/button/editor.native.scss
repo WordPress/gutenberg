@@ -28,10 +28,6 @@
 	margin: $panel-padding 2 * $panel-padding;
 }
 
-.buttonsSelected {
-	margin: $panel-padding + $border-width + $block-selected-child-margin + $block-selected-child-to-content;
-}
-
 .fallbackButton {
 	background-color: $button-fallback-bg;
 }
