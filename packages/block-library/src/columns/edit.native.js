@@ -44,6 +44,7 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
  *
  * @type {number}
  */
+const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 1;
 
 function ColumnsEditContainer( {
@@ -56,18 +57,17 @@ function ColumnsEditContainer( {
 	onDelete,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
-	const [ columnsSettings, setColumnsSettings ] = useState( {
-		columnsInRow: 2,
-	} );
+	const [ columnsSettings, setColumnsSettings ] = useState();
 
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
 	useEffect( () => {
-		updateColumns( columnCount, columnCount );
+		const newColumnCount = ! columnCount ? DEFAULT_COLUMNS : columnCount;
+		updateColumns( columnCount, newColumnCount );
 		setColumnsSettings( {
 			...columnsSettings,
-			columnsInRow: getColumnsInRow( width, columnCount ),
+			columnsInRow: getColumnsInRow( width, newColumnCount ),
 		} );
 	}, [ columnCount ] );
 
