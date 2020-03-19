@@ -185,6 +185,7 @@
 	align-items: center;
 	padding-right: $panel-padding;
 	padding-left: $panel-padding;
+	height: 44px;
 }
 
 .bottomSheetBackButton {
@@ -193,24 +194,45 @@
 	flex: 1;
 }
 
-.bottomSheetBackButtonIcon {
-	color: $blue-wordpress;
-	margin-left: -14px;
-	margin-right: -14px;
+.chevronLeftIcon {
+	color: $blue-50;
+	margin-left: -13px;
+	margin-right: -13px;
+}
+
+.chevronLeftIconDark {
+	color: $blue-30;
 }
 
 .bottomSheetHeaderTitle {
+	color: rgba(0, 0, 0, 0.87);
 	text-align: center;
-	font-weight: 500;
+	font-weight: 600;
 	font-size: 16px;
 	flex: 2;
 }
 
-.bottomSheetBackButtonText {
+.bottomSheetHeaderTitleDark {
+	color: rgba(255, 255, 255, 0.87);
+}
+
+.bottomSheetButtonText {
+	color: $blue-50;
 	font-size: 16px;
-	color: $blue-wordpress;
+}
+
+.bottomSheetButtonTextDark {
+	color: $blue-30;
 }
 
 .bottomSheetRightSpace {
 	flex: 1;
+}
+
+.arrowLeftIcon {
+	color: #50575e;
+}
+
+.arrowLeftIconDark {
+	color: rgba(255, 255, 255, 0.6);
 }

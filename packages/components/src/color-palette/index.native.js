@@ -10,6 +10,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -25,9 +26,10 @@ function ColorPalette( {
 	currentSegment,
 	currentScreen,
 	onCustomPress,
+	getStylesFromColorScheme,
 } ) {
 	const customSwatchGradients = [
-		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,0,0,0) 70.71%)',
+		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
 		'linear-gradient(240deg, rgba(0,255,0,.8), 0%, rgba(0,255,0,0) 70.71%)',
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
@@ -60,6 +62,10 @@ function ColorPalette( {
 
 	function Swatch( { gradient, custom } ) {
 		const palette = gradient ? defaultGradientColors : defaultColors;
+		const verticalSeparatorStyle = getStylesFromColorScheme(
+			styles.verticalSeparator,
+			styles.verticalSeparatorDark
+		);
 		return (
 			<>
 				{ palette.map( ( color ) => {
@@ -86,7 +92,7 @@ function ColorPalette( {
 				} ) }
 				{ custom && (
 					<>
-						<View style={ styles.verticalSeparator } />
+						<View style={ verticalSeparatorStyle } />
 						<TouchableWithoutFeedback onPress={ onCustomPress }>
 							<View>
 								<ColorIndicator
@@ -117,4 +123,4 @@ function ColorPalette( {
 	);
 }
 
-export default ColorPalette;
+export default withPreferredColorScheme( ColorPalette );

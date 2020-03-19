@@ -23,7 +23,7 @@ $border-radius-ios: 7px;
 }
 
 .selectedDark {
-	background-color: #545454;
+	background-color: rgba(255, 255, 255, 0.25);
 }
 
 .shadowIOS {
@@ -42,7 +42,7 @@ $border-radius-ios: 7px;
 }
 
 .containerDark {
-	background-color: #a4a4a4;
+	background-color: rgba(255, 255, 255, 0.08);
 }
 
 .containerIOS {
@@ -81,7 +81,7 @@ $border-radius-ios: 7px;
 }
 
 .buttonTextDefaultDark {
-	color: #f4f4f4;
+	color: #e0e0e0;
 }
 
 .buttonTextSelected {
@@ -89,7 +89,7 @@ $border-radius-ios: 7px;
 }
 
 .buttonTextSelectedDark {
-	color: #e0e0e0;
+	color: #f4f4f4;
 }
 
 .row {

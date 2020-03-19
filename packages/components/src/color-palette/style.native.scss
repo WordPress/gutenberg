@@ -11,6 +11,10 @@
 	align-self: center;
 }
 
+.verticalSeparatorDark {
+	border-color: $gray-70;
+}
+
 .row {
 	flex-direction: row;
 }

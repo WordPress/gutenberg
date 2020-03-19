@@ -7,13 +7,35 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
+import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
+function BottomSheetNavigationHeader( {
+	leftButtonOnPress,
+	screen,
+	getStylesFromColorScheme,
+} ) {
 	const isIOS = Platform.OS === 'ios';
+
+	const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+		styles.bottomSheetHeaderTitle,
+		styles.bottomSheetHeaderTitleDark
+	);
+	const bottomSheetButtonTextStyle = getStylesFromColorScheme(
+		styles.bottomSheetButtonText,
+		styles.bottomSheetButtonTextDark
+	);
+	const chevronLeftStyle = getStylesFromColorScheme(
+		styles.chevronLeftIcon,
+		styles.chevronLeftIconDark
+	);
+	const arrowLeftStyle = getStylesFromColorScheme(
+		styles.arrowLeftIcon,
+		styles.arrowLeftIconDark
+	);
 
 	return (
 		<View style={ styles.bottomSheetHeader }>
@@ -24,18 +46,22 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 							<Icon
 								icon={ chevronLeft }
 								size={ 40 }
-								style={ styles.bottomSheetBackButtonIcon }
+								style={ chevronLeftStyle }
 							/>
-							<Text style={ styles.bottomSheetBackButtonText }>
+							<Text style={ bottomSheetButtonTextStyle }>
 								{ __( 'Back' ) }
 							</Text>
 						</>
 					) : (
-						<Icon icon={ arrowLeft } size={ 24 } />
+						<Icon
+							icon={ arrowLeft }
+							size={ 24 }
+							style={ arrowLeftStyle }
+						/>
 					) }
 				</View>
 			</TouchableWithoutFeedback>
-			<Text style={ [ styles.bottomSheetHeaderTitle ] }>
+			<Text style={ bottomSheetHeaderTitleStyle }>
 				{ sprintf( __( '%s' ), screen ) }
 			</Text>
 			<View style={ styles.bottomSheetRightSpace } />
@@ -43,4 +69,4 @@ function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 	);
 }
 
-export default BottomSheetNavigationHeader;
+export default withPreferredColorScheme( BottomSheetNavigationHeader );

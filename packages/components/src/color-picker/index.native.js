@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import HsvColorPicker from 'react-native-hsv-color-picker';
 import tinycolor from 'tinycolor2';
 /**
@@ -11,6 +11,8 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ColorIndicator, BottomSheet } from '@wordpress/components';
 import { __experimentalUseGradient } from '@wordpress/block-editor';
+import { withPreferredColorScheme } from '@wordpress/compose';
+import { Icon, check, close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -27,7 +29,10 @@ function ColorPicker( {
 	clientId,
 	previousScreen,
 	onCloseBottomSheet,
+	getStylesFromColorScheme,
 } ) {
+	const isIOS = Platform.OS === 'ios';
+
 	const [ hue, setHue ] = useState( 0 );
 	const [ sat, setSaturation ] = useState( 0.5 );
 	const [ val, setValue ] = useState( 0.5 );
@@ -37,6 +42,23 @@ function ColorPicker( {
 
 	const { paddingLeft, height, borderRadius } = styles.picker;
 	const pickerWidth = BottomSheet.getWidth() - 2 * paddingLeft;
+
+	const applyButtonStyle = getStylesFromColorScheme(
+		styles.applyButton,
+		styles.applyButtonDark
+	);
+	const cancelButtonStyle = getStylesFromColorScheme(
+		styles.cancelButton,
+		styles.cancelButtonDark
+	);
+	const colorTextStyle = getStylesFromColorScheme(
+		styles.colorText,
+		styles.colorTextDark
+	);
+	const footerStyle = getStylesFromColorScheme(
+		styles.footer,
+		styles.footerDark
+	);
 
 	const currentColor = tinycolor(
 		`hsv ${ hue } ${ sat } ${ val }`
@@ -133,31 +155,54 @@ function ColorPicker( {
 					shouldEnableBottomSheetScroll( true )
 				}
 				huePickerBarWidth={ pickerWidth }
+				huePickerBarHeight={ 8 }
 				satValPickerSize={ { width: pickerWidth, height } }
 				satValPickerBorderRadius={ borderRadius }
 				huePickerBorderRadius={ borderRadius }
 			/>
-			<View style={ styles.footer }>
+			<View style={ footerStyle }>
 				<TouchableWithoutFeedback onPress={ onPressCancelButton }>
-					<Text style={ styles.cancelButton }>
-						{ __( 'Cancel' ) }
-					</Text>
+					<View>
+						{ isIOS ? (
+							<Text style={ cancelButtonStyle }>
+								{ __( 'Cancel' ) }
+							</Text>
+						) : (
+							<Icon
+								icon={ close }
+								size={ 24 }
+								style={ cancelButtonStyle }
+							/>
+						) }
+					</View>
 				</TouchableWithoutFeedback>
 				<View style={ styles.colorWrapper }>
 					<ColorIndicator
 						color={ currentColor }
 						style={ styles.colorIndicator }
 					/>
-					<Text style={ styles.colorText }>
+					<Text style={ colorTextStyle }>
 						{ currentColor.toUpperCase() }
 					</Text>
 				</View>
 				<TouchableWithoutFeedback onPress={ onPressApplyButton }>
-					<Text style={ styles.applyButton }>{ __( 'Apply' ) }</Text>
+					<View>
+						{ isIOS ? (
+							<Text style={ applyButtonStyle }>
+								{ __( 'Apply' ) }
+							</Text>
+						) : (
+							<Icon
+								icon={ check }
+								size={ 24 }
+								style={ applyButtonStyle }
+							/>
+						) }
+					</View>
 				</TouchableWithoutFeedback>
 			</View>
 		</>
 	);
 }
 
-export default ColorPicker;
+export default withPreferredColorScheme( ColorPicker );

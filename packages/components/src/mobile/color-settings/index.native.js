@@ -7,6 +7,7 @@ import { View, Text } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -30,8 +31,14 @@ function ColorSettings( {
 	shouldEnableBottomSheetScroll,
 	isBottomSheetScrolling,
 	onCloseBottomSheet,
+	getStylesFromColorScheme,
 } ) {
 	const [ segment, setSegment ] = useState( 'Solid' );
+
+	const horizontalSeparatorStyle = getStylesFromColorScheme(
+		styles.horizontalSeparator,
+		styles.horizontalSeparatorDark
+	);
 
 	useEffect( () => {
 		setSegment( 'Solid' );
@@ -63,7 +70,7 @@ function ColorSettings( {
 						}
 					/>
 					{ getColorPalette() }
-					<View style={ styles.horizontalSeparator } />
+					<View style={ horizontalSeparatorStyle } />
 					<SegmentedControls
 						segments={ [ 'Solid', 'Gradient' ] }
 						segmentHandler={ ( item ) => setSegment( item ) }
@@ -85,7 +92,7 @@ function ColorSettings( {
 						}
 					/>
 					{ getColorPalette() }
-					<View style={ styles.horizontalSeparator } />
+					<View style={ horizontalSeparatorStyle } />
 					<View style={ styles.textFooter }>
 						<ColorIndicator
 							color={ textColor }
@@ -121,4 +128,4 @@ function ColorSettings( {
 	);
 }
 
-export default ColorSettings;
+export default withPreferredColorScheme( ColorSettings );
