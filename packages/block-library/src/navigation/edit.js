@@ -293,6 +293,7 @@ export default compose( [
 			parent: 0,
 			order: 'asc',
 			orderby: 'id',
+			per_page: -1,
 		};
 
 		const pagesSelect = [
