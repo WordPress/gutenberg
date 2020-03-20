@@ -6,15 +6,13 @@ import { flow } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuItem, withSpokenMessages } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
 function FeatureToggle( {
-	onToggle,
-	isActive,
+	feature,
 	label,
 	info,
 	messageActivated,
@@ -29,11 +27,17 @@ function FeatureToggle( {
 		}
 	};
 
+	const isActive = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).isFeatureActive( feature );
+	}, [] );
+
+	const { toggleFeature } = useDispatch( 'core/edit-site' );
+
 	return (
 		<MenuItem
 			icon={ isActive && check }
 			isSelected={ isActive }
-			onClick={ flow( onToggle, speakMessage ) }
+			onClick={ flow( toggleFeature.bind( null, feature ), speakMessage ) }
 			role="menuitemcheckbox"
 			info={ info }
 		>
@@ -42,14 +46,4 @@ function FeatureToggle( {
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { feature } ) => ( {
-		isActive: select( 'core/edit-site' ).isFeatureActive( feature ),
-	} ) ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		onToggle() {
-			dispatch( 'core/edit-site' ).toggleFeature( ownProps.feature );
-		},
-	} ) ),
-	withSpokenMessages,
-] )( FeatureToggle );
+export default withSpokenMessages( FeatureToggle );
