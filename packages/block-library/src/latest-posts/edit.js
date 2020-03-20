@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy, find } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -53,7 +53,6 @@ class LatestPostsEdit extends Component {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
-			usersList: [],
 		};
 	}
 
@@ -72,20 +71,6 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList: [] } );
 				}
 			} );
-
-		this.fetchRequest = apiFetch( {
-			path: addQueryArgs( `/wp/v2/users` ),
-		} )
-			.then( ( usersList ) => {
-				if ( this.isStillMounted ) {
-					this.setState( { usersList } );
-				}
-			} )
-			.catch( () => {
-				if ( this.isStillMounted ) {
-					this.setState( { usersList: [] } );
-				}
-			} );
 	}
 
 	componentWillUnmount() {
@@ -98,10 +83,11 @@ class LatestPostsEdit extends Component {
 			setAttributes,
 			imageSizeOptions,
 			latestPosts,
+			authors,
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList, usersList } = this.state;
+		const { categoriesList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
@@ -311,12 +297,14 @@ class LatestPostsEdit extends Component {
 		);
 
 		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
-		if ( ! hasPosts ) {
+		const hasAuthors = Array.isArray( authors ) && authors.length;
+		if ( ! hasPosts || ! hasAuthors ) {
 			return (
 				<>
 					{ inspectorControls }
 					<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
-						{ ! Array.isArray( latestPosts ) ? (
+						{ ! Array.isArray( latestPosts ) ||
+						! Array.isArray( authors ) ? (
 							<Spinner />
 						) : (
 							__( 'No posts found.' )
@@ -371,6 +359,10 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
+						const currentAuthor = find(
+							authors,
+							( author ) => author.id === post.author
+						);
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
@@ -443,9 +435,13 @@ class LatestPostsEdit extends Component {
 										) }
 									</time>
 								) }
-								{ displayPostAuthor && usersList[ i ].name && (
+								{ displayPostAuthor && !! currentAuthor.name && (
 									<span className="wp-block-latest-posts__post-author">
-										by { usersList[ i ].name }
+										{ sprintf(
+											/* translators: byline. %s: current author. */
+											__( 'by %s' ),
+											currentAuthor.name
+										) }
 									</span>
 								) }
 								{ displayPostContent &&
@@ -499,6 +495,20 @@ export default withSelect( ( select, props ) => {
 	);
 
 	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
+
+	let authors = [];
+	if ( posts ) {
+		const postAuthors = posts.reduce( ( accumulator, post ) => {
+			accumulator.push( post.author );
+			return accumulator;
+		}, [] );
+		const authorsQuery = {
+			include: postAuthors.join( ',' ),
+		};
+
+		authors = getEntityRecords( 'root', 'user', authorsQuery );
+	}
+
 	const imageSizeOptions = imageSizes
 		.filter( ( { slug } ) => slug !== 'full' )
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
@@ -507,6 +517,7 @@ export default withSelect( ( select, props ) => {
 		defaultImageWidth: imageDimensions[ featuredImageSizeSlug ].width,
 		defaultImageHeight: imageDimensions[ featuredImageSizeSlug ].height,
 		imageSizeOptions,
+		authors,
 		latestPosts: ! Array.isArray( posts )
 			? posts
 			: posts.map( ( post ) => {
