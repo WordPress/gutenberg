@@ -19,7 +19,9 @@ export function getBlockPreviewContainerDOMNode( clientId ) {
 		return;
 	}
 
-	return domNode.firstChild || domNode;
+	return [ domNode.firstChild, domNode ].find(
+		( node ) => node && node.getBoundingClientRect
+	);
 }
 
 /**
