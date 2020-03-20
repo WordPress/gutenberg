@@ -37,7 +37,10 @@ function FeatureToggle( {
 		<MenuItem
 			icon={ isActive && check }
 			isSelected={ isActive }
-			onClick={ flow( toggleFeature.bind( null, feature ), speakMessage ) }
+			onClick={ flow(
+				toggleFeature.bind( null, feature ),
+				speakMessage
+			) }
 			role="menuitemcheckbox"
 			info={ info }
 		>

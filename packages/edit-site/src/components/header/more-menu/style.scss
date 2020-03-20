@@ -19,12 +19,6 @@
 .edit-site-more-menu__content .components-popover__content {
 	min-width: 260px;
 
-	// Let the menu scale to fit items.
-	@include break-mobile() {
-		width: auto;
-		max-width: $break-mobile;
-	}
-
 	.components-dropdown-menu__menu {
 		padding: 0;
 	}
