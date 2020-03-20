@@ -18,7 +18,6 @@ export const BASE = {
  *
  * "G2" refers to the movement to advance the interface of the block editor.
  * https://github.com/WordPress/gutenberg/issues/18667
-
  */
 export const G2 = {
 	blue: {
@@ -143,13 +142,13 @@ export const UI = {
 
 export const COLORS = {
 	...BASE,
-	darkGray: merge( DARK_GRAY, G2.darkGray ),
+	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
-	lightGray: merge( LIGHT_GRAY, G2.lightGray ),
+	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
-	blue: merge( BLUE, G2.blue ),
+	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
 	ui: UI,
 };
