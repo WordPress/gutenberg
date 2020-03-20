@@ -17,26 +17,28 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import {
 	ALIGNMENTS,
 	DIRECTION,
-	useControlledState,
-	getIndexFromAlign,
-	getAlignFromIndex,
+	FLEX_ALIGNMENT_PROPS,
+	getAlignmentIndex,
+	getAlignmentValueFromIndex,
 	getNextIndexFromDirection,
 } from './utils';
 import { color, reduceMotion } from '../utils/style-mixins';
+import { useControlledState } from '../utils/hooks';
 
 export default function AlignmentControl( {
 	alignment: alignmentProp = 'center',
 	onChange = noop,
 } ) {
 	const [ alignIndex, setAlignIndex ] = useControlledState(
-		getIndexFromAlign( alignmentProp )
+		getAlignmentIndex( alignmentProp )
 	);
 	const nodeRef = useRef();
 
 	const handleOnChange = ( nextIndex ) => {
-		const alignName = getAlignFromIndex( nextIndex );
+		const alignName = getAlignmentValueFromIndex( nextIndex );
+
 		setAlignIndex( nextIndex );
-		onChange( alignName, { flexProps: alignmentProp[ nextIndex ] } );
+		onChange( alignName );
 	};
 
 	const handleOnKeyDown = ( event ) => {
@@ -84,7 +86,7 @@ export default function AlignmentControl( {
 	const createHandleOnClick = ( index ) => ( event ) => {
 		nodeRef.current.focus();
 		event.preventDefault();
-		handleOnChange( index );
+		handleOnChange( index, { flexProps: FLEX_ALIGNMENT_PROPS[ index ] } );
 	};
 
 	return (

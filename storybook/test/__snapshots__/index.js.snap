@@ -1,5 +1,178 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Storyshots Components/AlignmentControl Default 1`] = `
+.emotion-36 {
+  --maxWidth: 92px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  max-width: var( --maxWidth );
+  display: grid;
+  grid-template-columns: repeat( 3,1fr );
+  grid-template-rows: repeat( 3,calc( var( --maxWidth ) / 3 ) );
+  outline: none;
+}
+
+.emotion-36:active,
+.emotion-36:focus {
+  border: 1px solid #007cba;
+}
+
+.emotion-2 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.emotion-0 {
+  width: 6px;
+  height: 6px;
+  margin: auto;
+  -webkit-transition: all 120ms linear;
+  transition: all 120ms linear;
+  background: currentColor;
+  color: #b5bcc2;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+*:hover > .emotion-0 {
+  color: #007cba;
+}
+
+.emotion-16 {
+  width: 6px;
+  height: 6px;
+  margin: auto;
+  -webkit-transition: all 120ms linear;
+  transition: all 120ms linear;
+  background: currentColor;
+  box-shadow: 0 0 0 2px #000;
+  color: #000;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-16 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+*:hover > .emotion-16 {
+  color: #000;
+}
+
+<div
+  className="emotion-36 emotion-37"
+  onKeyDown={[Function]}
+  tabIndex={0}
+>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-16 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+  <div
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <div
+      className="dot emotion-0 emotion-1"
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/AnglePickerControl Default 1`] = `
 <div
   className="components-base-control components-angle-picker-control"
