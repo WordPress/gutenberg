@@ -23,6 +23,12 @@ $navigation-item-height: 46px;
 	padding: $grid-unit-20;
 }
 
+// Ensure sub-menus stay open and visible when a nested block is selected.
+.wp-block-navigation__container.is-parent-of-selected-block {
+	visibility: visible;
+	opacity: 1;
+}
+
 /**
  * Colors Selector component
  */
