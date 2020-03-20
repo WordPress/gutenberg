@@ -33,7 +33,7 @@ const MoreMenu = ( { showIconLabel } ) => (
 			'show-icon-label': showIconLabel,
 		} ) }
 		icon={ moreVertical }
-		label={ __( 'More tools & options' ) }
+		label={ __( 'More options' ) }
 		popoverProps={ POPOVER_PROPS }
 		toggleProps={ TOGGLE_PROPS }
 	>

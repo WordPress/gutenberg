@@ -33,9 +33,8 @@ const Header = () => {
 		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
-			shortcut: select(
-				'core/keyboard-shortcuts'
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isEditorSidebarOpened: select(
 				'core/edit-post'
@@ -44,8 +43,13 @@ const Header = () => {
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
+
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		} ),
 		[]
 	);
