@@ -1,1 +1,1 @@
-export { default as controls } from './default-function-named';
+export { default as controls } from '../default-function-anonymous';

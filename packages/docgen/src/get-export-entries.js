@@ -1,19 +1,30 @@
 /**
  * External dependencies
  */
-const ts = require( 'typescript' );
-const { SyntaxKind } = ts;
+const { SyntaxKind } = require( 'typescript' );
 
 const { hasExportModifier, hasDefaultModifier } = require( './has-modifier' );
+
+/**
+ * @typedef {import('typescript').Statement} Statement
+ */
+
+/**
+ * @typedef ExportEntry
+ *
+ * @property {string} localName
+ * @property {string} exportedName
+ * @property {?string} module
+ */
 
 /**
  * Returns the export entry records of the given export statement.
  * Unlike [the standard](http://www.ecma-international.org/ecma-262/9.0/#exportentry-record),
  * the `importName` and the `localName` are merged together.
  *
- * @param {Object} statement TypeScript AST node representing an export.
+ * @param {Statement} statement TypeScript AST node representing an export.
  *
- * @return {Array} Exported entry records. Example:
+ * @return {Array<ExportEntry>} Exported entry records. Example:
  * [ {
  *    localName: 'localName',
  *    exportName: 'exportedName',

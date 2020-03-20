@@ -3,9 +3,21 @@
  */
 const { SourceFile, SyntaxKind } = require( 'typescript' );
 
+/**
+ * Internal dependencies
+ */
 const { hasExportModifier } = require( './has-modifier' );
 
 /**
+ * ExportAssignment
+ *   - export default 3
+ *
+ * ExportDeclaration:
+ *   - export { a, b } from 'c'
+ *
+ * hasExportModifier
+ *   - export const x = 42
+ *
  * @param {SourceFile} sourceFile
  */
 function getExportStatements( sourceFile ) {

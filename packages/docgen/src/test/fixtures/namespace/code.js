@@ -1,1 +1,1 @@
-export * from './namespace-module';
+export * from './module';

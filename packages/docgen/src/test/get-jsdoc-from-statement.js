@@ -1,9 +1,4 @@
 /**
- * External dependencies.
- */
-const ts = require( 'typescript' );
-
-/**
  * Node dependencies.
  */
 const { join } = require( 'path' );
@@ -11,18 +6,13 @@ const { join } = require( 'path' );
 /**
  * Internal dependencies.
  */
+const compile = require( '../compile' );
 const getJSDocFromToken = require( '../get-jsdoc-from-statement' );
 
 describe( 'JSDoc', () => {
 	const prepare = ( dir ) => {
 		const filePath = join( __dirname, 'fixtures', dir, 'code.js' );
-		const program = ts.createProgram( [ filePath ], {
-			allowJs: true,
-			target: ts.ScriptTarget.ES2020,
-		} );
-
-		const typeChecker = program.getTypeChecker();
-		const sourceFile = program.getSourceFile( filePath );
+		const { typeChecker, sourceFile } = compile( filePath );
 
 		return {
 			typeChecker,

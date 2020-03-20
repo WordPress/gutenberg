@@ -2,4 +2,4 @@ export {
 	functionDeclaration,
 	variableDeclaration,
 	ClassDeclaration,
-} from './named-identifiers';
+} from '../named-identifiers/code';

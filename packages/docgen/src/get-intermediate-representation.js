@@ -1,144 +1,237 @@
 /**
  * External dependencies.
  */
-const { get } = require( 'lodash' );
+const { get, flatten } = require( 'lodash' );
+const { SyntaxKind } = require( 'typescript' );
+
+/**
+ * Node dependencies.
+ */
+const { dirname } = require( 'path' );
 
 /**
  * Internal dependencies.
  */
+const compile = require( './compile' );
 const getExportEntries = require( './get-export-entries' );
-const getJSDocFromToken = require( './get-jsdoc-from-token' );
-const getDependencyPath = require( './get-dependency-path' );
+const getJSDocFromStatement = require( './get-jsdoc-from-statement' );
+
+/**
+ * @typedef {import('typescript').TypeChecker} TypeChecker
+ */
+
+/**
+ * @typedef {import('typescript').Statement} Statement
+ */
+
+/**
+ * @typedef {import('typescript').SourceFile} SourceFile
+ */
+
+/**
+ * @typedef {import('./get-export-entries').ExportEntry} ExportEntry
+ */
 
 const UNDOCUMENTED = 'Undocumented declaration.';
 const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
-const hasClassWithName = ( node, name ) =>
-	node.type === 'ClassDeclaration' && node.id.name === name;
+/**
+ * @param {Statement} statement
+ * @param {string} name
+ */
+const hasClassWithName = ( statement, name ) =>
+	statement.kind === SyntaxKind.ClassDeclaration &&
+	statement.name &&
+	statement.name.escapedText === name;
 
-const hasFunctionWithName = ( node, name ) =>
-	node.type === 'FunctionDeclaration' && node.id.name === name;
+/**
+ * @param {Statement} statement
+ * @param {string} name
+ */
+const hasFunctionWithName = ( statement, name ) =>
+	statement.kind === SyntaxKind.FunctionDeclaration &&
+	statement.name &&
+	statement.name.escapedText === name;
 
-const hasVariableWithName = ( node, name ) =>
-	node.type === 'VariableDeclaration' &&
-	node.declarations.some( ( declaration ) => {
-		if ( declaration.id.type === 'ObjectPattern' ) {
-			return declaration.id.properties.some(
-				( property ) => property.key.name === name
+/**
+ * @param {Statement} statement
+ * @param {string} name
+ */
+const hasVariableWithName = ( statement, name ) =>
+	statement.kind === SyntaxKind.VariableStatement &&
+	statement.declarationList.declarations.some( ( declaration ) => {
+		if ( declaration.name.kind === SyntaxKind.ObjectBindingPattern ) {
+			return declaration.name.elements.some(
+				( element ) => element.name.escapedText === name
 			);
 		}
-		return declaration.id.name === name;
+		return declaration.name.escapedText === name;
 	} );
 
-const hasNamedExportWithName = ( node, name ) =>
-	node.type === 'ExportNamedDeclaration' &&
-	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
-		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
-		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
+/**
+ * @param {Statement} statement
+ * @param {string} name
+ */
+const hasImportWithName = ( statement, name ) =>
+	statement.kind === SyntaxKind.ImportDeclaration &&
+	// import a from 'b'
+	( ( statement.importClause.name &&
+		statement.importClause.name.escapedText === name ) ||
+		// import { a } from 'b'
+		( statement.importClause.namedBindings &&
+			// import * as a from 'b' is SyntaxKind.NamespaceImport
+			// So, this check is necessary.
+			statement.importClause.namedBindings.kind ===
+				SyntaxKind.NamedImports &&
+			statement.importClause.namedBindings.elements.some(
+				( specifier ) => specifier.name.escapedText === name
+			) ) );
 
-const hasImportWithName = ( node, name ) =>
-	node.type === 'ImportDeclaration' &&
-	node.specifiers.some( ( specifier ) => specifier.local.name === name );
+const someImportMatchesName = ( name, statement ) => {
+	if ( statement.importClause.name && name === 'default' ) {
+		return true;
+	}
 
-const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
-
-const someImportMatchesName = ( name, token ) => {
-	let matches = false;
-	token.specifiers.forEach( ( specifier ) => {
-		if (
-			specifier.type === 'ImportDefaultSpecifier' &&
-			name === 'default'
-		) {
-			matches = true;
-		}
-		if (
-			specifier.type === 'ImportSpecifier' &&
-			name === specifier.imported.name
-		) {
-			matches = true;
-		}
-	} );
-	return matches;
+	return statement.importClause.namedBindings.elements.some( ( specifier ) =>
+		specifier.propertyName
+			? specifier.propertyName.escapedText === name
+			: specifier.name.escapedText === name
+	);
 };
 
-const someEntryMatchesName = ( name, entry, token ) =>
-	( token.type === 'ExportNamedDeclaration' && entry.localName === name ) ||
-	( token.type === 'ImportDeclaration' &&
-		someImportMatchesName( name, token ) );
+/**
+ * @param {string} name
+ * @param {ExportEntry} entry
+ * @param {Statement} statement
+ */
+const someEntryMatchesName = ( name, entry, statement ) =>
+	( statement.kind === SyntaxKind.ExportDeclaration &&
+		entry.localName === name ) ||
+	( statement.kind === SyntaxKind.ImportDeclaration &&
+		someImportMatchesName( name, statement ) );
 
-const getJSDocFromDependency = ( token, entry, parseDependency ) => {
+/**
+ * @typedef IREntry
+ *
+ * @param {?string} path
+ * @param {string} name
+ * @param {string} description
+ * @param {Array} tags
+ */
+
+/**
+ * @param {Statement} statement
+ * @param {ExportEntry} entry
+ * @param {() => Array<IREntry>} getDependencyIR
+ */
+const getJSDocFromDependency = ( statement, entry, getDependencyIR ) => {
 	let doc;
-	const ir = parseDependency( getDependencyPath( token ) );
+	const ir = getDependencyIR( statement );
 	if ( entry.localName === NAMESPACE_EXPORT ) {
 		doc = ir.filter( ( { name } ) => name !== DEFAULT_EXPORT );
 	} else {
 		doc = ir.find( ( { name } ) =>
-			someEntryMatchesName( name, entry, token )
+			someEntryMatchesName( name, entry, statement )
 		);
 	}
 	return doc;
 };
 
-const getJSDoc = ( token, entry, ast, parseDependency ) => {
+/**
+ * @param {Statement} statement
+ * @param {ExportEntry} entry
+ * @param {TypeChecker} typeChecker
+ * @param {SourceFile} sourceFile
+ * @param {() => Array<IREntry>} getDependencyIR
+ */
+const getJSDoc = (
+	statement,
+	entry,
+	typeChecker,
+	sourceFile,
+	getDependencyIR
+) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
-		doc = getJSDocFromToken( token );
+		doc = getJSDocFromStatement( statement, typeChecker );
 		if ( doc !== undefined ) {
 			return doc;
 		}
 	}
 
 	if ( entry && entry.module === null ) {
-		const candidates = ast.body.filter( ( node ) => {
+		const candidates = sourceFile.statements.filter( ( stmt ) => {
 			return (
-				hasClassWithName( node, entry.localName ) ||
-				hasFunctionWithName( node, entry.localName ) ||
-				hasVariableWithName( node, entry.localName ) ||
-				hasNamedExportWithName( node, entry.localName ) ||
-				hasImportWithName( node, entry.localName )
+				hasClassWithName( stmt, entry.localName ) ||
+				hasFunctionWithName( stmt, entry.localName ) ||
+				hasVariableWithName( stmt, entry.localName ) ||
+				hasImportWithName( stmt, entry.localName )
 			);
 		} );
 		if ( candidates.length !== 1 ) {
 			return doc;
 		}
 		const node = candidates[ 0 ];
-		if ( isImportDeclaration( node ) ) {
-			doc = getJSDocFromDependency( node, entry, parseDependency );
+		if ( node.kind === SyntaxKind.ImportDeclaration ) {
+			doc = getJSDocFromDependency( node, entry, getDependencyIR );
 		} else {
-			doc = getJSDocFromToken( node );
+			doc = getJSDocFromStatement( node, typeChecker );
 		}
 		return doc;
 	}
 
-	return getJSDocFromDependency( token, entry, parseDependency );
+	return getJSDocFromDependency( statement, entry, getDependencyIR );
 };
 
 /**
- * Takes a export token and returns an intermediate representation in JSON.
+ * Function that takes a path and returns the intermediate representation of the dependency file.
  *
- * If the export token doesn't contain any JSDoc, and it's a identifier,
- * the identifier declaration will be looked up in the file or dependency
- * if an `ast` and `parseDependency` callback are provided.
+ * @param {SourceFile} sourceFile
+ * */
+const getDependencyIR = ( sourceFile ) => ( statement ) => {
+	const dependencyPath = require.resolve( statement.moduleSpecifier.text, {
+		paths: [ dirname( sourceFile.fileName ) ],
+	} );
+
+	const {
+		exportStatements,
+		typeChecker,
+		sourceFile: depSourceFile,
+	} = compile( dependencyPath );
+
+	return getIntermediateRepresentation(
+		dependencyPath,
+		exportStatements,
+		typeChecker,
+		depSourceFile
+	);
+};
+
+/**
+ * @param {string} path
+ * @param {Statement} statement
+ * @param {TypeChecker} typeChecker
+ * @param {SourceFile} sourceFile
  *
- * @param {string} path Path to file being processed.
- * @param {Object} token Espree export token.
- * @param {Object} [ast] Espree ast of the file being parsed.
- * @param {Function} [parseDependency] Function that takes a path
- * and returns the intermediate representation of the dependency file.
- *
- * @return {Object} Intermediate Representation in JSON.
+ * @return {Array<IREntry>} Intermediate Representation in JSON.
  */
-module.exports = function(
+export const getIRFromStatement = (
 	path,
-	token,
-	ast = { body: [] },
-	parseDependency = () => {}
-) {
-	const exportEntries = getExportEntries( token );
+	statement,
+	typeChecker,
+	sourceFile
+) => {
+	const exportEntries = getExportEntries( statement );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
-		const doc = getJSDoc( token, entry, ast, parseDependency );
+		const doc = getJSDoc(
+			statement,
+			entry,
+			typeChecker,
+			sourceFile,
+			getDependencyIR( sourceFile )
+		);
 		if ( entry.localName === NAMESPACE_EXPORT ) {
 			doc.forEach( ( namedExport ) => {
 				ir.push( {
@@ -146,8 +239,6 @@ module.exports = function(
 					name: namedExport.name,
 					description: namedExport.description,
 					tags: namedExport.tags,
-					lineStart: entry.lineStart,
-					lineEnd: entry.lineEnd,
 				} );
 			} );
 		} else {
@@ -156,10 +247,34 @@ module.exports = function(
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),
 				tags: get( doc, [ 'tags' ], [] ),
-				lineStart: entry.lineStart,
-				lineEnd: entry.lineEnd,
 			} );
 		}
 	} );
 	return ir;
+};
+
+/**
+ * Takes export statements and returns an intermediate representation in JSON.
+ *
+ * If the export statement doesn't contain any JSDoc and it's an identifier,
+ * the identifier declaration will be looked up in the file or dependency.
+ *
+ * @param {string} path Path to file being processed.
+ * @param {Array<Statement>} exportStatements TypeScript export statements.
+ * @param {TypeChecker} typeChecker TypeScript type checker
+ * @param {SourceFile} sourceFile TypeScript SourceFile object of the file being parsed.
+ *
+ * @return {Array<IREntry>} Intermediate Representation in JSON.
+ */
+export const getIntermediateRepresentation = (
+	path,
+	exportStatements,
+	typeChecker,
+	sourceFile
+) => {
+	return flatten(
+		exportStatements.map( ( statement ) =>
+			getIRFromStatement( path, statement, typeChecker, sourceFile )
+		)
+	);
 };
