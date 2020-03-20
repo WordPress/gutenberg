@@ -26,7 +26,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $dark-gray-primary;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -81,7 +81,7 @@
 
 	.components-menu-group + .components-menu-group {
 		margin-top: 0;
-		border-top: $border-width solid $light-gray-secondary;
+		border-top: $border-width solid $dark-gray-primary;
 		padding: $grid-unit-15;
 	}
 }
