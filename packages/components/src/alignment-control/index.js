@@ -2,8 +2,6 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import styled from '@emotion/styled';
-import { css } from '@emotion/core';
 
 /**
  * WordPress dependencies
@@ -22,12 +20,15 @@ import {
 	getAlignmentValueFromIndex,
 	getNextIndexFromDirection,
 } from './utils';
-import { color, reduceMotion } from '../utils/style-mixins';
+import { Root, Cell, Point } from './styles/alignment-control-styles';
 import { useControlledState } from '../utils/hooks';
 
+// TODO: Account for RTL alignments
 export default function AlignmentControl( {
 	alignment: alignmentProp = 'center',
 	onChange = noop,
+	onKeyDown = noop,
+	...props
 } ) {
 	const [ alignIndex, setAlignIndex ] = useControlledState(
 		getAlignmentIndex( alignmentProp )
@@ -44,6 +45,8 @@ export default function AlignmentControl( {
 	const handleOnKeyDown = ( event ) => {
 		const { keyCode } = event;
 		let nextIndex;
+
+		onKeyDown( event );
 
 		switch ( keyCode ) {
 			case UP:
@@ -90,72 +93,24 @@ export default function AlignmentControl( {
 	};
 
 	return (
-		<RootView tabIndex={ 0 } ref={ nodeRef } onKeyDown={ handleOnKeyDown }>
+		<Root
+			{ ...props }
+			tabIndex={ 0 }
+			ref={ nodeRef }
+			onKeyDown={ handleOnKeyDown }
+		>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;
 				return (
-					<CellView
+					<Cell
 						tabIndex={ -1 }
 						key={ align }
 						onClick={ createHandleOnClick( index ) }
 					>
-						<DotView className="dot" isActive={ isActive } />
-					</CellView>
+						<Point isActive={ isActive } />
+					</Cell>
 				);
 			} ) }
-		</RootView>
+		</Root>
 	);
 }
-
-const RootView = styled.div`
-	--maxWidth: 92px;
-	border: 1px solid transparent;
-	border-radius: 2px;
-	max-width: var( --maxWidth );
-	display: grid;
-	grid-template-columns: repeat( 3, 1fr );
-	grid-template-rows: repeat( 3, calc( var( --maxWidth ) / 3 ) );
-	outline: none;
-
-	&:active,
-	&:focus {
-		border: 1px solid ${color( 'blue.medium.focus' )};
-	}
-`;
-
-const DotView = styled.div`
-	width: 6px;
-	height: 6px;
-	margin: auto;
-	transition: all 120ms linear;
-	background: currentColor;
-	${reduceMotion( 'transition' )};
-
-	${( { isActive } ) =>
-		css( {
-			boxShadow: isActive ? `0 0 0 2px ${ color( 'black' ) }` : null,
-			color: isActive ? color( 'black' ) : color( 'lightGray.800' ),
-		} )}
-
-	*:hover > & {
-		${( { isActive } ) =>
-			css( {
-				color: isActive
-					? color( 'black' )
-					: color( 'blue.medium.focus' ),
-			} )}
-	}
-`;
-
-const CellView = styled.div`
-	appearance: none;
-	border: none;
-	margin: 0;
-	display: flex;
-	position: relative;
-	outline: none;
-	cursor: pointer;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-`;
