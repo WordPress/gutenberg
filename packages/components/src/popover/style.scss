@@ -143,9 +143,10 @@ $arrow-size: 8px;
 }
 
 .components-popover__content {
+	margin: 6px;
 	height: 100%;
 	background: $white;
-	border: $border-width solid $light-gray-secondary;
+	border: $border-width solid $dark-gray-primary;
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 
