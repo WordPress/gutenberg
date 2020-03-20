@@ -1,4 +1,5 @@
-$floating-toolbar-height: 44;
+$floating-toolbar-height: 44px;
+$floating-toolbar-shift: 47px;
 
 .floatingToolbar {
 	background-color: $dark-gray-500;
@@ -13,7 +14,7 @@ $floating-toolbar-height: 44;
 	justify-content: center;
 	align-self: center;
 	position: absolute;
-	top: -$floating-toolbar-height;
+	top: -$floating-toolbar-shift;
 }
 
 .floatingToolbarFillColor {

@@ -16,7 +16,6 @@ import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import OverflowView from '../../../../../../react-native-overflow-view/src/OverflowView'
 
 /**
  * Internal dependencies
@@ -28,6 +27,7 @@ import BlockMobileToolbar from '../block-mobile-toolbar';
 import FloatingToolbar from './block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
+import OverflowView from '../../../../../../react-native-overflow-view/src/OverflowView';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -205,12 +205,11 @@ class BlockListBlock extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
-				hitSlop={{top: (adjustsForFloatingToolbar?44:0)}} 
+				hitSlop={ { top: adjustsForFloatingToolbar ? 44 : 0 } }
 				accessible={ ! isSelected }
 				accessibilityRole={ 'button' }
 			>
-				<OverflowView accessibilityLabel={ accessibilityLabel } 
-				presentingOverflow={ adjustsForFloatingToolbar }>
+				<OverflowView presentingOverflow={ adjustsForFloatingToolbar }>
 					{ showFloatingToolbar && (
 						<FloatingToolbar>
 							{ hasParent && (
@@ -284,7 +283,9 @@ export default compose( [
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
 
 		const showFloatingToolbar = shouldShowFloatingToolbar( clientId );
-		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar( clientId );
+		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar(
+			clientId
+		);
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
