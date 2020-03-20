@@ -356,14 +356,6 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
-    @ReactProp(name = "linkTextColor", customType = "Color")
-    public void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
-        view.setLinkFormatter(new LinkFormatter(view,
-                new LinkFormatter.LinkStyle(
-                        color, true)
-        ));
-    }
-
     /* End of the code taken from ReactTextInputManager */
 
     @ReactProp(name = "color", customType = "Color")
