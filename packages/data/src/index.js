@@ -18,6 +18,7 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
+export { default as useSelector } from './components/use-selector';
 export {
 	useDispatch,
 	useDispatchWithMap as __unstableUseDispatchWithMap,
