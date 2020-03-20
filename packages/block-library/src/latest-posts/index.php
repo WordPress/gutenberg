@@ -104,11 +104,14 @@ function render_block_core_latest_posts( $attributes ) {
 
 		if ( isset( $attributes['displayPostAuthor'] ) && $attributes['displayPostAuthor'] ) {
 			$recent_author       = get_user_by( 'ID', $post->post_author );
-			$author_display_name = 'by ' . $recent_author->display_name;
-			$list_items_markup  .= sprintf(
-				'<span class="wp-block-latest-posts__post-author">%1$s</span>',
-				esc_html( $author_display_name )
-			);
+			/* translators: byline. %s: current author. */
+			$author_display_name = sprintf( __( 'by %s' ), $recent_author->display_name );
+			if ( ! empty( $recent_author->display_name ) ) {
+				$list_items_markup  .= sprintf(
+					'<span class="wp-block-latest-posts__post-author">%1$s</span>',
+					esc_html( $author_display_name )
+				);
+			}
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
