@@ -20,6 +20,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
+import floatingToolbarStyles from './block-mobile-floating-toolbar.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
@@ -159,8 +160,12 @@ export class BlockList extends Component {
 
 		return (
 			<View
-				zIndex={ 1000 + index }
-				hitSlop={ { top: adjustsForFloatingToolbar ? 44 : 0 } }
+				zIndex={ 100 + index }
+				hitSlop={ {
+					top: adjustsForFloatingToolbar
+						? floatingToolbarStyles.hitslop.top
+						: 0,
+				} }
 				pointerEvents={ 'box-none' }
 			>
 				{ children }

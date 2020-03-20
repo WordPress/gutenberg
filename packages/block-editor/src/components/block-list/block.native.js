@@ -21,6 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './block.scss';
+import floatingToolbarStyles from './block-mobile-floating-toolbar.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
@@ -205,7 +206,11 @@ class BlockListBlock extends Component {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
-				hitSlop={ { top: adjustsForFloatingToolbar ? 44 : 0 } }
+				hitSlop={ {
+					top: adjustsForFloatingToolbar
+						? floatingToolbarStyles.hitslop.top
+						: 0,
+				} }
 				accessible={ ! isSelected }
 				accessibilityRole={ 'button' }
 			>

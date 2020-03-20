@@ -24,3 +24,7 @@ $floating-toolbar-shift: 47px;
 .floatingToolbarFillColorDark {
 	background-color: rgba(#3c434a, 0.85);
 }
+
+.hitslop {
+	top: $floating-toolbar-shift;
+}
