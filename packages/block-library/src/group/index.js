@@ -91,7 +91,6 @@ export const settings = {
 		html: false,
 		lightBlockWrapper: true,
 		__experimentalColor: true,
-		customClassName: false,
 	},
 	transforms: {
 		from: [

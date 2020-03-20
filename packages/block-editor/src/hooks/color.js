@@ -45,14 +45,14 @@ function addAttributes( settings ) {
 	if ( ! settings.attributes?.backgroundColor ) {
 		settings.attributes = Object.assign( settings.attributes, {
 			backgroundColor: {
-				type: 'object',
+				type: 'string',
 			},
 		} );
 	}
 	if ( ! settings.attributes?.textColor ) {
 		settings.attributes = Object.assign( settings.attributes, {
 			textColor: {
-				type: 'object',
+				type: 'string',
 			},
 		} );
 	}
