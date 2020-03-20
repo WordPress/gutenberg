@@ -32,7 +32,7 @@ const PluginDocumentSettingFill = ( {
 	title,
 	icon,
 	children,
-	currentPostType
+	editorContext,
 } ) => {
 	return (
 		<>
@@ -49,7 +49,9 @@ const PluginDocumentSettingFill = ( {
 						opened={ opened }
 						onToggle={ onToggle }
 					>
-						{ isFunction( children ) ? ( children( { currentPostType } ) ) : ( children ) }
+						{ isFunction( children )
+							? children( { ...editorContext } )
+							: children }
 					</PanelBody>
 				) }
 			</Fill>
@@ -115,13 +117,12 @@ const PluginDocumentSettingPanel = compose(
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
-		return (
-			{
-				opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
-				isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
-				currentPostType: select( 'core/editor' ).getCurrentPostType(),
-			}
-		);
+		return {
+			opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
+			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+				panelName
+			),
+		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
