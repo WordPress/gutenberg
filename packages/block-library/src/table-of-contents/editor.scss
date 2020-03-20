@@ -1,0 +1,21 @@
+.wp-block-table-of-contents {
+	.editor-block-list__block & ul {
+		padding-left: 1.3em;
+
+		a {
+			display: block;
+
+			&:focus {
+				box-shadow: none;
+			}
+		}
+
+		ul {
+			margin-bottom: 0;
+		}
+	}
+
+	p {
+		opacity: 0.5;
+	}
+}
