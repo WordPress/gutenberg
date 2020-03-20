@@ -19,7 +19,13 @@ const styleSupportKeys = [ COLOR_SUPPORT_KEY ];
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
-// This is a global styles utility that should probably be shared with code elsewhere.
+/**
+ * Flatten a nested Global styles config and generates the corresponding
+ * flattened CSS variables.
+ *
+ * @param  {Object} styles Styles configuration
+ * @return {Object}        Flattened CSS variables declaration
+ */
 function getCSSVariables( styles = {} ) {
 	const prefix = '--wp';
 	const token = '--';

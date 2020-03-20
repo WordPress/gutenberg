@@ -16,7 +16,6 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-// This should be moved out of the components folder
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
