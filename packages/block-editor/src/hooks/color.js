@@ -49,7 +49,7 @@ function addAttributes( settings ) {
 		} );
 	}
 	if ( ! settings.attributes?.textColor ) {
-		settings.attributes = Object.assign( settings.attributes, {
+		Object.assign( settings.attributes, {
 			textColor: {
 				type: 'string',
 			},
