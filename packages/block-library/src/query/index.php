@@ -93,9 +93,11 @@ function render_block_core_query( $attributes ) {
 				foreach ( $blocks as $block ) {
 					$block_data = array(
 						'blockName'    => $block['name'],
-						'attrs'        => $block['attributes'],
 						'innerContent' => array(),
 					);
+					if ( isset( $block['attributes'])) {
+						$block_data['attrs'] = $block['attributes'];
+					}
 
 					$allowed_html         = wp_kses_allowed_html( 'post' );
 					$allowed_html['time'] = array(
