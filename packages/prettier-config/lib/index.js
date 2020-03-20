@@ -1,4 +1,13 @@
-module.exports = {
+/** @typedef {import('prettier').Options} PrettierOptions */
+
+/**
+ * @typedef WPPrettierOptions
+ *
+ * @property {boolean} [parenSpacing=true] Insert spaces inside parentheses.
+ */
+
+/** @type {PrettierOptions & WPPrettierOptions} */
+const config = {
 	useTabs: true,
 	tabWidth: 4,
 	printWidth: 80,
@@ -10,3 +19,5 @@ module.exports = {
 	semi: true,
 	arrowParens: 'always',
 };
+
+module.exports = config;
