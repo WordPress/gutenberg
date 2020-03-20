@@ -2,7 +2,10 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+
+		// This is required because the `react-native-url-polyfill` dependency lacks types
+		"noImplicitAny": false
 	},
 	"include": [ "src/**/*" ]
 }
