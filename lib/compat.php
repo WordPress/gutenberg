@@ -125,3 +125,19 @@ function gutenberg_get_post_from_context() {
 	}
 	return get_post();
 }
+
+/**
+ * Reorders the priority on the_content filters for blocks and autoembeds
+ *
+ * See: https://core.trac.wordpress.org/ticket/46457
+ */
+function gutenberg_reorder_content_filters() {
+	global $wp_embed;
+	remove_filter( 'the_content', array( $wp_embed, 'run_shortcode' ), 8 );
+	remove_filter( 'the_content', array( $wp_embed, 'autoembed' ), 8 );
+	remove_filter( 'the_content', 'do_blocks', 9 );
+	add_filter( 'the_content', 'do_blocks', 8 );
+	add_filter( 'the_content', array( $wp_embed, 'run_shortcode' ), 9 );
+	add_filter( 'the_content', array( $wp_embed, 'autoembed' ), 9 );
+}
+add_action( 'init', 'gutenberg_reorder_content_filters' );
