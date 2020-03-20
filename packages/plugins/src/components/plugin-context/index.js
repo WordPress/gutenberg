@@ -24,6 +24,9 @@ export { Provider as PluginContextProvider };
  */
 export const withPluginContext = ( mapContextToProps ) =>
 	createHigherOrderComponent( ( OriginalComponent ) => {
+		/**
+		 * Wrap the passed component in a withSelect to allow passing data to it.
+		 */
 		return withSelect( ( select ) => {
 			return {
 				editorContext: {
