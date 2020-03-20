@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -13,6 +19,7 @@ const PluginPostPublishPanelFill = ( {
 	title,
 	initialOpen = false,
 	icon,
+	editorContext,
 } ) => (
 	<Fill>
 		<PanelBody
@@ -21,7 +28,9 @@ const PluginPostPublishPanelFill = ( {
 			title={ title }
 			icon={ icon }
 		>
-			{ children }
+			{ isFunction( children )
+				? children( { ...editorContext } )
+				: children }
 		</PanelBody>
 	</Fill>
 );
