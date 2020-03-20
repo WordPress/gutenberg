@@ -208,7 +208,6 @@ class RichImage extends Component {
 									isCollapsed={ true }
 									icon={ <RotateLeftIcon /> }
 									label={ __( 'Rotate' ) }
-									disabled={ inProgress }
 									popoverProps={ {
 										position: 'bottom right',
 									} }
@@ -236,48 +235,27 @@ class RichImage extends Component {
 									isCollapsed={ true }
 									icon={ <FlipVerticalIcon /> }
 									label={ __( 'Flip' ) }
-									disabled={ inProgress }
 									popoverProps={ {
 										position: 'bottom right',
 									} }
-									controls={
-										inProgress
-											? []
-											: [
-													{
-														icon: (
-															<FlipVerticalIcon />
-														),
-														title: __(
-															'Flip vertical'
-														),
-														onClick: () =>
-															this.adjustImage(
-																'flip',
-																{
-																	direction:
-																		'vertical',
-																}
-															),
-													},
-													{
-														icon: (
-															<FlipHorizontalIcon />
-														),
-														title: __(
-															'Flip horizontal'
-														),
-														onClick: () =>
-															this.adjustImage(
-																'flip',
-																{
-																	direction:
-																		'horizontal',
-																}
-															),
-													},
-											  ]
-									}
+									controls={ [
+										{
+											icon: <FlipVerticalIcon />,
+											title: __( 'Flip vertical' ),
+											onClick: () =>
+												this.adjustImage( 'flip', {
+													direction: 'vertical',
+												} ),
+										},
+										{
+											icon: <FlipHorizontalIcon />,
+											title: __( 'Flip horizontal' ),
+											onClick: () =>
+												this.adjustImage( 'flip', {
+													direction: 'horizontal',
+												} ),
+										},
+									] }
 								/>
 							</Fragment>
 						) }
