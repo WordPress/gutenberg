@@ -32,6 +32,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"displayPostAuthor": {
+			"type": "boolean",
+			"default": false
+		},
 		"postLayout": {
 			"type": "string",
 			"default": "list"
