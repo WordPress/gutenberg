@@ -41,7 +41,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		&:hover,
 		&:focus-within {
 			cursor: pointer;
-			z-index: 99999;
 		}
 
 		// Submenu Display
