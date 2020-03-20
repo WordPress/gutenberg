@@ -82,7 +82,7 @@ export function convertHeadingBlocksToAttributes( headingBlocks ) {
 		contentDiv.innerHTML = anchorContent;
 		let anchor = contentDiv.textContent || contentDiv.innerText || '';
 
-		if ( anchor !== '' && anchor.indexOf( '#' ) === -1 ) {
+		if ( anchor !== '' && ! anchor.includes( '#' ) ) {
 			anchor = '#' + cleanForSlug( anchor );
 		}
 
