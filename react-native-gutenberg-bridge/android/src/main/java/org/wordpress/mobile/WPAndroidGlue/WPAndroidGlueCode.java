@@ -26,6 +26,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -38,6 +39,7 @@ import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -75,6 +77,7 @@ public class WPAndroidGlueCode {
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
+    private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -152,6 +155,10 @@ public class WPAndroidGlueCode {
 
     public interface OnMediaEditorListener {
         void onMediaEditorClicked(String mediaUrl);
+    }
+
+    public interface OnLogGutenbergUserEventListener {
+        void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -317,6 +324,11 @@ public class WPAndroidGlueCode {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
             }
+
+            @Override
+            public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
+                mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
+            }
         });
 
         return Arrays.asList(
@@ -392,7 +404,8 @@ public class WPAndroidGlueCode {
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
-                                  OnMediaEditorListener onMediaEditorListener) {
+                                  OnMediaEditorListener onMediaEditorListener,
+                                  OnLogGutenbergUserEventListener onLogGutenbergUserEventListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -403,6 +416,7 @@ public class WPAndroidGlueCode {
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
+        mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

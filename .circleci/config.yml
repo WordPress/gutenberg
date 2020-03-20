@@ -40,7 +40,7 @@ jobs:
         type: boolean
         default: false
     docker:
-      - image: circleci/node:8
+      - image: circleci/node:10
     steps:
       - checkout
       - checkout-gutenberg
@@ -118,8 +118,8 @@ jobs:
         - dependencies-v3-{{ checksum "ios/Gemfile.lock" }}
         - dependencies-v3-
     - run:
-        name: Yarn preios (if needed)
-        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || yarn preios
+        name: Build (if needed)
+        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || SKIP_BUNDLING=true yarn test:e2e:build-app:ios
     - save_cache:
         name: Save Dependencies Cache
         key: dependencies-v3-{{ checksum "ios/Gemfile.lock" }}-{{ checksum "ios/Podfile.lock" }}-{{
@@ -129,9 +129,6 @@ jobs:
         - ~/Library/Caches/CocoaPods
         - ~/.cocoapods/repos/trunk
         - ios/vendor
-    - run:
-        name: Build (if needed)
-        command: test -e ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || yarn react-native run-ios --configuration Release --no-packager
     - run:
         name: Bundle iOS
         command: yarn test:e2e:bundle:ios

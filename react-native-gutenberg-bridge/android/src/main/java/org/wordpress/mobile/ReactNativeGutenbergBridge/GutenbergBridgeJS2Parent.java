@@ -2,13 +2,16 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     interface RNMedia {
@@ -81,6 +84,29 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         }
     }
 
+    enum GutenbergUserEvent {
+        EDITOR_SESSION_TEMPLATE_APPLY("editor_session_template_apply"),
+        EDITOR_SESSION_TEMPLATE_PREVIEW("editor_session_template_preview");
+
+        private static final Map<String, GutenbergUserEvent> MAP = new HashMap<>();
+
+        static {
+            for (GutenbergUserEvent event : values()) {
+                MAP.put(event.name, event);
+            }
+        }
+
+        String name;
+
+        GutenbergUserEvent(String name) {
+            this.name = name;
+        }
+
+        public static GutenbergUserEvent getEnum(String eventName) {
+            return MAP.get(eventName);
+        }
+    }
+
     void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType);
 
     void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType);
@@ -108,4 +134,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestImageFullscreenPreview(String mediaUrl);
 
     void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl);
+
+    void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties);
 }
