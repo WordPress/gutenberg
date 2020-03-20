@@ -94,7 +94,7 @@ export function updateHeadingBlockAnchors() {
 	// Add anchors to any headings that don't have one.
 	getHeadingBlocks().forEach( function( heading, key ) {
 		const headingAnchorEmpty =
-			typeof heading.attributes.anchor === 'undefined' ||
+			heading.attributes.anchor === undefined ||
 			heading.attributes.anchor === '';
 		const headingContentEmpty =
 			typeof heading.attributes.content === 'undefined' ||
