@@ -27,6 +27,11 @@
 				display: block;
 				font-size: 12px;
 			}
+			&.is-primary {
+				&::after {
+					color: $black;
+				}
+			}
 		}
 	}
 }
@@ -79,7 +84,7 @@
 		}
 
 		.block-editor-block-toolbar .components-toolbar {
-			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
+			$top-toolbar-padding: ( $header-height - $grid-unit-60 ) / 2;
 			height: $header-height;
 			padding: $top-toolbar-padding 0;
 		}
