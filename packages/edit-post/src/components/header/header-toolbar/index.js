@@ -24,18 +24,22 @@ import {
 
 const inserterToggleProps = { isPrimary: true };
 
-const HeaderToolbar = () => {
+function HeaderToolbar() {
 	const {
 		hasFixedToolbar,
+		showInserter,
 		isTextModeEnabled,
 		previewDeviceType,
 		showIconLabels,
-		showInserter,
 	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
+			// This setting (richEditingEnabled) should not live in the block editor's setting.
+			showInserter:
+				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
@@ -44,10 +48,6 @@ const HeaderToolbar = () => {
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
-			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			showInserter:
-				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
-				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		} ),
 		[]
 	);
@@ -87,6 +87,6 @@ const HeaderToolbar = () => {
 			) }
 		</NavigableToolbar>
 	);
-};
+}
 
 export default HeaderToolbar;

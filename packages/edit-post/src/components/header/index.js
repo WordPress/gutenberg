@@ -22,19 +22,20 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import PreviewOptions from '../preview-options';
 
-const Header = () => {
+function Header() {
 	const {
-		getBlockSelectionStart,
+		shortcut,
 		hasActiveMetaboxes,
 		isEditorSidebarOpened,
 		isPublishSidebarOpened,
 		isSaving,
-		shortcut,
+		getBlockSelectionStart,
 		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
+			shortcut: select(
+				'core/keyboard-shortcuts'
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isEditorSidebarOpened: select(
 				'core/edit-post'
@@ -43,10 +44,8 @@ const Header = () => {
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-
-			shortcut: select(
-				'core/keyboard-shortcuts'
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			getBlockSelectionStart: select( 'core/block-editor' )
+				.getBlockSelectionStart,
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
@@ -97,14 +96,14 @@ const Header = () => {
 					forceIsSaving={ isSaving }
 				/>
 				<Button
-					aria-expanded={ isEditorSidebarOpened }
 					className={ classnames( {
 						'has-text-label': showIconLabels,
 					} ) }
 					icon={ cog }
-					isPressed={ isEditorSidebarOpened }
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
+					isPressed={ isEditorSidebarOpened }
+					aria-expanded={ isEditorSidebarOpened }
 					shortcut={ shortcut }
 				/>
 				<PinnedItems.Slot scope="core/edit-post" />
@@ -112,6 +111,6 @@ const Header = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 export default Header;

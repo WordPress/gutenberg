@@ -89,7 +89,13 @@
 			background-size: 100px 100%;
 			// Disable reason: This function call looks nicer when each argument is on its own line.
 			/* stylelint-disable */
-			background-image: linear-gradient(-45deg, $theme-color 28%, color($theme-color shade(20%)) 28%, color($theme-color shade(20%)) 72%, $theme-color 72%);
+			background-image: linear-gradient(
+				-45deg,
+				$theme-color 28%,
+				color($theme-color shade(20%)) 28%,
+				color($theme-color shade(20%)) 72%,
+				$theme-color 72%
+			);
 			/* stylelint-enable */
 			border-color: color($theme-color);
 		}

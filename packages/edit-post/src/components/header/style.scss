@@ -25,7 +25,7 @@
 		order: 1;
 
 		// Restore default order for all other browsers
-		@supports ( position: sticky ) {
+		@supports (position: sticky) {
 			order: initial;
 		}
 	}
@@ -55,6 +55,10 @@
 	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
+	@include break-small() {
+		padding-right: $grid-unit-20;
+	}
+
 	button.admin-settings[aria-label] {
 		&.has-text-label {
 			color: $white;
@@ -70,11 +74,8 @@
 			}
 		}
 	}
-
-	@include break-small() {
-		padding-right: $grid-unit-20;
-	}
 }
+
 
 /**
  * Buttons in the Toolbar
@@ -88,6 +89,7 @@
 		margin-right: $grid-unit-10;
 	}
 }
+
 
 .edit-post-header__settings {
 	// Header toggle buttons.
