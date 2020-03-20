@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString } from 'lodash';
+import { isString, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ export function MenuItem( {
 	shortcut,
 	isSelected,
 	role = 'menuitem',
+	editorContext,
 	...props
 } ) {
 	className = classnames( 'components-menu-item__button', className );
@@ -35,7 +36,9 @@ export function MenuItem( {
 	if ( info ) {
 		children = (
 			<span className="components-menu-item__info-wrapper">
-				{ children }
+				{ isFunction( children )
+					? children( { ...editorContext } )
+					: children }
 				<span className="components-menu-item__info">{ info }</span>
 			</span>
 		);
@@ -60,7 +63,9 @@ export function MenuItem( {
 			className={ className }
 			{ ...props }
 		>
-			{ children }
+			{ isFunction( children )
+				? children( { ...editorContext } )
+				: children }
 			<Shortcut
 				className="components-menu-item__shortcut"
 				shortcut={ shortcut }
