@@ -21,7 +21,8 @@ describe( 'Managing reusable blocks', () => {
 				document
 					.querySelector( '.all .count' )
 					.textContent.replace( '(', '' )
-					.replace( ')', '' )
+					.replace( ')', '' ),
+				10
 			)
 		);
 	}
