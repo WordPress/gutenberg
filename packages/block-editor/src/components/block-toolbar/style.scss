@@ -70,6 +70,17 @@
 	display: flex;
 }
 
+.block-editor-block-toolbar__block-parent-wrapper {
+	position: absolute;
+	left: -1px;
+	border: 1px solid $black;
+	border-radius: 2px;
+	transform: translateY(0);
+	transition: all 60ms linear;
+	transition-delay: 300ms;
+	z-index: -1; // This makes it slide out from underneath the toolbar.
+}
+
 .block-editor-block-toolbar__block-switcher-wrapper {
 	.block-editor-block-switcher {
 		display: block;
@@ -112,4 +123,3 @@
 		@include reduce-motion("transition");
 	}
 }
-

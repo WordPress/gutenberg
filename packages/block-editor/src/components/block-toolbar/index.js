@@ -8,10 +8,12 @@ import classnames from 'classnames';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import BlockParent from '../block-parent';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
@@ -86,6 +88,12 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		transform: shouldShowMovers ? 'translateX(0px)' : 'translateX(100%)',
 	};
 
+	const animatedBlockParentStyles = {
+		opacity: shouldShowMovers ? 1 : 0,
+		transform: shouldShowMovers ? 'translateY(-55px)' : 'translateY(0)',
+		transitionDelay: shouldShowMovers ? 0 : 0,
+	};
+
 	const classes = classnames(
 		'block-editor-block-toolbar',
 		! displayHeaderToolbar && 'has-responsive-movers'
@@ -112,6 +120,14 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						/>
 					</div>
 				</div>
+
+				<div
+					className="block-editor-block-toolbar__block-parent-wrapper"
+					style={ animatedBlockParentStyles }
+				>
+					<BlockParent clientIds={ blockClientIds } />
+				</div>
+
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<div
 						{ ...showMoversGestures }
@@ -121,6 +137,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</div>
 				) }
 			</div>
+
 			{ shouldShowVisualToolbar && ! isMultiToolbar && (
 				<>
 					<BlockControls.Slot
