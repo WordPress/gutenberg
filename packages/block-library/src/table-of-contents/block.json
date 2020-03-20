@@ -1,0 +1,17 @@
+{
+	"name": "core/table-of-contents",
+	"category": "common",
+	"attributes": {
+		"headings": {
+			"type": "array",
+			"source": "query",
+			"selector": ".blocks-table-of-contents-entry",
+			"default": [],
+			"query": {
+				"content": { "source": "text" },
+				"anchor": { "source": "attribute", "attribute": "href" },
+				"level": { "source": "attribute", "attribute": "data-level" }
+			}
+		}
+	}
+}
