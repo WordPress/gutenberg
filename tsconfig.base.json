@@ -30,5 +30,14 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true
 	},
-	"exclude": [ "**/benchmark", "**/test/**", "**/build/**", "**/build-*/**" ]
+	"exclude": [
+		// Don't compile react-native types.
+		// They create incompatibilities and require a separate build.
+		"**/*.native.js",
+
+		"**/benchmark",
+		"**/test/**",
+		"**/build/**",
+		"**/build-*/**"
+	]
 }
