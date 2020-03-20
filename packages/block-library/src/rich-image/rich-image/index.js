@@ -44,6 +44,9 @@ const DEFAULT_CROP = {
 	width: 50,
 	height: 50,
 };
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.1;
 
 class RichImage extends Component {
 	constructor( props ) {
@@ -156,6 +159,8 @@ class RichImage extends Component {
 								<Cropper
 									image={ url }
 									disabled={ inProgress }
+									minZoom={ MIN_ZOOM }
+									maxZoom={ MAX_ZOOM }
 									crop={ position }
 									zoom={ zoom }
 									aspect={ isPortrait ? 1 / aspect : aspect }
@@ -178,9 +183,11 @@ class RichImage extends Component {
 								/>
 							</div>
 							<RangeControl
-								min={ 1 }
-								max={ 3 }
-								step={ 0.1 }
+								className="richimage__zoom-control"
+								label={ __( 'Zoom' ) }
+								min={ MIN_ZOOM }
+								max={ MAX_ZOOM }
+								step={ ZOOM_STEP }
 								value={ zoom }
 								onChange={ ( newZoom ) => {
 									this.setState( { zoom: newZoom } );
