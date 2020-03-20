@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapKeys, kebabCase } from 'lodash';
+import { mapKeys, kebabCase, isObject, entries } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,10 +23,29 @@ const hasStyleSupport = ( blockType ) =>
 function getCSSVariables( styles = {} ) {
 	const prefix = '--wp';
 	const token = '--';
+	const getNestedCSSVariables = ( config ) => {
+		let result = {};
+		entries( config ).forEach( ( [ key, value ] ) => {
+			if ( ! isObject( value ) ) {
+				result[ key ] = value;
+				return;
+			}
+
+			result = {
+				...result,
+				...mapKeys(
+					getNestedCSSVariables( value ),
+					( _, subkey ) => kebabCase( key ) + token + subkey
+				),
+			};
+		} );
+
+		return result;
+	};
 
 	return mapKeys(
-		styles,
-		( value, key ) => prefix + token + kebabCase( key )
+		getNestedCSSVariables( styles ),
+		( _, key ) => prefix + token + key
 	);
 }
 

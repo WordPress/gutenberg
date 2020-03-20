@@ -82,8 +82,8 @@ export function addSaveProps( props, blockType, attributes ) {
 	);
 	const textClass = getColorClassName( 'color', textColor );
 	props.className = classnames( props.className, backgroundClass, textClass, {
-		'has-text-color': textColor || style?.textColor,
-		'has-background': backgroundColor || style?.backgroundColor,
+		'has-text-color': textColor || style?.color?.text,
+		'has-background': backgroundColor || style?.color?.background,
 	} );
 
 	return props;
@@ -176,15 +176,20 @@ export const withBlockControls = createHigherOrderComponent(
 
 		const onChangeColor = ( name ) => ( value ) => {
 			const colorObject = getColorObjectByColorValue( colors, value );
+			const attributeName = name + 'Color';
 			const newStyle = {
 				...style,
-				[ name ]: colorObject && colorObject.slug ? undefined : value,
+				color: {
+					...style?.color,
+					[ name ]:
+						colorObject && colorObject.slug ? undefined : value,
+				},
 			};
 			const newNamedColor =
 				colorObject && colorObject.slug ? colorObject.slug : undefined;
 			props.setAttributes( {
 				style: newStyle,
-				[ name ]: newNamedColor,
+				[ attributeName ]: newNamedColor,
 			} );
 		};
 
@@ -195,22 +200,22 @@ export const withBlockControls = createHigherOrderComponent(
 				colorSettings={ [
 					{
 						label: __( 'Text Color' ),
-						onChange: onChangeColor( 'textColor' ),
+						onChange: onChangeColor( 'text' ),
 						colors,
 						value: getColorObjectByAttributeValues(
 							colors,
 							textColor,
-							style?.textColor
+							style?.color?.text
 						).color,
 					},
 					{
 						label: __( 'Background Color' ),
-						onChange: onChangeColor( 'backgroundColor' ),
+						onChange: onChangeColor( 'background' ),
 						colors,
 						value: getColorObjectByAttributeValues(
 							colors,
 							backgroundColor,
-							style?.backgroundColor
+							style?.color?.background
 						).color,
 					},
 				] }
