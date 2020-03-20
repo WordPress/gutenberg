@@ -295,7 +295,10 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 		await page.waitForSelector( '#inspector-text-control-0' );
-		const postUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+		const postUrl = await page.$eval(
+			'#inspector-text-control-0',
+			( el ) => el.value
+		);
 		await createNewPost();
 		await clickBlockAppender();
 		await page.keyboard.type( '/WordPress' );
@@ -303,19 +306,17 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( postUrl );
 		await page.keyboard.press( 'Enter' );
 
-		// Navigate to the WordPress block.
-		await page.click( '[aria-label="Block Navigation"]' );
-		const blockMenuItem = ( await page.$x( "//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'WordPress')]" ) )[ 0 ];
-		await blockMenuItem.click();
 		await clickBlockToolbarButton( 'More options' );
 
 		// Convert it to a reusable block.
-		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
+		const convertButton = await page.waitForXPath(
+			'//button[text()="Add to Reusable blocks"]'
+		);
 		await convertButton.click();
 
 		// Wait for creation to finish.
 		await page.waitForXPath(
-			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block created."]'
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
 
 		// Save the reusable block
@@ -326,11 +327,17 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath( '//button[text()="Edit"]' );
 
 		// Check that we have a reusable block on the page.
-		const block = await page.$( '.block-editor-block-list__block[data-type="core/block"]' );
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
 		expect( block ).not.toBeNull();
+
 		await publishPost();
 		await page.waitForSelector( '#inspector-text-control-0' );
-		const postWithEmbedUrl = await page.$eval( '#inspector-text-control-0', ( el ) => el.value );
+		const postWithEmbedUrl = await page.$eval(
+			'#inspector-text-control-0',
+			( el ) => el.value
+		);
 
 		// Check the embed shows up on the front end of the site.
 		await page.goto( postWithEmbedUrl );
