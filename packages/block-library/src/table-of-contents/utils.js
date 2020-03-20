@@ -97,7 +97,7 @@ export function updateHeadingBlockAnchors() {
 			heading.attributes.anchor === undefined ||
 			heading.attributes.anchor === '';
 		const headingContentEmpty =
-			typeof heading.attributes.content === 'undefined' ||
+			heading.attributes.content === undefined ||
 			heading.attributes.content === '';
 		const headingDefaultAnchor =
 			! headingAnchorEmpty &&
