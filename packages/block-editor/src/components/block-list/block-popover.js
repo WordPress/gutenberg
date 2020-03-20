@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { useState, useCallback, useContext } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelector } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -21,27 +21,6 @@ import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './root-container';
-
-function selector( select ) {
-	const {
-		isNavigationMode,
-		isMultiSelecting,
-		hasMultiSelection,
-		isTyping,
-		isCaretWithinFormattedText,
-		getSettings,
-		getLastMultiSelectedBlockClientId,
-	} = select( 'core/block-editor' );
-	return {
-		isNavigationMode: isNavigationMode(),
-		isMultiSelecting: isMultiSelecting(),
-		isTyping: isTyping(),
-		isCaretWithinFormattedText: isCaretWithinFormattedText(),
-		hasMultiSelection: hasMultiSelection(),
-		hasFixedToolbar: getSettings().hasFixedToolbar,
-		lastClientId: getLastMultiSelectedBlockClientId(),
-	};
-}
 
 function BlockPopover( {
 	clientId,
@@ -58,26 +37,27 @@ function BlockPopover( {
 		isTyping,
 		isCaretWithinFormattedText,
 		hasMultiSelection,
-		hasFixedToolbar,
-		lastClientId,
-	} = useSelect( selector, [] );
+		getSettings,
+		getLastMultiSelectedBlockClientId,
+	} = useSelector( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ blockNodes ] = useContext( BlockNodes );
 
+	const { hasFixedToolbar } = getSettings();
 	const showEmptyBlockSideInserter =
-		! isNavigationMode && isEmptyDefaultBlock && isValid;
-	const shouldShowBreadcrumb = isNavigationMode;
+		! isNavigationMode() && isEmptyDefaultBlock && isValid;
+	const shouldShowBreadcrumb = isNavigationMode();
 	const shouldShowContextualToolbar =
-		! isNavigationMode &&
+		! isNavigationMode() &&
 		! hasFixedToolbar &&
 		isLargeViewport &&
 		! showEmptyBlockSideInserter &&
-		! isMultiSelecting &&
-		( ! isTyping || isCaretWithinFormattedText );
+		! isMultiSelecting() &&
+		( ! isTyping() || isCaretWithinFormattedText() );
 	const canFocusHiddenToolbar =
-		! isNavigationMode &&
+		! isNavigationMode() &&
 		! shouldShowContextualToolbar &&
 		! hasFixedToolbar &&
 		! isEmptyDefaultBlock;
@@ -118,8 +98,8 @@ function BlockPopover( {
 
 	let anchorRef = node;
 
-	if ( hasMultiSelection ) {
-		const bottomNode = blockNodes[ lastClientId ];
+	if ( hasMultiSelection() ) {
+		const bottomNode = blockNodes[ getLastMultiSelectedBlockClientId() ];
 
 		// Wait to render the popover until the bottom reference is available
 		// as well.
@@ -226,7 +206,7 @@ function BlockPopover( {
 	);
 }
 
-function wrapperSelector( select ) {
+export default function WrappedBlockPopover() {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
@@ -235,20 +215,25 @@ function wrapperSelector( select ) {
 		getBlockParents,
 		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
-	} = select( 'core/block-editor' );
+	} = useSelector( 'core/block-editor' );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
 	if ( ! clientId ) {
-		return;
+		return null;
+	}
+
+	const { name, attributes = {}, isValid } =
+		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
+
+	if ( ! name ) {
+		return null;
 	}
 
 	const rootClientId = getBlockRootClientId( clientId );
-	const { name, attributes = {}, isValid } =
-		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } =
+	const { __experimentalMoverDirection: moverDirection } =
 		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
@@ -272,40 +257,9 @@ function wrapperSelector( select ) {
 			];
 	}
 
-	return {
-		clientId,
-		rootClientId: getBlockRootClientId( clientId ),
-		name,
-		align: attributes.align,
-		isValid,
-		moverDirection: __experimentalMoverDirection,
-		isEmptyDefaultBlock:
-			name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		capturingClientId,
-	};
-}
-
-export default function WrappedBlockPopover() {
-	const selected = useSelect( wrapperSelector, [] );
-
-	if ( ! selected ) {
-		return null;
-	}
-
-	const {
-		clientId,
-		rootClientId,
-		name,
-		align,
-		isValid,
-		moverDirection,
-		isEmptyDefaultBlock,
-		capturingClientId,
-	} = selected;
-
-	if ( ! name ) {
-		return null;
-	}
+	const { align } = attributes;
+	const isEmptyDefaultBlock =
+		name && isUnmodifiedDefaultBlock( { name, attributes } );
 
 	return (
 		<BlockPopover
