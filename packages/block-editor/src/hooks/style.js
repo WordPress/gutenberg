@@ -67,7 +67,7 @@ function addAttribute( settings ) {
 	}
 
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! settings.attributes?.style ) {
+	if ( ! settings.attributes.style ) {
 		Object.assign( settings.attributes, {
 			style: {
 				type: 'object',

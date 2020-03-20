@@ -41,14 +41,14 @@ function addAttributes( settings ) {
 	}
 
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! settings.attributes?.backgroundColor ) {
+	if ( ! settings.attributes.backgroundColor ) {
 		Object.assign( settings.attributes, {
 			backgroundColor: {
 				type: 'string',
 			},
 		} );
 	}
-	if ( ! settings.attributes?.textColor ) {
+	if ( ! settings.attributes.textColor ) {
 		Object.assign( settings.attributes, {
 			textColor: {
 				type: 'string',
