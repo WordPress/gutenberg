@@ -18,7 +18,7 @@ export function linearToNestedList( array, index = 0 ) {
 			// If it does and the next level is greater than the current level,
 			// the next iteration becomes a child of the current interation.
 			if (
-				typeof array[ key + 1 ] !== 'undefined' &&
+				array[ key + 1 ] !== undefined &&
 				array[ key + 1 ].level > heading.level
 			) {
 				// We need to calculate the last index before the next iteration that has the same level (siblings).
