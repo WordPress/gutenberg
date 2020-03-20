@@ -1311,7 +1311,7 @@ _Returns_
 
 <a name="toggleBlockHighlight" href="#toggleBlockHighlight">#</a> **toggleBlockHighlight**
 
-Generator that toggles the highlighted block state.
+Returns an action object that toggles the highlighted block state.
 
 _Parameters_
 
