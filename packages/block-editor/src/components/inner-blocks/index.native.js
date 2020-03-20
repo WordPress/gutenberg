@@ -112,6 +112,8 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			marginVertical,
+			marginHorizontal,
 			__experimentalMoverDirection,
 			customOnDelete,
 			containerStyle,
@@ -124,6 +126,8 @@ class InnerBlocks extends Component {
 			<>
 				{ ! templateInProcess && (
 					<BlockList
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }

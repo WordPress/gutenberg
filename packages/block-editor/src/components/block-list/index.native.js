@@ -73,15 +73,20 @@ export class BlockList extends Component {
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		const parentWidth = columnsSettings && columnsSettings.width;
 		return (
-			<ReadableContentView
-				style={ parentWidth && { maxWidth: parentWidth } }
+			<View
+				style={ [
+					styles.defaultAppender,
+					parentWidth && { maxWidth: parentWidth },
+				] }
 			>
-				<BlockListAppender // show the default appender, anormal, when not inserting a block
-					rootClientId={ this.props.rootClientId }
-					renderAppender={ this.props.renderAppender }
-					showSeparator={ willShowInsertionPoint }
-				/>
-			</ReadableContentView>
+				<ReadableContentView>
+					<BlockListAppender // show the default appender, anormal, when not inserting a block
+						rootClientId={ this.props.rootClientId }
+						renderAppender={ this.props.renderAppender }
+						showSeparator={ willShowInsertionPoint }
+					/>
+				</ReadableContentView>
+			</View>
 		);
 	}
 
@@ -102,6 +107,8 @@ export class BlockList extends Component {
 			flatListProps,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 
 		const { blockToolbar, blockBorder, headerToolbar } = styles;
@@ -109,9 +116,15 @@ export class BlockList extends Component {
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
+		const containerStyle = {
+			flex: isRootList ? 1 : 0,
+			marginVertical: isRootList ? 0 : -marginVertical,
+			marginHorizontal: isRootList ? 0 : -marginHorizontal,
+		};
+
 		return (
 			<View
-				style={ { flex: isRootList ? 1 : 0 } }
+				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				<KeyboardAwareFlatList
@@ -127,7 +140,10 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					scrollViewStyle={ {
+						flex: isRootList ? 1 : 0,
+						overflow: 'visible',
+					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -167,6 +183,8 @@ export class BlockList extends Component {
 			customOnDelete,
 			containerStyle,
 			columnsSettings,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 
 		const horizontalDirection =
@@ -185,6 +203,8 @@ export class BlockList extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange

@@ -80,106 +80,6 @@ class BlockListBlock extends Component {
 		);
 	}
 
-	applySelectedBlockStyle() {
-		const { hasChildren, getStylesFromColorScheme } = this.props;
-
-		const fullSolidBorderStyle = {
-			// define style for full border
-			...styles.fullSolidBordered,
-			...getStylesFromColorScheme(
-				styles.solidBorderColor,
-				styles.solidBorderColorDark
-			),
-		};
-
-		if ( hasChildren ) {
-			// if block has children apply style for selected parent
-			return { ...styles.selectedParent, ...fullSolidBorderStyle };
-		}
-
-		/* selected block is one of below:
-				1. does not have children
-				2. is not on root list level
-				3. is an emty group block on root or nested level	*/
-		return { ...styles.selectedLeaf, ...fullSolidBorderStyle };
-	}
-
-	applyUnSelectedBlockStyle() {
-		const {
-			hasChildren,
-			isParentSelected,
-			isAncestorSelected,
-			hasParent,
-			getStylesFromColorScheme,
-			isLastBlock,
-		} = this.props;
-
-		// if block does not have parent apply neutral or full
-		// margins depending if block has children or not
-		if ( ! hasParent ) {
-			return hasChildren ? styles.neutral : styles.full;
-		}
-
-		if ( isParentSelected ) {
-			// parent of a block is selected
-			const dashedBorderStyle = {
-				// define style for dashed border
-				...styles.dashedBordered,
-				...getStylesFromColorScheme(
-					styles.dashedBorderColor,
-					styles.dashedBorderColorDark
-				),
-			};
-
-			// return apply childOfSelected or childOfSelectedLeaf
-			// margins depending if block has children or not
-			return {
-				...( hasChildren
-					? styles.childOfSelected
-					: styles.childOfSelectedLeaf ),
-				...dashedBorderStyle,
-				...( ( ! isLastBlock || this.props.name === 'core/column' ) &&
-					styles.marginVerticalChild ),
-			};
-		}
-
-		if ( isAncestorSelected ) {
-			// ancestor of a block is selected
-			return {
-				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && {
-					...styles.marginHorizontalNone,
-					...styles.marginVerticalNone,
-				} ),
-				...( ! isLastBlock && styles.marginVerticalDescendant ),
-			};
-		}
-
-		// if none of above condition are met return apply neutral or full
-		// margins depending if block has children or not
-		return hasChildren ? styles.neutral : styles.full;
-	}
-
-	applyBlockStyle() {
-		const { isSelected, isDimmed, name } = this.props;
-
-		return [
-			isSelected
-				? this.applySelectedBlockStyle()
-				: this.applyUnSelectedBlockStyle(),
-			isDimmed && styles.dimmed,
-			name === 'core/column' && { flex: 1 },
-		];
-	}
-
-	applyToolbarStyle() {
-		const { hasChildren, isUnregisteredBlock } = this.props;
-
-		if ( ! hasChildren || isUnregisteredBlock ) {
-			return styles.neutralToolbar;
-		}
-	}
-
 	render() {
 		const {
 			attributes,
@@ -191,12 +91,17 @@ class BlockListBlock extends Component {
 			order,
 			title,
 			parentId,
+			isDimmed,
 			isTouchable,
 			customOnDelete,
 			horizontalDirection,
 			hasParent,
+			isParentSelected,
 			onSelect,
 			showFloatingToolbar,
+			getStylesFromColorScheme,
+			marginVertical,
+			marginHorizontal,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -233,8 +138,33 @@ class BlockListBlock extends Component {
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
-						style={ this.applyBlockStyle() }
+						style={ [
+							{ marginVertical, marginHorizontal },
+							isDimmed && styles.dimmed,
+						] }
 					>
+						{ isSelected && (
+							<View
+								style={ [
+									styles.solidBorder,
+									getStylesFromColorScheme(
+										styles.solidBorderColor,
+										styles.solidBorderColorDark
+									),
+								] }
+							/>
+						) }
+						{ isParentSelected && (
+							<View
+								style={ [
+									styles.dashedBorder,
+									getStylesFromColorScheme(
+										styles.dashedBorderColor,
+										styles.dashedBorderColorDark
+									),
+								] }
+							/>
+						) }
 						{ isValid ? (
 							this.getBlockForType()
 						) : (
@@ -243,7 +173,7 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ this.applyToolbarStyle() }>
+						<View style={ styles.neutralToolbar }>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
