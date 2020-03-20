@@ -8,6 +8,7 @@ import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
+import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
@@ -44,6 +45,7 @@ export default function Header() {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header__toolbar">
+				<FullscreenModeClose />
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }
