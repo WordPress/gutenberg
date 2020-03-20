@@ -38,16 +38,21 @@ export function useDebouncedShowMovers( {
 		return ! isFocused && ! isHovered;
 	};
 
-	const debouncedShowMovers = ( event ) => {
-		if ( event ) {
-			event.stopPropagation();
-		}
-
+	const clearTimeoutRef = () => {
 		const timeout = timeoutRef.current;
 
 		if ( timeout && clearTimeout ) {
 			clearTimeout( timeout );
 		}
+	};
+
+	const debouncedShowMovers = ( event ) => {
+		if ( event ) {
+			event.stopPropagation();
+		}
+
+		clearTimeoutRef();
+
 		if ( ! showMovers ) {
 			handleOnChange( true );
 		}
@@ -58,6 +63,8 @@ export function useDebouncedShowMovers( {
 			event.stopPropagation();
 		}
 
+		clearTimeoutRef();
+
 		timeoutRef.current = setTimeout( () => {
 			if ( shouldHideMovers() ) {
 				handleOnChange( false );
@@ -65,7 +72,7 @@ export function useDebouncedShowMovers( {
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
+	useEffect( () => () => clearTimeoutRef(), [] );
 
 	return {
 		showMovers,
