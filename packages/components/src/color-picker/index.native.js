@@ -40,8 +40,13 @@ function ColorPicker( {
 	const [ savedTextColor ] = useState( textColor );
 	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
-	const { paddingLeft, height, borderRadius } = styles.picker;
-	const pickerWidth = BottomSheet.getWidth() - 2 * paddingLeft;
+	const {
+		paddingLeft: spacing,
+		height: pickerHeight,
+		borderRadius,
+	} = styles.picker;
+	const { height: pickerPointerSize } = styles.pickerPointer;
+	const pickerWidth = BottomSheet.getWidth() - 2 * spacing;
 
 	const applyButtonStyle = getStylesFromColorScheme(
 		styles.applyButton,
@@ -155,8 +160,12 @@ function ColorPicker( {
 					shouldEnableBottomSheetScroll( true )
 				}
 				huePickerBarWidth={ pickerWidth }
-				huePickerBarHeight={ 8 }
-				satValPickerSize={ { width: pickerWidth, height } }
+				huePickerBarHeight={ pickerPointerSize / 2 }
+				satValPickerSize={ {
+					width: pickerWidth,
+					height: pickerHeight,
+				} }
+				satValPickerSliderSize={ pickerPointerSize }
 				satValPickerBorderRadius={ borderRadius }
 				huePickerBorderRadius={ borderRadius }
 			/>

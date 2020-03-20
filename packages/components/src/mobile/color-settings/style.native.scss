@@ -13,22 +13,26 @@
 	height: 24px;
 }
 
-.textFooter {
+.footer {
 	flex-direction: row;
 	justify-content: center;
-	padding: $panel-padding;
+	align-items: center;
+	align-content: center;
+	padding: 12px $panel-padding;
 }
 
-.absoluteColorIndicator {
+.colorIndicator {
 	width: 24px;
 	height: 24px;
-	position: absolute;
-	left: $panel-padding;
-	top: 14px;
 }
 
 .selectColorText {
 	text-align: center;
-	align-self: center;
 	color: $gray;
+	font-size: 16px;
+	flex: 2;
+}
+
+.flex {
+	flex: 1;
 }

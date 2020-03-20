@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
+import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -9,7 +10,7 @@ import {
 	SETTINGS_DEFAULTS,
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useState, useEffect, createRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -34,6 +35,8 @@ function ColorPalette( {
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
 
+	const scrollViewRef = createRef();
+
 	const isGradientSegment = currentSegment === 'Gradient';
 	const isTextScreen = currentScreen === 'Text';
 
@@ -42,8 +45,15 @@ function ColorPalette( {
 	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
 	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
 
-	const defaultColors = SETTINGS_DEFAULTS.colors;
-	const defaultGradientColors = SETTINGS_DEFAULTS.gradients;
+	const defaultColors = map( SETTINGS_DEFAULTS.colors, 'color' );
+	const defaultGradientColors = map(
+		SETTINGS_DEFAULTS.gradients,
+		'gradient'
+	);
+
+	useEffect( () => {
+		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+	}, [ currentSegment ] );
 
 	function onColorPress( value ) {
 		setActiveBgColor( value );
@@ -66,23 +76,31 @@ function ColorPalette( {
 			styles.verticalSeparator,
 			styles.verticalSeparatorDark
 		);
+		const isSelectedCustomBgColor =
+			! defaultColors.includes( activeBgColor ) &&
+			! defaultGradientColors.includes( activeBgColor );
+		const isSelectedCustomTextColor = ! defaultColors.includes(
+			activeTextColor
+		);
+		const isSelectedCustom = isTextScreen
+			? isSelectedCustomTextColor
+			: isSelectedCustomBgColor;
 		return (
 			<>
 				{ palette.map( ( color ) => {
-					const paletteColor = gradient
-						? color.gradient
-						: color.color;
-					const isSelected =
-						paletteColor === activeBgColor ||
-						paletteColor === activeTextColor;
+					const isSelectedBgColor = color === activeBgColor;
+					const isSelectedTextColor = color === activeTextColor;
+					const isSelected = isTextScreen
+						? isSelectedTextColor
+						: isSelectedBgColor;
 					return (
 						<TouchableWithoutFeedback
-							onPress={ () => onColorPress( paletteColor ) }
-							key={ paletteColor }
+							onPress={ () => onColorPress( color ) }
+							key={ color }
 						>
 							<View>
 								<ColorIndicator
-									color={ paletteColor }
+									color={ color }
 									gradient
 									isSelected={ isSelected }
 								/>
@@ -98,6 +116,7 @@ function ColorPalette( {
 								<ColorIndicator
 									custom
 									color={ customSwatchGradients }
+									isSelected={ isSelectedCustom }
 								/>
 							</View>
 						</TouchableWithoutFeedback>
@@ -109,10 +128,12 @@ function ColorPalette( {
 
 	return (
 		<ScrollView
-			contentContainerStyle={ styles.container }
+			contentContainerStyle={ styles.contentContainer }
+			style={ styles.container }
 			horizontal
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps={ true }
+			ref={ scrollViewRef }
 		>
 			{ isGradientSegment ? (
 				<Swatch gradient />

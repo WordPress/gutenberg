@@ -77,7 +77,7 @@ const SegmentedControls = ( {
 
 	return (
 		<View style={ styles.row }>
-			<View style={ { flex: 1 } }>{ addonLeft }</View>
+			<View style={ styles.flex }>{ addonLeft }</View>
 			<View style={ [ containerStyle, isIOS && styles.containerIOS ] }>
 				{ segments.map( ( segment ) => (
 					<Segment
@@ -89,7 +89,7 @@ const SegmentedControls = ( {
 					/>
 				) ) }
 			</View>
-			<View style={ { flex: 1 } }>{ addonRight }</View>
+			<View style={ styles.flex }>{ addonRight }</View>
 		</View>
 	);
 };

@@ -93,14 +93,17 @@ function ColorSettings( {
 					/>
 					{ getColorPalette() }
 					<View style={ horizontalSeparatorStyle } />
-					<View style={ styles.textFooter }>
-						<ColorIndicator
-							color={ textColor }
-							style={ styles.absoluteColorIndicator }
-						/>
+					<View style={ styles.footer }>
+						<View style={ styles.flex }>
+							<ColorIndicator
+								color={ textColor }
+								style={ styles.colorIndicator }
+							/>
+						</View>
 						<Text style={ styles.selectColorText }>
 							{ __( 'Select a color' ) }
 						</Text>
+						<View style={ styles.flex } />
 					</View>
 				</View>
 			) }
