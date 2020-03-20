@@ -135,9 +135,6 @@ export class BlockList extends Component {
 					ListFooterComponent={
 						! isReadOnly && withFooter && this.renderBlockListFooter
 					}
-					getItemLayout={(data, index) => {
-						return { length: 0, offset: 0, index };
-					}}
 					CellRendererComponent={ this.cellRenderer }
 				/>
 
@@ -156,12 +153,14 @@ export class BlockList extends Component {
 
 	cellRenderer( { children, index, item } ) {
 		const { shouldAllowSpaceForFloatingToolbar } = this.props;
-		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar( item );
+		const adjustsForFloatingToolbar = shouldAllowSpaceForFloatingToolbar(
+			item
+		);
 
 		return (
 			<View
 				zIndex={ 1000 + index }
-				hitSlop={{top: (adjustsForFloatingToolbar?44:0)}}
+				hitSlop={ { top: adjustsForFloatingToolbar ? 44 : 0 } }
 				pointerEvents={ 'box-none' }
 			>
 				{ children }
