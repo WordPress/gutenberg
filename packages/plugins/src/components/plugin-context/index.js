@@ -3,7 +3,7 @@
  */
 import { createContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 const { Consumer, Provider } = createContext( {
 	name: null,
@@ -24,27 +24,26 @@ export { Provider as PluginContextProvider };
  */
 export const withPluginContext = ( mapContextToProps ) =>
 	createHigherOrderComponent( ( OriginalComponent ) => {
-		/**
-		 * Wrap the passed component in a withSelect to allow passing data to it.
-		 */
-		return withSelect( ( select ) => {
-			return {
-				editorContext: {
-					currentPostType: select(
-						'core/editor'
-					).getCurrentPostType(),
-				},
-			};
-		} )( ( props ) => {
+		return ( props ) => {
+			const editorContext = useSelect( ( select ) => {
+				return {
+					editorContext: {
+						currentPostType: select(
+							'core/editor'
+						).getCurrentPostType(),
+					},
+				};
+			} );
 			return (
 				<Consumer>
 					{ ( context ) => (
 						<OriginalComponent
 							{ ...props }
+							{ ...editorContext }
 							{ ...mapContextToProps( context, props ) }
 						/>
 					) }
 				</Consumer>
 			);
-		} );
+		};
 	}, 'withPluginContext' );
