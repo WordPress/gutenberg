@@ -128,8 +128,8 @@ class LatestPostsEdit extends Component {
 						: null;
 				return typeof token === 'string' ? newToken : token;
 			} );
-			// we do nothing if the category is not selected
-			// from suggestions
+			// We do nothing if the category is not selected
+			// from suggestions.
 			if ( includes( allCategories, null ) ) {
 				return false;
 			}
