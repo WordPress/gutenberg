@@ -44,8 +44,8 @@ export default function Header() {
 	);
 	return (
 		<div className="edit-site-header">
+			<FullscreenModeClose />
 			<div className="edit-site-header__toolbar">
-				<FullscreenModeClose />
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }
