@@ -4,7 +4,7 @@
 import AlignmentControl from '../';
 
 export default {
-	title: 'Components/AligmentControl',
+	title: 'Components/AlignmentControl',
 	component: AlignmentControl,
 };
 
