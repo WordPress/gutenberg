@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { assign, has } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -43,15 +42,15 @@ function addAttributes( settings ) {
 	}
 
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! has( settings.attributes, [ 'backgroundColor', 'type' ] ) ) {
-		settings.attributes = assign( settings.attributes, {
+	if ( ! settings.attributes?.backgroundColor ) {
+		settings.attributes = Object.assign( settings.attributes, {
 			backgroundColor: {
 				type: 'object',
 			},
 		} );
 	}
-	if ( ! has( settings.attributes, [ 'textColor', 'type' ] ) ) {
-		settings.attributes = assign( settings.attributes, {
+	if ( ! settings.attributes?.textColor ) {
+		settings.attributes = Object.assign( settings.attributes, {
 			textColor: {
 				type: 'object',
 			},

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, has, mapKeys, kebabCase } from 'lodash';
+import { mapKeys, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,8 +42,8 @@ function addAttribute( settings ) {
 	}
 
 	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! has( settings.attributes, [ 'style', 'type' ] ) ) {
-		settings.attributes = assign( settings.attributes, {
+	if ( ! settings.attributes?.style ) {
+		settings.attributes = Object.assign( settings.attributes, {
 			style: {
 				type: 'object',
 			},
