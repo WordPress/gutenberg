@@ -8,7 +8,7 @@ export function linearToNestedList( array, index = 0 ) {
 	const returnValue = [];
 
 	array.forEach( function( heading, key ) {
-		if ( typeof heading.content === 'undefined' ) {
+		if ( heading.content === undefined ) {
 			return;
 		}
 
