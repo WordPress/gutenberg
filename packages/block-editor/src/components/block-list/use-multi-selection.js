@@ -242,6 +242,17 @@ export default function useMultiSelection( ref ) {
 
 			startClientId.current = clientId;
 			anchorElement.current = document.activeElement;
+			if ( anchorElement.current ) {
+				const blockInspector = document.querySelector(
+					'.block-editor-block-inspector'
+				);
+				if (
+					blockInspector &&
+					blockInspector.contains( anchorElement.current )
+				) {
+					return;
+				}
+			}
 			startMultiSelect();
 
 			// `onSelectionStart` is called after `mousedown` and `mouseleave`
