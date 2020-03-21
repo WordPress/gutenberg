@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { join, relative, resolve, sep, basename } = require( 'path' );
+const { join, relative, resolve, sep, basename, dirname } = require( 'path' );
 const glob = require( 'fast-glob' );
 const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
@@ -199,8 +199,6 @@ glob.stream( [
 		const [ file, tokens ] = data;
 		const output = relative( ROOT_DIR, file );
 
-		const packageName = getFilePackage( file );
-
 		// Each file can have more than one placeholder content to update, each
 		// represented by tokens. The docgen script updates one token at a time,
 		// so the tokens must be replaced in sequence to prevent the processes
@@ -217,7 +215,7 @@ glob.stream( [
 						'docgen'
 					).replace( / /g, '\\ ' ),
 					[
-						join( 'packages', packageName, path ),
+						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
 						`--output ${ output }`,
 						'--to-token',
 						`--use-token "${ token }"`,
