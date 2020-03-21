@@ -3,35 +3,41 @@
 /**
  * Node dependencies.
  */
-const { join } = require( 'path' );
+const { extname } = require( 'path' );
 const chalk = require( 'chalk' );
 const execSync = require( 'child_process' ).execSync;
-
-/**
- * Local dependencies.
- */
-const getPackages = require( './packages' );
+const { readFile } = require( 'fs' ).promises;
 
 const getUnstagedFiles = () =>
 	execSync( 'git diff --name-only', { encoding: 'utf8' } )
 		.split( '\n' )
-		.filter( ( element ) => '' !== element );
-const readmeFiles = getPackages().map( ( [ packageName ] ) =>
-	join( 'packages', packageName, 'README.md' )
-);
-const unstagedReadmes = getUnstagedFiles().filter( ( element ) =>
-	readmeFiles.includes( element )
-);
+		.filter( Boolean );
 
-if ( unstagedReadmes.length > 0 ) {
-	process.exitCode = 1;
-	process.stdout.write(
-		chalk.red(
-			'\n',
-			'Some API docs may be out of date:',
-			unstagedReadmes.toString(),
-			'Either stage them or continue with --no-verify.',
-			'\n'
+const fileHasToken = async ( file ) =>
+	( await readFile( file, 'utf8' ) ).includes( '<!-- START TOKEN' );
+
+const getUnstagedReadmes = () =>
+	Promise.all(
+		getUnstagedFiles().map(
+			async ( file ) =>
+				extname( file ) === '.md' &&
+				( await fileHasToken( file ) ) &&
+				file
 		)
-	);
-}
+	).then( ( files ) => files.filter( Boolean ) );
+
+( async () => {
+	const unstagedReadmes = await getUnstagedReadmes();
+	if ( unstagedReadmes.length > 0 ) {
+		process.exitCode = 1;
+		process.stdout.write(
+			chalk.red(
+				'\n',
+				'Some API docs may be out of date:',
+				unstagedReadmes.toString(),
+				'Either stage them or continue with --no-verify.',
+				'\n'
+			)
+		);
+	}
+} )();
