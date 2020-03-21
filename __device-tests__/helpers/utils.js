@@ -141,11 +141,15 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 };
 
 /*
- * The 'clear' parameter is defaulted to true because not clearing the text requires Android to use ADB, which
+ * Problems about the 'clear' parameter:
+ *
+ * On Android: "clear" is defaulted to true because not clearing the text requires Android to use ADB, which
  * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
  * have to append the new text and, in that case, append fewest number of characters possible.
+ *
+ * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
  */
-const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = true ) => {
+const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
 	if ( isAndroid() ) {
 		await typeStringAndroid( driver, element, str, clear );
 	} else {
@@ -160,7 +164,12 @@ const typeStringIos = async ( driver: wd.PromiseChainWebdriver, element: wd.Prom
 	await element.type( str );
 };
 
-const typeStringAndroid = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
+const typeStringAndroid = async (
+	driver: wd.PromiseChainWebdriver,
+	element: wd.PromiseChainWebdriver.Element,
+	str: string,
+	clear: boolean = true // see comment above for why it is defaulted to true
+) => {
 	if ( str in strToKeycode ) {
 		return await driver.pressKeycode( strToKeycode[ str ] );
 	} else if ( clear ) {
@@ -170,7 +179,7 @@ const typeStringAndroid = async ( driver: wd.PromiseChainWebdriver, element: wd.
 		 * long text along these lines:
 		 *         await driver.execute( 'mobile: shell', { command: 'input',
 		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
-		 * but using adb in this way proved to be very flakey (frequently all of the text would not get entered,
+		 * but using adb in this way proved to be very flaky (frequently all of the text would not get entered,
 		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
 		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
 		 *
