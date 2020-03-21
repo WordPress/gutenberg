@@ -4,7 +4,7 @@
 		"allowSyntheticDefaultImports": true,
 		"checkJs": true,
 		"jsx": "preserve",
-		"lib": ["dom", "esnext"],
+		"lib": ["dom", "esnext", "es2020.string"],
 		"module": "commonjs",
 		"noEmit": true,
 		"resolveJsonModule": true,
@@ -31,6 +31,7 @@
 		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	},
 	"include": [
+		"./bin/update-readmes.js",
 		"./packages/a11y/**/*.js",
 		"./packages/blob/**/*.js",
 		"./packages/dom-ready/**/*.js",
