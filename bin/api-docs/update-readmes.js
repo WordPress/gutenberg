@@ -205,14 +205,7 @@ glob.stream( [
 		for ( const [ token, path ] of tokens ) {
 			try {
 				await execa(
-					join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					).replace( / /g, '\\ ' ),
+					join( __dirname, '..', 'node_modules', '.bin', 'docgen' ),
 					[
 						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
 						`--output ${ output }`,
