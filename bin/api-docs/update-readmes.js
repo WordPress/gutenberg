@@ -79,7 +79,7 @@ function getPackagePattern( files ) {
 
 	// Since brace expansion doesn't work with a single package, special-case
 	// the pattern for the singular match.
-	const packages = files.map( getFilePackage );
+	const packages = Array.from( new Set( files.map( getFilePackage ) ) );
 	return packages.length === 1 ? packages[ 0 ] : '{' + packages.join() + '}';
 }
 
@@ -143,9 +143,8 @@ function getDataDocumentationPattern( files ) {
 
 	// Since brace expansion doesn't work with a single package, special-case
 	// the pattern for the singular match.
-	const docFiles = files
-		.map( getFilePackage )
-		.map( getDataDocumentationFile );
+	const filePackages = Array.from( new Set( files.map( getFilePackage ) ) );
+	const docFiles = filePackages.map( getDataDocumentationFile );
 
 	return docFiles.length === 1 ? docFiles[ 0 ] : '{' + docFiles.join() + '}';
 }
