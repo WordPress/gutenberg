@@ -123,6 +123,13 @@ The output format for the generated asset file. There are two options available:
 
 By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory.
 
+##### `combinedOutputFile`
+
+- Type: string
+- Default: `null`
+
+This option is useful only when the `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
+
 ##### `useDefaults`
 
 - Type: boolean

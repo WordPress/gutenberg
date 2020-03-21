@@ -231,6 +231,10 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="Editable" href="#Editable">#</a> **Editable**
+
+Renders an editable text input in which text formatting is not allowed.
+
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.
@@ -420,7 +424,6 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
--   _\_\_mobileEnablePageTemplates_ `boolean`: Whether the user has enabled the Page Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 

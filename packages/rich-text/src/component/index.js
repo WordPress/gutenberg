@@ -482,16 +482,12 @@ class RichText extends Component {
 		clearTimeout( this.onInput.timeout );
 		this.onInput.timeout = setTimeout( this.onCreateUndoLevel, 1000 );
 
-		if ( ! allowPrefixTransformations ) {
-			return;
-		}
-
 		// Only run input rules when inserting text.
 		if ( inputType !== 'insertText' ) {
 			return;
 		}
 
-		if ( inputRule ) {
+		if ( allowPrefixTransformations && inputRule ) {
 			inputRule( change, this.valueToFormat );
 		}
 
@@ -624,6 +620,11 @@ class RichText extends Component {
 	 *                                    created.
 	 */
 	onChange( record, { withoutHistory } = {} ) {
+		if ( this.props.__unstableDisableFormats ) {
+			record.formats = Array( record.text.length );
+			record.replacements = Array( record.text.length );
+		}
+
 		this.applyRecord( record );
 
 		const { start, end, activeFormats = [] } = record;
@@ -1009,7 +1010,16 @@ class RichText extends Component {
 			format,
 			__unstableMultilineTag: multilineTag,
 			preserveWhiteSpace,
+			__unstableDisableFormats: disableFormats,
 		} = this.props;
+
+		if ( disableFormats ) {
+			return {
+				text: value,
+				formats: Array( value.length ),
+				replacements: Array( value.length ),
+			};
+		}
 
 		if ( format !== 'string' ) {
 			return value;
@@ -1068,7 +1078,12 @@ class RichText extends Component {
 			format,
 			__unstableMultilineTag: multilineTag,
 			preserveWhiteSpace,
+			__unstableDisableFormats: disableFormats,
 		} = this.props;
+
+		if ( disableFormats ) {
+			return value.text;
+		}
 
 		value = this.removeEditorOnlyFormats( value );
 

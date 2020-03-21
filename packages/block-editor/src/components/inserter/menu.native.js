@@ -241,7 +241,8 @@ export default compose(
 					);
 
 					const count = getBlockCount();
-					if ( count === 1 ) {
+					// Check if there is a rootClientId because that means it is a nested replacable block and we don't want to clear/reset all blocks.
+					if ( count === 1 && ! ownProps.rootClientId ) {
 						// removing the last block is not possible with `removeBlock` action
 						// it always inserts a default block if the last of the blocks have been removed
 						clearSelectedBlock();

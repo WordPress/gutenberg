@@ -21,6 +21,22 @@ function gutenberg_edit_site_page() {
 }
 
 /**
+ * Checks whether the provided page is one of allowed Site Editor pages.
+ *
+ * @param string $page Page to check.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_page( $page ) {
+	$allowed_pages = array(
+		'gutenberg_page_gutenberg-edit-site',
+		'toplevel_page_gutenberg-edit-site',
+	);
+
+	return in_array( $page, $allowed_pages, true );
+}
+
+/**
  * Initialize the Gutenberg Edit Site Page.
  *
  * @since 7.2.0
@@ -33,14 +49,20 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_name,
 		$_wp_current_template_content,
 		$_wp_current_template_hierarchy,
-		$_wp_current_template_part_ids;
+		$_wp_current_template_part_ids,
+		$current_screen;
 
-	$allowed_hooks = array( 'gutenberg_page_gutenberg-edit-site' );
-	$allowed_hooks = apply_filters( 'site_editor_allowed_hooks', $allowed_hooks );
-
-	if ( ! in_array( $hook, $allowed_hooks, true ) ) {
+	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
 	}
+
+	/**
+	 * Make the WP Screen object aware that this is a block editor page.
+	 * Since custom blocks check whether the screen is_block_editor,
+	 * this is required for custom blocks to be loaded.
+	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
+	 */
+	$current_screen->is_block_editor( true );
 
 	// Get editor settings.
 	$max_upload_size = wp_max_upload_size();
@@ -147,11 +169,30 @@ function gutenberg_edit_site_init( $hook ) {
 		)
 	);
 
-	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( get_block_editor_server_block_settings() ) ),
+		'after'
 	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
+		'after'
+	);
+
+	/**
+	 * Fires after block assets have been enqueued for the editing interface.
+	 *
+	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the block editor.
+	 *
+	 * @since 5.0.0
+	 */
+
+	do_action( 'enqueue_block_editor_assets' );
 
 	wp_enqueue_script( 'wp-edit-site' );
 	wp_enqueue_script( 'wp-format-library' );

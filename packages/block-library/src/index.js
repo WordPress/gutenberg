@@ -68,6 +68,7 @@ import * as templatePart from './template-part';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
+import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postDate from './post-date';
@@ -199,6 +200,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postTitle,
 								postContent,
 								postAuthor,
+								postComments,
 								postCommentsCount,
 								postCommentsForm,
 								postDate,
