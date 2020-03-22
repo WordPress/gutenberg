@@ -606,10 +606,4 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 		} );
 	} );
-
-	// describe( 'JSDoc in module dependency through import', function() {
-	// 	it( 'default export', function() {
-	// 	} );
-
-	// } );
 } );
