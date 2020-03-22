@@ -7,46 +7,44 @@ This repository uses [lerna] to manage WordPress modules and publish them as pac
 When creating a new package, you need to provide at least the following:
 
 1. `package.json` based on the template:
-	```json
-	{
-		"name": "@wordpress/package-name",
-		"version": "1.0.0-beta.0",
-		"description": "Package description.",
-		"author": "The WordPress Contributors",
-		"license": "GPL-2.0-or-later",
-		"keywords": [
-			"wordpress"
-		],
-		"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
-		"repository": {
-			"type": "git",
-			"url": "https://github.com/WordPress/gutenberg.git"
-		},
-		"bugs": {
-			"url": "https://github.com/WordPress/gutenberg/issues"
-		},
-		"main": "build/index.js",
-		"module": "build-module/index.js",
-		"react-native": "src/index",
-		"dependencies": {
-			"@babel/runtime": "^7.8.3"
-		},
-		"publishConfig": {
-			"access": "public"
-		}
-	}
-	```
-	This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+    ```json
+    {
+    	"name": "@wordpress/package-name",
+    	"version": "1.0.0-beta.0",
+    	"description": "Package description.",
+    	"author": "The WordPress Contributors",
+    	"license": "GPL-2.0-or-later",
+    	"keywords": [ "wordpress" ],
+    	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+    	"repository": {
+    		"type": "git",
+    		"url": "https://github.com/WordPress/gutenberg.git"
+    	},
+    	"bugs": {
+    		"url": "https://github.com/WordPress/gutenberg/issues"
+    	},
+    	"main": "build/index.js",
+    	"module": "build-module/index.js",
+    	"react-native": "src/index",
+    	"dependencies": {
+    		"@babel/runtime": "^7.8.3"
+    	},
+    	"publishConfig": {
+    		"access": "public"
+    	}
+    }
+    ```
+    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
 2. `.npmrc` file which disables creating `package-lock.json` file for the package:
-	```
-	package-lock=false
-	```
+    ```
+    package-lock=false
+    ```
 3. `README.md` file containing at least:
-	- Package name
-	- Package description
-	- Installation details
-	- Usage example
-	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
+    - Package name
+    - Package description
+    - Installation details
+    - Usage example
+    - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 
 ## Managing Dependencies
 
@@ -57,7 +55,7 @@ There are two types of dependencies that you might want to add to one of the exi
 Production dependencies are stored in the `dependencies` section of the package’s `package.json` file.
 
 #### Adding New Dependencies
- 
+
 The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
 
 _Example:_
@@ -91,9 +89,10 @@ Next, you need to run `npm install` in the root of the project to ensure that `p
 #### Updating Existing Dependencies
 
 This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
- 1. First, remove the existing dependency as described in the previous section.
- 2. Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
- 
+
+1.  First, remove the existing dependency as described in the previous section.
+2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+
 ### Development Dependencies
 
 In contrast to production dependencies, development dependencies shouldn't be stored in individual WordPress packages. Instead they should be installed in the project's `package.json` file using the usual `npm install` command. In effect, all development tools are configured to work with every package at the same time to ensure they share the same characteristics and integrate correctly with each other.
@@ -119,16 +118,16 @@ _Example:_
 
 ### Bug Fix
 
-- Fixed an off-by-one error with the `sum` function.
+-   Fixed an off-by-one error with the `sum` function.
 ```
 
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
-- "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
-- "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor verison bump).
-- "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
-- "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
-- "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
+-   "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+-   "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor verison bump).
+-   "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
+-   "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
+-   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
 
 While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
 
@@ -206,8 +205,8 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root.
-The presence of the `tsconfig.json` file indicates to our build system that the package has opted-in and will be included in the TypeScript build process.
+To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
+The changes will indicate that the package has opted-in and will be included in the TypeScript build process.
 
 A `tsconfig.json` file should look like the following (comments are not necessary):
 

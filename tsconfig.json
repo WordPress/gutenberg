@@ -1,0 +1,15 @@
+{
+	"references": [
+		{ "path": "packages/a11y" },
+		{ "path": "packages/blob" },
+		{ "path": "packages/dom-ready" },
+		{ "path": "packages/i18n" },
+		{ "path": "packages/is-shallow-equal" },
+		{ "path": "packages/priority-queue" },
+		{ "path": "packages/project-management-automation" },
+		{ "path": "packages/token-list" },
+		{ "path": "packages/url" },
+		{ "path": "packages/warning" }
+	],
+	"files": []
+}

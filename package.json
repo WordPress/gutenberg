@@ -177,10 +177,10 @@
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
-		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-* ./packages/*/node_modules ./packages/*/tsconfig.tsbuildinfo",
+		"clean:packages": "rimraf './packages/*/@(build|build-module|build-style)' && tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
-		"build:package-types": "node ./bin/packages/build-types.js",
+		"build:package-types": "tsc --build --verbose",
 		"build": "npm run build:packages && wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
