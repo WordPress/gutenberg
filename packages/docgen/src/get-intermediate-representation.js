@@ -216,12 +216,7 @@ const getDependencyIR = ( sourceFile ) => ( statement ) => {
  *
  * @return {Array<IREntry>} Intermediate Representation in JSON.
  */
-export const getIRFromStatement = (
-	path,
-	statement,
-	typeChecker,
-	sourceFile
-) => {
+const getIRFromStatement = ( path, statement, typeChecker, sourceFile ) => {
 	const exportEntries = getExportEntries( statement );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
@@ -266,7 +261,7 @@ export const getIRFromStatement = (
  *
  * @return {Array<IREntry>} Intermediate Representation in JSON.
  */
-export const getIntermediateRepresentation = (
+const getIntermediateRepresentation = (
 	path,
 	exportStatements,
 	typeChecker,
@@ -278,3 +273,5 @@ export const getIntermediateRepresentation = (
 		)
 	);
 };
+
+module.exports = getIntermediateRepresentation;
