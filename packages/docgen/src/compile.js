@@ -27,6 +27,10 @@ module.exports = function( filePath ) {
 	const sourceFile = program.getSourceFile( filePath );
 	const exportStatements = getExportStatements( sourceFile );
 
+	// Without the line below, sourceFile.fileName is set to
+	// /gutenberg/node_modules/typescript/lib/lib.es2020.full.d.ts
+	sourceFile.fileName = filePath;
+
 	return {
 		program,
 		typeChecker,
