@@ -32,7 +32,9 @@ module.exports = function( statement, typeChecker ) {
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
 				const getType = () =>
 					typeChecker.typeToString(
-						typeChecker.getTypeFromTypeNode( tag.typeExpression )
+						typeChecker.getTypeFromTypeNode(
+							tag.typeExpression.type
+						)
 					);
 				const result = {
 					title: tag.tagName.escapedText,

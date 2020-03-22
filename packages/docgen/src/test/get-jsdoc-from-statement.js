@@ -120,4 +120,28 @@ describe( 'JSDoc', () => {
 			tags: [],
 		} );
 	} );
+
+	it( 'extracts types correctly', () => {
+		const { typeChecker, sourceFile } = prepare( 'tags-param-types' );
+
+		expect(
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
+		).toEqual( {
+			description: 'A function with many params.',
+			tags: [
+				{
+					title: 'param',
+					description: 'The first param to add.',
+					type: 'any',
+					name: 'p0',
+				},
+				{
+					title: 'param',
+					description: 'File',
+					type: 'File',
+					name: 'p1',
+				},
+			],
+		} );
+	} );
 } );
