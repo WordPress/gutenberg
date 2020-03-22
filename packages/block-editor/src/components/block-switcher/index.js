@@ -143,6 +143,7 @@ export class BlockSwitcher extends Component {
 								label={ label }
 								onKeyDown={ openOnArrowDown }
 								showTooltip
+								tooltipPosition="bottom"
 								icon={ <BlockIcon icon={ icon } showColors /> }
 							/>
 						</ToolbarGroup>
