@@ -75,6 +75,8 @@ const hasVariableWithName = ( statement, name ) =>
  */
 const hasImportWithName = ( statement, name ) =>
 	statement.kind === SyntaxKind.ImportDeclaration &&
+	// import 'x' doesn't have importClause
+	statement.importClause &&
 	// import a from 'b'
 	( ( statement.importClause.name &&
 		statement.importClause.name.escapedText === name ) ||
