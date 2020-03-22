@@ -3,67 +3,18 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { last } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
-const engine = require( './engine' );
+const compile = require( './compile' );
+const getIntermediateRepresentation = require( './get-intermediate-representation' );
 const defaultMarkdownFormatter = require( './markdown' );
 const isSymbolPrivate = require( './is-symbol-private' );
 
 /**
  * Helpers functions.
  */
-
-const relativeToAbsolute = ( basePath, relativePath ) => {
-	const target = path.join( path.dirname( basePath ), relativePath );
-	if ( path.extname( target ) === '.js' ) {
-		return target;
-	}
-	let targetFile = target + '.js';
-	if ( fs.existsSync( targetFile ) ) {
-		return targetFile;
-	}
-	targetFile = path.join( target, 'index.js' );
-	if ( fs.existsSync( targetFile ) ) {
-		return targetFile;
-	}
-	process.stderr.write( '\nRelative path does not exists.' );
-	process.stderr.write( '\n' );
-	process.stderr.write( `\nBase: ${ basePath }` );
-	process.stderr.write( `\nRelative: ${ relativePath }` );
-	process.stderr.write( '\n\n' );
-	process.exit( 1 );
-};
-
-const getIRFromRelativePath = ( rootDir, basePath ) => ( relativePath ) => {
-	if ( ! relativePath.startsWith( '.' ) ) {
-		return [];
-	}
-	const absolutePath = relativeToAbsolute( basePath, relativePath );
-	const result = processFile( rootDir, absolutePath );
-	return result.ir || undefined;
-};
-
-const processFile = ( rootDir, inputFile ) => {
-	try {
-		const data = fs.readFileSync( inputFile, 'utf8' );
-		currentFileStack.push( inputFile );
-		const relativePath = path.relative( rootDir, inputFile );
-		const result = engine(
-			relativePath,
-			data,
-			getIRFromRelativePath( rootDir, last( currentFileStack ) )
-		);
-		currentFileStack.pop();
-		return result;
-	} catch ( e ) {
-		process.stderr.write( `\n${ e }` );
-		process.stderr.write( '\n\n' );
-		process.exit( 1 );
-	}
-};
 
 const runCustomFormatter = (
 	customFormatterFile,
@@ -84,36 +35,38 @@ const runCustomFormatter = (
 	return 'custom formatter';
 };
 
-// To keep track of file being processed.
-const currentFileStack = [];
-
-module.exports = function( sourceFile, options ) {
+module.exports = function( sourceFilePath, options ) {
 	// Input: process CLI args, prepare files, etc
 	const processDir = process.cwd();
-	if ( sourceFile === undefined ) {
+	if ( sourceFilePath === undefined ) {
 		process.stderr.write( '\n' );
 		process.stderr.write( 'No source file provided' );
 		process.stderr.write( '\n\n' );
 		process.exit( 1 );
 	}
-	sourceFile = path.join( processDir, sourceFile );
+	sourceFilePath = path.join( processDir, sourceFilePath );
 
 	const debugMode = options.debug ? true : false;
 
 	const inputBase = path.join(
-		path.dirname( sourceFile ),
-		path.basename( sourceFile, path.extname( sourceFile ) )
+		path.dirname( sourceFilePath ),
+		path.basename( sourceFilePath, path.extname( sourceFilePath ) )
 	);
-	const ast = inputBase + '-ast.json';
-	const tokens = inputBase + '-exports.json';
-	const ir = inputBase + '-ir.json';
 	const doc = options.output
 		? path.join( processDir, options.output )
 		: inputBase + '-api.md';
 
 	// Process
-	const result = processFile( processDir, sourceFile );
-	const filteredIR = result.ir.filter( ( symbol ) => {
+	const { sourceFile, exportStatements, typeChecker } = compile(
+		sourceFilePath
+	);
+	const ir = getIntermediateRepresentation(
+		sourceFilePath,
+		exportStatements,
+		typeChecker,
+		sourceFile
+	);
+	const filteredIR = ir.filter( ( symbol ) => {
 		if ( isSymbolPrivate( symbol ) ) {
 			return false;
 		}
@@ -126,14 +79,14 @@ module.exports = function( sourceFile, options ) {
 	} );
 
 	// Ouput
-	if ( result === undefined ) {
-		process.stdout.write(
-			'\nFile was processed, but contained no ES6 module exports:'
-		);
-		process.stdout.write( `\n${ sourceFile }` );
-		process.stdout.write( '\n\n' );
-		process.exit( 0 );
-	}
+	// if ( result === undefined ) {
+	// 	process.stdout.write(
+	// 		'\nFile was processed, but contained no ES6 module exports:'
+	// 	);
+	// 	process.stdout.write( `\n${ sourceFilePath }` );
+	// 	process.stdout.write( '\n\n' );
+	// 	process.exit( 0 );
+	// }
 
 	if ( options.formatter ) {
 		runCustomFormatter(
@@ -148,9 +101,13 @@ module.exports = function( sourceFile, options ) {
 	}
 
 	if ( debugMode ) {
-		fs.writeFileSync( ir, JSON.stringify( result.ir ) );
-		fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
-		fs.writeFileSync( ast, JSON.stringify( result.ast ) );
+		const ast = inputBase + '-ast.json';
+		const tokens = inputBase + '-exports.json';
+		const irFile = inputBase + '-ir.json';
+
+		fs.writeFileSync( irFile, JSON.stringify( ir ) );
+		fs.writeFileSync( tokens, JSON.stringify( exportStatements ) );
+		fs.writeFileSync( ast, JSON.stringify( sourceFile ) );
 	}
 
 	process.exit( 0 );
