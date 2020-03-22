@@ -13,6 +13,8 @@
  *  @example
  *
  * ```js
+ * const x = require('@wordpress/test');
+ *
  * const addResult = sum( 1, 3 );
  * console.log( addResult ); // will yield 4
  * ```

@@ -60,7 +60,7 @@ describe( 'JSDoc', () => {
 				{
 					title: 'example',
 					description:
-						'```js\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```',
+						"```js\nconst x = require('@wordpress/test');\n\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```",
 				},
 				{
 					title: 'return',

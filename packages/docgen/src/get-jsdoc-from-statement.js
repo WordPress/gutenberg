@@ -51,6 +51,13 @@ module.exports = function( statement, typeChecker ) {
 					result.type = getType();
 				}
 
+				if ( result.title === 'example' ) {
+					result.description = result.description.replace(
+						/__WORDPRESS_IMPORT__/g,
+						'@wordpress'
+					);
+				}
+
 				return result;
 			} ),
 		};
