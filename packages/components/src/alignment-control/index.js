@@ -22,6 +22,7 @@ import {
 } from './utils';
 import { Root, Cell, Point } from './styles/alignment-control-styles';
 import { useControlledState } from '../utils/hooks';
+import AlignmentControlIcon from './icon';
 
 // TODO: Account for RTL alignments
 export default function AlignmentControl( {
@@ -114,3 +115,5 @@ export default function AlignmentControl( {
 		</Root>
 	);
 }
+
+AlignmentControl.icon = <AlignmentControlIcon />;
