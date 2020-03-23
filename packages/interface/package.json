@@ -2,7 +2,7 @@
 	"name": "@wordpress/interface",
 	"version": "0.0.1",
 	"private": true,
-	"description": "Interface module for WordPress.",
+	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

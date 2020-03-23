@@ -30,7 +30,11 @@ export function* openGeneralSidebar( name ) {
  * @yield {Object} Action object.
  */
 export function* closeGeneralSidebar() {
-	yield* openGeneralSidebar();
+	yield dispatch(
+		'core/interface',
+		'setSingleActiveArea',
+		'edit-post/complementary-area'
+	);
 }
 
 /**
