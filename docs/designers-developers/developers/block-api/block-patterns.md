@@ -1,6 +1,8 @@
-# Patterns
+# Patterns (Experimental)
 
-Patterns are predefined block layouts, ready to insert and tweak.
+Patterns are predefined block layouts, ready to insert and tweak. 
+
+**Note** Patterns are still under heavy development and the APIs are subject to change.
 
 #### register_pattern
 
