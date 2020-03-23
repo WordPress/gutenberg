@@ -248,7 +248,6 @@
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js",
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.js": [
