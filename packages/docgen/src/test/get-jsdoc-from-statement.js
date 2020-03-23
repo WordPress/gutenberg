@@ -144,4 +144,28 @@ describe( 'JSDoc', () => {
 			],
 		} );
 	} );
+
+	it( 'extracts types correctly (from object notation)', () => {
+		const { typeChecker, sourceFile } = prepare( 'tags-param-object' );
+
+		expect(
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
+		).toEqual( {
+			description: 'Object param',
+			tags: [
+				{
+					title: 'param',
+					description: 'The first param to add.',
+					type: 'any',
+					name: 'p0',
+				},
+				{
+					title: 'param',
+					description: 'File',
+					type: 'File',
+					name: 'p1',
+				},
+			],
+		} );
+	} );
 } );
