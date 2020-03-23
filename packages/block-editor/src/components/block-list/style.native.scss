@@ -54,9 +54,6 @@
 	margin: $block-edge-to-content;
 }
 
-.paddingToContent {
-	margin-top: -6;
-	margin-left: $block-edge-to-content / 2;
-	margin-right: $block-edge-to-content / 2;
-	margin-bottom: $block-edge-to-content;
+.innerAppender {
+	margin: $block-edge-to-content / 2;
 }

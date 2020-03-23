@@ -150,7 +150,13 @@ export class BlockList extends Component {
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
-					<View style={ styles.paddingToContent }>
+					<View
+						style={ {
+							marginHorizontal:
+								marginHorizontal -
+								styles.innerAppender.marginLeft,
+						} }
+					>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }

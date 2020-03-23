@@ -133,7 +133,7 @@ class BlockListBlock extends Component {
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
 						style={ [
-							{ marginVertical, marginHorizontal },
+							{ marginVertical, marginHorizontal, flex: 1 },
 							isDimmed && styles.dimmed,
 						] }
 					>
