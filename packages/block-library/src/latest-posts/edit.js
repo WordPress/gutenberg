@@ -483,8 +483,16 @@ export default withSelect( ( select, props ) => {
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	return {
-		defaultImageWidth: imageDimensions[ featuredImageSizeSlug ].width,
-		defaultImageHeight: imageDimensions[ featuredImageSizeSlug ].height,
+		defaultImageWidth: get(
+			imageDimensions,
+			[ featuredImageSizeSlug, 'width' ],
+			0
+		),
+		defaultImageHeight: get(
+			imageDimensions,
+			[ featuredImageSizeSlug, 'height' ],
+			0
+		),
 		imageSizeOptions,
 		latestPosts: ! Array.isArray( posts )
 			? posts
