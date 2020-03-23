@@ -272,7 +272,7 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 		// End anchor tag content.
 
 		if ( $has_submenu ) {
-			$html .= core_block_navigation_build_html( $attributes, $block, $colors, $font_sizes );
+			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes );
 		}
 
 		$html .= '</li>';
