@@ -639,15 +639,21 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(
-		[
-			gutenberg_load_block_pattern( 'text-two-columns' ),
-			gutenberg_load_block_pattern( 'two-buttons' ),
-			gutenberg_load_block_pattern( 'cover-abc' ),
-			gutenberg_load_block_pattern( 'two-images' ),
-		],
+		WP_Patterns_Registry::get_instance()->get_all_registered(),
 		$settings['__experimentalBlockPatterns']
 	);
 
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
+
+
+/*
+ * Register default patterns if not registered in Core already.
+ */
+if ( ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
+	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+}
