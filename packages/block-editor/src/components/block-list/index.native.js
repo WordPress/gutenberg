@@ -76,13 +76,15 @@ export class BlockList extends Component {
 		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
-			<ReadableContentView>
-				<BlockListAppender // show the default appender, anormal, when not inserting a block
-					rootClientId={ this.props.rootClientId }
-					renderAppender={ this.props.renderAppender }
-					showSeparator={ willShowInsertionPoint }
-				/>
-			</ReadableContentView>
+			<View style={ styles.defaultAppender }>
+				<ReadableContentView>
+					<BlockListAppender // show the default appender, anormal, when not inserting a block
+						rootClientId={ this.props.rootClientId }
+						renderAppender={ this.props.renderAppender }
+						showSeparator={ willShowInsertionPoint }
+					/>
+				</ReadableContentView>
+			</View>
 		);
 	}
 
@@ -109,6 +111,8 @@ export class BlockList extends Component {
 			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 			__experimentalMoverDirection,
 		} = this.props;
 
@@ -117,12 +121,18 @@ export class BlockList extends Component {
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
+		const containerStyle = {
+			flex: isRootList ? 1 : 0,
+			marginVertical: isRootList ? 0 : -marginVertical,
+			marginHorizontal: isRootList ? 0 : -marginHorizontal,
+		};
+
 		const horizontalDirection =
 			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<View
-				style={ { flex: isRootList ? 1 : 0 } }
+				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				<KeyboardAwareFlatList
@@ -137,7 +147,10 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					scrollViewStyle={ {
+						flex: isRootList ? 1 : 0,
+						overflow: 'visible',
+					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -158,7 +171,13 @@ export class BlockList extends Component {
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
-					<View style={ styles.paddingToContent }>
+					<View
+						style={ {
+							marginHorizontal:
+								marginHorizontal -
+								styles.innerAppender.marginLeft,
+						} }
+					>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
@@ -175,6 +194,8 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 			customOnDelete,
 			customOnAdd,
 			__experimentalMoverDirection,
@@ -193,6 +214,8 @@ export class BlockList extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
