@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import { __experimentalText as Text } from '../text.styles';
+import Text from '../index';
 
 export default {
-	title: 'Components/Experimental/Text',
+	title: 'Components/Text',
 	component: Text,
 };
 
