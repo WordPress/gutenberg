@@ -305,21 +305,15 @@ export function applySelection( { startPath, endPath }, current ) {
 
 	// This function is not intended to cause a shift in focus. Since the above
 	// selection manipulations may shift focus, ensure that focus is restored to
-	// its previous state. `activeElement` can be `null` or the body element if
-	// there is no focus, which is accounted for here in the explicit `blur` to
-	// restore to a state of non-focus.
+	// its previous state.
 	if ( activeElement !== document.activeElement ) {
 		// The `instanceof` checks protect against edge cases where the focused
 		// element is not of the interface HTMLElement (does not have a `focus`
 		// or `blur` property).
 		//
 		// See: https://github.com/Microsoft/TypeScript/issues/5901#issuecomment-431649653
-		if ( activeElement ) {
-			if ( activeElement instanceof window.HTMLElement ) {
-				activeElement.focus();
-			}
-		} else if ( document.activeElement instanceof window.HTMLElement ) {
-			document.activeElement.blur();
+		if ( activeElement instanceof window.HTMLElement ) {
+			activeElement.focus();
 		}
 	}
 }
