@@ -20,7 +20,7 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
-	flex = true,
+	isFlex = true,
 	customOnAdd,
 } ) {
 	const appenderStyle = {
@@ -49,7 +49,7 @@ function ButtonBlockAppender( {
 						<View
 							style={ [
 								appenderStyle,
-								! flex && styles.noFlexAppender,
+								! isFlex && styles.noFlexAppender,
 							] }
 						>
 							<Icon
