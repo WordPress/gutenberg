@@ -80,7 +80,7 @@ const label = `
 /**
  * @param {TextVariant} variantName
  */
-const variant = ( variantName ) => {
+const variant = ( variantName = 'body' ) => {
 	switch ( variantName ) {
 		case 'title.large':
 			return css`
