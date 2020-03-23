@@ -65,15 +65,20 @@
 		margin: 1.5em 0;
 	}
 
-	div.components-toolbar {
-		box-shadow: none;
-		margin-bottom: 1.5em;
-		&:last-child {
-			margin-bottom: 0;
+	.components-toolbar {
+		height: $block-toolbar-height;
+		background: none;
+		border-radius: $radius-block-ui;
+		border-color: $dark-gray-primary;
+
+		.components-button {
+			margin-top: -$border-width;
+			height: $block-toolbar-height;
 		}
 	}
 
 	p + div.components-toolbar {
+		display: inline-flex;
 		margin-top: -1em;
 	}
 
