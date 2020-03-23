@@ -23,11 +23,6 @@ import styles from './editor.scss';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
-const ALIGNMENT_MAP = {
-	left: 'flex-start',
-	center: 'center',
-	right: 'flex-end',
-};
 
 function ButtonsEdit( {
 	isSelected,
@@ -51,7 +46,7 @@ function ButtonsEdit( {
 		if ( shouldRenderFooterAppender ) {
 			return (
 				<InnerBlocks.ButtonBlockAppender
-					flex={ false }
+					isFlex={ false }
 					customOnAdd={ onAddNextButton }
 				/>
 			);
@@ -68,10 +63,6 @@ function ButtonsEdit( {
 		setMaxWidth( parentWidth );
 	}
 
-	const buttonsStyle = {
-		justifyContent: ALIGNMENT_MAP[ align ],
-	};
-
 	return (
 		<>
 			<BlockControls>
@@ -87,7 +78,7 @@ function ButtonsEdit( {
 					template={ BUTTONS_TEMPLATE }
 					renderAppender={ renderAppender }
 					__experimentalMoverDirection="horizontal"
-					style={ buttonsStyle }
+					style={ styles[ `is-aligned-${ align }` ] }
 					customOnDelete={ shouldDelete && onDelete }
 					customOnAdd={ onAddNextButton }
 					parentWidth={ maxWidth }

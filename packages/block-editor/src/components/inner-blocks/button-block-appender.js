@@ -7,14 +7,14 @@ import withClientId from './with-client-id';
 export const ButtonBlockAppender = ( {
 	clientId,
 	showSeparator,
-	flex,
+	isFlex,
 	customOnAdd,
 } ) => {
 	return (
 		<BaseButtonBlockAppender
 			rootClientId={ clientId }
 			showSeparator={ showSeparator }
-			flex={ flex }
+			isFlex={ isFlex }
 			customOnAdd={ customOnAdd }
 		/>
 	);

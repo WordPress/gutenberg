@@ -1,3 +1,15 @@
 .nestedButtons {
 	margin: $block-selected-child-margin + $block-selected-child-border-width + $block-selected-border-width + $block-selected-margin;
 }
+
+.is-aligned-left {
+	justify-content: flex-start;
+}
+
+.is-aligned-center {
+	justify-content: center;
+}
+
+.is-aligned-right {
+	justify-content: flex-end;
+}
