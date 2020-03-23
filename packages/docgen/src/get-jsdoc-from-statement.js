@@ -27,7 +27,10 @@ module.exports = function( statement ) {
 		return {
 			description: lastComment.comment,
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
-				const getType = () => typeToString( tag.typeExpression.type );
+				const getType = () =>
+					tag.typeExpression
+						? typeToString( tag.typeExpression.type )
+						: 'undocumented';
 				const result = {
 					title: tag.tagName.escapedText,
 					description: tag.comment ? tag.comment : null,

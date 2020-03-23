@@ -6,19 +6,30 @@
  * @param p undocumented type
  * @param {any} p any
  * @param {*} p jsdoc all types
- * @param {?} p unknown
- * @param {unknown} p unknown TS
+ * @param {?} p jsdoc unknown
+ * @param {unknown} p TS unknown
  * @param {string} p string
+ * @param {String} p string in capital case
  * @param {number} p number
+ * @param {Number} p number in capital case
  * @param {bigint} p bigint
  * @param {boolean} p boolean
  * @param {symbol} p symbol
  * @param {undefined} p undefined
  * @param {null} p null
  * @param {never} p never
- * @param {Object} p Object
+ * @param {object} p object
+ * @param {Object} p object in capital case
  * @param {Object.<string, number>} p jsdoc record type
- * @param {File} p Random Type name
+ * @param {File} p random type name
+ *
+ */
+// eslint-disable-next-line no-unused-vars
+export const sum = ( p0, p1 ) => {};
+
+/* eslint-enable jsdoc/check-types */
+
+/**
  * @param {'string literal'} p string literal
  * @param {42} p number literal
  * @param {typeof J} p type query
@@ -63,10 +74,6 @@
  * @param {asdf} p identifier
  *
  */
-// eslint-disable-next-line no-unused-vars
-export const sum = ( p0, p1 ) => {};
-
-/* eslint-enable jsdoc/check-types */
 
 // @param {void} p9 void -> should be tested with functions
 

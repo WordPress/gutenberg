@@ -123,30 +123,40 @@ describe( 'JSDoc', () => {
 
 	it( 'extracts types correctly', () => {
 		const { typeChecker, sourceFile } = prepare( 'tags-param-types' );
+		const type = ( typeName, description ) => ( {
+			title: 'param',
+			name: 'p',
+			description,
+			type: typeName,
+		} );
 
 		expect(
 			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
 		).toEqual( {
 			description: 'A function with many params.',
 			tags: [
-				{
-					title: 'param',
-					description: 'undocumented type',
-					type: 'undocumneted',
-					name: 'p',
-				},
-				{
-					title: 'param',
-					description: 'any',
-					type: 'any',
-					name: 'p',
-				},
-				{
-					title: 'param',
-					description: 'jsdoc all types',
-					type: 'any',
-					name: 'p',
-				},
+				type( 'undocumented', 'undocumented type' ),
+				type( 'any', 'any' ),
+				type( 'any', 'jsdoc all types' ),
+				type( 'unknown', 'jsdoc unknown' ),
+				type( 'unknown', 'TS unknown' ),
+				type( 'string', 'string' ),
+				type( 'string', 'string in capital case' ),
+				type( 'number', 'number' ),
+				type( 'number', 'number in capital case' ),
+				type( 'bigint', 'bigint' ),
+				type( 'boolean', 'boolean' ),
+				type( 'symbol', 'symbol' ),
+				type( 'undefined', 'undefined' ),
+				type( 'null', 'null' ),
+				type( 'never', 'never' ),
+				type( 'object', 'object' ),
+				type( 'object', 'object in capital case' ),
+				type( 'Record<string, number>', 'jsdoc record type' ),
+				type( 'File', 'random type name' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
 			],
 		} );
 	} );
