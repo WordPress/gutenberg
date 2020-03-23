@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -18,8 +18,6 @@ import Container from './container';
 import getDefaultTemplates from './default-templates';
 import Preview from './preview';
 
-const PICKER_ANIMATION_DELAY = 500;
-
 const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
 	visible,
@@ -35,14 +33,10 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
-	const contentOpacity = new Animated.Value( 1 );
+	const contentOpacity = useRef( new Animated.Value( 0 ) );
 
 	useEffect( () => {
-		if ( ! visible ) {
-			onHidePicker();
-		} else {
-			setPickerVisible( true );
-		}
+		onPickerAnimation();
 	}, [ visible ] );
 
 	const onApply = () => {
@@ -56,13 +50,19 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
-	const onHidePicker = () => {
-		Animated.timing( contentOpacity, {
-			toValue: 0,
+	const onPickerAnimation = () => {
+		if ( visible && ! pickerVisible ) {
+			setPickerVisible( true );
+		}
+
+		Animated.timing( contentOpacity.current, {
+			toValue: visible ? 1 : 0,
 			duration: 300,
-			delay: PICKER_ANIMATION_DELAY,
+			useNativeDriver: true,
 		} ).start( () => {
-			setPickerVisible( false );
+			if ( ! visible ) {
+				setPickerVisible( false );
+			}
 		} );
 	};
 
@@ -71,7 +71,7 @@ const __experimentalPageTemplatePicker = ( {
 	}
 
 	return (
-		<Animated.View style={ [ { opacity: contentOpacity } ] }>
+		<Animated.View style={ [ { opacity: contentOpacity.current } ] }>
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button

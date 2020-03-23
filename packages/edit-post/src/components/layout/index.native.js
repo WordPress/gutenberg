@@ -13,7 +13,7 @@ import { withSelect } from '@wordpress/data';
 import {
 	BottomSheetSettings,
 	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePickerVisible,
+	__experimentalWithPageTemplatePicker,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
@@ -95,9 +95,9 @@ class Layout extends Component {
 	render() {
 		const {
 			getStylesFromColorScheme,
-			isPage,
+			isTemplatePickerAvailable,
+			isTemplatePickerVisible,
 			mode,
-			showPageTemplatePicker,
 		} = this.props;
 
 		const isHtmlView = mode === 'text';
@@ -144,9 +144,9 @@ class Layout extends Component {
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
 					>
-						{ isPage && (
+						{ isTemplatePickerAvailable && (
 							<__experimentalPageTemplatePicker
-								visible={ showPageTemplatePicker }
+								visible={ isTemplatePickerVisible }
 							/>
 						) }
 						<Header />
@@ -160,18 +160,16 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			__unstableIsEditorReady: isEditorReady,
-			getCurrentPostType,
-		} = select( 'core/editor' );
+		const { __unstableIsEditorReady: isEditorReady } = select(
+			'core/editor'
+		);
 		const { getEditorMode } = select( 'core/edit-post' );
 
 		return {
-			isPage: getCurrentPostType(),
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
 		};
 	} ),
 	withPreferredColorScheme,
-	__experimentalWithPageTemplatePickerVisible,
+	__experimentalWithPageTemplatePicker,
 ] )( Layout );
