@@ -7,7 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, forwardRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
+import { useEffect, forwardRef, renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -18,10 +19,38 @@ import { Button } from '../';
 
 const NOTICE_TIMEOUT = 10000;
 
+/** @typedef {import('@wordpress/element').WPElement} WPElement */
+
+/**
+ * Custom hook which announces the message with the given politeness, if a
+ * valid message is provided.
+ *
+ * @param {string|WPElement}     [message]  Message to announce.
+ * @param {'polite'|'assertive'} politeness Politeness to announce.
+ */
+function useSpokenMessage( message, politeness ) {
+	const spokenMessage =
+		typeof message === 'string' ? message : renderToString( message );
+
+	useEffect( () => {
+		if ( spokenMessage ) {
+			speak( spokenMessage, politeness );
+		}
+	}, [ spokenMessage, politeness ] );
+}
+
 function Snackbar(
-	{ className, children, actions = [], onRemove = noop },
+	{
+		className,
+		children,
+		spokenMessage = children,
+		politeness = 'polite',
+		actions = [],
+		onRemove = noop,
+	},
 	ref
 ) {
+	useSpokenMessage( spokenMessage, politeness );
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			onRemove();

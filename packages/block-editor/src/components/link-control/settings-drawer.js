@@ -7,12 +7,12 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
+import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 
 const defaultSettings = [
 	{
 		id: 'opensInNewTab',
-		title: __( 'Open in New Tab' ),
+		title: __( 'Open in new tab' ),
 	},
 ];
 
@@ -38,15 +38,15 @@ const LinkControlSettingsDrawer = ( {
 			key={ setting.id }
 			label={ setting.title }
 			onChange={ handleSettingChange( setting ) }
-			checked={ value ? value[ setting.id ] : false }
+			checked={ value ? !! value[ setting.id ] : false }
 		/>
 	) );
 
 	return (
 		<fieldset className="block-editor-link-control__settings">
-			<legend className="screen-reader-text">
+			<VisuallyHidden as="legend">
 				{ __( 'Currently selected link settings' ) }
-			</legend>
+			</VisuallyHidden>
 			{ theSettings }
 		</fieldset>
 	);

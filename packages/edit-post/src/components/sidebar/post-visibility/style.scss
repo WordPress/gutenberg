@@ -3,8 +3,6 @@
 }
 
 .edit-post-post-visibility__dialog .components-popover__content {
-	padding: 10px;
-
 	@include break-medium {
 		// 279px (sidebar width) - 20px (padding) - 2px (horizontal borders)
 		width: 257px;

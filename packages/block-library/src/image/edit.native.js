@@ -17,16 +17,16 @@ import {
 	requestImageFullscreenPreview,
 	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
-import { isEmpty, map, get } from 'lodash';
+import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
+	CycleSelectControl,
 	Icon,
 	PanelBody,
 	PanelActions,
-	SelectControl,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
@@ -44,43 +44,37 @@ import {
 	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { image as icon } from '@wordpress/icons';
+import {
+	external,
+	link,
+	image as icon,
+	textColor,
+	replace,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, LINK_DESTINATION_NONE } from './constants';
+import {
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_NONE,
+	DEFAULT_SIZE_SLUG,
+} from './constants';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
-const sizeOptionLabels = {
-	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
-	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
-	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
-	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
-};
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( {
-	value: option,
-	label,
-} ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -134,7 +128,7 @@ export class ImageEdit extends React.Component {
 		if (
 			! attributes.id &&
 			attributes.url &&
-			attributes.url.indexOf( 'file:' ) === 0
+			getProtocol( attributes.url ) === 'file:'
 		) {
 			requestMediaImport( attributes.url, ( id, url ) => {
 				if ( url ) {
@@ -145,7 +139,11 @@ export class ImageEdit extends React.Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			mediaUploadSync();
 		}
 	}
@@ -184,7 +182,10 @@ export class ImageEdit extends React.Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
 			requestImageFullscreenPreview(
@@ -348,7 +349,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { attributes, isSelected, image } = this.props;
+		const { attributes, isSelected, image, imageSizes } = this.props;
 		const {
 			align,
 			url,
@@ -368,12 +369,21 @@ export class ImageEdit extends React.Component {
 			},
 		];
 
+		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
+		const sizeOptionsValid = find( sizeOptions, [
+			'value',
+			DEFAULT_SIZE_SLUG,
+		] );
+
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
-						icon={ editImageIcon }
+						icon={ replace }
 						onClick={ open }
 					/>
 				</ToolbarGroup>
@@ -389,7 +399,7 @@ export class ImageEdit extends React.Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					<TextControl
-						icon={ 'admin-links' }
+						icon={ link }
 						label={ __( 'Link To' ) }
 						value={ href || '' }
 						valuePlaceholder={ __( 'Add URL' ) }
@@ -399,22 +409,16 @@ export class ImageEdit extends React.Component {
 						keyboardType="url"
 					/>
 					<ToggleControl
-						icon={ 'external' }
+						icon={ external }
 						label={ __( 'Open in new tab' ) }
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
-					{ // eslint-disable-next-line no-undef
-					image && __DEV__ && (
-						<SelectControl
-							hideCancelButton
+					{ image && sizeOptionsValid && (
+						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
-							value={
-								sizeOptionLabels[
-									sizeSlug || DEFAULT_SIZE_SLUG
-								]
-							}
+							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) =>
 								this.onSetSizeSlug( newValue )
 							}
@@ -422,7 +426,7 @@ export class ImageEdit extends React.Component {
 						/>
 					) }
 					<TextControl
-						icon={ 'editor-textcolor' }
+						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
@@ -663,13 +667,18 @@ export class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
 		const {
-			attributes: { id },
+			attributes: { id, url },
 			isSelected,
 		} = props;
+		const { imageSizes } = getSettings();
 
+		const shouldGetMedia =
+			id && isSelected && getProtocol( url ) !== 'file:';
 		return {
-			image: id && isSelected ? getMedia( id ) : null,
+			image: shouldGetMedia ? getMedia( id ) : null,
+			imageSizes,
 		};
 	} ),
 	withPreferredColorScheme,

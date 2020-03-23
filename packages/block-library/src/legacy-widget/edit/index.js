@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { update } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -91,7 +92,7 @@ class LegacyWidgetEdit extends Component {
 							<Button
 								onClick={ this.changeWidget }
 								label={ __( 'Change widget' ) }
-								icon="update"
+								icon={ update }
 							/>
 						) }
 						{ hasEditForm && (

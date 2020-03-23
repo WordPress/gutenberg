@@ -3,42 +3,10 @@
  */
 import addMilestone from '../add-milestone';
 
-describe( 'addFirstTimeContributorLabel', () => {
-	it( 'does nothing if PR is not merged', async () => {
-		const payload = {
-			pull_request: {
-				merged: false,
-			},
-		};
-		const octokit = {
-			issues: {
-				get: jest.fn(),
-				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn(),
-				update: jest.fn(),
-			},
-			repos: {
-				getContents: jest.fn(),
-			},
-		};
-
-		await addMilestone( payload, octokit );
-
-		expect( octokit.issues.get ).not.toHaveBeenCalled();
-		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
-		expect( octokit.issues.listMilestonesForRepo ).not.toHaveBeenCalled();
-		expect( octokit.issues.update ).not.toHaveBeenCalled();
-		expect( octokit.repos.getContents ).not.toHaveBeenCalled();
-	} );
-
+describe( 'addMilestone', () => {
 	it( 'does nothing if base is not master', async () => {
 		const payload = {
-			pull_request: {
-				merged: true,
-				base: {
-					ref: 'release/5.0',
-				},
-			},
+			ref: 'refs/heads/not-master',
 		};
 		const octokit = {
 			issues: {
@@ -63,13 +31,8 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 	it( 'does nothing if PR already has a milestone', async () => {
 		const payload = {
-			pull_request: {
-				merged: true,
-				base: {
-					ref: 'master',
-				},
-				number: 123,
-			},
+			ref: 'refs/heads/master',
+			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -100,7 +63,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: 123,
+			issue_number: '123',
 		} );
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
 		expect( octokit.issues.listMilestonesForRepo ).not.toHaveBeenCalled();
@@ -110,13 +73,8 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 	it( 'correctly milestones PRs when `package.json` has a `*.[1-8]` version', async () => {
 		const payload = {
-			pull_request: {
-				merged: true,
-				base: {
-					ref: 'master',
-				},
-				number: 123,
-			},
+			ref: 'refs/heads/master',
+			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -166,7 +124,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: 123,
+			issue_number: '123',
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -186,20 +144,15 @@ describe( 'addFirstTimeContributorLabel', () => {
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: 123,
+			issue_number: '123',
 			milestone: 12,
 		} );
 	} );
 
 	it( 'correctly milestones PRs when `package.json` has a `*.9` version', async () => {
 		const payload = {
-			pull_request: {
-				merged: true,
-				base: {
-					ref: 'master',
-				},
-				number: 123,
-			},
+			ref: 'refs/heads/master',
+			commits: [ { message: '(#123)' } ],
 			repository: {
 				owner: {
 					login: 'WordPress',
@@ -249,7 +202,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: 123,
+			issue_number: '123',
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -269,7 +222,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: 123,
+			issue_number: '123',
 			milestone: 12,
 		} );
 	} );

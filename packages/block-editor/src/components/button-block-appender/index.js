@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip } from '@wordpress/components';
+import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, plusCircle } from '@wordpress/icons';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -62,10 +62,8 @@ function ButtonBlockAppender( {
 							disabled={ disabled }
 							label={ label }
 						>
-							<span className="screen-reader-text">
-								{ label }
-							</span>
-							<Icon icon={ plusCircle } />
+							<VisuallyHidden as="span">{ label }</VisuallyHidden>
+							<Icon icon={ plus } />
 						</Button>
 					</Tooltip>
 				);

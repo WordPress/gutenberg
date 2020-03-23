@@ -41,7 +41,6 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
-		showInserterHelpPanel,
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
@@ -57,7 +56,6 @@ class Editor extends Component {
 			},
 			hasFixedToolbar,
 			focusMode,
-			showInserterHelpPanel,
 			__experimentalLocalAutosaveInterval,
 		};
 
@@ -93,7 +91,6 @@ class Editor extends Component {
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
-			showInserterHelpPanel,
 			updatePreferredStyleVariations,
 			...props
 		} = this.props;
@@ -105,7 +102,6 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
-			showInserterHelpPanel,
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
@@ -145,13 +141,18 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select, { postId, postType } ) => {
-		const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+		const {
+			isFeatureActive,
+			getPreference,
+			__experimentalGetPreviewDeviceType,
+		} = select( 'core/edit-post' );
 		const { getEntityRecord } = select( 'core' );
 		const { getBlockTypes } = select( 'core/blocks' );
 
 		return {
-			showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar:
+				isFeatureActive( 'fixedToolbar' ) ||
+				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(

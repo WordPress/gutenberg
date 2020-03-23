@@ -148,9 +148,13 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
-		devOnly( group ),
+		group,
+		button,
 		spacer,
 		shortcode,
+		latestPosts,
+		devOnly( verse ),
+		devOnly( cover ),
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

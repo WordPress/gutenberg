@@ -3,6 +3,10 @@
  */
 const debug = require( './debug' );
 
+/** @typedef {import('@octokit/rest').HookError} HookError */
+/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
+
 // Milestone due dates are calculated from a known due date:
 // 6.3, which was due on August 12 2019.
 const REFERENCE_MAJOR = 6;
@@ -21,7 +25,7 @@ const DAYS_PER_RELEASE = 14;
  * @see https://developer.github.com/v3/#client-errors
  * @see https://github.com/octokit/request.js/blob/2a1d768/src/fetch-wrapper.ts#L79-L80
  *
- * @param {Error} error Error to test.
+ * @param {HookError} error Error to test.
  *
  * @return {boolean} Whether error is a duplicate validation request error.
  */
@@ -32,19 +36,19 @@ const isDuplicateValidationError = ( error ) =>
 /**
  * Assigns the correct milestone to PRs once merged.
  *
- * @param {Object} payload Pull request event payload, see https://developer.github.com/v3/activity/events/types/#pullrequestevent.
- * @param {Object} octokit Initialized Octokit REST client, see https://octokit.github.io/rest.js/.
+ * @param {WebhookPayloadPush} payload Push event payload.
+ * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function addMilestone( payload, octokit ) {
-	if ( ! payload.pull_request.merged ) {
-		debug( 'add-milestone: Pull request is not merged. Aborting' );
+	if ( payload.ref !== 'refs/heads/master' ) {
+		debug( 'add-milestone: Commit is not to `master`. Aborting' );
 		return;
 	}
 
-	if ( payload.pull_request.base.ref !== 'master' ) {
-		debug(
-			'add-milestone: Pull request is not based on `master`. Aborting'
-		);
+	const match = payload.commits[ 0 ].message.match( /\(#(\d+)\)$/m );
+	const prNumber = match && match[ 1 ];
+	if ( ! prNumber ) {
+		debug( 'add-milestone: Commit is not a squashed PR. Aborting' );
 		return;
 	}
 
@@ -55,7 +59,7 @@ async function addMilestone( payload, octokit ) {
 	} = await octokit.issues.get( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
-		issue_number: payload.pull_request.number,
+		issue_number: prNumber,
 	} );
 
 	if ( milestone ) {
@@ -133,13 +137,13 @@ async function addMilestone( payload, octokit ) {
 	);
 
 	debug(
-		`add-milestone: Adding issue #${ payload.pull_request.number } to milestone #${ number }`
+		`add-milestone: Adding issue #${ prNumber } to milestone #${ number }`
 	);
 
 	await octokit.issues.update( {
 		owner: payload.repository.owner.login,
 		repo: payload.repository.name,
-		issue_number: payload.pull_request.number,
+		issue_number: prNumber,
 		milestone: number,
 	} );
 }

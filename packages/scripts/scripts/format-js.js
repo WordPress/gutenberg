@@ -21,7 +21,7 @@ const {
 	getArgFromCLI,
 	getFileArgsFromCLI,
 	hasArgInCLI,
-	hasPackageProp,
+	hasPrettierConfig,
 	hasProjectFile,
 } = require( '../utils' );
 
@@ -59,29 +59,6 @@ function checkPrettier() {
 		};
 	}
 
-	// See: https://prettier.io/docs/en/configuration.html
-	const hasProjectPrettierConfig =
-		hasProjectFile( '.prettierrc.js' ) ||
-		hasProjectFile( '.prettierrc.json' ) ||
-		hasProjectFile( '.prettierrc.toml' ) ||
-		hasProjectFile( '.prettierrc.yaml' ) ||
-		hasProjectFile( '.prettierrc.yml' ) ||
-		hasProjectFile( 'prettier.config.js' ) ||
-		hasProjectFile( '.prettierrc' ) ||
-		hasPackageProp( 'prettier' );
-
-	if ( ! hasProjectPrettierConfig ) {
-		return {
-			success: false,
-			message:
-				chalk.red(
-					'The Prettier config file was not found in your project\n'
-				) +
-				'You need to create a top-level Prettier config file in your project to get ' +
-				'automatic code formatting that works with IDE and editor integrations.\n\n',
-		};
-	}
-
 	return { success: true };
 }
 
@@ -89,6 +66,15 @@ const checkResult = checkPrettier();
 if ( ! checkResult.success ) {
 	stdout.write( checkResult.message );
 	exit( 1 );
+}
+
+// Check for existing config in project, if it exists no command-line args are
+// needed for config, otherwise pass in args to default config in packages
+// See: https://prettier.io/docs/en/configuration.html
+let configArgs = [];
+// TODO: once setup, use @wordpress/prettier-config
+if ( ! hasPrettierConfig() ) {
+	configArgs = [ '--config', fromConfigRoot( '.prettierrc.js' ) ];
 }
 
 // If `--ignore-path` is not explicitly specified, use the project's or global .eslintignore
@@ -119,7 +105,7 @@ const globArgs = dirGlob( fileArgs, { extensions: [ 'js' ] } );
 
 const result = spawn(
 	resolveBin( 'prettier' ),
-	[ '--write', ...ignoreArgs, ...pragmaArgs, ...globArgs ],
+	[ '--write', ...configArgs, ...ignoreArgs, ...pragmaArgs, ...globArgs ],
 	{ stdio: 'inherit' }
 );
 

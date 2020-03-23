@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	__experimentalAddBlockVariations,
-	__experimentalRemoveBlockVariations,
-} from '../actions';
+import { addBlockVariations, removeBlockVariations } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'addBlockVariations', () => {
@@ -19,10 +16,7 @@ describe( 'actions', () => {
 					example: 'foo',
 				},
 			};
-			const result = __experimentalAddBlockVariations(
-				blockName,
-				variation
-			);
+			const result = addBlockVariations( blockName, variation );
 			expect( result ).toEqual( {
 				type: 'ADD_BLOCK_VARIATIONS',
 				variations: [ variation ],
@@ -31,10 +25,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should return the REMOVE_BLOCK_VARIATIONS action', () => {
-			const result = __experimentalRemoveBlockVariations(
-				blockName,
-				variationName
-			);
+			const result = removeBlockVariations( blockName, variationName );
 			expect( result ).toEqual( {
 				type: 'REMOVE_BLOCK_VARIATIONS',
 				variationNames: [ variationName ],

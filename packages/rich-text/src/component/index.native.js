@@ -5,7 +5,7 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import { pickBy } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -278,8 +278,7 @@ export class RichText extends Component {
 	 * Handles any case where the content of the AztecRN instance has changed in size
 	 */
 	onContentSizeChange( contentSize ) {
-		const contentHeight = contentSize.height;
-		this.setState( { height: contentHeight } );
+		this.setState( contentSize );
 		this.lastAztecEventType = 'content size change';
 	}
 
@@ -696,7 +695,11 @@ export class RichText extends Component {
 			__unstableIsSelected: isSelected,
 			children,
 			getStylesFromColorScheme,
+			minWidth,
+			maxWidth,
 			formatTypes,
+			parentBlockStyles,
+			withoutInteractiveFormatting,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -780,6 +783,12 @@ export class RichText extends Component {
 			this.firedAfterTextChanged = false;
 		}
 
+		// Logic below assures that `RichText` width will always have equal value when container is almost fully filled.
+		const width =
+			maxWidth && this.state.width && maxWidth - this.state.width < 10
+				? maxWidth
+				: this.state.width;
+
 		return (
 			<View>
 				{ children &&
@@ -798,7 +807,11 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
+						backgroundColor: styles.richText.backgroundColor,
 						...style,
+						...( this.isIOS && minWidth && maxWidth
+							? { width }
+							: {} ),
 						minHeight: this.state.height,
 					} }
 					text={ {
@@ -825,7 +838,11 @@ export class RichText extends Component {
 					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ ( style && style.color ) || defaultColor }
+					color={
+						( style && style.color ) ||
+						( parentBlockStyles && parentBlockStyles.color ) ||
+						defaultColor
+					}
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
@@ -837,12 +854,18 @@ export class RichText extends Component {
 					disableEditingMenu={ this.props.disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
+					{ ...( this.isIOS ? { maxWidth } : {} ) }
+					minWidth={ minWidth }
+					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
 				/>
 				{ isSelected && (
 					<FormatEdit
 						formatTypes={ formatTypes }
 						value={ record }
+						withoutInteractiveFormatting={
+							withoutInteractiveFormatting
+						}
 						onChange={ this.onFormatChange }
 						onFocus={ () => {} }
 					/>
@@ -859,8 +882,17 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-	} ) ),
+	withSelect( ( select, { clientId } ) => {
+		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const parents = getBlockParents( clientId, true );
+		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
+		const parentBlockStyles =
+			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+
+		return {
+			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			...{ parentBlockStyles },
+		};
+	} ),
 	withPreferredColorScheme,
 ] )( RichText );

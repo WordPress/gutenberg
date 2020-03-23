@@ -2,18 +2,24 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import useResizeAware from 'react-resize-aware';
+
+/**
+ * WordPress dependencies
+ */
+import { more } from '@wordpress/icons';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Placeholder from '../';
 
-jest.mock( 'react-resize-aware' );
-
 describe( 'Placeholder', () => {
 	beforeEach( () => {
-		useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+		useResizeObserver.mockReturnValue( [
+			<div key="1" />,
+			{ width: 320 },
+		] );
 	} );
 
 	describe( 'basic rendering', () => {
@@ -44,7 +50,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should render an Icon in the label section', () => {
-			const placeholder = shallow( <Placeholder icon="wordpress" /> );
+			const placeholder = shallow( <Placeholder icon={ more } /> );
 			const placeholderLabel = placeholder.find(
 				'.components-placeholder__label'
 			);
@@ -104,8 +110,8 @@ describe( 'Placeholder', () => {
 	} );
 
 	describe( 'resize aware', () => {
-		it( 'should not assign modifier class in first-pass `null` width from `useResizeAware`', () => {
-			useResizeAware.mockReturnValue( [
+		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
+			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 320 },
 			] );
@@ -118,7 +124,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
-			useResizeAware.mockReturnValue( [
+			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },
 			] );

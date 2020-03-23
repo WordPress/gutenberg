@@ -3,11 +3,14 @@
  */
 const debug = require( './debug' );
 
+/** @typedef {import('@actions/github').GitHub} GitHub */
+/** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
+
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
  *
- * @param {Object} payload Pull request event payload, see https://developer.github.com/v3/activity/events/types/#pullrequestevent.
- * @param {Object} octokit Initialized Octokit REST client, see https://octokit.github.io/rest.js/.
+ * @param {WebhookPayloadPullRequest} payload Pull request event payload.
+ * @param {GitHub}                    octokit Initialized Octokit REST client.
  */
 async function assignFixedIssues( payload, octokit ) {
 	const regex = /(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;

@@ -11,12 +11,7 @@ export const {
 
 function Sidebar() {
 	return (
-		<div
-			className="edit-widgets-sidebar"
-			role="region"
-			aria-label={ __( 'Widgets advanced settings' ) }
-			tabIndex="-1"
-		>
+		<div className="edit-widgets-sidebar">
 			<Panel header={ __( 'Block Areas' ) }>
 				<BlockSidebarSlot bubblesVirtually />
 			</Panel>

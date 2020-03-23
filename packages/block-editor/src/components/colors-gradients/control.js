@@ -110,27 +110,29 @@ function ColorGradientControlInner( {
 		>
 			<fieldset>
 				<legend>
-					<BaseControl.VisualLabel>
-						<VisualLabel
-							currentTab={ currentTab }
-							label={ label }
-							colorValue={ colorValue }
-							gradientValue={ gradientValue }
-						/>
-					</BaseControl.VisualLabel>
+					<div className="block-editor-color-gradient-control__color-indicator">
+						<BaseControl.VisualLabel>
+							<VisualLabel
+								currentTab={ currentTab }
+								label={ label }
+								colorValue={ colorValue }
+								gradientValue={ gradientValue }
+							/>
+						</BaseControl.VisualLabel>
+					</div>
 				</legend>
 				{ canChooseAColor && canChooseAGradient && (
 					<ButtonGroup className="block-editor-color-gradient-control__button-tabs">
 						<Button
-							isLarge
+							isSmall
 							isPrimary={ currentTab === 'color' }
 							isSecondary={ currentTab !== 'color' }
 							onClick={ () => setCurrentTab( 'color' ) }
 						>
-							{ __( 'Solid Color' ) }
+							{ __( 'Solid' ) }
 						</Button>
 						<Button
-							isLarge
+							isSmall
 							isPrimary={ currentTab === 'gradient' }
 							isSecondary={ currentTab !== 'gradient' }
 							onClick={ () => setCurrentTab( 'gradient' ) }

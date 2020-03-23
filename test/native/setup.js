@@ -13,6 +13,7 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -78,6 +79,10 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
 
 // Overwrite some native module mocks from `react-native` jest preset:
 // https://github.com/facebook/react-native/blob/master/jest/setup.js

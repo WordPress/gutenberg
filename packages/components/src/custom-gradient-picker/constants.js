@@ -11,3 +11,8 @@ export const COLOR_POPOVER_PROPS = {
 	className: 'components-custom-gradient-picker__color-picker-popover',
 	position: 'top',
 };
+export const DEFAULT_LINEAR_GRADIENT_ANGLE = 180;
+export const HORIZONTAL_GRADIENT_ORIENTATION = {
+	type: 'angular',
+	value: 90,
+};

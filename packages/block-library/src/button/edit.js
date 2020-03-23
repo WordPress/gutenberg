@@ -31,6 +31,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { link } from '@wordpress/icons';
 
 const { getComputedStyle } = window;
 
@@ -71,7 +72,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
-				label={ __( 'Border Radius' ) }
+				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
 				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
@@ -120,7 +121,7 @@ function URLPicker( {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
-						icon="admin-links"
+						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ openLinkControl }
@@ -231,7 +232,7 @@ function ButtonEdit( {
 						{
 							colorValue: textColor.color,
 							onColorChange: setTextColor,
-							label: __( 'Text Color' ),
+							label: __( 'Text color' ),
 						},
 						{
 							colorValue: backgroundColor.color,

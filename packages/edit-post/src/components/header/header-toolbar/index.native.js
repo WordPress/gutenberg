@@ -13,6 +13,11 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
 import { Inserter, BlockToolbar } from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
+import {
+	keyboardClose,
+	undo as undoIcon,
+	redo as redoIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -51,35 +56,33 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Toolbar accessible={ false }>
-					<Inserter disabled={ ! showInserter } />
-					{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
-					<ToolbarButton
-						title={ __( 'Undo' ) }
-						icon="undo"
-						isDisabled={ ! hasUndo }
-						onClick={ undo }
-						extraProps={ {
-							hint: __( 'Double tap to undo last change' ),
-						} }
-					/>
-					<ToolbarButton
-						title={ __( 'Redo' ) }
-						icon="redo"
-						isDisabled={ ! hasRedo }
-						onClick={ redo }
-						extraProps={ {
-							hint: __( 'Double tap to redo last change' ),
-						} }
-					/>
-				</Toolbar>
+				<Inserter disabled={ ! showInserter } />
+				{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
+				<ToolbarButton
+					title={ __( 'Undo' ) }
+					icon={ undoIcon }
+					isDisabled={ ! hasUndo }
+					onClick={ undo }
+					extraProps={ {
+						hint: __( 'Double tap to undo last change' ),
+					} }
+				/>
+				<ToolbarButton
+					title={ __( 'Redo' ) }
+					icon={ redoIcon }
+					isDisabled={ ! hasRedo }
+					onClick={ redo }
+					extraProps={ {
+						hint: __( 'Double tap to redo last change' ),
+					} }
+				/>
 				{ hasFixedToolbar && <BlockToolbar /> }
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<Toolbar passedStyle={ styles.keyboardHideContainer }>
 					<ToolbarButton
 						title={ __( 'Hide keyboard' ) }
-						icon="keyboard-hide"
+						icon={ keyboardClose }
 						onClick={ onHideKeyboard }
 						extraProps={ {
 							hint: __( 'Tap to hide the keyboard' ),

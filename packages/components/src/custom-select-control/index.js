@@ -7,11 +7,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon, check } from '@wordpress/icons';
+import { Icon, check, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button, VisuallyHidden } from '../';
 
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
@@ -98,19 +98,20 @@ export default function CustomSelectControl( {
 				className
 			) }
 		>
-			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<label
-				{ ...getLabelProps( {
-					className: classnames(
-						'components-custom-select-control__label',
-						{
-							'screen-reader-text': hideLabelFromVision,
-						}
-					),
-				} ) }
-			>
-				{ label }
-			</label>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="label" { ...getLabelProps() }>
+					{ label }
+				</VisuallyHidden>
+			) : (
+				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+				<label
+					{ ...getLabelProps( {
+						className: 'components-custom-select-control__label',
+					} ) }
+				>
+					{ label }
+				</label>
+			) }
 			<Button
 				{ ...getToggleButtonProps( {
 					// This is needed because some speech recognition software don't support `aria-labelledby`.
@@ -121,8 +122,8 @@ export default function CustomSelectControl( {
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
-				<Dashicon
-					icon="arrow-down-alt2"
+				<Icon
+					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>

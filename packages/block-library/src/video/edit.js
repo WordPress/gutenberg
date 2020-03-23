@@ -113,7 +113,7 @@ class VideoEdit extends Component {
 	}
 
 	render() {
-		const { caption, controls, poster, src } = this.props.attributes;
+		const { id, caption, controls, poster, src } = this.props.attributes;
 		const {
 			className,
 			instanceId,
@@ -156,6 +156,7 @@ class VideoEdit extends Component {
 			<>
 				<BlockControls>
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ src }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="video/*"
@@ -173,17 +174,17 @@ class VideoEdit extends Component {
 						<MediaUploadCheck>
 							<BaseControl className="editor-video-poster-control">
 								<BaseControl.VisualLabel>
-									{ __( 'Poster Image' ) }
+									{ __( 'Poster image' ) }
 								</BaseControl.VisualLabel>
 								<MediaUpload
-									title={ __( 'Select Poster Image' ) }
+									title={ __( 'Select poster image' ) }
 									onSelect={ this.onSelectPoster }
 									allowedTypes={
 										VIDEO_POSTER_ALLOWED_MEDIA_TYPES
 									}
 									render={ ( { open } ) => (
 										<Button
-											isSecondary
+											isPrimary
 											onClick={ open }
 											ref={ this.posterImageButton }
 											aria-describedby={
@@ -191,8 +192,8 @@ class VideoEdit extends Component {
 											}
 										>
 											{ ! this.props.attributes.poster
-												? __( 'Select Poster Image' )
-												: __( 'Replace image' ) }
+												? __( 'Select' )
+												: __( 'Replace' ) }
 										</Button>
 									) }
 								/>
@@ -211,10 +212,9 @@ class VideoEdit extends Component {
 								{ !! this.props.attributes.poster && (
 									<Button
 										onClick={ this.onRemovePoster }
-										isLink
-										isDestructive
+										isTertiary
 									>
-										{ __( 'Remove Poster Image' ) }
+										{ __( 'Remove' ) }
 									</Button>
 								) }
 							</BaseControl>

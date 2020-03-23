@@ -10,6 +10,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { arrowUp, arrowDown } from '@wordpress/icons';
 
 const BlockMover = ( {
 	isFirst,
@@ -39,7 +40,7 @@ const BlockMover = ( {
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon="arrow-up-alt"
+				icon={ arrowUp }
 				extraProps={ { hint: __( 'Double tap to move the block up' ) } }
 			/>
 
@@ -58,7 +59,7 @@ const BlockMover = ( {
 				}
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon="arrow-down-alt"
+				icon={ arrowDown }
 				extraProps={ {
 					hint: __( 'Double tap to move the block down' ),
 				} }

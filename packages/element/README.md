@@ -138,6 +138,38 @@ _Returns_
 
 -   `WPElement`: Element.
 
+<a name="createInterpolateElement" href="#createInterpolateElement">#</a> **createInterpolateElement**
+
+This function creates an interpolated element from a passed in string with
+specific tags matching how the string should be converted to an element via
+the conversion map value.
+
+_Usage_
+
+For example, for the given string:
+
+"This is a <span>string</span> with <a>a link</a> and a self-closing
+<CustomComponentB/> tag"
+
+You would have something like this as the conversionMap value:
+
+```js
+{
+    span: <span />,
+    a: <a href={ 'https://github.com' } />,
+    CustomComponentB: <CustomComponent />,
+}
+```
+
+_Parameters_
+
+-   _interpolatedString_ `string`: The interpolation string to be parsed.
+-   _conversionMap_ `Object`: The map used to convert the string to a react element.
+
+_Returns_
+
+-   `WPElement`: A wp element.
+
 <a name="createPortal" href="#createPortal">#</a> **createPortal**
 
 Creates a portal into which a component can be rendered.

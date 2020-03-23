@@ -67,7 +67,22 @@ describe( 'Links', () => {
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
-		// Press Enter to apply the link
+		// Navigate to and toggle the "Open in new tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Space' );
+
+		// Toggle should still have focus and be checked.
+		await page.waitForSelector(
+			':focus:checked.components-form-toggle__input'
+		);
+
+		// Ensure that the contents of the post have not been changed, since at
+		// this point the link is still not inserted.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Tab back to the Submit and apply the link
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
 		// The link should have been inserted
@@ -320,6 +335,12 @@ describe( 'Links', () => {
 			)
 		).toBeNull();
 
+		// Confirm that selection is returned to where it was before launching
+		// the link editor, with "Gutenberg" as an uncollapsed selection.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
 
@@ -350,7 +371,7 @@ describe( 'Links', () => {
 			)
 		).not.toBeNull();
 
-		// Tab to the settings icon button.
+		// Tab to the "Open in new tab" toggle.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
@@ -396,25 +417,22 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
-
 		await waitForAutoFocus();
-		const activeElementParentClasses = await page.evaluate( () =>
-			Object.values(
-				document.activeElement.parentElement.parentElement.classList
-			)
+		const isInURLInput = await page.evaluate(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
 		);
-		expect( activeElementParentClasses ).toContain(
-			'block-editor-url-input'
-		);
+		expect( isInURLInput ).toBe( true );
 		const activeElementValue = await page.evaluate(
 			() => document.activeElement.value
 		);
 		expect( activeElementValue ).toBe( URL );
+
+		// Confirm that submitting the input without any changes keeps the same
+		// value and moves focus back to the paragraph.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '.' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
@@ -447,16 +465,20 @@ describe( 'Links', () => {
 
 		// Navigate back to the popover
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			'.components-popover__content .block-editor-link-control'
-		);
+		await waitForAutoFocus();
 
-		// Navigate to the "Open in New Tab" checkbox.
+		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-
-		// Check the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Confirm that focus was not prematurely returned to the paragraph on
+		// a changing value of the setting.
+		await page.waitForSelector( ':focus.components-form-toggle__input' );
+
+		// Close dialog. Expect that "Open in new tab" would have been applied
+		// immediately.
+		await page.keyboard.press( 'Escape' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -472,11 +494,6 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
 		await waitForAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
@@ -486,11 +503,9 @@ describe( 'Links', () => {
 
 		// Navigate back to the popover
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			'.components-popover__content .block-editor-link-control'
-		);
+		await waitForAutoFocus();
 
-		// Navigate to the "Open in New Tab" checkbox.
+		// Navigate to the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.

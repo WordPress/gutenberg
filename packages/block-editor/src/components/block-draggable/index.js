@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
@@ -18,20 +13,18 @@ const BlockDraggable = ( { children, clientIds } ) => {
 				getBlockRootClientId,
 				getTemplateLock,
 			} = select( 'core/block-editor' );
-			const normalizedClientIds = castArray( clientIds );
 			const rootClientId =
-				normalizedClientIds.length === 1
-					? getBlockRootClientId( normalizedClientIds[ 0 ] )
+				clientIds.length === 1
+					? getBlockRootClientId( clientIds[ 0 ] )
 					: null;
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
 
 			return {
-				index: getBlockIndex( normalizedClientIds[ 0 ], rootClientId ),
+				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
-				isDraggable:
-					normalizedClientIds.length === 1 && 'all' !== templateLock,
+				isDraggable: clientIds.length === 1 && 'all' !== templateLock,
 			};
 		},
 		[ clientIds ]
@@ -51,15 +44,14 @@ const BlockDraggable = ( { children, clientIds } ) => {
 	}, [] );
 
 	if ( ! isDraggable ) {
-		return null;
+		return children( { isDraggable: false } );
 	}
 
-	const normalizedClientIds = castArray( clientIds );
-	const blockElementId = `block-${ normalizedClientIds[ 0 ] }`;
+	const blockElementId = `block-${ clientIds[ 0 ] }`;
 	const transferData = {
 		type: 'block',
 		srcIndex: index,
-		srcClientId: normalizedClientIds[ 0 ],
+		srcClientId: clientIds[ 0 ],
 		srcRootClientId,
 	};
 
@@ -78,6 +70,7 @@ const BlockDraggable = ( { children, clientIds } ) => {
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
+					isDraggable: true,
 					onDraggableStart,
 					onDraggableEnd,
 				} );

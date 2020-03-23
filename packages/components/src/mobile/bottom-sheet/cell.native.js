@@ -14,7 +14,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -187,7 +187,10 @@ class BottomSheetCell extends Component {
 				case 'none':
 					return undefined;
 				case undefined:
-					return showValue ? leftMarginStyle : defaultSeparatorStyle;
+					if ( showValue && icon !== undefined ) {
+						return leftMarginStyle;
+					}
+					return defaultSeparatorStyle;
 			}
 		};
 
@@ -296,7 +299,7 @@ class BottomSheetCell extends Component {
 						<View style={ styles.cellRowContainer }>
 							{ icon && (
 								<View style={ styles.cellRowContainer }>
-									<Dashicon
+									<Icon
 										icon={ icon }
 										size={ 24 }
 										color={ iconStyle.color }

@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -20,7 +20,7 @@ function build_css_colors( $attributes ) {
 
 	// Text color.
 	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'rgbTextColor', $attributes );
+	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
 
 	// If has text color.
 	if ( $has_custom_text_color || $has_named_text_color ) {
@@ -33,12 +33,12 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
 	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['rgbTextColor'] );
+		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	}
 
 	// Background color.
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'rgbBackgroundColor', $attributes );
+	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
@@ -51,7 +51,7 @@ function build_css_colors( $attributes ) {
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
 	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['rgbBackgroundColor'] );
+		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	}
 
 	return $colors;
@@ -64,7 +64,7 @@ function build_css_colors( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function build_css_font_sizes( $attributes ) {
+function block_core_navigation_build_css_font_sizes( $attributes ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -91,7 +91,7 @@ function build_css_font_sizes( $attributes ) {
  * @param array $blocks Navigation link inner blocks from the Navigation block.
  * @return array Blocks that had valid labels
  */
-function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
+function block_core_navigation_empty_navigation_links_recursive( $blocks ) {
 	$blocks = array_filter(
 		$blocks,
 		function( $block ) {
@@ -102,7 +102,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
 	if ( ! empty( $blocks ) ) {
 		foreach ( $blocks as $key => $block ) {
 			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+				$blocks[ $key ]['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 			}
 		}
 	}
@@ -115,7 +115,7 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
  *
  * @return string
  */
-function render_submenu_icon() {
+function block_core_navigation_render_submenu_icon() {
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" transform="rotate(90)"><path d="M8 5v14l11-7z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
 }
 
@@ -127,21 +127,38 @@ function render_submenu_icon() {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $content, $block ) {
+function render_block_core_navigation( $content, $block ) {
 
 	if ( 'core/navigation' !== $block['blockName'] ) {
 		return $content;
 	}
 
+	$block['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
 	$attributes           = $block['attrs'];
-	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+
+	/**
+	 * Deprecated:
+	 * The rgbTextColor and rgbBackgroundColor attributes
+	 * have been deprecated in favor of
+	 * customTextColor and customBackgroundColor ones.
+	 * Move the values from old attrs to the new ones.
+	 */
+	if ( isset( $attributes['rgbTextColor'] ) && empty( $attributes['textColor'] ) ) {
+		$attributes['customTextColor'] = $attributes['rgbTextColor'];
+	}
+
+	if ( isset( $attributes['rgbBackgroundColor'] ) && empty( $attributes['backgroundColor'] ) ) {
+		$attributes['customBackgroundColor'] = $attributes['rgbBackgroundColor'];
+	}
+
+	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 	if ( empty( $block['innerBlocks'] ) ) {
 		return '';
 	}
 
-	$colors          = build_css_colors( $attributes );
-	$font_sizes      = build_css_font_sizes( $attributes );
+	$colors          = block_core_navigation_build_css_colors( $attributes );
+	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
@@ -159,7 +176,7 @@ function render_block_navigation( $content, $block ) {
 		'<nav %1$s %2$s>%3$s</nav>',
 		$class_attribute,
 		$style_attribute,
-		build_navigation_html( $attributes, $block, $colors, $font_sizes, true )
+		block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
 	);
 }
 
@@ -173,7 +190,7 @@ function render_block_navigation( $content, $block ) {
  *
  * @return string Returns  an HTML list from innerBlocks.
  */
-function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
+function block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
 	$html            = '';
 	$classes         = array_merge(
 		$colors['css_classes'],
@@ -194,9 +211,6 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 		// Start appending HTML attributes to anchor tag.
 		if ( isset( $block['attrs']['url'] ) ) {
 			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
-		}
-		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
@@ -243,14 +257,14 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 			) &&
 			$has_submenu
 		) {
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
 
 		$html .= '</a>';
 		// End anchor tag content.
 
 		if ( $has_submenu ) {
-			$html .= build_navigation_html( $attributes, $block, $colors, $font_sizes, false );
+			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
 		}
 
 		$html .= '</li>';
@@ -261,7 +275,7 @@ function build_navigation_html( $attributes, $block, $colors, $font_sizes ) {
 /**
  * Register the navigation block.
  *
- * @uses render_block_navigation()
+ * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
@@ -270,31 +284,39 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes' => array(
-				'className'          => array(
+				'className'             => array(
 					'type' => 'string',
 				),
-				'textColor'          => array(
+				'textColor'             => array(
 					'type' => 'string',
 				),
-				'rgbTextColor'       => array(
+				'customTextColor'       => array(
 					'type' => 'string',
 				),
-				'backgroundColor'    => array(
+				// deprecated.
+				'rgbTextColor'          => array(
 					'type' => 'string',
 				),
-				'rgbBackgroundColor' => array(
+				'backgroundColor'       => array(
 					'type' => 'string',
 				),
-				'fontSize'           => array(
+				'customBackgroundColor' => array(
 					'type' => 'string',
 				),
-				'customFontSize'     => array(
+				// deprecated.
+				'rgbBackgroundColor'    => array(
+					'type' => 'string',
+				),
+				'fontSize'              => array(
+					'type' => 'string',
+				),
+				'customFontSize'        => array(
 					'type' => 'number',
 				),
-				'itemsJustification' => array(
+				'itemsJustification'    => array(
 					'type' => 'string',
 				),
-				'showSubmenuIcon'    => array(
+				'showSubmenuIcon'       => array(
 					'type'    => 'boolean',
 					'default' => true,
 				),
@@ -303,4 +325,4 @@ function register_block_core_navigation() {
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );
-add_filter( 'render_block', 'render_block_navigation', 10, 2 );
+add_filter( 'render_block', 'render_block_core_navigation', 10, 2 );

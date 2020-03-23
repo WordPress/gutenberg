@@ -8,6 +8,7 @@ import TestUtils from 'react-dom/test-utils';
  * WordPress dependencies
  */
 import { createRef } from '@wordpress/element';
+import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -85,36 +86,24 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render an icon button', () => {
-			const iconButton = shallow( <Button icon="plus" /> );
+			const iconButton = shallow( <Button icon={ plusCircle } /> );
 			expect( iconButton.hasClass( 'has-icon' ) ).toBe( true );
 			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
 		} );
 
 		it( 'should render a Dashicon component matching the wordpress icon', () => {
-			const iconButton = shallow( <Button icon="wordpress" /> );
-			expect(
-				iconButton
-					.find( 'Icon' )
-					.dive()
-					.shallow()
-					.hasClass( 'dashicons-wordpress' )
-			).toBe( true );
+			const iconButton = shallow( <Button icon={ plusCircle } /> );
+			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
 		} );
 
 		it( 'should render child elements and icon', () => {
 			const iconButton = shallow(
 				<Button
-					icon="wordpress"
+					icon={ plusCircle }
 					children={ <p className="test">Test</p> }
 				/>
 			);
-			expect(
-				iconButton
-					.find( 'Icon' )
-					.dive()
-					.shallow()
-					.hasClass( 'dashicons-wordpress' )
-			).toBe( true );
+			expect( iconButton.find( 'Icon' ).dive() ).not.toBeNull();
 			expect(
 				iconButton
 					.find( '.test' )
@@ -125,7 +114,7 @@ describe( 'Button', () => {
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', () => {
 			const iconButton = shallow(
-				<Button icon="WordPress" label="WordPress" />
+				<Button icon={ plusCircle } label="WordPress" />
 			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
@@ -142,7 +131,7 @@ describe( 'Button', () => {
 		it( 'should allow tooltip disable', () => {
 			const iconButton = shallow(
 				<Button
-					icon="WordPress"
+					icon={ plusCircle }
 					label="WordPress"
 					showTooltip={ false }
 				/>
@@ -153,7 +142,7 @@ describe( 'Button', () => {
 
 		it( 'should show the tooltip for empty children', () => {
 			const iconButton = shallow(
-				<Button icon="WordPress" label="WordPress" children={ [] } />
+				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
@@ -161,7 +150,7 @@ describe( 'Button', () => {
 
 		it( 'should not show the tooltip when icon and children defined', () => {
 			const iconButton = shallow(
-				<Button icon="WordPress" label="WordPress">
+				<Button icon={ plusCircle } label="WordPress">
 					Children
 				</Button>
 			);
@@ -170,7 +159,7 @@ describe( 'Button', () => {
 
 		it( 'should force showing the tooltip even if icon and children defined', () => {
 			const iconButton = shallow(
-				<Button icon="WordPress" label="WordPress" showTooltip>
+				<Button icon={ plusCircle } label="WordPress" showTooltip>
 					Children
 				</Button>
 			);

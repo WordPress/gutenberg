@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Button, Popover } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,7 +58,7 @@ class URLPopover extends Component {
 						{ !! renderSettings && (
 							<Button
 								className="block-editor-url-popover__settings-toggle"
-								icon="arrow-down-alt2"
+								icon={ chevronDown }
 								label={ __( 'Link settings' ) }
 								onClick={ this.toggleSettingsVisibility }
 								aria-expanded={ isSettingsExpanded }

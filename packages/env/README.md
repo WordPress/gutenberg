@@ -43,7 +43,7 @@ Then, start the local environment:
 $ wp-env start
 ```
 
-Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
+Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated. Default login credentials are username: `admin` password: `password`.
 
 ### Stopping the environment
 
@@ -78,6 +78,8 @@ $ WP_ENV_PORT=3333 wp-env start
 ```
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
+
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
 
 ### 3. Restart `wp-env`
 
@@ -135,16 +137,18 @@ $ wp-env start
 
 ## Command reference
 
+`wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
+
 ### `wp-env start [ref]`
 
 ```sh
-wp-env start [ref]
+wp-env start
 
 Starts WordPress for development on port 8888 (​http://localhost:8888​)
 (override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). If the current working directory is a plugin
-and/or has e2e-tests with plugins and/or mu-plugins, they will be mounted
-appropriately.
+(override with WP_ENV_TESTS_PORT). The current working directory must be a
+WordPress installation, a plugin, a theme, or contain a .wp-env.json file.
+
 
 Positionals:
   ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
@@ -171,28 +175,121 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
-## Running with multiple plugins and/or themes
+### `wp-env run [container] [command]` 
 
-`wp-env` also supports a configuration file. At the moment, this is only used for loading extra themes and plugins that you may be developing together with your main one. The script will attach the specified theme and plugin directories as volumes on the docker containers so that changes you make to them exist in the WordPress instance.
+```sh
+wp-env run <container> [command..]
 
-### Example:
+Runs an arbitrary command in one of the underlying Docker containers, for
+example it's useful for running wp cli commands.
 
-`wp-env.json`
+
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
+```
+
+For example:
+
+```sh
+wp-env run cli wp user list
+⠏ Running `wp user list` in 'cli'.
+
+ID      user_login      display_name    user_email      user_registered roles
+1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
+
+✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
+## .wp-env.json
+
+You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
+
+`.wp-env.json` supports five fields:
+
+| Field         | Type          | Default                                    | Description                                                                                                               |
+| ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`      | `string|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
+| `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
+| `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`                                   | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`      | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+
+_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+
+Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
+
+| Type              | Format                        | Example(s)                                               |
+| ----------------- | ----------------------------- | -------------------------------------------------------- |
+| Relative path     | `.<path>|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
+| ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
+
+Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
+
+## .wp-env.override.json
+
+Any fields here will take precedence over .wp-env.json. This file is useful, when ignored from version control, to persist local development overrides.
+
+### Examples
+
+#### Latest production WordPress + current directory as a plugin
+
+This is useful for plugin development.
+
 ```json
 {
-  "themes": [
-    "../path/to/theme/dir"
-  ],
-  "plugins": [
-    "../path/to/plugin/dir"
-  ]
+	"core": null,
+	"plugins": [ "." ]
 }
 ```
 
-### Caveats:
+#### Latest development WordPress + current directory as a plugin
 
-The file should be located in the same directory from which you run `wp-env` commands for a project. So if you are running `wp-env` in the root directory of a plugin, `wp-env.json` should also be located there. 
+This is useful for plugin development when upstream Core changes need to be tested.
 
-Each item in the `themes` or `plugins` array should be an absolute or relative path to the root of a different theme or plugin directory. Relative paths will be resolved from the current working directory, which means they will be resolved from the location of the `wp-env.json` file.
+```json
+{
+	"core": "WordPress/WordPress#master",
+	"plugins": [ "." ]
+}
+```
+
+#### Local `wordpress-develop` + current directory as a plugin
+
+This is useful for working on plugins and WordPress Core at the same time.
+
+```json
+{
+	"core": "../wordpress-develop/build",
+	"plugins": [ "." ]
+}
+```
+
+#### A complete testing environment
+
+This is useful for integration testing: that is, testing how old versions of WordPress and different combinations of plugins and themes impact each other.
+
+```json
+{
+	"core": "WordPress/WordPress#5.2.0",
+	"plugins": [ "WordPress/wp-lazy-loading", "WordPress/classic-editor" ],
+	"themes": [ "WordPress/theme-experiments" ]
+}
+```
+
+#### Custom Port Numbers
+
+You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
+
+```json
+{
+	"plugins": [ "." ],
+	"port": 4013,
+	"testsPort": 4012
+}
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

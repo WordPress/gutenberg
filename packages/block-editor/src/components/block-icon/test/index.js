@@ -7,6 +7,7 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { image } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,21 +16,21 @@ import BlockIcon from '../';
 
 describe( 'BlockIcon', () => {
 	it( 'renders a Icon', () => {
-		const wrapper = shallow( <BlockIcon icon="format-image" /> );
+		const wrapper = shallow( <BlockIcon icon={ image } /> );
 
 		expect(
-			wrapper.containsMatchingElement( <Icon icon="format-image" /> )
+			wrapper.containsMatchingElement( <Icon icon={ image } /> )
 		).toBe( true );
 	} );
 
 	it( 'renders a span without the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon="format-image" /> );
+		const wrapper = shallow( <BlockIcon icon={ image } /> );
 
 		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( false );
 	} );
 
 	it( 'renders a span with the has-colors classname', () => {
-		const wrapper = shallow( <BlockIcon icon="format-image" showColors /> );
+		const wrapper = shallow( <BlockIcon icon={ image } showColors /> );
 
 		expect( wrapper.find( 'span' ).hasClass( 'has-colors' ) ).toBe( true );
 	} );

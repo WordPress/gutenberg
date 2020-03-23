@@ -8,7 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	getChildBlockNames,
-	__experimentalGetDefaultBlockVariation,
+	getDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
 } from '../selectors';
@@ -156,7 +156,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( '__experimentalGetDefaultBlockVariation', () => {
+	describe( 'getDefaultBlockVariation', () => {
 		const blockName = 'block/name';
 		const createBlockVariationsState = ( variations ) => {
 			return deepFreeze( {
@@ -186,10 +186,7 @@ describe( 'selectors', () => {
 				thirdBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockVariation(
-				state,
-				blockName
-			);
+			const result = getDefaultBlockVariation( state, blockName );
 
 			expect( result ).toEqual( defaultBlockVariation );
 		} );
@@ -211,10 +208,7 @@ describe( 'selectors', () => {
 				defaultBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockVariation(
-				state,
-				blockName
-			);
+			const result = getDefaultBlockVariation( state, blockName );
 
 			expect( result ).toEqual( defaultBlockVariation );
 		} );
@@ -226,10 +220,7 @@ describe( 'selectors', () => {
 				thirdBlockVariation,
 			] );
 
-			const result = __experimentalGetDefaultBlockVariation(
-				state,
-				blockName
-			);
+			const result = getDefaultBlockVariation( state, blockName );
 
 			expect( result ).toEqual( firstBlockVariation );
 		} );

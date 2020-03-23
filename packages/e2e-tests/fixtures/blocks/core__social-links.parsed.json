@@ -4,8 +4,9 @@
         "attrs": {},
         "innerBlocks": [
             {
-                "blockName": "core/social-link-mastodon",
+                "blockName": "core/social-link",
                 "attrs": {
+                    "service": "mastodon",
                     "url": "https://mastodon.social/@marcuskaz"
                 },
                 "innerBlocks": [],

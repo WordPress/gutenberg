@@ -20,6 +20,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
+import { link as linkIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -151,7 +152,7 @@ export const link = {
 						/>
 						<RichTextToolbarButton
 							name="link"
-							icon="admin-links"
+							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							onClick={ this.addLink }
 							isActive={ isActive }

@@ -3,7 +3,10 @@
         "clientId": "_clientId_0",
         "name": "core/post-excerpt",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "wordCount": 55,
+            "showMoreOnNewLine": true
+        },
         "innerBlocks": [],
         "originalContent": ""
     }

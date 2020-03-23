@@ -138,6 +138,7 @@ class FileEdit extends Component {
 			media,
 		} = this.props;
 		const {
+			id,
 			fileName,
 			href,
 			textLinkHref,
@@ -185,6 +186,7 @@ class FileEdit extends Component {
 				/>
 				<BlockControls>
 					<MediaReplaceFlow
+						mediaId={ id }
 						mediaURL={ href }
 						accept="*"
 						onSelect={ this.onSelectFile }

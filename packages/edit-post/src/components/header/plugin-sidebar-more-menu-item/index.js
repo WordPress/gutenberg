@@ -41,13 +41,14 @@ const PluginSidebarMoreMenuItem = ( {
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MySidebarMoreMenuItem() {
  * 	return wp.element.createElement(
  * 		PluginSidebarMoreMenuItem,
  * 		{
  * 			target: 'my-sidebar',
- * 			icon: 'smiley',
+ * 			icon: moreIcon,
  * 		},
  * 		__( 'My sidebar title' )
  * 	)
@@ -57,13 +58,14 @@ const PluginSidebarMoreMenuItem = ( {
  * @example <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginSidebarMoreMenuItem } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MySidebarMoreMenuItem = () => (
  * 	<PluginSidebarMoreMenuItem
  * 		target="my-sidebar"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		{ __( 'My sidebar title' ) }
  * 	</PluginSidebarMoreMenuItem>

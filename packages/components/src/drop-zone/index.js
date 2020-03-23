@@ -8,11 +8,11 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
+import { upload, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
 import { DropZoneConsumer, Context } from './provider';
 
 export function useDropZone( {
@@ -22,6 +22,7 @@ export function useDropZone( {
 	onDrop,
 	isDisabled,
 	withPosition,
+	__unstableIsRelative = false,
 } ) {
 	const { addDropZone, removeDropZone } = useContext( Context );
 	const [ state, setState ] = useState( {
@@ -39,6 +40,7 @@ export function useDropZone( {
 				onHTMLDrop,
 				setState,
 				withPosition,
+				isRelative: __unstableIsRelative,
 			};
 			addDropZone( dropZone );
 			return () => {
@@ -76,6 +78,7 @@ function DropZoneComponent( {
 			onFilesDrop,
 			onHTMLDrop,
 			onDrop,
+			__unstableIsRelative: true,
 		}
 	);
 
@@ -84,8 +87,8 @@ function DropZoneComponent( {
 	if ( isDraggingOverElement ) {
 		children = (
 			<div className="components-drop-zone__content">
-				<Dashicon
-					icon="upload"
+				<Icon
+					icon={ upload }
 					size="40"
 					className="components-drop-zone__content-icon"
 				/>

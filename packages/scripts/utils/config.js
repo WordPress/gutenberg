@@ -31,6 +31,16 @@ const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.json' ) ||
 	hasPackageProp( 'jest' );
 
+const hasPrettierConfig = () =>
+	hasProjectFile( '.prettierrc.js' ) ||
+	hasProjectFile( '.prettierrc.json' ) ||
+	hasProjectFile( '.prettierrc.toml' ) ||
+	hasProjectFile( '.prettierrc.yaml' ) ||
+	hasProjectFile( '.prettierrc.yml' ) ||
+	hasProjectFile( 'prettier.config.js' ) ||
+	hasProjectFile( '.prettierrc' ) ||
+	hasPackageProp( 'prettier' );
+
 const hasWebpackConfig = () =>
 	hasArgInCLI( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
@@ -98,4 +108,5 @@ module.exports = {
 	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
+	hasPrettierConfig,
 };

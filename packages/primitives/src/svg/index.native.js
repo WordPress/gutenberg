@@ -8,7 +8,17 @@ import { Svg } from 'react-native-svg';
  */
 import styles from './style.scss';
 
-export { Circle, G, Path, Polygon, Rect } from 'react-native-svg';
+export {
+	Circle,
+	G,
+	Path,
+	Polygon,
+	Rect,
+	Defs,
+	RadialGradient,
+	LinearGradient,
+	Stop,
+} from 'react-native-svg';
 
 export const SVG = ( { className = '', isPressed, ...props } ) => {
 	const colorScheme = props.colorScheme || 'light';

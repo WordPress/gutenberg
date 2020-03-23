@@ -9,6 +9,8 @@ import { dropRight, get, map, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
+
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -16,6 +18,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -43,7 +46,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -59,14 +61,23 @@ function ColumnsEditContainer( {
 		[ clientId ]
 	);
 
+	const ref = useRef();
 	const {
 		BackgroundColor,
 		InspectorControlsColorPanel,
-	} = __experimentalUseColors( [
-		{ name: 'backgroundColor', className: 'has-background' },
-	] );
+		TextColor,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
+			colorDetector: { targetRef: ref },
+		}
+	);
 
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
@@ -91,12 +102,29 @@ function ColumnsEditContainer( {
 			</InspectorControls>
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
-				<div className={ classes }>
-					<InnerBlocks
-						templateLock="all"
-						allowedBlocks={ ALLOWED_BLOCKS }
-					/>
-				</div>
+				{ ( backgroundProps ) => (
+					<TextColor>
+						{ ( textColorProps ) => (
+							<InnerBlocks
+								allowedBlocks={ ALLOWED_BLOCKS }
+								__experimentalMoverDirection="horizontal"
+								ref={ ref }
+								__experimentalTagName={ Block.div }
+								__experimentalPassedProps={ {
+									className: classnames(
+										classes,
+										backgroundProps.className,
+										textColorProps.className
+									),
+									style: {
+										...backgroundProps.style,
+										...textColorProps.style,
+									},
+								} }
+							/>
+						) }
+					</TextColor>
+				) }
 			</BackgroundColor>
 		</>
 	);
@@ -218,21 +246,18 @@ const ColumnsEdit = ( props ) => {
 	} = useSelect(
 		( select ) => {
 			const {
-				__experimentalGetBlockVariations,
+				getBlockVariations,
 				getBlockType,
-				__experimentalGetDefaultBlockVariation,
+				getDefaultBlockVariation,
 			} = select( 'core/blocks' );
 
 			return {
 				blockType: getBlockType( name ),
-				defaultVariation: __experimentalGetDefaultBlockVariation(
-					name,
-					'block'
-				),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
 				hasInnerBlocks:
 					select( 'core/block-editor' ).getBlocks( clientId ).length >
 					0,
-				variations: __experimentalGetBlockVariations( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
 			};
 		},
 		[ clientId, name ]
@@ -245,25 +270,27 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<__experimentalBlockVariationPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			variations={ variations }
-			onSelect={ ( nextVariation = defaultVariation ) => {
-				if ( nextVariation.attributes ) {
-					props.setAttributes( nextVariation.attributes );
-				}
-				if ( nextVariation.innerBlocks ) {
-					replaceInnerBlocks(
-						props.clientId,
-						createBlocksFromInnerBlocksTemplate(
-							nextVariation.innerBlocks
-						)
-					);
-				}
-			} }
-			allowSkip
-		/>
+		<Block.div>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						props.setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							props.clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							)
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</Block.div>
 	);
 };
 

@@ -13,6 +13,28 @@ const addMilestone = require( './add-milestone' );
 const debug = require( './debug' );
 const ifNotFork = require( './if-not-fork' );
 
+/** @typedef {import('@actions/github').GitHub} GitHub */
+
+/**
+ * Automation task function.
+ *
+ * @typedef {(payload:any,octokit:GitHub)=>void} WPAutomationTask
+ */
+
+/**
+ * Full list of automations, matched by given properties against the incoming
+ * payload object.
+ *
+ * @typedef WPAutomation
+ *
+ * @property {string}           event    Webhook event name to match.
+ * @property {string}           [action] Action to match, if applicable.
+ * @property {WPAutomationTask} task     Task to run.
+ */
+
+/**
+ * @type {WPAutomation[]}
+ */
 const automations = [
 	{
 		event: 'pull_request',
@@ -25,8 +47,7 @@ const automations = [
 		task: ifNotFork( addFirstTimeContributorLabel ),
 	},
 	{
-		event: 'pull_request',
-		action: 'closed',
+		event: 'push',
 		task: addMilestone,
 	},
 ];
@@ -47,7 +68,7 @@ const automations = [
 	for ( const { event, action, task } of automations ) {
 		if (
 			event === context.eventName &&
-			action === context.payload.action
+			( action === undefined || action === context.payload.action )
 		) {
 			try {
 				debug( `main: Starting task ${ task.name }` );

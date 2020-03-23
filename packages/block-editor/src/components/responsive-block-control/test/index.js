@@ -101,11 +101,11 @@ describe( 'Basic rendering', () => {
 			.checked;
 
 		const defaultControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--default'
+			'.block-editor-responsive-block-control__group:not(.is-responsive)'
 		);
 
 		const responsiveControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--responsive'
+			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
 		expect( container.innerHTML ).not.toBe( '' );
@@ -220,10 +220,10 @@ describe( 'Default and Responsive modes', () => {
 		} );
 
 		const defaultControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--default'
+			'.block-editor-responsive-block-control__group:not(.is-responsive)'
 		);
 		const responsiveControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--responsive'
+			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
 		expect( defaultControlGroup ).toBeNull();
@@ -310,10 +310,10 @@ describe( 'Default and Responsive modes', () => {
 		} );
 
 		let defaultControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--default'
+			'.block-editor-responsive-block-control__group:not(.is-responsive)'
 		);
 		let responsiveControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--responsive'
+			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
 		// Select elements based on what the user can see
@@ -338,10 +338,10 @@ describe( 'Default and Responsive modes', () => {
 		} );
 
 		defaultControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--default'
+			'.block-editor-responsive-block-control__group:not(.is-responsive)'
 		);
 		responsiveControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--responsive'
+			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
 		expect( defaultControlGroup ).toBeNull();
@@ -353,10 +353,10 @@ describe( 'Default and Responsive modes', () => {
 		} );
 
 		defaultControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--default'
+			'.block-editor-responsive-block-control__group:not(.is-responsive)'
 		);
 		responsiveControlGroup = container.querySelector(
-			'.block-editor-responsive-block-control__group--responsive'
+			'.block-editor-responsive-block-control__group.is-responsive'
 		);
 
 		expect( defaultControlGroup ).not.toBeNull();

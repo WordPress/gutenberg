@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -94,9 +95,8 @@ export class PostPublishPanel extends Component {
 						</div>
 					) }
 					<Button
-						aria-expanded={ true }
 						onClick={ onClose }
-						icon="no-alt"
+						icon={ close }
 						label={ __( 'Close panel' ) }
 					/>
 				</div>

@@ -65,7 +65,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						<BlockEdit { ...props } />
 						<InspectorAdvancedControls>
 							<TextControl
-								label={ __( 'Additional CSS Class(es)' ) }
+								label={ __( 'Additional CSS class(es)' ) }
 								value={ props.attributes.className || '' }
 								onChange={ ( nextValue ) => {
 									props.setAttributes( {

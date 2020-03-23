@@ -33,11 +33,7 @@ class VisualEditor extends Component {
 					title={ title }
 					onUpdate={ editTitle }
 					placeholder={ __( 'Add title' ) }
-					borderStyle={
-						this.props.isFullyBordered
-							? styles.blockHolderFullBordered
-							: styles.blockHolderSemiBordered
-					}
+					borderStyle={ styles.blockHolderFullBordered }
 					focusedBorderColor={ blockHolderFocusedStyle.borderColor }
 					accessibilityLabel="post-title"
 				/>
@@ -46,12 +42,11 @@ class VisualEditor extends Component {
 	}
 
 	render() {
-		const { isFullyBordered, safeAreaBottomInset } = this.props;
+		const { safeAreaBottomInset } = this.props;
 
 		return (
 			<BlockList
 				header={ this.renderHeader() }
-				isFullyBordered={ isFullyBordered }
 				safeAreaBottomInset={ safeAreaBottomInset }
 				autoScroll={ true }
 			/>

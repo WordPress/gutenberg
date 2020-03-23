@@ -6,7 +6,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
+import { Icon, chevronDown, chevronUp } from '@wordpress/icons';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -47,8 +47,8 @@ function Stepper( {
 					isMinValue ? { opacity: 0.4 } : null,
 				] }
 			>
-				<Dashicon
-					icon="arrow-down-alt2"
+				<Icon
+					icon={ chevronDown }
 					size={ 18 }
 					color={ buttonIconStyle.color }
 				/>
@@ -63,8 +63,8 @@ function Stepper( {
 					isMaxValue ? { opacity: 0.4 } : null,
 				] }
 			>
-				<Dashicon
-					icon="arrow-up-alt2"
+				<Icon
+					icon={ chevronUp }
 					size={ 18 }
 					color={ buttonIconStyle.color }
 				/>

@@ -73,7 +73,7 @@ export function removeBlockStyles( blockName, styleNames ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalAddBlockVariations( blockName, variations ) {
+export function addBlockVariations( blockName, variations ) {
 	return {
 		type: 'ADD_BLOCK_VARIATIONS',
 		variations: castArray( variations ),
@@ -89,10 +89,7 @@ export function __experimentalAddBlockVariations( blockName, variations ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalRemoveBlockVariations(
-	blockName,
-	variationNames
-) {
+export function removeBlockVariations( blockName, variationNames ) {
 	return {
 		type: 'REMOVE_BLOCK_VARIATIONS',
 		variationNames: castArray( variationNames ),

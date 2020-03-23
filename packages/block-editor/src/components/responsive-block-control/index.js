@@ -1,10 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-
 import { Fragment } from '@wordpress/element';
-
 import { ToggleControl } from '@wordpress/components';
 
 /**
@@ -93,23 +96,20 @@ function ResponsiveBlockControl( props ) {
 					onChange={ onIsResponsiveChange }
 					help={ toggleHelpText }
 				/>
-
-				{ ! isResponsive && (
-					<div className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--default">
-						{ defaultControl }
-					</div>
-				) }
-
-				{ isResponsive && (
-					<div
-						className="block-editor-responsive-block-control__group block-editor-responsive-block-control__group--responsive"
-						hidden={ ! isResponsive }
-					>
-						{ renderResponsiveControls
+				<div
+					className={ classnames(
+						'block-editor-responsive-block-control__group',
+						{
+							'is-responsive': isResponsive,
+						}
+					) }
+				>
+					{ ! isResponsive && defaultControl }
+					{ isResponsive &&
+						( renderResponsiveControls
 							? renderResponsiveControls( viewports )
-							: defaultResponsiveControls() }
-					</div>
-				) }
+							: defaultResponsiveControls() ) }
+				</div>
 			</div>
 		</fieldset>
 	);

@@ -19,7 +19,7 @@ branches:
   only:
     - master
     - rnmobile/master
-    - rnmobile/releases
+    - /rnmobile\/release.*/
     - /wp\/.*/
 
 env:

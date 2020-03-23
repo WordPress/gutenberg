@@ -7,6 +7,7 @@ import { button as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import transforms from './transforms';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -26,6 +27,7 @@ export const settings = {
 		align: true,
 		alignWide: false,
 	},
+	transforms,
 	edit,
 	save,
 };

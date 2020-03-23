@@ -32,7 +32,17 @@ function render_block_core_template_part( $attributes ) {
 	if ( is_null( $content ) ) {
 		return 'Template Part Not Found';
 	}
-	return apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+
+	// Run through the actions that are typically taken on the_content.
+	$content = do_blocks( $content );
+	$content = wptexturize( $content );
+	$content = convert_smilies( $content );
+	$content = wpautop( $content );
+	$content = shortcode_unautop( $content );
+	$content = wp_make_content_images_responsive( $content );
+	$content = do_shortcode( $content );
+
+	return str_replace( ']]>', ']]&gt;', $content );
 }
 
 /**

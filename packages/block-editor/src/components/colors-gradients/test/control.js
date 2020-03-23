@@ -27,7 +27,7 @@ const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
 	);
 };
 
-const colorTabButtonPredicate = getButtonWithTestPredicate( 'Solid Color' );
+const colorTabButtonPredicate = getButtonWithTestPredicate( 'Solid' );
 const gradientTabButtonPredicate = getButtonWithTestPredicate( 'Gradient' );
 
 describe( 'ColorPaletteControl', () => {
@@ -86,7 +86,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the custom color picker.
 		expect(
-			wrapper.root.findAll( getButtonWithTestPredicate( 'Custom Color' ) )
+			wrapper.root.findAll( getButtonWithTestPredicate( 'Custom color' ) )
 		).toHaveLength( 1 );
 	} );
 
@@ -128,7 +128,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the custom color picker.
 		expect(
-			wrapper.root.findAll( getButtonWithTestPredicate( 'Custom Color' ) )
+			wrapper.root.findAll( getButtonWithTestPredicate( 'Custom color' ) )
 		).toHaveLength( 1 );
 	} );
 

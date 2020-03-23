@@ -393,7 +393,7 @@ export function* saveEntityRecord(
 			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
 			persistedEntity = yield select(
-				'getEntityRecordNoResolver',
+				'__experimentalGetEntityRecordNoResolver',
 				kind,
 				name,
 				recordId

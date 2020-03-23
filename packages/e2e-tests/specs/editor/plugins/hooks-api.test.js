@@ -34,7 +34,7 @@ describe( 'Using Hooks API', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		const paragraphContent = await page.$eval(
-			'div[data-type="core/paragraph"] p',
+			'p[data-type="core/paragraph"]',
 			( element ) => element.textContent
 		);
 		expect( paragraphContent ).toEqual( 'First paragraph' );

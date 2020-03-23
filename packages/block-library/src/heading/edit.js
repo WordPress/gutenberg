@@ -20,16 +20,11 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
-function HeadingEdit( {
-	attributes,
-	setAttributes,
-	mergeBlocks,
-	onReplace,
-	className,
-} ) {
+function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	const ref = useRef();
 	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
@@ -80,7 +75,7 @@ function HeadingEdit( {
 				<RichText
 					ref={ ref }
 					identifier="content"
-					tagName={ tagName }
+					tagName={ Block[ tagName ] }
 					value={ content }
 					onChange={ ( value ) =>
 						setAttributes( { content: value } )
@@ -98,7 +93,7 @@ function HeadingEdit( {
 					} }
 					onReplace={ onReplace }
 					onRemove={ () => onReplace( [] ) }
-					className={ classnames( className, {
+					className={ classnames( {
 						[ `has-text-align-${ align }` ]: align,
 					} ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }

@@ -1,0 +1,24 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/group",
+        "isValid": true,
+        "attributes": {
+            "textColor": "accent"
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "My paragraph",
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>My paragraph</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-group has-text-color\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\t</div>\n</div>"
+    }
+]

@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
-import { Button, Path, SVG } from '@wordpress/components';
+import { Component, createRef, renderToString } from '@wordpress/element';
+import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -103,12 +104,13 @@ export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.buttonRef = createRef();
+
 		this.openPreviewWindow = this.openPreviewWindow.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
 		const { previewLink } = this.props;
-
 		// This relies on the window being responsible to unset itself when
 		// navigation occurs or a new preview window is opened, to avoid
 		// unintentional forceful redirects.
@@ -128,6 +130,9 @@ export class PostPreviewButton extends Component {
 
 		if ( previewWindow && ! previewWindow.closed ) {
 			previewWindow.location = url;
+			if ( this.buttonRef.current ) {
+				this.buttonRef.current.focus();
+			}
 		}
 	}
 
@@ -182,20 +187,30 @@ export class PostPreviewButton extends Component {
 		// just link to the post's URL.
 		const href = previewLink || currentPostLink;
 
+		const classNames = classnames(
+			{
+				'editor-post-preview': ! this.props.className,
+			},
+			this.props.className
+		);
+
 		return (
 			<Button
-				isSecondary
-				className="editor-post-preview"
+				isTertiary={ ! this.props.className }
+				className={ classNames }
 				href={ href }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
 				onClick={ this.openPreviewWindow }
+				ref={ this.buttonRef }
 			>
-				{ _x( 'Preview', 'imperative verb' ) }
-				<span className="screen-reader-text">
+				{ this.props.textContent
+					? this.props.textContent
+					: _x( 'Preview', 'imperative verb' ) }
+				<VisuallyHidden as="span">
 					{ /* translators: accessibility text */
 					__( '(opens in a new tab)' ) }
-				</span>
+				</VisuallyHidden>
 			</Button>
 		);
 	}

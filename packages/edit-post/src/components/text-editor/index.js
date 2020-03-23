@@ -11,6 +11,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
+import { close } from '@wordpress/icons';
 
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
@@ -20,10 +21,10 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 					<h2>{ __( 'Editing Code' ) }</h2>
 					<Button
 						onClick={ onExit }
-						icon="no-alt"
+						icon={ close }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
-						{ __( 'Exit Code Editor' ) }
+						{ __( 'Exit code editor' ) }
 					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>

@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef, useEffect } from '@wordpress/element';
+import { useMemo, Fragment, useRef } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -15,6 +15,7 @@ import {
 	FontSizePicker,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
@@ -29,8 +30,8 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-
 import { __ } from '@wordpress/i18n';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -86,14 +87,6 @@ function Navigation( {
 		[ fontSize.size ]
 	);
 
-	// Pickup and store text and background colors in grb format into attrs object.
-	useEffect( () => {
-		setAttributes( {
-			rgbTextColor: TextColor.color,
-			rgbBackgroundColor: BackgroundColor.color,
-		} );
-	}, [ TextColor.color, BackgroundColor.color ] );
-
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
@@ -113,7 +106,6 @@ function Navigation( {
 				label: ! title.rendered
 					? __( '(no title)' )
 					: escape( title.rendered ),
-				title: ! title.raw ? __( '(no title)' ) : escape( title.raw ),
 				opensInNewTab: false,
 			} )
 		);
@@ -145,7 +137,7 @@ function Navigation( {
 	const hasPages = hasResolvedPages && pages && pages.length;
 
 	const blockClassNames = classnames( className, {
-		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
 	} );
 	const blockInlineStyles = {
@@ -157,10 +149,10 @@ function Navigation( {
 	// then show the Placeholder
 	if ( ! hasExistingNavItems ) {
 		return (
-			<Fragment>
+			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon="menu"
+					icon={ menu }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -171,7 +163,7 @@ function Navigation( {
 						className="wp-block-navigation-placeholder__buttons"
 					>
 						<Button
-							isSecondary
+							isPrimary
 							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }
@@ -188,7 +180,7 @@ function Navigation( {
 						</Button>
 					</div>
 				</Placeholder>
-			</Fragment>
+			</Block.div>
 		);
 	}
 
@@ -265,8 +257,7 @@ function Navigation( {
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
-					<div
-						ref={ ref }
+					<Block.nav
 						className={ blockClassNames }
 						style={ blockInlineStyles }
 					>
@@ -275,13 +266,18 @@ function Navigation( {
 								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
 							</>
 						) }
-
 						<InnerBlocks
+							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={ 'horizontal' }
+							__experimentalTagName="ul"
+							__experimentalAppenderTagName="li"
+							__experimentalPassedProps={ {
+								className: 'wp-block-navigation__container',
+							} }
 						/>
-					</div>
+					</Block.nav>
 				</BackgroundColor>
 			</TextColor>
 		</Fragment>

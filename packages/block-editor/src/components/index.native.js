@@ -6,6 +6,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export * from './colors';
+export * from './gradients';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InnerBlocks } from './inner-blocks';
@@ -44,6 +45,7 @@ export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as Inserter } from './inserter';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';
