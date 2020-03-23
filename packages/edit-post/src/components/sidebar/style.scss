@@ -65,6 +65,9 @@
 		margin: 1.5em 0;
 	}
 
+	// This section of code duplicates many of the styles of the block toolbar.
+	// It would be good to refactor the block toolbar/components-toolbar to
+	// include those styles so we don't have to duplicate these styles here.
 	.components-toolbar {
 		height: $block-toolbar-height;
 		background: none;
