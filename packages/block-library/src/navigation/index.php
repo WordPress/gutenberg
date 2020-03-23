@@ -231,7 +231,7 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 			isset( $block['attrs']['id'] ) &&
 			'URL' !== $block['attrs']['type']
 		) {
-			$html .= ' href="' . get_permalink( $block['attrs']['id']  ) . '"';
+			$html .= ' href="' . get_permalink( $block['attrs']['id'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {

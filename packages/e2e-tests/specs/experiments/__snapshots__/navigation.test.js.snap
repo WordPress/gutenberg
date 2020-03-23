@@ -2,9 +2,8 @@
 
 exports[`Navigation allows a navigation menu to be created from an empty menu using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
-
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"type\\":\\"URL\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
 <!-- /wp:navigation -->"
 `;
 
@@ -20,6 +19,6 @@ exports[`Navigation allows a navigation menu to be created using existing pages 
 
 exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
 <!-- /wp:navigation -->"
 `;
