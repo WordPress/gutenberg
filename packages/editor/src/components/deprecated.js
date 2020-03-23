@@ -61,12 +61,12 @@ import {
 	withFontSizes as rootWithFontSizes,
 } from '@wordpress/block-editor';
 
-export { default as ServerSideRender } from '@wordpress/server-side-render';
+import { default as RootServerSideRender } from '@wordpress/server-side-render';
 
-function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
+function deprecateComponent( name, Wrapped, staticsToHoist = [], alternative ) {
 	const Component = forwardRef( ( props, ref ) => {
 		deprecated( 'wp.editor.' + name, {
-			alternative: 'wp.blockEditor.' + name,
+			alternative: alternative || 'wp.blockEditor.' + name,
 		} );
 
 		return <Wrapped ref={ ref } { ...props } />;
@@ -228,6 +228,12 @@ export const ObserveTyping = deprecateComponent(
 export const PreserveScrollInReorder = deprecateComponent(
 	'PreserveScrollInReorder',
 	RootPreserveScrollInReorder
+);
+export const ServerSideRender = deprecateComponent(
+	'ServerSideRender',
+	RootServerSideRender,
+	[],
+	'wp.serverSideRender'
 );
 export const SkipToSelectedBlock = deprecateComponent(
 	'SkipToSelectedBlock',
