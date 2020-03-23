@@ -8,7 +8,6 @@ import classnames from 'classnames';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -90,7 +89,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const animatedBlockParentStyles = {
 		opacity: shouldShowMovers ? 1 : 0,
-		transform: shouldShowMovers ? 'translateY(-55px)' : 'translateY(0)',
+		transform: shouldShowMovers ? 'translateY(-63px)' : 'translateY(0)',
 		transitionDelay: shouldShowMovers ? 0 : 0,
 	};
 
