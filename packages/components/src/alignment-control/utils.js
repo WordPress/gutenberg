@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined } from 'lodash';
+import { isEqual, isUndefined } from 'lodash';
 
 export const DIRECTION = {
 	UP: 'up',
@@ -15,7 +15,7 @@ export const BASE_ALIGNMENTS = [
 	[ 'top', 'center' ],
 	[ 'top', 'right' ],
 	[ 'center', 'left' ],
-	[ 'center' ],
+	[ 'center', 'center' ],
 	[ 'center', 'right' ],
 	[ 'bottom', 'left' ],
 	[ 'bottom', 'center' ],
@@ -60,6 +60,16 @@ export function transformAlignment( alignments = [] ) {
 		value = [];
 	}
 
+	value = value
+		.map( ( v ) => v.toLowerCase() )
+		// Supports remapping of 'middle' to 'center'
+		.map( ( v ) => v.replace( 'middle', 'center' ) );
+
+	// Handles cases were only 'center' or ['center'] is provided
+	if ( value.length === 1 && value[ 0 ] === 'center' ) {
+		value.push( 'center' );
+	}
+
 	return value.sort();
 }
 
@@ -87,12 +97,10 @@ export function getAlignmentValues( alignment = 'center' ) {
 	const values = transformAlignment( alignment );
 
 	if ( values.length > 2 ) {
-		return false;
+		return undefined;
 	}
 
-	const match = ALIGNMENTS.find( ( a ) => {
-		return a.every( ( v ) => values.includes( v ) );
-	} );
+	const match = ALIGNMENTS.find( ( a ) => isEqual( values, a ) );
 
 	return match;
 }
