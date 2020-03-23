@@ -700,6 +700,7 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
+			enableAutoCorrection,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -858,6 +859,7 @@ export class RichText extends Component {
 					minWidth={ minWidth }
 					id={ this.props.id }
 					selectionColor={ this.props.selectionColor }
+					enableAutoCorrection={ enableAutoCorrection }
 				/>
 				{ isSelected && (
 					<FormatEdit

@@ -43,6 +43,7 @@ export function CodeEdit( props ) {
 				} }
 				placeholder={ __( 'Write code…' ) }
 				style={ codeStyle }
+				enableAutoCorrection={ false }
 			/>
 		</View>
 	);
