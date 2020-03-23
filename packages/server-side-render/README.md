@@ -48,6 +48,12 @@ Examples: "my-custom-server-side-rendered".
 - Type: `String`
 - Required: No
 
+### requestBody
+
+Whether to send the attributes in the request body, not in the URL. False by default. If true, this makes a POST instead of a GET request, which can allow a bigger attributes object. Only works with WP 5.5 and later, or if 'rest_endpoints' is filtered in PHP to allow this.
+- Type: `Boolean`
+- Required: No
+
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
