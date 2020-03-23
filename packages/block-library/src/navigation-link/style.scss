@@ -1,0 +1,104 @@
+.wp-block-navigation-link {
+	position: relative;
+	margin: 0;
+	min-height: $navigation-menu-height;
+	display: flex;
+	line-height: 1.4;
+
+	// Sub menus
+	.wp-block,
+	.wp-block-navigation-link {
+		min-height: auto; // reset the min-height and rely on padding
+		padding: 0;
+	}
+
+	// Sub menus (editor canvas)
+	.wp-block .wp-block-navigation-link {
+		margin: 0;
+	}
+
+	// TODO - this shouldn't have a wp-block__navigation classname,
+	// it should use a wp-block__navigation-link classname.
+	&.has-child > .wp-block-navigation__container {
+		// Box model
+		display: flex;
+		border: $border-width solid rgba(0, 0, 0, 0.15);
+
+		// Position (first level)
+		position: absolute;
+		z-index: 1;
+		top: 100%;
+		left: 0; // just under the main menu item.
+
+		// Position (nested levels)
+		.block-editor-inner-blocks,
+		.wp-block-navigation__container {
+			left: 100%;
+			top: - $border-width;
+		}
+	}
+
+	// Inherit colors from menu
+	.wp-block-navigation__container {
+		background-color: inherit;
+		color: inherit;
+	}
+
+	// All links
+	.wp-block-navigation-link__content {
+		display: flex;
+		align-items: center;
+		width: max-content;
+		padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+
+		// Inherit colors from the parent nav block. Overrides some
+		// default styling on `<a>` elements that sets the color to blue.
+		color: inherit;
+	}
+
+	// Submenu links only
+	.wp-block-navigation-link {
+
+		&:first-child:not(:only-child) .wp-block-navigation-link__content {
+			padding-top: $grid-unit-10;
+		}
+
+		&:last-child .wp-block-navigation-link__content {
+			padding-bottom: $grid-unit-10;
+		}
+	}
+
+	&.has-child .wp-block-navigation-link__content {
+		padding-right: $grid-unit-10 * 4;
+		position: relative;
+	}
+
+	// reset rotation of submenu indicator icons on nested levels
+	.wp-block-navigation-link svg {
+		transform: rotate(0);
+	}
+
+	&.has-text-color .wp-block-navigation-link__content {
+		color: inherit;
+	}
+}
+
+.wp-block-navigation-link__submenu-icon {
+	display: none;
+	position: absolute;
+	right: $grid-unit-10 * 2;
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+.has-submenu-icon .wp-block-navigation-link__submenu-icon {
+	display: block;
+}
+
+.wp-block-navigation-link.has-child > .wp-block-navigation__container {
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+}

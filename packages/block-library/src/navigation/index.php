@@ -86,31 +86,6 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 }
 
 /**
- * Recursively filters out links with no labels to build a clean navigation block structure.
- *
- * @param array $blocks Link inner blocks from the Navigation block.
- * @return array Blocks that had valid labels
- */
-function block_core_navigation_empty_navigation_links_recursive( $blocks ) {
-	$blocks = array_filter(
-		$blocks,
-		function( $block ) {
-			return ! empty( $block['attrs']['label'] );
-		}
-	);
-
-	if ( ! empty( $blocks ) ) {
-		foreach ( $blocks as $key => $block ) {
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
-			}
-		}
-	}
-
-	return $blocks;
-}
-
-/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -133,8 +108,11 @@ function render_block_core_navigation( $content, $block ) {
 		return $content;
 	}
 
-	$block['innerBlocks'] = block_core_navigation_empty_navigation_links_recursive( $block['innerBlocks'] );
-	$attributes           = $block['attrs'];
+	// Apply default attributes. This is currently needed because the nav block overrides
+	// block rendering using the render_block filter. It does this to gain access to
+	// innerBlocks, but at the same time this bypasses prepare_attributes_for_render.
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
 
 	/**
 	 * Deprecated:
@@ -166,119 +144,23 @@ function render_block_core_navigation( $content, $block ) {
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
+		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array(),
+		isset( $attributes['showSubmenuIcon'] ) && $attributes['showSubmenuIcon'] ? array( 'has-submenu-icon' ) : array()
 	);
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
+	// Render inner blocks.
+	$inner_blocks_html = implode( array_map( 'render_block', $block['innerBlocks'] ) );
+
 	return sprintf(
-		'<nav %1$s %2$s>%3$s</nav>',
+		'<nav %1$s %2$s><ul class="wp-block-navigation__container">%3$s</ul></nav>',
 		$class_attribute,
 		$style_attribute,
-		block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, true )
+		$inner_blocks_html
 	);
-}
-
-/**
- * Walks the inner block structure and returns an HTML list for it.
- *
- * @param array $attributes    The Navigation block attributes.
- * @param array $block         The NavigationItem block.
- * @param array $colors        Contains inline styles and CSS classes to apply to navigation item.
- * @param array $font_sizes    Contains inline styles and CSS classes to apply to navigation item.
- *
- * @return string Returns  an HTML list from innerBlocks.
- */
-function block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes ) {
-	$html            = '';
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
-	);
-	$classes[]       = 'wp-block-navigation-link';
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
-
-	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
-		$css_classes = trim( implode( ' ', $classes ) );
-		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
-		$is_active   = ! empty( $block['attrs']['id'] ) && ( get_the_ID() === $block['attrs']['id'] );
-
-		$class_name = ! empty( $block['attrs']['className'] ) ? implode( ' ', (array) $block['attrs']['className'] ) : false;
-
-		if ( false !== $class_name ) {
-			$css_classes .= ' ' . $class_name;
-		};
-
-		$html .= '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
-			( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
-			'<a class="wp-block-navigation-link__content"';
-
-		// Start appending HTML attributes to anchor tag.
-		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
-		}
-
-		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
-			$html .= ' target="_blank"  ';
-		}
-		// End appending HTML attributes to anchor tag.
-
-		// Start anchor tag content.
-		$html .= '>' .
-			// Wrap title with span to isolate it from submenu icon.
-			'<span class="wp-block-navigation-link__label">';
-
-		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= wp_kses(
-				$block['attrs']['label'],
-				array(
-					'code'   => array(),
-					'em'     => array(),
-					'img'    => array(
-						'scale' => array(),
-						'class' => array(),
-						'style' => array(),
-						'src'   => array(),
-						'alt'   => array(),
-					),
-					's'      => array(),
-					'span'   => array(
-						'style' => array(),
-					),
-					'strong' => array(),
-				)
-			);
-		}
-
-		$html .= '</span>';
-
-		$html .= '</a>';
-		// End anchor tag content.
-
-		// Append submenu icon to top-level item.
-		// it shows the icon as default, when 'showSubmenuIcon' is not set,
-		// or when it's set and also not False.
-		if (
-			(
-				isset( $attributes['showSubmenuIcon'] ) && false !== $attributes['showSubmenuIcon'] ||
-				! isset( $attributes['showSubmenuIcon'] )
-			) &&
-			$has_submenu
-		) {
-			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
-		}
-
-		if ( $has_submenu ) {
-			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes );
-		}
-
-		$html .= '</li>';
-	}
-	return '<ul class="wp-block-navigation__container">' . $html . '</ul>';
 }
 
 /**
@@ -292,5 +174,6 @@ function register_block_core_navigation() {
 		__DIR__ . '/navigation'
 	);
 }
+
 add_action( 'init', 'register_block_core_navigation' );
 add_filter( 'render_block', 'render_block_core_navigation', 10, 2 );
