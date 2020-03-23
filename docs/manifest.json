@@ -612,6 +612,12 @@
 		"parent": null
 	},
 	{
+		"title": "AlignmentControl",
+		"slug": "alignment-control",
+		"markdown_source": "../packages/components/src/alignment-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AnglePickerControl",
 		"slug": "angle-picker-control",
 		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
