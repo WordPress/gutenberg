@@ -25,7 +25,7 @@ export const _default = () => {
 	return <AlignmentControl />;
 };
 
-export const alignControlIcon = () => {
+export const alignmentControlIcon = () => {
 	const props = {
 		alignment: select( 'alignment', alignmentOptions, 'center' ),
 		size: number( 'size', 24 ),
