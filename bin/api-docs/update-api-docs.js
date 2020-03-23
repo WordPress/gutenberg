@@ -44,6 +44,11 @@ const DATA_DOCS_DIR = resolve(
 );
 
 /**
+ * Default path to use if the token doesn't include one.
+ */
+const DEFAULT_PATH = 'src/index.js';
+
+/**
  * Pattern matching start token of a README file.
  *
  * @type {RegExp}
@@ -169,7 +174,7 @@ const filterTokenTransform = new Transform( {
 			const tokens = [];
 
 			for ( const match of content.matchAll( TOKEN_PATTERN ) ) {
-				const [ , token, path = 'src/index.js' ] = match;
+				const [ , token, path = DEFAULT_PATH ] = match;
 				tokens.push( [ token, path ] );
 			}
 
