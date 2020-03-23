@@ -74,7 +74,7 @@ const label = `
 `;
 
 /**
- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.small'|'button'|'caption'|'label'} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
  */
 
 /**
@@ -112,6 +112,10 @@ const variant = ( variantName = 'body' ) => {
 		case 'body':
 			return css`
 				${body}
+			`;
+		case 'body.large':
+			return css`
+				${body}
 				${bodyLarge}
 			`;
 		case 'body.small':
@@ -140,5 +144,6 @@ const variant = ( variantName = 'body' ) => {
  * @param {TextProps} props
  */
 export const text = ( props ) => css`
+	box-sizing: border-box;
 	${variant( props.variant )}
 `;
