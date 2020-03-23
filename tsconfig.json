@@ -31,7 +31,7 @@
 		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	},
 	"include": [
-		"./bin/update-readmes.js",
+		"./bin/api-docs/update-api-docs.js",
 		"./packages/a11y/**/*.js",
 		"./packages/blob/**/*.js",
 		"./packages/dom-ready/**/*.js",

@@ -185,7 +185,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-readmes.js",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "packages/env/bin/wp-env run wordpress ./wp-content/plugins/gutenberg/bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -251,8 +251,8 @@
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/api-docs/update-readmes.js",
-			"node ./bin/api-docs/are-readmes-unstaged.js"
+			"node ./bin/api-docs/update-api-docs.js",
+			"node ./bin/api-docs/are-api-docs-unstaged.js"
 		]
 	},
 	"wp-env": {
