@@ -92,7 +92,7 @@ function getPackagePattern( files ) {
  */
 function getPackageStoreName( packageName ) {
 	let storeName = 'core';
-	if ( packageName !== 'core' ) {
+	if ( packageName !== 'core-data' ) {
 		storeName += '/' + packageName;
 	}
 
