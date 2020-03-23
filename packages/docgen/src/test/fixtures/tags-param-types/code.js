@@ -5,7 +5,7 @@
  *
  * @param p undocumented type
  * @param {any} p any
- * @param {*} p all types
+ * @param {*} p jsdoc all types
  * @param {?} p unknown
  * @param {unknown} p unknown TS
  * @param {string} p string

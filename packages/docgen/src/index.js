@@ -57,13 +57,11 @@ module.exports = function( sourceFilePath, options ) {
 		: inputBase + '-api.md';
 
 	// Process
-	const { sourceFile, exportStatements, typeChecker } = compile(
-		sourceFilePath
-	);
+	const { sourceFile, exportStatements } = compile( sourceFilePath );
+
 	const ir = getIntermediateRepresentation(
 		sourceFilePath,
 		exportStatements,
-		typeChecker,
 		sourceFile
 	);
 	const filteredIR = ir.filter( ( symbol ) => {

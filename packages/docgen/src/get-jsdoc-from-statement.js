@@ -4,12 +4,10 @@
 const ts = require( 'typescript' );
 const { SyntaxKind } = ts;
 
-/**
- * @typedef {import('typescript').Statement} Statement
- */
+const typeToString = require( './type-to-string' );
 
 /**
- * @typedef {import('typescript').TypeChecker} TypeChecker
+ * @typedef {import('typescript').Statement} Statement
  */
 
 /**
@@ -18,11 +16,10 @@ const { SyntaxKind } = ts;
  * if any.
  *
  * @param {Statement} statement TypeScript statement.
- * @param {TypeChecker} typeChecker TypeScript typeChecker.
  *
  * @return {Object} Object representing the JSDoc comment.
  */
-module.exports = function( statement, typeChecker ) {
+module.exports = function( statement ) {
 	let jsdoc;
 	if ( statement.jsDoc ) {
 		const lastComment = statement.jsDoc[ statement.jsDoc.length - 1 ];
@@ -30,12 +27,7 @@ module.exports = function( statement, typeChecker ) {
 		return {
 			description: lastComment.comment,
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
-				const getType = () =>
-					typeChecker.typeToString(
-						typeChecker.getTypeFromTypeNode(
-							tag.typeExpression.type
-						)
-					);
+				const getType = () => typeToString( tag.typeExpression.type );
 				const result = {
 					title: tag.tagName.escapedText,
 					description: tag.comment ? tag.comment : null,

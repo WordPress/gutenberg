@@ -17,10 +17,6 @@ const getExportEntries = require( './get-export-entries' );
 const getJSDocFromStatement = require( './get-jsdoc-from-statement' );
 
 /**
- * @typedef {import('typescript').TypeChecker} TypeChecker
- */
-
-/**
  * @typedef {import('typescript').Statement} Statement
  */
 
@@ -143,20 +139,13 @@ const getJSDocFromDependency = ( statement, entry, getDependencyIR ) => {
 /**
  * @param {Statement} statement
  * @param {ExportEntry} entry
- * @param {TypeChecker} typeChecker
  * @param {SourceFile} sourceFile
  * @param {() => Array<IREntry>} getDependencyIR
  */
-const getJSDoc = (
-	statement,
-	entry,
-	typeChecker,
-	sourceFile,
-	getDependencyIR
-) => {
+const getJSDoc = ( statement, entry, sourceFile, getDependencyIR ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
-		doc = getJSDocFromStatement( statement, typeChecker );
+		doc = getJSDocFromStatement( statement );
 		if ( doc !== undefined ) {
 			return doc;
 		}
@@ -178,7 +167,7 @@ const getJSDoc = (
 		if ( node.kind === SyntaxKind.ImportDeclaration ) {
 			doc = getJSDocFromDependency( node, entry, getDependencyIR );
 		} else {
-			doc = getJSDocFromStatement( node, typeChecker );
+			doc = getJSDocFromStatement( node );
 		}
 		return doc;
 	}
@@ -196,16 +185,13 @@ const getDependencyIR = ( sourceFile ) => ( statement ) => {
 		paths: [ dirname( sourceFile.fileName ) ],
 	} );
 
-	const {
-		exportStatements,
-		typeChecker,
-		sourceFile: depSourceFile,
-	} = compile( dependencyPath );
+	const { exportStatements, sourceFile: depSourceFile } = compile(
+		dependencyPath
+	);
 
 	return getIntermediateRepresentation(
 		dependencyPath,
 		exportStatements,
-		typeChecker,
 		depSourceFile
 	);
 };
@@ -213,19 +199,17 @@ const getDependencyIR = ( sourceFile ) => ( statement ) => {
 /**
  * @param {string} path
  * @param {Statement} statement
- * @param {TypeChecker} typeChecker
  * @param {SourceFile} sourceFile
  *
  * @return {Array<IREntry>} Intermediate Representation in JSON.
  */
-const getIRFromStatement = ( path, statement, typeChecker, sourceFile ) => {
+const getIRFromStatement = ( path, statement, sourceFile ) => {
 	const exportEntries = getExportEntries( statement );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
 		const doc = getJSDoc(
 			statement,
 			entry,
-			typeChecker,
 			sourceFile,
 			getDependencyIR( sourceFile )
 		);
@@ -258,7 +242,6 @@ const getIRFromStatement = ( path, statement, typeChecker, sourceFile ) => {
  *
  * @param {string} path Path to file being processed.
  * @param {Array<Statement>} exportStatements TypeScript export statements.
- * @param {TypeChecker} typeChecker TypeScript type checker
  * @param {SourceFile} sourceFile TypeScript SourceFile object of the file being parsed.
  *
  * @return {Array<IREntry>} Intermediate Representation in JSON.
@@ -266,12 +249,11 @@ const getIRFromStatement = ( path, statement, typeChecker, sourceFile ) => {
 const getIntermediateRepresentation = (
 	path,
 	exportStatements,
-	typeChecker,
 	sourceFile
 ) => {
 	return flatten(
 		exportStatements.map( ( statement ) =>
-			getIRFromStatement( path, statement, typeChecker, sourceFile )
+			getIRFromStatement( path, statement, sourceFile )
 		)
 	);
 };

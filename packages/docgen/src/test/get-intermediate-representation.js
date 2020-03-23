@@ -12,25 +12,21 @@ const getIntermediateRepresentation = require( '../get-intermediate-representati
 describe( 'Intermediate Representation From Statement', function() {
 	const prepare = ( dir ) => {
 		const filePath = path.join( __dirname, 'fixtures', dir, 'code.js' );
-		const { typeChecker, sourceFile, exportStatements } = compile(
-			filePath
-		);
+		const { sourceFile, exportStatements } = compile( filePath );
 
 		return {
-			typeChecker,
 			sourceFile,
 			exportStatements,
 		};
 	};
 
 	it( 'undocumented (no comments)', function() {
-		const { typeChecker, exportStatements, sourceFile } = prepare(
+		const { exportStatements, sourceFile } = prepare(
 			'default-undocumented-nocomments'
 		);
 		const ir = getIntermediateRepresentation(
 			null,
 			exportStatements,
-			typeChecker,
 			sourceFile
 		);
 		expect( ir ).toHaveLength( 1 );
@@ -43,13 +39,12 @@ describe( 'Intermediate Representation From Statement', function() {
 	} );
 
 	it( 'undocumented (one liner)', function() {
-		const { typeChecker, exportStatements, sourceFile } = prepare(
+		const { exportStatements, sourceFile } = prepare(
 			'default-undocumented-oneliner'
 		);
 		const irOneliner = getIntermediateRepresentation(
 			null,
 			exportStatements,
-			typeChecker,
 			sourceFile
 		);
 		expect( irOneliner ).toHaveLength( 1 );
@@ -62,14 +57,8 @@ describe( 'Intermediate Representation From Statement', function() {
 	} );
 
 	it( 'parses TypeScript type correctly', () => {
-		const { typeChecker, exportStatements } = prepare(
-			'tags-ts-definition'
-		);
-		const ir = getIntermediateRepresentation(
-			null,
-			exportStatements,
-			typeChecker
-		);
+		const { exportStatements } = prepare( 'tags-ts-definition' );
+		const ir = getIntermediateRepresentation( null, exportStatements );
 		expect( ir ).toHaveLength( 1 );
 		expect( ir[ 0 ] ).toEqual( {
 			path: null,
@@ -90,13 +79,12 @@ describe( 'Intermediate Representation From Statement', function() {
 	describe( 'JSDoc in export statement', function() {
 		describe( 'default export', function() {
 			it( 'class anonymous', function() {
-				const { typeChecker, exportStatements } = prepare(
+				const { exportStatements } = prepare(
 					'default-class-anonymous'
 				);
 				const irClassAnonymous = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irClassAnonymous ).toHaveLength( 1 );
 				expect( irClassAnonymous[ 0 ] ).toEqual( {
@@ -108,13 +96,10 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'class named', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'default-class-named'
-				);
+				const { exportStatements } = prepare( 'default-class-named' );
 				const irClassNamed = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irClassNamed ).toHaveLength( 1 );
 				expect( irClassNamed[ 0 ] ).toEqual( {
@@ -126,13 +111,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'function anonymous', function() {
-				const { typeChecker, exportStatements } = prepare(
+				const { exportStatements } = prepare(
 					'default-function-anonymous'
 				);
 				const irFnAnonymous = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irFnAnonymous ).toHaveLength( 1 );
 				expect( irFnAnonymous[ 0 ] ).toEqual( {
@@ -144,13 +128,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'function named', function() {
-				const { typeChecker, exportStatements } = prepare(
+				const { exportStatements } = prepare(
 					'default-function-named'
 				);
 				const irFnNamed = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irFnNamed[ 0 ] ).toEqual( {
 					path: null,
@@ -161,13 +144,10 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'variable', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'default-variable'
-				);
+				const { exportStatements } = prepare( 'default-variable' );
 				const irVar = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irVar[ 0 ] ).toEqual( {
 					path: null,
@@ -180,13 +160,10 @@ describe( 'Intermediate Representation From Statement', function() {
 
 		describe( 'named export', function() {
 			it( 'class', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'named-class'
-				);
+				const { exportStatements } = prepare( 'named-class' );
 				const irNamedClass = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irNamedClass ).toHaveLength( 1 );
 				expect( irNamedClass[ 0 ] ).toEqual( {
@@ -198,13 +175,10 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'function', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'named-function'
-				);
+				const { exportStatements } = prepare( 'named-function' );
 				const irNamedFn = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irNamedFn ).toHaveLength( 1 );
 				expect( irNamedFn[ 0 ] ).toEqual( {
@@ -216,13 +190,10 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'variable', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'named-variable'
-				);
+				const { exportStatements } = prepare( 'named-variable' );
 				const irNamedVar = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irNamedVar ).toHaveLength( 1 );
 				expect( irNamedVar[ 0 ] ).toEqual( {
@@ -234,13 +205,10 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'variables', function() {
-				const { typeChecker, exportStatements } = prepare(
-					'named-variables'
-				);
+				const { exportStatements } = prepare( 'named-variables' );
 				const irNamedVars = getIntermediateRepresentation(
 					null,
-					exportStatements,
-					typeChecker
+					exportStatements
 				);
 				expect( irNamedVars ).toHaveLength( 2 );
 				expect( irNamedVars[ 0 ] ).toEqual( {
@@ -262,13 +230,12 @@ describe( 'Intermediate Representation From Statement', function() {
 	describe( 'JSDoc in same file', function() {
 		describe( 'default export', function() {
 			it( 'identifier', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'default-identifier'
 				);
 				const irDefaultId = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irDefaultId ).toHaveLength( 1 );
@@ -281,13 +248,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'named export', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'default-named-export'
 				);
 				const irDefaultNamed = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irDefaultNamed ).toHaveLength( 2 );
@@ -308,13 +274,12 @@ describe( 'Intermediate Representation From Statement', function() {
 
 		describe( 'named export', function() {
 			it( 'identifier', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-identifier'
 				);
 				const irNamedId = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamedId ).toHaveLength( 1 );
@@ -327,13 +292,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'identifier destructuring', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-identifier-destructuring'
 				);
 				const irNamedIdDestructuring = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamedIdDestructuring ).toHaveLength( 1 );
@@ -346,13 +310,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'identifiers', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-identifiers'
 				);
 				const irIds = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irIds ).toHaveLength( 3 );
@@ -377,13 +340,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'identifiers (inline)', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-identifiers-and-inline'
 				);
 				const irIdInline = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irIdInline ).toHaveLength( 3 );
@@ -411,13 +373,12 @@ describe( 'Intermediate Representation From Statement', function() {
 
 	describe( 'JSDoc in module dependency', function() {
 		it( 'named export', function() {
-			const { sourceFile, typeChecker, exportStatements } = prepare(
+			const { sourceFile, exportStatements } = prepare(
 				'named-import-named'
 			);
 			const ir = getIntermediateRepresentation(
 				null,
 				exportStatements,
-				typeChecker,
 				sourceFile
 			);
 			expect( ir ).toHaveLength( 3 );
@@ -443,13 +404,12 @@ describe( 'Intermediate Representation From Statement', function() {
 
 		describe( 'default', function() {
 			it( 'named', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-default'
 				);
 				const irNamedDefault = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamedDefault ).toHaveLength( 1 );
@@ -462,13 +422,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'named exported', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'named-default-exported'
 				);
 				const irNamedDefaultExported = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamedDefaultExported ).toHaveLength( 1 );
@@ -483,13 +442,10 @@ describe( 'Intermediate Representation From Statement', function() {
 
 		describe( 'namespace export', function() {
 			it( 'simple', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
-					'namespace'
-				);
+				const { sourceFile, exportStatements } = prepare( 'namespace' );
 				const irNamespace = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamespace ).toHaveLength( 3 );
@@ -514,13 +470,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'commented', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'namespace-commented'
 				);
 				const irNamespaceCommented = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamespaceCommented ).toHaveLength( 3 );
@@ -549,13 +504,12 @@ describe( 'Intermediate Representation From Statement', function() {
 	describe( 'JSDoc in module dependency through import', function() {
 		describe( 'default export', function() {
 			it( 'import default', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'default-import-default'
 				);
 				const irDefault = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irDefault ).toHaveLength( 1 );
@@ -568,13 +522,12 @@ describe( 'Intermediate Representation From Statement', function() {
 			} );
 
 			it( 'import named', function() {
-				const { sourceFile, typeChecker, exportStatements } = prepare(
+				const { sourceFile, exportStatements } = prepare(
 					'default-import-named'
 				);
 				const irNamed = getIntermediateRepresentation(
 					null,
 					exportStatements,
-					typeChecker,
 					sourceFile
 				);
 				expect( irNamed ).toHaveLength( 1 );
@@ -588,13 +541,12 @@ describe( 'Intermediate Representation From Statement', function() {
 		} );
 
 		it( 'named export', function() {
-			const { sourceFile, typeChecker, exportStatements } = prepare(
+			const { sourceFile, exportStatements } = prepare(
 				'named-import-namespace'
 			);
 			const ir = getIntermediateRepresentation(
 				null,
 				exportStatements,
-				typeChecker,
 				sourceFile
 			);
 			expect( ir ).toHaveLength( 1 );
