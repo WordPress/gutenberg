@@ -74,7 +74,48 @@
 		.components-button {
 			margin-top: -$border-width;
 			height: $block-toolbar-height;
+
+			svg {
+				position: relative;
+
+				// Center the icon inside.
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			&:focus {
+				box-shadow: none;
+			}
 		}
+
+		// Focus and toggle pseudo elements.
+		.components-button::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-block-ui;
+			height: 32px;
+			min-width: 32px;
+
+			// Position the focus rectangle.
+			left: 2px;
+			right: 2px;
+		}
+
+		// Toggled style.
+		.components-button.is-pressed {
+			color: $white;
+
+			&::before {
+				background: $dark-gray-primary;
+			}
+		}
+
+		// Focus style.
+		.components-button:focus::before {
+			@include block-toolbar-button-style__focus();
+		}
+
 	}
 
 	p + div.components-toolbar {
