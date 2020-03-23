@@ -8,6 +8,7 @@ import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
+import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 
@@ -59,6 +60,7 @@ export default function Header() {
 			</div>
 			<div className="edit-site-header__actions">
 				<SaveButton />
+				<MoreMenu />
 			</div>
 		</div>
 	);
