@@ -73,7 +73,6 @@
 .block-editor-block-toolbar__block-parent-wrapper {
 	transform: translateY(0);
 	transition: all 60ms linear;
-	transition-delay: 420ms;
 	z-index: -1; // This makes it slide out from underneath the toolbar.
 }
 
