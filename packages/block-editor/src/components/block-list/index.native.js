@@ -69,16 +69,10 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
-		const { shouldShowInsertionPointBefore, columnsSettings } = this.props;
+		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
-		const parentWidth = columnsSettings && columnsSettings.width;
 		return (
-			<View
-				style={ [
-					styles.defaultAppender,
-					parentWidth && { maxWidth: parentWidth },
-				] }
-			>
+			<View style={ [ styles.defaultAppender ] }>
 				<ReadableContentView>
 					<BlockListAppender // show the default appender, anormal, when not inserting a block
 						rootClientId={ this.props.rootClientId }
@@ -162,7 +156,13 @@ export class BlockList extends Component {
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
-					<View style={ styles.paddingToContent }>
+					<View
+						style={ {
+							marginHorizontal:
+								marginHorizontal -
+								styles.innerAppender.marginLeft,
+						} }
+					>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
