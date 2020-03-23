@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PluginComplementaryArea } from '@wordpress/interface';
+import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -80,7 +80,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 		};
 	} );
 	return (
-		<PluginComplementaryArea
+		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-post-sidebar"
 			smallScreenTitle={ postTitle }

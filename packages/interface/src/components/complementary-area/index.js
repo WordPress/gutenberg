@@ -15,37 +15,24 @@ import { starEmpty, starFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import PluginComplementaryAreaHeader from '../plugin-complementary-area-header';
+import ComplementaryAreaHeader from '../complementary-area-header';
 import PinnedItems from '../pinned-items';
 
-function PluginComplementaryAreaSlot( { scope, ...props } ) {
-	return <Slot name={ `PluginComplementaryArea/${ scope }` } { ...props } />;
+function ComplementaryAreaSlot( { scope, ...props } ) {
+	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-function PluginComplementaryAreaFill( { scope, ...props } ) {
-	return <Fill name={ `PluginComplementaryArea/${ scope }` } { ...props } />;
-}
-
-/**
- * Renders a complementary area with its content.
- *
- * @return {Object} The rendered complementary area.
- */
-function RawComplementaryArea( { children, className } ) {
-	return <div className={ className }>{ children }</div>;
-}
-
-function ComplementaryArea( { scope, ...props } ) {
+function ComplementaryAreaFill( { scope, children, className } ) {
 	return (
-		<PluginComplementaryAreaFill scope={ scope }>
+		<Fill name={ `ComplementaryArea/${ scope }` }>
 			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ () => <RawComplementaryArea { ...props } /> }
+				{ () => <div className={ className }>{ children }</div> }
 			</Animate>
-		</PluginComplementaryAreaFill>
+		</Fill>
 	);
 }
 
-function PluginComplementaryArea( {
+function ComplementaryArea( {
 	className,
 	complementaryAreaName,
 	toggleShortcut,
@@ -106,14 +93,14 @@ function PluginComplementaryArea( {
 				</PinnedItems>
 			) }
 			{ isActive && (
-				<ComplementaryArea
+				<ComplementaryAreaFill
 					className={ classnames(
-						'interface-plugin-complementary-area',
+						'interface-complementary-area',
 						className
 					) }
 					scope={ scope }
 				>
-					<PluginComplementaryAreaHeader
+					<ComplementaryAreaHeader
 						className={ headerClassName }
 						closeLabel={ closeLabel || __( 'Close plugin' ) }
 						onClose={ () =>
@@ -148,25 +135,23 @@ function PluginComplementaryArea( {
 								) }
 							</>
 						) }
-					</PluginComplementaryAreaHeader>
+					</ComplementaryAreaHeader>
 					<Panel className={ panelClassName }>{ children }</Panel>
-				</ComplementaryArea>
+				</ComplementaryAreaFill>
 			) }
 		</>
 	);
 }
 
-const PluginComplementaryAreaWrapped = withPluginContext(
-	( context, ownProps ) => {
-		return {
-			icon: ownProps.icon || context.icon,
-			complementaryAreaName:
-				ownProps.complementaryAreaName ||
-				`${ context.name }/${ ownProps.name }`,
-		};
-	}
-)( PluginComplementaryArea );
+const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
+	return {
+		icon: ownProps.icon || context.icon,
+		complementaryAreaName:
+			ownProps.complementaryAreaName ||
+			`${ context.name }/${ ownProps.name }`,
+	};
+} )( ComplementaryArea );
 
-PluginComplementaryAreaWrapped.Slot = PluginComplementaryAreaSlot;
+ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
 
-export default PluginComplementaryAreaWrapped;
+export default ComplementaryAreaWrapped;

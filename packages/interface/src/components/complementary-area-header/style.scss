@@ -1,8 +1,8 @@
-.components-panel__header.interface-plugin-complementary-area-header__small {
+.components-panel__header.interface-complementary-area-header__small {
 	background: $white;
 	padding-right: $grid-unit-05;
 
-	.interface-plugin-complementary-area-header__small-title {
+	.interface-complementary-area-header__small-title {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -14,7 +14,7 @@
 	}
 }
 
-.interface-plugin-complementary-area-header {
+.interface-complementary-area-header {
 	padding-right: $grid-unit-05;
 	background: $light-gray-200;
 

@@ -29,7 +29,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
-import { PluginComplementaryArea } from '@wordpress/interface';
+import { ComplementaryArea } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -145,7 +145,7 @@ function Layout() {
 									</div>
 								) }
 								<SettingsSidebar />
-								<PluginComplementaryArea.Slot scope="edit-post" />
+								<ComplementaryArea.Slot scope="edit-post" />
 							</>
 						)
 					}

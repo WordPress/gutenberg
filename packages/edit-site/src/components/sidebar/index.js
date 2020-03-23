@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
-import { PluginComplementaryArea } from '@wordpress/interface';
+import { ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { cog, pencil } from '@wordpress/icons';
 
@@ -12,23 +12,23 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 function Sidebar() {
 	return (
 		<>
-			<PluginComplementaryArea.Slot scope="edit-site" />
-			<PluginComplementaryArea
+			<ComplementaryArea.Slot scope="edit-site" />
+			<ComplementaryArea
 				scope="edit-site"
 				complementaryAreaName="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
 			>
 				<InspectorSlot bubblesVirtually />
-			</PluginComplementaryArea>
-			<PluginComplementaryArea
+			</ComplementaryArea>
+			<ComplementaryArea
 				scope="edit-site"
 				complementaryAreaName="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				icon={ pencil }
 			>
 				<p>Global Styles area</p>
-			</PluginComplementaryArea>
+			</ComplementaryArea>
 		</>
 	);
 }

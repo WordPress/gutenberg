@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { close } from '@wordpress/icons';
 
-const PluginComplementaryAreaHeader = ( {
+const ComplementaryAreaHeader = ( {
 	smallScreenTitle,
 	toggleShortcut,
 	onClose,
@@ -20,8 +20,8 @@ const PluginComplementaryAreaHeader = ( {
 } ) => {
 	return (
 		<>
-			<div className="components-panel__header interface-plugin-complementary-area-header__small">
-				<span className="interface-plugin-complementary-area-header__small-title">
+			<div className="components-panel__header interface-complementary-area-header__small">
+				<span className="interface-complementary-area-header__small-title">
 					{ smallScreenTitle || __( '(no title)' ) }
 				</span>
 				<Button
@@ -33,7 +33,7 @@ const PluginComplementaryAreaHeader = ( {
 			<div
 				className={ classnames(
 					'components-panel__header',
-					'interface-plugin-complementary-area-header',
+					'interface-complementary-area-header',
 					className
 				) }
 				tabIndex={ -1 }
@@ -50,4 +50,4 @@ const PluginComplementaryAreaHeader = ( {
 	);
 };
 
-export default PluginComplementaryAreaHeader;
+export default ComplementaryAreaHeader;
