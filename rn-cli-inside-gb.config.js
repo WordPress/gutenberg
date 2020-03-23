@@ -26,12 +26,12 @@ const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat(
 );
 
 module.exports = {
-	extraNodeModules: Object.assign( enm, wppackages ),
 	watchFolders: alternateRoots,
 	resolver: {
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
 		providesModuleNodeModules: [ 'react-native-svg', 'react-native' ],
+		extraNodeModules: Object.assign( enm, wppackages ),
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer-inside-gb.js' ),

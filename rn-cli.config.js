@@ -10,10 +10,10 @@ const blacklistElements = blacklist( [
 const enm = require( './extra-node-modules.config.js' );
 
 module.exports = {
-	extraNodeModules: enm,
 	resolver: {
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
+		extraNodeModules: enm,
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer.js' ),
