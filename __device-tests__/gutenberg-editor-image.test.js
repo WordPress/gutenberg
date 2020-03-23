@@ -48,7 +48,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( imageBlockName );
-		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+		let imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
 
 		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
@@ -61,12 +61,12 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 			// end workaround
 
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 			await editorPage.dismissKeyboard();
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await imageBlock.click();
 		}
 		await editorPage.removeImageBlockAtPosition( 1 );
@@ -74,14 +74,14 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 	it( 'should be able to add an image block with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( imageBlockName );
-		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+		let imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
 
 		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
 			await editorPage.selectEmptyImageBlock( imageBlock );
 			await editorPage.chooseMediaLibrary();
 
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+			imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
 			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
@@ -89,10 +89,8 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 		}
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
+		await editorPage.getBlockAtPosition( paragraphBlockName );
+
 		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.longText );
 
 		// skip HTML check for Android since we couldn't add image from media library

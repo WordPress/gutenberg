@@ -233,10 +233,6 @@ export default class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async getParagraphBlockAtPosition( position: number, options: { autoscroll: boolean } = { autoscroll: false } ) {
-		return this.getBlockAtPosition( position, this.paragraphBlockName, options );
-	}
-
 	async hasParagraphBlockAtPosition( position: number ) {
 		return this.hasBlockAtPosition( position, this.paragraphBlockName );
 	}
@@ -262,7 +258,7 @@ export default class EditorPage {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			// Select block first
-			const block = await this.getParagraphBlockAtPosition( position + i );
+			const block = await this.getBlockAtPosition( this.paragraphBlockName, position + i);
 			await block.click();
 
 			await this.sendTextToParagraphBlock( block, paragraphs[ i ], clear );
@@ -284,10 +280,10 @@ export default class EditorPage {
 
 	async getTextForParagraphBlockAtPosition( position: number ) {
 		// Select block first
-		let block = await this.getParagraphBlockAtPosition( position );
+		let block = await this.getBlockAtPosition( this.paragraphBlockName, position );
 		await block.click();
 
-		block = await this.getParagraphBlockAtPosition( position );
+		block = await this.getBlockAtPosition( this.paragraphBlockName, position );
 		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
 	}
@@ -295,10 +291,6 @@ export default class EditorPage {
 	// =========================
 	// List Block functions
 	// =========================
-
-	async getListBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.listBlockName );
-	}
 
 	async hasListBlockAtPosition( position: number ) {
 		return await this.hasBlockAtPosition( position, this.listBlockName );
@@ -335,7 +327,7 @@ export default class EditorPage {
 	}
 
 	async getTextForListBlockAtPosition( position: number ) {
-		const block = await this.getListBlockAtPosition( position );
+		const block = await this.getBlockAtPosition( this.listBlockName, position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
 	}
@@ -347,10 +339,6 @@ export default class EditorPage {
 	// =========================
 	// Image Block functions
 	// =========================
-
-	async getImageBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.imageBlockName );
-	}
 
 	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
@@ -378,10 +366,6 @@ export default class EditorPage {
 	// Gallery Block functions
 	// =========================
 
-	async getGalleryBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.galleryBlockName );
-	}
-
 	async removeGalleryBlockAtPosition( position: number ) {
 		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
@@ -389,10 +373,6 @@ export default class EditorPage {
 	// =========================
 	// Heading Block functions
 	// =========================
-
-	async getHeadingBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.headingBlockName );
-	}
 
 	// Inner element changes on iOS if Heading Block is empty
 	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {

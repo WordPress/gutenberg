@@ -44,7 +44,7 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 
 	it( 'should be able to end a List block', async () => {
 		await editorPage.addNewBlock( listBlockName );
-		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
+		const listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
 
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {

@@ -47,18 +47,17 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block into post', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
+		await editorPage.getBlockAtPosition( paragraphBlockName );
+
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2);
 		await paragraphBlockElement.click();
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
+
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3);
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlockAtPosition( 3, testData.mediumText );
 
@@ -69,13 +68,14 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3, { autoscroll: true } );
+			paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3, { autoscroll: true } );
+
 			await paragraphBlockElement.click();
 			await editorPage.removeParagraphBlockAtPosition( 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
-				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i, { autoscroll: true } );
+				paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, i, { autoscroll: true } );
 				await paragraphBlockElement.click();
 				await editorPage.removeParagraphBlockAtPosition( i );
 			}
@@ -83,7 +83,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			for ( let i = 4; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
-				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+				paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 				await clickMiddleOfElement( driver, paragraphBlockElement );
 				await editorPage.removeParagraphBlockAtPosition( 1 );
 			}
@@ -92,10 +92,8 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
+		await editorPage.getBlockAtPosition( paragraphBlockName );
+
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
@@ -109,7 +107,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await titleElement.click();
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );
 		await paragraphBlockElement.click();

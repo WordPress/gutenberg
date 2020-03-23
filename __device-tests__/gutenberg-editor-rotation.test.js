@@ -45,10 +45,7 @@ describe( 'Gutenberg Editor tests', () => {
 
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-		if ( isAndroid() ) {
-			await paragraphBlockElement.click();
-		}
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
@@ -64,10 +61,10 @@ describe( 'Gutenberg Editor tests', () => {
 			await driver.hideDeviceKeyboard();
 		}
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		while ( ! paragraphBlockElement ) {
 			await driver.hideDeviceKeyboard();
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+			paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		}
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 		await toggleOrientation( driver );

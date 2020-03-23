@@ -42,7 +42,7 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 
 	it( 'should be able to add a gallery block', async () => {
 		await editorPage.addNewBlock( galleryBlockName );
-		const galleryBlock = await editorPage.getGalleryBlockAtPosition( 1 );
+		const galleryBlock = await editorPage.getBlockAtPosition( galleryBlockName );
 
 		expect( galleryBlock ).toBeTruthy();
 		await editorPage.removeGalleryBlockAtPosition( 1 );

@@ -10,7 +10,6 @@ import {
 	setupDriver,
 	isLocalEnvironment,
 	stopDriver,
-	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -45,27 +44,24 @@ describe( 'Gutenberg Editor tests', () => {
 
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
 		await editorPage.addNewBlock( headingBlockName );
-		let headingBlockElement = await editorPage.getHeadingBlockAtPosition( 1 );
+		let headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName );
 
-		if ( isAndroid() ) {
-			await headingBlockElement.click();
-		}
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( headingBlockName );
-		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
+		headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName, 4 );
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 5 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 5 );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 
