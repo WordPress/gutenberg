@@ -10,15 +10,22 @@
 		border: none;
 		border-radius: 0;
 		height: auto;
+		margin-right: -8px;
 		width: $header-height;
+		background: #23282e; // WP-admin gray.
+		transition: all 0.12s ease-in-out;
 
 		svg {
-			fill: #23282e;
+			padding: 8px;
+			border-radius: 2px;
+			width: 44px;
+			height: 44px;
+			fill: $white;
 		}
 
 		&:hover {
 			svg {
-				fill: #32373d;
+				opacity: 0.9;
 			}
 		}
 
@@ -27,19 +34,19 @@
 		}
 
 		&:focus {
-			box-shadow: inset 0 0 0 2px color($theme-color);
+			box-shadow: none;
+
+			svg {
+				box-shadow: inset 0 0 0 2px color($theme-color);
+			}
 		}
 
 		body.js.is-showing-admin-menu & {
-			background: #23282e; // WP-admin gray.
+			width: 160px;
+		}
 
-			svg {
-				fill: $white;
-			}
-
-			&:hover {
-				background: #32373d; // WP-admin light-gray.
-			}
+		body.js.is-showing-admin-menu.folded & {
+			width: $header-height;
 		}
 	}
 }
