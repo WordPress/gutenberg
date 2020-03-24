@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { join, relative, resolve, sep, basename, dirname } = require( 'path' );
+const { join, relative, resolve, sep, dirname } = require( 'path' );
 const glob = require( 'fast-glob' );
 const execa = require( 'execa' );
 const { Transform } = require( 'stream' );
@@ -76,9 +76,7 @@ const TOKEN_PATTERN = /<!-- START TOKEN\((.+?(?:\|(.+?))?)\) -->/g;
  * @return {string} Package name.
  */
 function getFilePackage( file ) {
-	return file.startsWith( PACKAGES_DIR )
-		? relative( PACKAGES_DIR, file ).split( sep )[ 0 ]
-		: getDataDocumentationFilePackage( basename( file, '.md' ) );
+	return relative( PACKAGES_DIR, file ).split( sep )[ 0 ];
 }
 
 /**
@@ -115,22 +113,6 @@ function getPackageStoreName( packageName ) {
 	}
 
 	return storeName;
-}
-
-/**
- * Returns the conventional package name of a given documentation file name.
- *
- * @param {string} file Documentation file name.
- *
- * @return {string} package name.
- */
-function getDataDocumentationFilePackage( file ) {
-	let packageName = file.replace( /^data-/, '' ).replace( /^core-/, '' );
-	if ( packageName === 'core' ) {
-		packageName += '-data';
-	}
-
-	return packageName;
 }
 
 /**
