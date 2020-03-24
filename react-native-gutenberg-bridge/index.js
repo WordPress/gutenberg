@@ -10,8 +10,6 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
-export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
-
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 	deviceCamera: 'DEVICE_CAMERA',
@@ -70,10 +68,6 @@ export function subscribeMediaUpload( callback ) {
 
 export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
-}
-
-export function subscribePreferredColorScheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
 
 /**
