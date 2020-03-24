@@ -24,21 +24,13 @@ import {
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
-		const classNameAttribute = {
-			type: 'string',
-		};
-
 		// Gracefully handle if settings.attributes is undefined.
-		if (
-			typeof settings.attributes === 'object' &&
-			settings.attributes !== null
-		) {
-			settings.attributes.className = classNameAttribute;
-		} else {
-			settings.attributes = {
-				className: classNameAttribute,
-			};
-		}
+		settings.attributes = {
+			...settings.attributes,
+			className: {
+				type: 'string',
+			},
+		};
 	}
 
 	return settings;
