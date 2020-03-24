@@ -18,10 +18,8 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
-	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 	galleryBlockName = 'Gallery';
-	unorderedListButtonName = 'Convert to unordered list';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -44,7 +42,7 @@ export default class EditorPage {
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
-	async getBlockAtPosition( blockName: string, position = 1, options: { autoscroll: boolean } = { autoscroll: false } ) {
+	async getBlockAtPosition( blockName: string, position: number = 1, options: { autoscroll: boolean } = { autoscroll: false } ) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
@@ -73,7 +71,7 @@ export default class EditorPage {
 				// scroll down
 				await swipeUp( this.driver );
 			}
-			return this.getBlockAtPosition( position, blockName, options );
+			return this.getBlockAtPosition( blockName, position, options );
 		}
 		await lastElementFound.click();
 		return lastElementFound;
@@ -92,7 +90,7 @@ export default class EditorPage {
 	}
 
 	async hasBlockAtPosition( position: number, blockName: string = '' ) {
-		return undefined !== await this.getBlockAtPosition( position, blockName );
+		return undefined !== await this.getBlockAtPosition( blockName, position );
 	}
 
 	async getTitleElement( options: { autoscroll: boolean } = { autoscroll: false } ) {
@@ -207,7 +205,7 @@ export default class EditorPage {
 
 	// position of the block to remove
 	// Block will no longer be present if this succeeds
-	async removeBlockAtPosition( position: number, blockName: string = '' ) {
+	async removeBlockAtPosition( blockName: string = '', position: number ) {
 		if ( ! await this.hasBlockAtPosition( position, blockName ) ) {
 			throw Error( `No Block at position ${ position }` );
 		}
@@ -217,7 +215,7 @@ export default class EditorPage {
 		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( position, blockName );
+			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
 				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
@@ -275,7 +273,7 @@ export default class EditorPage {
 	}
 
 	async removeParagraphBlockAtPosition( position: number ) {
-		await this.removeBlockAtPosition( position, this.paragraphBlockName );
+		await this.removeBlockAtPosition( this.paragraphBlockName, position );
 	}
 
 	async getTextForParagraphBlockAtPosition( position: number ) {
@@ -323,7 +321,7 @@ export default class EditorPage {
 	}
 
 	async removeListBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.listBlockName );
+		return await this.removeBlockAtPosition( this.listBlockName, position );
 	}
 
 	async getTextForListBlockAtPosition( position: number ) {
@@ -359,7 +357,7 @@ export default class EditorPage {
 	}
 
 	async removeImageBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.imageBlockName );
+		return await this.removeBlockAtPosition( this.imageBlockName, position );
 	}
 
 	// =========================
@@ -367,7 +365,7 @@ export default class EditorPage {
 	// =========================
 
 	async removeGalleryBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.galleryBlockName );
+		return await this.removeBlockAtPosition( this.galleryBlockName, position );
 	}
 
 	// =========================
