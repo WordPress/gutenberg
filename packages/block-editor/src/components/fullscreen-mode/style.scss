@@ -10,27 +10,48 @@ body.js.is-fullscreen-mode {
 			height: calc(100% + #{ $admin-bar-height });
 		}
 
-		#adminmenumain,
+		// Hide the top adminbar toolbar.
 		#wpadminbar {
 			display: none;
+		}
+
+		// Display the sidebar offscreen, and then transition in when needed.
+		#adminmenumain {
+			position: relative;
+			top: 60px;
+			left: -160px;
+			transition: left 0.12s ease-in-out;
+		}
+
+		// This is all so stupid
+		#adminmenu {
+			position: relative;
+			bottom: auto;
+		}
+
+		#adminmenuback {
+			top: 60px;
+		}
+
+		.block-editor-editor-skeleton__body,
+		.block-editor-editor-skeleton__footer {
+			transition: margin-left 0.12s ease-in-out;
 		}
 
 		#wpcontent,
 		#wpfooter {
 			margin-left: 0;
 		}
-
-		// Animations.
-		.edit-post-header {
-			transform: translateY(-100%);
-			animation: edit-post-fullscreen-mode__slide-in-animation 0.1s forwards;
-			@include reduce-motion("animation");
-		}
 	}
 }
 
-@keyframes edit-post-fullscreen-mode__slide-in-animation {
-	100% {
-		transform: translateY(0%);
+body.js.is-showing-admin-menu {
+	#adminmenumain {
+		left: 0;
+	}
+
+	.block-editor-editor-skeleton__body,
+	.block-editor-editor-skeleton__footer {
+		margin-left: 160px;
 	}
 }
