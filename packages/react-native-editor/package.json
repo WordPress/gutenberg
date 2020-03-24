@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.7.7",
-    "@react-native-community/cli": "^3.0.4",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
     "@wordpress/data": "file:../data",
     "@wordpress/edit-post": "file:../edit-post",
@@ -47,7 +46,6 @@
     "node-libs-react-native": "^1.0.2",
     "patch-package": "^6.2.0",
     "postinstall-prepare": "^1.0.1",
-    "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",

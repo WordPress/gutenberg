@@ -18,9 +18,6 @@
   "bugs": {
     "url": "https://github.com/WordPress/gutenberg/issues"
   },
-  "dependencies": {
-    "prop-types": "15.6.0"
-  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
