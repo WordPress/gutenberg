@@ -28,7 +28,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
 		const reporter = {
-			specDone: async result => {
+			specDone: async ( result ) => {
 				allPassed = allPassed && result.status !== 'failed';
 			},
 		};
