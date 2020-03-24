@@ -3,19 +3,13 @@
  */
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import {
-  getBlocksByClientId,
-  getBlockAttributes,
-  getBlockName,
-  getBlockType } from '@wordpress/blocks';
-import { image } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import BlockTitle from '../block-title';
 
 /**
  * Block parent component, displaying the hierarchy of the
@@ -24,10 +18,8 @@ import BlockTitle from '../block-title';
  * @return {WPElement} Block Breadcrumb.
  */
 const BlockParent = function() {
-  const { selectBlock, clearSelectedBlock } = useDispatch(
-		'core/block-editor'
-	);
-	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { parents } = useSelect( ( select ) => {
 		const {
 			getSelectionStart,
 			getSelectedBlockClientId,
@@ -41,31 +33,37 @@ const BlockParent = function() {
 		};
 	}, [] );
 
-  const firstParentClientID = parents[parents.length - 1];
+	const firstParentClientID = parents[ parents.length - 1 ];
 
-  const { parentClientId, parentBlockType } = useSelect( ( select ) => {
-    const { getBlockName } = select( 'core/block-editor' );
-    const parentBlockName = getBlockName( firstParentClientID )
-    return {
-      parentBlockType: getBlockType( parentBlockName ),
-    };
-  }, [] );
+	const { parentBlockType } = useSelect( ( select ) => {
+		const { getBlockName } = select( 'core/block-editor' );
+		const parentBlockName = getBlockName( firstParentClientID );
+		return {
+			parentBlockType: getBlockType( parentBlockName ),
+		};
+	}, [] );
 
-  if ( parents && parents.length ) {
-    return (
-      <div className="block-editor-block-parent" key={ firstParentClientID }>
-          <Button
-            className="block-editor-block-parent__button"
-            onClick={ () => selectBlock( firstParentClientID ) }
-            label={ __( 'Select parent block' ) }
-            showTooltip
-            icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-          />
-      </div>
-    );
-  } else {
-    return null;
-  }
+	if ( parents && parents.length ) {
+		return (
+			<div
+				className="block-editor-block-parent"
+				key={ firstParentClientID }
+			>
+				<Button
+					className="block-editor-block-parent__button"
+					onClick={ () => selectBlock( firstParentClientID ) }
+					label={ sprintf(
+              __( 'Select %s' ),
+               parentBlockType.title
+					) }
+					showTooltip
+					icon={ <BlockIcon icon={ parentBlockType.icon } /> }
+				/>
+			</div>
+		);
+	}
+
+	return null;
 };
 
 export default BlockParent;
