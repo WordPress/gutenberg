@@ -165,8 +165,8 @@ export function getCoordsFromIndex( index = 0 ) {
 export function getIndexFromCoords( coords, fallback = 0 ) {
 	const [ x, y ] = coords;
 	const exists =
-		! isUndefined( ALIGNMENT_MATRIX[ x ] ) &&
-		! isUndefined( ALIGNMENT_MATRIX[ x ][ y ] );
+		ALIGNMENT_MATRIX[ x ] !== undefined &&
+		ALIGNMENT_MATRIX[ x ][ y ] !== undefined;
 
 	return exists ? ALIGNMENT_MATRIX[ x ][ y ] : fallback;
 }
