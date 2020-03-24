@@ -1,5 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Storyshots Components/AnglePickerControl Default 1`] = `
+<div
+  className="components-base-control components-angle-picker-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="components-angle-picker-control__input-0"
+    >
+      Angle
+    </label>
+    <div
+      aria-hidden="true"
+      className="components-angle-picker-control__angle-circle"
+      onMouseDown={[Function]}
+    >
+      <div
+        className="components-angle-picker-control__angle-circle-indicator-wrapper"
+      >
+        <span
+          className="components-angle-picker-control__angle-circle-indicator"
+        />
+      </div>
+    </div>
+    <input
+      className="components-angle-picker-control__input-field"
+      id="components-angle-picker-control__input-0"
+      max={360}
+      min={0}
+      onChange={[Function]}
+      step="1"
+      type="number"
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
 <div
   className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
@@ -8911,45 +8950,6 @@ Array [
   </span>,
   "Inspect the HTML to see!",
 ]
-`;
-
-exports[`Storyshots Components|AnglePickerControl Default 1`] = `
-<div
-  className="components-base-control components-angle-picker-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="components-angle-picker-control__input-0"
-    >
-      Angle
-    </label>
-    <div
-      aria-hidden="true"
-      className="components-angle-picker-control__angle-circle"
-      onMouseDown={[Function]}
-    >
-      <div
-        className="components-angle-picker-control__angle-circle-indicator-wrapper"
-      >
-        <span
-          className="components-angle-picker-control__angle-circle-indicator"
-        />
-      </div>
-    </div>
-    <input
-      className="components-angle-picker-control__input-field"
-      id="components-angle-picker-control__input-0"
-      max={360}
-      min={0}
-      onChange={[Function]}
-      step="1"
-      type="number"
-    />
-  </div>
-</div>
 `;
 
 exports[`Storyshots Icons/Icon Default 1`] = `
