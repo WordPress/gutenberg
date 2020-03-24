@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 
 function FullscreenModeClose() {
@@ -33,10 +27,10 @@ function FullscreenModeClose() {
 			className="edit-post-fullscreen-mode-close"
 			icon={ wordpress }
 			iconSize={ 36 }
-			href={ addQueryArgs( 'edit.php', {
-				post_type: postType.slug,
-			} ) }
-			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
+			onClick={ function() {
+				document.body.classList.toggle( 'is-showing-admin-menu' );
+			} }
+			label={ __( 'Show sidebar menu' ) }
 		/>
 	);
 }
