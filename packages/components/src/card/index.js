@@ -12,7 +12,7 @@ import { CardUI } from './styles/card-styles';
 export const defaultProps = {
 	isBorderless: false,
 	isElevated: false,
-	size: 'medium',
+	padding: 'medium',
 };
 
 export function Card( props ) {
@@ -20,7 +20,7 @@ export function Card( props ) {
 		className,
 		isBorderless,
 		isElevated,
-		size,
+		padding,
 		...additionalProps
 	} = props;
 	const { Provider } = CardContext;
@@ -28,14 +28,14 @@ export function Card( props ) {
 	const contextProps = {
 		isBorderless,
 		isElevated,
-		size,
+		padding,
 	};
 
 	const classes = classnames(
 		'components-card',
 		isBorderless && 'is-borderless',
 		isElevated && 'is-elevated',
-		size && `is-size-${ size }`,
+		padding && `is-padding-${ padding }`,
 		className
 	);
 

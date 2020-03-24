@@ -6,20 +6,20 @@ import { boolean, select } from '@storybook/addon-knobs';
 /* eslint-enable import/no-extraneous-dependencies */
 
 export const getCardProps = ( props = {} ) => {
-	const { size } = props;
+	const { padding } = props;
 
 	return {
 		isBorderless: boolean( 'Card: isBorderless', false ),
 		isElevated: boolean( 'Card: isElevated', false ),
-		size: select(
-			'Card: size',
+		padding: select(
+			'Card: padding',
 			{
 				large: 'large',
 				medium: 'medium',
 				small: 'small',
 				extraSmall: 'extraSmall',
 			},
-			size || 'medium'
+			padding || 'medium'
 		),
 	};
 };

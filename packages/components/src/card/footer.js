@@ -12,19 +12,19 @@ import { useCardContext } from './context';
 export const defaultProps = {
 	isBorderless: false,
 	isShady: false,
-	size: 'medium',
+	padding: 'medium',
 };
 
 export function CardFooter( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
-	const { isBorderless, size } = mergedProps;
+	const { isBorderless, padding } = mergedProps;
 
 	const classes = classnames(
 		'components-card__footer',
 		isBorderless && 'is-borderless',
 		isShady && 'is-shady',
-		size && `is-size-${ size }`,
+		padding && `is-padding-${ padding }`,
 		className
 	);
 

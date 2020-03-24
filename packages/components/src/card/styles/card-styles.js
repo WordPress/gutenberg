@@ -46,7 +46,7 @@ export const HeaderUI = styled.div`
 		border-bottom: none;
 	}
 
-	${headerFooterSizes};
+	${headerFooterPaddings};
 	${handleBorderless};
 	${handleShady};
 `;
@@ -77,7 +77,7 @@ export const MediaUI = styled.div`
 export const BodyUI = styled.div`
 	box-sizing: border-box;
 
-	${bodySize};
+	${bodyPadding};
 	${handleShady};
 `;
 
@@ -91,7 +91,7 @@ export const FooterUI = styled.div`
 		border-top: none;
 	}
 
-	${headerFooterSizes};
+	${headerFooterPaddings};
 	${handleBorderless};
 	${handleShady};
 `;
@@ -105,9 +105,9 @@ export const DividerUI = styled( HorizontalRule )`
 	width: 100%;
 `;
 
-export function bodySize() {
+export function bodyPadding() {
 	return `
-		&.is-size {
+		&.is-padding {
 			&-large {
 				padding: 28px;
 			}
@@ -124,9 +124,9 @@ export function bodySize() {
 	`;
 }
 
-export function headerFooterSizes() {
+export function headerFooterPaddings() {
 	return `
-		&.is-size {
+		&.is-padding {
 			&-large {
 				padding: 20px 28px;
 			}

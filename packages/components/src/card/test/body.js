@@ -31,11 +31,11 @@ describe( 'CardBody', () => {
 	} );
 
 	describe( 'modifiers', () => {
-		test( 'should be able to render size modifier', () => {
-			const wrapper = shallow( <CardBody size="large" /> );
+		test( 'should be able to render padding modifier', () => {
+			const wrapper = shallow( <CardBody padding="large" /> );
 			const cardBody = wrapper.find( '.components-card__body' );
 
-			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
+			expect( cardBody.hasClass( 'is-padding-large' ) ).toBe( true );
 		} );
 
 		test( 'should be able to render shady modifier', () => {
