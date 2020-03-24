@@ -48,7 +48,8 @@ registerPlugin( 'edit-post', {
 								href={ __(
 									'https://wordpress.org/support/article/wordpress-editor/'
 								) }
-								target="_new"
+								target="_blank"
+								rel="noopener noreferrer"
 							>
 								{ __( 'Help' ) }
 							</MenuItem>

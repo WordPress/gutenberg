@@ -141,6 +141,7 @@ function BlockStyles( {
 					>
 						<div className="block-editor-block-styles__item-preview">
 							<BlockPreview
+								autoHeight
 								viewportWidth={ 500 }
 								blocks={
 									type.example
