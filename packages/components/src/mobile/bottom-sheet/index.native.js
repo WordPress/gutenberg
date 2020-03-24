@@ -69,7 +69,7 @@ class BottomSheet extends Component {
 
 	componentDidMount() {
 		if ( Platform.OS === 'android' ) {
-			this.subscribeAndroidModalClosed = subscribeAndroidModalClosed(
+			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
 				() => {
 					this.props.onClose();
 				}
@@ -95,7 +95,7 @@ class BottomSheet extends Component {
 
 	componentWillUnmount() {
 		if ( Platform.OS === 'android' ) {
-			this.subscribeAndroidModalClosed.remove();
+			this.androidModalClosedSubscription.remove();
 		}
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
