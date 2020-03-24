@@ -1,4 +1,4 @@
-# `Editable`
+# `EditableText`
 
 Renders an editable text input in which text formatting is not allowed.
 
@@ -45,9 +45,9 @@ Renders an editable text input in which text formatting is not allowed.
 
 *Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
-## Editable.Content
+## EditableText.Content
 
-`Text.Content` should be used in the `save` function of your block to correctly save text content.
+`EditableText.Content` should be used in the `save` function of your block to correctly save text content.
 
 ## Example
 
@@ -65,7 +65,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.Editable, {
+		return wp.element.createElement( wp.editor.EditableText, {
 			className: props.className,
 			value: props.attributes.content,
 			onChange: function( content ) {
@@ -75,7 +75,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( wp.editor.Editable.Content, {
+		return wp.element.createElement( wp.editor.EditableText.Content, {
 			value: props.attributes.content
 		} );
 	}
@@ -84,7 +84,7 @@ wp.blocks.registerBlockType( /* ... */, {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
-const { Editable } = wp.editor;
+const { EditableText } = wp.editor;
 
 registerBlockType( /* ... */, {
 	// ...
@@ -98,7 +98,7 @@ registerBlockType( /* ... */, {
 
 	edit( { className, attributes, setAttributes } ) {
 		return (
-			<Editable
+			<EditableText
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
@@ -107,7 +107,7 @@ registerBlockType( /* ... */, {
 	},
 
 	save( { attributes } ) {
-		return <Editable.Content value={ attributes.content } />;
+		return <EditableText.Content value={ attributes.content } />;
 	}
 } );
 ```
