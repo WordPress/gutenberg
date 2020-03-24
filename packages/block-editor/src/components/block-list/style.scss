@@ -76,7 +76,7 @@
 
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
@@ -142,7 +142,7 @@
 		&::after { // Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
 
@@ -524,18 +524,24 @@
 		// The button here has a special style to appear as a toolbar.
 		.components-button {
 			font-size: $default-font-size;
-			height: $block-toolbar-height;
+			height: $block-toolbar-height - $border-width - $border-width;
 			padding: $grid-unit-15 $grid-unit-20;
 
+			// Position this to align with the block toolbar.
+			position: relative;
+			top: -$border-width;
+
 			// Block UI appearance.
-			border: $border-width solid $dark-gray-primary;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			background-color: $white;
+
+			// Indent to align with block toolbar.
+			margin-left: $block-toolbar-height + $border-width;
 
 			// When button is focused, it receives a box-shadow instead of the border.
 			&:focus {
-				border: none;
-				box-shadow: inset 0 0 0 1px color($theme-color), 0 0 0 1px color($theme-color);
+				box-shadow: 0 0 0 $border-width-focus color($theme-color);
 			}
 		}
 
