@@ -24,8 +24,48 @@ const getTypeFromTypeReference = ( type ) => {
 			return 'object';
 		}
 
+		if ( name === 'Array' ) {
+			const args = type.typeArguments;
+
+			if ( args && args.length === 1 ) {
+				return getArrayType( typeToString( args[ 0 ] ) );
+			}
+
+			return 'Array';
+		}
+
 		return name;
 	}
+};
+
+const getTypeFromLiteral = ( { literal } ) => {
+	if ( literal.kind === SyntaxKind.StringLiteral ) {
+		return `'${ literal.text }'`;
+	} else if ( literal.kind === SyntaxKind.NumericLiteral ) {
+		return `${ literal.text }`;
+	} else if ( literal.kind === SyntaxKind.TrueKeyword ) {
+		return 'true';
+	} else if ( literal.kind === SyntaxKind.FalseKeyword ) {
+		return 'false';
+	}
+};
+
+const getArrayType = ( elementTypeName ) => {
+	return `${ elementTypeName }[]`;
+};
+
+const getTupleType = ( elementTypes ) => {
+	const str = elementTypes
+		.map( ( type ) => {
+			if ( type.kind === SyntaxKind.JSDocNullableType ) {
+				type.kind = SyntaxKind.OptionalType;
+			}
+
+			return typeToString( type );
+		} )
+		.join( ', ' );
+
+	return `[${ str }]`;
 };
 
 const typeToString = ( type ) => {
@@ -56,6 +96,42 @@ const typeToString = ( type ) => {
 			return 'object';
 		case SyntaxKind.TypeReference:
 			return getTypeFromTypeReference( type );
+		case SyntaxKind.LiteralType:
+			return getTypeFromLiteral( type );
+		case SyntaxKind.TypeQuery:
+			return `typeof ${ type.exprName.escapedText }`;
+		case SyntaxKind.ArrayType:
+			return getArrayType( typeToString( type.elementType ) );
+		case SyntaxKind.TupleType:
+			return getTupleType( type.elementTypes );
+		case SyntaxKind.JSDocNullableType:
+			return `${ typeToString( type.type ) } | null`;
+		case SyntaxKind.OptionalType:
+			return `${ typeToString( type.type ) }?`;
+		case SyntaxKind.UnionType:
+			return type.types
+				.map( ( t ) => {
+					if ( t.kind === SyntaxKind.IntersectionType ) {
+						return `( ${ typeToString( t ) } )`;
+					}
+					return typeToString( t );
+				} )
+				.join( ' | ' );
+		case SyntaxKind.IntersectionType:
+			return type.types
+				.map( ( t ) => {
+					return typeToString( t );
+				} )
+				.join( ' & ' );
+		case SyntaxKind.JSDocOptionalType:
+			return `${ typeToString( type.type ) } | undefined`;
+		case SyntaxKind.ParenthesizedType:
+			return `( ${ typeToString( type.type ) } )`;
+		case SyntaxKind.JSDocNonNullableType:
+			return typeToString( type.type );
+		case SyntaxKind.RestType:
+		case SyntaxKind.JSDocVariadicType:
+			return `...${ typeToString( type.type ) }`;
 	}
 };
 

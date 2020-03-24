@@ -129,6 +129,13 @@ describe( 'JSDoc', () => {
 			description,
 			type: typeName,
 		} );
+		const typeWithDefault = ( typeName, defaultValue, description ) => ( {
+			title: 'param',
+			name: 'p',
+			description,
+			type: typeName,
+			defaultValue,
+		} );
 
 		expect(
 			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
@@ -154,6 +161,98 @@ describe( 'JSDoc', () => {
 				type( 'object', 'object in capital case' ),
 				type( 'Record<string, number>', 'jsdoc record type' ),
 				type( 'File', 'random type name' ),
+				type( `'string literal'`, 'string literal' ),
+				type( '42', 'number literal' ),
+				type( 'true', 'true keyword' ),
+				type( 'false', 'false keyword' ),
+				type( 'typeof J', 'type query' ),
+				type( 'number[]', 'number array' ),
+				type( 'WPElements[]', 'array 2' ),
+				type( 'WPElements[]', 'jsdoc style array' ),
+				type( 'Array', 'simple array' ),
+				type( '[string, number]', 'simple tuple' ),
+				type(
+					'[TypeChecker, SourceFile, string?]',
+					'tuple with optional type'
+				),
+				type( 'string | null', 'jsdoc nullable 1' ),
+				type( 'WPElements | null', 'jsdoc nullable 2' ),
+				type( 'string | number', 'union type' ),
+				type( 'X & Y', 'intersection type' ),
+				type( '( X & Y ) | Z', 'union + intersection type' ),
+				type( 'number | undefined', 'jsdoc optional type' ),
+				type( 'number | undefined', 'jsdoc optional type 2' ),
+				typeWithDefault(
+					'number',
+					42,
+					'jsdoc optional with default: integer type'
+				),
+				typeWithDefault(
+					'number',
+					3.141592,
+					'jsdoc optional with default: float type'
+				),
+				typeWithDefault(
+					'string',
+					'John Doe',
+					'jsdoc optional with default: string type'
+				),
+				typeWithDefault(
+					'string',
+					"John 'Mark' Doe",
+					'jsdoc optional with default: string type 2'
+				),
+				typeWithDefault(
+					'string',
+					`Test "double" 'single' quotes`,
+					'jsdoc optional with default: string type 3'
+				),
+				typeWithDefault(
+					'string',
+					'10px',
+					'jsdoc optional with default: string type 4'
+				),
+				typeWithDefault(
+					'string | null',
+					null,
+					'jsdoc optional with default: null keyword'
+				),
+				typeWithDefault(
+					'boolean',
+					true,
+					'jsdoc optional with default: true keyword'
+				),
+				typeWithDefault(
+					'boolean',
+					false,
+					'jsdoc optional with default: false keyword'
+				),
+				typeWithDefault(
+					'object',
+					'{ x: 3, y: null }',
+					'jsdoc optional with default: object type'
+				),
+				typeWithDefault(
+					'number[]',
+					'[ 1, 2, 3 ]',
+					'jsdoc optional with default: array type'
+				),
+				type( '( XX | YY ) & ZZ', 'parenthesized type' ),
+				type( 'string', 'jsdoc non-nullable type' ),
+				type( 'string', 'jsdoc non-nullable type 2' ),
+				type( '[string, ...X]', 'rest type' ),
+				type( '...number', 'jsdoc variadic type' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
+				// type( '', '' ),
 				// type( '', '' ),
 				// type( '', '' ),
 				// type( '', '' ),

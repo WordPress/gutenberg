@@ -146,7 +146,7 @@ const getJSDoc = ( statement, entry, sourceFile, getDependencyIR ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
 		doc = getJSDocFromStatement( statement );
-		if ( doc !== undefined ) {
+		if ( doc !== null ) {
 			return doc;
 		}
 	}
