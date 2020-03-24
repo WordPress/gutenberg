@@ -152,7 +152,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 4px $white; // Inner halo makes this work on top of a toggled button.
+	box-shadow: inset 0 0 0 $border-width-focus color($theme-color), inset 0 0 0 4px $white; // Inner halo makes this work on top of a toggled button.
 	outline: 2px solid transparent; // Shown to Windows 10 High Contrast Mode.
 }
 
@@ -219,7 +219,7 @@
 }
 
 @mixin block-style__focus() {
-	box-shadow: inset 0 0 0 1px $white, 0 0 0 2px $theme-color;
+	box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -416,7 +416,7 @@
 		}
 
 		&:checked:focus {
-			box-shadow: 0 0 0 2px $medium-gray-text;
+			box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
 		}
 	}
 
@@ -459,7 +459,7 @@
 			}
 
 			&:focus {
-				box-shadow: 0 0 0 2px $dark-gray-500;
+				box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
 			}
 		}
 	}
