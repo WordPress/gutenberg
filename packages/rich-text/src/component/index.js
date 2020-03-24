@@ -41,12 +41,6 @@ import withFormatTypes from './with-format-types';
 import { BoundaryStyle } from './boundary-style';
 import { InlineWarning } from './inline-warning';
 
-/**
- * Browser dependencies
- */
-
-const { getComputedStyle } = window;
-
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
 /**
@@ -850,7 +844,7 @@ class RichText extends Component {
 		const { text, formats, start, end, activeFormats = [] } = value;
 		const collapsed = isCollapsed( value );
 		// To do: ideally, we should look at visual position instead.
-		const { direction } = getComputedStyle(
+		const { direction } = this.getWindow().getComputedStyle(
 			this.props.forwardedRef.current
 		);
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
