@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Animated } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -13,11 +13,11 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-function SelectedIcon() {
+function SelectedIcon( { opacity } ) {
 	return (
-		<View style={ styles.selected }>
+		<Animated.View style={ [ styles.selected, { opacity } ] }>
 			<Icon icon={ check } style={ styles.icon } size={ 24 } />
-		</View>
+		</Animated.View>
 	);
 }
 
@@ -27,6 +27,7 @@ function ColorIndicator( {
 	custom,
 	style,
 	getStylesFromColorScheme,
+	opacity,
 } ) {
 	const isGradient = color.includes( 'linear-gradient' );
 
@@ -41,7 +42,7 @@ function ColorIndicator( {
 				style={ [ circleStyle, style ] }
 				gradientValue={ color }
 			>
-				{ isSelected && <SelectedIcon /> }
+				{ isSelected && <SelectedIcon opacity={ opacity } /> }
 			</LinearGradient>
 		);
 	} else if ( custom ) {
@@ -62,7 +63,7 @@ function ColorIndicator( {
 	}
 	return (
 		<View style={ [ circleStyle, style, { backgroundColor: color } ] }>
-			{ isSelected && <SelectedIcon /> }
+			{ isSelected && <SelectedIcon opacity={ opacity } /> }
 		</View>
 	);
 }

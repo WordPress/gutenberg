@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
+import {
+	ScrollView,
+	TouchableWithoutFeedback,
+	View,
+	Animated,
+	Easing,
+} from 'react-native';
 import { map } from 'lodash';
 /**
  * WordPress dependencies
@@ -18,6 +24,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
+
+const ANIMATION_DURATION = 350;
 
 function ColorPalette( {
 	setBackgroundColor,
@@ -59,6 +67,8 @@ function ColorPalette( {
 
 	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
 	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
+	const [ scale ] = useState( new Animated.Value( 1 ) );
+	const [ opacity ] = useState( new Animated.Value( 1 ) );
 
 	const defaultColors = map( extendedDefaultColors, 'color' );
 	const defaultGradientColors = map(
@@ -70,7 +80,51 @@ function ColorPalette( {
 		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 	}, [ currentSegment ] );
 
+	function isSelected( color ) {
+		const isSelectedBgColor = color === activeBgColor;
+		const isSelectedTextColor = color === activeTextColor;
+		return isTextScreen ? isSelectedTextColor : isSelectedBgColor;
+	}
+
+	function isSelectedCustom() {
+		const isSelectedCustomBgColor =
+			! defaultColors.includes( activeBgColor ) &&
+			! defaultGradientColors.includes( activeBgColor );
+		const isSelectedCustomTextColor = ! defaultColors.includes(
+			activeTextColor
+		);
+
+		return isTextScreen
+			? isSelectedCustomTextColor
+			: isSelectedCustomBgColor;
+	}
+
+	function timingAnimation( property, toValue ) {
+		return Animated.timing( property, {
+			toValue,
+			duration: ANIMATION_DURATION,
+			easing: Easing.ease,
+		} );
+	}
+
+	function performAnimation( value ) {
+		opacity.setValue( isSelected( value ) ? 1 : 0 );
+		scale.setValue( 1 );
+
+		Animated.parallel( [
+			timingAnimation( scale, 2 ),
+			timingAnimation( opacity, 1 ),
+		] ).start();
+	}
+
+	const bounce = scale.interpolate( {
+		inputRange: [ 1, 1.5, 2 ],
+		outputRange: [ 1, 1.3, 1 ],
+	} );
+
 	function onColorPress( value ) {
+		performAnimation( value );
+
 		setActiveBgColor( value );
 		setActiveTextColor( value );
 
@@ -91,35 +145,32 @@ function ColorPalette( {
 			styles.verticalSeparator,
 			styles.verticalSeparatorDark
 		);
-		const isSelectedCustomBgColor =
-			! defaultColors.includes( activeBgColor ) &&
-			! defaultGradientColors.includes( activeBgColor );
-		const isSelectedCustomTextColor = ! defaultColors.includes(
-			activeTextColor
-		);
-		const isSelectedCustom = isTextScreen
-			? isSelectedCustomTextColor
-			: isSelectedCustomBgColor;
+
 		return (
 			<>
 				{ palette.map( ( color ) => {
-					const isSelectedBgColor = color === activeBgColor;
-					const isSelectedTextColor = color === activeTextColor;
-					const isSelected = isTextScreen
-						? isSelectedTextColor
-						: isSelectedBgColor;
+					const scaleValue = isSelected( color ) ? bounce : 1;
 					return (
 						<TouchableWithoutFeedback
 							onPress={ () => onColorPress( color ) }
 							key={ color }
 						>
-							<View>
+							<Animated.View
+								style={ {
+									transform: [
+										{
+											scale: scaleValue,
+										},
+									],
+								} }
+							>
 								<ColorIndicator
 									color={ color }
 									gradient
-									isSelected={ isSelected }
+									isSelected={ isSelected( color ) }
+									opacity={ opacity }
 								/>
-							</View>
+							</Animated.View>
 						</TouchableWithoutFeedback>
 					);
 				} ) }
@@ -131,7 +182,7 @@ function ColorPalette( {
 								<ColorIndicator
 									custom
 									color={ customSwatchGradients }
-									isSelected={ isSelectedCustom }
+									isSelected={ isSelectedCustom() }
 								/>
 							</View>
 						</TouchableWithoutFeedback>
