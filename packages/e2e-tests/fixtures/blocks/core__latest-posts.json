@@ -9,6 +9,7 @@
             "displayPostContentRadio": "excerpt",
             "excerptLength": 55,
             "displayPostDate": false,
+            "displayPostAuthor": false,
             "postLayout": "list",
             "columns": 3,
             "order": "desc",
