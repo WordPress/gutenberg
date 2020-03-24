@@ -120,7 +120,7 @@ repositories {
 }
 
 dependencies {
-    implementation project(':react-native-aztec')
+    implementation project(':@wordpress_react-native-aztec')
 
     implementation "org.wordpress:utils:1.22"
 

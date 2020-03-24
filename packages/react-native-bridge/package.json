@@ -10,6 +10,9 @@
   ],
   "author": "",
   "license": "GPL-2.0-or-later",
+  "dependencies": {
+    "@wordpress/react-native-aztec": "file:../react-native-aztec"
+  },
   "peerDependencies": {
     "react-native": "*"
   }
