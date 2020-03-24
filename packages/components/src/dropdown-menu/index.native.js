@@ -158,6 +158,12 @@ function DropdownMenu( {
 												icon={ control.icon }
 												leftAlign={ true }
 												isSelected={ control.isActive }
+												separatorType={
+													indexOfControl <
+													controlSet.length - 1
+														? 'leftMargin'
+														: 'none'
+												}
 											/>
 										)
 									)
