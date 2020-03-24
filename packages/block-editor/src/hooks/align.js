@@ -89,13 +89,21 @@ export function addAttribute( settings ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'align' ) ) {
-		// Gracefully handle if attributes are undefined.
-		settings.attributes = {
-			...settings.attributes,
-			align: {
-				type: 'string',
-			},
+		const alignAttribute = {
+			type: 'string',
 		};
+
+		// Gracefully handle if settings.attributes is undefined.
+		if (
+			typeof settings.attributes === 'object' &&
+			settings.attributes !== null
+		) {
+			settings.attributes.align = alignAttribute;
+		} else {
+			settings.attributes = {
+				align: alignAttribute,
+			};
+		}
 	}
 
 	return settings;

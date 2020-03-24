@@ -38,16 +38,24 @@ export function addAttribute( settings ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
-		// Gracefully handle if attributes are undefined.
-		settings.attributes = {
-			...settings.attributes,
-			anchor: {
-				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
-			},
+		const anchorAttribute = {
+			type: 'string',
+			source: 'attribute',
+			attribute: 'id',
+			selector: '*',
 		};
+
+		// Gracefully handle if settings.attributes is undefined.
+		if (
+			typeof settings.attributes === 'object' &&
+			settings.attributes !== null
+		) {
+			settings.attributes.anchor = anchorAttribute;
+		} else {
+			settings.attributes = {
+				anchor: anchorAttribute,
+			};
+		}
 	}
 
 	return settings;

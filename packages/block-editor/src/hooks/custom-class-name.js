@@ -32,13 +32,21 @@ import { InspectorAdvancedControls } from '../components';
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
-		// Gracefully handle if attributes are undefined.
-		settings.attributes = {
-			...settings.attributes,
-			className: {
-				type: 'string',
-			},
+		const classNameAttribute = {
+			type: 'string',
 		};
+
+		// Gracefully handle if settings.attributes is undefined.
+		if (
+			typeof settings.attributes === 'object' &&
+			settings.attributes !== null
+		) {
+			settings.attributes.className = classNameAttribute;
+		} else {
+			settings.attributes = {
+				className: classNameAttribute,
+			};
+		}
 	}
 
 	return settings;
