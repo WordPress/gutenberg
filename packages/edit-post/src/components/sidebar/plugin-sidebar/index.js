@@ -3,6 +3,7 @@
  */
 import { ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -83,7 +84,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-post-sidebar"
-			smallScreenTitle={ postTitle }
+			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="edit-post"
 			toggleShortcut={ shortcut }
 			{ ...props }

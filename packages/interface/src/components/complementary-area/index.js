@@ -33,19 +33,19 @@ function ComplementaryAreaFill( { scope, children, className } ) {
 }
 
 function ComplementaryArea( {
-	className,
-	complementaryAreaName,
-	toggleShortcut,
 	children,
+	className,
+	closeLabel = __( 'Close plugin' ),
+	complementaryAreaIdentifier,
+	header,
 	headerClassName,
-	panelClassName,
 	icon,
 	isPinnable = true,
-	title,
+	panelClassName,
 	scope,
-	header,
 	smallScreenTitle,
-	closeLabel,
+	title,
+	toggleShortcut,
 } ) {
 	const singleActiveAreaStoreKey = `${ scope }/complementary-area`;
 	const pinnedItemsStoreKey = `${ scope }/pinned-items`;
@@ -57,14 +57,18 @@ function ComplementaryArea( {
 			return {
 				isActive:
 					getSingleActiveArea( singleActiveAreaStoreKey ) ===
-					complementaryAreaName,
+					complementaryAreaIdentifier,
 				isPinned: isMultipleActiveAreaActive(
 					pinnedItemsStoreKey,
-					complementaryAreaName
+					complementaryAreaIdentifier
 				),
 			};
 		},
-		[ complementaryAreaName, singleActiveAreaStoreKey, pinnedItemsStoreKey ]
+		[
+			complementaryAreaIdentifier,
+			singleActiveAreaStoreKey,
+			pinnedItemsStoreKey,
+		]
 	);
 	const { setSingleActiveArea } = useDispatch( 'core/interface' );
 	const { setMultipleActiveAreaEnableState } = useDispatch(
@@ -84,7 +88,7 @@ function ComplementaryArea( {
 								  )
 								: setSingleActiveArea(
 										singleActiveAreaStoreKey,
-										complementaryAreaName
+										complementaryAreaIdentifier
 								  )
 						}
 						isPressed={ isActive }
@@ -102,7 +106,7 @@ function ComplementaryArea( {
 				>
 					<ComplementaryAreaHeader
 						className={ headerClassName }
-						closeLabel={ closeLabel || __( 'Close plugin' ) }
+						closeLabel={ closeLabel }
 						onClose={ () =>
 							setSingleActiveArea( singleActiveAreaStoreKey )
 						}
@@ -125,7 +129,7 @@ function ComplementaryArea( {
 										onClick={ () =>
 											setMultipleActiveAreaEnableState(
 												pinnedItemsStoreKey,
-												complementaryAreaName,
+												complementaryAreaIdentifier,
 												! isPinned
 											)
 										}
@@ -146,8 +150,8 @@ function ComplementaryArea( {
 const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
 	return {
 		icon: ownProps.icon || context.icon,
-		complementaryAreaName:
-			ownProps.complementaryAreaName ||
+		complementaryAreaIdentifier:
+			ownProps.complementaryAreaIdentifier ||
 			`${ context.name }/${ ownProps.name }`,
 	};
 } )( ComplementaryArea );

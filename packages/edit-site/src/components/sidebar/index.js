@@ -15,7 +15,7 @@ function Sidebar() {
 			<ComplementaryArea.Slot scope="edit-site" />
 			<ComplementaryArea
 				scope="edit-site"
-				complementaryAreaName="edit-site/block-inspector"
+				complementaryAreaIdentifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
 			>
@@ -23,7 +23,7 @@ function Sidebar() {
 			</ComplementaryArea>
 			<ComplementaryArea
 				scope="edit-site"
-				complementaryAreaName="edit-site/global-styles"
+				complementaryAreaIdentifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				icon={ pencil }
 			>

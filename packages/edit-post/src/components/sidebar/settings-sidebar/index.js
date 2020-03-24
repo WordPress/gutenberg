@@ -36,7 +36,7 @@ const SettingsSidebar = () => {
 	}
 	return (
 		<PluginSidebarEditPost
-			complementaryAreaName={ sidebarName }
+			complementaryAreaIdentifier={ sidebarName }
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
 			headerClassName="edit-post-sidebar__panel-tabs"

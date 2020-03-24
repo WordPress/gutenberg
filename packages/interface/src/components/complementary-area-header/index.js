@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { close } from '@wordpress/icons';
 
@@ -21,9 +20,11 @@ const ComplementaryAreaHeader = ( {
 	return (
 		<>
 			<div className="components-panel__header interface-complementary-area-header__small">
-				<span className="interface-complementary-area-header__small-title">
-					{ smallScreenTitle || __( '(no title)' ) }
-				</span>
+				{ smallScreenTitle && (
+					<span className="interface-complementary-area-header__small-title">
+						{ smallScreenTitle }
+					</span>
+				) }
 				<Button
 					onClick={ onClose }
 					icon={ close }
