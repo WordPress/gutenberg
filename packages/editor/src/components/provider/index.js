@@ -118,7 +118,6 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
-				'__mobileEnablePageTemplates',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
 				'gradients',

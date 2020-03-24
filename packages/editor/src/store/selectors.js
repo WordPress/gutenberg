@@ -30,6 +30,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import serializeBlocks from './utils/serialize-blocks';
+import { cleanForSlug } from '../utils/url';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1147,6 +1148,23 @@ export function getPermalink( state ) {
 	}
 
 	return prefix;
+}
+
+/**
+ * Returns the slug for the post being edited, preferring a manually edited
+ * value if one exists, then a sanitized version of the current post title, and
+ * finally the post ID.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} The current slug to be displayed in the editor
+ */
+export function getEditedPostSlug( state ) {
+	return (
+		getEditedPostAttribute( state, 'slug' ) ||
+		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
+		getCurrentPostId( state )
+	);
 }
 
 /**

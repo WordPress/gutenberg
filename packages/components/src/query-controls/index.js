@@ -2,31 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl } from '../';
-import CategorySelect from './category-select';
+import { RangeControl, SelectControl, FormTokenField } from '../';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
-
-// currently this is needed for consistent controls UI on mobile
-// this can be removed after control components settle on consistent defaults
-const MOBILE_CONTROL_PROPS = Platform.select( {
-	web: {},
-	native: { separatorType: 'fullWidth' },
-} );
-const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
-	web: {},
-	native: { separatorType: 'none' },
-} );
+const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 export default function QueryControls( {
-	categoriesList,
-	selectedCategoryId,
+	categorySuggestions,
+	selectedCategories,
 	numberOfItems,
 	order,
 	orderBy,
@@ -72,20 +60,24 @@ export default function QueryControls( {
 						onOrderByChange( newOrderBy );
 					}
 				} }
-				{ ...MOBILE_CONTROL_PROPS }
 			/>
 		),
 		onCategoryChange && (
-			<CategorySelect
-				key="query-controls-category-select"
-				categoriesList={ categoriesList }
-				label={ __( 'Category' ) }
-				noOptionLabel={ __( 'All' ) }
-				selectedCategoryId={ selectedCategoryId }
+			<FormTokenField
+				label={ __( 'Categories' ) }
+				value={
+					selectedCategories &&
+					selectedCategories.map( ( item ) => ( {
+						id: item.id,
+						value: item.name || item.value,
+					} ) )
+				}
+				suggestions={ Object.keys( categorySuggestions ) }
 				onChange={ onCategoryChange }
-				{ ...MOBILE_CONTROL_PROPS }
+				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>
 		),
+
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"
@@ -95,7 +87,6 @@ export default function QueryControls( {
 				min={ minItems }
 				max={ maxItems }
 				required
-				{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 			/>
 		),
 	];

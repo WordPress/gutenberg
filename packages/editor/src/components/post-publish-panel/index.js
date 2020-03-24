@@ -95,7 +95,6 @@ export class PostPublishPanel extends Component {
 						</div>
 					) }
 					<Button
-						aria-expanded={ true }
 						onClick={ onClose }
 						icon={ close }
 						label={ __( 'Close panel' ) }
