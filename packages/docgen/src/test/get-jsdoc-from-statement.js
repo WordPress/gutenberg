@@ -242,14 +242,45 @@ describe( 'JSDoc', () => {
 				type( 'string', 'jsdoc non-nullable type 2' ),
 				type( '[string, ...X]', 'rest type' ),
 				type( '...number', 'jsdoc variadic type' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
+				type( '(x: number, y: Test) => number', 'function type' ),
+				type(
+					'(a: string, b: string) => { x: string, y: string }',
+					'function + type literal'
+				),
+				type( '(k: () => number) => React.FC', 'function arg' ),
+				type( '() => void', 'function void return type' ),
+				type( 'new () => T', 'constructor type' ),
+				type( '(p0: b) => c', 'jsdoc function type' ),
+				type( '{ x: number, y: XY }', 'type literal' ),
+				type( '{ [setting: string]: any }', 'indexable interface' ),
+				type(
+					'{ j: (a: string) => number, k: number }',
+					'function as type literal property type'
+				),
+				{
+					title: 'param',
+					name: 'p',
+					description: 'jsdoc type literal',
+					type: 'object',
+					properties: [
+						{
+							name: 'p.x0',
+							description: 'property 0',
+							type: 'string',
+						},
+						{
+							name: 'p.x1',
+							description: 'property 1',
+							type: 'XXX | undefined',
+						},
+						{
+							name: 'p.x2',
+							description: 'property 2',
+							type: 'number',
+							defaultValue: 11,
+						},
+					],
+				},
 				// type( '', '' ),
 				// type( '', '' ),
 				// type( '', '' ),

@@ -70,6 +70,34 @@ const getDefaultValue = ( name, code, description ) => {
 	return stripQuotes( rawValue );
 };
 
+const getType = ( typeExpression ) =>
+	typeExpression ? typeToString( typeExpression.type ) : 'undocumented';
+
+const getTypeNameAndDefaultValue = ( tag, code, description ) => {
+	const typeName = getType( tag.typeExpression );
+	const result = {};
+
+	if ( tag.isBracketed ) {
+		if ( code[ tag.name.end ] === '=' ) {
+			result.type = typeName;
+			result.defaultValue = getDefaultValue(
+				tag.name,
+				code,
+				description
+			);
+		} else {
+			result.type =
+				typeName !== 'undocumented'
+					? `${ typeName } | undefined`
+					: typeName;
+		}
+	} else {
+		result.type = typeName;
+	}
+
+	return result;
+};
+
 /**
  * Function that takes a TypeScript statement and returns
  * a object representing the leading JSDoc comment of the statement,
@@ -81,61 +109,93 @@ const getDefaultValue = ( name, code, description ) => {
  */
 module.exports = function( statement ) {
 	if ( statement.jsDoc ) {
+		const code = statement.parent.text;
 		const lastComment = statement.jsDoc[ statement.jsDoc.length - 1 ];
 
 		return {
 			description: lastComment.comment,
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
-				const getType = () =>
-					tag.typeExpression
-						? typeToString( tag.typeExpression.type )
-						: 'undocumented';
-				const result = {
-					title: tag.tagName.escapedText,
-					description: tag.comment ? tag.comment : null,
-				};
+				const title = tag.tagName.escapedText;
+				const description = tag.comment ? tag.comment : null;
 
 				if ( tag.kind === SyntaxKind.JSDocParameterTag ) {
-					const typeName = getType();
+					const result = {
+						title,
+						description,
+					};
+					const { type, defaultValue } = getTypeNameAndDefaultValue(
+						tag,
+						code,
+						description
+					);
 
-					if ( tag.isBracketed ) {
-						const code = statement.parent.text;
+					result.type = type;
+					result.name = tag.name.escapedText;
 
-						if ( code[ tag.name.end ] === '=' ) {
-							result.type = typeName;
-							result.defaultValue = getDefaultValue(
-								tag.name,
-								code,
-								result.description
-							);
-						} else {
-							result.type =
-								typeName !== 'undocumented'
-									? `${ typeName } | undefined`
-									: typeName;
-						}
-					} else {
-						result.type = typeName;
+					if ( defaultValue !== undefined ) {
+						result.defaultValue = defaultValue;
 					}
 
-					result.name = tag.name.escapedText;
+					if (
+						tag.typeExpression &&
+						tag.typeExpression.type.kind ===
+							SyntaxKind.JSDocTypeLiteral
+					) {
+						const properties =
+							tag.typeExpression.type.jsDocPropertyTags;
+						result.properties = properties.map( ( p ) => {
+							const propResult = {
+								name: `${ p.name.left.escapedText }.${ p.name.right.escapedText }`,
+								description: p.comment ? p.comment : null,
+							};
+
+							const {
+								type: typeName,
+								defaultValue: value,
+							} = getTypeNameAndDefaultValue(
+								p,
+								code,
+								propResult.description
+							);
+
+							propResult.type = typeName;
+
+							if ( value !== undefined ) {
+								propResult.defaultValue = value;
+							}
+
+							return propResult;
+						} );
+					}
+
+					return result;
 				}
 
 				if (
 					tag.kind === SyntaxKind.JSDocReturnTag ||
 					tag.kind === SyntaxKind.JSDocTypeTag
 				) {
-					result.type = getType();
+					return {
+						title,
+						description,
+						type: getType( tag.typeExpression ),
+					};
 				}
 
-				if ( result.title === 'example' ) {
-					result.description = result.description.replace(
-						/__WORDPRESS_IMPORT__/g,
-						'@wordpress'
-					);
+				if ( title === 'example' ) {
+					return {
+						title,
+						description: description.replace(
+							/__WORDPRESS_IMPORT__/g,
+							'@wordpress'
+						),
+					};
 				}
 
-				return result;
+				return {
+					title,
+					description,
+				};
 			} ),
 		};
 	}

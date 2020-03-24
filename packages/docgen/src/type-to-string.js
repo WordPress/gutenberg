@@ -36,6 +36,12 @@ const getTypeFromTypeReference = ( type ) => {
 
 		return name;
 	}
+
+	if ( type.typeName.kind === SyntaxKind.QualifiedName ) {
+		const name = type.typeName;
+
+		return `${ name.left.escapedText }.${ name.right.escapedText }`;
+	}
 };
 
 const getTypeFromLiteral = ( { literal } ) => {
@@ -68,6 +74,40 @@ const getTupleType = ( elementTypes ) => {
 	return `[${ str }]`;
 };
 
+const getFunctionType = ( type ) => {
+	const params = type.parameters
+		.map( ( p ) => `${ p.name.escapedText }: ${ typeToString( p.type ) }` )
+		.join( ', ' );
+
+	return `(${ params }) => ${ typeToString( type.type ) }`;
+};
+
+const getFunctionTypeFromJSDocFunctionType = ( type ) => {
+	const params = type.parameters
+		.map( ( p, i ) => `p${ i }: ${ typeToString( p.type ) }` )
+		.join( ', ' );
+
+	return `(${ params }) => ${ typeToString( type.type ) }`;
+};
+
+const getTypeLiteral = ( type ) => {
+	const properties = type.members
+		.map( ( m ) => {
+			if ( m.kind === SyntaxKind.PropertySignature ) {
+				return `${ m.name.escapedText }: ${ typeToString( m.type ) }`;
+			}
+
+			// m.kind === SyntaxKind.IndexSignature
+			const param = m.parameters[ 0 ];
+			return `[${ param.name.escapedText }: ${ typeToString(
+				param.type
+			) }]: ${ typeToString( m.type ) }`;
+		} )
+		.join( ', ' );
+
+	return `{ ${ properties } }`;
+};
+
 const typeToString = ( type ) => {
 	switch ( type.kind ) {
 		case SyntaxKind.AnyKeyword:
@@ -93,7 +133,10 @@ const typeToString = ( type ) => {
 		case SyntaxKind.NeverKeyword:
 			return 'never';
 		case SyntaxKind.ObjectKeyword:
+		case SyntaxKind.JSDocTypeLiteral:
 			return 'object';
+		case SyntaxKind.VoidKeyword:
+			return 'void';
 		case SyntaxKind.TypeReference:
 			return getTypeFromTypeReference( type );
 		case SyntaxKind.LiteralType:
@@ -132,6 +175,14 @@ const typeToString = ( type ) => {
 		case SyntaxKind.RestType:
 		case SyntaxKind.JSDocVariadicType:
 			return `...${ typeToString( type.type ) }`;
+		case SyntaxKind.FunctionType:
+			return getFunctionType( type );
+		case SyntaxKind.ConstructorType:
+			return `new ${ getFunctionType( type ) }`;
+		case SyntaxKind.JSDocFunctionType:
+			return getFunctionTypeFromJSDocFunctionType( type );
+		case SyntaxKind.TypeLiteral:
+			return getTypeLiteral( type );
 	}
 };
 
