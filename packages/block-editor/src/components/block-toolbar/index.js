@@ -120,13 +120,13 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</div>
 				</div>
 
-				{ ( ! isMultiToolbar ) && (
-				<div
-					className="block-editor-block-toolbar__block-parent-wrapper"
-					style={ animatedBlockParentStyles }
-				>
-					<BlockParent clientIds={ blockClientIds } />
-				</div>
+				{ ! isMultiToolbar && (
+					<div
+						className="block-editor-block-toolbar__block-parent-wrapper"
+						style={ animatedBlockParentStyles }
+					>
+						<BlockParent clientIds={ blockClientIds } />
+					</div>
 				) }
 
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
