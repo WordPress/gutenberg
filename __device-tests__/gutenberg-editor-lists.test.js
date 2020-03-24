@@ -19,7 +19,7 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	let listBlockName = 'List';
+	const listBlockName = 'List';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {

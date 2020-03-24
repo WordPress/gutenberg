@@ -22,12 +22,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	let paragraphBlockName = 'Paragraph';
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
 		const reporter = {
-			specDone: async ( result ) => {
+			specDone: async result => {
 				allPassed = allPassed && result.status !== 'failed';
 			},
 		};
@@ -52,12 +52,12 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
-		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2);
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		await paragraphBlockElement.click();
 
 		await editorPage.addNewBlock( paragraphBlockName );
 
-		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3);
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3 );
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlockAtPosition( 3, testData.mediumText );
 
@@ -68,14 +68,18 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
-			paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3, { autoscroll: true } );
+			paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3, {
+				autoscroll: true,
+			} );
 
 			await paragraphBlockElement.click();
 			await editorPage.removeParagraphBlockAtPosition( 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
-				paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, i, { autoscroll: true } );
+				paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, i, {
+					autoscroll: true,
+				} );
 				await paragraphBlockElement.click();
 				await editorPage.removeParagraphBlockAtPosition( i );
 			}

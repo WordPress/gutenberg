@@ -22,7 +22,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	let paragraphBlockName = 'Paragraph';
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
