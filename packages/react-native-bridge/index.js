@@ -10,11 +10,20 @@ const isIOS = Platform.OS === 'ios';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
+
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 	deviceCamera: 'DEVICE_CAMERA',
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
+
+export const userEvents = {
+	editorSessionTemplateApply: 'editor_session_template_apply',
+	editorSessionTemplatePreview: 'editor_session_template_preview',
+};
+
+export const showMediaEditorButton = isIOS;
 
 // Console polyfill from react-native
 
@@ -63,6 +72,10 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
+export function subscribePreferredColorScheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
+}
+
 /**
  * Request media picker for the given media source.
  *
@@ -101,12 +114,23 @@ export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
 }
 
-export function requestImageFullscreenPreview( mediaUrl ) {
-	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( mediaUrl );
+export function requestImageFullscreenPreview( currentImageUrl, originalImageUrl ) {
+	if ( isIOS ) {
+		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( currentImageUrl, originalImageUrl );
+	}
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( originalImageUrl || currentImageUrl );
+}
+
+export function requestMediaEditor( mediaUrl, callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaEditor( mediaUrl, callback );
 }
 
 export function fetchRequest( path ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
+}
+
+export function logUserEvent( event, properties ) {
+	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
 export default RNReactNativeGutenbergBridge;

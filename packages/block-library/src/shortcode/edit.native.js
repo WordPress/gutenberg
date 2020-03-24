@@ -17,14 +17,29 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './style.scss';
 
 export function ShortcodeEdit( props ) {
-	const { attributes, setAttributes, onFocus, onBlur, getStylesFromColorScheme } = props;
-	const titleStyle = getStylesFromColorScheme( styles.blockTitle, styles.blockTitleDark );
-	const shortcodeStyle = getStylesFromColorScheme( styles.blockShortcode, styles.blockShortcodeDark );
-	const placeholderStyle = getStylesFromColorScheme( styles.placeholder, styles.placeholderDark );
+	const {
+		attributes,
+		setAttributes,
+		onFocus,
+		onBlur,
+		getStylesFromColorScheme,
+	} = props;
+	const titleStyle = getStylesFromColorScheme(
+		styles.blockTitle,
+		styles.blockTitleDark
+	);
+	const shortcodeStyle = getStylesFromColorScheme(
+		styles.blockShortcode,
+		styles.blockShortcodeDark
+	);
+	const placeholderStyle = getStylesFromColorScheme(
+		styles.placeholder,
+		styles.placeholderDark
+	);
 
 	return (
 		<View>
-			<Text style={ titleStyle } >{ __( 'Shortcode' ) }</Text>
+			<Text style={ titleStyle }>{ __( 'Shortcode' ) }</Text>
 			<PlainText
 				value={ attributes.text }
 				style={ shortcodeStyle }
@@ -36,6 +51,8 @@ export function ShortcodeEdit( props ) {
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
+				autoCorrect={ false }
+				autoComplete="off"
 				placeholderTextColor={ placeholderStyle.color }
 			/>
 		</View>

@@ -23,10 +23,7 @@ import Provider, { Consumer } from './context';
  * @return {boolean} Whether object is component-like.
  */
 function isComponentLike( object ) {
-	return (
-		object instanceof Component ||
-		typeof object === 'function'
-	);
+	return object instanceof Component || typeof object === 'function';
 }
 
 /**
@@ -57,9 +54,9 @@ function withFocusReturn( options ) {
 			constructor() {
 				super( ...arguments );
 
-				this.ownFocusedElements = new Set;
+				this.ownFocusedElements = new Set();
 				this.activeElementOnMount = document.activeElement;
-				this.setIsFocusedFalse = () => this.isFocused = false;
+				this.setIsFocusedFalse = () => ( this.isFocused = false );
 				this.setIsFocusedTrue = ( event ) => {
 					this.ownFocusedElements.add( event.target );
 					this.isFocused = true;
@@ -117,7 +114,9 @@ function withFocusReturn( options ) {
 
 		return ( props ) => (
 			<Consumer>
-				{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }
+				{ ( context ) => (
+					<FocusReturn childProps={ props } focus={ context } />
+				) }
 			</Consumer>
 		);
 	};

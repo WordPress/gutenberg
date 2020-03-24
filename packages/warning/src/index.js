@@ -7,9 +7,8 @@ function isDev() {
 }
 
 /**
- * Shows a warning with `message` if `condition` passes and environment is not `production`.
+ * Shows a warning with `message` if environment is not `production`.
  *
- * @param {boolean} condition Whether the warning will be triggered or not.
  * @param {string} message Message to show in the warning.
  *
  * @example
@@ -17,17 +16,15 @@ function isDev() {
  * import warning from '@wordpress/warning';
  *
  * function MyComponent( props ) {
- *   warning( ! props.title, '`props.title` was not passed' );
+ *   if ( ! props.title ) {
+ *     warning( '`props.title` was not passed' );
+ *   }
  *   ...
  * }
  * ```
  */
-export default function warning( condition, message ) {
+export default function warning( message ) {
 	if ( ! isDev() ) {
-		return;
-	}
-
-	if ( ! condition ) {
 		return;
 	}
 

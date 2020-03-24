@@ -30,14 +30,19 @@ describe( 'DownloadableBlockHeader', () => {
 	describe( 'icon rendering', () => {
 		test( 'should render an <img> tag', () => {
 			const wrapper = getContainer( pluginWithImg );
-			expect( wrapper.find( 'img' ).prop( 'src' ) ).toEqual( pluginWithImg.icon );
+			expect( wrapper.find( 'img' ).prop( 'src' ) ).toEqual(
+				pluginWithImg.icon
+			);
 		} );
 
 		test( 'should render an <img> tag if icon URL has query string', () => {
-			const iconURLwithQueryString = pluginWithImg.icon + '?rev=2011672&test=234234';
+			const iconURLwithQueryString =
+				pluginWithImg.icon + '?rev=2011672&test=234234';
 			const plugin = { ...pluginWithImg, icon: iconURLwithQueryString };
 			const wrapper = getContainer( plugin );
-			expect( wrapper.find( 'img' ).prop( 'src' ) ).toEqual( plugin.icon );
+			expect( wrapper.find( 'img' ).prop( 'src' ) ).toEqual(
+				plugin.icon
+			);
 		} );
 
 		test( 'should render a <BlockIcon/> component', () => {

@@ -13,7 +13,9 @@ describe( 'MetaBoxesSection', () => {
 		const wrapper = shallow(
 			<MetaBoxesSection
 				areCustomFieldsRegistered={ false }
-				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
+				metaBoxes={ [
+					{ id: 'postcustom', title: 'This should not render' },
+				] }
 			/>
 		);
 		expect( wrapper.isEmptyRender() ).toBe( true );
@@ -24,7 +26,9 @@ describe( 'MetaBoxesSection', () => {
 			<MetaBoxesSection
 				title="Advanced panels"
 				areCustomFieldsRegistered
-				metaBoxes={ [ { id: 'postcustom', title: 'This should not render' } ] }
+				metaBoxes={ [
+					{ id: 'postcustom', title: 'This should not render' },
+				] }
 			/>
 		);
 		expect( wrapper ).toMatchSnapshot();

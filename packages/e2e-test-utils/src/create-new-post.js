@@ -30,12 +30,25 @@ export async function createNewPost( {
 	await visitAdminPage( 'post-new.php', query );
 
 	const isWelcomeGuideActive = await page.evaluate( () =>
-		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ) );
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+	);
+	const isFullscreenMode = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+	);
 
 	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
 		await page.evaluate( () =>
-			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' ) );
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
+		);
 
 		await page.reload();
+	}
+
+	if ( isFullscreenMode ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'fullscreenMode' )
+		);
 	}
 }

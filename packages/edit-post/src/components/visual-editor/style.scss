@@ -1,6 +1,8 @@
 .edit-post-visual-editor {
 	position: relative;
 	padding-top: 50px;
+	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
+	background-color: $white;
 
 	& .components-button {
 		font-family: $default-font;
@@ -17,14 +19,15 @@
 }
 
 .edit-post-visual-editor > .block-editor__typewriter,
-.edit-post-visual-editor > .block-editor__typewriter > .block-editor-writing-flow,
-.edit-post-visual-editor > .block-editor__typewriter > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
+.edit-post-visual-editor > .block-editor__typewriter > div,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow,
+.edit-post-visual-editor > .block-editor__typewriter > div > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
 	height: 100%;
 }
 
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	// Allow the page to be scrolled with the last block in the middle.
-	min-height: 50vh;
+	min-height: 40vh;
 	width: 100%;
 }
 
@@ -74,13 +77,5 @@
 			margin-left: -$block-padding - $block-side-ui-clearance;
 			margin-right: -$block-padding - $block-side-ui-clearance;
 		}
-	}
-}
-
-.edit-post-visual-editor {
-	// If the first block is floated, it needs top margin, unlike the rule in line 69.
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="left"]:first-child,
-	.block-editor-block-list__layout > .block-editor-block-list__block[data-align="right"]:first-child {
-		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
 	}
 }

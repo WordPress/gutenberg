@@ -15,7 +15,7 @@ import path from 'path';
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { ios, android8 } from './caps';
+import { iosServer, iosLocal, android8 } from './caps';
 import AppiumLocal from './appium-local';
 import _ from 'underscore';
 
@@ -29,7 +29,7 @@ const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 
 // Local App Paths
 const defaultAndroidAppPath = './android/app/build/outputs/apk/debug/app-debug.apk';
-const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app';
+const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
 
 const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
@@ -92,13 +92,11 @@ const setupDriver = async () => {
 			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.apk`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	} else {
-		desiredCaps = _.clone( ios );
+		desiredCaps = _.clone( iosServer );
+		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		if ( isLocalEnvironment() ) {
+			desiredCaps = _.clone( iosLocal );
 			desiredCaps.app = path.resolve( localIOSAppPath );
-			delete desiredCaps.platformVersion;
-			desiredCaps.deviceName = 'iPhone 11';
-		} else {
-			desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		}
 	}
 
@@ -116,28 +114,9 @@ const setupDriver = async () => {
 
 	await driver.setImplicitWaitTimeout( 2000 );
 	await timer( 3000 );
-	await driver.setOrientation( 'PORTRAIT' );
 
-	// Proxy driver to patch functions on Android
-	// This is needed to adapt to changes in the way accessibility ids are being
-	// assigned after migrating to AndroidX and React Native 0.60. See:
-	// https://github.com/wordpress-mobile/gutenberg-mobile/pull/1112#issuecomment-501165250
-	// for more details.
-	return new Proxy( driver, {
-		get: ( original, property ) => {
-			const propertiesToPatch = [
-				'elementByAccessibilityId',
-				'hasElementByAccessibilityId',
-			];
-			if ( isAndroid() && ( propertiesToPatch.includes( property ) ) ) {
-				return async function( value, cb ) {
-					// Add a comma and a space to all ids
-					return await original[ property ]( `${ value }, `, cb );
-				};
-			}
-			return original[ property ];
-		},
-	} );
+	await driver.setOrientation( 'PORTRAIT' );
+	return driver;
 };
 
 const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
@@ -161,14 +140,60 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
 	}
 };
 
-const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean = false ) => {
+/*
+ * Problems about the 'clear' parameter:
+ *
+ * On Android: "clear" is defaulted to true because not clearing the text requires Android to use ADB, which
+ * has demonstrated itself to be very flaky, particularly on CI. In other words, clear the view unless you absolutely
+ * have to append the new text and, in that case, append fewest number of characters possible.
+ *
+ * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
+ */
+const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
+	if ( isAndroid() ) {
+		await typeStringAndroid( driver, element, str, clear );
+	} else {
+		await typeStringIos( driver, element, str, clear );
+	}
+};
+
+const typeStringIos = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
 	if ( clear ) {
 		await element.clear();
 	}
+	await element.type( str );
+};
 
-	if ( isAndroid() ) {
+const typeStringAndroid = async (
+	driver: wd.PromiseChainWebdriver,
+	element: wd.PromiseChainWebdriver.Element,
+	str: string,
+	clear: boolean = true // see comment above for why it is defaulted to true
+) => {
+	if ( str in strToKeycode ) {
+		return await driver.pressKeycode( strToKeycode[ str ] );
+	} else if ( clear ) {
+		/*
+		 * On Android `element.type` deletes the contents of the EditText before typing and, unfortunately,
+		 * with our blocks it also deletes the block entirely. We used to avoid this by using adb to enter
+		 * long text along these lines:
+		 *         await driver.execute( 'mobile: shell', { command: 'input',
+		 *                                                  args: [ 'text', 'text I want to enter...' ] } )
+		 * but using adb in this way proved to be very flaky (frequently all of the text would not get entered,
+		 * particularly on CI). We are now using the `type` approach again, but adding a space to the block to
+		 * insure it is not empty, which avoids the deletion of the block when `type` executes.
+		 *
+		 * Note that this approach does not allow appending text to the text in a block on account
+		 * of `type` always clearing the block (on Android).
+		 */
+
+		await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', '%s' ] } );
+		await element.type( str );
+	} else {
+		// eslint-disable-next-line no-console
+		console.log( 'Warning: Using `adb shell input text` on Android which is rather flaky.' );
+
 		const paragraphs = str.split( '\n' );
-
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			const paragraph = paragraphs[ i ].replace( /[ ]/g, '%s' );
 			if ( paragraph in strToKeycode ) {
@@ -181,8 +206,6 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 				await driver.pressKeycode( strToKeycode[ '\n' ] );
 			}
 		}
-	} else {
-		return await element.type( str );
 	}
 };
 

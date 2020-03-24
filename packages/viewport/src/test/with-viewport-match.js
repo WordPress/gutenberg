@@ -39,15 +39,16 @@ describe( 'withViewportMatch()', () => {
 			isSmall: '>= small',
 			isLarge: 'large',
 			isLessThanSmall: '< small',
-		}
-		)( ChildComponent );
+		} )( ChildComponent );
 
 		useViewportMatchMock.mockReturnValueOnce( false );
 		useViewportMatchMock.mockReturnValueOnce( true );
 		useViewportMatchMock.mockReturnValueOnce( true );
 		useViewportMatchMock.mockReturnValueOnce( false );
 
-		const wrapper = renderer.create( getTestComponent( EnhancedComponent ) );
+		const wrapper = renderer.create(
+			getTestComponent( EnhancedComponent )
+		);
 
 		expect( useViewportMatchMock.mock.calls ).toEqual( [
 			[ 'wide', '>=' ],

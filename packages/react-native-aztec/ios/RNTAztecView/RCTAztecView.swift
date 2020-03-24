@@ -12,14 +12,9 @@ class RCTAztecView: Aztec.TextView {
     @objc var onPaste: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
-    @objc var blockType: NSDictionary? = nil {
-        didSet {
-            guard let block = blockType, let tag = block["tag"] as? String else {
-                return
-            }
-            blockModel = BlockModel(tag: tag)
-        }
-    }
+    @objc var minWidth: CGFloat = 0
+    @objc var maxWidth: CGFloat = 0
+
     @objc var activeFormats: NSSet? = nil {
         didSet {
             let currentTypingAttributes = formattingIdentifiersForTypingAttributes()
@@ -35,18 +30,16 @@ class RCTAztecView: Aztec.TextView {
     }
 
     override var textAlignment: NSTextAlignment {
-        didSet {
-            super.textAlignment = textAlignment
-            defaultParagraphStyle.alignment = textAlignment
-            placeholderLabel.textAlignment = textAlignment
+        set {
+            super.textAlignment = newValue
+            defaultParagraphStyle.alignment = newValue
+            placeholderLabel.textAlignment = newValue
         }
-    }
 
-    var blockModel = BlockModel(tag: "") {
-        didSet {
-            forceTypingAttributesIfNeeded()
+        get {
+            return super.textAlignment
         }
-    }
+    }    
 
     private var previousContentSize: CGSize = .zero
 
@@ -135,9 +128,11 @@ class RCTAztecView: Aztec.TextView {
     }
 
     func commonInit() {
+        Configuration.headersWithBoldTrait = true
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
+        textContainer.lineFragmentPadding = 0        
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
@@ -172,12 +167,23 @@ class RCTAztecView: Aztec.TextView {
         recognizer.isEnabled = false
     }
 
-    // MARK - View Height: Match to content height
+    // MARK: - View height and width: Match to the content
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        adjustWidth()
         fixLabelPositionForRTLLayout()
         updateContentSizeInRN()
+    }
+
+    private func adjustWidth() {
+        if (maxWidth > 0 && minWidth > 0) {
+            let maxSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
+            let newWidth = sizeThatFits(maxSize).width
+            if (newWidth != frame.size.width) {
+                frame.size.width = max(newWidth, minWidth)
+            }
+        }
     }
 
     private func fixLabelPositionForRTLLayout() {
@@ -321,9 +327,10 @@ class RCTAztecView: Aztec.TextView {
     }
 
     public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
-        let text = dictationResult.reduce("") { $0 + $1.text }
-        insertText(text)
+        let objectPlaceholder = "\u{FFFC}"
+        let dictationText = dictationResult.reduce("") { $0 + $1.text }
         isInsertingDictationResult = false
+        self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
     }
 
     // MARK: - Custom Edit Intercepts
@@ -599,12 +606,6 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    func forceTypingAttributesIfNeeded() {
-        if let formatHandler = HeadingBlockFormatHandler(block: blockModel) {
-            formatHandler.forceTypingFormat(on: self)
-        }
-    }
-
     // MARK: - Event Propagation
 
     func propagateContentChanges() {
@@ -653,8 +654,7 @@ extension RCTAztecView: UITextViewDelegate {
         guard isInsertingDictationResult == false else {
             return
         }
-
-        forceTypingAttributesIfNeeded()
+        
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.

@@ -114,7 +114,7 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 {
 	images: {
 		type: 'array',
-		source: 'query'
+		source: 'query',
 		selector: 'img',
 		query: {
 			url: {

@@ -7,9 +7,14 @@ import { assign, get, has, includes, without } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	getBlockType,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -47,7 +52,11 @@ const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
  *
  * @return {string[]} Valid alignments.
  */
-export function getValidAlignments( blockAlign, hasWideBlockSupport = true, hasWideEnabled = true ) {
+export function getValidAlignments(
+	blockAlign,
+	hasWideBlockSupport = true,
+	hasWideEnabled = true
+) {
 	let validAlignments;
 	if ( Array.isArray( blockAlign ) ) {
 		validAlignments = blockAlign;
@@ -91,6 +100,13 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
+const AlignmentHookSettings = createContext( {} );
+
+/**
+ * Allows to pass additional settings to the alignment hook.
+ */
+export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
+
 /**
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
@@ -99,42 +115,47 @@ export function addAttribute( settings ) {
  * @return {Function}           Wrapped component
  */
 export const withToolbarControls = createHigherOrderComponent(
-	( BlockEdit ) => (
-		( props ) => {
-			const { name: blockName } = props;
-			// Compute valid alignments without taking into account,
-			// if the theme supports wide alignments or not.
-			// BlockAlignmentToolbar takes into account the theme support.
-			const validAlignments = getValidAlignments(
-				getBlockSupport( blockName, 'align' ),
-				hasBlockSupport( blockName, 'alignWide', true ),
-			);
+	( BlockEdit ) => ( props ) => {
+		const { isEmbedButton } = useContext( AlignmentHookSettings );
+		const { name: blockName } = props;
+		// Compute valid alignments without taking into account,
+		// if the theme supports wide alignments or not.
+		// BlockAlignmentToolbar takes into account the theme support.
+		const validAlignments = isEmbedButton
+			? []
+			: getValidAlignments(
+					getBlockSupport( blockName, 'align' ),
+					hasBlockSupport( blockName, 'alignWide', true )
+			  );
 
-			const updateAlignment = ( nextAlign ) => {
-				if ( ! nextAlign ) {
-					const blockType = getBlockType( props.name );
-					const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
-					if ( blockDefaultAlign ) {
-						nextAlign = '';
-					}
+		const updateAlignment = ( nextAlign ) => {
+			if ( ! nextAlign ) {
+				const blockType = getBlockType( props.name );
+				const blockDefaultAlign = get( blockType, [
+					'attributes',
+					'align',
+					'default',
+				] );
+				if ( blockDefaultAlign ) {
+					nextAlign = '';
 				}
-				props.setAttributes( { align: nextAlign } );
-			};
+			}
+			props.setAttributes( { align: nextAlign } );
+		};
 
-			return [
-				validAlignments.length > 0 && props.isSelected && (
-					<BlockControls key="align-controls">
-						<BlockAlignmentToolbar
-							value={ props.attributes.align }
-							onChange={ updateAlignment }
-							controls={ validAlignments }
-						/>
-					</BlockControls>
-				),
-				<BlockEdit key="edit" { ...props } />,
-			];
-		}
-	),
+		return [
+			validAlignments.length > 0 && props.isSelected && (
+				<BlockControls key="align-controls">
+					<BlockAlignmentToolbar
+						value={ props.attributes.align }
+						onChange={ updateAlignment }
+						controls={ validAlignments }
+					/>
+				</BlockControls>
+			),
+			<BlockEdit key="edit" { ...props } />,
+		];
+	},
 	'withToolbarControls'
 );
 
@@ -144,33 +165,36 @@ export const withToolbarControls = createHigherOrderComponent(
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
-export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => ( props ) => {
-	const { name, attributes } = props;
-	const { align } = attributes;
-	const hasWideEnabled = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getSettings().alignWide,
-		[]
-	);
+export const withDataAlign = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { name, attributes } = props;
+		const { align } = attributes;
+		const hasWideEnabled = useSelect(
+			( select ) =>
+				!! select( 'core/block-editor' ).getSettings().alignWide,
+			[]
+		);
 
-	// If an alignment is not assigned, there's no need to go through the
-	// effort to validate or assign its value.
-	if ( align === undefined ) {
-		return <BlockListBlock { ...props } />;
+		// If an alignment is not assigned, there's no need to go through the
+		// effort to validate or assign its value.
+		if ( align === undefined ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const validAlignments = getValidAlignments(
+			getBlockSupport( name, 'align' ),
+			hasBlockSupport( name, 'alignWide', true ),
+			hasWideEnabled
+		);
+
+		let wrapperProps = props.wrapperProps;
+		if ( includes( validAlignments, align ) ) {
+			wrapperProps = { ...wrapperProps, 'data-align': align };
+		}
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	}
-
-	const validAlignments = getValidAlignments(
-		getBlockSupport( name, 'align' ),
-		hasBlockSupport( name, 'alignWide', true ),
-		hasWideEnabled
-	);
-
-	let wrapperProps = props.wrapperProps;
-	if ( includes( validAlignments, align ) ) {
-		wrapperProps = { ...wrapperProps, 'data-align': align };
-	}
-
-	return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
-} );
+);
 
 /**
  * Override props assigned to save component to inject alignment class name if
@@ -199,8 +223,23 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	return props;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
-addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
-
+addFilter(
+	'blocks.registerBlockType',
+	'core/align/addAttribute',
+	addAttribute
+);
+addFilter(
+	'editor.BlockListBlock',
+	'core/editor/align/with-data-align',
+	withDataAlign
+);
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/align/with-toolbar-controls',
+	withToolbarControls
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/align/addAssignedAlign',
+	addAssignedAlign
+);

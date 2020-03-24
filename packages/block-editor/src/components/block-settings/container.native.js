@@ -11,7 +11,11 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import styles from './container.native.scss';
 
-function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...props } ) {
+function BottomSheetSettings( {
+	editorSidebarOpened,
+	closeGeneralSidebar,
+	...props
+} ) {
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
@@ -20,16 +24,14 @@ function BottomSheetSettings( { editorSidebarOpened, closeGeneralSidebar, ...pro
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<InspectorControls.Slot	/>
+			<InspectorControls.Slot />
 		</BottomSheet>
 	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			isEditorSidebarOpened,
-		} = select( 'core/edit-post' );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 
 		return {
 			editorSidebarOpened: isEditorSidebarOpened(),
@@ -42,5 +44,4 @@ export default compose( [
 			closeGeneralSidebar,
 		};
 	} ),
-]
-)( BottomSheetSettings );
+] )( BottomSheetSettings );

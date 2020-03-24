@@ -10,7 +10,8 @@ describe( 'popovers', () => {
 
 	describe( 'dropdown', () => {
 		it( 'toggles via click', async () => {
-			const isMoreMenuOpen = async () => !! await page.$( '.edit-post-more-menu__content' );
+			const isMoreMenuOpen = async () =>
+				!! ( await page.$( '.edit-post-more-menu__content' ) );
 
 			expect( await isMoreMenuOpen() ).toBe( false );
 

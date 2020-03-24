@@ -5,4 +5,4 @@ The majority of the code shared with native mobile is in the very same JavaScrip
 ## Mind the mobile
 Our tooling isn't as good yet as we'd like to and it's hard to have a good awareness of those native mobile files. That means that contributors need to manually pay attention to update the native mobile files during code refactorings. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We are in the process of putting some more safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
 ## Debugging the native mobile unit tests
-Follow the instructions in [Native mobile testing](/docs/contributors/testing-overview.md#native-mobile-testing) to locally debug the native mobile unit tests when neeeded.
+Follow the instructions in [Native mobile testing](/docs/contributors/testing-overview.md#native-mobile-testing) to locally debug the native mobile unit tests when needed.

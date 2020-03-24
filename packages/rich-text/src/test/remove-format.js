@@ -16,7 +16,21 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 		};
 		const expected = {
@@ -33,7 +47,21 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format for collased selection', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 		};
 		const expected = {

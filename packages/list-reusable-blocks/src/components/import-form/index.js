@@ -80,11 +80,7 @@ class ImportForm extends Component {
 				className="list-reusable-blocks-import-form"
 				onSubmit={ this.onSubmit }
 			>
-				{ error && (
-					<Notice status="error">
-						{ error }
-					</Notice>
-				) }
+				{ error && <Notice status="error">{ error }</Notice> }
 				<label
 					htmlFor={ inputId }
 					className="list-reusable-blocks-import-form__label"

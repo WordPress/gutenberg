@@ -8,5 +8,4 @@ packages/react-native-*
 playground/dist
 vendor
 wordpress
-
-!.eslintrc.js
+!.*.js

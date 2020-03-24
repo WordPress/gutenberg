@@ -2,7 +2,7 @@
 
 The Gutenberg project is transforming the way content is created on WordPress. A block editor was the first product launched creating a new methodology for working with content. 
 
-Th Block Editor handbook provides documentation for designers and developers on how to extend the editor, and also how you can start contributing to the project. For authors, writers, and users of the block editor see the [block editor support documentation](https://wordpress.org/support/article/wordpress-editor/).
+The Block Editor handbook provides documentation for designers and developers on how to extend the editor, and also how you can start contributing to the project. For authors, writers, and users of the block editor see the [block editor support documentation](https://wordpress.org/support/article/wordpress-editor/).
 
 ![Gutenberg Demo](https://cldup.com/kZXGDcGPMU.gif)
 

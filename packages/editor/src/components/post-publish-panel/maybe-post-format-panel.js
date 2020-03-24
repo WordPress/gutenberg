@@ -16,7 +16,11 @@ import { Button, PanelBody } from '@wordpress/components';
  */
 import { POST_FORMATS } from '../post-format';
 
-const PostFormatSuggestion = ( { suggestedPostFormat, suggestionText, onUpdatePostFormat } ) => (
+const PostFormatSuggestion = ( {
+	suggestedPostFormat,
+	suggestionText,
+	onUpdatePostFormat,
+} ) => (
 	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
 		{ suggestionText }
 	</Button>
@@ -25,17 +29,17 @@ const PostFormatSuggestion = ( { suggestedPostFormat, suggestionText, onUpdatePo
 const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 	const panelBodyTitle = [
 		__( 'Suggestion:' ),
-		(
-			<span className="editor-post-publish-panel__link" key="label">
-				{ __( 'Use a post format' ) }
-			</span>
-		),
+		<span className="editor-post-publish-panel__link" key="label">
+			{ __( 'Use a post format' ) }
+		</span>,
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle } >
+		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
 			<p>
-				{ __( 'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.' ) }
+				{ __(
+					'Your theme uses post formats to highlight different kinds of content, like images or videos. Apply a post format to see this special styling.'
+				) }
 			</p>
 			<p>
 				<PostFormatSuggestion
@@ -52,17 +56,28 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 };
 
 const getSuggestion = ( supportedFormats, suggestedPostFormat ) => {
-	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
+	const formats = POST_FORMATS.filter( ( format ) =>
+		includes( supportedFormats, format.id )
+	);
 	return find( formats, ( format ) => format.id === suggestedPostFormat );
 };
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
-		const supportedFormats = get( select( 'core' ).getThemeSupports(), [ 'formats' ], [] );
+		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
+			'core/editor'
+		);
+		const supportedFormats = get(
+			select( 'core' ).getThemeSupports(),
+			[ 'formats' ],
+			[]
+		);
 		return {
 			currentPostFormat: getEditedPostAttribute( 'format' ),
-			suggestion: getSuggestion( supportedFormats, getSuggestedPostFormat() ),
+			suggestion: getSuggestion(
+				supportedFormats,
+				getSuggestedPostFormat()
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
@@ -70,5 +85,8 @@ export default compose(
 			dispatch( 'core/editor' ).editPost( { format: postFormat } );
 		},
 	} ) ),
-	ifCondition( ( { suggestion, currentPostFormat } ) => suggestion && suggestion.id !== currentPostFormat ),
+	ifCondition(
+		( { suggestion, currentPostFormat } ) =>
+			suggestion && suggestion.id !== currentPostFormat
+	)
 )( PostFormatPanel );

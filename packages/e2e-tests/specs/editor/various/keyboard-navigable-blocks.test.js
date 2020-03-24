@@ -5,6 +5,8 @@ import {
 	createNewPost,
 	insertBlock,
 	pressKeyWithModifier,
+	clickBlockAppender,
+	getEditedPostContent,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
@@ -30,13 +32,10 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
-
-	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
-	await expect( await page.evaluate( () =>
-		document.activeElement.innerHTML
-	) ).toBe( paragraphText );
+	await expect(
+		await page.evaluate( () => document.activeElement.innerHTML )
+	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Document' );
@@ -117,15 +116,21 @@ describe( 'Order of block keyboard navigation', () => {
 		} );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await page.evaluate( () => {
-			return document.activeElement.placeholder;
-		} ) ).toBe( 'Add title' );
+		await expect(
+			await page.evaluate( () => {
+				return document.activeElement.placeholder;
+			} )
+		).toBe( 'Add title' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 1. 0'
+		);
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 2. 1'
+		);
 
 		await page.keyboard.press( 'Tab' );
 		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
@@ -143,18 +148,54 @@ describe( 'Order of block keyboard navigation', () => {
 		// Clear the selected block and put focus behind the block list.
 		await page.evaluate( () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
-			document.querySelector( '.edit-post-editor-regions__sidebar' ).focus();
+			document
+				.querySelector( '.block-editor-editor-skeleton__sidebar' )
+				.focus();
 		} );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 2. 1' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 2. 1'
+		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Paragraph Block. Row 1. 0' );
+		await expect( await getActiveLabel() ).toBe(
+			'Paragraph Block. Row 1. 0'
+		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await page.evaluate( () => {
-			return document.activeElement.placeholder;
-		} ) ).toBe( 'Add title' );
+		await expect(
+			await page.evaluate( () => {
+				return document.activeElement.placeholder;
+			} )
+		).toBe( 'Add title' );
+	} );
+
+	it( 'should navigate correctly with multi selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '4' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
+
+		await page.keyboard.press( 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'Document' );
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe(
+			'Multiple selected blocks'
+		);
+
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expect( await getActiveLabel() ).toBe( 'More options' );
 	} );
 } );

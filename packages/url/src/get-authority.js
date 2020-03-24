@@ -12,7 +12,9 @@
  * @return {string|void} The authority part of the URL.
  */
 export function getAuthority( url ) {
-	const matches = /^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/.exec( url );
+	const matches = /^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/.exec(
+		url
+	);
 	if ( matches ) {
 		return matches[ 1 ];
 	}

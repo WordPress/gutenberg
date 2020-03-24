@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { Platform, AccessibilityInfo, findNodeHandle, TextInput, View, PixelRatio, AppState } from 'react-native';
+import {
+	Platform,
+	AccessibilityInfo,
+	findNodeHandle,
+	TextInput,
+	View,
+	PixelRatio,
+	AppState,
+} from 'react-native';
 import Slider from '@react-native-community/slider';
 
 /**
@@ -28,10 +36,18 @@ class BottomSheetRangeCell extends Component {
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
 
-		const initialValue = this.validateInput( props.value || props.defaultValue || props.minimumValue );
+		const initialValue = this.validateInput(
+			props.value || props.defaultValue || props.minimumValue
+		);
 		const fontScale = this.getFontScale();
 
-		this.state = { accessible: true, sliderValue: initialValue, initialValue, hasFocus: false, fontScale };
+		this.state = {
+			accessible: true,
+			sliderValue: initialValue,
+			initialValue,
+			hasFocus: false,
+			fontScale,
+		};
 	}
 
 	componentDidMount() {
@@ -79,7 +95,13 @@ class BottomSheetRangeCell extends Component {
 		if ( typeof text === 'number' ) {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
-		return Math.min( Math.max( text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ), minimumValue ), maximumValue );
+		return Math.min(
+			Math.max(
+				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
+				minimumValue
+			),
+			maximumValue
+		);
 	}
 
 	handleValueSave( text ) {
@@ -124,8 +146,12 @@ class BottomSheetRangeCell extends Component {
 			disabled,
 			step = 1,
 			preferredColorScheme,
-			minimumTrackTintColor = preferredColorScheme === 'light' ? '#00669b' : '#5198d9',
-			maximumTrackTintColor = Platform.OS === 'ios' ? '#e9eff3' : '#909090',
+			minimumTrackTintColor = preferredColorScheme === 'light'
+				? '#00669b'
+				: '#5198d9',
+			maximumTrackTintColor = Platform.OS === 'ios'
+				? '#e9eff3'
+				: '#909090',
 			thumbTintColor = Platform.OS === 'android' && '#00669b',
 			getStylesFromColorScheme,
 			...cellProps
@@ -133,14 +159,20 @@ class BottomSheetRangeCell extends Component {
 
 		const { hasFocus, sliderValue, accessible, fontScale } = this.state;
 
-		const accessibilityLabel =
-		sprintf(
+		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			_x( '%1$s. Current value is %2$s', 'Slider for picking a number inside a range' ),
-			cellProps.label, value
+			_x(
+				'%1$s. Current value is %2$s',
+				'Slider for picking a number inside a range'
+			),
+			cellProps.label,
+			value
 		);
 
-		const defaultSliderStyle = getStylesFromColorScheme( styles.sliderTextInput, styles.sliderDarkTextInput );
+		const defaultSliderStyle = getStylesFromColorScheme(
+			styles.sliderTextInput,
+			styles.sliderDarkTextInput
+		);
 
 		return (
 			<Cell

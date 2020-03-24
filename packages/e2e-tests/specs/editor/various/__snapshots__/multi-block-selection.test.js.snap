@@ -8,6 +8,16 @@ exports[`Multi-block selection should allow selecting outer edge if there is no 
 
 exports[`Multi-block selection should always expand single line selection 1`] = `""`;
 
+exports[`Multi-block selection should clear selection when clicking next to blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should copy and paste 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
@@ -49,6 +59,26 @@ exports[`Multi-block selection should only trigger multi-selection when at the e
 
 <!-- wp:paragraph -->
 <p></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should preserve dragged selection on move 1`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should return original focus after failed multi selection attempt 1`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -17,27 +17,29 @@ import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
 import com.brentvatne.react.ReactVideoPackage;
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.horcrux.svg.SvgPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -74,6 +76,8 @@ public class WPAndroidGlueCode {
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
+    private OnMediaEditorListener mOnMediaEditorListener;
+    private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -96,6 +100,7 @@ public class WPAndroidGlueCode {
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
+    private boolean mIsDarkMode;
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -147,6 +152,14 @@ public class WPAndroidGlueCode {
 
     public interface OnEditorAutosaveListener {
         void onEditorAutosave();
+    }
+
+    public interface OnMediaEditorListener {
+        void onMediaEditorClicked(String mediaUrl);
+    }
+
+    public interface OnLogGutenbergUserEventListener {
+        void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -297,7 +310,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<String> onError) {
+            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
                 mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
             }
 
@@ -305,13 +318,25 @@ public class WPAndroidGlueCode {
             public void requestImageFullscreenPreview(String mediaUrl) {
                 mOnImageFullscreenPreviewListener.onImageFullscreenPreviewClicked(mediaUrl);
             }
-        });
+
+            @Override
+            public void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl) {
+                mMediaPickedByUserOnBlock = true;
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
+            }
+
+            @Override
+            public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
+                mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
+            }
+        }, mIsDarkMode);
 
         return Arrays.asList(
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
+                new LinearGradientPackage(),
                 new ReactAztecPackage(),
-                new RNRecyclerviewListPackage(),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
@@ -329,15 +354,18 @@ public class WPAndroidGlueCode {
     @Deprecated
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost, String localeString, Bundle translations) {
+                             boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
         onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations);
+        , localeString, translations, colorBackground, isDarkMode);
     }
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             String postType, boolean isNewPost, String localeString, Bundle translations) {
+                             String postType, boolean isNewPost, String localeString, Bundle translations,
+                             int colorBackground, boolean isDarkMode) {
+        mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
+        mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
@@ -345,16 +373,14 @@ public class WPAndroidGlueCode {
                                     .setJSMainModulePath("index")
                                     .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
+                                    .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
             builder.setBundleAssetName("index.android.bundle");
         }
         mReactInstanceManager = builder.build();
-        mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-            @Override
-            public void onReactContextInitialized(ReactContext context) {
-                mReactContext = context;
-            }
+        mReactInstanceManager.addReactInstanceEventListener(context -> {
+            mReactContext = context;
         });
         Bundle initialProps = mReactRootView.getAppProperties();
         if (initialProps == null) {
@@ -378,7 +404,11 @@ public class WPAndroidGlueCode {
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
-                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener) {
+                                  OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
+                                  OnMediaEditorListener onMediaEditorListener,
+                                  OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
+                                  boolean isDarkMode) {
+
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -388,6 +418,8 @@ public class WPAndroidGlueCode {
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
+        mOnMediaEditorListener = onMediaEditorListener;
+        mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -397,6 +429,10 @@ public class WPAndroidGlueCode {
 
         viewGroup.addView(mReactRootView, 0,
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        if (mReactContext != null) {
+            setPreferredColorScheme(isDarkMode);
+        }
 
         refocus();
     }
@@ -468,6 +504,14 @@ public class WPAndroidGlueCode {
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                             .appendNewMediaBlock(mediaId, mediaUri, mediaType);
+    }
+
+    public void setPreferredColorScheme(boolean isDarkMode) {
+        if (mIsDarkMode != isDarkMode) {
+            mIsDarkMode = isDarkMode;
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .setPreferredColorScheme(isDarkMode);
+        }
     }
 
     public void setTitle(String title) {
@@ -628,6 +672,12 @@ public class WPAndroidGlueCode {
             } else {
                 rnMediaList.addAll(mediaList);
                 mPendingMediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
+            }
+        } else {
+            // This case is for media that is shared from the device
+            for (Media mediaToAppend : mediaList) {
+                sendOrDeferAppendMediaSignal(mediaToAppend.getId(), mediaToAppend.getUrl(),
+                        mediaToAppend.getType());
             }
         }
 

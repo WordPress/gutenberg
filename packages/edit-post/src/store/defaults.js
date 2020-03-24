@@ -8,8 +8,8 @@ export const PREFERENCES_DEFAULTS = {
 	},
 	features: {
 		fixedToolbar: false,
-		showInserterHelpPanel: true,
 		welcomeGuide: true,
+		fullscreenMode: true,
 	},
 	pinnedPluginItems: {},
 	hiddenBlockTypes: [],

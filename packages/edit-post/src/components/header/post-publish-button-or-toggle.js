@@ -84,8 +84,12 @@ export default compose(
 		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
 		isPending: select( 'core/editor' ).isCurrentPostPending(),
 		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
-		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		isPublishSidebarEnabled: select(
+			'core/editor'
+		).isPublishSidebarEnabled(),
+		isPublishSidebarOpened: select(
+			'core/edit-post'
+		).isPublishSidebarOpened(),
 		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
@@ -93,5 +97,5 @@ export default compose(
 		return {
 			togglePublishSidebar,
 		};
-	} ),
+	} )
 )( PostPublishButtonOrToggle );

@@ -8,7 +8,7 @@ Once you have Node installed, run these scripts from within your local Gutenberg
 
 Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
 
-```
+```bash
 npm install
 npm run build
 ```
@@ -20,9 +20,10 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 ## Local Environment
 
 ### Step 1: Installing a Local Environment
-#### Quickest Method: Using Docker
 
-The quickest way to get up and running is to use the provided Docker setup. If you don't already have it, you'll need to install Docker and Docker Compose.
+The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
 To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
 
@@ -30,55 +31,26 @@ To install Docker Compose, [follow their instructions here](https://docs.docker.
 
 Once Docker is installed and running, run this script to install WordPress, and build your local environment:
 
-```
-npm run env install
-```
-
-#### Alternative Method: Using an Existing Local WordPress Install
-WordPress will be installed in the `wordpress` directory, if you need to access WordPress core files directly, you can find them there.
-
-If you already have WordPress checked out in a different directory, you can use that installation, instead, by running these commands:
-
-```
-export WP_DEVELOP_DIR=/path/to/wordpress-develop
-npm run env connect
+```bash
+npx wp-env start
 ```
 
-This will use WordPress' own local environment, and mount your Gutenberg directory as a volume there.
-
-In Windows, you can set the `WP_DEVELOP_DIR` environment variable using the appropriate method for your shell:
-
-    CMD: set WP_DEVELOP_DIR=/path/to/wordpress-develop
-    PowerShell: $env:WP_DEVELOP_DIR = "/path/to/wordpress-develop"
-	
 ### Step 2: Accessing and Configuring the Local WordPress Install
+
 #### Accessing the Local WordPress Install
 
-Whether you decided to use Docker or an existing local WordPress install, the WordPress installation should now be available at `http://localhost:8889` (**Username**: `admin`, **Password**: `password`).
-If this port is in use, you can override it using the `LOCAL_PORT` environment variable. For example running the below command on your computer will change the URL to
-`http://localhost:7777` .
+The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
+If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
 
-Linux/macOS: `export LOCAL_PORT=7777`
-Windows using Command Prompt: `setx LOCAL_PORT "7777"`
-Windows using PowerShell: `$env:LOCAL_PORT = "7777"`
-
-If you're running [e2e tests](/docs/contributors/testing-overview.md#end-to-end-testing), this change will be used correctly.
-
-To shut down this local WordPress instance run `npm run env stop`. To start it back up again, run `npm run env start`.
+To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
 
 #### Toggling Debug Systems
 
-WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. It is possible to use environment variables (`LOCAL_WP_DEBUG` and `LOCAL_SCRIPT_DEBUG`) to update a site's configuration constants located in `wp-config.php` file. Both flags can be disabled at any time by running the following command:
-
-Example on Linux/MacOS:
-```
-LOCAL_SCRIPT_DEBUG=false LOCAL_WP_DEBUG=false npm run env install
-```
-By default, both flags will be set to `true`.
+WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. In order to use with `wp-env,` you'll have to edit your local WordPress install's `wp-config.php`.
 
 #### Troubleshooting
 
-You might find yourself stuck on a screen stating that "you are running WordPress without JavaScript and CSS files". If you tried installing WordPress via `npm run env install`, it probably means that something went wrong during the process. To fix it, try removing the `/wordpress` folder and running `npm run env install` again.
+See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
 
 ## On A Remote Server
 
@@ -125,7 +97,7 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
 
-To use Prettier, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) in Visual Studio Code. You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
+To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
 
 ```json
 "[javascript]": {
@@ -134,11 +106,11 @@ To use Prettier, you should install the [Prettier - Code formatter extension](ht
 },
 ```
 
-This will use the `.prettierrc.js` file in the root folder of the Gutenberg repository and the version of Prettier that is installed in the root `node_modules` folder. To test it out prior to PR #18048 being merged, you should:
+This will use the `.prettierrc.js` file included in the root of the Gutenberg repository.
 
-1. git switch add/prettier
-2. npm ci
-3. Edit a JavaScript file and on save it will format it as defined
+If you only want to use this configuration with the Gutenberg project, create a directory called .vscode at the top-level of Gutenberg, and place your settings in a settings.json there. Visual Studio Code refers to this as Workplace Settings, and only apply to the project.
+
+For other editors, see [Prettier's Editor Integration docs](https://prettier.io/docs/en/editors.html)
 
 ### TypeScript
 

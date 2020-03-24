@@ -13,6 +13,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -67,7 +68,9 @@ jest.mock( 'react-native-safe-area', () => {
 
 jest.mock( 'react-native-recyclerview-list' );
 
-jest.mock( '@react-native-community/slider', () => () => 'Slider', { virtual: true } );
+jest.mock( '@react-native-community/slider', () => () => 'Slider', {
+	virtual: true,
+} );
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
@@ -76,6 +79,10 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
 
 // Overwrite some native module mocks from `react-native` jest preset:
 // https://github.com/facebook/react-native/blob/master/jest/setup.js
@@ -92,6 +99,8 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 	try {
 		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
 	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], { virtual: true } );
+		jest.doMock( module, () => mockNativeModules[ module ], {
+			virtual: true,
+		} );
 	}
 } );

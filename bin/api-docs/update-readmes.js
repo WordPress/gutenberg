@@ -16,7 +16,14 @@ getPackages().forEach( ( entry ) => {
 		// Each target operates over the same file, so it needs to be processed synchronously,
 		// as to make sure the processes don't overwrite each other.
 		const { status, stderr } = spawnSync(
-			join( __dirname, '..', '..', 'node_modules', '.bin', 'docgen' ).replace( / /g, '\\ ' ),
+			join(
+				__dirname,
+				'..',
+				'..',
+				'node_modules',
+				'.bin',
+				'docgen'
+			).replace( / /g, '\\ ' ),
 			[
 				join( 'packages', packageName, path ),
 				`--output packages/${ packageName }/README.md`,
@@ -24,7 +31,7 @@ getPackages().forEach( ( entry ) => {
 				`--use-token "${ token }"`,
 				'--ignore "/unstable|experimental/i"',
 			],
-			{ shell: true },
+			{ shell: true }
 		);
 
 		if ( status !== 0 ) {

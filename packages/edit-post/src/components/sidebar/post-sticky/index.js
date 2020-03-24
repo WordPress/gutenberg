@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { PanelRow } from '@wordpress/components';
-import { PostSticky as PostStickyForm, PostStickyCheck } from '@wordpress/editor';
+import {
+	PostSticky as PostStickyForm,
+	PostStickyCheck,
+} from '@wordpress/editor';
 
 export function PostSticky() {
 	return (

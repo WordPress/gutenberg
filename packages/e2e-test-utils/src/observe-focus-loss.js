@@ -5,7 +5,10 @@
 export async function enableFocusLossObservation() {
 	await page.evaluate( () => {
 		if ( window._detectFocusLoss ) {
-			document.body.removeEventListener( 'focusout', window._detectFocusLoss );
+			document.body.removeEventListener(
+				'focusout',
+				window._detectFocusLoss
+			);
 		}
 
 		window._detectFocusLoss = ( event ) => {
@@ -24,7 +27,10 @@ export async function enableFocusLossObservation() {
 export async function disableFocusLossObservation() {
 	await page.evaluate( () => {
 		if ( window._detectFocusLoss ) {
-			document.body.removeEventListener( 'focusout', window._detectFocusLoss );
+			document.body.removeEventListener(
+				'focusout',
+				window._detectFocusLoss
+			);
 		}
 	} );
 }

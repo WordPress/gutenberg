@@ -1,6 +1,6 @@
 
 import UIKit
-import RNReactNativeGutenbergBridge
+import Gutenberg
 import Aztec
 
 class GutenbergViewController: UIViewController {
@@ -181,9 +181,18 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Fatal: \(message)")
         }
     }
+
+    func gutenbergDidRequestImagePreview(with fullSizeUrl: URL, thumbUrl: URL?) {
+        print("Gutenberg requested fullscreen image preview for " + fullSizeUrl.absoluteString)
+    }
+
+    func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg requested media editor for " + mediaUrl.absoluteString)
+        callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
+    }
     
-    func gutenbergDidRequestFullscreenImage(with mediaUrl: URL) {
-        print("Gutenberg requested fullscreen image preview for " + mediaUrl.absoluteString)
+    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
+        print("Gutenberg loged user event")
     }
 }
 

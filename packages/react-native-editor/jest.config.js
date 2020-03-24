@@ -12,8 +12,6 @@ if ( process.env.TEST_RN_PLATFORM ) {
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
 
-const configPath = 'test/native';
-
 const transpiledPackageNames = glob( '../../packages/*/src/index.js' )
 	.map( ( fileName ) => fileName.split( '/' )[ 3 ] );
 
@@ -51,7 +49,6 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		hasteImplModulePath: '<rootDir>/node_modules/react-native/jest/hasteImpl.js',
 		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [

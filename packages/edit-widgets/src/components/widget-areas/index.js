@@ -11,7 +11,12 @@ import WidgetArea from '../widget-area';
 
 const EMPTY_ARRAY = [];
 
-function WidgetAreas( { areas, blockEditorSettings, selectedArea, setSelectedArea } ) {
+function WidgetAreas( {
+	areas,
+	blockEditorSettings,
+	selectedArea,
+	setSelectedArea,
+} ) {
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
 			isSelectedArea={ index === selectedArea }

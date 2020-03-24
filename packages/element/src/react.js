@@ -227,11 +227,18 @@ export function concatChildren( ...childrenArguments ) {
  * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
-	return children && Children.map( children, ( elt, index ) => {
-		if ( isString( elt ) ) {
-			return createElement( nodeName, { key: index }, elt );
-		}
-		const { children: childrenProp, ...props } = elt.props;
-		return createElement( nodeName, { key: index, ...props }, childrenProp );
-	} );
+	return (
+		children &&
+		Children.map( children, ( elt, index ) => {
+			if ( isString( elt ) ) {
+				return createElement( nodeName, { key: index }, elt );
+			}
+			const { children: childrenProp, ...props } = elt.props;
+			return createElement(
+				nodeName,
+				{ key: index, ...props },
+				childrenProp
+			);
+		} )
+	);
 }

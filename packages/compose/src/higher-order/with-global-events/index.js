@@ -78,7 +78,12 @@ function withGlobalEvents( eventTypesToHandlers ) {
 			}
 
 			render() {
-				return <WrappedComponent { ...this.props.ownProps } ref={ this.handleRef } />;
+				return (
+					<WrappedComponent
+						{ ...this.props.ownProps }
+						ref={ this.handleRef }
+					/>
+				);
 			}
 		}
 

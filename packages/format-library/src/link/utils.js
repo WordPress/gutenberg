@@ -18,7 +18,6 @@ import {
 	getFragment,
 	isValidFragment,
 } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Check for issues with the provided href.
@@ -47,7 +46,10 @@ export function isValidHref( href ) {
 
 		// Add some extra checks for http(s) URIs, since these are the most common use-case.
 		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
-		if ( startsWith( protocol, 'http' ) && ! /^https?:\/\/[^\/\s]/i.test( trimmedHref ) ) {
+		if (
+			startsWith( protocol, 'http' ) &&
+			! /^https?:\/\/[^\/\s]/i.test( trimmedHref )
+		) {
 			return false;
 		}
 
@@ -90,7 +92,7 @@ export function isValidHref( href ) {
  *
  * @return {Object} The final format object.
  */
-export function createLinkFormat( { url, opensInNewWindow, text } ) {
+export function createLinkFormat( { url, opensInNewWindow } ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -99,12 +101,8 @@ export function createLinkFormat( { url, opensInNewWindow, text } ) {
 	};
 
 	if ( opensInNewWindow ) {
-		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text );
-
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
-		format.attributes[ 'aria-label' ] = label;
 	}
 
 	return format;

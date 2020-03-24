@@ -56,24 +56,22 @@ export default function save( { attributes } ) {
 				>
 					{ image }
 				</a>
-			) : image }
-			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+			) : (
+				image
+			) }
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content tagName="figcaption" value={ caption } />
+			) }
 		</>
 	);
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
 			<div>
-				<figure className={ classes }>
-					{ figure }
-				</figure>
+				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return (
-		<figure className={ classes }>
-			{ figure }
-		</figure>
-	);
+	return <figure className={ classes }>{ figure }</figure>;
 }

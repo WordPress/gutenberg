@@ -27,9 +27,7 @@ export const DefaultBlockAppender = ( { clientId, lastBlockClientId } ) => {
 export default compose( [
 	withClientId,
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlockOrder,
-		} = select( 'core/block-editor' );
+		const { getBlockOrder } = select( 'core/block-editor' );
 
 		const blockClientIds = getBlockOrder( clientId );
 

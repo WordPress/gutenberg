@@ -1,10 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	isEmpty,
-	each,
-} from 'lodash';
+import { isEmpty, each } from 'lodash';
 
 /**
  * Internal dependencies

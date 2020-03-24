@@ -24,6 +24,30 @@ export const textItem = {
 	utility: 1,
 };
 
+export const withVariationsItem = {
+	id: 'core/block-with-variations',
+	name: 'core/block-with-variations',
+	initialAttributes: {},
+	title: 'With Variations',
+	category: 'widgets',
+	isDisabled: false,
+	utility: 0,
+	variations: [
+		{
+			name: 'variation-one',
+			title: 'Variation One',
+		},
+		{
+			name: 'variation-two',
+			title: 'Variation Two',
+		},
+		{
+			name: 'variation-three',
+			title: 'Variation Three',
+		},
+	],
+};
+
 export const advancedTextItem = {
 	id: 'core/advanced-text-block',
 	name: 'core/advanced-text-block',
@@ -87,6 +111,7 @@ export const reusableItem = {
 
 export default [
 	textItem,
+	withVariationsItem,
 	advancedTextItem,
 	someOtherItem,
 	moreItem,

@@ -17,8 +17,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalPageTemplatePicker,
-	__experimentalUsePageTemplatePickerVisible,
+	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalFullscreenMode as FullscreenMode,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -39,8 +39,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import EditorRegions from '../editor-regions';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -51,10 +49,15 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const { closePublishSidebar, togglePublishSidebar } = useDispatch( 'core/edit-post' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const {
+		closePublishSidebar,
+		openGeneralSidebar,
+		togglePublishSidebar,
+	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -64,31 +67,54 @@ function Layout() {
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
+		hasBlockSelected,
 	} = useSelect( ( select ) => {
-		return ( {
-			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-			editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-			pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-			publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		return {
+			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+				'fixedToolbar'
+			),
+			editorSidebarOpened: select(
+				'core/edit-post'
+			).isEditorSidebarOpened(),
+			pluginSidebarOpened: select(
+				'core/edit-post'
+			).isPluginSidebarOpened(),
+			publishSidebarOpened: select(
+				'core/edit-post'
+			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			previousShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/previous-region' ),
-			nextShortcut: select( 'core/keyboard-shortcuts' ).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-		} );
+			previousShortcut: select(
+				'core/keyboard-shortcuts'
+			).getAllShortcutRawKeyCombinations(
+				'core/edit-post/previous-region'
+			),
+			nextShortcut: select(
+				'core/keyboard-shortcuts'
+			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+		};
 	}, [] );
-	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
-	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
+	const sidebarIsOpened =
+		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 	} );
+	const openSidebarPanel = () =>
+		openGeneralSidebar(
+			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
+		);
 
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
@@ -96,53 +122,86 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorRegions
+				<EditorSkeleton
 					className={ className }
 					header={ <Header /> }
-					sidebar={ ! publishSidebarOpened && (
-						<>
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
-					) }
+					sidebar={
+						( ! isMobileViewport || sidebarIsOpened ) && (
+							<>
+								{ ! isMobileViewport && ! sidebarIsOpened && (
+									<div className="edit-post-layout__toogle-sidebar-panel">
+										<Button
+											isSecondary
+											className="edit-post-layout__toogle-sidebar-panel-button"
+											onClick={ openSidebarPanel }
+											aria-expanded={ false }
+										>
+											{ hasBlockSelected
+												? __( 'Open block settings' )
+												: __(
+														'Open document settings'
+												  ) }
+										</Button>
+									</div>
+								) }
+								<SettingsSidebar />
+								<Sidebar.Slot />
+							</>
+						)
+					}
 					content={
 						<>
 							<EditorNotices />
-							<Popover.Slot name="block-toolbar" />
-							{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
-							{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
+							{ ( mode === 'text' || ! isRichEditingEnabled ) && (
+								<TextEditor />
+							) }
+							{ isRichEditingEnabled && mode === 'visual' && (
+								<VisualEditor />
+							) }
 							<div className="edit-post-layout__metaboxes">
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
 							</div>
-							{ isMobileViewport && sidebarIsOpened && <ScrollLock /> }
+							{ isMobileViewport && sidebarIsOpened && (
+								<ScrollLock />
+							) }
 						</>
 					}
-					footer={ isRichEditingEnabled && mode === 'visual' && (
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb />
-						</div>
-					) }
-					publish={ publishSidebarOpened ? (
-						<PostPublishPanel
-							onClose={ closePublishSidebar }
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-							PrePublishExtension={ PluginPrePublishPanel.Slot }
-							PostPublishExtension={ PluginPostPublishPanel.Slot }
-						/>
-					) : (
-						<div className="edit-post-toggle-publish-panel">
-							<Button
-								isSecondary
-								className="edit-post-toggle-publish-panel__button"
-								onClick={ togglePublishSidebar }
-								aria-expanded={ false }
-							>
-								{ __( 'Open publish panel' ) }
-							</Button>
-						</div>
-					) }
+					footer={
+						! isMobileViewport &&
+						isRichEditingEnabled &&
+						mode === 'visual' && (
+							<div className="edit-post-layout__footer">
+								<BlockBreadcrumb />
+							</div>
+						)
+					}
+					publish={
+						publishSidebarOpened ? (
+							<PostPublishPanel
+								onClose={ closePublishSidebar }
+								forceIsDirty={ hasActiveMetaboxes }
+								forceIsSaving={ isSaving }
+								PrePublishExtension={
+									PluginPrePublishPanel.Slot
+								}
+								PostPublishExtension={
+									PluginPostPublishPanel.Slot
+								}
+							/>
+						) : (
+							<div className="edit-post-layout__toggle-publish-panel">
+								<Button
+									isSecondary
+									className="edit-post-layout__toggle-publish-panel-button"
+									onClick={ togglePublishSidebar }
+									aria-expanded={ false }
+								>
+									{ __( 'Open publish panel' ) }
+								</Button>
+							</div>
+						)
+					}
 					shortcuts={ {
 						previous: previousShortcut,
 						next: nextShortcut,
@@ -154,9 +213,7 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && <__experimentalPageTemplatePicker /> }
 			</FocusReturnProvider>
-
 		</>
 	);
 }

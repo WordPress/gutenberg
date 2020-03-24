@@ -11,11 +11,7 @@ import URLPopover from '../';
 describe( 'URLPopover', () => {
 	it( 'matches the snapshot in its default state', () => {
 		const wrapper = shallow(
-			<URLPopover
-				renderSettings={ () => (
-					<div>Settings</div>
-				) }
-			>
+			<URLPopover renderSettings={ () => <div>Settings</div> }>
 				<div>Editor</div>
 			</URLPopover>
 		);
@@ -25,16 +21,14 @@ describe( 'URLPopover', () => {
 
 	it( 'matches the snapshot when the settings are toggled open', () => {
 		const wrapper = shallow(
-			<URLPopover
-				renderSettings={ () => (
-					<div>Settings</div>
-				) }
-			>
+			<URLPopover renderSettings={ () => <div>Settings</div> }>
 				<div>Editor</div>
 			</URLPopover>
 		);
 
-		const toggleButton = wrapper.find( '.block-editor-url-popover__settings-toggle' );
+		const toggleButton = wrapper.find(
+			'.block-editor-url-popover__settings-toggle'
+		);
 		expect( toggleButton ).toHaveLength( 1 );
 		toggleButton.simulate( 'click' );
 

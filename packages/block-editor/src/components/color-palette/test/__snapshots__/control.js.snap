@@ -9,20 +9,24 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   >
     <fieldset>
       <legend>
-        <span
-          className="components-base-control__label"
+        <div
+          className="block-editor-color-gradient-control__color-indicator"
         >
-          Test Color
           <span
-            aria-label="(Color: #f00)"
-            className="component-color-indicator"
-            style={
-              Object {
-                "background": "#f00",
+            className="components-base-control__label"
+          >
+            Test Color
+            <span
+              aria-label="(Color: #f00)"
+              className="component-color-indicator"
+              style={
+                Object {
+                  "background": "#f00",
+                }
               }
-            }
-          />
-        </span>
+            />
+          </span>
+        </div>
       </legend>
       <div
         className="components-circular-option-picker"
@@ -42,6 +46,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             onMouseLeave={[Function]}
             style={
               Object {
+                "backgroundColor": "#f00",
                 "color": "#f00",
               }
             }
@@ -49,16 +54,16 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
           />
           <svg
             aria-hidden="true"
-            className="dashicon dashicons-saved"
+            fill="#000000"
             focusable="false"
-            height={20}
+            height={24}
             role="img"
-            viewBox="0 0 20 20"
-            width={20}
+            viewBox="0 0 24 24"
+            width={24}
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+              d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
             />
           </svg>
         </div>
@@ -75,7 +80,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               onClick={[Function]}
               type="button"
             >
-              Custom Color
+              Custom color
             </button>
           </div>
           <button

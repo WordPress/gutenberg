@@ -6,6 +6,7 @@ import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 function onClick( event ) {
 	// Tips are often nested within buttons. We stop propagation so that clicking
@@ -58,7 +59,7 @@ export function DotTip( {
 			</p>
 			<Button
 				className="nux-dot-tip__disable"
-				icon="no-alt"
+				icon={ close }
 				label={ __( 'Disable tips' ) }
 				onClick={ onDisable }
 			/>
@@ -85,5 +86,5 @@ export default compose(
 				disableTips();
 			},
 		};
-	} ),
+	} )
 )( DotTip );

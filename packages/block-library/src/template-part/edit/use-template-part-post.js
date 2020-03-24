@@ -34,7 +34,10 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 				const foundPost =
 					posts &&
 					posts.find(
-						( post ) => post.slug === slug && post.meta && post.meta.theme === theme
+						( post ) =>
+							post.slug === slug &&
+							post.meta &&
+							post.meta.theme === theme
 					);
 				return foundPost && foundPost.id;
 			}

@@ -43,14 +43,13 @@ function testIsAccessedViaProcessEnv( node, context ) {
 		parent &&
 		parent.type === 'MemberExpression' &&
 		context.getSource( parent ) === 'process.env.GUTENBERG_PHASE'
-
 	) {
 		return;
 	}
 
 	context.report(
 		node,
-		'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.',
+		'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.'
 	);
 }
 
@@ -72,17 +71,22 @@ function testIsAccessedViaProcessEnv( node, context ) {
  * @param {Object} context The eslint context object.
  */
 function testIsUsedInStrictBinaryExpression( node, context ) {
-	const parent = findParent( node, ( candidate ) => candidate.type === 'BinaryExpression' );
+	const parent = findParent(
+		node,
+		( candidate ) => candidate.type === 'BinaryExpression'
+	);
 
 	if ( parent ) {
-		const comparisonNode = node.parent.type === 'MemberExpression' ? node.parent : node;
+		const comparisonNode =
+			node.parent.type === 'MemberExpression' ? node.parent : node;
 
 		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
-		const hasCorrectOperands = (
-			( parent.left === comparisonNode && typeof parent.right.value === 'number' ) ||
-			( parent.right === comparisonNode && typeof parent.left.value === 'number' )
-		);
+		const hasCorrectOperands =
+			( parent.left === comparisonNode &&
+				typeof parent.right.value === 'number' ) ||
+			( parent.right === comparisonNode &&
+				typeof parent.left.value === 'number' );
 
 		if ( hasCorrectOperator && hasCorrectOperands ) {
 			return;
@@ -91,7 +95,7 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
 
 	context.report(
 		node,
-		'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.',
+		'The `GUTENBERG_PHASE` constant should only be used in a strict equality comparison with a primitive number.'
 	);
 }
 
@@ -112,13 +116,16 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
  * @param {Object} context The eslint context object.
  */
 function testIsUsedInIfOrTernary( node, context ) {
-	const conditionalParent = findParent(
-		node,
-		( candidate ) => [ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
+	const conditionalParent = findParent( node, ( candidate ) =>
+		[ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
 	);
-	const binaryParent = findParent( node, ( candidate ) => candidate.type === 'BinaryExpression' );
+	const binaryParent = findParent(
+		node,
+		( candidate ) => candidate.type === 'BinaryExpression'
+	);
 
-	if ( conditionalParent &&
+	if (
+		conditionalParent &&
 		binaryParent &&
 		conditionalParent.test &&
 		conditionalParent.test.start === binaryParent.start &&
@@ -129,7 +136,7 @@ function testIsUsedInIfOrTernary( node, context ) {
 
 	context.report(
 		node,
-		'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.',
+		'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.'
 	);
 }
 

@@ -26,12 +26,7 @@ const {
  * @return {boolean} Whether the selection is forward.
  */
 function isSelectionForward( selection ) {
-	const {
-		anchorNode,
-		focusNode,
-		anchorOffset,
-		focusOffset,
-	} = selection;
+	const { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 
 	const position = anchorNode.compareDocumentPosition( focusNode );
 
@@ -93,7 +88,8 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const range = selection.getRangeAt( 0 ).cloneRange();
+	const originalRange = selection.getRangeAt( 0 );
+	const range = originalRange.cloneRange();
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
@@ -121,19 +117,22 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const padding = parseInt( computedStyle[
-		`padding${ isReverse ? 'Top' : 'Bottom' }`
-	], 10 ) || 0;
+	const padding =
+		parseInt(
+			computedStyle[ `padding${ isReverse ? 'Top' : 'Bottom' }` ],
+			10
+		) || 0;
 
 	// Calculate a buffer that is half the line height. In some browsers, the
 	// selection rectangle may not fill the entire height of the line, so we add
 	// 3/4 the line height to the selection rectangle to ensure that it is well
 	// over its line boundary.
-	const buffer = 3 * parseInt( lineHeight, 10 ) / 4;
+	const buffer = ( 3 * parseInt( lineHeight, 10 ) ) / 4;
 	const containerRect = container.getBoundingClientRect();
-	const verticalEdge = isReverse ?
-		containerRect.top + padding > rangeRect.top - buffer :
-		containerRect.bottom - padding < rangeRect.bottom + buffer;
+	const originalRangeRect = getRectangleFromRange( originalRange );
+	const verticalEdge = isReverse
+		? containerRect.top + padding > originalRangeRect.top - buffer
+		: containerRect.bottom - padding < originalRangeRect.bottom + buffer;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -145,7 +144,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
 	const { direction } = computedStyle;
-	const isReverseDir = direction === 'rtl' ? ( ! isReverse ) : isReverse;
+	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 	// To calculate the horizontal position, we insert a test range and see if
 	// this test range has the same horizontal position. This method proves to
@@ -153,7 +152,9 @@ function isEdge( container, isReverse, onlyVertical ) {
 	// nodes and a trailing line break element. In other words, we need to check
 	// visual positioning, not DOM positioning.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
-	const y = isReverse ? containerRect.top + buffer : containerRect.bottom - buffer;
+	const y = isReverse
+		? containerRect.top + buffer
+		: containerRect.bottom - buffer;
 	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! testRange ) {
@@ -211,7 +212,9 @@ export function getRectangleFromRange( range ) {
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
-		const index = Array.from( parentNode.childNodes ).indexOf( startContainer );
+		const index = Array.from( parentNode.childNodes ).indexOf(
+			startContainer
+		);
 
 		range = document.createRange();
 		range.setStart( parentNode, index );
@@ -376,7 +379,12 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
  * @param {DOMRect} [rect]              The rectangle to position the caret with.
  * @param {boolean} [mayUseScroll=true] True to allow scrolling, false to disallow.
  */
-export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScroll = true ) {
+export function placeCaretAtVerticalEdge(
+	container,
+	isReverse,
+	rect,
+	mayUseScroll = true
+) {
 	if ( ! container ) {
 		return;
 	}
@@ -395,14 +403,19 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
-	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
+	const y = isReverse
+		? editableRect.bottom - buffer
+		: editableRect.top + buffer;
 
 	const range = hiddenCaretRangeFromPoint( document, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
-		if ( mayUseScroll && (
-			( ! range || ! range.startContainer ) ||
-				! range.startContainer.contains( container ) ) ) {
+		if (
+			mayUseScroll &&
+			( ! range ||
+				! range.startContainer ||
+				! range.startContainer.contains( container ) )
+		) {
 			// Might be out of view.
 			// Easier than attempting to calculate manually.
 			container.scrollIntoView( isReverse );
@@ -440,7 +453,7 @@ export function isTextField( element ) {
 
 		return (
 			( nodeName === 'INPUT' && selectionStart !== null ) ||
-			( nodeName === 'TEXTAREA' ) ||
+			nodeName === 'TEXTAREA' ||
 			contentEditable === 'true'
 		);
 	} catch ( error ) {
@@ -483,7 +496,10 @@ export function documentHasSelection() {
  */
 export function isEntirelySelected( element ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
-		return element.selectionStart === 0 && element.value.length === element.selectionEnd;
+		return (
+			element.selectionStart === 0 &&
+			element.value.length === element.selectionEnd
+		);
 	}
 
 	if ( ! element.isContentEditable ) {
@@ -509,9 +525,10 @@ export function isEntirelySelected( element ) {
 	}
 
 	const lastChild = element.lastChild;
-	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
-		lastChild.data.length :
-		lastChild.childNodes.length;
+	const lastChildContentLength =
+		lastChild.nodeType === TEXT_NODE
+			? lastChild.data.length
+			: lastChild.childNodes.length;
 
 	return (
 		startContainer === element.firstChild &&
@@ -669,7 +686,7 @@ export function wrap( newNode, referenceNode ) {
  *
  * @return {string} The text content with any html removed.
  */
-export function stripHTML( html ) {
+export function __unstableStripHTML( html ) {
 	const document = new DOMParser().parseFromString( html, 'text/html' );
 	return document.body.textContent || '';
 }

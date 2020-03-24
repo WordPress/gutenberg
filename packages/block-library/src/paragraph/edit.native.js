@@ -1,68 +1,44 @@
 /**
- * External dependencies
- */
-import { View } from 'react-native';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
+import {
+	AlignmentToolbar,
+	BlockControls,
+	RichText,
+	__experimentalUseColors,
+} from '@wordpress/block-editor';
 
 const name = 'core/paragraph';
 
-class ParagraphEdit extends Component {
-	constructor( props ) {
-		super( props );
-		this.onReplace = this.onReplace.bind( this );
-	}
+function ParagraphBlock( {
+	attributes,
+	mergeBlocks,
+	onReplace,
+	setAttributes,
+	style,
+} ) {
+	const { align, content, placeholder } = attributes;
 
-	onReplace( blocks ) {
-		const { attributes, onReplace } = this.props;
-		onReplace( blocks.map( ( block, index ) => (
-			index === 0 && block.name === name ?
-				{ ...block,
-					attributes: {
-						...attributes,
-						...block.attributes,
-					},
-				} :
-				block
-		) ) );
-	}
+	/* eslint-disable @wordpress/no-unused-vars-before-return */
+	const { TextColor } = __experimentalUseColors( [
+		{ name: 'textColor', property: 'color' },
+	] );
+	/* eslint-enable @wordpress/no-unused-vars-before-return */
 
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			mergeBlocks,
-			onReplace,
-			style,
-		} = this.props;
-
-		const {
-			align,
-			content,
-			placeholder,
-		} = attributes;
-
-		return (
-			<View>
-				<BlockControls>
-					<AlignmentToolbar
-						isCollapsed={ false }
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
+	return (
+		<>
+			<BlockControls>
+				<AlignmentToolbar
+					isCollapsed={ false }
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
+			</BlockControls>
+			<TextColor>
 				<RichText
 					identifier="content"
 					tagName="p"
@@ -90,9 +66,9 @@ class ParagraphEdit extends Component {
 					placeholder={ placeholder || __( 'Start writing…' ) }
 					textAlign={ align }
 				/>
-			</View>
-		);
-	}
+			</TextColor>
+		</>
+	);
 }
 
-export default ParagraphEdit;
+export default ParagraphBlock;

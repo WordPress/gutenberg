@@ -1,4 +1,3 @@
-
 /**
  * WordPress dependencies
  */
@@ -23,17 +22,9 @@ const ColorPickerWithState = ( { ...props } ) => {
 };
 
 export const _default = () => {
-	return (
-		<ColorPickerWithState
-			disableAlpha
-		/>
-	);
+	return <ColorPickerWithState disableAlpha />;
 };
 
 export const alphaEnabled = () => {
-	return (
-		<ColorPickerWithState
-			disableAlpha={ false }
-		/>
-	);
+	return <ColorPickerWithState disableAlpha={ false } />;
 };

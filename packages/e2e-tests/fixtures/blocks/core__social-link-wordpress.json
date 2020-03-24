@@ -1,11 +1,11 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core/social-link-wordpress",
+        "name": "core/social-link",
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "site": "wordpress"
+            "service": "wordpress"
         },
         "innerBlocks": [],
         "originalContent": ""

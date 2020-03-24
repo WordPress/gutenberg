@@ -4,18 +4,16 @@
 import React from 'react';
 
 class AztecView extends React.Component {
-	blur = () => {
-	}
+	blur = () => {};
 
-	focus = () => {
-	}
+	focus = () => {};
 
 	isFocused = () => {
 		return false;
-	}
+	};
 
 	render() {
-		return ( <></> );
+		return <></>;
 	}
 }
 

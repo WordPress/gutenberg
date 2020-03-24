@@ -8,9 +8,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withViewportMatch } from '@wordpress/viewport';
-import { Component } from '@wordpress/element';
+import { Component, forwardRef, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
+import {
+	synchronizeBlocksWithTemplate,
+	withBlockContentContext,
+} from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
 
@@ -41,6 +44,7 @@ class InnerBlocks extends Component {
 			templateLock,
 			__experimentalBlocks,
 			replaceInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
 		} = this.props;
 		const { innerBlocks } = block;
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
@@ -56,7 +60,8 @@ class InnerBlocks extends Component {
 
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
-			replaceInnerBlocks( __experimentalBlocks );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( __experimentalBlocks, false );
 		}
 	}
 
@@ -74,7 +79,10 @@ class InnerBlocks extends Component {
 		this.updateNestedSettings();
 		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
-			const hasTemplateChanged = ! isEqual( template, prevProps.template );
+			const hasTemplateChanged = ! isEqual(
+				template,
+				prevProps.template
+			);
 			if ( hasTemplateChanged ) {
 				this.synchronizeBlocksWithTemplate();
 			}
@@ -99,8 +107,11 @@ class InnerBlocks extends Component {
 		const { innerBlocks } = block;
 
 		// Synchronize with templates. If the next set differs, replace.
-		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
-		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
+		const nextBlocks = synchronizeBlocksWithTemplate(
+			innerBlocks,
+			template
+		);
+		if ( ! isEqual( nextBlocks, innerBlocks ) ) {
 			replaceInnerBlocks( nextBlocks );
 		}
 	}
@@ -119,8 +130,10 @@ class InnerBlocks extends Component {
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: templateLock === undefined ? parentLock : templateLock,
-			__experimentalCaptureToolbars: __experimentalCaptureToolbars || false,
+			templateLock:
+				templateLock === undefined ? parentLock : templateLock,
+			__experimentalCaptureToolbars:
+				__experimentalCaptureToolbars || false,
 			__experimentalMoverDirection,
 			__experimentalUIParts,
 		};
@@ -136,29 +149,42 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
+			forwardedRef,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const classes = classnames( 'block-editor-inner-blocks', {
+		if ( templateInProcess ) {
+			return null;
+		}
+
+		const classes = classnames( {
 			'has-overlay': enableClickThrough && hasOverlay,
 			'is-capturing-toolbar': captureToolbars,
 		} );
 
+		const blockList = (
+			<BlockList
+				{ ...props }
+				ref={ forwardedRef }
+				rootClientId={ clientId }
+				className={ classes }
+			/>
+		);
+
+		if ( props.__experimentalTagName ) {
+			return blockList;
+		}
+
 		return (
-			<div className={ classes }>
-				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						{ ...props }
-					/>
-				) }
+			<div className="block-editor-inner-blocks" ref={ forwardedRef }>
+				{ blockList }
 			</div>
 		);
 	}
 }
 
-InnerBlocks = compose( [
+const ComposedInnerBlocks = compose( [
 	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
@@ -179,7 +205,10 @@ InnerBlocks = compose( [
 		return {
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
+			hasOverlay:
+				block.name !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
 			isLastBlockChangePersistent: isLastBlockChangePersistent(),
@@ -188,20 +217,28 @@ InnerBlocks = compose( [
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			replaceInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
 			updateBlockListSettings,
 		} = dispatch( 'core/block-editor' );
-		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
+		const {
+			block,
+			clientId,
+			templateInsertUpdatesSelection = true,
+		} = ownProps;
 
 		return {
-			replaceInnerBlocks( blocks ) {
+			replaceInnerBlocks( blocks, forceUpdateSelection ) {
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
+					forceUpdateSelection !== undefined
+						? forceUpdateSelection
+						: block.innerBlocks.length === 0 &&
+								templateInsertUpdatesSelection &&
+								blocks.length !== 0
 				);
 			},
+			__unstableMarkNextChangeAsNotPersistent,
 			updateNestedSettings( settings ) {
 				dispatch( updateBlockListSettings( clientId, settings ) );
 			},
@@ -209,15 +246,22 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-// Expose default appender placeholders as components.
-InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
-InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return (
+		<ComposedInnerBlocks { ...props } forwardedRef={ ref || fallbackRef } />
+	);
+} );
 
-InnerBlocks.Content = withBlockContentContext(
+// Expose default appender placeholders as components.
+ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+
+ForwardedInnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
 );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
-export default InnerBlocks;
+export default ForwardedInnerBlocks;

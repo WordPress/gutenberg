@@ -1,0 +1,13 @@
+{
+	"name": "core/more",
+	"category": "layout",
+	"attributes": {
+		"customText": {
+			"type": "string"
+		},
+		"noTeaser": {
+			"type": "boolean",
+			"default": false
+		}
+	}
+}

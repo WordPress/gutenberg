@@ -78,9 +78,13 @@ describe( 'replace', () => {
 			end: 18,
 		};
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace
-		const result = replace( deepFreeze( record ), /([^\d]*)(\d*)([^\w]*)/, ( match, p1, p2, p3 ) => {
-			return [ p1, p2, p3 ].join( ' - ' );
-		} );
+		const result = replace(
+			deepFreeze( record ),
+			/([^\d]*)(\d*)([^\w]*)/,
+			( match, p1, p2, p3 ) => {
+				return [ p1, p2, p3 ].join( ' - ' );
+			}
+		);
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

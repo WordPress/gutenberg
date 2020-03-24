@@ -18,7 +18,6 @@ DEST="${WD}/react-native-gutenberg-bridge/third-party-podspecs"
 EXTERNAL_PODSPECS=$(find "node_modules/react-native/third-party-podspecs" \
                          "node_modules/react-native-svg" \
                          "node_modules/react-native-keyboard-aware-scroll-view" \
-                         "node_modules/react-native-recyclerview-list" \
                          "node_modules/react-native-safe-area" \
                          "node_modules/react-native-dark-mode" -type f -name "*.podspec" -print)
 
@@ -34,7 +33,7 @@ done
 # Change to the React Native directory to get relative paths for the RN podspecs
 cd "node_modules/react-native"
 
-RN_PODSPECS=$(find * -type f -name "*.podspec" -not -path "third-party-podspecs/*" -print)
+RN_PODSPECS=$(find * -type f -name "*.podspec" -not -path "third-party-podspecs/*" -not -path "*Fabric*" -print)
 TMP_DEST=$(mktemp -d)
 
 for podspec in $RN_PODSPECS
@@ -49,7 +48,5 @@ do
     # Add a "prepare_command" entry to each podspec so that 'pod install' will fetch sources from the correct directory
     # and retains the existing prepare_command if it exists
     prepare_command="TMP_DIR=\$(mktemp -d); mv * \$TMP_DIR; cp -R \"\$TMP_DIR/${path}\"/* ."
-    cat "$TMP_DEST/$pod.podspec.json" | jq --arg CMD "$prepare_command" '.prepare_command = "\($CMD) && \(.prepare_command // true)"
-                                                                         # Point to React Native fork. To be removed once https://github.com/facebook/react-native/issues/25349 is closed
-                                                                         | .source.git = "https://github.com/jtreanor/react-native.git"' > "$DEST/$pod.podspec.json"
+    cat "$TMP_DEST/$pod.podspec.json" | jq --arg CMD "$prepare_command" '.prepare_command = "\($CMD) && \(.prepare_command // true)"' > "$DEST/$pod.podspec.json"
 done

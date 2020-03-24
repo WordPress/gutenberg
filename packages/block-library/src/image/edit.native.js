@@ -2,17 +2,31 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
-import { isEmpty, map, get } from 'lodash';
+import {
+	View,
+	ImageBackground,
+	Text,
+	TouchableWithoutFeedback,
+	Dimensions,
+} from 'react-native';
+import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
+	requestMediaImport,
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
+	showMediaEditorButton,
+} from '@wordpress/react-native-bridge';
+import {
+	CycleSelectControl,
 	Icon,
 	PanelBody,
 	PanelActions,
-	SelectControl,
 	TextControl,
 	ToggleControl,
 	ToolbarButton,
@@ -27,31 +41,33 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
+	MediaEdit,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	requestMediaImport,
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-	requestImageFullscreenPreview,
-} from '@wordpress/react-native-bridge';
+	external,
+	link,
+	image as icon,
+	textColor,
+	replace,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
-import SvgIcon, { editImageIcon } from './icon';
 import SvgIconRetry from './icon-retry';
+import SvgIconCustomize from './icon-customize';
 import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_NONE,
+	DEFAULT_SIZE_SLUG,
 } from './constants';
 
 const ICON_TYPE = {
@@ -59,18 +75,6 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-const IMAGE_SIZE_THUMBNAIL = 'thumbnail';
-const IMAGE_SIZE_MEDIUM = 'medium';
-const IMAGE_SIZE_LARGE = 'large';
-const IMAGE_SIZE_FULL_SIZE = 'full';
-const DEFAULT_SIZE_SLUG = IMAGE_SIZE_LARGE;
-const sizeOptionLabels = {
-	[ IMAGE_SIZE_THUMBNAIL ]: __( 'Thumbnail' ),
-	[ IMAGE_SIZE_MEDIUM ]: __( 'Medium' ),
-	[ IMAGE_SIZE_LARGE ]: __( 'Large' ),
-	[ IMAGE_SIZE_FULL_SIZE ]: __( 'Full Size' ),
-};
-const sizeOptions = map( sizeOptionLabels, ( label, option ) => ( { value: option, label } ) );
 
 // Default Image ratio 4:3
 const IMAGE_ASPECT_RATIO = 4 / 3;
@@ -87,10 +91,16 @@ export class ImageEdit extends React.Component {
 			isCaptionSelected: false,
 		};
 
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
@@ -115,7 +125,11 @@ export class ImageEdit extends React.Component {
 		}
 
 		// Detect any pasted image and start an upload
-		if ( ! attributes.id && attributes.url && attributes.url.indexOf( 'file:' ) === 0 ) {
+		if (
+			! attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			requestMediaImport( attributes.url, ( id, url ) => {
 				if ( url ) {
 					setAttributes( { id, url } );
@@ -125,15 +139,25 @@ export class ImageEdit extends React.Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( attributes.id && attributes.url && ! isURL( attributes.url ) ) {
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			mediaUploadSync();
 		}
 	}
 
 	componentWillUnmount() {
 		// this action will only exist if the user pressed the trash button on the block holder
-		if ( hasAction( 'blocks.onRemoveBlockCheckUpload' ) && this.state.isUploadInProgress ) {
-			doAction( 'blocks.onRemoveBlockCheckUpload', this.props.attributes.id );
+		if (
+			hasAction( 'blocks.onRemoveBlockCheckUpload' ) &&
+			this.state.isUploadInProgress
+		) {
+			doAction(
+				'blocks.onRemoveBlockCheckUpload',
+				this.props.attributes.id
+			);
 		}
 	}
 
@@ -154,14 +178,20 @@ export class ImageEdit extends React.Component {
 	}
 
 	onImagePressed() {
-		const { attributes } = this.props;
+		const { attributes, image } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( attributes.id );
-		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
 			requestImageFailedRetryDialog( attributes.id );
 		} else if ( ! this.state.isCaptionSelected ) {
-			requestImageFullscreenPreview( attributes.url );
+			requestImageFullscreenPreview(
+				attributes.url,
+				image && image.source_url
+			);
 		}
 
 		this.setState( {
@@ -206,7 +236,11 @@ export class ImageEdit extends React.Component {
 	}
 
 	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+		this.props.setAttributes( {
+			url,
+			width: undefined,
+			height: undefined,
+		} );
 	}
 
 	updateAlignment( nextAlign ) {
@@ -221,7 +255,10 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSetNewTab( value ) {
-		const updatedLinkTarget = getUpdatedLinkTargetSettings( value, this.props.attributes );
+		const updatedLinkTarget = getUpdatedLinkTargetSettings(
+			value,
+			this.props.attributes
+		);
 		this.props.setAttributes( updatedLinkTarget );
 	}
 
@@ -296,27 +333,57 @@ export class ImageEdit extends React.Component {
 			case ICON_TYPE.RETRY:
 				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 			case ICON_TYPE.PLACEHOLDER:
-				iconStyle = this.props.getStylesFromColorScheme( styles.iconPlaceholder, styles.iconPlaceholderDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					styles.iconPlaceholder,
+					styles.iconPlaceholderDark
+				);
 				break;
 			case ICON_TYPE.UPLOAD:
-				iconStyle = this.props.getStylesFromColorScheme( styles.iconUpload, styles.iconUploadDark );
+				iconStyle = this.props.getStylesFromColorScheme(
+					styles.iconUpload,
+					styles.iconUploadDark
+				);
 				break;
 		}
-		return <Icon icon={ SvgIcon } { ...iconStyle } />;
+		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
 	render() {
-		const { attributes, isSelected, image } = this.props;
-		const { align, url, height, width, alt, href, id, linkTarget, sizeSlug } = attributes;
+		const { attributes, isSelected, image, imageSizes } = this.props;
+		const {
+			align,
+			url,
+			height,
+			width,
+			alt,
+			href,
+			id,
+			linkTarget,
+			sizeSlug,
+		} = attributes;
 
-		const actions = [ { label: __( 'Clear All Settings' ), onPress: this.onClearSettings } ];
+		const actions = [
+			{
+				label: __( 'Clear All Settings' ),
+				onPress: this.onClearSettings,
+			},
+		];
+
+		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
+		const sizeOptionsValid = find( sizeOptions, [
+			'value',
+			DEFAULT_SIZE_SLUG,
+		] );
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
 						title={ __( 'Edit image' ) }
-						icon={ editImageIcon }
+						icon={ replace }
 						onClick={ open }
 					/>
 				</ToolbarGroup>
@@ -330,9 +397,9 @@ export class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<InspectorControls>
-				<PanelBody title={ __( 'Image Settings' ) } >
+				<PanelBody title={ __( 'Image settings' ) }>
 					<TextControl
-						icon={ 'admin-links' }
+						icon={ link }
 						label={ __( 'Link To' ) }
 						value={ href || '' }
 						valuePlaceholder={ __( 'Add URL' ) }
@@ -342,23 +409,24 @@ export class ImageEdit extends React.Component {
 						keyboardType="url"
 					/>
 					<ToggleControl
-						icon={ 'external' }
+						icon={ external }
 						label={ __( 'Open in new tab' ) }
 						checked={ linkTarget === '_blank' }
 						onChange={ this.onSetNewTab }
 					/>
-					{ // eslint-disable-next-line no-undef
-						image && __DEV__ &&
-						<SelectControl
-							hideCancelButton
+					{ image && sizeOptionsValid && (
+						<CycleSelectControl
 							icon={ 'editor-expand' }
 							label={ __( 'Size' ) }
-							value={ sizeOptionLabels[ sizeSlug || DEFAULT_SIZE_SLUG ] }
-							onChangeValue={ ( newValue ) => this.onSetSizeSlug( newValue ) }
+							value={ sizeSlug || DEFAULT_SIZE_SLUG }
+							onChangeValue={ ( newValue ) =>
+								this.onSetSizeSlug( newValue )
+							}
 							options={ sizeOptions }
-						/> }
+						/>
+					) }
 					<TextControl
-						icon={ 'editor-textcolor' }
+						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
@@ -372,7 +440,7 @@ export class ImageEdit extends React.Component {
 
 		if ( ! url ) {
 			return (
-				<View style={ { flex: 1 } } >
+				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
 						allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 						onSelect={ this.onSelectMediaUploadOption }
@@ -391,7 +459,23 @@ export class ImageEdit extends React.Component {
 			wide: 'center',
 		};
 
-		const imageContainerHeight = Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+		const imageContainerHeight =
+			Dimensions.get( 'window' ).width / IMAGE_ASPECT_RATIO;
+
+		const editImageComponent = ( { open, mediaOptions } ) => (
+			<TouchableWithoutFeedback onPress={ open }>
+				<View style={ styles.editContainer }>
+					<View style={ styles.edit }>
+						{ mediaOptions() }
+						<Icon
+							size={ 16 }
+							icon={ SvgIconCustomize }
+							{ ...styles.iconCustomise }
+						/>
+					</View>
+				</View>
+			</TouchableWithoutFeedback>
+		);
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<TouchableWithoutFeedback
@@ -403,21 +487,39 @@ export class ImageEdit extends React.Component {
 				<View style={ { flex: 1 } }>
 					{ getInspectorControls() }
 					{ getMediaOptions() }
-					{ ( ! this.state.isCaptionSelected ) &&
-						getToolbarEditButton( openMediaOptions )
-					}
+					{ ! this.state.isCaptionSelected &&
+						getToolbarEditButton( openMediaOptions ) }
 					<MediaUploadProgress
 						height={ height }
 						width={ width }
 						coverUrl={ url }
 						mediaId={ id }
 						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-						onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
+						onFinishMediaUploadWithSuccess={
+							this.finishMediaUploadWithSuccess
+						}
+						onFinishMediaUploadWithFailure={
+							this.finishMediaUploadWithFailure
+						}
 						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( { isUploadInProgress, isUploadFailed, finalWidth, finalHeight, imageWidthWithinContainer, retryMessage } ) => {
+						renderContent={ ( {
+							isUploadInProgress,
+							isUploadFailed,
+							finalWidth,
+							finalHeight,
+							imageWidthWithinContainer,
+							retryMessage,
+						} ) => {
 							const opacity = isUploadInProgress ? 0.3 : 1;
-							const imageBorderOnSelectedStyle = isSelected && ! ( isUploadInProgress || isUploadFailed || this.state.isCaptionSelected ) ? styles.imageBorder : '';
+							const imageBorderOnSelectedStyle =
+								isSelected &&
+								! (
+									isUploadInProgress ||
+									isUploadFailed ||
+									this.state.isCaptionSelected
+								)
+									? styles.imageBorder
+									: '';
 
 							const iconRetryContainer = (
 								<View style={ styles.modalIcon }>
@@ -426,37 +528,104 @@ export class ImageEdit extends React.Component {
 							);
 
 							return (
-								<View style={ {
-									flex: 1,
-									// only set alignSelf if an image exists because alignSelf causes the placeholder
-									// to disappear when an aligned image can't be downloaded
-									// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-									alignSelf: imageWidthWithinContainer && alignToFlex[ align ] }
-								} >
-									{ ! imageWidthWithinContainer &&
-										<View style={ [ this.props.getStylesFromColorScheme( styles.imageContainerUpload, styles.imageContainerUploadDark ),
-											{ height: imageContainerHeight } ] } >
-											<View style={ styles.imageUploadingIconContainer }>
-												{ this.getIcon( ICON_TYPE.UPLOAD ) }
+								<View
+									style={ {
+										flex: 1,
+										// only set alignSelf if an image exists because alignSelf causes the placeholder
+										// to disappear when an aligned image can't be downloaded
+										// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
+										alignSelf:
+											imageWidthWithinContainer &&
+											alignToFlex[ align ],
+									} }
+								>
+									{ ! imageWidthWithinContainer && (
+										<View
+											style={ [
+												this.props.getStylesFromColorScheme(
+													styles.imageContainerUpload,
+													styles.imageContainerUploadDark
+												),
+												{
+													height: imageContainerHeight,
+												},
+											] }
+										>
+											<View
+												style={
+													styles.imageUploadingIconContainer
+												}
+											>
+												{ this.getIcon(
+													ICON_TYPE.UPLOAD
+												) }
 											</View>
-										</View> }
+										</View>
+									) }
 									<ImageBackground
 										accessible={ true }
 										disabled={ ! isSelected }
 										accessibilityLabel={ alt }
-										accessibilityHint={ __( 'Double tap and hold to edit' ) }
+										accessibilityHint={ __(
+											'Double tap and hold to edit'
+										) }
 										accessibilityRole={ 'imagebutton' }
-										style={ [ imageBorderOnSelectedStyle, { width: finalWidth, height: finalHeight, opacity } ] }
+										style={ [
+											imageBorderOnSelectedStyle,
+											{
+												width: finalWidth,
+												height: finalHeight,
+												opacity,
+											},
+										] }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
 									>
-										{ isUploadFailed &&
-											<View style={ [ styles.imageContainer, { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)' } ] } >
+										{ isUploadFailed && (
+											<View
+												style={ [
+													styles.imageContainer,
+													{
+														flex: 1,
+														backgroundColor:
+															'rgba(0, 0, 0, 0.5)',
+													},
+												] }
+											>
 												{ iconRetryContainer }
-												<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
+												<Text
+													style={
+														styles.uploadFailedText
+													}
+												>
+													{ retryMessage }
+												</Text>
 											</View>
-										}
+										) }
+										{ isSelected &&
+											! isUploadInProgress &&
+											! isUploadFailed &&
+											finalWidth &&
+											finalHeight &&
+											showMediaEditorButton && (
+												<MediaEdit
+													allowedTypes={ [
+														MEDIA_TYPE_IMAGE,
+													] }
+													onSelect={
+														this
+															.onSelectMediaUploadOption
+													}
+													source={ { uri: url } }
+													openReplaceMediaOptions={
+														openMediaOptions
+													}
+													render={
+														editImageComponent
+													}
+												/>
+											) }
 									</ImageBackground>
 								</View>
 							);
@@ -467,13 +636,14 @@ export class ImageEdit extends React.Component {
 						isSelected={ this.state.isCaptionSelected }
 						accessible={ true }
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption ) ?
-							/* translators: accessibility text. Empty image caption. */
-								( 'Image caption. Empty' ) :
-								sprintf(
-								/* translators: accessibility text. %s: image caption. */
-									__( 'Image caption. %s' ),
-									caption )
+							isEmpty( caption )
+								? /* translators: accessibility text. Empty image caption. */
+								  'Image caption. Empty'
+								: sprintf(
+										/* translators: accessibility text. %s: image caption. */
+										__( 'Image caption. %s' ),
+										caption
+								  )
 						}
 						onFocus={ this.onFocusCaption }
 						onBlur={ this.props.onBlur } // always assign onBlur as props
@@ -483,7 +653,8 @@ export class ImageEdit extends React.Component {
 		);
 
 		return (
-			<MediaUpload allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
+			<MediaUpload
+				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return getImageComponent( open, getMediaOptions );
@@ -496,10 +667,18 @@ export class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { attributes: { id }, isSelected } = props;
+		const { getSettings } = select( 'core/block-editor' );
+		const {
+			attributes: { id, url },
+			isSelected,
+		} = props;
+		const { imageSizes } = getSettings();
 
+		const shouldGetMedia =
+			id && isSelected && getProtocol( url ) !== 'file:';
 		return {
-			image: id && isSelected ? getMedia( id ) : null,
+			image: shouldGetMedia ? getMedia( id ) : null,
+			imageSizes,
 		};
 	} ),
 	withPreferredColorScheme,

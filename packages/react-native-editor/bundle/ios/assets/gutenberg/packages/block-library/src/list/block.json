@@ -1,0 +1,27 @@
+{
+	"name": "core/list",
+	"category": "common",
+	"attributes": {
+		"ordered": {
+			"type": "boolean",
+			"default": false
+		},
+		"values": {
+			"type": "string",
+			"source": "html",
+			"selector": "ol,ul",
+			"multiline": "li",
+			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
+			"default": ""
+		},
+		"type": {
+			"type": "string"
+		},
+		"start": {
+			"type": "number"
+		},
+		"reversed": {
+			"type": "boolean"
+		}
+	}
+}

@@ -130,16 +130,53 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
         delegate?.gutenbergDidEmitLog(message: message, logLevel: logLevel)
     }
-    
+
     @objc
-    func requestImageFullscreenPreview(_ urlString: String) {
+    func requestImageFullscreenPreview(_ currentImageUrlString: String, originalImageUrlString: String?) {
+        guard let currentImageUrl = URL(string: currentImageUrlString) else {
+            assertionFailure("Given String is not a URL")
+            return
+        }
+
+        let originalUrl: URL
+        let currentUrl: URL?
+
+        if let originalImageUrlString = originalImageUrlString, let original = URL(string: originalImageUrlString) {
+            originalUrl = original
+            currentUrl = currentImageUrl
+        } else {
+            // The current image url is the only one available.
+            originalUrl = currentImageUrl
+            currentUrl = nil
+        }
+
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestImagePreview(with: originalUrl, thumbUrl: currentUrl)
+        }
+    }
+
+    @objc
+    func requestMediaEditor(_ urlString: String, callback: @escaping RCTResponseSenderBlock) {
         guard let url = URL(string: urlString) else {
             assertionFailure("Given String is not a URL")
             return
         }
-        
+
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestFullscreenImage(with: url)
+            self.delegate?.gutenbergDidRequestMediaEditor(with: url) { media in
+                guard let media = media else {
+                    callback(nil)
+                    return
+                }
+
+                let mediaToReturn = media
+
+                let jsFormattedMedia = mediaToReturn.map { mediaInfo in
+                    return mediaInfo.encodeForJS()
+                }
+
+                callback(jsFormattedMedia)
+            }
         }
     }
 
@@ -186,6 +223,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         if ( hasObservers ) {
             self.sendEvent(withName: name, body: body)
         }
+    }
+    
+    @objc
+    func logUserEvent(_ event: String, properties:[AnyHashable: Any]?) {
+        guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
+        self.delegate?.gutenbergDidLogUserEvent(logEvent)
     }
 }
 

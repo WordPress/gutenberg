@@ -23,5 +23,7 @@ export function cleanForSlug( string ) {
 	if ( ! string ) {
 		return '';
 	}
-	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
+	return toLower(
+		deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) )
+	);
 }

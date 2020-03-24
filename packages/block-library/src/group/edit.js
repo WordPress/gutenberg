@@ -1,66 +1,56 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import {
-	InspectorControls,
 	InnerBlocks,
-	PanelColorSettings,
-	withColors,
+	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
-function GroupEdit( {
-	className,
-	setBackgroundColor,
-	backgroundColor,
-	hasInnerBlocks,
-} ) {
-	const styles = {
-		backgroundColor: backgroundColor.color,
-	};
-
-	const classes = classnames( className, backgroundColor.class, {
-		'has-background': !! backgroundColor.color,
-	} );
+function GroupEdit( { hasInnerBlocks, className } ) {
+	const ref = useRef();
+	const {
+		TextColor,
+		BackgroundColor,
+		InspectorControlsColorPanel,
+	} = __experimentalUseColors(
+		[
+			{ name: 'textColor', property: 'color' },
+			{ name: 'backgroundColor', className: 'has-background' },
+		],
+		{
+			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
+			colorDetector: { targetRef: ref },
+		}
+	);
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelColorSettings
-					title={ __( 'Color Settings' ) }
-					colorSettings={ [
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background Color' ),
-						},
-					] }
-				/>
-			</InspectorControls>
-			<div className={ classes } style={ styles }>
-				<div className="wp-block-group__inner-container">
-					<InnerBlocks
-						renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
-					/>
-				</div>
-			</div>
+			{ InspectorControlsColorPanel }
+			<BackgroundColor>
+				<TextColor>
+					<Block.div className={ className } ref={ ref }>
+						<div className="wp-block-group__inner-container">
+							<InnerBlocks
+								renderAppender={
+									! hasInnerBlocks &&
+									InnerBlocks.ButtonBlockAppender
+								}
+							/>
+						</div>
+					</Block.div>
+				</TextColor>
+			</BackgroundColor>
 		</>
 	);
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
+		const { getBlock } = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
 

@@ -6,10 +6,7 @@ import { castArray, get, isEqual, find } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	receiveItems,
-	receiveQueriedItems,
-} from './queried-data';
+import { receiveItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { select, apiFetch } from './controls';
 
@@ -68,7 +65,13 @@ export function addEntities( entities ) {
  *
  * @return {Object} Action object.
  */
-export function receiveEntityRecords( kind, name, records, query, invalidateCache = false ) {
+export function receiveEntityRecords(
+	kind,
+	name,
+	records,
+	query,
+	invalidateCache = false
+) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
@@ -138,7 +141,9 @@ export function receiveEmbedPreview( url, preview ) {
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 	const entity = yield select( 'getEntity', kind, name );
 	if ( ! entity ) {
-		throw new Error( `The entity being edited (${ kind }, ${ name }) does not have a loaded config.` );
+		throw new Error(
+			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
 	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
@@ -158,9 +163,9 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		edits: Object.keys( edits ).reduce( ( acc, key ) => {
 			const recordValue = record[ key ];
 			const editedRecordValue = editedRecord[ key ];
-			const value = mergedEdits[ key ] ?
-				{ ...editedRecordValue, ...edits[ key ] } :
-				edits[ key ];
+			const value = mergedEdits[ key ]
+				? { ...editedRecordValue, ...edits[ key ] }
+				: edits[ key ];
 			acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
 			return acc;
 		}, {} ),
@@ -269,7 +274,13 @@ export function* saveEntityRecord(
 		}
 	}
 
-	yield { type: 'SAVE_ENTITY_RECORD_START', kind, name, recordId, isAutosave };
+	yield {
+		type: 'SAVE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+		isAutosave,
+	};
 	let updatedRecord;
 	let error;
 	let persistedEntity;
@@ -320,27 +331,45 @@ export function* saveEntityRecord(
 			// when its update is requested by the author and the post had
 			// draft or auto-draft status.
 			if ( persistedRecord.id === updatedRecord.id ) {
-				let newRecord = { ...persistedRecord, ...data, ...updatedRecord };
+				let newRecord = {
+					...persistedRecord,
+					...data,
+					...updatedRecord,
+				};
 				newRecord = Object.keys( newRecord ).reduce( ( acc, key ) => {
 					// These properties are persisted in autosaves.
 					if ( [ 'title', 'excerpt', 'content' ].includes( key ) ) {
 						// Edits should be the "raw" attribute values.
-						acc[ key ] = get( newRecord[ key ], 'raw', newRecord[ key ] );
+						acc[ key ] = get(
+							newRecord[ key ],
+							'raw',
+							newRecord[ key ]
+						);
 					} else if ( key === 'status' ) {
 						// Status is only persisted in autosaves when going from
 						// "auto-draft" to "draft".
 						acc[ key ] =
 							persistedRecord.status === 'auto-draft' &&
-							newRecord.status === 'draft' ?
-								newRecord.status :
-								persistedRecord.status;
+							newRecord.status === 'draft'
+								? newRecord.status
+								: persistedRecord.status;
 					} else {
 						// These properties are not persisted in autosaves.
-						acc[ key ] = get( persistedRecord[ key ], 'raw', persistedRecord[ key ] );
+						acc[ key ] = get(
+							persistedRecord[ key ],
+							'raw',
+							persistedRecord[ key ]
+						);
 					}
 					return acc;
 				}, {} );
-				yield receiveEntityRecords( kind, name, newRecord, undefined, true );
+				yield receiveEntityRecords(
+					kind,
+					name,
+					newRecord,
+					undefined,
+					true
+				);
 			} else {
 				yield receiveAutosaves( persistedRecord.id, updatedRecord );
 			}
@@ -348,7 +377,11 @@ export function* saveEntityRecord(
 			// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
 			// but some plugins break with this behavior so we can't filter it on the server.
 			let data = record;
-			if ( kind === 'postType' && persistedRecord && persistedRecord.status === 'auto-draft' ) {
+			if (
+				kind === 'postType' &&
+				persistedRecord &&
+				persistedRecord.status === 'auto-draft'
+			) {
 				if ( ! data.status ) {
 					data = { ...data, status: 'draft' };
 				}
@@ -357,11 +390,10 @@ export function* saveEntityRecord(
 				}
 			}
 
-			// We perform an optimistic update here to clear all the edits that
-			// will be persisted so that if the server filters them, the new
-			// filtered values are always accepted.
+			// Get the full local version of the record before the update,
+			// to merge it with the edits and then propagate it to subscribers
 			persistedEntity = yield select(
-				'getEntityRecord',
+				'__experimentalGetEntityRecordNoResolver',
 				kind,
 				name,
 				recordId
@@ -372,14 +404,26 @@ export function* saveEntityRecord(
 				name,
 				recordId
 			);
-			yield receiveEntityRecords( kind, name, { ...persistedEntity, ...data }, undefined, true );
+			yield receiveEntityRecords(
+				kind,
+				name,
+				{ ...persistedEntity, ...data },
+				undefined,
+				true
+			);
 
 			updatedRecord = yield apiFetch( {
 				path,
 				method: recordId ? 'PUT' : 'POST',
 				data,
 			} );
-			yield receiveEntityRecords( kind, name, updatedRecord, undefined, true );
+			yield receiveEntityRecords(
+				kind,
+				name,
+				updatedRecord,
+				undefined,
+				true
+			);
 		}
 	} catch ( _error ) {
 		error = _error;
@@ -387,14 +431,25 @@ export function* saveEntityRecord(
 		// If we got to the point in the try block where we made an optimistic update,
 		// we need to roll it back here.
 		if ( persistedEntity && currentEdits ) {
-			yield receiveEntityRecords( kind, name, persistedEntity, undefined, true );
+			yield receiveEntityRecords(
+				kind,
+				name,
+				persistedEntity,
+				undefined,
+				true
+			);
 			yield editEntityRecord(
 				kind,
 				name,
 				recordId,
 				{
 					...currentEdits,
-					...( yield select( 'getEntityRecordEdits', kind, name, recordId ) ),
+					...( yield select(
+						'getEntityRecordEdits',
+						kind,
+						name,
+						recordId
+					) ),
 				},
 				{ undoIgnore: true }
 			);
@@ -421,7 +476,9 @@ export function* saveEntityRecord(
  * @param {Object} options  Saving options.
  */
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
-	if ( ! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) ) ) {
+	if (
+		! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) )
+	) {
 		return;
 	}
 	const edits = yield select(

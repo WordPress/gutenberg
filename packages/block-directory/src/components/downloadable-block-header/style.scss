@@ -3,15 +3,15 @@
 	flex-grow: 1;
 
 	.block-editor-block-icon {
-		width: $icon-button-size;
-		height: $icon-button-size;
-		font-size: $icon-button-size;
+		width: $button-size;
+		height: $button-size;
+		font-size: $button-size;
 		background-color: $light-gray-300;
 	}
 
 	img {
-		width: $icon-button-size;
-		height: $icon-button-size;
+		width: $button-size;
+		height: $button-size;
 	}
 
 	.block-directory-downloadable-block-header__column {

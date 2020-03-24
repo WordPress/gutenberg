@@ -12,8 +12,8 @@ export default { title: 'Components/TabPanel', component: TabPanel };
 
 export const _default = () => {
 	return (
-		<TabPanel className="my-tab-panel"
-			activeClass="active-tab"
+		<TabPanel
+			className="my-tab-panel"
 			tabs={ [
 				{
 					name: 'tab1',
@@ -25,10 +25,9 @@ export const _default = () => {
 					title: text( 'Tab 2 title', 'Tab 2' ),
 					className: 'tab-two',
 				},
-			] }>
-			{
-				( tab ) => <p>Selected tab: { tab.title }</p>
-			}
+			] }
+		>
+			{ ( tab ) => <p>Selected tab: { tab.title }</p> }
 		</TabPanel>
 	);
 };

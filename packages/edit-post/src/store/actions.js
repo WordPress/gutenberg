@@ -196,6 +196,13 @@ export function updatePreferredStyleVariations( blockName, blockStyle ) {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that the editor should attempt
+ * to locally autosave the current post every `interval` seconds.
+ *
+ * @param {number} interval The new interval, in seconds.
+ * @return {Object} Action object.
+ */
 export function __experimentalUpdateLocalAutosaveInterval( interval ) {
 	return {
 		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
@@ -252,5 +259,21 @@ export function requestMetaBoxUpdates() {
 export function metaBoxUpdatesSuccess() {
 	return {
 		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used to toggle the width of the editing canvas.
+ * It's marked as experimental because, potentially, we'll need this
+ * in several pages including edit-site.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalSetPreviewDeviceType( deviceType ) {
+	return {
+		type: 'SET_PREVIEW_DEVICE_TYPE',
+		deviceType,
 	};
 }

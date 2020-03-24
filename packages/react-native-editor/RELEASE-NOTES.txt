@@ -1,3 +1,42 @@
+1.25.0
+------
+* Improve icon on the "Take a Video" media option
+
+1.24.0
+------
+* New block: Latest Posts
+* Fix Quote block's left border not being visible in Dark Mode
+* Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
+* Fix crash when pasting HTML content with embeded images on paragraphs
+* [Android] Dark Mode
+
+1.23.0
+------
+* New block: Group
+* Add support for upload options in Gallery block
+* Add support for size options in the Image block
+* New block: Button
+* Add scroll support inside block picker and block settings
+* [Android] Fix issue preventing correct placeholder image from displaying during image upload
+* [iOS] Fix diplay of large numbers on ordered lists
+* Fix issue where adding emojis to the post title add strong HTML elements to the title of the post
+* [iOS] Fix issue where alignment of paragraph blocks was not always being respected when splitting the paragraph or reading the post's html content.
+* We’ve introduced a new toolbar that floats above the block you’re editing, which makes navigating your blocks easier — especially complex ones.
+
+1.22.0
+------
+* Make inserter to show options on long-press to add before/after
+* Retry displaying image when connectivity restores
+* [iOS] Show an "Edit" button overlay on selected image blocks
+* [Android] Fix blank post when sharing media from another app
+* Add support for image size options in the gallery block
+* Fix issue that sometimes prevented merging paragraph blocks
+
+1.21.0
+------
+* Reduced padding around text on Rich Text based blocks.
+* [Android] Improved stability on very long posts.
+
 1.20.0
 ------
 * Fix bug where image placeholders would sometimes not be shown

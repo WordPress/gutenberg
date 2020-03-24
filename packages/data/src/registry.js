@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	omit,
-	without,
-	mapValues,
-} from 'lodash';
+import { omit, without, mapValues } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -93,22 +89,23 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	const getResolveSelectors = memize(
 		( selectors ) => {
 			return mapValues(
-				omit(
-					selectors,
-					[
-						'getIsResolving',
-						'hasStartedResolution',
-						'hasFinishedResolution',
-						'isResolving',
-						'getCachedResolvers',
-					]
-				),
+				omit( selectors, [
+					'getIsResolving',
+					'hasStartedResolution',
+					'hasFinishedResolution',
+					'isResolving',
+					'getCachedResolvers',
+				] ),
 				( selector, selectorName ) => {
 					return ( ...args ) => {
 						return new Promise( ( resolve ) => {
-							const hasFinished = () => selectors
-								.hasFinishedResolution( selectorName, args );
-							const getResult = () => selector.apply( null, args );
+							const hasFinished = () =>
+								selectors.hasFinishedResolution(
+									selectorName,
+									args
+								);
+							const getResult = () =>
+								selector.apply( null, args );
 
 							// trigger the selector (to trigger the resolver)
 							const result = getResult();
@@ -241,8 +238,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
 
-	Object.entries( storeConfigs ).forEach(
-		( [ name, config ] ) => registry.registerStore( name, config )
+	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
+		registry.registerStore( name, config )
 	);
 
 	if ( parent ) {

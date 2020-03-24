@@ -36,5 +36,5 @@ export default compose(
 		onUpdateStatus( status ) {
 			dispatch( 'core/editor' ).editPost( { status } );
 		},
-	} ) ),
+	} ) )
 )( PostPendingStatus );

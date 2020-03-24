@@ -5,6 +5,11 @@ import { shallow, mount } from 'enzyme';
 import { uniqueId } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { plus } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { DimensionControl } from '../';
@@ -32,7 +37,7 @@ describe( 'DimensionControl', () => {
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 				/>
 			);
 			expect( wrapper ).toMatchSnapshot();
@@ -43,7 +48,7 @@ describe( 'DimensionControl', () => {
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 					iconLabel={ 'Tablet Devices' }
 				/>
 			);
@@ -90,17 +95,23 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: 'small',
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: 'small',
+					},
+				} );
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: 'medium',
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: 'medium',
+					},
+				} );
 
 			expect( onChangeHandler ).toHaveBeenCalledTimes( 2 );
 			expect( onChangeHandler.mock.calls[ 0 ][ 0 ] ).toEqual( 'small' );
@@ -116,11 +127,14 @@ describe( 'DimensionControl', () => {
 				/>
 			);
 
-			wrapper.find( 'select' ).at( 0 ).simulate( 'change', {
-				target: {
-					value: '', // this happens when you select the "default" <option />
-				},
-			} );
+			wrapper
+				.find( 'select' )
+				.at( 0 )
+				.simulate( 'change', {
+					target: {
+						value: '', // this happens when you select the "default" <option />
+					},
+				} );
 
 			expect( onChangeHandler ).toHaveBeenNthCalledWith( 1, undefined );
 		} );

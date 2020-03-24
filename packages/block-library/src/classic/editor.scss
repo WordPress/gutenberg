@@ -250,8 +250,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&.is-selected::before {
-		border-color: $light-gray-800;
-		border-left-color: transparent;
+		border-color: $dark-gray-primary;
 	}
 
 	.block-editor-block-contextual-toolbar + div {
@@ -295,13 +294,14 @@ div[data-type="core/freeform"] {
 	// block is empty or loading and the placeholder should be displayed.
 	display: none;
 	width: auto;
-	margin: 0 #{ -$block-padding };
+	margin: 0;
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
-	top: $block-padding;
-	transform: translateY(-$block-padding);
+	top: $grid-unit-10;
 	border: $border-width solid $light-gray-500;
 	border-bottom: none;
+	border-radius: $radius-block-ui;
+	margin-bottom: $grid-unit-10;
 
 	// On mobile, toolbars go edge to edge.
 	padding: 0;
@@ -312,7 +312,7 @@ div[data-type="core/freeform"] {
 	div[data-type="core/freeform"].is-selected &,
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
-		border-color: $light-gray-800;
+		border-color: $dark-gray-primary;
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
@@ -337,6 +337,10 @@ div[data-type="core/freeform"] {
 			line-height: 37px;
 			padding: $block-padding;
 		}
+	}
+
+	div.mce-toolbar-grp {
+		border-bottom: 1px solid $dark-gray-primary;
 	}
 
 	// Overwrite inline styles.

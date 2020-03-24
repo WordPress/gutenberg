@@ -44,11 +44,14 @@ export function localAutosaveGet( postId ) {
 }
 
 export function localAutosaveSet( postId, title, content, excerpt ) {
-	window.sessionStorage.setItem( postKey( postId ), JSON.stringify( {
-		post_title: title,
-		content,
-		excerpt,
-	} ) );
+	window.sessionStorage.setItem(
+		postKey( postId ),
+		JSON.stringify( {
+			post_title: title,
+			content,
+			excerpt,
+		} )
+	);
 }
 
 export function localAutosaveClear( postId ) {
@@ -56,8 +59,8 @@ export function localAutosaveClear( postId ) {
 }
 
 const controls = {
-	AWAIT_NEXT_STATE_CHANGE: createRegistryControl(
-		( registry ) => () => new Promise( ( resolve ) => {
+	AWAIT_NEXT_STATE_CHANGE: createRegistryControl( ( registry ) => () =>
+		new Promise( ( resolve ) => {
 			const unsubscribe = registry.subscribe( () => {
 				unsubscribe();
 				resolve();

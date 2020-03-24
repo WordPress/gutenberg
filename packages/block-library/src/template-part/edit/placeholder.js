@@ -8,6 +8,7 @@ import { useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -47,7 +48,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			);
 			if ( templatePart ) {
 				return (
-					<EntityProvider kind="postType" type="wp_template_part" id={ postId }>
+					<EntityProvider
+						kind="postType"
+						type="wp_template_part"
+						id={ postId }
+					>
 						<TemplatePartPreview />
 					</EntityProvider>
 				);
@@ -90,7 +95,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	}, [ postId, slug, theme ] );
 	return (
 		<Placeholder
-			icon="layout"
+			icon={ layout }
 			label={ __( 'Template Part' ) }
 			instructions={ __(
 				'Choose a template part by slug and theme, or create a new one.'
@@ -114,7 +119,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				/>
 			</div>
 			{ preview }
-			<Button isPrimary disabled={ ! slug || ! theme } onClick={ onChooseOrCreate }>
+			<Button
+				isPrimary
+				disabled={ ! slug || ! theme }
+				onClick={ onChooseOrCreate }
+			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
 		</Placeholder>

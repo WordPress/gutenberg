@@ -19,6 +19,19 @@ _Returns_
 
 -   `Array<string>`: Shortcuts.
 
+<a name="getCategoryShortcuts" href="#getCategoryShortcuts">#</a> **getCategoryShortcuts**
+
+Returns the shortcut names list for a given category name.
+
+_Parameters_
+
+-   _state_ `Object`: Global state.
+-   _name_ `string`: Category name.
+
+_Returns_
+
+-   `Array<string>`: Shortcut names.
+
 <a name="getShortcutAliases" href="#getShortcutAliases">#</a> **getShortcutAliases**
 
 Returns the aliases for a given shortcut name.
@@ -66,7 +79,7 @@ _Parameters_
 
 -   _state_ `Object`: Global state.
 -   _name_ `string`: Shortcut name.
--   _representation_ `null`: Type of representation (display, raw, ariaLabel).
+-   _representation_ (unknown type): Type of representation (display, raw, ariaLabel).
 
 _Returns_
 

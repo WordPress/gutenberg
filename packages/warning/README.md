@@ -32,7 +32,7 @@ To prevent that, you should:
 
 <a name="default" href="#default">#</a> **default**
 
-Shows a warning with `message` if `condition` passes and environment is not `production`.
+Shows a warning with `message` if environment is not `production`.
 
 _Usage_
 
@@ -40,14 +40,15 @@ _Usage_
 import warning from '@wordpress/warning';
 
 function MyComponent( props ) {
-  warning( ! props.title, '`props.title` was not passed' );
+  if ( ! props.title ) {
+    warning( '`props.title` was not passed' );
+  }
   ...
 }
 ```
 
 _Parameters_
 
--   _condition_ `boolean`: Whether the warning will be triggered or not.
 -   _message_ `string`: Message to show in the warning.
 
 

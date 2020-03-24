@@ -44,7 +44,9 @@ describe( 'preferences', () => {
 		expect( await getActiveSidebarTabText() ).toBe( 'Document' );
 
 		// Dismiss
-		await page.click( '.edit-post-sidebar__panel-tabs [aria-label="Close settings"]' );
+		await page.click(
+			'.edit-post-sidebar__panel-tabs [aria-label="Close settings"]'
+		);
 		expect( await getActiveSidebarTabText() ).toBe( null );
 
 		// Remember after reload.
