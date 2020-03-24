@@ -26,14 +26,14 @@ const hasStyleSupport = ( blockType ) =>
  * @param  {Object} styles Styles configuration
  * @return {Object}        Flattened CSS variables declaration
  */
-function getCSSVariables( styles = {} ) {
+export function getCSSVariables( styles = {} ) {
 	const prefix = '--wp';
 	const token = '--';
 	const getNestedCSSVariables = ( config ) => {
 		let result = {};
 		entries( config ).forEach( ( [ key, value ] ) => {
 			if ( ! isObject( value ) ) {
-				result[ key ] = value;
+				result[ kebabCase( key ) ] = value;
 				return;
 			}
 
