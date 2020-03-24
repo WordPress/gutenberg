@@ -9,7 +9,10 @@ import Cropper from 'react-easy-crop';
  * WordPress dependencies
  */
 
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 import { Fragment, Component } from '@wordpress/element';
 import {
 	Toolbar,
@@ -147,7 +150,7 @@ class RichImage extends Component {
 					) }
 
 					{ isCrop ? (
-						<div className="richimage__crop-controls">
+						<Block.div className="richimage__crop-controls">
 							<div
 								className="richimage__crop-area"
 								style={ {
@@ -193,7 +196,7 @@ class RichImage extends Component {
 									this.setState( { zoom: newZoom } );
 								} }
 							/>
-						</div>
+						</Block.div>
 					) : (
 						<OriginalBlock { ...this.props } />
 					) }
