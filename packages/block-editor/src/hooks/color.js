@@ -117,7 +117,6 @@ const ColorPanel = ( { colorSettings, clientId } ) => {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
-	// TODO: check performance impact of running this on each render
 	useEffect( () => {
 		const colorsDetectionElement = getBlockDOMNode( clientId );
 		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
@@ -180,12 +179,12 @@ export const withBlockControls = createHigherOrderComponent(
 				...style,
 				color: {
 					...style?.color,
-					[ name ]:
-						colorObject?.slug ? undefined : value,
+					[ name ]: colorObject?.slug ? undefined : value,
 				},
 			};
-			const newNamedColor =
-				colorObject?.slug ? colorObject.slug : undefined;
+			const newNamedColor = colorObject?.slug
+				? colorObject.slug
+				: undefined;
 			props.setAttributes( {
 				style: newStyle,
 				[ attributeName ]: newNamedColor,
