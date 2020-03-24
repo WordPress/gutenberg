@@ -19,7 +19,6 @@ import { link as linkIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import PostPermalinkEditor from './editor.js';
-import { cleanForSlug } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -70,8 +69,6 @@ class PostPermalink extends Component {
 			permalinkParts,
 			postLink,
 			postSlug,
-			postID,
-			postTitle,
 		} = this.props;
 
 		if ( isNew || ! isViewable || ! permalinkParts || ! postLink ) {
@@ -84,11 +81,9 @@ class PostPermalink extends Component {
 			: __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug =
-			safeDecodeURIComponent( postSlug ) ||
-			cleanForSlug( postTitle ) ||
-			postID;
-		const samplePermalink = isEditable ? prefix + slug + suffix : prefix;
+		const samplePermalink = isEditable
+			? prefix + postSlug + suffix
+			: prefix;
 
 		return (
 			<div className="editor-post-permalink">
@@ -123,7 +118,7 @@ class PostPermalink extends Component {
 
 				{ isEditingPermalink && (
 					<PostPermalinkEditor
-						slug={ slug }
+						slug={ postSlug }
 						onSave={ () =>
 							this.setState( { isEditingPermalink: false } )
 						}
@@ -155,10 +150,11 @@ export default compose( [
 			getPermalinkParts,
 			getEditedPostAttribute,
 			isCurrentPostPublished,
+			getEditedPostSlug,
 		} = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 
-		const { id, link } = getCurrentPost();
+		const { link } = getCurrentPost();
 
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
@@ -167,11 +163,9 @@ export default compose( [
 			isNew: isEditedPostNew(),
 			postLink: link,
 			permalinkParts: getPermalinkParts(),
-			postSlug: getEditedPostAttribute( 'slug' ),
+			postSlug: safeDecodeURIComponent( getEditedPostSlug() ),
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
-			postTitle: getEditedPostAttribute( 'title' ),
-			postID: id,
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),

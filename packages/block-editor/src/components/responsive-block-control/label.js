@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 
@@ -26,12 +27,9 @@ export default function ResponsiveBlockControlLabel( {
 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
 				{ viewport.label }
 			</span>
-			<span
-				className="screen-reader-text"
-				id={ `rbc-desc-${ instanceId }` }
-			>
+			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
 				{ accessibleLabel }
-			</span>
+			</VisuallyHidden>
 		</Fragment>
 	);
 }

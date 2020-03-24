@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, createRef, renderToString } from '@wordpress/element';
-import { Button, Path, SVG } from '@wordpress/components';
+import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -207,10 +207,10 @@ export class PostPreviewButton extends Component {
 				{ this.props.textContent
 					? this.props.textContent
 					: _x( 'Preview', 'imperative verb' ) }
-				<span className="screen-reader-text">
+				<VisuallyHidden as="span">
 					{ /* translators: accessibility text */
 					__( '(opens in a new tab)' ) }
-				</span>
+				</VisuallyHidden>
 			</Button>
 		);
 	}

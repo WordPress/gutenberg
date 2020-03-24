@@ -84,6 +84,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Patterns (Experimental)",
+		"slug": "block-patterns",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Annotations",
 		"slug": "block-annotations",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-annotations.md",
@@ -1443,6 +1449,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/prettier-config",
+		"slug": "packages-prettier-config",
+		"markdown_source": "../packages/prettier-config/README.md",
 		"parent": "packages"
 	},
 	{

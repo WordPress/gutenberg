@@ -199,7 +199,11 @@ const BlockComponent = forwardRef(
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
-				className={ classnames( className, props.className ) }
+				className={ classnames(
+					className,
+					props.className,
+					wrapperProps && wrapperProps.className
+				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
@@ -209,6 +213,7 @@ const BlockComponent = forwardRef(
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				tabIndex="0"
 				style={ {
+					...( wrapperProps ? wrapperProps.style : {} ),
 					...( props.style || {} ),
 					...animationStyle,
 				} }

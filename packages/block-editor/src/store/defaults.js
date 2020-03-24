@@ -33,7 +33,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
  * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
- * @property {boolean} __mobileEnablePageTemplates Whether the user has enabled the Page Templates
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
