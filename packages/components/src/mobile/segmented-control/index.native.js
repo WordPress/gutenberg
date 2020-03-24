@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
+import {
+	View,
+	TouchableWithoutFeedback,
+	Text,
+	Platform,
+	LayoutAnimation,
+} from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -71,6 +77,13 @@ const SegmentedControls = ( {
 	);
 
 	function onHandlePress( item ) {
+		LayoutAnimation.configureNext(
+			LayoutAnimation.create(
+				350,
+				LayoutAnimation.Types.easeInEaseOut,
+				LayoutAnimation.Properties.opacity
+			)
+		);
 		setActiveSegment( item );
 		segmentHandler( item );
 	}

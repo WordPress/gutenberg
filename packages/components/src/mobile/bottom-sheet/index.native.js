@@ -10,6 +10,7 @@ import {
 	ScrollView,
 	Keyboard,
 	StatusBar,
+	TouchableHighlight,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -171,8 +172,7 @@ class BottomSheet extends Component {
 	onScroll( { nativeEvent } ) {
 		if ( this.isCloseToTop( nativeEvent ) ) {
 			this.setState( { bounces: false } );
-		}
-		if ( this.isCloseToBottom( nativeEvent ) ) {
+		} else if ( this.isCloseToBottom( nativeEvent ) ) {
 			this.setState( { bounces: true } );
 		}
 	}
@@ -319,7 +319,9 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 							} }
 						>
-							{ children }
+							<TouchableHighlight accessible={ false }>
+								{ children }
+							</TouchableHighlight>
 						</BottomSheetProvider>
 						<View style={ { height: safeAreaBottomInset } } />
 					</ScrollView>

@@ -11,6 +11,7 @@ import {
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { useState, useEffect, createRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -35,6 +36,20 @@ function ColorPalette( {
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
 
+	const extendedDefaultColors = [
+		{
+			name: __( 'White' ),
+			slug: 'white',
+			color: '#fff',
+		},
+		{
+			name: __( 'Black' ),
+			slug: 'black',
+			color: '#000',
+		},
+		...SETTINGS_DEFAULTS.colors,
+	];
+
 	const scrollViewRef = createRef();
 
 	const isGradientSegment = currentSegment === 'Gradient';
@@ -45,7 +60,7 @@ function ColorPalette( {
 	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
 	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
 
-	const defaultColors = map( SETTINGS_DEFAULTS.colors, 'color' );
+	const defaultColors = map( extendedDefaultColors, 'color' );
 	const defaultGradientColors = map(
 		SETTINGS_DEFAULTS.gradients,
 		'gradient'
@@ -70,7 +85,7 @@ function ColorPalette( {
 		}
 	}
 
-	function Swatch( { gradient, custom } ) {
+	function Palette( { gradient, custom } ) {
 		const palette = gradient ? defaultGradientColors : defaultColors;
 		const verticalSeparatorStyle = getStylesFromColorScheme(
 			styles.verticalSeparator,
@@ -132,13 +147,13 @@ function ColorPalette( {
 			style={ styles.container }
 			horizontal
 			showsHorizontalScrollIndicator={ false }
-			keyboardShouldPersistTaps={ true }
+			keyboardShouldPersistTaps="always"
 			ref={ scrollViewRef }
 		>
 			{ isGradientSegment ? (
-				<Swatch gradient />
+				<Palette gradient />
 			) : (
-				<Swatch custom onCustomPress={ onCustomPress } />
+				<Palette custom onCustomPress={ onCustomPress } />
 			) }
 		</ScrollView>
 	);

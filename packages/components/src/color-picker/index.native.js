@@ -33,6 +33,8 @@ function ColorPicker( {
 } ) {
 	const isIOS = Platform.OS === 'ios';
 
+	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
+
 	const [ hue, setHue ] = useState( 0 );
 	const [ sat, setSaturation ] = useState( 0.5 );
 	const [ val, setValue ] = useState( 0.5 );
@@ -165,12 +167,15 @@ function ColorPicker( {
 					width: pickerWidth,
 					height: pickerHeight,
 				} }
-				satValPickerSliderSize={ pickerPointerSize }
+				satValPickerSliderSize={ pickerPointerSize * 2 }
 				satValPickerBorderRadius={ borderRadius }
 				huePickerBorderRadius={ borderRadius }
 			/>
 			<View style={ footerStyle }>
-				<TouchableWithoutFeedback onPress={ onPressCancelButton }>
+				<TouchableWithoutFeedback
+					onPress={ onPressCancelButton }
+					hitSlop={ hitSlop }
+				>
 					<View>
 						{ isIOS ? (
 							<Text style={ cancelButtonStyle }>
@@ -194,7 +199,10 @@ function ColorPicker( {
 						{ currentColor.toUpperCase() }
 					</Text>
 				</View>
-				<TouchableWithoutFeedback onPress={ onPressApplyButton }>
+				<TouchableWithoutFeedback
+					onPress={ onPressApplyButton }
+					hitSlop={ hitSlop }
+				>
 					<View>
 						{ isIOS ? (
 							<Text style={ applyButtonStyle }>

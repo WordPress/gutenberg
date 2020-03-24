@@ -51,7 +51,7 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const PREPEND_HTTP = 'http://';
-
+const ANIMATION_DURATION = 350;
 // It's needed to set the following flags via UIManager
 // to have `LayoutAnimation` working on Android
 if (
@@ -315,7 +315,7 @@ class ButtonEdit extends Component {
 		const { screen } = this.state;
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
-				200,
+				ANIMATION_DURATION,
 				LayoutAnimation.Types.easeInEaseOut,
 				LayoutAnimation.Properties.opacity
 			)

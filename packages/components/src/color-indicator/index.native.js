@@ -16,11 +16,7 @@ import styles from './style.scss';
 function SelectedIcon() {
 	return (
 		<View style={ styles.selected }>
-			<Icon
-				icon={ check }
-				style={ styles.icon }
-				size={ styles.icon.height }
-			/>
+			<Icon icon={ check } style={ styles.icon } size={ 24 } />
 		</View>
 	);
 }

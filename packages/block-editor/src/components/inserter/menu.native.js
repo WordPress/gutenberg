@@ -132,57 +132,54 @@ export class InserterMenu extends Component {
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
-				<TouchableHighlight accessible={ false }>
-					<FlatList
-						onLayout={ this.onLayout }
-						scrollEnabled={ false }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ items }
-						ItemSeparatorComponent={ () => (
-							<View style={ styles.rowSeparator } />
-						) }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) => (
-							<TouchableHighlight
-								style={ styles.touchableArea }
-								underlayColor="transparent"
-								activeOpacity={ 0.5 }
-								accessibilityLabel={ item.title }
-								onPress={ () => onSelect( item ) }
+				<FlatList
+					onLayout={ this.onLayout }
+					scrollEnabled={ false }
+					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+					keyboardShouldPersistTaps="always"
+					numColumns={ numberOfColumns }
+					data={ items }
+					ItemSeparatorComponent={ () => (
+						<View style={ styles.rowSeparator } />
+					) }
+					keyExtractor={ ( item ) => item.name }
+					renderItem={ ( { item } ) => (
+						<TouchableHighlight
+							style={ styles.touchableArea }
+							underlayColor="transparent"
+							activeOpacity={ 0.5 }
+							accessibilityLabel={ item.title }
+							onPress={ () => onSelect( item ) }
+						>
+							<View
+								style={ [
+									styles.modalItem,
+									{ width: columnProperties.maxWidth },
+								] }
 							>
 								<View
 									style={ [
-										styles.modalItem,
-										{ width: columnProperties.maxWidth },
+										modalIconWrapperStyle,
+										columnProperties.itemWidth && {
+											width: columnProperties.itemWidth,
+										},
 									] }
 								>
-									<View
-										style={ [
-											modalIconWrapperStyle,
-											columnProperties.itemWidth && {
-												width:
-													columnProperties.itemWidth,
-											},
-										] }
-									>
-										<View style={ modalIconStyle }>
-											<Icon
-												icon={ item.icon.src }
-												fill={ modalIconStyle.fill }
-												size={ modalIconStyle.width }
-											/>
-										</View>
+									<View style={ modalIconStyle }>
+										<Icon
+											icon={ item.icon.src }
+											fill={ modalIconStyle.fill }
+											size={ modalIconStyle.width }
+										/>
 									</View>
-									<Text style={ modalItemLabelStyle }>
-										{ item.title }
-									</Text>
 								</View>
-							</TouchableHighlight>
-						) }
-					/>
-				</TouchableHighlight>
+								<Text style={ modalItemLabelStyle }>
+									{ item.title }
+								</Text>
+							</View>
+						</TouchableHighlight>
+					) }
+				/>
 			</BottomSheet>
 		);
 	}
