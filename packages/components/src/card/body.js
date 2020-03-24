@@ -11,18 +11,18 @@ import { useCardContext } from './context';
 
 export const defaultProps = {
 	isShady: false,
-	padding: 'medium',
+	size: 'medium',
 };
 
 export function CardBody( props ) {
 	const { className, isShady, ...additionalProps } = props;
 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
-	const { padding } = mergedProps;
+	const { size } = mergedProps;
 
 	const classes = classnames(
 		'components-card__body',
 		isShady && 'is-shady',
-		padding && `is-padding-${ padding }`,
+		size && `is-size-${ size }`,
 		className
 	);
 

@@ -66,24 +66,24 @@ describe( 'Card', () => {
 
 		test( 'should receive modifier props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall">
+				<Card size="extraSmall">
 					<CardBody>Hello</CardBody>
 				</Card>
 			);
 			const cardBody = card.find( '.components-card__body' ).first();
 
-			expect( cardBody.hasClass( 'is-padding-extraSmall' ) ).toBe( true );
+			expect( cardBody.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 		} );
 
 		test( 'should be able to override props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall">
-					<CardBody padding="large">Hello</CardBody>
+				<Card size="extraSmall">
+					<CardBody size="large">Hello</CardBody>
 				</Card>
 			);
 			const cardBody = card.find( '.components-card__body' ).first();
 
-			expect( cardBody.hasClass( 'is-padding-large' ) ).toBe( true );
+			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
 		} );
 	} );
 
@@ -102,27 +102,27 @@ describe( 'Card', () => {
 
 		test( 'should receive modifier props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall" isBorderless={ true }>
+				<Card size="extraSmall" isBorderless={ true }>
 					<CardHeader>Hello</CardHeader>
 				</Card>
 			);
 			const cardHeader = card.find( '.components-card__header' ).first();
 
-			expect( cardHeader.hasClass( 'is-padding-extraSmall' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 
 		test( 'should be able to override props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall" isBorderless={ true }>
-					<CardHeader padding="large" isBorderless={ false }>
+				<Card size="extraSmall" isBorderless={ true }>
+					<CardHeader size="large" isBorderless={ false }>
 						Hello
 					</CardHeader>
 				</Card>
 			);
 			const cardHeader = card.find( '.components-card__header' ).first();
 
-			expect( cardHeader.hasClass( 'is-padding-large' ) ).toBe( true );
+			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
 			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( false );
 		} );
 	} );
@@ -142,27 +142,27 @@ describe( 'Card', () => {
 
 		test( 'should receive modifier props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall" isBorderless={ true }>
+				<Card size="extraSmall" isBorderless={ true }>
 					<CardFooter>Hello</CardFooter>
 				</Card>
 			);
 			const cardFooter = card.find( '.components-card__footer' ).first();
 
-			expect( cardFooter.hasClass( 'is-padding-extraSmall' ) ).toBe( true );
+			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
 			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
 		} );
 
 		test( 'should be able to override props from context', () => {
 			const card = mount(
-				<Card padding="extraSmall" isBorderless={ true }>
-					<CardFooter padding="large" isBorderless={ false }>
+				<Card size="extraSmall" isBorderless={ true }>
+					<CardFooter size="large" isBorderless={ false }>
 						Hello
 					</CardFooter>
 				</Card>
 			);
 			const cardFooter = card.find( '.components-card__footer' ).first();
 
-			expect( cardFooter.hasClass( 'is-padding-large' ) ).toBe( true );
+			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
 			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( false );
 		} );
 	} );
