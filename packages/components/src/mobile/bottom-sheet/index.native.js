@@ -320,7 +320,7 @@ class BottomSheet extends Component {
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
-								{ children }
+								<>{ children }</>
 							</TouchableHighlight>
 						</BottomSheetProvider>
 						<View style={ { height: safeAreaBottomInset } } />
