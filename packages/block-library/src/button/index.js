@@ -33,6 +33,7 @@ export const settings = {
 	supports: {
 		align: true,
 		alignWide: false,
+		reusable: false,
 	},
 	parent: [ 'core/buttons' ],
 	styles: [

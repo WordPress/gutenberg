@@ -11,6 +11,7 @@ import {
 	Placeholder,
 	Spinner,
 	ToggleControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -136,9 +137,9 @@ class CategoriesEdit extends Component {
 		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
 			<>
-				<label htmlFor={ selectId } className="screen-reader-text">
+				<VisuallyHidden as="label" htmlFor={ selectId }>
 					{ __( 'Categories' ) }
-				</label>
+				</VisuallyHidden>
 				<select
 					id={ selectId }
 					className="wp-block-categories__dropdown"

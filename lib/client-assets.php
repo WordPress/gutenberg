@@ -205,17 +205,36 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_register_vendor_scripts( &$scripts ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	// This function is intentionally left empty.
-	//
-	// Scripts such as react and react-dom are expected to be overridden soon,
-	// and it is preferred to keep this function in place so as not to disturb
-	// tooling related to the plugin build process.
-	//
-	// TODO: Remove phpcs exception in function signature once this function
-	// regains its use.
-	//
-	// See https://github.com/WordPress/gutenberg/pull/20628.
+function gutenberg_register_vendor_scripts( &$scripts ) {
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
+
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * once the plugin is updated to support WordPress 5.4.0 and newer.
+	 *
+	 * See: `gutenberg_add_url_polyfill`
+	 */
+	gutenberg_register_vendor_script(
+		$scripts,
+		'wp-polyfill-url',
+		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
+		array(),
+		'3.6.4'
+	);
+
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * removed once the plugin is updated to support WordPress 5.4.0 and newer.
+	 *
+	 * See: `gutenberg_add_dom_rect_polyfill`
+	 */
+	gutenberg_register_vendor_script(
+		$scripts,
+		'wp-polyfill-dom-rect',
+		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
+		array(),
+		'3.42.0'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -413,19 +432,6 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * @since 0.1.0
  */
 function gutenberg_enqueue_block_editor_assets() {
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf(
-			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
-			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
-			'wp.apiFetch.nonceEndpoint = "%s";' .
-			'wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );',
-			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
-			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
-		),
-		'after'
-	);
-
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
 
@@ -607,27 +613,6 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Extends block editor settings to include a list of image dimensions per size.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_image_dimensions( $settings ) {
-	$image_dimensions = array();
-	$all_sizes        = wp_get_registered_image_subsizes();
-	foreach ( $settings['imageSizes'] as $size ) {
-		$key = $size['slug'];
-		if ( isset( $all_sizes[ $key ] ) ) {
-			$image_dimensions[ $key ] = $all_sizes[ $key ];
-		}
-	}
-	$settings['imageDimensions'] = $image_dimensions;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
-
-/**
  * Load a block pattern by name.
  *
  * @param string $name Block Pattern File name.
@@ -649,13 +634,26 @@ function gutenberg_load_block_pattern( $name ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
-	$block_patterns                          = [
-		gutenberg_load_block_pattern( 'text-two-columns' ),
-		gutenberg_load_block_pattern( 'two-buttons' ),
-		gutenberg_load_block_pattern( 'cover-abc' ),
-		gutenberg_load_block_pattern( 'two-images' ),
-	];
-	$settings['__experimentalBlockPatterns'] = $block_patterns;
+	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
+		$settings['__experimentalBlockPatterns'] = [];
+	}
+
+	$settings['__experimentalBlockPatterns'] = array_merge(
+		WP_Patterns_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatterns']
+	);
+
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns' );
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
+
+
+/*
+ * Register default patterns if not registered in Core already.
+ */
+if ( ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
+	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+}

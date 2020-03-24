@@ -296,7 +296,12 @@ function NavigationLinkEdit( {
 					__experimentalTagName="ul"
 					__experimentalAppenderTagName="li"
 					__experimentalPassedProps={ {
-						className: 'wp-block-navigation__container',
+						className: classnames(
+							'wp-block-navigation__container',
+							{
+								'is-parent-of-selected-block': isParentOfSelectedBlock,
+							}
+						),
 					} }
 				/>
 			</Block.li>

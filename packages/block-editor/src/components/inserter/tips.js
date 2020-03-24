@@ -2,26 +2,23 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalCreateInterpolateElement,
-	useState,
-} from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import { Tip } from '@wordpress/components';
 
 const globalTips = [
-	__experimentalCreateInterpolateElement(
+	createInterpolateElement(
 		__(
 			'While writing, you can press <kbd>/</kbd> to quickly insert new blocks.'
 		),
 		{ kbd: <kbd /> }
 	),
-	__experimentalCreateInterpolateElement(
+	createInterpolateElement(
 		__(
 			'Indent a list by pressing <kbd>space</kbd> at the beginning of a line.'
 		),
 		{ kbd: <kbd /> }
 	),
-	__experimentalCreateInterpolateElement(
+	createInterpolateElement(
 		__(
 			'Outdent a list by pressing <kbd>backspace</kbd> at the beginning of a line'
 		),

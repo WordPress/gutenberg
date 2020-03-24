@@ -21,7 +21,7 @@ function gutenberg_is_block_editor() {
 		(
 			$screen->is_block_editor() ||
 			'gutenberg_page_gutenberg-widgets' === $screen->id ||
-			'gutenberg_page_gutenberg-edit-site' === $screen->id
+			gutenberg_is_edit_site_page( $screen->id )
 		);
 }
 

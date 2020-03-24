@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,8 +24,6 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
-
-const innerToolbarHeight = 44;
 
 export class BlockList extends Component {
 	constructor() {
@@ -101,6 +100,8 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 		} = this.props;
 
+		const { blockToolbar, blockBorder, headerToolbar } = styles;
+
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
@@ -116,7 +117,10 @@ export class BlockList extends Component {
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
-					extraScrollHeight={ innerToolbarHeight + 10 }
+					extraScrollHeight={
+						blockToolbar.height + blockBorder.width
+					}
+					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
 					data={ blockClientIds }
@@ -127,7 +131,7 @@ export class BlockList extends Component {
 						this.shouldFlatListPreventAutomaticScroll
 					}
 					title={ title }
-					ListHeaderComponent={ ! isReadOnly && header }
+					ListHeaderComponent={ header }
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
@@ -185,6 +189,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
+					accessibilityLabel={ __( 'Add paragraph block' ) }
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }

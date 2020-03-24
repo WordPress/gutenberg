@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,7 +18,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
-	FormTokenField,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -34,12 +33,20 @@ import { withSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import {
+	MIN_EXCERPT_LENGTH,
+	MAX_EXCERPT_LENGTH,
+	MAX_POSTS_COLUMNS,
+} from './constants';
+
+/**
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
-const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -104,13 +111,30 @@ class LatestPostsEdit extends Component {
 			} ),
 			{}
 		);
-
+		const categorySuggestions = categoriesList.reduce(
+			( accumulator, category ) => ( {
+				...accumulator,
+				[ category.name ]: category,
+			} ),
+			{}
+		);
 		const selectCategories = ( tokens ) => {
+			const hasNoSuggestion = tokens.some(
+				( token ) => typeof token === 'string' && ! suggestions[ token ]
+			);
+			if ( hasNoSuggestion ) {
+				return;
+			}
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
-			const allCategories = tokens.map( ( token ) =>
-				typeof token === 'string' ? suggestions[ token ] : token
-			);
+			const allCategories = tokens.map( ( token ) => {
+				return typeof token === 'string' ? suggestions[ token ] : token;
+			} );
+			// We do nothing if the category is not selected
+			// from suggestions.
+			if ( includes( allCategories, null ) ) {
+				return false;
+			}
 			setAttributes( { categories: allCategories } );
 		};
 
@@ -150,8 +174,8 @@ class LatestPostsEdit extends Component {
 								onChange={ ( value ) =>
 									setAttributes( { excerptLength: value } )
 								}
-								min={ 10 }
-								max={ 100 }
+								min={ MIN_EXCERPT_LENGTH }
+								max={ MAX_EXCERPT_LENGTH }
 							/>
 						) }
 				</PanelBody>
@@ -235,21 +259,11 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+						categorySuggestions={ categorySuggestions }
+						onCategoryChange={ selectCategories }
+						selectedCategories={ categories }
 					/>
-					{ categoriesList.length > 0 && (
-						<FormTokenField
-							label={ __( 'Categories' ) }
-							value={
-								categories &&
-								categories.map( ( item ) => ( {
-									id: item.id,
-									value: item.name || item.value,
-								} ) )
-							}
-							suggestions={ Object.keys( suggestions ) }
-							onChange={ selectCategories }
-						/>
-					) }
+
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -357,9 +371,9 @@ class LatestPostsEdit extends Component {
 										.trim()
 										.split( ' ', excerptLength )
 										.join( ' ' ) +
-								  ' ... <a href=' +
+								  ' ... <a href="' +
 								  post.link +
-								  'target="_blank" rel="noopener noreferrer">' +
+								  '" target="_blank" rel="noopener noreferrer">' +
 								  __( 'Read more' ) +
 								  '</a>'
 								: excerpt;

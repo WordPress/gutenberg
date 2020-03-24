@@ -214,7 +214,7 @@ class URLInput extends Component {
 
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue );
+			this.updateSuggestions( inputValue.trim() );
 		}
 	}
 
@@ -231,7 +231,7 @@ class URLInput extends Component {
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value );
+			this.updateSuggestions( value.trim() );
 		}
 	}
 
