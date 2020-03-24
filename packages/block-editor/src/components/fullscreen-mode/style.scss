@@ -55,3 +55,10 @@ body.js.is-showing-admin-menu {
 		margin-left: 160px;
 	}
 }
+
+body.js.is-showing-admin-menu.folded {
+	.block-editor-editor-skeleton__body,
+	.block-editor-editor-skeleton__footer {
+		margin-left: 36px;
+	}
+}
