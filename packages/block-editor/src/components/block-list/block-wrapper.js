@@ -239,13 +239,15 @@ const elements = [
 const BlockSaveComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, wrapper ) => {
 		return (
-			<BlockPropsFilterContext>
-				{ ( filter ) => (
-					<TagName ref={ wrapper } { ...filter( props ) }>
-						{ children }
-					</TagName>
-				) }
-			</BlockPropsFilterContext>
+			<BlockPropsFilterContext.Consumer>
+				{ ( filter ) => {
+					return (
+						<TagName ref={ wrapper } { ...filter( props ) }>
+							{ children }
+						</TagName>
+					);
+				} }
+			</BlockPropsFilterContext.Consumer>
 		);
 	}
 );

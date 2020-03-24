@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	getColorClassName,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -38,8 +42,11 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<div className={ className ? className : undefined } style={ style }>
+		<Block.Save.div
+			className={ className ? className : undefined }
+			style={ style }
+		>
 			<InnerBlocks.Content />
-		</div>
+		</Block.Save.div>
 	);
 }

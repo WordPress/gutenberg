@@ -107,7 +107,7 @@ export function getSaveElement(
 
 	if ( hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
 		if ( hasBlockSupport( blockType, 'lightBlockWrapper', false ) ) {
-			blockPropsFilter = ( props ) =>
+			blockPropsFilter = ( props ) => {
 				/**
 				 * Filters the props applied to the block save result element.
 				 *
@@ -115,12 +115,13 @@ export function getSaveElement(
 				 * @param {WPBlock} blockType  Block type definition.
 				 * @param {Object}  attributes Block attributes.
 				 */
-				applyFilters(
+				return applyFilters(
 					'blocks.getSaveContent.extraProps',
 					{ ...props },
 					blockType,
 					attributes
 				);
+			};
 		} else if ( isObject( element ) ) {
 			/**
 			 * Filters the props applied to the block save result element.
@@ -157,11 +158,11 @@ export function getSaveElement(
 	);
 
 	return (
-		<BlockContentProvider innerBlocks={ innerBlocks }>
-			<BlockPropsFilterContext.Provider value={ blockPropsFilter }>
+		<BlockPropsFilterContext.Provider value={ blockPropsFilter }>
+			<BlockContentProvider innerBlocks={ innerBlocks }>
 				{ element }
-			</BlockPropsFilterContext.Provider>
-		</BlockContentProvider>
+			</BlockContentProvider>
+		</BlockPropsFilterContext.Provider>
 	);
 }
 
