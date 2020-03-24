@@ -45,7 +45,7 @@ import { InlineWarning } from './inline-warning';
  * Browser dependencies
  */
 
-const { getSelection, getComputedStyle } = window;
+const { getComputedStyle } = window;
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -113,9 +113,11 @@ function createPrepareEditableTree( props, prefix ) {
 /**
  * If the selection is set on the placeholder element, collapse the selection to
  * the start (before the placeholder).
+ *
+ * @param {Window} defaultView
  */
-function fixPlaceholderSelection() {
-	const selection = window.getSelection();
+function fixPlaceholderSelection( defaultView ) {
+	const selection = defaultView.getSelection();
 	const { anchorNode, anchorOffset } = selection;
 
 	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
@@ -142,6 +144,8 @@ class RichText extends Component {
 	constructor( { value, selectionStart, selectionEnd } ) {
 		super( ...arguments );
 
+		this.getDocument = this.getDocument.bind( this );
+		this.getWindow = this.getWindow.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -186,15 +190,23 @@ class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener(
+		this.getDocument().removeEventListener(
 			'selectionchange',
 			this.onSelectionChange
 		);
-		window.cancelAnimationFrame( this.rafId );
+		this.getWindow().cancelAnimationFrame( this.rafId );
 	}
 
 	componentDidMount() {
 		this.applyRecord( this.record, { domOnly: true } );
+	}
+
+	getDocument() {
+		return this.props.forwardedRef.current.ownerDocument;
+	}
+
+	getWindow() {
+		return this.getDocument().defaultView;
 	}
 
 	createRecord() {
@@ -203,7 +215,7 @@ class RichText extends Component {
 			forwardedRef,
 			preserveWhiteSpace,
 		} = this.props;
-		const selection = getSelection();
+		const selection = this.getWindow().getSelection();
 		const range =
 			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -401,9 +413,14 @@ class RichText extends Component {
 		// frame. The event listener for selection changes may be added too late
 		// at this point, but this focus event is still too early to calculate
 		// the selection.
-		this.rafId = window.requestAnimationFrame( this.onSelectionChange );
+		this.rafId = this.getWindow().requestAnimationFrame(
+			this.onSelectionChange
+		);
 
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
+		this.getDocument().addEventListener(
+			'selectionchange',
+			this.onSelectionChange
+		);
 
 		if ( this.props.setFocusedElement ) {
 			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
@@ -414,7 +431,7 @@ class RichText extends Component {
 	}
 
 	onBlur() {
-		document.removeEventListener(
+		this.getDocument().removeEventListener(
 			'selectionchange',
 			this.onSelectionChange
 		);
@@ -514,7 +531,7 @@ class RichText extends Component {
 		// Do not update the selection when characters are being composed as
 		// this rerenders the component and might distroy internal browser
 		// editing state.
-		document.removeEventListener(
+		this.getDocument().removeEventListener(
 			'selectionchange',
 			this.onSelectionChange
 		);
@@ -526,7 +543,10 @@ class RichText extends Component {
 		// input event after composition.
 		this.onInput( { inputType: 'insertText' } );
 		// Tracking selection changes can be resumed.
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
+		this.getDocument().addEventListener(
+			'selectionchange',
+			this.onSelectionChange
+		);
 	}
 
 	/**
@@ -569,7 +589,7 @@ class RichText extends Component {
 			// element, in which case the caret is not visible. We need to set
 			// the caret before the placeholder if that's the case.
 			if ( value.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection();
+				fixPlaceholderSelection( this.getWindow() );
 			}
 
 			return;
@@ -933,8 +953,8 @@ class RichText extends Component {
 
 		const { parentNode } = target;
 		const index = Array.from( parentNode.childNodes ).indexOf( target );
-		const range = target.ownerDocument.createRange();
-		const selection = getSelection();
+		const range = this.getDocument().createRange();
+		const selection = this.getWindow().getSelection();
 
 		range.setStart( target.parentNode, index );
 		range.setEnd( target.parentNode, index + 1 );
