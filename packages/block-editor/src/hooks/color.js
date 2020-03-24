@@ -181,7 +181,7 @@ export const withBlockControls = createHigherOrderComponent(
 				color: {
 					...style?.color,
 					[ name ]:
-						colorObject && colorObject.slug ? undefined : value,
+						colorObject?.slug ? undefined : value,
 				},
 			};
 			const newNamedColor =
