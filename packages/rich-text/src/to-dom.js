@@ -101,7 +101,7 @@ export function toDom( {
 	prepareEditableTree,
 	isEditableTree = true,
 	placeholder,
-	doc,
+	doc = document,
 } ) {
 	let startPath = [];
 	let endPath = [];
