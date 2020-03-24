@@ -13,7 +13,7 @@ import wd from 'wd';
 import { isAndroid, swipeUp, swipeDown, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
-	driver: wd.PromiseChainWebdriver;
+	driver: wd.promiseChainRemote;
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
@@ -22,7 +22,7 @@ export default class EditorPage {
 	galleryBlockName = 'Gallery';
 	orderedListButtonName = 'Convert to ordered list';
 
-	constructor( driver: wd.PromiseChainWebdriver ) {
+	constructor( driver: wd.promiseChainRemote ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
