@@ -91,7 +91,7 @@ install:
     fi
   - |
     if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      npm run env docker-run -- php composer install
+      npm run env docker-run -- php composer install --no-interaction
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -152,12 +152,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true COMPOSER_NO_INTERACTION=1
+      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm COMPOSER_NO_INTERACTION=1
+      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
