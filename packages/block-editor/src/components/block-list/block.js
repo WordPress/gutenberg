@@ -88,7 +88,7 @@ function BlockListBlock( {
 		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( ! lightBlockWrapper && blockType.getEditWrapperProps ) {
+	if ( blockType.getEditWrapperProps ) {
 		wrapperProps = {
 			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
