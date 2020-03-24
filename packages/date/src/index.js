@@ -357,18 +357,21 @@ export function format( dateFormat, dateValue = new Date() ) {
 }
 
 /**
- * Formats a date (like `date()` in PHP), in the site's timezone.
+ * Formats a date (like `date()` in PHP).
  *
- * @param {string}                           dateFormat PHP-style formatting string.
- *                                                      See php.net/date.
- * @param {(Date|string|Moment|null)}        dateValue  Date object or string,
- *                                                      parsable by moment.js.
+ * @param {string}                      dateFormat PHP-style formatting string.
+ *                                                 See php.net/date.
+ * @param {(Date|string|Moment|null)}   dateValue  Date object or string, parsable
+ *                                                 by moment.js.
+ * @param {(string|number|null)}        timezone   Timezone to output result in or
+ *                                                 a UTC offset.
+ *                                                 Defaults to timezone from site.
+ *                                                 See momentjs.com.
  *
- * @return {string} Formatted date.
+ * @return {string} Formatted date in English.
  */
-export function date( dateFormat, dateValue = new Date() ) {
-	const offset = settings.timezone.offset * HOUR_IN_MINUTES;
-	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
+export function date( dateFormat, dateValue = new Date(), timezone ) {
+	const dateMoment = buildMoment( dateValue, timezone );
 	return format( dateFormat, dateMoment );
 }
 
@@ -380,7 +383,7 @@ export function date( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|Moment|null)}        dateValue  Date object or string,
  *                                                      parsable by moment.js.
  *
- * @return {string} Formatted date.
+ * @return {string} Formatted date in English.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
 	const dateMoment = momentLib( dateValue ).utc();
@@ -388,26 +391,46 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
 }
 
 /**
- * Formats a date (like `date_i18n()` in PHP).
+ * Formats a date (like `wp_date()` in PHP), translating it into site's locale.
+ *
+ * Backward Compatibility Notice: if `timezone` is set to `true`, the function
+ * behaves like `gmdateI18n`.
+ *
+ * @param {string}                      dateFormat PHP-style formatting string.
+ *                                                 See php.net/date.
+ * @param {(Date|string|Moment|null)}   dateValue  Date object or string,
+ *                                                 parsable by moment.js.
+ * @param {(string|number|null)}        timezone   Timezone to output result in or
+ *                                                 a UTC offset.
+ *                                                 Defaults to timezone from site.
+ *                                                 See momentjs.com.
+ *
+ * @return {string} Formatted date.
+ */
+export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
+	if ( true === timezone ) {
+		return gmdateI18n( dateFormat, dateValue );
+	}
+
+	const dateMoment = buildMoment( dateValue, timezone );
+	dateMoment.locale( settings.l10n.locale );
+	return format( dateFormat, dateMoment );
+}
+
+/**
+ * Formats a date (like `wp_date()` in PHP), translating it into site's locale
+ * and using the UTC timezone.
  *
  * @param {string}                           dateFormat PHP-style formatting string.
  *                                                      See php.net/date.
  * @param {(Date|string|Moment|null)}        dateValue  Date object or string,
  *                                                      parsable by moment.js.
- * @param {boolean}                          gmt        True for GMT/UTC, false for
- *                                                      site's timezone.
  *
  * @return {string} Formatted date.
  */
-export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
-	// Defaults.
-	const offset = gmt ? 0 : settings.timezone.offset * HOUR_IN_MINUTES;
-	// Convert to moment object.
-	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
-
-	// Set the locale.
+export function gmdateI18n( dateFormat, dateValue = new Date() ) {
+	const dateMoment = momentLib( dateValue ).utc();
 	dateMoment.locale( settings.l10n.locale );
-	// Format and return.
 	return format( dateFormat, dateMoment );
 }
 
@@ -438,6 +461,51 @@ export function getDate( dateString ) {
 	}
 
 	return momentLib.tz( dateString, WP_ZONE ).toDate();
+}
+
+/**
+ * Creates a moment instance using the given timezone or, if none is provided, using global settings.
+ *
+ * @param {(Date|string|Moment|null)}   dateValue  Date object or string, parsable
+ *                                                 by moment.js.
+ * @param {(string|number|null)}        timezone   Timezone to output result in or
+ *                                                 a UTC offset.
+ *                                                 Defaults to timezone from site.
+ *                                                 See momentjs.com.
+ * @return {Moment}  a moment instance.
+ */
+function buildMoment( dateValue, timezone ) {
+	if ( timezone && ! isUtcOffset( timezone ) ) {
+		return momentLib( dateValue ).tz( timezone );
+	}
+
+	if ( timezone && isUtcOffset( timezone ) ) {
+		return momentLib( dateValue ).utcOffset( timezone );
+	}
+
+	if ( settings.timezone.string ) {
+		return momentLib( dateValue ).tz( settings.timezone.string );
+	}
+
+	return momentLib( dateValue ).utcOffset( settings.timezone.offset );
+}
+
+const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:[0-9][0-9])?$/;
+
+/**
+ * Returns whether a certain UTC offset is valid or not.
+ *
+ * @param {number|string} offset a UTC offset.
+ *
+ * @return {boolean} whether a certain UTC offset is valid or not.
+ */
+function isUtcOffset( offset ) {
+	if ( 'number' === typeof offset ) {
+		return true;
+	} //end if
+
+	offset = `${ offset }`;
+	return VALID_UTC_OFFSET.test( offset );
 }
 
 setupWPTimezone();

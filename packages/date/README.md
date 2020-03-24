@@ -18,26 +18,30 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 <a name="date" href="#date">#</a> **date**
 
-Formats a date (like `date()` in PHP), in the site's timezone.
+Formats a date (like `date()` in PHP).
 
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
+-   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. See momentjs.com.
 
 _Returns_
 
--   `string`: Formatted date.
+-   `string`: Formatted date in English.
 
 <a name="dateI18n" href="#dateI18n">#</a> **dateI18n**
 
-Formats a date (like `date_i18n()` in PHP).
+Formats a date (like `wp_date()` in PHP), translating it into site's locale.
+
+Backward Compatibility Notice: if `timezone` is set to `true`, the function
+behaves like `gmdateI18n`.
 
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
--   _gmt_ `boolean`: True for GMT/UTC, false for site's timezone.
+-   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. See momentjs.com.
 
 _Returns_
 
@@ -71,6 +75,20 @@ _Returns_
 <a name="gmdate" href="#gmdate">#</a> **gmdate**
 
 Formats a date (like `date()` in PHP), in the UTC timezone.
+
+_Parameters_
+
+-   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
+-   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
+
+_Returns_
+
+-   `string`: Formatted date in English.
+
+<a name="gmdateI18n" href="#gmdateI18n">#</a> **gmdateI18n**
+
+Formats a date (like `wp_date()` in PHP), translating it into site's locale
+and using the UTC timezone.
 
 _Parameters_
 
