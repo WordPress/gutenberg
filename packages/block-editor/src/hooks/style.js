@@ -79,7 +79,7 @@ function addAttribute( settings ) {
 }
 
 /**
- * Override props assigned to save component to inject colors classnames and styles.
+ * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
  * @param  {Object} blockType  Block type
