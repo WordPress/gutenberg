@@ -90,11 +90,13 @@ const makeCancelable = ( promise ) => {
  *                                    providing a custom `settings` prop.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
+/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
@@ -105,12 +107,14 @@ const makeCancelable = ( promise ) => {
  * @property {string} title Human-readable label to show in user interface.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Properties associated with a link control value, composed as a union of the
  * default properties and any custom settings values.
  *
  * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
  */
+/* eslint-enable */
 
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
