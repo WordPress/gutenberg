@@ -14,6 +14,10 @@ describe( 'getCSSVariables', () => {
 		} );
 	} );
 
+	it( 'should omit CSS variables when the provided value is falsy', () => {
+		expect( getCSSVariables( { color: undefined } ) ).toEqual( {} );
+	} );
+
 	it( 'should flatten nested style config', () => {
 		expect(
 			getCSSVariables( {

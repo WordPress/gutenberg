@@ -30,8 +30,10 @@ export const settings = {
 	example: {
 		attributes: {
 			style: {
-				textColor: '#000000',
-				backgroundColor: '#ffffff',
+				color: {
+					text: '#000000',
+					background: '#ffffff',
+				},
 			},
 		},
 		innerBlocks: [

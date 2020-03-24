@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +28,19 @@ import InspectorControls from '../components/inspector-controls';
 import { getBlockDOMNode } from '../utils/dom';
 
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
+
+export const cleanEmptyObject = ( object ) => {
+	if ( ! isObject( object ) ) {
+		return object;
+	}
+	const cleanedNestedObjects = pickBy(
+		mapValues( object, cleanEmptyObject ),
+		identity
+	);
+	return isEqual( cleanedNestedObjects, {} )
+		? undefined
+		: cleanedNestedObjects;
+};
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -186,7 +200,7 @@ export const withBlockControls = createHigherOrderComponent(
 				? colorObject.slug
 				: undefined;
 			props.setAttributes( {
-				style: newStyle,
+				style: cleanEmptyObject( newStyle ),
 				[ attributeName ]: newNamedColor,
 			} );
 		};
