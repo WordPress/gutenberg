@@ -19,7 +19,7 @@ import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockPropsFilterContext } from '@wordpress/blocks';
+import { __unstableBlockPropsFilterContext as BlockPropsFilterContext } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

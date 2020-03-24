@@ -24,7 +24,7 @@ export {
 	getBlockMenuDefaultClassName,
 	getSaveElement,
 	getSaveContent,
-	BlockPropsFilterContext,
+	BlockPropsFilterContext as __unstableBlockPropsFilterContext,
 } from './serializer';
 export { isValidBlockContent } from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
