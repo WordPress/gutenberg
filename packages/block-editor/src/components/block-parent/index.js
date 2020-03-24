@@ -53,8 +53,8 @@ const BlockParent = function() {
 					className="block-editor-block-parent__button"
 					onClick={ () => selectBlock( firstParentClientID ) }
 					label={ sprintf(
-              __( 'Select %s' ),
-               parentBlockType.title
+						__( 'Select %s' ),
+						parentBlockType.title
 					) }
 					showTooltip
 					icon={ <BlockIcon icon={ parentBlockType.icon } /> }
