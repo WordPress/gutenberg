@@ -136,7 +136,10 @@ function DropdownMenu( {
 						onClose={ onClose }
 					>
 						{ isFunction( children ) ? children( props ) : null }
-						<PanelBody title={ label }>
+						<PanelBody
+							title={ label }
+							style={ { paddingLeft: 0, paddingRight: 0 } }
+						>
 							{ flatMap(
 								controlSets,
 								( controlSet, indexOfSet ) =>

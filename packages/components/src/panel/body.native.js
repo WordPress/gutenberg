@@ -19,10 +19,10 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { children, title } = this.props;
+		const { children, title, style = {} } = this.props;
 
 		return (
-			<View style={ styles.panelContainer }>
+			<View style={ [ styles.panelContainer, style ] }>
 				{ title && (
 					<Text style={ styles.sectionHeaderText }>{ title }</Text>
 				) }
