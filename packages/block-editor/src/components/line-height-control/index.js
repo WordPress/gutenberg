@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,16 +12,10 @@ import {
 	RESET_VALUE,
 	STEP,
 	useIsLineHeightControlsDisabled,
-	useLineHeightControlState,
 	isLineHeightDefined,
 } from './utils';
 
-export default function LineHeightControl( {
-	className,
-	style = {},
-	...props
-} ) {
-	const [ lineHeight, setLineHeight ] = useLineHeightControlState();
+export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	const isDisabled = useIsLineHeightControlsDisabled();
 	const isDefined = isLineHeightDefined( lineHeight );
 
@@ -38,7 +27,7 @@ export default function LineHeightControl( {
 	const handleOnChange = ( nextValue ) => {
 		// Set the next value without modification if lineHeight has been defined
 		if ( isDefined ) {
-			setLineHeight( nextValue );
+			onChange( nextValue );
 			return;
 		}
 
@@ -56,15 +45,13 @@ export default function LineHeightControl( {
 				break;
 		}
 
-		setLineHeight( adjustedNextValue );
+		onChange( adjustedNextValue );
 	};
-
-	const classes = classnames( 'block-editor-line-height-control', className );
 
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
 	return (
-		<div className={ classes } style={ style }>
+		<div className="block-editor-line-height-control">
 			<TextControl
 				autoComplete="off"
 				onChange={ handleOnChange }
@@ -73,7 +60,6 @@ export default function LineHeightControl( {
 				step={ STEP }
 				type="number"
 				value={ value }
-				{ ...props }
 				min={ 0 }
 			/>
 		</div>

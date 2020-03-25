@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +24,6 @@ export default function save( { attributes } ) {
 		fontSize,
 		customFontSize,
 		direction,
-		lineHeight,
 	} = attributes;
 
 	const textClass = getColorClassName( 'color', textColor );
@@ -49,7 +47,6 @@ export default function save( { attributes } ) {
 		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		color: textClass ? undefined : customTextColor,
 		fontSize: fontSizeClass ? undefined : customFontSize,
-		lineHeight: isUndefined( lineHeight ) ? undefined : lineHeight,
 	};
 
 	return (

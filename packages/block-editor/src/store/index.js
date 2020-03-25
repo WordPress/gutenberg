@@ -37,6 +37,4 @@ const store = registerStore( MODULE_KEY, {
 } );
 applyMiddlewares( store );
 
-export { useBlockEditProps as __experimentalUseBlockEditProps } from './hooks';
-
 export default store;
