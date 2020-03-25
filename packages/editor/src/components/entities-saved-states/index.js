@@ -88,12 +88,12 @@ export default function EntitiesSavedStates( {
 	);
 
 	// Unchecked entities to be ignored by save function.
-	const [ entityRecordsToIgnore, _setEntityRecordsToIgnore ] = useState( [] );
+	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
 
-	const setEntityRecordsToIgnore = ( { kind, name, key }, checked ) => {
+	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
 		if ( checked ) {
-			_setEntityRecordsToIgnore(
-				entityRecordsToIgnore.filter(
+			_setUnselectedEntities(
+				unselectedEntities.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
@@ -101,8 +101,8 @@ export default function EntitiesSavedStates( {
 				)
 			);
 		} else {
-			_setEntityRecordsToIgnore( [
-				...entityRecordsToIgnore,
+			_setUnselectedEntities( [
+				...unselectedEntities,
 				{ kind, name, key },
 			] );
 		}
@@ -112,7 +112,7 @@ export default function EntitiesSavedStates( {
 		const entitiesToSave = savableEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
-					entityRecordsToIgnore,
+					unselectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -140,8 +140,8 @@ export default function EntitiesSavedStates( {
 						<EntityTypeList
 							key={ list[ 0 ].name }
 							list={ list }
-							ignored={ entityRecordsToIgnore }
-							setIgnored={ setEntityRecordsToIgnore }
+							ignored={ unselectedEntities }
+							setIgnored={ setUnselectedEntities }
 						/>
 					);
 				} ) }
@@ -150,7 +150,7 @@ export default function EntitiesSavedStates( {
 					isPrimary
 					disabled={
 						savableEntityRecords.length -
-							entityRecordsToIgnore.length ===
+							unselectedEntities.length ===
 						0
 					}
 					onClick={ saveCheckedEntities }
