@@ -9,20 +9,11 @@
  * Registers the `core/post` block on the server.
  */
 function register_block_core_post() {
+	$path     = __DIR__ . '/post/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
 	register_block_type(
-		'core/post',
-		array(
-			'attributes' => array(
-				'postType' => array(
-					'type'    => 'string',
-					'context' => true,
-				),
-				'postId'   => array(
-					'type'    => 'string',
-					'context' => true,
-				),
-			),
-		)
+		$metadata['name'],
+		$metadata
 	);
 }
 add_action( 'init', 'register_block_core_post' );
