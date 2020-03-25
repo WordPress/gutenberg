@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -18,21 +18,23 @@ import {
 	FLEX_ALIGNMENT_PROPS,
 	getAlignmentIndex,
 	getAlignmentValueFromIndex,
+	getAlignmentFlexProps,
 	getNextIndexFromDirection,
 } from './utils';
-import { Root, Cell, Point } from './styles/alignment-control-styles';
+import { Root, Cell, Point } from './styles/alignment-matrix-control-styles';
 import { useControlledState } from '../utils/hooks';
-import AlignmentControlIcon from './icon';
+import AlignmentMatrixControlIcon from './icon';
 
 // TODO: Account for RTL alignments
-export default function AlignmentControl( {
-	alignment: alignmentProp = 'center',
+export default function AlignmentMatrixControl( {
+	hasFocusBorder = true,
 	onChange = noop,
 	onKeyDown = noop,
+	value = 'center',
 	...props
 } ) {
 	const [ alignIndex, setAlignIndex ] = useControlledState(
-		getAlignmentIndex( alignmentProp )
+		getAlignmentIndex( value )
 	);
 	const nodeRef = useRef();
 
@@ -93,12 +95,30 @@ export default function AlignmentControl( {
 		handleOnChange( index, { flexProps: FLEX_ALIGNMENT_PROPS[ index ] } );
 	};
 
+	/**
+	 * Keydown event is handled on the native node element rather than
+	 * on the React Element. This resolves interaction conflicts when
+	 * integrated with other components, such as Toolbar.
+	 */
+	useEffect( () => {
+		const node = nodeRef.current;
+		if ( node ) {
+			node.addEventListener( 'keydown', handleOnKeyDown );
+		}
+
+		return () => {
+			if ( node ) {
+				node.removeEventListener( 'keydown', handleOnKeyDown );
+			}
+		};
+	}, [ handleOnKeyDown ] );
+
 	return (
 		<Root
 			{ ...props }
-			tabIndex={ 0 }
+			hasFocusBorder={ hasFocusBorder }
 			ref={ nodeRef }
-			onKeyDown={ handleOnKeyDown }
+			tabIndex={ 0 }
 		>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;
@@ -116,4 +136,6 @@ export default function AlignmentControl( {
 	);
 }
 
-AlignmentControl.icon = <AlignmentControlIcon />;
+AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+AlignmentMatrixControl.icon = <AlignmentMatrixControlIcon />;
+AlignmentMatrixControl.__getAlignmentFlexProps = getAlignmentFlexProps;

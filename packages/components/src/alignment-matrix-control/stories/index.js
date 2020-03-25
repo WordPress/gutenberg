@@ -5,11 +5,11 @@ import { number, select } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/icons';
+import { Icon as BaseIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import AlignmentControl from '../';
+import AlignmentMatrixControl from '../';
 import { ALIGNMENT_VALUES } from '../utils';
 
 const alignmentOptions = ALIGNMENT_VALUES.reduce( ( options, item ) => {
@@ -17,23 +17,23 @@ const alignmentOptions = ALIGNMENT_VALUES.reduce( ( options, item ) => {
 }, {} );
 
 export default {
-	title: 'Components/AlignmentControl',
-	component: AlignmentControl,
+	title: 'Components/AlignmentMatrixControl',
+	component: AlignmentMatrixControl,
 };
 
 export const _default = () => {
-	return <AlignmentControl />;
+	return <AlignmentMatrixControl />;
 };
 
-export const alignmentControlIcon = () => {
+export const icon = () => {
 	const props = {
-		alignment: select( 'alignment', alignmentOptions, 'center' ),
+		value: select( 'value', alignmentOptions, 'center' ),
 		size: number( 'size', 24 ),
 	};
 
 	return (
 		<>
-			<Icon icon={ AlignmentControl.icon } { ...props } />
+			<BaseIcon icon={ AlignmentMatrixControl.icon } { ...props } />
 		</>
 	);
 };

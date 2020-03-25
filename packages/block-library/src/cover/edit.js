@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -33,6 +34,7 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
+	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -65,6 +67,29 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+const {
+	__getAlignmentFlexProps: getAlignmentFlexProps,
+} = AlignmentMatrixControl;
+
+function getAlignmentFlexStyles( contentPosition ) {
+	const [ alignItems, justifyContent ] = getAlignmentFlexProps(
+		contentPosition
+	);
+
+	return {
+		alignItems,
+		justifyContent,
+	};
+}
+
+function isContentPositionCenter( contentPosition ) {
+	return (
+		! contentPosition ||
+		contentPosition === 'center center' ||
+		contentPosition === 'center'
+	);
+}
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -233,6 +258,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		contentPosition,
 		id,
 		backgroundType,
 		dimRatio,
@@ -277,6 +303,7 @@ function CoverEdit( {
 			: {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		...getAlignmentFlexStyles( contentPosition ),
 	};
 
 	if ( gradientValue && ! url ) {
@@ -293,6 +320,12 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
+				<BlockAlignmentMatrixToolbar
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( { contentPosition: nextPosition } )
+					}
+				/>
 				{ hasBackground && (
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -446,6 +479,7 @@ function CoverEdit( {
 		[ overlayColor.class ]: overlayColor.class,
 		'has-background-gradient': gradientValue,
 		[ gradientClass ]: ! url && gradientClass,
+		'has-custom-content-position': isContentPositionCenter(),
 	} );
 
 	return (
