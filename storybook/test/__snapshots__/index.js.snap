@@ -1,15 +1,22 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Storyshots Components/AlignmentControl Alignment Control Icon 1`] = `
+exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
 .emotion-36 {
-  padding: 1px;
+  --width: 92px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  grid-template-rows: repeat( 3,calc( var( --width ) / 3 ) );
+  width: var( --width,92px );
   border-radius: 2px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat( 3,1fr );
   outline: none;
-  grid-template-rows: repeat( 3,calc( 24px / 3));
-  max-width: 24px;
+}
+
+.emotion-36:active,
+.emotion-36:focus {
+  border-color: #007cba;
 }
 
 .emotion-2 {
@@ -25,7 +32,6 @@ exports[`Storyshots Components/AlignmentControl Alignment Control Icon 1`] = `
   display: flex;
   position: relative;
   outline: none;
-  cursor: pointer;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -35,7 +41,177 @@ exports[`Storyshots Components/AlignmentControl Alignment Control Icon 1`] = `
   -ms-flex-pack: center;
   justify-content: center;
   padding: 0;
-  cursor: initial;
+}
+
+.emotion-0 {
+  height: 6px;
+  width: 6px;
+  background: currentColor;
+  box-sizing: border-box;
+  display: grid;
+  margin: auto;
+  -webkit-transition: all 120ms linear;
+  transition: all 120ms linear;
+  color: #b5bcc2;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+*:hover > .emotion-0 {
+  color: #007cba;
+}
+
+.emotion-16 {
+  height: 6px;
+  width: 6px;
+  background: currentColor;
+  box-sizing: border-box;
+  display: grid;
+  margin: auto;
+  -webkit-transition: all 120ms linear;
+  transition: all 120ms linear;
+  box-shadow: 0 0 0 2px #000;
+  color: #000;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-16 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+*:hover > .emotion-16 {
+  color: #000;
+}
+
+<div
+  className="emotion-36 emotion-37"
+  tabIndex={0}
+>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-16 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+  <span
+    className="emotion-2 emotion-3"
+    onClick={[Function]}
+    tabIndex={-1}
+  >
+    <span
+      className="emotion-0 emotion-1"
+    />
+  </span>
+</div>
+`;
+
+exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
+.emotion-2 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  box-sizing: border-box;
+  margin: 0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+  outline: none;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.emotion-36 {
+  width: 100%;
+  border-radius: 2px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat( 3,1fr );
+  outline: none;
+  grid-template-rows: repeat( 3,calc( 24px / 3));
+  max-width: 24px;
 }
 
 .emotion-0 {
@@ -100,256 +276,78 @@ exports[`Storyshots Components/AlignmentControl Alignment Control Icon 1`] = `
   className="emotion-36 emotion-37"
   size={24}
 >
-  <div
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-16 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-  <div
+  </span>
+  <span
     className="emotion-2 emotion-3"
     tabIndex={-1}
   >
-    <div
+    <span
       className="emotion-0 emotion-1"
     />
-  </div>
-</div>
-`;
-
-exports[`Storyshots Components/AlignmentControl Default 1`] = `
-.emotion-36 {
-  --maxWidth: 92px;
-  grid-template-rows: repeat( 3,calc( var( --maxWidth ) / 3 ) );
-  max-width: var( --maxWidth );
-  border-radius: 2px;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: repeat( 3,1fr );
-  outline: none;
-}
-
-.emotion-36:active,
-.emotion-36:focus {
-  border: 1px solid #007cba;
-}
-
-.emotion-2 {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: none;
-  box-sizing: border-box;
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  position: relative;
-  outline: none;
-  cursor: pointer;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.emotion-0 {
-  height: 6px;
-  width: 6px;
-  background: currentColor;
-  box-sizing: border-box;
-  display: grid;
-  margin: auto;
-  -webkit-transition: all 120ms linear;
-  transition: all 120ms linear;
-  color: #b5bcc2;
-}
-
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-0 {
-    -webkit-transition-duration: 0ms;
-    transition-duration: 0ms;
-  }
-}
-
-*:hover > .emotion-0 {
-  color: #007cba;
-}
-
-.emotion-16 {
-  height: 6px;
-  width: 6px;
-  background: currentColor;
-  box-sizing: border-box;
-  display: grid;
-  margin: auto;
-  -webkit-transition: all 120ms linear;
-  transition: all 120ms linear;
-  box-shadow: 0 0 0 2px #000;
-  color: #000;
-}
-
-@media ( prefers-reduced-motion:reduce ) {
-  .emotion-16 {
-    -webkit-transition-duration: 0ms;
-    transition-duration: 0ms;
-  }
-}
-
-*:hover > .emotion-16 {
-  color: #000;
-}
-
-<div
-  className="emotion-36 emotion-37"
-  onKeyDown={[Function]}
-  tabIndex={0}
->
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-16 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
-  <div
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <div
-      className="emotion-0 emotion-1"
-    />
-  </div>
+  </span>
 </div>
 `;
 

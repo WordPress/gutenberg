@@ -612,9 +612,9 @@
 		"parent": null
 	},
 	{
-		"title": "AlignmentControl",
-		"slug": "alignment-control",
-		"markdown_source": "../packages/components/src/alignment-control/README.md",
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
 		"parent": "components"
 	},
 	{
