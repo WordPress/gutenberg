@@ -48,12 +48,12 @@ function ColorPalette( {
 		{
 			name: __( 'White' ),
 			slug: 'white',
-			color: '#fff',
+			color: '#ffffff',
 		},
 		{
 			name: __( 'Black' ),
 			slug: 'black',
-			color: '#000',
+			color: '#000000',
 		},
 		...SETTINGS_DEFAULTS.colors,
 	];

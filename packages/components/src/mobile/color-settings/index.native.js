@@ -34,10 +34,16 @@ function ColorSettings( {
 	getStylesFromColorScheme,
 } ) {
 	const [ segment, setSegment ] = useState( 'Solid' );
+	const isGradient = backgroundColor.includes( 'linear-gradient' );
 
 	const horizontalSeparatorStyle = getStylesFromColorScheme(
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
+	);
+
+	const colorTextStyle = getStylesFromColorScheme(
+		styles.colorText,
+		styles.colorTextDark
 	);
 
 	useEffect( () => {
@@ -75,10 +81,17 @@ function ColorSettings( {
 						segments={ [ 'Solid', 'Gradient' ] }
 						segmentHandler={ ( item ) => setSegment( item ) }
 						addonLeft={
-							<ColorIndicator
-								color={ backgroundColor }
-								style={ styles.colorIndicator }
-							/>
+							<View style={ styles.row }>
+								<ColorIndicator
+									color={ backgroundColor }
+									style={ styles.colorIndicator }
+								/>
+								<Text style={ colorTextStyle } selectable>
+									{ isGradient
+										? __( 'Gradient' )
+										: backgroundColor.toUpperCase() }
+								</Text>
+							</View>
 						}
 					/>
 				</View>
@@ -94,11 +107,14 @@ function ColorSettings( {
 					{ getColorPalette() }
 					<View style={ horizontalSeparatorStyle } />
 					<View style={ styles.footer }>
-						<View style={ styles.flex }>
+						<View style={ styles.row }>
 							<ColorIndicator
 								color={ textColor }
 								style={ styles.colorIndicator }
 							/>
+							<Text style={ colorTextStyle } selectable>
+								{ textColor.toUpperCase() }
+							</Text>
 						</View>
 						<Text style={ styles.selectColorText }>
 							{ __( 'Select a color' ) }

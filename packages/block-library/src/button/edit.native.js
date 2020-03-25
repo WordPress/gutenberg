@@ -407,7 +407,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: textColor.color || '#fff',
+							color: textColor.color || '#ffffff',
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -424,7 +424,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ textColor.color || '#fff' }
+						selectionColor={ textColor.color || '#ffffff' }
 						onReplace={ onReplace }
 						onRemove={ () => onReplace( [] ) }
 					/>
@@ -513,7 +513,7 @@ class ButtonEdit extends Component {
 													label={ __( 'Text' ) }
 													color={
 														textColor.color ||
-														'#fff'
+														'#ffffff'
 													}
 													separatorType="none"
 												/>
@@ -540,7 +540,9 @@ class ButtonEdit extends Component {
 											)
 										}
 										backgroundColor={ backgroundColor }
-										textColor={ textColor.color || '#fff' }
+										textColor={
+											textColor.color || '#ffffff'
+										}
 										setTextColor={ setTextColor }
 										setBackgroundColor={
 											setBackgroundColor
