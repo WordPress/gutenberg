@@ -101,7 +101,9 @@ const BlockComponent = forwardRef(
 			// should only consider tabbables within editable display, since it
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
-			if ( wrapper.current.contains( document.activeElement ) ) {
+			if (
+				isInsideRootBlock( wrapper.current, document.activeElement )
+			) {
 				return;
 			}
 
