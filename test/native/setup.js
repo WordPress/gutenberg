@@ -97,7 +97,7 @@ const mockNativeModules = {
 };
 
 Object.keys( mockNativeModules ).forEach( ( module ) => {
-	try {		
+	try {
 		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
 	} catch ( error ) {
 		jest.doMock( module, () => mockNativeModules[ module ], {
@@ -108,4 +108,4 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 
 // Hack to add the isFocused method to the mock of TextInput provided by RN implementation
 // This should be remove if and when this PR is merged on React-Native repo: https://github.com/facebook/react-native/pull/28332
-Object.assign(TextInput.prototype, { isFocused: jest.fn() });
+Object.assign( TextInput.prototype, { isFocused: jest.fn() } );
