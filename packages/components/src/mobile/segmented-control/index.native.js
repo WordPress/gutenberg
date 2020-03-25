@@ -72,13 +72,13 @@ const SegmentedControls = ( {
 	addonRight,
 	getStylesFromColorScheme,
 } ) => {
-	const [ activeSegment, setActiveSegment ] = useState( segments[ 0 ] );
+	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState( 0 );
 	const containerStyle = getStylesFromColorScheme(
 		styles.container,
 		styles.containerDark
 	);
 
-	function onHandlePress( item ) {
+	function onHandlePress( segment, index ) {
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
 				ANIMATION_DURATION,
@@ -86,23 +86,27 @@ const SegmentedControls = ( {
 				LayoutAnimation.Properties.opacity
 			)
 		);
-		setActiveSegment( item );
-		segmentHandler( item );
+		setActiveSegmentIndex( index );
+		segmentHandler( segment );
 	}
 
 	return (
 		<View style={ styles.row }>
 			<View style={ styles.flex }>{ addonLeft }</View>
 			<View style={ [ containerStyle, isIOS && styles.containerIOS ] }>
-				{ segments.map( ( segment ) => (
-					<Segment
-						title={ sprintf( __( '%s' ), segment ) }
-						onPress={ () => onHandlePress( segment ) }
-						isSelected={ activeSegment === segment }
-						key={ segment }
-						getStylesFromColorScheme={ getStylesFromColorScheme }
-					/>
-				) ) }
+				{ segments.map( ( segment, index ) => {
+					return (
+						<Segment
+							title={ sprintf( __( '%s' ), segment ) }
+							onPress={ () => onHandlePress( segment, index ) }
+							isSelected={ activeSegmentIndex === index }
+							key={ index }
+							getStylesFromColorScheme={
+								getStylesFromColorScheme
+							}
+						/>
+					);
+				} ) }
 			</View>
 			<View style={ styles.flex }>{ addonRight }</View>
 		</View>
