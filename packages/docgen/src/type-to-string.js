@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { SyntaxKind } from 'typescript';
+const { SyntaxKind } = require( 'typescript' );
 
 const getTypeFromTypeReference = ( type ) => {
 	if ( type.typeName.kind === SyntaxKind.Identifier ) {
