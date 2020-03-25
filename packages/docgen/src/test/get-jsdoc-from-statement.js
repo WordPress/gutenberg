@@ -307,6 +307,7 @@ describe( 'JSDoc', () => {
 					title: 'typedef',
 					name: 'WPEditorInserterItem',
 					description: null,
+					type: 'object',
 					properties: [
 						{
 							name: 'id',

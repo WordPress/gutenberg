@@ -178,6 +178,9 @@ module.exports = function( statement ) {
 						title,
 						name: tag.name.escapedText,
 						description,
+						type: tag.typeExpression.jsDocPropertyTags
+							? 'object'
+							: getType( tag.typeExpression ),
 					};
 
 					const properties = getJSDocTypeLiteralProperties(
