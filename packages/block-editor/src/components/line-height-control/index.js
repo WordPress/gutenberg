@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
+import { ZERO } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -24,6 +25,20 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 		return null;
 	}
 
+	const handleOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+
+		if ( keyCode === ZERO && ! isDefined ) {
+			/**
+			 * Prevents the onChange callback from firing, which prevents
+			 * the logic from assuming the change was triggered from
+			 * an input arrow CLICK.
+			 */
+			event.preventDefault();
+			onChange( '0' );
+		}
+	};
+
 	const handleOnChange = ( nextValue ) => {
 		// Set the next value without modification if lineHeight has been defined
 		if ( isDefined ) {
@@ -32,6 +47,11 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 		}
 
 		// Otherwise...
+		/**
+		 * The following logic handles the initial up/down arrow CLICK of the
+		 * input element. This is so that the next values (from an undefined value state)
+		 * are more better suited for line-height rendering.
+		 */
 		let adjustedNextValue = nextValue;
 
 		switch ( nextValue ) {
@@ -54,6 +74,7 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
 		<div className="block-editor-line-height-control">
 			<TextControl
 				autoComplete="off"
+				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				label={ __( 'Line height' ) }
 				placeholder={ BASE_DEFAULT_VALUE }
