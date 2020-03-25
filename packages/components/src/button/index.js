@@ -8,11 +8,12 @@ import { isArray } from 'lodash';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { RadioContext } from '../button-group';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
@@ -41,6 +42,7 @@ export function Button( props, ref ) {
 		shortcut,
 		label,
 		children,
+		value,
 		__experimentalIsFocusable: isFocusable,
 		...additionalProps
 	} = props;
@@ -51,9 +53,13 @@ export function Button( props, ref ) {
 		} );
 	}
 
+	const context = useContext( RadioContext );
+	const radioProps = context[ value ] || {};
+
 	const classes = classnames( 'components-button', className, {
-		'is-secondary': isDefault || isSecondary,
-		'is-primary': isPrimary,
+		'is-secondary':
+			isDefault || isSecondary || radioProps[ 'aria-checked' ] === false,
+		'is-primary': isPrimary || radioProps[ 'aria-checked' ] === true,
 		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
@@ -106,11 +112,12 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
+			ref={ ref }
 			{ ...tagProps }
+			{ ...radioProps }
 			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
-			ref={ ref }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
