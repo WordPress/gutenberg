@@ -65,10 +65,10 @@
 
 .solidBorder {
 	position: absolute;
-	top: -12;
+	top: -$solid-border-space;
 	bottom: 0;
-	left: -12;
-	right: -12;
+	left: -$solid-border-space;
+	right: -$solid-border-space;
 	border-width: $block-selected-border-width;
 	border-radius: 4px;
 	border-style: solid;
@@ -76,10 +76,10 @@
 
 .dashedBorder {
 	position: absolute;
-	top: -6;
-	bottom: -6;
-	left: -6;
-	right: -6;
+	top: -$dashed-border-space;
+	bottom: -$dashed-border-space;
+	left: -$dashed-border-space;
+	right: -$dashed-border-space;
 	border-width: $block-selected-border-width;
 	border-radius: 2px;
 	border-style: dashed;

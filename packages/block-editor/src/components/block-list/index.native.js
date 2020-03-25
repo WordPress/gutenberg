@@ -111,6 +111,7 @@ export class BlockList extends Component {
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
+			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
