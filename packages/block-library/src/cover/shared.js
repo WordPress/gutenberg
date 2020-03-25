@@ -1,3 +1,22 @@
+/**
+ * WordPress dependencies
+ */
+import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
+
+const { __getAlignmentIndex: getAlignmentIndex } = AlignmentMatrixControl;
+
+const POSITION_CLASSNAMES = [
+	'is-position-top-left',
+	'is-position-top-center',
+	'is-position-top-right',
+	'is-position-center-left',
+	'is-position-center-center',
+	'is-position-center-right',
+	'is-position-bottom-left',
+	'is-position-bottom-center',
+	'is-position-bottom-right',
+];
+
 export const IMAGE_BACKGROUND_TYPE = 'image';
 export const VIDEO_BACKGROUND_TYPE = 'video';
 export const COVER_MIN_HEIGHT = 50;
@@ -55,4 +74,18 @@ export function attributesFromMedia( setAttributes ) {
 				: {} ),
 		} );
 	};
+}
+
+export function getPositionClassName( contentPosition ) {
+	const index = getAlignmentIndex( contentPosition );
+
+	return POSITION_CLASSNAMES[ index ];
+}
+
+export function isContentPositionCenter( contentPosition ) {
+	return (
+		! contentPosition ||
+		contentPosition === 'center center' ||
+		contentPosition === 'center'
+	);
 }

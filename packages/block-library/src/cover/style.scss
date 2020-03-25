@@ -108,6 +108,54 @@
 			color: inherit;
 		}
 	}
+
+	// Position: Top
+	&.is-position-top-left {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	&.is-position-top-center {
+		align-items: flex-start;
+		justify-content: center;
+	}
+	&.is-position-top-right {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	// Position: Center
+	&.is-position-center-left {
+		align-items: center;
+		justify-content: flex-start;
+	}
+	&.is-position-center-center {
+		align-items: center;
+		justify-content: center;
+	}
+	&.is-position-center-right {
+		align-items: center;
+		justify-content: flex-end;
+	}
+	// Position: Bottom
+	&.is-position-bottom-left {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	&.is-position-bottom-center {
+		align-items: flex-end;
+		justify-content: center;
+	}
+	&.is-position-bottom-right {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
+
+	&.has-custom-content-position.has-custom-content-position {
+		.wp-block-cover__inner-container {
+			margin: 0;
+			padding: $grid-unit-40;
+			width: auto;
+		}
+	}
 }
 
 .wp-block-cover__video-background {

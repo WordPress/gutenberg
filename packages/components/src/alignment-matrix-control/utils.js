@@ -30,18 +30,6 @@ export const ALIGNMENT_MATRIX = [
 	[ 6, 7, 8 ],
 ];
 
-export const FLEX_ALIGNMENT_PROPS = [
-	[ 'flex-start', 'flex-start' ],
-	[ 'flex-start', 'center' ],
-	[ 'flex-start', 'flex-end' ],
-	[ 'center', 'flex-start' ],
-	[ 'center', 'center' ],
-	[ 'center', 'flex-end' ],
-	[ 'flex-end', 'flex-start' ],
-	[ 'flex-end', 'center' ],
-	[ 'flex-end', 'flex-end' ],
-];
-
 /**
  * Transforms an alignment value to an [x, y] alignment data.
  *
@@ -204,9 +192,4 @@ export function getNextIndexFromDirection( currentIndex, direction ) {
 	}
 
 	return getIndexFromCoords( [ moveX, moveY ], currentIndex );
-}
-
-export function getAlignmentFlexProps( alignment = 'center' ) {
-	const index = getAlignmentIndex( alignment );
-	return FLEX_ALIGNMENT_PROPS[ index ];
 }
