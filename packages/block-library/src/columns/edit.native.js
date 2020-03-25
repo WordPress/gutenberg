@@ -141,7 +141,7 @@ function ColumnsEditContainer( {
 					} }
 					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					columnsSettings={ columnsSettings }
+					customBlockProps={ columnsSettings }
 					customOnAdd={ onAddNextColumn }
 					customOnDelete={ columnCount === 1 && onDelete }
 				/>

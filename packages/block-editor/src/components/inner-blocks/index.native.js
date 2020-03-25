@@ -116,7 +116,7 @@ class InnerBlocks extends Component {
 			customOnDelete,
 			containerStyle,
 			flatListProps,
-			columnsSettings,
+			customBlockProps,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -133,7 +133,7 @@ class InnerBlocks extends Component {
 						customOnDelete={ customOnDelete }
 						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
-						columnsSettings={ columnsSettings }
+						customBlockProps={ customBlockProps }
 					/>
 				) }
 			</>

@@ -69,9 +69,9 @@ export class BlockList extends Component {
 	}
 
 	renderDefaultBlockAppender() {
-		const { shouldShowInsertionPointBefore, columnsSettings } = this.props;
+		const { shouldShowInsertionPointBefore, customBlockProps } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
-		const parentWidth = columnsSettings && columnsSettings.width;
+		const parentWidth = customBlockProps && customBlockProps.width;
 		return (
 			<ReadableContentView
 				style={ parentWidth && { maxWidth: parentWidth } }
@@ -166,7 +166,7 @@ export class BlockList extends Component {
 			__experimentalMoverDirection,
 			customOnDelete,
 			containerStyle,
-			columnsSettings,
+			customBlockProps,
 		} = this.props;
 
 		const horizontalDirection =
@@ -191,7 +191,7 @@ export class BlockList extends Component {
 						}
 						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
-						columnsSettings={ columnsSettings }
+						customBlockProps={ customBlockProps }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

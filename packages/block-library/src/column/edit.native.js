@@ -28,10 +28,10 @@ function ColumnEdit( {
 	isDescendantOfParentSelected,
 	isDescendantSelected,
 	isAncestorSelected,
-	columnsSettings,
+	customBlockProps,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
+	const { columnsInRow, width: columnsContainerWidth } = customBlockProps;
 
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
 
