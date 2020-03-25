@@ -471,7 +471,7 @@
 	@include reduce-motion("animation");
 }
 
-.wp-block:not(.is-selected):not(.has-child-selected) .block-list-appender {
+.wp-block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
 	display: none;
 
 	.block-editor-inserter__toggle {
