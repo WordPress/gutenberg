@@ -37,6 +37,7 @@
 		"./packages/i18n/**/*.js",
 		"./packages/is-shallow-equal/**/*.js",
 		"./packages/priority-queue/**/*.js",
+		"./packages/project-management-automation/**/*.js",
 		"./packages/token-list/**/*.js",
 		"./packages/url/src/**/*.js",
 		"./packages/warning/**/*.js",

@@ -22,7 +22,7 @@ import { Component } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
-import { isURL } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { close, arrowLeft, arrowRight } from '@wordpress/icons';
 
@@ -91,7 +91,10 @@ class GalleryImage extends Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
-		} else if ( this.state.didUploadFail || ( id && ! isURL( url ) ) ) {
+		} else if (
+			this.state.didUploadFail ||
+			( id && getProtocol( url ) === 'file:' )
+		) {
 			requestImageFailedRetryDialog( id );
 		}
 	}

@@ -18,6 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalFullscreenMode as FullscreenMode,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -38,7 +39,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -57,6 +57,7 @@ function Layout() {
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -81,6 +82,9 @@ function Layout() {
 			publishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -110,7 +114,7 @@ function Layout() {
 
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
