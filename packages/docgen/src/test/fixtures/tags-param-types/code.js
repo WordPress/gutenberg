@@ -1,4 +1,8 @@
 /* eslint-disable jsdoc/check-types */
+/* eslint-disable jsdoc/valid-types */
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable jsdoc/require-param-type */
+/* eslint-disable jsdoc/no-undefined-types */
 
 /**
  * A function with many params.
@@ -81,8 +85,17 @@
  * @param {T extends U ? X : Y} p conditional type
  * @param {T extends (...args: any[]) => infer R ? R : any} p infer type: ReturnType
  * @param {import('typescript').Statement} p import type
+ * @param {WPEditorInserterItem} p typedef
+ *
+ * @typedef {object} WPEditorInserterItem
+ * @property {number}   id                Unique identifier for the item.
+ * @property {string}   name              The type of block to create.
  */
 // eslint-disable-next-line no-unused-vars
 export const sum = ( p ) => {};
 
+/* eslint-enable jsdoc/no-undefined-types */
+/* eslint-enable jsdoc/require-param-type */
+/* eslint-enable jsdoc/check-param-names */
+/* eslint-enable jsdoc/valid-types */
 /* eslint-enable jsdoc/check-types */

@@ -96,6 +96,31 @@ const getTypeNameAndDefaultValue = ( tag, code, description ) => {
 	return result;
 };
 
+const getJSDocTypeLiteralProperties = ( code, jsDocPropertyTags ) => {
+	return jsDocPropertyTags.map( ( p ) => {
+		const result = {
+			name:
+				p.name.kind === SyntaxKind.QualifiedName
+					? `${ p.name.left.escapedText }.${ p.name.right.escapedText }`
+					: `${ p.name.escapedText }`,
+			description: p.comment ? p.comment : null,
+		};
+
+		const {
+			type: typeName,
+			defaultValue: value,
+		} = getTypeNameAndDefaultValue( p, code, result.description );
+
+		result.type = typeName;
+
+		if ( value !== undefined ) {
+			result.defaultValue = value;
+		}
+
+		return result;
+	} );
+};
+
 /**
  * Function that takes a TypeScript statement and returns
  * a object representing the leading JSDoc comment of the statement,
@@ -139,31 +164,29 @@ module.exports = function( statement ) {
 						tag.typeExpression.type.kind ===
 							SyntaxKind.JSDocTypeLiteral
 					) {
-						const properties =
-							tag.typeExpression.type.jsDocPropertyTags;
-						result.properties = properties.map( ( p ) => {
-							const propResult = {
-								name: `${ p.name.left.escapedText }.${ p.name.right.escapedText }`,
-								description: p.comment ? p.comment : null,
-							};
+						result.properties = getJSDocTypeLiteralProperties(
+							code,
+							tag.typeExpression.type.jsDocPropertyTags
+						);
+					}
 
-							const {
-								type: typeName,
-								defaultValue: value,
-							} = getTypeNameAndDefaultValue(
-								p,
-								code,
-								propResult.description
-							);
+					return result;
+				}
 
-							propResult.type = typeName;
+				if ( tag.kind === SyntaxKind.JSDocTypedefTag ) {
+					const result = {
+						title,
+						name: tag.name.escapedText,
+						description,
+					};
 
-							if ( value !== undefined ) {
-								propResult.defaultValue = value;
-							}
+					const properties = getJSDocTypeLiteralProperties(
+						code,
+						tag.typeExpression.jsDocPropertyTags
+					);
 
-							return propResult;
-						} );
+					if ( properties !== null ) {
+						result.properties = properties;
 					}
 
 					return result;

@@ -302,12 +302,24 @@ describe( 'JSDoc', () => {
 					'infer type: ReturnType'
 				),
 				type( "import('typescript').Statement", 'import type' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
-				// type( '', '' ),
+				type( 'WPEditorInserterItem', 'typedef' ),
+				{
+					title: 'typedef',
+					name: 'WPEditorInserterItem',
+					description: null,
+					properties: [
+						{
+							name: 'id',
+							description: 'Unique identifier for the item.',
+							type: 'number',
+						},
+						{
+							name: 'name',
+							description: 'The type of block to create.',
+							type: 'string',
+						},
+					],
+				},
 			],
 		} );
 	} );
