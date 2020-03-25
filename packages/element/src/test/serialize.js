@@ -317,6 +317,36 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'inner provided|outer provided' );
 	} );
 
+	it( 'renders proper value through Context API when nested, distinct providers present', () => {
+		const {
+			Consumer: FirstConsumer,
+			Provider: FirstProvider,
+		} = createContext();
+		const {
+			Consumer: SecondConsumer,
+			Provider: SecondProvider,
+		} = createContext();
+
+		const result = renderElement(
+			<FirstProvider value="First">
+				<SecondProvider value="Second">
+					<FirstConsumer>
+						{ ( first ) => (
+							<>
+								First: { first }, Second:{ ' ' }
+								<SecondConsumer>
+									{ ( second ) => second }
+								</SecondConsumer>
+							</>
+						) }
+					</FirstConsumer>
+				</SecondProvider>
+			</FirstProvider>
+		);
+
+		expect( result ).toBe( 'First: First, Second: Second' );
+	} );
+
 	it( 'renders RawHTML as its unescaped children', () => {
 		const result = renderElement( <RawHTML>{ '<img/>' }</RawHTML> );
 

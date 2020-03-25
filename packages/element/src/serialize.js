@@ -347,7 +347,7 @@ function getNormalStylePropertyValue( property, value ) {
  * Serializes a React element to string.
  *
  * @param {WPElement} element       Element to serialize.
- * @param {?Object}   context       Context object.
+ * @param {Map=}      context       Context object.
  * @param {?Object}   legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
@@ -411,11 +411,16 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 	switch ( type && type.$$typeof ) {
 		case Provider.$$typeof:
-			return renderChildren( props.children, props.value, legacyContext );
+			context = new Map( context );
+			context.set( type, props.value );
+			return renderChildren( props.children, context, legacyContext );
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children(
+					( context && context.get( type._context.Provider ) ) ||
+						type._currentValue
+				),
 				context,
 				legacyContext
 			);
