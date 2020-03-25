@@ -114,7 +114,7 @@
 }
 
 /**
- * Block Toolbar/Formatting Buttons
+ * Focus styles.
  */
 
 @mixin block-toolbar-button-style__focus() {
@@ -123,7 +123,6 @@
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
 }
-
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
@@ -140,17 +139,6 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-}
-
-// Square buttons.
-@mixin square-style__neutral() {
-	outline-offset: -1px;
-}
-
-@mixin square-style__focus() {
-	color: $dark-gray-900;
-	outline-offset: -1px;
-	outline: 1px dotted $dark-gray-500;
 }
 
 // Menu items.
