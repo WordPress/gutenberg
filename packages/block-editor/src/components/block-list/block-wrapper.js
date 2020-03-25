@@ -101,7 +101,9 @@ const BlockComponent = forwardRef(
 			// should only consider tabbables within editable display, since it
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
-			if ( wrapper.current.contains( document.activeElement ) ) {
+			if (
+				isInsideRootBlock( wrapper.current, document.activeElement )
+			) {
 				return;
 			}
 
@@ -199,7 +201,11 @@ const BlockComponent = forwardRef(
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
-				className={ classnames( className, props.className ) }
+				className={ classnames(
+					className,
+					props.className,
+					wrapperProps && wrapperProps.className
+				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
@@ -209,6 +215,7 @@ const BlockComponent = forwardRef(
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				tabIndex="0"
 				style={ {
+					...( wrapperProps ? wrapperProps.style : {} ),
 					...( props.style || {} ),
 					...animationStyle,
 				} }
@@ -233,6 +240,7 @@ const elements = [
 	'li',
 	'figure',
 	'nav',
+	'pre',
 ];
 
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {

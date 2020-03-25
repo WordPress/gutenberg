@@ -22,7 +22,7 @@ function TemplatePartPreview() {
 			<div className="wp-block-template-part__placeholder-preview-title">
 				{ __( 'Preview' ) }
 			</div>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview blocks={ blocks } autoHeight />
 		</div>
 	);
 }
