@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
+import { some, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,29 +12,51 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 function EntityRecordState( { record, checked, onChange } ) {
-	const entity = useSelect(
-		( select ) => select( 'core' ).getEntity( record.kind, record.name ),
-		[ record.kind, record.name ]
-	);
-
 	return (
 		<CheckboxControl
 			label={
 				<>
-					{ entity.label }
 					{ !! record.title && (
-						<>
-							{ ': ' }
-							<strong>
-								{ record.title || __( 'Untitled' ) }
-							</strong>
-						</>
+						<strong>{ record.title || __( 'Untitled' ) }</strong>
 					) }
 				</>
 			}
 			checked={ checked }
 			onChange={ onChange }
 		/>
+	);
+}
+
+function EntityTypeList( { list, ignored, setIgnored } ) {
+	const firstRecord = list[ 0 ];
+	const entity = useSelect(
+		( select ) =>
+			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
+		[ firstRecord.kind, firstRecord.name ]
+	);
+
+	return (
+		<>
+			<h2>{ entity.label }</h2>
+			{ list.map( ( record ) => {
+				return (
+					<EntityRecordState
+						key={ record.key }
+						record={ record }
+						checked={
+							! some(
+								ignored,
+								( elt ) =>
+									elt.kind === record.kind &&
+									elt.name === record.name &&
+									elt.key === record.key
+							)
+						}
+						onChange={ ( value ) => setIgnored( record, value ) }
+					/>
+				);
+			} ) }
+		</>
 	);
 }
 
@@ -47,7 +69,9 @@ export default function EntitiesSavedStates( {
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
+	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
+	// Entities savable by save function.
 	const savableEntityRecords = dirtyEntityRecords.filter(
 		( { kind, name, key } ) => {
 			return ! some(
@@ -58,9 +82,14 @@ export default function EntitiesSavedStates( {
 		}
 	);
 
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
+	// To group entities by type.
+	const partitionedSavables = Object.values(
+		groupBy( savableEntityRecords, 'name' )
+	);
 
+	// Unchecked entities to be ignored by save function.
 	const [ entityRecordsToIgnore, _setEntityRecordsToIgnore ] = useState( [] );
+
 	const setEntityRecordsToIgnore = ( { kind, name, key }, checked ) => {
 		if ( checked ) {
 			_setEntityRecordsToIgnore(
@@ -78,6 +107,7 @@ export default function EntitiesSavedStates( {
 			] );
 		}
 	};
+
 	const saveCheckedEntities = () => {
 		const entitiesToSave = savableEntityRecords.filter(
 			( { kind, name, key } ) => {
@@ -105,23 +135,13 @@ export default function EntitiesSavedStates( {
 				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
-				{ savableEntityRecords.map( ( record ) => {
+				{ partitionedSavables.map( ( list ) => {
 					return (
-						<EntityRecordState
-							key={ record.key }
-							record={ record }
-							checked={
-								! some(
-									entityRecordsToIgnore,
-									( elt ) =>
-										elt.kind === record.kind &&
-										elt.name === record.name &&
-										elt.key === record.key
-								)
-							}
-							onChange={ ( value ) =>
-								setEntityRecordsToIgnore( record, value )
-							}
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							ignored={ entityRecordsToIgnore }
+							setIgnored={ setEntityRecordsToIgnore }
 						/>
 					);
 				} ) }
