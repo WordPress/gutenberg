@@ -1,3 +1,5 @@
+$media-to-text: 12px;
+
 .wp-block-media-text {
 	display: flex;
 	align-items: flex-start;
@@ -110,33 +112,33 @@
 
 // Inner blocks STACK
 .innerBlockStackMediaLeft {
-	margin-top: $block-edge-to-content;
+	margin-top: $media-to-text;
 }
 
 .innerBlockStackMediaRight {
-	margin-bottom: $block-edge-to-content;
+	margin-bottom: $media-to-text;
 }
 
 // Inner blocks
 .innerBlock {
-	padding-right: $block-edge-to-content;
-	padding-left: $block-edge-to-content;
+	padding-right: $media-to-text;
+	padding-left: $media-to-text;
 }
 
 // Media STACK
 .mediaStackLeft {
-	margin-bottom: $block-edge-to-content;
+	margin-bottom: $media-to-text;
 }
 
 .mediaStackRight {
-	margin-top: $block-edge-to-content;
+	margin-top: $media-to-text;
 }
 
 // Media
 .mediaLeft {
-	padding-right: $block-edge-to-content;
+	padding-right: $media-to-text;
 }
 
 .mediaRight {
-	padding-left: $block-edge-to-content;
+	padding-left: $media-to-text;
 }
