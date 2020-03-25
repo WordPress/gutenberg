@@ -7,6 +7,7 @@ module.exports = {
 		'@wordpress/no-unguarded-get-range-at': 'error',
 		'@wordpress/i18n-translator-comments': 'error',
 		'@wordpress/i18n-text-domain': 'error',
+		'@wordpress/i18n-no-placeholders-only': 'error',
 		'@wordpress/i18n-no-variables': 'error',
 		'@wordpress/i18n-ellipsis': 'error',
 		'no-restricted-syntax': [
