@@ -317,8 +317,13 @@ class BottomSheetCell extends Component {
 							<Text style={ [ defaultLabelStyle, labelStyle ] }>
 								{ label }
 							</Text>
+							{ isSelected && (
+								<Icon
+									icon={ check }
+									fill={ platformStyles.isSelected.color }
+								/>
+							) }
 						</View>
-						{ isSelected && <Icon icon={ check } /> }
 						{ customActionButton && (
 							<TouchableOpacity
 								onPress={ handler }
