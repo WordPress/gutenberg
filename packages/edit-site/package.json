@@ -35,6 +35,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",

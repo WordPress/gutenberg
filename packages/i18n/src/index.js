@@ -6,7 +6,7 @@ import memoize from 'memize';
 import sprintfjs from 'sprintf-js';
 
 /**
- * @typedef {{[key: string]: any}} LocaleData
+ * @typedef {Record<string, any>} LocaleData
  */
 
 /**

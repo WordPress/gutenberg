@@ -706,6 +706,19 @@ _Returns_
 
 -   `boolean`: Whether an ancestor of the block is in multi-selection set.
 
+<a name="isBlockHighlighted" href="#isBlockHighlighted">#</a> **isBlockHighlighted**
+
+Returns true if the current highlighted block matches the block clientId.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block is currently highlighted.
+
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
 Returns true if we should show the block insertion point.
@@ -1295,6 +1308,15 @@ Returns an action object synchronize the template with the list of blocks
 _Returns_
 
 -   `Object`: Action object.
+
+<a name="toggleBlockHighlight" href="#toggleBlockHighlight">#</a> **toggleBlockHighlight**
+
+Returns an action object that toggles the highlighted block state.
+
+_Parameters_
+
+-   _clientId_ `string`: The block's clientId.
+-   _isHighlighted_ `boolean`: The highlight state.
 
 <a name="toggleBlockMode" href="#toggleBlockMode">#</a> **toggleBlockMode**
 

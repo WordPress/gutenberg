@@ -143,8 +143,9 @@ _Related_
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
--   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+-   _preview_ `Object`: options for how the preview should be shown
+-   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
@@ -230,10 +231,6 @@ _Returns_
 <a name="DefaultBlockAppender" href="#DefaultBlockAppender">#</a> **DefaultBlockAppender**
 
 Undocumented declaration.
-
-<a name="Editable" href="#Editable">#</a> **Editable**
-
-Renders an editable text input in which text formatting is not allowed.
 
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
