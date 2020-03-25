@@ -430,7 +430,7 @@
 		@include reduce-motion("animation");
 
 		&:hover {
-			animation: block-editor-inserter__toggle__fade-in-animation 0.2s ease;
+			animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
 			animation-fill-mode: forwards;
 			@include reduce-motion("animation");
 		}
@@ -440,24 +440,45 @@
 @keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
 	0% {
 		opacity: 0;
+		transform: scale(0);
 	}
 	80% {
 		opacity: 0;
+		transform: scale(0);
 	}
 	100% {
 		opacity: 1;
+		transform: scale(1);
 	}
 }
 
 @keyframes block-editor-inserter__toggle__fade-in-animation {
 	from {
 		opacity: 0;
+		transform: scale(0);
 	}
 	to {
 		opacity: 1;
+		transform: scale(1);
 	}
 }
 
+// Hide the appender that sits at the end of block lists, when inside a nested block,
+// unless the block itself, or a parent, is selected.
+.wp-block .block-list-appender .block-editor-inserter__toggle {
+	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+.wp-block:not(.is-selected):not(.has-child-selected) .block-list-appender {
+	display: none;
+
+	.block-editor-inserter__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
 
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {

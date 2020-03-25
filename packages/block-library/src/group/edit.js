@@ -36,8 +36,11 @@ function GroupEdit( { hasInnerBlocks, className } ) {
 						<div className="wp-block-group__inner-container">
 							<InnerBlocks
 								renderAppender={
-									! hasInnerBlocks &&
-									InnerBlocks.ButtonBlockAppender
+									hasInnerBlocks
+										? undefined
+										: () => (
+												<InnerBlocks.ButtonBlockAppender />
+										  )
 								}
 							/>
 						</div>
