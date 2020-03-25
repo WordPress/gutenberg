@@ -72,7 +72,7 @@ export class BlockList extends Component {
 		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
-			<View style={ [ styles.defaultAppender ] }>
+			<View style={ styles.defaultAppender }>
 				<ReadableContentView>
 					<BlockListAppender // show the default appender, anormal, when not inserting a block
 						rootClientId={ this.props.rootClientId }
@@ -112,6 +112,7 @@ export class BlockList extends Component {
 
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
+			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
@@ -136,7 +137,7 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ {
 						flex: isRootList ? 1 : 0,
-						overflow: 'visible',
+						...( ! isRootList && { overflow: 'visible' } ),
 					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
@@ -180,9 +181,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			__experimentalMoverDirection,
-			customOnDelete,
-			containerStyle,
-			columnsSettings,
+			customBlockProps,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
@@ -190,10 +189,12 @@ export class BlockList extends Component {
 		const horizontalDirection =
 			__experimentalMoverDirection === 'horizontal';
 
+		const { readableContentViewStyle } = customBlockProps || {};
+
 		return (
-			<ReadableContentView style={ containerStyle }>
+			<ReadableContentView style={ readableContentViewStyle }>
 				<View
-					style={ containerStyle }
+					style={ readableContentViewStyle }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
@@ -209,9 +210,8 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
-						columnsSettings={ columnsSettings }
+						customBlockProps={ customBlockProps }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

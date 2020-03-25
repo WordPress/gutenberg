@@ -149,6 +149,7 @@
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
 		// Show selection borders around every non-nested block's actual footprint.
@@ -168,6 +169,8 @@
 			// 2px outside.
 			box-shadow: 0 0 0 2px $blue-medium-focus;
 			border-radius: $radius-block-ui;
+			transition: box-shadow 0.2s ease-out;
+			@include reduce-motion("transition");
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
@@ -201,6 +204,20 @@
 .block-editor-block-list__layout .block-editor-block-list__block {
 	&.has-warning {
 		min-height: ( $block-padding + $block-spacing ) * 2;
+	}
+
+	&::after {
+		content: "";
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		box-shadow: 0 0 0 2px transparent;
+		transition: box-shadow 0.1s ease-in;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings
@@ -413,7 +430,7 @@
 		@include reduce-motion("animation");
 
 		&:hover {
-			animation: block-editor-inserter__toggle__fade-in-animation 0.2s ease;
+			animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
 			animation-fill-mode: forwards;
 			@include reduce-motion("animation");
 		}
@@ -423,24 +440,45 @@
 @keyframes block-editor-inserter__toggle__fade-in-animation-delayed {
 	0% {
 		opacity: 0;
+		transform: scale(0);
 	}
 	80% {
 		opacity: 0;
+		transform: scale(0);
 	}
 	100% {
 		opacity: 1;
+		transform: scale(1);
 	}
 }
 
 @keyframes block-editor-inserter__toggle__fade-in-animation {
 	from {
 		opacity: 0;
+		transform: scale(0);
 	}
 	to {
 		opacity: 1;
+		transform: scale(1);
 	}
 }
 
+// Hide the appender that sits at the end of block lists, when inside a nested block,
+// unless the block itself, or a parent, is selected.
+.wp-block .block-list-appender .block-editor-inserter__toggle {
+	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+.wp-block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+	display: none;
+
+	.block-editor-inserter__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
 
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {

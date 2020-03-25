@@ -12,7 +12,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
-	getUnregisteredTypeHandlerName,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -67,7 +66,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
-				columnsSettings={ this.props.columnsSettings }
+				customBlockProps={ this.props.customBlockProps }
 			/>
 		);
 	}
@@ -93,7 +92,7 @@ class BlockListBlock extends Component {
 			parentId,
 			isDimmed,
 			isTouchable,
-			customOnDelete,
+			customBlockProps,
 			horizontalDirection,
 			hasParent,
 			isParentSelected,
@@ -109,6 +108,8 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
+
+		const { customOnDelete } = customBlockProps || {};
 
 		return (
 			<TouchableWithoutFeedback
@@ -201,16 +202,13 @@ export default compose( [
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
-			getBlockCount,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 
-		const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
 		const icon = blockType.icon;
@@ -234,8 +232,6 @@ export default compose( [
 			? parents[ commonAncestorIndex ]
 			: parents[ parents.length - 1 ];
 
-		const hasChildren =
-			! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
@@ -271,18 +267,15 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
-			isLastBlock,
 			isSelected,
 			isValid,
 			parentId,
 			isParentSelected,
 			firstToSelectId,
-			hasChildren,
 			hasParent,
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			isUnregisteredBlock,
 			showFloatingToolbar,
 		};
 	} ),

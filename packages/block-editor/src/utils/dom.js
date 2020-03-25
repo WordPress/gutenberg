@@ -4,7 +4,6 @@
  * in cases where isolated behaviors need remote access to a block node.
  *
  * @param {string} clientId Block client ID.
- * @param {Element} scope an optional DOM Element to which the selector should be scoped
  *
  * @return {Element} Block DOM node.
  */

@@ -3,7 +3,7 @@ $navigation-sub-menu-height: $grid-unit-10 * 5;
 $navigation-sub-menu-width: $grid-unit-10 * 25;
 
 /*
-* Frontend: reset the default list styles
+* Reset the default list styles
 */
 
 .wp-block-navigation > ul {
@@ -31,7 +31,7 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 }
 
 /*
-* Frontend: styles for submenu flyout
+* Styles for submenu flyout
 */
 
 .wp-block-navigation > ul {
@@ -41,7 +41,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		&:hover,
 		&:focus-within {
 			cursor: pointer;
-			z-index: 99999;
 		}
 
 		// Submenu Display
@@ -219,7 +218,7 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 }
 
 /*
-* Frontend: non-shared styles & overrides
+* Non-shared styles & overrides
 */
 
 .wp-block-navigation {

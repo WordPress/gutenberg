@@ -115,10 +115,8 @@ class InnerBlocks extends Component {
 			marginVertical,
 			marginHorizontal,
 			__experimentalMoverDirection,
-			customOnDelete,
-			containerStyle,
 			flatListProps,
-			columnsSettings,
+			customBlockProps,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -134,10 +132,8 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
-						customOnDelete={ customOnDelete }
-						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
-						columnsSettings={ columnsSettings }
+						customBlockProps={ customBlockProps }
 					/>
 				) }
 			</>

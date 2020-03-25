@@ -13,7 +13,6 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
@@ -26,10 +25,10 @@ function ColumnEdit( {
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
-	columnsSettings,
+	customBlockProps,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { columnsInRow, width: columnsContainerWidth } = columnsSettings;
+	const { columnsInRow, width: columnsContainerWidth } = customBlockProps;
 
 	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
 
@@ -138,6 +137,5 @@ export default compose( [
 			isSelected,
 		};
 	} ),
-	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
 ] )( ColumnEditWrapper );
