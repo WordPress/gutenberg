@@ -19,6 +19,10 @@ $border-width: 1px;
 $border-width-focus: 1.5px;
 $border-width-tab: 4px;
 
+:root {
+	--border-width-focus: 1.5px;
+}
+
 /**
  * Grid System.
  * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/

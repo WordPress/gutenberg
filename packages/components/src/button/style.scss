@@ -30,7 +30,8 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus color($theme-color);
+		box-shadow: 0 0 0 $border-width-focus $theme-color;
+		box-shadow: 0 0 0 var(--border-width-focus) $theme-color;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 1px solid transparent;
@@ -59,7 +60,8 @@
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus color($theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--border-width-focus) $theme-color;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 1px solid transparent;

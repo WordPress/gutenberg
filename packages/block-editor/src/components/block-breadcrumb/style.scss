@@ -32,12 +32,13 @@
 		content: "";
 		display: block;
 		position: absolute;
-		top: $border-width-focus;
-		right: $border-width-focus;
-		bottom: $border-width-focus;
-		left: $border-width-focus;
 		border-radius: $radius-block-ui;
-		box-shadow: inset 0 0 0 $border-width-focus color($theme-color);
+		top: $border-width;
+		right: $border-width;
+		bottom: $border-width;
+		left: $border-width;
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		box-shadow: inset 0 0 0 var(--border-width-focus) $theme-color;
 	}
 }
 
