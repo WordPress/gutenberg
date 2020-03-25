@@ -115,6 +115,8 @@ class InnerBlocks extends Component {
 			__experimentalMoverDirection,
 			flatListProps,
 			customBlockProps,
+			marginVertical,
+			marginHorizontal,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -122,6 +124,8 @@ class InnerBlocks extends Component {
 			<>
 				{ ! templateInProcess && (
 					<BlockList
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
