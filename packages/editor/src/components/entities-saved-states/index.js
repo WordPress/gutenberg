@@ -47,7 +47,7 @@ export default function EntitiesSavedStates( {
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
-	// Since we are chosing to ignore saving items in `ignoredForSave` prop, don't show them as an option to save!
+
 	const savableEntityRecords = dirtyEntityRecords.filter(
 		( { kind, name, key } ) => {
 			return ! some(
@@ -60,10 +60,8 @@ export default function EntitiesSavedStates( {
 
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	// Which ones to NOT save...  this is an odd name...
 	const [ entityRecordsToIgnore, _setEntityRecordsToIgnore ] = useState( [] );
 	const setEntityRecordsToIgnore = ( { kind, name, key }, checked ) => {
-		// If checked, remove it from list of not to save
 		if ( checked ) {
 			_setEntityRecordsToIgnore(
 				entityRecordsToIgnore.filter(
@@ -81,7 +79,6 @@ export default function EntitiesSavedStates( {
 		}
 	};
 	const saveCheckedEntities = () => {
-		// Save it if its not one of those "unsaved"/ not-to-save things
 		const entitiesToSave = savableEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
