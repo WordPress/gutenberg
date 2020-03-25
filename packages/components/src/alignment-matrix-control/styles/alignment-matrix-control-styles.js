@@ -19,17 +19,26 @@ export const rootBase = () => {
 	`;
 };
 
-export const Root = styled.div`
-	--maxWidth: 92px;
-	grid-template-rows: repeat( 3, calc( var( --maxWidth ) / 3 ) );
-	max-width: var( --maxWidth );
+const rootBorder = ( { hasFocusBorder } ) => {
+	if ( ! hasFocusBorder ) return '';
 
-	&:active,
-	&:focus {
-		border: 1px solid ${color( 'blue.medium.focus' )};
-	}
+	return css`
+		&:active,
+		&:focus {
+			border-color: ${color( 'blue.medium.focus' )};
+		}
+	`;
+};
+
+export const Root = styled.div`
+	--width: 92px;
+	border: 1px solid transparent;
+	cursor: pointer;
+	grid-template-rows: repeat( 3, calc( var( --width ) / 3 ) );
+	width: var( --width, 92px );
 
 	${rootBase};
+	${rootBorder};
 `;
 
 const pointActive = ( { isActive } ) => {
@@ -62,13 +71,13 @@ export const pointBase = ( props ) => {
 	`;
 };
 
-export const Point = styled.div`
+export const Point = styled.span`
 	height: 6px;
 	width: 6px;
 	${pointBase};
 `;
 
-export const Cell = styled.div`
+export const Cell = styled.span`
 	appearance: none;
 	border: none;
 	box-sizing: border-box;
@@ -76,7 +85,6 @@ export const Cell = styled.div`
 	display: flex;
 	position: relative;
 	outline: none;
-	cursor: pointer;
 	align-items: center;
 	justify-content: center;
 	padding: 0;

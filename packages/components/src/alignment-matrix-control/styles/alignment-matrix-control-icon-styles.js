@@ -11,7 +11,7 @@ import {
 	rootBase,
 	pointBase,
 	Cell as CellBase,
-} from './alignment-control-styles';
+} from './alignment-matrix-control-styles';
 import { color } from '../../utils/style-mixins';
 
 const rootSize = ( { size } ) => {
@@ -22,7 +22,7 @@ const rootSize = ( { size } ) => {
 };
 
 export const Root = styled.div`
-	padding: 1px;
+	width: 100%;
 
 	${rootBase};
 	${rootSize};
@@ -44,13 +44,11 @@ const pointActive = ( { isActive } ) => {
 	`;
 };
 
-export const Point = styled.div`
+export const Point = styled.span`
 	height: 2px;
 	width: 2px;
 	${pointBase};
 	${pointActive};
 `;
 
-export const Cell = styled( CellBase )`
-	cursor: initial;
-`;
+export const Cell = CellBase;

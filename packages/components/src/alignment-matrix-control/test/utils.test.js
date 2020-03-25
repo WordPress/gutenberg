@@ -7,7 +7,7 @@ import {
 	isAlignmentValid,
 } from '../utils';
 
-describe( 'AlignmentControl', () => {
+describe( 'AlignmentMatrixControl', () => {
 	describe( 'isAlignmentValid', () => {
 		it( 'should return true for correctly matching alignment values', () => {
 			// x and y values

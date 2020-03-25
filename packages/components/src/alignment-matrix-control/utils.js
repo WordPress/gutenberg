@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, isUndefined } from 'lodash';
+import { isEqual } from 'lodash';
 
 export const DIRECTION = {
 	UP: 'up',
@@ -204,4 +204,9 @@ export function getNextIndexFromDirection( currentIndex, direction ) {
 	}
 
 	return getIndexFromCoords( [ moveX, moveY ], currentIndex );
+}
+
+export function getAlignmentFlexProps( alignment = 'center' ) {
+	const index = getAlignmentIndex( alignment );
+	return FLEX_ALIGNMENT_PROPS[ index ];
 }

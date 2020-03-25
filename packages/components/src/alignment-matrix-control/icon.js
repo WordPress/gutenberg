@@ -2,16 +2,20 @@
  * Internal dependencies
  */
 import { ALIGNMENTS, getAlignmentIndex } from './utils';
-import { Root, Cell, Point } from './styles/alignment-control-icon-styles';
+import {
+	Root,
+	Cell,
+	Point,
+} from './styles/alignment-matrix-control-icon-styles';
 
-export default function AlignmentControlIcon( {
-	alignment = 'center',
-	size: sizeProp = 24,
-	width,
+export default function AlignmentMatrixControlIcon( {
 	height,
+	size: sizeProp = 24,
+	value = 'center',
+	width,
 	...props
 } ) {
-	const alignIndex = getAlignmentIndex( alignment );
+	const alignIndex = getAlignmentIndex( value );
 	const size = sizeProp || width || height;
 
 	return (

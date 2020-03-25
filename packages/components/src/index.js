@@ -11,7 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
-export { default as __experimentalAlignmentControl } from './alignment-control';
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
