@@ -20,24 +20,28 @@ const getContext = ( blockName, attributeName ) => {
 };
 
 function Providers( { blockType, blockAttributes, children } ) {
-	for ( const [ attributeName, attributeConfig ] of Object.entries(
-		blockType.attributes
-	) ) {
-		if (
-			attributeConfig.context &&
-			blockAttributes[ attributeName ] !== undefined
-		) {
-			const Provider = getContext( blockType.name, attributeName )
-				.Provider;
-			children = (
-				<Provider value={ blockAttributes[ attributeName ] }>
-					{ children }
-				</Provider>
-			);
+	if ( blockType ) {
+		for ( const [ attributeName, attributeConfig ] of Object.entries(
+			blockType.attributes
+		) ) {
+			if (
+				attributeConfig.context &&
+				blockAttributes[ attributeName ] !== undefined
+			) {
+				const Provider = getContext( blockType.name, attributeName )
+					.Provider;
+				children = (
+					<Provider value={ blockAttributes[ attributeName ] }>
+						{ children }
+					</Provider>
+				);
+			}
 		}
 	}
+
 	return children;
 }
+
 function BlockContext( {
 	blockType,
 	blockAttributes,
