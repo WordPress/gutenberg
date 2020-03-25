@@ -13,7 +13,6 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 } from '@wordpress/block-editor';
-import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
@@ -213,6 +212,5 @@ export default compose( [
 			isDescendantSelected,
 		};
 	} ),
-	withViewportMatch( { isMobile: '< mobile' } ),
 	withPreferredColorScheme,
 ] )( ColumnEditWrapper );

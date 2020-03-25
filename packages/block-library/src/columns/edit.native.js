@@ -17,10 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import {
-	withPreferredColorScheme,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
@@ -242,39 +239,21 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( ColumnsEditContainer );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected, getStylesFromColorScheme } = props;
-	const { hasChildren, columnCount } = useSelect(
+	const { clientId } = props;
+	const { columnCount } = useSelect(
 		( select ) => {
-			const { getBlocks, getBlockCount } = select( 'core/block-editor' );
+			const { getBlockCount } = select( 'core/block-editor' );
 
 			return {
-				hasChildren: getBlocks( clientId ).length > 0,
 				columnCount: getBlockCount( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	if ( ! isSelected && ! hasChildren ) {
-		return (
-			<View
-				style={ [
-					getStylesFromColorScheme(
-						styles.columnsPlaceholder,
-						styles.columnsPlaceholderDark
-					),
-					! hasChildren && {
-						...styles.marginVerticalDense,
-						...styles.marginHorizontalNone,
-					},
-				] }
-			/>
-		);
-	}
-
 	return (
 		<ColumnsEditContainerWrapper columnCount={ columnCount } { ...props } />
 	);
 };
 
-export default withPreferredColorScheme( ColumnsEdit );
+export default ColumnsEdit;
