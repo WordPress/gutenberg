@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isUndefined } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
