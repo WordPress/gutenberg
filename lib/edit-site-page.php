@@ -56,7 +56,7 @@ function gutenberg_get_editor_styles() {
 	);
 
 	/* translators: Use this to specify the CSS font family for the default font. */
-	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font' );
+	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
 	$styles[]           = array(
 		'css' => "body { font-family: '$locale_font_family' }",
 	);
