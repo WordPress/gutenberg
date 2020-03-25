@@ -4,11 +4,6 @@
 import { shallow } from 'enzyme';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import { HTMLTextInput } from '..';
@@ -18,18 +13,18 @@ const findTextInputInWrapper = ( wrapper, accessibilityLabel ) => {
 	return wrapper
 		.dive()
 		.findWhere( ( node ) => {
-			return node.prop('accessibilityLabel') === accessibilityLabel
+			return node.prop( 'accessibilityLabel' ) === accessibilityLabel;
 		} )
 		.first();
 };
 
 // Finds the Content TextInput in our HTMLInputView
-const findContentTextInput = ( wrapper ) => {		
+const findContentTextInput = ( wrapper ) => {
 	return findTextInputInWrapper( wrapper, 'html-view-content' );
 };
 
 // Finds the Title TextInput in our HTMLInputView
-const findTitleTextInput = ( wrapper ) => {	
+const findTitleTextInput = ( wrapper ) => {
 	return findTextInputInWrapper( wrapper, 'html-view-title' );
 };
 
