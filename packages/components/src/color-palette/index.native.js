@@ -25,7 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 
-const ANIMATION_DURATION = 350;
+const ANIMATION_DURATION = 200;
 
 function ColorPalette( {
 	setBackgroundColor,
@@ -119,7 +119,7 @@ function ColorPalette( {
 
 	const bounce = scale.interpolate( {
 		inputRange: [ 1, 1.5, 2 ],
-		outputRange: [ 1, 1.3, 1 ],
+		outputRange: [ 1, 0.7, 1 ],
 	} );
 
 	function onColorPress( value ) {
@@ -169,6 +169,7 @@ function ColorPalette( {
 									gradient
 									isSelected={ isSelected( color ) }
 									opacity={ opacity }
+									style={ styles.colorIndicator }
 								/>
 							</Animated.View>
 						</TouchableWithoutFeedback>
@@ -183,6 +184,7 @@ function ColorPalette( {
 									custom
 									color={ customSwatchGradients }
 									isSelected={ isSelectedCustom() }
+									style={ styles.colorIndicator }
 								/>
 							</View>
 						</TouchableWithoutFeedback>

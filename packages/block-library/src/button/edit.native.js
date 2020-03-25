@@ -51,7 +51,7 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const PREPEND_HTTP = 'http://';
-const ANIMATION_DURATION = 350;
+const ANIMATION_DURATION = 300;
 // It's needed to set the following flags via UIManager
 // to have `LayoutAnimation` working on Android
 if (
@@ -113,7 +113,6 @@ class ButtonEdit extends Component {
 			setAttributes( { url: prependHTTP( url ) } );
 			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
-			this.setState( { screen: 'Settings' } );
 		}
 
 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
@@ -122,6 +121,7 @@ class ButtonEdit extends Component {
 			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
 			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
 		) {
+			this.setState( { screen: 'Settings' } );
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );

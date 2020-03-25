@@ -5,8 +5,6 @@
 	background-color: #fff;
 	justify-content: center;
 	align-items: center;
-	border-color: rgba(0, 0, 0, 0.1);
-	border-width: $border-width;
 }
 
 .circleOption {
@@ -32,4 +30,15 @@
 
 .icon {
 	color: $gray-dark;
+}
+
+.outline {
+	border-color: rgba(0, 0, 0, 0.1);
+	top: -$border-width;
+	bottom: -$border-width;
+	left: -$border-width;
+	right: -$border-width;
+	border-radius: 14px;
+	border-width: $border-width;
+	position: absolute;
 }

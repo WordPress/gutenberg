@@ -1,6 +1,6 @@
 .contentContainer {
 	flex-direction: row;
-	padding: 12px $panel-padding;
+	padding: 0 $panel-padding;
 }
 
 .container {
@@ -17,4 +17,9 @@
 
 .verticalSeparatorDark {
 	border-color: $gray-70;
+}
+
+.colorIndicator {
+	margin-top: 12px;
+	margin-bottom: 12px;
 }

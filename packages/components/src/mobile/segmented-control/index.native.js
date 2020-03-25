@@ -20,6 +20,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
+const ANIMATION_DURATION = 300;
+
 const isIOS = Platform.OS === 'ios';
 
 const Segment = ( {
@@ -79,7 +81,7 @@ const SegmentedControls = ( {
 	function onHandlePress( item ) {
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
-				350,
+				ANIMATION_DURATION,
 				LayoutAnimation.Types.easeInEaseOut,
 				LayoutAnimation.Properties.opacity
 			)

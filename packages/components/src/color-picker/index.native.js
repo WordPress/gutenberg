@@ -28,7 +28,7 @@ function ColorPicker( {
 	onNavigationBack,
 	clientId,
 	previousScreen,
-	onCloseBottomSheet,
+	onCloseBottomSheet = () => {},
 	getStylesFromColorScheme,
 } ) {
 	const isIOS = Platform.OS === 'ios';
@@ -195,7 +195,7 @@ function ColorPicker( {
 						color={ currentColor }
 						style={ styles.colorIndicator }
 					/>
-					<Text style={ colorTextStyle }>
+					<Text style={ colorTextStyle } selectable>
 						{ currentColor.toUpperCase() }
 					</Text>
 				</View>
