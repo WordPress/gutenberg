@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { requestUnsupportedBlockFallback } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -24,12 +25,19 @@ export class UnsupportedBlockEdit extends Component {
 		super( props );
 		this.state = { showHelp: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
+		this.requestFallback = this.requestFallback.bind( this );
 	}
 
 	toggleSheet() {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
 		} );
+	}
+
+	componentWillUnmount() {
+		if ( this.timeout ) {
+			clearTimeout( this.timeout );
+		}
 	}
 
 	renderHelpIcon() {
@@ -57,8 +65,13 @@ export class UnsupportedBlockEdit extends Component {
 		);
 	}
 
+	requestFallback() {
+		this.toggleSheet();
+		this.setState( { sendFallbackMessage: true } );
+	}
+
 	renderSheet( title ) {
-		const { getStylesFromColorScheme } = this.props;
+		const { getStylesFromColorScheme, attributes } = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
 			styles.infoTextDark
@@ -89,6 +102,18 @@ export class UnsupportedBlockEdit extends Component {
 				isVisible={ this.state.showHelp }
 				hideHeader
 				onClose={ this.toggleSheet }
+				onModalHide={ () => {
+					if ( this.state.sendFallbackMessage ) {
+						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
+						// A small delay will ensure that the controller has already been removed.
+						this.timeout = setTimeout( () => {
+							requestUnsupportedBlockFallback(
+								attributes.originalContent
+							);
+						}, 100 );
+						this.setState( { sendFallbackMessage: false } );
+					}
+				} }
 			>
 				<View style={ styles.infoContainer }>
 					<Icon
@@ -111,6 +136,7 @@ export class UnsupportedBlockEdit extends Component {
 						<BottomSheet.Cell
 							label={ __( 'Edit post on Web Browser' ) }
 							separatorType="topFullWidth"
+							onPress={ this.requestFallback }
 						/>
 						<BottomSheet.Cell
 							label={ __( 'Dismiss' ) }
