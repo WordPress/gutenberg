@@ -77,6 +77,8 @@ export function attributesFromMedia( setAttributes ) {
 }
 
 export function getPositionClassName( contentPosition ) {
+	if ( contentPosition === undefined ) return '';
+
 	const index = getAlignmentIndex( contentPosition );
 
 	return POSITION_CLASSNAMES[ index ];
