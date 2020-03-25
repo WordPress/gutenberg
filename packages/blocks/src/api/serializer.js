@@ -6,7 +6,12 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, renderToString } from '@wordpress/element';
+import {
+	Component,
+	cloneElement,
+	renderToString,
+	createContext,
+} from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -20,6 +25,8 @@ import {
 } from './registration';
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
+
+const SomeContext = createContext();
 
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
@@ -135,7 +142,7 @@ export function getSaveElement(
 
 	return (
 		<BlockContentProvider innerBlocks={ innerBlocks }>
-			{ element }
+			<SomeContext.Provider value="">{ element }</SomeContext.Provider>
 		</BlockContentProvider>
 	);
 }
