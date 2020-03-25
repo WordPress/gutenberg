@@ -22,7 +22,7 @@ export const userEvents = {
 	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
 
-export const showMediaEditorButton = isIOS;
+export const showMediaEditorButton = true;
 
 // Console polyfill from react-native
 
