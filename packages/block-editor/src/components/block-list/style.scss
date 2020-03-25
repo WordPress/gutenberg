@@ -22,33 +22,6 @@
 }
 
 /**
- * General Post Content Layout
- */
-
-// Add side padding for the main block container, currently post_content.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint, as well as the side-UI.
-.block-editor-block-list__layout {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-	position: relative;
-
-	// Beyond the mobile breakpoint, compensate for side UI.
-	@include break-small() {
-		padding-left: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-		padding-right: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-	}
-
-	// Don't propogate that padding to nested blocks.
-	.block-editor-block-list__layout {
-		padding-left: 0;
-		padding-right: 0;
-	}
-}
-
-
-/**
  * Notices & Block Selected/Hover Styles.
  */
 

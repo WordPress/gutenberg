@@ -52,3 +52,13 @@
 	// This rule can be retired once the title becomes an actual block.
 	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
 }
+
+// Add side padding for the canvas, currently edit-post-visual-editor.
+// The purpose of this padding is to ensure that on small viewports, there is
+// room for the block border that sits 14px ($block-padding) offset from the
+// block footprint.
+.edit-post-visual-editor {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+	position: relative;
+}
