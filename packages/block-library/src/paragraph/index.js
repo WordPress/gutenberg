@@ -42,6 +42,7 @@ export const settings = {
 		lightBlockWrapper: true,
 		__experimentalColor: true,
 		__experimentalLineHeight: true,
+		__experimentalFontSize: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
