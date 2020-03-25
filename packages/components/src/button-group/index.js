@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { Children, useRef, createContext, useMemo } from '@wordpress/element';
 
+// Default values for when a button isn't a child of a group
 export const ButtonGroupContext = createContext( {
 	mode: null,
 	buttons: {},
