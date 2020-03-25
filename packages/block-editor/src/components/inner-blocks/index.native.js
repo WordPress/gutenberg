@@ -112,11 +112,11 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
-			marginVertical,
-			marginHorizontal,
 			__experimentalMoverDirection,
 			flatListProps,
 			customBlockProps,
+			marginVertical,
+			marginHorizontal,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
