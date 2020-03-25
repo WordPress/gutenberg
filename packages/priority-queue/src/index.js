@@ -67,6 +67,7 @@ export const createQueue = () => {
 
 	let isRunning = false;
 
+	/* eslint-disable jsdoc/valid-types */
 	/**
 	 * Callback to process as much queue as time permits.
 	 *
@@ -75,6 +76,7 @@ export const createQueue = () => {
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
+	/* eslint-enable */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining =
 			typeof deadline === 'number'
