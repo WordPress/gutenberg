@@ -164,18 +164,18 @@ export class BlockList extends Component {
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			__experimentalMoverDirection,
-			customOnDelete,
-			containerStyle,
 			customBlockProps,
 		} = this.props;
 
 		const horizontalDirection =
 			__experimentalMoverDirection === 'horizontal';
 
+		const { readableContentViewStyle } = customBlockProps || {};
+
 		return (
-			<ReadableContentView style={ containerStyle }>
+			<ReadableContentView style={ readableContentViewStyle }>
 				<View
-					style={ containerStyle }
+					style={ readableContentViewStyle }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
@@ -189,7 +189,6 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						customOnDelete={ customOnDelete }
 						horizontalDirection={ horizontalDirection }
 						customBlockProps={ customBlockProps }
 					/>

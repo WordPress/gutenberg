@@ -113,8 +113,6 @@ class InnerBlocks extends Component {
 			clientId,
 			renderAppender,
 			__experimentalMoverDirection,
-			customOnDelete,
-			containerStyle,
 			flatListProps,
 			customBlockProps,
 		} = this.props;
@@ -130,8 +128,6 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
-						customOnDelete={ customOnDelete }
-						containerStyle={ containerStyle }
 						flatListProps={ flatListProps }
 						customBlockProps={ customBlockProps }
 					/>

@@ -129,7 +129,7 @@ function ColumnsEditContainer( {
 					__experimentalMoverDirection={
 						getColumnsInRow( width, columnCount ) > 1
 							? 'horizontal'
-							: ''
+							: undefined
 					}
 					flatListProps={ {
 						contentContainerStyle: {
@@ -139,11 +139,14 @@ function ColumnsEditContainer( {
 						horizontal: true,
 						scrollEnabled: false,
 					} }
-					containerStyle={ { flex: 1 } }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					customBlockProps={ columnsSettings }
-					customOnAdd={ onAddNextColumn }
-					customOnDelete={ columnCount === 1 && onDelete }
+					customBlockProps={ {
+						...columnsSettings,
+						readableContentViewStyle: { flex: 1 },
+						customOnAdd: onAddNextColumn,
+						customOnDelete:
+							columnCount === 1 ? onDelete : undefined,
+					} }
 				/>
 			</View>
 		</>

@@ -192,7 +192,7 @@ class BlockListBlock extends Component {
 			title,
 			parentId,
 			isTouchable,
-			customOnDelete,
+			customBlockProps,
 			horizontalDirection,
 			hasParent,
 			onSelect,
@@ -204,6 +204,8 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
+
+		const { customOnDelete } = customBlockProps || {};
 
 		return (
 			<TouchableWithoutFeedback
