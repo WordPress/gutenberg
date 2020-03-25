@@ -162,8 +162,25 @@ export default class EditorPage {
 		await addButton.click();
 
 		// Click on block of choice
-		const blockButton = await this.driver.elementByAccessibilityId( blockName );
+		const blockButton = await this.findBlockButton( blockName );
 		await blockButton.click();
+	}
+
+	// Attempts to find the given block button in the block inserter control.
+	async findBlockButton( blockName: string ) {
+		// If running on iOS returns the result of the look up as no scrolling is necessary for offscreen items.
+		if ( ! isAndroid() ) {
+			return await this.driver.elementByAccessibilityId( blockName );
+		}
+
+		// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
+		if ( ! await this.driver.hasElementByAccessibilityId( blockName ) ) {
+			for ( let step = 0; step < 5; step++ ) {
+				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+			}
+		}
+
+		return await this.driver.elementByAccessibilityId( blockName );
 	}
 
 	async clickToolBarButton( buttonName: string ) {
