@@ -45,5 +45,5 @@ export function useIsLineHeightControlsDisabled() {
  * @return {boolean} Whether the lineHeight attribute is valid.
  */
 export function isLineHeightDefined( lineHeight ) {
-	return ! isUndefined( lineHeight ) && lineHeight !== RESET_VALUE;
+	return lineHeight !== undefined && lineHeight !== RESET_VALUE;
 }
