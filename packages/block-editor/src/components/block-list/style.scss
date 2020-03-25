@@ -289,18 +289,6 @@
 		clear: both;
 	}
 
-	// Full-wide.
-	&[data-align="full"],
-	&.alignfull {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-		}
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
