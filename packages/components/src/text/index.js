@@ -8,6 +8,12 @@ import styled from '@emotion/styled';
  */
 import { text } from './styles/text-mixins';
 
-const Text = styled.p( `margin: 0;`, text );
+const Text = styled.p(
+	`
+	box-sizing: border-box;
+	margin: 0;
+`,
+	text
+);
 
 export default Text;

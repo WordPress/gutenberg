@@ -1,7 +1,8 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { css } from '@emotion/core';
+import { fontFamily } from './font-family';
+import css from './emotion-css';
 
 const fontWeightNormal = `font-weight: 400;`;
 const fontWeightSemibold = `font-weight: 600;`;
@@ -144,6 +145,6 @@ const variant = ( variantName = 'body' ) => {
  * @param {TextProps} props
  */
 export const text = ( props ) => css`
-	box-sizing: border-box;
+	${fontFamily}
 	${variant( props.variant )}
 `;
