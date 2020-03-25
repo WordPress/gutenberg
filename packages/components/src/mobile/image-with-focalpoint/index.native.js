@@ -27,7 +27,7 @@ const ImageWithFocalPoint = ( { focalPoint, url } ) => {
 				} );
 			} );
 		}
-	}, [] );
+	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
