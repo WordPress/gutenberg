@@ -39,7 +39,7 @@ function VisualEditor() {
 					<WritingFlow>
 						<ObserveTyping>
 							<CopyHandler>
-								<PostTitle />
+								<PostTitle title="Static Title Value!" />
 								<BlockList />
 							</CopyHandler>
 						</ObserveTyping>
