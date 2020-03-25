@@ -134,7 +134,7 @@ const variant = ( variantName ) => {
 
 /**
  * @typedef {Object} TextProps
- * @property {TextVariant} variant
+ * @property {TextVariant} variant one of TextVariant to be used
  */
 
 /**
