@@ -8709,6 +8709,72 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/TreeSelect Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-1"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-1__help"
+      className="components-select-control__input"
+      id="inspector-select-control-1"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        value=""
+      >
+        No parent page
+      </option>
+      <option
+        value="p1"
+      >
+        Page 1
+      </option>
+      <option
+        value="p11"
+      >
+           Descend 1 of page 1
+      </option>
+      <option
+        value="p12"
+      >
+           Descend 2 of page 1
+      </option>
+      <option
+        value="p2"
+      >
+        Page 2
+      </option>
+      <option
+        value="p21"
+      >
+           Descend 1 of page 2
+      </option>
+      <option
+        value="p211"
+      >
+              Descend 1 of Descend 1 of page 2
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-1__help"
+  >
+    Help text to explain the select control.
+  </p>
+</div>
+`;
+
 exports[`Storyshots Components/VisuallyHidden Default 1`] = `
 Array [
   <div
