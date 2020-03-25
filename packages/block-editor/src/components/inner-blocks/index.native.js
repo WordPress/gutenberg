@@ -109,13 +109,20 @@ class InnerBlocks extends Component {
 	}
 
 	render() {
-		const { clientId, renderAppender } = this.props;
+		const {
+			clientId,
+			renderAppender,
+			marginVertical,
+			marginHorizontal,
+		} = this.props;
 		const { templateInProcess } = this.state;
 
 		return (
 			<>
 				{ ! templateInProcess && (
 					<BlockList
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
