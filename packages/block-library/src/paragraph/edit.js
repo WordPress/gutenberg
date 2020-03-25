@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +16,6 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalBlock as Block,
-	__experimentalLineHeightControl as LineHeightControl,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
@@ -82,14 +80,7 @@ function ParagraphBlock( {
 	setAttributes,
 	setFontSize,
 } ) {
-	const {
-		align,
-		content,
-		direction,
-		dropCap,
-		lineHeight,
-		placeholder,
-	} = attributes;
+	const { align, content, direction, dropCap, placeholder } = attributes;
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
@@ -100,7 +91,6 @@ function ParagraphBlock( {
 		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
 		direction,
 		minHeight: dropCapMinimumHeight,
-		lineHeight: isUndefined( lineHeight ) ? undefined : lineHeight,
 	};
 
 	return (
@@ -125,7 +115,6 @@ function ParagraphBlock( {
 						value={ fontSize.size }
 						onChange={ setFontSize }
 					/>
-					<LineHeightControl />
 					<ToggleControl
 						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }

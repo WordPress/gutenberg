@@ -8,11 +8,6 @@ import { isUndefined } from 'lodash';
  */
 import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { __experimentalUseBlockEditProps as useBlockEditProps } from '../../store';
-
 export const BASE_DEFAULT_VALUE = 1.5;
 export const STEP = 0.1;
 /**
@@ -40,29 +35,6 @@ export function useIsLineHeightControlsDisabled() {
 	}, [] );
 
 	return isDisabled;
-}
-
-/**
- * Retrieves the attributes/setter for the block, but adjusted to target just the lineHeight attribute
- *
- * @return {Array<string|undefined, Function>} [lineHeight, setLineHeight] from the block's edit props.
- */
-export function useLineHeightControlState() {
-	const [ attributes, setAttributes ] = useBlockEditProps();
-
-	const { lineHeight } = attributes;
-
-	const setLineHeight = ( value ) => {
-		const nextValue = isLineHeightDefined( value )
-			? // Convert to a number for the block attribute
-			  parseFloat( value )
-			: // Unset for the block attribute
-			  undefined;
-
-		setAttributes( { lineHeight: nextValue } );
-	};
-
-	return [ lineHeight, setLineHeight ];
 }
 
 /**

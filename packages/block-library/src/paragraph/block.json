@@ -21,9 +21,6 @@
 		"fontSize": {
 			"type": "string"
 		},
-		"lineHeight": {
-			"type": "number"
-		},
 		"customFontSize": {
 			"type": "number"
 		},

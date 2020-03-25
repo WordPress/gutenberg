@@ -41,6 +41,7 @@ export const settings = {
 		__unstablePasteTextInline: true,
 		lightBlockWrapper: true,
 		__experimentalColor: true,
+		__experimentalLineHeight: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {

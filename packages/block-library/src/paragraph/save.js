@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +16,6 @@ export default function save( { attributes } ) {
 		fontSize,
 		customFontSize,
 		direction,
-		lineHeight,
 	} = attributes;
 
 	const fontSizeClass = getFontSizeClass( fontSize );
@@ -30,7 +28,6 @@ export default function save( { attributes } ) {
 
 	const styles = {
 		fontSize: fontSizeClass ? undefined : customFontSize,
-		lineHeight: isUndefined( lineHeight ) ? undefined : lineHeight,
 	};
 
 	return (
