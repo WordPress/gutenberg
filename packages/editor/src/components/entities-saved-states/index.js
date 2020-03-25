@@ -32,7 +32,7 @@ function EntityRecordState( { record, checked, onChange } ) {
 					) }
 				</>
 			}
-			checked={ ! checked }
+			checked={ checked }
 			onChange={ onChange }
 		/>
 	);
@@ -47,10 +47,23 @@ export default function EntitiesSavedStates( {
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
+	// Since we are chosing to ignore saving items in `ignoredForSave` prop, don't show them as an option to save!
+	const savableEntityRecords = dirtyEntityRecords.filter(
+		( { kind, name, key } ) => {
+			return ! some(
+				ignoredForSave,
+				( elt ) =>
+					elt.kind === kind && elt.name === name && elt.key === key
+			);
+		}
+	);
+
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
+	// Which ones to NOT save...  this is an odd name...
 	const [ unsavedEntityRecords, _setUnsavedEntityRecords ] = useState( [] );
 	const setUnsavedEntityRecords = ( { kind, name, key }, checked ) => {
+		// If checked, remove it from list of not to save
 		if ( checked ) {
 			_setUnsavedEntityRecords(
 				unsavedEntityRecords.filter(
@@ -68,10 +81,11 @@ export default function EntitiesSavedStates( {
 		}
 	};
 	const saveCheckedEntities = () => {
-		const entitiesToSave = dirtyEntityRecords.filter(
+		// Save it if its not one of those "unsaved"/ not-to-save things
+		const entitiesToSave = savableEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
-					ignoredForSave.concat( unsavedEntityRecords ),
+					unsavedEntityRecords,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -86,6 +100,7 @@ export default function EntitiesSavedStates( {
 
 		onRequestClose( entitiesToSave );
 	};
+
 	return (
 		isOpen && (
 			<Modal
@@ -93,7 +108,7 @@ export default function EntitiesSavedStates( {
 				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
-				{ dirtyEntityRecords.map( ( record ) => {
+				{ savableEntityRecords.map( ( record ) => {
 					return (
 						<EntityRecordState
 							key={ record.key }
@@ -117,7 +132,7 @@ export default function EntitiesSavedStates( {
 				<Button
 					isPrimary
 					disabled={
-						dirtyEntityRecords.length -
+						savableEntityRecords.length -
 							unsavedEntityRecords.length ===
 						0
 					}
