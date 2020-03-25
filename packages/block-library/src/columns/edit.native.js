@@ -190,7 +190,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 		updateColumns( previousColumns, newColumns ) {
 			const { clientId } = ownProps;
 			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
-			const { getBlocks } = registry.select( 'core/block-editor' );
+			const { getBlocks, getBlockAttributes } = registry.select(
+				'core/block-editor'
+			);
 
 			let innerBlocks = getBlocks( clientId );
 
@@ -198,10 +200,15 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const isAddingColumn = newColumns > previousColumns;
 
 			if ( isAddingColumn ) {
+				// Get verticalAlignment from Columns block to set the same to new Column
+				const { verticalAlignment } = getBlockAttributes( clientId );
+
 				innerBlocks = [
 					...innerBlocks,
 					...times( newColumns - previousColumns, () => {
-						return createBlock( 'core/column' );
+						return createBlock( 'core/column', {
+							verticalAlignment,
+						} );
 					} ),
 				];
 			} else {
@@ -219,11 +226,18 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { replaceInnerBlocks, selectBlock } = dispatch(
 				'core/block-editor'
 			);
-			const { getBlocks } = registry.select( 'core/block-editor' );
+			const { getBlocks, getBlockAttributes } = registry.select(
+				'core/block-editor'
+			);
+
+			// Get verticalAlignment from Columns block to set the same to new Column
+			const { verticalAlignment } = getBlockAttributes( clientId );
 
 			const innerBlocks = getBlocks( clientId );
 
-			const insertedBlock = createBlock( 'core/column' );
+			const insertedBlock = createBlock( 'core/column', {
+				verticalAlignment,
+			} );
 
 			innerBlocks.push( insertedBlock );
 
