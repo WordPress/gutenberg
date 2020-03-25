@@ -1,7 +1,6 @@
 package com.gutenberg;
 
 import android.app.Application;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -127,8 +126,7 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
-
-        }, isDarkMode());
+        });
 
         return new ReactNativeHost(this) {
             @Override
@@ -153,13 +151,6 @@ public class MainApplication extends Application implements ReactApplication {
                 return "index";
             }
         };
-    }
-
-    private boolean isDarkMode() {
-        Configuration configuration = getResources().getConfiguration();
-        int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
-
-        return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
     }
 
     @Override

@@ -7,10 +7,9 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
-
-export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
 
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
@@ -72,8 +71,8 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
-export function subscribePreferredColorScheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
+export function subscribeAndroidModalClosed( callback ) {
+	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
 }
 
 /**
