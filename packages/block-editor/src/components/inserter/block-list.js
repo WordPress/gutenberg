@@ -206,12 +206,12 @@ function InserterBlockList( {
 		);
 	}, [ filteredItems, rootChildBlocks ] );
 
-	const suggestedItems = useMemo( () => {
+	const suggestedItems = () => {
 		return filter( items, ( item ) => item.utility > 0 ).slice(
 			0,
 			MAX_SUGGESTED_ITEMS
 		);
-	}, [ items ] );
+	};
 
 	const reusableItems = useMemo( () => {
 		return filter( filteredItems, { category: 'reusable' } );
