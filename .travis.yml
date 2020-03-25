@@ -91,7 +91,7 @@ install:
     fi
   - |
     if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      npm run env docker-run -- php composer install
+      npm run env docker-run -- php composer install --no-interaction
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then

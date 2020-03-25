@@ -9,7 +9,6 @@ import { dropRight, get, map, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 
 import {
 	InspectorControls,
@@ -17,7 +16,6 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
@@ -61,22 +59,6 @@ function ColumnsEditContainer( {
 		[ clientId ]
 	);
 
-	const ref = useRef();
-	const {
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		TextColor,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
-			colorDetector: { targetRef: ref },
-		}
-	);
-
 	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
@@ -100,32 +82,14 @@ function ColumnsEditContainer( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<BackgroundColor>
-				{ ( backgroundProps ) => (
-					<TextColor>
-						{ ( textColorProps ) => (
-							<InnerBlocks
-								allowedBlocks={ ALLOWED_BLOCKS }
-								__experimentalMoverDirection="horizontal"
-								ref={ ref }
-								__experimentalTagName={ Block.div }
-								__experimentalPassedProps={ {
-									className: classnames(
-										classes,
-										backgroundProps.className,
-										textColorProps.className
-									),
-									style: {
-										...backgroundProps.style,
-										...textColorProps.style,
-									},
-								} }
-							/>
-						) }
-					</TextColor>
-				) }
-			</BackgroundColor>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				__experimentalMoverDirection="horizontal"
+				__experimentalTagName={ Block.div }
+				__experimentalPassedProps={ {
+					className: classes,
+				} }
+			/>
 		</>
 	);
 }
