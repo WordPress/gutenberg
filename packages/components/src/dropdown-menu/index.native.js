@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { flatMap, isEmpty, isFunction } from 'lodash';
+import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -162,10 +163,11 @@ function DropdownMenu( {
 												leftAlign={ true }
 												isSelected={ control.isActive }
 												separatorType={
-													indexOfControl <
-													controlSet.length - 1
-														? 'leftMargin'
-														: 'none'
+													indexOfControl ===
+														controlSet.length - 1 ||
+													Platform.OS === 'android'
+														? 'none'
+														: 'leftMargin'
 												}
 											/>
 										)
