@@ -76,7 +76,12 @@ const getTupleType = ( elementTypes ) => {
 
 const getFunctionType = ( type ) => {
 	const params = type.parameters
-		.map( ( p ) => `${ p.name.escapedText }: ${ typeToString( p.type ) }` )
+		.map( ( p ) => {
+			const dots = p.dotDotDotToken ? '...' : '';
+			const typeName = typeToString( p.type );
+
+			return `${ dots }${ p.name.escapedText }: ${ typeName }`;
+		} )
 		.join( ', ' );
 
 	return `(${ params }) => ${ typeToString( type.type ) }`;
@@ -106,6 +111,58 @@ const getTypeLiteral = ( type ) => {
 		.join( ', ' );
 
 	return `{ ${ properties } }`;
+};
+
+const getTypeOperator = ( type ) => {
+	if ( type.operator === SyntaxKind.KeyOfKeyword ) {
+		return `keyof ${ typeToString( type.type ) }`;
+	}
+
+	if ( type.operator === SyntaxKind.ReadonlyKeyword ) {
+		return `readonly ${ typeToString( type.type ) }`;
+	}
+
+	// type.operator === SyntaxKind.UniqueKeyword
+	return `unique ${ typeToString( type.type ) }`;
+};
+
+const getIndexedAccessType = ( { objectType, indexType } ) => {
+	return `${ typeToString( objectType ) }[${ typeToString( indexType ) }]`;
+};
+
+const getMappedType = ( type ) => {
+	const readonly = type.readonlyToken ? 'readonly ' : '';
+	const paramTypeName = type.typeParameter.name.escapedText;
+	const constraint = typeToString( type.typeParameter.constraint );
+	const question = type.questionToken ? '?' : '';
+	const typeName = typeToString( type.type );
+
+	return `{ ${ readonly }[${ paramTypeName } in ${ constraint }]${ question }: ${ typeName } }`;
+};
+
+const getConditionalType = ( {
+	checkType,
+	extendsType,
+	trueType,
+	falseType,
+} ) => {
+	const checkName = typeToString( checkType );
+	const extendsName = typeToString(
+		extendsType.kind === SyntaxKind.JSDocNullableType
+			? extendsType.type
+			: extendsType
+	);
+	const trueName = typeToString( trueType );
+	const falseName = typeToString( falseType );
+
+	return `${ checkName } extends ${ extendsName } ? ${ trueName } : ${ falseName }`;
+};
+
+const getImportType = ( { argument, qualifier } ) => {
+	const argumentName = typeToString( argument );
+	const qualifierName = qualifier.escapedText;
+
+	return `import(${ argumentName }).${ qualifierName }`;
 };
 
 const typeToString = ( type ) => {
@@ -183,6 +240,18 @@ const typeToString = ( type ) => {
 			return getFunctionTypeFromJSDocFunctionType( type );
 		case SyntaxKind.TypeLiteral:
 			return getTypeLiteral( type );
+		case SyntaxKind.TypeOperator:
+			return getTypeOperator( type );
+		case SyntaxKind.IndexedAccessType:
+			return getIndexedAccessType( type );
+		case SyntaxKind.MappedType:
+			return getMappedType( type );
+		case SyntaxKind.ConditionalType:
+			return getConditionalType( type );
+		case SyntaxKind.InferType:
+			return `infer ${ type.typeParameter.name.escapedText }`;
+		case SyntaxKind.ImportType:
+			return getImportType( type );
 	}
 };
 

@@ -30,27 +30,28 @@ function stripQuotes( str ) {
 	return str;
 }
 
+const getType = ( typeExpression ) =>
+	typeExpression ? typeToString( typeExpression.type ) : 'undocumented';
+
 /**
  * It loops back from the description until ] is found and extract default value from it.
  * This function assumes that the name of param tag always ends with ].
  *
- * @param {Object} name
  * @param {string} code
- * @param {string} description
+ * @param {number} nameEndPos
+ * @param {number} descriptionPos
  */
-const getDefaultValue = ( name, code, description ) => {
-	const descriptionPos = code.indexOf( description, name.end );
-
+const getDefaultValue = ( code, nameEndPos, descriptionPos ) => {
 	let closingBracketPos = descriptionPos;
 
-	for ( let i = descriptionPos - 1; i > name.end; i-- ) {
+	for ( let i = descriptionPos - 1; i > nameEndPos; i-- ) {
 		if ( code[ i ] === ']' ) {
 			closingBracketPos = i;
 			break;
 		}
 	}
 
-	const rawValue = code.substring( name.end + 1, closingBracketPos );
+	const rawValue = code.substring( nameEndPos + 1, closingBracketPos );
 
 	if ( isNumeric( rawValue ) ) {
 		if ( Number.isInteger( rawValue ) ) {
@@ -70,9 +71,6 @@ const getDefaultValue = ( name, code, description ) => {
 	return stripQuotes( rawValue );
 };
 
-const getType = ( typeExpression ) =>
-	typeExpression ? typeToString( typeExpression.type ) : 'undocumented';
-
 const getTypeNameAndDefaultValue = ( tag, code, description ) => {
 	const typeName = getType( tag.typeExpression );
 	const result = {};
@@ -81,9 +79,9 @@ const getTypeNameAndDefaultValue = ( tag, code, description ) => {
 		if ( code[ tag.name.end ] === '=' ) {
 			result.type = typeName;
 			result.defaultValue = getDefaultValue(
-				tag.name,
 				code,
-				description
+				tag.name.end,
+				code.indexOf( description, tag.name.end )
 			);
 		} else {
 			result.type =

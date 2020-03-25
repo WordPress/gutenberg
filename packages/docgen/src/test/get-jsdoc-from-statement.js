@@ -182,6 +182,7 @@ describe( 'JSDoc', () => {
 				type( '( X & Y ) | Z', 'union + intersection type' ),
 				type( 'number | undefined', 'jsdoc optional type' ),
 				type( 'number | undefined', 'jsdoc optional type 2' ),
+				type( 'string | undefined', null ),
 				typeWithDefault(
 					'number',
 					42,
@@ -237,6 +238,7 @@ describe( 'JSDoc', () => {
 					'[ 1, 2, 3 ]',
 					'jsdoc optional with default: array type'
 				),
+				typeWithDefault( 'string', 'gutenberg', null ),
 				type( '( XX | YY ) & ZZ', 'parenthesized type' ),
 				type( 'string', 'jsdoc non-nullable type' ),
 				type( 'string', 'jsdoc non-nullable type 2' ),
@@ -281,6 +283,25 @@ describe( 'JSDoc', () => {
 						},
 					],
 				},
+				type( 'keyof X', 'jsdoc type operator 1: keyof' ),
+				type( 'readonly Y', 'jsdoc type operator 2: readonly' ),
+				type( 'unique symbol', 'jsdoc type operator 3: unique' ),
+				type( "T['key']", 'indexed access type' ),
+				type( '{ [P in keyof T]?: T[P] }', 'mapped type 1: Partial' ),
+				type(
+					'{ [P in keyof T]: T[P] | null }',
+					'mapped type 2: Nullable'
+				),
+				type(
+					'{ readonly [P in keyof T]: T[P] }',
+					'mapped type 3: Readonly'
+				),
+				type( 'T extends U ? X : Y', 'conditional type' ),
+				type(
+					'T extends (...args: any[]) => infer R ? R : any',
+					'infer type: ReturnType'
+				),
+				type( "import('typescript').Statement", 'import type' ),
 				// type( '', '' ),
 				// type( '', '' ),
 				// type( '', '' ),
