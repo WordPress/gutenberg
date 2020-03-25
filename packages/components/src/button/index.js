@@ -13,7 +13,7 @@ import { forwardRef, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { RadioContext } from '../button-group';
+import { ButtonGroupContext } from '../button-group';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
@@ -43,6 +43,8 @@ export function Button( props, ref ) {
 		label,
 		children,
 		value,
+		onKeyDown,
+		onClick,
 		__experimentalIsFocusable: isFocusable,
 		...additionalProps
 	} = props;
@@ -53,46 +55,9 @@ export function Button( props, ref ) {
 		} );
 	}
 
-	const radioContext = useContext( RadioContext );
-	const buttonContext = radioContext.buttons[ value ] || {};
-
-	const radioProps = {
-		role: radioContext.mode,
-		'aria-checked': buttonContext.isChecked,
-		tabIndex: buttonContext.isChecked || buttonContext.isFirst ? 0 : -1,
-		ref: buttonContext.refCallback,
-		onKeyDown( e ) {
-			if ( e.key === 'ArrowUp' || e.key === 'ArrowLeft' ) {
-				e.preventDefault();
-				buttonContext.onPrev();
-			}
-			if ( e.key === 'ArrowDown' || e.key === 'ArrowRight' ) {
-				e.preventDefault();
-				buttonContext.onNext();
-			}
-		},
-		onClick() {
-			buttonContext.onSelect();
-		},
-	};
-
-	const refCallback = ( current ) => {
-		// Merge the refs so you can still use the forwarded ref of the button
-		// alongside the radio button group ref
-		[ radioProps.ref, ref ].forEach( ( r ) => {
-			if ( typeof r === 'function' ) {
-				r( current );
-			} else if ( r ) {
-				r.current = current;
-			}
-		} );
-	};
-
-	const classes = classnames( 'components-button', className, {
-		// isChecked strict equality so undefined will return false
-		'is-secondary':
-			isDefault || isSecondary || buttonContext.isChecked === false,
-		'is-primary': isPrimary || buttonContext.isChecked === true,
+	let classes = classnames( 'components-button', className, {
+		'is-secondary': isDefault || isSecondary,
+		'is-primary': isPrimary,
 		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
@@ -128,6 +93,60 @@ export function Button( props, ref ) {
 		}
 	}
 
+	const groupContext = useContext( ButtonGroupContext );
+	const buttonContext = groupContext.buttons[ value ];
+
+	let refs = ref;
+
+	if ( groupContext.mode === 'radio' && buttonContext ) {
+		const {
+			isChecked,
+			isFirst,
+			onPrev,
+			onNext,
+			onSelect,
+			refCallback,
+		} = buttonContext;
+
+		Object.assign( tagProps, {
+			role: groupContext.mode,
+			'aria-checked': isChecked,
+			tabIndex: isChecked || isFirst ? 0 : -1,
+			onKeyDown( e ) {
+				if ( typeof onKeyDown === 'function' ) onKeyDown( e );
+				if ( e.key === 'ArrowUp' || e.key === 'ArrowLeft' ) {
+					e.preventDefault();
+					onPrev();
+				}
+				if ( e.key === 'ArrowDown' || e.key === 'ArrowRight' ) {
+					e.preventDefault();
+					onNext();
+				}
+			},
+			onClick( e ) {
+				if ( typeof onClick === 'function' ) onClick( e );
+				onSelect();
+			},
+		} );
+
+		// Automatically update the visual style
+		classes = classnames( classes, {
+			'is-secondary': ! isChecked,
+			'is-primary': isChecked,
+		} );
+
+		// Also handle both the forwardRef ref and the button group ref
+		refs = ( current ) => {
+			refCallback( current );
+
+			if ( typeof ref === 'function' ) {
+				ref( current );
+			} else if ( ref ) {
+				ref.current = current;
+			}
+		};
+	}
+
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! trulyDisabled &&
@@ -145,12 +164,13 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
-			{ ...tagProps }
-			{ ...radioProps }
-			{ ...additionalProps }
+			ref={ refs }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
-			ref={ refCallback }
+			onKeyDown={ onKeyDown }
+			onClick={ onClick }
+			{ ...tagProps }
+			{ ...additionalProps }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
