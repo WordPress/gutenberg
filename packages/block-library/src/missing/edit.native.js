@@ -23,6 +23,7 @@ export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.state = { showHelp: false };
+		this.toggleSheet = this.toggleSheet.bind( this );
 	}
 
 	toggleSheet() {
@@ -42,7 +43,7 @@ export class UnsupportedBlockEdit extends Component {
 				accessibilityLabel={ __( 'Help icon' ) }
 				accessibilityRole={ 'button' }
 				accessibilityHint={ __( 'Tap here to show help' ) }
-				onPress={ this.toggleSheet.bind( this ) }
+				onPress={ this.toggleSheet }
 			>
 				<View style={ styles.helpIconContainer }>
 					<Icon
@@ -87,7 +88,7 @@ export class UnsupportedBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ this.state.showHelp }
 				hideHeader
-				onClose={ this.toggleSheet.bind( this ) }
+				onClose={ this.toggleSheet }
 			>
 				<View style={ styles.infoContainer }>
 					<Icon
@@ -104,6 +105,20 @@ export class UnsupportedBlockEdit extends Component {
 						) }
 					</Text>
 				</View>
+				{ // eslint-disable-next-line no-undef
+				__DEV__ && (
+					<>
+						<BottomSheet.Cell
+							label={ __( 'Edit post on Web Browser' ) }
+							separatorType="topFullWidth"
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Dismiss' ) }
+							separatorType="topFullWidth"
+							onPress={ this.toggleSheet }
+						/>
+					</>
+				) }
 			</BottomSheet>
 		);
 	}
