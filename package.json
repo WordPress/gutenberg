@@ -177,7 +177,7 @@
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
-		"clean:packages": "rimraf './packages/*/@(build|build-module|build-style)' && tsc --build --clean",
+		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\" && tsc --build --clean",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "tsc --build --verbose",
