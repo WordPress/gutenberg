@@ -141,33 +141,6 @@
 	outline: 2px solid transparent;
 }
 
-// Blocks in the Library.
-@mixin block-style__disabled {
-	opacity: 0.6;
-	cursor: default;
-}
-
-@mixin block-style__hover {
-	border-color: $theme-color;
-	color: $theme-color !important;
-}
-
-@mixin block-style__focus() {
-	box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
-
-@mixin block-style__is-active() {
-	color: $white;
-	background: $dark-gray-primary;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: -2px;
-}
-
 
 /**
  * Applies editor left position to the selector passed as argument
