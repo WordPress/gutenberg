@@ -276,6 +276,7 @@ function Navigation( {
 							__experimentalPassedProps={ {
 								className: 'wp-block-navigation__container',
 							} }
+							__experimentalCaptureToolbars={ true }
 						/>
 					</Block.nav>
 				</BackgroundColor>

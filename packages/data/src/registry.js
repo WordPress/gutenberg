@@ -32,6 +32,8 @@ import createCoreDataStore from './store';
 
 /**
  * @typedef {Object} WPDataPlugin An object of registry function overrides.
+ *
+ * @property {Function} registerStore registers store.
  */
 
 /**

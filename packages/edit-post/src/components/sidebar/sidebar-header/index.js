@@ -23,6 +23,14 @@ const SidebarHeader = ( { children, className, closeLabel } ) => {
 	);
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 
+	// The `tabIndex` serves the purpose of normalizing browser behavior of
+	// button clicks and focus. Notably, without making the header focusable, a
+	// Button click would not trigger a focus event in macOS Firefox. Thus, when
+	// the sidebar is unmounted, the corresponding "focus return" behavior to
+	// shift focus back to the heading toolbar would not be run.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+
 	return (
 		<>
 			<div className="components-panel__header edit-post-sidebar-header__small">
@@ -40,6 +48,7 @@ const SidebarHeader = ( { children, className, closeLabel } ) => {
 					'components-panel__header edit-post-sidebar-header',
 					className
 				) }
+				tabIndex={ -1 }
 			>
 				{ children }
 				<Button

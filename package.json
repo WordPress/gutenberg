@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.7.1",
+	"version": "7.8.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -77,6 +77,7 @@
 		"@babel/runtime-corejs3": "7.8.3",
 		"@babel/traverse": "7.8.3",
 		"@octokit/rest": "16.26.0",
+		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "5.3.2",
 		"@storybook/addon-docs": "5.3.2",
 		"@storybook/addon-knobs": "5.3.2",

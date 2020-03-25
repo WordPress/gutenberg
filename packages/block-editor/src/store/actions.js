@@ -258,6 +258,9 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 	);
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
+		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
+			return block;
+		}
 		if ( ! preferredStyleVariations[ blockName ] ) {
 			return block;
 		}
@@ -986,4 +989,18 @@ export function* insertAfterBlock( clientId ) {
 		rootClientId
 	);
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
+}
+
+/**
+ * Returns an action object that toggles the highlighted block state.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} isHighlighted The highlight state.
+ */
+export function toggleBlockHighlight( clientId, isHighlighted ) {
+	return {
+		type: 'TOGGLE_BLOCK_HIGHLIGHT',
+		clientId,
+		isHighlighted,
+	};
 }

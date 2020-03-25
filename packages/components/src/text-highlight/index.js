@@ -6,7 +6,7 @@ import { escapeRegExp } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __experimentalCreateInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 const TextHighlight = ( { text = '', highlight = '' } ) => {
 	const trimmedHighlightText = highlight.trim();
@@ -20,12 +20,9 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
 		'gi'
 	);
 
-	return __experimentalCreateInterpolateElement(
-		text.replace( regex, '<mark>$&</mark>' ),
-		{
-			mark: <mark />,
-		}
-	);
+	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
+		mark: <mark />,
+	} );
 };
 
 export default TextHighlight;
