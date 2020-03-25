@@ -53,8 +53,28 @@ export function Button( props, ref ) {
 		} );
 	}
 
-	const context = useContext( RadioContext );
-	const radioProps = context[ value ] || {};
+	const radioContext = useContext( RadioContext );
+	const buttonContext = radioContext.buttons[ value ] || {};
+
+	const radioProps = {
+		role: radioContext.mode,
+		'aria-checked': buttonContext.isChecked,
+		tabIndex: buttonContext.isChecked || buttonContext.isFirst ? 0 : -1,
+		ref: buttonContext.refCallback,
+		onKeyDown( e ) {
+			if ( e.key === 'ArrowUp' || e.key === 'ArrowLeft' ) {
+				e.preventDefault();
+				buttonContext.onPrev();
+			}
+			if ( e.key === 'ArrowDown' || e.key === 'ArrowRight' ) {
+				e.preventDefault();
+				buttonContext.onNext();
+			}
+		},
+		onClick() {
+			buttonContext.onSelect();
+		},
+	};
 
 	const refCallback = ( current ) => {
 		// Merge the refs so you can still use the forwarded ref of the button
@@ -69,9 +89,10 @@ export function Button( props, ref ) {
 	};
 
 	const classes = classnames( 'components-button', className, {
+		// isChecked strict equality so undefined will return false
 		'is-secondary':
-			isDefault || isSecondary || radioProps[ 'aria-checked' ] === false,
-		'is-primary': isPrimary || radioProps[ 'aria-checked' ] === true,
+			isDefault || isSecondary || buttonContext.isChecked === false,
+		'is-primary': isPrimary || buttonContext.isChecked === true,
 		'is-large': isLarge,
 		'is-small': isSmall,
 		'is-tertiary': isTertiary,
