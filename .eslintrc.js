@@ -76,11 +76,6 @@ module.exports = {
 			},
 			{
 				selector:
-					'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
-				message: 'Use ellipsis character (…) in place of three dots',
-			},
-			{
-				selector:
 					'ImportDeclaration[source.value="redux"] Identifier.imported[name="combineReducers"]',
 				message: 'Use `combineReducers` from `@wordpress/data`',
 			},

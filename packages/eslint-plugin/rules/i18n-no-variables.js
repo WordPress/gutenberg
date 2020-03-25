@@ -1,7 +1,28 @@
 /**
  * Internal dependencies
  */
-const { TRANSLATION_FUNCTIONS } = require( '../utils' );
+const {
+	TRANSLATION_FUNCTIONS,
+	getTranslateFunctionName,
+} = require( '../utils' );
+
+function isAcceptableLiteralNode( node ) {
+	if ( 'BinaryExpression' === node.type ) {
+		return (
+			'+' === node.operator &&
+			isAcceptableLiteralNode( node.left ) &&
+			isAcceptableLiteralNode( node.right )
+		);
+	}
+
+	if ( 'TemplateLiteral' === node.type ) {
+		// Backticks are fine, but if there's any interpolation in it,
+		// that's a problem
+		return node.expressions.length === 0;
+	}
+
+	return 'Literal' === node.type;
+}
 
 module.exports = {
 	meta: {
@@ -11,35 +32,13 @@ module.exports = {
 			invalidArgument:
 				'Translate function arguments must be string literals.',
 		},
-		fixable: 'code',
 	},
 	create( context ) {
-		function isAcceptableLiteralNode( node ) {
-			if ( 'BinaryExpression' === node.type ) {
-				return (
-					'+' === node.operator &&
-					isAcceptableLiteralNode( node.left ) &&
-					isAcceptableLiteralNode( node.right )
-				);
-			}
-
-			if ( 'TemplateLiteral' === node.type ) {
-				// Backticks are fine, but if there's any interpolation in it,
-				// that's a problem
-				return node.expressions.length === 0;
-			}
-
-			return 'Literal' === node.type;
-		}
-
 		return {
 			CallExpression( node ) {
 				const { callee, arguments: args } = node;
 
-				const functionName =
-					callee.property && callee.property.name
-						? callee.property.name
-						: callee.name;
+				const functionName = getTranslateFunctionName( callee );
 
 				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
 					return;

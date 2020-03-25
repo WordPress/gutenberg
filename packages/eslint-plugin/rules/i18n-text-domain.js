@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-const { TRANSLATION_FUNCTIONS } = require( '../utils' );
+const {
+	TRANSLATION_FUNCTIONS,
+	getTranslateFunctionName,
+} = require( '../utils' );
 
 /**
  * Returns the text domain passed to the given translation function.
@@ -63,10 +66,7 @@ module.exports = {
 			CallExpression( node ) {
 				const { callee, arguments: args } = node;
 
-				const functionName =
-					callee.property && callee.property.name
-						? callee.property.name
-						: callee.name;
+				const functionName = getTranslateFunctionName( callee );
 
 				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
 					return;

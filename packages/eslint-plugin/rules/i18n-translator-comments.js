@@ -5,6 +5,7 @@ const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_PLACEHOLDER,
 	getTranslateStrings,
+	getTranslateFunctionName,
 } = require( '../utils' );
 
 module.exports = {
@@ -27,10 +28,7 @@ module.exports = {
 					arguments: args,
 				} = node;
 
-				const functionName =
-					callee.property && callee.property.name
-						? callee.property.name
-						: callee.name;
+				const functionName = getTranslateFunctionName( callee );
 
 				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
 					return;

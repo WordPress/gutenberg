@@ -8,6 +8,7 @@ module.exports = {
 		'@wordpress/i18n-translator-comments': 'error',
 		'@wordpress/i18n-text-domain': 'error',
 		'@wordpress/i18n-no-variables': 'error',
+		'@wordpress/i18n-ellipsis': 'error',
 		'no-restricted-syntax': [
 			'error',
 			{
