@@ -20,12 +20,15 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 	backgroundImageStyles,
 	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
 } from './shared';
 
 export default function save( { attributes } ) {
 	const {
 		backgroundType,
 		gradient,
+		contentPosition,
 		customGradient,
 		customOverlayColor,
 		dimRatio,
@@ -70,7 +73,11 @@ export default function save( { attributes } ) {
 			'has-parallax': hasParallax,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
-		}
+			'has-custom-content-position': ! isContentPositionCenter(
+				contentPosition
+			),
+		},
+		getPositionClassName( contentPosition )
 	);
 
 	return (

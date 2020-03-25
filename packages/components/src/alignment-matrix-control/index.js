@@ -15,10 +15,8 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import {
 	ALIGNMENTS,
 	DIRECTION,
-	FLEX_ALIGNMENT_PROPS,
 	getAlignmentIndex,
 	getAlignmentValueFromIndex,
-	getAlignmentFlexProps,
 	getNextIndexFromDirection,
 } from './utils';
 import { Root, Cell, Point } from './styles/alignment-matrix-control-styles';
@@ -38,11 +36,11 @@ export default function AlignmentMatrixControl( {
 	);
 	const nodeRef = useRef();
 
-	const handleOnChange = ( nextIndex ) => {
+	const handleOnChange = ( nextIndex, changeProps ) => {
 		const alignName = getAlignmentValueFromIndex( nextIndex );
 
 		setAlignIndex( nextIndex );
-		onChange( alignName );
+		onChange( alignName, changeProps );
 	};
 
 	const handleOnKeyDown = ( event ) => {
@@ -58,7 +56,7 @@ export default function AlignmentMatrixControl( {
 					alignIndex,
 					DIRECTION.UP
 				);
-				handleOnChange( nextIndex );
+				handleOnChange( nextIndex, { event } );
 				break;
 			case DOWN:
 				event.preventDefault();
@@ -66,7 +64,7 @@ export default function AlignmentMatrixControl( {
 					alignIndex,
 					DIRECTION.DOWN
 				);
-				handleOnChange( nextIndex );
+				handleOnChange( nextIndex, { event } );
 				break;
 			case LEFT:
 				event.preventDefault();
@@ -74,7 +72,7 @@ export default function AlignmentMatrixControl( {
 					alignIndex,
 					DIRECTION.LEFT
 				);
-				handleOnChange( nextIndex );
+				handleOnChange( nextIndex, { event } );
 				break;
 			case RIGHT:
 				event.preventDefault();
@@ -82,7 +80,7 @@ export default function AlignmentMatrixControl( {
 					alignIndex,
 					DIRECTION.RIGHT
 				);
-				handleOnChange( nextIndex );
+				handleOnChange( nextIndex, { event } );
 				break;
 			default:
 				break;
@@ -92,7 +90,7 @@ export default function AlignmentMatrixControl( {
 	const createHandleOnClick = ( index ) => ( event ) => {
 		nodeRef.current.focus();
 		event.preventDefault();
-		handleOnChange( index, { flexProps: FLEX_ALIGNMENT_PROPS[ index ] } );
+		handleOnChange( index, { event } );
 	};
 
 	/**
@@ -138,4 +136,5 @@ export default function AlignmentMatrixControl( {
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
 AlignmentMatrixControl.icon = <AlignmentMatrixControlIcon />;
-AlignmentMatrixControl.__getAlignmentFlexProps = getAlignmentFlexProps;
+
+AlignmentMatrixControl.__getAlignmentIndex = getAlignmentIndex;

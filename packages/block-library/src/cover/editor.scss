@@ -31,11 +31,10 @@
 		width: 100%;
 	}
 
+
 	&.has-custom-content-position.has-custom-content-position {
 		.wp-block-cover__inner-container {
-			margin: 0;
 			padding: 0 $grid-unit-40;
-			width: auto;
 		}
 	}
 }
