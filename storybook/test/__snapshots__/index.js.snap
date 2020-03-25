@@ -7763,8 +7763,9 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
 exports[`Storyshots Components/Text Default 1`] = `
 Array [
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
   font-size: 32px;
   line-height: 40px;
@@ -7776,8 +7777,9 @@ Array [
     Title Large
   </h1>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
   font-size: 24px;
   line-height: 32px;
@@ -7789,8 +7791,9 @@ Array [
     Title Medium
   </h2>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
   font-size: 20px;
   line-height: 28px;
@@ -7802,8 +7805,9 @@ Array [
     Title Small
   </h3>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -7817,8 +7821,9 @@ Array [
     Subtitle
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -7832,8 +7837,9 @@ Array [
     Subtitle Small
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
 }
 
@@ -7843,8 +7849,9 @@ Array [
     Body
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
@@ -7856,8 +7863,9 @@ Array [
     Body Small
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
@@ -7869,8 +7877,9 @@ Array [
     Button
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
@@ -7882,8 +7891,9 @@ Array [
     Caption
   </p>,
   .emotion-0 {
-  margin: 0;
   box-sizing: border-box;
+  margin: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600;
   font-size: 12px;
   line-height: 16px;
