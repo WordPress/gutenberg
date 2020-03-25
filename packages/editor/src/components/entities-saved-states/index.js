@@ -61,12 +61,12 @@ export default function EntitiesSavedStates( {
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
 	// Which ones to NOT save...  this is an odd name...
-	const [ unsavedEntityRecords, _setUnsavedEntityRecords ] = useState( [] );
-	const setUnsavedEntityRecords = ( { kind, name, key }, checked ) => {
+	const [ entityRecordsToIgnore, _setEntityRecordsToIgnore ] = useState( [] );
+	const setEntityRecordsToIgnore = ( { kind, name, key }, checked ) => {
 		// If checked, remove it from list of not to save
 		if ( checked ) {
-			_setUnsavedEntityRecords(
-				unsavedEntityRecords.filter(
+			_setEntityRecordsToIgnore(
+				entityRecordsToIgnore.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
@@ -74,8 +74,8 @@ export default function EntitiesSavedStates( {
 				)
 			);
 		} else {
-			_setUnsavedEntityRecords( [
-				...unsavedEntityRecords,
+			_setEntityRecordsToIgnore( [
+				...entityRecordsToIgnore,
 				{ kind, name, key },
 			] );
 		}
@@ -85,7 +85,7 @@ export default function EntitiesSavedStates( {
 		const entitiesToSave = savableEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
-					unsavedEntityRecords,
+					entityRecordsToIgnore,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -115,7 +115,7 @@ export default function EntitiesSavedStates( {
 							record={ record }
 							checked={
 								! some(
-									unsavedEntityRecords,
+									entityRecordsToIgnore,
 									( elt ) =>
 										elt.kind === record.kind &&
 										elt.name === record.name &&
@@ -123,7 +123,7 @@ export default function EntitiesSavedStates( {
 								)
 							}
 							onChange={ ( value ) =>
-								setUnsavedEntityRecords( record, value )
+								setEntityRecordsToIgnore( record, value )
 							}
 						/>
 					);
@@ -133,7 +133,7 @@ export default function EntitiesSavedStates( {
 					isPrimary
 					disabled={
 						savableEntityRecords.length -
-							unsavedEntityRecords.length ===
+							entityRecordsToIgnore.length ===
 						0
 					}
 					onClick={ saveCheckedEntities }
