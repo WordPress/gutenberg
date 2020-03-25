@@ -656,4 +656,5 @@ if ( ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' )
 	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
 	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_pattern( 'core/one-testimonial', gutenberg_load_block_pattern( 'one-testimonial' ) );
 }
