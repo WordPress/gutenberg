@@ -94,7 +94,7 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( Platform.OS === 'android' ) {
+		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
 		if ( this.safeAreaEventSubscription === null ) {
