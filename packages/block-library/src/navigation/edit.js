@@ -7,13 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	Fragment,
-	useRef,
-	useState,
-	useEffect,
-} from '@wordpress/element';
+import { useMemo, Fragment, useRef, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -23,8 +17,6 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-
-import apiFetch from '@wordpress/api-fetch';
 
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -49,6 +41,7 @@ import useBlockNavigator from './use-block-navigator';
 import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
+import useApiFetch from './use-api-fetch';
 
 function Navigation( {
 	attributes,
@@ -63,10 +56,10 @@ function Navigation( {
 	//
 	// HOOKS
 	//
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
+	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const {
 		TextColor,
 		BackgroundColor,
@@ -92,16 +85,15 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
-
-	const [ pages, setPages ] = useState( null );
-
 	/* eslint-enable @wordpress/no-unused-vars-before-return */
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
-	let isMounted = true;
-	let isRequestingPages = false;
+	const [ pages, setPages ] = useState( null );
+
+	const [ isRequestingPages, setIsRequestingPages ] = useState( false );
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
@@ -122,46 +114,23 @@ function Navigation( {
 		);
 	}, [ pages ] );
 
-	useEffect( () => {
-		// Indicate the fetching status
-		isRequestingPages = true;
+	const baseUrl = '/wp/v2/pages';
 
-		const baseUrl = '/wp/v2/pages';
+	// "view" is required to ensure Pages are returned by REST API
+	// for users with lower capabilities such as "Contributor" otherwise
+	// Pages are not returned in the request if "edit" context is set
+	const context = 'view';
 
-		// "view" is required to ensure Pages are returned by REST API
-		// for users with lower capabilities such as "Contributor" otherwise
-		// Pages are not returned in the request if "edit" context is set
-		const context = 'view';
+	const filterDefaultPages = {
+		parent: 0,
+		order: 'asc',
+		orderby: 'id',
+		context,
+	};
 
-		const filterDefaultPages = {
-			parent: 0,
-			order: 'asc',
-			orderby: 'id',
-			context,
-		};
+	const queryPath = addQueryArgs( baseUrl, filterDefaultPages );
 
-		apiFetch( {
-			path: addQueryArgs( baseUrl, filterDefaultPages ),
-		} )
-			.then( ( pagesList ) => {
-				if ( isMounted ) {
-					setPages( pagesList );
-				}
-				// We've stopped fetching
-				isRequestingPages = false;
-			} )
-			.catch( () => {
-				if ( isMounted ) {
-					setPages( [] );
-				}
-				// We've stopped fetching
-				isRequestingPages = false;
-			} );
-
-		return () => {
-			isMounted = false;
-		};
-	}, [] );
+	useApiFetch( setIsRequestingPages, setPages, queryPath );
 
 	//
 	// HANDLERS
