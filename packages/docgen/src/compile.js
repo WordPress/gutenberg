@@ -15,6 +15,8 @@ module.exports = function( filePath ) {
 	};
 	const host = ts.createCompilerHost( options, true );
 	const raw = readFileSync( filePath ).toString();
+	// typescript interprets @wordpress in @example code as a JSDoc tag.
+	// So, it should be replaced for the time being.
 	const code = raw.replace( /@wordpress/g, '__WORDPRESS_IMPORT__' );
 	const sF = ts.createSourceFile( filePath, code, options.target, true );
 

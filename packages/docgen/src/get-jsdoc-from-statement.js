@@ -183,6 +183,7 @@ module.exports = function( statement ) {
 				if ( title === 'example' ) {
 					return {
 						title,
+						// restore @wordpress changed in compile.js
 						description: description.replace(
 							/__WORDPRESS_IMPORT__/g,
 							'@wordpress'
