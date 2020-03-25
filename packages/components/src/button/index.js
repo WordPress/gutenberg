@@ -56,6 +56,18 @@ export function Button( props, ref ) {
 	const context = useContext( RadioContext );
 	const radioProps = context[ value ] || {};
 
+	const refCallback = ( current ) => {
+		// Merge the refs so you can still use the forwarded ref of the button
+		// alongside the radio button group ref
+		[ radioProps.ref, ref ].forEach( ( r ) => {
+			if ( typeof r === 'function' ) {
+				r( current );
+			} else if ( r ) {
+				r.current = current;
+			}
+		} );
+	};
+
 	const classes = classnames( 'components-button', className, {
 		'is-secondary':
 			isDefault || isSecondary || radioProps[ 'aria-checked' ] === false,
@@ -112,12 +124,12 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
-			ref={ ref }
 			{ ...tagProps }
 			{ ...radioProps }
 			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
+			ref={ refCallback }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
