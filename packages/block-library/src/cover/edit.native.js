@@ -25,6 +25,7 @@ import {
 	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
@@ -69,7 +70,14 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 } ) => {
-	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
+	const {
+		backgroundType,
+		dimRatio,
+		focalPoint,
+		minHeight,
+		url,
+		id,
+	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -190,23 +198,35 @@ const Cover = ( {
 			<View style={ styles.background }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
-
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-					<ImageWithFocalPoint
-						focalPoint={ focalPoint }
-						url={ url }
-					/>
-				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-					<Video
-						muted
-						disableFocus
-						repeat
-						resizeMode={ 'cover' }
-						source={ { uri: url } }
-						style={ styles.background }
-					/>
-				) }
+				<MediaUploadProgress 
+					mediaId={ id }
+					onFinishMediaUploadWithSuccess={ ( {
+						mediaServerId: id,
+						mediaUrl: url,
+					} ) => {
+						setAttributes( { id, url, backgroundType } );
+					} }
+					renderContent={ () => (
+						<>
+							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+											<ImageWithFocalPoint
+												focalPoint={ focalPoint }
+												url={ url }
+											/>
+							) }
+							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+								<Video
+									muted
+									disableFocus
+									repeat
+									resizeMode={ 'cover' }
+									source={ { uri: url } }
+									style={ styles.background }
+								/>
+							) }
+						</>
+					) }
+				/>
 			</View>
 		</TouchableWithoutFeedback>
 	);
