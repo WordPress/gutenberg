@@ -11,7 +11,7 @@ const i18n = createI18n();
  */
 
 /**
- * @typedef {{[key: string]: any}} LocaleData
+ * @typedef {import('./create-i18n').LocaleData} LocaleData
  */
 
 /**
