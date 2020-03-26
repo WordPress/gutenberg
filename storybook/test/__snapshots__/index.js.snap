@@ -1,5 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Storyshots Components/AnglePickerControl Default 1`] = `
+<div
+  className="components-base-control components-angle-picker-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="components-angle-picker-control__input-0"
+    >
+      Angle
+    </label>
+    <div
+      aria-hidden="true"
+      className="components-angle-picker-control__angle-circle"
+      onMouseDown={[Function]}
+    >
+      <div
+        className="components-angle-picker-control__angle-circle-indicator-wrapper"
+      >
+        <span
+          className="components-angle-picker-control__angle-circle-indicator"
+        />
+      </div>
+    </div>
+    <input
+      className="components-angle-picker-control__input-field"
+      id="components-angle-picker-control__input-0"
+      max={360}
+      min={0}
+      onChange={[Function]}
+      step="1"
+      type="number"
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
 <div
   className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
@@ -629,7 +668,7 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+        d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
       />
     </svg>
   </button>
@@ -654,7 +693,7 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+        d="M12.5 5L10 19h1.9l2.5-14z"
       />
     </svg>
   </button>
@@ -2590,6 +2629,95 @@ exports[`Storyshots Components/Dashicon Default 1`] = `
 </svg>
 `;
 
+exports[`Storyshots Components/Disabled Default 1`] = `
+<div
+  className="components-disabled"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-text-control-2"
+      >
+        Text Control
+      </label>
+      <input
+        className="components-text-control__input"
+        id="inspector-text-control-2"
+        onChange={[Function]}
+        type="text"
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-textarea-control-0"
+      >
+        TextArea Control
+      </label>
+      <textarea
+        className="components-textarea-control__input"
+        id="inspector-textarea-control-0"
+        onChange={[Function]}
+        rows={4}
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-select-control-0"
+      >
+        Select Control
+      </label>
+      <select
+        className="components-select-control__input"
+        id="inspector-select-control-0"
+        multiple={false}
+        onChange={[Function]}
+      >
+        <option
+          disabled={true}
+          value={null}
+        >
+          Select an option
+        </option>
+        <option
+          value="a"
+        >
+          Option A
+        </option>
+        <option
+          value="b"
+        >
+          Option B
+        </option>
+        <option
+          value="c"
+        >
+          Option C
+        </option>
+      </select>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Draggable Default 1`] = `
 <div>
   <p>
@@ -3463,10 +3591,12 @@ input[type='number'].emotion-18 {
           <span
             aria-hidden={true}
             className="emotion-4 emotion-5"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-6 emotion-7"
+            disabled={false}
             style={
               Object {
                 "width": "4.545454545454546%",
@@ -3520,6 +3650,7 @@ input[type='number'].emotion-18 {
         <input
           aria-label="Custom Size"
           className="components-range-control__number emotion-18 emotion-153"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={12}
@@ -4348,13 +4479,13 @@ exports[`Storyshots Components/Placeholder Default 1`] = `
         >
           <label
             className="components-base-control__label"
-            htmlFor="inspector-text-control-2"
+            htmlFor="inspector-text-control-3"
           >
             Sample Field
           </label>
           <input
             className="components-text-control__input"
-            id="inspector-text-control-2"
+            id="inspector-text-control-3"
             onChange={[Function]}
             placeholder="Enter something here"
             type="text"
@@ -4920,6 +5051,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden="true"
@@ -4928,6 +5060,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "0%",
@@ -4949,6 +5082,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "10%",
@@ -4970,6 +5104,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "20%",
@@ -4991,6 +5126,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "80%",
@@ -5012,6 +5148,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "100%",
@@ -5034,6 +5171,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-26 emotion-27"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5056,6 +5194,7 @@ input[type='number'].emotion-34 {
         </span>
         <input
           className="components-range-control__number emotion-34 emotion-333"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5257,10 +5396,12 @@ input[type='number'].emotion-12 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5285,6 +5426,7 @@ input[type='number'].emotion-12 {
         <input
           aria-label="Range Label"
           className="components-range-control__number emotion-12 emotion-113"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5533,10 +5675,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "0%",
@@ -5573,6 +5717,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={20}
         min={0}
@@ -5819,10 +5964,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5858,6 +6005,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5902,10 +6050,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5941,6 +6091,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5985,10 +6136,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6024,6 +6177,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6068,10 +6222,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6107,6 +6263,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6356,10 +6513,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6396,6 +6555,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6654,10 +6814,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6712,6 +6874,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6982,10 +7145,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-4 emotion-5"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-6 emotion-7"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7022,6 +7187,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-153"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -7269,10 +7435,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "37.5%",
@@ -7309,6 +7477,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={10}
         min={2}
@@ -7570,10 +7739,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7610,6 +7781,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -7791,14 +7963,14 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-select-control-0"
+      htmlFor="inspector-select-control-1"
     >
       Label Text
     </label>
     <select
-      aria-describedby="inspector-select-control-0__help"
+      aria-describedby="inspector-select-control-1__help"
       className="components-select-control__input"
-      id="inspector-select-control-0"
+      id="inspector-select-control-1"
       multiple={false}
       onChange={[Function]}
     >
@@ -7827,7 +7999,7 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-select-control-0__help"
+    id="inspector-select-control-1__help"
   >
     Help text to explain the select control.
   </p>
@@ -7939,21 +8111,21 @@ exports[`Storyshots Components/TextControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-text-control-3"
+      htmlFor="inspector-text-control-4"
     >
       Label Text
     </label>
     <input
-      aria-describedby="inspector-text-control-3__help"
+      aria-describedby="inspector-text-control-4__help"
       className="components-text-control__input"
-      id="inspector-text-control-3"
+      id="inspector-text-control-4"
       onChange={[Function]}
       type="text"
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-text-control-3__help"
+    id="inspector-text-control-4__help"
   >
     Help text to explain the input.
   </p>
@@ -7979,21 +8151,21 @@ exports[`Storyshots Components/TextareaControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-textarea-control-0"
+      htmlFor="inspector-textarea-control-1"
     >
       Label Text
     </label>
     <textarea
-      aria-describedby="inspector-textarea-control-0__help"
+      aria-describedby="inspector-textarea-control-1__help"
       className="components-textarea-control__input"
-      id="inspector-textarea-control-0"
+      id="inspector-textarea-control-1"
       onChange={[Function]}
       rows={4}
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-textarea-control-0__help"
+    id="inspector-textarea-control-1__help"
   >
     Help text to explain the textarea.
   </p>
@@ -8267,7 +8439,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+          d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
         />
       </svg>
     </button>
@@ -8295,7 +8467,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+          d="M12.5 5L10 19h1.9l2.5-14z"
         />
       </svg>
     </button>
@@ -8418,7 +8590,7 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+        d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
       />
     </svg>
   </button>
@@ -8446,7 +8618,7 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+        d="M12.5 5L10 19h1.9l2.5-14z"
       />
     </svg>
   </button>
@@ -8508,7 +8680,7 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+          d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
         />
       </svg>
     </button>
@@ -8535,7 +8707,7 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+          d="M12.5 5L10 19h1.9l2.5-14z"
         />
       </svg>
     </button>
@@ -8599,7 +8771,7 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+          d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
         />
       </svg>
     </button>
@@ -8628,7 +8800,7 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+          d="M12.5 5L10 19h1.9l2.5-14z"
         />
       </svg>
     </button>
@@ -8662,6 +8834,72 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
       </svg>
     </button>
   </div>
+</div>
+`;
+
+exports[`Storyshots Components/TreeSelect Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-2"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-2__help"
+      className="components-select-control__input"
+      id="inspector-select-control-2"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        value=""
+      >
+        No parent page
+      </option>
+      <option
+        value="p1"
+      >
+        Page 1
+      </option>
+      <option
+        value="p11"
+      >
+           Descend 1 of page 1
+      </option>
+      <option
+        value="p12"
+      >
+           Descend 2 of page 1
+      </option>
+      <option
+        value="p2"
+      >
+        Page 2
+      </option>
+      <option
+        value="p21"
+      >
+           Descend 1 of page 2
+      </option>
+      <option
+        value="p211"
+      >
+              Descend 1 of Descend 1 of page 2
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-2__help"
+  >
+    Help text to explain the select control.
+  </p>
 </div>
 `;
 
@@ -8712,45 +8950,6 @@ Array [
   </span>,
   "Inspect the HTML to see!",
 ]
-`;
-
-exports[`Storyshots Components|AnglePickerControl Default 1`] = `
-<div
-  className="components-base-control components-angle-picker-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="components-angle-picker-control__input-0"
-    >
-      Angle
-    </label>
-    <div
-      aria-hidden="true"
-      className="components-angle-picker-control__angle-circle"
-      onMouseDown={[Function]}
-    >
-      <div
-        className="components-angle-picker-control__angle-circle-indicator-wrapper"
-      >
-        <span
-          className="components-angle-picker-control__angle-circle-indicator"
-        />
-      </div>
-    </div>
-    <input
-      className="components-angle-picker-control__input-field"
-      id="components-angle-picker-control__input-0"
-      max={360}
-      min={0}
-      onChange={[Function]}
-      step="1"
-      type="number"
-    />
-  </div>
-</div>
 `;
 
 exports[`Storyshots Icons/Icon Default 1`] = `
@@ -9837,6 +10036,120 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M6 5V3H3v2h3zm12 10V4H9L7 6H2v9h16zm-7-8c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      capturePhoto
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      captureVideo
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
       />
     </svg>
   </div>
@@ -11064,7 +11377,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+        d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
       />
     </svg>
     <svg
@@ -11077,7 +11390,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+        d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
       />
     </svg>
     <svg
@@ -11090,7 +11403,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M14.846 11.246c2.026.655 3.04 2.057 3.04 4.205 0 1.433-.465 2.553-1.395 3.36-.93.793-2.201 1.189-3.817 1.189H6V4h6.034c3.048 0 4.572 1.288 4.572 3.863 0 1.585-.587 2.712-1.76 3.383zm-5.92-.96H11.6c.716 0 1.25-.145 1.6-.435.35-.304.526-.77.526-1.394 0-.655-.176-1.127-.526-1.417-.35-.29-.884-.434-1.6-.434H8.926v3.68zm3.314 7.108c.853 0 1.501-.167 1.943-.503.457-.35.686-.937.686-1.76 0-.807-.237-1.379-.709-1.714-.457-.35-1.097-.526-1.92-.526H8.926v4.503h3.314z"
+        d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
       />
     </svg>
   </div>
@@ -11121,7 +11434,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm1-4l4-4-4-4-1 1 3 3-3 3 1 1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-8-3.5l3 3-3 3 1 1 4-4-4-4-1 1z"
       />
     </svg>
     <svg
@@ -11134,7 +11447,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm1-4l4-4-4-4-1 1 3 3-3 3 1 1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-8-3.5l3 3-3 3 1 1 4-4-4-4-1 1z"
       />
     </svg>
     <svg
@@ -11147,7 +11460,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zm1-4l4-4-4-4-1 1 3 3-3 3 1 1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-8-3.5l3 3-3 3 1 1 4-4-4-4-1 1z"
       />
     </svg>
   </div>
@@ -11178,7 +11491,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+        d="M12.5 5L10 19h1.9l2.5-14z"
       />
     </svg>
     <svg
@@ -11191,7 +11504,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+        d="M12.5 5L10 19h1.9l2.5-14z"
       />
     </svg>
     <svg
@@ -11204,7 +11517,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M11.811 4h2.172L11.17 20H9l2.811-16z"
+        d="M12.5 5L10 19h1.9l2.5-14z"
       />
     </svg>
   </div>
@@ -11406,7 +11719,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zM8 8l-4 4 4 4 1-1-3-3 3-3-1-1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-4-4.6l-4 4 4 4 1-1-3-3 3-3-1-1z"
       />
     </svg>
     <svg
@@ -11419,7 +11732,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zM8 8l-4 4 4 4 1-1-3-3 3-3-1-1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-4-4.6l-4 4 4 4 1-1-3-3 3-3-1-1z"
       />
     </svg>
     <svg
@@ -11432,7 +11745,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 4v1.5h16V4H4zm8 8.5h8V11h-8v1.5zM4 20h16v-1.5H4V20zM8 8l-4 4 4 4 1-1-3-3 3-3-1-1z"
+        d="M4 7.2v1.5h16V7.2H4zm8 8.6h8v-1.5h-8v1.5zm-4-4.6l-4 4 4 4 1-1-3-3 3-3-1-1z"
       />
     </svg>
   </div>
@@ -11520,7 +11833,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M8.6 9c-.2-.3-.2-.6-.2-1 0-.7.3-1.3.8-1.6.6-.4 1.3-.5 2.3-.5.8 0 1.6.1 2.4.3s1.6.6 2.4 1.1l.2-2.2c-.6-.3-1.4-.5-2.2-.7-.9-.3-1.8-.4-2.7-.4-1.8 0-3.1.4-4.1 1.1-1 .8-1.4 1.8-1.4 3 0 .3 0 .6.1.8h2.4zM20 12H4v1h7.7c.5.2 1 .4 1.4.5.6.2 1 .6 1.3.9.3.4.4.8.4 1.4 0 .7-.3 1.3-.9 1.7-.6.4-1.3.5-2.4.5-.9 0-1.8-.1-2.7-.4-.9-.3-1.8-.6-2.5-.9L6 19c.6.3 1.3.5 2.3.7.9.2 1.8.3 2.7.3 2 0 3.5-.4 4.5-1.1 1-.8 1.5-1.8 1.5-3.2 0-1.1-.3-2-1-2.7h4v-1z"
+        d="M9.1 9v-.5c0-.6.2-1.1.7-1.4.5-.3 1.2-.5 2-.5.7 0 1.4.1 2.1.3.7.2 1.4.5 2.1.9l.2-1.9c-.6-.3-1.2-.5-1.9-.7-.8-.1-1.6-.2-2.4-.2-1.5 0-2.7.3-3.6 1-.8.7-1.2 1.5-1.2 2.6V9h2zM20 12H4v1h8.3c.3.1.6.2.8.3.5.2.9.5 1.1.8.3.3.4.7.4 1.2 0 .7-.2 1.1-.8 1.5-.5.3-1.2.5-2.1.5-.8 0-1.6-.1-2.4-.3-.8-.2-1.5-.5-2.2-.8L7 18.1c.5.2 1.2.4 2 .6.8.2 1.6.3 2.4.3 1.7 0 3-.3 3.9-1 .9-.7 1.3-1.6 1.3-2.8 0-.9-.2-1.7-.7-2.2H20v-1z"
       />
     </svg>
     <svg
@@ -11533,7 +11846,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M8.6 9c-.2-.3-.2-.6-.2-1 0-.7.3-1.3.8-1.6.6-.4 1.3-.5 2.3-.5.8 0 1.6.1 2.4.3s1.6.6 2.4 1.1l.2-2.2c-.6-.3-1.4-.5-2.2-.7-.9-.3-1.8-.4-2.7-.4-1.8 0-3.1.4-4.1 1.1-1 .8-1.4 1.8-1.4 3 0 .3 0 .6.1.8h2.4zM20 12H4v1h7.7c.5.2 1 .4 1.4.5.6.2 1 .6 1.3.9.3.4.4.8.4 1.4 0 .7-.3 1.3-.9 1.7-.6.4-1.3.5-2.4.5-.9 0-1.8-.1-2.7-.4-.9-.3-1.8-.6-2.5-.9L6 19c.6.3 1.3.5 2.3.7.9.2 1.8.3 2.7.3 2 0 3.5-.4 4.5-1.1 1-.8 1.5-1.8 1.5-3.2 0-1.1-.3-2-1-2.7h4v-1z"
+        d="M9.1 9v-.5c0-.6.2-1.1.7-1.4.5-.3 1.2-.5 2-.5.7 0 1.4.1 2.1.3.7.2 1.4.5 2.1.9l.2-1.9c-.6-.3-1.2-.5-1.9-.7-.8-.1-1.6-.2-2.4-.2-1.5 0-2.7.3-3.6 1-.8.7-1.2 1.5-1.2 2.6V9h2zM20 12H4v1h8.3c.3.1.6.2.8.3.5.2.9.5 1.1.8.3.3.4.7.4 1.2 0 .7-.2 1.1-.8 1.5-.5.3-1.2.5-2.1.5-.8 0-1.6-.1-2.4-.3-.8-.2-1.5-.5-2.2-.8L7 18.1c.5.2 1.2.4 2 .6.8.2 1.6.3 2.4.3 1.7 0 3-.3 3.9-1 .9-.7 1.3-1.6 1.3-2.8 0-.9-.2-1.7-.7-2.2H20v-1z"
       />
     </svg>
     <svg
@@ -11546,7 +11859,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M8.6 9c-.2-.3-.2-.6-.2-1 0-.7.3-1.3.8-1.6.6-.4 1.3-.5 2.3-.5.8 0 1.6.1 2.4.3s1.6.6 2.4 1.1l.2-2.2c-.6-.3-1.4-.5-2.2-.7-.9-.3-1.8-.4-2.7-.4-1.8 0-3.1.4-4.1 1.1-1 .8-1.4 1.8-1.4 3 0 .3 0 .6.1.8h2.4zM20 12H4v1h7.7c.5.2 1 .4 1.4.5.6.2 1 .6 1.3.9.3.4.4.8.4 1.4 0 .7-.3 1.3-.9 1.7-.6.4-1.3.5-2.4.5-.9 0-1.8-.1-2.7-.4-.9-.3-1.8-.6-2.5-.9L6 19c.6.3 1.3.5 2.3.7.9.2 1.8.3 2.7.3 2 0 3.5-.4 4.5-1.1 1-.8 1.5-1.8 1.5-3.2 0-1.1-.3-2-1-2.7h4v-1z"
+        d="M9.1 9v-.5c0-.6.2-1.1.7-1.4.5-.3 1.2-.5 2-.5.7 0 1.4.1 2.1.3.7.2 1.4.5 2.1.9l.2-1.9c-.6-.3-1.2-.5-1.9-.7-.8-.1-1.6-.2-2.4-.2-1.5 0-2.7.3-3.6 1-.8.7-1.2 1.5-1.2 2.6V9h2zM20 12H4v1h8.3c.3.1.6.2.8.3.5.2.9.5 1.1.8.3.3.4.7.4 1.2 0 .7-.2 1.1-.8 1.5-.5.3-1.2.5-2.1.5-.8 0-1.6-.1-2.4-.3-.8-.2-1.5-.5-2.2-.8L7 18.1c.5.2 1.2.4 2 .6.8.2 1.6.3 2.4.3 1.7 0 3-.3 3.9-1 .9-.7 1.3-1.6 1.3-2.8 0-.9-.2-1.7-.7-2.2H20v-1z"
       />
     </svg>
   </div>
@@ -14250,7 +14563,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 5v-.8h-6.5v1.6h4.7L5.8 17.2V12H4.2v7H5v.8h7v-1.6H6.8L18.2 6.8v4.7h1.6V5z"
+        d="M12.5 4.2v1.6h4.7L5.8 17.2V12H4.2v7.8H12v-1.6H6.8L18.2 6.8v4.7h1.6V4.2z"
       />
     </svg>
     <svg
@@ -14263,7 +14576,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 5v-.8h-6.5v1.6h4.7L5.8 17.2V12H4.2v7H5v.8h7v-1.6H6.8L18.2 6.8v4.7h1.6V5z"
+        d="M12.5 4.2v1.6h4.7L5.8 17.2V12H4.2v7.8H12v-1.6H6.8L18.2 6.8v4.7h1.6V4.2z"
       />
     </svg>
     <svg
@@ -14276,7 +14589,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 5v-.8h-6.5v1.6h4.7L5.8 17.2V12H4.2v7H5v.8h7v-1.6H6.8L18.2 6.8v4.7h1.6V5z"
+        d="M12.5 4.2v1.6h4.7L5.8 17.2V12H4.2v7.8H12v-1.6H6.8L18.2 6.8v4.7h1.6V4.2z"
       />
     </svg>
   </div>

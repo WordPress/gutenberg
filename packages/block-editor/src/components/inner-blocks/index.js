@@ -61,7 +61,7 @@ class InnerBlocks extends Component {
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( __experimentalBlocks );
+			replaceInnerBlocks( __experimentalBlocks, false );
 		}
 	}
 
@@ -125,7 +125,6 @@ class InnerBlocks extends Component {
 			parentLock,
 			__experimentalCaptureToolbars,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		} = this.props;
 
 		const newSettings = {
@@ -135,7 +134,6 @@ class InnerBlocks extends Component {
 			__experimentalCaptureToolbars:
 				__experimentalCaptureToolbars || false,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -227,13 +225,15 @@ const ComposedInnerBlocks = compose( [
 		} = ownProps;
 
 		return {
-			replaceInnerBlocks( blocks ) {
+			replaceInnerBlocks( blocks, forceUpdateSelection ) {
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
+					forceUpdateSelection !== undefined
+						? forceUpdateSelection
+						: block.innerBlocks.length === 0 &&
+								templateInsertUpdatesSelection &&
+								blocks.length !== 0
 				);
 			},
 			__unstableMarkNextChangeAsNotPersistent,

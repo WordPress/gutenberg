@@ -89,6 +89,7 @@ describe( 'getProtocol', () => {
 		expect( getProtocol( 'https://localhost:8080' ) ).toBe( 'https:' );
 		expect( getProtocol( 'tel:1234' ) ).toBe( 'tel:' );
 		expect( getProtocol( 'blob:data' ) ).toBe( 'blob:' );
+		expect( getProtocol( 'file:///folder/file.txt' ) ).toBe( 'file:' );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {

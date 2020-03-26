@@ -31,6 +31,9 @@ export const settings = {
 			),
 		},
 	},
+	supports: {
+		lightBlockWrapper: true,
+	},
 	keywords: [ __( 'poetry' ), __( 'poem' ) ],
 	transforms,
 	deprecated,

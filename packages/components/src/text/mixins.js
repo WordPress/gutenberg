@@ -1,11 +1,8 @@
 /**
- * External dependencies
- */
-import css from '@emotion/css';
-/**
  * Internal dependencies
  */
 import { fontFamily } from './font-family';
+import css from './emotion-css';
 
 const fontWeightNormal = `font-weight: 400;`;
 const fontWeightSemibold = `font-weight: 600;`;
@@ -137,7 +134,7 @@ const variant = ( variantName ) => {
 
 /**
  * @typedef {Object} TextProps
- * @property {TextVariant} variant
+ * @property {TextVariant} variant one of TextVariant to be used
  */
 
 /**
