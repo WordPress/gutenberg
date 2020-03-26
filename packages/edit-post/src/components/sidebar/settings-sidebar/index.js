@@ -24,8 +24,8 @@ import { useSelect } from '@wordpress/data';
 const SettingsSidebar = () => {
 	const sidebarName = useSelect(
 		( select ) =>
-			select( 'core/interface' ).getSingleActiveArea(
-				'edit-post/complementary-area'
+			select( 'core/interface' ).getActiveComplementaryArea(
+				'core/edit-post'
 			),
 		[]
 	);

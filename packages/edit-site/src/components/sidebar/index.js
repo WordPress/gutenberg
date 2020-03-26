@@ -12,9 +12,9 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 function Sidebar() {
 	return (
 		<>
-			<ComplementaryArea.Slot scope="edit-site" />
+			<ComplementaryArea.Slot scope="core/edit-site" />
 			<ComplementaryArea
-				scope="edit-site"
+				scope="core/edit-site"
 				complementaryAreaIdentifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
@@ -22,7 +22,7 @@ function Sidebar() {
 				<InspectorSlot bubblesVirtually />
 			</ComplementaryArea>
 			<ComplementaryArea
-				scope="edit-site"
+				scope="core/edit-site"
 				complementaryAreaIdentifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				icon={ pencil }

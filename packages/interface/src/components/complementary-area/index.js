@@ -47,33 +47,24 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 } ) {
-	const singleActiveAreaStoreKey = `${ scope }/complementary-area`;
-	const pinnedItemsStoreKey = `${ scope }/pinned-items`;
 	const { isActive, isPinned } = useSelect(
 		( select ) => {
-			const { getSingleActiveArea, isMultipleActiveAreaActive } = select(
+			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
 			);
 			return {
 				isActive:
-					getSingleActiveArea( singleActiveAreaStoreKey ) ===
+					getActiveComplementaryArea( scope ) ===
 					complementaryAreaIdentifier,
-				isPinned: isMultipleActiveAreaActive(
-					pinnedItemsStoreKey,
-					complementaryAreaIdentifier
-				),
+				isPinned: isItemPinned( scope, complementaryAreaIdentifier ),
 			};
 		},
-		[
-			complementaryAreaIdentifier,
-			singleActiveAreaStoreKey,
-			pinnedItemsStoreKey,
-		]
+		[ complementaryAreaIdentifier, scope ]
 	);
-	const { setSingleActiveArea } = useDispatch( 'core/interface' );
-	const { setMultipleActiveAreaEnableState } = useDispatch(
+	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		'core/interface'
 	);
+	const { pinItem, unpinItem } = useDispatch( 'core/interface' );
 	return (
 		<>
 			{ isPinned && (
@@ -83,11 +74,9 @@ function ComplementaryArea( {
 						label={ title }
 						onClick={ () =>
 							isActive
-								? setSingleActiveArea(
-										singleActiveAreaStoreKey
-								  )
-								: setSingleActiveArea(
-										singleActiveAreaStoreKey,
+								? disableComplementaryArea( scope )
+								: enableComplementaryArea(
+										scope,
 										complementaryAreaIdentifier
 								  )
 						}
@@ -107,9 +96,7 @@ function ComplementaryArea( {
 					<ComplementaryAreaHeader
 						className={ headerClassName }
 						closeLabel={ closeLabel }
-						onClose={ () =>
-							setSingleActiveArea( singleActiveAreaStoreKey )
-						}
+						onClose={ () => disableComplementaryArea( scope ) }
 						smallScreenTitle={ smallScreenTitle }
 						toggleShortcut={ toggleShortcut }
 					>
@@ -127,10 +114,9 @@ function ComplementaryArea( {
 												: __( 'Pin to toolbar' )
 										}
 										onClick={ () =>
-											setMultipleActiveAreaEnableState(
-												pinnedItemsStoreKey,
-												complementaryAreaIdentifier,
-												! isPinned
+											( isPinned ? unpinItem : pinItem )(
+												scope,
+												complementaryAreaIdentifier
 											)
 										}
 										isPressed={ isPinned }

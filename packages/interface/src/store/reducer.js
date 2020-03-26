@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, get, omit } from 'lodash';
+import { flow, get, isEmpty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,19 +33,32 @@ const createWithInitialState = ( initialState ) => ( reducer ) => {
  *
  * @return {Object} Updated state.
  */
-export function singleActiveAreas( state = {}, action ) {
-	if ( action.type !== 'SET_SINGLE_ACTIVE_AREA' || ! action.scope ) {
+export function singleEnableItems(
+	state = {},
+	{ type, itemType, scope, item }
+) {
+	if ( type !== 'SET_SINGLE_ENABLE_ITEM' || ! itemType || ! scope ) {
 		return state;
 	}
+
 	if (
-		! action.activeArea &&
-		! DEFAULTS.areaControl.singleActiveAreas[ action.scope ]
+		! item &&
+		! get( DEFAULTS.enableItems.singleEnableItems, [ itemType, scope ] )
 	) {
-		return omit( state, [ action.scope ] );
+		const newTypeState = omit( state[ itemType ], [ scope ] );
+		return isEmpty( newTypeState )
+			? omit( state, [ itemType ] )
+			: {
+					...state,
+					[ itemType ]: newTypeState,
+			  };
 	}
 	return {
 		...state,
-		[ action.scope ]: action.activeArea || null,
+		[ itemType ]: {
+			...state[ itemType ],
+			[ scope ]: item || null,
+		},
 	};
 }
 
@@ -57,37 +70,63 @@ export function singleActiveAreas( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function multipleActiveAreas( state = {}, action ) {
+export function multipleEnableItems(
+	state = {},
+	{ type, itemType, scope, item, isEnable }
+) {
 	if (
-		action.type !== 'SET_MULTIPLE_ACTIVE_AREA_ENABLE_STATE' ||
-		! action.scope ||
-		! action.area ||
-		get( state, [ action.scope, action.area ] ) === action.isEnable
+		type !== 'SET_MULTIPLE_ENABLE_ITEM' ||
+		! itemType ||
+		! scope ||
+		! item ||
+		get( state, [ itemType, scope, item ] ) === isEnable
 	) {
 		return state;
 	}
-	if ( action.isEnable ) {
-		return {
-			...state,
-			[ action.scope ]: {
-				...( state[ action.scope ] || {} ),
-				[ action.area ]: true,
-			},
-		};
+	const currentTypeState = state[ itemType ] || {};
+	const currentScopeState = currentTypeState[ scope ] || {};
+	if (
+		! isEnable &&
+		! get( DEFAULTS.enableItems.multipleEnableItems, [
+			itemType,
+			scope,
+			item,
+		] )
+	) {
+		const newScopeState = omit( currentScopeState, [ item ] );
+		const newTypeState = isEmpty( newScopeState )
+			? omit( currentTypeState, [ scope ] )
+			: {
+					...currentScopeState,
+					[ scope ]: newScopeState,
+			  };
+		return isEmpty( newTypeState )
+			? omit( state, [ itemType ] )
+			: {
+					...state,
+					[ itemType ]: newTypeState,
+			  };
 	}
+
 	return {
 		...state,
-		[ action.scope ]: omit( state[ action.scope ] || {}, [ action.area ] ),
+		[ itemType ]: {
+			...currentTypeState,
+			[ scope ]: {
+				...currentScopeState,
+				[ item ]: isEnable || false,
+			},
+		},
 	};
 }
 
-const areaControl = combineReducers( {
-	singleActiveAreas,
-	multipleActiveAreas,
+const enableItems = combineReducers( {
+	singleEnableItems,
+	multipleEnableItems,
 } );
 
 export default flow( [ combineReducers, createWithInitialState( DEFAULTS ) ] )(
 	{
-		areaControl,
+		enableItems,
 	}
 );

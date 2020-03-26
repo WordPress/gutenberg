@@ -15,7 +15,7 @@ const store = registerStore( STORE_KEY, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'areaControl' ],
+	persist: [ 'enableItems' ],
 } );
 
 export default store;

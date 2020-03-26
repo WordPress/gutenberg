@@ -145,7 +145,7 @@ function Layout() {
 									</div>
 								) }
 								<SettingsSidebar />
-								<ComplementaryArea.Slot scope="edit-post" />
+								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)
 					}

@@ -18,8 +18,8 @@ import { dispatch } from '@wordpress/data-controls';
 export function* openGeneralSidebar( name ) {
 	yield dispatch(
 		'core/interface',
-		'setSingleActiveArea',
-		'edit-post/complementary-area',
+		'enableComplementaryArea',
+		'core/edit-post',
 		name
 	);
 }
@@ -32,8 +32,8 @@ export function* openGeneralSidebar( name ) {
 export function* closeGeneralSidebar() {
 	yield dispatch(
 		'core/interface',
-		'setSingleActiveArea',
-		'edit-post/complementary-area'
+		'disableComplementaryArea',
+		'core/edit-post'
 	);
 }
 
