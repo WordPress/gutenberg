@@ -48,7 +48,7 @@ module.exports = {
 				allowedTextDomains: [ 'default' ],
 			},
 		],
-		'@wordpress/i18n-translator-comments': 'error',
+		'@wordpress/i18n-no-collapsible-whitespace': 'off',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
