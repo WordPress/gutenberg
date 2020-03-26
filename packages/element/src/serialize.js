@@ -412,7 +412,7 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 	switch ( type && type.$$typeof ) {
 		case Provider.$$typeof:
-			context = new CoreJSMap( context );
+			context = context ? new CoreJSMap( context ) : new CoreJSMap();
 			context.set( type, props.value );
 			return renderChildren( props.children, context, legacyContext );
 
