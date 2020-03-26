@@ -58,8 +58,8 @@ function ButtonGroup( {
 					},
 				};
 			} );
-			return buttonsContext;
 		}
+		return buttonsContext;
 	}, [ children, mode, onChange, checked, childRefs ] );
 
 	return (
