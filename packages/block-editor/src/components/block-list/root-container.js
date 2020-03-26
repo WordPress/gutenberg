@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createContext, forwardRef, useState } from '@wordpress/element';
@@ -85,7 +90,7 @@ function RootContainer( { children, className, hasPopover = true }, ref ) {
 				{ hasPopover ? <BlockPopover /> : null }
 				<div
 					ref={ ref }
-					className={ className }
+					className={ classnames( className, 'is-root-container' ) }
 					onFocus={ onFocus }
 					onDragStart={ onDragStart }
 				>
