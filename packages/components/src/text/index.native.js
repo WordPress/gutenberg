@@ -6,6 +6,8 @@ import styled from '@emotion/native';
 /**
  * Internal dependencies
  */
-import { text } from './mixins';
+import { text } from './styles/text-mixins';
 
-export const __experimentalText = styled.Text( text );
+const Text = styled.Text( text );
+
+export default Text;

@@ -1,11 +1,8 @@
 /**
- * External dependencies
- */
-import css from '@emotion/css';
-/**
  * Internal dependencies
  */
 import { fontFamily } from './font-family';
+import css from './emotion-css';
 
 const fontWeightNormal = `font-weight: 400;`;
 const fontWeightSemibold = `font-weight: 600;`;
@@ -78,13 +75,13 @@ const label = `
 `;
 
 /**
- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.small'|'button'|'caption'|'label'} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
  */
 
 /**
  * @param {TextVariant} variantName
  */
-const variant = ( variantName ) => {
+const variant = ( variantName = 'body' ) => {
 	switch ( variantName ) {
 		case 'title.large':
 			return css`
@@ -114,6 +111,10 @@ const variant = ( variantName ) => {
 			`;
 
 		case 'body':
+			return css`
+				${body}
+			`;
+		case 'body.large':
 			return css`
 				${body}
 				${bodyLarge}
