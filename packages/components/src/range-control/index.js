@@ -74,6 +74,7 @@ const BaseRangeControl = forwardRef(
 
 		const sliderValue =
 			valueProp !== undefined ? valueProp : initialPosition;
+
 		const [ value, setValue ] = useControlledRangeValue( {
 			min,
 			max,
@@ -99,7 +100,6 @@ const BaseRangeControl = forwardRef(
 		const currentValue = value !== undefined ? value : currentInput;
 
 		const inputSliderValue = isValueReset ? '' : currentValue;
-		const currentInputValue = isValueReset ? '' : currentValue;
 
 		const rangeFillValue = isValueReset
 			? floatClamp( max / 2, min, max )
@@ -260,7 +260,7 @@ const BaseRangeControl = forwardRef(
 							onChange={ handleOnChange }
 							step={ step }
 							type="number"
-							value={ currentInputValue }
+							value={ inputSliderValue }
 						/>
 					) }
 					{ allowReset && (
