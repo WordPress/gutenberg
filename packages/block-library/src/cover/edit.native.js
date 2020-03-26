@@ -181,7 +181,7 @@ const Cover = ( {
 		hasChildren && isParentSelected && styles.innerPadding,
 	];
 
-	const background = ( openMediaOptions, getMediaOptions ) => (
+	const renderBackground = ( { open: openMediaOptions, getMediaOptions } ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onLongPress={ openMediaOptions }
@@ -257,9 +257,7 @@ const Cover = ( {
 					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
-					render={ ( { open, getMediaOptions } ) => {
-						return background( open, getMediaOptions );
-					} }
+					render={ renderBackground }
 				/>
 			</View>
 		</View>
