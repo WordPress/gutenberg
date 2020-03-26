@@ -2590,6 +2590,95 @@ exports[`Storyshots Components/Dashicon Default 1`] = `
 </svg>
 `;
 
+exports[`Storyshots Components/Disabled Default 1`] = `
+<div
+  className="components-disabled"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-text-control-2"
+      >
+        Text Control
+      </label>
+      <input
+        className="components-text-control__input"
+        id="inspector-text-control-2"
+        onChange={[Function]}
+        type="text"
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-textarea-control-0"
+      >
+        TextArea Control
+      </label>
+      <textarea
+        className="components-textarea-control__input"
+        id="inspector-textarea-control-0"
+        onChange={[Function]}
+        rows={4}
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-select-control-0"
+      >
+        Select Control
+      </label>
+      <select
+        className="components-select-control__input"
+        id="inspector-select-control-0"
+        multiple={false}
+        onChange={[Function]}
+      >
+        <option
+          disabled={true}
+          value={null}
+        >
+          Select an option
+        </option>
+        <option
+          value="a"
+        >
+          Option A
+        </option>
+        <option
+          value="b"
+        >
+          Option B
+        </option>
+        <option
+          value="c"
+        >
+          Option C
+        </option>
+      </select>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Draggable Default 1`] = `
 <div>
   <p>
@@ -4351,13 +4440,13 @@ exports[`Storyshots Components/Placeholder Default 1`] = `
         >
           <label
             className="components-base-control__label"
-            htmlFor="inspector-text-control-2"
+            htmlFor="inspector-text-control-3"
           >
             Sample Field
           </label>
           <input
             className="components-text-control__input"
-            id="inspector-text-control-2"
+            id="inspector-text-control-3"
             onChange={[Function]}
             placeholder="Enter something here"
             type="text"
@@ -7835,14 +7924,14 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-select-control-0"
+      htmlFor="inspector-select-control-1"
     >
       Label Text
     </label>
     <select
-      aria-describedby="inspector-select-control-0__help"
+      aria-describedby="inspector-select-control-1__help"
       className="components-select-control__input"
-      id="inspector-select-control-0"
+      id="inspector-select-control-1"
       multiple={false}
       onChange={[Function]}
     >
@@ -7871,7 +7960,7 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-select-control-0__help"
+    id="inspector-select-control-1__help"
   >
     Help text to explain the select control.
   </p>
@@ -7983,21 +8072,21 @@ exports[`Storyshots Components/TextControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-text-control-3"
+      htmlFor="inspector-text-control-4"
     >
       Label Text
     </label>
     <input
-      aria-describedby="inspector-text-control-3__help"
+      aria-describedby="inspector-text-control-4__help"
       className="components-text-control__input"
-      id="inspector-text-control-3"
+      id="inspector-text-control-4"
       onChange={[Function]}
       type="text"
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-text-control-3__help"
+    id="inspector-text-control-4__help"
   >
     Help text to explain the input.
   </p>
@@ -8023,21 +8112,21 @@ exports[`Storyshots Components/TextareaControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-textarea-control-0"
+      htmlFor="inspector-textarea-control-1"
     >
       Label Text
     </label>
     <textarea
-      aria-describedby="inspector-textarea-control-0__help"
+      aria-describedby="inspector-textarea-control-1__help"
       className="components-textarea-control__input"
-      id="inspector-textarea-control-0"
+      id="inspector-textarea-control-1"
       onChange={[Function]}
       rows={4}
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-textarea-control-0__help"
+    id="inspector-textarea-control-1__help"
   >
     Help text to explain the textarea.
   </p>
@@ -8706,6 +8795,72 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
       </svg>
     </button>
   </div>
+</div>
+`;
+
+exports[`Storyshots Components/TreeSelect Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-2"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-2__help"
+      className="components-select-control__input"
+      id="inspector-select-control-2"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        value=""
+      >
+        No parent page
+      </option>
+      <option
+        value="p1"
+      >
+        Page 1
+      </option>
+      <option
+        value="p11"
+      >
+           Descend 1 of page 1
+      </option>
+      <option
+        value="p12"
+      >
+           Descend 2 of page 1
+      </option>
+      <option
+        value="p2"
+      >
+        Page 2
+      </option>
+      <option
+        value="p21"
+      >
+           Descend 1 of page 2
+      </option>
+      <option
+        value="p211"
+      >
+              Descend 1 of Descend 1 of page 2
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-2__help"
+  >
+    Help text to explain the select control.
+  </p>
 </div>
 `;
 

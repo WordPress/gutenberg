@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createContext, forwardRef, useState } from '@wordpress/element';
@@ -46,7 +51,7 @@ function onDragStart( event ) {
 	}
 }
 
-function RootContainer( { children, className, hasPopover = true }, ref ) {
+function RootContainer( { children, className }, ref ) {
 	const {
 		selectedBlockClientId,
 		hasMultiSelection,
@@ -76,17 +81,16 @@ function RootContainer( { children, className, hasPopover = true }, ref ) {
 
 	return (
 		<InsertionPoint
-			className={ className }
 			isMultiSelecting={ isMultiSelecting }
 			hasMultiSelection={ hasMultiSelection }
 			selectedBlockClientId={ selectedBlockClientId }
 			containerRef={ ref }
 		>
 			<BlockNodes.Provider value={ useState( {} ) }>
-				{ hasPopover ? <BlockPopover /> : null }
+				<BlockPopover />
 				<div
 					ref={ ref }
-					className={ className }
+					className={ classnames( className, 'is-root-container' ) }
 					onFocus={ onFocus }
 					onDragStart={ onDragStart }
 				>
