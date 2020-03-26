@@ -20,7 +20,7 @@ const i18n = createI18n();
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {LocaleData} [data]   Locale data configuration.
+ * @param {LocaleData} data     Locale data configuration.
  * @param {string}     [domain] Domain for which configuration applies.
  */
 export const setLocaleData = i18n.setLocaleData.bind( i18n );
