@@ -6,19 +6,23 @@ $border-width-android: $border-width;
 $border-radius-ios: 7px;
 
 .segment {
-	height: $segment-height - 2 * $border-width;
 	border-radius: $segment-height / 2;
 	padding: 6px $panel-padding;
 	align-items: center;
 	justify-content: center;
+	margin-top: $segment-spacing + $border-width;
+	margin-bottom: $segment-spacing + $border-width;
+	z-index: 2;
 }
 
 .segmentIOS {
 	border-radius: $border-radius-ios;
-	height: $segment-height - 2 * $border-width-ios;
+	margin-top: $segment-spacing + $border-width-ios;
+	margin-bottom: $segment-spacing + $border-width-ios;
 }
 
 .selected {
+	position: absolute;
 	background-color: #fff;
 }
 
@@ -31,7 +35,7 @@ $border-radius-ios: 7px;
 }
 
 .container {
-	height: $container-height;
+	min-height: $container-height;
 	background-color: rgba(0, 0, 0, 0.04);
 	border-radius: $container-height / 2;
 	align-items: center;
@@ -53,10 +57,7 @@ $border-radius-ios: 7px;
 
 .outline {
 	position: absolute;
-	top: -$border-width;
-	bottom: -$border-width;
-	left: -$border-width;
-	right: -$border-width;
+	min-height: $segment-height - 2 * $border-width-ios;
 	border-width: $border-width;
 	border-radius: $container-height / 2;
 	border-color: rgba(0, 0, 0, 0.04);
@@ -65,16 +66,10 @@ $border-radius-ios: 7px;
 .outlineIOS {
 	border-radius: $border-radius-ios;
 	border-width: $border-width-ios;
-	top: -$border-width-ios;
-	bottom: -$border-width-ios;
-	left: -$border-width-ios;
-	right: -$border-width-ios;
 }
-
 
 .buttonTextDefault {
 	font-size: 12px;
-	height: 16px;
 	font-weight: 600;
 	text-align: center;
 	color: rgba(0, 0, 0, 0.6);
