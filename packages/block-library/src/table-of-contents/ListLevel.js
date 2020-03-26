@@ -5,48 +5,48 @@ import { RichText } from '@wordpress/editor';
 
 export default function ListLevel( props ) {
 	const { edit, attributes, setAttributes } = props;
-	let childnodes = null;
+	let childNodes = null;
 
 	if ( props.children ) {
-		childnodes = props.children.map( function( childnode ) {
-			const link = getLinkElement( childnode, props );
+		childNodes = props.children.map( function( childNode ) {
+			const link = getLinkElement( childNode, props );
 
 			return (
-				<li key={ childnode.block.anchor }>
+				<li key={ childNode.block.anchor }>
 					{ link }
-					{ childnode.children ? (
+					{ childNode.children ? (
 						<ListLevel
 							edit={ edit }
 							attributes={ attributes }
 							setAttributes={ setAttributes }
 						>
-							{ childnode.children }
+							{ childNode.children }
 						</ListLevel>
 					) : null }
 				</li>
 			);
 		} );
 
-		return <ul>{ childnodes }</ul>;
+		return <ul>{ childNodes }</ul>;
 	}
 }
 
-function getLinkElement( childnode, props ) {
+function getLinkElement( childNode, props ) {
 	const { edit, attributes, setAttributes } = props;
 	const { headings, autosync } = attributes;
 
 	const updateHeading = ( content ) => {
-		headings[ childnode.index ].content = content;
+		headings[ childNode.index ].content = content;
 		setAttributes( { headings } );
 	};
 
 	if ( autosync ) {
 		return (
 			<a
-				href={ childnode.block.anchor }
-				data-level={ childnode.block.level }
+				href={ childNode.block.anchor }
+				data-level={ childNode.block.level }
 			>
-				{ childnode.block.content }
+				{ childNode.block.content }
 			</a>
 		);
 	}
@@ -55,10 +55,10 @@ function getLinkElement( childnode, props ) {
 		return (
 			<RichText
 				tagName="a"
-				href={ childnode.block.anchor }
-				data-level={ childnode.block.level }
+				href={ childNode.block.anchor }
+				data-level={ childNode.block.level }
 				onChange={ ( content ) => updateHeading( content ) }
-				value={ childnode.block.content }
+				value={ childNode.block.content }
 			/>
 		);
 	}
@@ -66,9 +66,9 @@ function getLinkElement( childnode, props ) {
 	return (
 		<RichText.Content
 			tagName="a"
-			href={ childnode.block.anchor }
-			data-level={ childnode.block.level }
-			value={ childnode.block.content }
+			href={ childNode.block.anchor }
+			data-level={ childNode.block.level }
+			value={ childNode.block.content }
 		/>
 	);
 }
