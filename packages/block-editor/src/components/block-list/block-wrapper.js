@@ -107,6 +107,17 @@ const BlockComponent = forwardRef(
 				return;
 			}
 
+			// Don't move focus if it's outside the editor content. In the
+			// future, the check for this could look different, e.g. focus is
+			// outside the BlockList component, or outside the iframe.
+			if (
+				! wrapper.current
+					.closest( '[role="region"]' )
+					.contains( document.activeElement )
+			) {
+				return;
+			}
+
 			// Find all tabbables within node.
 			const textInputs = focus.tabbable
 				.find( wrapper.current )
