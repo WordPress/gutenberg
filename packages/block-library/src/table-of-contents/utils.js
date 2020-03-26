@@ -133,5 +133,5 @@ export function haveHeadingsChanged( oldHeadings, newHeadings ) {
 	} );
 
 	// Return boolean value from length.
-	return !! +changedHeadings.length;
+	return changedHeadings.length > 0;
 }
