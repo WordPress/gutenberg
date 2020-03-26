@@ -39,6 +39,7 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	rootClientId,
+	isHighlighted,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -61,7 +62,6 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	isMultiSelecting,
-	hasSelectedUI = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -87,7 +87,7 @@ function BlockListBlock( {
 		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( ! lightBlockWrapper && blockType.getEditWrapperProps ) {
+	if ( blockType.getEditWrapperProps ) {
 		wrapperProps = {
 			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
@@ -109,9 +109,9 @@ function BlockListBlock( {
 		customClassName,
 		'wp-block block-editor-block-list__block',
 		{
-			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
+			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -228,6 +228,7 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
+			isBlockHighlighted,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -248,6 +249,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isHighlighted: isBlockHighlighted( clientId ),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||

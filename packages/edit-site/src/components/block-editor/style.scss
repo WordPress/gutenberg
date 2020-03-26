@@ -1,4 +1,14 @@
 .edit-site-block-editor__block-list {
 	padding-bottom: $grid-unit-30;
 	padding-top: $grid-unit-30 + 5;
+
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	// Full-wide. (to account for the padddings added above)
+	.block-editor-block-list__block[data-align="full"],
+	.block-editor-block-list__block.alignfull {
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+	}
 }

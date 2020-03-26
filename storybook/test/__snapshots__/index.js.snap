@@ -1,5 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Storyshots Components/AnglePickerControl Default 1`] = `
+<div
+  className="components-base-control components-angle-picker-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="components-angle-picker-control__input-0"
+    >
+      Angle
+    </label>
+    <div
+      aria-hidden="true"
+      className="components-angle-picker-control__angle-circle"
+      onMouseDown={[Function]}
+    >
+      <div
+        className="components-angle-picker-control__angle-circle-indicator-wrapper"
+      >
+        <span
+          className="components-angle-picker-control__angle-circle-indicator"
+        />
+      </div>
+    </div>
+    <input
+      className="components-angle-picker-control__input-field"
+      id="components-angle-picker-control__input-0"
+      max={360}
+      min={0}
+      onChange={[Function]}
+      step="1"
+      type="number"
+    />
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
 <div
   className="components-animate__appear is-from-left is-from-bottom components-notice is-success is-dismissible"
@@ -2590,6 +2629,95 @@ exports[`Storyshots Components/Dashicon Default 1`] = `
 </svg>
 `;
 
+exports[`Storyshots Components/Disabled Default 1`] = `
+<div
+  className="components-disabled"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-text-control-2"
+      >
+        Text Control
+      </label>
+      <input
+        className="components-text-control__input"
+        id="inspector-text-control-2"
+        onChange={[Function]}
+        type="text"
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-textarea-control-0"
+      >
+        TextArea Control
+      </label>
+      <textarea
+        className="components-textarea-control__input"
+        id="inspector-textarea-control-0"
+        onChange={[Function]}
+        rows={4}
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-select-control-0"
+      >
+        Select Control
+      </label>
+      <select
+        className="components-select-control__input"
+        id="inspector-select-control-0"
+        multiple={false}
+        onChange={[Function]}
+      >
+        <option
+          disabled={true}
+          value={null}
+        >
+          Select an option
+        </option>
+        <option
+          value="a"
+        >
+          Option A
+        </option>
+        <option
+          value="b"
+        >
+          Option B
+        </option>
+        <option
+          value="c"
+        >
+          Option C
+        </option>
+      </select>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Draggable Default 1`] = `
 <div>
   <p>
@@ -3463,10 +3591,12 @@ input[type='number'].emotion-18 {
           <span
             aria-hidden={true}
             className="emotion-4 emotion-5"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-6 emotion-7"
+            disabled={false}
             style={
               Object {
                 "width": "4.545454545454546%",
@@ -3520,6 +3650,7 @@ input[type='number'].emotion-18 {
         <input
           aria-label="Custom Size"
           className="components-range-control__number emotion-18 emotion-153"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={12}
@@ -4348,13 +4479,13 @@ exports[`Storyshots Components/Placeholder Default 1`] = `
         >
           <label
             className="components-base-control__label"
-            htmlFor="inspector-text-control-2"
+            htmlFor="inspector-text-control-3"
           >
             Sample Field
           </label>
           <input
             className="components-text-control__input"
-            id="inspector-text-control-2"
+            id="inspector-text-control-3"
             onChange={[Function]}
             placeholder="Enter something here"
             type="text"
@@ -4920,6 +5051,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden="true"
@@ -4928,6 +5060,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "0%",
@@ -4949,6 +5082,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "10%",
@@ -4970,6 +5104,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark is-filled emotion-4 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "20%",
@@ -4991,6 +5126,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "80%",
@@ -5012,6 +5148,7 @@ input[type='number'].emotion-34 {
             <span
               aria-hidden="true"
               className="components-range-control__mark emotion-16 emotion-5"
+              disabled={false}
               style={
                 Object {
                   "left": "100%",
@@ -5034,6 +5171,7 @@ input[type='number'].emotion-34 {
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-26 emotion-27"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5056,6 +5194,7 @@ input[type='number'].emotion-34 {
         </span>
         <input
           className="components-range-control__number emotion-34 emotion-333"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5257,10 +5396,12 @@ input[type='number'].emotion-12 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "50%",
@@ -5285,6 +5426,7 @@ input[type='number'].emotion-12 {
         <input
           aria-label="Range Label"
           className="components-range-control__number emotion-12 emotion-113"
+          disabled={false}
           inputMode="decimal"
           max={10}
           min={0}
@@ -5533,10 +5675,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "0%",
@@ -5573,6 +5717,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={20}
         min={0}
@@ -5819,10 +5964,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5858,6 +6005,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5902,10 +6050,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -5941,6 +6091,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -5985,10 +6136,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6024,6 +6177,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6068,10 +6222,12 @@ input[type='number'].emotion-14 {
           <span
             aria-hidden={true}
             className="emotion-2 emotion-3"
+            disabled={false}
           />
           <span
             aria-hidden={true}
             className="components-range-control__track emotion-4 emotion-5"
+            disabled={false}
             style={
               Object {
                 "width": "5%",
@@ -6107,6 +6263,7 @@ input[type='number'].emotion-14 {
         </span>
         <input
           className="components-range-control__number emotion-14 emotion-133"
+          disabled={false}
           inputMode="decimal"
           max={100}
           min={0}
@@ -6356,10 +6513,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6396,6 +6555,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6654,10 +6814,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -6712,6 +6874,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -6982,10 +7145,12 @@ input[type='number'].emotion-16 {
         <span
           aria-hidden={true}
           className="emotion-4 emotion-5"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-6 emotion-7"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7022,6 +7187,7 @@ input[type='number'].emotion-16 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-16 emotion-153"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -7269,10 +7435,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "37.5%",
@@ -7309,6 +7477,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={10}
         min={2}
@@ -7570,10 +7739,12 @@ input[type='number'].emotion-14 {
         <span
           aria-hidden={true}
           className="emotion-2 emotion-3"
+          disabled={false}
         />
         <span
           aria-hidden={true}
           className="components-range-control__track emotion-4 emotion-5"
+          disabled={false}
           style={
             Object {
               "width": "5%",
@@ -7610,6 +7781,7 @@ input[type='number'].emotion-14 {
       <input
         aria-label="How many columns should this use?"
         className="components-range-control__number emotion-14 emotion-133"
+        disabled={false}
         inputMode="decimal"
         max={100}
         min={0}
@@ -7791,14 +7963,14 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-select-control-0"
+      htmlFor="inspector-select-control-1"
     >
       Label Text
     </label>
     <select
-      aria-describedby="inspector-select-control-0__help"
+      aria-describedby="inspector-select-control-1__help"
       className="components-select-control__input"
-      id="inspector-select-control-0"
+      id="inspector-select-control-1"
       multiple={false}
       onChange={[Function]}
     >
@@ -7827,7 +7999,7 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-select-control-0__help"
+    id="inspector-select-control-1__help"
   >
     Help text to explain the select control.
   </p>
@@ -7939,21 +8111,21 @@ exports[`Storyshots Components/TextControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-text-control-3"
+      htmlFor="inspector-text-control-4"
     >
       Label Text
     </label>
     <input
-      aria-describedby="inspector-text-control-3__help"
+      aria-describedby="inspector-text-control-4__help"
       className="components-text-control__input"
-      id="inspector-text-control-3"
+      id="inspector-text-control-4"
       onChange={[Function]}
       type="text"
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-text-control-3__help"
+    id="inspector-text-control-4__help"
   >
     Help text to explain the input.
   </p>
@@ -7979,21 +8151,21 @@ exports[`Storyshots Components/TextareaControl Default 1`] = `
   >
     <label
       className="components-base-control__label"
-      htmlFor="inspector-textarea-control-0"
+      htmlFor="inspector-textarea-control-1"
     >
       Label Text
     </label>
     <textarea
-      aria-describedby="inspector-textarea-control-0__help"
+      aria-describedby="inspector-textarea-control-1__help"
       className="components-textarea-control__input"
-      id="inspector-textarea-control-0"
+      id="inspector-textarea-control-1"
       onChange={[Function]}
       rows={4}
     />
   </div>
   <p
     className="components-base-control__help"
-    id="inspector-textarea-control-0__help"
+    id="inspector-textarea-control-1__help"
   >
     Help text to explain the textarea.
   </p>
@@ -8665,6 +8837,72 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/TreeSelect Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-2"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-2__help"
+      className="components-select-control__input"
+      id="inspector-select-control-2"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        value=""
+      >
+        No parent page
+      </option>
+      <option
+        value="p1"
+      >
+        Page 1
+      </option>
+      <option
+        value="p11"
+      >
+           Descend 1 of page 1
+      </option>
+      <option
+        value="p12"
+      >
+           Descend 2 of page 1
+      </option>
+      <option
+        value="p2"
+      >
+        Page 2
+      </option>
+      <option
+        value="p21"
+      >
+           Descend 1 of page 2
+      </option>
+      <option
+        value="p211"
+      >
+              Descend 1 of Descend 1 of page 2
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-2__help"
+  >
+    Help text to explain the select control.
+  </p>
+</div>
+`;
+
 exports[`Storyshots Components/VisuallyHidden Default 1`] = `
 Array [
   <div
@@ -8712,45 +8950,6 @@ Array [
   </span>,
   "Inspect the HTML to see!",
 ]
-`;
-
-exports[`Storyshots Components|AnglePickerControl Default 1`] = `
-<div
-  className="components-base-control components-angle-picker-control"
->
-  <div
-    className="components-base-control__field"
-  >
-    <label
-      className="components-base-control__label"
-      htmlFor="components-angle-picker-control__input-0"
-    >
-      Angle
-    </label>
-    <div
-      aria-hidden="true"
-      className="components-angle-picker-control__angle-circle"
-      onMouseDown={[Function]}
-    >
-      <div
-        className="components-angle-picker-control__angle-circle-indicator-wrapper"
-      >
-        <span
-          className="components-angle-picker-control__angle-circle-indicator"
-        />
-      </div>
-    </div>
-    <input
-      className="components-angle-picker-control__input-field"
-      id="components-angle-picker-control__input-0"
-      max={360}
-      min={0}
-      onChange={[Function]}
-      step="1"
-      type="number"
-    />
-  </div>
-</div>
 `;
 
 exports[`Storyshots Icons/Icon Default 1`] = `
@@ -9837,6 +10036,120 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M6 5V3H3v2h3zm12 10V4H9L7 6H2v9h16zm-7-8c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      capturePhoto
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 9.2c-2.2 0-3.9 1.8-3.9 4s1.8 4 3.9 4 4-1.8 4-4-1.8-4-4-4zm0 6.5c-1.4 0-2.4-1.1-2.4-2.5s1.1-2.5 2.4-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5zM20.2 8c-.1 0-.3 0-.5-.1l-2.5-.8c-.4-.1-.8-.4-1.1-.8l-1-1.5c-.4-.5-1-.9-1.7-.9h-2.9c-.6.1-1.2.4-1.6 1l-1 1.5c-.3.3-.6.6-1.1.7l-2.5.8c-.2.1-.4.1-.6.1-1 .2-1.7.9-1.7 1.9v8.3c0 1 .9 1.9 2 1.9h16c1.1 0 2-.8 2-1.9V9.9c0-1-.7-1.7-1.8-1.9zm.3 10.1c0 .2-.2.4-.5.4H4c-.3 0-.5-.2-.5-.4V9.9c0-.1.2-.3.5-.4.2 0 .5-.1.8-.2l2.5-.8c.7-.2 1.4-.6 1.8-1.3l1-1.5c.1-.1.2-.2.4-.2h2.9c.2 0 .3.1.4.2l1 1.5c.4.7 1.1 1.1 1.9 1.4l2.5.8c.3.1.6.1.8.2.3 0 .4.2.4.4v8.1z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      captureVideo
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm.5 12c0 .3-.2.5-.5.5H4c-.3 0-.5-.2-.5-.5V7c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v10zm2.5-7v4l5 3V7l-5 3zm3.5 4.4l-2-1.2v-2.3l2-1.2v4.7z"
       />
     </svg>
   </div>

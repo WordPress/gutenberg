@@ -84,6 +84,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Patterns (Experimental)",
+		"slug": "block-patterns",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Annotations",
 		"slug": "block-annotations",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-annotations.md",
