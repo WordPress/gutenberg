@@ -21,7 +21,7 @@ function EntityRecordState( { record, checked, onChange } ) {
 	);
 }
 
-function EntityTypeList( { list, ignored, setIgnored } ) {
+function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	const firstRecord = list[ 0 ];
 	const entity = useSelect(
 		( select ) =>
@@ -39,14 +39,16 @@ function EntityTypeList( { list, ignored, setIgnored } ) {
 						record={ record }
 						checked={
 							! some(
-								ignored,
+								unselectedEntities,
 								( elt ) =>
 									elt.kind === record.kind &&
 									elt.name === record.name &&
 									elt.key === record.key
 							)
 						}
-						onChange={ ( value ) => setIgnored( record, value ) }
+						onChange={ ( value ) =>
+							setUnselectedEntities( record, value )
+						}
 					/>
 				);
 			} ) }
@@ -134,8 +136,8 @@ export default function EntitiesSavedStates( {
 						<EntityTypeList
 							key={ list[ 0 ].name }
 							list={ list }
-							ignored={ unselectedEntities }
-							setIgnored={ setUnselectedEntities }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
 						/>
 					);
 				} ) }
