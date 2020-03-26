@@ -453,6 +453,7 @@ export function isTextField( element ) {
 
 		return (
 			( nodeName === 'INPUT' && selectionStart !== null ) ||
+			element.getAttribute( 'type' ) === 'email' ||
 			nodeName === 'TEXTAREA' ||
 			contentEditable === 'true'
 		);
