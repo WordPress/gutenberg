@@ -277,17 +277,17 @@ describe( 'JSDoc', () => {
 					type: 'object',
 					properties: [
 						{
-							name: 'p.x0',
+							name: 'x0',
 							description: 'property 0',
 							type: 'string',
 						},
 						{
-							name: 'p.x1',
+							name: 'x1',
 							description: 'property 1',
 							type: 'XXX | undefined',
 						},
 						{
-							name: 'p.x2',
+							name: 'x2',
 							description: 'property 2',
 							type: 'number',
 							defaultValue: 11,

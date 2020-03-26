@@ -142,7 +142,7 @@ const getJSDocTypeLiteralProperties = ( code, jsDocPropertyTags ) => {
 		const result = {
 			name:
 				p.name.kind === SyntaxKind.QualifiedName
-					? `${ p.name.left.escapedText }.${ p.name.right.escapedText }`
+					? `${ p.name.right.escapedText }`
 					: `${ p.name.escapedText }`,
 			description: p.comment ? p.comment : null,
 		};
