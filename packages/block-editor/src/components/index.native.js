@@ -44,6 +44,7 @@ export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as DefaultBlockAppender } from './default-block-appender';
+export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { Block as __experimentalBlock } from './block-list/block-wrapper';
 
