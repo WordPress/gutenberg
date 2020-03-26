@@ -30,7 +30,8 @@ describe( 'JSDoc', () => {
 			tags: [
 				{
 					title: 'deprecated',
-					description: 'Use native addition instead.',
+					description:
+						"since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`\nselector from the '@wordpress/core-data' package.",
 				},
 				{
 					title: 'since',

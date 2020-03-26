@@ -1,7 +1,8 @@
 /**
  * A function that adds two parameters.
  *
- * @deprecated Use native addition instead.
+ * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
+ * 			   selector from the '@wordpress/core-data' package.
  * @since 2.0.0
  *
  * @see addition

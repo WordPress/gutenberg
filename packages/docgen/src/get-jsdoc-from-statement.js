@@ -180,7 +180,15 @@ module.exports = function( statement ) {
 			description: lastComment.comment,
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
 				const title = tag.tagName.escapedText;
-				const description = tag.comment ? tag.comment : null;
+				let description = tag.comment ? tag.comment : null;
+
+				if ( description ) {
+					// restore @wordpress changed in compile.js
+					description = description.replace(
+						/__WORDPRESS_IMPORT__/g,
+						'@wordpress'
+					);
+				}
 
 				if ( tag.kind === SyntaxKind.JSDocParameterTag ) {
 					const result = {
@@ -250,11 +258,7 @@ module.exports = function( statement ) {
 				if ( title === 'example' ) {
 					return {
 						title,
-						// restore @wordpress changed in compile.js
-						description: description.replace(
-							/__WORDPRESS_IMPORT__/g,
-							'@wordpress'
-						),
+						description,
 					};
 				}
 
