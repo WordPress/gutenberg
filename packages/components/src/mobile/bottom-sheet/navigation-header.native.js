@@ -48,7 +48,10 @@ function BottomSheetNavigationHeader( {
 								size={ 40 }
 								style={ chevronLeftStyle }
 							/>
-							<Text style={ bottomSheetButtonTextStyle }>
+							<Text
+								style={ bottomSheetButtonTextStyle }
+								maxFontSizeMultiplier={ 2 }
+							>
 								{ __( 'Back' ) }
 							</Text>
 						</>

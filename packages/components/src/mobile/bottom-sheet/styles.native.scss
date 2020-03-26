@@ -185,7 +185,7 @@
 	align-items: center;
 	padding-right: $panel-padding;
 	padding-left: $panel-padding;
-	height: 44px;
+	min-height: 44px;
 }
 
 .bottomSheetBackButton {

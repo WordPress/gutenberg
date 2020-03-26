@@ -19,7 +19,7 @@ import { Icon, check, close } from '@wordpress/icons';
 import styles from './style.scss';
 
 function ColorPicker( {
-	shouldEnableBottomSheetScroll,
+	shouldEnableBottomSheetScroll = false,
 	isBottomSheetScrolling,
 	setBackgroundColor,
 	setTextColor,

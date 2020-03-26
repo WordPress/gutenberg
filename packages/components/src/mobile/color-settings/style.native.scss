@@ -37,20 +37,3 @@
 	flex: 1;
 }
 
-.colorText {
-	font-family: $default-monospace-font;
-	color: rgba(0, 0, 0, 0.87);
-	font-size: 12px;
-	font-weight: 400;
-	text-align: center;
-}
-
-.colorTextDark {
-	color: rgba(255, 255, 255, 0.87);
-}
-
-.row {
-	flex-direction: row;
-	align-items: center;
-	flex: 1;
-}

@@ -32,6 +32,7 @@ $border-radius-ios: 7px;
 
 .shadowIOS {
 	box-shadow: 0 0 8px rgba(0, 0, 0, 0.12);
+	z-index: 2;
 }
 
 .container {
