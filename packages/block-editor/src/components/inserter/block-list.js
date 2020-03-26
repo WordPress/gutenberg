@@ -206,12 +206,12 @@ function InserterBlockList( {
 		);
 	}, [ filteredItems, rootChildBlocks ] );
 
-	const suggestedItems = () => {
+	const suggestedItems = useMemo( () => {
 		return filter( items, ( item ) => item.utility > 0 ).slice(
 			0,
 			MAX_SUGGESTED_ITEMS
 		);
-	};
+	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
 		return filter( filteredItems, { category: 'reusable' } );
@@ -323,11 +323,7 @@ function InserterBlockList( {
 
 	const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
-	const hasItems =
-		! isEmpty( suggestedItems ) ||
-		! isEmpty( reusableItems ) ||
-		! isEmpty( itemsPerCategory ) ||
-		! isEmpty( itemsPerCollection );
+	const hasItems = ! isEmpty( filteredItems );
 
 	return (
 		<div
