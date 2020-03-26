@@ -24,7 +24,13 @@ import {
 } from '@wordpress/block-editor';
 import { useRef, Platform } from '@wordpress/element';
 
-function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
+function HeadingEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+	onReplace,
+	className,
+} ) {
 	const ref = useRef();
 	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
 		[ { name: 'textColor', property: 'color' } ],
@@ -95,7 +101,7 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 					} }
 					onReplace={ onReplace }
 					onRemove={ () => onReplace( [] ) }
-					className={ classnames( {
+					className={ classnames( className, {
 						[ `has-text-align-${ align }` ]: align,
 					} ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }
