@@ -122,7 +122,7 @@ function ColumnsEditContainer( {
 					isCollapsed={ false }
 				/>
 			</BlockControls>
-			<View>
+			<View style={ isSelected && styles.innerBlocksSelected }>
 				{ resizeListener }
 				<InnerBlocks
 					renderAppender={ renderAppender }
@@ -132,12 +132,10 @@ function ColumnsEditContainer( {
 							: undefined
 					}
 					flatListProps={ {
-						contentContainerStyle: {
-							...styles.columnsContainer,
-							maxWidth: width,
-						},
+						contentContainerStyle: styles.columnsContainer,
 						horizontal: true,
 						scrollEnabled: false,
+						style: styles.innerBlocks,
 					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					customBlockProps={ {

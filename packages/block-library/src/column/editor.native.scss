@@ -1,4 +1,9 @@
+.columnPlaceholderNotSelected {
+	padding-top: $block-selected-to-content;
+}
+
 .columnPlaceholder {
+	flex: 1;
 	padding: $block-selected-to-content;
 	background-color: $white;
 	border: $border-width dashed $gray;
@@ -10,42 +15,16 @@
 	border: $border-width dashed $gray-70;
 }
 
-.marginVerticalDense {
-	margin-top: $block-selected-child-to-content;
-	margin-bottom: $block-selected-child-to-content;
+.innerBlocks {
+	overflow: visible;
 }
 
-.marginHorizontalNone {
-	margin-left: 0;
-	margin-right: 0;
+.innerBlocksBottomSpace {
+	margin-bottom: $block-selected-to-content;
 }
 
 .columns-container {
 	max-width: $content-width;
-}
-
-.column-container-base {
-	max-width: $content-width - 2 * ( $block-selected-margin + $block-selected-border-width );
-}
-
-.column-placeholder-selected-margin {
-	width: 2 * $block-selected-to-content;
-}
-
-.column-parent-selected-margin {
-	width: $block-selected-to-content;
-}
-
-.column-selected-margin {
-	width: 2 * $block-edge-to-content;
-}
-
-.column-descendant-selected-margin {
-	width: 2 * $block-selected-margin;
-}
-
-.column-dashed-border-margin {
-	width: 2 * $block-selected-border-width;
 }
 
 .is-vertically-aligned-top {
@@ -62,4 +41,8 @@
 
 .flexBase {
 	flex: 1;
+}
+
+.columnMargin {
+	margin: $block-edge-to-content / 2;
 }
