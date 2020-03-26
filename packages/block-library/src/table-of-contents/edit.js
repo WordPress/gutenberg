@@ -10,13 +10,6 @@ import ListLevel from './ListLevel';
 import { Component } from '@wordpress/element';
 import { subscribe } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import {
-	IconButton,
-	Toolbar,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
-import { BlockControls, InspectorControls } from '@wordpress/editor';
 
 class TOCEdit extends Component {
 	constructor() {
@@ -60,22 +53,19 @@ class TOCEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { attributes, setAttributes } = this.props;
+		const { setAttributes } = this.props;
 		const pageHeadings = Utils.getPageHeadings();
 		if (
 			JSON.stringify( pageHeadings ) !==
 			JSON.stringify( prevState.pageHeadings )
 		) {
 			this.setState( { pageHeadings } );
-			if ( attributes.autosync ) {
-				setAttributes( { headings: pageHeadings } ); // this is displayed on the page
-			}
+			setAttributes( { headings: pageHeadings } );
 		}
 	}
 
 	render() {
 		const { attributes, setAttributes } = this.props;
-		const { autosync } = attributes;
 		const headings = attributes.headings || [];
 		if ( headings.length === 0 ) {
 			return (
@@ -91,34 +81,6 @@ class TOCEdit extends Component {
 
 		return (
 			<div className={ this.props.className }>
-				{ ! autosync && (
-					<BlockControls>
-						<Toolbar>
-							<IconButton
-								label={ __( 'Update' ) }
-								aria-pressed={ this.state.isEditing }
-								onClick={ this.refresh }
-								icon="update"
-							/>
-						</Toolbar>
-					</BlockControls>
-				) }
-				{
-					<InspectorControls>
-						<PanelBody title={ __( 'Table of Contents Settings' ) }>
-							<ToggleControl
-								label={ __( 'Auto Sync' ) }
-								checked={ autosync }
-								onChange={ () => {
-									if ( ! autosync ) {
-										this.refresh();
-									}
-									this.toggleAttribute( 'autosync' );
-								} }
-							/>
-						</PanelBody>
-					</InspectorControls>
-				}
 				<ListLevel
 					edit={ true }
 					attributes={ attributes }

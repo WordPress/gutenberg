@@ -31,10 +31,6 @@ export const settings = {
 				level: { source: 'attribute', attribute: 'data-level' },
 			},
 		},
-		autosync: {
-			type: 'boolean',
-			default: true,
-		},
 	},
 	edit,
 	save,
