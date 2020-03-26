@@ -25,6 +25,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.8.3",
 		"@wordpress/escape-html": "file:../escape-html",
+		"core-js-pure": "^3.6.4",
 		"lodash": "^4.17.15",
 		"react": "^16.9.0",
 		"react-dom": "^16.9.0"

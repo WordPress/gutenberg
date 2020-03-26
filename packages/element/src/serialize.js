@@ -36,6 +36,7 @@ import {
 	kebabCase,
 	isPlainObject,
 } from 'lodash';
+import CoreJSMap from 'core-js-pure/features/map';
 
 /**
  * WordPress dependencies
@@ -411,7 +412,7 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 	switch ( type && type.$$typeof ) {
 		case Provider.$$typeof:
-			context = new Map( context );
+			context = new CoreJSMap( context );
 			context.set( type, props.value );
 			return renderChildren( props.children, context, legacyContext );
 
