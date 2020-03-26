@@ -68,6 +68,8 @@ export function getHeadingBlocks() {
 
 export function convertHeadingBlocksToAttributes( headingBlocks ) {
 	return headingBlocks.map( function( heading ) {
+		// This is a string so that it can be stored/sourced as an attribute in the table of contents
+		// block using a data attribute.
 		const level = heading.attributes.level.toString();
 
 		const headingContent = heading.attributes.content || '';
