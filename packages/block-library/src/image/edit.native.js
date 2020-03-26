@@ -14,7 +14,7 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-	requestImageFullscreenPreview
+	requestImageFullscreenPreview,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, get, find, map } from 'lodash';
 
