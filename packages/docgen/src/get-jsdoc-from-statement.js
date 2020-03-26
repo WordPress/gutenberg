@@ -142,8 +142,8 @@ const getJSDocTypeLiteralProperties = ( code, jsDocPropertyTags ) => {
 		const result = {
 			name:
 				p.name.kind === SyntaxKind.QualifiedName
-					? `${ p.name.right.escapedText }`
-					: `${ p.name.escapedText }`,
+					? p.name.right.text
+					: p.name.text,
 			description: p.comment ? p.comment : null,
 		};
 
@@ -179,7 +179,7 @@ module.exports = function( statement ) {
 		return {
 			description: lastComment.comment,
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
-				const title = tag.tagName.escapedText;
+				const title = tag.tagName.text;
 				let description = tag.comment ? tag.comment : null;
 
 				if ( description ) {
@@ -202,7 +202,7 @@ module.exports = function( statement ) {
 					);
 
 					result.type = type;
-					result.name = tag.name.escapedText;
+					result.name = tag.name.text;
 
 					if ( defaultValue !== undefined ) {
 						result.defaultValue = defaultValue;
@@ -225,7 +225,7 @@ module.exports = function( statement ) {
 				if ( tag.kind === SyntaxKind.JSDocTypedefTag ) {
 					const result = {
 						title,
-						name: tag.name.escapedText,
+						name: tag.name.text,
 						description,
 						type: tag.typeExpression.jsDocPropertyTags
 							? 'object'

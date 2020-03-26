@@ -89,10 +89,14 @@
  * @param {T extends (...args: any[]) => infer R ? R : any} p infer type: ReturnType
  * @param {import('typescript').Statement} p import type
  * @param {WPEditorInserterItem} p typedef
+ * @param {string} __experimentalParam It's experimental
+ * @param {number} __unstableParam It's unstable
  *
  * @typedef {object} WPEditorInserterItem
  * @property {number}   id                Unique identifier for the item.
  * @property {string}   name              The type of block to create.
+ * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
+ * @property {boolean} __unstableProp This is unstable.
  */
 // eslint-disable-next-line no-unused-vars
 export const sum = ( p ) => {};

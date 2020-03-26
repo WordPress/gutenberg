@@ -315,6 +315,18 @@ describe( 'JSDoc', () => {
 				type( "import('typescript').Statement", 'import type' ),
 				type( 'WPEditorInserterItem', 'typedef' ),
 				{
+					title: 'param',
+					name: '__experimentalParam',
+					description: "It's experimental",
+					type: 'string',
+				},
+				{
+					title: 'param',
+					name: '__unstableParam',
+					description: "It's unstable",
+					type: 'number',
+				},
+				{
 					title: 'typedef',
 					name: 'WPEditorInserterItem',
 					description: null,
@@ -329,6 +341,17 @@ describe( 'JSDoc', () => {
 							name: 'name',
 							description: 'The type of block to create.',
 							type: 'string',
+						},
+						{
+							name: '__experimentalBlockDirectory',
+							description:
+								'Whether the user has enabled the Block Directory',
+							type: 'boolean',
+						},
+						{
+							name: '__unstableProp',
+							description: 'This is unstable.',
+							type: 'boolean',
 						},
 					],
 				},

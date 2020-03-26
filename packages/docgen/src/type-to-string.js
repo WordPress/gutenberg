@@ -5,7 +5,7 @@ const { SyntaxKind } = require( 'typescript' );
 
 const getTypeFromTypeReference = ( type ) => {
 	if ( type.typeName.kind === SyntaxKind.Identifier ) {
-		const name = type.typeName.escapedText;
+		const name = type.typeName.text;
 
 		if ( name === 'String' || name === 'Number' ) {
 			return name.toLowerCase();
@@ -40,7 +40,7 @@ const getTypeFromTypeReference = ( type ) => {
 	if ( type.typeName.kind === SyntaxKind.QualifiedName ) {
 		const name = type.typeName;
 
-		return `${ name.left.escapedText }.${ name.right.escapedText }`;
+		return `${ name.left.text }.${ name.right.text }`;
 	}
 };
 
@@ -80,7 +80,7 @@ const getFunctionType = ( type ) => {
 			const dots = p.dotDotDotToken ? '...' : '';
 			const typeName = typeToString( p.type );
 
-			return `${ dots }${ p.name.escapedText }: ${ typeName }`;
+			return `${ dots }${ p.name.text }: ${ typeName }`;
 		} )
 		.join( ', ' );
 
@@ -99,12 +99,12 @@ const getTypeLiteral = ( type ) => {
 	const properties = type.members
 		.map( ( m ) => {
 			if ( m.kind === SyntaxKind.PropertySignature ) {
-				return `${ m.name.escapedText }: ${ typeToString( m.type ) }`;
+				return `${ m.name.text }: ${ typeToString( m.type ) }`;
 			}
 
 			// m.kind === SyntaxKind.IndexSignature
 			const param = m.parameters[ 0 ];
-			return `[${ param.name.escapedText }: ${ typeToString(
+			return `[${ param.name.text }: ${ typeToString(
 				param.type
 			) }]: ${ typeToString( m.type ) }`;
 		} )
@@ -132,7 +132,7 @@ const getIndexedAccessType = ( { objectType, indexType } ) => {
 
 const getMappedType = ( type ) => {
 	const readonly = type.readonlyToken ? 'readonly ' : '';
-	const paramTypeName = type.typeParameter.name.escapedText;
+	const paramTypeName = type.typeParameter.name.text;
 	const constraint = typeToString( type.typeParameter.constraint );
 	const question = type.questionToken ? '?' : '';
 	const typeName = typeToString( type.type );
@@ -160,7 +160,7 @@ const getConditionalType = ( {
 
 const getImportType = ( { argument, qualifier } ) => {
 	const argumentName = typeToString( argument );
-	const qualifierName = qualifier.escapedText;
+	const qualifierName = qualifier.text;
 
 	return `import(${ argumentName }).${ qualifierName }`;
 };
@@ -199,7 +199,7 @@ const typeToString = ( type ) => {
 		case SyntaxKind.LiteralType:
 			return getTypeFromLiteral( type );
 		case SyntaxKind.TypeQuery:
-			return `typeof ${ type.exprName.escapedText }`;
+			return `typeof ${ type.exprName.text }`;
 		case SyntaxKind.ArrayType:
 			return getArrayType( typeToString( type.elementType ) );
 		case SyntaxKind.TupleType:
@@ -249,7 +249,7 @@ const typeToString = ( type ) => {
 		case SyntaxKind.ConditionalType:
 			return getConditionalType( type );
 		case SyntaxKind.InferType:
-			return `infer ${ type.typeParameter.name.escapedText }`;
+			return `infer ${ type.typeParameter.name.text }`;
 		case SyntaxKind.ImportType:
 			return getImportType( type );
 	}
