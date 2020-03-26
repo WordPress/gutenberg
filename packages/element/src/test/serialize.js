@@ -317,6 +317,16 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'inner provided|outer provided' );
 	} );
 
+	it( 'renders Context gracefully', () => {
+		const Context = createContext( 'Default' );
+
+		const result = renderElement(
+			<Context>{ ( value ) => value }</Context>
+		);
+
+		expect( result ).toBe( 'Default' );
+	} );
+
 	it( 'renders proper value through Context API when nested, distinct providers present', () => {
 		const {
 			Consumer: FirstConsumer,
