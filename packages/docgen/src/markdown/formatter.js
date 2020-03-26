@@ -62,6 +62,44 @@ const formatTypedef = ( tags, docs ) => {
 	}
 };
 
+const formatParameters = ( tags, docs ) => {
+	formatTag(
+		'Parameters',
+		tags,
+		( { name, type, description, defaultValue, properties } ) => {
+			const result = paramDescription(
+				name,
+				type,
+				description,
+				defaultValue,
+				0
+			);
+
+			if ( properties && properties.length > 0 ) {
+				const lines = [];
+				lines.push( result );
+
+				properties.forEach( ( p ) => {
+					lines.push(
+						paramDescription(
+							p.name,
+							p.type,
+							p.description,
+							p.defaultValue,
+							1
+						)
+					);
+				} );
+
+				return lines.join( '' );
+			}
+
+			return result;
+		},
+		docs
+	);
+};
+
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
@@ -90,6 +128,23 @@ const getSymbolHeading = ( text ) => {
 
 const getTypeOutput = ( type ) => {
 	return type ? `\`${ type }\`` : '(unknown type)';
+};
+
+const appendDefault = ( result, defaultVal ) =>
+	defaultVal === undefined
+		? result
+		: `${ result } (Default: \`${ defaultVal }\`)`;
+
+const paramDescription = ( name, type, description, defaultValue, depth ) => {
+	const typeName = getTypeOutput( type );
+	const desc = cleanSpaces( description );
+	const result = appendDefault(
+		`- *${ name }* ${ typeName }: ${ desc }`,
+		defaultValue
+	);
+	const indent = ' '.repeat( depth * 2 );
+
+	return `\n${ indent }${ result }`;
 };
 
 module.exports = function(
@@ -142,22 +197,7 @@ module.exports = function(
 					) }`,
 				docs
 			);
-			formatTag(
-				'Parameters',
-				getSymbolTagsByName( symbol, 'param' ),
-				( { name, type, description, defaultValue } ) => {
-					const typeName = getTypeOutput( type );
-					const desc = cleanSpaces( description );
-					const str = `\n- *${ name }* ${ typeName }: ${ desc }`;
-
-					if ( defaultValue !== undefined ) {
-						return `${ str } (Default: \`${ defaultValue }\`)`;
-					}
-
-					return str;
-				},
-				docs
-			);
+			formatParameters( getSymbolTagsByName( symbol, 'param' ), docs );
 			formatTag(
 				'Returns',
 				getSymbolTagsByName( symbol, 'return' ),

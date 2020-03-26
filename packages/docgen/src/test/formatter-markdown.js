@@ -29,6 +29,30 @@ describe( 'Formatter', () => {
 							defaultValue: 'gutenberg',
 						},
 						{
+							title: 'param',
+							name: 'thirdParam',
+							description: 'Third declaration parameter.',
+							type: 'object',
+							properties: [
+								{
+									name: 'x0',
+									description: 'property 0',
+									type: 'string',
+								},
+								{
+									name: 'x1',
+									description: 'property 1',
+									type: 'XXX | undefined',
+								},
+								{
+									name: 'x2',
+									description: 'property 2',
+									type: 'number',
+									defaultValue: 11,
+								},
+							],
+						},
+						{
 							title: 'return',
 							description: 'The result of the declaration.',
 							type: 'number',
@@ -68,6 +92,10 @@ My declaration example.
 
 - *firstParam* \`number\`: First declaration parameter.
 - *secondParam* \`string\`: Second declaration parameter. (Default: \`gutenberg\`)
+- *thirdParam* \`object\`: Third declaration parameter.
+  - *x0* \`string\`: property 0
+  - *x1* \`XXX | undefined\`: property 1
+  - *x2* \`number\`: property 2 (Default: \`11\`)
 
 *Returns*
 
