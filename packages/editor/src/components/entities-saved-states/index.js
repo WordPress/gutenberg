@@ -14,13 +14,7 @@ import { useState } from '@wordpress/element';
 function EntityRecordState( { record, checked, onChange } ) {
 	return (
 		<CheckboxControl
-			label={
-				<>
-					{ !! record.title && (
-						<strong>{ record.title || __( 'Untitled' ) }</strong>
-					) }
-				</>
-			}
+			label={ <strong>{ record.title || __( 'Untitled' ) }</strong> }
 			checked={ checked }
 			onChange={ onChange }
 		/>
