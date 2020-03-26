@@ -7,6 +7,7 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
@@ -68,6 +69,10 @@ export function subscribeMediaUpload( callback ) {
 
 export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
+}
+
+export function subscribeAndroidModalClosed( callback ) {
+	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
 }
 
 /**
