@@ -19,15 +19,7 @@ class TOCEdit extends Component {
 			wpDataUnsubscribe: null,
 		};
 
-		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.refresh = this.refresh.bind( this );
-	}
-
-	toggleAttribute( propName ) {
-		const value = this.props.attributes[ propName ];
-		const { setAttributes } = this.props;
-
-		setAttributes( { [ propName ]: ! value } );
 	}
 
 	refresh() {
