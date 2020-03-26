@@ -5421,6 +5421,7 @@ input[type='number'].emotion-14 {
         onChange={[Function]}
         step={1}
         type="number"
+        value={0}
       />
     </span>
   </div>
