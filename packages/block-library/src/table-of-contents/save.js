@@ -20,7 +20,7 @@ export default function save( props ) {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			>
-				{ Utils.linearToNestedList( headings ) }
+				{ Utils.linearToNestedHeadingList( headings ) }
 			</ListLevel>
 		</nav>
 	);

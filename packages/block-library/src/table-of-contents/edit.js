@@ -124,7 +124,7 @@ class TOCEdit extends Component {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				>
-					{ Utils.linearToNestedList( headings ) }
+					{ Utils.linearToNestedHeadingList( headings ) }
 				</ListLevel>
 			</div>
 		);

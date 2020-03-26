@@ -4,7 +4,7 @@
 import { select } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/editor';
 
-export function linearToNestedList( array, index = 0 ) {
+export function linearToNestedHeadingList( array, index = 0 ) {
 	const returnValue = [];
 
 	array.forEach( function( heading, key ) {
@@ -36,7 +36,7 @@ export function linearToNestedList( array, index = 0 ) {
 				returnValue.push( {
 					block: heading,
 					index: index + key,
-					children: linearToNestedList(
+					children: linearToNestedHeadingList(
 						array.slice( key + 1, endOfSlice ),
 						index + key + 1
 					),
