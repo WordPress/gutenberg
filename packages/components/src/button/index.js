@@ -81,6 +81,7 @@ export function Button( props, ref ) {
 			  };
 
 	const disabledEventProps = {};
+
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
@@ -112,6 +113,7 @@ export function Button( props, ref ) {
 			role: groupContext.mode,
 			'aria-checked': isChecked,
 			tabIndex: isChecked || isFirst ? 0 : -1,
+			// Pass through events and also handle the keyboard controls
 			onKeyDown( e ) {
 				if ( typeof onKeyDown === 'function' ) onKeyDown( e );
 				if ( e.key === 'ArrowUp' || e.key === 'ArrowLeft' ) {
@@ -123,10 +125,13 @@ export function Button( props, ref ) {
 					onNext();
 				}
 			},
+			// May get overridden when disabled && isFocusable
 			onClick( e ) {
 				if ( typeof onClick === 'function' ) onClick( e );
 				onSelect();
 			},
+			// Grab a ref for handling onPrev and onNext in the group, but also
+			// pass through the ref from forwardRef
 			ref: ( current ) => {
 				refCallback( current );
 
@@ -136,6 +141,7 @@ export function Button( props, ref ) {
 					ref.current = current;
 				}
 			},
+			// Automatically handle the styling for the selected button
 			className: classnames( classes, {
 				'is-secondary': ! isChecked,
 				'is-primary': isChecked,
@@ -167,8 +173,8 @@ export function Button( props, ref ) {
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			onKeyDown={ onKeyDown }
 			onClick={ onClick }
-			{ ...groupProps } // overrides className, onKeyDown, and onClick
-			{ ...disabledEventProps } // overrides onMouseDown and onClick
+			{ ...groupProps } // Overrides className, onKeyDown, and onClick
+			{ ...disabledEventProps } // May override onMouseDown and/or onClick
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
