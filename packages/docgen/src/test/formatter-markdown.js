@@ -26,17 +26,54 @@ describe( 'Formatter', () => {
 							description: 'The result of the declaration.',
 							type: 'number',
 						},
+						{
+							title: 'typedef',
+							name: 'WPEditorInserterItem',
+							description: null,
+							type: 'object',
+							properties: [
+								{
+									name: 'id',
+									description:
+										'Unique identifier for the item.',
+									type: 'number',
+								},
+								{
+									name: 'name',
+									description: 'The type of block to create.',
+									type: 'string',
+								},
+							],
+						},
 					],
 					name: 'myDeclaration',
-					lineStart: 1,
-					lineEnd: 2,
 				},
 			],
 			'API docs'
 		);
-		expect( docs ).toBe(
-			'# API docs\n\n<a name="myDeclaration" href="#myDeclaration">#</a> **myDeclaration**\n\nMy declaration example.\n\n*Parameters*\n\n- *firstParam* `number`: First declaration parameter.\n\n*Returns*\n\n- `number`: The result of the declaration.\n'
-		);
+		expect( docs ).toBe( `# API docs
+
+<a name="myDeclaration" href="#myDeclaration">#</a> **myDeclaration**
+
+My declaration example.
+
+*Parameters*
+
+- *firstParam* \`number\`: First declaration parameter.
+
+*Returns*
+
+- \`number\`: The result of the declaration.
+
+*Type Definition*
+
+- *WPEditorInserterItem* \`object\`
+
+*Properties*
+
+- *id* \`number\`: Unique identifier for the item.
+- *name* \`string\`: The type of block to create.
+` );
 	} );
 
 	it( 'handles unknown types from parse error', () => {

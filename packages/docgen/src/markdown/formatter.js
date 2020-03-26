@@ -35,6 +35,33 @@ const formatExamples = ( tags, docs ) => {
 	}
 };
 
+const formatTypedef = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
+		const typedef = tags[ 0 ];
+
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '*Type Definition*' );
+		docs.push( '\n' );
+		docs.push(
+			`\n- *${ typedef.name }* ${ getTypeOutput( typedef.type ) }`
+		);
+
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '*Properties*' );
+		docs.push( '\n' );
+		docs.push(
+			...typedef.properties.map( ( { name, type, description } ) => {
+				const typeName = getTypeOutput( type );
+				const desc = cleanSpaces( description );
+
+				return `\n- *${ name }* ${ typeName }: ${ desc }`;
+			} )
+		);
+	}
+};
+
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
@@ -133,21 +160,7 @@ module.exports = function(
 					) }`,
 				docs
 			);
-			formatTag(
-				'Type Definition',
-				getSymbolTagsByName( symbol, 'typedef' ),
-				( tag ) => `\n- *${ tag.name }* ${ getTypeOutput( tag.type ) }`,
-				docs
-			);
-			formatTag(
-				'Properties',
-				getSymbolTagsByName( symbol, 'property' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag.type
-					) }: ${ cleanSpaces( tag.description ) }`,
-				docs
-			);
+			formatTypedef( getSymbolTagsByName( symbol, 'typedef' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );
