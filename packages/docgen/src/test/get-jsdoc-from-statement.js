@@ -238,6 +238,16 @@ describe( 'JSDoc', () => {
 					'[ 1, 2, 3 ]',
 					'jsdoc optional with default: array type'
 				),
+				typeWithDefault(
+					'( number[] | number )[]',
+					'[ 1, [ 2, 3 ] ]',
+					'jsdoc optional with default: nested array type'
+				),
+				typeWithDefault(
+					'boolean',
+					true,
+					'Whether block selection should\n be enabled.'
+				),
 				typeWithDefault( 'string', 'gutenberg', null ),
 				type( '( XX | YY ) & ZZ', 'parenthesized type' ),
 				type( 'string', 'jsdoc non-nullable type' ),

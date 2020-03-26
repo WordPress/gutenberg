@@ -145,10 +145,17 @@ module.exports = function(
 			formatTag(
 				'Parameters',
 				getSymbolTagsByName( symbol, 'param' ),
-				( tag ) =>
-					`\n- *${ tag.name }* ${ getTypeOutput(
-						tag.type
-					) }: ${ cleanSpaces( tag.description ) }`,
+				( { name, type, description, defaultValue } ) => {
+					const typeName = getTypeOutput( type );
+					const desc = cleanSpaces( description );
+					const str = `\n- *${ name }* ${ typeName }: ${ desc }`;
+
+					if ( defaultValue !== undefined ) {
+						return `${ str } (Default: \`${ defaultValue }\`)`;
+					}
+
+					return str;
+				},
 				docs
 			);
 			formatTag(

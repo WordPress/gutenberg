@@ -34,24 +34,65 @@ const getType = ( typeExpression ) =>
 	typeExpression ? typeToString( typeExpression.type ) : 'undocumented';
 
 /**
- * It loops back from the description until ] is found and extract default value from it.
+ * It loops from = character until ] is found and extract default value from it.
+ * If it starts with a quote(', ", `), it tries to find it.
  * This function assumes that the name of param tag always ends with ].
  *
  * @param {string} code
  * @param {number} nameEndPos
- * @param {number} descriptionPos
  */
-const getDefaultValue = ( code, nameEndPos, descriptionPos ) => {
-	let closingBracketPos = descriptionPos;
+const getDefaultValue = ( code, nameEndPos ) => {
+	let closingBracketPos = nameEndPos;
 
-	for ( let i = descriptionPos - 1; i > nameEndPos; i-- ) {
-		if ( code[ i ] === ']' ) {
-			closingBracketPos = i;
-			break;
+	let startPos = nameEndPos + 1;
+	let endingChar = ']';
+	const firstChar = code[ startPos ];
+
+	if ( firstChar === `'` || firstChar === '"' || firstChar === '`' ) {
+		endingChar = firstChar;
+		startPos = nameEndPos + 2;
+	}
+
+	if ( firstChar !== '[' ) {
+		for ( let i = startPos; ; i++ ) {
+			if ( code[ i ] === '\\' && code[ i + 1 ] !== ']' ) {
+				continue;
+			}
+
+			if (
+				code[ i ] === endingChar ||
+				code[ i ] === '\n' ||
+				code[ i ] === '\r'
+			) {
+				closingBracketPos = i;
+				break;
+			}
+		}
+	} else {
+		// count the broken pairs of brackets
+		let broken = 0;
+
+		for ( let i = startPos; ; i++ ) {
+			if (
+				( code[ i ] === ']' && broken === 0 ) ||
+				code[ i ] === '\n' ||
+				code[ i ] === '\r'
+			) {
+				closingBracketPos = i;
+				break;
+			}
+
+			if ( code[ i ] === '[' ) {
+				broken++;
+			}
+
+			if ( code[ i ] === ']' ) {
+				broken--;
+			}
 		}
 	}
 
-	const rawValue = code.substring( nameEndPos + 1, closingBracketPos );
+	const rawValue = code.substring( startPos, closingBracketPos );
 
 	if ( isNumeric( rawValue ) ) {
 		if ( Number.isInteger( rawValue ) ) {

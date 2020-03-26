@@ -56,6 +56,9 @@
  * @param {boolean} [p=false] jsdoc optional with default: false keyword
  * @param {object} [p={ x: 3, y: null }] jsdoc optional with default: object type
  * @param {number[]} [p=[ 1, 2, 3 ]] jsdoc optional with default: array type
+ * @param {(number[] | number)[]} [p=[ 1, [ 2, 3 ] ]] jsdoc optional with default: nested array type
+ * @param {boolean} [p=true] Whether block selection should
+ *                           be enabled.
  * @param {string} [p='gutenberg']
  * @param {(XX | YY) & ZZ} p parenthesized type
  * @param {!string} p jsdoc non-nullable type

@@ -22,6 +22,13 @@ describe( 'Formatter', () => {
 							name: 'firstParam',
 						},
 						{
+							title: 'param',
+							description: 'Second declaration parameter.',
+							type: 'string',
+							name: 'secondParam',
+							defaultValue: 'gutenberg',
+						},
+						{
 							title: 'return',
 							description: 'The result of the declaration.',
 							type: 'number',
@@ -60,6 +67,7 @@ My declaration example.
 *Parameters*
 
 - *firstParam* \`number\`: First declaration parameter.
+- *secondParam* \`string\`: Second declaration parameter. (Default: \`gutenberg\`)
 
 *Returns*
 
