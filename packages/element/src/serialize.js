@@ -418,7 +418,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 		case Consumer.$$typeof:
 			return renderElement(
 				props.children(
-					( context && context.get( type._context.Provider ) ) ||
+					( context &&
+						type._context &&
+						context.get( type._context.Provider ) ) ||
 						type._currentValue
 				),
 				context,
