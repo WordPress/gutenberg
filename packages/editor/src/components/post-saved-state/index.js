@@ -14,7 +14,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
-import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -79,7 +78,6 @@ export class PostSavedState extends Component {
 								animateClassName
 							) }
 						>
-							<Icon icon={ cloud } />
 							{ isAutosaving
 								? __( 'Autosaving' )
 								: __( 'Saving' ) }
@@ -100,7 +98,6 @@ export class PostSavedState extends Component {
 		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
 				<span className="editor-post-saved-state is-saved">
-					<Icon icon={ check } />
 					{ __( 'Saved' ) }
 				</span>
 			);
@@ -125,7 +122,6 @@ export class PostSavedState extends Component {
 					label={ label }
 					onClick={ () => onSave() }
 					shortcut={ displayShortcut.primary( 's' ) }
-					icon={ cloudUpload }
 				/>
 			);
 		}
