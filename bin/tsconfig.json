@@ -1,0 +1,12 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"target": "ES6",
+		"lib": [ "ES6", "ES2020.string" ],
+		"rootDir": ".",
+		"outDir": ".cache"
+	},
+	"files": [ "./api-docs/update-api-docs.js" ]
+}

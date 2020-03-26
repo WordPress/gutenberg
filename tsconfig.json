@@ -1,5 +1,6 @@
 {
 	"references": [
+		{ "path": "bin" },
 		{ "path": "packages/a11y" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/dom-ready" },
