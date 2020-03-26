@@ -122,10 +122,7 @@ const Cover = ( {
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
-			backgroundColor:
-				overlayColor && overlayColor.color
-					? overlayColor.color
-					: styles.overlay.color,
+			backgroundColor: overlayColor?.color || styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
