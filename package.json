@@ -153,7 +153,7 @@
 		"progress": "2.0.3",
 		"react": "16.11.0",
 		"react-dom": "16.11.0",
-		"react-native": "0.62.0-rc.5",
+		"react-native": "0.62.0",
 		"react-test-renderer": "16.11.0",
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
