@@ -327,6 +327,13 @@ describe( 'JSDoc', () => {
 					type: 'number',
 				},
 				{
+					title: 'param',
+					name: 'props.value',
+					description:
+						'Qualified name without an object definition above.',
+					type: 'boolean',
+				},
+				{
 					title: 'typedef',
 					name: 'WPEditorInserterItem',
 					description: null,

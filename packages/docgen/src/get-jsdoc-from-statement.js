@@ -202,7 +202,10 @@ module.exports = function( statement ) {
 					);
 
 					result.type = type;
-					result.name = tag.name.text;
+					result.name =
+						tag.name.kind === SyntaxKind.QualifiedName
+							? `${ tag.name.left.text }.${ tag.name.right.text }`
+							: tag.name.text;
 
 					if ( defaultValue !== undefined ) {
 						result.defaultValue = defaultValue;

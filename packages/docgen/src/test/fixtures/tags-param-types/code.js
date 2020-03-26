@@ -91,6 +91,7 @@
  * @param {WPEditorInserterItem} p typedef
  * @param {string} __experimentalParam It's experimental
  * @param {number} __unstableParam It's unstable
+ * @param {boolean}   props.value  Qualified name without an object definition above.
  *
  * @typedef {object} WPEditorInserterItem
  * @property {number}   id                Unique identifier for the item.
