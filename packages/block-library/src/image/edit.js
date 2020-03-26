@@ -33,7 +33,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -509,15 +509,18 @@ export class ImageEdit extends Component {
 			</>
 		);
 
-		const AlignmentWrapper = needsAlignmentWrapper
-			? ( { children } ) => <div className="wp-block block-editor-block-list__block">{ children }</div>
-			: Fragment;
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
-				<AlignmentWrapper>
+				<div
+					className={
+						needsAlignmentWrapper
+							? 'wp-block block-editor-block-list__block'
+							: undefined
+					}
+				>
 					<Block.figure className={ classes }>
 						<ImageSize src={ url } dirtynessTrigger={ align }>
 							{ ( sizes ) => {
@@ -697,7 +700,7 @@ export class ImageEdit extends Component {
 
 						{ mediaPlaceholder }
 					</Block.figure>
-				</AlignmentWrapper>
+				</div>
 			</>
 		);
 		/* eslint-enable jsx-a11y/click-events-have-key-events */
