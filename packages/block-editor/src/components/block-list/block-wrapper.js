@@ -111,6 +111,7 @@ const BlockComponent = forwardRef(
 			// future, the check for this could look different, e.g. focus is
 			// outside the BlockList component, or outside the iframe.
 			if (
+				document.activeElement !== document.body &&
 				! wrapper.current
 					.closest( '[role="region"]' )
 					.contains( document.activeElement )
