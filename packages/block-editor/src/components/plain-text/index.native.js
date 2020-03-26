@@ -74,6 +74,7 @@ export default class PlainText extends Component {
 				style={
 					this.props.style || styles[ 'block-editor-plain-text' ]
 				}
+				scrollEnabled={ false }
 			/>
 		);
 	}

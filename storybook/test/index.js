@@ -6,6 +6,23 @@ import initStoryshots, {
 } from '@storybook/addon-storyshots';
 import path from 'path';
 
+// The current version of JSDOM doesn't support MutationObserver
+// This stub is needed to test the  Disabled component
+// Pending PR #20766 to update jest and JSDOM may make this unnecessary
+let MutationObserver;
+beforeAll( () => {
+	MutationObserver = window.MutationObserver;
+	window.MutationObserver = function() {};
+	window.MutationObserver.prototype = {
+		observe() {},
+		disconnect() {},
+	};
+} );
+
+afterAll( () => {
+	window.MutationObserver = MutationObserver;
+} );
+
 initStoryshots( {
 	configPath: path.resolve( __dirname, '../' ),
 	test: snapshotWithOptions( ( story ) => ( {
@@ -25,7 +42,6 @@ initStoryshots( {
 				const parentElement = document.createElement( 'div' );
 				parentElement.appendChild( currentElement );
 			}
-
 			return currentElement;
 		},
 	} ) ),

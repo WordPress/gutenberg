@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.8.0-rc.1",
+	"version": "7.8.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -127,6 +127,7 @@
 		"enzyme": "3.9.0",
 		"eslint-plugin-eslint-comments": "3.1.2",
 		"eslint-plugin-import": "2.18.2",
+		"execa": "3.4.0",
 		"fast-glob": "2.2.7",
 		"fbjs": "0.8.17",
 		"glob": "7.1.2",
@@ -184,7 +185,7 @@
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-readmes.js",
+		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:server-registered": "packages/env/bin/wp-env run wordpress ./wp-content/plugins/gutenberg/bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
@@ -246,13 +247,12 @@
 			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],
-		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js",
-			"node ./docs/tool/are-data-files-unstaged.js"
+		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
+			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.js": [
-			"node ./bin/api-docs/update-readmes.js",
-			"node ./bin/api-docs/are-readmes-unstaged.js"
+			"node ./bin/api-docs/update-api-docs.js",
+			"node ./bin/api-docs/are-api-docs-unstaged.js"
 		]
 	},
 	"wp-env": {

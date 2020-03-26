@@ -17,8 +17,7 @@ describe( 'Code block', () => {
 		const code = 'print "Hello Dolly!"';
 
 		await insertBlock( 'Code' );
-
-		await page.type( '.block-editor-block-list__block textarea', code );
+		await page.keyboard.type( code );
 
 		// Verify the content starts out as a Code block.
 		const originalPostContent = await getEditedPostContent();
