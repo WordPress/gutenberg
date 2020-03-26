@@ -5,7 +5,7 @@ import { select } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/editor';
 
 export function linearToNestedHeadingList( headingsList, index = 0 ) {
-	const returnValue = [];
+	const nestedHeadingsList = [];
 
 	headingsList.forEach( function( heading, key ) {
 		if ( heading.content === undefined ) {
@@ -33,7 +33,7 @@ export function linearToNestedHeadingList( headingsList, index = 0 ) {
 				}
 
 				// We found a child node: Push a new node onto the return array with children.
-				returnValue.push( {
+				nestedHeadingsList.push( {
 					block: heading,
 					index: index + key,
 					children: linearToNestedHeadingList(
@@ -43,7 +43,7 @@ export function linearToNestedHeadingList( headingsList, index = 0 ) {
 				} );
 			} else {
 				// No child node: Push a new node onto the return array.
-				returnValue.push( {
+				nestedHeadingsList.push( {
 					block: heading,
 					index: index + key,
 					children: null,
@@ -52,7 +52,7 @@ export function linearToNestedHeadingList( headingsList, index = 0 ) {
 		}
 	} );
 
-	return returnValue;
+	return nestedHeadingsList;
 }
 
 export function getPageHeadings() {
