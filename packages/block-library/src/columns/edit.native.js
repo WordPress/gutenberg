@@ -132,15 +132,11 @@ function ColumnsEditContainer( {
 							: undefined
 					}
 					flatListProps={ {
-						contentContainerStyle: {
-							...styles.columnsContainer,
-							maxWidth: width,
-						},
+						contentContainerStyle: styles.columnsContainer,
 						horizontal: true,
 						scrollEnabled: false,
 						style: styles.innerBlocks,
 					} }
-					marginHorizontal={ 0 }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					customBlockProps={ {
 						...columnsSettings,
