@@ -163,6 +163,16 @@ const getJSDocTypeLiteralProperties = ( code, jsDocPropertyTags ) => {
 };
 
 /**
+ * Restore `@wordpress` changed in compile.js
+ *
+ * @param {string} description
+ */
+const restoreWordpressImport = ( description ) =>
+	description
+		? description.replace( /__WORDPRESS_IMPORT__/g, '@wordpress' )
+		: description;
+
+/**
  * Function that takes a TypeScript statement and returns
  * a object representing the leading JSDoc comment of the statement,
  * if any.
@@ -177,18 +187,12 @@ module.exports = function( statement ) {
 		const lastComment = statement.jsDoc[ statement.jsDoc.length - 1 ];
 
 		return {
-			description: lastComment.comment,
+			description: restoreWordpressImport( lastComment.comment ),
 			tags: ( lastComment.tags || [] ).map( ( tag ) => {
 				const title = tag.tagName.text;
-				let description = tag.comment ? tag.comment : null;
-
-				if ( description ) {
-					// restore @wordpress changed in compile.js
-					description = description.replace(
-						/__WORDPRESS_IMPORT__/g,
-						'@wordpress'
-					);
-				}
+				const description = restoreWordpressImport(
+					tag.comment ? tag.comment : null
+				);
 
 				if ( tag.kind === SyntaxKind.JSDocParameterTag ) {
 					const result = {

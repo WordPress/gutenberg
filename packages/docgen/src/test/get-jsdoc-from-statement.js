@@ -26,7 +26,7 @@ describe( 'JSDoc', () => {
 		expect(
 			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
 		).toEqual( {
-			description: 'A function that adds two parameters.',
+			description: 'Registers a standard `@wordpress/data` store.',
 			tags: [
 				{
 					title: 'deprecated',

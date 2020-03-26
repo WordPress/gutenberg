@@ -1,5 +1,5 @@
 /**
- * A function that adds two parameters.
+ * Registers a standard `@wordpress/data` store.
  *
  * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
  * 			   selector from the '@wordpress/core-data' package.
