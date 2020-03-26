@@ -12,7 +12,7 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
@@ -22,7 +22,7 @@ import {
 	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useRef, Platform } from '@wordpress/element';
 
 function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	const ref = useRef();
@@ -42,8 +42,8 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 		<>
 			<BlockControls>
 				<HeadingToolbar
-					minLevel={ 2 }
-					maxLevel={ 5 }
+					minLevel={ Platform.OS === 'web' ? 2 : 1 }
+					maxLevel={ Platform.OS === 'web' ? 5 : 7 }
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
@@ -56,20 +56,22 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar
-						isCollapsed={ false }
-						minLevel={ 1 }
-						maxLevel={ 7 }
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
+			{ Platform.OS === 'web' && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Heading settings' ) }>
+						<Text variant="label">{ __( 'Level' ) }</Text>
+						<HeadingToolbar
+							isCollapsed={ false }
+							minLevel={ 1 }
+							maxLevel={ 7 }
+							selectedLevel={ level }
+							onChange={ ( newLevel ) =>
+								setAttributes( { level: newLevel } )
+							}
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			{ InspectorControlsColorPanel }
 			<TextColor>
 				<RichText
@@ -97,6 +99,7 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 						[ `has-text-align-${ align }` ]: align,
 					} ) }
 					placeholder={ placeholder || __( 'Write heading…' ) }
+					textAlign={ align }
 				/>
 			</TextColor>
 		</>
