@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
-import { default as Video } from 'react-native-video';
+import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
