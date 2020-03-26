@@ -4,29 +4,29 @@
 import { select } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/editor';
 
-export function linearToNestedHeadingList( array, index = 0 ) {
+export function linearToNestedHeadingList( headingsList, index = 0 ) {
 	const returnValue = [];
 
-	array.forEach( function( heading, key ) {
+	headingsList.forEach( function( heading, key ) {
 		if ( heading.content === undefined ) {
 			return;
 		}
 
 		// Make sure we are only working with the same level as the first iteration in our set.
-		if ( heading.level === array[ 0 ].level ) {
+		if ( heading.level === headingsList[ 0 ].level ) {
 			// Check that the next iteration will return a value.
 			// If it does and the next level is greater than the current level,
 			// the next iteration becomes a child of the current interation.
 			if (
-				array[ key + 1 ] !== undefined &&
-				array[ key + 1 ].level > heading.level
+				headingsList[ key + 1 ] !== undefined &&
+				headingsList[ key + 1 ].level > heading.level
 			) {
 				// We need to calculate the last index before the next iteration that has the same level (siblings).
 				// We then use this last index to slice the array for use in recursion.
 				// This prevents duplicate nodes.
-				let endOfSlice = array.length;
-				for ( let i = key + 1; i < array.length; i++ ) {
-					if ( array[ i ].level === heading.level ) {
+				let endOfSlice = headingsList.length;
+				for ( let i = key + 1; i < headingsList.length; i++ ) {
+					if ( headingsList[ i ].level === heading.level ) {
 						endOfSlice = i;
 						break;
 					}
@@ -37,7 +37,7 @@ export function linearToNestedHeadingList( array, index = 0 ) {
 					block: heading,
 					index: index + key,
 					children: linearToNestedHeadingList(
-						array.slice( key + 1, endOfSlice ),
+						headingsList.slice( key + 1, endOfSlice ),
 						index + key + 1
 					),
 				} );
