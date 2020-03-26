@@ -509,17 +509,16 @@ export class ImageEdit extends Component {
 			</>
 		);
 
-		const AlignmentWrapper = needsAlignmentWrapper ? Block.div : Fragment;
-		const BlockContentWrapper = needsAlignmentWrapper
-			? 'figure'
-			: Block.figure;
+		const AlignmentWrapper = needsAlignmentWrapper
+			? ( { children } ) => <div className="wp-block block-editor-block-list__block">{ children }</div>
+			: Fragment;
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
 				<AlignmentWrapper>
-					<BlockContentWrapper className={ classes }>
+					<Block.figure className={ classes }>
 						<ImageSize src={ url } dirtynessTrigger={ align }>
 							{ ( sizes ) => {
 								const {
@@ -697,7 +696,7 @@ export class ImageEdit extends Component {
 						) }
 
 						{ mediaPlaceholder }
-					</BlockContentWrapper>
+					</Block.figure>
 				</AlignmentWrapper>
 			</>
 		);
