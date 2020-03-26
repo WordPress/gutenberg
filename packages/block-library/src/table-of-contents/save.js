@@ -5,8 +5,8 @@ import * as Utils from './utils';
 import ListLevel from './ListLevel';
 
 export default function save( props ) {
-	const { attributes, setAttributes } = props;
-	const headings = attributes.headings;
+	const { attributes } = props;
+	const { headings } = attributes;
 
 	if ( headings.length === 0 ) {
 		return null;
@@ -15,11 +15,7 @@ export default function save( props ) {
 	Utils.updateHeadingBlockAnchors();
 	return (
 		<nav className={ props.className }>
-			<ListLevel
-				edit={ false }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-			>
+			<ListLevel>
 				{ Utils.linearToNestedHeadingList( headings ) }
 			</ListLevel>
 		</nav>

@@ -3,11 +3,11 @@
  */
 
 export default function ListLevel( props ) {
-	const { edit, attributes, setAttributes } = props;
+	const { children, noWrapList = false } = props;
 	let childNodes = null;
 
-	if ( props.children ) {
-		childNodes = props.children.map( function( childNode ) {
+	if ( children ) {
+		childNodes = children.map( function( childNode ) {
 			const link = (
 				<a
 					href={ childNode.block.anchor }
@@ -21,18 +21,13 @@ export default function ListLevel( props ) {
 				<li key={ childNode.block.anchor }>
 					{ link }
 					{ childNode.children ? (
-						<ListLevel
-							edit={ edit }
-							attributes={ attributes }
-							setAttributes={ setAttributes }
-						>
-							{ childNode.children }
-						</ListLevel>
+						<ListLevel>{ childNode.children }</ListLevel>
 					) : null }
 				</li>
 			);
 		} );
 
-		return <ul>{ childNodes }</ul>;
+		// Don't wrap the list elements in <ul> if converting to a core/list.
+		return noWrapList ? childNodes : <ul>{ childNodes }</ul>;
 	}
 }

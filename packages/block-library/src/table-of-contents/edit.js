@@ -65,8 +65,8 @@ class TOCEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes } = this.props;
-		const headings = attributes.headings || [];
+		const { attributes } = this.props;
+		const { headings = [] } = attributes;
 		if ( headings.length === 0 ) {
 			return (
 				<p>
@@ -81,11 +81,7 @@ class TOCEdit extends Component {
 
 		return (
 			<div className={ this.props.className }>
-				<ListLevel
-					edit={ true }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				>
+				<ListLevel>
 					{ Utils.linearToNestedHeadingList( headings ) }
 				</ListLevel>
 			</div>
