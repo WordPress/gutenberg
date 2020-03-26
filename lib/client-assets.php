@@ -651,7 +651,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns',
 /*
  * Register default patterns if not registered in Core already.
  */
-if ( ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
 	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
 	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
