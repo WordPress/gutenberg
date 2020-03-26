@@ -4,7 +4,7 @@ With the meta field registered in the previous step, next you will create a new 
 
 For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [components](/packages/components/src) and [editor](/packages/editor/src/components) packages repositories.
 
-The hook `useEntityProp` can be used by the blocks to change meta values.
+The hook `useEntityProp` can be used by the blocks to get or change meta values.
 
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
@@ -137,4 +137,3 @@ You can now edit a draft post and add a Meta Block to the post. You will see you
 ![Meta Block](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block.png)
 
 You can now use the post meta data in a template, or another block. See next section for [using post meta data](/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md). You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
-
