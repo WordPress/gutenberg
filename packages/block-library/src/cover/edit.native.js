@@ -215,7 +215,8 @@ const Cover = ( {
 		return (
 			<View style={ containerStyles }>
 				<MediaPlaceholder
-					__experimentalOnlyMediaLibrary
+					// eslint-disable-next-line no-undef
+					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -252,7 +253,8 @@ const Cover = ( {
 				</View>
 
 				<MediaUpload
-					__experimentalOnlyMediaLibrary
+					// eslint-disable-next-line no-undef
+					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onSelect={ onSelectMedia }
 					render={ ( { open, getMediaOptions } ) => {
