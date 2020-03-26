@@ -814,7 +814,6 @@ exports[`Storyshots Components/ButtonGroup Radio Button Group 1`] = `
     role="radio"
     tabIndex={-1}
     type="button"
-    value="small"
   >
     Small
   </button>
@@ -826,7 +825,6 @@ exports[`Storyshots Components/ButtonGroup Radio Button Group 1`] = `
     role="radio"
     tabIndex={0}
     type="button"
-    value="medium"
   >
     Medium
   </button>
@@ -838,7 +836,6 @@ exports[`Storyshots Components/ButtonGroup Radio Button Group 1`] = `
     role="radio"
     tabIndex={-1}
     type="button"
-    value="large"
   >
     Large
   </button>
