@@ -240,24 +240,17 @@ class ButtonEdit extends Component {
 
 	onSetMaxWidth( width ) {
 		const { maxWidth } = this.state;
-		const { parentWidth, isSelectedButtonsBlock } = this.props;
-		const { marginRight: unselectedSpacing } = styles.button;
-		const { marginRight: selectedSpacing } = styles.buttonsSelected;
+		const { parentWidth } = this.props;
 
-		const buttonSpacing = isSelectedButtonsBlock
-			? selectedSpacing
-			: unselectedSpacing;
-
-		const isParentWidthChanged =
-			maxWidth !== parentWidth - 2 * buttonSpacing;
-		const isWidthChanged = maxWidth !== width - unselectedSpacing;
+		const isParentWidthChanged = maxWidth !== parentWidth;
+		const isWidthChanged = maxWidth !== width;
 
 		if ( parentWidth && ! width && isParentWidthChanged ) {
 			this.setState( {
-				maxWidth: parentWidth - 2 * buttonSpacing,
+				maxWidth: parentWidth,
 			} );
 		} else if ( ! parentWidth && width && isWidthChanged ) {
-			this.setState( { maxWidth: width - unselectedSpacing } );
+			this.setState( { maxWidth: width } );
 		}
 	}
 

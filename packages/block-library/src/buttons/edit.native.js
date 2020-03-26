@@ -31,7 +31,6 @@ function ButtonsEdit( {
 	onDelete,
 	onAddNextButton,
 	shouldDelete,
-	isParentSelected,
 	isSelectedButton,
 } ) {
 	const { align } = attributes;
@@ -56,11 +55,8 @@ function ButtonsEdit( {
 
 	function onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
-		const { marginLeft: nestedSpacing } = styles.nestedButtons;
-		const parentWidth =
-			width + ( isParentSelected ? 2 * nestedSpacing : 0 );
-
-		setMaxWidth( parentWidth );
+		const margins = 2 * styles.parent.marginRight;
+		setMaxWidth( width - margins );
 	}
 
 	return (
@@ -97,8 +93,6 @@ export default compose(
 			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const buttonsParents = getBlockParents( clientId, true );
-		const parentId = buttonsParents[ 0 ] || '';
 		const selectedButtonParents = getBlockParents(
 			selectedBlockClientId,
 			true
@@ -111,8 +105,6 @@ export default compose(
 			// `Buttons` container along with the last inner button when
 			// there is exactly one button.
 			shouldDelete: getBlockCount( clientId ) === 1,
-			isParentSelected:
-				selectedBlockClientId && selectedBlockClientId === parentId,
 			isSelectedButton: selectedButtonParentId === clientId,
 		};
 	} ),
