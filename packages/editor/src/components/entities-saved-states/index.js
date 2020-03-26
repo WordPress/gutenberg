@@ -37,7 +37,7 @@ function EntityTypeList( { list, ignored, setIgnored } ) {
 
 	return (
 		<>
-			<h2>{ entity.label }</h2>
+			<h3>{ entity.label }</h3>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
