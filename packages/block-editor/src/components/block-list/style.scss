@@ -22,33 +22,6 @@
 }
 
 /**
- * General Post Content Layout
- */
-
-// Add side padding for the main block container, currently post_content.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint, as well as the side-UI.
-.block-editor-block-list__layout {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-	position: relative;
-
-	// Beyond the mobile breakpoint, compensate for side UI.
-	@include break-small() {
-		padding-left: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-		padding-right: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-	}
-
-	// Don't propogate that padding to nested blocks.
-	.block-editor-block-list__layout {
-		padding-left: 0;
-		padding-right: 0;
-	}
-}
-
-
-/**
  * Notices & Block Selected/Hover Styles.
  */
 
@@ -145,6 +118,7 @@
  */
 
 .block-editor-block-list__layout {
+	position: relative;
 
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
@@ -314,18 +288,6 @@
 	&.alignfull,
 	&.alignwide {
 		clear: both;
-	}
-
-	// Full-wide.
-	&[data-align="full"],
-	&.alignfull {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-		}
 	}
 
 	// Clear floats.
@@ -668,4 +630,33 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
+}
+
+
+// Add side padding for the canvas, currently edit-post-visual-editor.
+// The purpose of this padding is to ensure that on small viewports, there is
+// room for the block border that sits 14px ($block-padding) offset from the
+// block footprint.
+.block-editor-block-list__layout.is-root-container {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-side-ui-width;
+		padding-right: $block-side-ui-width;
+	}
+}
+
+.block-editor-block-list__layout.is-root-container {
+	// Full-wide. (to account for the padddings added above)
+	> .block-editor-block-list__block[data-align="full"],
+	> .block-editor-block-list__block.alignfull {
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+
+		@include break-small() {
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
+		}
+	}
 }
