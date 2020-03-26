@@ -516,6 +516,10 @@ export class ImageEdit extends Component {
 				{ controls }
 				<div
 					className={
+						// Ideally these classes are not needed, and ideally, we
+						// provide an alignment wrapper component that the block
+						// can wrap around the block or we build it into
+						// Block.*.
 						needsAlignmentWrapper
 							? 'wp-block block-editor-block-list__block'
 							: undefined
