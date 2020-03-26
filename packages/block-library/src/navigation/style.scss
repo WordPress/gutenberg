@@ -36,8 +36,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 
 .wp-block-navigation > ul {
 	li {
-		z-index: 1;
-
 		&:hover,
 		&:focus-within {
 			cursor: pointer;
