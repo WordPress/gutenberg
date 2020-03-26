@@ -223,11 +223,19 @@ const getIRFromStatement = ( path, statement, sourceFile ) => {
 				} );
 			} );
 		} else {
+			let description = get( doc, [ 'description' ], null );
+			const tags = get( doc, [ 'tags' ], [] );
+
+			// When a doc has no description but has tags, it's documented.
+			if ( description === null ) {
+				description = tags.length > 0 ? '' : UNDOCUMENTED;
+			}
+
 			ir.push( {
 				path,
 				name: entry.exportName,
-				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				tags: get( doc, [ 'tags' ], [] ),
+				description,
+				tags,
 			} );
 		}
 	} );

@@ -56,6 +56,34 @@ describe( 'Intermediate Representation From Statement', function() {
 		} );
 	} );
 
+	it( 'no-description', function() {
+		const { exportStatements, sourceFile } = prepare( 'no-description' );
+		const ir = getIntermediateRepresentation(
+			null,
+			exportStatements,
+			sourceFile
+		);
+		expect( ir ).toHaveLength( 1 );
+		expect( ir[ 0 ] ).toEqual( {
+			path: null,
+			name: 'f',
+			description: '',
+			tags: [
+				{
+					title: 'param',
+					description: 'dummy number',
+					name: 'x',
+					type: 'number',
+				},
+				{
+					title: 'return',
+					description: 'The relay of the value, x.',
+					type: 'number',
+				},
+			],
+		} );
+	} );
+
 	it( 'parses TypeScript type correctly', () => {
 		const { exportStatements } = prepare( 'tags-ts-definition' );
 		const ir = getIntermediateRepresentation( null, exportStatements );
