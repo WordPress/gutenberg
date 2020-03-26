@@ -55,7 +55,7 @@ export function Button( props, ref ) {
 		} );
 	}
 
-	let classes = classnames( 'components-button', className, {
+	const classes = classnames( 'components-button', className, {
 		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
 		'is-large': isLarge,
@@ -96,8 +96,6 @@ export function Button( props, ref ) {
 	const groupContext = useContext( ButtonGroupContext );
 	const buttonContext = groupContext.buttons[ value ];
 
-	let refs = ref;
-
 	if ( groupContext.mode === 'radio' && buttonContext ) {
 		const {
 			isChecked,
@@ -127,24 +125,20 @@ export function Button( props, ref ) {
 				if ( typeof onClick === 'function' ) onClick( e );
 				onSelect();
 			},
+			ref: ( current ) => {
+				refCallback( current );
+
+				if ( typeof ref === 'function' ) {
+					ref( current );
+				} else if ( ref ) {
+					ref.current = current;
+				}
+			},
+			className: classnames( classes, {
+				'is-secondary': ! isChecked,
+				'is-primary': isChecked,
+			} ),
 		} );
-
-		// Automatically update the visual style
-		classes = classnames( classes, {
-			'is-secondary': ! isChecked,
-			'is-primary': isChecked,
-		} );
-
-		// Also handle both the forwardRef ref and the button group ref
-		refs = ( current ) => {
-			refCallback( current );
-
-			if ( typeof ref === 'function' ) {
-				ref( current );
-			} else if ( ref ) {
-				ref.current = current;
-			}
-		};
 	}
 
 	// Should show the tooltip if...
@@ -164,7 +158,7 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
-			ref={ refs }
+			ref={ ref }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			onKeyDown={ onKeyDown }
