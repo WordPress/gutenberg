@@ -9,6 +9,7 @@ module.exports = {
 	resolver: {
 		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
 		extraNodeModules: enm,
+		platforms: [ 'native', 'android', 'ios' ]
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer.js' ),
