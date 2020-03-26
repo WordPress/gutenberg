@@ -14,8 +14,7 @@ import {
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
-	requestImageFullscreenPreview,
-	showMediaEditorButton,
+	requestImageFullscreenPreview
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, get, find, map } from 'lodash';
 
@@ -607,8 +606,7 @@ export class ImageEdit extends React.Component {
 											! isUploadInProgress &&
 											! isUploadFailed &&
 											finalWidth &&
-											finalHeight &&
-											showMediaEditorButton && (
+											finalHeight && (
 												<MediaEdit
 													allowedTypes={ [
 														MEDIA_TYPE_IMAGE,
