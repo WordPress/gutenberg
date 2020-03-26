@@ -81,7 +81,7 @@ class TOCEdit extends Component {
 			return (
 				<p>
 					{ __(
-						'Start adding headings to generate Table of Contents'
+						'Start adding heading blocks to see a Table of Contents here'
 					) }
 				</p>
 			);
