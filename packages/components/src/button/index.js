@@ -80,13 +80,14 @@ export function Button( props, ref ) {
 					'aria-pressed': isPressed,
 			  };
 
+	const disabledEventProps = {};
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		tagProps[ 'aria-disabled' ] = true;
 
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event ) => {
+			disabledEventProps[ disabledEvent ] = ( event ) => {
 				event.stopPropagation();
 				event.preventDefault();
 			};
@@ -95,6 +96,7 @@ export function Button( props, ref ) {
 
 	const groupContext = useContext( ButtonGroupContext );
 	const buttonContext = groupContext.buttons[ value ];
+	const groupProps = {};
 
 	if ( groupContext.mode === 'radio' && buttonContext ) {
 		const {
@@ -106,7 +108,7 @@ export function Button( props, ref ) {
 			refCallback,
 		} = buttonContext;
 
-		Object.assign( tagProps, {
+		Object.assign( groupProps, {
 			role: groupContext.mode,
 			'aria-checked': isChecked,
 			tabIndex: isChecked || isFirst ? 0 : -1,
@@ -159,12 +161,14 @@ export function Button( props, ref ) {
 	const element = (
 		<Tag
 			ref={ ref }
+			{ ...tagProps }
+			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			onKeyDown={ onKeyDown }
 			onClick={ onClick }
-			{ ...tagProps }
-			{ ...additionalProps }
+			{ ...groupProps } // overrides className, onKeyDown, and onClick
+			{ ...disabledEventProps } // overrides onMouseDown and onClick
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
