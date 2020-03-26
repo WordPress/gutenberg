@@ -64,7 +64,7 @@
   },
   "scripts": {
     "start": "react-native start",
-    "start:reset": "npm run clean:runtime && npm run start --reset-cache",
+    "start:reset": "npm run clean:runtime && npm run start -- --reset-cache",
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
     "patch-metro-no-file-watch": "cp ../../node_modules/metro/src/node-haste/DependencyGraph.js ./ && cp DependencyGraph.js.patched ../../node_modules/metro/src/node-haste/DependencyGraph.js",
     "un-patch-metro-no-file-watch": "mv ./DependencyGraph.js ../../node_modules/metro/src/node-haste/DependencyGraph.js",
