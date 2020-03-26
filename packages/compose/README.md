@@ -119,6 +119,33 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
+
+Use to debounce a value that is changing too frequently.
+
+Example usage:
+
+// An example using the useDebounce hook with useResizeObserver()
+ // to debounce a rapidly changing width value
+
+const [ resizeListener, sizes ] = useResizeObserver();
+const debouncedSize = useDebounce(sizes.width, 100);
+
+useEffect( () => {
+
+    // ... do your thing here ...
+
+}, [debouncedSize] );
+
+_Parameters_
+
+-   _value_ `Object`: The value changing you want to debounce.
+-   _delay_ `number`: The amount to delay time in ms.
+
+_Returns_
+
+-   `Object`: Debounced value
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
