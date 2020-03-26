@@ -22,7 +22,6 @@
 	"files": [
 		"lib",
 		"build-types",
-		"*.js",
 		"*.md"
 	],
 	"main": "lib/index.js",
