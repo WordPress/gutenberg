@@ -182,7 +182,9 @@ export const createI18n = ( initialData, initialDomain ) => {
 		return 'rtl' === _x( 'ltr', 'text direction' );
 	};
 
-	setLocaleData( initialData, initialDomain );
+	if ( initialData ) {
+		setLocaleData( initialData, initialDomain );
+	}
 
 	return {
 		setLocaleData,
