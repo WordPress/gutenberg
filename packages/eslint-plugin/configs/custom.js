@@ -11,27 +11,6 @@ module.exports = {
 		'@wordpress/i18n-no-placeholders-only': 'error',
 		'@wordpress/i18n-no-variables': 'error',
 		'@wordpress/i18n-ellipsis': 'error',
-		'no-restricted-syntax': [
-			'error',
-			{
-				selector:
-					'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-		],
 	},
 	overrides: [
 		{
