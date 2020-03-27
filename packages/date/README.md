@@ -22,8 +22,8 @@ Formats a date (like `date()` in PHP).
 
 _Related_
 
--   {@link <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}>
--   {@link <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC> Offsets}
+-   <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
+-   <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC>
 
 _Parameters_
 
@@ -44,8 +44,8 @@ behaves like `gmdateI18n`.
 
 _Related_
 
--   {@link <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}>
--   {@link <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC> Offsets}
+-   <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones>
+-   <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC>
 
 _Parameters_
 

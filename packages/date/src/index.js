@@ -371,8 +371,8 @@ export function format( dateFormat, dateValue = new Date() ) {
  *                                             UTC offset. Defaults to timezone from
  *                                             site.
  *
- * @see {@link https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}
- * @see {@link https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC Offsets}
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
  *
  * @return {string} Formatted date in English.
  */
@@ -412,8 +412,8 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  *                                                deprecated, but still supported for
  *                                                backward compatibility reasons.
  *
- * @see {@link https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}
- * @see {@link https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC Offsets}
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
  *
  * @return {string} Formatted date.
  */
@@ -486,8 +486,8 @@ export function getDate( dateString ) {
  *                                            UTC offset. Defaults to timezone from
  *                                            site.
  *
- * @see {@link https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}
- * @see {@link https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC Offsets}
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
  *
  * @return {Moment} a moment instance.
  */
