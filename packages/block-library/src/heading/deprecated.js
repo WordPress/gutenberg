@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,7 +43,7 @@ const migrateCustomColors = ( attributes ) => {
 		},
 	};
 	return {
-		...attributes,
+		...omit( attributes, [ 'customTextColor' ] ),
 		style,
 	};
 };
