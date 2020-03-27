@@ -122,6 +122,7 @@ const Cover = ( {
 	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
 
 	const onSelectMedia = ( media ) => {
+		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
 		// Remove gradient attribute
 		setAttributes( { gradient: undefined, customGradient: undefined } );
@@ -227,33 +228,43 @@ const Cover = ( {
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress 
 					mediaId={ id }
+					onUpdateMediaProgress={ () => {
+						setIsUploadInProgress( true );
+					} }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId: id,
 						mediaUrl: url,
 					} ) => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
 						setAttributes( { id, url, backgroundType } );
 					} }
-					renderContent={ () => (
-						<>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-											<ImageWithFocalPoint
-												focalPoint={ focalPoint }
-												url={ url }
-											/>
-							) }
-							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-								<Video
-									muted
-									disableFocus
-									repeat
-									resizeMode={ 'cover' }
-									source={ { uri: url } }
-									style={ styles.background }
-								/>
-							) }
-						</>
-					) }
+					onFinishMediaUploadWithFailure={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( true );
+					} }
+					onMediaUploadStateReset={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
+						setAttributes( { id: undefined, url: undefined } );
+					} }
 				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+								<ImageWithFocalPoint
+									focalPoint={ focalPoint }
+									url={ url }
+								/>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						style={ styles.background }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
