@@ -1,23 +1,23 @@
 /**
  * Node dependencies.
  */
-const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
  * Internal dependencies.
  */
+const compile = require( '../compile' );
 const getExportEntries = require( '../get-export-entries' );
 
 describe( 'Export entries', function() {
-	const getStatement = ( dir ) =>
-		JSON.parse(
-			fs.readFileSync(
-				path.join( __dirname, './fixtures', dir, 'exports.json' ),
-				'utf-8'
-			)
-		);
-	const getStatements = getStatement;
+	const getStatements = ( dir ) => {
+		const filePath = path.join( __dirname, 'fixtures', dir, 'code.js' );
+		const { exportStatements } = compile( filePath );
+
+		return exportStatements;
+	};
+
+	const getStatement = ( dir ) => getStatements( dir )[ 0 ];
 
 	it( 'default class (anonymous)', () => {
 		const statement = getStatement( 'default-class-anonymous' );
@@ -154,7 +154,18 @@ describe( 'Export entries', function() {
 		expect( name[ 0 ] ).toEqual( {
 			localName: 'default',
 			exportName: 'moduleName',
-			module: './named-default-module',
+			module: './module-code',
+		} );
+	} );
+
+	it( 'named double underscore', function() {
+		const statement = getStatement( 'named-double-underscore' );
+		const name = getExportEntries( statement );
+		expect( name ).toHaveLength( 1 );
+		expect( name[ 0 ] ).toEqual( {
+			localName: '__',
+			exportName: '__',
+			module: null,
 		} );
 	} );
 
@@ -281,7 +292,7 @@ describe( 'Export entries', function() {
 		expect( name[ 0 ] ).toEqual( {
 			localName: '*',
 			exportName: null,
-			module: './namespace-module',
+			module: './module',
 		} );
 	} );
 } );

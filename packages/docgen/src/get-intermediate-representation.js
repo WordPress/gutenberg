@@ -39,7 +39,7 @@ const DEFAULT_EXPORT = 'default';
 const hasClassWithName = ( statement, name ) =>
 	statement.kind === SyntaxKind.ClassDeclaration &&
 	statement.name &&
-	statement.name.escapedText === name;
+	statement.name.text === name;
 
 /**
  * @param {Statement} statement
@@ -48,7 +48,7 @@ const hasClassWithName = ( statement, name ) =>
 const hasFunctionWithName = ( statement, name ) =>
 	statement.kind === SyntaxKind.FunctionDeclaration &&
 	statement.name &&
-	statement.name.escapedText === name;
+	statement.name.text === name;
 
 /**
  * @param {Statement} statement
@@ -59,10 +59,10 @@ const hasVariableWithName = ( statement, name ) =>
 	statement.declarationList.declarations.some( ( declaration ) => {
 		if ( declaration.name.kind === SyntaxKind.ObjectBindingPattern ) {
 			return declaration.name.elements.some(
-				( element ) => element.name.escapedText === name
+				( element ) => element.name.text === name
 			);
 		}
-		return declaration.name.escapedText === name;
+		return declaration.name.text === name;
 	} );
 
 /**
@@ -75,7 +75,7 @@ const hasImportWithName = ( statement, name ) =>
 	statement.importClause &&
 	// import a from 'b'
 	( ( statement.importClause.name &&
-		statement.importClause.name.escapedText === name ) ||
+		statement.importClause.name.text === name ) ||
 		// import { a } from 'b'
 		( statement.importClause.namedBindings &&
 			// import * as a from 'b' is SyntaxKind.NamespaceImport
@@ -83,7 +83,7 @@ const hasImportWithName = ( statement, name ) =>
 			statement.importClause.namedBindings.kind ===
 				SyntaxKind.NamedImports &&
 			statement.importClause.namedBindings.elements.some(
-				( specifier ) => specifier.name.escapedText === name
+				( specifier ) => specifier.name.text === name
 			) ) );
 
 const someImportMatchesName = ( name, statement ) => {
@@ -93,8 +93,8 @@ const someImportMatchesName = ( name, statement ) => {
 
 	return statement.importClause.namedBindings.elements.some( ( specifier ) =>
 		specifier.propertyName
-			? specifier.propertyName.escapedText === name
-			: specifier.name.escapedText === name
+			? specifier.propertyName.text === name
+			: specifier.name.text === name
 	);
 };
 

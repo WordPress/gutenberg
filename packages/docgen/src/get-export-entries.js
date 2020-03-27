@@ -39,7 +39,7 @@ module.exports = function( statement ) {
 					case SyntaxKind.ClassDeclaration:
 					case SyntaxKind.FunctionDeclaration:
 					default:
-						return s.name ? s.name.escapedText : '*default*';
+						return s.name ? s.name.text : '*default*';
 				}
 			};
 
@@ -55,8 +55,8 @@ module.exports = function( statement ) {
 		if ( statement.kind === SyntaxKind.VariableStatement ) {
 			return statement.declarationList.declarations.map( ( decl ) => {
 				return {
-					localName: decl.name.escapedText,
-					exportName: decl.name.escapedText,
+					localName: decl.name.text,
+					exportName: decl.name.text,
 					module: null,
 				};
 			} );
@@ -64,8 +64,8 @@ module.exports = function( statement ) {
 
 		return [
 			{
-				localName: statement.name.escapedText,
-				exportName: statement.name.escapedText,
+				localName: statement.name.text,
+				exportName: statement.name.text,
 				module: null,
 			},
 		];
@@ -75,7 +75,7 @@ module.exports = function( statement ) {
 		const getLocalName = ( s ) => {
 			switch ( s.expression.kind ) {
 				case SyntaxKind.Identifier:
-					return s.expression.escapedText;
+					return s.expression.text;
 				default:
 					return '*default*';
 			}
@@ -97,9 +97,9 @@ module.exports = function( statement ) {
 		  statement.exportClause.elements.map( ( element ) => {
 				return {
 					localName: element.propertyName
-						? element.propertyName.escapedText
-						: element.name.escapedText,
-					exportName: element.name.escapedText,
+						? element.propertyName.text
+						: element.name.text,
+					exportName: element.name.text,
 					module: statement.moduleSpecifier
 						? statement.moduleSpecifier.text
 						: null,
