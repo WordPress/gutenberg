@@ -475,19 +475,21 @@ export function getDate( dateString ) {
  * @return {Moment}  a moment instance.
  */
 function buildMoment( dateValue, timezone ) {
+	const dateMoment = momentLib( dateValue );
+
 	if ( timezone && ! isUTCOffset( timezone ) ) {
-		return momentLib( dateValue ).tz( timezone );
+		return dateMoment.tz( timezone );
 	}
 
 	if ( timezone && isUTCOffset( timezone ) ) {
-		return momentLib( dateValue ).utcOffset( timezone );
+		return dateMoment.utcOffset( timezone );
 	}
 
 	if ( settings.timezone.string ) {
-		return momentLib( dateValue ).tz( settings.timezone.string );
+		return dateMoment.tz( settings.timezone.string );
 	}
 
-	return momentLib( dateValue ).utcOffset( settings.timezone.offset );
+	return dateMoment.utcOffset( settings.timezone.offset );
 }
 
 const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:[0-9][0-9])?$/;
