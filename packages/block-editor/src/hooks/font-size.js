@@ -8,17 +8,19 @@ import classnames from 'classnames';
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { compose, createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import {
+	getFontSize,
 	getFontSizeClass,
+	getFontSizeObjectByValue,
 	FontSizePicker,
-	withFontSizes,
 } from '../components/font-sizes';
 import InspectorControls from '../components/inspector-controls';
 
@@ -94,13 +96,31 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-const FontSizeInspectorControl = ( { fontSize, setFontSize } ) => (
+const FontSizeInspectorControl = ( { value, onChange } ) => (
 	<InspectorControls key="inspector-controls">
 		<PanelBody title={ __( 'Text settings' ) }>
-			<FontSizePicker value={ fontSize.size } onChange={ setFontSize } />
+			<FontSizePicker value={ value } onChange={ onChange } />
 		</PanelBody>
 	</InspectorControls>
 );
+
+const setFontSize = ( { style, setAttributes }, fontSizes ) => ( value ) => {
+	const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
+
+	setAttributes( {
+		style: {
+			...style,
+			typography: {
+				...style?.typography,
+				fontSize: fontSizeSlug ? undefined : value,
+			},
+		},
+		fontSize: fontSizeSlug,
+	} );
+};
+
+const hasFontSizeSupport = ( { name: blockName } ) =>
+	hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY );
 
 /**
  * Override the default edit UI to include inspector controls
@@ -111,19 +131,27 @@ const FontSizeInspectorControl = ( { fontSize, setFontSize } ) => (
  */
 const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName, fontSize, setFontSize } = props;
+		const { fontSizes } = useSelect( ( select ) =>
+			select( 'core/block-editor' ).getSettings()
+		);
 
-		if ( ! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ) {
-			return <BlockEdit key="edit" { ...props } />;
+		const fontSize = getFontSize(
+			fontSizes,
+			props.fontSize,
+			props.style?.fontSize
+		);
+
+		if ( ! hasFontSizeSupport( props ) ) {
+			return <BlockEdit key="edit" { ...props } fontSize={ fontSize } />;
 		}
 
 		return [
 			<FontSizeInspectorControl
 				key="inspector-controls"
-				fontSize={ fontSize }
-				setFontSize={ setFontSize }
+				value={ fontSize.size }
+				onChange={ setFontSize( props, fontSizes ) }
 			/>,
-			<BlockEdit key="edit" { ...props } />,
+			<BlockEdit key="edit" { ...props } fontSize={ fontSize } />,
 		];
 	},
 	'withFontSizeControlsTest'
@@ -146,5 +174,5 @@ addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
 addFilter(
 	'editor.BlockEdit',
 	'core/font/with-block-controls',
-	compose( [ withFontSizes( 'fontSize' ), withBlockControls ] )
+	withBlockControls
 );
