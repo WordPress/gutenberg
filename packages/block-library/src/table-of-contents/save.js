@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import * as Utils from './utils';
+import { linearToNestedList, updateHeadingBlockAnchors } from './utils';
 import ListLevel from './ListLevel';
 
 export default function save( props ) {

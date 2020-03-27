@@ -46,7 +46,7 @@ class TOCEdit extends Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		const { setAttributes } = this.props;
-		const pageHeadings = Utils.getPageHeadings();
+		const { pageHeadings } = this.state;
 		if (
 			JSON.stringify( pageHeadings ) !==
 			JSON.stringify( prevState.pageHeadings )
