@@ -138,6 +138,15 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
+
+	const onMediaPressed = () => {
+		if ( isUploadInProgress ) {
+			requestImageUploadCancelDialog( id );
+		} else if ( shouldShowFailure ) {
+			requestImageFailedRetryDialog( id );
+		}
+	}
+
 	const overlayStyles = [
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
@@ -209,6 +218,7 @@ const Cover = ( {
 	const renderBackground = ( { open: openMediaOptions, getMediaOptions } ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
+			onPress={ onMediaPressed }
 			onLongPress={ openMediaOptions }
 			disabled={ ! isParentSelected }
 		>
