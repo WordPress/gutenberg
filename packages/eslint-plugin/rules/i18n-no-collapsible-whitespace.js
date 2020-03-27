@@ -7,6 +7,13 @@ const {
 	getTranslateFunctionName,
 } = require( '../utils' );
 
+const PROBLEMS_BY_CHAR_CODE = {
+	9: '\\t',
+	10: '\\n',
+	13: '\\r',
+	32: 'consecutive spaces',
+};
+
 module.exports = {
 	meta: {
 		type: 'problem',
@@ -33,13 +40,6 @@ module.exports = {
 					functionArgs.push( args[ 1 ] );
 				}
 
-				const problemsByCharCode = {
-					9: '\\t',
-					10: '\\n',
-					13: '\\r',
-					32: 'consecutive spaces',
-				};
-
 				for ( const arg of functionArgs ) {
 					const argumentString = getTextContentFromNode( arg );
 					if ( ! argumentString ) {
@@ -55,7 +55,7 @@ module.exports = {
 					}
 
 					const problem =
-						problemsByCharCode[
+						PROBLEMS_BY_CHAR_CODE[
 							collapsibleWhitespace[ 0 ].charCodeAt( 0 )
 						];
 					const problemString = problem ? ` (${ problem })` : '';
