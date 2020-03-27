@@ -16,28 +16,19 @@ import { subscribe } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 class TableOfContentsEdit extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			wpDataUnsubscribe: null,
-		};
-	}
-
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
 		const headings = attributes.headings || [];
-		const wpDataUnsubscribe = subscribe( () => {
+		this.unsubscribe = subscribe( () => {
 			const pageHeadings = getPageHeadings();
 			this.setState( { pageHeadings } );
 		} );
 
 		setAttributes( { headings } );
-		this.setState( { wpDataUnsubscribe } );
 	}
 
 	componentWillUnmount() {
-		this.state.wpDataUnsubscribe();
+		this.unsubscribe();
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
