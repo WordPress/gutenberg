@@ -2,6 +2,10 @@
  * External dependencies
  */
 const tscDetectedVersion = require( 'typescript' ).version;
+
+/**
+ * Internal dependencies
+ */
 const tscDependencyVersion = require( '../../package.json' ).devDependencies
 	.typescript;
 
