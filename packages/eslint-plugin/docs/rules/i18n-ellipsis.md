@@ -1,6 +1,6 @@
-# Enforce using ellipsis (…) instead of three dots (i18n-ellipsis)
+# Disallow using three dots in translatable strings (i18n-ellipsis)
 
-Translatable strings should use ellipsis (…) instead of three dots.
+Three dots for indicating an ellipsis should be replaced with the UTF-8 character … (Horizontal Ellipsis, U+2026) as it has a more semantic meaning.
 
 ## Rule details
 

@@ -1,6 +1,6 @@
 # Prevent using only placeholders in translatable strings (i18n-no-placeholders-only)
 
-Translatable strings that consist of nothing but a placeholder are rather pointless and not really translatable.
+Translatable strings that consist of nothing but a placeholder cannot be translated.
 
 ## Rule details
 
