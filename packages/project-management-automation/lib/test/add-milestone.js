@@ -63,7 +63,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
 		expect( octokit.issues.listMilestonesForRepo ).not.toHaveBeenCalled();
@@ -124,7 +124,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -144,7 +144,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 			milestone: 12,
 		} );
 	} );
@@ -202,7 +202,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -222,7 +222,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 			milestone: 12,
 		} );
 	} );
