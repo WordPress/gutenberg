@@ -4,6 +4,7 @@
 const {
 	TRANSLATION_FUNCTIONS,
 	getTranslateFunctionName,
+	getTranslateFunctionArgs,
 } = require( '../utils' );
 
 function isAcceptableLiteralNode( node ) {
@@ -44,17 +45,12 @@ module.exports = {
 					return;
 				}
 
-				const functionArgs = [ args[ 0 ] ];
+				const candidates = getTranslateFunctionArgs(
+					functionName,
+					args
+				);
 
-				if ( [ '_n', '_nx', '_x' ].includes( functionName ) ) {
-					functionArgs.push( args[ 1 ] );
-				}
-
-				if ( [ '_nx' ].includes( functionName ) ) {
-					functionArgs.push( args[ 3 ] );
-				}
-
-				for ( const arg of functionArgs ) {
+				for ( const arg of candidates ) {
 					if ( isAcceptableLiteralNode( arg ) ) {
 						continue;
 					}

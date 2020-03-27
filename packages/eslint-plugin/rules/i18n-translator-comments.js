@@ -4,8 +4,9 @@
 const {
 	TRANSLATION_FUNCTIONS,
 	REGEXP_PLACEHOLDER,
-	getTranslateStrings,
 	getTranslateFunctionName,
+	getTranslateFunctionArgs,
+	getTextContentFromNode,
 } = require( '../utils' );
 
 module.exports = {
@@ -34,9 +35,14 @@ module.exports = {
 					return;
 				}
 
-				const candidates = getTranslateStrings( functionName, args );
+				const candidates = getTranslateFunctionArgs(
+					functionName,
+					args
+				)
+					.map( getTextContentFromNode )
+					.filter( Boolean );
 
-				if ( ! candidates ) {
+				if ( candidates.length === 0 ) {
 					return;
 				}
 

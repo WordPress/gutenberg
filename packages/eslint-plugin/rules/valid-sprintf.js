@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-const { REGEXP_PLACEHOLDER, getTranslateStrings } = require( '../utils' );
+const {
+	REGEXP_PLACEHOLDER,
+	getTranslateFunctionArgs,
+	getTextContentFromNode,
+} = require( '../utils' );
 
 module.exports = {
 	meta: {
@@ -45,15 +49,16 @@ module.exports = {
 					case 'CallExpression':
 						// All possible options (arguments) from a translate
 						// function must be valid.
-						candidates = getTranslateStrings(
+						candidates = getTranslateFunctionArgs(
 							args[ 0 ].callee.name,
-							args[ 0 ].arguments
-						);
+							args[ 0 ].arguments,
+							false
+						).map( getTextContentFromNode );
 
 						// An unknown function call may produce a valid string
 						// value. Ideally its result is verified, but this is
 						// not straight-forward to implement. Thus, bail.
-						if ( candidates === undefined ) {
+						if ( candidates.filter( Boolean ).length === 0 ) {
 							return;
 						}
 

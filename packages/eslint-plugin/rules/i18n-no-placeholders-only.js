@@ -6,6 +6,7 @@ const {
 	REGEXP_PLACEHOLDER,
 	getTextContentFromNode,
 	getTranslateFunctionName,
+	getTranslateFunctionArgs,
 } = require( '../utils' );
 
 module.exports = {
@@ -28,13 +29,12 @@ module.exports = {
 					return;
 				}
 
-				const functionArgs = [ args[ 0 ] ];
+				const candidates = getTranslateFunctionArgs(
+					functionName,
+					args
+				);
 
-				if ( [ '_n', '_nx' ].includes( functionName ) ) {
-					functionArgs.push( args[ 1 ] );
-				}
-
-				for ( const arg of functionArgs ) {
+				for ( const arg of candidates ) {
 					const argumentString = getTextContentFromNode( arg );
 					if ( ! argumentString ) {
 						continue;
