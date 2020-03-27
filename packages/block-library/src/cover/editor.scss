@@ -24,28 +24,16 @@
 	}
 }
 
-<<<<<<< HEAD
 [data-align="left"] > .wp-block-cover,
 [data-align="right"] > .wp-block-cover,
 [data-align="left"] > .wp-block-cover-image,
 [data-align="right"] > .wp-block-cover-image {
 	max-width: $content-width / 2;
 	width: 100%;
-=======
-	// Apply max-width to floated items that have no intrinsic width.
-	[data-align="left"] &,
-	[data-align="right"] & {
-		max-width: $content-width / 2;
-		width: 100%;
-	}
+}
 
-
-	&.has-custom-content-position.has-custom-content-position {
-		.wp-block-cover__inner-container {
-			padding: 0 $grid-unit-40;
-		}
-	}
->>>>>>> Integrate AlignmentControl with Cover block
+.wp-block-cover {
+	padding: $grid-unit-20 $grid-unit-40;
 }
 
 .block-library-cover__reset-button {

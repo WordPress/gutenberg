@@ -152,10 +152,13 @@
 	&.has-custom-content-position.has-custom-content-position {
 		.wp-block-cover__inner-container {
 			margin: 0;
-			padding: $grid-unit-40;
 			width: auto;
 		}
 	}
+}
+
+.wp-block-cover {
+	padding: $grid-unit-20;
 }
 
 .wp-block-cover__video-background {
