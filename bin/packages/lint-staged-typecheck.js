@@ -27,7 +27,7 @@ const changedPackages = _.uniq(
 try {
 	execa.sync( tscPath, [ '--build', ...changedPackages ] );
 } catch ( err ) {
-	console.error( err.message );
+	console.error( err.stdout );
 	process.exitCode = 1;
 }
 
