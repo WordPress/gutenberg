@@ -56,31 +56,16 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	);
 }
 
-export default function EntitiesSavedStates( {
-	isOpen,
-	onRequestClose,
-	ignoredForSave = [],
-} ) {
+export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 	const dirtyEntityRecords = useSelect(
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	// Entities savable by save function.
-	const savableEntityRecords = dirtyEntityRecords.filter(
-		( { kind, name, key } ) => {
-			return ! some(
-				ignoredForSave,
-				( elt ) =>
-					elt.kind === kind && elt.name === name && elt.key === key
-			);
-		}
-	);
-
 	// To group entities by type.
 	const partitionedSavables = Object.values(
-		groupBy( savableEntityRecords, 'name' )
+		groupBy( dirtyEntityRecords, 'name' )
 	);
 
 	// Unchecked entities to be ignored by save function.
@@ -105,7 +90,7 @@ export default function EntitiesSavedStates( {
 	};
 
 	const saveCheckedEntities = () => {
-		const entitiesToSave = savableEntityRecords.filter(
+		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
 					unselectedEntities,
@@ -145,7 +130,7 @@ export default function EntitiesSavedStates( {
 				<Button
 					isPrimary
 					disabled={
-						savableEntityRecords.length -
+						dirtyEntityRecords.length -
 							unselectedEntities.length ===
 						0
 					}
