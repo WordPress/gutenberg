@@ -20,11 +20,16 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Formats a date (like `date()` in PHP).
 
+_Related_
+
+-   {@link <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}>
+-   {@link <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC> Offsets}
+
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
--   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. See momentjs.com.
+-   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site.
 
 _Returns_
 
@@ -37,11 +42,16 @@ Formats a date (like `wp_date()` in PHP), translating it into site's locale.
 Backward Compatibility Notice: if `timezone` is set to `true`, the function
 behaves like `gmdateI18n`.
 
+_Related_
+
+-   {@link <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones|Timezones}>
+-   {@link <https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC|UTC> Offsets}
+
 _Parameters_
 
 -   _dateFormat_ `string`: PHP-style formatting string. See php.net/date.
 -   _dateValue_ `(Date|string|Moment|null)`: Date object or string, parsable by moment.js.
--   _timezone_ `(string|number|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. See momentjs.com.
+-   _timezone_ `(string|number|boolean|null)`: Timezone to output result in or a UTC offset. Defaults to timezone from site. Notice: `boolean` is effectively deprecated, but still supported for backward compatibility reasons.
 
 _Returns_
 
