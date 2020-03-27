@@ -15,9 +15,14 @@ module.exports = function( filePath ) {
 	};
 	const host = ts.createCompilerHost( options, true );
 	const raw = readFileSync( filePath ).toString();
-	// typescript interprets @wordpress in @example code as a JSDoc tag.
-	// So, it should be replaced for the time being.
-	const code = raw.replace( /@wordpress/g, '__WORDPRESS_IMPORT__' );
+	const code = raw
+		// typescript interprets @wordpress in @example code as a JSDoc tag.
+		// So, it should be replaced for the time being.
+		.replace( /@wordpress/g, '__WORDPRESS_IMPORT__' )
+		// When <caption>ES(5|Next)<\/caption> exists next to @example tag,
+		// typescript cannot parse code correctly.
+		// So, they're removed.
+		.replace( /@example\s+<caption>ES(5|Next)<\/caption>/g, '@example' );
 	const sF = ts.createSourceFile( filePath, code, options.target, true );
 
 	host.getSourceFile = () => sF;

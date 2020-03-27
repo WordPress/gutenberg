@@ -64,6 +64,38 @@ describe( 'JSDoc', () => {
 						"```js\nconst x = require('@wordpress/test');\n\nconst addResult = sum( 1, 3 );\nconsole.log( addResult ); // will yield 4\n```",
 				},
 				{
+					title: 'example',
+					description: `\`\`\`js
+// Using ES5 syntax
+
+function MyButtonMoreMenuItem() {
+	return wp.element.createElement(
+		PluginMoreMenuItem,
+		{
+			icon: moreIcon,
+			onClick: onButtonClick,
+		},
+		__( 'My button title' )
+	);
+}
+\`\`\``,
+				},
+				{
+					title: 'example',
+					description: `\`\`\`jsx
+// Using ESNext syntax
+
+const MyButtonMoreMenuItem = () => (
+	<PluginMoreMenuItem
+		icon={ more }
+		onClick={ onButtonClick }
+	>
+		{ __( 'My button title' ) }
+	</PluginMoreMenuItem>
+);
+\`\`\``,
+				},
+				{
 					title: 'return',
 					description: 'The result of adding the two params.',
 					type: 'number',
