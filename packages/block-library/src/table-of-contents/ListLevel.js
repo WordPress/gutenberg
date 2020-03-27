@@ -7,7 +7,7 @@ export default function ListLevel( props ) {
 	let childNodes = null;
 
 	if ( children ) {
-		childNodes = children.map( function( childNode ) {
+		childNodes = children.map( function( childNode, index ) {
 			const { content, anchor, level } = childNode.block;
 
 			const entry = anchor ? (
@@ -28,7 +28,7 @@ export default function ListLevel( props ) {
 			);
 
 			return (
-				<li key={ anchor }>
+				<li key={ index }>
 					{ entry }
 					{ childNode.children ? (
 						<ListLevel>{ childNode.children }</ListLevel>
