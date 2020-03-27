@@ -4,10 +4,17 @@
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
-const __experimentalUsePageTemplatePickerVisible = () => {
+export const __experimentalUsePageTemplatePickerAvailable = () => {
 	return useSelect( ( select ) => {
 		const { getCurrentPostType } = select( 'core/editor' );
+		return getCurrentPostType() === 'page';
+	}, [] );
+};
 
+export const __experimentalUsePageTemplatePickerVisible = () => {
+	const isTemplatePickerAvailable = __experimentalUsePageTemplatePickerAvailable();
+
+	return useSelect( ( select ) => {
 		const { getBlockOrder, getBlock } = select( 'core/block-editor' );
 
 		const blocks = getBlockOrder();
@@ -16,10 +23,7 @@ const __experimentalUsePageTemplatePickerVisible = () => {
 		const isOnlyUnmodifiedDefault =
 			blocks.length === 1 && isUnmodifiedDefaultBlock( firstBlock );
 		const isEmptyContent = isEmptyBlockList || isOnlyUnmodifiedDefault;
-		const isPage = getCurrentPostType() === 'page';
 
-		return isEmptyContent && isPage;
+		return isEmptyContent && isTemplatePickerAvailable;
 	}, [] );
 };
-
-export default __experimentalUsePageTemplatePickerVisible;
