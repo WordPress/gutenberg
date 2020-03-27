@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { isUndefined, noop } from 'lodash';
-import classNames from 'classnames';
+import classnames from 'classnames';
 /**
  * Internal dependencies
  */
@@ -33,7 +33,7 @@ export default function UnitControl( {
 		}
 	};
 
-	const classes = classNames( 'component-unit-control', className );
+	const classes = classnames( 'component-unit-control', className );
 
 	return (
 		<Root className={ classes } style={ style }>
