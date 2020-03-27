@@ -1,17 +1,3 @@
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	background-color: var(--wp--color--background);
-	color: var(--wp--color--text);
-
-	&.has-background {
-		padding: $block-bg-padding--v $block-bg-padding--h;
-	}
-}
-
 :root {
 	h1,
 	h2,
@@ -19,6 +5,19 @@ h6 {
 	h4,
 	h5,
 	h6 {
+		background-color: var(--wp--color--background);
+		color: var(--wp--color--text);
 		line-height: var(--wp--typography--line-height);
+	}
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
 	}
 }
