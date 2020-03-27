@@ -10,6 +10,11 @@
 - New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
 - New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
 
+### Breaking Changes
+
+- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
+- The `valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
+
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes
