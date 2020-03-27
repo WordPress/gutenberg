@@ -119,7 +119,7 @@ const setFontSize = ( { style, setAttributes }, fontSizes ) => ( value ) => {
 	} );
 };
 
-const hasFontSizeSupport = ( { name: blockName } ) =>
+const hasFontSizeSupport = ( blockName ) =>
 	hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY );
 
 /**
@@ -131,27 +131,38 @@ const hasFontSizeSupport = ( { name: blockName } ) =>
  */
 const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const {
+			name: blockName,
+			attributes: { fontSize, style },
+		} = props;
+
 		const { fontSizes } = useSelect( ( select ) =>
 			select( 'core/block-editor' ).getSettings()
 		);
 
-		const fontSize = getFontSize(
+		const fontSizeObject = getFontSize(
 			fontSizes,
-			props.fontSize,
-			props.style?.fontSize
+			fontSize,
+			style?.fontSize
 		);
 
-		if ( ! hasFontSizeSupport( props ) ) {
-			return <BlockEdit key="edit" { ...props } fontSize={ fontSize } />;
+		if ( ! hasFontSizeSupport( blockName ) ) {
+			return (
+				<BlockEdit
+					key="edit"
+					{ ...props }
+					fontSize={ fontSizeObject }
+				/>
+			);
 		}
 
 		return [
 			<FontSizeInspectorControl
 				key="inspector-controls"
-				value={ fontSize.size }
+				value={ fontSizeObject.size }
 				onChange={ setFontSize( props, fontSizes ) }
 			/>,
-			<BlockEdit key="edit" { ...props } fontSize={ fontSize } />,
+			<BlockEdit key="edit" { ...props } fontSize={ fontSizeObject } />,
 		];
 	},
 	'withFontSizeControlsTest'
