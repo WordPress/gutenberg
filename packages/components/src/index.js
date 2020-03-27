@@ -40,6 +40,7 @@ export {
 } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
+export { default as DropdownFlyout } from './dropdown-flyout';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
 export { default as FocalPointPicker } from './focal-point-picker';
