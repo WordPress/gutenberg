@@ -9,6 +9,7 @@ const execa = require( 'execa' );
 /* eslint-disable no-console */
 
 const repoRoot = path.join( __dirname, '..', '..' );
+const tscPath = path.join( repoRoot, 'node_modules', '.bin', 'tsc' );
 
 // lint-staged passes full paths to staged changes
 const changedFiles = process.argv.slice( 2 );
@@ -24,7 +25,7 @@ const changedPackages = _.uniq(
 );
 
 try {
-	execa.sync( 'npm', [ 'run', 'build:package-types', ...changedPackages ] );
+	execa.sync( tscPath, [ '--build', ...changedPackages ] );
 } catch ( err ) {
 	console.error( err.message );
 	process.exitCode = 1;
