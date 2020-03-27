@@ -44,6 +44,11 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 const DEFAULT_COLUMNS = 2;
 const MIN_COLUMNS_NUMBER = 1;
 
+const BREAKPOINTS = {
+	mobile: 480,
+	large: 768,
+};
+
 function ColumnsEditContainer( {
 	attributes,
 	updateAlignment,
@@ -78,12 +83,14 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
-		if ( containerWidth < 480 ) {
+		if ( containerWidth < BREAKPOINTS.mobile ) {
+			// show only 1 Column in row for mobile breakpoint container width
 			return 1;
-		}
-		if ( containerWidth >= 480 && containerWidth < 768 ) {
+		} else if ( containerWidth < BREAKPOINTS.large ) {
+			// show 2 Column in row for large breakpoint container width
 			return Math.min( columnCount, 2 );
 		}
+		// show all Column in one row
 		return columnsNumber;
 	};
 
