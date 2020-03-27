@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isBoolean } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, renderToString, createRef } from '@wordpress/element';
@@ -29,7 +34,7 @@ class Sandbox extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const forceRerender = prevProps.html !== this.props.html;
+		const forceRerender = ! isHTMLEqual( prevProps.html, this.props.html );
 
 		this.trySandbox( forceRerender );
 	}
@@ -76,9 +81,23 @@ class Sandbox extends Component {
 			return;
 		}
 
+		/**
+		 * This method is called in the FocusableIframe onLoad callback.
+		 * As such, the incoming argument is NOT a boolean, but rather, a
+		 * (synthetic) event.
+		 *
+		 * We only need to do this check if we're purposefully doing
+		 * a forceRerender. This happens in the componentDidUpdate
+		 * lifecycle hook.
+		 *
+		 * Doing this extra step prevents the iFrame from recursively
+		 * re-rendering itself.
+		 */
+		const shouldRerender = isBoolean( forceRerender ) && forceRerender;
 		const body = this.iframe.current.contentDocument.body;
+
 		if (
-			! forceRerender &&
+			! shouldRerender &&
 			null !== body.getAttribute( 'data-resizable-iframe-connected' )
 		) {
 			return;
@@ -239,6 +258,29 @@ class Sandbox extends Component {
 			/>
 		);
 	}
+}
+
+/**
+ * A simple (and perhaps naive) way to compare if two html strings are equal.
+ *
+ * @param {string} prevHtml The previous HTML string.
+ * @param {string} nextHtml The next HTML string.
+ * @return {boolean} Whether the HTML strings are equal
+ */
+function isHTMLEqual( prevHtml, nextHtml ) {
+	/**
+	 * Convert \" quotes to ". This is due to how React and Safari handle
+	 * storing the incoming props.html value.
+	 *
+	 * Additional details for this can be found here:
+	 * https://github.com/WordPress/gutenberg/issues/20614#issuecomment-605347414
+	 */
+	const escapeQuoteRegex = new RegExp( /\\"/, 'g' );
+
+	return (
+		prevHtml.replace( escapeQuoteRegex, '"' ) ===
+		nextHtml.replace( escapeQuoteRegex, '"' )
+	);
 }
 
 Sandbox = withGlobalEvents( {
