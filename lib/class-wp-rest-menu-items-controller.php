@@ -404,7 +404,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
 				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
 				if ( empty( $original ) ) {
-					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post  ID.', 'gutenberg' ), array( 'status' => 400 ) );
+					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
 			}

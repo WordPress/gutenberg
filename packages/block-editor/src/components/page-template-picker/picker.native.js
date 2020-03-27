@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * External dependencies
  */
 import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
+import { Animated } from 'react-native';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import Preview from './preview';
 
 const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
+	visible,
 } ) => {
 	const { editPost } = useDispatch( 'core/editor' );
 	const { title } = useSelect( ( select ) => {
@@ -30,6 +32,12 @@ const __experimentalPageTemplatePicker = ( {
 	} );
 
 	const [ templatePreview, setTemplatePreview ] = useState();
+	const [ pickerVisible, setPickerVisible ] = useState( visible );
+	const contentOpacity = useRef( new Animated.Value( 0 ) );
+
+	useEffect( () => {
+		onPickerAnimation();
+	}, [ visible ] );
 
 	const onApply = () => {
 		editPost( {
@@ -42,8 +50,28 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
+	const onPickerAnimation = () => {
+		if ( visible && ! pickerVisible ) {
+			setPickerVisible( true );
+		}
+
+		Animated.timing( contentOpacity.current, {
+			toValue: visible ? 1 : 0,
+			duration: 300,
+			useNativeDriver: true,
+		} ).start( () => {
+			if ( ! visible ) {
+				setPickerVisible( false );
+			}
+		} );
+	};
+
+	if ( ! pickerVisible ) {
+		return null;
+	}
+
 	return (
-		<>
+		<Animated.View style={ [ { opacity: contentOpacity.current } ] }>
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
@@ -67,7 +95,7 @@ const __experimentalPageTemplatePicker = ( {
 				onDismiss={ () => setTemplatePreview( undefined ) }
 				onApply={ onApply }
 			/>
-		</>
+		</Animated.View>
 	);
 };
 

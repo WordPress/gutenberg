@@ -1,6 +1,12 @@
+## Master
+
+### Breaking Change
+
+- Add `types` to the order of preferred properties. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
 ## 2.0.0 (2019-06-12)
 
-### Braking Change
+### Breaking Change
 
 - Added `type` and `react-native` to the order of preferred properties. 
 

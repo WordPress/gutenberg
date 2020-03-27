@@ -1,5 +1,9 @@
 ## Master
 
+### New feature
+
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
 ### Bug Fixes
 
 - `getQueryString` now correctly considers hash fragments when considering whether to return a query string. Previously, `getQueryString( 'https://example.com/#?foo' )` would wrongly return `'foo'` as its result. A hash fragment is always the last segment of a URL, and the querystring must always precede it ([see reference specification](https://url.spec.whatwg.org/#absolute-url-with-fragment-string)).

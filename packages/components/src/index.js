@@ -80,6 +80,7 @@ export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
+export { default as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
@@ -113,4 +114,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-export * from './text';

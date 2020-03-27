@@ -123,6 +123,7 @@ class EditorProvider extends Component {
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
+				'__experimentalDisableCustomLineHeight',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
