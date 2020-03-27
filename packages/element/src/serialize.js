@@ -60,14 +60,14 @@ const ForwardRef = forwardRef( () => {
 /**
  * Valid attribute types.
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const ATTRIBUTES_TYPES = new Set( [ 'string', 'boolean', 'number' ] );
 
 /**
  * Element tags which can be self-closing.
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const SELF_CLOSING_TAGS = new Set( [
 	'area',
@@ -101,7 +101,7 @@ const SELF_CLOSING_TAGS = new Set( [
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const BOOLEAN_ATTRIBUTES = new Set( [
 	'allowfullscreen',
@@ -152,7 +152,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
  *
  *  - `alt`: https://blog.whatwg.org/omit-alt
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const ENUMERATED_ATTRIBUTES = new Set( [
 	'autocapitalize',
@@ -195,7 +195,7 @@ const ENUMERATED_ATTRIBUTES = new Set( [
  *     .map( ( [ key ] ) => key )
  *     .sort();
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 	'animation',
