@@ -22,17 +22,6 @@ export const settings = {
 	),
 	icon: 'list-view',
 	category: 'layout',
-	attributes: {
-		headings: {
-			source: 'query',
-			selector: 'a',
-			query: {
-				content: { source: 'text' },
-				anchor: { source: 'attribute', attribute: 'href' },
-				level: { source: 'attribute', attribute: 'data-level' },
-			},
-		},
-	},
 	transforms,
 	edit,
 	save,

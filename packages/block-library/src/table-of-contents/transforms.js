@@ -7,7 +7,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as Utils from './utils';
+import { linearToNestedHeadingList } from './utils';
 import ListLevel from './ListLevel';
 
 const transforms = {
@@ -19,7 +19,7 @@ const transforms = {
 				return createBlock( 'core/list', {
 					values: renderToString(
 						<ListLevel noWrapList>
-							{ Utils.linearToNestedHeadingList( headings ) }
+							{ linearToNestedHeadingList( headings ) }
 						</ListLevel>
 					),
 				} );

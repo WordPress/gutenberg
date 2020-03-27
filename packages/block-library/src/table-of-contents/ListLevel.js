@@ -8,18 +8,28 @@ export default function ListLevel( props ) {
 
 	if ( children ) {
 		childNodes = children.map( function( childNode ) {
-			const link = (
+			const { content, anchor, level } = childNode.block;
+
+			const entry = anchor ? (
 				<a
-					href={ childNode.block.anchor }
-					data-level={ childNode.block.level }
+					className="blocks-table-of-contents-entry"
+					href={ anchor }
+					data-level={ level }
 				>
-					{ childNode.block.content }
+					{ content }
 				</a>
+			) : (
+				<span
+					className="blocks-table-of-contents-entry"
+					data-level={ level }
+				>
+					{ content }
+				</span>
 			);
 
 			return (
-				<li key={ childNode.block.anchor }>
-					{ link }
+				<li key={ anchor }>
+					{ entry }
 					{ childNode.children ? (
 						<ListLevel>{ childNode.children }</ListLevel>
 					) : null }

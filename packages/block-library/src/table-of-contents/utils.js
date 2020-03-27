@@ -2,8 +2,16 @@
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { cleanForSlug } from '@wordpress/editor';
+import { create } from '@wordpress/rich-text';
 
+/**
+ * Takes a flat list of heading parameters and nests them based on each header's
+ * immediate parent's level.
+ *
+ * @param {Array}  headingsList The flat list of headings to nest.
+ * @param {number} index        The current list index.
+ * @return {Array} The nested list of headings.
+ */
 export function linearToNestedHeadingList( headingsList, index = 0 ) {
 	const nestedHeadingsList = [];
 
@@ -55,10 +63,20 @@ export function linearToNestedHeadingList( headingsList, index = 0 ) {
 	return nestedHeadingsList;
 }
 
-export function getPageHeadings() {
-	return convertHeadingBlocksToAttributes( getHeadingBlocks() );
+/**
+ * Gets a list of heading texts, anchors and levels in the current document.
+ *
+ * @return {Array} The list of headings.
+ */
+export function getHeadingsList() {
+	return convertBlocksToTableOfContents( getHeadingBlocks() );
 }
 
+/**
+ * Gets a list of heading blocks in the current document.
+ *
+ * @return {Array} The list of heading blocks.
+ */
 export function getHeadingBlocks() {
 	const editor = select( 'core/block-editor' );
 	return editor
@@ -66,72 +84,28 @@ export function getHeadingBlocks() {
 		.filter( ( block ) => block.name === 'core/heading' );
 }
 
-export function convertHeadingBlocksToAttributes( headingBlocks ) {
+/**
+ * Extracts text, anchor and level from a list of heading blocks.
+ *
+ * @param {Array} headingBlocks The list of heading blocks.
+ * @return {Array} The list of heading parameters.
+ */
+export function convertBlocksToTableOfContents( headingBlocks ) {
 	return headingBlocks.map( function( heading ) {
 		// This is a string so that it can be stored/sourced as an attribute in the table of contents
 		// block using a data attribute.
 		const level = heading.attributes.level.toString();
 
-		const headingContent = heading.attributes.content || '';
-		const anchorContent = heading.attributes.anchor || '';
+		const headingContent = heading.attributes.content;
+		const anchorContent = heading.attributes.anchor;
 
-		// strip html from heading and attribute content
-		const contentDiv = document.createElement( 'div' );
+		// Strip html from heading to use as the table of contents entry.
+		const content = headingContent
+			? create( { html: headingContent } ).text
+			: '';
 
-		contentDiv.innerHTML = headingContent;
-		const content = contentDiv.textContent || contentDiv.innerText || '';
-
-		contentDiv.innerHTML = anchorContent;
-		let anchor = contentDiv.textContent || contentDiv.innerText || '';
-
-		if ( anchor !== '' && ! anchor.includes( '#' ) ) {
-			anchor = '#' + cleanForSlug( anchor );
-		}
+		const anchor = anchorContent ? '#' + anchorContent : '';
 
 		return { content, anchor, level };
 	} );
-}
-
-export function updateHeadingBlockAnchors() {
-	// Add anchors to any headings that don't have one.
-	getHeadingBlocks().forEach( function( heading, key ) {
-		const headingAnchorEmpty =
-			heading.attributes.anchor === undefined ||
-			heading.attributes.anchor === '';
-		const headingContentEmpty =
-			heading.attributes.content === undefined ||
-			heading.attributes.content === '';
-		const headingDefaultAnchor =
-			! headingAnchorEmpty &&
-			heading.attributes.anchor.indexOf( key + '-' ) === 0;
-
-		if (
-			! headingContentEmpty &&
-			( headingAnchorEmpty || headingDefaultAnchor )
-		) {
-			heading.attributes.anchor =
-				key +
-				'-' +
-				cleanForSlug( heading.attributes.content.toString() );
-		}
-	} );
-}
-
-export function haveHeadingsChanged( oldHeadings, newHeadings ) {
-	if ( oldHeadings.length !== newHeadings.length ) {
-		return true;
-	}
-
-	const changedHeadings = oldHeadings.filter( ( heading, index ) => {
-		const newHeading = newHeadings[ index ];
-
-		return (
-			heading.content !== newHeading.content ||
-			heading.anchor !== newHeading.anchor ||
-			heading.level !== newHeading.level
-		);
-	} );
-
-	// Return boolean value from length.
-	return changedHeadings.length > 0;
 }

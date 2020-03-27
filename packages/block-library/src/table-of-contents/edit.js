@@ -7,11 +7,7 @@ const { isEqual } = require( 'lodash' );
 /**
  * Internal dependencies
  */
-import {
-	getPageHeadings,
-	updateHeadingBlockAnchors,
-	linearToNestedHeadingList,
-} from './utils';
+import { getHeadingsList, linearToNestedHeadingList } from './utils';
 import ListLevel from './ListLevel';
 
 /**
@@ -22,30 +18,18 @@ import { subscribe } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 class TableOfContentsEdit extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = {
-			wpDataUnsubscribe: null,
-		};
-
-		this.refresh = this.refresh.bind( this );
-	}
-
-	refresh() {
-		const { setAttributes } = this.props;
-		const headings = getPageHeadings();
-		setAttributes( { headings } );
-	}
-
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-		const { headings = [] } = attributes;
+		let { headings } = attributes;
 
+		// Update the table of contents when changes are made to other blocks.
 		this.unsubscribe = subscribe( () => {
-			const pageHeadings = getPageHeadings();
-			this.setState( { pageHeadings } );
+			this.setState( { headings: getHeadingsList() } );
 		} );
+
+		if ( ! headings ) {
+			headings = getHeadingsList();
+		}
 
 		setAttributes( { headings } );
 	}
@@ -56,16 +40,17 @@ class TableOfContentsEdit extends Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		const { setAttributes } = this.props;
-		const { pageHeadings } = this.state;
+		const { headings } = this.state;
 
-		if ( ! isEqual( pageHeadings, prevState.pageHeadings ) ) {
-			setAttributes( { headings: pageHeadings } );
+		if ( prevState && ! isEqual( headings, prevState.headings ) ) {
+			setAttributes( { headings } );
 		}
 	}
 
 	render() {
 		const { attributes } = this.props;
 		const { headings = [] } = attributes;
+
 		if ( headings.length === 0 ) {
 			return (
 				<p>
@@ -75,8 +60,6 @@ class TableOfContentsEdit extends Component {
 				</p>
 			);
 		}
-
-		updateHeadingBlockAnchors();
 
 		return (
 			<div className={ this.props.className }>
