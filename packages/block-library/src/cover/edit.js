@@ -298,6 +298,7 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				<BlockAlignmentMatrixToolbar
+					label={ __( 'Change content position' ) }
 					value={ contentPosition }
 					onChange={ ( nextPosition ) =>
 						setAttributes( { contentPosition: nextPosition } )
