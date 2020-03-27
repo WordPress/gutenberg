@@ -2,6 +2,11 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
@@ -31,8 +36,9 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
+import { isURL, getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -100,6 +106,20 @@ const Cover = ( {
 			setAttributes( { childrenStyles: styles.defaultColor } );
 		}
 	}, [ setAttributes ] );
+
+	// sync with local media store
+	useEffect( mediaUploadSync, [] );
+
+	// initialize uploading flag to false, awaiting sync
+	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+
+	// initialize upload failure flag to true if url is local
+	const [ didUploadFail, setDidUploadFail ] = useState(
+		 id && getProtocol( url ) === 'file:'
+	);
+
+	// don't show failure if upload is in progress
+	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
 
 	const onSelectMedia = ( media ) => {
 		const onSelect = attributesFromMedia( setAttributes );
