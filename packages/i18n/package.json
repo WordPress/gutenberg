@@ -30,7 +30,7 @@
 		"lodash": "^4.17.15",
 		"memize": "^1.0.5",
 		"sprintf-js": "^1.1.1",
-		"tannin": "^1.1.0"
+		"tannin": "^1.2.0"
 	},
 	"publishConfig": {
 		"access": "public"
