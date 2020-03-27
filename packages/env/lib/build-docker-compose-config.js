@@ -43,13 +43,52 @@ module.exports = function buildDockerComposeConfig( config ) {
 		...themeMounts,
 	];
 
-	const testsMounts = [
-		`${
-			config.coreSource ? config.coreSource.testsPath : 'tests-wordpress'
-		}:/var/www/html`,
-		...pluginMounts,
-		...themeMounts,
-	];
+	let testsMounts;
+	if ( config.coreSource ) {
+		testsMounts = [
+			// When using a local source for "core" we want to ensure two things:
+			//
+			// 1. That changes the user makes within the "core" directory are
+			//    served in both the development and tests environments.
+			// 2. That the development and tests environment use separate
+			//    databases and `wp-content/uploads`.
+			//
+			// To do this we copy the local "core" files ($wordpress) to a tests
+			// directory ($tests-wordpress) and instruct the tests environment
+			// to source its files like so:
+			//
+			// - wp-config.php        <- $tests-wordpress/wp-config.php
+			// - wp-config-sample.php <- $tests-wordpress/wp-config.php
+			// - wp-content           <- $tests-wordpress/wp-content
+			// - *                    <- $wordpress/*
+			//
+			// https://github.com/WordPress/gutenberg/issues/21164
+			`${ config.coreSource.testsPath }:/var/www/html`,
+			...fs
+				.readdirSync( config.coreSource.path )
+				.filter(
+					( file ) =>
+						file !== 'wp-config.php' &&
+						file !== 'wp-config-sample.php' &&
+						file !== 'wp-content'
+				)
+				.map(
+					( file ) =>
+						`${ path.join(
+							config.coreSource.path,
+							file
+						) }:/var/www/html/${ file }`
+				),
+			...pluginMounts,
+			...themeMounts,
+		];
+	} else {
+		testsMounts = [
+			'tests-wordpress:/var/www/html',
+			...pluginMounts,
+			...themeMounts,
+		];
+	}
 
 	// Set the default ports based on the config values.
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.port }}:80`;
