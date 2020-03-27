@@ -203,11 +203,13 @@ function ColorPalette( {
 			keyboardShouldPersistTaps="always"
 			ref={ scrollViewRef }
 		>
-			{ isGradientSegment ? (
-				<Palette gradient />
-			) : (
-				<Palette custom onCustomPress={ onCustomPress } />
-			) }
+			<TouchableWithoutFeedback>
+				{ isGradientSegment ? (
+					<Palette gradient />
+				) : (
+					<Palette custom onCustomPress={ onCustomPress } />
+				) }
+			</TouchableWithoutFeedback>
 		</ScrollView>
 	);
 }

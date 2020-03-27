@@ -23,7 +23,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const ANIMATION_DURATION = 300;
+const ANIMATION_DURATION = 200;
 
 const isIOS = Platform.OS === 'ios';
 
@@ -90,7 +90,7 @@ const SegmentedControls = ( {
 	function pefrormAnimation( index ) {
 		Animated.timing( positionAnimationValue, {
 			toValue: calculateEndValue( index ),
-			duration: 200,
+			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
 		} ).start();
 	}

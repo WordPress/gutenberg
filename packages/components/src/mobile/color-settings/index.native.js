@@ -75,10 +75,21 @@ function ColorSettings( {
 						segments={ [ 'Solid', 'Gradient' ] }
 						segmentHandler={ ( item ) => setSegment( item ) }
 						addonLeft={
-							<ColorIndicator
-								color={ backgroundColor }
-								style={ styles.colorIndicator }
-							/>
+							<View>
+								<Text
+									selectable
+									style={ [
+										styles.colorIndicator,
+										styles.textIndicator,
+									] }
+								>
+									{ backgroundColor }
+								</Text>
+								<ColorIndicator
+									color={ backgroundColor }
+									style={ styles.colorIndicator }
+								/>
+							</View>
 						}
 					/>
 				</View>
@@ -95,6 +106,16 @@ function ColorSettings( {
 					<View style={ horizontalSeparatorStyle } />
 					<View style={ styles.footer }>
 						<View style={ styles.flex }>
+							<Text
+								selectable
+								style={ [
+									styles.colorIndicator,
+									styles.textIndicator,
+								] }
+							>
+								{ textColor }
+							</Text>
+
 							<ColorIndicator
 								color={ textColor }
 								style={ styles.colorIndicator }

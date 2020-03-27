@@ -13,6 +13,12 @@
 	height: 24px;
 }
 
+.textIndicator {
+	position: absolute;
+	z-index: 2;
+	color: transparent;
+}
+
 .footer {
 	flex-direction: row;
 	justify-content: center;
