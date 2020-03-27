@@ -470,6 +470,11 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void onDetach(Activity activity) {
+        mReactInstanceManager.onHostDestroy(activity);
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().notifyModalClosed();
+    }
+
     public void onDestroy(Activity activity) {
         if (mReactRootView != null) {
             mReactRootView.unmountReactApplication();
