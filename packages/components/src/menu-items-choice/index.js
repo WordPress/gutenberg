@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { check } from '@wordpress/icons';
@@ -8,7 +13,12 @@ import { check } from '@wordpress/icons';
  */
 import MenuItem from '../menu-item';
 
-export default function MenuItemsChoice( { choices = [], onSelect, value } ) {
+export default function MenuItemsChoice( {
+	choices = [],
+	onHover = noop,
+	onSelect,
+	value,
+} ) {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
@@ -24,6 +34,8 @@ export default function MenuItemsChoice( { choices = [], onSelect, value } ) {
 						onSelect( item.value );
 					}
 				} }
+				onMouseEnter={ () => onHover( item.value ) }
+				onMouseLeave={ () => onHover( null ) }
 			>
 				{ item.label }
 			</MenuItem>

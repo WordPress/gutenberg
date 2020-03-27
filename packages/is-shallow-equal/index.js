@@ -9,7 +9,7 @@ var isShallowEqualArrays = require( './arrays' );
 var isArray = Array.isArray;
 
 /**
- * @typedef {{[key: string]: any}} ComparableObject
+ * @typedef {Record<string, any>} ComparableObject
  */
 
 /**

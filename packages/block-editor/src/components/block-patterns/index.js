@@ -56,7 +56,11 @@ function BlockPatterns( { patterns } ) {
 			false
 		);
 		createSuccessNotice(
-			sprintf( __( 'Pattern "%s" inserted' ), pattern.title ),
+			sprintf(
+				/* translators: %s: block pattern title. */
+				__( 'Pattern "%s" inserted.' ),
+				pattern.title
+			),
 			{
 				type: 'snackbar',
 			}
