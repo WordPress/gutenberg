@@ -80,6 +80,13 @@
  * @param {string} p.x0 property 0
  * @param {XXX} [p.x1] property 1
  * @param {number} [p.x2=11] property 2
+ * @param {?Object} p             nullable obj
+ * @param {?string} p.version     Version in which the feature will be removed.
+ * @param {object=} p optional obj
+ * @param {?number} p.number number description
+ * @param {?number} p.number2 number2 description
+ * @param {object} [p] optional obj 2
+ * @param {boolean} p.bo boolean description
  * @param {keyof X} p jsdoc type operator 1: keyof
  * @param {readonly Y} p jsdoc type operator 2: readonly
  * @param {unique symbol} p jsdoc type operator 3: unique
@@ -93,6 +100,7 @@
  * @param {WPEditorInserterItem} p typedef
  * @param {string} __experimentalParam It's experimental
  * @param {number} __unstableParam It's unstable
+ * @param {string}   p.val  Test when 2 consecutive qualified names have different first part.
  * @param {boolean}   props.value  Qualified name without an object definition above.
  *
  * @typedef {object} WPEditorInserterItem

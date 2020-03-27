@@ -172,6 +172,176 @@ const restoreWordpressImport = ( description ) =>
 		? description.replace( /__WORDPRESS_IMPORT__/g, '@wordpress' )
 		: description;
 
+const getTags = ( tags, code ) => {
+	const docTags = ( tags || [] ).map( ( tag ) => {
+		const title = tag.tagName.text;
+		const description = restoreWordpressImport(
+			tag.comment ? tag.comment : null
+		);
+
+		if ( tag.kind === SyntaxKind.JSDocParameterTag ) {
+			const result = {
+				title,
+				description,
+			};
+			const { type, defaultValue } = getTypeNameAndDefaultValue(
+				tag,
+				code,
+				description
+			);
+
+			result.type = type;
+			result.name =
+				tag.name.kind === SyntaxKind.QualifiedName
+					? `${ tag.name.left.text }.${ tag.name.right.text }`
+					: tag.name.text;
+
+			if ( defaultValue !== undefined ) {
+				result.defaultValue = defaultValue;
+			}
+
+			if (
+				tag.typeExpression &&
+				tag.typeExpression.type.kind === SyntaxKind.JSDocTypeLiteral
+			) {
+				result.properties = getJSDocTypeLiteralProperties(
+					code,
+					tag.typeExpression.type.jsDocPropertyTags
+				);
+			}
+
+			return result;
+		}
+
+		if ( tag.kind === SyntaxKind.JSDocTypedefTag ) {
+			const result = {
+				title,
+				name: tag.name.text,
+				description,
+				type: tag.typeExpression.jsDocPropertyTags
+					? 'object'
+					: getType( tag.typeExpression ),
+			};
+
+			const properties = getJSDocTypeLiteralProperties(
+				code,
+				tag.typeExpression.jsDocPropertyTags
+			);
+
+			if ( properties !== null ) {
+				result.properties = properties;
+			}
+
+			return result;
+		}
+
+		if (
+			tag.kind === SyntaxKind.JSDocReturnTag ||
+			tag.kind === SyntaxKind.JSDocTypeTag
+		) {
+			return {
+				title,
+				description,
+				type: getType( tag.typeExpression ),
+			};
+		}
+
+		if ( title === 'example' ) {
+			return {
+				title,
+				description,
+			};
+		}
+
+		return {
+			title,
+			description,
+		};
+	} );
+
+	return handleJSDocTypeLiteralsWithTypeOptions( docTags );
+};
+
+/**
+ * When the type of JSDocTypeLiteral has a type option like {?object} or {object=},
+ * typescript cannot parse it correctly and treats properties like seperate parameters.
+ *
+ * This function handles that case.
+ *
+ * @param {Array<Object>} docTags
+ */
+const handleJSDocTypeLiteralsWithTypeOptions = ( docTags ) => {
+	let properties = [];
+	let removed = [];
+	let currentName = '';
+	let removedAt = -1;
+
+	// Loops backward to find tag names written in qualified name format i.e. props.value
+	for ( let i = docTags.length - 1; i >= 0; i-- ) {
+		const tag = docTags[ i ];
+
+		if ( ! tag.name ) continue;
+
+		const names = tag.name.split( '.' );
+
+		// When tag name is written in qualified name format
+		if ( names.length > 1 ) {
+			// First encounter of the tag name in that style.
+			// -> Save it.
+			if ( currentName === '' ) {
+				currentName = names[ 0 ];
+			}
+
+			// Met a qualified name with different first part.
+			// -> Reset.
+			if ( currentName !== names[ 0 ] ) {
+				currentName = names[ 0 ];
+
+				docTags.splice( removedAt, 0, ...removed );
+				properties = [];
+				removed = [];
+				removedAt = -1;
+			}
+
+			// Remove tag from the list.
+			removedAt = i;
+			docTags.splice( i, 1 );
+			removed.unshift( tag );
+			properties.unshift( {
+				name: names[ 1 ],
+				type: tag.type,
+				description: tag.description,
+			} );
+		}
+
+		// When we meet a param written in identifier format i.e. name
+		// and we have properties to add to it.
+		if ( properties.length > 0 && names.length === 1 ) {
+			// names match -> add properties.
+			if ( tag.name === currentName ) {
+				tag.properties = properties;
+			}
+			// name not match -> restore the removed tags.
+			else {
+				docTags.splice( removedAt, 0, ...removed );
+			}
+
+			// Reset
+			properties = [];
+			removed = [];
+			currentName = '';
+			removedAt = -1;
+		}
+	}
+
+	// when a tag name written in qualfied name format is at the top of the list.
+	if ( properties.length > 0 ) {
+		docTags.splice( removedAt, 0, ...removed );
+	}
+
+	return docTags;
+};
+
 /**
  * Function that takes a TypeScript statement and returns
  * a object representing the leading JSDoc comment of the statement,
@@ -186,94 +356,13 @@ module.exports = function( statement ) {
 		const code = statement.parent.text;
 		const lastComment = statement.jsDoc[ statement.jsDoc.length - 1 ];
 
+		const comment = lastComment.comment ? lastComment.comment : null;
+		const description = restoreWordpressImport( comment );
+		const tags = getTags( lastComment.tags, code );
+
 		return {
-			description: restoreWordpressImport( lastComment.comment ),
-			tags: ( lastComment.tags || [] ).map( ( tag ) => {
-				const title = tag.tagName.text;
-				const description = restoreWordpressImport(
-					tag.comment ? tag.comment : null
-				);
-
-				if ( tag.kind === SyntaxKind.JSDocParameterTag ) {
-					const result = {
-						title,
-						description,
-					};
-					const { type, defaultValue } = getTypeNameAndDefaultValue(
-						tag,
-						code,
-						description
-					);
-
-					result.type = type;
-					result.name =
-						tag.name.kind === SyntaxKind.QualifiedName
-							? `${ tag.name.left.text }.${ tag.name.right.text }`
-							: tag.name.text;
-
-					if ( defaultValue !== undefined ) {
-						result.defaultValue = defaultValue;
-					}
-
-					if (
-						tag.typeExpression &&
-						tag.typeExpression.type.kind ===
-							SyntaxKind.JSDocTypeLiteral
-					) {
-						result.properties = getJSDocTypeLiteralProperties(
-							code,
-							tag.typeExpression.type.jsDocPropertyTags
-						);
-					}
-
-					return result;
-				}
-
-				if ( tag.kind === SyntaxKind.JSDocTypedefTag ) {
-					const result = {
-						title,
-						name: tag.name.text,
-						description,
-						type: tag.typeExpression.jsDocPropertyTags
-							? 'object'
-							: getType( tag.typeExpression ),
-					};
-
-					const properties = getJSDocTypeLiteralProperties(
-						code,
-						tag.typeExpression.jsDocPropertyTags
-					);
-
-					if ( properties !== null ) {
-						result.properties = properties;
-					}
-
-					return result;
-				}
-
-				if (
-					tag.kind === SyntaxKind.JSDocReturnTag ||
-					tag.kind === SyntaxKind.JSDocTypeTag
-				) {
-					return {
-						title,
-						description,
-						type: getType( tag.typeExpression ),
-					};
-				}
-
-				if ( title === 'example' ) {
-					return {
-						title,
-						description,
-					};
-				}
-
-				return {
-					title,
-					description,
-				};
-			} ),
+			description,
+			tags,
 		};
 	}
 

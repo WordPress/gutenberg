@@ -331,6 +331,51 @@ const MyButtonMoreMenuItem = () => (
 						},
 					],
 				},
+				{
+					title: 'param',
+					name: 'p',
+					description: 'nullable obj',
+					type: 'object | null',
+					properties: [
+						{
+							name: 'version',
+							description:
+								'Version in which the feature will be removed.',
+							type: 'string | null',
+						},
+					],
+				},
+				{
+					title: 'param',
+					name: 'p',
+					description: 'optional obj',
+					type: 'object | undefined',
+					properties: [
+						{
+							name: 'number',
+							description: 'number description',
+							type: 'number | null',
+						},
+						{
+							name: 'number2',
+							description: 'number2 description',
+							type: 'number | null',
+						},
+					],
+				},
+				{
+					title: 'param',
+					name: 'p',
+					description: 'optional obj 2',
+					type: 'object | undefined',
+					properties: [
+						{
+							name: 'bo',
+							description: 'boolean description',
+							type: 'boolean',
+						},
+					],
+				},
 				type( 'keyof X', 'jsdoc type operator 1: keyof' ),
 				type( 'readonly Y', 'jsdoc type operator 2: readonly' ),
 				type( 'unique symbol', 'jsdoc type operator 3: unique' ),
@@ -362,6 +407,13 @@ const MyButtonMoreMenuItem = () => (
 					name: '__unstableParam',
 					description: "It's unstable",
 					type: 'number',
+				},
+				{
+					title: 'param',
+					name: 'p.val',
+					description:
+						'Test when 2 consecutive qualified names have different first part.',
+					type: 'string',
 				},
 				{
 					title: 'param',
@@ -398,6 +450,32 @@ const MyButtonMoreMenuItem = () => (
 							type: 'boolean',
 						},
 					],
+				},
+			],
+		} );
+	} );
+
+	it( 'can handle qualified names at the top', () => {
+		const { typeChecker, sourceFile } = prepare(
+			'tags-param-qualified-name-at-top'
+		);
+
+		expect(
+			getJSDocFromToken( sourceFile.statements[ 0 ], typeChecker )
+		).toEqual( {
+			description: null,
+			tags: [
+				{
+					title: 'param',
+					description: 'name description',
+					name: 'props.name',
+					type: 'string',
+				},
+				{
+					title: 'param',
+					description: 'val description',
+					name: 'props.val',
+					type: 'string',
 				},
 			],
 		} );
