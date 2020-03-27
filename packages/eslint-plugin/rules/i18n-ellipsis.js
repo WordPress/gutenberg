@@ -67,7 +67,7 @@ module.exports = {
 
 				const functionName = getTranslateFunctionName( callee );
 
-				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
+				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
 					return;
 				}
 
