@@ -22,14 +22,6 @@ class TableOfContentsEdit extends Component {
 		this.state = {
 			wpDataUnsubscribe: null,
 		};
-
-		this.refresh = this.refresh.bind( this );
-	}
-
-	refresh() {
-		const { setAttributes } = this.props;
-		const headings = getPageHeadings();
-		setAttributes( { headings } );
 	}
 
 	componentDidMount() {
