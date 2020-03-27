@@ -25,6 +25,8 @@
  * @param {object} p object
  * @param {Object} p object in capital case
  * @param {Object.<string, number>} p jsdoc record type
+ * @param {RandomName<string | number, number, Y>} p generics
+ * @param {React.Component<Props, State>} p generics with qualified name
  * @param {File} p random type name
  * @param {'string literal'} p string literal
  * @param {42} p number literal

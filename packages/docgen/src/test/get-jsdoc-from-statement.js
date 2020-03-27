@@ -161,6 +161,11 @@ describe( 'JSDoc', () => {
 				type( 'object', 'object' ),
 				type( 'object', 'object in capital case' ),
 				type( 'Record<string, number>', 'jsdoc record type' ),
+				type( 'RandomName<string | number, number, Y>', 'generics' ),
+				type(
+					'React.Component<Props, State>',
+					'generics with qualified name'
+				),
 				type( 'File', 'random type name' ),
 				type( `'string literal'`, 'string literal' ),
 				type( '42', 'number literal' ),

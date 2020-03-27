@@ -3,6 +3,18 @@
  */
 const { SyntaxKind } = require( 'typescript' );
 
+const getTypeArgs = ( type ) => {
+	const args = type.typeArguments;
+
+	if ( args ) {
+		const types = args.map( ( a ) => typeToString( a ) ).join( ', ' );
+
+		return `<${ types }>`;
+	}
+
+	return '';
+};
+
 const getTypeFromTypeReference = ( type ) => {
 	if ( type.typeName.kind === SyntaxKind.Identifier ) {
 		const name = type.typeName.text;
@@ -34,13 +46,15 @@ const getTypeFromTypeReference = ( type ) => {
 			return 'Array';
 		}
 
-		return name;
+		return `${ name }${ getTypeArgs( type ) }`;
 	}
 
 	if ( type.typeName.kind === SyntaxKind.QualifiedName ) {
-		const name = type.typeName;
+		const left = type.typeName.left.text;
+		const right = type.typeName.right.text;
+		const types = getTypeArgs( type );
 
-		return `${ name.left.text }.${ name.right.text }`;
+		return `${ left }.${ right }${ types }`;
 	}
 };
 
