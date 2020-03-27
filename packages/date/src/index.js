@@ -475,11 +475,11 @@ export function getDate( dateString ) {
  * @return {Moment}  a moment instance.
  */
 function buildMoment( dateValue, timezone ) {
-	if ( timezone && ! isUtcOffset( timezone ) ) {
+	if ( timezone && ! isUTCOffset( timezone ) ) {
 		return momentLib( dateValue ).tz( timezone );
 	}
 
-	if ( timezone && isUtcOffset( timezone ) ) {
+	if ( timezone && isUTCOffset( timezone ) ) {
 		return momentLib( dateValue ).utcOffset( timezone );
 	}
 
@@ -499,10 +499,10 @@ const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:[0-9][0-9])?$/;
  *
  * @return {boolean} whether a certain UTC offset is valid or not.
  */
-function isUtcOffset( offset ) {
+function isUTCOffset( offset ) {
 	if ( 'number' === typeof offset ) {
 		return true;
-	} //end if
+	}
 
 	offset = `${ offset }`;
 	return VALID_UTC_OFFSET.test( offset );
