@@ -8848,7 +8848,7 @@ exports[`Storyshots Components/UnitControl Default 1`] = `
       value=""
     />
     <select
-      className="emotion-2 emotion-3"
+      className="component-unit-control__select component-unit-control__select emotion-2 emotion-3"
       onChange={[Function]}
       size="default"
       tabIndex={null}
