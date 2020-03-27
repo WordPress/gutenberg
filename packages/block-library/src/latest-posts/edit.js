@@ -368,31 +368,25 @@ class LatestPostsEdit extends Component {
 								excerpt.trim().split( ' ' ).length &&
 							post.excerpt.raw === '';
 
-						const getReadMoreLink = ( excerptText, link ) => {
-							return (
-								<>
-									{ excerptText }
-									&nbsp;&hellip;&nbsp;
-									<a
-										href={ link }
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										{ __( 'Read more' ) }
-									</a>
-								</>
-							);
-						};
-
-						const postExcerpt = needsReadMore
-							? getReadMoreLink(
-									excerpt
-										.trim()
-										.split( ' ', excerptLength )
-										.join( ' ' ),
-									post.link
-							  )
-							: excerpt;
+						const postExcerpt = needsReadMore ? (
+							<>
+								{ excerpt
+									.trim()
+									.split( ' ', excerptLength )
+									.join( ' ' ) }
+								{ /* translators: excerpt truncation character, default …  */ }
+								{ __( ' … ' ) }
+								<a
+									href={ post.link }
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{ __( 'Read more' ) }
+								</a>
+							</>
+						) : (
+							excerpt
+						);
 
 						return (
 							<li key={ i }>
