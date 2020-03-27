@@ -1144,7 +1144,7 @@ export default class Dashicon extends Component {
 				viewBox="0 0 20 20"
 				{ ...extraProps }
 			>
-				<Path d={ path } />
+				<Path d={ path } stroke="currentColor" />
 			</SVG>
 		);
 	}
