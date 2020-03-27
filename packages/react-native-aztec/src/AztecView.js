@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import ReactNative, { requireNativeComponent, TextViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform } from 'react-native';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
@@ -165,32 +164,6 @@ class AztecView extends React.Component {
 		);
 	}
 }
-
-AztecView.propTypes = {
-	activeFormats: PropTypes.array,
-	isSelected: PropTypes.bool,
-	disableGutenbergMode: PropTypes.bool,
-	deleteEnter: PropTypes.bool,
-	text: PropTypes.object,
-	placeholder: PropTypes.string,
-	placeholderTextColor: ColorPropType,
-	color: ColorPropType,
-	linkTextColor: ColorPropType,
-	maxImagesWidth: PropTypes.number,
-	minImagesWidth: PropTypes.number,
-	onChange: PropTypes.func,
-	onFocus: PropTypes.func,
-	onBlur: PropTypes.func,
-	onContentSizeChange: PropTypes.func,
-	onEnter: PropTypes.func,
-	onBackspace: PropTypes.func,
-	onScroll: PropTypes.func,
-	onSelectionChange: PropTypes.func,
-	onHTMLContentWithCursor: PropTypes.func,
-	onCaretVerticalPositionChange: PropTypes.func,
-	blockType: PropTypes.object,
-	...TextViewPropTypes, // include the default view properties
-};
 
 const RCTAztecView = requireNativeComponent( 'RCTAztecView', AztecView );
 
