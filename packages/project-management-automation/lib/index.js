@@ -42,9 +42,8 @@ const automations = [
 		task: ifNotFork( assignFixedIssues ),
 	},
 	{
-		event: 'pull_request',
-		action: 'opened',
-		task: ifNotFork( addFirstTimeContributorLabel ),
+		event: 'push',
+		task: addFirstTimeContributorLabel,
 	},
 	{
 		event: 'push',

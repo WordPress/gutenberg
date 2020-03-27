@@ -2,22 +2,40 @@
  * Internal dependencies
  */
 const debug = require( './debug' );
+const getAssociatedPullRequest = require( './get-associated-pull-request' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
-/** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
+/** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
+/** @typedef {import('./get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
- * Adds the 'First Time Contributor' label to PRs opened by contributors that
- * have not yet made a commit.
+ * Adds the 'First Time Contributor' label to PRs merged on behalf of
+ * contributors that have not yet made a commit.
  *
- * @param {WebhookPayloadPullRequest} payload Pull request event payload.
- * @param {GitHub}                    octokit Initialized Octokit REST client.
+ * @param {WebhookPayloadPush} payload Push event payload.
+ * @param {GitHub}             octokit Initialized Octokit REST client.
  */
 async function addFirstTimeContributorLabel( payload, octokit ) {
-	const owner = payload.repository.owner.login;
-	const repo = payload.repository.name;
-	const author = payload.pull_request.user.login;
+	if ( payload.ref !== 'refs/heads/master' ) {
+		debug(
+			'add-first-time-contributor-label: Commit is not to `master`. Aborting'
+		);
+		return;
+	}
 
+	const commit =
+		/** @type {WebhookPayloadPushCommit} */ ( payload.commits[ 0 ] );
+	const pullRequest = getAssociatedPullRequest( commit );
+	if ( ! pullRequest ) {
+		debug(
+			'add-first-time-contributor-label: Cannot determine pull request associated with commit. Aborting'
+		);
+		return;
+	}
+
+	const repo = payload.repository.name;
+	const owner = payload.repository.owner.login;
+	const author = commit.author.username;
 	debug(
 		`add-first-time-contributor-label: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
@@ -36,13 +54,13 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	}
 
 	debug(
-		`add-first-time-contributor-label: Adding 'First Time Contributor' label to issue #${ payload.pull_request.number }`
+		`add-first-time-contributor-label: Adding 'First Time Contributor' label to issue #${ pullRequest }`
 	);
 
 	await octokit.issues.addLabels( {
 		owner,
 		repo,
-		issue_number: payload.pull_request.number,
+		issue_number: pullRequest,
 		labels: [ 'First-time Contributor' ],
 	} );
 }

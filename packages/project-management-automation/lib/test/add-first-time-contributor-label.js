@@ -5,12 +5,17 @@ import addFirstTimeContributorLabel from '../add-first-time-contributor-label';
 
 describe( 'addFirstTimeContributorLabel', () => {
 	const payload = {
-		pull_request: {
-			user: {
-				login: 'matt',
+		ref: 'refs/heads/master',
+		commits: [
+			{
+				message: 'Add a feature from pull request (#123)',
+				author: {
+					name: 'Ghost',
+					email: 'ghost@example.invalid',
+					username: 'ghost',
+				},
 			},
-			number: 123,
-		},
+		],
 		repository: {
 			owner: {
 				login: 'WordPress',
@@ -18,6 +23,49 @@ describe( 'addFirstTimeContributorLabel', () => {
 			name: 'gutenberg',
 		},
 	};
+
+	it( 'does nothing if not a commit to master', async () => {
+		const payloadForBranchPush = {
+			...payload,
+			ref: 'refs/heads/update/chicken-branch',
+		};
+
+		const octokit = {
+			search: {
+				commits: jest.fn(),
+			},
+		};
+
+		await addFirstTimeContributorLabel( payloadForBranchPush, octokit );
+
+		expect( octokit.search.commits ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing if commit pull request undeterminable', async () => {
+		const payloadDirectToMaster = {
+			...payload,
+			commits: [
+				{
+					message: 'Add a feature direct to master',
+					author: {
+						name: 'Ghost',
+						email: 'ghost@example.invalid',
+						username: 'ghost',
+					},
+				},
+			],
+		};
+
+		const octokit = {
+			search: {
+				commits: jest.fn(),
+			},
+		};
+
+		await addFirstTimeContributorLabel( payloadDirectToMaster, octokit );
+
+		expect( octokit.search.commits ).not.toHaveBeenCalled();
+	} );
 
 	it( 'does nothing if the user has commits', async () => {
 		const octokit = {
@@ -38,7 +86,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		await addFirstTimeContributorLabel( payload, octokit );
 
 		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:matt',
+			q: 'repo:WordPress/gutenberg+author:ghost',
 		} );
 		expect( octokit.issues.addLabels ).not.toHaveBeenCalled();
 	} );
@@ -62,7 +110,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		await addFirstTimeContributorLabel( payload, octokit );
 
 		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:matt',
+			q: 'repo:WordPress/gutenberg+author:ghost',
 		} );
 		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

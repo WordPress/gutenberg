@@ -1,10 +1,22 @@
 /**
+ * @typedef WebhookPayloadPushCommitAuthor
+ *
+ * @property {string} name     Author name.
+ * @property {string} email    Author email.
+ * @property {string} username Author username.
+ */
+
+/**
  * Minimal type detail of GitHub Push webhook event payload, for lack of their
  * own.
  *
+ * TODO: If GitHub improves this on their own webhook payload types, this type
+ * should no longer be necessary.
+ *
  * @typedef {Record<string,*>} WebhookPayloadPushCommit
  *
- * @property {string} message Commit message.
+ * @property {string}                         message Commit message.
+ * @property {WebhookPayloadPushCommitAuthor} author  Commit author.
  *
  * @see https://developer.github.com/v3/activity/events/types/#pushevent
  */
