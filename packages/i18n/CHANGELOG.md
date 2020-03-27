@@ -2,7 +2,9 @@
 
 ### New Feature
 
-- Add `isRTL` function (#20298)
+- Add `isRTL` function  ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
 
 ## 3.1.0 (2018-11-15)
 
