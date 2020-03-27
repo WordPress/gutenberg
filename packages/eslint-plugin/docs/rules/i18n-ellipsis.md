@@ -7,12 +7,12 @@ Translatable strings should use ellipsis (…) instead of three dots.
 Examples of **incorrect** code for this rule:
 
 ```js
-__('Continue...');
+__( 'Continue...' );
 
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-__('Continue…');
+__( 'Continue…' );
 ```

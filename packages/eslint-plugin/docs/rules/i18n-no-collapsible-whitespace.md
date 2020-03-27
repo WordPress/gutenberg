@@ -7,11 +7,11 @@ Translatable strings that consist of nothing but a placeholder are rather pointl
 Examples of **incorrect** code for this rule:
 
 ```js
-__('%s');
+__( '%s' );
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-__('Hello %s');
+__( 'Hello %s' );
 ```

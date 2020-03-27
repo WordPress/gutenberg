@@ -7,14 +7,14 @@
 Examples of **incorrect** code for this rule:
 
 ```js
-__('Hello World');
-_x('Hello World', 'context', 'foo');
+__( 'Hello World' );
+_x( 'Hello World', 'context', 'foo' );
 
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-__(`Hello ${foo}`);
-_x('Hello World', bar);
+__( `Hello ${foo}` );
+_x( 'Hello World', bar );
 ```
