@@ -1448,6 +1448,28 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
+/**
+ * Reducer returning current highlighted block.
+ *
+ * @param {boolean} state  Current highlighted block.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function highlightedBlock( state, action ) {
+	const { clientId, isHighlighted } = action;
+
+	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
+		if ( isHighlighted ) {
+			return clientId;
+		} else if ( state === clientId ) {
+			return null;
+		}
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1467,4 +1489,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
+	highlightedBlock,
 } );

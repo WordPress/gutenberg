@@ -70,7 +70,6 @@ const COVER_DEFAULT_HEIGHT = 300;
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
-	hasChildren,
 	isParentSelected,
 	onFocus,
 	overlayColor,
@@ -211,11 +210,6 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const containerStyles = [
-		hasChildren && ! isParentSelected && styles.regularMediaPadding,
-		hasChildren && isParentSelected && styles.innerPadding,
-	];
-
 	const renderBackground = ( { open: openMediaOptions, getMediaOptions } ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
@@ -271,7 +265,7 @@ const Cover = ( {
 
 	if ( ! hasBackground ) {
 		return (
-			<View style={ containerStyles }>
+			<View>
 				<MediaPlaceholder
 					// eslint-disable-next-line no-undef
 					__experimentalOnlyMediaLibrary={ ! __DEV__ }
@@ -288,51 +282,46 @@ const Cover = ( {
 	}
 
 	return (
-		<View style={ containerStyles }>
+		<View style={ styles.backgroundContainer }>
 			{ controls }
-			<View style={ styles.backgroundContainer }>
-				<View
-					pointerEvents="box-none"
-					style={ [
-						styles.content,
-						{ minHeight: CONTAINER_HEIGHT },
-					] }
-				>
-					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
-				</View>
 
-				<View pointerEvents="none" style={ overlayStyles }>
-					{ gradientValue && (
-						<LinearGradient
-							gradientValue={ gradientValue }
-							style={ styles.background }
-						/>
-					) }
-				</View>
-
-				<MediaUpload
-					// eslint-disable-next-line no-undef
-					__experimentalOnlyMediaLibrary={ ! __DEV__ }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onSelect={ onSelectMedia }
-					render={ renderBackground }
-				/>
-
-				{  shouldShowFailure && (
-					<View
-						pointerEvents="none"
-						style={ styles.uploadFailedContainer }
-					>
-						<View style={ styles.uploadFailed }>
-							<Icon
-								icon={ 'warning' }
-								{ ...styles.uploadFailedIcon }
-							/>
-						</View>
-					</View>
-				) }
-
+			<View
+				pointerEvents="box-none"
+				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+			>
+				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
+
+			<View pointerEvents="none" style={ overlayStyles }>
+				{ gradientValue && (
+					<LinearGradient
+						gradientValue={ gradientValue }
+						style={ styles.background }
+					/>
+				) }
+			</View>
+
+			<MediaUpload
+				// eslint-disable-next-line no-undef
+				__experimentalOnlyMediaLibrary={ ! __DEV__ }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onSelect={ onSelectMedia }
+				render={ renderBackground }
+			/>
+
+			{  shouldShowFailure && (
+				<View
+					pointerEvents="none"
+					style={ styles.uploadFailedContainer }
+				>
+					<View style={ styles.uploadFailed }>
+						<Icon
+							icon={ 'warning' }
+							{ ...styles.uploadFailedIcon }
+						/>
+					</View>
+				</View>
+			) }
 		</View>
 	);
 };
@@ -340,15 +329,11 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId, getBlockCount } = select(
-			'core/block-editor'
-		);
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const hasChildren = getBlockCount( clientId );
 
 		return {
-			hasChildren,
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),

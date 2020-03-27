@@ -14,7 +14,7 @@ import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
-import { fetchRequest } from 'react-native-gutenberg-bridge';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Icon,
 	PanelBody,
@@ -52,23 +52,13 @@ class LatestPostsEdit extends Component {
 
 	componentDidMount() {
 		this.isStillMounted = true;
-		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
+		this.fetchRequest = apiFetch( { path: '/wp/v2/categories' } )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
-					let parsedCategoriesList = categoriesList;
-
-					// TODO: remove this check after `fetchRequest` types are made consist across platforms
-					// (see: https://github.com/wordpress-mobile/gutenberg-mobile/issues/1961)
-					if ( typeof categoriesList === 'string' ) {
-						parsedCategoriesList = JSON.parse( categoriesList );
-					}
-
-					if ( isEmpty( parsedCategoriesList ) ) {
-						parsedCategoriesList = [];
-					}
-
 					this.setState( {
-						categoriesList: parsedCategoriesList,
+						categoriesList: isEmpty( categoriesList )
+							? []
+							: categoriesList,
 					} );
 				}
 			} )

@@ -76,7 +76,6 @@ function RootContainer( { children, className, hasPopover = true }, ref ) {
 
 	return (
 		<InsertionPoint
-			className={ className }
 			isMultiSelecting={ isMultiSelecting }
 			hasMultiSelection={ hasMultiSelection }
 			selectedBlockClientId={ selectedBlockClientId }

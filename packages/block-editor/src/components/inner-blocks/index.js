@@ -61,7 +61,7 @@ class InnerBlocks extends Component {
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( __experimentalBlocks );
+			replaceInnerBlocks( __experimentalBlocks, false );
 		}
 	}
 
@@ -227,13 +227,15 @@ const ComposedInnerBlocks = compose( [
 		} = ownProps;
 
 		return {
-			replaceInnerBlocks( blocks ) {
+			replaceInnerBlocks( blocks, forceUpdateSelection ) {
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
+					forceUpdateSelection !== undefined
+						? forceUpdateSelection
+						: block.innerBlocks.length === 0 &&
+								templateInsertUpdatesSelection &&
+								blocks.length !== 0
 				);
 			},
 			__unstableMarkNextChangeAsNotPersistent,
