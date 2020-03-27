@@ -111,12 +111,12 @@ const Cover = ( {
 
 	const overlayStyles = [
 		styles.overlay,
-		{
+		url && { opacity: dimRatio / 100 },
+		! gradientValue && {
 			backgroundColor:
 				overlayColor && overlayColor.color
 					? overlayColor.color
 					: styles.overlay.color,
-			opacity: dimRatio / 100,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -185,19 +185,12 @@ const Cover = ( {
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 
-				{ /* When the gradient is set as a background the backgroundType is equal to IMAGE_BACKGROUND_TYPE */ }
-				{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-					( gradientValue ? (
-						<LinearGradient
-							gradientValue={ gradientValue }
-							style={ styles.background }
-						/>
-					) : (
-						<ImageWithFocalPoint
-							focalPoint={ focalPoint }
-							url={ url }
-						/>
-					) ) }
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
 						muted
@@ -240,10 +233,14 @@ const Cover = ( {
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
 
-			{ /* We don't render overlay on top of gradient */ }
-			{ ! gradientValue && (
-				<View pointerEvents="none" style={ overlayStyles } />
-			) }
+			<View pointerEvents="none" style={ overlayStyles }>
+				{ gradientValue && (
+					<LinearGradient
+						gradientValue={ gradientValue }
+						style={ styles.background }
+					/>
+				) }
+			</View>
 
 			<MediaUpload
 				__experimentalOnlyMediaLibrary
