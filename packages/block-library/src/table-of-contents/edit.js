@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+const { isEqual } = require( 'lodash' );
+
+/**
  * Internal dependencies
  */
 import {
@@ -18,7 +24,8 @@ import { __ } from '@wordpress/i18n';
 class TableOfContentsEdit extends Component {
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
-		const headings = attributes.headings || [];
+		const { headings = [] } = attributes;
+
 		this.unsubscribe = subscribe( () => {
 			const pageHeadings = getPageHeadings();
 			this.setState( { pageHeadings } );
@@ -34,10 +41,8 @@ class TableOfContentsEdit extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		const { setAttributes } = this.props;
 		const { pageHeadings } = this.state;
-		if (
-			JSON.stringify( pageHeadings ) !==
-			JSON.stringify( prevState.pageHeadings )
-		) {
+
+		if ( ! isEqual( pageHeadings, prevState.pageHeadings ) ) {
 			this.setState( { pageHeadings } );
 			setAttributes( { headings: pageHeadings } );
 		}
