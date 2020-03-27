@@ -4,7 +4,7 @@
 
 - Add `isRTL` function  ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
 - Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
-
+- Add `createI18n` method to allow creation of multiple i18n instances ([#21182](https://github.com/WordPress/gutenberg/pull/21182))
 
 ## 3.1.0 (2018-11-15)
 
