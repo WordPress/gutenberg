@@ -17,7 +17,7 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'i18n-no-collapsible-whitespace', rule, {
 	valid: [
 		{
-			code: `__('Hello World…')`,
+			code: `__( 'Hello World…' )`,
 		},
 		{
 			code:

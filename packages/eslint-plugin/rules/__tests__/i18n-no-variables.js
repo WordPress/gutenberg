@@ -17,34 +17,34 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'i18n-no-variables', rule, {
 	valid: [
 		{
-			code: `__('Hello World')`,
+			code: `__( 'Hello World' )`,
 		},
 		{
-			code: `__('Hello' + 'World')`,
+			code: `__( 'Hello' + 'World' )`,
 		},
 		{
-			code: `_x('Hello World', 'context')`,
+			code: `_x( 'Hello World', 'context' )`,
 		},
 		{
-			code: `var number = ''; _n('Singular', 'Plural', number)`,
+			code: `var number = ''; _n( 'Singular', 'Plural', number)`,
 		},
 		{
-			code: `var number = ''; _nx('Singular', 'Plural', number, 'context')`,
+			code: `var number = ''; _nx( 'Singular', 'Plural', number, 'context' )`,
 		},
 		{
-			code: `__('Hello World', 'foo')`,
+			code: `__( 'Hello World', 'foo' )`,
 		},
 		{
-			code: `_x('Hello World', 'context', 'foo')`,
+			code: `_x( 'Hello World', 'context', 'foo' )`,
 		},
 		{
-			code: `var number = ''; _n('Singular', 'Plural', number, 'foo')`,
+			code: `var number = ''; _n( 'Singular', 'Plural', number, 'foo' )`,
 		},
 		{
-			code: `var number = ''; _nx('Singular', 'Plural', number, 'context', 'foo')`,
+			code: `var number = ''; _nx( 'Singular', 'Plural', number, 'context', 'foo' )`,
 		},
 		{
-			code: `i18n.__('Hello World')`,
+			code: `i18n.__( 'Hello World' )`,
 		},
 	],
 	invalid: [
@@ -57,11 +57,11 @@ ruleTester.run( 'i18n-no-variables', rule, {
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `_x(foo, 'context')`,
+			code: `_x(foo, 'context' )`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `_x('Hello World', bar)`,
+			code: `_x( 'Hello World', bar)`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
@@ -69,19 +69,19 @@ ruleTester.run( 'i18n-no-variables', rule, {
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `var number = ''; _n('Singular', bar, number)`,
+			code: `var number = ''; _n( 'Singular', bar, number)`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `var number = ''; _nx(foo, 'Plural', number, 'context')`,
+			code: `var number = ''; _nx(foo, 'Plural', number, 'context' )`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `var number = ''; _nx('Singular', bar, number, 'context')`,
+			code: `var number = ''; _nx( 'Singular', bar, number, 'context' )`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
-			code: `var number = ''; _nx('Singular', 'Plural', number, baz)`,
+			code: `var number = ''; _nx( 'Singular', 'Plural', number, baz)`,
 			errors: [ { messageId: 'invalidArgument' } ],
 		},
 		{
