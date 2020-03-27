@@ -19,6 +19,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 		ref: 'refs/heads/master',
 		commits: [
 			{
+				id: '4c535288a6a2b75ff23ee96c75f7d9877e919241',
 				message: 'Add a feature from pull request (#123)',
 				author: {
 					name: 'Ghost',
@@ -42,14 +43,14 @@ describe( 'addFirstTimeContributorLabel', () => {
 		};
 
 		const octokit = {
-			search: {
-				commits: jest.fn(),
+			repos: {
+				listCommits: jest.fn(),
 			},
 		};
 
 		await addFirstTimeContributorLabel( payloadForBranchPush, octokit );
 
-		expect( octokit.search.commits ).not.toHaveBeenCalled();
+		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if commit pull request undeterminable', async () => {
@@ -68,24 +69,25 @@ describe( 'addFirstTimeContributorLabel', () => {
 		};
 
 		const octokit = {
-			search: {
-				commits: jest.fn(),
+			repos: {
+				listCommits: jest.fn(),
 			},
 		};
 
 		await addFirstTimeContributorLabel( payloadDirectToMaster, octokit );
 
-		expect( octokit.search.commits ).not.toHaveBeenCalled();
+		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does nothing if the user has commits', async () => {
+	it( 'does nothing if the user has multiple commits', async () => {
 		const octokit = {
-			search: {
-				commits: jest.fn( () =>
+			repos: {
+				listCommits: jest.fn( () =>
 					Promise.resolve( {
-						data: {
-							total_count: 100,
-						},
+						data: [
+							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
+							{ sha: '59b07cc57adff90630fc9d5cf2317269a0f4f158' },
+						],
 					} )
 				),
 			},
@@ -96,20 +98,22 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		await addFirstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:ghost',
+		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
 		} );
 		expect( octokit.issues.addLabels ).not.toHaveBeenCalled();
 	} );
 
-	it( 'adds the label if the user does not have commits', async () => {
+	it( 'adds the label if this was the first commit for the user', async () => {
 		const octokit = {
-			search: {
-				commits: jest.fn( () =>
+			repos: {
+				listCommits: jest.fn( () =>
 					Promise.resolve( {
-						data: {
-							total_count: 0,
-						},
+						data: [
+							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
+						],
 					} )
 				),
 			},
@@ -123,8 +127,10 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		await addFirstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:ghost',
+		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
 		} );
 		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -137,12 +143,12 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 	it( 'aborts if the request to retrieve WordPress.org user profile fails', async () => {
 		const octokit = {
-			search: {
-				commits: jest.fn( () =>
+			repos: {
+				listCommits: jest.fn( () =>
 					Promise.resolve( {
-						data: {
-							total_count: 0,
-						},
+						data: [
+							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
+						],
 					} )
 				),
 			},
@@ -158,8 +164,10 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		await addFirstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:ghost',
+		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
 		} );
 		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -172,12 +180,12 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 	it( 'prompts the user to link their GitHub account to their WordPress.org profile', async () => {
 		const octokit = {
-			search: {
-				commits: jest.fn( () =>
+			repos: {
+				listCommits: jest.fn( () =>
 					Promise.resolve( {
-						data: {
-							total_count: 0,
-						},
+						data: [
+							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
+						],
 					} )
 				),
 			},
@@ -201,8 +209,10 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		await addFirstTimeContributorLabel( payload, octokit );
 
-		expect( octokit.search.commits ).toHaveBeenCalledWith( {
-			q: 'repo:WordPress/gutenberg+author:ghost',
+		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			author: 'ghost',
 		} );
 		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

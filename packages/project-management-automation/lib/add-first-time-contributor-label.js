@@ -69,15 +69,15 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 		`add-first-time-contributor-label: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const {
-		data: { total_count: totalCount },
-	} = await octokit.search.commits( {
-		q: `repo:${ owner }/${ repo }+author:${ author }`,
+	const { data: commits } = await octokit.repos.listCommits( {
+		owner,
+		repo,
+		author,
 	} );
 
-	if ( totalCount !== 0 ) {
+	if ( commits.length > 1 ) {
 		debug(
-			`add-first-time-contributor-label: ${ totalCount } commits found. Aborting`
+			`add-first-time-contributor-label: Not the first commit for author. Aborting`
 		);
 		return;
 	}
