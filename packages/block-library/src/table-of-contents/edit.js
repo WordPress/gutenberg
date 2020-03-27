@@ -22,6 +22,22 @@ import { subscribe } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 class TableOfContentsEdit extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.state = {
+			wpDataUnsubscribe: null,
+		};
+
+		this.refresh = this.refresh.bind( this );
+	}
+
+	refresh() {
+		const { setAttributes } = this.props;
+		const headings = getPageHeadings();
+		setAttributes( { headings } );
+	}
+
 	componentDidMount() {
 		const { attributes, setAttributes } = this.props;
 		const { headings = [] } = attributes;
