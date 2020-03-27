@@ -94,10 +94,16 @@ export function addSaveProps( props, blockType, attributes ) {
 		backgroundColor
 	);
 	const textClass = getColorClassName( 'color', textColor );
-	props.className = classnames( props.className, backgroundClass, textClass, {
-		'has-text-color': textColor || style?.color?.text,
-		'has-background': backgroundColor || style?.color?.background,
-	} );
+	const newClassName = classnames(
+		props.className,
+		backgroundClass,
+		textClass,
+		{
+			'has-text-color': textColor || style?.color?.text,
+			'has-background': backgroundColor || style?.color?.background,
+		}
+	);
+	props.className = newClassName ? newClassName : undefined;
 
 	return props;
 }
