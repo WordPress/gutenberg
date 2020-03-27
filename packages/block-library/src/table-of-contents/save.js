@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { linearToNestedList, updateHeadingBlockAnchors } from './utils';
+import { linearToNestedHeadingList, updateHeadingBlockAnchors } from './utils';
 import ListLevel from './ListLevel';
 
 export default function save( props ) {
@@ -12,12 +12,10 @@ export default function save( props ) {
 		return null;
 	}
 
-	Utils.updateHeadingBlockAnchors();
+	updateHeadingBlockAnchors();
 	return (
 		<nav className={ props.className }>
-			<ListLevel>
-				{ Utils.linearToNestedHeadingList( headings ) }
-			</ListLevel>
+			<ListLevel>{ linearToNestedHeadingList( headings ) }</ListLevel>
 		</nav>
 	);
 }

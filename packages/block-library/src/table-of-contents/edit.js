@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import * as Utils from './utils';
+import {
+	getPageHeadings,
+	updateHeadingBlockAnchors,
+	linearToNestedHeadingList,
+} from './utils';
 import ListLevel from './ListLevel';
 
 /**
@@ -24,7 +28,7 @@ class TableOfContentsEdit extends Component {
 
 	refresh() {
 		const { setAttributes } = this.props;
-		const headings = Utils.getPageHeadings();
+		const headings = getPageHeadings();
 		setAttributes( { headings } );
 	}
 
@@ -32,7 +36,7 @@ class TableOfContentsEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const headings = attributes.headings || [];
 		const wpDataUnsubscribe = subscribe( () => {
-			const pageHeadings = Utils.getPageHeadings();
+			const pageHeadings = getPageHeadings();
 			this.setState( { pageHeadings } );
 		} );
 
@@ -69,13 +73,11 @@ class TableOfContentsEdit extends Component {
 			);
 		}
 
-		Utils.updateHeadingBlockAnchors();
+		updateHeadingBlockAnchors();
 
 		return (
 			<div className={ this.props.className }>
-				<ListLevel>
-					{ Utils.linearToNestedHeadingList( headings ) }
-				</ListLevel>
+				<ListLevel>{ linearToNestedHeadingList( headings ) }</ListLevel>
 			</div>
 		);
 	}
