@@ -46,6 +46,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 	let testsMounts;
 	if ( config.coreSource ) {
 		testsMounts = [
+			`${ config.coreSource.testsPath }:/var/www/html`,
+
 			// When using a local source for "core" we want to ensure two things:
 			//
 			// 1. That changes the user makes within the "core" directory are
@@ -63,22 +65,24 @@ module.exports = function buildDockerComposeConfig( config ) {
 			// - *                    <- $wordpress/*
 			//
 			// https://github.com/WordPress/gutenberg/issues/21164
-			`${ config.coreSource.testsPath }:/var/www/html`,
-			...fs
-				.readdirSync( config.coreSource.path )
-				.filter(
-					( file ) =>
-						file !== 'wp-config.php' &&
-						file !== 'wp-config-sample.php' &&
-						file !== 'wp-content'
-				)
-				.map(
-					( file ) =>
-						`${ path.join(
-							config.coreSource.path,
-							file
-						) }:/var/www/html/${ file }`
-				),
+			...( config.coreSource.type === 'local'
+				? fs
+						.readdirSync( config.coreSource.path )
+						.filter(
+							( filename ) =>
+								filename !== 'wp-config.php' &&
+								filename !== 'wp-config-sample.php' &&
+								filename !== 'wp-content'
+						)
+						.map(
+							( filename ) =>
+								`${ path.join(
+									config.coreSource.path,
+									filename
+								) }:/var/www/html/${ filename }`
+						)
+				: [] ),
+
 			...pluginMounts,
 			...themeMounts,
 		];
