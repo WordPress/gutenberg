@@ -80,12 +80,18 @@ function ParagraphBlock( {
 	setAttributes,
 	setFontSize,
 } ) {
-	const { align, content, dropCap, placeholder, direction } = attributes;
+	const { align, content, direction, dropCap, placeholder } = attributes;
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
 		fontSize.size,
 	] );
+
+	const styles = {
+		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
+		direction,
+		minHeight: dropCapMinimumHeight,
+	};
 
 	return (
 		<>
@@ -132,11 +138,7 @@ function ParagraphBlock( {
 					[ `has-text-align-${ align }` ]: align,
 					[ fontSize.class ]: fontSize.class,
 				} ) }
-				style={ {
-					fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-					direction,
-					minHeight: dropCapMinimumHeight,
-				} }
+				style={ styles }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
