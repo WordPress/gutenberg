@@ -317,6 +317,21 @@ const Cover = ( {
 					onSelect={ onSelectMedia }
 					render={ renderBackground }
 				/>
+
+				{  shouldShowFailure && (
+					<View
+						pointerEvents="none"
+						style={ styles.uploadFailedContainer }
+					>
+						<View style={ styles.uploadFailed }>
+							<Icon
+								icon={ 'warning' }
+								{ ...styles.uploadFailedIcon }
+							/>
+						</View>
+					</View>
+				) }
+
 			</View>
 		</View>
 	);
