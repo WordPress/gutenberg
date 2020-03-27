@@ -64,7 +64,7 @@ _Related_
 
 _Parameters_
 
--   _data_ `LocaleData`: Locale data configuration.
+-   _data_ `[LocaleData]`: Locale data configuration.
 -   _domain_ `[string]`: Domain for which configuration applies.
 
 <a name="sprintf" href="#sprintf">#</a> **sprintf**

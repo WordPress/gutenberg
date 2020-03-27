@@ -55,7 +55,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 	 *
 	 * @see http://messageformat.github.io/Jed/
 	 *
-	 * @param {LocaleData} data     Locale data configuration.
+	 * @param {LocaleData} [data]   Locale data configuration.
 	 * @param {string}     [domain] Domain for which configuration applies.
 	 */
 	const setLocaleData = ( data, domain = 'default' ) => {
