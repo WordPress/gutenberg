@@ -246,13 +246,6 @@ const getTags = ( tags, code ) => {
 			};
 		}
 
-		if ( title === 'example' ) {
-			return {
-				title,
-				description,
-			};
-		}
-
 		return {
 			title,
 			description,
