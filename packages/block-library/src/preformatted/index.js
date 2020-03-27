@@ -31,6 +31,9 @@ export const settings = {
 		},
 	},
 	transforms,
+	supports: {
+		lightBlockWrapper: true,
+	},
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {

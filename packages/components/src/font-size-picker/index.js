@@ -12,6 +12,7 @@ import { textColor } from '@wordpress/icons';
 import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
+import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -99,9 +100,7 @@ export default function FontSizePicker( {
 	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<legend className="screen-reader-text">
-				{ __( 'Font size' ) }
-			</legend>
+			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl

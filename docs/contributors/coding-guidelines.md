@@ -216,7 +216,7 @@ Custom types should be named as succinctly as possible, while still retaining cl
 /**
  * A block selection object.
  *
- * @typedef {Object} WPBlockSelection
+ * @typedef WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
  * @property {string} attributeKey A block attribute key.
@@ -224,6 +224,8 @@ Custom types should be named as succinctly as possible, while still retaining cl
  *                                 text value.
  */
 ```
+
+Note that there is no `{Object}` between `@typedef` and the type name. As `@property`s below tells us that it is a type for objects, it is recommend to not use `{Object}` when you want to define types for your objects.
 
 Custom types can also be used to describe a set of predefined options. While the [type union](https://jsdoc.app/tags-type.html) can be used with literal values as an inline type, it can be difficult to align tags while still respecting a maximum line length of 80 characters. Using a custom type to define a union type can afford the opportunity to describe the purpose of these options, and helps to avoid these line length issues.
 
@@ -269,23 +271,25 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](http://definitelytyped.org/) community-maintained types definitions, if one exists.
 
-### Record Types
+### Generic Types
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
 ```js
-// Incorrect:
+// Bad:
 
 /** @type {Object} */
 /** @type {Function} */
 /** @type {Promise} */
 
-// Correct:
+// Good:
 
-/** @type {Object<string,number>} */
+/** @type {Record<string,number>} */ /* or */ /** @type {{[setting:string]:any}} */
 /** @type {(key:string)=>boolean} */
 /** @type {Promise<string>} */
 ```
+
+When an object is used as a dictionary, you can define its type in 2 ways: indexable interface (`{[setting:string]:any}`) or `Record`. When the name of the key for an object provides hints for developers what to do like `setting`, use indexable interface. If not, use `Record`.
 
 The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
 
@@ -312,7 +316,7 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
- * @type {Object<WPBreakpoint,number>}
+ * @type {Record<WPBreakpoint,number>}
  */
 const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
@@ -409,7 +413,7 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
  *
- * @return {Object<string,WPDataSelector>} Object containing the store's
+ * @return {Record<string,WPDataSelector>} Object containing the store's
  *                                         selectors.
  */
 ````

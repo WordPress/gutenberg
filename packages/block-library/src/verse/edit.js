@@ -11,6 +11,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 export default function VerseEdit( {
@@ -32,7 +33,7 @@ export default function VerseEdit( {
 				/>
 			</BlockControls>
 			<RichText
-				tagName="pre"
+				tagName={ Block.pre }
 				preserveWhiteSpace
 				value={ content }
 				onChange={ ( nextContent ) => {

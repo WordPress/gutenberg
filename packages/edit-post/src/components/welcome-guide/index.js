@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide, GuidePage } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { __experimentalCreateInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -67,7 +67,7 @@ export default function WelcomeGuide() {
 				</h1>
 				<BlockLibraryImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
-					{ __experimentalCreateInterpolateElement(
+					{ createInterpolateElement(
 						__(
 							'All of the blocks available to you live in the block library. You’ll find it wherever you see the <InserterIconImage /> icon.'
 						),

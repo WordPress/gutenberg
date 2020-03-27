@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import useResizeAware from 'react-resize-aware';
-
-/**
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,15 +13,15 @@ function AutoBlockPreview( { viewportWidth } ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
-	] = useResizeAware();
+	] = useResizeObserver();
 	const [
 		containtResizeListener,
 		{ height: contentHeight },
-	] = useResizeAware();
+	] = useResizeObserver();
 
 	return (
 		<div
-			className="block-editor-block-preview__container editor-styles-wrapper is-auto-height"
+			className="block-editor-block-preview__container editor-styles-wrapper"
 			aria-hidden
 			style={ {
 				height: ( contentHeight * containerWidth ) / viewportWidth,

@@ -15,6 +15,7 @@ import { isEmpty, get } from 'lodash';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { check } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -101,6 +102,7 @@ class BottomSheetCell extends Component {
 			onChangeValue,
 			children,
 			editable = true,
+			isSelected = false,
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
@@ -128,7 +130,7 @@ class BottomSheetCell extends Component {
 			? cellLabelLeftAlignNoIconStyle
 			: cellLabelCenteredStyle;
 		const defaultLabelStyle =
-			showValue || icon !== undefined || customActionButton
+			showValue || customActionButton
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
 
@@ -310,6 +312,7 @@ class BottomSheetCell extends Component {
 										icon={ icon }
 										size={ 24 }
 										color={ iconStyle.color }
+										isPressed={ false }
 									/>
 									<View
 										style={
@@ -321,6 +324,12 @@ class BottomSheetCell extends Component {
 							<Text style={ [ defaultLabelStyle, labelStyle ] }>
 								{ label }
 							</Text>
+							{ isSelected && (
+								<Icon
+									icon={ check }
+									fill={ platformStyles.isSelected.color }
+								/>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity
