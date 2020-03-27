@@ -15,7 +15,6 @@ import {
 	InspectorControls,
 	RichText,
 	withFontSizes,
-	__experimentalUseColors,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -87,27 +86,6 @@ function ParagraphBlock( {
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
 		fontSize.size,
 	] );
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [
-				{
-					backgroundColor: true,
-					textColor: true,
-					fontSize: fontSize.size,
-				},
-			],
-			colorDetector: { targetRef: ref },
-		},
-		[ fontSize.size ]
-	);
 
 	return (
 		<>
@@ -145,60 +123,51 @@ function ParagraphBlock( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<BackgroundColor>
-				<TextColor>
-					<RichText
-						ref={ ref }
-						identifier="content"
-						tagName={ Block.p }
-						className={ classnames( {
-							'has-drop-cap': dropCap,
-							[ `has-text-align-${ align }` ]: align,
-							[ fontSize.class ]: fontSize.class,
-						} ) }
-						style={ {
-							fontSize: fontSize.size
-								? fontSize.size + 'px'
-								: undefined,
-							direction,
-							minHeight: dropCapMinimumHeight,
-						} }
-						value={ content }
-						onChange={ ( newContent ) =>
-							setAttributes( { content: newContent } )
-						}
-						onSplit={ ( value ) => {
-							if ( ! value ) {
-								return createBlock( name );
-							}
+			<RichText
+				ref={ ref }
+				identifier="content"
+				tagName={ Block.p }
+				className={ classnames( {
+					'has-drop-cap': dropCap,
+					[ `has-text-align-${ align }` ]: align,
+					[ fontSize.class ]: fontSize.class,
+				} ) }
+				style={ {
+					fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+					direction,
+					minHeight: dropCapMinimumHeight,
+				} }
+				value={ content }
+				onChange={ ( newContent ) =>
+					setAttributes( { content: newContent } )
+				}
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( name );
+					}
 
-							return createBlock( name, {
-								...attributes,
-								content: value,
-							} );
-						} }
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						onRemove={
-							onReplace ? () => onReplace( [] ) : undefined
-						}
-						aria-label={
-							content
-								? __( 'Paragraph block' )
-								: __(
-										'Empty block; start writing or type forward slash to choose a block'
-								  )
-						}
-						placeholder={
-							placeholder ||
-							__( 'Start writing or type / to choose a block' )
-						}
-						__unstableEmbedURLOnPaste
-						__unstableAllowPrefixTransformations
-					/>
-				</TextColor>
-			</BackgroundColor>
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
+				} }
+				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
+				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+				aria-label={
+					content
+						? __( 'Paragraph block' )
+						: __(
+								'Empty block; start writing or type forward slash to choose a block'
+						  )
+				}
+				placeholder={
+					placeholder ||
+					__( 'Start writing or type / to choose a block' )
+				}
+				__unstableEmbedURLOnPaste
+				__unstableAllowPrefixTransformations
+			/>
 		</>
 	);
 }
