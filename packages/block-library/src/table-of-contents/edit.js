@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 import { subscribe } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-class TOCEdit extends Component {
+class TableOfContentsEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -81,4 +81,4 @@ class TOCEdit extends Component {
 	}
 }
 
-export default TOCEdit;
+export default TableOfContentsEdit;
