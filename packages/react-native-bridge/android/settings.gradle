@@ -1,5 +1,4 @@
 rootProject.name = '@wordpress/react-native-bridge'
 
-include ':react-native-aztec'
-project(':react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')
-
+include ':@wordpress_react-native-aztec'
+project(':@wordpress_react-native-aztec').projectDir = new File(rootProject.projectDir, '../../react-native-aztec/android')

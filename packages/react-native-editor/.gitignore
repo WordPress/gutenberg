@@ -19,6 +19,9 @@ yarn-error.log*
 # OS X
 .DS_Store
 
+# JS Builds
+bundle/
+
 # Android builds
 *.apk
 *.ap_
