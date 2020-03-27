@@ -1,5 +1,6 @@
 1.25.0
 ------
+* New block: Cover
 * Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
 
