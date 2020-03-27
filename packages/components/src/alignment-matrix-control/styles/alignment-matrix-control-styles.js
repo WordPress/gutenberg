@@ -37,8 +37,8 @@ export const Root = styled.div`
 	grid-template-rows: repeat( 3, calc( var( --width ) / 3 ) );
 	width: var( --width, 92px );
 
-	${rootBase};
-	${rootBorder};
+	${rootBase}
+	${rootBorder}
 `;
 
 const pointActive = ( { isActive } ) => {
@@ -66,15 +66,15 @@ export const pointBase = ( props ) => {
 		margin: auto;
 		transition: all 120ms linear;
 
-		${reduceMotion( 'transition' )};
-		${pointActive( props )};
+		${reduceMotion( 'transition' )}
+		${pointActive( props )}
 	`;
 };
 
 export const Point = styled.span`
 	height: 6px;
 	width: 6px;
-	${pointBase};
+	${pointBase}
 `;
 
 export const Cell = styled.span`

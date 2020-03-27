@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * Internal dependencies
  */
 import { ALIGNMENTS, getAlignmentIndex } from './utils';
@@ -9,6 +14,7 @@ import {
 } from './styles/alignment-matrix-control-icon-styles';
 
 export default function AlignmentMatrixControlIcon( {
+	className,
 	height,
 	size: sizeProp = 24,
 	value = 'center',
@@ -18,12 +24,23 @@ export default function AlignmentMatrixControlIcon( {
 	const alignIndex = getAlignmentIndex( value );
 	const size = sizeProp || width || height;
 
+	const classes = classnames(
+		'component-alignment-matrix-control-icon',
+		className
+	);
+
 	return (
-		<Root { ...props } size={ size }>
+		<Root
+			{ ...props }
+			className={ classes }
+			role="presentation"
+			size={ size }
+		>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;
+
 				return (
-					<Cell tabIndex={ -1 } key={ align }>
+					<Cell key={ align } tabIndex={ -1 }>
 						<Point isActive={ isActive } />
 					</Cell>
 				);
