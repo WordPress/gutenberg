@@ -3,6 +3,11 @@
  */
 import { isEqual } from 'lodash';
 
+/**
+ * Internal dependencies
+ */
+import { getRTL } from '../utils/rtl';
+
 export const DIRECTION = {
 	UP: 'up',
 	DOWN: 'down',
@@ -51,7 +56,9 @@ export function transformAlignment( alignments = [] ) {
 	value = value
 		.map( ( v ) => v.toLowerCase() )
 		// Supports remapping of 'middle' to 'center'
-		.map( ( v ) => v.replace( 'middle', 'center' ) );
+		.map( ( v ) => v.replace( 'middle', 'center' ) )
+		// Flips for RTL
+		.map( transformAlignmentRTL );
 
 	// Handles cases were only 'center' or ['center'] is provided
 	if ( value.length === 1 && value[ 0 ] === 'center' ) {
@@ -59,6 +66,28 @@ export function transformAlignment( alignments = [] ) {
 	}
 
 	return value.sort();
+}
+/**
+ * Transforms alignment values to respect RTL.
+ *
+ * @param {string} value The alignment value to transform.
+ *
+ * @return {string} The flipped alignment value (if RTL).
+ */
+function transformAlignmentRTL( value ) {
+	const isRTL = getRTL();
+	const token = '$TMP';
+
+	if ( ! isRTL ) return value;
+
+	return (
+		value
+			// Temporarily swap left for token
+			.replace( 'left', token )
+			.replace( 'right', 'left' )
+			// Swap tokenized left for actual value
+			.replace( token, 'right' )
+	);
 }
 
 /**

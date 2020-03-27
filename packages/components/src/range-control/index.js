@@ -37,7 +37,7 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
-import { useRtl } from '../utils/rtl';
+import { useRTL } from '../utils/rtl';
 
 const BaseRangeControl = forwardRef(
 	(
@@ -70,7 +70,7 @@ const BaseRangeControl = forwardRef(
 		},
 		ref
 	) => {
-		const isRTL = useRtl();
+		const isRTL = useRTL();
 
 		const sliderValue =
 			valueProp !== undefined ? valueProp : initialPosition;
