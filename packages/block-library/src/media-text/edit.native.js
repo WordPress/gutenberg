@@ -263,7 +263,6 @@ class MediaTextEdit extends Component {
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
-						isCollapsed={ false }
 					/>
 				</BlockControls>
 				<View
