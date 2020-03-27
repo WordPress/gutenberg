@@ -8,8 +8,6 @@
 	margin-bottom: 5px;
 }
 
-$input-focus-width: calc(var(--border-width-focus) - #{ $border-width });
-
 .components-custom-select-control__button {
 	border: 1px solid $medium-gray-text;
 	border-radius: $radius-block-ui;
@@ -22,7 +20,6 @@ $input-focus-width: calc(var(--border-width-focus) - #{ $border-width });
 	&:focus:not(:disabled) {
 		border-color: $theme-color;
 		box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
-		box-shadow: 0 0 0 $input-focus-width $theme-color;
 	}
 
 	&-icon {

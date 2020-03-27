@@ -76,13 +76,11 @@
 
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
-			box-shadow: 0 0 0 var(--border-width-focus) $blue-medium-focus;
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
-				box-shadow: 0 0 0 var(--border-width-focus) $blue-medium-focus-dark;
 			}
 		}
 	}
@@ -144,7 +142,6 @@
 		&::after { // Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
-			box-shadow: 0 0 0 var(--border-width-focus) $blue-medium-focus;
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
@@ -155,7 +152,6 @@
 			// Show a lighter color for dark themes.
 			.is-dark-theme & {
 				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
-				box-shadow: 0 0 0 var(--border-width-focus) $blue-medium-focus-dark;
 			}
 		}
 
@@ -330,7 +326,6 @@
 	position: absolute;
 	top: calc(50% - #{ $border-width });
 	height: $border-width-focus;
-	height: var(--border-width-focus);
 	left: 0;
 	right: 0;
 	background: theme(primary);
@@ -547,7 +542,6 @@
 			// When button is focused, it receives a box-shadow instead of the border.
 			&:focus {
 				box-shadow: 0 0 0 $border-width-focus $theme-color;
-				box-shadow: 0 0 0 var(--border-width-focus) $theme-color;
 			}
 		}
 
