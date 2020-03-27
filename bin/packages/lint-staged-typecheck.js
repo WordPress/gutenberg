@@ -6,6 +6,11 @@ const path = require( 'path' );
 const fs = require( 'fs' );
 const execa = require( 'execa' );
 
+/**
+ * Internal dependencies
+ */
+require( './validate-typescript-version' );
+
 /* eslint-disable no-console */
 
 const repoRoot = path.join( __dirname, '..', '..' );
