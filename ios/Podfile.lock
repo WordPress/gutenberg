@@ -241,8 +241,8 @@ PODS:
     - React
   - RNTAztecView (1.24.0):
     - React-Core
-    - WordPress-Aztec-iOS (= 1.17.0)
-  - WordPress-Aztec-iOS (1.17.0)
+    - WordPress-Aztec-iOS (~> 1.17.0)
+  - WordPress-Aztec-iOS (1.17.1)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -282,12 +282,12 @@ DEPENDENCIES:
   - ReactNativeDarkMode (from `../node_modules/react-native-dark-mode`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNTAztecView (from `../RNTAztecView.podspec`)
+  - WordPress-Aztec-iOS (from `https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git`, commit `edf1c9ae758b946e76bb9de6efc9135d2c2a4b43`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
-    - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
   BVLinearGradient:
@@ -356,8 +356,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../RNTAztecView.podspec"
+  WordPress-Aztec-iOS:
+    :commit: edf1c9ae758b946e76bb9de6efc9135d2c2a4b43
+    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  WordPress-Aztec-iOS:
+    :commit: edf1c9ae758b946e76bb9de6efc9135d2c2a4b43
+    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
@@ -393,10 +401,10 @@ SPEC CHECKSUMS:
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: 8d9f78ce613bec2de7ab33bd22829ceff28a7c7e
-  WordPress-Aztec-iOS: 2a9fb6c2a23284f53d6d69ada43c50b5fddc7c3b
+  RNTAztecView: 68ac69e2cbedcbb7debbe054d448f322cf39aae7
+  WordPress-Aztec-iOS: 319620514af963ca519bd83b96a2c0ebdf3a0f03
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 2ca635b0121a10753500623fbaee9edd0fe6ef92
+PODFILE CHECKSUM: 2a81c0ea11df86e190e523d5d5d58996e141cd1e
 
 COCOAPODS: 1.8.4

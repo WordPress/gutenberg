@@ -38,6 +38,7 @@ target 'gutenberg' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'RNTAztecView', :path => '../RNTAztecView.podspec'
+  pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => 'edf1c9ae758b946e76bb9de6efc9135d2c2a4b43'
   pod 'Gutenberg', :path => '../Gutenberg.podspec'
 
   target 'gutenbergTests' do
