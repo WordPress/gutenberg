@@ -59,7 +59,6 @@ class TableOfContentsEdit extends Component {
 		const { pageHeadings } = this.state;
 
 		if ( ! isEqual( pageHeadings, prevState.pageHeadings ) ) {
-			this.setState( { pageHeadings } );
 			setAttributes( { headings: pageHeadings } );
 		}
 	}
