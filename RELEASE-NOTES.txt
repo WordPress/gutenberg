@@ -3,6 +3,8 @@
 * New block: Cover
 * Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
+* Add alignment toolbar for heading
+* Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
 * Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
 
 1.24.0
