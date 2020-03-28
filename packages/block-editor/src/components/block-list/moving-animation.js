@@ -69,12 +69,10 @@ function useMovingAnimation(
 	} );
 
 	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
-	const scrollContainer = useMemo( () => {
-		if ( ! adjustScrolling ) {
-			return false;
-		}
-		return getScrollContainer( ref.current );
-	}, [ adjustScrolling ] );
+	const scrollContainer = useMemo(
+		() => getScrollContainer( ref.current ),
+		[]
+	);
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
