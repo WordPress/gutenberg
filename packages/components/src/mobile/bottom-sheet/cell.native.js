@@ -130,7 +130,7 @@ class BottomSheetCell extends Component {
 			? cellLabelLeftAlignNoIconStyle
 			: cellLabelCenteredStyle;
 		const defaultLabelStyle =
-			showValue || customActionButton
+			showValue || customActionButton || icon
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
 
@@ -319,12 +319,6 @@ class BottomSheetCell extends Component {
 							<Text style={ [ defaultLabelStyle, labelStyle ] }>
 								{ label }
 							</Text>
-							{ isSelected && (
-								<Icon
-									icon={ check }
-									fill={ platformStyles.isSelected.color }
-								/>
-							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity
@@ -337,6 +331,12 @@ class BottomSheetCell extends Component {
 							</TouchableOpacity>
 						) }
 					</View>
+					{ isSelected && (
+						<Icon
+							icon={ check }
+							fill={ platformStyles.isSelected.color }
+						/>
+					) }
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
