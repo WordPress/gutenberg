@@ -8,7 +8,7 @@ const { isEqual } = require( 'lodash' );
  * Internal dependencies
  */
 import { getHeadingsList, linearToNestedHeadingList } from './utils';
-import ListLevel from './ListLevel';
+import ListItem from './ListItem';
 
 /**
  * WordPress dependencies
@@ -63,7 +63,7 @@ class TableOfContentsEdit extends Component {
 
 		return (
 			<div className={ this.props.className }>
-				<ListLevel>{ linearToNestedHeadingList( headings ) }</ListLevel>
+				<ListItem>{ linearToNestedHeadingList( headings ) }</ListItem>
 			</div>
 		);
 	}

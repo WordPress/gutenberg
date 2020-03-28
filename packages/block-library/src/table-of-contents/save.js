@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { linearToNestedHeadingList } from './utils';
-import ListLevel from './ListLevel';
+import ListItem from './ListItem';
 
 export default function save( props ) {
 	const { attributes } = props;
@@ -14,7 +14,7 @@ export default function save( props ) {
 
 	return (
 		<nav className={ props.className }>
-			<ListLevel>{ linearToNestedHeadingList( headings ) }</ListLevel>
+			<ListItem>{ linearToNestedHeadingList( headings ) }</ListItem>
 		</nav>
 	);
 }

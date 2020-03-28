@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-export default function ListLevel( props ) {
+export default function ListItem( props ) {
 	const { children, noWrapList = false } = props;
 	let childNodes = null;
 
@@ -31,7 +31,7 @@ export default function ListLevel( props ) {
 				<li key={ index }>
 					{ entry }
 					{ childNode.children ? (
-						<ListLevel>{ childNode.children }</ListLevel>
+						<ListItem>{ childNode.children }</ListItem>
 					) : null }
 				</li>
 			);
