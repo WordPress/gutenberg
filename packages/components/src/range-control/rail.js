@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { isUndefined } from 'lodash';
-/**
  * Internal dependencies
  */
 import RangeMark from './mark';
@@ -78,7 +74,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		  } ) );
 
 	const enhancedMarks = marksArray.map( ( mark, index ) => {
-		const markValue = ! isUndefined( mark.value ) ? mark.value : value;
+		const markValue = mark.value !== undefined ? mark.value : value;
 
 		const key = `mark-${ index }`;
 		const isFilled = markValue * step <= value;

@@ -390,7 +390,6 @@ export class ImageEdit extends React.Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
-					isCollapsed={ false }
 				/>
 			</BlockControls>
 		);
