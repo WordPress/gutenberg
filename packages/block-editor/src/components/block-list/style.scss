@@ -649,6 +649,9 @@
 
 .block-editor-block-list__layout.is-root-container {
 	// Full-wide. (to account for the padddings added above)
+	// The first two rules account for the alignment wrapper div for the image block.
+	> div > .block-editor-block-list__block[data-align="full"],
+	> div > .block-editor-block-list__block.alignfull,
 	> .block-editor-block-list__block[data-align="full"],
 	> .block-editor-block-list__block.alignfull {
 		margin-left: -$block-padding;
