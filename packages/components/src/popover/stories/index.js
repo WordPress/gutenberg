@@ -97,6 +97,6 @@ export const positioning = () => {
 	const noArrow = boolean( 'noArrow', false );
 
 	return (
-		<DragExample label={ label } content={ content } noArrow={ noArrow } />
+		<DragExample label={ label } content={ content } noArrow={ noArrow } position="right"/>
 	);
 };

@@ -1,0 +1,17 @@
+.flyout {
+	display: none;
+	border: $border-width solid $light-gray-secondary;
+	width: 300px;
+	padding: $grid-unit-20;
+	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	position: absolute;
+	top: -$border-width;
+	left: calc(100% + #{$grid-unit-15});
+
+
+	@include break-medium {
+		display: block;
+	}
+}

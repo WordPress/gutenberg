@@ -726,6 +726,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DropdownFlyout",
+		"slug": "dropdown-flyout",
+		"markdown_source": "../packages/components/src/dropdown-flyout/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DropdownMenu",
 		"slug": "dropdown-menu",
 		"markdown_source": "../packages/components/src/dropdown-menu/README.md",
