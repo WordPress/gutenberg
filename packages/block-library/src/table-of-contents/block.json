@@ -5,7 +5,7 @@
 		"headings": {
 			"type": "array",
 			"source": "query",
-			"selector": ".blocks-table-of-contents-entry",
+			"selector": ".wp-block-table-of-contents__entry",
 			"default": [],
 			"query": {
 				"content": { "source": "text" },

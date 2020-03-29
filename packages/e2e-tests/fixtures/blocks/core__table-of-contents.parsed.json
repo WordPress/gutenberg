@@ -1,11 +1,11 @@
 [
-    {
-        "blockName": "core/table-of-contents",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"blocks-table-of-contents-entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"blocks-table-of-contents-entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>\n",
-        "innerContent": [
-            "\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"blocks-table-of-contents-entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"blocks-table-of-contents-entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>\n"
-        ]
-    }
+	{
+		"blockName": "core/table-of-contents",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"wp-block-table-of-contents__entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"wp-block-table-of-contents__entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>\n",
+		"innerContent": [
+			"\n<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"wp-block-table-of-contents__entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"wp-block-table-of-contents__entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>\n"
+		]
+	}
 ]

@@ -1,11 +1,10 @@
 /**
  * Internal dependencies
  */
+import ListItem from './list-item';
 import { linearToNestedHeadingList } from './utils';
-import ListItem from './ListItem';
 
-export default function save( props ) {
-	const { attributes } = props;
+export default function save( { attributes, className } ) {
 	const { headings } = attributes;
 
 	if ( headings.length === 0 ) {
@@ -13,7 +12,7 @@ export default function save( props ) {
 	}
 
 	return (
-		<nav className={ props.className }>
+		<nav className={ className }>
 			<ListItem>{ linearToNestedHeadingList( headings ) }</ListItem>
 		</nav>
 	);

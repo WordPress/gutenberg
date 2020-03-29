@@ -7,8 +7,8 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import ListItem from './list-item';
 import { linearToNestedHeadingList } from './utils';
-import ListItem from './ListItem';
 
 const transforms = {
 	to: [

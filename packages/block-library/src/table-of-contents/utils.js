@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { select } from '@wordpress/data';
 import { create } from '@wordpress/rich-text';
 
 /**
@@ -16,7 +14,7 @@ import { create } from '@wordpress/rich-text';
 export function linearToNestedHeadingList( headingsList, index = 0 ) {
 	const nestedHeadingsList = [];
 
-	headingsList.forEach( function ( heading, key ) {
+	headingsList.forEach( ( heading, key ) => {
 		if ( heading.content === undefined ) {
 			return;
 		}
@@ -65,34 +63,13 @@ export function linearToNestedHeadingList( headingsList, index = 0 ) {
 }
 
 /**
- * Gets a list of heading texts, anchors and levels in the current document.
- *
- * @return {Array} The list of headings.
- */
-export function getHeadingsList() {
-	return convertBlocksToTableOfContents( getHeadingBlocks() );
-}
-
-/**
- * Gets a list of heading blocks in the current document.
- *
- * @return {Array} The list of heading blocks.
- */
-export function getHeadingBlocks() {
-	const editor = select( blockEditorStore );
-	return editor
-		.getBlocks()
-		.filter( ( block ) => block.name === 'core/heading' );
-}
-
-/**
  * Extracts text, anchor and level from a list of heading blocks.
  *
  * @param {Array} headingBlocks The list of heading blocks.
  * @return {Array} The list of heading parameters.
  */
 export function convertBlocksToTableOfContents( headingBlocks ) {
-	return headingBlocks.map( function ( heading ) {
+	return headingBlocks.map( ( heading ) => {
 		// This is a string so that it can be stored/sourced as an attribute in the table of contents
 		// block using a data attribute.
 		const level = heading.attributes.level.toString();
@@ -105,7 +82,7 @@ export function convertBlocksToTableOfContents( headingBlocks ) {
 			? create( { html: headingContent } ).text
 			: '';
 
-		const anchor = anchorContent ? '#' + anchorContent : '';
+		const anchor = anchorContent ? `#${ anchorContent }` : '';
 
 		return { content, anchor, level };
 	} );

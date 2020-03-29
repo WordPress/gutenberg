@@ -1,32 +1,32 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/table-of-contents",
-        "isValid": true,
-        "attributes": {
-            "headings": [
-                {
-                    "content": "First Heading",
-                    "anchor": "#0-First-Heading",
-                    "level": "2"
-                },
-                {
-                    "content": "Sub Heading",
-                    "anchor": "#1-Sub-Heading",
-                    "level": "3"
-                },
-                {
-                    "content": "Another Sub Heading",
-                    "anchor": "#2-Another-Sub-Heading",
-                    "level": "3"
-                },
-                {
-                    "content": "A Sub Heading Without Link",
-                    "level": "3"
-                }
-            ]
-        },
-        "innerBlocks": [],
-        "originalContent": "<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"blocks-table-of-contents-entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"blocks-table-of-contents-entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"blocks-table-of-contents-entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>"
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/table-of-contents",
+		"isValid": true,
+		"attributes": {
+			"headings": [
+				{
+					"content": "First Heading",
+					"anchor": "#0-First-Heading",
+					"level": "2"
+				},
+				{
+					"content": "Sub Heading",
+					"anchor": "#1-Sub-Heading",
+					"level": "3"
+				},
+				{
+					"content": "Another Sub Heading",
+					"anchor": "#2-Another-Sub-Heading",
+					"level": "3"
+				},
+				{
+					"content": "A Sub Heading Without Link",
+					"level": "3"
+				}
+			]
+		},
+		"innerBlocks": [],
+		"originalContent": "<nav class=\"wp-block-table-of-contents\"><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#0-First-Heading\" data-level=\"2\">First Heading</a><ul><li><a class=\"wp-block-table-of-contents__entry\" href=\"#1-Sub-Heading\" data-level=\"3\">Sub Heading</a></li><li><a class=\"wp-block-table-of-contents__entry\" href=\"#2-Another-Sub-Heading\" data-level=\"3\">Another Sub Heading</a></li><li><span class=\"wp-block-table-of-contents__entry\" data-level=\"3\">A Sub Heading Without Link</span></li></ul></li></ul></nav>"
+	}
 ]

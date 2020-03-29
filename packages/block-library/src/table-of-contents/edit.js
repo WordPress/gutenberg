@@ -1,72 +1,59 @@
 /**
  * External dependencies
  */
-
 const { isEqual } = require( 'lodash' );
-
-/**
- * Internal dependencies
- */
-import { getHeadingsList, linearToNestedHeadingList } from './utils';
-import ListItem from './ListItem';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { subscribe } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-class TableOfContentsEdit extends Component {
-	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
-		let { headings } = attributes;
+/**
+ * Internal dependencies
+ */
+import ListItem from './list-item';
+import {
+	convertBlocksToTableOfContents,
+	linearToNestedHeadingList,
+} from './utils';
 
-		// Update the table of contents when changes are made to other blocks.
-		this.unsubscribe = subscribe( () => {
-			this.setState( { headings: getHeadingsList() } );
-		} );
+export default function TableOfContentsEdit( {
+	attributes,
+	className,
+	setAttributes,
+} ) {
+	const { headings = [] } = attributes;
 
-		if ( ! headings ) {
-			headings = getHeadingsList();
+	const headingBlocks = useSelect( ( select ) => {
+		return select( blockEditorStore )
+			.getBlocks()
+			.filter( ( block ) => block.name === 'core/heading' );
+	}, [] );
+
+	useEffect( () => {
+		const latestHeadings = convertBlocksToTableOfContents( headingBlocks );
+
+		if ( ! isEqual( headings, latestHeadings ) ) {
+			setAttributes( { headings: latestHeadings } );
 		}
+	}, [ headingBlocks ] );
 
-		setAttributes( { headings } );
-	}
-
-	componentWillUnmount() {
-		this.unsubscribe();
-	}
-
-	componentDidUpdate( prevProps, prevState ) {
-		const { setAttributes } = this.props;
-		const { headings } = this.state;
-
-		if ( prevState && ! isEqual( headings, prevState.headings ) ) {
-			setAttributes( { headings } );
-		}
-	}
-
-	render() {
-		const { attributes } = this.props;
-		const { headings = [] } = attributes;
-
-		if ( headings.length === 0 ) {
-			return (
-				<p>
-					{ __(
-						'Start adding heading blocks to see a Table of Contents here'
-					) }
-				</p>
-			);
-		}
-
+	if ( headings.length === 0 ) {
 		return (
-			<div className={ this.props.className }>
-				<ListItem>{ linearToNestedHeadingList( headings ) }</ListItem>
-			</div>
+			<p>
+				{ __(
+					'Start adding Heading blocks to create a table of contents here.'
+				) }
+			</p>
 		);
 	}
-}
 
-export default TableOfContentsEdit;
+	return (
+		<div className={ className }>
+			<ListItem>{ linearToNestedHeadingList( headings ) }</ListItem>
+		</div>
+	);
+}
