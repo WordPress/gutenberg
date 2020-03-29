@@ -48,6 +48,15 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-locations-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Dependencies_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-dependencies-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Scripts_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-scripts-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Styles_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-styles-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
