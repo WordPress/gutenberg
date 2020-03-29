@@ -119,8 +119,13 @@ function InlineLinkUI( {
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
+			const newText =
+				nextValue.hasOwnProperty( 'title' ) && nextValue.title !== ''
+					? nextValue.title
+					: newUrl;
+
 			const toInsert = applyFormat(
-				create( { text: newUrl } ),
+				create( { text: newText } ),
 				format,
 				0,
 				newUrl.length
