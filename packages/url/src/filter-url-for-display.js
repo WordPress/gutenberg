@@ -19,5 +19,14 @@ export function filterURLForDisplay( url ) {
 		return filteredURL.replace( '/', '' );
 	}
 
+	// Prettify image urls
+	const mediaRegexp = /([\w|:])*\.(?:jpg|jpeg|gif|png|svg)/g;
+	if ( filteredURL.match( mediaRegexp ) ) {
+		const tokens = filteredURL.split( '/' );
+		const prettifiedImageURL =
+			tokens[ 0 ] + '...' + tokens[ tokens.length - 1 ];
+		return prettifiedImageURL;
+	}
+
 	return filteredURL;
 }

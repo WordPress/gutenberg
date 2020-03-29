@@ -662,6 +662,26 @@ describe( 'filterURLForDisplay', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org/something' );
 		expect( url ).toBe( 'wordpress.org/something' );
 	} );
+	it( 'should truncate image URLs in the middle', () => {
+		const url = filterURLForDisplay(
+			'https://i1.wp.com/example.com/wp-content/uploads/2020/03/prague-landscape.jpg'
+		);
+		expect( url ).toBe( 'i1.wp.com...prague-landscape.jpg' );
+	} );
+	it( 'should truncate image URLs hosted on localhost', () => {
+		const url = filterURLForDisplay(
+			'http://localhost:8888/wp-content/uploads/2020/03/cactus-field.jpg'
+		);
+		expect( url ).toBe( 'localhost:8888...cactus-field.jpg' );
+	} );
+	it( 'should not truncate images URLs with no extension', () => {
+		const url = filterURLForDisplay(
+			'https://images.unsplash.com/photo-123-auto=format&fit=crop&w=1650&q=80'
+		);
+		expect( url ).toBe(
+			'images.unsplash.com/photo-123-auto=format&fit=crop&w=1650&q=80'
+		);
+	} );
 } );
 
 describe( 'cleanForSlug', () => {
