@@ -289,13 +289,11 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `Object`: 
--   _props.children_ `string`: HTML to render.
--   _props.props_ `Object`: Any additonal props to be set on the containing div.
+-   _props_ `RawHTMLProps`: 
 
 _Returns_
 
--   `WPComponent`: Dangerously-rendering component.
+-   `JSX.Element`: Dangerously-rendering component.
 
 <a name="render" href="#render">#</a> **render**
 
