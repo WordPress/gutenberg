@@ -12,9 +12,9 @@ const { hasExportModifier, hasDefaultModifier } = require( './has-modifier' );
 /**
  * @typedef ExportEntry
  *
- * @property {string} localName
- * @property {string} exportedName
- * @property {?string} module
+ * @property {string} localName    name of an exported entry in its local file.
+ * @property {string} exportedName name of an exported entry in export statement.
+ * @property {?string} module      which file the name exported from.
  */
 
 /**
