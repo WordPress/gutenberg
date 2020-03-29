@@ -141,6 +141,20 @@ function wp_api_nav_menus_taxonomy_args( $args, $taxonomy ) {
 add_filter( 'register_taxonomy_args', 'wp_api_nav_menus_taxonomy_args', 10, 2 );
 
 /**
+ * Registers the scripts and styles area REST API routes.
+ */
+function gutenberg_register_script_style() {
+	// Scripts.
+	$controller = new WP_REST_Scripts_Controller();
+	$controller->register_routes();
+
+	// Styles.
+	$controller = new WP_REST_Styles_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_script_style' );
+
+/**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *
  * This function filters the return from get_sample_permalink() and essentially
