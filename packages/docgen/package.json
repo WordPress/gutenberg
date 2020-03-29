@@ -18,9 +18,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"scripts": {
-		"gen": "node ./scripts/gen-exports.js"
-	},
 	"bin": {
 		"docgen": "./bin/cli.js"
 	},
@@ -35,5 +32,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"gen": "node ./scripts/gen-exports.js"
 	}
 }
