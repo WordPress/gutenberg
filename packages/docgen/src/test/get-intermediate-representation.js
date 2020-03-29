@@ -98,7 +98,7 @@ describe( 'Intermediate Representation From Statement', function() {
 					description: 'Callback function.',
 					name: 'callback',
 					title: 'param',
-					type: '(timestamp: number) => void',
+					type: '( timestamp: number ) => void',
 				},
 			],
 		} );

@@ -85,7 +85,7 @@ const getTupleType = ( elementTypes ) => {
 		} )
 		.join( ', ' );
 
-	return `[${ str }]`;
+	return `[ ${ str } ]`;
 };
 
 const getFunctionType = ( type ) => {
@@ -98,7 +98,9 @@ const getFunctionType = ( type ) => {
 		} )
 		.join( ', ' );
 
-	return `(${ params }) => ${ typeToString( type.type ) }`;
+	const paramStr = type.parameters.length > 0 ? `( ${ params } )` : `()`;
+
+	return `${ paramStr } => ${ typeToString( type.type ) }`;
 };
 
 const getFunctionTypeFromJSDocFunctionType = ( type ) => {
@@ -106,7 +108,9 @@ const getFunctionTypeFromJSDocFunctionType = ( type ) => {
 		.map( ( p, i ) => `p${ i }: ${ typeToString( p.type ) }` )
 		.join( ', ' );
 
-	return `(${ params }) => ${ typeToString( type.type ) }`;
+	const paramStr = type.parameters.length > 0 ? `( ${ params } )` : `()`;
+
+	return `${ paramStr } => ${ typeToString( type.type ) }`;
 };
 
 const getTypeLiteral = ( type ) => {
@@ -118,9 +122,10 @@ const getTypeLiteral = ( type ) => {
 
 			// m.kind === SyntaxKind.IndexSignature
 			const param = m.parameters[ 0 ];
-			return `[${ param.name.text }: ${ typeToString(
-				param.type
-			) }]: ${ typeToString( m.type ) }`;
+			const indexTypeName = typeToString( param.type );
+			const propertyTypeName = typeToString( m.type );
+
+			return `[ ${ param.name.text }: ${ indexTypeName } ]: ${ propertyTypeName }`;
 		} )
 		.join( ', ' );
 
@@ -141,7 +146,7 @@ const getTypeOperator = ( type ) => {
 };
 
 const getIndexedAccessType = ( { objectType, indexType } ) => {
-	return `${ typeToString( objectType ) }[${ typeToString( indexType ) }]`;
+	return `${ typeToString( objectType ) }[ ${ typeToString( indexType ) } ]`;
 };
 
 const getMappedType = ( type ) => {
@@ -151,7 +156,7 @@ const getMappedType = ( type ) => {
 	const question = type.questionToken ? '?' : '';
 	const typeName = typeToString( type.type );
 
-	return `{ ${ readonly }[${ paramTypeName } in ${ constraint }]${ question }: ${ typeName } }`;
+	return `{ ${ readonly }[ ${ paramTypeName } in ${ constraint } ]${ question }: ${ typeName } }`;
 };
 
 const getConditionalType = ( {
@@ -176,7 +181,7 @@ const getImportType = ( { argument, qualifier } ) => {
 	const argumentName = typeToString( argument );
 	const qualifierName = qualifier.text;
 
-	return `import(${ argumentName }).${ qualifierName }`;
+	return `import( ${ argumentName } ).${ qualifierName }`;
 };
 
 const typeToString = ( type ) => {

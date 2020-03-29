@@ -135,7 +135,7 @@ const MyButtonMoreMenuItem = () => (
 					title: 'param',
 					description: 'Callback function.',
 					name: 'callback',
-					type: '(timestamp: number) => void',
+					type: '( timestamp: number ) => void',
 				},
 			],
 		} );
@@ -208,9 +208,9 @@ const MyButtonMoreMenuItem = () => (
 				type( 'WPElements[]', 'array 2' ),
 				type( 'WPElements[]', 'jsdoc style array' ),
 				type( 'Array', 'simple array' ),
-				type( '[string, number]', 'simple tuple' ),
+				type( '[ string, number ]', 'simple tuple' ),
 				type(
-					'[TypeChecker, SourceFile, string?]',
+					'[ TypeChecker, SourceFile, string? ]',
 					'tuple with optional type'
 				),
 				type( 'string | null', 'jsdoc nullable 1' ),
@@ -302,21 +302,21 @@ const MyButtonMoreMenuItem = () => (
 				type( '( XX | YY ) & ZZ', 'parenthesized type' ),
 				type( 'string', 'jsdoc non-nullable type' ),
 				type( 'string', 'jsdoc non-nullable type 2' ),
-				type( '[string, ...X]', 'rest type' ),
+				type( '[ string, ...X ]', 'rest type' ),
 				type( '...number', 'jsdoc variadic type' ),
-				type( '(x: number, y: Test) => number', 'function type' ),
+				type( '( x: number, y: Test ) => number', 'function type' ),
 				type(
-					'(a: string, b: string) => { x: string, y: string }',
+					'( a: string, b: string ) => { x: string, y: string }',
 					'function + type literal'
 				),
-				type( '(k: () => number) => React.FC', 'function arg' ),
+				type( '( k: () => number ) => React.FC', 'function arg' ),
 				type( '() => void', 'function void return type' ),
 				type( 'new () => T', 'constructor type' ),
-				type( '(p0: b) => c', 'jsdoc function type' ),
+				type( '( p0: b ) => c', 'jsdoc function type' ),
 				type( '{ x: number, y: XY }', 'type literal' ),
-				type( '{ [setting: string]: any }', 'indexable interface' ),
+				type( '{ [ setting: string ]: any }', 'indexable interface' ),
 				type(
-					'{ j: (a: string) => number, k: number }',
+					'{ j: ( a: string ) => number, k: number }',
 					'function as type literal property type'
 				),
 				{
@@ -391,22 +391,25 @@ const MyButtonMoreMenuItem = () => (
 				type( 'keyof X', 'jsdoc type operator 1: keyof' ),
 				type( 'readonly Y', 'jsdoc type operator 2: readonly' ),
 				type( 'unique symbol', 'jsdoc type operator 3: unique' ),
-				type( "T['key']", 'indexed access type' ),
-				type( '{ [P in keyof T]?: T[P] }', 'mapped type 1: Partial' ),
+				type( "T[ 'key' ]", 'indexed access type' ),
 				type(
-					'{ [P in keyof T]: T[P] | null }',
+					'{ [ P in keyof T ]?: T[ P ] }',
+					'mapped type 1: Partial'
+				),
+				type(
+					'{ [ P in keyof T ]: T[ P ] | null }',
 					'mapped type 2: Nullable'
 				),
 				type(
-					'{ readonly [P in keyof T]: T[P] }',
+					'{ readonly [ P in keyof T ]: T[ P ] }',
 					'mapped type 3: Readonly'
 				),
 				type( 'T extends U ? X : Y', 'conditional type' ),
 				type(
-					'T extends (...args: any[]) => infer R ? R : any',
+					'T extends ( ...args: any[] ) => infer R ? R : any',
 					'infer type: ReturnType'
 				),
-				type( "import('typescript').Statement", 'import type' ),
+				type( "import( 'typescript' ).Statement", 'import type' ),
 				type( 'WPEditorInserterItem', 'typedef' ),
 				{
 					title: 'param',
