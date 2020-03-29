@@ -117,3 +117,9 @@ export const sum = ( p ) => {};
 /* eslint-enable jsdoc/check-param-names */
 /* eslint-enable jsdoc/valid-types */
 /* eslint-enable jsdoc/check-types */
+
+// Known issues:
+// When string-opening character or array opening character is repeated,
+// they cannot be parsed correctly.
+// * @param {string} [p=`Test "double" 'single' \`backtick\` quotes`] jsdoc optional with default: string type 4
+// * @param {object} [p={x:[1,2]}] jsdoc optional with default: array in object

@@ -246,6 +246,12 @@ const MyButtonMoreMenuItem = () => (
 					`Test "double" 'single' quotes`,
 					'jsdoc optional with default: string type 3'
 				),
+				// Known issue: The test below fails.
+				// typeWithDefault(
+				// 	'string',
+				// 	`Test "double" 'single' \`backtick\` quotes`,
+				// 	'jsdoc optional with default: string type 4'
+				// ),
 				typeWithDefault(
 					'string',
 					'10px',
@@ -281,6 +287,12 @@ const MyButtonMoreMenuItem = () => (
 					'[ 1, [ 2, 3 ] ]',
 					'jsdoc optional with default: nested array type'
 				),
+				// Known issue: the test below fails
+				// typeWithDefault(
+				// 	'object',
+				// 	'{x:[1,2]}',
+				// 	'jsdoc optional with default: array in object'
+				// ),
 				typeWithDefault(
 					'boolean',
 					true,
