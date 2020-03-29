@@ -176,6 +176,12 @@ const MyButtonMoreMenuItem = () => (
 			description: 'A function with many params.',
 			tags: [
 				type( 'undocumented', 'undocumented type' ),
+				{
+					title: 'param',
+					name: '',
+					type: '(unknown type) or (type error)',
+					description: '++} p unknown type or error',
+				},
 				type( 'any', 'any' ),
 				type( 'any', 'jsdoc all types' ),
 				type( 'unknown', 'jsdoc unknown' ),

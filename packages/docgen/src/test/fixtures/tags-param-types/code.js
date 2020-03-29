@@ -8,6 +8,7 @@
  * A function with many params.
  *
  * @param p undocumented type
+ * @param {++} p unknown type or error
  * @param {any} p any
  * @param {*} p jsdoc all types
  * @param {?} p jsdoc unknown

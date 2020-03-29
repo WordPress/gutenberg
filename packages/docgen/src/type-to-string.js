@@ -19,6 +19,10 @@ const getTypeFromTypeReference = ( type ) => {
 	if ( type.typeName.kind === SyntaxKind.Identifier ) {
 		const name = type.typeName.text;
 
+		if ( name === '' ) {
+			return '(unknown type) or (type error)';
+		}
+
 		if ( name === 'String' || name === 'Number' ) {
 			return name.toLowerCase();
 		}
