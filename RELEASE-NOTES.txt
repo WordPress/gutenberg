@@ -3,6 +3,7 @@
 * New block: Cover
 * Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
+* Enabled edit button over image block for Android
 
 1.24.0
 ------
