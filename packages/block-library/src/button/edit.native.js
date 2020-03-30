@@ -462,6 +462,7 @@ class ButtonEdit extends Component {
 						{ ( {
 							isBottomSheetScrolling,
 							shouldEnableBottomSheetScroll,
+							shouldSetBottomSheetMaxHeight,
 							onCloseBottomSheet,
 						} ) => {
 							return (
@@ -554,6 +555,9 @@ class ButtonEdit extends Component {
 										}
 										isBottomSheetScrolling={
 											isBottomSheetScrolling
+										}
+										shouldSetBottomSheetMaxHeight={
+											shouldSetBottomSheetMaxHeight
 										}
 										onCloseBottomSheet={
 											onCloseBottomSheet

@@ -19,7 +19,8 @@ import { Icon, check, close } from '@wordpress/icons';
 import styles from './style.scss';
 
 function ColorPicker( {
-	shouldEnableBottomSheetScroll = false,
+	shouldEnableBottomSheetScroll = () => {},
+	shouldSetBottomSheetMaxHeight = () => {},
 	isBottomSheetScrolling,
 	setBackgroundColor,
 	setTextColor,
@@ -102,6 +103,7 @@ function ColorPicker( {
 			setBackgroundColor( backgroundColor );
 			setGradient();
 		}
+		shouldSetBottomSheetMaxHeight( false );
 		onCloseBottomSheet( resetColors );
 	}, [] );
 
@@ -122,12 +124,15 @@ function ColorPicker( {
 	function onPressCancelButton() {
 		onNavigationBack();
 		onCloseBottomSheet( null );
+		shouldSetBottomSheetMaxHeight( true );
 		resetColors();
 	}
 
 	function onPressApplyButton() {
 		onNavigationBack();
 		onCloseBottomSheet( null );
+		shouldSetBottomSheetMaxHeight( true );
+
 		if ( isTextScreen ) {
 			return setTextColor( currentColor );
 		}

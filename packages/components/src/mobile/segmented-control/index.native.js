@@ -78,6 +78,11 @@ const SegmentedControls = ( {
 	const [ positionAnimationValue ] = useState( new Animated.Value( 0 ) );
 
 	useEffect( () => {
+		setActiveSegmentIndex( 0 );
+		segmentHandler( segments[ 0 ] );
+	}, [] );
+
+	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);

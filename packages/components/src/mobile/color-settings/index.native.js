@@ -29,20 +29,24 @@ function ColorSettings( {
 	setTextColor,
 	previousScreen,
 	shouldEnableBottomSheetScroll,
+	shouldSetBottomSheetMaxHeight,
 	isBottomSheetScrolling,
 	onCloseBottomSheet,
 	getStylesFromColorScheme,
 } ) {
-	const [ segment, setSegment ] = useState( 'Solid' );
+	const segments = [ 'Solid', 'Gradient' ];
+	const [ segment, setSegment ] = useState( segments[ 0 ] );
+
+	useEffect( () => {
+		changeBottomSheetContent( 'Settings' );
+		shouldSetBottomSheetMaxHeight( true );
+		onCloseBottomSheet( null );
+	}, [] );
 
 	const horizontalSeparatorStyle = getStylesFromColorScheme(
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
 	);
-
-	useEffect( () => {
-		setSegment( 'Solid' );
-	}, [ screen ] );
 
 	function getColorPalette() {
 		return (
@@ -72,7 +76,7 @@ function ColorSettings( {
 					{ getColorPalette() }
 					<View style={ horizontalSeparatorStyle } />
 					<SegmentedControls
-						segments={ [ 'Solid', 'Gradient' ] }
+						segments={ segments }
 						segmentHandler={ ( item ) => setSegment( item ) }
 						addonLeft={
 							<View>
@@ -136,6 +140,9 @@ function ColorSettings( {
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
+						shouldSetBottomSheetMaxHeight={
+							shouldSetBottomSheetMaxHeight
+						}
 						isBottomSheetScrolling={ isBottomSheetScrolling }
 						setTextColor={ setTextColor }
 						setBackgroundColor={ setBackgroundColor }
@@ -146,6 +153,7 @@ function ColorSettings( {
 						}
 						clientId={ clientId }
 						onCloseBottomSheet={ onCloseBottomSheet }
+						changeBottomSheetContent={ changeBottomSheetContent }
 					/>
 				</View>
 			) }

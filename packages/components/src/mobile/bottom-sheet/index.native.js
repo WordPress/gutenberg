@@ -45,6 +45,7 @@ class BottomSheet extends Component {
 		this.onScroll = this.onScroll.bind( this );
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
+		this.onShouldSetMaxHeight = this.onShouldSetMaxHeight.bind( this );
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -61,6 +62,7 @@ class BottomSheet extends Component {
 			scrollEnabled: true,
 			isScrolling: false,
 			onCloseBottomSheet: null,
+			setMaxHeight: true,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -189,6 +191,10 @@ class BottomSheet extends Component {
 		this.setState( { onCloseBottomSheet: action } );
 	}
 
+	onShouldSetMaxHeight( value ) {
+		this.setState( { setMaxHeight: value } );
+	}
+
 	onCloseBottomSheet() {
 		const { onClose } = this.props;
 		const { onCloseBottomSheet } = this.state;
@@ -196,7 +202,6 @@ class BottomSheet extends Component {
 			onCloseBottomSheet();
 		}
 		onClose();
-		return this.onHandleClosingBottomSheet( null );
 	}
 
 	render() {
@@ -219,6 +224,7 @@ class BottomSheet extends Component {
 			safeAreaBottomInset,
 			isScrolling,
 			scrollEnabled,
+			setMaxHeight,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -301,7 +307,7 @@ class BottomSheet extends Component {
 						onScrollBeginDrag={ () => this.isScrolling( true ) }
 						onScrollEndDrag={ () => this.isScrolling( false ) }
 						scrollEventThrottle={ 16 }
-						style={ { maxHeight } }
+						style={ setMaxHeight ? { maxHeight } : {} }
 						contentContainerStyle={ [
 							styles.content,
 							hideHeader && styles.emptyHeader,
@@ -314,6 +320,8 @@ class BottomSheet extends Component {
 							value={ {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
+								shouldSetBottomSheetMaxHeight: this
+									.onShouldSetMaxHeight,
 								isBottomSheetScrolling: isScrolling,
 								onCloseBottomSheet: this
 									.onHandleClosingBottomSheet,
