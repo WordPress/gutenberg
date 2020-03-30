@@ -43,6 +43,7 @@ export const withBlockControls = createHigherOrderComponent(
 		};
 
 		return [
+			<BlockEdit key="edit" { ...props } />,
 			<InspectorControls key="control">
 				<PanelBody title={ __( 'Typography' ) }>
 					<LineHeightControl
@@ -51,7 +52,6 @@ export const withBlockControls = createHigherOrderComponent(
 					/>
 				</PanelBody>
 			</InspectorControls>,
-			<BlockEdit key="edit" { ...props } />,
 		];
 	},
 	'withToolbarControls'
