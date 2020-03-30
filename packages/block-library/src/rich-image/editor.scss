@@ -53,6 +53,15 @@
 	}
 }
 
+.richimage__zoom-control {
+	border: $border-width solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	margin: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-10;
+	line-height: 1;
+}
+
 // Make the toolbar dropdowns blend in.
 .components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
 	padding: 0;
