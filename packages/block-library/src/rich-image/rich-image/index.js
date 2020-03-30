@@ -16,12 +16,13 @@ import {
 import { Fragment, Component } from '@wordpress/element';
 import {
 	Toolbar,
-	IconButton,
+	ToolbarButton,
 	Icon,
 	Button,
 	Spinner,
 	withNotices,
 	RangeControl,
+	DropdownMenu,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -50,6 +51,7 @@ const DEFAULT_CROP = {
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.1;
+const POPOVER_PROPS = { position: 'bottom right' };
 
 class RichImage extends Component {
 	constructor( props ) {
@@ -204,84 +206,58 @@ class RichImage extends Component {
 
 				{ isEditing && (
 					<BlockControls>
-						{ ! inProgress && (
-							<Fragment>
-								<Toolbar
-									className="richimage-toolbar__dropdown"
-									isCollapsed={ true }
-									icon={ <RotateLeftIcon /> }
-									label={ __( 'Rotate' ) }
-									popoverProps={ {
-										position: 'bottom right',
-									} }
-									controls={ [
-										{
-											icon: <RotateLeftIcon />,
-											title: __( 'Rotate left' ),
-											onClick: () =>
-												this.adjustImage( 'rotate', {
-													angle: -ROTATE_STEP,
-												} ),
-										},
-										{
-											icon: <RotateRightIcon />,
-											title: __( 'Rotate right' ),
-											onClick: () =>
-												this.adjustImage( 'rotate', {
-													angle: ROTATE_STEP,
-												} ),
-										},
-									] }
-								/>
-								<Toolbar
-									className="richimage-toolbar__dropdown"
-									isCollapsed={ true }
-									icon={ <FlipVerticalIcon /> }
-									label={ __( 'Flip' ) }
-									popoverProps={ {
-										position: 'bottom right',
-									} }
-									controls={ [
-										{
-											icon: <FlipVerticalIcon />,
-											title: __( 'Flip vertical' ),
-											onClick: () =>
-												this.adjustImage( 'flip', {
-													direction: 'vertical',
-												} ),
-										},
-										{
-											icon: <FlipHorizontalIcon />,
-											title: __( 'Flip horizontal' ),
-											onClick: () =>
-												this.adjustImage( 'flip', {
-													direction: 'horizontal',
-												} ),
-										},
-									] }
-								/>
-							</Fragment>
-						) }
-
 						<Toolbar>
-							{ inProgress && (
-								<Fragment>
-									<IconButton
-										disabled
-										className="richimage-toolbar__working"
-										icon={ <RotateLeftIcon /> }
-										label={ __( 'Rotate' ) }
-									/>
-									<IconButton
-										disabled
-										className="richimage-toolbar__working"
-										icon={ <FlipVerticalIcon /> }
-										label={ __( 'Flip' ) }
-									/>
-								</Fragment>
-							) }
-							<IconButton
-								className="components-toolbar__control richimage-toolbar__dropdown"
+							<DropdownMenu
+								icon={ <RotateLeftIcon /> }
+								label={ __( 'Rotate' ) }
+								popoverProps={ POPOVER_PROPS }
+								controls={ [
+									{
+										icon: <RotateLeftIcon />,
+										title: __( 'Rotate left' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.adjustImage( 'rotate', {
+												angle: -ROTATE_STEP,
+											} ),
+									},
+									{
+										icon: <RotateRightIcon />,
+										title: __( 'Rotate right' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.adjustImage( 'rotate', {
+												angle: ROTATE_STEP,
+											} ),
+									},
+								] }
+							/>
+							<DropdownMenu
+								icon={ <FlipVerticalIcon /> }
+								label={ __( 'Flip' ) }
+								popoverProps={ POPOVER_PROPS }
+								controls={ [
+									{
+										icon: <FlipVerticalIcon />,
+										title: __( 'Flip vertical' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.adjustImage( 'flip', {
+												direction: 'vertical',
+											} ),
+									},
+									{
+										icon: <FlipHorizontalIcon />,
+										title: __( 'Flip horizontal' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.adjustImage( 'flip', {
+												direction: 'horizontal',
+											} ),
+									},
+								] }
+							/>
+							<ToolbarButton
 								disabled={ inProgress }
 								icon={ <CropIcon /> }
 								label={ __( 'Crop' ) }
@@ -355,7 +331,7 @@ class RichImage extends Component {
 							}
 						/>
 						<Toolbar>
-							<IconButton
+							<ToolbarButton
 								className="richimage-toolbar__dropdown"
 								disabled={ inProgress }
 								icon="image-rotate-right"
