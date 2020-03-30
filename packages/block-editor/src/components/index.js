@@ -34,6 +34,7 @@ export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
+export { default as __experimentalLineHeightControl } from './line-height-control';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -48,6 +49,7 @@ export {
 	__unstableRichTextInputEvent,
 } from './rich-text';
 export { default as ToolSelector } from './tool-selector';
+export { default as __experimentalUnitControl } from './unit-control';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
@@ -72,6 +74,7 @@ export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
+export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';

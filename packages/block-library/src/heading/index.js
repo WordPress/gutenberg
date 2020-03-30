@@ -34,6 +34,8 @@ export const settings = {
 		anchor: true,
 		__unstablePasteTextInline: true,
 		lightBlockWrapper: true,
+		__experimentalColor: true,
+		__experimentalLineHeight: true,
 	},
 	example: {
 		attributes: {

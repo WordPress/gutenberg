@@ -17,6 +17,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "lib/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.0.0",
 		"@actions/github": "^1.0.0",

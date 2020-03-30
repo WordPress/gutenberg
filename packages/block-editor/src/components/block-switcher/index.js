@@ -187,7 +187,6 @@ export class BlockSwitcher extends Component {
 									{ __( 'Preview' ) }
 								</div>
 								<BlockPreview
-									autoHeight
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example
