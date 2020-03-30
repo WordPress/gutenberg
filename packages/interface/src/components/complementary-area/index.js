@@ -105,6 +105,7 @@ function ComplementaryArea( {
 								<strong>{ title }</strong>
 								{ isPinnable && (
 									<Button
+										className="interface-complementary-area__pin-unpin-item"
 										icon={
 											isPinned ? starFilled : starEmpty
 										}
