@@ -99,7 +99,7 @@ export default class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	async hasBlockAtPosition( position: number, blockName: string = '' ) {
+	async hasBlockAtPosition( position: number = 1, blockName: string = '' ) {
 		return undefined !== ( await this.getBlockAtPosition( blockName, position ) );
 	}
 
@@ -255,10 +255,6 @@ export default class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async hasParagraphBlockAtPosition( position: number ) {
-		return this.hasBlockAtPosition( position, this.paragraphBlockName );
-	}
-
 	async getTextViewForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
 		let textViewElementName = 'XCUIElementTypeTextView';
 		if ( isAndroid() ) {
@@ -315,10 +311,6 @@ export default class EditorPage {
 	// =========================
 	// List Block functions
 	// =========================
-
-	async hasListBlockAtPosition( position: number ) {
-		return await this.hasBlockAtPosition( position, this.listBlockName );
-	}
 
 	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
 		let textViewElementName = 'XCUIElementTypeTextView';

@@ -67,7 +67,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n', false );
-		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
+		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -91,7 +91,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
+		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -108,7 +108,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
 
-		expect( await editorPage.hasParagraphBlockAtPosition( 2 ) ).toBe( false );
+		expect( await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) ).toBe( false );
 		await editorPage.removeBlockAtPosition( paragraphBlockName );
 	} );
 
