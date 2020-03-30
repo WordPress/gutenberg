@@ -38,12 +38,14 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 						setAttributes( { level: newLevel } )
 					}
 				/>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
+				{ Platform.OS !== 'android' && (
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				) }
 			</BlockControls>
 			{ Platform.OS === 'web' && (
 				<InspectorControls>
