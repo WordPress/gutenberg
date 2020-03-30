@@ -68,7 +68,7 @@ const migrateCustomColors = ( attributes ) => {
 		style.color.background = attributes.customBackgroundColor;
 	}
 	return {
-		...attributes,
+		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
 		style,
 	};
 };

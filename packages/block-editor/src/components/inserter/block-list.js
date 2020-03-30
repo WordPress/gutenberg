@@ -324,11 +324,7 @@ function InserterBlockList( {
 
 	const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
-	const hasItems =
-		! isEmpty( suggestedItems ) ||
-		! isEmpty( reusableItems ) ||
-		! isEmpty( itemsPerCategory ) ||
-		! isEmpty( itemsPerCollection );
+	const hasItems = ! isEmpty( filteredItems );
 
 	return (
 		<div
