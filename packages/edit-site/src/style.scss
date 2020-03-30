@@ -45,6 +45,12 @@ body.toplevel_page_gutenberg-edit-site {
 	> .components-navigate-regions {
 		height: 100%;
 	}
+
+	// Todo: Remove this rule when edit site gets support
+	// for opening unpinned sidebar items.
+	.interface-complementary-area__pin-unpin-item.components-button {
+		display: none;
+	}
 }
 
 /**
