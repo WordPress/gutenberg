@@ -16,6 +16,7 @@ import TextControl from '../';
 export default {
 	title: 'Components/TextControl',
 	component: TextControl,
+	parameters: { fileName: __filename },
 };
 
 const TextControlWithState = ( props ) => {

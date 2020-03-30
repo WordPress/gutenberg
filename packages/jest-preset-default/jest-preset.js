@@ -24,6 +24,7 @@ module.exports = {
 	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/wordpress/' ],
 	timers: 'fake',
 	transform: {
+		'^.+stories/.+\\.jsx?$': '@storybook/addon-storyshots/injectFileName',
 		'^.+\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},
 	verbose: true,

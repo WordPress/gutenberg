@@ -12,7 +12,11 @@ import Card from '../index';
 import CardHeader from '../header';
 import { getCardStoryProps } from './_utils';
 
-export default { title: 'Components/Card/Header', component: CardHeader };
+export default {
+	title: 'Components/Card/Header',
+	component: CardHeader,
+	parameters: { fileName: __filename },
+};
 
 export const _default = () => {
 	const props = getCardStoryProps();

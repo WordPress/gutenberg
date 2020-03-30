@@ -16,6 +16,7 @@ import SelectControl from '../';
 export default {
 	title: 'Components/SelectControl',
 	component: SelectControl,
+	parameters: { fileName: __filename },
 };
 
 const SelectControlWithState = ( props ) => {

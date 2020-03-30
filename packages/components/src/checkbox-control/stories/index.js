@@ -16,6 +16,7 @@ import CheckboxControl from '../';
 export default {
 	title: 'Components/CheckboxControl',
 	component: CheckboxControl,
+	parameters: { fileName: __filename },
 };
 
 const CheckboxControlWithState = ( { checked, ...props } ) => {

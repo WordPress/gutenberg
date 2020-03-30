@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/CheckboxControl All 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-checkbox-control-1"
+    >
+      User
+    </label>
+    <span
+      className="components-checkbox-control__input-container"
+    >
+      <input
+        aria-describedby="inspector-checkbox-control-1__help"
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-1"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <svg
+        aria-hidden="true"
+        className="components-checkbox-control__checked"
+        focusable="false"
+        height={24}
+        role="img"
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-checkbox-control__label"
+      htmlFor="inspector-checkbox-control-1"
+    >
+      Is author
+    </label>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-checkbox-control-1__help"
+  >
+    Is the user an author or not?
+  </p>
+</div>
+`;
+
+exports[`Storyshots Components/CheckboxControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <span
+      className="components-checkbox-control__input-container"
+    >
+      <input
+        checked={true}
+        className="components-checkbox-control__input"
+        id="inspector-checkbox-control-0"
+        onChange={[Function]}
+        type="checkbox"
+        value="1"
+      />
+      <svg
+        aria-hidden="true"
+        className="components-checkbox-control__checked"
+        focusable="false"
+        height={24}
+        role="img"
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+        />
+      </svg>
+    </span>
+    <label
+      className="components-checkbox-control__label"
+      htmlFor="inspector-checkbox-control-0"
+    >
+      Is author
+    </label>
+  </div>
+</div>
+`;

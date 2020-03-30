@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ColorIndicator Default 1`] = `
+<span
+  className="component-color-indicator"
+  style={
+    Object {
+      "background": "#0073aa",
+    }
+  }
+/>
+`;

@@ -11,6 +11,7 @@ import AnglePickerControl from '../';
 export default {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
+	parameters: { fileName: __filename },
 };
 
 const AnglePickerWithState = () => {

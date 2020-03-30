@@ -16,6 +16,7 @@ import ClipboardButton from '../';
 export default {
 	title: 'Components/ClipboardButton',
 	component: ClipboardButton,
+	parameters: { fileName: __filename },
 };
 
 const ClipboardButtonWithState = ( { copied, ...props } ) => {

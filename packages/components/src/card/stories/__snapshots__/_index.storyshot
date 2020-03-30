@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/Card Default 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__header is-size-medium css-1vhqpef-HeaderUI e1q7k77g1"
+  >
+    Header
+  </div>
+  <div
+    className="components-card__body is-size-medium css-xmjzce-BodyUI e1q7k77g3"
+  >
+    Code is Poetry
+  </div>
+  <div
+    className="components-card__footer is-size-medium css-1ph2e95-FooterUI e1q7k77g4"
+  >
+    Footer
+  </div>
+</div>
+`;

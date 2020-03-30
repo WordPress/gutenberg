@@ -6,6 +6,7 @@ import Text from '../index';
 export default {
 	title: 'Components/Text',
 	component: Text,
+	parameters: { fileName: __filename },
 };
 
 export const _default = () => (

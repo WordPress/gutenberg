@@ -11,6 +11,7 @@ import ColorIndicator from '../';
 export default {
 	title: 'Components/ColorIndicator',
 	component: ColorIndicator,
+	parameters: { fileName: __filename },
 };
 
 export const _default = () => {

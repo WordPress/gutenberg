@@ -1,0 +1,195 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ColorPalette Default 1`] = `
+<div
+  className="components-circular-option-picker"
+>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: red"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#f00",
+          "color": "#f00",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: white"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#fff",
+          "color": "#fff",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: blue"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#00f",
+          "color": "#00f",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__custom-clear-wrapper"
+  >
+    <div
+      className="components-dropdown components-circular-option-picker__dropdown-link-action"
+    >
+      <button
+        aria-expanded={false}
+        aria-label="Custom color picker"
+        className="components-button is-link"
+        onClick={[Function]}
+        type="button"
+      >
+        Custom color
+      </button>
+    </div>
+    <button
+      className="components-button components-circular-option-picker__clear is-secondary is-small"
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/ColorPalette With Knobs 1`] = `
+<div
+  className="components-circular-option-picker"
+>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: red"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#f00",
+          "color": "#f00",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: white"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#fff",
+          "color": "#fff",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__option-wrapper"
+  >
+    <button
+      aria-label="Color: blue"
+      aria-pressed={false}
+      className="components-button components-circular-option-picker__option"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onFocus={[Function]}
+      onMouseDown={[Function]}
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "backgroundColor": "#00f",
+          "color": "#00f",
+        }
+      }
+      type="button"
+    />
+  </div>
+  <div
+    className="components-circular-option-picker__custom-clear-wrapper"
+  >
+    <div
+      className="components-dropdown components-circular-option-picker__dropdown-link-action"
+    >
+      <button
+        aria-expanded={false}
+        aria-label="Custom color picker"
+        className="components-button is-link"
+        onClick={[Function]}
+        type="button"
+      >
+        Custom color
+      </button>
+    </div>
+    <button
+      className="components-button components-circular-option-picker__clear is-secondary is-small"
+      onClick={[Function]}
+      type="button"
+    >
+      Clear
+    </button>
+  </div>
+</div>
+`;

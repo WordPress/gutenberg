@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/VisuallyHidden Default 1`] = `
+Array [
+  <div
+    className="components-visually-hidden"
+  >
+    This should not show.
+  </div>,
+  <div>
+    This text will
+     
+    <span
+      className="components-visually-hidden"
+    >
+      but not inline 
+    </span>
+     always show.
+  </div>,
+]
+`;
+
+exports[`Storyshots Components/VisuallyHidden With Additional Class Names 1`] = `
+Array [
+  "Additional class names passed to VisuallyHidden extend the component class name.",
+  " ",
+  <label
+    className="components-visually-hidden test-input"
+  >
+    Check out my class!
+     
+  </label>,
+  "Inspect the HTML to see!",
+]
+`;
+
+exports[`Storyshots Components/VisuallyHidden With Forwarded Props 1`] = `
+Array [
+  "Additional props can be passed to VisuallyHidden and are forwarded to the rendered element.",
+  " ",
+  <span
+    className="components-visually-hidden"
+    data-id="test"
+  >
+    Check out my data attribute!
+     
+  </span>,
+  "Inspect the HTML to see!",
+]
+`;

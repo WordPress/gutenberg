@@ -16,6 +16,7 @@ import TreeSelect from '../';
 export default {
 	title: 'Components/TreeSelect',
 	component: TreeSelect,
+	parameters: { fileName: __filename },
 };
 
 const TreeSelectWithState = ( props ) => {

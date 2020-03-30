@@ -16,6 +16,7 @@ import FontSizePicker from '../';
 export default {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
+	parameters: { fileName: __filename },
 };
 
 const FontSizePickerWithState = ( { ...props } ) => {

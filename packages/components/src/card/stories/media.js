@@ -16,7 +16,11 @@ import CardHeader from '../header';
 import CardMedia from '../media';
 import { getCardStoryProps } from './_utils';
 
-export default { title: 'Components/Card/Media', component: CardMedia };
+export default {
+	title: 'Components/Card/Media',
+	component: CardMedia,
+	parameters: { fileName: __filename },
+};
 
 const DummyImage = () => (
 	<img

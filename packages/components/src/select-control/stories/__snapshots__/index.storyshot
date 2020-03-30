@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/SelectControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-select-control-1"
+    >
+      Label Text
+    </label>
+    <select
+      aria-describedby="inspector-select-control-1__help"
+      className="components-select-control__input"
+      id="inspector-select-control-1"
+      multiple={false}
+      onChange={[Function]}
+    >
+      <option
+        disabled={true}
+        value={null}
+      >
+        Select an Option
+      </option>
+      <option
+        value="a"
+      >
+        Option A
+      </option>
+      <option
+        value="b"
+      >
+        Option B
+      </option>
+      <option
+        value="c"
+      >
+        Option C
+      </option>
+    </select>
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-select-control-1__help"
+  >
+    Help text to explain the select control.
+  </p>
+</div>
+`;

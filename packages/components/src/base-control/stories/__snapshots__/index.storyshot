@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/BaseControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="textarea-1"
+    >
+      Label text
+    </label>
+    <textarea
+      id="textarea-1"
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="textarea-1__help"
+  >
+    Help text
+  </p>
+</div>
+`;

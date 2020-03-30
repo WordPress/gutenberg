@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/Text Default 1`] = `
+Array [
+  <h1
+    className="css-azwfar-Text e15wbhsk0"
+  >
+    Title Large
+  </h1>,
+  <h2
+    className="css-kz1cf4-Text e15wbhsk0"
+  >
+    Title Medium
+  </h2>,
+  <h3
+    className="css-1ahfdc3-Text e15wbhsk0"
+  >
+    Title Small
+  </h3>,
+  <p
+    className="css-1svs5s6-Text e15wbhsk0"
+  >
+    Subtitle
+  </p>,
+  <p
+    className="css-12vx9xw-Text e15wbhsk0"
+  >
+    Subtitle Small
+  </p>,
+  <p
+    className="css-1f0yw52-Text e15wbhsk0"
+  >
+    Body
+  </p>,
+  <p
+    className="css-101we7g-Text e15wbhsk0"
+  >
+    Body Small
+  </p>,
+  <p
+    className="css-pwcpdf-Text e15wbhsk0"
+  >
+    Button
+  </p>,
+  <p
+    className="css-1qmnemh-Text e15wbhsk0"
+  >
+    Caption
+  </p>,
+  <p
+    className="css-1xas4vb-Text e15wbhsk0"
+  >
+    Label
+  </p>,
+]
+`;

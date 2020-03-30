@@ -6,6 +6,7 @@ import CustomSelectControl from '../';
 export default {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
+	parameters: { fileName: __filename },
 };
 
 const options = [

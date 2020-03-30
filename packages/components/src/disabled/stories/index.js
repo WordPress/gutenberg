@@ -9,6 +9,7 @@ import TextareaControl from '../../textarea-control/';
 export default {
 	title: 'Components/Disabled',
 	component: Disabled,
+	parameters: { fileName: __filename },
 };
 
 export const _default = () => {

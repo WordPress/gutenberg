@@ -16,6 +16,7 @@ import TextareaControl from '../';
 export default {
 	title: 'Components/TextareaControl',
 	component: TextareaControl,
+	parameters: { fileName: __filename },
 };
 
 const TextareaControlWithState = ( props ) => {

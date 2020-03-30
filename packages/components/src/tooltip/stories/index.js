@@ -11,6 +11,7 @@ import Tooltip from '../';
 export default {
 	title: 'Components/ToolTip',
 	component: Tooltip,
+	parameters: { fileName: __filename },
 };
 
 export const _default = () => {

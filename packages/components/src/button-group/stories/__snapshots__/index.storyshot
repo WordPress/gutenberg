@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ButtonGroup Default 1`] = `
+<div
+  className="components-button-group"
+  role="group"
+>
+  <button
+    className="components-button is-primary"
+    style={
+      Object {
+        "margin": "0 4px",
+      }
+    }
+    type="button"
+  >
+    Button 1
+  </button>
+  <button
+    className="components-button is-primary"
+    style={
+      Object {
+        "margin": "0 4px",
+      }
+    }
+    type="button"
+  >
+    Button 2
+  </button>
+</div>
+`;

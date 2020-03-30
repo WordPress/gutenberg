@@ -13,7 +13,11 @@ import { useState } from '@wordpress/element';
  */
 import ColorPalette from '../';
 
-export default { title: 'Components/ColorPalette', component: ColorPalette };
+export default {
+	title: 'Components/ColorPalette',
+	component: ColorPalette,
+	parameters: { fileName: __filename },
+};
 
 const ColorPaletteWithState = ( props ) => {
 	const [ color, setColor ] = useState( '#F00' );

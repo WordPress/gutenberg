@@ -6,6 +6,7 @@ import VisuallyHidden from '../';
 export default {
 	title: 'Components/VisuallyHidden',
 	component: VisuallyHidden,
+	parameters: { fileName: __filename },
 };
 
 export const _default = () => (

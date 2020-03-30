@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/Disabled Default 1`] = `
+<div
+  className="components-disabled"
+>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-text-control-2"
+      >
+        Text Control
+      </label>
+      <input
+        className="components-text-control__input"
+        id="inspector-text-control-2"
+        onChange={[Function]}
+        type="text"
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-textarea-control-0"
+      >
+        TextArea Control
+      </label>
+      <textarea
+        className="components-textarea-control__input"
+        id="inspector-textarea-control-0"
+        onChange={[Function]}
+        rows={4}
+      />
+    </div>
+  </div>
+  <div
+    className="components-base-control"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-select-control-0"
+      >
+        Select Control
+      </label>
+      <select
+        className="components-select-control__input"
+        id="inspector-select-control-0"
+        multiple={false}
+        onChange={[Function]}
+      >
+        <option
+          disabled={true}
+          value={null}
+        >
+          Select an option
+        </option>
+        <option
+          value="a"
+        >
+          Option A
+        </option>
+        <option
+          value="b"
+        >
+          Option B
+        </option>
+        <option
+          value="c"
+        >
+          Option C
+        </option>
+      </select>
+    </div>
+  </div>
+</div>
+`;

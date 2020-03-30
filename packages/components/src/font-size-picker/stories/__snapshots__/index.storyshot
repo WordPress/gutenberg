@@ -1,0 +1,359 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/FontSizePicker Default 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend
+    className="components-visually-hidden"
+  >
+    Font size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-custom-select-control components-font-size-picker__select"
+    >
+      <label
+        className="components-custom-select-control__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
+      >
+        Preset size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset size"
+        className="components-button components-custom-select-control__button is-small"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="components-custom-select-control__button-icon"
+          focusable="false"
+          height={24}
+          role="img"
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select-control__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
+    <div
+      className="components-font-size-picker__number-container"
+    >
+      <label
+        htmlFor="components-font-size-picker__number#0"
+      >
+        Custom
+      </label>
+      <input
+        aria-label="Custom"
+        className="components-font-size-picker__number"
+        id="components-font-size-picker__number#0"
+        onChange={[Function]}
+        type="number"
+        value={16}
+      />
+    </div>
+    <button
+      className="components-button components-color-palette__clear is-secondary is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+</fieldset>
+`;
+
+exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend
+    className="components-visually-hidden"
+  >
+    Font size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-custom-select-control components-font-size-picker__select"
+    >
+      <label
+        className="components-custom-select-control__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
+      >
+        Preset size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset size"
+        className="components-button components-custom-select-control__button is-small"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="components-custom-select-control__button-icon"
+          focusable="false"
+          height={24}
+          role="img"
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select-control__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
+    <button
+      className="components-button components-color-palette__clear is-secondary is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+  <div
+    className="components-base-control components-range-control components-font-size-picker__custom-input"
+  >
+    <div
+      className="components-base-control__field"
+    >
+      <label
+        className="components-base-control__label"
+        htmlFor="inspector-range-control-0"
+      >
+        Custom Size
+      </label>
+      <span
+        className="components-range-control__root css-yaebbd-Root exqw8y20"
+      >
+        <span
+          className="css-1hnflx3-BeforeIconWrapper exqw8y22"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="-2 -2 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+            />
+          </svg>
+        </span>
+        <span
+          className="components-range-control__wrapper css-13ppmsj-Wrapper exqw8y21"
+          color="#00669b"
+        >
+          <input
+            aria-hidden={false}
+            aria-label="Custom Size"
+            className="components-range-control__slider css-15v4a6m-InputRange exqw8y211"
+            disabled={false}
+            id="inspector-range-control-0"
+            max={100}
+            min={12}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            onMouseLeave={[Function]}
+            onMouseMove={[Function]}
+            step={1}
+            tabIndex={0}
+            type="range"
+            value={16}
+          />
+          <span
+            aria-hidden={true}
+            className="css-1lwhlrq-Rail exqw8y24"
+            disabled={false}
+          />
+          <span
+            aria-hidden={true}
+            className="components-range-control__track css-ogrpie-Track exqw8y25"
+            disabled={false}
+            style={
+              Object {
+                "width": "4.545454545454546%",
+              }
+            }
+          />
+          <span
+            className="css-1nmcb0w-ThumbWrapper exqw8y29"
+            style={
+              Object {
+                "left": "4.545454545454546%",
+              }
+            }
+          >
+            <span
+              aria-hidden={true}
+              className="css-ppqvfn-Thumb exqw8y210"
+            />
+          </span>
+          <span
+            aria-hidden={false}
+            className="components-simple-tooltip components-range-control__tooltip css-1701tus-Tooltip exqw8y212"
+            role="tooltip"
+            style={
+              Object {
+                "left": "4.545454545454546%",
+                "zIndex": 100,
+              }
+            }
+          >
+            16
+          </span>
+        </span>
+        <span
+          className="css-1ka2gnm-AfterIconWrapper exqw8y23"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="-2 -2 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+            />
+          </svg>
+        </span>
+        <input
+          aria-label="Custom Size"
+          className="components-range-control__number css-1k07lkz-InputNumber exqw8y213"
+          disabled={false}
+          inputMode="decimal"
+          max={100}
+          min={12}
+          onChange={[Function]}
+          step={1}
+          type="number"
+          value={16}
+        />
+      </span>
+    </div>
+  </div>
+</fieldset>
+`;
+
+exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
+<fieldset
+  className="components-font-size-picker"
+>
+  <legend
+    className="components-visually-hidden"
+  >
+    Font size
+  </legend>
+  <div
+    className="components-font-size-picker__controls"
+  >
+    <div
+      className="components-custom-select-control components-font-size-picker__select"
+    >
+      <label
+        className="components-custom-select-control__label"
+        htmlFor="downshift-null-toggle-button"
+        id="downshift-null-label"
+      >
+        Preset size
+      </label>
+      <button
+        aria-expanded={false}
+        aria-haspopup="listbox"
+        aria-label="Preset size"
+        className="components-button components-custom-select-control__button is-small"
+        id="downshift-null-toggle-button"
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Normal
+        <svg
+          aria-hidden="true"
+          className="components-custom-select-control__button-icon"
+          focusable="false"
+          height={24}
+          role="img"
+          viewBox="0 0 24 24"
+          width={24}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
+          />
+        </svg>
+      </button>
+      <ul
+        aria-labelledby="downshift-null-label"
+        className="components-custom-select-control__menu"
+        id="downshift-null-menu"
+        onBlur={[Function]}
+        onKeyDown={[Function]}
+        onMouseLeave={[Function]}
+        role="listbox"
+        tabIndex={-1}
+      />
+    </div>
+    <button
+      className="components-button components-color-palette__clear is-secondary is-small"
+      disabled={false}
+      onClick={[Function]}
+      type="button"
+    >
+      Reset
+    </button>
+  </div>
+</fieldset>
+`;

@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/TextareaControl Default 1`] = `
+<div
+  className="components-base-control"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-textarea-control-1"
+    >
+      Label Text
+    </label>
+    <textarea
+      aria-describedby="inspector-textarea-control-1__help"
+      className="components-textarea-control__input"
+      id="inspector-textarea-control-1"
+      onChange={[Function]}
+      rows={4}
+    />
+  </div>
+  <p
+    className="components-base-control__help"
+    id="inspector-textarea-control-1__help"
+  >
+    Help text to explain the textarea.
+  </p>
+</div>
+`;

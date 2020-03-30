@@ -1,0 +1,168 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/Card/Media Default 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+  >
+    <img
+      alt="SMELLING MARSHMELLOW ICECREAM CONE"
+      src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+    />
+  </div>
+  <div
+    className="components-card__body is-size-medium css-xmjzce-BodyUI e1q7k77g3"
+  >
+    Content
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__header is-size-medium css-1vhqpef-HeaderUI e1q7k77g1"
+  >
+    Header Content
+  </div>
+  <div
+    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+  >
+    <img
+      alt="SMELLING MARSHMELLOW ICECREAM CONE"
+      src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+    />
+  </div>
+  <div
+    className="components-card__footer is-shady is-size-medium css-1ph2e95-FooterUI e1q7k77g4"
+  >
+    Caption
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/Card/Media Horizontally Aligned 1`] = `
+Array [
+  <p>
+    Note: This story demonstrates how this UI may be created. It requires extra styling.
+  </p>,
+  <div
+    className="components-card is-size-medium is-left e1gk3lep2 css-1pwk4mg-CardUI-HorizontallyAlignedCard e1q7k77g0"
+  >
+    <div
+      className="components-card__media is-left e1gk3lep0 css-7tds6a-MediaUI-StyledCardMedia e1q7k77g2"
+      style={
+        Object {
+          "maxWidth": 200,
+        }
+      }
+    >
+      <img
+        alt="SMELLING MARSHMELLOW ICECREAM CONE"
+        src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+      />
+    </div>
+    <div
+      className="components-card__body is-size-medium e1gk3lep1 css-wzsy6y-BodyUI-StyledCardBody e1q7k77g3"
+    >
+      Content
+    </div>
+  </div>,
+]
+`;
+
+exports[`Storyshots Components/Card/Media Iframe Embed 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__header is-size-medium css-1vhqpef-HeaderUI e1q7k77g1"
+  >
+    Header Content
+  </div>
+  <div
+    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+  >
+    <iframe
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen={true}
+      frameBorder="0"
+      height="315"
+      src="https://www.youtube.com/embed/zGP6zk7jcrQ"
+      title="Corgi"
+      width="560"
+    />
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/Card/Media On Bottom 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__body is-size-medium css-xmjzce-BodyUI e1q7k77g3"
+  >
+    Content
+  </div>
+  <div
+    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+  >
+    <img
+      alt="SMELLING MARSHMELLOW ICECREAM CONE"
+      src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+    />
+  </div>
+</div>
+`;
+
+exports[`Storyshots Components/Card/Media On Top 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
+  >
+    <img
+      alt="SMELLING MARSHMELLOW ICECREAM CONE"
+      src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+    />
+  </div>
+  <div
+    className="components-card__body is-size-medium css-xmjzce-BodyUI e1q7k77g3"
+  >
+    <div>
+      Content
+    </div>
+  </div>
+</div>
+`;

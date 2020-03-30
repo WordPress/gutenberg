@@ -15,7 +15,11 @@ import CardFooter from '../footer';
 import CardHeader from '../header';
 import { getCardStoryProps } from './_utils';
 
-export default { title: 'Components/Card', component: Card };
+export default {
+	title: 'Components/Card',
+	component: Card,
+	parameters: { fileName: __filename },
+};
 
 export const _default = () => {
 	const props = getCardStoryProps();

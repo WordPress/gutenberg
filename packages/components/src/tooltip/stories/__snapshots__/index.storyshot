@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ToolTip Default 1`] = `
+<div
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseDown={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  style={
+    Object {
+      "border": "1px solid #ccc",
+      "margin": "50px auto",
+      "padding": "20px",
+      "textAlign": "center",
+      "width": "200px",
+    }
+  }
+>
+  Hover for more information
+</div>
+`;

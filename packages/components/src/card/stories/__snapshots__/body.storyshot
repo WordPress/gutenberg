@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/Card/Body Default 1`] = `
+<div
+  className="components-card is-size-medium css-1xs3c37-CardUI e1q7k77g0"
+  style={
+    Object {
+      "width": "360px",
+    }
+  }
+>
+  <div
+    className="components-card__body is-size-medium css-xmjzce-BodyUI e1q7k77g3"
+  >
+    Content
+  </div>
+</div>
+`;
