@@ -22,8 +22,6 @@ export const userEvents = {
 	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
 
-export const showMediaEditorButton = isIOS;
-
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
