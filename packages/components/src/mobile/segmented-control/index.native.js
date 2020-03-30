@@ -54,6 +54,7 @@ const Segment = ( {
 				<View style={ segmentStyle } onLayout={ onLayout }>
 					<Text
 						style={ [ textStyle, isSelected && selectedTextStyle ] }
+						maxFontSizeMultiplier={ 2 }
 					>
 						{ title }
 					</Text>

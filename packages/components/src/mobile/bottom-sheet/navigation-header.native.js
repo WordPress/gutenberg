@@ -64,7 +64,10 @@ function BottomSheetNavigationHeader( {
 					) }
 				</View>
 			</TouchableWithoutFeedback>
-			<Text style={ bottomSheetHeaderTitleStyle }>
+			<Text
+				style={ bottomSheetHeaderTitleStyle }
+				maxFontSizeMultiplier={ 3 }
+			>
 				{ sprintf( __( '%s' ), screen ) }
 			</Text>
 			<View style={ styles.bottomSheetRightSpace } />

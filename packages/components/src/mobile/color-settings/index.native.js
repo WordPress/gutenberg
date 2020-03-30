@@ -107,7 +107,6 @@ function ColorSettings( {
 					<View style={ styles.footer }>
 						<View style={ styles.flex }>
 							<Text
-								selectable
 								style={ [
 									styles.colorIndicator,
 									styles.textIndicator,
@@ -115,13 +114,15 @@ function ColorSettings( {
 							>
 								{ textColor }
 							</Text>
-
 							<ColorIndicator
 								color={ textColor }
 								style={ styles.colorIndicator }
 							/>
 						</View>
-						<Text style={ styles.selectColorText }>
+						<Text
+							style={ styles.selectColorText }
+							maxFontSizeMultiplier={ 2 }
+						>
 							{ __( 'Select a color' ) }
 						</Text>
 						<View style={ styles.flex } />

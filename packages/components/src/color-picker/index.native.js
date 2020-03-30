@@ -9,7 +9,7 @@ import tinycolor from 'tinycolor2';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ColorIndicator, BottomSheet } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/components';
 import { __experimentalUseGradient } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { Icon, check, close } from '@wordpress/icons';
@@ -190,15 +190,9 @@ function ColorPicker( {
 						) }
 					</View>
 				</TouchableWithoutFeedback>
-				<View style={ styles.colorWrapper }>
-					<ColorIndicator
-						color={ currentColor }
-						style={ styles.colorIndicator }
-					/>
-					<Text style={ colorTextStyle } selectable>
-						{ currentColor.toUpperCase() }
-					</Text>
-				</View>
+				<Text style={ colorTextStyle } selectable>
+					{ currentColor.toUpperCase() }
+				</Text>
 				<TouchableWithoutFeedback
 					onPress={ onPressApplyButton }
 					hitSlop={ hitSlop }

@@ -32,11 +32,6 @@
 	font-size: 17px;
 }
 
-.colorWrapper {
-	flex-direction: row;
-	align-items: center;
-}
-
 .colorText {
 	font-family: $default-monospace-font;
 	color: rgba(0, 0, 0, 0.87);
@@ -46,11 +41,6 @@
 
 .colorTextDark {
 	color: rgba(255, 255, 255, 0.87);
-}
-
-.colorIndicator {
-	height: 16px;
-	width: 16px;
 }
 
 .picker {
