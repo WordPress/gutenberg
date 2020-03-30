@@ -25,7 +25,7 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
-			code: `var number = ''; _n( 'Singular', 'Plural', number)`,
+			code: `var number = ''; _n( 'Singular', 'Plural', number )`,
 			options: [ { allowedTextDomains: [ 'default' ] } ],
 		},
 		{
@@ -67,7 +67,7 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			errors: [ { messageId: 'missing' } ],
 		},
 		{
-			code: `var number = ''; _n( 'Singular', 'Plural', number)`,
+			code: `var number = ''; _n( 'Singular', 'Plural', number )`,
 			output: `var number = ''; _n( 'Singular', 'Plural', number, 'foo' )`,
 			options: [ { allowedTextDomains: [ 'foo' ] } ],
 			errors: [ { messageId: 'missing' } ],
@@ -103,19 +103,19 @@ ruleTester.run( 'i18n-text-domain', rule, {
 			errors: [ { messageId: 'invalidValue' } ],
 		},
 		{
-			code: `var value = ''; __( 'Hello World', value)`,
+			code: `var value = ''; __( 'Hello World', value )`,
 			errors: [ { messageId: 'invalidType' } ],
 		},
 		{
-			code: `var value = ''; _x( 'Hello World', 'context', value)`,
+			code: `var value = ''; _x( 'Hello World', 'context', value )`,
 			errors: [ { messageId: 'invalidType' } ],
 		},
 		{
-			code: `var value = ''; var number = ''; _n( 'Singular', 'Plural', number, value)`,
+			code: `var value = ''; var number = ''; _n( 'Singular', 'Plural', number, value )`,
 			errors: [ { messageId: 'invalidType' } ],
 		},
 		{
-			code: `var value = ''; var number = ''; _nx( 'Singular', 'Plural', number, 'context', value)`,
+			code: `var value = ''; var number = ''; _nx( 'Singular', 'Plural', number, 'context', value )`,
 			errors: [ { messageId: 'invalidType' } ],
 		},
 		{
@@ -138,7 +138,7 @@ ruleTester.run( 'i18n-text-domain', rule, {
 		},
 		{
 			code: `var number = ''; _n( 'Singular', 'Plural', number, 'default' )`,
-			output: `var number = ''; _n( 'Singular', 'Plural', number)`,
+			output: `var number = ''; _n( 'Singular', 'Plural', number )`,
 			options: [ { allowedTextDomains: [ 'default' ] } ],
 			errors: [ { messageId: 'unnecessaryDefault' } ],
 		},
