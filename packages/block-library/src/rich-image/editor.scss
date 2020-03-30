@@ -2,11 +2,11 @@
 .richimage__working {
 	position: relative;
 
-	.richimage__working-notice {
+	.richimage__working-spinner {
 		position: absolute;
 		z-index: 1;
-		top: 18px;
-		left: 18px;
+		width: 100%;
+		height: 100%;
 	}
 
 	img {

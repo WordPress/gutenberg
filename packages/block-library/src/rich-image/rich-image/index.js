@@ -19,7 +19,7 @@ import {
 	IconButton,
 	Icon,
 	Button,
-	Snackbar,
+	Spinner,
 	withNotices,
 	RangeControl,
 } from '@wordpress/components';
@@ -142,15 +142,15 @@ class RichImage extends Component {
 			<Fragment>
 				{ noticeUI }
 
-				<div className={ classes }>
+				<Block.div className={ classes }>
 					{ inProgress && (
-						<Snackbar className="richimage__working-notice">
-							{ __( 'Processing…' ) }
-						</Snackbar>
+						<div className="richimage__working-spinner">
+							<Spinner />
+						</div>
 					) }
 
 					{ isCrop ? (
-						<Block.div className="richimage__crop-controls">
+						<div className="richimage__crop-controls">
 							<div
 								className="richimage__crop-area"
 								style={ {
@@ -196,11 +196,11 @@ class RichImage extends Component {
 									this.setState( { zoom: newZoom } );
 								} }
 							/>
-						</Block.div>
+						</div>
 					) : (
 						<OriginalBlock { ...this.props } />
 					) }
-				</div>
+				</Block.div>
 
 				{ isEditing && (
 					<BlockControls>
