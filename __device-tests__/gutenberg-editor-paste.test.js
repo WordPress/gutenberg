@@ -53,6 +53,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
@@ -65,6 +68,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 		// create another paragraph block
 		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement2 = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		if ( isAndroid() ) {
+			await paragraphBlockElement2.click();
+		}
 
 		const textViewElement2 = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement2 );
 
@@ -80,6 +86,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 		// create paragraph block with styled text by editing html
 		await editorPage.setHtmlContentAndroid( testData.pasteHtmlText );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 
@@ -91,6 +100,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 		// create another paragraph block
 		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement2 = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		if ( isAndroid() ) {
+			await paragraphBlockElement2.click();
+		}
 
 		const textViewElement2 = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement2 );
 

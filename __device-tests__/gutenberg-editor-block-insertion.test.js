@@ -47,12 +47,15 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block into post', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		await editorPage.getBlockAtPosition( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
-		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		await paragraphBlockElement.click();
 
 		await editorPage.addNewBlock( paragraphBlockName );
@@ -96,7 +99,10 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		await editorPage.getBlockAtPosition( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
@@ -111,7 +117,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await titleElement.click();
 
 		await editorPage.addNewBlock( paragraphBlockName );
-		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );
 		await paragraphBlockElement.click();

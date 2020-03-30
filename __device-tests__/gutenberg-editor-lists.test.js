@@ -10,6 +10,7 @@ import {
 	setupDriver,
 	isLocalEnvironment,
 	stopDriver,
+	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -44,6 +45,10 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	it( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( listBlockName );
 		const listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
+		// Click List block on Android to force EditText focus
+		if ( isAndroid() ) {
+			await listBlockElement.click();
+		}
 
 		// Send the first list item text
 		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem1 );
@@ -59,7 +64,10 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	} );
 
 	it( 'should update format to ordered list, using toolbar button', async () => {
-		await editorPage.getBlockAtPosition( listBlockName );
+		const listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
+
+		// Click List block to force EditText focus
+		await listBlockElement.click();
 
 		// Send a click on the order list format button
 		await editorPage.clickOrderedListToolBarButton();

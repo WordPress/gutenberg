@@ -46,6 +46,9 @@ describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 

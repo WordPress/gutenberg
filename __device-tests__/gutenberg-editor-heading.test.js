@@ -6,7 +6,7 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
+import { setupDriver, isLocalEnvironment, stopDriver, isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
@@ -41,6 +41,9 @@ describe( 'Gutenberg Editor tests', () => {
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
 		await editorPage.addNewBlock( headingBlockName );
 		let headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName );
+		if ( isAndroid() ) {
+			await headingBlockElement.click();
+		}
 
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
 

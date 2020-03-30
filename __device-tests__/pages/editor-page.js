@@ -13,7 +13,7 @@ import wd from 'wd';
 import { isAndroid, swipeUp, swipeDown, typeString, toggleHtmlMode } from '../helpers/utils';
 
 export default class EditorPage {
-	driver: wd.promiseChainRemote;
+	driver: wd.PromiseChainWebdriver;
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
@@ -22,7 +22,7 @@ export default class EditorPage {
 	galleryBlockName = 'Gallery';
 	orderedListButtonName = 'Convert to ordered list';
 
-	constructor( driver: wd.promiseChainRemote ) {
+	constructor( driver: wd.PromiseChainWebdriver ) {
 		this.driver = driver;
 		this.accessibilityIdKey = 'name';
 		this.accessibilityIdXPathAttrib = 'name';
@@ -57,7 +57,6 @@ export default class EditorPage {
 			const lastBlockVisible = await this.getLastBlockVisible();
 			// exit if no block is found
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
-				await lastElementFound.click();
 				return lastElementFound;
 			}
 			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute(
@@ -73,7 +72,6 @@ export default class EditorPage {
 			if ( firstBlockRow && position < firstBlockRow ) {
 				if ( firstBlockRow === 1 ) {
 					// we're at the top already stop recursing
-					await lastElementFound.click();
 					return lastElementFound;
 				}
 				// scroll up
@@ -84,7 +82,6 @@ export default class EditorPage {
 			}
 			return this.getBlockAtPosition( blockName, position, options );
 		}
-		await lastElementFound.click();
 		return lastElementFound;
 	}
 

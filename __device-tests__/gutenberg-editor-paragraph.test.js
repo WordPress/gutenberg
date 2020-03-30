@@ -13,6 +13,7 @@ import {
 	clickBeginningOfElement,
 	stopDriver,
 	swipeUp,
+	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -47,6 +48,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to add a new Paragraph block', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		await editorPage.removeParagraphBlockAtPosition( 1 );
@@ -55,6 +59,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to split one paragraph block into two', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
@@ -76,6 +83,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
@@ -87,6 +97,9 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickBeginningOfElement( driver, textViewElement );
@@ -101,7 +114,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
 		await editorPage.addNewBlock( paragraphBlockName );
-		await editorPage.getBlockAtPosition( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
 		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 
