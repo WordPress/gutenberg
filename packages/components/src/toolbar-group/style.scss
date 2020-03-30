@@ -1,4 +1,5 @@
 .components-toolbar-group {
+	min-height: $block-toolbar-height;
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
 	display: inline-flex;
@@ -17,6 +18,7 @@
 // Legacy toolbar group
 // External code references to it, so we can't change it?
 .components-toolbar {
+	min-height: $block-toolbar-height;
 	margin: 0;
 	border: $border-width solid $light-gray-500;
 	background-color: $white;
@@ -62,6 +64,7 @@ div.components-toolbar {
 .components-toolbar {
 	.components-button {
 		position: relative;
+		height: $block-toolbar-height;
 
 		// Give all buttons extra padding to fit text.
 		padding-left: $grid-unit-20;
@@ -83,8 +86,8 @@ div.components-toolbar {
 			min-width: 32px;
 
 			// Position the focus rectangle.
-			left: ($button-size - 32) / 2;
-			right: ($button-size - 32) / 2;
+			left: $grid-unit-10;
+			right: $grid-unit-10;
 		}
 
 		svg {
@@ -112,10 +115,9 @@ div.components-toolbar {
 		// Ensure the icon buttons remain square.
 		&.has-icon {
 			// Reduce the default padding when a button only has an icon.
-			padding-left: ($button-size - 32) / 2;
-			padding-right: ($button-size - 32) / 2;
-
-			min-width: $button-size;
+			padding-left: $grid-unit-10;
+			padding-right: $grid-unit-10;
+			min-width: $block-toolbar-height;
 			justify-content: center;
 		}
 

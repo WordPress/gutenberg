@@ -48,20 +48,6 @@
 	.components-toolbar-group,
 	.components-toolbar {
 		display: flex;
-
-		.components-button {
-			// Focus and toggle pseudo elements.
-			&::before {
-				left: $grid-unit-10;
-				right: $grid-unit-10;
-			}
-
-			&.has-icon {
-				padding-left: $grid-unit-10;
-				padding-right: $grid-unit-10;
-				min-width: $block-toolbar-height;
-			}
-		}
 	}
 
 	// Size multiple sequential buttons to be optically balanced.
