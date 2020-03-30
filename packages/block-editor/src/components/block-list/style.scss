@@ -501,36 +501,28 @@
 	display: block;
 	z-index: z-index(".block-editor-block-list__breadcrumb");
 
-	.components-toolbar {
-		display: flex;
-		border: none;
-		background: none;
+	// The button here has a special style to appear as a toolbar.
+	.components-button {
+		font-size: $default-font-size;
+		height: $block-toolbar-height - $border-width - $border-width;
+		padding: $grid-unit-15 $grid-unit-20;
 
-		// The button here has a special style to appear as a toolbar.
-		.components-button {
-			font-size: $default-font-size;
-			height: $block-toolbar-height - $border-width - $border-width;
-			padding: $grid-unit-15 $grid-unit-20;
+		// Position this to align with the block toolbar.
+		position: relative;
+		top: -$border-width;
 
-			// Position this to align with the block toolbar.
-			position: relative;
-			top: -$border-width;
+		// Block UI appearance.
+		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+		background-color: $white;
 
-			// Block UI appearance.
-			box-shadow: 0 0 0 $border-width $dark-gray-primary;
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-			background-color: $white;
+		// Indent to align with block toolbar.
+		margin-left: $block-toolbar-height + $border-width;
 
-			// Indent to align with block toolbar.
-			margin-left: $block-toolbar-height + $border-width;
-
-			// When button is focused, it receives a box-shadow instead of the border.
-			&:focus {
-				box-shadow: 0 0 0 $border-width-focus $theme-color;
-			}
+		// When button is focused, it receives a box-shadow instead of the border.
+		&:focus {
+			box-shadow: 0 0 0 $border-width-focus $theme-color;
 		}
-
-		// @todo, it should have the block type icon here.
 	}
 }
 
