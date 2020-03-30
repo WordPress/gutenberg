@@ -52,7 +52,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
@@ -62,7 +62,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3 );
 		await paragraphBlockElement.click();
-		await editorPage.sendTextToParagraphBlockAtPosition( 3, testData.mediumText );
+		await editorPage.sendTextToParagraphBlock( 3, testData.mediumText );
 
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 
@@ -104,7 +104,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
 		if ( isAndroid() ) {
@@ -119,7 +119,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
-		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );
+		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
 		await paragraphBlockElement.click();
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtmlFromTitle );
 	} );

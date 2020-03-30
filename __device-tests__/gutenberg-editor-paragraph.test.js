@@ -119,7 +119,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
 			await swipeUp( driver );

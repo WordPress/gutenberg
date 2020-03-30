@@ -268,7 +268,7 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToParagraphBlock(
+	async typeTextToParagraphBlock(
 		block: wd.PromiseChainWebdriver.Element,
 		text: string,
 		clear: boolean
@@ -278,16 +278,16 @@ export default class EditorPage {
 		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
-	async sendTextToParagraphBlockAtPosition( position: number, text: string, clear: boolean ) {
+	async sendTextToParagraphBlock( position: number, text: string, clear: boolean ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			// Select block first
 			const block = await this.getBlockAtPosition( this.paragraphBlockName, position + i );
 			await block.click();
 
-			await this.sendTextToParagraphBlock( block, paragraphs[ i ], clear );
+			await this.typeTextToParagraphBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.sendTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToParagraphBlock( block, '\n', false );
 			}
 		}
 	}

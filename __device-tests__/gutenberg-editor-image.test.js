@@ -71,7 +71,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.shortText );
+		await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
 
 		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {
