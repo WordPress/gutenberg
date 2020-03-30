@@ -216,7 +216,6 @@ function gutenberg_edit_site_init( $hook ) {
 		'/wp/v2/taxonomies?per_page=-1&context=edit',
 		'/wp/v2/themes?status=active',
 		sprintf( '/wp/v2/templates/%s?context=edit', $_wp_current_template_id ),
-		'/wp/v2/users/me?post_type=templates&context=edit',
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(
