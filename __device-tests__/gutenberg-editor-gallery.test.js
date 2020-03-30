@@ -41,7 +41,7 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 		const galleryBlock = await editorPage.getBlockAtPosition( galleryBlockName );
 
 		expect( galleryBlock ).toBeTruthy();
-		await editorPage.removeGalleryBlockAtPosition( 1 );
+		await editorPage.removeBlockAtPosition( galleryBlockName );
 	} );
 
 	afterAll( async () => {

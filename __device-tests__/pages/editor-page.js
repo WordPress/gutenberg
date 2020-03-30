@@ -18,8 +18,6 @@ export default class EditorPage {
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
-	imageBlockName = 'Image';
-	galleryBlockName = 'Gallery';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -229,7 +227,7 @@ export default class EditorPage {
 
 	// position of the block to remove
 	// Block will no longer be present if this succeeds
-	async removeBlockAtPosition( blockName: string = '', position: number ) {
+	async removeBlockAtPosition( blockName: string = '', position: number = 1 ) {
 		if ( ! await this.hasBlockAtPosition( position, blockName ) ) {
 			throw Error( `No Block at position ${ position }` );
 		}
@@ -304,10 +302,6 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-	async removeParagraphBlockAtPosition( position: number ) {
-		await this.removeBlockAtPosition( this.paragraphBlockName, position );
-	}
-
 	async getTextForParagraphBlockAtPosition( position: number ) {
 		// Select block first
 		let block = await this.getBlockAtPosition( this.paragraphBlockName, position );
@@ -354,10 +348,6 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-	async removeListBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( this.listBlockName, position );
-	}
-
 	async getTextForListBlockAtPosition( position: number ) {
 		const block = await this.getBlockAtPosition( this.listBlockName, position );
 		const text = await this.getTextForListBlock( block );
@@ -394,18 +384,6 @@ export default class EditorPage {
 		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
-	}
-
-	async removeImageBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( this.imageBlockName, position );
-	}
-
-	// =========================
-	// Gallery Block functions
-	// =========================
-
-	async removeGalleryBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( this.galleryBlockName, position );
 	}
 
 	// =========================

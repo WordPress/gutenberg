@@ -76,7 +76,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			} );
 
 			await paragraphBlockElement.click();
-			await editorPage.removeParagraphBlockAtPosition( 3 );
+			await editorPage.removeBlockAtPosition( paragraphBlockName, 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
@@ -84,7 +84,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 					autoscroll: true,
 				} );
 				await paragraphBlockElement.click();
-				await editorPage.removeParagraphBlockAtPosition( i );
+				await editorPage.removeBlockAtPosition( paragraphBlockName, i );
 			}
 		} else {
 			for ( let i = 4; i > 0; i-- ) {
@@ -92,7 +92,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 				await driver.sleep( 1000 );
 				paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 				await clickMiddleOfElement( driver, paragraphBlockElement );
-				await editorPage.removeParagraphBlockAtPosition( 1 );
+				await editorPage.removeBlockAtPosition( paragraphBlockName );
 			}
 		}
 	} );
