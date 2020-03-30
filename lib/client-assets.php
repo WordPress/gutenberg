@@ -682,4 +682,5 @@ if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_insta
 	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
 	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 }
