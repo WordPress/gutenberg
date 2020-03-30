@@ -61,40 +61,21 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			// end workaround
 
 			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
-			await imageBlock.click();
-			await swipeUp( driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
-			await editorPage.dismissKeyboard();
-			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
-			await imageBlock.click();
-		}
-		await editorPage.removeImageBlockAtPosition( 1 );
-	} );
-
-	it( 'should be able to add an image block with multiple paragraph blocks', async () => {
-		await editorPage.addNewBlock( imageBlockName );
-		let imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
-
-		// Can only add image from media library on iOS
-		if ( ! isAndroid() ) {
-			await editorPage.selectEmptyImageBlock( imageBlock );
-			await editorPage.chooseMediaLibrary();
-
-			imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
-			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 			await editorPage.dismissKeyboard();
 		}
-
 		await editorPage.addNewBlock( paragraphBlockName );
-		await editorPage.getBlockAtPosition( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
 
-		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.longText );
+		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.shortText );
 
 		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {
-			await editorPage.verifyHtmlContent( testData.imageCompletehtml );
+			await editorPage.verifyHtmlContent( testData.imageShorteHtml );
 		}
 	} );
 
