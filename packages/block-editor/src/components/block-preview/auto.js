@@ -21,7 +21,7 @@ function AutoBlockPreview( { viewportWidth } ) {
 
 	return (
 		<div
-			className="block-editor-block-preview__container editor-styles-wrapper is-auto-height"
+			className="block-editor-block-preview__container editor-styles-wrapper"
 			aria-hidden
 			style={ {
 				height: ( contentHeight * containerWidth ) / viewportWidth,

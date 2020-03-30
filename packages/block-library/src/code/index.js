@@ -32,6 +32,7 @@ export const settings = {
 	},
 	supports: {
 		html: false,
+		lightBlockWrapper: true,
 	},
 	transforms,
 	edit,

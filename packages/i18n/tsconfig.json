@@ -1,0 +1,9 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"noImplicitAny": false,
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+	"include": [ "src/**/*" ]
+}

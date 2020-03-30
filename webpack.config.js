@@ -26,7 +26,7 @@ const {
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(

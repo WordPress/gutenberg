@@ -788,7 +788,7 @@ export function updateBlockListSettings( clientId, settings ) {
 	};
 }
 
-/*
+/**
  * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings

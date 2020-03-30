@@ -6,13 +6,12 @@ import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import {
 	Tooltip,
-	Icon,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { layout, plus } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,19 +21,14 @@ import TemplatePreview from './preview';
 
 function TemplateLabel( { template } ) {
 	return (
-		<div className="edit-site-template-switcher__label">
+		<>
 			{ template.slug }{ ' ' }
 			{ template.status !== 'auto-draft' && (
 				<Tooltip text={ __( 'Customized' ) }>
-					<div className="edit-site-template-switcher__label-customized-icon-container">
-						<Icon
-							icon="marker"
-							className="edit-site-template-switcher__label-customized-icon-icon"
-						/>
-					</div>
+					<span className="edit-site-template-switcher__label-customized-dot" />
 				</Tooltip>
 			) }
-		</div>
+		</>
 	);
 }
 
@@ -68,10 +62,10 @@ export default function TemplateSwitcher( {
 						label: template ? (
 							<TemplateLabel template={ template } />
 						) : (
-							__( 'loading…' )
+							__( 'Loading…' )
 						),
 						value: id,
-						slug: template ? template.slug : __( 'loading…' ),
+						slug: template ? template.slug : __( 'Loading…' ),
 					};
 				} ),
 				templateParts: templatePartIds.map( ( id ) => {
@@ -84,10 +78,10 @@ export default function TemplateSwitcher( {
 						label: template ? (
 							<TemplateLabel template={ template } />
 						) : (
-							__( 'loading…' )
+							__( 'Loading…' )
 						),
 						value: id,
-						slug: template ? template.slug : __( 'loading…' ),
+						slug: template ? template.slug : __( 'Loading…' ),
 					};
 				} ),
 			};
@@ -102,7 +96,7 @@ export default function TemplateSwitcher( {
 					className: 'edit-site-template-switcher__popover',
 					position: 'bottom right',
 				} }
-				icon={ layout }
+				icon={ null }
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
 					children: ( isTemplatePart

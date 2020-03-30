@@ -23,7 +23,7 @@ function TemplatePreview( { item } ) {
 	);
 	return (
 		<div className="edit-site-template-switcher__preview">
-			{ !! blocks && <BlockPreview blocks={ blocks } autoHeight /> }
+			{ !! blocks && <BlockPreview blocks={ blocks } /> }
 		</div>
 	);
 }
