@@ -62,7 +62,6 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	isMultiSelecting,
-	hasSelectedUI = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -110,7 +109,6 @@ function BlockListBlock( {
 		customClassName,
 		'wp-block block-editor-block-list__block',
 		{
-			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
 			'is-highlighted': isHighlighted,
