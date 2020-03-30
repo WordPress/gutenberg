@@ -49,7 +49,7 @@
 		"npmpub": "^5.0.0",
 		"remark-cli": "^8.0.0",
 		"remark-preset-lint-consistent": "^2.0.3",
-		"remark-preset-lint-recommended": "^3.0.3",
+		"remark-preset-lint-recommended": "^4.0.0",
 		"stylelint": "^13.2.0",
 		"stylelint-find-rules": "^2.2.0"
 	},
