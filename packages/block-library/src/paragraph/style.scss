@@ -1,3 +1,9 @@
+:root p {
+	background-color: var(--wp--color--background);
+	color: var(--wp--color--text);
+	line-height: var(--wp--typography--line-height);
+}
+
 .is-small-text {
 	font-size: 14px;
 }

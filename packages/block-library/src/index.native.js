@@ -154,7 +154,7 @@ export const registerCoreBlocks = () => {
 		shortcode,
 		latestPosts,
 		devOnly( verse ),
-		devOnly( cover ),
+		cover,
 		devOnly( pullquote ),
 	].forEach( registerBlock );
 
