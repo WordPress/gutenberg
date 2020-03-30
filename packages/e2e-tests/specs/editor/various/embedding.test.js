@@ -307,7 +307,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 		const postUrl = await page.$eval(
-			'[id^=inspector-text-control-]',
+			'.editor-post-publish-panel [id^=inspector-text-control-]',
 			( el ) => el.value
 		);
 

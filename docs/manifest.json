@@ -1368,6 +1368,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interface",
+		"slug": "packages-interface",
+		"markdown_source": "../packages/interface/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/is-shallow-equal",
 		"slug": "packages-is-shallow-equal",
 		"markdown_source": "../packages/is-shallow-equal/README.md",

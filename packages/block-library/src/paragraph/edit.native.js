@@ -31,7 +31,6 @@ function ParagraphBlock( {
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					isCollapsed={ false }
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
