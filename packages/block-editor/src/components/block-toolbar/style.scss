@@ -202,8 +202,17 @@
 			top: -1px;
 			transform: translateX(-48px);
 			user-select: none;
-			z-index: -1; // This makes it slide out from underneath the toolbar.
 		}
+	}
+
+	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
+	.block-editor-block-toolbar__block-switcher-wrapper {
+		background: $white;
+		border-left: $border-width solid;
+		border-radius: 0 0 $radius-block-ui $radius-block-ui;
+		position: relative;
+		z-index: 1;
+		margin-left: -$border-width;
 	}
 
 	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {

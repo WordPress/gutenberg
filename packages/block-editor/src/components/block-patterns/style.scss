@@ -1,8 +1,10 @@
 .block-editor-patterns {
+	background: $light-gray-200;
 	padding: 16px;
 }
 
 .block-editor-patterns__item {
+	background: $white;
 	border-radius: 2px;
 	cursor: pointer;
 	margin-bottom: 16px;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, has } from 'lodash';
+import { has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,15 +38,16 @@ export function addAttribute( settings ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			anchor: {
 				type: 'string',
 				source: 'attribute',
 				attribute: 'id',
 				selector: '*',
 			},
-		} );
+		};
 	}
 
 	return settings;

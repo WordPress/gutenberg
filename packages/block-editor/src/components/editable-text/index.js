@@ -9,7 +9,14 @@ import { forwardRef } from '@wordpress/element';
 import RichText from '../rich-text';
 
 const EditableText = forwardRef( ( props, ref ) => {
-	return <RichText ref={ ref } { ...props } __unstableDisableFormats />;
+	return (
+		<RichText
+			ref={ ref }
+			{ ...props }
+			__unstableDisableFormats
+			preserveWhiteSpace
+		/>
+	);
 } );
 
 EditableText.Content = ( { value = '', tagName: Tag = 'div', ...props } ) => {

@@ -185,7 +185,10 @@ class LatestPostsEdit extends Component {
 						}
 						onOrderChange={ this.onSetOrder }
 						onOrderByChange={ this.onSetOrderBy }
-						onCategoryChange={ this.onSetCategories }
+						onCategoryChange={
+							// eslint-disable-next-line no-undef
+							__DEV__ ? this.onSetCategories : undefined
+						}
 						onNumberOfItemsChange={ this.onSetPostsToShow }
 					/>
 				</PanelBody>

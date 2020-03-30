@@ -63,7 +63,7 @@ function ColumnEdit( {
 				templateLock={ false }
 				renderAppender={
 					hasChildBlocks
-						? false
+						? undefined
 						: () => <InnerBlocks.ButtonBlockAppender />
 				}
 				__experimentalTagName={ Block.div }
