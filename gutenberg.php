@@ -55,13 +55,13 @@ function gutenberg_menu() {
 			);
 		}
 		if ( array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) ) {
-			add_submenu_page(
-				'gutenberg',
+			add_menu_page(
 				__( 'Site Editor (beta)', 'gutenberg' ),
 				__( 'Site Editor (beta)', 'gutenberg' ),
 				'edit_theme_options',
 				'gutenberg-edit-site',
-				'gutenberg_edit_site_page'
+				'gutenberg_edit_site_page',
+				'dashicons-layout'
 			);
 		}
 	}
