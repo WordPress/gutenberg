@@ -73,6 +73,7 @@ describe( 'Allowed Blocks Setting on InnerBlocks ', () => {
 		 )[ 0 ];
 		await insertButton.click();
 		await insertBlock( 'Image' );
+		await page.waitForSelector( '.product[data-number-of-children="2"]' );
 		await page.click( appenderSelector );
 		await openAllBlockInserterCategories();
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [

@@ -37,6 +37,55 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
+ * Load editor styles (this is copied form edit-form-blocks.php).
+ * Ideally the code is extracted into a reusable function.
+ *
+ * @return array Editor Styles Setting.
+ */
+function gutenberg_get_editor_styles() {
+	global $editor_styles;
+
+	//
+	// Ideally the code is extracted into a reusable function.
+	$styles = array(
+		array(
+			'css' => file_get_contents(
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+			),
+		),
+	);
+
+	/* translators: Use this to specify the CSS font family for the default font. */
+	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
+	$styles[]           = array(
+		'css' => "body { font-family: '$locale_font_family' }",
+	);
+
+	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
+		foreach ( $editor_styles as $style ) {
+			if ( preg_match( '~^(https?:)?//~', $style ) ) {
+				$response = wp_remote_get( $style );
+				if ( ! is_wp_error( $response ) ) {
+					$styles[] = array(
+						'css' => wp_remote_retrieve_body( $response ),
+					);
+				}
+			} else {
+				$file = get_theme_file_path( $style );
+				if ( is_file( $file ) ) {
+					$styles[] = array(
+						'css'     => file_get_contents( $file ),
+						'baseURL' => get_theme_file_uri( $style ),
+					);
+				}
+			}
+		}
+	}
+
+	return $styles;
+}
+
+/**
  * Initialize the Gutenberg Edit Site Page.
  *
  * @since 7.2.0
@@ -152,6 +201,7 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['templateType']    = 'wp_template';
 	$settings['templateIds']     = array_values( $template_ids );
 	$settings['templatePartIds'] = array_values( $template_part_ids );
+	$settings['styles']          = gutenberg_get_editor_styles();
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.

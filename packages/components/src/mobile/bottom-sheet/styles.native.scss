@@ -93,6 +93,7 @@
 	flex-direction: row;
 	min-height: 48;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .clipToBounds {
@@ -137,7 +138,7 @@
 	font-size: 17px;
 	color: #2e4453;
 	flex: 1;
-	margin-left: 12px;
+	margin-left: 0;
 }
 
 .cellValue {

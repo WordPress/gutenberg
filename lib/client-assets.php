@@ -647,14 +647,41 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
 
+/**
+ * Extends block editor settings to determine whether to use custom line height controls.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_line_height( $settings ) {
+	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
+
+/**
+ * Extends block editor settings to determine whether to use custom unit controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_units( $settings ) {
+	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
 /*
  * Register default patterns if not registered in Core already.
  */
-if ( ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
 	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
 	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
 	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
 	register_pattern( 'core/hero-tucker', gutenberg_load_block_pattern( 'hero-tucker' ) );
+	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 }

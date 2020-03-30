@@ -15,7 +15,6 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	showMediaEditorButton,
 } from 'react-native-gutenberg-bridge';
 import { isEmpty, get, find, map } from 'lodash';
 
@@ -390,7 +389,6 @@ export class ImageEdit extends React.Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
-					isCollapsed={ false }
 				/>
 			</BlockControls>
 		);
@@ -607,8 +605,7 @@ export class ImageEdit extends React.Component {
 											! isUploadInProgress &&
 											! isUploadFailed &&
 											finalWidth &&
-											finalHeight &&
-											showMediaEditorButton && (
+											finalHeight && (
 												<MediaEdit
 													allowedTypes={ [
 														MEDIA_TYPE_IMAGE,

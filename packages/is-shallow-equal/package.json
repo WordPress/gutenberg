@@ -20,11 +20,12 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"files": [
-		"arrays.js",
-		"index.js",
-		"objects.js"
+		"lib",
+		"build-types",
+		"*.md"
 	],
-	"main": "index.js",
+	"main": "lib/index.js",
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.8.3"

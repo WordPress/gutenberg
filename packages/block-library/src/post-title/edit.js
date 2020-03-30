@@ -1,3 +1,3 @@
 export default function PostTitleEdit() {
-	return 'Post Title Placeholder';
+	return <h2>{ 'Hello world!' }</h2>;
 }
