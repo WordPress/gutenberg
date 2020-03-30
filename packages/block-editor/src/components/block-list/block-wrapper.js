@@ -27,6 +27,7 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockContext } from './block';
+import elements from './block-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
@@ -225,23 +226,6 @@ const BlockComponent = forwardRef(
 		);
 	}
 );
-
-const elements = [
-	'p',
-	'div',
-	'h1',
-	'h2',
-	'h3',
-	'h4',
-	'h5',
-	'h6',
-	'ol',
-	'ul',
-	'li',
-	'figure',
-	'nav',
-	'pre',
-];
 
 const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {
