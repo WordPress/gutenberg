@@ -279,58 +279,46 @@ class RichImage extends Component {
 								<Icon icon={ CropIcon } />
 							</div>
 						</Toolbar>
-						<Toolbar
-							className="richimage-toolbar__dropdown"
-							isCollapsed={ true }
-							icon={ <AspectIcon /> }
-							label={ __( 'Aspect Ratio' ) }
-							disabled={ inProgress }
-							popoverProps={ {
-								position: 'bottom right',
-							} }
-							controls={
-								inProgress
-									? []
-									: [
-											{
-												title: __( '16:10' ),
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 10,
-													} ),
-											},
-											{
-												title: __( '16:9' ),
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 9,
-													} ),
-											},
-											{
-												title: __( '4:3' ),
-												onClick: () =>
-													this.setState( {
-														aspect: 4 / 3,
-													} ),
-											},
-											{
-												title: __( '3:2' ),
-												onClick: () =>
-													this.setState( {
-														aspect: 3 / 2,
-													} ),
-											},
-											{
-												title: __( '1:1' ),
-												onClick: () =>
-													this.setState( {
-														aspect: 1,
-													} ),
-											},
-									  ]
-							}
-						/>
 						<Toolbar>
+							<DropdownMenu
+								icon={ <AspectIcon /> }
+								label={ __( 'Aspect Ratio' ) }
+								popoverProps={ POPOVER_PROPS }
+								controls={ [
+									{
+										title: __( '16:10' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.setState( {
+												aspect: 16 / 10,
+											} ),
+									},
+									{
+										title: __( '16:9' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.setState( { aspect: 16 / 9 } ),
+									},
+									{
+										title: __( '4:3' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.setState( { aspect: 4 / 3 } ),
+									},
+									{
+										title: __( '3:2' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.setState( { aspect: 3 / 2 } ),
+									},
+									{
+										title: __( '1:1' ),
+										isDisabled: inProgress,
+										onClick: () =>
+											this.setState( { aspect: 1 } ),
+									},
+								] }
+							/>
 							<ToolbarButton
 								className="richimage-toolbar__dropdown"
 								disabled={ inProgress }
