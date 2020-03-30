@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isBoolean } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, renderToString, createRef } from '@wordpress/element';
@@ -81,23 +76,10 @@ class Sandbox extends Component {
 			return;
 		}
 
-		/**
-		 * This method is called in the FocusableIframe onLoad callback.
-		 * As such, the incoming argument is NOT a boolean, but rather, a
-		 * (synthetic) event.
-		 *
-		 * We only need to do this check if we're purposefully doing
-		 * a forceRerender. This happens in the componentDidUpdate
-		 * lifecycle hook.
-		 *
-		 * Doing this extra step prevents the iFrame from recursively
-		 * re-rendering itself.
-		 */
-		const shouldRerender = isBoolean( forceRerender ) && forceRerender;
 		const body = this.iframe.current.contentDocument.body;
 
 		if (
-			! shouldRerender &&
+			! forceRerender &&
 			null !== body.getAttribute( 'data-resizable-iframe-connected' )
 		) {
 			return;
@@ -251,7 +233,7 @@ class Sandbox extends Component {
 				title={ title }
 				className="components-sandbox"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
-				onLoad={ this.trySandbox }
+				onLoad={ () => this.trySandbox() }
 				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
 				height={ Math.ceil( this.state.height ) }
