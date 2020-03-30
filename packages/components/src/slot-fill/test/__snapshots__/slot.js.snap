@@ -26,6 +26,8 @@ Array [
 ]
 `;
 
+exports[`Slot bubblesVirtually false should unmount two slots with the same name 1`] = `"<div data-position=\\"first\\"></div><div data-position=\\"second\\"></div>"`;
+
 exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
 Array [
   <div
@@ -53,6 +55,8 @@ Array [
   </div>,
 ]
 `;
+
+exports[`Slot bubblesVirtually true should unmount two slots with the same name 1`] = `"<div data-position=\\"first\\"></div><div data-position=\\"second\\"></div>"`;
 
 exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
 Array [
