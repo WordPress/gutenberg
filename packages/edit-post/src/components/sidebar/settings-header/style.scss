@@ -39,7 +39,8 @@
 	}
 
 	&.is-active {
-		box-shadow: inset 0 0 -$border-width-tab 0 0 color($theme-color);
+		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+		box-shadow: inset 0 0 0 $border-width-focus transparent, inset 0 0 -$border-width-tab 0 0 $theme-color;
 		font-weight: 600;
 		position: relative;
 
@@ -57,7 +58,6 @@
 
 	&:focus {
 		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
-		transition: none;
 	}
 
 	&.is-active:focus {
