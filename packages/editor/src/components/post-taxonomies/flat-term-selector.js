@@ -115,24 +115,29 @@ class FlatTermSelector extends Component {
 		const { taxonomy } = this.props;
 		const query = { ...DEFAULT_QUERY, ...params };
 		const request = apiFetch( {
-			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query),
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
 			signal,
 		} );
-		request.then( unescapeTerms ).then( ( terms ) => {
-			this.setState( ( state ) => ( {
-				availableTerms: state.availableTerms.concat(
-					terms.filter(
-						( term ) =>
-							! find(
-								state.availableTerms,
-								( availableTerm ) =>
-									availableTerm.id === term.id
-							)
-					)
-				),
-			} ) );
-			this.updateSelectedTerms( this.props.terms );
-		} ).catch(() => console.log('temporary catch to handle aborted requests'));
+		request
+			.then( unescapeTerms )
+			.then( ( terms ) => {
+				this.setState( ( state ) => ( {
+					availableTerms: state.availableTerms.concat(
+						terms.filter(
+							( term ) =>
+								! find(
+									state.availableTerms,
+									( availableTerm ) =>
+										availableTerm.id === term.id
+								)
+						)
+					),
+				} ) );
+				this.updateSelectedTerms( this.props.terms );
+			} )
+			.catch( () =>
+				console.log( 'temporary catch to handle aborted requests' )
+			);
 
 		return request;
 	}
@@ -226,15 +231,18 @@ class FlatTermSelector extends Component {
 		if ( search.length < 2 ) {
 			return;
 		}
-	
+
 		if ( this.abortControllers.length > 0 ) {
 			const currentController = this.abortControllers.pop();
 			currentController.abort();
 		}
 
 		const newController = new AbortController();
-		this.abortControllers.push( newController);
-		this.searchRequest = this.fetchTerms( { search }, newController.signal );
+		this.abortControllers.push( newController );
+		this.searchRequest = this.fetchTerms(
+			{ search },
+			newController.signal
+		);
 	}
 
 	render() {
