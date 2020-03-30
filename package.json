@@ -49,6 +49,7 @@
 		"@wordpress/html-entities": "file:packages/html-entities",
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/icons": "file:packages/icons",
+		"@wordpress/interface": "file:packages/interface",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
 		"@wordpress/keycodes": "file:packages/keycodes",
