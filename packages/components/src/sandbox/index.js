@@ -233,7 +233,7 @@ class Sandbox extends Component {
 				title={ title }
 				className="components-sandbox"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
-				onLoad={ () => this.trySandbox() }
+				onLoad={ () => this.trySandbox( false ) }
 				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
 				height={ Math.ceil( this.state.height ) }
