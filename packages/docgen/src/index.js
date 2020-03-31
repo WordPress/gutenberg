@@ -59,11 +59,21 @@ module.exports = function( sourceFilePath, options ) {
 	// Process
 	const { sourceFile, exportStatements } = compile( sourceFilePath );
 
+	if ( exportStatements.length === 0 ) {
+		process.stdout.write(
+			'\nFile was processed, but contained no ES6 module exports:'
+		);
+		process.stdout.write( `\n${ sourceFilePath }` );
+		process.stdout.write( '\n\n' );
+		process.exit( 0 );
+	}
+
 	const ir = getIntermediateRepresentation(
 		sourceFilePath,
 		exportStatements,
 		sourceFile
 	);
+
 	const filteredIR = ir.filter( ( symbol ) => {
 		if ( isSymbolPrivate( symbol ) ) {
 			return false;
@@ -75,16 +85,6 @@ module.exports = function( sourceFilePath, options ) {
 
 		return true;
 	} );
-
-	// Ouput
-	// if ( result === undefined ) {
-	// 	process.stdout.write(
-	// 		'\nFile was processed, but contained no ES6 module exports:'
-	// 	);
-	// 	process.stdout.write( `\n${ sourceFilePath }` );
-	// 	process.stdout.write( '\n\n' );
-	// 	process.exit( 0 );
-	// }
 
 	if ( options.formatter ) {
 		runCustomFormatter(
