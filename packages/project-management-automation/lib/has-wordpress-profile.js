@@ -32,6 +32,9 @@ async function hasWordPressProfile( githubUsername ) {
 			hostname: BASE_PROFILE_LOOKUP_API_HOSTNAME,
 			path: BASE_PROFILE_LOOKUP_API_BASE_PATH + githubUsername,
 			method: 'HEAD',
+			headers: {
+				'User-Agent': 'Gutenberg/project-management-automation',
+			},
 		};
 
 		request( options, ( res ) => resolve( res.statusCode === 200 ) )
