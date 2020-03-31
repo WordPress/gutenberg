@@ -10,7 +10,7 @@ const filename = process.argv[ 2 ];
 const sourceFile = ts.createSourceFile(
 	filename,
 	readFileSync( filename ).toString(),
-	ts.ScriptTarget.ES2020
+	ts.ScriptTarget.ESNext
 );
 
 // eslint-disable-next-line no-console

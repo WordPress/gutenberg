@@ -11,7 +11,6 @@ const { getExportStatements } = require( './get-export-statements' );
 module.exports = function( filePath ) {
 	const options = {
 		allowJs: true,
-		target: ts.ScriptTarget.ES2020,
 	};
 	const host = ts.createCompilerHost( options, true );
 	const raw = readFileSync( filePath ).toString();

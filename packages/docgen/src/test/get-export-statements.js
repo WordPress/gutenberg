@@ -18,7 +18,7 @@ const parse = ( dirname ) => {
 	return ts.createSourceFile(
 		filename,
 		readFileSync( filename ).toString(),
-		ts.ScriptTarget.ES2020
+		ts.ScriptTarget.ESNext
 	);
 };
 
