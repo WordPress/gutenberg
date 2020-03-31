@@ -1,11 +1,10 @@
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
-	border: $border-width solid $dark-gray-primary;
+	border-right: $border-width solid $dark-gray-primary;
 	background-color: $white;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
-	margin-right: -$border-width;
 
 	& & {
 		border-width: 0;
@@ -21,6 +20,7 @@
 	min-height: $block-toolbar-height;
 	margin: 0;
 	border: $border-width solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
 	background-color: $white;
 	display: inline-flex;
 	flex-shrink: 0;
@@ -59,88 +59,9 @@ div.components-toolbar {
 	}
 }
 
-
-.components-toolbar-group,
-.components-toolbar {
-	.components-button {
-		position: relative;
-		height: $block-toolbar-height;
-		z-index: 1;
-
-		// Give all buttons extra padding to fit text.
-		padding-left: $grid-unit-20;
-		padding-right: $grid-unit-20;
-
-		// Don't show the focus inherited by the Button component.
-		&:focus:enabled {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Focus and toggle pseudo elements.
-		&::before {
-			content: "";
-			position: absolute;
-			display: block;
-			border-radius: $radius-block-ui;
-			height: 32px;
-			min-width: 32px;
-
-			// Position the focus rectangle.
-			left: $grid-unit-10;
-			right: $grid-unit-10;
-			z-index: -1;
-		}
-
-		svg {
-			position: relative;
-
-			// Center the icon inside.
-			margin-left: auto;
-			margin-right: auto;
-		}
-
-		// Toggled style.
-		&.is-pressed {
-			color: $white;
-
-			&::before {
-				background: $dark-gray-primary;
-			}
-		}
-
-		// Focus style.
-		&:focus::before {
-			@include block-toolbar-button-style__focus();
-		}
-
-		// Ensure the icon buttons remain square.
-		&.has-icon {
-			// Reduce the default padding when a button only has an icon.
-			padding-left: $grid-unit-10;
-			padding-right: $grid-unit-10;
-			min-width: $block-toolbar-height;
-			justify-content: center;
-		}
-
-		// @todo: We should extract the tabs styles to the tabs component itself
-		&.components-tab-button {
-			font-weight: 500;
-
-			span {
-				display: inline-block;
-				padding-left: 0;
-				padding-right: 0;
-				position: relative;
-			}
-		}
-	}
-}
-
-
 // Size multiple sequential buttons to be optically balanced.
 // Icons are 36px, as set by a 24px icon and 12px padding.
-.components-toolbar-group div > .components-button.components-button.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button.components-button.has-icon,
 .components-toolbar div > .components-button.components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15;
 	padding-left: $grid-unit-15 / 2; // 6px.
@@ -157,7 +78,7 @@ div.components-toolbar {
 }
 
 // First button in a group.
-.components-toolbar-group div:first-child .components-button.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:first-child.has-icon,
 .components-toolbar div:first-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
 	padding-left: $grid-unit-15 - $border-width;
@@ -170,7 +91,7 @@ div.components-toolbar {
 }
 
 // Last button in a group.
-.components-toolbar-group div:last-child .components-button.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:last-child.has-icon,
 .components-toolbar div:last-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
 	padding-left: $grid-unit-15 / 2;
@@ -183,7 +104,7 @@ div.components-toolbar {
 }
 
 // Single buttons should remain 48px.
-.components-toolbar-group div:first-child:last-child > .components-button.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:first-child:last-child.has-icon,
 .components-toolbar div:first-child:last-child > .components-button.has-icon {
 	min-width: $block-toolbar-height;
 	padding-left: $grid-unit-15;
