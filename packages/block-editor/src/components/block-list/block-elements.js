@@ -1,4 +1,4 @@
-const elements = [
+const ELEMENTS = [
 	'p',
 	'div',
 	'h1',
@@ -15,4 +15,4 @@ const elements = [
 	'pre',
 ];
 
-export default elements;
+export default ELEMENTS;
