@@ -16,13 +16,13 @@ const horizontalMover = {
 	firstButtonIcon: arrowLeft,
 	secondButtonIcon: arrowRight,
 	firstButtonHint: __( 'Double tap to move the block to the left' ),
-	secondButtonHint:  __( 'Double tap to move the block to the right' ),
+	secondButtonHint: __( 'Double tap to move the block to the right' ),
 	firstBlockTitle: __( 'Move block left' ),
 	lastBlockTitle: __( 'Move block right' ),
 	firstButtonDirection: 'left',
 	secondButtonDirection: 'right',
 	location: 'position',
-}
+};
 
 const verticalMover = {
 	firstButtonIcon: arrowUp,
@@ -34,7 +34,7 @@ const verticalMover = {
 	firstButtonDirection: 'up',
 	secondButtonDirection: 'down',
 	location: 'row',
-}
+};
 
 const BlockMover = ( {
 	isFirst,
