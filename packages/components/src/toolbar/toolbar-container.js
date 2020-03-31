@@ -15,7 +15,7 @@ import ToolbarContext from '../toolbar-context';
 
 function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
 	// https://reakit.io/docs/basic-concepts/#state-hooks
-	const toolbarState = useToolbarState( { loop: true } );
+	const toolbarState = useToolbarState( { loop: true, baseId: props.id } );
 
 	return (
 		// This will provide state for `ToolbarButton`'s
