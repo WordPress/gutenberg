@@ -116,9 +116,6 @@ const getDefaultValue = ( code, nameEndPos ) => {
 	if ( rawValue === 'true' ) return true;
 	if ( rawValue === 'false' ) return false;
 
-	if ( rawValue[ 0 ] === '{' && rawValue[ rawValue.length - 1 ] === '}' ) {
-	}
-
 	return stripQuotes( rawValue );
 };
 
