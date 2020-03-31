@@ -16,14 +16,14 @@ const hasWordPressProfile = require( './has-wordpress-profile' );
  * @type {string}
  */
 const ACCOUNT_LINK_PROMPT =
-	'Congratulations on your first merged pull request! We would like to ' +
-	'give you credit for your contribution in the next WordPress release, but ' +
-	'we were unable to find a WordPress.org profile associated with your ' +
-	'GitHub account. At your convenience, please visit the following URL and ' +
-	'click "link your GitHub account" under "GitHub Username" to initiate ' +
-	'the process to link your accounts:\n\nhttps://profiles.wordpress.org/me/profile/edit/\n\n' +
-	'If you do not have a WordPress.org account, you can create one at the ' +
-	'following page:\n\nhttps://login.wordpress.org/register';
+	"Congratulations on your first merged pull request! We'd like to credit " +
+	'you for your contribution in the post announcing the next WordPress ' +
+	"release, but we can't find a WordPress.org profile associated with your " +
+	'GitHub account. When you have a moment, visit the following URL and ' +
+	'click "link your GitHub account" under "GitHub Username" to link your ' +
+	'accounts:\n\nhttps://profiles.wordpress.org/me/profile/edit/\n\nAnd if ' +
+	"you don't have a WordPress.org account, you can create one on this page:" +
+	'\n\nhttps://login.wordpress.org/register\n\nKudos!';
 
 /**
  * Adds the 'First Time Contributor' label to PRs merged on behalf of
