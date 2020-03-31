@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useMemo, Fragment, useRef, useState } from '@wordpress/element';
+import { useMemo, Fragment, useRef } from '@wordpress/element';
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -91,9 +91,25 @@ function Navigation( {
 		clientId
 	);
 
-	const [ pages, setPages ] = useState( null );
+	const baseUrl = '/wp/v2/pages';
 
-	const [ isRequestingPages, setIsRequestingPages ] = useState( false );
+	// "view" is required to ensure Pages are returned by REST API
+	// for users with lower capabilities such as "Contributor" otherwise
+	// Pages are not returned in the request if "edit" context is set
+	const context = 'view';
+
+	const filterDefaultPages = {
+		parent: 0,
+		order: 'asc',
+		orderby: 'id',
+		context,
+	};
+
+	const queryPath = addQueryArgs( baseUrl, filterDefaultPages );
+
+	const { isLoading: isRequestingPages, data: pages } = useApiFetch(
+		queryPath
+	);
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
@@ -113,24 +129,6 @@ function Navigation( {
 			} )
 		);
 	}, [ pages ] );
-
-	const baseUrl = '/wp/v2/pages';
-
-	// "view" is required to ensure Pages are returned by REST API
-	// for users with lower capabilities such as "Contributor" otherwise
-	// Pages are not returned in the request if "edit" context is set
-	const context = 'view';
-
-	const filterDefaultPages = {
-		parent: 0,
-		order: 'asc',
-		orderby: 'id',
-		context,
-	};
-
-	const queryPath = addQueryArgs( baseUrl, filterDefaultPages );
-
-	useApiFetch( setIsRequestingPages, setPages, queryPath );
 
 	//
 	// HANDLERS
