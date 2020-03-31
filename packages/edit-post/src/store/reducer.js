@@ -55,15 +55,6 @@ export const preferences = flow( [
 	combineReducers,
 	createWithInitialState( PREFERENCES_DEFAULTS ),
 ] )( {
-	isGeneralSidebarDismissed( state, action ) {
-		switch ( action.type ) {
-			case 'OPEN_GENERAL_SIDEBAR':
-			case 'CLOSE_GENERAL_SIDEBAR':
-				return action.type === 'CLOSE_GENERAL_SIDEBAR';
-		}
-
-		return state;
-	},
 	panels( state, action ) {
 		switch ( action.type ) {
 			case 'TOGGLE_PANEL_ENABLED': {
@@ -109,19 +100,6 @@ export const preferences = flow( [
 			return action.mode;
 		}
 
-		return state;
-	},
-	pinnedPluginItems( state, action ) {
-		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
-			return {
-				...state,
-				[ action.pluginName ]: ! get(
-					state,
-					[ action.pluginName ],
-					true
-				),
-			};
-		}
 		return state;
 	},
 	hiddenBlockTypes( state, action ) {
@@ -176,27 +154,6 @@ export function removedPanels( state = [], action ) {
 			if ( ! includes( state, action.panelName ) ) {
 				return [ ...state, action.panelName ];
 			}
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the next active general sidebar state. The active general
- * sidebar is a unique name to identify either an editor or plugin sidebar.
- *
- * @param {?string} state  Current state.
- * @param {Object}  action Action object.
- *
- * @return {?string} Updated state.
- */
-export function activeGeneralSidebar(
-	state = DEFAULT_ACTIVE_GENERAL_SIDEBAR,
-	action
-) {
-	switch ( action.type ) {
-		case 'OPEN_GENERAL_SIDEBAR':
-			return action.name;
 	}
 
 	return state;
@@ -294,7 +251,6 @@ const metaBoxes = combineReducers( {
 } );
 
 export default combineReducers( {
-	activeGeneralSidebar,
 	activeModal,
 	metaBoxes,
 	preferences,

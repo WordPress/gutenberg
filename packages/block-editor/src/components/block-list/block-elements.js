@@ -13,6 +13,11 @@ const ELEMENTS = [
 	'figure',
 	'nav',
 	'pre',
+	'header',
+	'section',
+	'aside',
+	'footer',
+	'main',
 ];
 
 export default ELEMENTS;

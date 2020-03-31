@@ -1,4 +1,7 @@
 .wp-block-media-text {
+	background-color: var(--wp--color--background);
+	color: var(--wp--color--text);
+
 	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
 	/*!rtl:begin:ignore*/
 	direction: ltr;
@@ -65,8 +68,8 @@
 	/*!rtl:end:ignore*/
 }
 
-.wp-block-media-text > figure > img,
-.wp-block-media-text > figure > video {
+.wp-block-media-text__media img,
+.wp-block-media-text__media video {
 	max-width: unset;
 	width: 100%;
 	vertical-align: middle;

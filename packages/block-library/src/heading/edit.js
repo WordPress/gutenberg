@@ -26,7 +26,11 @@ import { Platform } from '@wordpress/element';
 function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-
+	const isAndroid = Platform.select( {
+		android: true,
+		native: false,
+		web: false,
+	} );
 	return (
 		<>
 			<BlockControls>
@@ -38,12 +42,14 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 						setAttributes( { level: newLevel } )
 					}
 				/>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
+				{ ! isAndroid && (
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				) }
 			</BlockControls>
 			{ Platform.OS === 'web' && (
 				<InspectorControls>
