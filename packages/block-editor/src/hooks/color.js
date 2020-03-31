@@ -126,6 +126,9 @@ const ColorPanel = ( { colorSettings, clientId } ) => {
 
 	useEffect( () => {
 		const colorsDetectionElement = getBlockDOMNode( clientId );
+		if ( ! colorsDetectionElement ) {
+			return;
+		}
 		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
 
 		let backgroundColorNode = colorsDetectionElement;
