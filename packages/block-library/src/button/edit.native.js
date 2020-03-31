@@ -531,38 +531,40 @@ class ButtonEdit extends Component {
 											</PanelBody>
 										</View>
 									) }
-									<ColorSettings
-										screen={ screen }
-										changeBottomSheetContent={ (
-											destination
-										) =>
-											this.changeBottomSheetContent(
+									{ screen !== 'Settings' && (
+										<ColorSettings
+											screen={ screen }
+											changeBottomSheetContent={ (
 												destination
-											)
-										}
-										backgroundColor={ backgroundColor }
-										textColor={
-											textColor.color || '#ffffff'
-										}
-										setTextColor={ setTextColor }
-										setBackgroundColor={
-											setBackgroundColor
-										}
-										clientId={ clientId }
-										previousScreen={ previousScreen }
-										shouldEnableBottomSheetScroll={
-											shouldEnableBottomSheetScroll
-										}
-										isBottomSheetScrolling={
-											isBottomSheetScrolling
-										}
-										shouldSetBottomSheetMaxHeight={
-											shouldSetBottomSheetMaxHeight
-										}
-										onCloseBottomSheet={
-											onCloseBottomSheet
-										}
-									/>
+											) =>
+												this.changeBottomSheetContent(
+													destination
+												)
+											}
+											backgroundColor={ backgroundColor }
+											textColor={
+												textColor.color || '#ffffff'
+											}
+											setTextColor={ setTextColor }
+											setBackgroundColor={
+												setBackgroundColor
+											}
+											clientId={ clientId }
+											previousScreen={ previousScreen }
+											shouldEnableBottomSheetScroll={
+												shouldEnableBottomSheetScroll
+											}
+											isBottomSheetScrolling={
+												isBottomSheetScrolling
+											}
+											shouldSetBottomSheetMaxHeight={
+												shouldSetBottomSheetMaxHeight
+											}
+											onCloseBottomSheet={
+												onCloseBottomSheet
+											}
+										/>
+									) }
 								</>
 							);
 						} }

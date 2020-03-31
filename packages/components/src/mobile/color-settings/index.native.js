@@ -38,7 +38,6 @@ function ColorSettings( {
 	const [ segment, setSegment ] = useState( segments[ 0 ] );
 
 	useEffect( () => {
-		changeBottomSheetContent( 'Settings' );
 		shouldSetBottomSheetMaxHeight( true );
 		onCloseBottomSheet( null );
 	}, [] );
