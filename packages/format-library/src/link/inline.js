@@ -119,16 +119,12 @@ function InlineLinkUI( {
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const newText =
-				nextValue.hasOwnProperty( 'title' ) && nextValue.title !== ''
-					? nextValue.title
-					: newUrl;
-
+			const newText = nextValue.title || newUrl;
 			const toInsert = applyFormat(
 				create( { text: newText } ),
 				format,
 				0,
-				newUrl.length
+				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
