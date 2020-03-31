@@ -112,9 +112,15 @@ const getDefaultValue = ( code, nameEndPos ) => {
 		return parseFloat( rawValue );
 	}
 
-	if ( rawValue === 'null' ) return null;
-	if ( rawValue === 'true' ) return true;
-	if ( rawValue === 'false' ) return false;
+	if ( rawValue === 'null' ) {
+		return null;
+	}
+	if ( rawValue === 'true' ) {
+		return true;
+	}
+	if ( rawValue === 'false' ) {
+		return false;
+	}
 
 	return stripQuotes( rawValue );
 };
@@ -280,7 +286,9 @@ const handleJSDocTypeLiteralsWithTypeOptions = ( docTags ) => {
 	for ( let i = docTags.length - 1; i >= 0; i-- ) {
 		const tag = docTags[ i ];
 
-		if ( ! tag.name ) continue;
+		if ( ! tag.name ) {
+			continue;
+		}
 
 		const names = tag.name.split( '.' );
 
