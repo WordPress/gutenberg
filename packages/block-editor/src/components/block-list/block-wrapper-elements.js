@@ -1,3 +1,6 @@
+/**
+ * HTML elements that can be used as a block wrapper.
+ */
 const ELEMENTS = [
 	'p',
 	'div',

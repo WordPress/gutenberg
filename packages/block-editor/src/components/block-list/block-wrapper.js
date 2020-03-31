@@ -27,7 +27,7 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
-import ELEMENTS from './block-elements';
+import ELEMENTS from './block-wrapper-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
