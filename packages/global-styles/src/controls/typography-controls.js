@@ -16,7 +16,7 @@ export default function TypographyControls( {
 	setTypography,
 } ) {
 	return (
-		<PanelBody title={ __( 'Typography' ) } initialOpen={ false }>
+		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			<RangeControl
 				label={ __( 'Font Base' ) }
 				value={ fontBase }
