@@ -215,20 +215,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 }
 
 /**
- * Whether the loaded page is the site editor.
- *
- * @return boolean Whether the loaded page is the site editor.
- */
-function gutenberg_experimental_global_styles_is_site_editor() {
-	if ( ! function_exists( 'get_current_screen' ) ) {
-		return false;
-	}
-
-	$screen = get_current_screen();
-	return ! empty( $screen ) && gutenberg_is_edit_site_page( $screen->id );
-}
-
-/**
  * Makes the base Global Styles (core, theme)
  * and the ID of the CPT that stores the user's Global Styles
  * available to the client, to be used for live rendering the styles.
@@ -238,8 +224,7 @@ function gutenberg_experimental_global_styles_is_site_editor() {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	if (
-		! gutenberg_experimental_global_styles_has_theme_support() ||
-		! gutenberg_experimental_global_styles_is_site_editor()
+		! gutenberg_experimental_global_styles_has_theme_support()
 	) {
 		return $settings;
 	}
