@@ -197,16 +197,6 @@ function gutenberg_experimental_global_styles_resolver() {
 
 /**
  * Fetches the Global Styles for each level (core, theme, user)
- * and enqueues the resulting CSS custom properties for the editor.
- */
-function gutenberg_experimental_global_styles_enqueue_assets_editor() {
-	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
-		gutenberg_experimental_global_styles_enqueue_assets();
-	}
-}
-
-/**
- * Fetches the Global Styles for each level (core, theme, user)
  * and enqueues the resulting CSS custom properties.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
@@ -304,5 +294,5 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 	// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
 	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );
+	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 }
