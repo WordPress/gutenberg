@@ -22,9 +22,9 @@ function ParagraphBlock( {
 
 	const styles = {
 		...oldStyle,
-		color: style && style.color && style.color.text
+		color: style && style.color && style.color.text,
 	};
-	
+
 	return (
 		<>
 			<BlockControls>
