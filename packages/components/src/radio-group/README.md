@@ -46,6 +46,8 @@ Button groups that cannot be selected can either be given a disabled state, or b
 
 ### Usage
 
+**As a simple group**
+
 ```jsx
 import { Button, ButtonGroup } from '@wordpress/components';
 
@@ -57,6 +59,25 @@ const MyButtonGroup = () => (
 );
 ```
 
+**As a radio group**
+
+```jsx
+import { Button, ButtonGroup } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const MyRadioButtonGroup = () => {
+	const [ checked, setChecked ] = useState( 'medium' );
+	return (
+		<ButtonGroup mode="radio" onChange={ setChecked } checked={ checked }>
+			<Button value="small">Small</Button>
+			<Button value="medium">Medium</Button>
+			<Button value="large">Large</Button>
+		</ButtonGroup>
+	);
+};
+```
+
 ## Related components
 
 - For individual buttons, use a `Button` component.
+- For a traditional radio group, use a `RadioControl` component.

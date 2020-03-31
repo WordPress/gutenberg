@@ -1,0 +1,268 @@
+.components-button {
+	display: inline-flex;
+	text-decoration: none;
+	font-size: $default-font-size;
+	margin: 0;
+	border: 0;
+	cursor: pointer;
+	-webkit-appearance: none;
+	background: none;
+	transition: box-shadow 0.1s linear;
+	@include reduce-motion("transition");
+	height: $button-size;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 6px 12px;
+	overflow: hidden;
+	border-radius: $radius-block-ui;
+	color: $dark-gray-primary;
+
+	&[aria-expanded="true"],
+	&:hover {
+		color: $theme-color;
+	}
+
+	// Unset some hovers, instead of adding :not specificity.
+	&[aria-disabled="true"]:hover {
+		color: initial;
+	}
+
+	// Focus.
+	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+	&:focus:not(:disabled) {
+		box-shadow: 0 0 0 2px color($theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 1px solid transparent;
+	}
+
+	/**
+	 * Primary button style.
+	 */
+
+	&.is-primary {
+		white-space: nowrap;
+		background: color($theme-color);
+		color: $white;
+		text-decoration: none;
+		text-shadow: none;
+
+		&:hover:not(:disabled) {
+			background: color($theme-color shade(10%));
+			color: $white;
+		}
+
+		&:active:not(:disabled) {
+			background: color($theme-color shade(20%));
+			border-color: color($theme-color shade(20%));
+			color: $white;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 1px solid transparent;
+		}
+
+		&:disabled,
+		&:disabled:active:enabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+		&[aria-disabled="true"]:active:enabled {
+			color: color($theme-color tint(40%));
+			background: color($theme-color tint(10%));
+			border-color: color($theme-color tint(10%));
+			opacity: 1;
+
+			&:focus:enabled {
+				box-shadow:
+					0 0 0 $border-width $white,
+					0 0 0 3px color($theme-color);
+			}
+		}
+
+		&.is-busy,
+		&.is-busy:disabled,
+		&.is-busy[aria-disabled="true"] {
+			color: $white;
+			background-size: 100px 100%;
+			// Disable reason: This function call looks nicer when each argument is on its own line.
+			/* stylelint-disable */
+			background-image: linear-gradient(
+				-45deg,
+				$theme-color 28%,
+				color($theme-color shade(20%)) 28%,
+				color($theme-color shade(20%)) 72%,
+				$theme-color 72%
+			);
+			/* stylelint-enable */
+			border-color: color($theme-color);
+		}
+	}
+
+	/**
+	 * Secondary and tertiary buttons.
+	 */
+
+	&.is-secondary,
+	&.is-tertiary {
+		&:active:not(:disabled) {
+			background: $light-gray-tertiary;
+			color: color($theme-color shade(10%));
+			box-shadow: none;
+		}
+
+		&:hover:not(:disabled) {
+			color: color($theme-color shade(10%));
+			box-shadow: inset 0 0 0 $border-width color($theme-color shade(10%));
+		}
+
+		&:disabled,
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:hover {
+			color: lighten($medium-gray-text, 5%);
+			background: lighten($light-gray-tertiary, 5%);
+			transform: none;
+			opacity: 1;
+			box-shadow: none;
+		}
+	}
+
+	/**
+	 * Secondary button style.
+	 */
+
+	&.is-secondary {
+		box-shadow: inset 0 0 0 $border-width $theme-color;
+		outline: 1px solid transparent; // Shown in high contrast mode.
+		white-space: nowrap;
+		color: $theme-color;
+		background: transparent;
+	}
+
+	/**
+	 * Tertiary buttons.
+	 */
+
+	&.is-tertiary {
+		white-space: nowrap;
+		color: $theme-color;
+		background: transparent;
+		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+	}
+
+	/**
+	 * Link buttons.
+	 */
+
+	&.is-link {
+		margin: 0;
+		padding: 0;
+		box-shadow: none;
+		border: 0;
+		border-radius: 0;
+		background: none;
+		outline: none;
+		text-align: left;
+		/* Mimics the default link style in common.css */
+		color: #0073aa;
+		text-decoration: underline;
+		transition-property: border, background, color;
+		transition-duration: 0.05s;
+		transition-timing-function: ease-in-out;
+		@include reduce-motion("transition");
+		height: auto;
+
+		&:hover:not(:disabled),
+		&:active:not(:disabled) {
+			color: #00a0d2;
+		}
+
+		&:focus {
+			color: #124964;
+			box-shadow:
+				0 0 0 $border-width #5b9dd9,
+				0 0 2px $border-width rgba(30, 140, 190, 0.8);
+		}
+	}
+
+	// Link buttons that are red to indicate destructive behavior.
+	&.is-link.is-destructive {
+		color: $alert-red;
+	}
+
+	&:not([aria-disabled="true"]):active {
+		color: inherit;
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		cursor: default;
+		opacity: 0.3;
+	}
+
+	&.is-busy,
+	&.is-secondary.is-busy,
+	&.is-secondary.is-busy:disabled,
+	&.is-secondary.is-busy[aria-disabled="true"] {
+		animation: components-button__busy-animation 2500ms infinite linear;
+		background-size: 100px 100%;
+		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
+		opacity: 1;
+	}
+
+	&.is-small {
+		height: 24px;
+		line-height: 22px;
+		padding: 0 8px;
+		font-size: 11px;
+
+		&.has-icon:not(.has-text) {
+			width: 24px;
+		}
+	}
+
+	&.has-icon {
+		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+
+		// Icon buttons are square.
+		min-width: $button-size;
+		justify-content: center;
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		&.has-text {
+			justify-content: left;
+		}
+
+		&.has-text svg {
+			margin-right: 8px;
+		}
+	}
+
+	svg {
+		fill: currentColor;
+		outline: none;
+	}
+
+	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
+	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
+	.components-visually-hidden {
+		height: auto;
+	}
+}
+
+@keyframes components-button__busy-animation {
+	0% {
+		background-position: 200px 0;
+	}
+}
