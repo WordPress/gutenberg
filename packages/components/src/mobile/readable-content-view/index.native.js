@@ -11,12 +11,12 @@ import styles from './style.scss';
 const ReadableContentView = ( { reversed, children, style } ) => (
 	<View style={ styles.container }>
 		<View
-			style={ {
-				...( reversed
+			style={ [
+				reversed
 					? styles.reversedCenteredContent
-					: styles.centeredContent ),
-				...style,
-			} }
+					: styles.centeredContent,
+				style,
+			] }
 		>
 			{ children }
 		</View>
