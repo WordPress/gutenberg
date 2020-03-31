@@ -54,7 +54,8 @@ class ButtonEdit extends Component {
 		this.onLayout = this.onLayout.bind( this );
 		this.dismissSheet = this.dismissSheet.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
-		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 
@@ -201,9 +202,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onToggleLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	onShowLinkSettings() {
+		this.setState( { isLinkSheetVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSheetVisible: false } );
 	}
 
 	onToggleButtonFocus( value ) {
@@ -388,9 +392,9 @@ class ButtonEdit extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ __( 'Edit image' ) }
+								title={ __( 'Edit link' ) }
 								icon={ link }
-								onClick={ this.onToggleLinkSettings }
+								onClick={ this.onShowLinkSettings }
 								isActive={ url && url !== PREPEND_HTTP }
 							/>
 						</ToolbarGroup>
@@ -399,7 +403,7 @@ class ButtonEdit extends Component {
 
 				<BottomSheet
 					isVisible={ isLinkSheetVisible }
-					onClose={ this.onToggleLinkSettings }
+					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
 					{ this.getLinkSettings( url, rel, linkTarget ) }
