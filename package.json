@@ -149,6 +149,7 @@
 		"metro-react-native-babel-preset": "0.55.0",
 		"metro-react-native-babel-transformer": "0.55.0",
 		"mkdirp": "0.5.1",
+		"nock": "12.0.3",
 		"node-sass": "4.12.0",
 		"node-watch": "0.6.0",
 		"postcss": "7.0.13",
