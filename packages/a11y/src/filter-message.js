@@ -7,7 +7,7 @@ let previousMessage = '';
  *
  * @return {string} The filtered message.
  */
-const filterMessage = function( message ) {
+export default function filterMessage( message ) {
 	/*
 	 * Strip HTML tags (if any) from the message string. Ideally, messages should
 	 * be simple strings, carefully crafted for specific use with A11ySpeak.
@@ -24,6 +24,4 @@ const filterMessage = function( message ) {
 	previousMessage = message;
 
 	return message;
-};
-
-export default filterMessage;
+}

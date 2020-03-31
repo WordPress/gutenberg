@@ -1,15 +1,13 @@
 /**
  * Build the live regions markup.
  *
- * @param {string} ariaLive Optional. Value for the 'aria-live' attribute, default 'polite'.
+ * @param {string} [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
  *
  * @return {HTMLDivElement} The ARIA live region HTML element.
  */
-const addContainer = function( ariaLive ) {
-	ariaLive = ariaLive || 'polite';
-
+export default function addContainer( ariaLive = 'polite' ) {
 	const container = document.createElement( 'div' );
-	container.id = 'a11y-speak-' + ariaLive;
+	container.id = `a11y-speak-${ ariaLive }`;
 	container.className = 'a11y-speak-region';
 
 	container.setAttribute(
@@ -30,12 +28,10 @@ const addContainer = function( ariaLive ) {
 	container.setAttribute( 'aria-relevant', 'additions text' );
 	container.setAttribute( 'aria-atomic', 'true' );
 
-	const body = document.querySelector( 'body' );
+	const { body } = document;
 	if ( body ) {
 		body.appendChild( container );
 	}
 
 	return container;
-};
-
-export default addContainer;
+}
