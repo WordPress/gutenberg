@@ -21,7 +21,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 
 	return (
-		<div style={ { border: '1px solid black', padding: 10 } }>
+		<div className="edit-navigation-menu-editor">
 			<BlockEditorKeyboardShortcuts.Register />
 			<Button isPrimary onClick={ saveBlocks }>
 				{ __( 'Save' ) }
@@ -35,7 +35,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					templateLock: 'all',
 				} }
 			>
-				<div style={ { border: '1px solid black', padding: 10 } }>
+				<div className="edit-navigation-menu-editor__panel">
 					{ !! blocks.length && (
 						<__experimentalBlockNavigationList
 							blocks={ blocks }
@@ -46,7 +46,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 						/>
 					) }
 				</div>
-				<div style={ { border: '1px solid black', padding: 10 } }>
+				<div className="edit-navigation-menu-editor__panel">
 					<WritingFlow>
 						<ObserveTyping>
 							<BlockList />
