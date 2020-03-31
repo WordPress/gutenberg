@@ -24,8 +24,7 @@ import {
 import { Platform } from '@wordpress/element';
 
 function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
-	const { headingFontWeight, setStyles } = useGlobalStylesState();
-	const { align, content, level, placeholder } = attributes;
+	const { align, content, level, placeholder, style } = attributes;
 	const tagName = 'h' + level;
 	const isAndroid = Platform.select( {
 		android: true,
