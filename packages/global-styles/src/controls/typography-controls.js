@@ -33,7 +33,7 @@ export default function TypographyControls( {
 				step={ 0.025 }
 				onChange={ ( value ) => setTypography( { fontScale: value } ) }
 			/>
-			<h2>Heading</h2>
+			<h2>{ __( 'Heading' ) }</h2>
 			<RangeControl
 				label={ __( 'Line Height' ) }
 				value={ lineHeightHeading }
@@ -54,7 +54,7 @@ export default function TypographyControls( {
 					setTypography( { fontWeightHeading: value } )
 				}
 			/>
-			<h2>Base</h2>
+			<h2>{ __( 'Base' ) }</h2>
 			<RangeControl
 				label={ __( 'Line Height' ) }
 				value={ lineHeightBase }
