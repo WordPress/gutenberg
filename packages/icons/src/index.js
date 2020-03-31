@@ -38,6 +38,7 @@ export { default as columns } from './library/columns';
 export { default as comment } from './library/comment';
 export { default as controlsRepeat } from './library/controls-repeat';
 export { default as cover } from './library/cover';
+export { default as create } from './library/create';
 export { default as desktop } from './library/desktop';
 export { default as external } from './library/external';
 export { default as file } from './library/file';
