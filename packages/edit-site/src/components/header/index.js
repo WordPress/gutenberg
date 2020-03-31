@@ -10,6 +10,7 @@ import { PinnedItems } from '@wordpress/interface';
  */
 import { useEditorContext } from '../editor';
 import FullscreenModeClose from './fullscreen-mode-close';
+import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 
@@ -63,6 +64,7 @@ export default function Header() {
 			<div className="edit-site-header__actions">
 				<SaveButton />
 				<PinnedItems.Slot scope="core/edit-site" />
+				<MoreMenu />
 			</div>
 		</div>
 	);
