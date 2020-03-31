@@ -18,7 +18,7 @@ import {
 	disableExperimentalFeatures,
 } from '../../../experimental-features';
 
-describe( 'entities saved states', () => {
+describe( 'Multi-entity save flow', () => {
 	const experimentsSettings = [ '#gutenberg-full-site-editing' ];
 
 	beforeAll( async () => {
@@ -29,41 +29,42 @@ describe( 'entities saved states', () => {
 		await disableExperimentalFeatures( experimentsSettings );
 	} );
 
-	it( 'Should not trigger with only post type edited', async () => {
-		await createNewPost();
+	describe( 'Post Editor', () => {
+		it( 'Should not trigger multi-entity save button with only post edited', async () => {
+			await createNewPost();
+			// Edit the page some.
+			await page.keyboard.type( 'Test Post...' );
+			await page.keyboard.press( 'Enter' );
 
-		// Edit the page some.
-		await page.keyboard.type( 'Test Post...' );
-		await page.keyboard.press( 'Enter' );
+			// Button should not have has-changes-dot class.
+			const saveButton = await page.$(
+				'.editor-post-publish-button__button.has-changes-dot'
+			);
+			expect( saveButton ).toBeNull();
+		} );
 
-		// Button should not have has-changes-dot class.
-		const saveButton = await page.$(
-			'.editor-post-publish-button__button.has-changes-dot'
-		);
-		expect( saveButton ).toBeNull();
-	} );
+		it( 'Should trigger multi-entity save button once template part edited', async () => {
+			// Create new template part.
+			await insertBlock( 'Template Part' );
+			await page.keyboard.type( 'test-template-part' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'test-theme' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Enter' );
 
-	it( 'Should trigger once template part edited', async () => {
-		// Create new template part.
-		await insertBlock( 'Template Part' );
-		await page.keyboard.type( 'test-template-part' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'test-theme' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+			// Make some changes in new Template Part.
+			const tempPart = await page.waitForSelector(
+				'*[data-type="core/template-part"] .block-editor-inner-blocks'
+			);
+			await tempPart.focus();
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'some words...' );
 
-		// Make some changes in new Template Part.
-		const tempPart = await page.waitForSelector(
-			'*[data-type="core/template-part"] .block-editor-inner-blocks'
-		);
-		await tempPart.focus();
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'some words...' );
-
-		// Button should have has-changes-dot class
-		const saveButton = await page.$(
-			'.editor-post-publish-button__button.has-changes-dot'
-		);
-		expect( saveButton ).not.toBeNull();
+			// Button should have has-changes-dot class
+			const saveButton = await page.$(
+				'.editor-post-publish-button__button.has-changes-dot'
+			);
+			expect( saveButton ).not.toBeNull();
+		} );
 	} );
 } );
