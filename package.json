@@ -115,6 +115,7 @@
 		"babel-loader": "8.0.6",
 		"babel-plugin-emotion": "10.0.27",
 		"babel-plugin-inline-json-import": "0.3.2",
+		"babel-plugin-lodash": "3.3.4",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-require-context-hook": "1.0.0",

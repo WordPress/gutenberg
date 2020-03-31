@@ -3,6 +3,10 @@ module.exports = function( api ) {
 
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
-		plugins: [ 'babel-plugin-emotion', 'babel-plugin-inline-json-import' ],
+		plugins: [
+			'lodash',
+			'babel-plugin-emotion',
+			'babel-plugin-inline-json-import',
+		],
 	};
 };
