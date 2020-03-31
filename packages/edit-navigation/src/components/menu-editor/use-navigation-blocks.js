@@ -61,7 +61,6 @@ export default function useNavigationBlocks( menuId ) {
 			const menuItem = menuItemsRef.current[ block.clientId ];
 
 			if ( ! menuItem ) {
-				console.log( 'CREATE MENU ITEM' );
 				saveMenuItem( {
 					...createMenuItemAttributesFromBlock( block ),
 					menus: menuId,
@@ -75,7 +74,6 @@ export default function useNavigationBlocks( menuId ) {
 					createBlockFromMenuItem( menuItem ).attributes
 				)
 			) {
-				console.log( 'UPDATE MENU ITEM', menuItem.id );
 				saveMenuItem( {
 					...menuItem,
 					...createMenuItemAttributesFromBlock( block ),
@@ -89,12 +87,10 @@ export default function useNavigationBlocks( menuId ) {
 			innerBlocks.map( ( block ) => block.clientId )
 		);
 
+		// Disable reason, this code will eventually be implemented.
+		// eslint-disable-next-line no-unused-vars
 		for ( const clientId of deletedClientIds ) {
-			console.log(
-				'DELETE MENU ITEM',
-				menuItemsRef.current[ clientId ].id
-			);
-			// Hm, don't think we have a deleteEntityRecord() action?
+			// TODO - delete menu items.
 		}
 	};
 
