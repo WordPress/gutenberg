@@ -33,7 +33,7 @@ import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { menu } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-
+import { useApiFetch } from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
@@ -41,7 +41,6 @@ import useBlockNavigator from './use-block-navigator';
 import BlockNavigationList from './block-navigation-list';
 import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
-import useApiFetch from './use-api-fetch';
 
 function Navigation( {
 	attributes,
