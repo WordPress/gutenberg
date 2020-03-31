@@ -34,18 +34,11 @@ const { hasExportModifier, hasDefaultModifier } = require( './has-modifier' );
 module.exports = function( statement ) {
 	if ( hasExportModifier( statement ) ) {
 		if ( hasDefaultModifier( statement ) ) {
-			const getLocalName = ( s ) => {
-				switch ( s.kind ) {
-					case SyntaxKind.ClassDeclaration:
-					case SyntaxKind.FunctionDeclaration:
-					default:
-						return s.name ? s.name.text : '*default*';
-				}
-			};
-
 			return [
 				{
-					localName: getLocalName( statement ),
+					localName: statement.name
+						? statement.name.text
+						: '*default*',
 					exportName: 'default',
 					module: null,
 				},
