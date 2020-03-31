@@ -12,6 +12,30 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { arrowUp, arrowDown, arrowLeft, arrowRight } from '@wordpress/icons';
 
+const horizontalMover = {
+	firstButtonIcon: arrowLeft,
+	secondButtonIcon: arrowRight,
+	firstButtonHint: __( 'Double tap to move the block to the left' ),
+	secondButtonHint:  __( 'Double tap to move the block to the right' ),
+	firstBlockTitle: __( 'Move block left' ),
+	lastBlockTitle: __( 'Move block right' ),
+	firstButtonDirection: 'left',
+	secondButtonDirection: 'right',
+	location: 'position',
+}
+
+const verticalMover = {
+	firstButtonIcon: arrowUp,
+	secondButtonIcon: arrowDown,
+	firstButtonHint: __( 'Double tap to move the block up' ),
+	secondButtonHint: __( 'Double tap to move the block down' ),
+	firstBlockTitle: __( 'Move block up' ),
+	lastBlockTitle: __( 'Move block down' ),
+	firstButtonDirection: 'up',
+	secondButtonDirection: 'down',
+	location: 'row',
+}
+
 const BlockMover = ( {
 	isFirst,
 	isLast,
@@ -22,27 +46,17 @@ const BlockMover = ( {
 	rootClientId,
 	horizontalDirection,
 } ) => {
-	const firstButtonIcon = horizontalDirection ? arrowLeft : arrowUp;
-	const secondButtonIcon = horizontalDirection ? arrowRight : arrowDown;
-
-	const firstButtonHint = horizontalDirection
-		? __( 'Double tap to move the block to the left' )
-		: __( 'Double tap to move the block up' );
-	const secondButtonHint = horizontalDirection
-		? __( 'Double tap to move the block to the right' )
-		: __( 'Double tap to move the block down' );
-
-	const firstBlockTitle = horizontalDirection
-		? __( 'Move block left' )
-		: __( 'Move block up' );
-	const lastBlockTitle = horizontalDirection
-		? __( 'Move block right' )
-		: __( 'Move block down' );
-
-	const firstButtonDirection = horizontalDirection ? 'left' : 'up';
-	const secondButtonDirection = horizontalDirection ? 'right' : 'down';
-
-	const location = horizontalDirection ? 'position' : 'row';
+	const {
+		firstButtonIcon,
+		secondButtonIcon,
+		firstButtonHint,
+		secondButtonHint,
+		firstBlockTitle,
+		lastBlockTitle,
+		firstButtonDirection,
+		secondButtonDirection,
+		location,
+	} = horizontalDirection ? horizontalMover : verticalMover;
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
