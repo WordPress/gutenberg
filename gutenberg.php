@@ -54,6 +54,16 @@ function gutenberg_menu() {
 				'the_gutenberg_widgets'
 			);
 		}
+		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Navigation (beta)', 'gutenberg' ),
+				__( 'Navigation (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-navigation',
+				'gutenberg_navigation_page'
+			);
+		}
 		if ( array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) ) {
 			add_submenu_page(
 				'gutenberg',
