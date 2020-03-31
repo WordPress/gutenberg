@@ -18,6 +18,8 @@ const { hasExportModifier } = require( './has-modifier' );
  *   - export { a, b } from 'c'
  *   - export { myDeclaration };
  *   - export * from './module';
+ *   - export { default as moduleName } from './module-code';
+ *   - export { bar as quux, myDefault as default }
  *
  * hasExportModifier
  *   - export const x = 42
