@@ -27,7 +27,9 @@ const ACCOUNT_LINK_PROMPT =
 
 /**
  * Adds the 'First Time Contributor' label to PRs merged on behalf of
- * contributors that have not yet made a commit.
+ * contributors that have not yet made a commit, and prompts the user to link
+ * their GitHub account to their WordPress.org profile if neccessary for props
+ * credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
