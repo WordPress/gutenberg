@@ -45,7 +45,7 @@ module.exports = {
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
-				allowedTextDomains: [ 'default' ],
+				allowedTextDomain: 'default',
 			},
 		],
 		'@wordpress/i18n-no-collapsible-whitespace': 'off',
