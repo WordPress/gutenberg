@@ -149,8 +149,7 @@ function ColumnsEditContainer( {
 						...columnsSettings,
 						readableContentViewStyle: { flex: 1 },
 						customOnAdd: onAddNextColumn,
-						customOnDelete:
-							columnCount === 1 ? onDelete : undefined,
+						onDelete: columnCount === 1 ? onDelete : undefined,
 					} }
 				/>
 			</View>
