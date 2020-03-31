@@ -1,18 +1,14 @@
 /**
- * External dependencies
- */
-import got from 'got';
-
-/**
  * Internal dependencies
  */
 import addFirstTimeContributorLabel from '../add-first-time-contributor-label';
+import hasWordPressProfile from '../has-wordpress-profile';
 
-jest.mock( 'got', () => jest.fn() );
+jest.mock( '../has-wordpress-profile', () => jest.fn() );
 
 describe( 'addFirstTimeContributorLabel', () => {
 	beforeEach( () => {
-		got.mockReset();
+		hasWordPressProfile.mockReset();
 	} );
 
 	const payload = {
@@ -123,7 +119,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		got.mockReturnValue( Promise.resolve( { body: { slug: 'ghostwp' } } ) );
+		hasWordPressProfile.mockReturnValue( Promise.resolve( true ) );
 
 		await addFirstTimeContributorLabel( payload, octokit );
 
@@ -158,8 +154,8 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		got.mockImplementation( () => {
-			throw new Error( 'Whoops!' );
+		hasWordPressProfile.mockImplementation( () => {
+			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
 		await addFirstTimeContributorLabel( payload, octokit );
@@ -195,17 +191,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		got.mockReturnValue(
-			Promise.resolve( {
-				body: {
-					code: 'user_not_linked',
-					message: 'Github Account not linked.',
-					data: {
-						status: 404,
-					},
-				},
-			} )
-		);
+		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
 		await addFirstTimeContributorLabel( payload, octokit );
 

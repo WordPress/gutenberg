@@ -1,25 +1,13 @@
 /**
- * External dependencies
- */
-const got = /** @type {*} */ ( require( 'got' ) ); // See: https://github.com/sindresorhus/got/issues/1137
-
-/**
  * Internal dependencies
  */
 const debug = require( './debug' );
 const getAssociatedPullRequest = require( './get-associated-pull-request' );
+const hasWordPressProfile = require( './has-wordpress-profile' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
 /** @typedef {import('./get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
-
-/**
- * Base endpoint URL for WordPress.org profile lookup by GitHub username.
- *
- * @type {string}
- */
-const BASE_PROFILE_LOOKUP_API_URL =
-	'https://profiles.wordpress.org/wp-json/wporg-github/v1/lookup/';
 
 /**
  * Message of comment prompting contributor to link their GitHub account from
@@ -97,15 +85,9 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 		`add-first-time-contributor-label: Checking for WordPress username associated with @${ author }`
 	);
 
-	let dotOrgUsername;
+	let hasProfile;
 	try {
-		const response = await got(
-			BASE_PROFILE_LOOKUP_API_URL + author,
-			/** @type {import('got').Options} */ ( {
-				responseType: 'json',
-			} )
-		);
-		dotOrgUsername = response.body.slug;
+		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
 		debug(
 			`add-first-time-contributor-label: Error retrieving from profile API:\n\n${ error.toString() }`
@@ -113,9 +95,9 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 		return;
 	}
 
-	if ( dotOrgUsername ) {
+	if ( hasProfile ) {
 		debug(
-			`add-first-time-contributor-label: User already known as ${ dotOrgUsername }. No need to prompt for account link!`
+			`add-first-time-contributor-label: User already known. No need to prompt for account link!`
 		);
 		return;
 	}
