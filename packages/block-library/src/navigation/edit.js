@@ -111,9 +111,11 @@ function Navigation( {
 		queryPath
 	);
 
+	const hasPages = !! pages && !! pages.length;
+
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
-		if ( ! pages ) {
+		if ( ! hasPages ) {
 			return null;
 		}
 
@@ -152,8 +154,6 @@ function Navigation( {
 		updateNavItemBlocks( defaultPagesNavigationItems );
 		selectBlock( clientId );
 	}
-
-	const hasPages = pages && pages.length;
 
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
