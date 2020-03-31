@@ -53,7 +53,7 @@ describe( 'entities saved states', () => {
 		);
 		tempPart.focus();
 		await insertBlock( 'Paragraph' );
-		await page.keyboard.type( 'some words' );
+		await page.keyboard.type( 'some words...' );
 		expect( true ).toBe( true );
 	} );
 } );

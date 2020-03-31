@@ -28,8 +28,8 @@ function TemplatePartPreview() {
 }
 
 export default function TemplatePartPlaceholder( { setAttributes } ) {
-	const [ slug, _setSlug ] = useState();
-	const [ theme, setTheme ] = useState();
+	const [ slug, _setSlug ] = useState( '' );
+	const [ theme, setTheme ] = useState( '' );
 	const [ help, setHelp ] = useState();
 
 	// Try to find an existing template part.
