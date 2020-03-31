@@ -110,7 +110,7 @@ function Navigation( {
 		queryPath
 	);
 
-	const hasPages = !! pages && !! pages.length;
+	const hasPages = !! pages;
 
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {

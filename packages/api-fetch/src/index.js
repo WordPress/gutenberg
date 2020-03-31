@@ -165,13 +165,17 @@ function apiFetch( options ) {
 function useApiFetch( path ) {
 	// Indicate the fetching status
 	const [ isLoading, setIsLoading ] = useState( true );
-	const [ data, setData ] = useState( [] );
+	const [ data, setData ] = useState( null );
 	const [ error, setError ] = useState( null );
 
 	useEffect( () => {
+		setIsLoading( true );
+		setData( null );
+		setError( null );
+
 		apiFetch( { path } )
-			.then( ( dataList ) => {
-				setData( dataList );
+			.then( ( fetchedData ) => {
+				setData( fetchedData );
 				// We've stopped fetching
 				setIsLoading( false );
 			} )
