@@ -46,7 +46,11 @@ export const LinkControlSearchItem = ( {
 					aria-hidden={ ! isURL }
 					className="block-editor-link-control__search-item-info"
 				>
-					{ ! isURL && ( safeDecodeURI( suggestion.url ) || '' ) }
+					{ ! isURL &&
+						( safeDecodeURI(
+							suggestion.url.replace( /http(s?):\/\//, '' )
+						) ||
+							'' ) }
 					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
