@@ -30,8 +30,8 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	);
 
 	return (
-		<>
-			<h3>{ entity.label }</h3>
+		<div className="editor-entities-saved-states__entity-type-list">
+			<h2>{ entity.label }</h2>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
@@ -52,7 +52,7 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 					/>
 				);
 			} ) }
-		</>
+		</div>
 	);
 }
 

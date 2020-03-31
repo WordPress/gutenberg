@@ -8,6 +8,8 @@ import {
 	pressKeyTimes,
 	switchEditorModeTo,
 	setBrowserViewport,
+	publishPost,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -66,5 +68,16 @@ describe( 'Multi-entity save flow', () => {
 			);
 			expect( saveButton ).not.toBeNull();
 		} );
+		// open save modal, => all boxes checked
+		it( 'Clicking should open modal with boxes checked by default', async () => {
+			await page.click( '.editor-post-publish-button__button' );
+			const checkedBoxes = await page.$$(
+				'.components-checkbox-control__checked'
+			);
+			expect( checkedBoxes.length ).toBe( 2 );
+		} );
+		// save modal => draft saved + no dot on publish
+		// from published state?
+		// edit post =>
 	} );
 } );
