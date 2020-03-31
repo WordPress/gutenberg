@@ -12,13 +12,17 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 );
 function Sidebar() {
 	return (
-		<div className="edit-site-sidebar">
-			<ComplementaryArea.Slot scope="core/edit-site" />
+		<>
+			<ComplementaryArea.Slot
+				scope="core/edit-site"
+				className="edit-site-complementary-area"
+			/>
 			<ComplementaryArea
 				scope="core/edit-site"
 				complementaryAreaIdentifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				icon={ typography }
+				className="edit-site-complementary-area"
 			>
 				<GlobalStylesControls bubblesVirtually />
 			</ComplementaryArea>
@@ -27,10 +31,11 @@ function Sidebar() {
 				complementaryAreaIdentifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
+				className="edit-site-complementary-area"
 			>
 				<InspectorSlot bubblesVirtually />
 			</ComplementaryArea>
-		</div>
+		</>
 	);
 }
 
