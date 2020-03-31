@@ -23,7 +23,9 @@ function TemplatePreview( { item } ) {
 	);
 	return (
 		<div className="edit-site-template-switcher__preview">
-			{ !! blocks && <BlockPreview blocks={ blocks } /> }
+			{ !! blocks && (
+				<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
+			) }
 		</div>
 	);
 }
