@@ -16,10 +16,15 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	style,
+	style: oldStyle,
 } ) {
-	const { align, content, placeholder } = attributes;
+	const { align, content, placeholder, style } = attributes;
 
+	const styles = {
+		...oldStyle,
+		color: style && style.color && style.color.text
+	};
+	
 	return (
 		<>
 			<BlockControls>
@@ -35,7 +40,7 @@ function ParagraphBlock( {
 				tagName="p"
 				value={ content }
 				deleteEnter={ true }
-				style={ style }
+				style={ styles }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
 						content: nextContent,
