@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
-import elements from './block-elements';
+import ELEMENTS from './block-elements';
 
-const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
+const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
 	acc[ element ] = element;
 	return acc;
 }, String );
