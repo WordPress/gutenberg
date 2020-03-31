@@ -9,7 +9,14 @@ import { omit } from 'lodash';
  */
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
-const migrateCustomColors = ( attributes ) => {
+const migrateAttributes = ( attributes ) => {
+	if ( ! attributes.tagName ) {
+		attributes = {
+			...attributes,
+			tagName: 'div',
+		};
+	}
+
 	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
 		return attributes;
 	}
@@ -48,7 +55,7 @@ const deprecated = [
 			anchor: true,
 			html: false,
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		save( { attributes } ) {
 			const {
 				backgroundColor,
@@ -99,7 +106,7 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		supports: {
 			align: [ 'wide', 'full' ],
 			anchor: true,
@@ -154,7 +161,7 @@ const deprecated = [
 			anchor: true,
 			html: false,
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		save( { attributes } ) {
 			const { backgroundColor, customBackgroundColor } = attributes;
 
