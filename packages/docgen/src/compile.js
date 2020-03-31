@@ -17,6 +17,7 @@ module.exports = function( filePath ) {
 	const code = raw
 		// typescript interprets @wordpress in @example code as a JSDoc tag.
 		// So, it should be replaced for the time being.
+		// They're restored in get-jsdoc-from-statement.js
 		.replace( /@wordpress/g, '__WORDPRESS_IMPORT__' )
 		// When <caption>ES(5|Next)<\/caption> exists next to @example tag,
 		// typescript cannot parse code correctly.
