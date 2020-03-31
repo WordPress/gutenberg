@@ -28,12 +28,7 @@ function gutenberg_edit_site_page() {
  * @return bool True for Site Editor pages, false otherwise.
  */
 function gutenberg_is_edit_site_page( $page ) {
-	$allowed_pages = array(
-		'gutenberg_page_gutenberg-edit-site',
-		'toplevel_page_gutenberg-edit-site',
-	);
-
-	return in_array( $page, $allowed_pages, true );
+	return 'toplevel_page_gutenberg-edit-site' === $page;
 }
 
 /**
