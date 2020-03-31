@@ -416,6 +416,10 @@ const MyButtonMoreMenuItem = () => (
 					'infer type: ReturnType'
 				),
 				type( "import( 'typescript' ).Statement", 'import type' ),
+				type(
+					"import( '@wordpress/element' ).WPSyntheticEvent",
+					'what if @wordpress?'
+				),
 				type( 'WPEditorInserterItem', 'typedef' ),
 				{
 					title: 'param',

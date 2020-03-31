@@ -30,8 +30,18 @@ function stripQuotes( str ) {
 	return str;
 }
 
-const getType = ( typeExpression ) =>
-	typeExpression ? typeToString( typeExpression.type ) : 'undocumented';
+const getType = ( typeExpression ) => {
+	if ( typeExpression ) {
+		const result = typeToString( typeExpression.type );
+
+		return result.replace(
+			/import\( '__WORDPRESS_IMPORT__\/(.+)' \)/g,
+			"import( '@wordpress/$1' )"
+		);
+	}
+
+	return 'undocumented';
+};
 
 /**
  * It loops from = character until ] is found and extract default value from it.

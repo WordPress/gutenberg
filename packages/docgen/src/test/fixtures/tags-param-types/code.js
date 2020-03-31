@@ -98,6 +98,7 @@
  * @param {T extends U ? X : Y} p conditional type
  * @param {T extends (...args: any[]) => infer R ? R : any} p infer type: ReturnType
  * @param {import('typescript').Statement} p import type
+ * @param {import('@wordpress/element').WPSyntheticEvent} p what if @wordpress?
  * @param {WPEditorInserterItem} p typedef
  * @param {string} __experimentalParam It's experimental
  * @param {number} __unstableParam It's unstable
