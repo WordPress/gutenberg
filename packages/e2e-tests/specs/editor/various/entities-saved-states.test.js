@@ -16,6 +16,50 @@ import {
 	disableExperimentalFeatures,
 } from '../../../experimental-features';
 
+async function initializeTemplatePart() {
+	await insertBlock( 'Template Part' );
+	await page.keyboard.type( 'test-template-part' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.type( 'test-theme' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Enter' );
+	// Make some changes in new Template Part.
+	const tempPart = await page.waitForSelector(
+		'*[data-type="core/template-part"] .block-editor-inner-blocks'
+	);
+	await tempPart.focus();
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.type( 'some words...' );
+}
+
+async function assertSaveButtonDisabled() {
+	const disabledSaveButton = await page.$(
+		'.editor-post-publish-button__button[aria-disabled=true]'
+	);
+	expect( disabledSaveButton ).not.toBeNull();
+}
+
+async function assertSaveButtonEnabled() {
+	const enabledSaveButton = await page.$(
+		'.editor-post-publish-button__button[aria-disabled=false]'
+	);
+	expect( enabledSaveButton ).not.toBeNull();
+}
+
+async function assertMultiSaveEnabled() {
+	const multiSaveButton = await page.$(
+		'.editor-post-publish-button__button.has-changes-dot'
+	);
+	expect( multiSaveButton ).not.toBeNull();
+}
+
+async function assertMultiSaveDisabled() {
+	const multiSaveButton = await page.$(
+		'.editor-post-publish-button__button.has-changes-dot'
+	);
+	expect( multiSaveButton ).toBeNull();
+}
+
 describe( 'Multi-entity save flow', () => {
 	const experimentsSettings = [ '#gutenberg-full-site-editing' ];
 
@@ -37,36 +81,17 @@ describe( 'Multi-entity save flow', () => {
 				await page.keyboard.press( 'Enter' );
 
 				// Button should not have has-changes-dot class.
-				const saveButton = await page.$(
-					'.editor-post-publish-button__button.has-changes-dot'
-				);
-				expect( saveButton ).toBeNull();
+				await assertMultiSaveDisabled();
 			} );
 
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
-				await insertBlock( 'Template Part' );
-				await page.keyboard.type( 'test-template-part' );
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.type( 'test-theme' );
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.press( 'Enter' );
-
-				// Make some changes in new Template Part.
-				const tempPart = await page.waitForSelector(
-					'*[data-type="core/template-part"] .block-editor-inner-blocks'
-				);
-				await tempPart.focus();
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.type( 'some words...' );
+				await initializeTemplatePart();
 
 				// Button should have has-changes-dot class
-				const saveButton = await page.$(
-					'.editor-post-publish-button__button.has-changes-dot'
-				);
-				expect( saveButton ).not.toBeNull();
+				await assertMultiSaveEnabled();
 			} );
-			// open save modal, => all boxes checked
+
 			it( 'Clicking should open modal with boxes checked by default', async () => {
 				await page.click( '.editor-post-publish-button__button' );
 				const checkedBoxes = await page.$$(
@@ -74,7 +99,7 @@ describe( 'Multi-entity save flow', () => {
 				);
 				expect( checkedBoxes.length ).toBe( 2 );
 			} );
-			// save modal => draft saved + no dot on publish
+
 			it( 'Saving should result in items being saved', async () => {
 				await page.click(
 					'.editor-entities-saved-states__save-button'
@@ -87,22 +112,26 @@ describe( 'Multi-entity save flow', () => {
 				expect( draftSaved ).not.toBeNull();
 
 				// Verify template part is saved.
-				const saveButton = await page.$(
-					'.editor-post-publish-button__button.has-changes-dot'
-				);
-				expect( saveButton ).toBeNull();
+				await assertMultiSaveDisabled();
 			} );
 		} );
-		// from published state?
+
 		describe( 'Published state', () => {
-			it( 'Should not trigger multi-entity save button with only post edited', async () => {
+			it( 'Update button disabled after publish', async () => {
 				await publishPostWithPrePublishChecksDisabled();
-				const saveButton = await page.$(
-					'.editor-post-publish-button__button[aria-disabled=true]'
-				);
-				expect( saveButton ).not.toBeNull();
+				await assertSaveButtonDisabled();
+			} );
+
+			it( 'Update button enabled after editing post', async () => {
+				await insertBlock( 'Paragraph' );
+				await page.keyboard.type( 'Some Things...' );
+
+				// Verify update button is enabled.
+				await assertSaveButtonEnabled();
+
+				// Verify is not for multi-entity saving.
+				await assertMultiSaveDisabled();
 			} );
 		} );
-		// edit post =>
 	} );
 } );
