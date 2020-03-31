@@ -126,7 +126,6 @@ function ColumnsEditContainer( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
-					isCollapsed={ false }
 				/>
 			</BlockControls>
 			<View style={ isSelected && styles.innerBlocksSelected }>

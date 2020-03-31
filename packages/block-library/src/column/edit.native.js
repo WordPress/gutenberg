@@ -73,7 +73,6 @@ function ColumnEdit( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
-					isCollapsed={ false }
 				/>
 			</BlockControls>
 			<View
