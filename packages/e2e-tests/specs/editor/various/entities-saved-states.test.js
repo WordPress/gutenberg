@@ -29,31 +29,41 @@ describe( 'entities saved states', () => {
 		await disableExperimentalFeatures( experimentsSettings );
 	} );
 
-	it( 'should run in suite', async () => {
+	it( 'Should not trigger with only post type edited', async () => {
 		await createNewPost();
 
 		// Edit the page some.
 		await page.keyboard.type( 'Test Post...' );
 		await page.keyboard.press( 'Enter' );
 
+		// Button should not have has-changes-dot class.
+		const saveButton = await page.$(
+			'.editor-post-publish-button__button.has-changes-dot'
+		);
+		expect( saveButton ).toBeNull();
+	} );
+
+	it( 'Should trigger once template part edited', async () => {
 		// Create new template part.
 		await insertBlock( 'Template Part' );
-		const [ slug, theme ] = await page.$$(
-			'.wp-block-template-part__placeholder-input'
-		);
-		slug.value = 'test-template';
-		theme.value = 'test-theme';
-		theme.focus();
+		await page.keyboard.type( 'test-template-part' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'test-theme' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
-		// Add paragraph inside new template part.
+		// Make some changes in new Template Part.
 		const tempPart = await page.waitForSelector(
-			'*[data-type="core/template-part"]'
+			'*[data-type="core/template-part"] .block-editor-inner-blocks'
 		);
-		tempPart.focus();
-		await insertBlock( 'Paragraph' );
+		await tempPart.focus();
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'some words...' );
-		expect( true ).toBe( true );
+
+		// Button should have has-changes-dot class
+		const saveButton = await page.$(
+			'.editor-post-publish-button__button.has-changes-dot'
+		);
+		expect( saveButton ).not.toBeNull();
 	} );
 } );
