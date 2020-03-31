@@ -180,14 +180,11 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			__experimentalMoverDirection,
 			customBlockProps,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			horizontalDirection,
 		} = this.props;
-
-		const horizontalDirection =
-			__experimentalMoverDirection === 'horizontal';
 
 		const { readableContentViewStyle } = customBlockProps || {};
 
@@ -291,6 +288,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			horizontalDirection,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
