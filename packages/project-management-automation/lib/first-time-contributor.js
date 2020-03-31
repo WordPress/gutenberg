@@ -32,11 +32,9 @@ const ACCOUNT_LINK_PROMPT =
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
-async function addFirstTimeContributorLabel( payload, octokit ) {
+async function firstTimeContributor( payload, octokit ) {
 	if ( payload.ref !== 'refs/heads/master' ) {
-		debug(
-			'add-first-time-contributor-label: Commit is not to `master`. Aborting'
-		);
+		debug( 'first-time-contributor: Commit is not to `master`. Aborting' );
 		return;
 	}
 
@@ -45,7 +43,7 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
-			'add-first-time-contributor-label: Cannot determine pull request associated with commit. Aborting'
+			'first-time-contributor: Cannot determine pull request associated with commit. Aborting'
 		);
 		return;
 	}
@@ -54,7 +52,7 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const author = commit.author.username;
 	debug(
-		`add-first-time-contributor-label: Searching for commits in ${ owner }/${ repo } by @${ author }`
+		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
 	const { data: commits } = await octokit.repos.listCommits( {
@@ -65,13 +63,13 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 
 	if ( commits.length > 1 ) {
 		debug(
-			`add-first-time-contributor-label: Not the first commit for author. Aborting`
+			`first-time-contributor: Not the first commit for author. Aborting`
 		);
 		return;
 	}
 
 	debug(
-		`add-first-time-contributor-label: Adding 'First Time Contributor' label to issue #${ pullRequest }`
+		`first-time-contributor: Adding 'First Time Contributor' label to issue #${ pullRequest }`
 	);
 
 	await octokit.issues.addLabels( {
@@ -82,7 +80,7 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	} );
 
 	debug(
-		`add-first-time-contributor-label: Checking for WordPress username associated with @${ author }`
+		`first-time-contributor: Checking for WordPress username associated with @${ author }`
 	);
 
 	let hasProfile;
@@ -90,14 +88,14 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
 		debug(
-			`add-first-time-contributor-label: Error retrieving from profile API:\n\n${ error.toString() }`
+			`first-time-contributor: Error retrieving from profile API:\n\n${ error.toString() }`
 		);
 		return;
 	}
 
 	if ( hasProfile ) {
 		debug(
-			`add-first-time-contributor-label: User already known. No need to prompt for account link!`
+			`first-time-contributor: User already known. No need to prompt for account link!`
 		);
 		return;
 	}
@@ -110,4 +108,4 @@ async function addFirstTimeContributorLabel( payload, octokit ) {
 	} );
 }
 
-module.exports = addFirstTimeContributorLabel;
+module.exports = firstTimeContributor;

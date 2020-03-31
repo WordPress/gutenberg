@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import addFirstTimeContributorLabel from '../add-first-time-contributor-label';
+import firstTimeContributor from '../first-time-contributor';
 import hasWordPressProfile from '../has-wordpress-profile';
 
 jest.mock( '../has-wordpress-profile', () => jest.fn() );
 
-describe( 'addFirstTimeContributorLabel', () => {
+describe( 'firstTimeContributor', () => {
 	beforeEach( () => {
 		hasWordPressProfile.mockReset();
 	} );
@@ -44,7 +44,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addFirstTimeContributorLabel( payloadForBranchPush, octokit );
+		await firstTimeContributor( payloadForBranchPush, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -70,7 +70,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addFirstTimeContributorLabel( payloadDirectToMaster, octokit );
+		await firstTimeContributor( payloadDirectToMaster, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -92,7 +92,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			},
 		};
 
-		await addFirstTimeContributorLabel( payload, octokit );
+		await firstTimeContributor( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -121,7 +121,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		hasWordPressProfile.mockReturnValue( Promise.resolve( true ) );
 
-		await addFirstTimeContributorLabel( payload, octokit );
+		await firstTimeContributor( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -158,7 +158,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
-		await addFirstTimeContributorLabel( payload, octokit );
+		await firstTimeContributor( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -193,7 +193,7 @@ describe( 'addFirstTimeContributorLabel', () => {
 
 		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
-		await addFirstTimeContributorLabel( payload, octokit );
+		await firstTimeContributor( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
