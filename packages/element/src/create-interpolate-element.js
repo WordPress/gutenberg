@@ -25,6 +25,8 @@ let indoc, offset, output, stack;
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
+ * The stack frame tracking parse progress.
+ *
  * @typedef Frame
  *
  * @property {WPElement} element            A parent element which may still have
