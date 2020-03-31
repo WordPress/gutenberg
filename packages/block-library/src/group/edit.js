@@ -16,10 +16,10 @@ function GroupEdit( { attributes, className, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const Tag = Block[ attributes.tagName ];
+	const BlockWrapper = Block[ attributes.tagName ];
 
 	return (
-		<Tag className={ className }>
+		<BlockWrapper className={ className }>
 			<div className="wp-block-group__inner-container">
 				<InnerBlocks
 					renderAppender={
@@ -29,7 +29,7 @@ function GroupEdit( { attributes, className, clientId } ) {
 					}
 				/>
 			</div>
-		</Tag>
+		</BlockWrapper>
 	);
 }
 

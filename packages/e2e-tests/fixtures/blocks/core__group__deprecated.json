@@ -6,7 +6,8 @@
         "attributes": {
             "backgroundColor": "lighter-blue",
             "align": "full",
-            "anchor": "test-id"
+            "anchor": "test-id",
+            "tagName": "div"
         },
         "innerBlocks": [
             {
