@@ -25,7 +25,6 @@ import {
 import styles from './style.scss';
 
 function HeaderToolbar( {
-	hasFixedToolbar,
 	hasRedo,
 	hasUndo,
 	redo,
@@ -76,7 +75,7 @@ function HeaderToolbar( {
 						hint: __( 'Double tap to redo last change' ),
 					} }
 				/>
-				{ hasFixedToolbar && <BlockToolbar /> }
+				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<Toolbar passedStyle={ styles.keyboardHideContainer }>
@@ -98,9 +97,6 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasRedo: select( 'core/editor' ).hasEditorRedo(),
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
-			'fixedToolbar'
-		),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter:
 			select( 'core/edit-post' ).getEditorMode() === 'visual' &&

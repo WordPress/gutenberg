@@ -5,6 +5,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
+import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -41,18 +42,20 @@ export const withBlockControls = createHigherOrderComponent(
 				style: cleanEmptyObject( newStyle ),
 			} );
 		};
-
-		return [
-			<BlockEdit key="edit" { ...props } />,
-			<InspectorControls key="control">
-				<PanelBody title={ __( 'Typography' ) }>
-					<LineHeightControl
-						value={ style?.typography?.lineHeight }
-						onChange={ onChange }
-					/>
-				</PanelBody>
-			</InspectorControls>,
-		];
+		const controls = Platform.select( {
+			web: (
+				<InspectorControls key="control">
+					<PanelBody title={ __( 'Typography' ) }>
+						<LineHeightControl
+							value={ style?.typography?.lineHeight }
+							onChange={ onChange }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			),
+			native: null,
+		} );
+		return [ <BlockEdit key="edit" { ...props } />, controls ];
 	},
 	'withToolbarControls'
 );
