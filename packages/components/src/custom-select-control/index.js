@@ -127,9 +127,9 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			<ul { ...menuProps }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
+			{ isOpen && (
+				<ul { ...menuProps }>
+					{ items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
 						<li
 							{ ...getItemProps( {
@@ -155,7 +155,8 @@ export default function CustomSelectControl( {
 							{ item.name }
 						</li>
 					) ) }
-			</ul>
+				</ul>
+			) }
 		</div>
 	);
 }
