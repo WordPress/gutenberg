@@ -24,6 +24,8 @@ body.toplevel_page_gutenberg-edit-site {
 	@include reset;
 }
 
+// This is to prevent the blocks styles
+// from leaking into the saving modal.
 .components-modal__frame h1 {
 	background-color: inherit;
 }
