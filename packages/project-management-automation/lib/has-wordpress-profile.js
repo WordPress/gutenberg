@@ -8,7 +8,7 @@ const { request } = require( 'https' );
  *
  * @type {string}
  */
-const BASE_PROFILE_LOOKUP_API_HOSTNAME = 'https://profiles.wordpress.org';
+const BASE_PROFILE_LOOKUP_API_HOSTNAME = 'profiles.wordpress.org';
 
 /**
  * Base path for WordPress.org profile lookup by GitHub username.
