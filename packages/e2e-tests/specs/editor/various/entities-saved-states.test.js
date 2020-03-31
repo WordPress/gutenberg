@@ -16,22 +16,6 @@ import {
 	disableExperimentalFeatures,
 } from '../../../experimental-features';
 
-async function initializeTemplatePart() {
-	await insertBlock( 'Template Part' );
-	await page.keyboard.type( 'test-template-part' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( 'test-theme' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Enter' );
-	// Make some changes in new Template Part.
-	const tempPart = await page.waitForSelector(
-		'*[data-type="core/template-part"] .block-editor-inner-blocks'
-	);
-	await tempPart.focus();
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( 'some words...' );
-}
-
 async function assertSaveButtonDisabled() {
 	const disabledSaveButton = await page.$(
 		'.editor-post-publish-button__button[aria-disabled=true]'
@@ -47,7 +31,7 @@ async function assertSaveButtonEnabled() {
 }
 
 async function assertMultiSaveEnabled() {
-	const multiSaveButton = await page.$(
+	const multiSaveButton = await page.waitForSelector(
 		'.editor-post-publish-button__button.has-changes-dot'
 	);
 	expect( multiSaveButton ).not.toBeNull();
@@ -77,6 +61,7 @@ describe( 'Multi-entity save flow', () => {
 				await createNewPost();
 				await disablePrePublishChecks();
 				// Edit the page some.
+				await page.click( '.editor-post-title' );
 				await page.keyboard.type( 'Test Post...' );
 				await page.keyboard.press( 'Enter' );
 
@@ -86,8 +71,18 @@ describe( 'Multi-entity save flow', () => {
 
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
-				await initializeTemplatePart();
-
+				await insertBlock( 'Template Part' );
+				await page.keyboard.type( 'test-template-part' );
+				await page.keyboard.press( 'Tab' );
+				await page.keyboard.type( 'test-theme' );
+				await page.keyboard.press( 'Tab' );
+				await page.keyboard.press( 'Enter' );
+				// Make some changes in new Template Part.
+				await page.waitForSelector(
+					'*[data-type="core/template-part"] .block-editor-inner-blocks'
+				);
+				await page.click( '*[data-type="core/template-part"]' );
+				await page.keyboard.type( 'some words...' );
 				// Button should have has-changes-dot class
 				await assertMultiSaveEnabled();
 			} );
@@ -123,14 +118,24 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			it( 'Update button enabled after editing post', async () => {
-				await insertBlock( 'Paragraph' );
-				await page.keyboard.type( 'Some Things...' );
+				await page.click( '.editor-post-title' );
+				await page.keyboard.type( '...more title!' );
 
 				// Verify update button is enabled.
 				await assertSaveButtonEnabled();
 
 				// Verify is not for multi-entity saving.
 				await assertMultiSaveDisabled();
+			} );
+
+			it( 'Multi-save button triggered after editing template part.', async () => {
+				const templatePart = await page.waitForSelector(
+					'*[data-type="core/template-part"] .block-editor-inner-blocks'
+				);
+				await templatePart.click();
+				await page.keyboard.type( '...some more words...' );
+				await page.keyboard.press( 'Enter' );
+				await assertMultiSaveEnabled();
 			} );
 		} );
 	} );
