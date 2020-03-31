@@ -80,7 +80,7 @@ function ParagraphBlock( {
 	setAttributes,
 	setFontSize,
 } ) {
-	const { align, content, dropCap, placeholder, direction } = attributes;
+	const { align, content, direction, dropCap, placeholder } = attributes;
 
 	const ref = useRef();
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
