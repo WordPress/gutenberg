@@ -16,15 +16,4 @@
 		margin: 0;
 	}
 
-	// There are to prevent the blocks styles
-	// from leaking into the sidebars (block inspector, global styles).
-	p {
-		background-color: inherit;
-		color: $dark-gray-500;
-	}
-
-	h2 {
-		background-color: inherit;
-	}
-
 }
