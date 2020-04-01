@@ -41,8 +41,8 @@ function FullscreenModeClose() {
 
 function useToggleAdminMenu( { ref } ) {
 	const [ isActive, setIsActive ] = useState( false );
+	const buttonNode = ref?.current;
 
-	const navigationHeaderNode = document.querySelector( '.edit-post-header' );
 	const adminMenuNode = document.querySelector( '#adminmenumain' );
 
 	const toggleClassName = 'is-showing-admin-menu';
@@ -51,7 +51,6 @@ function useToggleAdminMenu( { ref } ) {
 	const closeAdminMenu = () => setIsActive( false );
 
 	const focusFirstAdminMenuItem = () => {
-		const buttonNode = ref.current;
 		if ( ! buttonNode ) return;
 
 		const isButtonFocused = buttonNode.matches( ':focus' );
@@ -76,15 +75,8 @@ function useToggleAdminMenu( { ref } ) {
 		const handleOnClickOutside = ( event ) => {
 			const { target } = event;
 
-			const didClickOutsideNavigationHeader =
-				! navigationHeaderNode.contains( target ) &&
-				target !== navigationHeaderNode;
-
-			const didClickOutsideAdminMenu =
-				! adminMenuNode.contains( target ) && target !== adminMenuNode;
-
 			const didClickOutside =
-				didClickOutsideNavigationHeader && didClickOutsideAdminMenu;
+				! adminMenuNode.contains( target ) && target !== buttonNode;
 
 			if ( didClickOutside ) {
 				closeAdminMenu();
@@ -103,7 +95,7 @@ function useToggleAdminMenu( { ref } ) {
 				);
 			}
 		};
-	}, [ isActive ] );
+	}, [ isActive, buttonNode ] );
 
 	// Handles closing the admin menu when pressing ESCAPE or DOWN
 	useEffect( () => {
