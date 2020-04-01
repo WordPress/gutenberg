@@ -51,6 +51,10 @@ class BottomSheet extends Component {
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
 			this
 		);
+		this.onBackButtonPress = this.onBackButtonPress.bind( this );
+		this.onHandleBackButtonPress = this.onHandleBackButtonPress.bind(
+			this
+		);
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
@@ -62,6 +66,7 @@ class BottomSheet extends Component {
 			scrollEnabled: true,
 			isScrolling: false,
 			onCloseBottomSheet: null,
+			onBackButtonPress: null,
 			setMaxHeight: true,
 		};
 
@@ -183,6 +188,10 @@ class BottomSheet extends Component {
 		this.setState( { scrollEnabled: value } );
 	}
 
+	onShouldSetMaxHeight( value ) {
+		this.setState( { setMaxHeight: value } );
+	}
+
 	isScrolling( value ) {
 		this.setState( { isScrolling: value } );
 	}
@@ -191,8 +200,8 @@ class BottomSheet extends Component {
 		this.setState( { onCloseBottomSheet: action } );
 	}
 
-	onShouldSetMaxHeight( value ) {
-		this.setState( { setMaxHeight: value } );
+	onHandleBackButtonPress( action ) {
+		this.setState( { onBackButtonPress: action } );
 	}
 
 	onCloseBottomSheet() {
@@ -202,6 +211,15 @@ class BottomSheet extends Component {
 			onCloseBottomSheet();
 		}
 		onClose();
+	}
+
+	onBackButtonPress() {
+		const { onClose } = this.props;
+		const { onBackButtonPress } = this.state;
+		if ( onBackButtonPress ) {
+			return onBackButtonPress();
+		}
+		return onClose();
 	}
 
 	render() {
@@ -271,7 +289,7 @@ class BottomSheet extends Component {
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
-				onBackButtonPress={ this.onCloseBottomSheet }
+				onBackButtonPress={ this.onBackButtonPress }
 				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
@@ -325,6 +343,7 @@ class BottomSheet extends Component {
 								isBottomSheetScrolling: isScrolling,
 								onCloseBottomSheet: this
 									.onHandleClosingBottomSheet,
+								onBackButtonPress: this.onHandleBackButtonPress,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>

@@ -311,7 +311,7 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	changeBottomSheetContent( destination ) {
+	changeBottomSheetContent( destination, callback ) {
 		const { screen } = this.state;
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
@@ -320,10 +320,17 @@ class ButtonEdit extends Component {
 				LayoutAnimation.Properties.opacity
 			)
 		);
-		this.setState( {
-			screen: destination,
-			previousScreen: screen,
-		} );
+		this.setState(
+			{
+				screen: destination,
+				previousScreen: screen,
+			},
+			() => {
+				if ( callback ) {
+					callback();
+				}
+			}
+		);
 	}
 
 	render() {
@@ -464,6 +471,7 @@ class ButtonEdit extends Component {
 							shouldEnableBottomSheetScroll,
 							shouldSetBottomSheetMaxHeight,
 							onCloseBottomSheet,
+							onBackButtonPress,
 						} ) => {
 							return (
 								<>
@@ -562,6 +570,9 @@ class ButtonEdit extends Component {
 											}
 											onCloseBottomSheet={
 												onCloseBottomSheet
+											}
+											onBackButtonPress={
+												onBackButtonPress
 											}
 										/>
 									) }

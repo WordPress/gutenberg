@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -32,10 +32,27 @@ function ColorSettings( {
 	shouldSetBottomSheetMaxHeight,
 	isBottomSheetScrolling,
 	onCloseBottomSheet,
+	onBackButtonPress,
 	getStylesFromColorScheme,
 } ) {
+	const isIOS = Platform.OS === 'ios';
 	const segments = [ 'Solid', 'Gradient' ];
 	const [ segment, setSegment ] = useState( segments[ 0 ] );
+
+	useEffect( () => {
+		if ( screen === 'Background' || screen === 'Text' ) {
+			onBackButtonPress( () =>
+				changeBottomSheetContent(
+					'Settings',
+					onBackButtonPress( null )
+				)
+			);
+		} else {
+			onBackButtonPress( () =>
+				changeBottomSheetContent( previousScreen )
+			);
+		}
+	}, [ screen ] );
 
 	useEffect( () => {
 		shouldSetBottomSheetMaxHeight( true );
@@ -80,7 +97,7 @@ function ColorSettings( {
 						addonLeft={
 							<View>
 								<Text
-									selectable
+									selectable={ isIOS }
 									style={ [
 										styles.colorIndicator,
 										styles.textIndicator,
@@ -110,6 +127,7 @@ function ColorSettings( {
 					<View style={ styles.footer }>
 						<View style={ styles.flex }>
 							<Text
+								selectable={ isIOS }
 								style={ [
 									styles.colorIndicator,
 									styles.textIndicator,
