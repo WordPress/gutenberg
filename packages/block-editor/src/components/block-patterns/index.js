@@ -55,7 +55,6 @@ function BlockPatternPlaceholder( { pattern } ) {
 
 function BlockPatterns( { patterns } ) {
 	const currentShownPatterns = useAsyncList( patterns );
-	//const currentShownPatterns = patterns;
 	const getBlockInsertionPoint = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlockInsertionPoint;
 	} );
