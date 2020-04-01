@@ -105,8 +105,9 @@ export default function useMultiSelection( ref ) {
 				);
 
 				if (
-					! blockNode.contains( startContainer ) ||
-					! blockNode.contains( endContainer )
+					!! blockNode &&
+					( ! blockNode.contains( startContainer ) ||
+						! blockNode.contains( endContainer ) )
 				) {
 					selection.removeAllRanges();
 				}
