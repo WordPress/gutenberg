@@ -130,23 +130,25 @@ Example usage:
  // to debounce a rapidly changing width value
 
 const [ resizeListener, sizes ] = useResizeObserver();
-const debouncedSize = useDebounce(sizes.width, 100);
 
-useEffect( () => {
+useDebounce( ( sz ) => {
 
 	// ... do your thing here ...
 
-}, [debouncedSize] );
+}, 200, sizes.width );
+
+return (
+	<div>
+		{resizeListener}
+	</div>
+);
 ```
 
 _Parameters_
 
--   _value_ `Object`: The value changing you want to debounce.
+-   _callback_ `Function`: The function to call with the debounced value.
 -   _delay_ `number`: The amount to delay time in ms.
-
-_Returns_
-
--   `Object`: Debounced value
+-   _deps_ `*`: The dependent value changing you want to debounce.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 

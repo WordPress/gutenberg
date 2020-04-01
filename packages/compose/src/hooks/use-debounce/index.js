@@ -5,7 +5,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Use to debounce a value that is changing too frequently.
@@ -17,30 +17,30 @@ import { useState, useEffect } from '@wordpress/element';
  *  // to debounce a rapidly changing width value
  *
  *	const [ resizeListener, sizes ] = useResizeObserver();
- *	const debouncedSize = useDebounce( sizes.width, 100 );
  *
- *	useEffect( () => {
+ *	useDebounce( ( sz ) => {
  *
  *		// ... do your thing here ...
  *
- *	}, [debouncedSize] );
+ *	}, 200, sizes.width );
+ *
+ *	return (
+ *		<div>
+ *			{resizeListener}
+ *		</div>
+ *	);
  *	```
  *
- * @param {*}      value  The value changing you want to debounce.
- * @param {number} delay  The amount to delay time in ms.
- *
- * @return {*} Debounced value.
+ * @param {Function} callback The function to call with the debounced value.
+ * @param {number}   delay    The amount to delay time in ms.
+ * @param {*}        deps     The dependent value changing you want to debounce.
  *
  */
-const useDebounce = ( value, delay ) => {
-	const [ debouncedValue, setDebouncedValue ] = useState( value );
-
+const useDebounce = ( callback, delay, deps ) => {
 	useEffect( () => {
-		const handler = setTimeout( () => setDebouncedValue( value ), delay );
+		const handler = setTimeout( () => callback( deps ), delay );
 		return () => clearTimeout( handler );
-	}, [ value ] );
-
-	return debouncedValue;
+	}, [ deps ] );
 };
 
 export default useDebounce;
