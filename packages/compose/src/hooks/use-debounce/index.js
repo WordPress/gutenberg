@@ -12,24 +12,24 @@ import { useState, useEffect } from '@wordpress/element';
  *
  * Example usage:
  *
- *	// An example using the useDebounce hook with useResizeObserver()
- *  // to debounce a rapidly changing width value
+ * // An example using the useDebounce hook with useResizeObserver()
+ * // to debounce a rapidly changing width value
  *
  *	const [ resizeListener, sizes ] = useResizeObserver();
- *	const debouncedSize = useDebounce(sizes.width, 100);
+ *	const debouncedSize = useDebounce( sizes.width, 100 );
  *
  *	useEffect( () => {
  *
  *		// ... do your thing here ...
  *
- *	}, [debouncedSize] );
+ *	}, [ debouncedSize ] );
  *
- * @param {Object}        value  The value changing you want to debounce.
- * @param {number}        delay  The amount to delay time in ms.
- * @return {Object}				 Debounced value
+ * @param {*}      value  The value changing you want to debounce.
+ * @param {number} delay  The amount to delay time in ms.
+ *
+ * @return {*} Debounced value.
  *
  */
-
 const useDebounce = ( value, delay ) => {
 	const [ debouncedValue, setDebouncedValue ] = useState( value );
 
