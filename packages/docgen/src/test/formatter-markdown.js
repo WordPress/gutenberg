@@ -111,36 +111,4 @@ My declaration example.
 - *name* \`string\`: The type of block to create.
 ` );
 	} );
-
-	it( 'handles unknown types from parse error', () => {
-		const rootDir = '/home/my-path';
-		const docPath = '/home/my-path/docs';
-		const docs = formatter(
-			rootDir,
-			docPath + '-api.md',
-			[
-				{
-					path: null,
-					name: 'default',
-					description:
-						'Function invoking callback after delay with current timestamp in milliseconds\nsince epoch.',
-					tags: [
-						{
-							description: 'Callback function.',
-							errors: [ 'unexpected token' ],
-							name: 'callback',
-							title: 'param',
-							type: null,
-						},
-					],
-					lineStart: 7,
-					lineEnd: 9,
-				},
-			],
-			'API docs'
-		);
-		expect( docs ).toBe(
-			'# API docs\n\n<a name="default" href="#default">#</a> **default**\n\nFunction invoking callback after delay with current timestamp in milliseconds\nsince epoch.\n\n*Parameters*\n\n- *callback* (unknown type): Callback function.\n'
-		);
-	} );
 } );
