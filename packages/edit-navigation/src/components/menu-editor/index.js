@@ -34,7 +34,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				} }
 			>
 				<Panel className="edit-navigation-menu-editor__panel">
-					<PanelBody title={ __( 'Navigation Structure' ) }>
+					<PanelBody title={ __( 'Navigation structure' ) }>
 						{ !! blocks.length && (
 							<__experimentalBlockNavigationList
 								blocks={ blocks }
@@ -54,7 +54,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					}
 					className="edit-navigation-menu-editor__panel"
 				>
-					<PanelBody title={ __( 'Navigation Menu' ) }>
+					<PanelBody title={ __( 'Navigation menu' ) }>
 						<WritingFlow>
 							<ObserveTyping>
 								<BlockList />
