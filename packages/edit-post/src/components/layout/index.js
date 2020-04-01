@@ -18,7 +18,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalFullscreenMode as FullscreenMode,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -29,7 +28,10 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
-import { ComplementaryArea } from '@wordpress/interface';
+import {
+	ComplementaryArea,
+	__experimentalFullscreenMode as FullscreenMode,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
