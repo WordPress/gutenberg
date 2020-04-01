@@ -125,6 +125,7 @@ Use to debounce a value that is changing too frequently.
 
 Example usage:
 
+```js
 // An example using the useDebounce hook with useResizeObserver()
  // to debounce a rapidly changing width value
 
@@ -133,9 +134,10 @@ const debouncedSize = useDebounce(sizes.width, 100);
 
 useEffect( () => {
 
-    // ... do your thing here ...
+	// ... do your thing here ...
 
 }, [debouncedSize] );
+```
 
 _Parameters_
 
