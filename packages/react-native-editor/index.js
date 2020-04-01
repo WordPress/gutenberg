@@ -1,6 +1,4 @@
 /**
  * Internal dependencies
  */
-import { registerApp } from './src';
-
-registerApp();
+import './src';

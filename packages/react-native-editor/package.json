@@ -26,6 +26,8 @@
     "node": ">=10",
     "npm": ">=6.9"
   },
+  "main": "src/index.js",
+  "react-native": "src/index",
   "dependencies": {
     "@babel/runtime": "^7.7.7",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
