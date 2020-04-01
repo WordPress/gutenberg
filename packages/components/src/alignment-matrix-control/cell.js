@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { unstable_CompositeItem as CompositeItem } from 'reakit';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,14 +13,14 @@ import {
 
 export default function Cell( { isActive = false, value, ...props } ) {
 	return (
-		<CellView
-			aria-selected={ isActive }
+		<CompositeItem
+			as={ CellView }
 			aria-label={ value }
-			role="option"
+			role="gridcell"
 			tabIndex={ -1 }
 			{ ...props }
 		>
 			<Point isActive={ isActive } role="presentation" />
-		</CellView>
+		</CompositeItem>
 	);
 }

@@ -3,37 +3,40 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
+import {
+	unstable_useCompositeState as useCompositeState,
+	unstable_Composite as Composite,
+	unstable_CompositeGroup as CompositeGroup,
+} from 'reakit';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import {
-	ALIGNMENTS,
-	DIRECTION,
 	getAlignmentIndex,
 	getAlignmentValueFromIndex,
-	getNextIndexFromDirection,
+	getAlignIndexFromGrid,
+	mapAlignmentToGrid,
 } from './utils';
 import Cell from './cell';
-import { Root } from './styles/alignment-matrix-control-styles';
+import { Root, Row } from './styles/alignment-matrix-control-styles';
 import { useControlledState } from '../utils/hooks';
 import { useRTL } from '../utils/rtl';
 import AlignmentMatrixControlIcon from './icon';
 
 export default function AlignmentMatrixControl( {
 	className,
+	id: idProp,
 	label = __( 'Alignment Matrix Control' ),
 	hasFocusBorder = true,
 	onChange = noop,
-	onKeyDown = noop,
 	value = 'center',
 	...props
 } ) {
@@ -41,87 +44,37 @@ export default function AlignmentMatrixControl( {
 	const [ alignIndex, setAlignIndex ] = useControlledState(
 		getAlignmentIndex( value )
 	);
+
 	const nodeRef = useRef();
 	const instanceId = useInstanceId( AlignmentMatrixControl );
+	const idPrefix = idProp || 'alignment-matrix-control';
+	const id = `${ idPrefix }-${ instanceId }`;
+	const currentId = `${ id }-${ alignIndex }`;
 
-	const handleOnChange = ( nextIndex, changeProps ) => {
-		const alignName = getAlignmentValueFromIndex( nextIndex );
+	const composite = useCompositeState( {
+		currentId,
+		rtl: isRTL,
+		unstable_virtual: true,
+		wrap: false,
+	} );
 
-		setAlignIndex( nextIndex );
-		onChange( alignName, changeProps );
-	};
+	const compositeRef = useRef( composite.currentId );
+	const grid = useMemo( () => mapAlignmentToGrid( { id } ), [ id ] );
 
-	const handleOnKeyDown = ( event ) => {
-		const { keyCode } = event;
-		let nextIndex;
-		let direction;
-
-		onKeyDown( event );
-
-		switch ( keyCode ) {
-			case UP:
-				event.preventDefault();
-				direction = DIRECTION.UP;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case DOWN:
-				event.preventDefault();
-				direction = DIRECTION.DOWN;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case LEFT:
-				event.preventDefault();
-				direction = isRTL ? DIRECTION.RIGHT : DIRECTION.LEFT;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case RIGHT:
-				event.preventDefault();
-				direction = isRTL ? DIRECTION.LEFT : DIRECTION.RIGHT;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			default:
-				break;
-		}
-	};
-
-	const createHandleOnClick = ( index ) => ( event ) => {
-		nodeRef.current.focus();
-		event.preventDefault();
-		handleOnChange( index, { event } );
-	};
-
-	/**
-	 * Keydown event is handled on the native node element rather than
-	 * on the React Element. This resolves interaction conflicts when
-	 * integrated with other components, such as Toolbar.
-	 */
 	useEffect( () => {
-		const node = nodeRef.current;
-		if ( node ) {
-			node.addEventListener( 'keydown', handleOnKeyDown );
-		}
+		if ( compositeRef.current === composite.currentId ) return;
 
-		return () => {
-			if ( node ) {
-				node.removeEventListener( 'keydown', handleOnKeyDown );
-			}
-		};
-	}, [ handleOnKeyDown ] );
+		const nextAlignIndex = getAlignIndexFromGrid(
+			grid,
+			composite.currentId
+		);
+		const alignName = getAlignmentValueFromIndex( nextAlignIndex );
 
-	const id = `alignment-matrix-control-${ instanceId }`;
-	const activeCellId = `${ id }-${ alignIndex }`;
+		onChange( alignName );
+		setAlignIndex( nextAlignIndex );
+
+		compositeRef.current = composite.currentId;
+	}, [ composite.currentId, grid, onChange ] );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -129,34 +82,40 @@ export default function AlignmentMatrixControl( {
 	);
 
 	return (
-		<Root
-			{ ...props }
-			aria-activedescendant={ activeCellId }
-			aria-label={ label }
-			aria-labelledby={ id }
-			className={ classes }
-			hasFocusBorder={ hasFocusBorder }
-			id={ id }
-			ref={ nodeRef }
-			role="listbox"
-			tabIndex={ 0 }
-		>
-			{ ALIGNMENTS.map( ( align, index ) => {
-				const isActive = alignIndex === index;
-				const cellId = `${ id }-${ index }`;
-				const cellValue = getAlignmentValueFromIndex( index );
-
-				return (
-					<Cell
-						id={ cellId }
-						isActive={ isActive }
-						key={ align }
-						onClick={ createHandleOnClick( index ) }
-						value={ cellValue }
-					/>
-				);
-			} ) }
-		</Root>
+		<>
+			<Composite
+				{ ...props }
+				{ ...composite }
+				aria-label={ label }
+				aria-labelledby={ id }
+				as={ Root }
+				className={ classes }
+				hasFocusBorder={ hasFocusBorder }
+				id={ id }
+				ref={ nodeRef }
+				role="listbox"
+				tabIndex={ 0 }
+			>
+				{ grid.map( ( cells, index ) => (
+					<CompositeGroup
+						{ ...composite }
+						as={ Row }
+						role="row"
+						key={ index }
+					>
+						{ cells.map( ( cell ) => (
+							<Cell
+								{ ...composite }
+								isActive={ composite.currentId === cell.id }
+								key={ cell.id }
+								id={ cell.id }
+								value={ cell.value }
+							/>
+						) ) }
+					</CompositeGroup>
+				) ) }
+			</Composite>
+		</>
 	);
 }
 

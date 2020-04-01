@@ -35,6 +35,8 @@ export const ALIGNMENT_MATRIX = [
 	[ 6, 7, 8 ],
 ];
 
+export const ALIGNMENT_GRID_SIZE = 3;
+
 /**
  * Transforms an alignment value to an [x, y] alignment data.
  *
@@ -221,4 +223,38 @@ export function getNextIndexFromDirection( currentIndex, direction ) {
 	}
 
 	return getIndexFromCoords( [ moveX, moveY ], currentIndex );
+}
+
+export function mapAlignmentToGrid( { alignment = ALIGNMENTS, id } ) {
+	const gridSize = ALIGNMENT_GRID_SIZE;
+	const grid = [];
+
+	alignment.forEach( ( values, index ) => {
+		if ( index % gridSize === 0 ) {
+			grid.push( [] );
+		}
+		const currentRow = grid[ grid.length - 1 ];
+
+		currentRow.push( {
+			values,
+			index,
+			id: `${ id }-${ index }`,
+		} );
+	} );
+
+	return grid;
+}
+
+export function getAlignIndexFromGrid( grid, id ) {
+	const flatGrid = [];
+
+	grid.forEach( ( row ) => {
+		row.forEach( ( cell ) => {
+			flatGrid.push( cell );
+		} );
+	} );
+
+	const cell = flatGrid.find( ( item ) => item.id === id );
+
+	return cell ? cell.index : undefined;
 }

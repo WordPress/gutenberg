@@ -1,22 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
-.emotion-36 {
+.emotion-42 {
   --width: 92px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  grid-template-rows: repeat( 3,calc( var( --width ) / 3 ) );
-  width: var( --width,92px );
   border-radius: 2px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat( 3,1fr );
   outline: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  grid-template-columns: auto;
+  grid-template-rows: repeat( 3,calc( var( --width ) / 3 ) );
+  width: var( --width,92px );
 }
 
-.emotion-36:active,
-.emotion-36:focus {
+.emotion-42:active,
+.emotion-42:focus {
   border-color: #007cba;
+}
+
+.emotion-12 {
+  display: grid;
+  grid-template-columns: repeat( 3,1fr );
 }
 
 .emotion-2 {
@@ -66,7 +72,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
   color: #007cba;
 }
 
-.emotion-16 {
+.emotion-18 {
   height: 6px;
   width: 6px;
   background: currentColor;
@@ -80,101 +86,193 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
 }
 
 @media ( prefers-reduced-motion:reduce ) {
-  .emotion-16 {
+  .emotion-18 {
     -webkit-transition-duration: 0ms;
     transition-duration: 0ms;
   }
 }
 
-*:hover > .emotion-16 {
+*:hover > .emotion-18 {
   color: #000;
 }
 
 <div
-  className="emotion-36 emotion-37"
+  aria-activedescendant="alignment-matrix-control-0-4"
+  aria-label="Alignment Matrix Control"
+  aria-labelledby="alignment-matrix-control-0"
+  className="component-alignment-matrix-control emotion-42 emotion-43"
+  id="alignment-matrix-control-0"
+  onClick={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  onMouseDown={[Function]}
+  role="listbox"
   tabIndex={0}
 >
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
+  <div
+    className="emotion-12 emotion-13"
+    id="alignment-matrix-control-0-1"
+    role="row"
   >
     <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-0"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+    <span
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-1"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+    <span
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-2"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+  </div>
+  <div
+    className="emotion-12 emotion-13"
+    id="alignment-matrix-control-0-5"
+    role="row"
   >
     <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-3"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+    <span
+      aria-selected={true}
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-4"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-18 emotion-1"
+        role="presentation"
+      />
+    </span>
+    <span
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-5"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+  </div>
+  <div
+    className="emotion-12 emotion-13"
+    id="alignment-matrix-control-0-9"
+    role="row"
   >
     <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-6"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
     <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-7"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
     <span
-      className="emotion-16 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
-  <span
-    className="emotion-2 emotion-3"
-    onClick={[Function]}
-    tabIndex={-1}
-  >
-    <span
-      className="emotion-0 emotion-1"
-    />
-  </span>
+      className="emotion-2 emotion-3"
+      id="alignment-matrix-control-0-8"
+      onClick={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      role="gridcell"
+      tabIndex={-1}
+    >
+      <span
+        className="emotion-0 emotion-1"
+        role="presentation"
+      />
+    </span>
+  </div>
 </div>
 `;
 
@@ -273,7 +371,8 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
 }
 
 <div
-  className="emotion-36 emotion-37"
+  className="component-alignment-matrix-control-icon emotion-36 emotion-37"
+  role="presentation"
   size={24}
 >
   <span
