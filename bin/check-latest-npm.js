@@ -76,7 +76,7 @@ Promise.all( [ getLatestNPMVersion(), getLocalNPMVersion() ] )
 			throw new Error(
 				`The local NPM version does not match the expected latest version. Expected ${ latest }, found ${ local }.
 
-You must run the latest version of NPM to commit a change to the \`package-lock.json\` file.
+It is required that you have the latest version of NPM installed in order to commit a change to the \`package-lock.json\` file.
 
 Run \`npm install --global npm@latest\`, then try again.`
 			);
