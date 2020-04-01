@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text, Platform } from 'react-native';
+import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -35,7 +35,6 @@ function ColorSettings( {
 	onBackButtonPress,
 	getStylesFromColorScheme,
 } ) {
-	const isIOS = Platform.OS === 'ios';
 	const segments = [ 'Solid', 'Gradient' ];
 	const [ segment, setSegment ] = useState( segments[ 0 ] );
 
@@ -95,21 +94,10 @@ function ColorSettings( {
 						segments={ segments }
 						segmentHandler={ ( item ) => setSegment( item ) }
 						addonLeft={
-							<View>
-								<Text
-									selectable={ isIOS }
-									style={ [
-										styles.colorIndicator,
-										styles.textIndicator,
-									] }
-								>
-									{ backgroundColor }
-								</Text>
-								<ColorIndicator
-									color={ backgroundColor }
-									style={ styles.colorIndicator }
-								/>
-							</View>
+							<ColorIndicator
+								color={ backgroundColor }
+								style={ styles.colorIndicator }
+							/>
 						}
 					/>
 				</View>
@@ -126,15 +114,6 @@ function ColorSettings( {
 					<View style={ horizontalSeparatorStyle } />
 					<View style={ styles.footer }>
 						<View style={ styles.flex }>
-							<Text
-								selectable={ isIOS }
-								style={ [
-									styles.colorIndicator,
-									styles.textIndicator,
-								] }
-							>
-								{ textColor }
-							</Text>
 							<ColorIndicator
 								color={ textColor }
 								style={ styles.colorIndicator }
