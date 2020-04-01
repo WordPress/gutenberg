@@ -137,6 +137,7 @@ export default function TemplateSwitcher( {
 						{ !! hoveredTemplate?.id && (
 							<TemplatePreview item={ hoveredTemplate } />
 						) }
+						<div className="edit-site-template-switcher__footer" />
 					</>
 				) }
 			</DropdownMenu>
