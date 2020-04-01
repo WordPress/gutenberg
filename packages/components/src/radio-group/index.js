@@ -1,74 +1,45 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { useRadioState, RadioGroup as ReakitRadioGroup } from 'reakit/Radio';
 
 /**
  * WordPress dependencies
  */
-import { Children, useRef, createContext, useMemo } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
-// Default values for when a button isn't a child of a group
-export const ButtonGroupContext = createContext( {
-	mode: null,
-	buttons: {},
-} );
+/**
+ * Internal dependencies
+ */
+import ButtonGroup from '../button-group';
+import RadioContext from '../radio-context';
 
-function ButtonGroup( {
-	mode,
-	checked,
-	onChange,
-	className,
-	children,
-	...props
-} ) {
-	const classes = classnames( 'components-button-group', className );
-	const role = mode === 'radio' ? 'radiogroup' : 'group';
-	const childRefs = useRef( [] );
-
-	const buttons = useMemo( () => {
-		const buttonsContext = {};
-		if ( mode === 'radio' ) {
-			const childrenArray = Children.toArray( children );
-			childrenArray.forEach( ( child, index ) => {
-				buttonsContext[ child.props.value ] = {
-					isChecked: checked === child.props.value,
-					isFirst: ! checked && index === 0,
-					onPrev: () => {
-						const prevIndex =
-							( index - 1 + childrenArray.length ) %
-							childrenArray.length;
-						childRefs.current[ prevIndex ].focus();
-						onChange( childrenArray[ prevIndex ].props.value );
-					},
-					onNext: () => {
-						const nextIndex = ( index + 1 ) % childrenArray.length;
-						childRefs.current[ nextIndex ].focus();
-						onChange( childrenArray[ nextIndex ].props.value );
-					},
-					onSelect: () => {
-						onChange( child.props.value );
-					},
-					refCallback: ( ref ) => {
-						if ( ref === null ) {
-							delete childRefs.current[ index ];
-						} else {
-							childRefs.current[ index ] = ref;
-						}
-					},
-				};
-			} );
-		}
-		return buttonsContext;
-	}, [ children, mode, onChange, checked, childRefs ] );
+function RadioGroup(
+	{ accessibilityLabel, defaultChecked, checked, onChange, ...props },
+	ref
+) {
+	const radioState = useRadioState( {
+		state: defaultChecked,
+		baseId: props.id,
+	} );
+	const radioContext = {
+		...radioState,
+		// controlled or uncontrolled
+		state: checked || radioState.state,
+		setState: onChange || radioState.setState,
+	};
 
 	return (
-		<div className={ classes } role={ role } { ...props }>
-			<ButtonGroupContext.Provider value={ { mode, buttons } }>
-				{ children }
-			</ButtonGroupContext.Provider>
-		</div>
+		<RadioContext.Provider value={ radioContext }>
+			<ReakitRadioGroup
+				ref={ ref }
+				as={ ButtonGroup }
+				aria-label={ accessibilityLabel }
+				{ ...radioState }
+				{ ...props }
+			/>
+		</RadioContext.Provider>
 	);
 }
 
-export default ButtonGroup;
+export default forwardRef( RadioGroup );
