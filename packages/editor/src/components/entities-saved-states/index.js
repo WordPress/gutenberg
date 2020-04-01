@@ -35,7 +35,7 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
-						key={ record.key }
+						key={ record.key || 'site' }
 						record={ record }
 						checked={
 							! some(
