@@ -62,7 +62,6 @@ describe( 'Multi-entity save flow', () => {
 				await page.keyboard.type( 'Test Post...' );
 				await page.keyboard.press( 'Enter' );
 
-				// Button should not have has-changes-dot class.
 				await assertMultiSaveDisabled();
 			} );
 
