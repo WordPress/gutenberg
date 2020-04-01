@@ -50,13 +50,14 @@
 
 	p {
 		margin-top: 0;
+		font-size: $default-font-size;
+		font-weight: normal;
 	}
 
 	h2 {
 		font-weight: 500;
 	}
 
-	p,
 	h3 {
 		font-weight: normal;
 	}
