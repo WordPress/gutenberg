@@ -34,7 +34,7 @@ const localAndroidAppPath =
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
-let appiumProcess: ?childProcess.ChildProcess;
+let appiumProcess;
 
 // Used to map unicode and special values to keycodes on Android
 // Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
@@ -43,8 +43,7 @@ const strToKeycode = {
 	'\u0008': 67,
 };
 
-const timer = ( ms: number ) =>
-	new Promise() < {} > ( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms ) => new Promise()( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
@@ -127,7 +126,7 @@ const setupDriver = async () => {
 	return driver;
 };
 
-const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
+const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
 		const jobID = driver.sessionID;
 
@@ -158,12 +157,7 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
  *
  * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
  */
-const typeString = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element,
-	str: string,
-	clear: boolean
-) => {
+const typeString = async ( driver, element, str, clear ) => {
 	if ( isAndroid() ) {
 		await typeStringAndroid( driver, element, str, clear );
 	} else {
@@ -171,12 +165,7 @@ const typeString = async (
 	}
 };
 
-const typeStringIos = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element,
-	str: string,
-	clear: boolean
-) => {
+const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
 		await element.clear();
 	}
@@ -184,10 +173,10 @@ const typeStringIos = async (
 };
 
 const typeStringAndroid = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element,
-	str: string,
-	clear: boolean = true // see comment above for why it is defaulted to true
+	driver,
+	element,
+	str,
+	clear = true // see comment above for why it is defaulted to true
 ) => {
 	if ( str in strToKeycode ) {
 		return await driver.pressKeycode( strToKeycode[ str ] );
@@ -237,10 +226,7 @@ const typeStringAndroid = async (
 };
 
 // Calculates middle x,y and clicks that position
-const clickMiddleOfElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
@@ -251,10 +237,7 @@ const clickMiddleOfElement = async (
 };
 
 // Clicks in the top left of an element
-const clickBeginningOfElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: location.x, y: location.y } );
@@ -263,10 +246,7 @@ const clickBeginningOfElement = async (
 };
 
 // long press to activate context menu
-const longPressMiddleOfElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const longPressMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
@@ -280,10 +260,7 @@ const longPressMiddleOfElement = async (
 };
 
 // press "Select All" in floating context menu
-const tapSelectAllAboveElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const tapSelectAllAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	const x = location.x + 300;
@@ -294,10 +271,7 @@ const tapSelectAllAboveElement = async (
 };
 
 // press "Copy" in floating context menu
-const tapCopyAboveElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const tapCopyAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	const x = location.x + 220;
@@ -310,10 +284,7 @@ const tapCopyAboveElement = async (
 };
 
 // press "Paste" in floating context menu
-const tapPasteAboveElement = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element
-) => {
+const tapPasteAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.wait( 2000 );
@@ -325,10 +296,7 @@ const tapPasteAboveElement = async (
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element = undefined
-) => {
+const swipeUp = async ( driver, element = undefined ) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -351,7 +319,7 @@ const swipeUp = async (
 };
 
 // Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
+const swipeDown = async ( driver ) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
@@ -368,10 +336,7 @@ const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
 	await action.perform();
 };
 
-const toggleHtmlMode = async (
-	driver: wd.PromiseChainWebdriver,
-	toggleOn: boolean
-) => {
+const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
@@ -401,7 +366,7 @@ const toggleHtmlMode = async (
 	}
 };
 
-const toggleOrientation = async ( driver: wd.PromiseChainWebdriver ) => {
+const toggleOrientation = async ( driver ) => {
 	const orientation = await driver.getOrientation();
 	if ( orientation === 'LANDSCAPE' ) {
 		await driver.setOrientation( 'PORTRAIT' );
