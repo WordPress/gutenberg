@@ -25,6 +25,7 @@ export default function Layout( { blockEditorSettings } ) {
 						{ /* <Notices /> */ }
 						<Popover.Slot name="block-toolbar" />
 						<TabPanel
+							className="edit-navigation-layout__tab-panel"
 							tabs={ [
 								{
 									name: 'menus',
