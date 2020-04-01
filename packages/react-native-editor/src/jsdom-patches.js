@@ -28,13 +28,18 @@ const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
 // Exception codes
-const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } = core;
+const {
+	NO_MODIFICATION_ALLOWED_ERR,
+	HIERARCHY_REQUEST_ERR,
+	NOT_FOUND_ERR,
+} = core;
 
 // Node types
 const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
 
 /**
  * Simple recursive implementation of Node.contains method
+ *
  * @param {number} otherNode Another node (may be the same node).
  * @return {boolean} true if otherNode is a descendant of this node, or is this
  * node, false otherwise.
@@ -55,6 +60,7 @@ Node.prototype.contains = function( otherNode ) {
 /**
  * Copy of insertBefore function from jsdom-jscore, WRONG_DOCUMENT_ERR exception
  * disabled.
+ *
  * @param {Object} newChild The node to be insterted.
  * @param {Object} refChild The node before which newChild is inserted.
  * @return {Object} the newly inserted child node
@@ -64,7 +70,10 @@ Node.prototype.contains = function( otherNode ) {
  * see: https://github.com/jsdom/jsdom/issues/717 for more information, * and:
  * https://dom.spec.whatwg.org/#dom-node-insertbefore for the latest spec.
  */
-Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild ) {
+Node.prototype.insertBefore = function(
+	/* Node */ newChild,
+	/* Node*/ refChild
+) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException(
 			NO_MODIFICATION_ALLOWED_ERR,
@@ -126,7 +135,12 @@ Node.prototype.insertBefore = function( /* Node */ newChild, /* Node*/ refChild 
 			}
 		}
 
-		Array.prototype.splice.call( this._childNodes, refChildIndex, 0, newChild );
+		Array.prototype.splice.call(
+			this._childNodes,
+			refChildIndex,
+			0,
+			newChild
+		);
 
 		newChild._parentNode = this;
 		if ( this._attached && newChild._attach ) {
@@ -167,6 +181,7 @@ Element.prototype.closest = function( selector ) {
 /**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
+ *
  * @param {Object} node Node to check
  * @return {boolean} true if node is a NonDocumentTypeChildNode, false otherwise
  *
@@ -181,9 +196,9 @@ function isNonDocumentTypeChildNode( node ) {
 // $FlowFixMe
 Object.defineProperties( Node.prototype, {
 	/*
-	* This defines parentElement property on the Node prototype using a getter.
-	* See: https://dom.spec.whatwg.org/#parent-element
-	*/
+	 * This defines parentElement property on the Node prototype using a getter.
+	 * See: https://dom.spec.whatwg.org/#parent-element
+	 */
 	parentElement: {
 		get() {
 			const parent = this.parentNode;
@@ -196,10 +211,10 @@ Object.defineProperties( Node.prototype, {
 		},
 	},
 	/*
-	* This defines previousElementSibling property on the Node prototype using a
-	* getter.
-	* See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-previouselementsibling
-	*/
+	 * This defines previousElementSibling property on the Node prototype using a
+	 * getter.
+	 * See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-previouselementsibling
+	 */
 	previousElementSibling: {
 		get() {
 			// Property is undefined if node is not a NonDocumentTypeChildNode
@@ -217,10 +232,10 @@ Object.defineProperties( Node.prototype, {
 		},
 	},
 	/*
-	* This defines nextElementSibling property on the Node prototype using a
-	* getter.
-	* See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-nextelementsibling
-	*/
+	 * This defines nextElementSibling property on the Node prototype using a
+	 * getter.
+	 * See: https://dom.spec.whatwg.org/#dom-nondocumenttypechildnode-nextelementsibling
+	 */
 	nextElementSibling: {
 		get() {
 			// Property is undefined if node is not a NonDocumentTypeChildNode

@@ -7,9 +7,9 @@
  * https://github.com/kristerkari/react-native-sass-transformer
  *
  * The MIT License (MIT)
-
+ 
  * Copyright (c) 2018 Krister Kari
-
+ 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -33,8 +33,11 @@
 
 const fs = require( 'fs' );
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 const sass = require( 'node-sass' );
+// eslint-disable-next-line import/no-extraneous-dependencies
 const semver = require( 'semver' );
+// eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
 const path = require( 'path' );
 
@@ -77,7 +80,8 @@ const autoImportAssets = [
 	'_animations.scss',
 	'_z-index.scss',
 ];
-const imports = '@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
+const imports =
+	'@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
 
 // Iterate through the include paths and extensions to find the file variant
 function findVariant( name, extensions, includePaths ) {
@@ -117,7 +121,10 @@ function transform( src, filename, options ) {
 	if ( filename.endsWith( '.scss' ) || filename.endsWith( '.sass' ) ) {
 		const result = sass.renderSync( {
 			data: src,
-			includePaths: [ path.dirname( filename ), ...autoImportIncludePaths ],
+			includePaths: [
+				path.dirname( filename ),
+				...autoImportIncludePaths,
+			],
 			importer( url /*, prev, done */ ) {
 				// url is the path in import as is, which LibSass encountered.
 				// prev is the previously resolved path.
@@ -126,9 +133,13 @@ function transform( src, filename, options ) {
 
 				const urlPath = path.parse( url );
 				const importerOptions = this.options;
-				const incPaths = importerOptions.includePaths.slice( 0 ).split( ':' );
+				const incPaths = importerOptions.includePaths
+					.slice( 0 )
+					.split( ':' );
 				if ( urlPath.dir.length > 0 ) {
-					incPaths.unshift( path.resolve( path.dirname( filename ), urlPath.dir ) ); // add the file's dir to the search array
+					incPaths.unshift(
+						path.resolve( path.dirname( filename ), urlPath.dir )
+					); // add the file's dir to the search array
 				}
 				const f = findVariant( urlPath.name, exts, incPaths );
 
@@ -136,7 +147,9 @@ function transform( src, filename, options ) {
 					return { file: f };
 				}
 
-				return new Error( url + ' could not be resolved in ' + incPaths );
+				return new Error(
+					url + ' could not be resolved in ' + incPaths
+				);
 			},
 		} );
 		const css = result.css.toString();

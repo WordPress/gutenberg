@@ -3,6 +3,7 @@
 /**
  * External dependencies
  */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import renderer from 'react-test-renderer';
 
 /**
@@ -60,11 +61,13 @@ describe( 'RootComponent', () => {
 			if ( 'core/code' === blockHolder.props.name ) {
 				// TODO: hardcoded indices are ugly and error prone. Can we do better here?
 				const blockHolderContainer =
-					blockHolder.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
+					blockHolder.children[ 0 ].children[ 0 ].children[ 0 ]
+						.children[ 0 ].children[ 0 ];
 				const contentComponent = blockHolderContainer.children[ 0 ];
 				const inputComponent =
-					contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
-						.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
+					contentComponent.children[ 0 ].children[ 0 ].children[ 0 ]
+						.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
+						.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
 						.children[ 0 ];
 
 				expect( inputComponent.type ).toBe( 'TextInput' );
@@ -79,7 +82,9 @@ describe( 'RootComponent', () => {
 		app.root.findAllByType( BlockListBlock ).forEach( ( blockHolder ) => {
 			if ( 'core/heading' === blockHolder.props.name ) {
 				const aztec = blockHolder.findByType( 'RCTAztecView' );
-				expect( aztec.props.text.text ).toBe( '<h2>What is Gutenberg?</h2>' );
+				expect( aztec.props.text.text ).toBe(
+					'<h2>What is Gutenberg?</h2>'
+				);
 			}
 		} );
 		app.unmount();

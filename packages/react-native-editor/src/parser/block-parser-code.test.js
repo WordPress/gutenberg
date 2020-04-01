@@ -38,6 +38,8 @@ describe( 'Parser', () => {
 		expect( codeBlockInstance.isValid ).toEqual( true );
 		expect( codeBlockInstance.name ).toEqual( 'core/code' );
 		expect( codeBlockInstance.innerBlocks ).toHaveLength( 0 );
-		expect( codeBlockInstance.originalContent ).toEqual( originalCodeBlockHtml );
+		expect( codeBlockInstance.originalContent ).toEqual(
+			originalCodeBlockHtml
+		);
 	} );
 } );

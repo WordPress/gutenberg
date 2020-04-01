@@ -3,6 +3,7 @@
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+// eslint-disable-next-line import/no-extraneous-dependencies
 const glob = require( 'glob' ).sync;
 if ( process.env.TEST_RN_PLATFORM ) {
 	// eslint-disable-next-line no-console
@@ -12,8 +13,9 @@ if ( process.env.TEST_RN_PLATFORM ) {
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
 
-const transpiledPackageNames = glob( '../../packages/*/src/index.js' )
-	.map( ( fileName ) => fileName.split( '/' )[ 3 ] );
+const transpiledPackageNames = glob( '../../packages/*/src/index.js' ).map(
+	( fileName ) => fileName.split( '/' )[ 3 ]
+);
 
 module.exports = {
 	verbose: true,
@@ -41,7 +43,9 @@ module.exports = {
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/test/native/__mocks__/styleMock.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]: '<rootDir>/packages/$1/src',
+		[ `@wordpress\\/(${ transpiledPackageNames.join(
+			'|'
+		) })$` ]: '<rootDir>/packages/$1/src',
 	},
 	modulePathIgnorePatterns: [
 		'<rootDir>/packages/react-native-editor/node_modules',

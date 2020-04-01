@@ -1,5 +1,13 @@
+/**
+ * External dependencies
+ */
 import React from 'react';
-import ReactNative, { requireNativeComponent, TextViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback, Platform } from 'react-native';
+import ReactNative, {
+	requireNativeComponent,
+	UIManager,
+	TouchableWithoutFeedback,
+	Platform,
+} from 'react-native';
 import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
@@ -10,7 +18,9 @@ class AztecView extends React.Component {
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
 		this._onEnter = this._onEnter.bind( this );
 		this._onBackspace = this._onBackspace.bind( this );
-		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind( this );
+		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
+			this
+		);
 		this._onFocus = this._onFocus.bind( this );
 		this._onBlur = this._onBlur.bind( this );
 		this._onSelectionChange = this._onSelectionChange.bind( this );
@@ -25,7 +35,7 @@ class AztecView extends React.Component {
 		UIManager.dispatchViewManagerCommand(
 			ReactNative.findNodeHandle( this ),
 			command,
-			params,
+			params
 		);
 	}
 
@@ -39,7 +49,7 @@ class AztecView extends React.Component {
 		}
 		const size = event.nativeEvent.contentSize;
 		const { onContentSizeChange } = this.props;
-		onContentSizeChange(size);
+		onContentSizeChange( size );
 	}
 
 	_onEnter( event ) {
@@ -104,10 +114,16 @@ class AztecView extends React.Component {
 			onSelectionChange( selectionStart, selectionEnd, text, event );
 		}
 
-		if ( this.props.onCaretVerticalPositionChange &&
-			this.selectionEndCaretY != event.nativeEvent.selectionEndCaretY ) {
+		if (
+			this.props.onCaretVerticalPositionChange &&
+			this.selectionEndCaretY !== event.nativeEvent.selectionEndCaretY
+		) {
 			const caretY = event.nativeEvent.selectionEndCaretY;
-			this.props.onCaretVerticalPositionChange( event.target, caretY, this.selectionEndCaretY );
+			this.props.onCaretVerticalPositionChange(
+				event.target,
+				caretY,
+				this.selectionEndCaretY
+			);
 			this.selectionEndCaretY = caretY;
 		}
 	}
@@ -122,7 +138,9 @@ class AztecView extends React.Component {
 
 	isFocused() {
 		const focusedField = TextInputState.currentlyFocusedField();
-		return focusedField && ( focusedField === ReactNative.findNodeHandle( this ) );
+		return (
+			focusedField && focusedField === ReactNative.findNodeHandle( this )
+		);
 	}
 
 	_onPress( event ) {
@@ -137,28 +155,29 @@ class AztecView extends React.Component {
 		// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
 		// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 		// For iOS, this is necessary to let the system know when Aztec was focused programatically.
-		if ( Platform.OS == 'ios' ) {
-			this._onPress(event);
+		if ( Platform.OS === 'ios' ) {
+			this._onPress( event );
 		}
 	}
 
 	render() {
+		// eslint-disable-next-line no-unused-vars
 		const { onActiveFormatsChange, onFocus, ...otherProps } = this.props;
 		return (
 			<TouchableWithoutFeedback onPress={ this._onPress }>
 				<RCTAztecView
-					{...otherProps}
-					onContentSizeChange = { this._onContentSizeChange }
-					onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
-					onSelectionChange = { this._onSelectionChange }
-					onEnter = { this.props.onEnter && this._onEnter }
-					deleteEnter = { this.props.deleteEnter }
+					{ ...otherProps }
+					onContentSizeChange={ this._onContentSizeChange }
+					onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
+					onSelectionChange={ this._onSelectionChange }
+					onEnter={ this.props.onEnter && this._onEnter }
+					deleteEnter={ this.props.deleteEnter }
 					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
 					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
-					onFocus = { this._onAztecFocus }
-					onBlur = { this._onBlur }
-					onBackspace = { this._onBackspace }
+					onFocus={ this._onAztecFocus }
+					onBlur={ this._onBlur }
+					onBackspace={ this._onBackspace }
 				/>
 			</TouchableWithoutFeedback>
 		);

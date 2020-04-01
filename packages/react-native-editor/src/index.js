@@ -8,6 +8,9 @@
  * External dependencies
  */
 import { AppRegistry, I18nManager } from 'react-native';
+/**
+ * WordPress dependencies
+ */
 import { Component } from '@wordpress/element';
 
 /**
@@ -41,7 +44,11 @@ const setupLocale = ( locale, extraTranslations ) => {
 		locale = locale.replace( /[-_][A-Za-z]+$/, '' );
 		gutenbergTranslations = getTranslation( locale );
 	}
-	const translations = Object.assign( {}, gutenbergTranslations, extraTranslations );
+	const translations = Object.assign(
+		{},
+		gutenbergTranslations,
+		extraTranslations
+	);
 	// eslint-disable-next-line no-console
 	console.log( 'locale', locale, translations );
 	// Only change the locale if it's supported by gutenberg
