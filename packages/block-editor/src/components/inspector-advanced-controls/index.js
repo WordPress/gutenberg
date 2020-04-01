@@ -8,10 +8,12 @@ import { createSlotFill } from '@wordpress/components';
  */
 import { ifBlockEditSelected } from '../block-edit/context';
 
-const { Fill, Slot } = createSlotFill( 'InspectorAdvancedControls' );
+const name = 'InspectorAdvancedControls';
+const { Fill, Slot } = createSlotFill( name );
 
 const InspectorAdvancedControls = ifBlockEditSelected( Fill );
 
+InspectorAdvancedControls.slotName = name;
 InspectorAdvancedControls.Slot = Slot;
 
 export default InspectorAdvancedControls;

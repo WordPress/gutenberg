@@ -1,60 +1,40 @@
 .edit-post-text-editor {
+	position: relative;
 	width: 100%;
+	background-color: $white;
+	flex-grow: 1;
 
 	// Always show outlines in code editor
-	.editor-post-title__block {
+	.editor-post-title {
 		textarea {
 			border: $border-width solid $light-gray-500;
 			margin-bottom: $block-spacing;
 			padding: $block-padding;
 
-			&:focus {
-				border: $border-width solid $light-gray-500;
+			&:focus,
+			&:hover {
+				border: $border-width solid $black;
 			}
 		}
 
-		// Hide the thick left border in the code editor.
-		&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) .editor-post-title__input:hover,
-		&:not(.is-focus-mode):not(.has-fixed-toolbar).is-selected .editor-post-title__input {
-			box-shadow: none;
-			border-left-width: $border-width;
-		}
-
-		textarea:hover,
-		&.is-selected textarea {
-			box-shadow: 0 0 0 $border-width $light-gray-500;
-		}
-	}
-
-	.editor-post-permalink {
-		margin-top: -6px;
-
-		// Hide the thick left border in the code editor.
-		box-shadow: none;
-		border: none;
-		outline: $border-width solid $light-gray-800;
-	}
-
-	@include break-small() {
-		.editor-post-title,
-		.editor-post-title__block {
+		@include break-small() {
 			padding: 0;
 		}
 	}
 
 	// Make room for toolbar.
-	padding-top: $block-controls-height + $grid-size;
+	padding-top: $block-toolbar-height + $grid-unit-10;
 }
 
-// Exit Code Editor toolbar.
+// Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
 	position: absolute;
-	top: $grid-size;
+	top: $grid-unit-10;
 	left: 0;
 	right: 0;
-	height: $block-controls-height;
-	line-height: $block-controls-height;
-	padding: 0 $grid-size 0 $grid-size-large;
+	height: $block-toolbar-height;
+	line-height: $block-toolbar-height;
+	padding: 0 $grid-unit-10 0 $grid-unit-20;
 	display: flex;
 
 	h2 {
@@ -63,16 +43,16 @@
 		color: $dark-gray-500;
 	}
 
-	.components-icon-button svg {
+	.components-button svg {
 		order: 1;
 	}
 }
 
 .edit-post-text-editor__body {
-	max-width: calc(100% - #{$grid-size-large * 2});
-	margin-left: $grid-size-large;
-	margin-right: $grid-size-large;
-	padding-top: $grid-size * 5;
+	max-width: calc(100% - #{$grid-unit-20 * 2});
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+	padding-top: $grid-unit-50;
 
 	@include break-small() {
 		max-width: $content-width;

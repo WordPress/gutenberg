@@ -1,20 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 
-function TextControl( { label, hideLabelFromVision, value, help, className, instanceId, onChange, type = 'text', ...props } ) {
+export default function TextControl( {
+	label,
+	hideLabelFromVision,
+	value,
+	help,
+	className,
+	onChange,
+	type = 'text',
+	...props
+} ) {
+	const instanceId = useInstanceId( TextControl );
 	const id = `inspector-text-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (
-		<BaseControl label={ label } hideLabelFromVision={ hideLabelFromVision } id={ id } help={ help } className={ className }>
-			<input className="components-text-control__input"
+		<BaseControl
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
+			<input
+				className="components-text-control__input"
 				type={ type }
 				id={ id }
 				value={ value }
@@ -25,5 +42,3 @@ function TextControl( { label, hideLabelFromVision, value, help, className, inst
 		</BaseControl>
 	);
 }
-
-export default withInstanceId( TextControl );

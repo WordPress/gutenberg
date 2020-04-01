@@ -7,6 +7,7 @@ import {
 	navigateRegions,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import WidgetAreas from '../widget-areas';
 import './sync-customizer';
 
 function CustomizerEditWidgetsInitializer( { settings } ) {
+	const [ selectedArea, setSelectedArea ] = useState( null );
 	return (
 		<SlotFillProvider>
 			<div
@@ -24,7 +26,11 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				<WidgetAreas blockEditorSettings={ settings } />
+				<WidgetAreas
+					selectedArea={ selectedArea }
+					setSelectedArea={ setSelectedArea }
+					blockEditorSettings={ settings }
+				/>
 			</div>
 			<Popover.Slot />
 		</SlotFillProvider>

@@ -14,22 +14,26 @@ import listReducer from './list-reducer';
 import blockquoteNormaliser from './blockquote-normaliser';
 import figureContentReducer from './figure-content-reducer';
 import shortcodeConverter from './shortcode-converter';
-import {
-	deepFilterHTML,
-	getBlockContentSchema,
-} from './utils';
+import { deepFilterHTML, getBlockContentSchema } from './utils';
 
-export { getPhrasingContentSchema } from './phrasing-content';
+import { getPhrasingContentSchema } from './phrasing-content';
+
 export { pasteHandler } from './paste-handler';
+export { getPhrasingContentSchema };
 
 function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } )
-		.map( ( transform ) => {
-			return transform.isMatch ? transform : {
-				...transform,
-				isMatch: ( node ) => transform.selector && node.matches( transform.selector ),
-			};
-		} );
+	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
+		( transform ) => {
+			return transform.isMatch
+				? transform
+				: {
+						...transform,
+						isMatch: ( node ) =>
+							transform.selector &&
+							node.matches( transform.selector ),
+				  };
+		}
+	);
 }
 
 /**
@@ -49,16 +53,15 @@ function htmlToBlocks( { html, rawTransforms } ) {
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
+			isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes(
-					'core/html',
-					node.outerHTML
-				)
+				getBlockAttributes( 'core/html', node.outerHTML )
 			);
 		}
 
@@ -70,10 +73,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 
 		return createBlock(
 			blockName,
-			getBlockAttributes(
-				blockName,
-				node.outerHTML
-			)
+			getBlockAttributes( blockName, node.outerHTML )
 		);
 	} );
 }
@@ -96,32 +96,38 @@ export function rawHandler( { HTML = '' } ) {
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
 	const rawTransforms = getRawTransformations();
-	const blockContentSchema = getBlockContentSchema( rawTransforms );
+	const phrasingContentSchema = getPhrasingContentSchema();
+	const blockContentSchema = getBlockContentSchema(
+		rawTransforms,
+		phrasingContentSchema
+	);
 
-	return compact( flatMap( pieces, ( piece ) => {
-		// Already a block from shortcode.
-		if ( typeof piece !== 'string' ) {
-			return piece;
-		}
+	return compact(
+		flatMap( pieces, ( piece ) => {
+			// Already a block from shortcode.
+			if ( typeof piece !== 'string' ) {
+				return piece;
+			}
 
-		// These filters are essential for some blocks to be able to transform
-		// from raw HTML. These filters move around some content or add
-		// additional tags, they do not remove any content.
-		const filters = [
-			// Needed to adjust invalid lists.
-			listReducer,
-			// Needed to create more and nextpage blocks.
-			specialCommentConverter,
-			// Needed to create media blocks.
-			figureContentReducer,
-			// Needed to create the quote block, which cannot handle text
-			// without wrapper paragraphs.
-			blockquoteNormaliser,
-		];
+			// These filters are essential for some blocks to be able to transform
+			// from raw HTML. These filters move around some content or add
+			// additional tags, they do not remove any content.
+			const filters = [
+				// Needed to adjust invalid lists.
+				listReducer,
+				// Needed to create more and nextpage blocks.
+				specialCommentConverter,
+				// Needed to create media blocks.
+				figureContentReducer,
+				// Needed to create the quote block, which cannot handle text
+				// without wrapper paragraphs.
+				blockquoteNormaliser,
+			];
 
-		piece = deepFilterHTML( piece, filters, blockContentSchema );
-		piece = normaliseBlocks( piece );
+			piece = deepFilterHTML( piece, filters, blockContentSchema );
+			piece = normaliseBlocks( piece );
 
-		return htmlToBlocks( { html: piece, rawTransforms } );
-	} ) );
+			return htmlToBlocks( { html: piece, rawTransforms } );
+		} )
+	);
 }

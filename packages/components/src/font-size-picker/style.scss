@@ -2,13 +2,18 @@
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
 	align-items: center;
-	margin-bottom: $grid-size * 3;
+	margin-bottom: $grid-unit-30;
 
 	// Apply the same height as the isSmall Reset button.
-	.components-range-control__number {
+	.components-font-size-picker__number {
+		display: inline-block;
+		font-weight: 500;
 		height: 30px;
+		margin-bottom: 0;
 		margin-left: 0;
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
+		margin-top: 5px;
+		width: 54px;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -16,19 +21,23 @@
 			opacity: 0.3;
 			pointer-events: none;
 		}
+
+		&-container {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
 		flex-grow: 1;
 	}
-}
 
-// Needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6.
-.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
-.components-font-size-picker__select .components-base-control__field {
-	margin-bottom: 0;
+	.components-color-palette__clear {
+		height: 30px;
+		margin-top: 23px;
+	}
 }
 
 .components-font-size-picker__custom-input {

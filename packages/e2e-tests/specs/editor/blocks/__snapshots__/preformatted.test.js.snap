@@ -14,3 +14,11 @@ exports[`Preformatted should preserve character newlines 2`] = `
 2</pre>
 <!-- /wp:preformatted -->"
 `;
+
+exports[`Preformatted should preserve white space when merging 1`] = `
+"<!-- wp:preformatted -->
+<pre class=\\"wp-block-preformatted\\">1
+2
+3</pre>
+<!-- /wp:preformatted -->"
+`;

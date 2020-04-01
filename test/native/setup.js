@@ -13,14 +13,17 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribeAndroidModalClosed: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
-		requestMediaPickFromMediaLibrary: jest.fn(),
-		requestMediaPickFromDeviceLibrary: jest.fn(),
-		requestMediaPickFromDeviceCamera: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
-		requestOtherMediaPickFrom: jest.fn(),
+		requestMediaPicker: jest.fn(),
+		mediaSources: {
+			deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+			deviceCamera: 'DEVICE_CAMERA',
+			siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+		},
 	};
 } );
 
@@ -65,6 +68,10 @@ jest.mock( 'react-native-safe-area', () => {
 
 jest.mock( 'react-native-recyclerview-list' );
 
+jest.mock( '@react-native-community/slider', () => () => 'Slider', {
+	virtual: true,
+} );
+
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
 		matches: false,
@@ -72,6 +79,10 @@ if ( ! global.window.matchMedia ) {
 		removeListener: () => {},
 	} );
 }
+
+jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
 
 // Overwrite some native module mocks from `react-native` jest preset:
 // https://github.com/facebook/react-native/blob/master/jest/setup.js
@@ -88,6 +99,8 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 	try {
 		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
 	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], { virtual: true } );
+		jest.doMock( module, () => mockNativeModules[ module ], {
+			virtual: true,
+		} );
 	}
 } );

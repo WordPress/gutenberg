@@ -6,7 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 
 class FormFileUpload extends Component {
 	constructor() {
@@ -27,23 +27,19 @@ class FormFileUpload extends Component {
 		const {
 			accept,
 			children,
-			icon = 'upload',
 			multiple = false,
 			onChange,
 			render,
 			...props
 		} = this.props;
 
-		const ui = render ?
-			render( { openFileDialog: this.openFileDialog } ) : (
-				<IconButton
-					icon={ icon }
-					onClick={ this.openFileDialog }
-					{ ...props }
-				>
-					{ children }
-				</IconButton>
-			);
+		const ui = render ? (
+			render( { openFileDialog: this.openFileDialog } )
+		) : (
+			<Button onClick={ this.openFileDialog } { ...props }>
+				{ children }
+			</Button>
+		);
 		return (
 			<div className="components-form-file-upload">
 				{ ui }

@@ -84,6 +84,7 @@ _Parameters_
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
 -   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to collapse white space characters.
 
 _Returns_
 
@@ -328,6 +329,7 @@ _Parameters_
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `Object`: Rich text value.
 -   _$1.multilineTag_ `[string]`: Multiline tag.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 

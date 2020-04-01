@@ -65,7 +65,9 @@ class Disabled extends Component {
 
 	disable() {
 		focus.focusable.find( this.node ).forEach( ( focusable ) => {
-			if ( includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName ) ) {
+			if (
+				includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
+			) {
 				focusable.setAttribute( 'disabled', '' );
 			}
 

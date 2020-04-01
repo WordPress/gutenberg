@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { FormToggle } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function BlockManagerShowAll( { instanceId, checked, onChange } ) {
+export default function BlockManagerShowAll( { checked, onChange } ) {
+	const instanceId = useInstanceId( BlockManagerShowAll );
 	const id = 'edit-post-manage-blocks-modal__show-all-' + instanceId;
 
 	return (
@@ -14,10 +15,8 @@ function BlockManagerShowAll( { instanceId, checked, onChange } ) {
 				htmlFor={ id }
 				className="edit-post-manage-blocks-modal__show-all-label"
 			>
-				{
-					/* translators: Checkbox toggle label */
-					__( 'Show section' )
-				}
+				{ /* translators: Checkbox toggle label */
+				__( 'Show section' ) }
 			</label>
 			<FormToggle
 				id={ id }
@@ -27,5 +26,3 @@ function BlockManagerShowAll( { instanceId, checked, onChange } ) {
 		</div>
 	);
 }
-
-export default withInstanceId( BlockManagerShowAll );

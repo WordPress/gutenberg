@@ -1,3 +1,9 @@
+## 3.8.0 (2019-12-19)
+
+### Bug Fixes
+
+- Resolves an issue with `createPreloadingMiddleware` where the preloaded data is assumed to be provided with keys matching the internal normalized value.
+
 ## 3.0.0 (2019-03-06)
 
 ### Breaking Changes

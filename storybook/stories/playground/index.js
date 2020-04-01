@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/editor'; // This shouldn't be necessary
-
 import { useEffect, useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
@@ -20,15 +18,6 @@ import {
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 
-/* eslint-disable no-restricted-syntax */
-import '@wordpress/components/build-style/style.css';
-import '@wordpress/block-editor/build-style/style.css';
-import '@wordpress/block-library/build-style/style.css';
-import '@wordpress/block-library/build-style/editor.css';
-import '@wordpress/block-library/build-style/theme.css';
-import '@wordpress/format-library/build-style/style.css';
-/* eslint-enable no-restricted-syntax */
-
 /**
  * Internal dependencies
  */
@@ -39,7 +28,7 @@ function App() {
 
 	useEffect( () => {
 		registerCoreBlocks();
-	} );
+	}, [] );
 
 	return (
 		<div className="playground">
@@ -54,6 +43,7 @@ function App() {
 							<BlockInspector />
 						</div>
 						<div className="editor-styles-wrapper">
+							<Popover.Slot name="block-toolbar" />
 							<BlockEditorKeyboardShortcuts />
 							<WritingFlow>
 								<ObserveTyping>
@@ -70,7 +60,7 @@ function App() {
 }
 
 export default {
-	title: 'Playground|Block Editor',
+	title: 'Playground/Block Editor',
 };
 
 export const _default = () => {

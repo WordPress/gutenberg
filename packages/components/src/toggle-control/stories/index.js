@@ -13,9 +13,13 @@ import { useState } from '@wordpress/element';
  */
 import ToggleControl from '../';
 
-export default { title: 'Components|ToggleControl', component: ToggleControl };
+export default { title: 'Components/ToggleControl', component: ToggleControl };
 
-const ToggleControlWithState = ( { helpTextChecked, helpTextUnchecked, ...props } ) => {
+const ToggleControlWithState = ( {
+	helpTextChecked,
+	helpTextUnchecked,
+	...props
+} ) => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );
 	return (
 		<ToggleControl
@@ -30,17 +34,19 @@ const ToggleControlWithState = ( { helpTextChecked, helpTextUnchecked, ...props 
 export const _default = () => {
 	const label = text( 'Label', 'Does this have a fixed background?' );
 
-	return (
-		<ToggleControlWithState
-			label={ label }
-		/>
-	);
+	return <ToggleControlWithState label={ label } />;
 };
 
 export const withHelpText = () => {
 	const label = text( 'Label', 'Does this have a fixed background?' );
-	const helpTextChecked = text( 'Help When Checked', 'Has fixed background.' );
-	const helpTextUnchecked = text( 'Help When Unchecked', 'No fixed background.' );
+	const helpTextChecked = text(
+		'Help When Checked',
+		'Has fixed background.'
+	);
+	const helpTextUnchecked = text(
+		'Help When Unchecked',
+		'No fixed background.'
+	);
 
 	return (
 		<ToggleControlWithState

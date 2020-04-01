@@ -20,22 +20,9 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
-	'WPDataPersistencePluginOptions',
-	'WPDataPlugin',
-	'WPDataRegistry',
 	'WPComponent',
-	'WPCompleter',
 	'WPElement',
-	'WPFormat',
-	'WPEditorInserterItem',
 	'WPIcon',
-	'WPNotice',
-	'WPNoticeAction',
-	'WPPlugin',
-	'WPShortcode',
-	'WPShortcodeAttrs',
-	'WPShortcodeMatch',
-	'WPSyntheticEvent',
 ];
 
 /**
@@ -44,13 +31,7 @@ const temporaryWordPressInternalTypes = [
  * should be removed once the related issues is fixed:
  * https://github.com/WordPress/gutenberg/issues/18045
  */
-const temporaryExternalTypes = [
-	'DOMHighResTimeStamp',
-	'espree',
-	'moment',
-	'puppeteer',
-	'react',
-];
+const temporaryExternalTypes = [ 'DOMHighResTimeStamp', 'espree' ];
 
 /**
  * Helpful utilities that are globally defined and known to the TypeScript compiler.
@@ -66,6 +47,7 @@ const typescriptUtilityTypes = [
 	'IterableIterator',
 	'NonNullable',
 	'Omit',
+	'Parameters',
 	'Partial',
 	'Pick',
 	'PromiseLike',
@@ -80,9 +62,7 @@ const typescriptUtilityTypes = [
 ];
 
 module.exports = {
-	extends: [
-		'plugin:jsdoc/recommended',
-	],
+	extends: [ 'plugin:jsdoc/recommended' ],
 	settings: {
 		jsdoc: {
 			preferredTypes: {
@@ -95,20 +75,46 @@ module.exports = {
 		},
 	},
 	rules: {
-		'jsdoc/no-undefined-types': [ 'warn', {
-			definedTypes: [
-				// Required to reference browser types because we don't have the `browser` environment enabled for the project.
-				// Here we filter out all browser globals that don't begin with an uppercase letter because those
-				// generally refer to window-level event listeners and are not a valid type to reference (e.g. `onclick`).
-				...Object.keys( globals.browser ).filter( ( k ) => /^[A-Z]/.test( k ) ),
-				...typescriptUtilityTypes,
-				...temporaryWordPressInternalTypes,
-				...temporaryExternalTypes,
-				'void',
-			],
-		} ],
+		'jsdoc/no-undefined-types': [
+			'warn',
+			{
+				definedTypes: [
+					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
+					// Here we filter out all browser globals that don't begin with an uppercase letter because those
+					// generally refer to window-level event listeners and are not a valid type to reference (e.g. `onclick`).
+					...Object.keys( globals.browser ).filter( ( k ) =>
+						/^[A-Z]/.test( k )
+					),
+					...typescriptUtilityTypes,
+					...temporaryWordPressInternalTypes,
+					...temporaryExternalTypes,
+					'void',
+				],
+			},
+		],
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
+		'jsdoc/check-access': 'error',
+		'jsdoc/check-alignment': 'error',
+		'jsdoc/check-param-names': 'error',
+		'jsdoc/check-property-names': 'error',
+		'jsdoc/check-tag-names': 'error',
+		'jsdoc/check-types': 'error',
+		'jsdoc/check-values': 'off',
+		'jsdoc/empty-tags': 'error',
+		'jsdoc/implements-on-classes': 'error',
+		'jsdoc/newline-after-description': 'error',
+		'jsdoc/require-param': 'error',
+		'jsdoc/require-param-name': 'error',
+		'jsdoc/require-param-type': 'error',
+		'jsdoc/require-property': 'error',
+		'jsdoc/require-property-description': 'error',
+		'jsdoc/require-property-name': 'error',
+		'jsdoc/require-property-type': 'error',
+		'jsdoc/require-returns-check': 'error',
+		'jsdoc/require-returns-description': 'error',
+		'jsdoc/require-returns-type': 'error',
+		'jsdoc/valid-types': 'error',
 	},
 };

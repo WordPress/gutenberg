@@ -29,14 +29,14 @@
 
 	img {
 		display: block;
-		width: 100%;
+		width: inherit;
+		height: inherit;
 	}
 }
 
 // Ensure the resize handles are visible when the image is focused.
 .wp-block-image.is-focused .components-resizable-box__handle {
 	display: block;
-	z-index: z-index(".block-library-image__resize-handlers");
 }
 
 .block-editor-block-list__block[data-type="core/image"][data-align="center"] {
@@ -48,33 +48,6 @@
 	&[data-resized="false"] .wp-block-image > div {
 		margin-left: auto;
 		margin-right: auto;
-	}
-}
-
-.edit-post-sidebar .block-library-image__dimensions {
-	margin-bottom: 1em;
-
-	.block-library-image__dimensions__row {
-		display: flex;
-		justify-content: space-between;
-
-		.block-library-image__dimensions__width,
-		.block-library-image__dimensions__height {
-			margin-bottom: 0.5em;
-
-			// Fix the text and placeholder text being misaligned in Safari
-			input {
-				line-height: 1.25;
-			}
-		}
-
-		.block-library-image__dimensions__width {
-			margin-right: 5px;
-		}
-
-		.block-library-image__dimensions__height {
-			margin-left: 5px;
-		}
 	}
 }
 
@@ -96,10 +69,8 @@
 [data-type="core/image"][data-align="center"],
 [data-type="core/image"][data-align="left"],
 [data-type="core/image"][data-align="right"] {
-	.block-editor-block-list__block-edit {
-		figure {
-			margin: 0;
-		}
+	figure {
+		margin: 0;
 	}
 }
 
@@ -111,6 +82,6 @@
 }
 
 // This is similar to above but for resized unfloated images only, where the markup is different.
-[data-type="core/image"] .block-editor-block-list__block-edit figure.is-resized {
+[data-type="core/image"] figure.is-resized {
 	margin: 0;
 }

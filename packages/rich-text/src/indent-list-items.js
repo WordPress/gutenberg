@@ -69,7 +69,8 @@ export function indentListItems( value, rootFormat ) {
 			);
 		} else {
 			const targetFormats = replacements[ previousLineIndex ] || [];
-			const lastformat = targetFormats[ targetFormats.length - 1 ] || rootFormat;
+			const lastformat =
+				targetFormats[ targetFormats.length - 1 ] || rootFormat;
 
 			newFormats[ index ] = targetFormats.concat(
 				[ lastformat ],

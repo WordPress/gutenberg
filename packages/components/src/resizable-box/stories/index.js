@@ -13,10 +13,13 @@ import ResizableBox from '../';
  */
 import { useState } from '@wordpress/element';
 
-export default { title: 'Components|ResizableBox', component: ResizableBox };
+export default { title: 'Components/ResizableBox', component: ResizableBox };
 
 const Example = ( props ) => {
-	const [ attributes, setAttributes ] = useState( { height: 200, width: 400 } );
+	const [ attributes, setAttributes ] = useState( {
+		height: 200,
+		width: 400,
+	} );
 	const { height, width } = attributes;
 	const { children, ...restProps } = props;
 

@@ -3,6 +3,8 @@
  */
 import { DEFAULT_CONTEXT } from './constants';
 
+/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
+
 /**
  * The default empty set of notices to return when there are no notices
  * assigned for a given notices context. This can occur if the getNotices
@@ -22,6 +24,8 @@ const DEFAULT_NOTICES = [];
  *                                      `info`, `error`, or `warning`. Defaults
  *                                      to `info`.
  * @property {string}  content          Notice message.
+ * @property {string}  spokenMessage    Audibly announced message text used by
+ *                                      assistive technologies.
  * @property {string}  __unstableHTML   Notice message as raw HTML. Intended to
  *                                      serve primarily for compatibility of
  *                                      server-rendered notices, and SHOULD NOT

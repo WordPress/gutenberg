@@ -35,7 +35,10 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 
 	let isRemoveButton = false;
 
-	let numButtons = await page.$$eval( '.block-editor-block-settings-menu__content button', ( btns ) => btns.length );
+	let numButtons = await page.$$eval(
+		'.block-editor-block-settings-menu__content button',
+		( btns ) => btns.length
+	);
 
 	// Limit by the number of buttons available
 	while ( --numButtons ) {
@@ -112,7 +115,9 @@ describe( 'block deletion -', () => {
 			await page.click( '.editor-post-title' );
 
 			// Click on the image block so that its wrapper is selected and backspace to delete it.
-			await page.click( '.wp-block[data-type="core/image"] .components-placeholder__label' );
+			await page.click(
+				'.wp-block[data-type="core/image"] .components-placeholder__label'
+			);
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -159,7 +164,9 @@ describe( 'deleting all blocks', () => {
 		await clickOnBlockSettingsMenuRemoveBlockButton();
 
 		// There is a default block:
-		expect( await page.$$( '.block-editor-block-list__block' ) ).toHaveLength( 1 );
+		expect(
+			await page.$$( '.block-editor-block-list__block' )
+		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -179,8 +186,12 @@ describe( 'deleting all blocks', () => {
 		// configured to not allow the default (paragraph) block type, either
 		// by plugin editor settings filtering or user block preferences.
 		await page.evaluate( () => {
-			const defaultBlockName = wp.data.select( 'core/blocks' ).getDefaultBlockName();
-			wp.data.dispatch( 'core/blocks' ).removeBlockTypes( defaultBlockName );
+			const defaultBlockName = wp.data
+				.select( 'core/blocks' )
+				.getDefaultBlockName();
+			wp.data
+				.dispatch( 'core/blocks' )
+				.removeBlockTypes( defaultBlockName );
 		} );
 
 		// Add and remove a block.
@@ -191,7 +202,9 @@ describe( 'deleting all blocks', () => {
 		// TODO: There should be expectations around where focus is placed in
 		// this scenario. Currently, a focus loss occurs (not acceptable).
 		const selectedBlocksCount = await page.evaluate( () => {
-			return wp.data.select( 'core/block-editor' ).getSelectedBlockClientIds().length;
+			return wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlockClientIds().length;
 		} );
 
 		expect( selectedBlocksCount ).toBe( 0 );

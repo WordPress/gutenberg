@@ -2,11 +2,9 @@
 	"name": "core/group",
 	"category": "layout",
 	"attributes": {
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	}
 }

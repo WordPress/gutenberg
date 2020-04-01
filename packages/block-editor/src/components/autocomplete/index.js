@@ -33,16 +33,11 @@ export function withFilteredAutocompleters( Autocomplete ) {
 				'editor.Autocomplete.completers',
 				// Provide copies so filters may directly modify them.
 				completers.map( clone ),
-				props.blockName,
+				props.blockName
 			);
 		}
 
-		return (
-			<Autocomplete
-				{ ...props }
-				completers={ completers }
-			/>
-		);
+		return <Autocomplete { ...props } completers={ completers } />;
 	};
 }
 

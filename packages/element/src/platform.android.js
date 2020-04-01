@@ -5,6 +5,7 @@ import { Platform as OriginalPlatform } from 'react-native';
 
 const Platform = {
 	...OriginalPlatform,
+	OS: 'native',
 	select: ( spec ) => {
 		if ( 'android' in spec ) {
 			return spec.android;

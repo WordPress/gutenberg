@@ -31,40 +31,48 @@ describe( 'element', () => {
 		} );
 
 		it( 'should return a string from an array', () => {
-			expect( renderToString( [
-				'Zucchini ',
-				createElement( 'em', null, 'is a' ),
-				' summer squash',
-			] ) ).toBe( 'Zucchini <em>is a</em> summer squash' );
+			expect(
+				renderToString( [
+					'Zucchini ',
+					createElement( 'em', null, 'is a' ),
+					' summer squash',
+				] )
+			).toBe( 'Zucchini <em>is a</em> summer squash' );
 		} );
 
 		it( 'should return a string from an element', () => {
-			expect( renderToString(
-				createElement( 'strong', null, 'Courgette' )
-			) ).toBe( '<strong>Courgette</strong>' );
+			expect(
+				renderToString( createElement( 'strong', null, 'Courgette' ) )
+			).toBe( '<strong>Courgette</strong>' );
 		} );
 
 		it( 'should escape attributes and html', () => {
-			const result = renderToString( createElement( 'a', {
-				href: '/index.php?foo=bar&qux=<"scary">',
-				style: {
-					backgroundColor: 'red',
-				},
-			}, '<"WordPress" & Friends>' ) );
+			const result = renderToString(
+				createElement(
+					'a',
+					{
+						href: '/index.php?foo=bar&qux=<"scary">',
+						style: {
+							backgroundColor: 'red',
+						},
+					},
+					'<"WordPress" & Friends>'
+				)
+			);
 
 			expect( result ).toBe(
 				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;" style="background-color:red">' +
-				'&lt;"WordPress" &amp; Friends>' +
-				'</a>'
+					'&lt;"WordPress" &amp; Friends>' +
+					'</a>'
 			);
 		} );
 
 		it( 'strips raw html wrapper', () => {
 			const html = '<p>So scary!</p>';
 
-			expect( renderToString(
-				<RawHTML>{ html }</RawHTML>,
-			) ).toBe( html );
+			expect( renderToString( <RawHTML>{ html }</RawHTML> ) ).toBe(
+				html
+			);
 		} );
 	} );
 
@@ -103,10 +111,13 @@ describe( 'element', () => {
 		} );
 
 		it( 'should switch elements', () => {
-			const children = switchChildrenNodeName( [
-				createElement( 'strong', { align: 'left' }, 'Courgette' ),
-				createElement( 'strong', {}, 'Concombre' ),
-			], 'em' );
+			const children = switchChildrenNodeName(
+				[
+					createElement( 'strong', { align: 'left' }, 'Courgette' ),
+					createElement( 'strong', {}, 'Concombre' ),
+				],
+				'em'
+			);
 			expect( children ).toHaveLength( 2 );
 			expect( children[ 0 ].type ).toBe( 'em' );
 			expect( children[ 0 ].props.children ).toBe( 'Courgette' );

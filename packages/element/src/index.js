@@ -1,3 +1,4 @@
+export { default as createInterpolateElement } from './create-interpolate-element';
 export * from './react';
 export * from './react-platform';
 export * from './utils';

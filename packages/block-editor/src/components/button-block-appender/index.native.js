@@ -6,7 +6,9 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Button, Dashicon } from '@wordpress/components';
+import { withPreferredColorScheme } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,7 +16,23 @@ import { Button, Dashicon } from '@wordpress/components';
 import Inserter from '../inserter';
 import styles from './styles.scss';
 
-function ButtonBlockAppender( { rootClientId } ) {
+function ButtonBlockAppender( {
+	rootClientId,
+	getStylesFromColorScheme,
+	showSeparator,
+} ) {
+	const appenderStyle = {
+		...styles.appender,
+		...getStylesFromColorScheme(
+			styles.appenderLight,
+			styles.appenderDark
+		),
+	};
+	const addBlockButtonStyle = getStylesFromColorScheme(
+		styles.addBlockButton,
+		styles.addBlockButtonDark
+	);
+
 	return (
 		<>
 			<Inserter
@@ -26,17 +44,18 @@ function ButtonBlockAppender( { rootClientId } ) {
 						disabled={ disabled }
 						fixedRatio={ false }
 					>
-						<View style={ [ styles.appender, { flex: 1 } ] }>
-							<Dashicon
-								icon="plus-alt"
-								style={ styles.addBlockButton }
-								color={ styles.addBlockButton.color }
-								size={ styles.addBlockButton.size }
+						<View style={ appenderStyle }>
+							<Icon
+								icon={ plusCircleFilled }
+								style={ addBlockButtonStyle }
+								color={ addBlockButtonStyle.color }
+								size={ addBlockButtonStyle.size }
 							/>
 						</View>
 					</Button>
 				) }
 				isAppender
+				showSeparator={ showSeparator }
 			/>
 		</>
 	);
@@ -45,4 +64,4 @@ function ButtonBlockAppender( { rootClientId } ) {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md
  */
-export default ButtonBlockAppender;
+export default withPreferredColorScheme( ButtonBlockAppender );

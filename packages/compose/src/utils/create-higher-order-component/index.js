@@ -14,11 +14,20 @@ import { camelCase, upperFirst } from 'lodash';
  *
  * @return {WPComponent} Component class with generated display name assigned.
  */
-function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+function createHigherOrderComponent(
+	mapComponentToEnhancedComponent,
+	modifierName
+) {
 	return ( OriginalComponent ) => {
-		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
-		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
-		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+		const EnhancedComponent = mapComponentToEnhancedComponent(
+			OriginalComponent
+		);
+		const {
+			displayName = OriginalComponent.name || 'Component',
+		} = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst(
+			camelCase( modifierName )
+		) }(${ displayName })`;
 
 		return EnhancedComponent;
 	};

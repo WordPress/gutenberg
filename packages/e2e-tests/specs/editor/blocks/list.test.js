@@ -72,6 +72,15 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should undo asterisk transform with backspace after mouse move', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '* ' );
+		await page.mouse.move( 0, 0, { steps: 10 } );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async () => {
 		await clickBlockAppender();
 		await page.evaluate( () => delete window.requestIdleCallback );

@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import Button from '../../button';
 import ScrollLock from '../';
 
-export default { title: 'Components|ScrollLock', component: ScrollLock };
+export default { title: 'Components/ScrollLock', component: ScrollLock };
 
 const Example = () => {
 	const [ isScrollLocked, setScrollLocked ] = useState( false );
@@ -19,12 +19,13 @@ const Example = () => {
 		<StripedBackground>
 			<div>Start scrolling down...</div>
 			<ToggleContainer>
-				<Button isDefault onClick={ toggleLock }>
+				<Button isSecondary onClick={ toggleLock }>
 					Toggle Scroll Lock
 				</Button>
 				{ isScrollLocked && <ScrollLock /> }
 				<p>
-					Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+					Scroll locked:{ ' ' }
+					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
 				</p>
 			</ToggleContainer>
 		</StripedBackground>

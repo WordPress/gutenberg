@@ -11,7 +11,9 @@ import onSubKey from '../on-sub-key';
 describe( 'onSubKey', () => {
 	function createEnhancedReducer( actionProperty ) {
 		const enhanceReducer = onSubKey( actionProperty );
-		return enhanceReducer( ( state, action ) => 'Called by ' + action.caller );
+		return enhanceReducer(
+			( state, action ) => 'Called by ' + action.caller
+		);
 	}
 
 	it( 'should default to an empty object', () => {

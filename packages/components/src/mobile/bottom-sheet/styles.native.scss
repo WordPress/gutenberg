@@ -12,6 +12,7 @@
 	width: 36px;
 	margin: auto;
 	margin-top: 6px;
+	margin-bottom: 6px;
 	border-radius: 2px;
 }
 
@@ -25,9 +26,10 @@
 	background-color: $gray-70;
 }
 
-.emptyHeaderSpace {
-	height: 14;
+.emptyHeader {
+	margin-top: $panel-padding / 2;
 }
+
 
 .background {
 	background-color: $white;
@@ -76,12 +78,22 @@
 	padding: 5px;
 }
 
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
 // Cell
 
 .cellContainer {
 	flex-direction: row;
 	min-height: 48;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .clipToBounds {
@@ -101,6 +113,7 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 0;
 }
 
 .cellIcon {
@@ -111,6 +124,7 @@
 	font-size: 17px;
 	color: #2e4453;
 	margin-right: 12px;
+	flex-shrink: 1;
 }
 
 .cellLabelCentered {
@@ -124,7 +138,7 @@
 	font-size: 17px;
 	color: #2e4453;
 	flex: 1;
-	margin-left: 12px;
+	margin-left: 0;
 }
 
 .cellValue {
@@ -143,9 +157,16 @@
 }
 
 .icon {
-	color: #7b9ab1;
+	color: $toolbar-button;
 }
 
 .iconDark {
 	color: #c3c4c7;
+}
+
+// Unsupported Footer Cell
+
+.unsupportedFooterCell {
+	font-size: $text-editor-font-size;
+	color: $gray;
 }

@@ -118,6 +118,10 @@ const registerBlock = ( block ) => {
 	} );
 };
 
+// only enable code block for development
+// eslint-disable-next-line no-undef
+const devOnly = ( block ) => ( !! __DEV__ ? block : null );
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -132,7 +136,7 @@ export const registerCoreBlocks = () => {
 	[
 		paragraph,
 		heading,
-		code,
+		devOnly( code ),
 		missing,
 		more,
 		image,
@@ -142,10 +146,15 @@ export const registerCoreBlocks = () => {
 		list,
 		quote,
 		mediaText,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? group : null,
-		// eslint-disable-next-line no-undef
-		!! __DEV__ ? spacer : null,
+		preformatted,
+		gallery,
+		group,
+		button,
+		spacer,
+		shortcode,
+		latestPosts,
+		devOnly( verse ),
+		cover,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

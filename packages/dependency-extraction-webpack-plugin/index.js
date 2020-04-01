@@ -3,18 +3,24 @@
  */
 const { createHash } = require( 'crypto' );
 const json2php = require( 'json2php' );
+const path = require( 'path' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
 /**
  * Internal dependencies
  */
-const { defaultRequestToExternal, defaultRequestToHandle } = require( './util' );
+const {
+	defaultRequestToExternal,
+	defaultRequestToHandle,
+} = require( './util' );
 
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
+				combineAssets: false,
+				combinedOutputFile: null,
 				injectPolyfill: false,
 				outputFormat: 'php',
 				useDefaults: true,
@@ -30,7 +36,10 @@ class DependencyExtractionWebpackPlugin {
 		this.externalizedDeps = new Set();
 
 		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new ExternalsPlugin( 'this', this.externalizeWpDeps.bind( this ) );
+		this.externalsPlugin = new ExternalsPlugin(
+			'this',
+			this.externalizeWpDeps.bind( this )
+		);
 	}
 
 	externalizeWpDeps( context, request, callback ) {
@@ -42,7 +51,10 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		// Cascade to default if unhandled and enabled
-		if ( typeof externalRequest === 'undefined' && this.options.useDefaults ) {
+		if (
+			typeof externalRequest === 'undefined' &&
+			this.options.useDefaults
+		) {
 			externalRequest = defaultRequestToExternal( request );
 		}
 
@@ -78,7 +90,9 @@ class DependencyExtractionWebpackPlugin {
 
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php( JSON.parse( JSON.stringify( asset ) ) ) };`;
+			return `<?php return ${ json2php(
+				JSON.parse( JSON.stringify( asset ) )
+			) };`;
 		}
 
 		return JSON.stringify( asset );
@@ -91,10 +105,19 @@ class DependencyExtractionWebpackPlugin {
 		const { filename: outputFilename } = output;
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
-			const { injectPolyfill, outputFormat } = this.options;
+			const {
+				combineAssets,
+				combinedOutputFile,
+				injectPolyfill,
+				outputFormat,
+			} = this.options;
+			const combinedAssetsData = {};
 
 			// Process each entry point independently.
-			for ( const [ entrypointName, entrypoint ] of compilation.entrypoints.entries() ) {
+			for ( const [
+				entrypointName,
+				entrypoint,
+			] of compilation.entrypoints.entries() ) {
 				const entrypointExternalizedWpDeps = new Set();
 				if ( injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
@@ -104,37 +127,73 @@ class DependencyExtractionWebpackPlugin {
 				for ( const chunk of entrypoint.chunks ) {
 					for ( const { userRequest } of chunk.modulesIterable ) {
 						if ( this.externalizedDeps.has( userRequest ) ) {
-							const scriptDependency = this.mapRequestToDependency( userRequest );
-							entrypointExternalizedWpDeps.add( scriptDependency );
+							const scriptDependency = this.mapRequestToDependency(
+								userRequest
+							);
+							entrypointExternalizedWpDeps.add(
+								scriptDependency
+							);
 						}
 					}
 				}
 
 				const runtimeChunk = entrypoint.getRuntimeChunk();
 
-				// Get a stable, stringified representation of the WordPress script asset.
-				const assetString = this.stringify( {
-					dependencies: Array.from( entrypointExternalizedWpDeps ).sort(),
+				const assetData = {
+					// Get a sorted array so we can produce a stable, stringified representation.
+					dependencies: Array.from(
+						entrypointExternalizedWpDeps
+					).sort(),
 					version: runtimeChunk.hash,
-				} );
+				};
+
+				const assetString = this.stringify( assetData );
 
 				// Determine a filename for the asset file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const assetFilename = compilation
-					.getPath( outputFilename, {
-						chunk: runtimeChunk,
-						filename,
-						query,
-						basename: basename( filename ),
-						contentHash: createHash( 'md4' )
-							.update( assetString )
-							.digest( 'hex' ),
-					} )
-					.replace( /\.js$/i, '.asset.' + ( outputFormat === 'php' ? 'php' : 'json' ) );
+				const buildFilename = compilation.getPath( outputFilename, {
+					chunk: runtimeChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash: createHash( 'md4' )
+						.update( assetString )
+						.digest( 'hex' ),
+				} );
+
+				if ( combineAssets ) {
+					combinedAssetsData[ buildFilename ] = assetData;
+					continue;
+				}
+
+				const assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
 
 				// Add source and file into compilation for webpack to output.
-				compilation.assets[ assetFilename ] = new RawSource( assetString );
+				compilation.assets[ assetFilename ] = new RawSource(
+					assetString
+				);
 				runtimeChunk.files.push( assetFilename );
+			}
+
+			if ( combineAssets ) {
+				const outputFolder = compiler.options.output.path;
+				const assetsFilePath = path.resolve(
+					outputFolder,
+					combinedOutputFile ||
+						'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+				const assetsFilename = path.relative(
+					outputFolder,
+					assetsFilePath
+				);
+
+				// Add source into compilation for webpack to output.
+				compilation.assets[ assetsFilename ] = new RawSource(
+					this.stringify( combinedAssetsData )
+				);
 			}
 		} );
 	}

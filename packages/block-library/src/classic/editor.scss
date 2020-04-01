@@ -240,7 +240,7 @@
 }
 
 div[data-type="core/freeform"] {
-	.block-editor-block-list__block-edit::before {
+	&::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
 		border: $border-width solid $light-gray-500;
@@ -249,17 +249,11 @@ div[data-type="core/freeform"] {
 		outline: $border-width solid transparent;
 	}
 
-	&.is-selected .block-editor-block-list__block-edit::before {
-		border-color: $light-gray-800;
-		border-left-color: transparent;
+	&.is-selected::before {
+		border-color: $dark-gray-primary;
 	}
 
-	// Don't show block type label for classic block
-	&.is-hovered .block-editor-block-list__breadcrumb {
-		display: none;
-	}
-
-	.editor-block-contextual-toolbar + div {
+	.block-editor-block-contextual-toolbar + div {
 		margin-top: 0;
 		padding-top: 0;
 	}
@@ -300,13 +294,14 @@ div[data-type="core/freeform"] {
 	// block is empty or loading and the placeholder should be displayed.
 	display: none;
 	width: auto;
-	margin: 0 #{ -$block-padding };
+	margin: 0;
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
-	top: $block-padding;
-	transform: translateY(-$block-padding);
+	top: $grid-unit-10;
 	border: $border-width solid $light-gray-500;
 	border-bottom: none;
+	border-radius: $radius-block-ui;
+	margin-bottom: $grid-unit-10;
 
 	// On mobile, toolbars go edge to edge.
 	padding: 0;
@@ -317,7 +312,7 @@ div[data-type="core/freeform"] {
 	div[data-type="core/freeform"].is-selected &,
 	div[data-type="core/freeform"].is-typing & {
 		display: block;
-		border-color: $light-gray-800;
+		border-color: $dark-gray-primary;
 	}
 
 	// Remove the box shadow to mimic other Gutenberg UI.
@@ -342,6 +337,10 @@ div[data-type="core/freeform"] {
 			line-height: 37px;
 			padding: $block-padding;
 		}
+	}
+
+	div.mce-toolbar-grp {
+		border-bottom: 1px solid $dark-gray-primary;
 	}
 
 	// Overwrite inline styles.
@@ -377,4 +376,3 @@ div[data-type="core/freeform"] {
 		display: block;
 	}
 }
-

@@ -12,6 +12,8 @@ const { getWebpackArgs } = require( '../utils' );
 const { status } = spawn(
 	resolveBin( 'webpack' ),
 	getWebpackArgs( [ '--watch' ] ),
-	{ stdio: 'inherit' }
+	{
+		stdio: 'inherit',
+	}
 );
 process.exit( status );

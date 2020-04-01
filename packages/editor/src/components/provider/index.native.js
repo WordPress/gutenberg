@@ -13,9 +13,15 @@ import RNReactNativeGutenbergBridge, {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { parse, serialize, getUnregisteredTypeHandlerName, createBlock } from '@wordpress/blocks';
+import {
+	parse,
+	serialize,
+	getUnregisteredTypeHandlerName,
+	createBlock,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { doAction } from '@wordpress/hooks';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -45,7 +51,11 @@ class NativeEditorProvider extends Component {
 		// Keep a local reference to `post` to detect changes
 		this.post = this.props.post;
 		this.props.addEntities( postTypeEntities );
-		this.props.receiveEntityRecords( 'postType', this.post.type, this.post );
+		this.props.receiveEntityRecords(
+			'postType',
+			this.post.type,
+			this.post
+		);
 	}
 
 	componentDidMount() {
@@ -53,30 +63,39 @@ class NativeEditorProvider extends Component {
 			this.serializeToNativeAction();
 		} );
 
-		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
-			this.toggleMode();
-		} );
+		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode(
+			() => {
+				this.toggleMode();
+			}
+		);
 
 		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
 			this.props.editTitle( payload.title );
 		} );
 
-		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
-			this.updateHtmlAction( payload.html );
-		} );
+		this.subscriptionParentUpdateHtml = subscribeUpdateHtml(
+			( payload ) => {
+				this.updateHtmlAction( payload.html );
+			}
+		);
 
-		this.subscriptionParentMediaAppend = subscribeMediaAppend( ( payload ) => {
-			const blockName = 'core/' + payload.mediaType;
-			const newBlock = createBlock( blockName, {
-				id: payload.mediaId,
-				[ payload.mediaType === 'image' ? 'url' : 'src' ]: payload.mediaUrl,
-			} );
+		this.subscriptionParentMediaAppend = subscribeMediaAppend(
+			( payload ) => {
+				const blockName = 'core/' + payload.mediaType;
+				const newBlock = createBlock( blockName, {
+					id: payload.mediaId,
+					[ payload.mediaType === 'image'
+						? 'url'
+						: 'src' ]: payload.mediaUrl,
+				} );
 
-			const indexAfterSelected = this.props.selectedBlockIndex + 1;
-			const insertionIndex = indexAfterSelected || this.props.blockCount;
+				const indexAfterSelected = this.props.selectedBlockIndex + 1;
+				const insertionIndex =
+					indexAfterSelected || this.props.blockCount;
 
-			this.props.insertBlock( newBlock, insertionIndex );
-		} );
+				this.props.insertBlock( newBlock, insertionIndex );
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -104,23 +123,35 @@ class NativeEditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( ! prevProps.isReady && this.props.isReady ) {
 			const blocks = this.props.blocks;
-			const isUnsupportedBlock = ( { name } ) => name === getUnregisteredTypeHandlerName();
-			const unsupportedBlockNames = blocks.filter( isUnsupportedBlock ).map( ( block ) => block.attributes.originalName );
-			RNReactNativeGutenbergBridge.editorDidMount( unsupportedBlockNames );
+			const isUnsupportedBlock = ( { name } ) =>
+				name === getUnregisteredTypeHandlerName();
+			const unsupportedBlockNames = blocks
+				.filter( isUnsupportedBlock )
+				.map( ( block ) => block.attributes.originalName );
+			RNReactNativeGutenbergBridge.editorDidMount(
+				unsupportedBlockNames
+			);
 		}
 	}
 
 	serializeToNativeAction() {
 		if ( this.props.mode === 'text' ) {
-			this.updateHtmlAction( this.props.getEditedPostContent() );
+			// The HTMLTextInput component does not update the store when user is doing changes
+			// Let's request a store update when parent is asking for it
+			doAction( 'native-editor.persist-html', 'core/editor' );
 		}
 
 		const html = serialize( this.props.blocks );
 		const title = this.props.title;
 
-		const hasChanges = title !== this.post.title.raw || html !== this.post.content.raw;
+		const hasChanges =
+			title !== this.post.title.raw || html !== this.post.content.raw;
 
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, title, hasChanges );
+		RNReactNativeGutenbergBridge.provideToNative_Html(
+			html,
+			title,
+			hasChanges
+		);
 
 		if ( hasChanges ) {
 			this.post.title.raw = title;
@@ -165,9 +196,7 @@ export default compose( [
 			getEditedPostAttribute,
 			getEditedPostContent,
 		} = select( 'core/editor' );
-		const {
-			getEditorMode,
-		} = select( 'core/edit-post' );
+		const { getEditorMode } = select( 'core/edit-post' );
 
 		const {
 			getBlockCount,
@@ -187,21 +216,12 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			editPost,
-			resetEditorBlocks,
-		} = dispatch( 'core/editor' );
-		const {
-			clearSelectedBlock,
-			insertBlock,
-		} = dispatch( 'core/block-editor' );
-		const {
-			switchEditorMode,
-		} = dispatch( 'core/edit-post' );
-		const {
-			addEntities,
-			receiveEntityRecords,
-		} = dispatch( 'core' );
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { clearSelectedBlock, insertBlock } = dispatch(
+			'core/block-editor'
+		);
+		const { switchEditorMode } = dispatch( 'core/edit-post' );
+		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
 		return {
 			addEntities,

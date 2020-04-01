@@ -1,20 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
-
-/**
- * Internal dependencies
- */
 import UngroupButton from '../ungroup-button';
 
-export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
+export default function BlockToolbar() {
+	const { blockClientIds, isValid, mode } = useSelect( ( select ) => {
+		const {
+			getBlockMode,
+			getSelectedBlockClientIds,
+			isBlockValid,
+		} = select( 'core/block-editor' );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+
+		return {
+			blockClientIds: selectedBlockClientIds,
+			isValid:
+				selectedBlockClientIds.length === 1
+					? isBlockValid( selectedBlockClientIds[ 0 ] )
+					: null,
+			mode:
+				selectedBlockClientIds.length === 1
+					? getBlockMode( selectedBlockClientIds[ 0 ] )
+					: null,
+		};
+	}, [] );
+
 	if ( blockClientIds.length === 0 ) {
 		return null;
 	}
@@ -30,19 +47,4 @@ export const BlockToolbar = ( { blockClientIds, isValid, mode } ) => {
 			) }
 		</>
 	);
-};
-
-export default withSelect( ( select ) => {
-	const {
-		getBlockMode,
-		getSelectedBlockClientIds,
-		isBlockValid,
-	} = select( 'core/block-editor' );
-	const blockClientIds = getSelectedBlockClientIds();
-
-	return {
-		blockClientIds,
-		isValid: blockClientIds.length === 1 ? isBlockValid( blockClientIds[ 0 ] ) : null,
-		mode: blockClientIds.length === 1 ? getBlockMode( blockClientIds[ 0 ] ) : null,
-	};
-} )( BlockToolbar );
+}

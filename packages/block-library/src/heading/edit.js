@@ -12,89 +12,93 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withFallbackStyles } from '@wordpress/components';
+import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
+import { Platform } from '@wordpress/element';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle } = window;
-
-function HeadingEdit( {
-	backgroundColor,
-	attributes,
-	setAttributes,
-	mergeBlocks,
-	onReplace,
-	className,
-} ) {
-	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-		{
-			contrastCheckerProps: { backgroundColor, isLargeText: true },
-		},
-		[]
-	);
-
-	const { align, content, level, placeholder } = attributes;
+function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
+	const { align, content, level, placeholder, style } = attributes;
 	const tagName = 'h' + level;
+	const isAndroid = Platform.select( {
+		android: true,
+		native: false,
+		web: false,
+	} );
+
+	const styles = {
+		color: style && style.color && style.color.text,
+	};
 
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				<AlignmentToolbar value={ align } onChange={ ( nextAlign ) => {
-					setAttributes( { align: nextAlign } );
-				} } />
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				</PanelBody>
-			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<TextColor>
-				<RichText
-					identifier="content"
-					tagName={ tagName }
-					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
-					onMerge={ mergeBlocks }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( 'core/paragraph' );
-						}
-
-						return createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} }
-					onReplace={ onReplace }
-					onRemove={ () => onReplace( [] ) }
-					className={ classnames( className, {
-						[ `has-text-align-${ align }` ]: align,
-					} ) }
-					placeholder={ placeholder || __( 'Write heading…' ) }
+				<HeadingToolbar
+					minLevel={ Platform.OS === 'web' ? 2 : 1 }
+					maxLevel={ Platform.OS === 'web' ? 5 : 7 }
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
 				/>
-			</TextColor>
+				{ ! isAndroid && (
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				) }
+			</BlockControls>
+			{ Platform.OS === 'web' && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Heading settings' ) }>
+						<Text variant="label">{ __( 'Level' ) }</Text>
+						<HeadingToolbar
+							isCollapsed={ false }
+							minLevel={ 1 }
+							maxLevel={ 7 }
+							selectedLevel={ level }
+							onChange={ ( newLevel ) =>
+								setAttributes( { level: newLevel } )
+							}
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
+			<RichText
+				identifier="content"
+				tagName={ Block[ tagName ] }
+				value={ content }
+				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onMerge={ mergeBlocks }
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( 'core/paragraph' );
+					}
+
+					return createBlock( 'core/heading', {
+						...attributes,
+						content: value,
+					} );
+				} }
+				onReplace={ onReplace }
+				onRemove={ () => onReplace( [] ) }
+				className={ classnames( {
+					[ `has-text-align-${ align }` ]: align,
+				} ) }
+				placeholder={ placeholder || __( 'Write heading…' ) }
+				textAlign={ align }
+				style={ styles }
+			/>
 		</>
 	);
 }
 
-export default withFallbackStyles( ( node ) => {
-	let backgroundColor = getComputedStyle( node ).backgroundColor;
-	while ( backgroundColor === 'rgba(0, 0, 0, 0)' && node.parentNode ) {
-		node = node.parentNode;
-		backgroundColor = getComputedStyle( node ).backgroundColor;
-	}
-	return { backgroundColor };
-} )( HeadingEdit );
+export default HeadingEdit;

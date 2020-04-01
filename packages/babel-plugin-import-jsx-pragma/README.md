@@ -18,14 +18,14 @@ npm install @wordpress/babel-plugin-import-jsx-pragma
 
 Refer to the [Babel Plugins documentation](http://babeljs.io/docs/en/plugins) if you don't yet have experience working with Babel plugins.
 
-Include `@wordpress/babel-plugin-import-jsx-pragma` (and [@babel/transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx/)) as plugins in your Babel configuration. If you don't include both you will receive errors when encountering JSX tokens.
+Include `@wordpress/babel-plugin-import-jsx-pragma` (and [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx/)) as plugins in your Babel configuration. If you don't include both you will receive errors when encountering JSX tokens.
 
 ```js
 // .babelrc.js
 module.exports = {
 	plugins: [
 		'@wordpress/babel-plugin-import-jsx-pragma',
-		'@babel/transform-react-jsx',
+		'@babel/plugin-transform-react-jsx',
 	],
 };
 ```
@@ -34,7 +34,7 @@ _Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/b
 
 ## Options
 
-As the `@babel/transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
+As the `@babel/plugin-transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
 
 For example, if you are using the `@wordpress/element` package, you may want to use the following configuration:
 
@@ -48,7 +48,7 @@ module.exports = {
 			source: '@wordpress/element',
 			isDefault: false,
 		} ],
-		[ '@babel/transform-react-jsx', {
+		[ '@babel/plugin-transform-react-jsx', {
 			pragma: 'createElement',
 			pragmaFrag: 'Fragment',
 		} ],
