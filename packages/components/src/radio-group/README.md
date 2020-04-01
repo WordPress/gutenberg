@@ -1,8 +1,8 @@
-# ButtonGroup
+# RadioGroup
 
-ButtonGroup can be used to group any related buttons together. To emphasize related buttons, a group should share a common container.
+Use a RadioGroup component when you want users to select one option from a small set of options.
 
-![ButtonGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)
+![RadioGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)
 
 ## Table of contents
 
@@ -16,68 +16,72 @@ ButtonGroup can be used to group any related buttons together. To emphasize rela
 
 #### Selected action
 
-![ButtonGroup selection](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1544127594329_ButtonGroup-Do.png)
-
-**Do**
-Only one option in a button group can be selected and active at a time. Selecting one option deselects any other.
+Only one option in a radio group can be selected and active at a time. Selecting one option deselects any other.
 
 ### Best practices
 
-Button groups should:
+Radio groups should:
 
 - **Be clearly and accurately labeled.**
 - **Clearly communicate that clicking or tapping will trigger an action.**
 - **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
 - **Have consistent locations in the interface.**
+- **Have a default option already selected.**
 
 ### States
 
-![ButtonGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)
+#### Active and available radio groups
 
-**Active and available button groups**
+A radio group’s state makes it clear which option is active. Hover and focus states express the available selection options for buttons in a button group.
 
-A button group’s state makes it clear which button is active. Hover and focus states express the available selection options for buttons in a button group.
+#### Disabled radio groups
 
-**Disabled button groups**
-
-Button groups that cannot be selected can either be given a disabled state, or be hidden.
+Radio groups that cannot be selected can either be given a disabled state, or be hidden.
 
 ## Development guidelines
 
 ### Usage
 
-**As a simple group**
+#### Controlled
 
 ```jsx
-import { Button, ButtonGroup } from '@wordpress/components';
-
-const MyButtonGroup = () => (
-	<ButtonGroup>
-		<Button isPrimary>Button 1</Button>
-		<Button isPrimary>Button 2</Button>
-	</ButtonGroup>
-);
-```
-
-**As a radio group**
-
-```jsx
-import { Button, ButtonGroup } from '@wordpress/components';
+import { Radio, RadioGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-const MyRadioButtonGroup = () => {
-	const [ checked, setChecked ] = useState( 'medium' );
+const MyControlledRadioRadioGroup = () => {
+	const [ checked, setChecked ] = useState( '25' );
 	return (
-		<ButtonGroup mode="radio" onChange={ setChecked } checked={ checked }>
-			<Button value="small">Small</Button>
-			<Button value="medium">Medium</Button>
-			<Button value="large">Large</Button>
-		</ButtonGroup>
+		<RadioGroup accessibilityLabel="Width" onChange={ setChecked } checked={ checked }>
+			<Radio value="25">25%</Radio>
+			<Radio value="50">50%</Radio>
+			<Radio value="75">75%</Radio>
+			<Radio value="100">100%</Radio>
+		</RadioGroup>
+	);
+};
+```
+
+#### Uncontrolled
+
+When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
+
+```jsx
+import { Radio, RadioGroup } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+
+const MyUncontrolledRadioRadioGroup = () => {
+	return (
+		<RadioGroup accessibilityLabel="Width" defaultChecked="25">
+			<Radio value="25">25%</Radio>
+			<Radio value="50">50%</Radio>
+			<Radio value="75">75%</Radio>
+			<Radio value="100">100%</Radio>
+		</RadioGroup>
 	);
 };
 ```
 
 ## Related components
 
-- For individual buttons, use a `Button` component.
-- For a traditional radio group, use a `RadioControl` component.
+- For simple buttons that are related, use a `ButtonGroup` component.
+- For traditional radio options, use a `RadioControl` component.
