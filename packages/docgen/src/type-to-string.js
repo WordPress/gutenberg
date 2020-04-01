@@ -1,3 +1,7 @@
+// The code below is inspired by the official TypeScript compiler function,
+// getTypeFromTypeNode() in checker.ts
+// link: https://github.com/microsoft/TypeScript/blob/v3.8.3/src/compiler/checker.ts
+
 /**
  * External dependencies
  */
