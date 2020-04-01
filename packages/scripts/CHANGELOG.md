@@ -6,9 +6,14 @@
 
 ### Enhancements
 
+- The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
+## 7.2.0 (2020-04-01)
+
+### Enhancements
+
 - Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
 - All webpack dependencies got minor version update if applicable.
-- The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
 
 ### Internal
 
