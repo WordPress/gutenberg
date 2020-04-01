@@ -204,7 +204,7 @@ ID      user_login      display_name    user_email      user_registered roles
 ### `docker logs -f [container] >/dev/null` 
 
 ```sh
-wp-env run docker logs -f <container> >/dev/null 
+docker logs -f <container> >/dev/null 
 
 Shows the error logs of the WordPress container in the terminal
 ```
