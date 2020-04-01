@@ -59,6 +59,7 @@ export default function SaveButton() {
 		<>
 			<Button
 				isPrimary
+				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				disabled={ disabled }
 				isBusy={ isSaving }
