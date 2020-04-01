@@ -1,14 +1,14 @@
 /**
  * Internal dependencies
  */
-import addContainer from '../addContainer';
+import addContainer from '../add-container';
 
 describe( 'addContainer', () => {
 	describe( 'with polite param', () => {
 		it( 'should create an aria-live element with aria-live attr set to polite', () => {
 			const container = addContainer( 'polite' );
 
-			expect( container ).not.toBe( null );
+			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-polite' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();
@@ -24,7 +24,7 @@ describe( 'addContainer', () => {
 		it( 'should create an aria-live element with aria-live attr set to assertive', () => {
 			const container = addContainer( 'assertive' );
 
-			expect( container ).not.toBe( null );
+			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-assertive' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();
@@ -40,7 +40,7 @@ describe( 'addContainer', () => {
 		it( 'should default to creating an aria-live element with aria-live attr set to polite', () => {
 			const container = addContainer( 'polite' );
 
-			expect( container ).not.toBe( null );
+			expect( container ).not.toBeNull();
 			expect( container.className ).toBe( 'a11y-speak-region' );
 			expect( container.id ).toBe( 'a11y-speak-polite' );
 			expect( container.getAttribute( 'style' ) ).not.toBeNull();

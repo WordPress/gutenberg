@@ -894,6 +894,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NumberControl",
+		"slug": "number-control",
+		"markdown_source": "../packages/components/src/number-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Panel",
 		"slug": "panel",
 		"markdown_source": "../packages/components/src/panel/README.md",
@@ -1029,6 +1035,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "UnitControl",
+		"slug": "unit-control",
+		"markdown_source": "../packages/components/src/unit-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1287,6 +1299,12 @@
 		"title": "@wordpress/e2e-tests",
 		"slug": "packages-e2e-tests",
 		"markdown_source": "../packages/e2e-tests/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-navigation",
+		"slug": "packages-edit-navigation",
+		"markdown_source": "../packages/edit-navigation/README.md",
 		"parent": "packages"
 	},
 	{
