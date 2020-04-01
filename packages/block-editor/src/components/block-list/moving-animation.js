@@ -10,7 +10,7 @@ import {
 	useState,
 	useLayoutEffect,
 	useReducer,
-	useMemo,
+	useRef,
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -69,10 +69,7 @@ function useMovingAnimation(
 	} );
 
 	const previous = ref.current ? getAbsolutePosition( ref.current ) : null;
-	const scrollContainer = useMemo(
-		() => getScrollContainer( ref.current ),
-		[]
-	);
+	const scrollContainer = useRef();
 
 	useLayoutEffect( () => {
 		if ( triggeredAnimation ) {
@@ -80,14 +77,17 @@ function useMovingAnimation(
 		}
 	}, [ triggeredAnimation ] );
 	useLayoutEffect( () => {
+		scrollContainer.current = getScrollContainer( ref.current );
 		if ( prefersReducedMotion ) {
-			if ( adjustScrolling && scrollContainer ) {
+			if ( adjustScrolling && scrollContainer.current && previous ) {
 				// if the animation is disabled and the scroll needs to be adjusted,
 				// just move directly to the final scroll position
 				ref.current.style.transform = 'none';
 				const destination = getAbsolutePosition( ref.current );
-				scrollContainer.scrollTop =
-					scrollContainer.scrollTop - previous.top + destination.top;
+				scrollContainer.current.scrollTop =
+					scrollContainer.current.scrollTop -
+					previous.top +
+					destination.top;
 			}
 
 			return;
@@ -98,8 +98,10 @@ function useMovingAnimation(
 			x: previous ? previous.left - destination.left : 0,
 			y: previous ? previous.top - destination.top : 0,
 			scrollTop:
-				previous && scrollContainer
-					? scrollContainer.scrollTop - previous.top + destination.top
+				previous && scrollContainer.current
+					? scrollContainer.current.scrollTop -
+					  previous.top +
+					  destination.top
 					: 0,
 		};
 		ref.current.style.transform =
@@ -125,11 +127,12 @@ function useMovingAnimation(
 		onFrame: ( props ) => {
 			if (
 				adjustScrolling &&
-				scrollContainer &&
+				scrollContainer.current &&
 				! prefersReducedMotion &&
 				props.y
 			) {
-				scrollContainer.scrollTop = transform.scrollTop + props.y;
+				scrollContainer.current.scrollTop =
+					transform.scrollTop + props.y;
 			}
 		},
 	} );
