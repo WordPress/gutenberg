@@ -1,3 +1,15 @@
+## Master
+
+### Breaking change
+
+- Restructure package moving source files into `lib` directory. Direct imports of
+  `@wordpress/is-shallow-equal/arrays` and `@wordpress/is-shallow-equal/objects` were never
+  officially supported and have been removed. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
+### New feature
+
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
 ## 1.5.0 (2019-08-05)
 
 ### Bug Fixes

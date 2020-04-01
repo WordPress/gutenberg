@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { clamp, isFinite, noop } from 'lodash';
+import { clamp, noop } from 'lodash';
 
 /**
  * WordPress dependencies

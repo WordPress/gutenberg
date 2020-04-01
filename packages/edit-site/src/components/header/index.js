@@ -3,6 +3,7 @@
  */
 import { useCallback } from '@wordpress/element';
 import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -62,6 +63,7 @@ export default function Header() {
 			</div>
 			<div className="edit-site-header__actions">
 				<SaveButton />
+				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />
 			</div>
 		</div>

@@ -15,6 +15,7 @@ const debug = require( './debug' );
  * @return {WPAutomationTask} Enhanced task.
  */
 function ifNotFork( handler ) {
+	/** @type {WPAutomationTask} */
 	const newHandler = ( payload, octokit ) => {
 		if (
 			payload.pull_request.head.repo.full_name ===

@@ -27,6 +27,7 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockContext } from './block';
+import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
@@ -111,9 +112,11 @@ const BlockComponent = forwardRef(
 			const textInputs = focus.tabbable
 				.find( wrapper.current )
 				.filter( isTextField )
-				// Exclude inner blocks
-				.filter( ( node ) =>
-					isInsideRootBlock( wrapper.current, node )
+				// Exclude inner blocks and block appenders
+				.filter(
+					( node ) =>
+						isInsideRootBlock( wrapper.current, node ) &&
+						! node.closest( '.block-list-appender' )
 				);
 
 			// If reversed (e.g. merge via backspace), use the last in the set of
@@ -226,24 +229,7 @@ const BlockComponent = forwardRef(
 	}
 );
 
-const elements = [
-	'p',
-	'div',
-	'h1',
-	'h2',
-	'h3',
-	'h4',
-	'h5',
-	'h6',
-	'ol',
-	'ul',
-	'li',
-	'figure',
-	'nav',
-	'pre',
-];
-
-const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
+const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {
 		return <BlockComponent { ...props } ref={ ref } tagName={ element } />;
 	} );

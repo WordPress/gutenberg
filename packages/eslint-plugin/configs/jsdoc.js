@@ -47,6 +47,7 @@ const typescriptUtilityTypes = [
 	'IterableIterator',
 	'NonNullable',
 	'Omit',
+	'Parameters',
 	'Partial',
 	'Pick',
 	'PromiseLike',

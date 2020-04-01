@@ -62,6 +62,7 @@ export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
+export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
@@ -82,6 +83,7 @@ export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
+export { default as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';
@@ -93,6 +95,7 @@ export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
@@ -115,4 +118,3 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
-export * from './text';

@@ -33,7 +33,7 @@ function block_core_latest_posts_get_excerpt_length() {
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $block_core_latest_posts_excerpt_length;
+	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
@@ -55,6 +55,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
+
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
@@ -108,21 +109,9 @@ function render_block_core_latest_posts( $attributes ) {
 			$trimmed_excerpt = get_the_excerpt( $post );
 
 			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts__post-excerpt">%1$s',
+				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
 				$trimmed_excerpt
 			);
-
-			if ( strpos( $trimmed_excerpt, ' &hellip; ' ) !== false ) {
-				$list_items_markup .= sprintf(
-					'<a href="%1$s">%2$s</a></div>',
-					esc_url( get_permalink( $post ) ),
-					__( 'Read more' )
-				);
-			} else {
-				$list_items_markup .= sprintf(
-					'</div>'
-				);
-			}
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']

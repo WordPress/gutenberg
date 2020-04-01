@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { cleanEmptyObject } from '../color';
+import { cleanEmptyObject } from '../utils';
 
 describe( 'cleanEmptyObject', () => {
 	it( 'should remove nested keys', () => {
