@@ -1,8 +1,4 @@
 /**
- * @flow
- * @format
- * */
-/**
  * External dependencies
  */
 import wd from 'wd';

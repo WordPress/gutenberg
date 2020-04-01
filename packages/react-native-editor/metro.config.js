@@ -1,4 +1,3 @@
-/** @format */
 const path = require( 'path' );
 const enm = require( './extra-node-modules.config.js' );
 

@@ -1,6 +1,3 @@
-/** @flow
- * @format */
-
 /**
  * This file is used in src/globals.js to patch jsdom-jscore.
  *

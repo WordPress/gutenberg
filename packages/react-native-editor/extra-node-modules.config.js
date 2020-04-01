@@ -1,4 +1,3 @@
-/** @format */
 const enm = require( 'node-libs-react-native' );
 
 enm.fs = __dirname + '/__mocks__/nodejsMock.js';

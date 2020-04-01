@@ -1,5 +1,3 @@
-/** @format */
-
 /**
  * Parts of this source were derived and modified from react-native-sass-transformer,
  * released under the MIT license.

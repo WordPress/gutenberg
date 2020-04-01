@@ -1,6 +1,3 @@
-/** @flow
- * @format */
-
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 // eslint-disable-next-line import/no-extraneous-dependencies

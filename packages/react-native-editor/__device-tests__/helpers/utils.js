@@ -1,9 +1,4 @@
 /**
- * @flow
- * @format
- * */
-
-/**
  * External dependencies
  */
 import childProcess from 'child_process';
@@ -49,7 +44,7 @@ const strToKeycode = {
 };
 
 const timer = ( ms: number ) =>
-	new Promise< {} >( ( res ) => setTimeout( res, ms ) );
+	new Promise() < {} > ( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';

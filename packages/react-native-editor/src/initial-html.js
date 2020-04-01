@@ -1,8 +1,3 @@
-/**
- * @format
- * @flow
- */
-
 export default `
 <!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>

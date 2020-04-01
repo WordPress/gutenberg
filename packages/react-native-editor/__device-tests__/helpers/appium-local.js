@@ -1,16 +1,11 @@
 /**
- * @flow
- * @format
- * */
-
-/**
  * External dependencies
  */
 import childProcess from 'child_process';
 
 // Spawns an appium process
-export const start = ( localAppiumPort: number ) =>
-	new Promise< childProcess.ChildProcess >( ( resolve, reject ) => {
+export const start = ( localAppiumPort ) =>
+	new Promise()( ( resolve, reject ) => {
 		const appium = childProcess.spawn( 'appium', [
 			'--port',
 			localAppiumPort.toString(),
@@ -45,7 +40,7 @@ export const start = ( localAppiumPort: number ) =>
 		} );
 	} );
 
-export const stop = async ( appium: ?childProcess.ChildProcess ) => {
+export const stop = async ( appium ) => {
 	if ( ! appium ) {
 		return;
 	}
