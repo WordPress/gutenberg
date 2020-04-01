@@ -47,7 +47,7 @@ module.exports = {
 				}
 
 				const hasPlaceholders = candidates.some( ( candidate ) =>
-					candidate.match( REGEXP_PLACEHOLDER )
+					REGEXP_PLACEHOLDER.test( candidate )
 				);
 
 				if ( ! hasPlaceholders ) {
