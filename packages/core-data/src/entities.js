@@ -67,6 +67,27 @@ export const defaultEntities = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 	},
+	{
+		name: 'menu',
+		kind: 'root',
+		baseURL: '/__experimental/menus',
+		plural: 'menus',
+		label: __( 'Menu' ),
+	},
+	{
+		name: 'menuItem',
+		kind: 'root',
+		baseURL: '/__experimental/menu-items',
+		plural: 'menuItems',
+		label: __( 'Menu Item' ),
+	},
+	{
+		name: 'menuLocation',
+		kind: 'root',
+		baseURL: '/__experimental/menu-locations',
+		plural: 'menuLocations',
+		label: __( 'Menu Location' ),
+	},
 ];
 
 export const kinds = [

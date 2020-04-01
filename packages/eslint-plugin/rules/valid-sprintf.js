@@ -2,9 +2,10 @@
  * Internal dependencies
  */
 const {
-	SPRINTF_PLACEHOLDER_REGEX,
-	UNORDERED_SPRINTF_PLACEHOLDER_REGEX,
-	getTranslateStrings,
+	REGEXP_SPRINTF_PLACEHOLDER,
+	REGEXP_SPRINTF_PLACEHOLDER_UNORDERED,
+	getTranslateFunctionArgs,
+	getTextContentFromNode,
 } = require( '../utils' );
 
 module.exports = {
@@ -74,15 +75,16 @@ module.exports = {
 
 						// All possible options (arguments) from a translate
 						// function must be valid.
-						candidates = getTranslateStrings(
+						candidates = getTranslateFunctionArgs(
 							argFunctionName,
-							args[ 0 ].arguments
-						);
+							args[ 0 ].arguments,
+							false
+						).map( getTextContentFromNode );
 
 						// An unknown function call may produce a valid string
 						// value. Ideally its result is verified, but this is
 						// not straight-forward to implement. Thus, bail.
-						if ( candidates === undefined ) {
+						if ( candidates.filter( Boolean ).length === 0 ) {
 							return;
 						}
 
@@ -109,10 +111,10 @@ module.exports = {
 				let numPlaceholders;
 				for ( const candidate of candidates ) {
 					const allMatches = candidate.match(
-						SPRINTF_PLACEHOLDER_REGEX
+						REGEXP_SPRINTF_PLACEHOLDER
 					);
 					const unorderedMatches = candidate.match(
-						UNORDERED_SPRINTF_PLACEHOLDER_REGEX
+						REGEXP_SPRINTF_PLACEHOLDER_UNORDERED
 					);
 
 					// Prioritize placeholder number consistency over matching

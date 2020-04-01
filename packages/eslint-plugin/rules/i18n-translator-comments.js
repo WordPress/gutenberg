@@ -3,8 +3,10 @@
  */
 const {
 	TRANSLATION_FUNCTIONS,
-	SPRINTF_PLACEHOLDER_REGEX,
-	getTranslateStrings,
+	REGEXP_SPRINTF_PLACEHOLDER,
+	getTranslateFunctionName,
+	getTranslateFunctionArgs,
+	getTextContentFromNode,
 } = require( '../utils' );
 
 module.exports = {
@@ -27,23 +29,25 @@ module.exports = {
 					arguments: args,
 				} = node;
 
-				const functionName =
-					callee.property && callee.property.name
-						? callee.property.name
-						: callee.name;
+				const functionName = getTranslateFunctionName( callee );
 
-				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
+				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
 					return;
 				}
 
-				const candidates = getTranslateStrings( functionName, args );
+				const candidates = getTranslateFunctionArgs(
+					functionName,
+					args
+				)
+					.map( getTextContentFromNode )
+					.filter( Boolean );
 
-				if ( ! candidates ) {
+				if ( candidates.length === 0 ) {
 					return;
 				}
 
 				const hasPlaceholders = candidates.some( ( candidate ) =>
-					candidate.match( SPRINTF_PLACEHOLDER_REGEX )
+					candidate.match( REGEXP_SPRINTF_PLACEHOLDER )
 				);
 
 				if ( ! hasPlaceholders ) {

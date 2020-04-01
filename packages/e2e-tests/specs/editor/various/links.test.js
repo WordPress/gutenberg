@@ -9,12 +9,6 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-/**
- * The modifier keys needed to invoke a 'select the next word' keyboard shortcut.
- *
- * @type {string}
- */
-
 describe( 'Links', () => {
 	beforeEach( async () => {
 		await createNewPost();

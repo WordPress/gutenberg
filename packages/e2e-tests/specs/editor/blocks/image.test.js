@@ -31,7 +31,9 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector( '.wp-block-image img[src^="http"]' );
+	await page.waitForSelector(
+		`.wp-block-image img[src$="${ filename }.png"]`
+	);
 	return filename;
 }
 

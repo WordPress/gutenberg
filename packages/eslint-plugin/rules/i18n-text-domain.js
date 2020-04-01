@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-const { TRANSLATION_FUNCTIONS } = require( '../utils' );
+const {
+	TRANSLATION_FUNCTIONS,
+	getTranslateFunctionName,
+} = require( '../utils' );
 
 /**
  * Returns the text domain passed to the given translation function.
@@ -32,12 +35,22 @@ module.exports = {
 			{
 				type: 'object',
 				properties: {
-					allowedTextDomains: {
-						type: 'array',
-						items: {
-							type: 'string',
-						},
-						uniqueItems: true,
+					// Supports a single string as the majority use case,
+					// but also an array of text domains.
+					allowedTextDomain: {
+						anyOf: [
+							{
+								type: 'array',
+								items: {
+									type: 'string',
+								},
+								uniqueItems: true,
+							},
+							{
+								type: 'string',
+								default: 'default',
+							},
+						],
 					},
 				},
 				additionalProperties: false,
@@ -55,7 +68,10 @@ module.exports = {
 	},
 	create( context ) {
 		const options = context.options[ 0 ] || {};
-		const { allowedTextDomains = [ 'default' ] } = options;
+		const { allowedTextDomain = 'default' } = options;
+		const allowedTextDomains = Array.isArray( allowedTextDomain )
+			? allowedTextDomain
+			: new Array( allowedTextDomain );
 		const canFixTextDomain = allowedTextDomains.length === 1;
 		const allowDefault = allowedTextDomains.includes( 'default' );
 
@@ -63,12 +79,9 @@ module.exports = {
 			CallExpression( node ) {
 				const { callee, arguments: args } = node;
 
-				const functionName =
-					callee.property && callee.property.name
-						? callee.property.name
-						: callee.name;
+				const functionName = getTranslateFunctionName( callee );
 
-				if ( ! TRANSLATION_FUNCTIONS.includes( functionName ) ) {
+				if ( ! TRANSLATION_FUNCTIONS.has( functionName ) ) {
 					return;
 				}
 

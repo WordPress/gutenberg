@@ -1,9 +1,9 @@
 /**
  * List of translation functions exposed by the `@wordpress/i18n` package.
  *
- * @type {string[]} Translation functions.
+ * @type {Set<string>} Translation functions.
  */
-const TRANSLATION_FUNCTIONS = [ '__', '_x', '_n', '_nx' ];
+const TRANSLATION_FUNCTIONS = new Set( [ '__', '_x', '_n', '_nx' ] );
 
 /**
  * Regular expression matching the presence of a printf format string

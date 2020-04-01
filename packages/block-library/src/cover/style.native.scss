@@ -8,18 +8,6 @@
 	fill: $white;
 }
 
-.innerPadding {
-	padding: $block-selected-to-content;
-}
-
-.regularMediaPadding {
-	padding: $block-edge-to-content;
-}
-
-.denseMediaPadding {
-	padding: $block-media-container-to-content;
-}
-
 .backgroundContainer {
 	overflow: hidden;
 	width: 100%;
@@ -29,6 +17,7 @@
 .content {
 	justify-content: center;
 	width: 100%;
+	padding: $block-edge-to-content;
 	z-index: 3;
 }
 
