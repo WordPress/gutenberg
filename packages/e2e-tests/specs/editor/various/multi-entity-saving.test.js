@@ -18,33 +18,38 @@ import {
 	disableExperimentalFeatures,
 } from '../../../experimental-features';
 
-const requiredExperiments = [
-	'#gutenberg-full-site-editing',
-	'#gutenberg-full-site-editing-demo',
-];
-
 describe( 'Multi-entity save flow', () => {
+	// Selectors.
+	const checkboxSelector = '.components-checkbox-control__checked';
+	const templatePartSelector = '*[data-type="core/template-part"]';
+	const saveButtonSelector = '.editor-post-publish-button__button';
+	const multisaveSelector =
+		'.editor-post-publish-button__button.has-changes-dot';
+	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
+	const saveSiteSelector = '.edit-site-save-button__button';
+
+	// Setup & Teardown.
+	const requiredExperiments = [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	];
 	beforeAll( async () => {
 		await enableExperimentalFeatures( requiredExperiments );
 	} );
-
 	afterAll( async () => {
 		await disableExperimentalFeatures( requiredExperiments );
 	} );
 
 	describe( 'Post Editor', () => {
-		// Reusable post editor button assertions.
 		const assertMultiSaveEnabled = async () => {
 			const multiSaveButton = await page.waitForSelector(
-				'.editor-post-publish-button__button.has-changes-dot'
+				multisaveSelector
 			);
 			expect( multiSaveButton ).not.toBeNull();
 		};
 
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$(
-				'.editor-post-publish-button__button.has-changes-dot'
-			);
+			const multiSaveButton = await page.$( multisaveSelector );
 			expect( multiSaveButton ).toBeNull();
 		};
 
@@ -72,26 +77,22 @@ describe( 'Multi-entity save flow', () => {
 
 				// Make some changes in new Template Part.
 				await page.waitForSelector(
-					'*[data-type="core/template-part"] .block-editor-inner-blocks'
+					`${ templatePartSelector } .block-editor-inner-blocks`
 				);
-				await page.click( '*[data-type="core/template-part"]' );
+				await page.click( templatePartSelector );
 				await page.keyboard.type( 'some words...' );
 
 				await assertMultiSaveEnabled();
 			} );
 
 			it( 'Clicking should open modal with boxes checked by default', async () => {
-				await page.click( '.editor-post-publish-button__button' );
-				const checkedBoxes = await page.$$(
-					'.components-checkbox-control__checked'
-				);
+				await page.click( saveButtonSelector );
+				const checkedBoxes = await page.$$( checkboxSelector );
 				expect( checkedBoxes.length ).toBe( 2 );
 			} );
 
 			it( 'Saving should result in items being saved', async () => {
-				await page.click(
-					'.editor-entities-saved-states__save-button'
-				);
+				await page.click( entitiesSaveSelector );
 
 				// Verify post is saved.
 				const draftSaved = await page.waitForSelector(
@@ -108,7 +109,7 @@ describe( 'Multi-entity save flow', () => {
 			it( 'Update button disabled after publish', async () => {
 				await publishPostWithPrePublishChecksDisabled();
 				const disabledSaveButton = await page.$(
-					'.editor-post-publish-button__button[aria-disabled=true]'
+					`${ saveButtonSelector }[aria-disabled=true]`
 				);
 				expect( disabledSaveButton ).not.toBeNull();
 			} );
@@ -119,7 +120,7 @@ describe( 'Multi-entity save flow', () => {
 
 				// Verify update button is enabled.
 				const enabledSaveButton = await page.$(
-					'.editor-post-publish-button__button[aria-disabled=false]'
+					`${ saveButtonSelector }[aria-disabled=false]`
 				);
 				expect( enabledSaveButton ).not.toBeNull();
 
@@ -128,7 +129,7 @@ describe( 'Multi-entity save flow', () => {
 			} );
 
 			it( 'Multi-save button triggered after editing template part.', async () => {
-				await page.click( '*[data-type="core/template-part"]' );
+				await page.click( templatePartSelector );
 				await page.keyboard.type( '...some more words...' );
 				await page.keyboard.press( 'Enter' );
 				await assertMultiSaveEnabled();
@@ -139,12 +140,11 @@ describe( 'Multi-entity save flow', () => {
 	describe( 'Site Editor', () => {
 		async function assertSaveDisabled() {
 			const disabledButton = await page.waitForSelector(
-				'.edit-site-save-button__button[aria-disabled=true]'
+				`${ saveSiteSelector }[aria-disabled=true]`
 			);
 			expect( disabledButton ).not.toBeNull();
 		}
-		const activeButtonSelector =
-			'.edit-site-save-button__button[aria-disabled=false]';
+		const activeButtonSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 
 		it( 'Save button should be disabled by default', async () => {
 			// Navigate to site editor.
@@ -157,7 +157,7 @@ describe( 'Multi-entity save flow', () => {
 		} );
 
 		it( 'Should be enabled after edits', async () => {
-			await page.click( '*[data-type="core/template-part"]' );
+			await page.click( templatePartSelector );
 			await page.keyboard.type( 'some words...' );
 			const enabledButton = await page.waitForSelector(
 				activeButtonSelector
@@ -167,14 +167,12 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Clicking button should open modal with boxes checked', async () => {
 			await page.click( activeButtonSelector );
-			const checkedBoxes = await page.$$(
-				'.components-checkbox-control__checked'
-			);
+			const checkedBoxes = await page.$$( checkboxSelector );
 			expect( checkedBoxes ).not.toHaveLength( 0 );
 		} );
 
 		it( 'Saving should result in items being saved', async () => {
-			await page.click( '.editor-entities-saved-states__save-button' );
+			await page.click( entitiesSaveSelector );
 			await assertSaveDisabled();
 		} );
 	} );
