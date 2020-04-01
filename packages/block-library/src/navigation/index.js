@@ -44,7 +44,7 @@ export const settings = {
 		{
 			name: 'vertical',
 			title: __( 'Vertical navigation' ),
-			description: __( 'Links shown in a column' ),
+			description: __( 'Links shown in a column.' ),
 			icon: undefined,
 			attributes: { orientation: 'vertical' },
 		},
