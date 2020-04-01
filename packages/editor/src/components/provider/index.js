@@ -117,6 +117,7 @@ class EditorProvider extends Component {
 				'templateLock',
 				'titlePlaceholder',
 				'onUpdateDefaultBlockStyles',
+				'__experimentalDisableCustomUnits',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
