@@ -840,47 +840,6 @@ exports[`Storyshots Components/ButtonGroup Default 1`] = `
 </div>
 `;
 
-exports[`Storyshots Components/ButtonGroup Radio Button Group 1`] = `
-<div
-  className="components-button-group"
-  role="radiogroup"
->
-  <button
-    aria-checked={false}
-    className="components-button is-secondary"
-    onClick={[Function]}
-    onKeyDown={[Function]}
-    role="radio"
-    tabIndex={-1}
-    type="button"
-  >
-    Small
-  </button>
-  <button
-    aria-checked={true}
-    className="components-button is-primary"
-    onClick={[Function]}
-    onKeyDown={[Function]}
-    role="radio"
-    tabIndex={0}
-    type="button"
-  >
-    Medium
-  </button>
-  <button
-    aria-checked={false}
-    className="components-button is-secondary"
-    onClick={[Function]}
-    onKeyDown={[Function]}
-    role="radio"
-    tabIndex={-1}
-    type="button"
-  >
-    Large
-  </button>
-</div>
-`;
-
 exports[`Storyshots Components/Card Default 1`] = `
 .emotion-6 {
   background: #fff;
