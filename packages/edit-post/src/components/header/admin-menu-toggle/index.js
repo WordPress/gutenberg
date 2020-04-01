@@ -4,7 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { ESCAPE, DOWN } from '@wordpress/keycodes';
+import { ESCAPE, TAB } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
@@ -97,7 +97,7 @@ function useToggle( { ref } ) {
 		};
 	}, [ isActive, buttonNode ] );
 
-	// Handles closing the admin menu when pressing ESCAPE or DOWN
+	// Handles admin menu keyboard interactions
 	useEffect( () => {
 		const handleOnKeyDown = ( event ) => {
 			const { keyCode } = event;
@@ -106,7 +106,7 @@ function useToggle( { ref } ) {
 				closeAdminMenu();
 			}
 
-			if ( keyCode === DOWN ) {
+			if ( keyCode === TAB ) {
 				focusFirstAdminMenuItem();
 			}
 		};
