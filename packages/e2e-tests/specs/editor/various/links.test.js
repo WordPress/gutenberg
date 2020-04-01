@@ -54,12 +54,12 @@ describe( 'Links', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		const actualTitleText = await page.evaluate(
+		const actualText = await page.evaluate(
 			() =>
 				document.querySelector( '.block-editor-rich-text__editable a' )
 					.textContent
 		);
-		expect( actualTitleText ).toBe( titleText );
+		expect( actualText ).toBe( titleText );
 	} );
 
 	it( 'can be created by selecting text and clicking Link', async () => {
