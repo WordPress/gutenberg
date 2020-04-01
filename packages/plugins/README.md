@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `WPPlugin | null`: Plugin setting.
+-   `?WPPlugin`: Plugin setting.
 
 <a name="getPlugins" href="#getPlugins">#</a> **getPlugins**
 
@@ -34,7 +34,7 @@ Returns all registered plugins.
 
 _Returns_
 
--   `WPPlugin[]`: Plugin settings.
+-   `Array<WPPlugin>`: Plugin settings.
 
 <a name="PluginArea" href="#PluginArea">#</a> **PluginArea**
 
@@ -178,7 +178,7 @@ _Parameters_
 
 _Returns_
 
--   `WPPlugin | null`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
+-   `?WPPlugin`: The previous plugin settings object, if it has been successfully unregistered; otherwise `undefined`.
 
 <a name="withPluginContext" href="#withPluginContext">#</a> **withPluginContext**
 

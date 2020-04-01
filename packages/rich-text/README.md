@@ -24,14 +24,14 @@ provided.
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _format_ `object`: Format to apply.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _value_ `Object`: Value to modify.
+-   _format_ `Object`: Format to apply.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new value with the format applied.
+-   `Object`: A new value with the format applied.
 
 <a name="concat" href="#concat">#</a> **concat**
 
@@ -40,11 +40,11 @@ Combine all Rich Text values into one. This is similar to
 
 _Parameters_
 
--   _values_ `...object`: Objects to combine.
+-   _values_ `...Object`: Objects to combine.
 
 _Returns_
 
--   `object`: A new value combining all given records.
+-   `Object`: A new value combining all given records.
 
 <a name="create" href="#create">#</a> **create**
 
@@ -60,11 +60,11 @@ to modify without the use of helper functions:
 
 ```js
 {
-   text: string,
-   formats: Array,
-   replacements: Array,
-   ?start: number,
-   ?end: number,
+  text: string,
+  formats: Array,
+  replacements: Array,
+  ?start: number,
+  ?end: number,
 }
 ```
 
@@ -77,18 +77,18 @@ provided if a `Range` was given.
 
 _Parameters_
 
--   _$1_ `object | undefined`: Optional named arguments.
-    -   _element_ `Element | undefined`: Element to create value from.
-    -   _text_ `string | undefined`: Text to create value from.
-    -   _html_ `string | undefined`: HTML to create value from.
-    -   _range_ `Range | undefined`: Range to create value from.
-    -   _multilineTag_ `string | undefined`: Multiline tag if the structure is multiline.
-    -   _multilineWrapperTags_ `Array | undefined`: Tags where lines can be found if nesting is possible.
-    -   _preserveWhiteSpace_ `boolean | null | undefined`: Whether or not to collapse white space characters.
+-   _$1_ `[Object]`: Optional named arguments.
+-   _$1.element_ `[Element]`: Element to create value from.
+-   _$1.text_ `[string]`: Text to create value from.
+-   _$1.html_ `[string]`: HTML to create value from.
+-   _$1.range_ `[Range]`: Range to create value from.
+-   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
+-   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to collapse white space characters.
 
 _Returns_
 
--   `object`: A rich text value.
+-   `Object`: A rich text value.
 
 <a name="getActiveFormat" href="#getActiveFormat">#</a> **getActiveFormat**
 
@@ -99,12 +99,12 @@ is no format at the selection.
 
 _Parameters_
 
--   _value_ `object`: Value to inspect.
+-   _value_ `Object`: Value to inspect.
 -   _formatType_ `string`: Format type to look for.
 
 _Returns_
 
--   `object | undefined`: Active format object of the specified type, or undefined.
+-   `(Object|undefined)`: Active format object of the specified type, or undefined.
 
 <a name="getActiveObject" href="#getActiveObject">#</a> **getActiveObject**
 
@@ -112,11 +112,11 @@ Gets the active object, if there is any.
 
 _Parameters_
 
--   _value_ `object`: Value to inspect.
+-   _value_ `Object`: Value to inspect.
 
 _Returns_
 
--   `object | null`: Active object, or undefined.
+-   `?Object`: Active object, or undefined.
 
 <a name="getTextContent" href="#getTextContent">#</a> **getTextContent**
 
@@ -125,7 +125,7 @@ Get the textual content of a Rich Text value. This is similar to
 
 _Parameters_
 
--   _value_ `object`: Value to use.
+-   _value_ `Object`: Value to use.
 
 _Returns_
 
@@ -140,14 +140,14 @@ none are provided.
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _valueToInsert_ `object | string`: Value to insert.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _value_ `Object`: Value to modify.
+-   _valueToInsert_ `(Object|string)`: Value to insert.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new value with the value inserted.
+-   `Object`: A new value with the value inserted.
 
 <a name="insertObject" href="#insertObject">#</a> **insertObject**
 
@@ -157,14 +157,14 @@ removed. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _formatToInsert_ `object`: Format to insert as object.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _value_ `Object`: Value to modify.
+-   _formatToInsert_ `Object`: Format to insert as object.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new value with the object inserted.
+-   `Object`: A new value with the object inserted.
 
 <a name="isCollapsed" href="#isCollapsed">#</a> **isCollapsed**
 
@@ -175,11 +175,11 @@ is no selection, `undefined` will be returned. This is similar to
 
 _Parameters_
 
--   _value_ `object`: The rich text value to check.
+-   _value_ `Object`: The rich text value to check.
 
 _Returns_
 
--   `boolean | undefined`: True if the selection is collapsed, false if not, undefined if there is no selection.
+-   `(boolean|undefined)`: True if the selection is collapsed, false if not, undefined if there is no selection.
 
 <a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
 
@@ -188,7 +188,7 @@ objects (such as images).
 
 _Parameters_
 
--   _value_ `object`: Value to use.
+-   _value_ `Object`: Value to use.
 
 _Returns_
 
@@ -202,12 +202,12 @@ string. This is similar to `Array.prototype.join`.
 
 _Parameters_
 
--   _values_ `object[]`: An array of values to join.
--   _separator_ `string | object | undefined`: Separator string or value.
+-   _values_ `Array<Object>`: An array of values to join.
+-   _separator_ `[(string|Object)]`: Separator string or value.
 
 _Returns_
 
--   `object`: A new combined value.
+-   `Object`: A new combined value.
 
 <a name="registerFormatType" href="#registerFormatType">#</a> **registerFormatType**
 
@@ -221,7 +221,7 @@ _Parameters_
 
 _Returns_
 
--   `WPFormat | undefined`: The format, if it has been successfully registered; otherwise `undefined`.
+-   `(WPFormat|undefined)`: The format, if it has been successfully registered; otherwise `undefined`.
 
 <a name="remove" href="#remove">#</a> **remove**
 
@@ -230,13 +230,13 @@ Remove content from a Rich Text value between the given `startIndex` and
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _value_ `Object`: Value to modify.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new value with the content removed.
+-   `Object`: A new value with the content removed.
 
 <a name="removeFormat" href="#removeFormat">#</a> **removeFormat**
 
@@ -246,14 +246,14 @@ selection if none are provided.
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
+-   _value_ `Object`: Value to modify.
 -   _formatType_ `string`: Format type to remove.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new value with the format applied.
+-   `Object`: A new value with the format applied.
 
 <a name="replace" href="#replace">#</a> **replace**
 
@@ -262,13 +262,13 @@ is similar to `String.prototype.replace`.
 
 _Parameters_
 
--   _value_ `object`: The value to modify.
--   _pattern_ `RegExp | string`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
--   _replacement_ `Function | string`: The match or matches are replaced with the specified or the value returned by the specified function.
+-   _value_ `Object`: The value to modify.
+-   _pattern_ `(RegExp|string)`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
+-   _replacement_ `(Function|string)`: The match or matches are replaced with the specified or the value returned by the specified function.
 
 _Returns_
 
--   `object`: A new value with replacements applied.
+-   `Object`: A new value with replacements applied.
 
 <a name="slice" href="#slice">#</a> **slice**
 
@@ -278,13 +278,13 @@ retrieved from the selection if none are provided. This is similar to
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _startIndex_ `number | undefined`: Start index.
--   _endIndex_ `number | undefined`: End index.
+-   _value_ `Object`: Value to modify.
+-   _startIndex_ `[number]`: Start index.
+-   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `object`: A new extracted value.
+-   `Object`: A new extracted value.
 
 <a name="split" href="#split">#</a> **split**
 
@@ -294,13 +294,13 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `object`: 
-    -   _formats_ `object[]`: 
-    -   _replacements_ `object[]`: 
-    -   _text_ `string`: 
-    -   _start_ `number`: 
-    -   _end_ `number`: 
--   _string_ `number | string | undefined`: Start index, or string at which to split.
+-   _value_ `Object`: 
+-   _value.formats_ `Array<Object>`: 
+-   _value.replacements_ `Array<Object>`: 
+-   _value.text_ `string`: 
+-   _value.start_ `number`: 
+-   _value.end_ `number`: 
+-   _string_ `[(number|string)]`: Start index, or string at which to split.
 
 _Returns_
 
@@ -312,12 +312,12 @@ Toggles a format object to a Rich Text value at the current selection.
 
 _Parameters_
 
--   _value_ `object`: Value to modify.
--   _format_ `object`: Format to apply or remove.
+-   _value_ `Object`: Value to modify.
+-   _format_ `Object`: Format to apply or remove.
 
 _Returns_
 
--   `object`: A new value with the format applied or removed.
+-   `Object`: A new value with the format applied or removed.
 
 <a name="toHTMLString" href="#toHTMLString">#</a> **toHTMLString**
 
@@ -326,10 +326,10 @@ provided, text separated by a line separator will be wrapped in it.
 
 _Parameters_
 
--   _$1_ `object`: Named argements.
-    -   _value_ `object`: Rich text value.
-    -   _multilineTag_ `string | undefined`: Multiline tag.
-    -   _preserveWhiteSpace_ `boolean | null | undefined`: Whether or not to use newline characters for line breaks.
+-   _$1_ `Object`: Named argements.
+-   _$1.value_ `Object`: Rich text value.
+-   _$1.multilineTag_ `[string]`: Multiline tag.
+-   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 
@@ -345,7 +345,7 @@ _Parameters_
 
 _Returns_
 
--   `WPFormat | undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+-   `(WPFormat|undefined)`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

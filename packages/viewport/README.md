@@ -100,7 +100,7 @@ MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
 
 _Parameters_
 
--   _queries_ `object`: Object of prop name to viewport query.
+-   _queries_ `Object`: Object of prop name to viewport query.
 
 _Returns_
 

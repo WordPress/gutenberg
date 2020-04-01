@@ -125,7 +125,7 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _object_ `object`: Object reference to create an id for.
+-   _object_ `Object`: Object reference to create an id for.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
@@ -133,7 +133,7 @@ Attach a keyboard shortcut handler.
 
 _Parameters_
 
--   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
+-   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
 -   _callback_ `Function`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
@@ -143,7 +143,7 @@ Runs a media query and returns its value when it changes.
 
 _Parameters_
 
--   _query_ `string | undefined`: Media Query.
+-   _query_ `[string]`: Media Query.
 
 _Returns_
 
@@ -195,7 +195,7 @@ useViewportMatch( 'medium' );
 _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
--   _operator_ `WPViewportOperator`: Viewport operator. (Default: `>=`)
+-   _operator_ `[WPViewportOperator]`: Viewport operator.
 
 _Returns_
 
@@ -212,7 +212,7 @@ event handler for the entire application.
 
 _Parameters_
 
--   _eventTypesToHandlers_ `Record<string, string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+-   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
 
 _Returns_
 
@@ -251,7 +251,7 @@ via props.
 
 _Parameters_
 
--   _initialState_ `object | null`: Optional initial state of the component.
+-   _initialState_ `?Object`: Optional initial state of the component.
 
 _Returns_
 

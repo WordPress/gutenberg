@@ -326,7 +326,7 @@ registerStore( 'my-shop', {
 
 _Parameters_
 
--   _reducers_ `object`: An object whose values correspond to different reducing functions that need to be combined into one.
+-   _reducers_ `Object`: An object whose values correspond to different reducing functions that need to be combined into one.
 
 _Returns_
 
@@ -339,8 +339,8 @@ configurations.
 
 _Parameters_
 
--   _storeConfigs_ `object`: Initial store configurations.
--   _parent_ `object | null`: Parent registry.
+-   _storeConfigs_ `Object`: Initial store configurations.
+-   _parent_ `?Object`: Parent registry.
 
 _Returns_
 
@@ -392,7 +392,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Object containing the action creators.
+-   `Object`: Object containing the action creators.
 
 <a name="plugins" href="#plugins">#</a> **plugins**
 
@@ -404,7 +404,7 @@ _Related_
 
 _Type_
 
--   `object` 
+-   `Object` 
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
@@ -413,7 +413,7 @@ Registers a generic store.
 _Parameters_
 
 -   _key_ `string`: Store registry key.
--   _config_ `object`: Configuration (getSelectors, getActions, subscribe).
+-   _config_ `Object`: Configuration (getSelectors, getActions, subscribe).
 
 <a name="registerStore" href="#registerStore">#</a> **registerStore**
 
@@ -422,11 +422,11 @@ Registers a standard `@wordpress/data` store.
 _Parameters_
 
 -   _reducerKey_ `string`: Reducer key.
--   _options_ `object`: Store description (reducer, actions, selectors, resolvers).
+-   _options_ `Object`: Store description (reducer, actions, selectors, resolvers).
 
 _Returns_
 
--   `object`: Registered store object.
+-   `Object`: Registered store object.
 
 <a name="RegistryConsumer" href="#RegistryConsumer">#</a> **RegistryConsumer**
 
@@ -489,7 +489,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Object containing the store's selectors.
+-   `Object`: Object containing the store's selectors.
 
 <a name="subscribe" href="#subscribe">#</a> **subscribe**
 
@@ -523,7 +523,7 @@ to extend the default registry behavior.
 
 _Parameters_
 
--   _plugin_ `object`: Plugin object.
+-   _plugin_ `Object`: Plugin object.
 
 <a name="useDispatch" href="#useDispatch">#</a> **useDispatch**
 
@@ -566,7 +566,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeName_ `string | undefined`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeName_ `[string]`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 

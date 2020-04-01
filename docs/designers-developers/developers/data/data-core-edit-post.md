@@ -19,11 +19,11 @@ Examples:
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
--   `string | null`: Active general sidebar name.
+-   `?string`: Active general sidebar name.
 
 <a name="getActiveMetaBoxLocations" href="#getActiveMetaBoxLocations">#</a> **getActiveMetaBoxLocations**
 
@@ -31,11 +31,11 @@ Returns an array of active meta box locations.
 
 _Parameters_
 
--   _state_ `object`: Post editor state.
+-   _state_ `Object`: Post editor state.
 
 _Returns_
 
--   `string[]`: Active meta box locations.
+-   `Array<string>`: Active meta box locations.
 
 <a name="getAllMetaBoxes" href="#getAllMetaBoxes">#</a> **getAllMetaBoxes**
 
@@ -43,7 +43,7 @@ Returns the list of all the available meta boxes.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -55,7 +55,7 @@ Returns the current editing mode.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -67,24 +67,24 @@ Returns the list of all the available meta boxes for a given location.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _location_ `string`: Meta box location to test.
 
 _Returns_
 
--   `Array | null`: List of meta boxes.
+-   `?Array`: List of meta boxes.
 
 <a name="getPreference" href="#getPreference">#</a> **getPreference**
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _preferenceKey_ `string`: Preference Key.
--   _defaultValue_ `any`: Default Value.
+-   _defaultValue_ `*`: Default Value.
 
 _Returns_
 
--   `any`: Preference Value.
+-   `*`: Preference Value.
 
 <a name="getPreferences" href="#getPreferences">#</a> **getPreferences**
 
@@ -92,11 +92,11 @@ Returns the preferences (these preferences are persisted locally).
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
--   `object`: Preferences Object.
+-   `Object`: Preferences Object.
 
 <a name="hasMetaBoxes" href="#hasMetaBoxes">#</a> **hasMetaBoxes**
 
@@ -104,7 +104,7 @@ Returns true if the post is using Meta Boxes
 
 _Parameters_
 
--   _state_ `object`: Global application state
+-   _state_ `Object`: Global application state
 
 _Returns_
 
@@ -117,7 +117,7 @@ enabled by default.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _panelName_ `string`: A string that identifies the panel.
 
 _Returns_
@@ -131,7 +131,7 @@ closed by default.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _panelName_ `string`: A string that identifies the panel.
 
 _Returns_
@@ -145,7 +145,7 @@ All panels are not removed by default.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _panelName_ `string`: A string that identifies the panel.
 
 _Returns_
@@ -158,7 +158,7 @@ Returns true if the editor sidebar is opened.
 
 _Parameters_
 
--   _state_ `object`: Global application state
+-   _state_ `Object`: Global application state
 
 _Returns_
 
@@ -170,7 +170,7 @@ Returns whether the given feature is enabled or not.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _feature_ `string`: Feature slug.
 
 _Returns_
@@ -184,7 +184,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `object`: Post editor state.
+-   _state_ `Object`: Post editor state.
 -   _location_ `string`: Meta box location to test.
 
 _Returns_
@@ -197,7 +197,7 @@ Returns true if a metabox location is active and visible
 
 _Parameters_
 
--   _state_ `object`: Post editor state.
+-   _state_ `Object`: Post editor state.
 -   _location_ `string`: Meta box location to test.
 
 _Returns_
@@ -210,7 +210,7 @@ Returns true if a modal is active, or false otherwise.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _modalName_ `string`: A string that uniquely identifies the modal.
 
 _Returns_
@@ -224,7 +224,7 @@ When the value is not set it defaults to true.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 -   _pluginName_ `string`: Plugin item name.
 
 _Returns_
@@ -237,7 +237,7 @@ Returns true if the plugin sidebar is opened.
 
 _Parameters_
 
--   _state_ `object`: Global application state
+-   _state_ `Object`: Global application state
 
 _Returns_
 
@@ -249,7 +249,7 @@ Returns true if the publish sidebar is opened.
 
 _Parameters_
 
--   _state_ `object`: Global application state
+-   _state_ `Object`: Global application state
 
 _Returns_
 
@@ -261,7 +261,7 @@ Returns true if the Meta Boxes are being saved.
 
 _Parameters_
 
--   _state_ `object`: Global application state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
@@ -283,7 +283,7 @@ Returns an action object signalling that the user closed a modal.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="closePublishSidebar" href="#closePublishSidebar">#</a> **closePublishSidebar**
 
@@ -292,7 +292,7 @@ publish sidebar.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="hideBlockTypes" href="#hideBlockTypes">#</a> **hideBlockTypes**
 
@@ -301,11 +301,11 @@ name(s) should be hidden.
 
 _Parameters_
 
--   _blockNames_ `string[]`: Names of block types to hide.
+-   _blockNames_ `Array<string>`: Names of block types to hide.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="metaBoxUpdatesSuccess" href="#metaBoxUpdatesSuccess">#</a> **metaBoxUpdatesSuccess**
 
@@ -313,7 +313,7 @@ Returns an action object used signal a successful meta box update.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="openGeneralSidebar" href="#openGeneralSidebar">#</a> **openGeneralSidebar**
 
@@ -321,7 +321,7 @@ Returns an action object used in signalling that the user opened an editor sideb
 
 _Parameters_
 
--   _name_ `string | null`: Sidebar name to be opened.
+-   _name_ `?string`: Sidebar name to be opened.
 
 <a name="openModal" href="#openModal">#</a> **openModal**
 
@@ -333,7 +333,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="openPublishSidebar" href="#openPublishSidebar">#</a> **openPublishSidebar**
 
@@ -342,7 +342,7 @@ sidebar.
 
 _Returns_
 
--   `object`: Action object
+-   `Object`: Action object
 
 <a name="removeEditorPanel" href="#removeEditorPanel">#</a> **removeEditorPanel**
 
@@ -354,7 +354,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="requestMetaBoxUpdates" href="#requestMetaBoxUpdates">#</a> **requestMetaBoxUpdates**
 
@@ -362,7 +362,7 @@ Returns an action object used to request meta box update.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="setAvailableMetaBoxesPerLocation" href="#setAvailableMetaBoxesPerLocation">#</a> **setAvailableMetaBoxesPerLocation**
 
@@ -371,11 +371,11 @@ what Meta boxes are available in which location.
 
 _Parameters_
 
--   _metaBoxesPerLocation_ `object`: Meta boxes per location.
+-   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="showBlockTypes" href="#showBlockTypes">#</a> **showBlockTypes**
 
@@ -384,11 +384,11 @@ name(s) should be shown.
 
 _Parameters_
 
--   _blockNames_ `string[]`: Names of block types to show.
+-   _blockNames_ `Array<string>`: Names of block types to show.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="switchEditorMode" href="#switchEditorMode">#</a> **switchEditorMode**
 
@@ -404,7 +404,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="toggleEditorPanelOpened" href="#toggleEditorPanelOpened">#</a> **toggleEditorPanelOpened**
 
@@ -416,7 +416,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="toggleFeature" href="#toggleFeature">#</a> **toggleFeature**
 
@@ -428,7 +428,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="togglePinnedPluginItem" href="#togglePinnedPluginItem">#</a> **togglePinnedPluginItem**
 
@@ -440,7 +440,7 @@ _Parameters_
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 <a name="togglePublishSidebar" href="#togglePublishSidebar">#</a> **togglePublishSidebar**
 
@@ -448,7 +448,7 @@ Returns an action object used in signalling that the user toggles the publish si
 
 _Returns_
 
--   `object`: Action object
+-   `Object`: Action object
 
 <a name="updatePreferredStyleVariations" href="#updatePreferredStyleVariations">#</a> **updatePreferredStyleVariations**
 
@@ -457,11 +457,11 @@ Returns an action object used in signaling that a style should be auto-applied w
 _Parameters_
 
 -   _blockName_ `string`: Name of the block.
--   _blockStyle_ `string | null`: Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+-   _blockStyle_ `?string`: Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
 
 _Returns_
 
--   `object`: Action object.
+-   `Object`: Action object.
 
 
 <!-- END TOKEN(Autogenerated actions|../../../../packages/edit-post/src/store/actions.js) -->

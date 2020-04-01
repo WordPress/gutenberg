@@ -143,9 +143,9 @@ _Related_
 
 _Parameters_
 
--   _preview_ `object`: options for how the preview should be shown
-    -   _blocks_ `Array | object`: A block instance (object) or an array of blocks to be previewed.
-    -   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+-   _preview_ `Object`: options for how the preview should be shown
+-   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
@@ -247,7 +247,7 @@ _Parameters_
 
 _Returns_
 
--   `string | null`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
+-   `?string`: String with the class corresponding to the color in the provided context. Returns undefined if either colorContextName or colorSlug are not provided.
 
 <a name="getColorObjectByAttributeValues" href="#getColorObjectByAttributeValues">#</a> **getColorObjectByAttributeValues**
 
@@ -257,12 +257,12 @@ and the values of the defined color or custom color returns a color object descr
 _Parameters_
 
 -   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
--   _definedColor_ `string | null`: A string containing the color slug.
--   _customColor_ `string | null`: A string containing the customColor value.
+-   _definedColor_ `?string`: A string containing the color slug.
+-   _customColor_ `?string`: A string containing the customColor value.
 
 _Returns_
 
--   `object | null`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
+-   `?Object`: If definedColor is passed and the name is found in colors, the color object exactly as set by the theme or editor defaults is returned. Otherwise, an object that just sets the color is defined.
 
 <a name="getColorObjectByColorValue" href="#getColorObjectByColorValue">#</a> **getColorObjectByColorValue**
 
@@ -271,26 +271,26 @@ Provided an array of color objects as set by the theme or by the editor defaults
 _Parameters_
 
 -   _colors_ `Array`: Array of color objects as set by the theme or by the editor defaults.
--   _colorValue_ `string | null`: A string containing the color value.
+-   _colorValue_ `?string`: A string containing the color value.
 
 _Returns_
 
--   `object | null`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
+-   `?Object`: Color object included in the colors array whose color property equals colorValue. Returns undefined if no color object matches this requirement.
 
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
-If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
+	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
 
 -   _fontSizes_ `Array`: Array of font size objects containing at least the "name" and "size" values as properties.
--   _fontSizeAttribute_ `string | null`: Content of the font size attribute (slug).
--   _customFontSizeAttribute_ `number | null`: Contents of the custom font size attribute (value).
+-   _fontSizeAttribute_ `?string`: Content of the font size attribute (slug).
+-   _customFontSizeAttribute_ `?number`: Contents of the custom font size attribute (value).
 
 _Returns_
 
--   `string | null`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
+-   `?string`: If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug. Otherwise, an object with just the size value based on customFontSize is returned.
 
 <a name="getFontSizeClass" href="#getFontSizeClass">#</a> **getFontSizeClass**
 
@@ -395,7 +395,7 @@ The default editor settings
 
 _Type Definition_
 
--   _SETTINGS_DEFAULT_ `object`
+-   _SETTINGS_DEFAULT_ `Object`
 
 _Properties_
 
@@ -407,7 +407,7 @@ _Properties_
 -   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
--   _allowedBlockTypes_ `boolean | Array`: Allowed block types
+-   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
 -   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
@@ -436,7 +436,7 @@ _Related_
 
 _Type_
 
--   `object` 
+-   `Object` 
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
@@ -517,7 +517,7 @@ export default compose(
 
 _Parameters_
 
--   _colorTypes_ `...( object | string )`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
+-   _colorTypes_ `...(Object|string)`: The arguments can be strings or objects. If the argument is an object, it should contain the color attribute name as key and the color context as value. If the argument is a string the value should be the color attribute name, the color context is computed by applying a kebab case transform to the value. Color context represents the context/place where the color is going to be used. The class name of the color is generated using 'has' followed by the color name and ending with the color context all in kebab case e.g: has-green-background-color.
 
 _Returns_
 
@@ -530,7 +530,7 @@ font size value retrieval, and font size change handling.
 
 _Parameters_
 
--   _fontSizeNames_ `...( object | string )`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
+-   _fontSizeNames_ `...(Object|string)`: The arguments should all be strings. Each string contains the font size attribute name e.g: 'fontSize'.
 
 _Returns_
 
