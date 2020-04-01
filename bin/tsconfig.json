@@ -8,6 +8,10 @@
 		"rootDir": ".",
 		"declarationMap": false,
 
+		// Needed for interop with Chalk, hopefully temporarily.
+		// See: https://github.com/chalk/chalk/issues/382
+		"isolatedModules": false,
+
 		// We're not interested in the output, but we must generate
 		// something as part of a composite project. Use the
 		// ignored `.cache` file to hide tsbuildinfo and d.ts files.
