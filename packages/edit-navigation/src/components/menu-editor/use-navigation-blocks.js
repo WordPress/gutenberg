@@ -90,7 +90,7 @@ export default function useNavigationBlocks( menuId ) {
 		// Disable reason, this code will eventually be implemented.
 		// eslint-disable-next-line no-unused-vars
 		for ( const clientId of deletedClientIds ) {
-			// TODO - delete menu items.
+			console.log( deletedClientIds );
 		}
 	};
 
