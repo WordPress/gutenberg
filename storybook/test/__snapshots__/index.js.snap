@@ -4369,6 +4369,55 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/Radio Default 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="default-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option1-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option2-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+</div>
+`;
+
 exports[`Storyshots Components/RadioControl Default 1`] = `
 <div
   className="components-base-control components-radio-control"
@@ -4517,6 +4566,140 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
   >
     The visibility level for the current post
   </p>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Controlled 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="controlled-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option1-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    checked={true}
+    className="components-button is-primary"
+    id="option2-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option3-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Default 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="default-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option1-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    checked={true}
+    className="components-button is-primary"
+    id="option2-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="option3-radio"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
 </div>
 `;
 
