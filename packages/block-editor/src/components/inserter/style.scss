@@ -89,7 +89,6 @@ $block-inserter-tabs-height: 44px;
 
 	.components-tab-panel__tabs {
 		padding: 0 $grid-unit-20;
-		margin-bottom: -1px;
 		border-bottom: $border-width solid $light-gray-secondary;
 	}
 
@@ -106,6 +105,7 @@ $block-inserter-tabs-height: 44px;
 	position: relative;
 	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
 	padding: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
+	margin-top: -$border-width;
 
 	&:focus {
 		outline: $border-width dotted $dark-gray-500;
@@ -259,9 +259,11 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns {
 	padding: $grid-unit-20;
+	background: $light-gray-200;
 }
 
 .block-editor-inserter__patterns-item {
+	background: $white;
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	margin-bottom: $grid-unit-20;
