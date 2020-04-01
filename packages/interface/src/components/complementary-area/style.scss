@@ -52,6 +52,15 @@
 		margin-top: 0;
 	}
 
+	h2 {
+		font-weight: 500;
+	}
+
+	p,
+	h3 {
+		font-weight: normal;
+	}
+
 	h2,
 	h3 {
 		font-size: $default-font-size;
