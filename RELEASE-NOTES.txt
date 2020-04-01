@@ -8,6 +8,7 @@
 * Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
 * Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
 * [Android] Show an "Edit" button overlay on selected image blocks
+
 1.24.0
 ------
 * New block: Latest Posts
