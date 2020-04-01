@@ -17,14 +17,11 @@
 
 		svg {
 			padding: 4px;
+			pointer-events: none;
 			border-radius: 2px;
 			width: 32px;
 			height: 32px;
 			fill: $white;
-		}
-
-		svg {
-			fill: #23282e;
 		}
 
 		&:hover {
