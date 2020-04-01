@@ -1,5 +1,7 @@
 ## Master
 
+## 4.1.0 (2020-04-01)
+
 ### New Features
 
 - The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.

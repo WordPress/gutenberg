@@ -1,5 +1,7 @@
 ## Master
 
+## 7.2.0 (2020-04-01)
+
 ### Enhancements
 
 - Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
