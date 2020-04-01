@@ -313,7 +313,7 @@ Serializes a React element to string.
 _Parameters_
 
 -   _element_ `WPElement`: Element to serialize.
--   _context_ `?Object`: Context object.
+-   _context_ `[Map]`: Context object.
 -   _legacyContext_ `?Object`: Legacy context object.
 
 _Returns_

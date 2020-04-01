@@ -36,6 +36,7 @@ import {
 	kebabCase,
 	isPlainObject,
 } from 'lodash';
+import CoreJSMap from 'core-js-pure/features/map';
 
 /**
  * WordPress dependencies
@@ -347,7 +348,7 @@ function getNormalStylePropertyValue( property, value ) {
  * Serializes a React element to string.
  *
  * @param {WPElement} element       Element to serialize.
- * @param {?Object}   context       Context object.
+ * @param {Map=}      context       Context object.
  * @param {?Object}   legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
@@ -411,11 +412,18 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 	switch ( type && type.$$typeof ) {
 		case Provider.$$typeof:
-			return renderChildren( props.children, props.value, legacyContext );
+			context = context ? new CoreJSMap( context ) : new CoreJSMap();
+			context.set( type, props.value );
+			return renderChildren( props.children, context, legacyContext );
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children(
+					( context &&
+						type._context &&
+						context.get( type._context.Provider ) ) ||
+						type._currentValue
+				),
 				context,
 				legacyContext
 			);
