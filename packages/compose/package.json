@@ -27,7 +27,8 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"lodash": "^4.17.15",
-		"mousetrap": "^1.6.2"
+		"mousetrap": "^1.6.2",
+		"react-resize-aware": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

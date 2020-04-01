@@ -232,7 +232,7 @@ const Popover = ( {
 	onKeyDown,
 	children,
 	className,
-	noArrow = false,
+	noArrow = true,
 	// Disable reason: We generate the `...contentProps` rest as remainder
 	// of props which aren't explicitly handled by this component.
 	/* eslint-disable no-unused-vars */
@@ -252,6 +252,7 @@ const Popover = ( {
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
 	__unstableFixedPosition = true,
+	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -324,6 +325,13 @@ const Popover = ( {
 				setStyle( containerRef.current, 'position' );
 			}
 
+			let boundaryElement;
+			if ( __unstableBoundaryParent ) {
+				boundaryElement = containerRef.current.closest(
+					'.popover-slot'
+				).parentNode;
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -337,7 +345,8 @@ const Popover = ( {
 				position,
 				__unstableSticky,
 				containerRef.current,
-				relativeOffsetTop
+				relativeOffsetTop,
+				boundaryElement
 			);
 
 			if (
@@ -472,6 +481,7 @@ const Popover = ( {
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
+		__unstableBoundaryParent,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -617,7 +627,7 @@ const Popover = ( {
 const PopoverContainer = Popover;
 
 PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } />
+	<Slot bubblesVirtually name={ name } className="popover-slot" />
 );
 
 export default PopoverContainer;

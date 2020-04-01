@@ -26,7 +26,12 @@ const BlockBreadcrumb = ( {
 	rootBlockIcon,
 } ) => {
 	return (
-		<View style={ styles.breadcrumbContainer }>
+		<View
+			style={ [
+				styles.breadcrumbContainer,
+				rootClientId && styles.densedPaddingLeft,
+			] }
+		>
 			<TouchableOpacity
 				style={ styles.button }
 				onPress={ () => {

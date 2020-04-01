@@ -21,6 +21,22 @@ function gutenberg_edit_site_page() {
 }
 
 /**
+ * Checks whether the provided page is one of allowed Site Editor pages.
+ *
+ * @param string $page Page to check.
+ *
+ * @return bool True for Site Editor pages, false otherwise.
+ */
+function gutenberg_is_edit_site_page( $page ) {
+	$allowed_pages = array(
+		'gutenberg_page_gutenberg-edit-site',
+		'toplevel_page_gutenberg-edit-site',
+	);
+
+	return in_array( $page, $allowed_pages, true );
+}
+
+/**
  * Initialize the Gutenberg Edit Site Page.
  *
  * @since 7.2.0
@@ -28,10 +44,25 @@ function gutenberg_edit_site_page() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $_wp_current_template_id;
-	if ( 'gutenberg_page_gutenberg-edit-site' !== $hook ) {
+	global
+		$_wp_current_template_id,
+		$_wp_current_template_name,
+		$_wp_current_template_content,
+		$_wp_current_template_hierarchy,
+		$_wp_current_template_part_ids,
+		$current_screen;
+
+	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
 	}
+
+	/**
+	 * Make the WP Screen object aware that this is a block editor page.
+	 * Since custom blocks check whether the screen is_block_editor,
+	 * this is required for custom blocks to be loaded.
+	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
+	 */
+	$current_screen->is_block_editor( true );
 
 	// Get editor settings.
 	$max_upload_size = wp_max_upload_size();
@@ -74,11 +105,58 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
-	// Get root template by trigerring `./template-loader.php`'s logic.
+	// Get all templates by triggering `./template-loader.php`'s logic.
+	$template_getters  = array(
+		'get_embed_template',
+		'get_404_template',
+		'get_search_template',
+		'get_home_template',
+		'get_privacy_policy_template',
+		'get_post_type_archive_template',
+		'get_taxonomy_template',
+		'get_attachment_template',
+		'get_single_template',
+		'get_page_template',
+		'get_singular_template',
+		'get_category_template',
+		'get_tag_template',
+		'get_author_template',
+		'get_date_template',
+		'get_archive_template',
+	);
+	$template_ids      = array();
+	$template_part_ids = array();
+	foreach ( $template_getters as $template_getter ) {
+		call_user_func( $template_getter );
+		apply_filters( 'template_include', null );
+		if ( isset( $_wp_current_template_id ) ) {
+			$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+		}
+		if ( isset( $_wp_current_template_part_ids ) ) {
+			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+		}
+		$_wp_current_template_id        = null;
+		$_wp_current_template_name      = null;
+		$_wp_current_template_content   = null;
+		$_wp_current_template_hierarchy = null;
+		$_wp_current_template_part_ids  = null;
+	}
 	get_front_page_template();
 	get_index_template();
 	apply_filters( 'template_include', null );
-	$settings['templateId'] = $_wp_current_template_id;
+	$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+	if ( isset( $_wp_current_template_part_ids ) ) {
+		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
+	}
+	$settings['templateId']      = $_wp_current_template_id;
+	$settings['templateType']    = 'wp_template';
+	$settings['templateIds']     = array_values( $template_ids );
+	$settings['templatePartIds'] = array_values( $template_part_ids );
+
+	// This is so other parts of the code can hook their own settings.
+	// Example: Global Styles.
+	global $post;
+	$settings = apply_filters( 'block_editor_settings', $settings, $post );
 
 	// Initialize editor.
 	wp_add_inline_script(
@@ -91,11 +169,30 @@ function gutenberg_edit_site_init( $hook ) {
 		)
 	);
 
-	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( get_block_editor_server_block_settings() ) ),
+		'after'
 	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
+		'after'
+	);
+
+	/**
+	 * Fires after block assets have been enqueued for the editing interface.
+	 *
+	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the block editor.
+	 *
+	 * @since 5.0.0
+	 */
+
+	do_action( 'enqueue_block_editor_assets' );
 
 	wp_enqueue_script( 'wp-edit-site' );
 	wp_enqueue_script( 'wp-format-library' );

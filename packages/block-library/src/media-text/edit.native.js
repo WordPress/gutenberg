@@ -18,6 +18,7 @@ import { Component } from '@wordpress/element';
 import { ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { pullLeft, pullRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -231,13 +232,13 @@ class MediaTextEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: 'align-pull-left',
+				icon: pullLeft,
 				title: __( 'Show media on left' ),
 				isActive: mediaPosition === 'left',
 				onClick: () => setAttributes( { mediaPosition: 'left' } ),
 			},
 			{
-				icon: 'align-pull-right',
+				icon: pullRight,
 				title: __( 'Show media on right' ),
 				isActive: mediaPosition === 'right',
 				onClick: () => setAttributes( { mediaPosition: 'right' } ),

@@ -16,11 +16,13 @@ import {
 	RichText,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
+import { formatLtr } from '@wordpress/icons';
 
 /**
  * Browser dependencies
@@ -41,7 +43,7 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 			<ToolbarGroup
 				controls={ [
 					{
-						icon: 'editor-ltr',
+						icon: formatLtr,
 						title: _x( 'Left to right', 'editor button' ),
 						isActive: direction === 'ltr',
 						onClick() {
@@ -73,7 +75,6 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 
 function ParagraphBlock( {
 	attributes,
-	className,
 	fontSize,
 	mergeBlocks,
 	onReplace,
@@ -150,16 +151,12 @@ function ParagraphBlock( {
 					<RichText
 						ref={ ref }
 						identifier="content"
-						tagName="p"
-						className={ classnames(
-							'wp-block-paragraph',
-							className,
-							{
-								'has-drop-cap': dropCap,
-								[ `has-text-align-${ align }` ]: align,
-								[ fontSize.class ]: fontSize.class,
-							}
-						) }
+						tagName={ Block.p }
+						className={ classnames( {
+							'has-drop-cap': dropCap,
+							[ `has-text-align-${ align }` ]: align,
+							[ fontSize.class ]: fontSize.class,
+						} ) }
 						style={ {
 							fontSize: fontSize.size
 								? fontSize.size + 'px'

@@ -15,17 +15,15 @@
 		width: $header-height;
 
 		&:hover {
-			background: #32373d !important; // WP-admin light-gray.
-			color: $white !important;
-			box-shadow: none !important;
+			background: #32373d; // WP-admin light-gray.
 		}
 
 		&:active {
 			color: $white;
 		}
-	}
-	svg {
-		margin-left: auto;
-		margin-right: auto;
+
+		&:focus {
+			box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 3px $white;
+		}
 	}
 }

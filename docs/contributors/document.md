@@ -12,7 +12,7 @@ The Gutenberg project uses GitHub for managing code and tracking issues. The mai
 
 ## Documentation Types
 
-There are two major sets of documentation for Gutenberg project:
+There are two major sets of documentation for the Gutenberg project:
 
 1. [User documentation](https://wordpress.org/support/article/wordpress-editor/) is information on how to use the Editor as an author publishing posts. For contributing to user docs, follow the docs blog, or ask in the #docs Slack channel, to understand the current priorities.
 2. [Block Editor Handbook](https://developer.wordpress.org/block-editor/) is everything related to the Gutenberg project including: developing, extending, and—what you are reading right now—contributing specific to Gutenberg.
@@ -44,8 +44,8 @@ To add a new documentation page:
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder.
 2. Add item to the [toc.json](https://github.com/WordPress/gutenberg/blob/master/docs/toc.json) hierarchy.
-3. Update `manifest-devhub.json` by running `npm run docs:build`.
-4. Commit `manifest-devhub.json` with other files updated.
+3. Update `manifest.json` by running `npm run docs:build`.
+4. Commit `manifest.json` with other files updated.
 
 ### Using Links
 

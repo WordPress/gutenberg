@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { Dashicon } from '@wordpress/components';
+import { Icon, textColor as textColorIcon } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
 
 /**
@@ -68,7 +68,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 				name={ isActive ? 'text-color' : undefined }
 				icon={
 					<>
-						<Dashicon icon="editor-textcolor" />
+						<Icon icon={ textColorIcon } />
 						{ isActive && (
 							<span
 								className="format-library-text-color-button__indicator"

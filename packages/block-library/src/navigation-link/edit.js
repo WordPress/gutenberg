@@ -28,6 +28,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -51,6 +52,8 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
+	saveEntityRecord,
+	userCanCreatePages = false,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
 	const link = {
@@ -84,9 +87,6 @@ function NavigationLinkEdit( {
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
 		if ( isLinkOpen && url ) {
-			// Close the link.
-			setIsLinkOpen( false );
-
 			// Does this look like a URL and have something TLD-ish?
 			if (
 				isURL( prependHTTP( label ) ) &&
@@ -112,6 +112,21 @@ function NavigationLinkEdit( {
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
 		selection.addRange( range );
+	}
+
+	async function handleCreatePage( pageTitle ) {
+		const type = 'page';
+		const page = await saveEntityRecord( 'postType', type, {
+			title: pageTitle,
+			status: 'publish',
+		} );
+
+		return {
+			id: page.id,
+			type,
+			title: page.title.rendered,
+			url: page.link,
+		};
 	}
 
 	return (
@@ -178,8 +193,8 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div
-				className={ classnames( 'wp-block-navigation-link', {
+			<Block.li
+				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
@@ -204,6 +219,7 @@ function NavigationLinkEdit( {
 							setAttributes( { label: labelValue } )
 						}
 						placeholder={ itemLabelPlaceholder }
+						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
 						allowedFormats={ [
 							'core/bold',
@@ -226,6 +242,11 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
+								createSuggestion={
+									userCanCreatePages
+										? handleCreatePage
+										: undefined
+								}
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -272,8 +293,18 @@ function NavigationLinkEdit( {
 							? InnerBlocks.DefaultAppender
 							: false
 					}
+					__experimentalTagName="ul"
+					__experimentalAppenderTagName="li"
+					__experimentalPassedProps={ {
+						className: classnames(
+							'wp-block-navigation__container',
+							{
+								'is-parent-of-selected-block': isParentOfSelectedBlock,
+							}
+						),
+					} }
 				/>
-			</div>
+			</Block.li>
 		</Fragment>
 	);
 }
@@ -320,12 +351,18 @@ export default compose( [
 			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
+		const userCanCreatePages = select( 'core' ).canUser(
+			'create',
+			'pages'
+		);
+
 		return {
 			isParentOfSelectedBlock,
 			hasDescendants,
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
+			userCanCreatePages,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,
@@ -339,7 +376,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
+		const { saveEntityRecord } = dispatch( 'core' );
 		return {
+			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 

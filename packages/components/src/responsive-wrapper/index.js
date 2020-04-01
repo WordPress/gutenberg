@@ -2,12 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { cloneElement, Children } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 
 function ResponsiveWrapper( {
 	naturalWidth,
@@ -18,7 +18,7 @@ function ResponsiveWrapper( {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
-	] = useResizeAware();
+	] = useResizeObserver();
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}

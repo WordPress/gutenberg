@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { navigation as icon } from '@wordpress/icons';
+import { mapMarker as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,6 +26,7 @@ export const settings = {
 	supports: {
 		reusable: false,
 		html: false,
+		lightBlockWrapper: true,
 	},
 
 	__experimentalLabel: ( { label } ) => label,

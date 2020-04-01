@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Requires at least: 5.2.0
+Requires at least: 5.3.0
 Tested up to: 5.3
 Stable tag: V.V.V
 License: GPLv2 or later
@@ -26,7 +26,7 @@ The block editor first became available in December 2018, and we're still hard a
 
 The development hub for the Gutenberg project is on Github at: <a href="https://github.com/wordpress/gutenberg/"> https://github.com/wordpress/gutenberg</a>
 
-Discussion for the project is on <a href="https://make.wordpress.com/core/">Make Blog</a> and the `#core-editor` channel in Slack, <a href="https://make.wordpress.org/chat/">signup information</a>.
+Discussion for the project is on <a href="https://make.wordpress.org/core/">Make Blog</a> and the `#core-editor` channel in Slack, <a href="https://make.wordpress.org/chat/">signup information</a>.
 
 == Frequently Asked Questions ==
 
@@ -52,4 +52,4 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 
 == Changelog ==
 
-To read the changelog for Gutenberg 7.5.0-rc.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.5.0-rc.1">release page</a>.
+To read the changelog for Gutenberg 7.8.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.8.1">release page</a>.

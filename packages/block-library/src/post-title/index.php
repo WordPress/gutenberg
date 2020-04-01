@@ -22,10 +22,16 @@ function render_block_core_post_title() {
  * Registers the `core/post-title` block on the server.
  */
 function register_block_core_post_title() {
+	$path     = __DIR__ . '/post-title/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/post-title',
-		array(
-			'render_callback' => 'render_block_core_post_title',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_post_title',
+			)
 		)
 	);
 }

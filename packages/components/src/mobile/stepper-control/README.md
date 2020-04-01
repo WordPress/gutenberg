@@ -10,14 +10,14 @@ Usage example
 import { StepperControl } from '@wordpress/components';
 import { more } from '@wordpress/icons';
 
-function Stepper( { onChangeValue, value } ) {
+function Stepper( { onChange, value } ) {
 	return (
 		<StepperControl
 			icon={ more }
 			label="Columns"
-			maxValue={ 8 }
-			minValue={ 1 }
-			onChangeValue={ onChangeValue }
+			max={ 8 }
+			min={ 1 }
+			onChange={ onChange }
 			value={ value }
 		/>
 	);
@@ -26,7 +26,7 @@ function Stepper( { onChangeValue, value } ) {
 
 ## Props
 
-### maxValue
+### max 
 
 Maximum value of the stepper.
 
@@ -34,7 +34,7 @@ Maximum value of the stepper.
 -   Required: Yes
 -   Platform: Mobile
 
-### minValue
+### min 
 
 Minimum value of the stepper.
 
@@ -58,7 +58,7 @@ Current value of the stepper.
 -   Required: Yes
 -   Platform: Mobile
 
-### onChangeValue
+### onChange
 
 Callback called when the value has changed
 

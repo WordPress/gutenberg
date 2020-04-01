@@ -18,8 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalPageTemplatePicker,
-	__experimentalUsePageTemplatePickerVisible,
+	__experimentalFullscreenMode as FullscreenMode,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -40,7 +39,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -51,7 +49,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -59,6 +57,7 @@ function Layout() {
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -83,6 +82,9 @@ function Layout() {
 			publishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -96,12 +98,8 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
 		};
 	}, [] );
-	const showPageTemplatePicker = __experimentalUsePageTemplatePickerVisible();
 	const sidebarIsOpened =
 		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -116,7 +114,7 @@ function Layout() {
 
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
@@ -128,24 +126,28 @@ function Layout() {
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						<>
-							{ ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
-									<Button
-										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
-										onClick={ openSidebarPanel }
-										aria-expanded={ false }
-									>
-										{ hasBlockSelected
-											? __( 'Open block settings' )
-											: __( 'Open document settings' ) }
-									</Button>
-								</div>
-							) }
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
+						( ! isMobileViewport || sidebarIsOpened ) && (
+							<>
+								{ ! isMobileViewport && ! sidebarIsOpened && (
+									<div className="edit-post-layout__toogle-sidebar-panel">
+										<Button
+											isSecondary
+											className="edit-post-layout__toogle-sidebar-panel-button"
+											onClick={ openSidebarPanel }
+											aria-expanded={ false }
+										>
+											{ hasBlockSelected
+												? __( 'Open block settings' )
+												: __(
+														'Open document settings'
+												  ) }
+										</Button>
+									</div>
+								) }
+								<SettingsSidebar />
+								<Sidebar.Slot />
+							</>
+						)
 					}
 					content={
 						<>
@@ -166,6 +168,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
@@ -187,10 +190,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
+							<div className="edit-post-layout__toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
+									className="edit-post-layout__toggle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>
@@ -210,9 +213,6 @@ function Layout() {
 				<WelcomeGuide />
 				<Popover.Slot />
 				<PluginArea />
-				{ showPageTemplatePicker && (
-					<__experimentalPageTemplatePicker />
-				) }
 			</FocusReturnProvider>
 		</>
 	);

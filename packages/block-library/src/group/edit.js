@@ -3,7 +3,11 @@
  */
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { InnerBlocks, __experimentalUseColors } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseColors,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
 function GroupEdit( { hasInnerBlocks, className } ) {
@@ -28,16 +32,19 @@ function GroupEdit( { hasInnerBlocks, className } ) {
 			{ InspectorControlsColorPanel }
 			<BackgroundColor>
 				<TextColor>
-					<div className={ className } ref={ ref }>
+					<Block.div className={ className } ref={ ref }>
 						<div className="wp-block-group__inner-container">
 							<InnerBlocks
 								renderAppender={
-									! hasInnerBlocks &&
-									InnerBlocks.ButtonBlockAppender
+									hasInnerBlocks
+										? undefined
+										: () => (
+												<InnerBlocks.ButtonBlockAppender />
+										  )
 								}
 							/>
 						</div>
-					</div>
+					</Block.div>
 				</TextColor>
 			</BackgroundColor>
 		</>

@@ -1,20 +1,25 @@
 .richTextWrapper {
-	overflow: hidden;
+	overflow: visible;
 	align-self: flex-start;
 }
 
-.container {
-	padding: $block-spacing;
-	background-color: transparent;
-	align-self: flex-start;
+.outline {
+	position: absolute;
+	left: -($block-spacing + $border-width);
+	right: -($block-spacing + $border-width);
+	top: -($block-spacing + $border-width);
+	bottom: -($block-spacing + $border-width);
 }
 
-.outlineBorder {
-	border-width: $border-width;
+.linearGradient {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 }
 
 .button {
-	background-color: $button-default-bg;
 	border-width: $border-width;
 	border-radius: $border-width * 4;
 	padding: $block-spacing;
@@ -29,4 +34,8 @@
 
 .clearLinkButton {
 	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
 }

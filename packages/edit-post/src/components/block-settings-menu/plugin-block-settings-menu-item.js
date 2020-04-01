@@ -6,13 +6,10 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import PluginBlockSettingsMenuGroup from './plugin-block-settings-menu-group';
+import { plugins } from '@wordpress/icons';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	difference( selected, allowed ).length === 0;
@@ -93,7 +90,7 @@ const PluginBlockSettingsMenuItem = ( {
 	small,
 	role,
 } ) => (
-	<PluginBlockSettingsMenuGroup>
+	<BlockSettingsMenuControls>
 		{ ( { selectedBlocks, onClose } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
@@ -101,7 +98,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || 'admin-plugins' }
+					icon={ icon || plugins }
 					label={ small ? label : undefined }
 					role={ role }
 				>
@@ -109,7 +106,7 @@ const PluginBlockSettingsMenuItem = ( {
 				</MenuItem>
 			);
 		} }
-	</PluginBlockSettingsMenuGroup>
+	</BlockSettingsMenuControls>
 );
 
 export default PluginBlockSettingsMenuItem;

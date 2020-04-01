@@ -4,6 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -11,6 +12,7 @@ import { useInstanceId } from '@wordpress/compose';
 import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
+import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -95,12 +97,10 @@ export default function FontSizePicker( {
 
 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
 
-	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
+	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 	return (
 		<fieldset className="components-font-size-picker">
-			<legend className="screen-reader-text">
-				{ __( 'Font size' ) }
-			</legend>
+			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<div className="components-font-size-picker__controls">
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
@@ -116,13 +116,13 @@ export default function FontSizePicker( {
 					/>
 				) }
 				{ ! withSlider && ! disableCustomFontSizes && (
-					<div className="components-range-control__number-container">
-						<label htmlFor={ rangeControlNumberId }>
+					<div className="components-font-size-picker__number-container">
+						<label htmlFor={ fontSizePickerNumberId }>
 							{ __( 'Custom' ) }
 						</label>
 						<input
-							id={ rangeControlNumberId }
-							className="components-range-control__number"
+							id={ fontSizePickerNumberId }
+							className="components-font-size-picker__number"
 							type="number"
 							onChange={ onChangeValue }
 							aria-label={ __( 'Custom' ) }
@@ -149,8 +149,8 @@ export default function FontSizePicker( {
 					onChange={ onSliderChangeValue }
 					min={ 12 }
 					max={ 100 }
-					beforeIcon="editor-textcolor"
-					afterIcon="editor-textcolor"
+					beforeIcon={ textColor }
+					afterIcon={ textColor }
 				/>
 			) }
 		</fieldset>
