@@ -58,5 +58,5 @@ You can also play with the [Gutenberg Example #03](https://github.com/WordPress/
 
 The [`@wordpress/block-editor` package](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) allows you to create and use standalone block editors.
 
-You can learn more by reading the [tutorial "Building a custom block editor"](./custom-block-editor/README.md).
+You can learn more by reading the [tutorial "Building a custom block editor"](/docs/designers-developers/developers/platform/custom-block-editor/README.md).
 

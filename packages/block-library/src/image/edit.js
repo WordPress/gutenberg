@@ -33,7 +33,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { Component, Fragment } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -391,12 +391,6 @@ export class ImageEdit extends Component {
 			</BlockControls>
 		);
 		const src = isExternal ? url : undefined;
-		const labels = {
-			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __(
-				'Upload an image file, pick one from your media library, or add one with a URL.'
-			),
-		};
 		const mediaPreview = !! url && (
 			<img
 				alt={ __( 'Edit image' ) }
@@ -412,7 +406,6 @@ export class ImageEdit extends Component {
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
-				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
 				notices={ noticeUI }
@@ -516,17 +509,23 @@ export class ImageEdit extends Component {
 			</>
 		);
 
-		const AlignmentWrapper = needsAlignmentWrapper ? Block.div : Fragment;
-		const BlockContentWrapper = needsAlignmentWrapper
-			? 'figure'
-			: Block.figure;
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/click-events-have-key-events */
 		return (
 			<>
 				{ controls }
-				<AlignmentWrapper>
-					<BlockContentWrapper className={ classes }>
+				<div
+					className={
+						// Ideally these classes are not needed, and ideally, we
+						// provide an alignment wrapper component that the block
+						// can wrap around the block or we build it into
+						// Block.*.
+						needsAlignmentWrapper
+							? 'wp-block block-editor-block-list__block'
+							: undefined
+					}
+				>
+					<Block.figure className={ classes }>
 						<ImageSize src={ url } dirtynessTrigger={ align }>
 							{ ( sizes ) => {
 								const {
@@ -704,8 +703,8 @@ export class ImageEdit extends Component {
 						) }
 
 						{ mediaPlaceholder }
-					</BlockContentWrapper>
-				</AlignmentWrapper>
+					</Block.figure>
+				</div>
 			</>
 		);
 		/* eslint-enable jsx-a11y/click-events-have-key-events */

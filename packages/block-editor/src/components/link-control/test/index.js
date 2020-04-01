@@ -240,6 +240,55 @@ describe( 'Searching for a link', () => {
 		);
 	} );
 
+	it( 'should trim search term', async () => {
+		const searchTerm = '   Hello    ';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		const searchResultTextHighlightElements = Array.from(
+			container.querySelectorAll(
+				'[role="listbox"] button[role="option"] mark'
+			)
+		);
+
+		const invalidResults = searchResultTextHighlightElements.find(
+			( mark ) => mark.innerHTML !== 'Hello'
+		);
+
+		// Grab the first argument that was passed to the fetchSuggestions
+		// handler (which is mocked out).
+		const mockFetchSuggestionsFirstArg =
+			mockFetchSearchSuggestions.mock.calls[ 0 ][ 0 ];
+
+		// Given we're mocking out the results we should always have 4 mark elements.
+		expect( searchResultTextHighlightElements ).toHaveLength( 4 );
+
+		// Make sure there are no `mark` elements which contain anything other
+		// than the trimmed search term (ie: no whitespace).
+		expect( invalidResults ).toBeFalsy();
+
+		// Implementation detail test to ensure that the fetch handler is called
+		// with the trimmed search value. We do this because we are mocking out
+		// the fetch handler in our test so we need to assert it would be called
+		// correctly in a real world scenario.
+		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
+	} );
+
 	it.each( [
 		[ 'couldbeurlorentitysearchterm' ],
 		[ 'ThisCouldAlsoBeAValidURL' ],

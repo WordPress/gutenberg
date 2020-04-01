@@ -30,12 +30,15 @@ export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';
 export { default as Button } from './button';
+export { default as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
+export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
 export { default as ColorControl } from './color-control';
+export { default as QueryControls } from './query-controls';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -45,6 +48,7 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export * from './text';
 
 // Mobile Components
 export {

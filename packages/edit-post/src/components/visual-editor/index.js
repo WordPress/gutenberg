@@ -39,7 +39,9 @@ function VisualEditor() {
 					<WritingFlow>
 						<ObserveTyping>
 							<CopyHandler>
-								<PostTitle />
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
 								<BlockList />
 							</CopyHandler>
 						</ObserveTyping>

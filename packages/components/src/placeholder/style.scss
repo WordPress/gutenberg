@@ -20,7 +20,7 @@
 	}
 
 	// Block UI appearance.
-	border-radius: $radius-block-ui;
+	border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 	background-color: $white;
 	box-shadow: 0 0 0 $border-width $dark-gray-primary;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.

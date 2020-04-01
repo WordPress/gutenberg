@@ -15,33 +15,11 @@
 	}
 }
 
-
-/**
- * General Post Content Layout
- */
-
-// Add side padding for the main block container, currently post_content.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint, as well as the side-UI.
-.block-editor-block-list__layout {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-	position: relative;
-
-	// Beyond the mobile breakpoint, compensate for side UI.
-	@include break-small() {
-		padding-left: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-		padding-right: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-	}
-
-	// Don't propogate that padding to nested blocks.
-	.block-editor-block-list__layout {
-		padding-left: 0;
-		padding-right: 0;
-	}
+// This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
+// It removes the margins around blocks when a BlockPreview is rendered in the block style selector
+.block-editor-block-styles .editor-styles-wrapper .block-editor-block-list__block {
+	margin: 0;
 }
-
 
 /**
  * Notices & Block Selected/Hover Styles.
@@ -97,12 +75,12 @@
 			right: 0;
 
 			// 2px outside.
-			box-shadow: 0 0 0 2px $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
 			}
 		}
 	}
@@ -140,10 +118,12 @@
  */
 
 .block-editor-block-list__layout {
+	position: relative;
 
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
 		// Show selection borders around every non-nested block's actual footprint.
@@ -161,15 +141,17 @@
 		.is-block-content, // Floats.
 		&::after { // Everything else.
 			// 2px outside.
-			box-shadow: 0 0 0 2px $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+			transition: box-shadow 0.2s ease-out;
+			@include reduce-motion("transition");
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
 
 			// Show a lighter color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
 			}
 		}
 
@@ -196,6 +178,20 @@
 .block-editor-block-list__layout .block-editor-block-list__block {
 	&.has-warning {
 		min-height: ( $block-padding + $block-spacing ) * 2;
+	}
+
+	&::after {
+		content: "";
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		box-shadow: 0 0 0 $border-width-focus transparent;
+		transition: box-shadow 0.1s ease-in;
+		@include reduce-motion("transition");
 	}
 
 	// Warnings
@@ -294,18 +290,6 @@
 		clear: both;
 	}
 
-	// Full-wide.
-	&[data-align="full"],
-	&.alignfull {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-			margin-right: -$block-padding - $block-padding - $block-side-ui-width - $border-width - $border-width;
-		}
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
@@ -331,7 +315,7 @@
 	cursor: grab;
 }
 
-// Insertion point (includes inbetween inserter and insertion indicator)
+// Insertion point (includes inbetween/sibling inserter and insertion indicator)
 .block-editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
@@ -341,7 +325,7 @@
 .block-editor-block-list__insertion-point-indicator {
 	position: absolute;
 	top: calc(50% - #{ $border-width });
-	height: 2px;
+	height: $border-width-focus;
 	left: 0;
 	right: 0;
 	background: theme(primary);
@@ -406,12 +390,6 @@
 		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
-
-		&:hover {
-			animation: block-editor-inserter__toggle__fade-in-animation 0.2s ease;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
-		}
 	}
 }
 
@@ -430,12 +408,30 @@
 @keyframes block-editor-inserter__toggle__fade-in-animation {
 	from {
 		opacity: 0;
+		transform: scale(0);
 	}
 	to {
 		opacity: 1;
+		transform: scale(1);
 	}
 }
 
+// Hide the appender that sits at the end of block lists, when inside a nested block,
+// unless the block itself, or a parent, is selected.
+.wp-block .block-list-appender .block-editor-inserter__toggle {
+	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+}
+
+.wp-block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+	display: none;
+
+	.block-editor-inserter__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
+}
 
 // This is the edge-to-edge hover area that contains the plus.
 .block-editor-block-list__block {
@@ -528,18 +524,24 @@
 		// The button here has a special style to appear as a toolbar.
 		.components-button {
 			font-size: $default-font-size;
-			height: $block-toolbar-height;
+			height: $block-toolbar-height - $border-width - $border-width;
 			padding: $grid-unit-15 $grid-unit-20;
 
+			// Position this to align with the block toolbar.
+			position: relative;
+			top: -$border-width;
+
 			// Block UI appearance.
-			border: $border-width solid $dark-gray-primary;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			background-color: $white;
+
+			// Indent to align with block toolbar.
+			margin-left: $block-toolbar-height + $border-width;
 
 			// When button is focused, it receives a box-shadow instead of the border.
 			&:focus {
-				border: none;
-				box-shadow: inset 0 0 0 1px color($theme-color), 0 0 0 1px color($theme-color);
+				box-shadow: 0 0 0 $border-width-focus $theme-color;
 			}
 		}
 
@@ -625,4 +627,36 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
+}
+
+
+// Add side padding for the canvas, currently edit-post-visual-editor.
+// The purpose of this padding is to ensure that on small viewports, there is
+// room for the block border that sits 14px ($block-padding) offset from the
+// block footprint.
+.block-editor-block-list__layout.is-root-container {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-side-ui-width;
+		padding-right: $block-side-ui-width;
+	}
+}
+
+.block-editor-block-list__layout.is-root-container {
+	// Full-wide. (to account for the padddings added above)
+	// The first two rules account for the alignment wrapper div for the image block.
+	> div:not(.block-editor-block-list__block) > .block-editor-block-list__block[data-align="full"],
+	> div:not(.block-editor-block-list__block) > .block-editor-block-list__block.alignfull,
+	> .block-editor-block-list__block[data-align="full"],
+	> .block-editor-block-list__block.alignfull {
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+
+		@include break-small() {
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
+		}
+	}
 }

@@ -90,11 +90,13 @@ const makeCancelable = ( promise ) => {
  *                                    providing a custom `settings` prop.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
+/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
@@ -105,12 +107,14 @@ const makeCancelable = ( promise ) => {
  * @property {string} title Human-readable label to show in user interface.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Properties associated with a link control value, composed as a union of the
  * default properties and any custom settings values.
  *
  * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
  */
+/* eslint-enable */
 
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
@@ -139,6 +143,7 @@ const makeCancelable = ( promise ) => {
  * @property {WPLinkControlValue=}                  value                  Current link value.
  * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
  *                                                                         the user selects a new link or updates settings.
+ * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
  * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
  * @property {WPLinkControlCreateSuggestionProp=}   createSuggestion       Handler to manage creation of link value from suggestion.
  */
@@ -154,6 +159,7 @@ function LinkControl( {
 	value,
 	settings,
 	onChange = noop,
+	showSuggestions = true,
 	showInitialSuggestions,
 	forceIsEditingLink,
 	createSuggestion,
@@ -345,6 +351,10 @@ function LinkControl( {
 	// Effects
 	const getSearchHandler = useCallback(
 		( val, args ) => {
+			if ( ! showSuggestions ) {
+				return Promise.resolve( [] );
+			}
+
 			return isURLLike( val )
 				? handleDirectEntry( val, args )
 				: handleEntitySearch( val, args );
@@ -544,7 +554,9 @@ function LinkControl( {
 							stopEditing();
 						}
 					} }
-					renderSuggestions={ renderSearchResults }
+					renderSuggestions={
+						showSuggestions ? renderSearchResults : null
+					}
 					fetchSuggestions={ getSearchHandler }
 					showInitialSuggestions={ showInitialSuggestions }
 					errorMessage={ errorMessage }

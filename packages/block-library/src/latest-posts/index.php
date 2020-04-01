@@ -33,7 +33,7 @@ function block_core_latest_posts_get_excerpt_length() {
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $block_core_latest_posts_excerpt_length;
+	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
@@ -47,7 +47,7 @@ function render_block_core_latest_posts( $attributes ) {
 	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
 	if ( isset( $attributes['categories'] ) ) {
-		$args['category'] = $attributes['categories'];
+		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
 
 	$recent_posts = get_posts( $args );
@@ -55,6 +55,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
+
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
@@ -108,21 +109,9 @@ function render_block_core_latest_posts( $attributes ) {
 			$trimmed_excerpt = get_the_excerpt( $post );
 
 			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts__post-excerpt">%1$s',
+				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
 				$trimmed_excerpt
 			);
-
-			if ( strpos( $trimmed_excerpt, ' &hellip; ' ) !== false ) {
-				$list_items_markup .= sprintf(
-					'<a href="%1$s">%2$s</a></div>',
-					esc_url( get_permalink( $post ) ),
-					__( 'Read more' )
-				);
-			} else {
-				$list_items_markup .= sprintf(
-					'</div>'
-				);
-			}
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
@@ -170,78 +159,16 @@ function render_block_core_latest_posts( $attributes ) {
  * Registers the `core/latest-posts` block on server.
  */
 function register_block_core_latest_posts() {
+	$path     = __DIR__ . '/latest-posts/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/latest-posts',
-		array(
-			'attributes'      => array(
-				'align'                   => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'               => array(
-					'type' => 'string',
-				),
-				'categories'              => array(
-					'type' => 'string',
-				),
-				'postsToShow'             => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayPostContent'      => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'displayPostContentRadio' => array(
-					'type'    => 'string',
-					'default' => 'excerpt',
-				),
-				'excerptLength'           => array(
-					'type'    => 'number',
-					'default' => 55,
-				),
-				'displayPostDate'         => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'postLayout'              => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
-				'columns'                 => array(
-					'type'    => 'number',
-					'default' => 3,
-				),
-				'order'                   => array(
-					'type'    => 'string',
-					'default' => 'desc',
-				),
-				'orderBy'                 => array(
-					'type'    => 'string',
-					'default' => 'date',
-				),
-				'displayFeaturedImage'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'featuredImageAlign'      => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right' ),
-				),
-				'featuredImageSizeSlug'   => array(
-					'type'    => 'string',
-					'default' => 'thumbnail',
-				),
-				'featuredImageSizeWidth'  => array(
-					'type'    => 'number',
-					'default' => null,
-				),
-				'featuredImageSizeHeight' => array(
-					'type'    => 'number',
-					'default' => null,
-				),
-			),
-			'render_callback' => 'render_block_core_latest_posts',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_latest_posts',
+			)
 		)
 	);
 }

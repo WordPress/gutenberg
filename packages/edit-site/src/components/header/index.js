@@ -3,11 +3,14 @@
  */
 import { useCallback } from '@wordpress/element';
 import { BlockNavigationDropdown, ToolSelector } from '@wordpress/block-editor';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
+import FullscreenModeClose from './fullscreen-mode-close';
+import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 
@@ -42,6 +45,7 @@ export default function Header() {
 	);
 	return (
 		<div className="edit-site-header">
+			<FullscreenModeClose />
 			<div className="edit-site-header__toolbar">
 				<TemplateSwitcher
 					ids={ settings.templateIds }
@@ -59,6 +63,8 @@ export default function Header() {
 			</div>
 			<div className="edit-site-header__actions">
 				<SaveButton />
+				<PinnedItems.Slot scope="core/edit-site" />
+				<MoreMenu />
 			</div>
 		</div>
 	);

@@ -19,6 +19,7 @@ function render_block_core_social_link( $attributes ) {
 		$attributes['label'] :
 		/* translators: %s: Social Link service name */
 		sprintf( __( 'Link to %s' ), block_core_social_link_get_name( $service ) );
+	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
 	if ( ! $url ) {
@@ -26,7 +27,7 @@ function render_block_core_social_link( $attributes ) {
 	}
 
 	$icon = block_core_social_link_get_icon( $service );
-	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
+	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . esc_attr( $class_name ) . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '"> ' . $icon . '</a></li>';
 }
 
 /**
@@ -249,7 +250,7 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 		),
 		'share'         => array(
 			'name' => 'Share Icon',
-			'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" role="img" aria-hidden="true" focusable="false"><rect x="0" fill="none" width="20" height="20"/><g><path d="M14.5 12c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3c0-.24.03-.46.09-.69l-4.38-2.3c-.55.61-1.33.99-2.21.99-1.66 0-3-1.34-3-3s1.34-3 3-3c.88 0 1.66.39 2.21.99l4.38-2.3c-.06-.23-.09-.45-.09-.69 0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3c-.88 0-1.66-.39-2.21-.99l-4.38 2.3c.06.23.09.45.09.69s-.03.46-.09.69l4.38 2.3c.55-.61 1.33-.99 2.21-.99z"/></g></svg>',
+			'icon' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 11.8l6.1-4.5c.1.4.4.7.9.7h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-2c-.6 0-1 .4-1 1v.4l-6.4 4.8c-.2-.1-.4-.2-.6-.2H6c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h2c.2 0 .4-.1.6-.2l6.4 4.8v.4c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-2c-.5 0-.8.3-.9.7L9 12.2v-.4z"/></svg>',
 		),
 	);
 

@@ -58,16 +58,18 @@ Render an is author checkbox:
 import { CheckboxControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-const MyCheckboxControl = () => (
+const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
-	<CheckboxControl
-		heading="User"
-		label="Is author"
-		help="Is the user a author or not?"
-		checked={ isChecked }
-		onChange={ setChecked }
-	/>
-) );
+	return (
+		<CheckboxControl
+			heading="User"
+			label="Is author"
+			help="Is the user a author or not?"
+			checked={ isChecked }
+			onChange={ setChecked }
+		/>
+	)
+};
 ```
 
 ### Props

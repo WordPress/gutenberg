@@ -29,8 +29,8 @@ function BlockList(
 		rootClientId,
 		isDraggable,
 		renderAppender,
-		__experimentalUIParts = {},
 		__experimentalTagName = 'div',
+		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
 	},
 	ref
@@ -72,9 +72,6 @@ function BlockList(
 		element: ref,
 		rootClientId,
 	} );
-	const __experimentalContainerProps = rootClientId
-		? {}
-		: { hasPopover: __experimentalUIParts.hasPopover };
 
 	return (
 		<Container
@@ -85,7 +82,6 @@ function BlockList(
 				className,
 				__experimentalPassedProps.className
 			) }
-			{ ...__experimentalContainerProps }
 		>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
@@ -107,9 +103,6 @@ function BlockList(
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
 							enableAnimation={ enableAnimation }
-							hasSelectedUI={
-								__experimentalUIParts.hasSelectedUI
-							}
 							className={
 								clientId === targetClientId
 									? 'is-drop-target'
@@ -120,6 +113,7 @@ function BlockList(
 				);
 			} ) }
 			<BlockListAppender
+				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
 				className={

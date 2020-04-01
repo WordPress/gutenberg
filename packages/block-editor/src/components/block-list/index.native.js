@@ -15,6 +15,7 @@ import {
 	KeyboardAwareFlatList,
 	ReadableContentView,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,8 +24,6 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
-
-const innerToolbarHeight = 44;
 
 export class BlockList extends Component {
 	constructor() {
@@ -73,13 +72,15 @@ export class BlockList extends Component {
 		const { shouldShowInsertionPointBefore } = this.props;
 		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
-			<ReadableContentView>
-				<BlockListAppender // show the default appender, anormal, when not inserting a block
-					rootClientId={ this.props.rootClientId }
-					renderAppender={ this.props.renderAppender }
-					showSeparator={ willShowInsertionPoint }
-				/>
-			</ReadableContentView>
+			<View style={ styles.defaultAppender }>
+				<ReadableContentView>
+					<BlockListAppender // show the default appender, anormal, when not inserting a block
+						rootClientId={ this.props.rootClientId }
+						renderAppender={ this.props.renderAppender }
+						showSeparator={ willShowInsertionPoint }
+					/>
+				</ReadableContentView>
+			</View>
 		);
 	}
 
@@ -99,14 +100,25 @@ export class BlockList extends Component {
 			isRootList,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+
+		const { blockToolbar, blockBorder, headerToolbar } = styles;
 
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
+		const containerStyle = {
+			flex: isRootList ? 1 : 0,
+			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
+			marginVertical: isRootList ? 0 : -marginVertical,
+			marginHorizontal: isRootList ? 0 : -marginHorizontal,
+		};
+
 		return (
 			<View
-				style={ { flex: isRootList ? 1 : 0 } }
+				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
 				<KeyboardAwareFlatList
@@ -116,9 +128,14 @@ export class BlockList extends Component {
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
 					innerRef={ this.scrollViewInnerRef }
-					extraScrollHeight={ innerToolbarHeight + 10 }
+					extraScrollHeight={
+						blockToolbar.height + blockBorder.width
+					}
+					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ { flex: isRootList ? 1 : 0 } }
+					scrollViewStyle={ {
+						flex: isRootList ? 1 : 0,
+					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -127,7 +144,7 @@ export class BlockList extends Component {
 						this.shouldFlatListPreventAutomaticScroll
 					}
 					title={ title }
-					ListHeaderComponent={ ! isReadOnly && header }
+					ListHeaderComponent={ header }
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
@@ -137,7 +154,13 @@ export class BlockList extends Component {
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
-					<View style={ styles.paddingToContent }>
+					<View
+						style={ {
+							marginHorizontal:
+								marginHorizontal -
+								styles.innerAppender.marginLeft,
+						} }
+					>
 						<BlockListAppender
 							rootClientId={ this.props.rootClientId }
 							renderAppender={ this.props.renderAppender }
@@ -154,6 +177,8 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 
 		return (
@@ -166,6 +191,8 @@ export class BlockList extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
 						rootClientId={ this.props.rootClientId }
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
@@ -185,6 +212,7 @@ export class BlockList extends Component {
 		return (
 			<>
 				<TouchableWithoutFeedback
+					accessibilityLabel={ __( 'Add paragraph block' ) }
 					onPress={ () => {
 						this.addBlockToEndOfPost( paragraphBlock );
 					} }

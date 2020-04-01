@@ -13,12 +13,12 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
-	TableOfContents,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalFullscreenMode as FullscreenMode,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -29,6 +29,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
+import { ComplementaryArea } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -39,11 +40,9 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
-import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
@@ -58,6 +57,7 @@ function Layout() {
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -68,7 +68,6 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
-		isTextModeEnabled,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -83,6 +82,9 @@ function Layout() {
 			publishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -96,8 +98,6 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			isTextModeEnabled:
-				select( 'core/edit-post' ).getEditorMode() === 'text',
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -114,7 +114,7 @@ function Layout() {
 
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
@@ -145,7 +145,7 @@ function Layout() {
 									</div>
 								) }
 								<SettingsSidebar />
-								<Sidebar.Slot />
+								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)
 					}
@@ -173,12 +173,6 @@ function Layout() {
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
 								<BlockBreadcrumb />
-
-								<TableOfContents
-									hasOutlineItemsDisabled={
-										isTextModeEnabled
-									}
-								/>
 							</div>
 						)
 					}
