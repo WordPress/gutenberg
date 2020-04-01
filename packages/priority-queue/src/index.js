@@ -28,12 +28,19 @@ import requestIdleCallback from './request-idle-callback';
  */
 
 /**
+ * Reset the queue.
+ *
+ * @typedef {()=>void} WPPriorityQueueReset
+ */
+
+/**
  * Priority queue instance.
  *
  * @typedef {Object} WPPriorityQueue
  *
  * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
  * @property {WPPriorityQueueFlush} flush Flush queue for context.
+ * @property {WPPriorityQueueReset} reset Reset queue.
  */
 
 /**
@@ -60,10 +67,10 @@ import requestIdleCallback from './request-idle-callback';
  */
 export const createQueue = () => {
 	/** @type {WPPriorityQueueContext[]} */
-	const waitingList = [];
+	let waitingList = [];
 
 	/** @type {WeakMap<WPPriorityQueueContext,WPPriorityQueueCallback>} */
-	const elementsMap = new WeakMap();
+	let elementsMap = new WeakMap();
 
 	let isRunning = false;
 
@@ -143,8 +150,15 @@ export const createQueue = () => {
 		return true;
 	};
 
+	const reset = () => {
+		waitingList = [];
+		elementsMap = new WeakMap();
+		isRunning = false;
+	};
+
 	return {
 		add,
 		flush,
+		reset,
 	};
 };
