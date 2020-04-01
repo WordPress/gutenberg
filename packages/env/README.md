@@ -206,7 +206,7 @@ ID      user_login      display_name    user_email      user_registered roles
 ```sh
 docker logs -f <container> >/dev/null 
 
-Shows the error logs of the WordPress container in the terminal
+Shows the error logs of the specified container in the terminal
 ```
 
 ## .wp-env.json
