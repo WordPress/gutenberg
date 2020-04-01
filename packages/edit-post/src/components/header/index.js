@@ -11,7 +11,7 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import FullscreenModeClose from './fullscreen-mode-close';
+import AdminMenuToggle from './admin-menu-toggle';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
@@ -58,7 +58,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<AdminMenuToggle />
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }

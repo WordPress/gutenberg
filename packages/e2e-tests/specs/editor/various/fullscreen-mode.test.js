@@ -22,10 +22,10 @@ describe( 'Fullscreen Mode', () => {
 
 		expect( isFullscreenEnabled ).toBe( true );
 
-		const fullscreenCloseButton = await page.$(
-			'.edit-post-fullscreen-mode-close'
+		const fullscreenAdminMenuToggle = await page.$(
+			'.edit-post-fullscreen-admin-menu-toggle'
 		);
 
-		expect( fullscreenCloseButton ).not.toBeNull();
+		expect( fullscreenAdminMenuToggle ).not.toBeNull();
 	} );
 } );

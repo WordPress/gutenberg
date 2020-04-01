@@ -8,9 +8,9 @@ import { ESCAPE, DOWN } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
-function FullscreenModeClose() {
+function AdminMenuToggle() {
 	const buttonRef = useRef();
-	const toggleAdminMenu = useToggleAdminMenu( { ref: buttonRef } );
+	const toggleMenu = useToggle( { ref: buttonRef } );
 
 	const { isActive, postType } = useSelect( ( select ) => {
 		const { getCurrentPostType } = select( 'core/editor' );
@@ -29,17 +29,17 @@ function FullscreenModeClose() {
 
 	return (
 		<Button
-			className="edit-post-fullscreen-mode-close"
+			className="edit-post-fullscreen-admin-menu-toggle"
 			icon={ wordpress }
 			iconSize={ 36 }
-			onClick={ toggleAdminMenu }
+			onClick={ toggleMenu }
 			label={ __( 'Show sidebar menu' ) }
 			ref={ buttonRef }
 		/>
 	);
 }
 
-function useToggleAdminMenu( { ref } ) {
+function useToggle( { ref } ) {
 	const [ isActive, setIsActive ] = useState( false );
 	const buttonNode = ref?.current;
 
@@ -125,4 +125,4 @@ function useToggleAdminMenu( { ref } ) {
 	return toggleAdminMenu;
 }
 
-export default FullscreenModeClose;
+export default AdminMenuToggle;
