@@ -29,7 +29,9 @@
 
 		/* This needs to be false so our types are possible to consume without setting this */
 		"esModuleInterop": false,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+
+		"typeRoots":["./node_modules/@types"]
 	},
 	"exclude": [ "**/benchmark", "**/test/**", "**/build/**", "**/build-*/**" ]
 }
