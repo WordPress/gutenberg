@@ -18,7 +18,7 @@ Returns whether or not the user has the unfiltered_html capability.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
@@ -31,7 +31,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -44,7 +44,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -56,11 +56,11 @@ Returns the active post lock.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `Object`: The lock object.
+-   `object`: The lock object.
 
 <a name="getAdjacentBlockClientId" href="#getAdjacentBlockClientId">#</a> **getAdjacentBlockClientId**
 
@@ -78,11 +78,11 @@ autosave).
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `?Object`: Current autosave, if exists.
+-   `object | null`: Current autosave, if exists.
 
 <a name="getAutosaveAttribute" href="#getAutosaveAttribute">#</a> **getAutosaveAttribute**
 
@@ -93,12 +93,12 @@ null if there is no autosave for the post.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 -   _attributeName_ `string`: Autosave attribute name.
 
 _Returns_
 
--   `*`: Autosave attribute value.
+-   `any`: Autosave attribute value.
 
 <a name="getBlock" href="#getBlock">#</a> **getBlock**
 
@@ -199,11 +199,11 @@ generated save content.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `Array<WPBlock>`: Filtered set of blocks for save.
+-   `WPBlock[]`: Filtered set of blocks for save.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 
@@ -225,11 +225,11 @@ values if the post has not yet been saved.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `Object`: Post object.
+-   `object`: Post object.
 
 <a name="getCurrentPostAttribute" href="#getCurrentPostAttribute">#</a> **getCurrentPostAttribute**
 
@@ -237,12 +237,12 @@ Returns an attribute value of the saved post.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 -   _attributeName_ `string`: Post attribute name.
 
 _Returns_
 
--   `*`: Post attribute value.
+-   `any`: Post attribute value.
 
 <a name="getCurrentPostId" href="#getCurrentPostId">#</a> **getCurrentPostId**
 
@@ -251,11 +251,11 @@ not yet been saved.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `?number`: ID of current post.
+-   `number | null`: ID of current post.
 
 <a name="getCurrentPostLastRevisionId" href="#getCurrentPostLastRevisionId">#</a> **getCurrentPostLastRevisionId**
 
@@ -264,11 +264,11 @@ or null if the post has no revisions.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `?number`: ID of the last revision.
+-   `number | null`: ID of the last revision.
 
 <a name="getCurrentPostRevisionsCount" href="#getCurrentPostRevisionsCount">#</a> **getCurrentPostRevisionsCount**
 
@@ -276,7 +276,7 @@ Returns the number of revisions of the post currently being edited.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -288,7 +288,7 @@ Returns the post type of the post currently being edited.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -302,12 +302,12 @@ saved state of the post.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 -   _attributeName_ `string`: Post attribute name.
 
 _Returns_
 
--   `*`: Post attribute value.
+-   `any`: Post attribute value.
 
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
@@ -315,7 +315,7 @@ Returns the content of the post being edited.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -327,11 +327,11 @@ Returns the post preview link
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `?string`: Preview Link.
+-   `string | null`: Preview Link.
 
 <a name="getEditedPostSlug" href="#getEditedPostSlug">#</a> **getEditedPostSlug**
 
@@ -341,7 +341,7 @@ finally the post ID.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
@@ -355,7 +355,7 @@ unsaved value if different than the saved post. The return value is one of
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -367,7 +367,7 @@ Return the current block list.
 
 _Parameters_
 
--   _state_ `Object`: 
+-   _state_ `object`: 
 
 _Returns_
 
@@ -379,7 +379,7 @@ Returns the current selection end.
 
 _Parameters_
 
--   _state_ `Object`: 
+-   _state_ `object`: 
 
 _Returns_
 
@@ -391,7 +391,7 @@ Returns the current selection start.
 
 _Parameters_
 
--   _state_ `Object`: 
+-   _state_ `object`: 
 
 _Returns_
 
@@ -403,11 +403,11 @@ Returns the post editor settings.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `Object`: The editor settings object.
+-   `object`: The editor settings object.
 
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
@@ -469,11 +469,11 @@ Returns the permalink for the post.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `?string`: The permalink, or null if the post is not viewable.
+-   `string | null`: The permalink, or null if the post is not viewable.
 
 <a name="getPermalinkParts" href="#getPermalinkParts">#</a> **getPermalinkParts**
 
@@ -482,11 +482,11 @@ the postName, and the suffix.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `Object`: An object containing the prefix, postName, and suffix for the permalink, or null if the post is not viewable.
+-   `object`: An object containing the prefix, postName, and suffix for the permalink, or null if the post is not viewable.
 
 <a name="getPostEdits" href="#getPostEdits">#</a> **getPostEdits**
 
@@ -495,11 +495,11 @@ been saved.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `Object`: Object of key value pairs comprising unsaved edits.
+-   `object`: Object of key value pairs comprising unsaved edits.
 
 <a name="getPostLockUser" href="#getPostLockUser">#</a> **getPostLockUser**
 
@@ -507,11 +507,11 @@ Returns details about the post lock user.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `Object`: A user object.
+-   `object`: A user object.
 
 <a name="getPreviousBlockClientId" href="#getPreviousBlockClientId">#</a> **getPreviousBlockClientId**
 
@@ -536,11 +536,11 @@ _Usage_
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `*`: A value whose reference will change only when an edit occurs.
+-   `any`: A value whose reference will change only when an edit occurs.
 
 <a name="getSelectedBlock" href="#getSelectedBlock">#</a> **getSelectedBlock**
 
@@ -573,12 +573,12 @@ if the transaction corresponding to the given ID cannot be found.
 
 _Parameters_
 
--   _state_ `Object`: Current global application state.
--   _transactionId_ `Object`: Optimist transaction ID.
+-   _state_ `object`: Current global application state.
+-   _transactionId_ `object`: Optimist transaction ID.
 
 _Returns_
 
--   `Object`: Global application state prior to transaction.
+-   `object`: Global application state prior to transaction.
 
 <a name="getSuggestedPostFormat" href="#getSuggestedPostFormat">#</a> **getSuggestedPostFormat**
 
@@ -588,11 +588,11 @@ default post format. Returns null if the format cannot be determined.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
--   `?string`: Suggested post format.
+-   `string | null`: Suggested post format.
 
 <a name="getTemplate" href="#getTemplate">#</a> **getTemplate**
 
@@ -614,7 +614,7 @@ Returns the true if there is an existing autosave, otherwise false.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -626,7 +626,7 @@ Returns true if content includes unsaved changes, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
@@ -639,7 +639,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -651,7 +651,7 @@ Returns true if any past editor history snapshots exist, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -676,7 +676,7 @@ the editor's post, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -701,7 +701,7 @@ before state satisfies the given predicate function.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 -   _predicate_ `Function`: Function given state, returning true if match.
 
 _Returns_
@@ -720,7 +720,7 @@ Returns true if the post is autosaving, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -769,7 +769,7 @@ if the currently edited post is new (has never been saved before).
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -781,7 +781,7 @@ Returns true if post is pending review.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -793,8 +793,8 @@ Return true if the current post has already been published.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _currentPost_ `?Object`: Explicit current post for bypassing registry selector.
+-   _state_ `object`: Global application state.
+-   _currentPost_ `object | null`: Explicit current post for bypassing registry selector.
 
 _Returns_
 
@@ -806,7 +806,7 @@ Returns true if post is already scheduled.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -818,8 +818,8 @@ Returns true if the post can be autosaved, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
--   _autosave_ `Object`: A raw autosave object from the REST API.
+-   _state_ `object`: Global application state.
+-   _autosave_ `object`: A raw autosave object from the REST API.
 
 _Returns_
 
@@ -832,7 +832,7 @@ unsaved status values.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -850,7 +850,7 @@ and modified date are the same.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
@@ -863,7 +863,7 @@ false if the editing state matches the saved or new post.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -877,7 +877,7 @@ assigned.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -890,7 +890,7 @@ the post has been saved.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -902,7 +902,7 @@ Return true if the post being edited can be published.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -915,7 +915,7 @@ contain a title, an excerpt, or non-empty content to be valid for save.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -939,7 +939,7 @@ Returns whether the permalink is editable or not.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
@@ -951,7 +951,7 @@ Returns whether post autosaving is locked.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -963,7 +963,7 @@ Returns whether the post is locked.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -975,7 +975,7 @@ Returns whether the edition of the post has been taken over.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -987,7 +987,7 @@ Returns whether post saving is locked.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -999,7 +999,7 @@ Returns true if the post is being previewed, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -1011,7 +1011,7 @@ Returns true if the post is being published, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -1024,7 +1024,7 @@ or skipped when the user clicks the "publish" button.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -1036,7 +1036,7 @@ Returns true if the post is currently being saved, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Global application state.
+-   _state_ `object`: Global application state.
 
 _Returns_
 
@@ -1072,7 +1072,7 @@ Action generator used in signalling that the post should autosave.
 
 _Parameters_
 
--   _options_ `?Object`: Extra flags to identify the autosave.
+-   _options_ `object | null`: Extra flags to identify the autosave.
 
 <a name="clearSelectedBlock" href="#clearSelectedBlock">#</a> **clearSelectedBlock**
 
@@ -1087,7 +1087,7 @@ be created.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="disablePublishSidebar" href="#disablePublishSidebar">#</a> **disablePublishSidebar**
 
@@ -1096,7 +1096,7 @@ publish sidebar.
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="editPost" href="#editPost">#</a> **editPost**
 
@@ -1105,8 +1105,8 @@ been edited.
 
 _Parameters_
 
--   _edits_ `Object`: Post attributes to edit.
--   _options_ `Object`: Options for the edit.
+-   _edits_ `object`: Post attributes to edit.
+-   _options_ `object`: Options for the edit.
 
 <a name="enablePublishSidebar" href="#enablePublishSidebar">#</a> **enablePublishSidebar**
 
@@ -1115,7 +1115,7 @@ publish sidebar.
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="enterFormattedText" href="#enterFormattedText">#</a> **enterFormattedText**
 
@@ -1168,7 +1168,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="lockPostSaving" href="#lockPostSaving">#</a> **lockPostSaving**
 
@@ -1215,7 +1215,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="mergeBlocks" href="#mergeBlocks">#</a> **mergeBlocks**
 
@@ -1295,11 +1295,11 @@ post has been received, by initialization or autosave.
 
 _Parameters_
 
--   _newAutosave_ `Object`: Autosave post object.
+-   _newAutosave_ `object`: Autosave post object.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="resetBlocks" href="#resetBlocks">#</a> **resetBlocks**
 
@@ -1314,7 +1314,7 @@ Returns an action object used to signal that the blocks have been updated.
 _Parameters_
 
 -   _blocks_ `Array`: Block Array.
--   _options_ `?Object`: Optional options.
+-   _options_ `object | null`: Optional options.
 
 <a name="resetPost" href="#resetPost">#</a> **resetPost**
 
@@ -1323,11 +1323,11 @@ post has been received, either by initialization or save.
 
 _Parameters_
 
--   _post_ `Object`: Post object.
+-   _post_ `object`: Post object.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="savePost" href="#savePost">#</a> **savePost**
 
@@ -1335,7 +1335,7 @@ Action generator for saving the current post in the editor.
 
 _Parameters_
 
--   _options_ `Object`: 
+-   _options_ `object`: 
 
 <a name="selectBlock" href="#selectBlock">#</a> **selectBlock**
 
@@ -1356,9 +1356,9 @@ the specified post object and editor settings.
 
 _Parameters_
 
--   _post_ `Object`: Post object.
--   _edits_ `Object`: Initial edited attributes object.
--   _template_ `?Array`: Block Template.
+-   _post_ `object`: Post object.
+-   _edits_ `object`: Initial edited attributes object.
+-   _template_ `Array | null`: Block Template.
 
 <a name="setupEditorState" href="#setupEditorState">#</a> **setupEditorState**
 
@@ -1367,11 +1367,11 @@ an editor.
 
 _Parameters_
 
--   _post_ `Object`: Post object.
+-   _post_ `object`: Post object.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="showInsertionPoint" href="#showInsertionPoint">#</a> **showInsertionPoint**
 
@@ -1444,7 +1444,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="unlockPostSaving" href="#unlockPostSaving">#</a> **unlockPostSaving**
 
@@ -1461,7 +1461,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object
+-   `object`: Action object
 
 <a name="updateBlock" href="#updateBlock">#</a> **updateBlock**
 
@@ -1492,11 +1492,11 @@ latest version of the post have been received.
 
 _Parameters_
 
--   _edits_ `Object`: Updated post fields.
+-   _edits_ `object`: Updated post fields.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="updatePostLock" href="#updatePostLock">#</a> **updatePostLock**
 
@@ -1504,11 +1504,11 @@ Returns an action object used to lock the editor.
 
 _Parameters_
 
--   _lock_ `Object`: Details about the post lock status, user, and nonce.
+-   _lock_ `object`: Details about the post lock status, user, and nonce.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 
 <!-- END TOKEN(Autogenerated actions|../../../../packages/editor/src/store/actions.js) -->

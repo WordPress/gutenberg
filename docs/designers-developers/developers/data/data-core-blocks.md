@@ -12,12 +12,12 @@ Returns block styles by block name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _name_ `string`: Block type name.
 
 _Returns_
 
--   `?Array`: Block Styles.
+-   `Array | null`: Block Styles.
 
 <a name="getBlockSupport" href="#getBlockSupport">#</a> **getBlockSupport**
 
@@ -25,14 +25,14 @@ Returns the block support value for a feature, if defined.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _nameOrType_ `(string|Object)`: Block name or type object
+-   _state_ `object`: Data state.
+-   _nameOrType_ `( string | object )`: Block name or type object
 -   _feature_ `string`: Feature to retrieve
--   _defaultSupports_ `*`: Default value to return if not explicitly defined
+-   _defaultSupports_ `any`: Default value to return if not explicitly defined
 
 _Returns_
 
--   `?*`: Block support value
+-   `any | null`: Block support value
 
 <a name="getBlockType" href="#getBlockType">#</a> **getBlockType**
 
@@ -40,12 +40,12 @@ Returns a block type by name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _name_ `string`: Block type name.
 
 _Returns_
 
--   `?Object`: Block Type.
+-   `object | null`: Block Type.
 
 <a name="getBlockTypes" href="#getBlockTypes">#</a> **getBlockTypes**
 
@@ -53,7 +53,7 @@ Returns all the available block types.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
@@ -65,13 +65,13 @@ Returns block variations by block name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _blockName_ `string`: Block type name.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+-   _scope_ `WPBlockVariationScope | undefined`: Block variation scope name.
 
 _Returns_
 
--   `(Array<WPBlockVariation>|void)`: Block variations.
+-   `( WPBlockVariation[] | void )`: Block variations.
 
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
@@ -79,7 +79,7 @@ Returns all the available categories.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
@@ -91,7 +91,7 @@ Returns an array with the child blocks of a given block.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
@@ -104,11 +104,11 @@ Returns all the available collections.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `Object`: Collections list.
+-   `object`: Collections list.
 
 <a name="getDefaultBlockName" href="#getDefaultBlockName">#</a> **getDefaultBlockName**
 
@@ -116,11 +116,11 @@ Returns the name of the default block name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `?string`: Default block name.
+-   `string | null`: Default block name.
 
 <a name="getDefaultBlockVariation" href="#getDefaultBlockVariation">#</a> **getDefaultBlockVariation**
 
@@ -131,13 +131,13 @@ When there is no default variation set, it returns the first item.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _blockName_ `string`: Block type name.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+-   _scope_ `WPBlockVariationScope | undefined`: Block variation scope name.
 
 _Returns_
 
--   `?WPBlockVariation`: The default block variation.
+-   `WPBlockVariation | null`: The default block variation.
 
 <a name="getFreeformFallbackBlockName" href="#getFreeformFallbackBlockName">#</a> **getFreeformFallbackBlockName**
 
@@ -145,11 +145,11 @@ Returns the name of the block for handling non-block content.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `?string`: Name of the block for handling non-block content.
+-   `string | null`: Name of the block for handling non-block content.
 
 <a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
 
@@ -157,11 +157,11 @@ Returns the name of the block for handling unregistered blocks.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `?string`: Name of the block for handling unregistered blocks.
+-   `string | null`: Name of the block for handling unregistered blocks.
 
 <a name="getUnregisteredFallbackBlockName" href="#getUnregisteredFallbackBlockName">#</a> **getUnregisteredFallbackBlockName**
 
@@ -169,11 +169,11 @@ Returns the name of the block for handling unregistered blocks.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `?string`: Name of the block for handling unregistered blocks.
+-   `string | null`: Name of the block for handling unregistered blocks.
 
 <a name="hasBlockSupport" href="#hasBlockSupport">#</a> **hasBlockSupport**
 
@@ -181,8 +181,8 @@ Returns true if the block defines support for a feature, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _nameOrType_ `(string|Object)`: Block name or type object.
+-   _state_ `object`: Data state.
+-   _nameOrType_ `( string | object )`: Block name or type object.
 -   _feature_ `string`: Feature to test.
 -   _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
@@ -196,7 +196,7 @@ Returns a boolean indicating if a block has child blocks or not.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
@@ -209,7 +209,7 @@ Returns a boolean indicating if a block has at least one child block with insert
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
@@ -223,13 +223,13 @@ search term, or false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Blocks state.
--   _nameOrType_ `(string|Object)`: Block name or type object.
+-   _state_ `object`: Blocks state.
+-   _nameOrType_ `( string | object )`: Block name or type object.
 -   _searchTerm_ `string`: Search term by which to filter.
 
 _Returns_
 
--   `Array<Object>`: Whether block type matches search term.
+-   `object[]`: Whether block type matches search term.
 
 <!-- END TOKEN(Autogenerated selectors|../../../../packages/blocks/src/store/selectors.js) -->
 
@@ -245,11 +245,11 @@ _Parameters_
 
 -   _namespace_ `string`: The namespace of the blocks to put in the collection
 -   _title_ `string`: The title to display in the block inserter
--   _icon_ `Object`: (optional) The icon to display in the block inserter
+-   _icon_ `object`: (optional) The icon to display in the block inserter
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="addBlockStyles" href="#addBlockStyles">#</a> **addBlockStyles**
 
@@ -258,11 +258,11 @@ Returns an action object used in signalling that new block styles have been adde
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _styles_ `(Array|Object)`: Block styles.
+-   _styles_ `Array | object`: Block styles.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="addBlockTypes" href="#addBlockTypes">#</a> **addBlockTypes**
 
@@ -270,11 +270,11 @@ Returns an action object used in signalling that block types have been added.
 
 _Parameters_
 
--   _blockTypes_ `(Array|Object)`: Block types received.
+-   _blockTypes_ `Array | object`: Block types received.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="addBlockVariations" href="#addBlockVariations">#</a> **addBlockVariations**
 
@@ -283,11 +283,11 @@ Returns an action object used in signalling that new block variations have been 
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _variations_ `(WPBlockVariation|Array<WPBlockVariation>)`: Block variations.
+-   _variations_ `WPBlockVariation | WPBlockVariation[]`: Block variations.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="removeBlockCollection" href="#removeBlockCollection">#</a> **removeBlockCollection**
 
@@ -299,7 +299,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="removeBlockStyles" href="#removeBlockStyles">#</a> **removeBlockStyles**
 
@@ -308,11 +308,11 @@ Returns an action object used in signalling that block styles have been removed.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _styleNames_ `(Array|string)`: Block style names.
+-   _styleNames_ `Array | string`: Block style names.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="removeBlockTypes" href="#removeBlockTypes">#</a> **removeBlockTypes**
 
@@ -320,11 +320,11 @@ Returns an action object used to remove a registered block type.
 
 _Parameters_
 
--   _names_ `(string|Array)`: Block name.
+-   _names_ `string | Array`: Block name.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="removeBlockVariations" href="#removeBlockVariations">#</a> **removeBlockVariations**
 
@@ -333,11 +333,11 @@ Returns an action object used in signalling that block variations have been remo
 _Parameters_
 
 -   _blockName_ `string`: Block name.
--   _variationNames_ `(string|Array<string>)`: Block variation names.
+-   _variationNames_ `string | string[]`: Block variation names.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="setCategories" href="#setCategories">#</a> **setCategories**
 
@@ -345,11 +345,11 @@ Returns an action object used to set block categories.
 
 _Parameters_
 
--   _categories_ `Array<Object>`: Block categories.
+-   _categories_ `object[]`: Block categories.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -361,7 +361,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="setFreeformFallbackBlockName" href="#setFreeformFallbackBlockName">#</a> **setFreeformFallbackBlockName**
 
@@ -374,7 +374,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
 
@@ -388,7 +388,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="setUnregisteredFallbackBlockName" href="#setUnregisteredFallbackBlockName">#</a> **setUnregisteredFallbackBlockName**
 
@@ -401,7 +401,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="updateCategory" href="#updateCategory">#</a> **updateCategory**
 
@@ -410,11 +410,11 @@ Returns an action object used to update a category.
 _Parameters_
 
 -   _slug_ `string`: Block category slug.
--   _category_ `Object`: Object containing the category properties that should be updated.
+-   _category_ `object`: Object containing the category properties that should be updated.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 
 <!-- END TOKEN(Autogenerated actions|../../../../packages/blocks/src/store/actions.js) -->

@@ -33,8 +33,8 @@ Create an i18n instance
 
 _Parameters_
 
--   _initialData_ `[LocaleData]`: Locale data configuration.
--   _initialDomain_ `[string]`: Domain for which configuration applies.
+-   _initialData_ `LocaleData | undefined`: Locale data configuration.
+-   _initialDomain_ `string | undefined`: Domain for which configuration applies.
 
 _Returns_
 
@@ -64,8 +64,8 @@ _Related_
 
 _Parameters_
 
--   _data_ `[LocaleData]`: Locale data configuration.
--   _domain_ `[string]`: Domain for which configuration applies.
+-   _data_ `LocaleData | undefined`: Locale data configuration.
+-   _domain_ `string | undefined`: Domain for which configuration applies.
 
 <a name="sprintf" href="#sprintf">#</a> **sprintf**
 
@@ -99,7 +99,7 @@ _Parameters_
 -   _single_ `string`: The text to be used if the number is singular.
 -   _plural_ `string`: The text to be used if the number is plural.
 -   _number_ `number`: The number to compare against to use either the singular or plural form.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -120,7 +120,7 @@ _Parameters_
 -   _plural_ `string`: The text to be used if the number is plural.
 -   _number_ `number`: The number to compare against to use either the singular or plural form.
 -   _context_ `string`: Context information for the translators.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -138,7 +138,7 @@ _Parameters_
 
 -   _text_ `string`: Text to translate.
 -   _context_ `string`: Context information for the translators.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 
@@ -155,7 +155,7 @@ _Related_
 _Parameters_
 
 -   _text_ `string`: Text to translate.
--   _domain_ `[string]`: Domain to retrieve the translated text.
+-   _domain_ `string | undefined`: Domain to retrieve the translated text.
 
 _Returns_
 

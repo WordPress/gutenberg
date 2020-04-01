@@ -18,14 +18,14 @@ Calling this may trigger an OPTIONS request to the REST API via the
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `[string]`: Optional ID of the rest resource to check.
+-   _id_ `string | undefined`: Optional ID of the rest resource to check.
 
 _Returns_
 
--   `(boolean|undefined)`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 <a name="getAuthors" href="#getAuthors">#</a> **getAuthors**
 
@@ -33,7 +33,7 @@ Returns all available authors.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
@@ -45,14 +45,14 @@ Returns the autosave for the post and author.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _postType_ `string`: The type of the parent post.
 -   _postId_ `number`: The id of the parent post.
 -   _authorId_ `number`: The id of the author.
 
 _Returns_
 
--   `?Object`: The autosave for the post and author.
+-   `object | null`: The autosave for the post and author.
 
 <a name="getAutosaves" href="#getAutosaves">#</a> **getAutosaves**
 
@@ -63,13 +63,13 @@ author for each post.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _postType_ `string`: The type of the parent post.
 -   _postId_ `number`: The id of the parent post.
 
 _Returns_
 
--   `?Array`: An array of autosaves for the post, or undefined if there is none.
+-   `Array | null`: An array of autosaves for the post, or undefined if there is none.
 
 <a name="getCurrentUser" href="#getCurrentUser">#</a> **getCurrentUser**
 
@@ -77,11 +77,11 @@ Returns the current user.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `Object`: Current user object.
+-   `object`: Current user object.
 
 <a name="getEditedEntityRecord" href="#getEditedEntityRecord">#</a> **getEditedEntityRecord**
 
@@ -89,14 +89,14 @@ Returns the specified entity record, merged with its edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
 
 _Returns_
 
--   `?Object`: The entity record, merged with its edits.
+-   `object | null`: The entity record, merged with its edits.
 
 <a name="getEmbedPreview" href="#getEmbedPreview">#</a> **getEmbedPreview**
 
@@ -104,12 +104,12 @@ Returns the embed preview for the given URL.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
 
--   `*`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
+-   `any`: Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
 
 <a name="getEntitiesByKind" href="#getEntitiesByKind">#</a> **getEntitiesByKind**
 
@@ -117,7 +117,7 @@ Returns whether the entities for the give kind are loaded.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _kind_ `string`: Entity kind.
 
 _Returns_
@@ -130,13 +130,13 @@ Returns the entity object given its kind and name.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 
 _Returns_
 
--   `Object`: Entity
+-   `object`: Entity
 
 <a name="getEntityRecord" href="#getEntityRecord">#</a> **getEntityRecord**
 
@@ -144,14 +144,14 @@ Returns the Entity's record object by key.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `object`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `number`: Record's key
 
 _Returns_
 
--   `?Object`: Record.
+-   `object | null`: Record.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
@@ -159,14 +159,14 @@ Returns the specified entity record's edits.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
 
 _Returns_
 
--   `?Object`: The entity record's edits.
+-   `object | null`: The entity record's edits.
 
 <a name="getEntityRecordNonTransientEdits" href="#getEntityRecordNonTransientEdits">#</a> **getEntityRecordNonTransientEdits**
 
@@ -178,14 +178,14 @@ They are defined in the entity's config.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
 
 _Returns_
 
--   `?Object`: The entity record's non transient edits.
+-   `object | null`: The entity record's non transient edits.
 
 <a name="getEntityRecords" href="#getEntityRecords">#</a> **getEntityRecords**
 
@@ -193,10 +193,10 @@ Returns the Entity's records.
 
 _Parameters_
 
--   _state_ `Object`: State tree
+-   _state_ `object`: State tree
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _query_ `?Object`: Optional terms query.
+-   _query_ `object | null`: Optional terms query.
 
 _Returns_
 
@@ -208,14 +208,14 @@ Returns the specified entity record's last save error.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
 
 _Returns_
 
--   `?Object`: The entity record's save error.
+-   `object | null`: The entity record's save error.
 
 <a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
 
@@ -224,14 +224,14 @@ with its attributes mapped to their raw values.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _key_ `number`: Record's key.
 
 _Returns_
 
--   `?Object`: Object with the entity's raw attributes.
+-   `object | null`: Object with the entity's raw attributes.
 
 <a name="getRedoEdit" href="#getRedoEdit">#</a> **getRedoEdit**
 
@@ -240,11 +240,11 @@ for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 
 _Returns_
 
--   `?Object`: The edit.
+-   `object | null`: The edit.
 
 <a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
 
@@ -261,11 +261,11 @@ _Usage_
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `object`: Editor state.
 
 _Returns_
 
--   `*`: A value whose reference will change only when an edit occurs.
+-   `any`: A value whose reference will change only when an edit occurs.
 
 <a name="getThemeSupports" href="#getThemeSupports">#</a> **getThemeSupports**
 
@@ -273,11 +273,11 @@ Return theme supports data in the index.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
--   `*`: Index data.
+-   `any`: Index data.
 
 <a name="getUndoEdit" href="#getUndoEdit">#</a> **getUndoEdit**
 
@@ -286,11 +286,11 @@ for the entity records edits history, if any.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 
 _Returns_
 
--   `?Object`: The edit.
+-   `object | null`: The edit.
 
 <a name="getUserQueryResults" href="#getUserQueryResults">#</a> **getUserQueryResults**
 
@@ -298,7 +298,7 @@ Returns all the users returned by a query ID.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _queryID_ `string`: Query ID.
 
 _Returns_
@@ -312,7 +312,7 @@ and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
@@ -327,7 +327,7 @@ Returns true if the REST request for autosaves has completed.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _postType_ `string`: The type of the parent post.
 -   _postId_ `number`: The id of the parent post.
 
@@ -342,7 +342,7 @@ for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 
 _Returns_
 
@@ -355,7 +355,7 @@ for the entity records edits history, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 
 _Returns_
 
@@ -374,7 +374,7 @@ Calling this may trigger an OPTIONS request to the REST API via the
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 
 _Returns_
 
@@ -386,7 +386,7 @@ Returns true if the specified entity record is autosaving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
@@ -405,7 +405,7 @@ get back from the oEmbed preview API.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _url_ `string`: Embedded URL.
 
 _Returns_
@@ -419,7 +419,7 @@ otherwise.
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `object`: Data state.
 -   _url_ `string`: URL the preview would be for.
 
 _Returns_
@@ -432,7 +432,7 @@ Returns true if the specified entity record is saving, and false otherwise.
 
 _Parameters_
 
--   _state_ `Object`: State tree.
+-   _state_ `object`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _recordId_ `number`: Record ID.
@@ -457,7 +457,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
@@ -469,13 +469,13 @@ _Parameters_
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
 -   _recordId_ `number`: Record ID of the edited entity record.
--   _edits_ `Object`: The edits.
--   _options_ `Object`: Options for the edit.
--   _options.undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
+-   _edits_ `object`: The edits.
+-   _options_ `object`: Options for the edit.
+    -   _undoIgnore_ `boolean`: Whether to ignore the edit in undo history or not.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveAutosaves" href="#receiveAutosaves">#</a> **receiveAutosaves**
 
@@ -485,11 +485,11 @@ post have been received.
 _Parameters_
 
 -   _postId_ `number`: The id of the post that is parent to the autosave.
--   _autosaves_ `(Array|Object)`: An array of autosaves or singular autosave object.
+-   _autosaves_ `Array | object`: An array of autosaves or singular autosave object.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveCurrentUser" href="#receiveCurrentUser">#</a> **receiveCurrentUser**
 
@@ -497,11 +497,11 @@ Returns an action used in signalling that the current user has been received.
 
 _Parameters_
 
--   _currentUser_ `Object`: Current user object.
+-   _currentUser_ `object`: Current user object.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveEmbedPreview" href="#receiveEmbedPreview">#</a> **receiveEmbedPreview**
 
@@ -511,11 +511,11 @@ a given URl has been received.
 _Parameters_
 
 -   _url_ `string`: URL to preview the embed for.
--   _preview_ `*`: Preview data.
+-   _preview_ `any`: Preview data.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveEntityRecords" href="#receiveEntityRecords">#</a> **receiveEntityRecords**
 
@@ -525,13 +525,13 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the received entity.
 -   _name_ `string`: Name of the received entity.
--   _records_ `(Array|Object)`: Records received.
--   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches
+-   _records_ `Array | object`: Records received.
+-   _query_ `object | null`: Query Object.
+-   _invalidateCache_ `boolean | null`: Should invalidate query caches
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveThemeSupports" href="#receiveThemeSupports">#</a> **receiveThemeSupports**
 
@@ -539,11 +539,11 @@ Returns an action object used in signalling that the index has been received.
 
 _Parameters_
 
--   _themeSupports_ `Object`: Theme support for the current theme.
+-   _themeSupports_ `object`: Theme support for the current theme.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveUploadPermissions" href="#receiveUploadPermissions">#</a> **receiveUploadPermissions**
 
@@ -555,7 +555,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveUserPermission" href="#receiveUserPermission">#</a> **receiveUserPermission**
 
@@ -569,7 +569,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="receiveUserQuery" href="#receiveUserQuery">#</a> **receiveUserQuery**
 
@@ -578,11 +578,11 @@ Returns an action object used in signalling that authors have been received.
 _Parameters_
 
 -   _queryID_ `string`: Query ID.
--   _users_ `(Array|Object)`: Users received.
+-   _users_ `Array | object`: Users received.
 
 _Returns_
 
--   `Object`: Action object.
+-   `object`: Action object.
 
 <a name="redo" href="#redo">#</a> **redo**
 
@@ -597,8 +597,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `Object`: ID of the record.
--   _options_ `Object`: Saving options.
+-   _recordId_ `object`: ID of the record.
+-   _options_ `object`: Saving options.
 
 <a name="saveEntityRecord" href="#saveEntityRecord">#</a> **saveEntityRecord**
 
@@ -608,8 +608,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the received entity.
 -   _name_ `string`: Name of the received entity.
--   _record_ `Object`: Record to be saved.
--   _options_ `Object`: Saving options.
+-   _record_ `object`: Record to be saved.
+-   _options_ `object`: Saving options.
 
 <a name="undo" href="#undo">#</a> **undo**
 

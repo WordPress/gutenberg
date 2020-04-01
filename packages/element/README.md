@@ -89,7 +89,7 @@ Creates a copy of an element with extended props.
 _Parameters_
 
 -   _element_ `WPElement`: Element
--   _props_ `?Object`: Props to apply to cloned element
+-   _props_ `object | null`: Props to apply to cloned element
 
 _Returns_
 
@@ -105,7 +105,7 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
+-   _childrenArguments_ `...object | null`: Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
@@ -117,11 +117,11 @@ Creates a context object containing two components: a provider and consumer.
 
 _Parameters_
 
--   _defaultValue_ `Object`: A default data stored in the context.
+-   _defaultValue_ `object`: A default data stored in the context.
 
 _Returns_
 
--   `Object`: Context object.
+-   `object`: Context object.
 
 <a name="createElement" href="#createElement">#</a> **createElement**
 
@@ -130,8 +130,8 @@ another function which itself returns an element.
 
 _Parameters_
 
--   _type_ `?(string|Function)`: Tag name or element creator
--   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
+-   _type_ `( string | Function ) | null`: Tag name or element creator
+-   _props_ `object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
 -   _children_ `...WPElement`: Descendant elements
 
 _Returns_
@@ -164,7 +164,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `object`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -191,7 +191,7 @@ type of element rendered with the ref attribute.
 
 _Returns_
 
--   `Object`: Ref object.
+-   `object`: Ref object.
 
 <a name="findDOMNode" href="#findDOMNode">#</a> **findDOMNode**
 
@@ -226,7 +226,7 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   _element_ `*`: WP element to check.
+-   _element_ `any`: WP element to check.
 
 _Returns_
 
@@ -238,7 +238,7 @@ Checks if an object is a valid WPElement.
 
 _Parameters_
 
--   _objectToCheck_ `Object`: The object to be checked.
+-   _objectToCheck_ `object`: The object to be checked.
 
 _Returns_
 
@@ -289,9 +289,9 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `Object`: 
--   _props.children_ `string`: HTML to render.
--   _props.props_ `Object`: Any additonal props to be set on the containing div.
+-   _props_ `object`: 
+    -   _children_ `string`: HTML to render.
+    -   _props_ `object`: Any additonal props to be set on the containing div.
 
 _Returns_
 
@@ -313,8 +313,8 @@ Serializes a React element to string.
 _Parameters_
 
 -   _element_ `WPElement`: Element to serialize.
--   _context_ `?Object`: Context object.
--   _legacyContext_ `?Object`: Legacy context object.
+-   _context_ `object | null`: Context object.
+-   _legacyContext_ `object | null`: Legacy context object.
 
 _Returns_
 
@@ -336,12 +336,12 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   _children_ `?Object`: Children object.
+-   _children_ `object | null`: Children object.
 -   _nodeName_ `string`: Node name.
 
 _Returns_
 
--   `?Object`: The updated children object.
+-   `object | null`: The updated children object.
 
 <a name="unmountComponentAtNode" href="#unmountComponentAtNode">#</a> **unmountComponentAtNode**
 

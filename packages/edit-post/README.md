@@ -37,10 +37,10 @@ call initializeEditor(). This is due to metaBox timing.
 _Parameters_
 
 -   _id_ `string`: Unique identifier for editor instance.
--   _postType_ `Object`: Post type of the post to edit.
--   _postId_ `Object`: ID of the post to edit.
--   _settings_ `?Object`: Editor settings object.
--   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+-   _postType_ `object`: Post type of the post to edit.
+-   _postId_ `object`: ID of the post to edit.
+-   _settings_ `object | null`: Editor settings object.
+-   _initialEdits_ `object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
 
 <a name="PluginBlockSettingsMenuItem" href="#PluginBlockSettingsMenuItem">#</a> **PluginBlockSettingsMenuItem**
 
@@ -90,11 +90,11 @@ const MyPluginBlockSettingsMenuItem = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
--   _props.label_ `string`: The menu item text.
--   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
+-   _props_ `object`: Component props.
+    -   _allowedBlocks_ `Array | undefined`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+    -   _icon_ `WPBlockTypeIconRender | undefined`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
+    -   _label_ `string`: The menu item text.
+    -   _onClick_ `Function`: Callback function to be executed when the user click the menu item.
 
 _Returns_
 
@@ -145,11 +145,11 @@ const MyDocumentSettingTest = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
--   _props.name_ `[string]`: The machine-friendly name for the panel.
--   _props.className_ `[string]`: An optional class name added to the row.
--   _props.title_ `[string]`: The title of the panel
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props_ `object`: Component properties.
+    -   _name_ `string | undefined`: The machine-friendly name for the panel.
+    -   _className_ `string | undefined`: An optional class name added to the row.
+    -   _title_ `string | undefined`: The title of the panel
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. (Default: `inherits from the plugin`)
 
 _Returns_
 
@@ -206,11 +206,11 @@ const MyButtonMoreMenuItem = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
--   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
--   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
--   _props.other_ `[...*]`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
+-   _props_ `object`: Component properties.
+    -   _href_ `string | undefined`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label. (Default: `inherits from the plugin`)
+    -   _onClick_ `Function`: The callback function to be executed when the user clicks the menu item. (Default: `noop`)
+    -   _other_ `...any | undefined`: Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
 
 _Returns_
 
@@ -259,11 +259,11 @@ const MyPluginPostPublishPanel = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props_ `object`: Component properties.
+    -   _className_ `string | undefined`: An optional class name added to the panel.
+    -   _title_ `string | undefined`: Title displayed at the top of the panel.
+    -   _initialOpen_ `boolean`: Whether to have the panel initially opened. When no title is provided it is always opened. (Default: `false`)
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. (Default: `inherits from the plugin`)
 
 _Returns_
 
@@ -309,8 +309,8 @@ const MyPluginPostStatusInfo = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
--   _props.className_ `[string]`: An optional class name added to the row.
+-   _props_ `object`: Component properties.
+    -   _className_ `string | undefined`: An optional class name added to the row.
 
 _Returns_
 
@@ -359,11 +359,11 @@ const MyPluginPrePublishPanel = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props_ `object`: Component props.
+    -   _className_ `string | undefined`: An optional class name added to the panel.
+    -   _title_ `string | undefined`: Title displayed at the top of the panel.
+    -   _initialOpen_ `boolean`: Whether to have the panel initially opened. When no title is provided it is always opened. (Default: `false`)
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. (Default: `inherits from the plugin`)
 
 _Returns_
 
@@ -431,12 +431,12 @@ const MyPluginSidebar = () => (
 
 _Parameters_
 
--   _props_ `Object`: Element props.
--   _props.name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
--   _props.className_ `[string]`: An optional class name added to the sidebar body.
--   _props.title_ `string`: Title displayed at the top of the sidebar.
--   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props_ `object`: Element props.
+    -   _name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
+    -   _className_ `string | undefined`: An optional class name added to the sidebar body.
+    -   _title_ `string`: Title displayed at the top of the sidebar.
+    -   _isPinnable_ `boolean`: Whether to allow to pin sidebar to toolbar. (Default: `true`)
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. (Default: `inherits from the plugin`)
 
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 
@@ -482,9 +482,9 @@ const MySidebarMoreMenuItem = () => (
 
 _Parameters_
 
--   _props_ `Object`: Component props.
--   _props.target_ `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+-   _props_ `object`: Component props.
+    -   _target_ `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+    -   _icon_ `WPBlockTypeIconRender`: from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label. (Default: `inherits from the plugin`)
 
 _Returns_
 
@@ -498,11 +498,11 @@ an initial state from prior to the crash.
 
 _Parameters_
 
--   _postType_ `Object`: Post type of the post to edit.
--   _postId_ `Object`: ID of the post to edit.
+-   _postType_ `object`: Post type of the post to edit.
+-   _postId_ `object`: ID of the post to edit.
 -   _target_ `Element`: DOM node in which editor is rendered.
--   _settings_ `?Object`: Editor settings object.
--   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+-   _settings_ `object | null`: Editor settings object.
+-   _initialEdits_ `object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

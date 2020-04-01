@@ -30,8 +30,8 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Object`: Query arguments to apply to URL.
+-   _url_ `string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned. (Default: ``)
+-   _args_ `object`: Query arguments to apply to URL.
 
 _Returns_
 
@@ -93,7 +93,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The authority part of the URL.
+-   `string | void`: The authority part of the URL.
 
 <a name="getFragment" href="#getFragment">#</a> **getFragment**
 
@@ -112,7 +112,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The fragment part of the URL.
+-   `string | void`: The fragment part of the URL.
 
 <a name="getPath" href="#getPath">#</a> **getPath**
 
@@ -131,7 +131,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The path part of the URL.
+-   `string | void`: The path part of the URL.
 
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
@@ -150,7 +150,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The protocol part of the URL.
+-   `string | void`: The protocol part of the URL.
 
 <a name="getQueryArg" href="#getQueryArg">#</a> **getQueryArg**
 
@@ -169,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgParsed|undefined)`: Query arg value.
+-   `QueryArgParsed | undefined`: Query arg value.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 
@@ -187,7 +187,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The query string part of the URL.
+-   `string | void`: The query string part of the URL.
 
 <a name="hasQueryArg" href="#hasQueryArg">#</a> **hasQueryArg**
 

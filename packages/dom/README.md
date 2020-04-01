@@ -20,7 +20,7 @@ Get the rectangle for the selection in a container.
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
@@ -52,7 +52,7 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -76,7 +76,7 @@ _Parameters_
 
 _Returns_
 
--   `?Element`: Scrollable container node, if found.
+-   `Element | null`: Scrollable container node, if found.
 
 <a name="insertAfter" href="#insertAfter">#</a> **insertAfter**
 
@@ -163,8 +163,8 @@ _Parameters_
 
 -   _container_ `Element`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
--   _rect_ `[DOMRect]`: The rectangle to position the caret with.
--   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
+-   _rect_ `DOMRect | undefined`: The rectangle to position the caret with.
+-   _mayUseScroll_ `boolean`: True to allow scrolling, false to disallow. (Default: `true`)
 
 <a name="remove" href="#remove">#</a> **remove**
 

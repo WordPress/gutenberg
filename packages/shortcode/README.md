@@ -49,7 +49,7 @@ the `type` of the shortcode ('single', 'self-closing', or 'closed'), and a
 
 _Parameters_
 
--   _options_ `Object`: Options as described.
+-   _options_ `object`: Options as described.
 
 _Returns_
 
@@ -83,7 +83,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPShortcodeMatch`: Matched information.
+-   `WPShortcodeMatch | null`: Matched information.
 
 <a name="regexp" href="#regexp">#</a> **regexp**
 
@@ -136,7 +136,7 @@ format the shortcode using a `single` tag, and a `content` string.
 
 _Parameters_
 
--   _options_ `Object`: 
+-   _options_ `object`: 
 
 _Returns_
 

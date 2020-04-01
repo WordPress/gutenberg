@@ -62,7 +62,7 @@ Click on the close button of an open modal.
 
 _Parameters_
 
--   _modalClassName_ `?string`: Class name for the modal to close
+-   _modalClassName_ `string | null`: Class name for the modal to close
 
 <a name="clickOnMoreMenuItem" href="#clickOnMoreMenuItem">#</a> **clickOnMoreMenuItem**
 
@@ -102,7 +102,7 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _obj_ `object`: Object to create new post, along with tips enabling option.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -111,7 +111,7 @@ Creates new URL by parsing base URL, WPPath and query string.
 _Parameters_
 
 -   _WPPath_ `string`: String to be serialized as pathname.
--   _query_ `?string`: String to be serialized as query portion of URL.
+-   _query_ `string | null`: String to be serialized as query portion of URL.
 
 _Returns_
 
@@ -151,10 +151,10 @@ Clicks an element, drags a particular distance and releases the mouse button.
 
 _Parameters_
 
--   _element_ `Object`: The puppeteer element handle.
--   _delta_ `Object`: Object containing movement distances.
--   _delta.x_ `number`: Horizontal distance to drag.
--   _delta.y_ `number`: Vertical distance to drag.
+-   _element_ `object`: The puppeteer element handle.
+-   _delta_ `object`: Object containing movement distances.
+    -   _x_ `number`: Horizontal distance to drag.
+    -   _y_ `number`: Vertical distance to drag.
 
 _Returns_
 
@@ -192,7 +192,7 @@ _Parameters_
 
 _Returns_
 
--   `?ElementHandle`: Object that represents an in-page DOM element.
+-   `ElementHandle | null`: Object that represents an in-page DOM element.
 
 <a name="findSidebarPanelWithTitle" href="#findSidebarPanelWithTitle">#</a> **findSidebarPanelWithTitle**
 
@@ -204,7 +204,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise<(ElementHandle|undefined)>`: Object that represents an in-page DOM element.
+-   `Promise<ElementHandle | undefined>`: Object that represents an in-page DOM element.
 
 <a name="getAllBlockInserterItemTitles" href="#getAllBlockInserterItemTitles">#</a> **getAllBlockInserterItemTitles**
 
@@ -277,7 +277,7 @@ Installs a plugin from the WP.org repository.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
--   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
+-   _searchTerm_ `string | null`: If the plugin is not findable by its slug use an alternative term to search.
 
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
@@ -286,7 +286,7 @@ Checks if current URL is a WordPress path.
 _Parameters_
 
 -   _WPPath_ `string`: String to be serialized as pathname.
--   _query_ `?string`: String to be serialized as query portion of URL.
+-   _query_ `string | null`: String to be serialized as query portion of URL.
 
 _Returns_
 
@@ -310,8 +310,8 @@ Performs log in with specified username and password.
 
 _Parameters_
 
--   _username_ `?string`: String to be used as user credential.
--   _password_ `?string`: String to be used as user credential.
+-   _username_ `string | null`: String to be used as user credential.
+-   _password_ `string | null`: String to be used as user credential.
 
 <a name="mockOrTransform" href="#mockOrTransform">#</a> **mockOrTransform**
 
@@ -321,8 +321,8 @@ deserialised JSON response for the request.
 _Parameters_
 
 -   _mockCheck_ `Function`: function that returns true if the request should be mocked.
--   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   _responseObjectTransform_ `(Function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _mock_ `object`: A mock object to wrap in a JSON response, if the request should be mocked.
+-   _responseObjectTransform_ `Function | undefined`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
@@ -488,7 +488,7 @@ Toggles the screen option with the given label.
 _Parameters_
 
 -   _label_ `string`: The label of the screen option, e.g. 'Show Tips'.
--   _shouldBeChecked_ `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
+-   _shouldBeChecked_ `boolean | null`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
 
 <a name="transformBlockTo" href="#transformBlockTo">#</a> **transformBlockTo**
 
