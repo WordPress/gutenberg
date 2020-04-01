@@ -16,7 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	enableExperimentalFeatures,
 	disableExperimentalFeatures,
-} from '../../../experimental-features';
+} from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors.
