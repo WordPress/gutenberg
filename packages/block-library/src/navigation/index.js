@@ -37,7 +37,7 @@ export const settings = {
 			name: 'horizontal',
 			isDefault: true,
 			title: __( 'Horizontal navigation' ),
-			description: __( 'Links shown in a row' ),
+			description: __( 'Links shown in a row.' ),
 			icon: undefined,
 			attributes: { orientation: 'horizontal' },
 		},
