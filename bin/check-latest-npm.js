@@ -3,6 +3,7 @@
 /**
  * External dependencies
  */
+const { green, red, yellow } = require( 'chalk' );
 const { get } = require( 'https' );
 const { spawn } = require( 'child_process' );
 
@@ -78,11 +79,14 @@ Promise.all( [ getLatestNPMVersion(), getLocalNPMVersion() ] )
 	.then( ( [ latest, local ] ) => {
 		if ( latest !== local ) {
 			throw new Error(
-				`The local NPM version does not match the expected latest version. Expected ${ latest }, found ${ local }.
+				`The local NPM version does not match the expected latest version. Expected ${ green(
+					latest
+				) }, found ${ red( local ) }.
 
-It is required that you have the latest version of NPM installed in order to commit a change to the \`package-lock.json\` file.
+It is required that you have the latest version of NPM installed in order to commit a change to the package-lock.json file.
 
-Run \`npm install --global npm@latest\`, then try again.`
+Run ${ yellow( 'npm install --global npm@latest' ) }, then try again.
+`
 			);
 		}
 	} )
