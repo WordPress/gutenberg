@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { RangeControl, SelectControl, FormTokenField } from '../';
-import CategorySelect from './category-select';
 import AuthorSelect from './author-select';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -15,9 +14,7 @@ const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 export default function QueryControls( {
-	categoriesList,
 	authorList,
-	selectedCategoryId,
 	selectedAuthorId,
 	categorySuggestions,
 	selectedCategories,

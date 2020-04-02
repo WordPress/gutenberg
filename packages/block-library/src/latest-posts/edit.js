@@ -303,7 +303,7 @@ class LatestPostsEdit extends Component {
 									: Math.min(
 											MAX_POSTS_COLUMNS,
 											latestPosts.length
-									)
+									  )
 							}
 							required
 						/>
@@ -478,7 +478,6 @@ class LatestPostsEdit extends Component {
 }
 
 export default withSelect( ( select, props ) => {
-
 	const {
 		featuredImageSizeSlug,
 		postsToShow,
@@ -535,6 +534,6 @@ export default withSelect( ( select, props ) => {
 						return { ...post, featuredImageSourceUrl: url };
 					}
 					return post;
-			} ),
+			  } ),
 	};
 } )( LatestPostsEdit );
