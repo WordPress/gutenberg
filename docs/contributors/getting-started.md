@@ -95,6 +95,14 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
     },
 ```
 
+**Note for Windows users:** In some environments, you'll find a lot of eslint errors even after fresh cloning repo. In many cases, it's because of the line endings. Gutenberg uses `lf`, not `crlf`, Windows default. In this case, you need to:
+
+1. turn off autocrlf option by executing `git config --global core.autocrlf false` on your command prompt.
+2. delete the entire Gutenberg repo and clone it again.
+3. check if files are correctly cloned in `lf` ([how to know it with vscode](https://stackoverflow.com/a/39532890))
+
+If the files in your local repo still uses `crlf`, then check [this StackOverflow answer](https://stackoverflow.com/a/13154031).
+
 ### Prettier
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
