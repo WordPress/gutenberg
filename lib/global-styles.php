@@ -274,10 +274,8 @@ function gutenberg_experimental_global_styles_register_cpt() {
 	register_post_type( 'wp_global_styles', $args );
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
-	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
-	// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
-	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-}
+add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
+add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
+// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
