@@ -237,51 +237,43 @@ class ButtonEdit extends Component {
 	}
 
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
-		return (
-			<>
-				<TextControl
-					icon={ ! isCompatibleWithSettings && link }
-					label={ __( 'Button Link URL' ) }
-					value={ url || '' }
-					valuePlaceholder={ __( 'Add URL' ) }
-					onChange={ this.onChangeURL }
-					onSubmit={ this.dismissSheet }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					// eslint-disable-next-line jsx-a11y/no-autofocus
-					autoFocus={
-						! isCompatibleWithSettings && Platform.OS === 'ios'
-					}
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
-					keyboardType="url"
-				/>
-				<ToggleControl
-					icon={ ! isCompatibleWithSettings && external }
-					label={ __( 'Open in new tab' ) }
-					checked={ linkTarget === '_blank' }
-					onChange={ this.onChangeOpenInNewTab }
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
-				/>
-				<TextControl
-					icon={ ! isCompatibleWithSettings && LinkRelIcon }
-					label={ __( 'Link Rel' ) }
-					value={ rel || '' }
-					valuePlaceholder={ __( 'None' ) }
-					onChange={ this.onChangeLinkRel }
-					onSubmit={ this.dismissSheet }
-					autoCapitalize="none"
-					autoCorrect={ false }
-					separatorType={
-						isCompatibleWithSettings ? 'none' : 'fullWidth'
-					}
-					keyboardType="url"
-				/>
-			</>
-		);
+		return [
+			<TextControl
+				icon={ ! isCompatibleWithSettings && link }
+				key="link-settings-url"
+				label={ __( 'Button Link URL' ) }
+				value={ url || '' }
+				valuePlaceholder={ __( 'Add URL' ) }
+				onChange={ this.onChangeURL }
+				onSubmit={ this.dismissSheet }
+				autoCapitalize="none"
+				autoCorrect={ false }
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus={
+					! isCompatibleWithSettings && Platform.OS === 'ios'
+				}
+				keyboardType="url"
+			/>,
+			<ToggleControl
+				key="link-settings-new-tab"
+				icon={ ! isCompatibleWithSettings && external }
+				label={ __( 'Open in new tab' ) }
+				checked={ linkTarget === '_blank' }
+				onChange={ this.onChangeOpenInNewTab }
+			/>,
+			<TextControl
+				key="link-settings-rel"
+				icon={ ! isCompatibleWithSettings && LinkRelIcon }
+				label={ __( 'Link Rel' ) }
+				value={ rel || '' }
+				valuePlaceholder={ __( 'None' ) }
+				onChange={ this.onChangeLinkRel }
+				onSubmit={ this.dismissSheet }
+				autoCapitalize="none"
+				autoCorrect={ false }
+				keyboardType="url"
+			/>,
+		];
 	}
 
 	setRef( richText ) {
@@ -402,11 +394,16 @@ class ButtonEdit extends Component {
 					onClose={ this.onToggleLinkSettings }
 					hideHeader
 				>
-					{ this.getLinkSettings( url, rel, linkTarget ) }
+					<PanelBody
+						style={ styles.linkSettingsPanel }
+						separatorType={ 'leftMargin' }
+						lastSeparatorType={ 'fullWidth' }
+					>
+						{ this.getLinkSettings( url, rel, linkTarget ) }
+					</PanelBody>
 					<BottomSheet.Cell
 						label={ __( 'Remove link' ) }
 						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
 						onPress={ this.onClearSettings }
 					/>
 				</BottomSheet>
@@ -419,10 +416,12 @@ class ButtonEdit extends Component {
 							maximumValue={ MAX_BORDER_RADIUS_VALUE }
 							value={ borderRadiusValue }
 							onChange={ this.onChangeBorderRadius }
-							separatorType="none"
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Link Settings' ) }>
+					<PanelBody
+						title={ __( 'Link Settings' ) }
+						separatorType={ 'fullWidth' }
+					>
 						{ this.getLinkSettings( url, rel, linkTarget, true ) }
 					</PanelBody>
 					<PanelBody>
@@ -430,7 +429,6 @@ class ButtonEdit extends Component {
 							label={ __(
 								'Button color settings are coming soon.'
 							) }
-							separatorType="none"
 						/>
 					</PanelBody>
 				</InspectorControls>

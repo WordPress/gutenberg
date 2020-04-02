@@ -167,23 +167,21 @@ class LatestPostsEdit extends Component {
 					/>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Sorting and filtering' ) }>
-					<QueryControls
-						{ ...{ order, orderBy } }
-						numberOfItems={ postsToShow }
-						categoriesList={ categoriesList }
-						selectedCategoryId={
-							undefined !== categories ? Number( categories ) : ''
-						}
-						onOrderChange={ this.onSetOrder }
-						onOrderByChange={ this.onSetOrderBy }
-						onCategoryChange={
-							// eslint-disable-next-line no-undef
-							__DEV__ ? this.onSetCategories : undefined
-						}
-						onNumberOfItemsChange={ this.onSetPostsToShow }
-					/>
-				</PanelBody>
+				<QueryControls
+					{ ...{ order, orderBy } }
+					numberOfItems={ postsToShow }
+					categoriesList={ categoriesList }
+					selectedCategoryId={
+						undefined !== categories ? Number( categories ) : ''
+					}
+					onOrderChange={ this.onSetOrder }
+					onOrderByChange={ this.onSetOrderBy }
+					onCategoryChange={
+						// eslint-disable-next-line no-undef
+						__DEV__ ? this.onSetCategories : undefined
+					}
+					onNumberOfItemsChange={ this.onSetPostsToShow }
+				/>
 			</InspectorControls>
 		);
 	}

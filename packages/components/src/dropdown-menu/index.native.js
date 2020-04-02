@@ -140,6 +140,11 @@ function DropdownMenu( {
 						<PanelBody
 							title={ label }
 							style={ { paddingLeft: 0, paddingRight: 0 } }
+							separatorType={
+								Platform.OS === 'android'
+									? 'none'
+									: 'leftMargin'
+							}
 						>
 							{ flatMap(
 								controlSets,
@@ -162,13 +167,6 @@ function DropdownMenu( {
 												icon={ control.icon }
 												leftAlign={ true }
 												isSelected={ control.isActive }
-												separatorType={
-													indexOfControl ===
-														controlSet.length - 1 ||
-													Platform.OS === 'android'
-														? 'none'
-														: 'leftMargin'
-												}
 											/>
 										)
 									)
