@@ -136,7 +136,7 @@ describe( 'Multi-entity save flow', () => {
 		} );
 	} );
 
-	describe( 'Site Editor', () => {
+	describe.skip( 'Site Editor', () => {
 		async function assertSaveDisabled() {
 			const disabledButton = await page.waitForSelector(
 				`${ saveSiteSelector }[aria-disabled=true]`
