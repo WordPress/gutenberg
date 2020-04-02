@@ -6,7 +6,6 @@ import {
 	BaseControl,
 	Button,
 	Disabled,
-	PanelBody,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -166,11 +165,10 @@ class VideoEdit extends Component {
 					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Video settings' ) }>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					>
 						<MediaUploadCheck>
 							<BaseControl className="editor-video-poster-control">
 								<BaseControl.VisualLabel>
@@ -220,7 +218,7 @@ class VideoEdit extends Component {
 								) }
 							</BaseControl>
 						</MediaUploadCheck>
-					</PanelBody>
+					</VideoCommonSettings>
 				</InspectorControls>
 				<figure className={ className }>
 					{ /*

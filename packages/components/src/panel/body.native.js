@@ -6,7 +6,7 @@ import { Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -19,14 +19,26 @@ export class PanelBody extends Component {
 	}
 
 	render() {
-		const { children, title, style = {} } = this.props;
+		const { children = [], title, separatorType, style = {} } = this.props;
+		// Filter children since sometimes there is undefined which is cause of a crash in cloneElement
+		const filteredChildren = Array.isArray( children )
+			? children.filter( ( child ) => !! child )
+			: [ children ];
 
 		return (
 			<View style={ [ styles.panelContainer, style ] }>
 				{ title && (
 					<Text style={ styles.sectionHeaderText }>{ title }</Text>
 				) }
-				{ children }
+				{ /* Set separator for all childrens except the last one */ }
+				{ Children.map( filteredChildren, ( child, index ) => {
+					return cloneElement( child, {
+						separatorType:
+							index !== filteredChildren.length - 1
+								? separatorType
+								: 'none',
+					} );
+				} ) }
 			</View>
 		);
 	}
