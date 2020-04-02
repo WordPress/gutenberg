@@ -146,11 +146,6 @@ function Navigation( {
 		selectBlock( clientId );
 	}
 
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
@@ -194,6 +189,12 @@ function Navigation( {
 			</Block.div>
 		);
 	}
+
+	const blockClassNames = classnames( className, {
+		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ fontSize.class ]: fontSize.class,
+		'is-vertical': attributes.orientation === 'vertical',
+	} );
 
 	// UI State: rendered Block UI
 	return (
