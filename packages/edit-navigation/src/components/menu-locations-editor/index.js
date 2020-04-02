@@ -1,12 +1,16 @@
 /**
+ * External dependencies
+ */
+import { forEach, find, pick } from 'lodash';
+/**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { Spinner, SelectControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const LocatioWithMenu = ( { onChange, menus, menusList, location } ) => {
+const MenuSelectControl = ( { onChange, menus, menusList, location } ) => {
 	const [ menuId, setMenuId ] = useState( 0 );
 
 	return (
@@ -33,15 +37,16 @@ export default function MenuLocationsEditor() {
 	const menuLocations = useSelect( ( select ) =>
 		select( 'core' ).getMenuLocations()
 	);
+	const [ locationsData, setLocationsData ] = useState( {} );
+	const { saveMenu } = useDispatch( 'core' );
 
 	if ( ! menus || ! menuLocations ) {
 		return <Spinner />;
 	}
 
-	const [ locationsData, setLocationsData ] = useSate( null );
-
 	const setLocations = ( { location, menu } ) => {
-		console.log( location, menu );
+		locationsData[ location ] = menu;
+		setLocationsData( locationsData );
 	};
 
 	const menusList =
@@ -60,6 +65,15 @@ export default function MenuLocationsEditor() {
 		<form
 			onSubmit={ ( e ) => {
 				e.preventDefault();
+				forEach( locationsData, ( menuId, location ) => {
+					saveMenu( {
+						...pick( find( menus, { id: parseInt( menuId ) } ), [
+							'id',
+							'name',
+						] ),
+						locations: [ location ],
+					} );
+				} );
 			} }
 		>
 			{ menuLocations && (
@@ -70,7 +84,7 @@ export default function MenuLocationsEditor() {
 								<tr>
 									<td>{ menuLocation.description }</td>
 									<td>
-										<LocatioWithMenu
+										<MenuSelectControl
 											menus={ menus }
 											menusList={ menusList }
 											key={ menuLocation.name }
