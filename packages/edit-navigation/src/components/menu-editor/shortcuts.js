@@ -15,7 +15,6 @@ function MenuEditorShortcuts( { saveBlocks } ) {
 		} ),
 		{
 			bindGlobal: true,
-			preventDefault: true,
 		}
 	);
 
