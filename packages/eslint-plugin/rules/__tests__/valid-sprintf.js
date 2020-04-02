@@ -56,6 +56,9 @@ sprintf(
 		{
 			code: `i18n.sprintf( i18n.__( '%s' ), 'substitute' )`,
 		},
+		{
+			code: `sprintf( ...args )`,
+		},
 	],
 	invalid: [
 		{

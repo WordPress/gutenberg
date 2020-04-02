@@ -49,6 +49,10 @@ module.exports = {
 				}
 
 				if ( args.length < 2 ) {
+					if ( args[ 0 ].type === 'SpreadElement' ) {
+						return;
+					}
+
 					context.report( {
 						node,
 						messageId: 'noPlaceholderArgs',
