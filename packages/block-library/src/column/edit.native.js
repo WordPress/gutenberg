@@ -37,7 +37,7 @@ function ColumnEdit( {
 	const minWidth = Math.min( containerWidth, containerMaxWidth );
 	const columnBaseWidth = minWidth / Math.max( 1, columnsInRow );
 
-	const applyColumnWidth = () => {
+	const getColumnWidth = () => {
 		let width = columnBaseWidth;
 		if ( columnsInRow > 1 ) {
 			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
@@ -60,7 +60,7 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					applyColumnWidth(),
+					getColumnWidth(),
 					styles.columnPlaceholderNotSelected,
 				] }
 			></View>
@@ -77,7 +77,7 @@ function ColumnEdit( {
 			</BlockControls>
 			<View
 				style={ [
-					applyColumnWidth(),
+					getColumnWidth(),
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
 				] }
 			>
