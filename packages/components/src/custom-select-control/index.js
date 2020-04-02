@@ -79,6 +79,7 @@ export default function CustomSelectControl( {
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
+		'aria-hidden': ! isOpen,
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.
@@ -127,9 +128,9 @@ export default function CustomSelectControl( {
 					className="components-custom-select-control__button-icon"
 				/>
 			</Button>
-			{ isOpen && (
-				<ul { ...menuProps }>
-					{ items.map( ( item, index ) => (
+			<ul { ...menuProps }>
+				{ isOpen &&
+					items.map( ( item, index ) => (
 						// eslint-disable-next-line react/jsx-key
 						<li
 							{ ...getItemProps( {
@@ -155,8 +156,7 @@ export default function CustomSelectControl( {
 							{ item.name }
 						</li>
 					) ) }
-				</ul>
-			) }
+			</ul>
 		</div>
 	);
 }
