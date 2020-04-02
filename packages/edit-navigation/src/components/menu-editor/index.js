@@ -5,13 +5,15 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 	BlockList,
+	BlockToolbar,
+	NavigableToolbar,
 	ObserveTyping,
 	WritingFlow,
 	__experimentalBlockNavigationList,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
+import { Button, Panel, PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,11 +37,12 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				settings={ {
 					...blockEditorSettings,
 					templateLock: 'all',
+					hasFixedToolbar: true,
 				} }
 			>
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
-				<Panel className="edit-navigation-menu-editor__panel">
+				<Panel>
 					<PanelBody
 						title={ __( 'Navigation structure' ) }
 						initialOpen={ isLargeViewport }
@@ -61,10 +64,14 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 							{ __( 'Save navigation' ) }
 						</Button>
 					}
-					className="edit-navigation-menu-editor__panel"
 				>
 					<PanelBody title={ __( 'Navigation menu' ) }>
-						<Popover.Slot name="block-toolbar" />
+						<NavigableToolbar
+							className="edit-navigation-menu-editor__toolbar"
+							aria-label={ __( 'Block tools' ) }
+						>
+							<BlockToolbar hideDragHandle />
+						</NavigableToolbar>
 						<WritingFlow>
 							<ObserveTyping>
 								<BlockList />

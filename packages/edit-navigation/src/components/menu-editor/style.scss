@@ -5,4 +5,23 @@
 	@include break-medium {
 		grid-template-columns: 280px 1fr;
 	}
+
+	// Make the block list take up the full width of the panel.
+	.block-editor-block-list__layout.is-root-container {
+		padding: 0;
+	}
+}
+	
+.edit-navigation-menu-editor__toolbar {
+	height: 46px;
+	margin-bottom: 16px;
+	border: 1px solid #e2e4e7;
+
+	// Buttons in a fixed top toolbar seem to need their styles overriden.
+	.components-button {
+		height: 48px;
+		min-width: 42px;
+		padding-left: 11px;
+		padding-right: 6px;
+	}
 }
