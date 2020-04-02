@@ -78,6 +78,11 @@
 		opacity: 1;
 		transform: translateY(-60px);
 	}
+
+	// Hide the Parent button in Top Toolbar mode.
+	.edit-post-header-toolbar__block-toolbar & {
+		display: none;
+	}
 }
 
 .block-editor-block-toolbar__mover-switcher-container {
