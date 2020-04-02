@@ -42,6 +42,12 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-text-domain': [
+			'error',
+			{
+				allowedTextDomain: 'default',
+			},
+		],
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
@@ -66,29 +72,6 @@ module.exports = {
 					'/]',
 				message:
 					'Deprecated functions must be removed before releasing this version.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(__|_n|_nx|_x)$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(_n|_nx|_x)$/]:not([arguments.1.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=_nx]:not([arguments.3.type=/^Literal|BinaryExpression$/])',
-				message:
-					'Translate function arguments must be string literals.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
-				message: 'Use ellipsis character (…) in place of three dots',
 			},
 			{
 				selector:

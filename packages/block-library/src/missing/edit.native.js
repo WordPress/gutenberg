@@ -75,11 +75,12 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		// translators: %s: Name of the block
 		const titleFormat =
 			Platform.OS === 'android'
-				? __( "'%s' isn't yet supported on WordPress for Android" )
-				: __( "'%s' isn't yet supported on WordPress for iOS" );
+				? // translators: %s: Name of the block
+				  __( "'%s' isn't yet supported on WordPress for Android" )
+				: // translators: %s: Name of the block
+				  __( "'%s' isn't yet supported on WordPress for iOS" );
 		const infoTitle = sprintf( titleFormat, title );
 
 		return (
