@@ -15,6 +15,9 @@
 		"users": {
 			"type": "array"
 		},
+		"items": {
+			"type": "array"
+		},
 		"postsToShow": {
 			"type": "number",
 			"default": 5
