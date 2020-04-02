@@ -3,7 +3,7 @@
  */
 const {
 	TRANSLATION_FUNCTIONS,
-	REGEXP_PLACEHOLDER,
+	REGEXP_SPRINTF_PLACEHOLDER,
 	getTextContentFromNode,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
@@ -41,7 +41,7 @@ module.exports = {
 					}
 
 					const modifiedString = argumentString.replace(
-						REGEXP_PLACEHOLDER,
+						REGEXP_SPRINTF_PLACEHOLDER,
 						''
 					);
 

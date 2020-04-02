@@ -23,11 +23,7 @@ function getTextContentFromNode( node ) {
 	}
 
 	if ( node.type === 'TemplateLiteral' ) {
-		return node.quasis
-			.map( function( quasis ) {
-				return quasis.value.raw;
-			} )
-			.join( '' );
+		return node.quasis.map( ( quasis ) => quasis.value.raw ).join( '' );
 	}
 
 	return false;

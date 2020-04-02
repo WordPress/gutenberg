@@ -71,7 +71,7 @@ module.exports = {
 		const { allowedTextDomain = 'default' } = options;
 		const allowedTextDomains = Array.isArray( allowedTextDomain )
 			? allowedTextDomain
-			: new Array( allowedTextDomain );
+			: [ allowedTextDomain ];
 		const canFixTextDomain = allowedTextDomains.length === 1;
 		const allowDefault = allowedTextDomains.includes( 'default' );
 

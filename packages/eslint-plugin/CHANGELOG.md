@@ -13,10 +13,7 @@
 ### Breaking Changes
 
 - There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
-- The `valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
-
-### Breaking Changes
-
+- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
 - The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
 
 ### Bug Fix

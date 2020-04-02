@@ -8,7 +8,7 @@ const { context, GitHub } = require( '@actions/github' );
  * Internal dependencies
  */
 const assignFixedIssues = require( './assign-fixed-issues' );
-const addFirstTimeContributorLabel = require( './add-first-time-contributor-label' );
+const firstTimeContributor = require( './first-time-contributor' );
 const addMilestone = require( './add-milestone' );
 const debug = require( './debug' );
 const ifNotFork = require( './if-not-fork' );
@@ -42,9 +42,8 @@ const automations = [
 		task: ifNotFork( assignFixedIssues ),
 	},
 	{
-		event: 'pull_request',
-		action: 'opened',
-		task: ifNotFork( addFirstTimeContributorLabel ),
+		event: 'push',
+		task: firstTimeContributor,
 	},
 	{
 		event: 'push',

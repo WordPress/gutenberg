@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 const debug = require( './debug' );
+const getAssociatedPullRequest = require( './get-associated-pull-request' );
 
 /** @typedef {import('@octokit/rest').HookError} HookError */
 /** @typedef {import('@actions/github').GitHub} GitHub */
@@ -45,8 +46,7 @@ async function addMilestone( payload, octokit ) {
 		return;
 	}
 
-	const match = payload.commits[ 0 ].message.match( /\(#(\d+)\)$/m );
-	const prNumber = match && match[ 1 ];
+	const prNumber = getAssociatedPullRequest( payload.commits[ 0 ] );
 	if ( ! prNumber ) {
 		debug( 'add-milestone: Commit is not a squashed PR. Aborting' );
 		return;

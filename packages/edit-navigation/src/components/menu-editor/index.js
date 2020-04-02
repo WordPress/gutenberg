@@ -10,7 +10,7 @@ import {
 	__experimentalBlockNavigationList,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Panel, PanelBody, Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,9 +23,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	return (
 		<div className="edit-navigation-menu-editor">
 			<BlockEditorKeyboardShortcuts.Register />
-			<Button isPrimary onClick={ saveBlocks }>
-				{ __( 'Save' ) }
-			</Button>
+
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
@@ -35,24 +33,36 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					templateLock: 'all',
 				} }
 			>
-				<div className="edit-navigation-menu-editor__panel">
-					{ !! blocks.length && (
-						<__experimentalBlockNavigationList
-							blocks={ blocks }
-							selectedBlockClientId={ blocks[ 0 ].clientId }
-							selectBlock={ () => {} }
-							showNestedBlocks
-							showAppender
-						/>
-					) }
-				</div>
-				<div className="edit-navigation-menu-editor__panel">
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</div>
+				<BlockEditorKeyboardShortcuts />
+				<Panel className="edit-navigation-menu-editor__panel">
+					<PanelBody title={ __( 'Navigation structure' ) }>
+						{ !! blocks.length && (
+							<__experimentalBlockNavigationList
+								blocks={ blocks }
+								selectedBlockClientId={ blocks[ 0 ].clientId }
+								selectBlock={ () => {} }
+								showNestedBlocks
+								showAppender
+							/>
+						) }
+					</PanelBody>
+				</Panel>
+				<Panel
+					header={
+						<Button isPrimary onClick={ saveBlocks }>
+							{ __( 'Save navigation' ) }
+						</Button>
+					}
+					className="edit-navigation-menu-editor__panel"
+				>
+					<PanelBody title={ __( 'Navigation menu' ) }>
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList />
+							</ObserveTyping>
+						</WritingFlow>
+					</PanelBody>
+				</Panel>
 			</BlockEditorProvider>
 		</div>
 	);
