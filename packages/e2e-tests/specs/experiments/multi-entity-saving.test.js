@@ -136,7 +136,7 @@ describe( 'Multi-entity save flow', () => {
 		} );
 	} );
 
-	describe.skip( 'Site Editor', () => {
+	describe( 'Site Editor', () => {
 		async function assertSaveDisabled() {
 			const disabledButton = await page.waitForSelector(
 				`${ saveSiteSelector }[aria-disabled=true]`
@@ -156,6 +156,15 @@ describe( 'Multi-entity save flow', () => {
 		} );
 
 		it( 'Should be enabled after edits', async () => {
+			// Ensure we are on 'front-page' demo template.
+			await page.click(
+				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
+			);
+			const [ demoTemplateButton ] = await page.$x(
+				'//button[contains(., "front-page")]'
+			);
+			await demoTemplateButton.click();
+
 			await page.click( templatePartSelector );
 			await page.keyboard.type( 'some words...' );
 			const enabledButton = await page.waitForSelector(
