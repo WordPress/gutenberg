@@ -38,17 +38,17 @@ module.exports = {
 				const candidates = getTranslateFunctionArgs(
 					functionName,
 					args
-				)
-					.map( getTextContentFromNode )
-					.filter( Boolean );
+				).map( getTextContentFromNode );
 
-				if ( candidates.length === 0 ) {
+				if ( candidates.filter( Boolean ).length === 0 ) {
 					return;
 				}
 
 				const hasPlaceholders = candidates.some( ( candidate ) =>
 					REGEXP_PLACEHOLDER.test( candidate )
 				);
+				// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test#Using_test()_on_a_regex_with_the_global_flag.
+				REGEXP_PLACEHOLDER.lastIndex = 0;
 
 				if ( ! hasPlaceholders ) {
 					return;
