@@ -201,6 +201,14 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
+### `docker logs -f [container_id] >/dev/null` 
+
+```sh
+docker logs -f <container_id> >/dev/null 
+
+Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.

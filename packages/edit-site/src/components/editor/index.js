@@ -16,6 +16,7 @@ import {
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
+	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
 	__experimentalFullscreenMode as FullscreenMode,
 	__unstableEditorStyles as EditorStyles,
@@ -84,6 +85,7 @@ function Editor( { settings: _settings } ) {
 												<BlockEditor />
 											</>
 										}
+										footer={ <BlockBreadcrumb /> }
 									/>
 									<Popover.Slot />
 								</FocusReturnProvider>
