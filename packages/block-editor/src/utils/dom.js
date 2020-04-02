@@ -30,10 +30,10 @@ export function getBlockPreviewContainerDOMNode( clientId ) {
 }
 
 /**
- * Returns true if the given HTMLElement is a block focus stop. Blocks without
- * their own text fields rely on the focus stop to be keyboard navigable.
+ * Returns true if the given element is a block focus stop. Blocks without their
+ * own text fields rely on the focus stop to be keyboard navigable.
  *
- * @param {HTMLElement} element Element to test.
+ * @param {Element} element Element to test.
  *
  * @return {boolean} Whether element is a block focus stop.
  */
@@ -44,8 +44,8 @@ export function isBlockFocusStop( element ) {
 /**
  * Returns true if two elements are contained within the same block.
  *
- * @param {HTMLElement} a First element.
- * @param {HTMLElement} b Second element.
+ * @param {Element} a First element.
+ * @param {Element} b Second element.
  *
  * @return {boolean} Whether elements are in the same block.
  */
@@ -57,12 +57,14 @@ export function isInSameBlock( a, b ) {
 }
 
 /**
- * Returns true if an elements is considered part of the block and not its children.
+ * Returns true if an element is considered part of the block and not its
+ * children.
  *
- * @param {HTMLElement} blockElement Block container element.
- * @param {HTMLElement} element      Element.
+ * @param {Element} blockElement Block container element.
+ * @param {Element} element      Element.
  *
- * @return {boolean} Whether element is in the block Element but not its children.
+ * @return {boolean} Whether element is in the block Element but not its
+ *                   children.
  */
 export function isInsideRootBlock( blockElement, element ) {
 	const parentBlock = element.closest( '.block-editor-block-list__block' );
@@ -70,10 +72,10 @@ export function isInsideRootBlock( blockElement, element ) {
 }
 
 /**
- * Returns true if the given HTMLElement contains inner blocks (an InnerBlocks
+ * Returns true if the given element contains inner blocks (an InnerBlocks
  * element).
  *
- * @param {HTMLElement} element Element to test.
+ * @param {Element} element Element to test.
  *
  * @return {boolean} Whether element contains inner blocks.
  */
@@ -89,7 +91,8 @@ export function hasInnerBlocksContext( element ) {
  *
  * @param {Node?} node DOM node.
  *
- * @return {string|undefined} Client ID or undefined if the node is not part of a block.
+ * @return {string|undefined} Client ID or undefined if the node is not part of
+ *                            a block.
  */
 export function getBlockClientId( node ) {
 	while ( node && node.nodeType !== window.Node.ELEMENT_NODE ) {
