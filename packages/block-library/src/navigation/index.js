@@ -36,14 +36,14 @@ export const settings = {
 		{
 			name: 'horizontal',
 			isDefault: true,
-			title: __( 'Horizontal navigation' ),
+			title: __( 'Navigation (horizontal)' ),
 			description: __( 'Links shown in a row.' ),
 			icon: undefined,
 			attributes: { orientation: 'horizontal' },
 		},
 		{
 			name: 'vertical',
-			title: __( 'Vertical navigation' ),
+			title: __( 'Navigation (vertical)' ),
 			description: __( 'Links shown in a column.' ),
 			icon: undefined,
 			attributes: { orientation: 'vertical' },
