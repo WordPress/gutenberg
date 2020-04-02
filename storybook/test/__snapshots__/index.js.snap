@@ -97,18 +97,14 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
 }
 
 <div
-  aria-activedescendant="alignment-matrix-control-0-4"
   aria-label="Alignment Matrix Control"
-  aria-labelledby="alignment-matrix-control-0"
   className="component-alignment-matrix-control emotion-42 emotion-43"
   id="alignment-matrix-control-0"
-  onClick={[Function]}
+  onBlur={[Function]}
   onFocus={[Function]}
   onKeyDown={[Function]}
   onKeyUp={[Function]}
-  onMouseDown={[Function]}
-  role="listbox"
-  tabIndex={0}
+  role="grid"
 >
   <div
     className="emotion-12 emotion-13"
@@ -117,7 +113,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
   >
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-0"
+      id="alignment-matrix-control-0-top left"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -126,6 +122,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        top left
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -133,7 +134,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
     </span>
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-1"
+      id="alignment-matrix-control-0-top center"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -142,6 +143,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        top center
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -149,7 +155,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
     </span>
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-2"
+      id="alignment-matrix-control-0-top right"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -158,6 +164,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        top right
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -171,7 +182,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
   >
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-3"
+      id="alignment-matrix-control-0-center left"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -180,23 +191,32 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        center left
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
       />
     </span>
     <span
-      aria-selected={true}
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-4"
+      id="alignment-matrix-control-0-center center"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
       onKeyUp={[Function]}
       onMouseDown={[Function]}
       role="gridcell"
-      tabIndex={-1}
+      tabIndex={0}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        center center
+      </div>
       <span
         className="emotion-18 emotion-1"
         role="presentation"
@@ -204,7 +224,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
     </span>
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-5"
+      id="alignment-matrix-control-0-center right"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -213,6 +233,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        center right
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -226,7 +251,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
   >
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-6"
+      id="alignment-matrix-control-0-bottom left"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -235,6 +260,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        bottom left
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -242,7 +272,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
     </span>
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-7"
+      id="alignment-matrix-control-0-bottom center"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -251,6 +281,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        bottom center
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
@@ -258,7 +293,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
     </span>
     <span
       className="emotion-2 emotion-3"
-      id="alignment-matrix-control-0-8"
+      id="alignment-matrix-control-0-bottom right"
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
@@ -267,6 +302,11 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       role="gridcell"
       tabIndex={-1}
     >
+      <div
+        className="components-visually-hidden"
+      >
+        bottom right
+      </div>
       <span
         className="emotion-0 emotion-1"
         role="presentation"
