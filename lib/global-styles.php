@@ -6,15 +6,6 @@
  */
 
 /**
- * Whether the current theme has support for Global Styles.
- *
- * @return boolean
- */
-function gutenberg_experimental_global_styles_has_theme_support() {
-	return is_readable( locate_template( 'experimental-theme.json' ) );
-}
-
-/**
  * Given a Global Styles tree, it creates a flattened tree
  * whose keys are the CSS custom properties
  * and its values the CSS custom properties' values.
@@ -200,10 +191,6 @@ function gutenberg_experimental_global_styles_resolver() {
  * and enqueues the resulting CSS custom properties.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return;
-	}
-
 	$inline_style = gutenberg_experimental_global_styles_resolver();
 	if ( empty( $inline_style ) ) {
 		return;
@@ -223,12 +210,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if (
-		! gutenberg_experimental_global_styles_has_theme_support()
-	) {
-		return $settings;
-	}
-
 	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
 	$global_styles = array_merge(
@@ -245,10 +226,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
  * Registers a Custom Post Type to store the user's Global Styles.
  */
 function gutenberg_experimental_global_styles_register_cpt() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return;
-	}
-
 	$args = array(
 		'label'        => __( 'Global Styles', 'gutenberg' ),
 		'description'  => 'CPT to store user design tokens',
