@@ -28,10 +28,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
-import {
-	ComplementaryArea,
-	__experimentalFullscreenMode as FullscreenMode,
-} from '@wordpress/interface';
+import { ComplementaryArea, FullscreenMode } from '@wordpress/interface';
 
 /**
  * Internal dependencies

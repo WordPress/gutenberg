@@ -21,7 +21,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { __experimentalFullscreenMode as FullscreenMode } from '@wordpress/interface';
+import { FullscreenMode } from '@wordpress/interface';
 
 /**
  * Internal dependencies
