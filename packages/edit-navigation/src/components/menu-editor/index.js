@@ -16,6 +16,7 @@ import { Panel, PanelBody, Button } from '@wordpress/components';
  * Internal dependencies
  */
 import useNavigationBlocks from './use-navigation-blocks';
+import MenuEditorShortcuts from './shortcuts';
 
 export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
@@ -23,6 +24,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	return (
 		<div className="edit-navigation-menu-editor">
 			<BlockEditorKeyboardShortcuts.Register />
+			<MenuEditorShortcuts.Register />
 
 			<BlockEditorProvider
 				value={ blocks }
@@ -34,6 +36,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				} }
 			>
 				<BlockEditorKeyboardShortcuts />
+				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
 				<Panel className="edit-navigation-menu-editor__panel">
 					<PanelBody title={ __( 'Navigation structure' ) }>
 						{ !! blocks.length && (
