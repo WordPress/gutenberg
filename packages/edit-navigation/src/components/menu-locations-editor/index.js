@@ -7,11 +7,17 @@ import { forEach, find, pick } from 'lodash';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { Spinner, SelectControl, Button } from '@wordpress/components';
+import {
+	Button,
+	Panel,
+	PanelBody,
+	SelectControl,
+	Spinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const MenuSelectControl = ( { onChange, menus, menusList, location } ) => {
-	const [ menuId, setMenuId ] = useState( 0 );
+	const [ menuId, setMenuId ] = useState( false );
 
 	return (
 		<>
@@ -62,44 +68,50 @@ export default function MenuLocationsEditor() {
 	} );
 
 	return (
-		<form
-			onSubmit={ ( e ) => {
-				e.preventDefault();
-				forEach( locationsData, ( menuId, location ) => {
-					saveMenu( {
-						...pick( find( menus, { id: parseInt( menuId ) } ), [
-							'id',
-							'name',
-						] ),
-						locations: [ location ],
-					} );
-				} );
-			} }
-		>
-			{ menuLocations && (
-				<table>
-					{ menuLocations.map(
-						( menuLocation ) =>
-							menus && (
-								<tr>
-									<td>{ menuLocation.description }</td>
-									<td>
-										<MenuSelectControl
-											menus={ menus }
-											menusList={ menusList }
-											key={ menuLocation.name }
-											location={ menuLocation }
-											onChange={ setLocations }
-										/>
-									</td>
-								</tr>
-							)
+		<Panel className="edit-navigation-menu-editor__panel">
+			<PanelBody title={ __( 'Navigation structure' ) }>
+				<form
+					onSubmit={ ( e ) => {
+						e.preventDefault();
+						forEach( locationsData, ( menuId, location ) => {
+							saveMenu( {
+								...pick(
+									find( menus, { id: parseInt( menuId ) } ),
+									[ 'id', 'name' ]
+								),
+								locations: [ location ],
+							} );
+						} );
+					} }
+				>
+					{ menuLocations && (
+						<table>
+							{ menuLocations.map(
+								( menuLocation ) =>
+									menus && (
+										<tr>
+											<td>
+												{ menuLocation.description }
+											</td>
+											<td>
+												<MenuSelectControl
+													menus={ menus }
+													menusList={ menusList }
+													key={ menuLocation.name }
+													location={ menuLocation }
+													onChange={ setLocations }
+												/>
+											</td>
+										</tr>
+									)
+							) }
+						</table>
 					) }
-				</table>
-			) }
-			<Button type="submit" isPrimary>
-				{ __( 'Save' ) }
-			</Button>
-		</form>
+					<Button type="submit" isPrimary>
+						{ __( 'Save' ) }
+					</Button>
+				</form>
+			</PanelBody>
+		</Panel>
 	);
 }
