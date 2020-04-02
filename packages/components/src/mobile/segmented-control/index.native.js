@@ -14,7 +14,6 @@ import { take, values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -155,7 +154,7 @@ const SegmentedControls = ( {
 				{ segments.map( ( segment, index ) => {
 					return (
 						<Segment
-							title={ sprintf( __( '%s' ), segment ) }
+							title={ segment }
 							onPress={ () => onHandlePress( segment, index ) }
 							isSelected={ activeSegmentIndex === index }
 							key={ index }

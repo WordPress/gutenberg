@@ -35,7 +35,7 @@ function ColorSettings( {
 	onBackButtonPress,
 	getStylesFromColorScheme,
 } ) {
-	const segments = [ 'Solid', 'Gradient' ];
+	const segments = [ __( 'Solid' ), __( 'Gradient' ) ];
 	const [ segment, setSegment ] = useState( segments[ 0 ] );
 
 	useEffect( () => {
@@ -84,7 +84,7 @@ function ColorSettings( {
 			{ screen === 'Background' && (
 				<View>
 					<NavigationHeader
-						screen={ screen }
+						screen={ __( 'Background' ) }
 						leftButtonOnPress={ () =>
 							changeBottomSheetContent( 'Settings' )
 						}
@@ -106,7 +106,7 @@ function ColorSettings( {
 			{ screen === 'Text' && (
 				<View>
 					<NavigationHeader
-						screen={ screen }
+						screen={ __( 'Text' ) }
 						leftButtonOnPress={ () =>
 							changeBottomSheetContent( 'Settings' )
 						}

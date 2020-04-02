@@ -5,7 +5,7 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
 import { withPreferredColorScheme } from '@wordpress/compose';
 /**
@@ -68,7 +68,7 @@ function BottomSheetNavigationHeader( {
 				style={ bottomSheetHeaderTitleStyle }
 				maxFontSizeMultiplier={ 3 }
 			>
-				{ sprintf( __( '%s' ), screen ) }
+				{ screen }
 			</Text>
 			<View style={ styles.bottomSheetRightSpace } />
 		</View>
