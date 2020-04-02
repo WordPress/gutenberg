@@ -5,12 +5,20 @@
  *
  * @param {string} clientId Block client ID.
  *
- * @return {Element} Block DOM node.
+ * @return {Element?} Block DOM node.
  */
 export function getBlockDOMNode( clientId ) {
 	return document.getElementById( 'block-' + clientId );
 }
 
+/**
+ * Returns the preview container DOM node for a given block client ID, or
+ * undefined if the container cannot be determined.
+ *
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Node|undefined} Preview container DOM node.
+ */
 export function getBlockPreviewContainerDOMNode( clientId ) {
 	const domNode = getBlockDOMNode( clientId );
 
@@ -79,16 +87,21 @@ export function hasInnerBlocksContext( element ) {
 /**
  * Finds the block client ID given any DOM node inside the block.
  *
- * @param {Node} node DOM node.
+ * @param {Node?} node DOM node.
  *
  * @return {string|undefined} Client ID or undefined if the node is not part of a block.
  */
 export function getBlockClientId( node ) {
-	if ( node.nodeType !== node.ELEMENT_NODE ) {
-		node = node.parentElement;
+	while ( node && node.nodeType !== window.Node.ELEMENT_NODE ) {
+		node = node.parentNode;
 	}
 
-	const blockNode = node.closest( '.block-editor-block-list__block' );
+	if ( ! node ) {
+		return;
+	}
+
+	const elementNode = /** @type {Element} */ ( node );
+	const blockNode = elementNode.closest( '.block-editor-block-list__block' );
 
 	if ( ! blockNode ) {
 		return;
