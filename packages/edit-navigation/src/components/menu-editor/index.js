@@ -33,6 +33,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					templateLock: 'all',
 				} }
 			>
+				<BlockEditorKeyboardShortcuts />
 				<Panel className="edit-navigation-menu-editor__panel">
 					<PanelBody title={ __( 'Navigation structure' ) }>
 						{ !! blocks.length && (
