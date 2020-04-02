@@ -9,16 +9,16 @@
 	border-radius: 0;
 	box-shadow: none;
 	cursor: pointer;
-	height: 50px;
-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	height: $grid-unit-60;
+	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: 400;
+	font-weight: 500;
 	transition: box-shadow 0.1s linear;
+	box-sizing: border-box;
 
 	&:focus:enabled,
 	&.is-active {
 		box-shadow: inset 0 -3px theme(outlines);
-		font-weight: 600;
 		position: relative;
 		background: transparent;
 

@@ -61,35 +61,52 @@ $block-inserter-tabs-height: 44px;
 	z-index: z-index(".components-popover.block-editor-inserter__popover");
 }
 
-.components-popover input[type="search"].block-editor-inserter__search {
-	display: block;
-	margin: $grid-unit-20;
-	padding: 11px $grid-unit-20;
-	position: relative;
+.block-editor-inserter__search {
+	padding: $grid-unit-20;
 	z-index: 1;
-	border-radius: $radius-round-rectangle;
 	flex-shrink: 0;
+	position: relative;
 
-	/* Fonts smaller than 16px causes mobile safari to zoom. */
-	font-size: $mobile-text-min-font-size;
-	@include break-small {
-		font-size: $default-font-size;
-	}
+	input[type="search"].block-editor-inserter__search-input {
+		display: block;
+		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
+		border-radius: $radius-block-ui;
+		background: $light-gray-200;
+		border: none;
+		width: 100%;
+		height: $grid-unit-60;
 
-	&:focus {
-		@include input-style__focus();
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
+
+		&:focus {
+			@include input-style__focus();
+		}
 	}
+}
+
+.block-editor-inserter__search-icon {
+	position: absolute;
+	top: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
+	right: $grid-unit-20 + ($grid-unit-60 - $icon-size) / 2;
 }
 
 .block-editor-inserter__tabs {
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
-	margin-top: -$grid-unit-20;
+	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
-		padding: 0 $grid-unit-20;
 		border-bottom: $border-width solid $light-gray-secondary;
+
+		.components-tab-panel__tabs-item {
+			flex-grow: 1;
+			margin-bottom: -$border-width;
+		}
 	}
 
 	.components-tab-panel__tab-content {
