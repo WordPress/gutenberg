@@ -37,6 +37,7 @@ function ColorPalette( {
 	currentScreen,
 	onCustomPress,
 	getStylesFromColorScheme,
+	shouldEnableBottomSheetScroll,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -201,6 +202,9 @@ function ColorPalette( {
 			horizontal
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps="always"
+			disableScrollViewPanResponder
+			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
+			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
 			ref={ scrollViewRef }
 		>
 			<TouchableWithoutFeedback>

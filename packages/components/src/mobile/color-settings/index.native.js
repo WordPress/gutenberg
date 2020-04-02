@@ -74,6 +74,7 @@ function ColorSettings( {
 				currentScreen={ screen }
 				clientId={ clientId }
 				onCustomPress={ () => changeBottomSheetContent( 'Custom' ) }
+				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 			/>
 		);
 	}
