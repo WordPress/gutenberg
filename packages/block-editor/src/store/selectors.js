@@ -1643,5 +1643,5 @@ export function isBlockHighlighted( state, clientId ) {
  * @return {boolean} True if the block has controlled inner blocks.
  */
 export function areInnerBlocksControlled( state, clientId ) {
-	return !! state.controlledInnerBLocks[ clientId ];
+	return !! state.controlledInnerBlocks[ clientId ];
 }

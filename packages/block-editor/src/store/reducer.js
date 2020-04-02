@@ -1483,7 +1483,7 @@ export function highlightedBlock( state, action ) {
  *
  * @return {string} Updated state.
  */
-export function controlledInnerBLocks(
+export function controlledInnerBlocks(
 	state = {},
 	{ type, clientId, hasControlledInnerBlocks }
 ) {
@@ -1517,5 +1517,5 @@ export default combineReducers( {
 	isNavigationMode,
 	automaticChangeStatus,
 	highlightedBlock,
-	controlledInnerBLocks,
+	controlledInnerBlocks,
 } );
