@@ -51,6 +51,7 @@ export default function AlignmentMatrixControl( {
 		baseId,
 		currentId: initialCurrentId,
 		rtl: isRTL,
+		unstable_virtual: true,
 	} );
 
 	const handleOnBlur = ( event ) => {
