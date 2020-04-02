@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -75,16 +75,14 @@ function BlockBreadcrumb( {
 
 	return (
 		<div className="block-editor-block-list__breadcrumb" { ...props }>
-			<Toolbar>
-				<Button
-					ref={ ref }
-					onClick={ () => setNavigationMode( false ) }
-					onKeyDown={ onKeyDown }
-					label={ label }
-				>
-					<BlockTitle clientId={ clientId } />
-				</Button>
-			</Toolbar>
+			<Button
+				ref={ ref }
+				onClick={ () => setNavigationMode( false ) }
+				onKeyDown={ onKeyDown }
+				label={ label }
+			>
+				<BlockTitle clientId={ clientId } />
+			</Button>
 		</div>
 	);
 }

@@ -32,6 +32,22 @@ export const settings = {
 		lightBlockWrapper: true,
 	},
 
+	variations: [
+		{
+			name: 'horizontal',
+			isDefault: true,
+			title: __( 'Navigation (horizontal)' ),
+			description: __( 'Links shown in a row.' ),
+			attributes: { orientation: 'horizontal' },
+		},
+		{
+			name: 'vertical',
+			title: __( 'Navigation (vertical)' ),
+			description: __( 'Links shown in a column.' ),
+			attributes: { orientation: 'vertical' },
+		},
+	],
+
 	example: {
 		innerBlocks: [
 			{
