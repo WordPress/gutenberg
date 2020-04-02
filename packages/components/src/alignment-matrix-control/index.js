@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
 import {
 	unstable_useCompositeState as useCompositeState,
@@ -14,67 +13,63 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	getAlignmentIndex,
-	getAlignmentValueFromIndex,
-	getAlignIndexFromGrid,
-	mapAlignmentToGrid,
-} from './utils';
+import { getAlignmentIndex } from './utils';
 import Cell from './cell';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
-import { useControlledState } from '../utils/hooks';
 import { useRTL } from '../utils/rtl';
 import AlignmentMatrixControlIcon from './icon';
 
+const grid = [
+	[ 'top left', 'top center', 'top right' ],
+	[ 'center left', 'center center', 'center right' ],
+	[ 'bottom left', 'bottom center', 'bottom right' ],
+];
+
+function useBaseId( id ) {
+	const instanceId = useInstanceId( AlignmentMatrixControl );
+	const prefix = id || 'alignment-matrix-control';
+	return `${ prefix }-${ instanceId }`;
+}
+
+function parseValue( value ) {
+	return value === 'center' ? 'center-center' : value.replace( ' ', '-' );
+}
+
+function getItemId( id, value ) {
+	return `${ id }-${ parseValue( value ) }`;
+}
+
 export default function AlignmentMatrixControl( {
 	className,
-	id: idProp,
+	id,
 	label = __( 'Alignment Matrix Control' ),
 	hasFocusBorder = true,
-	onChange = noop,
-	value = 'center',
+	defaultValue = 'center center',
+	value,
+	onChange,
 	...props
 } ) {
+	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
 	const isRTL = useRTL();
-	const [ alignIndex, setAlignIndex ] = useControlledState(
-		getAlignmentIndex( value )
-	);
-
-	const nodeRef = useRef();
-	const instanceId = useInstanceId( AlignmentMatrixControl );
-	const idPrefix = idProp || 'alignment-matrix-control';
-	const id = `${ idPrefix }-${ instanceId }`;
-	const currentId = `${ id }-${ alignIndex }`;
+	const baseId = useBaseId( id );
+	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
 
 	const composite = useCompositeState( {
-		currentId,
+		baseId,
+		currentId: initialCurrentId,
 		rtl: isRTL,
-		unstable_virtual: true,
-		wrap: false,
 	} );
 
-	const compositeRef = useRef( composite.currentId );
-	const grid = useMemo( () => mapAlignmentToGrid( { id } ), [ id ] );
-
 	useEffect( () => {
-		if ( compositeRef.current === composite.currentId ) return;
-
-		const nextAlignIndex = getAlignIndexFromGrid(
-			grid,
-			composite.currentId
-		);
-		const alignName = getAlignmentValueFromIndex( nextAlignIndex );
-
-		onChange( alignName );
-		setAlignIndex( nextAlignIndex );
-
-		compositeRef.current = composite.currentId;
-	}, [ composite.currentId, grid, onChange ] );
+		if ( typeof value !== 'undefined' ) {
+			composite.setCurrentId( getItemId( baseId, value ) );
+		}
+	}, [ value, composite.setCurrentId ] );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -82,40 +77,42 @@ export default function AlignmentMatrixControl( {
 	);
 
 	return (
-		<>
-			<Composite
-				{ ...props }
-				{ ...composite }
-				aria-label={ label }
-				aria-labelledby={ id }
-				as={ Root }
-				className={ classes }
-				hasFocusBorder={ hasFocusBorder }
-				id={ id }
-				ref={ nodeRef }
-				role="listbox"
-				tabIndex={ 0 }
-			>
-				{ grid.map( ( cells, index ) => (
-					<CompositeGroup
-						{ ...composite }
-						as={ Row }
-						role="row"
-						key={ index }
-					>
-						{ cells.map( ( cell ) => (
+		<Composite
+			{ ...props }
+			{ ...composite }
+			aria-label={ label }
+			as={ Root }
+			className={ classes }
+			hasFocusBorder={ hasFocusBorder }
+			role="grid"
+		>
+			{ grid.map( ( cells, index ) => (
+				<CompositeGroup
+					{ ...composite }
+					as={ Row }
+					role="row"
+					key={ index }
+				>
+					{ cells.map( ( cell ) => {
+						const cellId = getItemId( baseId, cell );
+						return (
 							<Cell
 								{ ...composite }
-								isActive={ composite.currentId === cell.id }
-								key={ cell.id }
-								id={ cell.id }
-								value={ cell.value }
+								isActive={ composite.currentId === cellId }
+								key={ cell }
+								id={ cellId }
+								value={ cell }
+								onFocus={ () => onChange?.( cell ) }
+								onClick={ () =>
+									// VoiceOver doesn't focus elements on click
+									composite.move( cellId )
+								}
 							/>
-						) ) }
-					</CompositeGroup>
-				) ) }
-			</Composite>
-		</>
+						);
+					} ) }
+				</CompositeGroup>
+			) ) }
+		</Composite>
 	);
 }
 

@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { unstable_CompositeItem as CompositeItem } from 'reakit';
+import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
+
+/**
+ * Internal dependencies
+ */
+import VisuallyHidden from '../visually-hidden';
 
 /**
  * Internal dependencies
@@ -13,13 +18,11 @@ import {
 
 export default function Cell( { isActive = false, value, ...props } ) {
 	return (
-		<CompositeItem
-			as={ CellView }
-			aria-label={ value }
-			role="gridcell"
-			tabIndex={ -1 }
-			{ ...props }
-		>
+		<CompositeItem as={ CellView } role="gridcell" { ...props }>
+			{ /* VoiceOver needs a text content to be rendered within grid cell,
+			otherwise it'll announce the content as "blank". So we use a visually
+			hidden element instead of aria-label. */ }
+			<VisuallyHidden>{ value }</VisuallyHidden>
 			<Point isActive={ isActive } role="presentation" />
 		</CompositeItem>
 	);
