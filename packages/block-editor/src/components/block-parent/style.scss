@@ -1,11 +1,5 @@
 .block-editor-block-parent {
-	position: absolute;
-	left: -1px;
-	border: 1px solid $black;
-	border-radius: 2px;
 	background: $white;
-
-	button.block-editor-block-parent__button {
-		padding: 0 12px;
-	}
+	border: 1px solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
 }
