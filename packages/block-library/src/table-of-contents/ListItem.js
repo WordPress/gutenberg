@@ -20,7 +20,7 @@ export default function ListItem( props ) {
 				</a>
 			) : (
 				<span
-					className="blocks-table-of-contents-entry"
+					className="wp-block-table-of-contents__entry"
 					data-level={ level }
 				>
 					{ content }
