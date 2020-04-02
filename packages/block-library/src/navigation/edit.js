@@ -57,14 +57,7 @@ function Navigation( {
 	//
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
+	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
@@ -84,7 +77,6 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
@@ -261,7 +253,6 @@ function Navigation( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
 			<InspectorControls>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl

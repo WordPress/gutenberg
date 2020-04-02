@@ -315,6 +315,7 @@ function InserterBlockList( {
 		);
 
 		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);

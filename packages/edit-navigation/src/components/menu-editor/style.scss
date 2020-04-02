@@ -1,8 +1,5 @@
 .edit-navigation-menu-editor {
-	border: 1px solid #000;
-}
-
-.edit-navigation-menu-editor__panel {
-	border: 1px solid #000;
-	padding: 10px;
+	display: grid;
+	grid-template-columns: 280px 1fr;
+	grid-column-gap: 10px;
 }
