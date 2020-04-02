@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import {
 	unstable_useCompositeState as useCompositeState,
@@ -18,30 +19,16 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getAlignmentIndex } from './utils';
 import Cell from './cell';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import { useRTL } from '../utils/rtl';
 import AlignmentMatrixControlIcon from './icon';
-
-const grid = [
-	[ 'top left', 'top center', 'top right' ],
-	[ 'center left', 'center center', 'center right' ],
-	[ 'bottom left', 'bottom center', 'bottom right' ],
-];
+import { GRID, getItemId } from './utils';
 
 function useBaseId( id ) {
 	const instanceId = useInstanceId( AlignmentMatrixControl );
 	const prefix = id || 'alignment-matrix-control';
 	return `${ prefix }-${ instanceId }`;
-}
-
-function parseValue( value ) {
-	return value === 'center' ? 'center-center' : value.replace( ' ', '-' );
-}
-
-function getItemId( id, value ) {
-	return `${ id }-${ parseValue( value ) }`;
 }
 
 export default function AlignmentMatrixControl( {
@@ -51,7 +38,8 @@ export default function AlignmentMatrixControl( {
 	hasFocusBorder = true,
 	defaultValue = 'center center',
 	value,
-	onChange,
+	onBlur = noop,
+	onChange = noop,
 	...props
 } ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
@@ -64,6 +52,18 @@ export default function AlignmentMatrixControl( {
 		currentId: initialCurrentId,
 		rtl: isRTL,
 	} );
+
+	const handleOnBlur = ( event ) => {
+		const isItemCurrent = composite.items.some(
+			( item ) => item.ref.current === event.relatedTarget
+		);
+
+		if ( isItemCurrent ) {
+			event.stopPropagation();
+		}
+
+		onBlur( event );
+	};
 
 	useEffect( () => {
 		if ( typeof value !== 'undefined' ) {
@@ -84,9 +84,10 @@ export default function AlignmentMatrixControl( {
 			as={ Root }
 			className={ classes }
 			hasFocusBorder={ hasFocusBorder }
+			onBlur={ handleOnBlur }
 			role="grid"
 		>
-			{ grid.map( ( cells, index ) => (
+			{ GRID.map( ( cells, index ) => (
 				<CompositeGroup
 					{ ...composite }
 					as={ Row }
@@ -95,6 +96,7 @@ export default function AlignmentMatrixControl( {
 				>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
+
 						return (
 							<Cell
 								{ ...composite }
@@ -102,7 +104,7 @@ export default function AlignmentMatrixControl( {
 								key={ cell }
 								id={ cellId }
 								value={ cell }
-								onFocus={ () => onChange?.( cell ) }
+								onFocus={ () => onChange( cell ) }
 								onClick={ () =>
 									// VoiceOver doesn't focus elements on click
 									composite.move( cellId )
@@ -118,5 +120,3 @@ export default function AlignmentMatrixControl( {
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
 AlignmentMatrixControl.icon = <AlignmentMatrixControlIcon />;
-
-AlignmentMatrixControl.__getAlignmentIndex = getAlignmentIndex;
