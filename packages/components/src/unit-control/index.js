@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, noop } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 /**
  * Internal dependencies
@@ -28,7 +28,7 @@ export default function UnitControl( {
 		const { data } = changeProps;
 		onUnitChange( unitValue, changeProps );
 
-		if ( isResetValueOnUnitChange && ! isUndefined( data.default ) ) {
+		if ( isResetValueOnUnitChange && ! data.default === undefined ) {
 			onChange( data.default, changeProps );
 		}
 	};
