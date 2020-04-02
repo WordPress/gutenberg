@@ -1,4 +1,5 @@
 $block-inserter-preview-height: 350px;
+$block-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -44,7 +45,7 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	@include break-medium {
-		width: 400px;
+		width: $block-inserter-width;
 		position: relative;
 	}
 }
@@ -117,21 +118,27 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__panel-header {
+	display: inline-flex;
+	align-items: center;
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__panel-content {
+	padding: 0 $grid-unit-20;
+}
+
+.block-editor-inserter__panel-title {
+	color: $theme-color;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+	margin-right: $grid-unit-10;
+}
+
 .block-editor-inserter__block-list {
 	flex-grow: 1;
 	position: relative;
-	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
-	padding: 0 $grid-unit-20 $grid-unit-20 $grid-unit-20;
-	margin-top: -$border-width;
-
-	&:focus {
-		outline: $border-width dotted $dark-gray-500;
-	}
-
-	// Don't show the top border on the first panel, let the Search border be the border.
-	[role="presentation"] + .components-panel__body {
-		border-top: none;
-	}
 }
 
 // This extra div is needed because
@@ -155,7 +162,8 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__manage-reusable-blocks {
-	margin: $grid-unit-20 0 0 $grid-unit-20;
+	display: inline-block;
+	margin: $grid-unit-20;
 }
 
 .block-editor-inserter__no-results {

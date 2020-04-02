@@ -10,22 +10,20 @@ import {
 	sortBy,
 	groupBy,
 	isEmpty,
-	without,
 } from 'lodash';
-import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { PanelBody, withSpokenMessages } from '@wordpress/components';
+import { withSpokenMessages } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
-import { useMemo, useEffect, useState, useRef } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { compose, withSafeTimeout } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,6 +32,7 @@ import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 import { searchItems } from './search-items';
+import InserterPanel from './panel';
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
@@ -59,7 +58,6 @@ function InserterBlockList( {
 	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	filterValue,
 	debouncedSpeak,
-	setTimeout: safeSetTimeout,
 } ) {
 	const {
 		categories,
@@ -167,61 +165,6 @@ function InserterBlockList( {
 		return result;
 	}, [ filteredItems, collections ] );
 
-	const inserterResults = useRef();
-	const panels = useRef( [] );
-	const bindPanel = ( name ) => ( ref ) => {
-		panels.current[ name ] = ref;
-	};
-	const [ openPanels, setOpenPanels ] = useState( [ 'suggested' ] );
-
-	const onTogglePanel = ( panel ) => {
-		return () => {
-			const isOpened = openPanels.indexOf( panel ) !== -1;
-			if ( isOpened ) {
-				setOpenPanels( without( openPanels, panel ) );
-			} else {
-				setOpenPanels( [ ...openPanels, panel ] );
-
-				safeSetTimeout( () => {
-					// We need a generic way to access the panel's container
-					scrollIntoView(
-						panels.current[ panel ],
-						inserterResults.current,
-						{
-							alignWithTop: true,
-						}
-					);
-				} );
-			}
-		};
-	};
-
-	// Update the open panels on search
-	useEffect( () => {
-		if ( ! filterValue ) {
-			setOpenPanels( [ 'suggested' ] );
-			return;
-		}
-		let newOpenPanels = [];
-		if ( reusableItems.length > 0 ) {
-			newOpenPanels.push( 'reusable' );
-		}
-		if ( filteredItems.length > 0 ) {
-			newOpenPanels = newOpenPanels.concat(
-				Object.keys( itemsPerCategory ),
-				Object.keys( itemsPerCollection )
-			);
-		}
-
-		setOpenPanels( newOpenPanels );
-	}, [
-		filterValue,
-		filteredItems,
-		reusableItems,
-		itemsPerCategory,
-		itemsPerCollection,
-	] );
-
 	// Announce search results on change
 	useEffect( () => {
 		const resultCount = Object.keys( itemsPerCategory ).reduce(
@@ -241,13 +184,10 @@ function InserterBlockList( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ itemsPerCategory, debouncedSpeak ] );
 
-	const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-
 	const hasItems = ! isEmpty( filteredItems );
 
 	return (
 		<div
-			ref={ inserterResults }
 			tabIndex="0"
 			role="region"
 			aria-label={ __( 'Available block types' ) }
@@ -260,18 +200,13 @@ function InserterBlockList( {
 			/>
 
 			{ !! suggestedItems.length && ! filterValue && (
-				<PanelBody
-					title={ _x( 'Most used', 'blocks' ) }
-					opened={ isPanelOpen( 'suggested' ) }
-					onToggle={ onTogglePanel( 'suggested' ) }
-					ref={ bindPanel( 'suggested' ) }
-				>
+				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 					<BlockTypesList
 						items={ suggestedItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
 					/>
-				</PanelBody>
+				</InserterPanel>
 			) }
 
 			{ map( categories, ( category ) => {
@@ -280,20 +215,17 @@ function InserterBlockList( {
 					return null;
 				}
 				return (
-					<PanelBody
+					<InserterPanel
 						key={ category.slug }
 						title={ category.title }
 						icon={ category.icon }
-						opened={ isPanelOpen( category.slug ) }
-						onToggle={ onTogglePanel( category.slug ) }
-						ref={ bindPanel( category.slug ) }
 					>
 						<BlockTypesList
 							items={ categoryItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
 						/>
-					</PanelBody>
+					</InserterPanel>
 				);
 			} ) }
 
@@ -304,31 +236,25 @@ function InserterBlockList( {
 				}
 
 				return (
-					<PanelBody
+					<InserterPanel
 						key={ namespace }
 						title={ collection.title }
 						icon={ collection.icon }
-						opened={ isPanelOpen( namespace ) }
-						onToggle={ onTogglePanel( namespace ) }
-						ref={ bindPanel( namespace ) }
 					>
 						<BlockTypesList
 							items={ collectionItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
 						/>
-					</PanelBody>
+					</InserterPanel>
 				);
 			} ) }
 
 			{ !! reusableItems.length && (
-				<PanelBody
+				<InserterPanel
 					className="block-editor-inserter__reusable-blocks-panel"
 					title={ __( 'Reusable' ) }
-					opened={ isPanelOpen( 'reusable' ) }
-					onToggle={ onTogglePanel( 'reusable' ) }
 					icon={ controlsRepeat }
-					ref={ bindPanel( 'reusable' ) }
 				>
 					<BlockTypesList
 						items={ reusableItems }
@@ -343,7 +269,7 @@ function InserterBlockList( {
 					>
 						{ __( 'Manage all reusable blocks' ) }
 					</a>
-				</PanelBody>
+				</InserterPanel>
 			) }
 
 			<__experimentalInserterMenuExtension.Slot
@@ -372,7 +298,4 @@ function InserterBlockList( {
 	);
 }
 
-export default compose(
-	withSpokenMessages,
-	withSafeTimeout
-)( InserterBlockList );
+export default compose( withSpokenMessages )( InserterBlockList );
