@@ -15,6 +15,7 @@
 * Fix Quote block's left border not being visible in Dark Mode
 * Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
 * Fix crash when pasting HTML content with embeded images on paragraphs
+* [Android] Dark Mode
 
 1.23.0
 ------
