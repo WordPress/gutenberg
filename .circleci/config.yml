@@ -172,6 +172,6 @@ workflows:
           platform: android
           check-tests: true
       - ios-device-checks:
-          name: Test iOS on Device - Canaries
+          name: Test iOS on Device
       - android-device-checks:
-          name: Test Android on Device - Canaries
+          name: Test Android on Device
