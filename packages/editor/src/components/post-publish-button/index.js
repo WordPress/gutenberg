@@ -3,7 +3,6 @@
  */
 import { noop, get, some } from 'lodash';
 import classnames from 'classnames';
-import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -33,12 +32,6 @@ export class PostPublishButton extends Component {
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
-		this.createIgnoredForSave = memoize(
-			( postType, postId ) => [
-				{ kind: 'postType', name: postType, key: postId },
-			],
-			{ maxSize: 1 }
-		);
 	}
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
@@ -102,8 +95,6 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
-			postType,
-			postId,
 		} = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
 
@@ -182,10 +173,6 @@ export class PostPublishButton extends Component {
 				<EntitiesSavedStates
 					isOpen={ Boolean( entitiesSavedStatesCallback ) }
 					onRequestClose={ this.closeEntitiesSavedStates }
-					ignoredForSave={ this.createIgnoredForSave(
-						postType,
-						postId
-					) }
 				/>
 				<Button
 					ref={ this.buttonNode }
