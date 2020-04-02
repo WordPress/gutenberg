@@ -34,6 +34,8 @@ import { insertAt, moveTo } from './array';
  * context, the value of which is an array of block client IDs existing within
  * that nesting context.
  *
+ * @todo noahtallen
+ *
  * @param {Array}   blocks       Blocks to map.
  * @param {?string} rootClientId Assumed root client ID.
  *
@@ -1470,6 +1472,31 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the blocks whose inner blocks are controlled. Maps a block
+ * clientId to a boolean. If true, the block's inner blocks are controlled by
+ * the block itself. For example, a template part uses an entity provider to
+ * control its blocks.
+ *
+ * @param {boolean} state  Current blocks which have controlled inner blocks.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function controlledInnerBLocks(
+	state = {},
+	{ type, clientId, hasControlledInnerBlocks }
+) {
+	if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+		return {
+			...state,
+			[ clientId ]: hasControlledInnerBlocks,
+		};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1490,4 +1517,5 @@ export default combineReducers( {
 	isNavigationMode,
 	automaticChangeStatus,
 	highlightedBlock,
+	controlledInnerBLocks,
 } );
