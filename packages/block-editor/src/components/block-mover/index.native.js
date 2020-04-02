@@ -19,8 +19,8 @@ const horizontalMover = {
 	secondButtonHint: __( 'Double tap to move the block to the right' ),
 	firstBlockTitle: __( 'Move block left' ),
 	lastBlockTitle: __( 'Move block right' ),
-	firstButtonDirection: 'left',
-	secondButtonDirection: 'right',
+	firstButtonDirection: __( 'left' ),
+	secondButtonDirection: __( 'right' ),
 	location: 'position',
 };
 
@@ -31,8 +31,8 @@ const verticalMover = {
 	secondButtonHint: __( 'Double tap to move the block down' ),
 	firstBlockTitle: __( 'Move block up' ),
 	lastBlockTitle: __( 'Move block down' ),
-	firstButtonDirection: 'up',
-	secondButtonDirection: 'down',
+	firstButtonDirection: __( 'up' ),
+	secondButtonDirection: __( 'down' ),
 	location: 'row',
 };
 
