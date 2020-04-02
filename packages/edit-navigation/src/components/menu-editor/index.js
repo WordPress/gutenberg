@@ -49,7 +49,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				<Panel
 					header={
 						<Button isPrimary onClick={ saveBlocks }>
-							{ __( 'Save Navigation' ) }
+							{ __( 'Save navigation' ) }
 						</Button>
 					}
 					className="edit-navigation-menu-editor__panel"
