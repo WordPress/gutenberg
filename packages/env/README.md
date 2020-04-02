@@ -201,12 +201,12 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
-### `docker logs -f [container] >/dev/null` 
+### `docker logs -f [container_id] >/dev/null` 
 
 ```sh
-docker logs -f <container> >/dev/null 
+docker logs -f <container_id> >/dev/null 
 
-Shows the error logs of the specified container in the terminal
+Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
 ```
 
 ## .wp-env.json
