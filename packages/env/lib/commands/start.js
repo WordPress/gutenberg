@@ -19,8 +19,8 @@ const rimraf = util.promisify( require( 'rimraf' ) );
 const retry = require( '../retry' );
 const stop = require( './stop' );
 const initConfig = require( '../init-config' );
+const downloadSource = require( '../download-source' );
 const {
-	downloadSource,
 	checkDatabaseConnection,
 	makeContentDirectoriesWritable,
 	configureWordPress,
@@ -34,7 +34,7 @@ const {
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
-async function start( { spinner, debug } ) {
+module.exports = async function start( { spinner, debug } ) {
 	/**
 	 * If the Docker image is already running and the `wp-env` files have been
 	 * deleted, the start command will not complete successfully. Stopping
@@ -142,7 +142,7 @@ async function start( { spinner, debug } ) {
 	] );
 
 	spinner.text = 'WordPress started.';
-}
+};
 
 /**
  * Checks for legacy installs and provides
@@ -189,5 +189,3 @@ async function checkForLegacyInstall( spinner ) {
 	}
 	spinner.start();
 }
-
-export default start;
