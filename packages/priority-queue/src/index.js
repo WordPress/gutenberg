@@ -63,7 +63,7 @@ import requestIdleCallback from './request-idle-callback';
  * queue.add( ctx2, () => console.log( 'This will be printed second' ) );
  *```
  *
- * @return {WPPriorityQueue} Queue object with `add` and `flush` methods.
+ * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
 export const createQueue = () => {
 	/** @type {WPPriorityQueueContext[]} */
@@ -150,6 +150,11 @@ export const createQueue = () => {
 		return true;
 	};
 
+	/**
+	 * Reset the queue without running the pending callbacks.
+	 *
+	 * @type {WPPriorityQueueReset}
+	 */
 	const reset = () => {
 		waitingList = [];
 		elementsMap = new WeakMap();
