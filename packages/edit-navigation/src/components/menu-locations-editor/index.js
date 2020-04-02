@@ -69,7 +69,7 @@ export default function MenuLocationsEditor() {
 
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
-			<PanelBody title={ __( 'Navigation structure' ) }>
+			<PanelBody title={ __( 'Menu locations' ) }>
 				<form
 					onSubmit={ ( e ) => {
 						e.preventDefault();
