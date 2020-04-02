@@ -31,7 +31,7 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"types": [ "node" ]
+		"typeRoots": [ "./node_modules/@types" ]
 	},
 	"exclude": [ "**/benchmark", "**/test/**", "**/build/**", "**/build-*/**" ]
 }
