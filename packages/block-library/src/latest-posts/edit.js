@@ -50,7 +50,6 @@ const CATEGORIES_LIST_QUERY = {
 const USERS_LIST_QUERY = {
 	per_page: -1,
 };
-const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
 	constructor() {
@@ -75,23 +74,20 @@ class LatestPostsEdit extends Component {
 				if ( this.isStillMounted ) {
 					this.setState( { categoriesList: [] } );
 				}
-			}
-		);
+			} );
 		this.fetchRequest = apiFetch( {
 			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
-		} ).then(
-			( authorList ) => {
+		} )
+			.then( ( authorList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( { authorList } );
 				}
-			}
-		).catch(
-			() => {
+			} )
+			.catch( () => {
 				if ( this.isStillMounted ) {
 					this.setState( { authorList: [] } );
 				}
-			}
-		);
+			} );
 	}
 
 	componentWillUnmount() {
@@ -99,7 +95,6 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-
 		const {
 			attributes,
 			setAttributes,
@@ -108,10 +103,7 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const {
-			categoriesList,
-			authorList,
-		} = this.state;
+		const { categoriesList, authorList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
@@ -285,12 +277,16 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
-						authorList={ authorList }
-						selectedAuthorId={ users }
-						categoriesList={ categoriesList }
 						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
 						selectedCategories={ categories }
+						onAuthorChange={ ( value ) =>
+							setAttributes( {
+								users: '' !== value ? value : undefined,
+							} )
+						}
+						authorList={ authorList }
+						selectedAuthorId={ users }
 					/>
 
 					{ postLayout === 'grid' && (

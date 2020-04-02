@@ -12,6 +12,9 @@
 		"categories": {
 			"type": "array"
 		},
+		"users": {
+			"type": "array"
+		},
 		"postsToShow": {
 			"type": "number",
 			"default": 5
