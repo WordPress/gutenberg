@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import filterMessage from '../filterMessage';
+import filterMessage from '../filter-message';
 
 describe( 'filterMessage', () => {
 	describe( 'when a clean message is passed in', () => {
@@ -15,7 +15,7 @@ describe( 'filterMessage', () => {
 		it( 'should add a space to the message to make sure it is announced again', () => {
 			filterMessage( 'repeated message.' );
 			const actual = filterMessage( 'repeated message.' );
-			expect( actual ).toBe( 'repeated message.' + '\u00A0' );
+			expect( actual ).toBe( 'repeated message.\u00A0' );
 		} );
 	} );
 
