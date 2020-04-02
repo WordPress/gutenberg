@@ -239,6 +239,7 @@ describe( 'state', () => {
 						chicken: {},
 						'chicken-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -291,6 +292,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -319,6 +321,7 @@ describe( 'state', () => {
 					cache: {
 						chicken: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -371,6 +374,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 				expect( state.cache.chicken ).not.toBe(
 					existingState.cache.chicken
@@ -421,6 +425,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-child-2': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
@@ -511,6 +516,7 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: {},
 						[ newChildBlockId3 ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 			} );
 
@@ -554,6 +560,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-grand-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-block' );
@@ -600,6 +607,7 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				// the cache key of the parent should be updated
@@ -620,6 +628,7 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				cache: {},
+				controlledInnerBlocks: {},
 			} );
 		} );
 

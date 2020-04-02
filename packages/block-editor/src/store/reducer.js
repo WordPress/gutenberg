@@ -971,6 +971,19 @@ export const blocks = flow(
 
 		return state;
 	},
+
+	controlledInnerBlocks(
+		state = {},
+		{ type, clientId, hasControlledInnerBlocks }
+	) {
+		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+			return {
+				...state,
+				[ clientId ]: hasControlledInnerBlocks,
+			};
+		}
+		return state;
+	},
 } );
 
 /**

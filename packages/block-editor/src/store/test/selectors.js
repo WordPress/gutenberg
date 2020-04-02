@@ -220,6 +220,7 @@ describe( 'selectors', () => {
 					cache: {
 						123: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -239,6 +240,7 @@ describe( 'selectors', () => {
 					order: {},
 					parents: {},
 					cache: {},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -269,6 +271,7 @@ describe( 'selectors', () => {
 						123: {},
 						456: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -311,6 +314,7 @@ describe( 'selectors', () => {
 						123: {},
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -365,6 +369,7 @@ describe( 'selectors', () => {
 						'client-id-03': {},
 						'client-id-04': {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -418,6 +423,7 @@ describe( 'selectors', () => {
 						'client-id-04': {},
 						'client-id-05': {},
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 
@@ -534,6 +540,7 @@ describe( 'selectors', () => {
 						'uuid-28': 'uuid-24',
 						'uuid-30': 'uuid-28',
 					},
+					controlledInnerBlocks: {},
 				},
 			};
 			expect(
@@ -907,6 +914,7 @@ describe( 'selectors', () => {
 					cache: {
 						23: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				selectionStart: { clientId: 23 },
 				selectionEnd: { clientId: 23 },
@@ -2335,6 +2343,7 @@ describe( 'selectors', () => {
 						block3: {},
 						block4: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
@@ -2418,6 +2427,7 @@ describe( 'selectors', () => {
 					cache: {
 						block1: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				preferences: {
 					insertUsage: {},
@@ -2499,6 +2509,7 @@ describe( 'selectors', () => {
 					cache: {
 						block1: {},
 					},
+					controlledInnerBlocks: {},
 				},
 				preferences: {
 					insertUsage: {},

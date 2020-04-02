@@ -1633,3 +1633,15 @@ export function didAutomaticChange( state ) {
 export function isBlockHighlighted( state, clientId ) {
 	return state.highlightedBlock === clientId;
 }
+
+/**
+ * Checks if a given block has controlled inner blocks.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} True if the block has controlled inner blocks.
+ */
+export function areInnerBlocksControlled( state, clientId ) {
+	return !! state.blocks.controlledInnerBlocks[ clientId ];
+}
