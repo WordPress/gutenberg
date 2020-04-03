@@ -56,7 +56,8 @@
     "react-native-sass-transformer": "^1.1.1",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#c43bdf6b06d361da399b98b8d2e32b578fa188ac"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#c43bdf6b06d361da399b98b8d2e32b578fa188ac",
+    "wd": "^1.11.1"
   },
   "publishConfig": {
     "access": "public"
