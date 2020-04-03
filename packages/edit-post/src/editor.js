@@ -18,7 +18,6 @@ import {
 	KeyboardShortcuts,
 	SlotFillProvider,
 	DropZoneProvider,
-	__experimentalThemeProvider as ThemeProvider,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -125,9 +124,7 @@ class Editor extends Component {
 							>
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
-									<ThemeProvider>
-										<Layout />
-									</ThemeProvider>
+									<Layout />
 									<KeyboardShortcuts
 										shortcuts={ preventEventDiscovery }
 									/>
