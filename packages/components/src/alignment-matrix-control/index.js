@@ -28,6 +28,7 @@ import { GRID, getItemId } from './utils';
 function useBaseId( id ) {
 	const instanceId = useInstanceId( AlignmentMatrixControl );
 	const prefix = id || 'alignment-matrix-control';
+
 	return `${ prefix }-${ instanceId }`;
 }
 

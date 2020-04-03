@@ -4,6 +4,7 @@ export const GRID = [
 	[ 'bottom left', 'bottom center', 'bottom right' ],
 ];
 
+// Transforms GRID into a flat Array of values
 export const ALIGNMENTS = GRID.reduce( ( alignments, row ) => {
 	row.forEach( ( cell ) => {
 		alignments.push( cell );
@@ -12,20 +13,35 @@ export const ALIGNMENTS = GRID.reduce( ( alignments, row ) => {
 	return alignments;
 }, [] );
 
+/**
+ * Parses and transforms an incoming value to better match the alignment values
+ *
+ * @param {string} value An alignment value to parse.
+ *
+ * @return {string} The parsed value.
+ */
 export function parseValue( value ) {
 	const nextValue = value === 'center' ? 'center center' : value;
 
 	return nextValue.replace( '-', ' ' );
 }
 
-export function getItemId( id, value ) {
+/**
+ * Creates an item ID based on a prefix ID and an alignment value.
+ *
+ * @param {string} prefixId An ID to prefix.
+ * @param {string} value An alignment value.
+ *
+ * @return {string} The item id.
+ */
+export function getItemId( prefixId, value ) {
 	const valueId = parseValue( value ).replace( '-', ' ' );
 
-	return `${ id }-${ valueId }`;
+	return `${ prefixId }-${ valueId }`;
 }
 
 /**
- * Retrieves the [x, y] alignment data index from a value.
+ * Retrieves the alignment index from a value.
  *
  * @param {string} alignment Value to check.
  *
