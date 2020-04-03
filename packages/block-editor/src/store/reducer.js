@@ -973,6 +973,19 @@ export const blocks = flow(
 
 		return state;
 	},
+
+	controlledInnerBlocks(
+		state = {},
+		{ type, clientId, hasControlledInnerBlocks }
+	) {
+		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+			return {
+				...state,
+				[ clientId ]: hasControlledInnerBlocks,
+			};
+		}
+		return state;
+	},
 } );
 
 /**
@@ -1472,31 +1485,6 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
-/**
- * Reducer returning the blocks whose inner blocks are controlled. Maps a block
- * clientId to a boolean. If true, the block's inner blocks are controlled by
- * the block itself. For example, a template part uses an entity provider to
- * control its blocks.
- *
- * @param {boolean} state  Current blocks which have controlled inner blocks.
- * @param {Object}  action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function controlledInnerBlocks(
-	state = {},
-	{ type, clientId, hasControlledInnerBlocks }
-) {
-	if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-		return {
-			...state,
-			[ clientId ]: hasControlledInnerBlocks,
-		};
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1517,5 +1505,4 @@ export default combineReducers( {
 	isNavigationMode,
 	automaticChangeStatus,
 	highlightedBlock,
-	controlledInnerBlocks,
 } );
