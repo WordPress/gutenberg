@@ -33,14 +33,14 @@ import { useEffect } from '@wordpress/element';
  *
  * @param {Function} callback The function to call with the debounced value.
  * @param {number}   delay    The amount to delay time in ms.
- * @param {*}        deps     The dependent value changing you want to debounce.
+ * @param {Array}    deps     The dependent value changing you want to debounce.
  *
  */
 const useDebounce = ( callback, delay, deps ) => {
 	useEffect( () => {
 		const handler = setTimeout( () => callback( deps ), delay );
 		return () => clearTimeout( handler );
-	}, [ deps ] );
+	}, deps );
 };
 
 export default useDebounce;

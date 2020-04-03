@@ -148,7 +148,7 @@ _Parameters_
 
 -   _callback_ `Function`: The function to call with the debounced value.
 -   _delay_ `number`: The amount to delay time in ms.
--   _deps_ `*`: The dependent value changing you want to debounce.
+-   _deps_ `Array`: The dependent value changing you want to debounce.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
