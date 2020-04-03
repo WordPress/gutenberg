@@ -4,7 +4,6 @@
 * [Android] Dark Mode
 * Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
-* Enabled edit button over image block for Android
 * [iOS] Add alignment options for heading block
 * Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
 * Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
