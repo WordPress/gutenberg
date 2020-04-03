@@ -15,6 +15,7 @@ import {
 
 export default function AlignmentMatrixControlIcon( {
 	className,
+	disablePointerEvents = true,
 	height,
 	size: sizeProp = 24,
 	value = 'center',
@@ -33,6 +34,7 @@ export default function AlignmentMatrixControlIcon( {
 		<Root
 			{ ...props }
 			className={ classes }
+			disablePointerEvents={ disablePointerEvents }
 			role="presentation"
 			size={ size }
 		>
@@ -40,7 +42,7 @@ export default function AlignmentMatrixControlIcon( {
 				const isActive = alignIndex === index;
 
 				return (
-					<Cell key={ align } tabIndex={ -1 }>
+					<Cell key={ align }>
 						<Point isActive={ isActive } />
 					</Cell>
 				);

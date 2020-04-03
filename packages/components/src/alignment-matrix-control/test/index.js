@@ -2,12 +2,7 @@
  * External dependencies
  */
 import { render, unmountComponentAtNode } from 'react-dom';
-import { act } from 'react-dom/test-utils';
-
-/**
- * WordPress dependencies
- */
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { act, Simulate } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -15,14 +10,6 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import AlignmentMatrixControl from '../';
 
 let container = null;
-
-function triggerKeyDown( el, { keyCode } ) {
-	// modern browsers, IE9+
-	const e = document.createEvent( 'HTMLEvents' );
-	e.keyCode = keyCode;
-	e.initEvent( 'keydown', false, true );
-	el.dispatchEvent( e );
-}
 
 beforeEach( () => {
 	container = document.createElement( 'div' );
@@ -39,6 +26,11 @@ const getControl = () => {
 	return container.querySelector( '.component-alignment-matrix-control' );
 };
 
+const getCells = () => {
+	const control = getControl();
+	return control.querySelectorAll( '[role="gridcell"]' );
+};
+
 describe( 'AlignmentMatrixControl', () => {
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
@@ -51,8 +43,8 @@ describe( 'AlignmentMatrixControl', () => {
 		} );
 	} );
 
-	describe( 'Keyboard movement', () => {
-		it( 'should move the next value up on UP press', () => {
+	describe( 'Change value', () => {
+		it( 'should change value on cell click', () => {
 			const spy = jest.fn();
 
 			act( () => {
@@ -65,79 +57,19 @@ describe( 'AlignmentMatrixControl', () => {
 				);
 			} );
 
-			const control = getControl();
+			const cells = getCells();
 
-			act( () => {
-				triggerKeyDown( control, { keyCode: UP } );
-			} );
-
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center top' );
-		} );
-
-		it( 'should move the next value down on DOWN press', () => {
-			const spy = jest.fn();
-
-			act( () => {
-				render(
-					<AlignmentMatrixControl
-						value={ 'center' }
-						onChange={ spy }
-					/>,
-					container
-				);
-			} );
-
-			const control = getControl();
-
-			act( () => {
-				triggerKeyDown( control, { keyCode: DOWN } );
-			} );
-
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'bottom center' );
-		} );
-
-		it( 'should move the next value left on LEFT press', () => {
-			const spy = jest.fn();
-
-			act( () => {
-				render(
-					<AlignmentMatrixControl
-						value={ 'center' }
-						onChange={ spy }
-					/>,
-					container
-				);
-			} );
-
-			const control = getControl();
-
-			act( () => {
-				triggerKeyDown( control, { keyCode: LEFT } );
-			} );
+			act( () => Simulate.click( cells[ 3 ] ) );
 
 			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
-		} );
 
-		it( 'should move the next value right on RIGHT press', () => {
-			const spy = jest.fn();
+			act( () => Simulate.click( cells[ 4 ] ) );
 
-			act( () => {
-				render(
-					<AlignmentMatrixControl
-						value={ 'center' }
-						onChange={ spy }
-					/>,
-					container
-				);
-			} );
+			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
 
-			const control = getControl();
+			act( () => Simulate.click( cells[ 7 ] ) );
 
-			act( () => {
-				triggerKeyDown( control, { keyCode: RIGHT } );
-			} );
-
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center right' );
+			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
 		} );
 	} );
 } );

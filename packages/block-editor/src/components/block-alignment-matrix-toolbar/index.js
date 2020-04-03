@@ -6,43 +6,60 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 import {
-	Toolbar,
+	Button,
+	Dropdown,
+	ToolbarGroup,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 } from '@wordpress/components';
 
-const POPOVER_PROPS = {
-	className: 'block-editor-block-alignment-matrix-toolbar',
-	position: 'bottom right',
-};
-
 export function BlockAlignmentMatrixToolbar( props ) {
 	const {
-		isCollapsed = true,
 		label = __( 'Change matrix alignment' ),
 		onChange = noop,
 		value = 'center',
 	} = props;
 
 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
+	const className = 'block-editor-block-alignment-matrix-toolbar';
 
 	return (
-		<Toolbar
-			isCollapsed={ isCollapsed }
-			icon={ icon }
-			label={ label }
-			popoverProps={ POPOVER_PROPS }
-		>
-			{ () => {
+		<Dropdown
+			position="bottom right"
+			className={ className }
+			popoverProps={ { className } }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
+
 				return (
-					<AlignmentMatrixControl
-						hasFocusBorder={ false }
-						onChange={ onChange }
-						value={ value }
-					/>
+					<ToolbarGroup>
+						<Button
+							onClick={ onToggle }
+							aria-haspopup="true"
+							aria-expanded={ isOpen }
+							onKeyDown={ openOnArrowDown }
+							label={ label }
+							icon={ icon }
+							showTooltip
+						/>
+					</ToolbarGroup>
 				);
 			} }
-		</Toolbar>
+			renderContent={ () => (
+				<AlignmentMatrixControl
+					hasFocusBorder={ false }
+					onChange={ onChange }
+					value={ value }
+				/>
+			) }
+		/>
 	);
 }
 

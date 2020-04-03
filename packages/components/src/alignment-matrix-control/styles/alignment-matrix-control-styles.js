@@ -32,13 +32,20 @@ const rootBorder = ( { hasFocusBorder } ) => {
 
 export const Root = styled.div`
 	--width: 92px;
+	${rootBase};
+
 	border: 1px solid transparent;
 	cursor: pointer;
+	grid-template-columns: auto;
 	grid-template-rows: repeat( 3, calc( var( --width ) / 3 ) );
 	width: var( --width, 92px );
 
-	${rootBase}
 	${rootBorder}
+`;
+
+export const Row = styled.div`
+	display: grid;
+	grid-template-columns: repeat( 3, 1fr );
 `;
 
 const pointActive = ( { isActive } ) => {

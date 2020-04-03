@@ -3,125 +3,74 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
+import {
+	unstable_useCompositeState as useCompositeState,
+	unstable_Composite as Composite,
+	unstable_CompositeGroup as CompositeGroup,
+} from 'reakit';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	ALIGNMENTS,
-	DIRECTION,
-	getAlignmentIndex,
-	getAlignmentValueFromIndex,
-	getNextIndexFromDirection,
-} from './utils';
 import Cell from './cell';
-import { Root } from './styles/alignment-matrix-control-styles';
-import { useControlledState } from '../utils/hooks';
+import { Root, Row } from './styles/alignment-matrix-control-styles';
 import { useRTL } from '../utils/rtl';
 import AlignmentMatrixControlIcon from './icon';
+import { GRID, getItemId } from './utils';
+
+function useBaseId( id ) {
+	const instanceId = useInstanceId( AlignmentMatrixControl );
+	const prefix = id || 'alignment-matrix-control';
+	return `${ prefix }-${ instanceId }`;
+}
 
 export default function AlignmentMatrixControl( {
 	className,
+	id,
 	label = __( 'Alignment Matrix Control' ),
 	hasFocusBorder = true,
+	defaultValue = 'center center',
+	value,
+	onBlur = noop,
 	onChange = noop,
-	onKeyDown = noop,
-	value = 'center',
 	...props
 } ) {
+	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
 	const isRTL = useRTL();
-	const [ alignIndex, setAlignIndex ] = useControlledState(
-		getAlignmentIndex( value )
-	);
-	const nodeRef = useRef();
-	const instanceId = useInstanceId( AlignmentMatrixControl );
+	const baseId = useBaseId( id );
+	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
 
-	const handleOnChange = ( nextIndex, changeProps ) => {
-		const alignName = getAlignmentValueFromIndex( nextIndex );
+	const composite = useCompositeState( {
+		baseId,
+		currentId: initialCurrentId,
+		rtl: isRTL,
+		unstable_virtual: true,
+	} );
 
-		setAlignIndex( nextIndex );
-		onChange( alignName, changeProps );
-	};
+	const handleOnBlur = ( event ) => {
+		const isItemCurrent = composite.items.some(
+			( item ) => item.ref.current === event.relatedTarget
+		);
 
-	const handleOnKeyDown = ( event ) => {
-		const { keyCode } = event;
-		let nextIndex;
-		let direction;
-
-		onKeyDown( event );
-
-		switch ( keyCode ) {
-			case UP:
-				event.preventDefault();
-				direction = DIRECTION.UP;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case DOWN:
-				event.preventDefault();
-				direction = DIRECTION.DOWN;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case LEFT:
-				event.preventDefault();
-				direction = isRTL ? DIRECTION.RIGHT : DIRECTION.LEFT;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			case RIGHT:
-				event.preventDefault();
-				direction = isRTL ? DIRECTION.LEFT : DIRECTION.RIGHT;
-
-				nextIndex = getNextIndexFromDirection( alignIndex, direction );
-				handleOnChange( nextIndex, { event } );
-
-				break;
-			default:
-				break;
+		if ( isItemCurrent ) {
+			event.stopPropagation();
 		}
+
+		onBlur( event );
 	};
 
-	const createHandleOnClick = ( index ) => ( event ) => {
-		nodeRef.current.focus();
-		event.preventDefault();
-		handleOnChange( index, { event } );
-	};
-
-	/**
-	 * Keydown event is handled on the native node element rather than
-	 * on the React Element. This resolves interaction conflicts when
-	 * integrated with other components, such as Toolbar.
-	 */
 	useEffect( () => {
-		const node = nodeRef.current;
-		if ( node ) {
-			node.addEventListener( 'keydown', handleOnKeyDown );
+		if ( typeof value !== 'undefined' ) {
+			composite.setCurrentId( getItemId( baseId, value ) );
 		}
-
-		return () => {
-			if ( node ) {
-				node.removeEventListener( 'keydown', handleOnKeyDown );
-			}
-		};
-	}, [ handleOnKeyDown ] );
-
-	const id = `alignment-matrix-control-${ instanceId }`;
-	const activeCellId = `${ id }-${ alignIndex }`;
+	}, [ value, composite.setCurrentId ] );
 
 	const classes = classnames(
 		'component-alignment-matrix-control',
@@ -129,38 +78,46 @@ export default function AlignmentMatrixControl( {
 	);
 
 	return (
-		<Root
+		<Composite
 			{ ...props }
-			aria-activedescendant={ activeCellId }
+			{ ...composite }
 			aria-label={ label }
-			aria-labelledby={ id }
+			as={ Root }
 			className={ classes }
 			hasFocusBorder={ hasFocusBorder }
-			id={ id }
-			ref={ nodeRef }
-			role="listbox"
-			tabIndex={ 0 }
+			onBlur={ handleOnBlur }
+			role="grid"
 		>
-			{ ALIGNMENTS.map( ( align, index ) => {
-				const isActive = alignIndex === index;
-				const cellId = `${ id }-${ index }`;
-				const cellValue = getAlignmentValueFromIndex( index );
+			{ GRID.map( ( cells, index ) => (
+				<CompositeGroup
+					{ ...composite }
+					as={ Row }
+					role="row"
+					key={ index }
+				>
+					{ cells.map( ( cell ) => {
+						const cellId = getItemId( baseId, cell );
 
-				return (
-					<Cell
-						id={ cellId }
-						isActive={ isActive }
-						key={ align }
-						onClick={ createHandleOnClick( index ) }
-						value={ cellValue }
-					/>
-				);
-			} ) }
-		</Root>
+						return (
+							<Cell
+								{ ...composite }
+								isActive={ composite.currentId === cellId }
+								key={ cell }
+								id={ cellId }
+								value={ cell }
+								onFocus={ () => onChange( cell ) }
+								onClick={ () =>
+									// VoiceOver doesn't focus elements on click
+									composite.move( cellId )
+								}
+							/>
+						);
+					} ) }
+				</CompositeGroup>
+			) ) }
+		</Composite>
 	);
 }
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
 AlignmentMatrixControl.icon = <AlignmentMatrixControlIcon />;
-
-AlignmentMatrixControl.__getAlignmentIndex = getAlignmentIndex;

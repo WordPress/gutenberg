@@ -10,9 +10,9 @@ import { Icon as BaseIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import AlignmentMatrixControl from '../';
-import { ALIGNMENT_VALUES } from '../utils';
+import { ALIGNMENTS } from '../utils';
 
-const alignmentOptions = ALIGNMENT_VALUES.reduce( ( options, item ) => {
+const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
 	return { ...options, [ item ]: item };
 }, {} );
 
@@ -27,7 +27,7 @@ export const _default = () => {
 
 export const icon = () => {
 	const props = {
-		value: select( 'value', alignmentOptions, 'center' ),
+		value: select( 'value', alignmentOptions, 'center center' ),
 		size: number( 'size', 24 ),
 	};
 
