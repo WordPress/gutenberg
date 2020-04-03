@@ -5,7 +5,7 @@
  *
  * @type {RegExp}
  */
-const REGEXP_PHP_ERROR = /<b>(Fatal error|Recoverable fatal error|Warning|Parse error|Notice|Strict Standards|Deprecated|Unknown error)<\/b>:  /;
+const REGEXP_PHP_ERROR = /(Fatal error|Recoverable fatal error|Warning|Parse error|Notice|Strict Standards|Deprecated|Unknown error)(<\/b>)?: (.*?) in (.*?) on line /;
 
 /**
  * Returns a promise resolving to a boolean reflecting whether a PHP notice is
