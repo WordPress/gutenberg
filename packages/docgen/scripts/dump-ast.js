@@ -13,5 +13,4 @@ const sourceFile = ts.createSourceFile(
 	ts.ScriptTarget.ESNext
 );
 
-// eslint-disable-next-line no-console
-console.log( inspect( sourceFile, false, null ) );
+process.stdout.write( inspect( sourceFile, false, null ) );
