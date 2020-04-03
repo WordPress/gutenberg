@@ -56,7 +56,7 @@ function ColumnsEditContainer( {
 	columnCount,
 	isSelected,
 	onAddNextColumn,
-	onDelete,
+	onDeleteBlock,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsSettings, setColumnsSettings ] = useState( {
@@ -98,7 +98,7 @@ function ColumnsEditContainer( {
 		if ( isSelected ) {
 			return (
 				<InnerBlocks.ButtonBlockAppender
-					customOnAdd={ onAddNextColumn }
+					onAddBlock={ onAddNextColumn }
 				/>
 			);
 		}
@@ -147,8 +147,9 @@ function ColumnsEditContainer( {
 					customBlockProps={ {
 						...columnsSettings,
 						readableContentViewStyle: { flex: 1 },
-						customOnAdd: onAddNextColumn,
-						onDelete: columnCount === 1 ? onDelete : undefined,
+						onAddBlock: onAddNextColumn,
+						onDeleteBlock:
+							columnCount === 1 ? onDeleteBlock : undefined,
 					} }
 				/>
 			</View>
@@ -250,7 +251,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			replaceInnerBlocks( clientId, innerBlocks, true );
 			selectBlock( insertedBlock.clientId );
 		},
-		onDelete: () => {
+		onDeleteBlock: () => {
 			const { clientId } = ownProps;
 			const { removeBlock } = dispatch( 'core/block-editor' );
 			removeBlock( clientId );

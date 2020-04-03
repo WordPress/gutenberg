@@ -109,7 +109,7 @@ class BlockListBlock extends Component {
 			order + 1
 		);
 
-		const { onDelete } = customBlockProps || {};
+		const { onDeleteBlock } = customBlockProps || {};
 
 		return (
 			<TouchableWithoutFeedback
@@ -178,7 +178,7 @@ class BlockListBlock extends Component {
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
-									onDelete={ onDelete }
+									onDelete={ onDeleteBlock }
 									horizontalDirection={ horizontalDirection }
 								/>
 							) }
