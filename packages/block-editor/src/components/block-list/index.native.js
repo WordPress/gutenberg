@@ -149,6 +149,7 @@ export class BlockList extends Component {
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ {
 						flex: isRootList ? 1 : 0,
+						overflow: isRootList ? 'hidden' : 'visible',
 					} }
 					data={ blockClientIds }
 					keyExtractor={ identity }

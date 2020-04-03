@@ -36,6 +36,7 @@ function ButtonsEdit( {
 	const { align } = attributes;
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isSelectedButton;
+	const { marginLeft: spacing } = styles.spacing;
 
 	function updateAlignment( nextAlign ) {
 		setAttributes( { align: nextAlign } );
@@ -44,10 +45,12 @@ function ButtonsEdit( {
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
 			return (
-				<InnerBlocks.ButtonBlockAppender
-					isFlex={ false }
-					customOnAdd={ onAddNextButton }
-				/>
+				<View style={ styles.appenderContainer }>
+					<InnerBlocks.ButtonBlockAppender
+						isFlex={ false }
+						customOnAdd={ onAddNextButton }
+					/>
+				</View>
 			);
 		}
 		return null;
@@ -79,6 +82,8 @@ function ButtonsEdit( {
 					customOnAdd={ onAddNextButton }
 					parentWidth={ maxWidth }
 					shouldRenderFooterAppender={ shouldRenderFooterAppender }
+					marginHorizontal={ spacing }
+					marginVertical={ spacing }
 				/>
 			</View>
 		</>

@@ -17,5 +17,9 @@
 .appenderContainer {
 	flex: 1;
 	// 3 is a base margin in Button that is used in appender and we need to subtract it
-	margin: $block-edge-to-content - 3;
+	margin: $block-selected-margin;
+}
+
+.spacing {
+	margin: 2 * $block-selected-margin;
 }
