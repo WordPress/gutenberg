@@ -13,12 +13,9 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes ) {
-	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label   = ( isset( $attributes['label'] ) ) ?
-		$attributes['label'] :
-		/* translators: %s: Social Link service name */
-		sprintf( __( 'Link to %s' ), block_core_social_link_get_name( $service ) );
+	$service    = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
+	$url        = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$label      = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
 	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
