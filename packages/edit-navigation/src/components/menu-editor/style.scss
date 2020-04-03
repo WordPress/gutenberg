@@ -3,3 +3,10 @@
 	grid-template-columns: 280px 1fr;
 	grid-column-gap: 10px;
 }
+.components-panel__header-actions {
+	margin-top: $grid-unit-20;
+	margin-bottom: $grid-unit-60;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}

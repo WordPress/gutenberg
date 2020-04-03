@@ -47,6 +47,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
+					onDelete={ () => setMenuId( 0 ) }
 				/>
 			) }
 		</>

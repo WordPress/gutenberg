@@ -233,6 +233,28 @@ export function __unstableCreateUndoLevel() {
 }
 
 /**
+ * Action triggered to delete an entity record.
+ *
+ * @param {string} kind      Kind of the received entity.
+ * @param {string} name      Name of the received entity.
+ * @param {Object} recordId  The recordId to be deleted.
+ */
+export function* deleteEntityRecord( kind, name, recordId ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+	const path = `${ entity.baseURL + '/' + recordId + '?force=true' }`;
+	yield apiFetch( {
+		path,
+		method: 'DELETE',
+	} );
+	const entityRecords = select( 'getEntityRecords', kind, name );
+	yield receiveEntityRecords( kind, name, entityRecords, undefined, true );
+}
+
+/**
  * Action triggered to save an entity record.
  *
  * @param {string} kind    Kind of the received entity.
