@@ -14,7 +14,8 @@ import { createElement } from './react';
  * To preserve additional props, a `div` wrapper _will_ be created if any props
  * aside from `children` are passed.
  *
- * @param {RawHTMLProps} props
+ * @param {RawHTMLProps} props Children should be a string of HTML. Other props
+ *                             will be passed through to div wrapper.
  *
  * @return {JSX.Element} Dangerously-rendering component.
  */
