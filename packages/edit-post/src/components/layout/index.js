@@ -15,10 +15,7 @@ import {
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockBreadcrumb,
-	__experimentalEditorSkeleton as EditorSkeleton,
-} from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -28,7 +25,11 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
-import { ComplementaryArea, FullscreenMode } from '@wordpress/interface';
+import {
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -121,7 +122,7 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorSkeleton
+				<InterfaceSkeleton
 					className={ className }
 					header={ <Header /> }
 					sidebar={
@@ -175,7 +176,7 @@ function Layout() {
 							</div>
 						)
 					}
-					publish={
+					actions={
 						publishSidebarOpened ? (
 							<PostPublishPanel
 								onClose={ closePublishSidebar }

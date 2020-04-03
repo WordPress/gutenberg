@@ -17,11 +17,10 @@ import {
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockBreadcrumb,
-	__experimentalEditorSkeleton as EditorSkeleton,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { FullscreenMode } from '@wordpress/interface';
+import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -75,7 +74,7 @@ function Editor( { settings: _settings } ) {
 						>
 							<Context.Provider value={ context }>
 								<FocusReturnProvider>
-									<EditorSkeleton
+									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
 										header={ <Header /> }
 										content={
