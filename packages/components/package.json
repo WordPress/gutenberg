@@ -53,6 +53,7 @@
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
+		"react-use-gesture": "^7.0.9",
 		"reakit": "^1.0.0-rc.2",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
