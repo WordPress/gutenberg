@@ -4,6 +4,7 @@
 const {
 	REGEXP_SPRINTF_PLACEHOLDER,
 	REGEXP_SPRINTF_PLACEHOLDER_UNORDERED,
+	getTranslateFunctionName,
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
 } = require( '../utils' );
@@ -71,11 +72,9 @@ module.exports = {
 						break;
 
 					case 'CallExpression':
-						const argFunctionName =
-							args[ 0 ].callee.property &&
-							args[ 0 ].callee.property.name
-								? args[ 0 ].callee.property.name
-								: args[ 0 ].callee.name;
+						const argFunctionName = getTranslateFunctionName(
+							args[ 0 ].callee
+						);
 
 						// All possible options (arguments) from a translate
 						// function must be valid.
@@ -117,9 +116,6 @@ module.exports = {
 					const allMatches = candidate.match(
 						REGEXP_SPRINTF_PLACEHOLDER
 					);
-					const unorderedMatches = candidate.match(
-						REGEXP_SPRINTF_PLACEHOLDER_UNORDERED
-					);
 
 					// Prioritize placeholder number consistency over matching
 					// placeholder, since it's a more common error to omit a
@@ -135,6 +131,10 @@ module.exports = {
 						} );
 						return;
 					}
+
+					const unorderedMatches = candidate.match(
+						REGEXP_SPRINTF_PLACEHOLDER_UNORDERED
+					);
 
 					if (
 						unorderedMatches &&
