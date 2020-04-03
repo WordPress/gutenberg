@@ -23,9 +23,14 @@ module.exports = function( filePath ) {
 		// typescript cannot parse code correctly.
 		// So, they're removed.
 		.replace( /@example\s+<caption>ES(5|Next)<\/caption>/g, '@example' );
-	const sF = ts.createSourceFile( filePath, code, options.target, true );
+	const internalSourceFile = ts.createSourceFile(
+		filePath,
+		code,
+		options.target,
+		true
+	);
 
-	host.getSourceFile = () => sF;
+	host.getSourceFile = () => internalSourceFile;
 	host.readFile = () => code;
 
 	const program = ts.createProgram( [ filePath ], options, host );
