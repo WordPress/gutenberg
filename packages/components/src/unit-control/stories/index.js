@@ -20,13 +20,15 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '' );
+	const [ value, setValue ] = useState( '10' );
 	const [ unit, setUnit ] = useState( 'px' );
 
 	const props = {
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
 		shiftStep: number( 'shiftStep', 10 ),
+		max: number( 'max', 100 ),
+		min: number( 'min', 0 ),
 		size: select(
 			'size',
 			{
@@ -43,9 +45,9 @@ function Example() {
 			<UnitControl
 				{ ...props }
 				value={ value }
-				onChange={ setValue }
+				onChange={ ( v ) => setValue( v ) }
 				unit={ unit }
-				onUnitChange={ setUnit }
+				onUnitChange={ ( v ) => setUnit( v ) }
 			/>
 		</ControlWrapperView>
 	);
