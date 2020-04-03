@@ -8,14 +8,19 @@ import styled from '@emotion/styled';
  */
 import { color } from '../utils/style-mixins';
 
-export default function BoxControlIcon( { sides = [ 'all' ] } ) {
+const BASE_ICON_SIZE = 24;
+
+export default function BoxControlIcon( { size = 24, sides = [ 'all' ] } ) {
 	const top = getSide( sides, 'top' );
 	const right = getSide( sides, 'right' );
 	const bottom = getSide( sides, 'bottom' );
 	const left = getSide( sides, 'left' );
 
+	// Simulates SVG Icon scaling
+	const scale = size / BASE_ICON_SIZE;
+
 	return (
-		<Root>
+		<Root style={ { transform: `scale(${ scale })` } }>
 			<Viewbox>
 				<TopStroke isFocused={ top } />
 				<RightStroke isFocused={ right } />

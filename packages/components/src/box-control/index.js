@@ -60,7 +60,7 @@ export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	type: typeProp = 'pairs',
+	type: typeProp = 'all',
 	values: valuesProp,
 	// Disable units for now
 	units = false,
@@ -105,6 +105,8 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 	const allValues = getValues( values, 'top', 'right', 'bottom', 'left' );
 	const isMixed = ! allValues.every( ( v ) => v === value );
 
+	const placeholderLabel = typeof value === 'number' ? placeholder : null;
+
 	return (
 		<ControlContainer>
 			<IconWrapper>
@@ -115,7 +117,7 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 					{ ...props }
 					label={ __( 'All Sides' ) }
 					value={ isMixed ? '' : value }
-					placeholder={ placeholder }
+					placeholder={ placeholderLabel }
 					unit={ unit }
 					onChange={ ( next ) => {
 						onChange( {
@@ -151,6 +153,11 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 		( v ) => v === horizontal
 	);
 
+	const verticalPlaceholder =
+		typeof vertical === 'number' ? placeholder : null;
+	const horizontalPlaceholder =
+		typeof horizontal === 'number' ? placeholder : null;
+
 	const iconSides = {
 		vertical: [ 'top', 'bottom' ],
 		horizontal: [ 'left', 'right' ],
@@ -165,8 +172,8 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 			</IconWrapper>
 			<UnitControl
 				{ ...props }
-				label={ __( 'Left/Right' ) }
-				placeholder={ placeholder }
+				label={ __( 'Top/Bottom' ) }
+				placeholder={ verticalPlaceholder }
 				onFocus={ () => setSelected( 'vertical' ) }
 				onChange={ ( next ) => {
 					onChange( {
@@ -185,8 +192,8 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 			/>
 			<UnitControl
 				{ ...props }
-				label={ __( 'Top/Bottom' ) }
-				placeholder={ placeholder }
+				label={ __( 'Left/Right' ) }
+				placeholder={ horizontalPlaceholder }
 				onFocus={ () => setSelected( 'horizontal' ) }
 				onChange={ ( next ) => {
 					onChange( {
@@ -321,12 +328,17 @@ function BoxTypeControl( {
 	);
 }
 
-function UnitControl( { label, ...props } ) {
+function UnitControl( { onChange, label, ...props } ) {
+	const handleOnChange = ( nextValue ) => {
+		const value = parseFloat( nextValue );
+		onChange( isNaN( value ) ? nextValue : value );
+	};
 	return (
 		<Tooltip text={ label }>
 			<UnitControlWrapper aria-label={ label }>
 				<BaseUnitControl
 					isResetValueOnUnitChange={ false }
+					onChange={ handleOnChange }
 					{ ...props }
 				/>
 			</UnitControlWrapper>
@@ -348,7 +360,7 @@ const IconWrapper = styled( FlexItem )`
 
 const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
-	max-width: 70px;
+	max-width: 75px;
 `;
 
 function parseValues( values = {} ) {
