@@ -14,6 +14,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalBlock as Block,
+	getFontSize,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -71,20 +72,29 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 
 function ParagraphBlock( {
 	attributes,
-	fontSize,
 	mergeBlocks,
 	onReplace,
 	setAttributes,
 } ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
-
+	const {
+		align,
+		content,
+		direction,
+		dropCap,
+		placeholder,
+		fontSize,
+		style,
+	} = attributes;
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
 	const ref = useRef();
+	const fontSizeObject = getFontSize( fontSizes, fontSize, style?.fontSize );
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
-		fontSize.size,
+		fontSizeObject.size,
 	] );
 
 	const styles = {
-		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
 		direction,
 		minHeight: dropCapMinimumHeight,
 	};
@@ -128,7 +138,6 @@ function ParagraphBlock( {
 				className={ classnames( {
 					'has-drop-cap': dropCap,
 					[ `has-text-align-${ align }` ]: align,
-					[ fontSize.class ]: fontSize.class,
 				} ) }
 				style={ styles }
 				value={ content }

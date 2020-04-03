@@ -8,9 +8,6 @@ import classnames from 'classnames';
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
-import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,9 +19,9 @@ import {
 	getFontSizeObjectByValue,
 	FontSizePicker,
 } from '../components/font-sizes';
-import InspectorControls from '../components/inspector-controls';
+import { cleanEmptyObject } from './utils';
 
-const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
+export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -66,8 +63,8 @@ function addSaveProps( props, blockType, attributes ) {
 	const { fontSize } = attributes;
 
 	const fontSizeClass = getFontSizeClass( fontSize );
-
-	props.className = classnames( props.className, fontSizeClass );
+	const newClassName = classnames( props.className, fontSizeClass );
+	props.className = newClassName ? newClassName : undefined;
 
 	return props;
 }
@@ -96,77 +93,55 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-const FontSizeInspectorControl = ( { value, onChange } ) => (
-	<InspectorControls key="inspector-controls">
-		<PanelBody title={ __( 'Text settings' ) }>
-			<FontSizePicker value={ value } onChange={ onChange } />
-		</PanelBody>
-	</InspectorControls>
-);
-
-const setFontSize = ( { style, setAttributes }, fontSizes ) => ( value ) => {
-	const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
-
-	setAttributes( {
-		style: {
-			...style,
-			typography: {
-				...style?.typography,
-				fontSize: fontSizeSlug ? undefined : value,
-			},
-		},
-		fontSize: fontSizeSlug,
-	} );
-};
-
 const hasFontSizeSupport = ( blockName ) =>
 	hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY );
 
 /**
- * Override the default edit UI to include inspector controls
- * for font size, if block defines support.
+ * Inspector control panel containing the font size related configuration
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Object} props
+ *
+ * @return {WPElement} Font size edit element.
  */
-const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const {
-			name: blockName,
-			attributes: { fontSize, style },
-		} = props;
+export function FontSizeEdit( props ) {
+	const {
+		name: blockName,
+		attributes: { fontSize, style },
+		setAttributes,
+	} = props;
 
-		const { fontSizes } = useSelect( ( select ) =>
-			select( 'core/block-editor' ).getSettings()
-		);
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
 
-		const fontSizeObject = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.fontSize
-		);
+	if ( ! hasFontSizeSupport( blockName ) ) {
+		return null;
+	}
 
-		if ( ! hasFontSizeSupport( blockName ) ) {
-			return (
-				<BlockEdit
-					key="edit"
-					{ ...props }
-					fontSize={ fontSizeObject }
-				/>
-			);
-		}
+	const fontSizeObject = getFontSize(
+		fontSizes,
+		fontSize,
+		style?.typography?.fontSize
+	);
+	const onChange = ( value ) => {
+		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
 
-		return [
-			<FontSizeInspectorControl
-				key="inspector-controls"
-				value={ fontSizeObject.size }
-				onChange={ setFontSize( props, fontSizes ) }
-			/>,
-			<BlockEdit key="edit" { ...props } fontSize={ fontSizeObject } />,
-		];
-	},
-	'withFontSizeControlsTest'
-);
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				typography: {
+					...style?.typography,
+					fontSize: fontSizeSlug ? undefined : value,
+				},
+			} ),
+			fontSize: fontSizeSlug,
+		} );
+	};
+
+	return (
+		<FontSizePicker value={ fontSizeObject.size } onChange={ onChange } />
+	);
+}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -181,9 +156,3 @@ addFilter(
 );
 
 addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
-
-addFilter(
-	'editor.BlockEdit',
-	'core/font/with-block-controls',
-	withBlockControls
-);
