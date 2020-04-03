@@ -4,6 +4,7 @@
 		{ "path": "packages/a11y" },
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
+		{ "path": "packages/block-editor" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/html-entities" },
