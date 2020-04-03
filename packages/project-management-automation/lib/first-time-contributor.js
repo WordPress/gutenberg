@@ -109,6 +109,10 @@ async function firstTimeContributor( payload, octokit ) {
 		return;
 	}
 
+	debug(
+		'first-time-contributor: User not known. Adding comment to prompt for account link.'
+	);
+
 	await octokit.issues.createComment( {
 		owner,
 		repo,
