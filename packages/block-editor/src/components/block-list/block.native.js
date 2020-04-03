@@ -66,7 +66,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
-				customBlockProps={ this.props.customBlockProps }
+				contentStyle={ this.props.contentStyle }
 			/>
 		);
 	}
@@ -92,7 +92,7 @@ class BlockListBlock extends Component {
 			parentId,
 			isDimmed,
 			isTouchable,
-			customBlockProps,
+			onDeleteBlock,
 			horizontalDirection,
 			hasParent,
 			isParentSelected,
@@ -108,8 +108,6 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-
-		const { onDeleteBlock } = customBlockProps || {};
 
 		return (
 			<TouchableWithoutFeedback

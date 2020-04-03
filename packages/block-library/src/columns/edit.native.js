@@ -149,13 +149,12 @@ function ColumnsEditContainer( {
 						style: styles.innerBlocks,
 					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
-					customBlockProps={ {
-						width: getColumnWidth( width ),
-						readableContentViewStyle: { flex: 1 },
-						onAddBlock: onAddNextColumn,
-						onDeleteBlock:
-							columnCount === 1 ? onDeleteBlock : undefined,
-					} }
+					contentResizeMode="stretch"
+					onAddBlock={ onAddNextColumn }
+					onDeleteBlock={
+						columnCount === 1 ? onDeleteBlock : undefined
+					}
+					contentStyle={ { width: getColumnWidth( width ) } }
 				/>
 			</View>
 		</>

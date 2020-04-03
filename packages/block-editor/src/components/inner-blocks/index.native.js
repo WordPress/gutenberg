@@ -114,7 +114,10 @@ class InnerBlocks extends Component {
 			renderAppender,
 			__experimentalMoverDirection,
 			flatListProps,
-			customBlockProps,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 			marginVertical,
 			marginHorizontal,
 		} = this.props;
@@ -133,7 +136,10 @@ class InnerBlocks extends Component {
 							__experimentalMoverDirection
 						}
 						flatListProps={ flatListProps }
-						customBlockProps={ customBlockProps }
+						contentResizeMode={ contentResizeMode }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 				) }
 			</>

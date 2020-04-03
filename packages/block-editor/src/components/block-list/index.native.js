@@ -180,13 +180,18 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			customBlockProps,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			horizontalDirection,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 		} = this.props;
 
-		const { readableContentViewStyle } = customBlockProps || {};
+		const readableContentViewStyle = contentResizeMode === 'stretch' && {
+			flex: 1,
+		};
 
 		return (
 			<ReadableContentView style={ readableContentViewStyle }>
@@ -208,7 +213,9 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						horizontalDirection={ horizontalDirection }
-						customBlockProps={ customBlockProps }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

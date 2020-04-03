@@ -25,10 +25,9 @@ function ColumnEdit( {
 	isSelected,
 	getStylesFromColorScheme,
 	isParentSelected,
-	customBlockProps,
+	contentStyle,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { width } = customBlockProps;
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -43,7 +42,7 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					{ width },
+					contentStyle,
 					styles.columnPlaceholderNotSelected,
 				] }
 			></View>
@@ -60,7 +59,7 @@ function ColumnEdit( {
 			</BlockControls>
 			<View
 				style={ [
-					{ width },
+					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
 				] }
 			>
