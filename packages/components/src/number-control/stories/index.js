@@ -27,7 +27,13 @@ function Example() {
 		step: number( 'step', 1 ),
 	};
 
-	return <NumberControl { ...props } value={ value } onChange={ setValue } />;
+	return (
+		<NumberControl
+			{ ...props }
+			value={ value }
+			onChange={ ( v ) => setValue( v ) }
+		/>
+	);
 }
 
 export const _default = () => {

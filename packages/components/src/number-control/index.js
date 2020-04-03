@@ -41,7 +41,7 @@ export function NumberControl(
 	useDragCursor( isDragging );
 
 	const dragGestureProps = useDrag(
-		( { dragging, delta, event } ) => {
+		( { dragging, delta, event, shiftKey } ) => {
 			if ( ! isDragEnabled ) return;
 			if ( ! dragging ) {
 				setIsDragging( false );
@@ -51,10 +51,13 @@ export function NumberControl(
 			event.stopPropagation();
 
 			const [ , y ] = delta;
-			const distance = y * -1;
-			const nextValue = clamp( add( valueProp, distance ), min, max );
+			const modifier = shiftKey ? shiftStep : 1;
+			const distance = y * modifier * -1;
 
-			onChange( nextValue.toString(), { event } );
+			if ( distance !== 0 ) {
+				const nextValue = clamp( add( valueProp, distance ), min, max );
+				onChange( nextValue.toString(), { event } );
+			}
 
 			if ( ! isDragging ) {
 				setIsDragging( true );
