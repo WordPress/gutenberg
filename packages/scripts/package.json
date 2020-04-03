@@ -50,6 +50,7 @@
 		"dir-glob": "^3.0.1",
 		"eslint": "^6.1.0",
 		"eslint-plugin-markdown": "1.0.1",
+		"got": "^10.7.0",
 		"jest": "^24.9.0",
 		"jest-puppeteer": "^4.3.0",
 		"js-yaml": "^3.13.1",
