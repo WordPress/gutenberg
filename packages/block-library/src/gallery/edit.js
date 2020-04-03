@@ -56,17 +56,6 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	native: __( 'ADD MEDIA' ),
 } );
 
-// currently this is needed for consistent controls UI on mobile
-// this can be removed after control components settle on consistent defaults
-const MOBILE_CONTROL_PROPS = Platform.select( {
-	web: {},
-	native: { separatorType: 'fullWidth' },
-} );
-const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
-	web: {},
-	native: { separatorType: 'none' },
-} );
-
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -383,10 +372,6 @@ class GalleryEdit extends Component {
 		const imageSizeOptions = this.getImagesSizeOptions();
 		const shouldShowSizeOptions =
 			hasImages && ! isEmpty( imageSizeOptions );
-		// This is needed to fix a separator fence-post issue on mobile.
-		const mobileLinkToProps = shouldShowSizeOptions
-			? MOBILE_CONTROL_PROPS
-			: MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
 
 		return (
 			<>
@@ -395,7 +380,6 @@ class GalleryEdit extends Component {
 						{ images.length > 1 && (
 							<ColumnsControl
 								label={ __( 'Columns' ) }
-								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
@@ -406,14 +390,12 @@ class GalleryEdit extends Component {
 
 						<ToggleControl
 							label={ __( 'Crop images' ) }
-							{ ...MOBILE_CONTROL_PROPS }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
 							label={ __( 'Link to' ) }
-							{ ...mobileLinkToProps }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
@@ -421,7 +403,6 @@ class GalleryEdit extends Component {
 						{ shouldShowSizeOptions && (
 							<SelectControl
 								label={ __( 'Images size' ) }
-								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }
