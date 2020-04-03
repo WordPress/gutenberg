@@ -9,7 +9,7 @@ import { useResizeObserver } from '@wordpress/compose';
  */
 import BlockList from '../block-list';
 
-function AutoBlockPreview( { viewportWidth } ) {
+function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
 		containerResizeListener,
 		{ width: containerWidth },
@@ -19,19 +19,26 @@ function AutoBlockPreview( { viewportWidth } ) {
 		{ height: contentHeight },
 	] = useResizeObserver();
 
+	const scale =
+		( containerWidth - 2 * __experimentalPadding ) / viewportWidth;
+
 	return (
 		<div
 			className="block-editor-block-preview__container editor-styles-wrapper"
 			aria-hidden
 			style={ {
-				height: ( contentHeight * containerWidth ) / viewportWidth,
+				height: contentHeight * scale + 2 * __experimentalPadding,
+				padding: __experimentalPadding,
 			} }
 		>
 			{ containerResizeListener }
 			<Disabled
 				style={ {
-					transform: `scale(${ containerWidth / viewportWidth })`,
+					transform: `scale(${ scale })`,
 					width: viewportWidth,
+					left: __experimentalPadding,
+					right: __experimentalPadding,
+					top: __experimentalPadding,
 				} }
 				className="block-editor-block-preview__content"
 			>
