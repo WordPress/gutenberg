@@ -111,9 +111,9 @@ export class BlockList extends Component {
 			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			__experimentalMoverDirection,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			horizontalDirection,
 		} = this.props;
 
 		const { blockToolbar, blockBorder, headerToolbar } = styles;
@@ -121,8 +121,6 @@ export class BlockList extends Component {
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
 
-		const horizontalDirection =
-			__experimentalMoverDirection === 'horizontal';
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
 			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
@@ -196,13 +194,10 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			customOnDelete,
 			customOnAdd,
-			__experimentalMoverDirection,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			horizontalDirection,
 		} = this.props;
-
-		const horizontalDirection =
-			__experimentalMoverDirection === 'horizontal';
 
 		return (
 			<ReadableContentView>
@@ -315,6 +310,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			horizontalDirection,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

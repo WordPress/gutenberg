@@ -381,7 +381,13 @@ class ButtonEdit extends Component {
 								styles.outline,
 								{
 									borderRadius: outlineBorderRadius,
-									borderWidth: styles.button.borderWidth,
+									// Border Width has to be spread since width is thicker
+									// on Android when border radius is decreased to 0
+									borderLeftWidth: styles.button.borderWidth,
+									borderRightWidth: styles.button.borderWidth,
+									borderTopWidth: styles.button.borderWidth,
+									borderBottomWidth:
+										styles.button.borderWidth,
 									borderColor: backgroundColor,
 								},
 							] }
