@@ -1,6 +1,7 @@
 1.25.0
 ------
 * New block: Cover
+* [Android] Dark Mode
 * Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
 * Enabled edit button over image block for Android
