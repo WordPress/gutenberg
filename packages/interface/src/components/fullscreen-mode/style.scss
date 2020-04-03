@@ -18,6 +18,12 @@ body.js.is-fullscreen-mode {
 			transition: left 0.12s ease-in-out;
 		}
 
+		// Hides the admin menu
+		// This prevents keyboard navigation from accessing inner links
+		#adminmenuwrap {
+			display: none;
+		}
+
 		#adminmenu {
 			position: relative;
 			bottom: auto;
@@ -43,6 +49,11 @@ body.js.is-fullscreen-mode {
 body.js.is-showing-admin-menu {
 	#adminmenumain {
 		left: 0;
+	}
+
+	// Show the admin menu
+	#adminmenuwrap {
+		display: block;
 	}
 
 	.edit-post-header-toolbar__block-toolbar,
