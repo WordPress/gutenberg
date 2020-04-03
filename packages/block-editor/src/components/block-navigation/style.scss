@@ -93,3 +93,28 @@ $tree-item-height: 36px;
 .components-popover.block-editor-block-navigation__popover {
 	z-index: z-index(".components-popover.block-editor-block-navigation__popover");
 }
+
+.block-editor-block-navigation-toolbar {
+	display: flex;
+	flex-direction: row;
+	height: 48px;
+	margin-bottom: 16px;
+	border: 1px solid #e2e4e7;
+
+	.components-toolbar {
+		background: none;
+		// IE11 has thick paddings without this.
+		line-height: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
+	}
+}
