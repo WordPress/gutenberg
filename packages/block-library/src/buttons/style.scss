@@ -1,7 +1,14 @@
 .wp-block-buttons .wp-block-button {
 	display: inline-block;
-	margin: $grid-unit-05;
+	margin-right: $grid-unit-10;
+	margin-bottom: $grid-unit-10;
 }
+
+.wp-block-button.alignright .wp-block-button {
+	margin-right: none;
+	margin-left: $grid-unit-10;
+}
+
 .wp-block-buttons.aligncenter {
 	text-align: center;
 }
