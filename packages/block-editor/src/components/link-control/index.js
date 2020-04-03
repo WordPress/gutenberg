@@ -210,7 +210,8 @@ function LinkControl( {
 		// is still unassigned after calling `onChange`.
 		const hadFocusLoss =
 			isEndingEditWithFocus.current &&
-			! wrapperNode.current?.contains( document.activeElement );
+			wrapperNode.current &&
+			! wrapperNode.current.contains( document.activeElement );
 
 		if ( hadFocusLoss ) {
 			// Prefer to focus a natural focusable descendent of the wrapper,
