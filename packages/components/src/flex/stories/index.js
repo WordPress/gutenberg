@@ -134,12 +134,12 @@ const ItemExample = () => {
 		<div>
 			<Flex justify="left" gap="small">
 				<FlexItem>
-					<Button onClick={ addItem } isDefault>
+					<Button onClick={ addItem } isSecondary>
 						Add Item
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button onClick={ removeItem } isDefault>
+					<Button onClick={ removeItem } isSecondary>
 						Remove Item
 					</Button>
 				</FlexItem>
@@ -184,12 +184,12 @@ const BlockExample = () => {
 		<div>
 			<Flex justify="left" gap="small">
 				<FlexItem>
-					<Button onClick={ addItem } isDefault>
+					<Button onClick={ addItem } isSecondary>
 						Add Block
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button onClick={ removeItem } isDefault>
+					<Button onClick={ removeItem } isSecondary>
 						Remove Blcok
 					</Button>
 				</FlexItem>
@@ -227,12 +227,12 @@ export const exampleActions = () => {
 			<FlexItem>
 				<Flex justify="left" gap="small">
 					<FlexItem>
-						<Button isDefault isPrimary>
+						<Button isSecondary isPrimary>
 							Add
 						</Button>
 					</FlexItem>
 					<FlexItem>
-						<Button isDefault>Remove Item</Button>
+						<Button isSecondary>Remove Item</Button>
 					</FlexItem>
 				</Flex>
 			</FlexItem>
