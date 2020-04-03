@@ -2,7 +2,7 @@
 ------
 * New block: Cover
 * [Android] Dark Mode
-* Improve icon on the "Take a Video" media option
+* [Android] Improve icon on the "Take a Video" media option
 * Removed the dimming effect on unselected blocks
 * [iOS] Add alignment options for heading block
 * Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
