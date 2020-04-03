@@ -14,8 +14,6 @@
     <string name="gutenberg_native_a_short_bio_with_personal_history_key_achievements_or_an_interest" tools:ignore="UnusedResources">A short bio with personal history, key achievements, or an interesting fact.</string>
     <!-- translators: sample content for "Services" page template -->
     <string name="gutenberg_native_a_short_description_of_the_services_you_offer" tools:ignore="UnusedResources">A short description of the services you offer.</string>
-    <!-- translators: title for "About" page template -->
-    <string name="gutenberg_native_about" tools:ignore="UnusedResources">About</string>
     <string name="gutenberg_native_add_a_description" tools:ignore="UnusedResources">Add a description</string>
     <string name="gutenberg_native_add_a_shortcode" tools:ignore="UnusedResources">Add a shortcode…</string>
     <string name="gutenberg_native_add_annotation" tools:ignore="UnusedResources">Add annotation</string>
@@ -33,6 +31,7 @@
     <string name="gutenberg_native_alt_text" tools:ignore="UnusedResources">Alt Text</string>
     <string name="gutenberg_native_an_unknown_error_occurred_please_try_again" tools:ignore="UnusedResources">An unknown error occurred. Please try again.</string>
     <string name="gutenberg_native_annotations_sidebar" tools:ignore="UnusedResources">Annotations Sidebar</string>
+    <string name="gutenberg_native_background_opacity" tools:ignore="UnusedResources">Background Opacity</string>
     <string name="gutenberg_native_border_radius" tools:ignore="UnusedResources">Border Radius</string>
     <string name="gutenberg_native_border_settings" tools:ignore="UnusedResources">Border Settings</string>
     <string name="gutenberg_native_button_color_settings_are_coming_soon" tools:ignore="UnusedResources">Button color settings are coming soon.</string>
@@ -41,8 +40,6 @@
     <!-- translators: sample content for "Contact" page template -->
     <string name="gutenberg_native_city_10100" tools:ignore="UnusedResources">City, 10100</string>
     <string name="gutenberg_native_clear_all_settings" tools:ignore="UnusedResources">Clear All Settings</string>
-    <!-- translators: title for "Contact" page template -->
-    <string name="gutenberg_native_contact" tools:ignore="UnusedResources">Contact</string>
     <string name="gutenberg_native_content" tools:ignore="UnusedResources">Content…</string>
     <string name="gutenberg_native_current_value_is_s" tools:ignore="UnusedResources">Current value is %s</string>
     <string name="gutenberg_native_customize" tools:ignore="UnusedResources">CUSTOMIZE</string>
@@ -67,6 +64,7 @@
     <string name="gutenberg_native_double_tap_to_undo_last_change" tools:ignore="UnusedResources">Double tap to undo last change</string>
     <!-- translators: sample content for "About" page template -->
     <string name="gutenberg_native_dr_seuss" tools:ignore="UnusedResources">Dr. Seuss</string>
+    <string name="gutenberg_native_edit_cover_media" tools:ignore="UnusedResources">Edit cover media</string>
     <string name="gutenberg_native_edit_media" tools:ignore="UnusedResources">Edit media</string>
     <string name="gutenberg_native_edit_video" tools:ignore="UnusedResources">Edit video</string>
     <!-- translators: sample content for "Team" page template -->
@@ -108,6 +106,7 @@ translators: sample content for "Services" page template -->
     <string name="gutenberg_native_link_settings" tools:ignore="UnusedResources">Link Settings</string>
     <string name="gutenberg_native_link_text" tools:ignore="UnusedResources">Link text</string>
     <string name="gutenberg_native_link_to" tools:ignore="UnusedResources">Link To</string>
+    <string name="gutenberg_native_minimum_height_in_pixels" tools:ignore="UnusedResources">Minimum height in pixels</string>
     <string name="gutenberg_native_move_block_down" tools:ignore="UnusedResources">Move block down</string>
     <!-- translators: accessibility text. %1: current block position (number). %2: next block position (number) -->
     <string name="gutenberg_native_move_block_down_from_row_1_s_to_row_2_s" tools:ignore="UnusedResources">Move block down from row %1$s to row %2$s</string>
