@@ -72,7 +72,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
-				label={ __( 'Border Radius' ) }
+				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
 				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
@@ -232,7 +232,7 @@ function ButtonEdit( {
 						{
 							colorValue: textColor.color,
 							onColorChange: setTextColor,
-							label: __( 'Text Color' ),
+							label: __( 'Text color' ),
 						},
 						{
 							colorValue: backgroundColor.color,

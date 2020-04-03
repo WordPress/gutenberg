@@ -5,6 +5,11 @@ import { shallow, mount } from 'enzyme';
 import { uniqueId } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { plus } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import { DimensionControl } from '../';
@@ -32,7 +37,7 @@ describe( 'DimensionControl', () => {
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 				/>
 			);
 			expect( wrapper ).toMatchSnapshot();
@@ -43,7 +48,7 @@ describe( 'DimensionControl', () => {
 				<DimensionControl
 					instanceId={ uniqueId() }
 					label={ 'Margin' }
-					icon={ 'tablet' }
+					icon={ plus }
 					iconLabel={ 'Tablet Devices' }
 				/>
 			);

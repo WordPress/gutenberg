@@ -6,8 +6,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { useEffect } from '@wordpress/element';
 import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+function useHTMLClass( className ) {
+	useEffect( () => {
+		const element =
+			document && document.querySelector( `html:not(.${ className })` );
+		if ( ! element ) {
+			return;
+		}
+		element.classList.toggle( className );
+		return () => {
+			element.classList.toggle( className );
+		};
+	}, [ className ] );
+}
 
 function EditorSkeleton( {
 	footer,
@@ -17,6 +32,7 @@ function EditorSkeleton( {
 	publish,
 	className,
 } ) {
+	useHTMLClass( 'block-editor-editor-skeleton__html-container' );
 	return (
 		<div
 			className={ classnames(

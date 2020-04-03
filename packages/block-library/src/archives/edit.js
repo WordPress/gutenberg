@@ -14,7 +14,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Archives settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ () =>
 							setAttributes( {
@@ -23,7 +23,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 						}
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
 						onChange={ () =>
 							setAttributes( {

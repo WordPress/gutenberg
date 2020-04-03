@@ -28,6 +28,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
+import { ComplementaryArea, FullscreenMode } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -38,18 +39,16 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
-import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -57,6 +56,7 @@ function Layout() {
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -81,6 +81,9 @@ function Layout() {
 			publishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -94,9 +97,6 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			hasBlockSelected: select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -113,7 +113,7 @@ function Layout() {
 
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
@@ -125,24 +125,28 @@ function Layout() {
 					className={ className }
 					header={ <Header /> }
 					sidebar={
-						<>
-							{ ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
-									<Button
-										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
-										onClick={ openSidebarPanel }
-										aria-expanded={ false }
-									>
-										{ hasBlockSelected
-											? __( 'Open block settings' )
-											: __( 'Open document settings' ) }
-									</Button>
-								</div>
-							) }
-							<SettingsSidebar />
-							<Sidebar.Slot />
-						</>
+						( ! isMobileViewport || sidebarIsOpened ) && (
+							<>
+								{ ! isMobileViewport && ! sidebarIsOpened && (
+									<div className="edit-post-layout__toogle-sidebar-panel">
+										<Button
+											isSecondary
+											className="edit-post-layout__toogle-sidebar-panel-button"
+											onClick={ openSidebarPanel }
+											aria-expanded={ false }
+										>
+											{ hasBlockSelected
+												? __( 'Open block settings' )
+												: __(
+														'Open document settings'
+												  ) }
+										</Button>
+									</div>
+								) }
+								<SettingsSidebar />
+								<ComplementaryArea.Slot scope="core/edit-post" />
+							</>
+						)
 					}
 					content={
 						<>
@@ -163,6 +167,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
 							<div className="edit-post-layout__footer">
@@ -184,10 +189,10 @@ function Layout() {
 								}
 							/>
 						) : (
-							<div className="edit-post-layout__toogle-publish-panel">
+							<div className="edit-post-layout__toggle-publish-panel">
 								<Button
 									isSecondary
-									className="edit-post-layout__toogle-publish-panel-button"
+									className="edit-post-layout__toggle-publish-panel-button"
 									onClick={ togglePublishSidebar }
 									aria-expanded={ false }
 								>

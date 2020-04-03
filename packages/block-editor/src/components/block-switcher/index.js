@@ -7,14 +7,7 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	Dropdown,
-	Button,
-	Toolbar,
-	PanelBody,
-	Path,
-	SVG,
-} from '@wordpress/components';
+import { Dropdown, Button, Toolbar, MenuGroup } from '@wordpress/components';
 import {
 	getBlockType,
 	getPossibleBlockTransformations,
@@ -26,6 +19,7 @@ import { Component } from '@wordpress/element';
 import { DOWN } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -87,7 +81,7 @@ export class BlockSwitcher extends Component {
 			const blockType = getBlockType( sourceBlockName );
 			icon = blockType.icon;
 		} else {
-			icon = 'layout';
+			icon = layout;
 		}
 
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
@@ -120,6 +114,7 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
+									/* translators: %s: number of blocks. */
 									_n(
 										'Change type of %d block',
 										'Change type of %d blocks',
@@ -138,18 +133,7 @@ export class BlockSwitcher extends Component {
 								label={ label }
 								onKeyDown={ openOnArrowDown }
 								showTooltip
-								icon={
-									<>
-										<BlockIcon icon={ icon } showColors />
-										<SVG
-											className="block-editor-block-switcher__transform"
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-										>
-											<Path d="M6.5 8.9c.6-.6 1.4-.9 2.2-.9h6.9l-1.3 1.3 1.4 1.4L19.4 7l-3.7-3.7-1.4 1.4L15.6 6H8.7c-1.4 0-2.6.5-3.6 1.5l-2.8 2.8 1.4 1.4 2.8-2.8zm13.8 2.4l-2.8 2.8c-.6.6-1.3.9-2.1.9h-7l1.3-1.3-1.4-1.4L4.6 16l3.7 3.7 1.4-1.4L8.4 17h6.9c1.3 0 2.6-.5 3.5-1.5l2.8-2.8-1.3-1.4z" />
-										</SVG>
-									</>
-								}
+								icon={ <BlockIcon icon={ icon } showColors /> }
 							/>
 						</Toolbar>
 					);
@@ -160,10 +144,10 @@ export class BlockSwitcher extends Component {
 							possibleBlockTransformations.length !== 0 ) && (
 							<div className="block-editor-block-switcher__container">
 								{ hasBlockStyles && (
-									<PanelBody
-										title={ __( 'Block Styles' ) }
-										initialOpen
-									>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Styles' ) }
+										</div>
 										<BlockStyles
 											clientId={ blocks[ 0 ].clientId }
 											onSwitch={ onClose }
@@ -171,13 +155,13 @@ export class BlockSwitcher extends Component {
 												this.onHoverClassName
 											}
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 								{ possibleBlockTransformations.length !== 0 && (
-									<PanelBody
-										title={ __( 'Transform To:' ) }
-										initialOpen
-									>
+									<MenuGroup>
+										<div className="block-editor-block-switcher__label">
+											{ __( 'Transform to' ) }
+										</div>
 										<BlockTypesList
 											items={ possibleBlockTransformations.map(
 												( destinationBlockType ) => ( {
@@ -194,7 +178,7 @@ export class BlockSwitcher extends Component {
 												onClose();
 											} }
 										/>
-									</PanelBody>
+									</MenuGroup>
 								) }
 							</div>
 						) }

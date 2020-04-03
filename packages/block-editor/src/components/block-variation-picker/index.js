@@ -8,9 +8,10 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 function BlockVariationPicker( {
-	icon = 'layout',
+	icon = layout,
 	label = __( 'Choose variation' ),
 	instructions = __( 'Select a variation to start with.' ),
 	variations,
@@ -36,6 +37,7 @@ function BlockVariationPicker( {
 			<ul
 				className="block-editor-block-variation-picker__variations"
 				role="list"
+				aria-label={ __( 'Block variations' ) }
 			>
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
@@ -45,8 +47,14 @@ function BlockVariationPicker( {
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
-							label={ variation.title }
+							label={ variation.description || variation.title }
 						/>
+						<span
+							className="block-editor-block-variation-picker__variation-label"
+							role="presentation"
+						>
+							{ variation.title }
+						</span>
 					</li>
 				) ) }
 			</ul>

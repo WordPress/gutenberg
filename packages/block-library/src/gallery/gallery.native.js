@@ -77,7 +77,7 @@ export const Gallery = ( props ) => {
 	};
 
 	return (
-		<View>
+		<View style={ { flex: 1 } }>
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }
@@ -88,8 +88,8 @@ export const Gallery = ( props ) => {
 				}
 			>
 				{ images.map( ( img, index ) => {
-					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 					const ariaLabel = sprintf(
+						/* translators: 1: the order number of the image. 2: the total number of images. */
 						__( 'image %1$d of %2$d in gallery' ),
 						index + 1,
 						images.length

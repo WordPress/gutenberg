@@ -1623,12 +1623,13 @@ export function didAutomaticChange( state ) {
 }
 
 /**
- * Returns the current editing canvas device type.
+ * Returns true if the current highlighted block matches the block clientId.
  *
  * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
  *
- * @return {string} Device type.
+ * @return {boolean} Whether the block is currently highlighted.
  */
-export function getPreviewDeviceType( state ) {
-	return state.deviceType;
+export function isBlockHighlighted( state, clientId ) {
+	return state.highlightedBlock === clientId;
 }

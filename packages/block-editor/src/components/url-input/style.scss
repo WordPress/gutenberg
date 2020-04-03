@@ -51,7 +51,7 @@ $input-size: 300px;
 	.components-spinner {
 		position: absolute;
 		right: $input-padding;
-		bottom: $input-padding + $grid-size + 1;
+		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
 	}
 }
@@ -86,7 +86,7 @@ $input-size: 300px;
 	width: 100%;
 	border: none;
 	text-align: left;
-	@include menu-style__neutral();
+	box-shadow: none;
 
 	&:hover {
 		background: $light-gray-500;
@@ -136,7 +136,7 @@ $input-size: 300px;
 
 	.components-button {
 		flex-shrink: 0;
-		width: $icon-button-size;
-		height: $icon-button-size;
+		width: $button-size;
+		height: $button-size;
 	}
 }

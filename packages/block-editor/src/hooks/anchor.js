@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, has } from 'lodash';
+import { has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,15 +38,16 @@ export function addAttribute( settings ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			anchor: {
 				type: 'string',
 				source: 'attribute',
 				attribute: 'id',
 				selector: '*',
 			},
-		} );
+		};
 	}
 
 	return settings;
@@ -72,11 +73,11 @@ export const withInspectorControl = createHigherOrderComponent(
 						<InspectorAdvancedControls>
 							<TextControl
 								className="html-anchor-control"
-								label={ __( 'HTML Anchor' ) }
+								label={ __( 'HTML anchor' ) }
 								help={
 									<>
 										{ __(
-											'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
+											'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
 										) }
 
 										<ExternalLink

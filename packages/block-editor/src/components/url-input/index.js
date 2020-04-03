@@ -178,6 +178,7 @@ class URLInput extends Component {
 				if ( !! suggestions.length ) {
 					this.props.debouncedSpeak(
 						sprintf(
+							/* translators: %s: number of results. */
 							_n(
 								'%d result found, use up and down arrow keys to navigate.',
 								'%d results found, use up and down arrow keys to navigate.',
@@ -214,27 +215,24 @@ class URLInput extends Component {
 
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue );
+			this.updateSuggestions( inputValue.trim() );
 		}
 	}
 
-	onFocus( event ) {
+	onFocus() {
 		const { suggestions } = this.state;
-		const { disableSuggestions, onFocus } = this.props;
-
-		const inputValue = event.target.value;
-
-		onFocus( inputValue );
+		const { disableSuggestions, value } = this.props;
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
 		if (
-			inputValue &&
+			value &&
 			! disableSuggestions &&
+			! this.isUpdatingSuggestions &&
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( inputValue );
+			this.updateSuggestions( value.trim() );
 		}
 	}
 
@@ -428,6 +426,7 @@ class URLInput extends Component {
 				} ) }
 			>
 				<input
+					className="block-editor-url-input__input"
 					autoFocus={ autoFocus }
 					type="text"
 					aria-label={ __( 'URL' ) }

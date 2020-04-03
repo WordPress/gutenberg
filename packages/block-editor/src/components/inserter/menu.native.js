@@ -70,23 +70,22 @@ export class InserterMenu extends Component {
 
 	calculateColumnsProperties() {
 		const bottomSheetWidth = BottomSheet.getWidth();
-		const {
-			paddingLeft: containerPaddingLeft,
-			paddingRight: containerPaddingRight,
-		} = styles.content;
+		const { paddingLeft, paddingRight } = styles.columnPadding;
 		const itemTotalWidth = this.calculateItemWidth();
 		const containerTotalWidth =
-			bottomSheetWidth - ( containerPaddingLeft + containerPaddingRight );
+			bottomSheetWidth - ( paddingLeft + paddingRight );
 		const numofColumns = Math.floor( containerTotalWidth / itemTotalWidth );
 
 		if ( numofColumns < MIN_COL_NUM ) {
 			return {
 				numOfColumns: MIN_COL_NUM,
 				itemWidth: this.calculateMinItemWidth( bottomSheetWidth ),
+				maxWidth: containerTotalWidth / MIN_COL_NUM,
 			};
 		}
 		return {
 			numOfColumns: numofColumns,
+			maxWidth: containerTotalWidth / numofColumns,
 		};
 	}
 
@@ -153,7 +152,12 @@ export class InserterMenu extends Component {
 								accessibilityLabel={ item.title }
 								onPress={ () => onSelect( item ) }
 							>
-								<View style={ styles.modalItem }>
+								<View
+									style={ [
+										styles.modalItem,
+										{ width: columnProperties.maxWidth },
+									] }
+								>
 									<View
 										style={ [
 											modalIconWrapperStyle,
@@ -237,7 +241,8 @@ export default compose(
 					);
 
 					const count = getBlockCount();
-					if ( count === 1 ) {
+					// Check if there is a rootClientId because that means it is a nested replacable block and we don't want to clear/reset all blocks.
+					if ( count === 1 && ! ownProps.rootClientId ) {
 						// removing the last block is not possible with `removeBlock` action
 						// it always inserts a default block if the last of the blocks have been removed
 						clearSelectedBlock();

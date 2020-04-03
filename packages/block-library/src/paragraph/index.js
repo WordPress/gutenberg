@@ -39,6 +39,9 @@ export const settings = {
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,
+		lightBlockWrapper: true,
+		__experimentalColor: true,
+		__experimentalLineHeight: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
@@ -54,12 +57,6 @@ export const settings = {
 				( attributes.content || '' ) +
 				( attributesToMerge.content || '' ),
 		};
-	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-			return { 'data-align': width };
-		}
 	},
 	edit,
 	save,

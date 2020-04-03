@@ -14,7 +14,6 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
-	__experimentalBlockSettingsMenuPluginsExtension,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 
@@ -22,7 +21,6 @@ import { Popover } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
-import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-settings-menu-group';
 import { useResizeCanvas } from '../resize-canvas';
 
 function VisualEditor() {
@@ -41,7 +39,9 @@ function VisualEditor() {
 					<WritingFlow>
 						<ObserveTyping>
 							<CopyHandler>
-								<PostTitle />
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
 								<BlockList />
 							</CopyHandler>
 						</ObserveTyping>
@@ -53,13 +53,6 @@ function VisualEditor() {
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__experimentalBlockSettingsMenuFirstItem>
-			<__experimentalBlockSettingsMenuPluginsExtension>
-				{ ( { clientIds, onClose } ) => (
-					<PluginBlockSettingsMenuGroup.Slot
-						fillProps={ { clientIds, onClose } }
-					/>
-				) }
-			</__experimentalBlockSettingsMenuPluginsExtension>
 		</BlockSelectionClearer>
 	);
 }

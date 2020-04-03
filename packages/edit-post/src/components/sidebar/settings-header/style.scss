@@ -1,7 +1,7 @@
 .components-panel__header.edit-post-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
-	padding-right: $grid-size-small;
+	padding-right: $grid-unit-05;
 	border-top: 0;
 
 	ul {
@@ -13,6 +13,8 @@
 }
 
 .components-button.edit-post-sidebar__panel-tab {
+	border-radius: 0;
+	height: 50px - $border-width;
 	background: transparent;
 	border: none;
 	box-shadow: none;
@@ -22,9 +24,6 @@
 	margin-left: 0;
 	font-weight: 400;
 	color: $dark-gray-900;
-	@include square-style__neutral;
-	transition: box-shadow 0.1s linear;
-	@include reduce-motion("transition");
 
 	// This pseudo-element "duplicates" the tab label and sets the text to bold.
 	// This ensures that the tab doesn't change width when selected.
@@ -40,7 +39,8 @@
 	}
 
 	&.is-active {
-		box-shadow: inset 0 -3px theme(outlines);
+		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+		box-shadow: inset 0 0 0 $border-width-focus transparent, inset 0 0 -$border-width-tab 0 0 $theme-color;
 		font-weight: 600;
 		position: relative;
 
@@ -52,12 +52,15 @@
 			bottom: 1px;
 			right: 0;
 			left: 0;
-			border-bottom: 3px solid transparent;
+			border-bottom: $border-width-tab solid transparent;
 		}
 	}
 
 	&:focus {
-		background-color: transparent;
-		@include square-style__focus;
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+	}
+
+	&.is-active:focus {
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color, inset 0 0 -$border-width-tab 0 0 $theme-color;
 	}
 }

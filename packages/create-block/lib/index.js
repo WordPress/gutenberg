@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
-const program = require( 'commander' );
 const inquirer = require( 'inquirer' );
+const program = require( 'commander' );
 const { startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
+const checkSystemRequirements = require( './check-system-requirements' );
 const CLIError = require( './cli-error' );
 const log = require( './log' );
-const { version } = require( '../package.json' );
+const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const { getDefaultValues, getPrompts } = require( './templates' );
 
@@ -31,6 +32,7 @@ program
 		'esnext'
 	)
 	.action( async ( slug, { template } ) => {
+		await checkSystemRequirements( engines );
 		try {
 			const defaultValues = getDefaultValues( template );
 			if ( slug ) {
@@ -50,21 +52,18 @@ program
 			}
 		} catch ( error ) {
 			if ( error instanceof CLIError ) {
-				log.info( '' );
 				log.error( error.message );
 				process.exit( 1 );
 			} else {
 				throw error;
 			}
 		}
-	} );
-
-program.on( '--help', function() {
-	log.info( '' );
-	log.info( 'Examples:' );
-	log.info( `  $ ${ commandName }` );
-	log.info( `  $ ${ commandName } todo-list` );
-	log.info( `  $ ${ commandName } --template es5 todo-list` );
-} );
-
-program.parse( process.argv );
+	} )
+	.on( '--help', function() {
+		log.info( '' );
+		log.info( 'Examples:' );
+		log.info( `  $ ${ commandName }` );
+		log.info( `  $ ${ commandName } todo-list` );
+		log.info( `  $ ${ commandName } --template es5 todo-list` );
+	} )
+	.parse( process.argv );

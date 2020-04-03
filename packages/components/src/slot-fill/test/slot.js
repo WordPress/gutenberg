@@ -3,13 +3,13 @@
  */
 import { isEmpty } from 'lodash';
 import ReactTestRenderer from 'react-test-renderer';
+import { render, unmountComponentAtNode } from 'react-dom';
+import { act } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
  */
-import Slot from '../slot';
-import Fill from '../fill';
-import Provider from '../context';
+import { Slot, Fill, Provider } from '../';
 
 /**
  * WordPress dependencies
@@ -37,6 +37,20 @@ class Filler extends Component {
 		];
 	}
 }
+
+let container = null;
+beforeEach( () => {
+	// setup a DOM element as a render target
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
+} );
+
+afterEach( () => {
+	// cleanup on exiting
+	unmountComponentAtNode( container );
+	container.remove();
+	container = null;
+} );
 
 describe( 'Slot', () => {
 	it( 'should render empty Fills', () => {
@@ -261,10 +275,55 @@ describe( 'Slot', () => {
 				);
 
 				expect( testRenderer.toJSON() ).toMatchSnapshot();
+			} );
 
-				expect( testRenderer.getInstance().slots ).toHaveProperty(
-					'egg'
-				);
+			it( 'should unmount two slots with the same name', () => {
+				act( () => {
+					render(
+						<Provider>
+							<div data-position="first">
+								<Slot
+									name="egg"
+									bubblesVirtually={ bubblesVirtually }
+								/>
+							</div>
+							<div data-position="second">
+								<Slot
+									name="egg"
+									bubblesVirtually={ bubblesVirtually }
+								/>
+							</div>
+							<Fill name="egg">Content</Fill>
+						</Provider>,
+						container
+					);
+				} );
+				act( () => {
+					render(
+						<Provider>
+							<div data-position="first">
+								<Slot
+									name="egg"
+									bubblesVirtually={ bubblesVirtually }
+								/>
+							</div>
+							<div data-position="second" />
+							<Fill name="egg">Content</Fill>
+						</Provider>,
+						container
+					);
+				} );
+				act( () => {
+					render(
+						<Provider>
+							<div data-position="first" />
+							<div data-position="second" />
+							<Fill name="egg">Content</Fill>
+						</Provider>,
+						container
+					);
+				} );
+				expect( container.innerHTML ).toMatchSnapshot();
 			} );
 		}
 	);

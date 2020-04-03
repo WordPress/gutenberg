@@ -13,9 +13,9 @@ import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 } from '@wordpress/block-editor';
-import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,6 +37,7 @@ function MediaPlaceholder( props ) {
 		labels = {},
 		icon,
 		onSelect,
+		__experimentalOnlyMediaLibrary,
 		isAppender,
 		disableMediaButtons,
 		getStylesFromColorScheme,
@@ -113,8 +114,8 @@ function MediaPlaceholder( props ) {
 			);
 		} else if ( isAppender && ! disableMediaButtons ) {
 			return (
-				<Dashicon
-					icon="plus-alt"
+				<Icon
+					icon={ plusCircleFilled }
 					style={ addMediaButtonStyle }
 					color={ addMediaButtonStyle.color }
 					size={ addMediaButtonStyle.size }
@@ -141,6 +142,9 @@ function MediaPlaceholder( props ) {
 			<MediaUpload
 				allowedTypes={ allowedTypes }
 				onSelect={ setMedia }
+				__experimentalOnlyMediaLibrary={
+					__experimentalOnlyMediaLibrary
+				}
 				multiple={ multiple }
 				render={ ( { open, getMediaOptions } ) => {
 					return (

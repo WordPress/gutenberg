@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
@@ -8,57 +13,59 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { EntitiesSavedStates } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import { useEditorContext } from '../editor';
+
 export default function SaveButton() {
+	const { settings } = useEditorContext();
 	const [ , setStatus ] = useEntityProp(
 		'postType',
-		'wp_template',
+		settings.templateType,
 		'status'
 	);
+	const [ , setTitle ] = useEntityProp(
+		'postType',
+		settings.templateType,
+		'title'
+	);
+	const [ slug ] = useEntityProp( 'postType', settings.templateType, 'slug' );
 	// Publish template if not done yet.
-	useEffect( () => setStatus( 'publish' ), [] );
+	useEffect( () => {
+		setStatus( 'publish' );
+		setTitle( slug );
+	}, [ slug ] );
 
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select(
-			'core'
-		);
-		const entityRecordChangesByRecord = getEntityRecordChangesByRecord();
-		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+		} = select( 'core' );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
-			isDirty: changedKinds.length > 0,
-			isSaving: changedKinds.some( ( changedKind ) =>
-				Object.keys(
-					entityRecordChangesByRecord[ changedKind ]
-				).some( ( changedName ) =>
-					Object.keys(
-						entityRecordChangesByRecord[ changedKind ][
-							changedName
-						]
-					).some( ( changedKey ) =>
-						isSavingEntityRecord(
-							changedKind,
-							changedName,
-							changedKey
-						)
-					)
-				)
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving: some( dirtyEntityRecords, ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
 	} );
 	const disabled = ! isDirty || isSaving;
 
 	const [ isOpen, setIsOpen ] = useState( false );
-	const open = useCallback( setIsOpen.bind( null, true ), [] );
-	const close = useCallback( setIsOpen.bind( null, false ), [] );
+	const open = useCallback( () => setIsOpen( true ), [] );
+	const close = useCallback( () => setIsOpen( false ), [] );
 	return (
 		<>
 			<Button
 				isPrimary
+				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				disabled={ disabled }
 				isBusy={ isSaving }
 				onClick={ disabled ? undefined : open }
 			>
-				{ __( 'Update' ) }
+				{ __( 'Update Design' ) }
 			</Button>
 			<EntitiesSavedStates isOpen={ isOpen } onRequestClose={ close } />
 		</>

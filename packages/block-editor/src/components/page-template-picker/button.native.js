@@ -1,25 +1,29 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-const PickerButton = ( { icon, label, onPress, getStylesFromColorScheme } ) => {
-	const butonStyles = getStylesFromColorScheme(
+const PickerButton = ( { icon, label, onPress } ) => {
+	const butonWrapperStyles = usePreferredColorSchemeStyle(
+		styles.buttonWrapper,
+		styles.buttonWrapperDark
+	);
+	const buttonStyles = usePreferredColorSchemeStyle(
 		styles.button,
 		styles.buttonDark
 	);
-	const butonTextStyles = getStylesFromColorScheme(
+	const buttonTextStyles = usePreferredColorSchemeStyle(
 		styles.buttonText,
 		styles.buttonTextDark
 	);
@@ -30,12 +34,14 @@ const PickerButton = ( { icon, label, onPress, getStylesFromColorScheme } ) => {
 			accessibilityHint={ __( 'Double tap to select layout' ) }
 			activeOpacity={ 0.7 }
 			onPress={ onPress }
-			style={ butonStyles }
+			style={ butonWrapperStyles }
 		>
-			<Text style={ styles.buttonIcon }>{ icon }</Text>
-			<Text style={ butonTextStyles }>{ label }</Text>
+			<View style={ buttonStyles }>
+				<Text style={ styles.buttonIcon }>{ icon }</Text>
+				<Text style={ buttonTextStyles }>{ label }</Text>
+			</View>
 		</TouchableOpacity>
 	);
 };
 
-export default withPreferredColorScheme( PickerButton );
+export default PickerButton;

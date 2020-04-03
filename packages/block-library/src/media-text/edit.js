@@ -15,8 +15,6 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
-	PanelColorSettings,
-	withColors,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -28,6 +26,8 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
+import { pullLeft, pullRight } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -159,7 +159,7 @@ class MediaTextEdit extends Component {
 		} = attributes;
 		return (
 			<MediaContainer
-				className="block-library-media-text__media-container"
+				className="wp-block-media-text__media"
 				onSelectMedia={ this.onSelectMedia }
 				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
@@ -181,10 +181,8 @@ class MediaTextEdit extends Component {
 		const {
 			attributes,
 			className,
-			backgroundColor,
 			isSelected,
 			setAttributes,
-			setBackgroundColor,
 			image,
 		} = this.props;
 		const {
@@ -208,8 +206,6 @@ class MediaTextEdit extends Component {
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
-			'has-background': backgroundColor.class || backgroundColor.color,
-			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
@@ -222,24 +218,16 @@ class MediaTextEdit extends Component {
 		const style = {
 			gridTemplateColumns,
 			msGridColumns: gridTemplateColumns,
-			backgroundColor: backgroundColor.color,
 		};
-		const colorSettings = [
-			{
-				value: backgroundColor.color,
-				onChange: setBackgroundColor,
-				label: __( 'Background Color' ),
-			},
-		];
 		const toolbarControls = [
 			{
-				icon: 'align-pull-left',
+				icon: pullLeft,
 				title: __( 'Show media on left' ),
 				isActive: mediaPosition === 'left',
 				onClick: () => setAttributes( { mediaPosition: 'left' } ),
 			},
 			{
-				icon: 'align-pull-right',
+				icon: pullRight,
 				title: __( 'Show media on right' ),
 				isActive: mediaPosition === 'right',
 				onClick: () => setAttributes( { mediaPosition: 'right' } ),
@@ -275,7 +263,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ imageFill && (
 					<FocalPointPicker
-						label={ __( 'Focal Point Picker' ) }
+						label={ __( 'Focal point picker' ) }
 						url={ mediaUrl }
 						value={ focalPoint }
 						onChange={ ( value ) =>
@@ -285,7 +273,7 @@ class MediaTextEdit extends Component {
 				) }
 				{ mediaType === 'image' && (
 					<TextareaControl
-						label={ __( 'Alt Text (Alternative Text)' ) }
+						label={ __( 'Alt text (alternative text)' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
 						help={
@@ -309,11 +297,6 @@ class MediaTextEdit extends Component {
 			<>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
-					<PanelColorSettings
-						title={ __( 'Color settings' ) }
-						initialOpen={ false }
-						colorSettings={ colorSettings }
-					/>
 				</InspectorControls>
 				<BlockControls>
 					<ToolbarGroup controls={ toolbarControls } />
@@ -350,7 +333,6 @@ class MediaTextEdit extends Component {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const {

@@ -9,9 +9,11 @@ import {
 	Dimensions,
 	ScrollView,
 	Keyboard,
+	StatusBar,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
+import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -66,6 +68,14 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		if ( Platform.OS === 'android' ) {
+			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
+				() => {
+					this.props.onClose();
+				}
+			);
+		}
+
 		this.keyboardWillShowListener = Keyboard.addListener(
 			'keyboardWillShow',
 			this.keyboardWillShow
@@ -84,6 +94,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		if ( this.androidModalClosedSubscription ) {
+			this.androidModalClosedSubscription.remove();
+		}
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -111,10 +124,15 @@ class BottomSheet extends Component {
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
 		const { safeAreaBottomInset, keyboardHeight } = this.state;
+		const statusBarHeight =
+			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
 		// `maxHeight` when modal is opened alon with a keyboard
 		const maxHeightWithOpenKeyboard =
-			0.95 * ( Dimensions.get( 'window' ).height - keyboardHeight );
+			0.95 *
+			( Dimensions.get( 'window' ).height -
+				keyboardHeight -
+				statusBarHeight );
 
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {

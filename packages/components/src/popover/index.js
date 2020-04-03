@@ -23,7 +23,7 @@ import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
-import { Slot, Fill, Consumer } from '../slot-fill';
+import { Slot, Fill, useSlot } from '../slot-fill';
 import Animate from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
@@ -232,7 +232,7 @@ const Popover = ( {
 	onKeyDown,
 	children,
 	className,
-	noArrow = false,
+	noArrow = true,
 	// Disable reason: We generate the `...contentProps` rest as remainder
 	// of props which aren't explicitly handled by this component.
 	/* eslint-disable no-unused-vars */
@@ -252,6 +252,7 @@ const Popover = ( {
 	__unstableAllowVerticalSubpixelPosition,
 	__unstableAllowHorizontalSubpixelPosition,
 	__unstableFixedPosition = true,
+	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -261,6 +262,7 @@ const Popover = ( {
 	const contentRect = useRef();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ animateOrigin, setAnimateOrigin ] = useState();
+	const slot = useSlot( __unstableSlotName );
 	const isExpanded = expandOnMobile && isMobileViewport;
 
 	noArrow = isExpanded || noArrow;
@@ -323,6 +325,13 @@ const Popover = ( {
 				setStyle( containerRef.current, 'position' );
 			}
 
+			let boundaryElement;
+			if ( __unstableBoundaryParent ) {
+				boundaryElement = containerRef.current.closest(
+					'.popover-slot'
+				).parentNode;
+			}
+
 			const {
 				popoverTop,
 				popoverLeft,
@@ -336,7 +345,8 @@ const Popover = ( {
 				position,
 				__unstableSticky,
 				containerRef.current,
-				relativeOffsetTop
+				relativeOffsetTop,
+				boundaryElement
 			);
 
 			if (
@@ -471,6 +481,7 @@ const Popover = ( {
 		__unstableSticky,
 		__unstableAllowVerticalSubpixelPosition,
 		__unstableAllowHorizontalSubpixelPosition,
+		__unstableBoundaryParent,
 	] );
 
 	useFocusContentOnMount( focusOnMount, contentRef );
@@ -602,31 +613,21 @@ const Popover = ( {
 		content = <FocusManaged>{ content }</FocusManaged>;
 	}
 
-	return (
-		<Consumer>
-			{ ( { getSlot } ) => {
-				// In case there is no slot context in which to render,
-				// default to an in-place rendering.
-				if ( getSlot && getSlot( __unstableSlotName ) ) {
-					content = (
-						<Fill name={ __unstableSlotName }>{ content }</Fill>
-					);
-				}
+	if ( slot.ref ) {
+		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
+	}
 
-				if ( anchorRef || anchorRect ) {
-					return content;
-				}
+	if ( anchorRef || anchorRect ) {
+		return content;
+	}
 
-				return <span ref={ anchorRefFallback }>{ content }</span>;
-			} }
-		</Consumer>
-	);
+	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
 const PopoverContainer = Popover;
 
 PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } />
+	<Slot bubblesVirtually name={ name } className="popover-slot" />
 );
 
 export default PopoverContainer;

@@ -8,6 +8,7 @@ import { useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,14 +22,14 @@ function TemplatePartPreview() {
 			<div className="wp-block-template-part__placeholder-preview-title">
 				{ __( 'Preview' ) }
 			</div>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 		</div>
 	);
 }
 
 export default function TemplatePartPlaceholder( { setAttributes } ) {
-	const [ slug, _setSlug ] = useState();
-	const [ theme, setTheme ] = useState();
+	const [ slug, _setSlug ] = useState( '' );
+	const [ theme, setTheme ] = useState( '' );
 	const [ help, setHelp ] = useState();
 
 	// Try to find an existing template part.
@@ -94,7 +95,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	}, [ postId, slug, theme ] );
 	return (
 		<Placeholder
-			icon="layout"
+			icon={ layout }
 			label={ __( 'Template Part' ) }
 			instructions={ __(
 				'Choose a template part by slug and theme, or create a new one.'

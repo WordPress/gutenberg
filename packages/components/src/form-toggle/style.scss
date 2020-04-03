@@ -77,7 +77,11 @@ $toggle-border-width: 2px;
 	}
 
 	&__input:focus + .components-form-toggle__track {
-		@include switch-style__focus-active();
+		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: 2px;
 	}
 
 	&.is-checked {

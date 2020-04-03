@@ -1,13 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Path, Polygon, SVG } from '@wordpress/primitives';
+import { Path, SVG } from '@wordpress/primitives';
 
 const pullquote = (
 	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Polygon points="21 18 2 18 2 20 21 20" />
-		<Path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" />
-		<Polygon points="21 4 2 4 2 6 21 6" />
+		<Path d="M18 8H6c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zm.5 6c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5v-4c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v4zM4 4v1.5h16V4H4zm0 16h16v-1.5H4V20z" />
 	</SVG>
 );
 

@@ -2,7 +2,7 @@
 
 Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The first step is to install the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of Node. The easiest way (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
+The first step is to install the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of Node, along with the latest version of [NPM](https://www.npmjs.com/). The easiest way (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install --latest-npm` in the Gutenberg directory.
 
 Once you have Node installed, run these scripts from within your local Gutenberg repository:
 
@@ -14,6 +14,8 @@ npm run build
 ```
 
 This will build Gutenberg, ready to be used as a WordPress plugin!
+
+`npm run build` is intended for one-off compilations of the project. If you're planning to do continued development in the source files, using `npm run dev` will most often be the better option. This will configure the build to avoid minifying the generated output, rebuild files automatically as they are changed in your working directory, and configure dependencies as running in a development environment so that useful warnings and errors are logged to your browser's developer console.
 
 If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
 

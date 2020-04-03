@@ -27,15 +27,18 @@ function MultiSelectionInspector( { blocks } ) {
 			/>
 			<div className="block-editor-multi-selection-inspector__card-content">
 				<div className="block-editor-multi-selection-inspector__card-title">
-					{ /* translators: %d: number of blocks */
-					sprintf(
+					{ sprintf(
+						/* translators: %d: number of blocks */
 						_n( '%d block', '%d blocks', blocks.length ),
 						blocks.length
 					) }
 				</div>
 				<div className="block-editor-multi-selection-inspector__card-description">
-					{ /* translators: %d: number of words */
-					sprintf( _n( '%d word', '%d words', words ), words ) }
+					{ sprintf(
+						/* translators: %d: number of words */
+						_n( '%d word', '%d words', words ),
+						words
+					) }
 				</div>
 			</div>
 		</div>

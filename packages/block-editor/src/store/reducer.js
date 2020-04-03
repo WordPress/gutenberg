@@ -1449,17 +1449,22 @@ export function automaticChangeStatus( state, action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
+ * Reducer returning current highlighted block.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {boolean} state  Current highlighted block.
+ * @param {Object}  action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_PREVIEW_DEVICE_TYPE':
-			return action.deviceType;
+export function highlightedBlock( state, action ) {
+	const { clientId, isHighlighted } = action;
+
+	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
+		if ( isHighlighted ) {
+			return clientId;
+		} else if ( state === clientId ) {
+			return null;
+		}
 	}
 
 	return state;
@@ -1484,5 +1489,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
-	deviceType,
+	highlightedBlock,
 } );

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -29,12 +30,21 @@ export default function ColorPalette( {
 			<CircularOptionPicker.Option
 				key={ color }
 				isSelected={ value === color }
+				selectedIconProps={
+					value === color
+						? {
+								fill: tinycolor
+									.mostReadable( color, [ '#000', '#fff' ] )
+									.toHexString(),
+						  }
+						: {}
+				}
 				tooltipText={
 					name ||
 					// translators: %s: color hex code e.g: "#f00".
 					sprintf( __( 'Color code: %s' ), color )
 				}
-				style={ { color } }
+				style={ { backgroundColor: color, color } }
 				onClick={
 					value === color ? clearColor : () => onChange( color )
 				}
@@ -75,7 +85,7 @@ export default function ColorPalette( {
 							buttonProps={ {
 								'aria-label': __( 'Custom color picker' ),
 							} }
-							linkText={ __( 'Custom Color' ) }
+							linkText={ __( 'Custom color' ) }
 						/>
 					) }
 					{ !! clearable && (

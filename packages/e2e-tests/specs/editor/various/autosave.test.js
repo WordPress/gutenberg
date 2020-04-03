@@ -310,7 +310,7 @@ describe( 'autosave', () => {
 		await page.keyboard.type( 'before publish' );
 		await publishPost();
 
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.type( ' after publish' );
 
 		// Trigger remote autosave

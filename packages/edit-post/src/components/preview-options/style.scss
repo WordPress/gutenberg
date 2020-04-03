@@ -1,84 +1,67 @@
 .editor-post-preview__dropdown {
 	display: none;
-	margin-right: $grid-size;
-	border: 1px solid $light-gray-600;
+	margin-right: $grid-unit-15;
+	padding: 0;
 }
 
-.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle.editor-post-preview__button-toggle {
-	border-radius: 0;
+.editor-post-preview__button-toggle {
 	display: flex;
 	justify-content: space-between;
-	height: $block-controls-height - 2; // Needs to be 2px smaller to account for the box-shadow.
+	padding: 0 $grid-unit-10 0 $grid-unit-15;
 
-	&:hover,
-	&:focus {
-		box-shadow: 0 0 0 1px $dark-gray-500, 0 0 0 2px $white;
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
 	}
 
+	svg {
+		margin-left: $grid-unit-05;
+	}
 }
 
 .editor-post-preview__button-resize.editor-post-preview__button-resize {
-	padding-left: 36px;
+	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 
 	&.has-icon {
-		padding-left: $grid-size;
+		padding-left: $grid-unit-10;
 	}
-}
-
-.editor-post-preview__button-separator {
-	border-left: 1px solid $light-gray-600;
-	height: $icon-button-size;
-	padding: $grid-size 0 $grid-size $grid-size;
-	margin-left: $grid-size;
 }
 
 .editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
+		padding-bottom: 0;
 	}
-	.components-menu-group__label {
-		padding-left: 15px;
-	}
+
 	.components-menu-group + .components-menu-group {
-		border-top: 1px solid $light-gray-500;
-		padding: 0;
+		border-top: $border-width solid $light-gray-secondary;
+		padding: $grid-unit-10 $grid-unit-15;
+		margin-left: -$grid-unit-15;
+		margin-right: -$grid-unit-15;
 	}
 }
 
 .editor-post-preview__grouping-external {
+	display: flex;
 	position: relative;
 }
 
-.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external.editor-post-preview__button-external {
-	padding: $grid-size-large - 1;
-	height: auto;
-	display: block;
+.editor-post-preview__button-external {
+	padding-left: $grid-unit-10;
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
 
-	&:focus {
-		color: $dark-gray-900;
-		border: none;
-		box-shadow: none;
-		outline-offset: -2px;
-		outline: 1px dotted $dark-gray-500;
+	svg {
+		margin-right: $grid-unit-10;
 	}
-	&:hover {
-		color: $dark-gray-900;
-		border: none;
-		box-shadow: none;
-		background: $light-gray-200;
-	}
-}
-
-.editor-post-preview__icon-external {
-	position: absolute;
-	right: $grid-size-large - 1;
-	top: $grid-size-large - 2;
 }
 
 @include break-small() {
 	.editor-post-preview {
 		display: none;
 	}
+
 	.editor-post-preview__dropdown {
 		display: flex;
 	}
