@@ -23,7 +23,7 @@ module.exports = {
 				'sprintf format string must contain at least one placeholder',
 			placeholderMismatch:
 				'sprintf format string options must have the same number of placeholders',
-			noNumberedPlaceholders:
+			noOrderedPlaceholders:
 				'Multiple sprintf placeholders should be ordered. Mix of ordered and non-ordered placeholders found.',
 		},
 	},
@@ -145,7 +145,7 @@ module.exports = {
 					) {
 						context.report( {
 							node,
-							messageId: 'noNumberedPlaceholders',
+							messageId: 'noOrderedPlaceholders',
 						} );
 						return;
 					}

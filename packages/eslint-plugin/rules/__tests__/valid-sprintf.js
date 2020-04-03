@@ -105,7 +105,7 @@ sprintf(
 	authorBlockCount,
 	authorBlockRating
 );`,
-			errors: [ { messageId: 'noNumberedPlaceholders' } ],
+			errors: [ { messageId: 'noOrderedPlaceholders' } ],
 		},
 		{
 			code: `i18n.sprintf()`,
