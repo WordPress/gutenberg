@@ -9,6 +9,7 @@ import { join } from 'path';
 import { createURL } from './create-url';
 import { isCurrentURL } from './is-current-url';
 import { loginUser } from './login-user';
+import { hasPHPError } from './has-php-error';
 
 /**
  * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
@@ -23,4 +24,6 @@ export async function visitAdminPage( adminPath, query ) {
 		await loginUser();
 		await visitAdminPage( adminPath, query );
 	}
+
+	expect( await hasPHPError() ).toBe( false );
 }

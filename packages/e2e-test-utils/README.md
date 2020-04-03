@@ -260,6 +260,20 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean.
 
+<a name="hasPHPError" href="#hasPHPError">#</a> **hasPHPError**
+
+Returns a promise resolving to a boolean reflecting whether a PHP notice is
+present anywhere within the document's markup. This requires the environment
+be configured to display errors.
+
+_Related_
+
+-   <http://php.net/manual/en/function.error-reporting.php>
+
+_Returns_
+
+-   `Promise`: Promise resolving to a boolean reflecting whether a PHP notice is present.
+
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
