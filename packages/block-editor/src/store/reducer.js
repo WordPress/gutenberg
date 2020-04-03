@@ -1094,6 +1094,8 @@ function selection( state = {}, action ) {
 
 			return { clientId: blockToSelect.clientId };
 		}
+		case 'RESET_BLOCKS':
+			return {};
 	}
 
 	return state;

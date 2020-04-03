@@ -2306,6 +2306,19 @@ describe( 'state', () => {
 			expect( state1 ).toEqual( original );
 			expect( state2 ).toEqual( original );
 		} );
+
+		it( 'should remove selection when blocks are reset', () => {
+			const original = deepFreeze( { clientId: 'chicken' } );
+			const action = {
+				type: 'RESET_BLOCKS',
+				blocks: [],
+			};
+			const state1 = selectionStart( original, action );
+			const state2 = selectionEnd( original, action );
+
+			expect( state1 ).toEqual( {} );
+			expect( state2 ).toEqual( {} );
+		} );
 	} );
 
 	describe( 'preferences()', () => {
