@@ -9,28 +9,5 @@
 	// some point in the future, this can be simplified to `src/**/*`.
 	"include": [
 		"src/utils/dom.js"
-	],
-	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../blob" },
-		{ "path": "../blocks" },
-		{ "path": "../components" },
-		{ "path": "../compose" },
-		{ "path": "../data" },
-		{ "path": "../deprecated" },
-		{ "path": "../dom" },
-		{ "path": "../element" },
-		{ "path": "../hooks" },
-		{ "path": "../html-entities" },
-		{ "path": "../i18n" },
-		{ "path": "../icons" },
-		{ "path": "../is-shallow-equal" },
-		{ "path": "../keyboard-shortcuts" },
-		{ "path": "../keycodes" },
-		{ "path": "../rich-text" },
-		{ "path": "../token-list" },
-		{ "path": "../url" },
-		{ "path": "../viewport" },
-		{ "path": "../wordcount" }
 	]
 }
