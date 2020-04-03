@@ -14,16 +14,17 @@ import { __ } from '@wordpress/i18n';
  */
 import ButtonGroup from '../button-group';
 import Button from '../button';
+import BoxControlIcon from './icon';
 import BaseUnitControl from '../unit-control';
 
 const types = [ 'all', 'pairs', 'custom' ];
 const defaultInputProps = {
 	min: 0,
 };
-const typeOptions = {
-	all: 'All',
-	pairs: 'Pairs',
-	custom: 'Custom',
+const typeIconSides = {
+	all: [ 'all' ],
+	pairs: [ 'top', 'bottom' ],
+	custom: [ 'top' ],
 };
 
 const defaultValueProps = {
@@ -49,6 +50,8 @@ export default function BoxControl( {
 	label = 'Box Control',
 	type: typeProp = 'pairs',
 	values: valuesProp,
+	// Disable units for now
+	units = false,
 } ) {
 	const [ type, setType ] = useState( parseType( typeProp ) );
 	const [ values, setValues ] = useState( parseValues( valuesProp ) );
@@ -79,6 +82,7 @@ export default function BoxControl( {
 				placeholder={ mixedLabel }
 				values={ values }
 				onChange={ updateValues }
+				units={ units }
 			/>
 		</div>
 	);
@@ -90,32 +94,36 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 	const isMixed = ! allValues.every( ( v ) => v === value );
 
 	return (
-		<UnitControl
-			{ ...props }
-			value={ isMixed ? '' : value }
-			placeholder={ placeholder }
-			unit={ unit }
-			onChange={ ( next ) => {
-				onChange( {
-					top: [ next, unit ],
-					right: [ next, unit ],
-					bottom: [ next, unit ],
-					left: [ next, unit ],
-				} );
-			} }
-			onUnitChange={ ( next ) => {
-				onChange( {
-					top: [ value, next ],
-					right: [ value, next ],
-					bottom: [ value, next ],
-					left: [ value, next ],
-				} );
-			} }
-		/>
+		<UnitControlContainer>
+			<BoxControlIcon />
+			<UnitControl
+				{ ...props }
+				value={ isMixed ? '' : value }
+				placeholder={ placeholder }
+				unit={ unit }
+				onChange={ ( next ) => {
+					onChange( {
+						top: [ next, unit ],
+						right: [ next, unit ],
+						bottom: [ next, unit ],
+						left: [ next, unit ],
+					} );
+				} }
+				onUnitChange={ ( next ) => {
+					onChange( {
+						top: [ value, next ],
+						right: [ value, next ],
+						bottom: [ value, next ],
+						left: [ value, next ],
+					} );
+				} }
+			/>
+		</UnitControlContainer>
 	);
 }
 
 function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
+	const [ selected, setSelected ] = useState( 'vertical' );
 	const [ vertical, verticalUnit ] = values.top;
 	const [ horizontal, horizontalUnit ] = values.left;
 
@@ -126,11 +134,20 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 		( v ) => v === horizontal
 	);
 
+	const iconSides = {
+		vertical: [ 'top', 'bottom' ],
+		horizontal: [ 'left', 'right' ],
+	};
+
+	const iconSide = iconSides[ selected ];
+
 	return (
 		<UnitControlContainer>
+			<BoxControlIcon sides={ iconSide } />
 			<UnitControl
 				{ ...props }
 				placeholder={ placeholder }
+				onFocus={ () => setSelected( 'vertical' ) }
 				onChange={ ( next ) => {
 					onChange( {
 						top: [ next, verticalUnit ],
@@ -149,6 +166,7 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 			<UnitControl
 				{ ...props }
 				placeholder={ placeholder }
+				onFocus={ () => setSelected( 'horizontal' ) }
 				onChange={ ( next ) => {
 					onChange( {
 						left: [ next, horizontalUnit ],
@@ -169,6 +187,7 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 }
 
 function BoxCustomControl( { onChange = noop, values, ...props } ) {
+	const [ selected, setSelected ] = useState( 'top' );
 	const unitControlProps = useCustomUnitControlProps( {
 		values,
 		onChange,
@@ -176,24 +195,29 @@ function BoxCustomControl( { onChange = noop, values, ...props } ) {
 
 	return (
 		<UnitControlContainer>
+			<BoxControlIcon sides={ [ selected ] } />
 			<UnitControl
 				{ ...unitControlProps.top }
 				{ ...props }
+				onFocus={ () => setSelected( 'top' ) }
 				placeholder=""
 			/>
 			<UnitControl
 				{ ...unitControlProps.right }
 				{ ...props }
+				onFocus={ () => setSelected( 'right' ) }
 				placeholder=""
 			/>
 			<UnitControl
 				{ ...unitControlProps.bottom }
 				{ ...props }
+				onFocus={ () => setSelected( 'bottom' ) }
 				placeholder=""
 			/>
 			<UnitControl
 				{ ...unitControlProps.left }
 				{ ...props }
+				onFocus={ () => setSelected( 'left' ) }
 				placeholder=""
 			/>
 		</UnitControlContainer>
@@ -247,7 +271,7 @@ function BoxTypeControl( {
 					key={ value }
 					value={ value }
 				>
-					{ typeOptions[ value ] }
+					<BoxControlIcon sides={ typeIconSides[ value ] } />
 				</Radio>
 			) ) }
 		</RadioGroup>
@@ -263,10 +287,12 @@ function UnitControl( props ) {
 }
 
 const UnitControlContainer = styled.div`
+	box-sizing: border-box;
 	display: flex;
 `;
 
 const UnitControlWrapper = styled.div`
+	box-sizing: border-box;
 	max-width: 80px;
 	padding-right: 4px;
 `;
