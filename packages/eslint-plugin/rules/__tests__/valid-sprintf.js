@@ -20,6 +20,9 @@ ruleTester.run( 'valid-sprintf', rule, {
 			code: `sprintf( '%s', 'substitute' )`,
 		},
 		{
+			code: `sprintf( '%1$d%%', 500 )`,
+		},
+		{
 			code: `sprintf( __( '%s' ), 'substitute' )`,
 		},
 		{
@@ -58,6 +61,15 @@ sprintf(
 		},
 		{
 			code: `sprintf( ...args )`,
+		},
+		{
+			code: `sprintf( '%1$s %2$s', 'foo', 'bar' )`,
+		},
+		{
+			code: `sprintf( '%(greeting)s', 'Hello' )`,
+		},
+		{
+			code: `sprintf( '%(greeting)s %(toWhom)s', 'Hello', 'World' )`,
 		},
 	],
 	invalid: [

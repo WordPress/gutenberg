@@ -150,7 +150,11 @@ module.exports = {
 						return;
 					}
 
-					if ( ! allMatches ) {
+					// Catch cases where a string only contains %% (escaped percentage sign).
+					if (
+						! allMatches ||
+						( allMatches.length === 1 && allMatches[ 0 ] === '%%' )
+					) {
 						context.report( {
 							node,
 							messageId: 'noPlaceholders',
