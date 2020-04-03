@@ -153,7 +153,7 @@ export const getBlock = createSelector(
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
 			innerBlocks: areInnerBlocksControlled( state, clientId )
-				? []
+				? EMPTY_ARRAY
 				: getBlocks( state, clientId ),
 		};
 	},
