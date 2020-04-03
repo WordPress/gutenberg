@@ -24,7 +24,7 @@ function ColorSettings( {
 	changeBottomSheetContent,
 	backgroundColor,
 	setBackgroundColor,
-	clientId,
+	setGradient,
 	textColor,
 	setTextColor,
 	previousScreen,
@@ -34,6 +34,7 @@ function ColorSettings( {
 	onCloseBottomSheet,
 	onBackButtonPress,
 	getStylesFromColorScheme,
+	defaultSettings,
 } ) {
 	const segments = [ __( 'Solid' ), __( 'Gradient' ) ];
 	const [ segment, setSegment ] = useState( segments[ 0 ] );
@@ -68,13 +69,14 @@ function ColorSettings( {
 			<ColorPalette
 				setBackgroundColor={ setBackgroundColor }
 				setTextColor={ setTextColor }
+				setGradient={ setGradient }
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
 				currentSegment={ segment }
 				currentScreen={ screen }
-				clientId={ clientId }
 				onCustomPress={ () => changeBottomSheetContent( 'Custom' ) }
 				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
+				defaultSettings={ defaultSettings }
 			/>
 		);
 	}
@@ -133,24 +135,24 @@ function ColorSettings( {
 			{ screen === 'Custom' && (
 				<View>
 					<ColorPicker
-						previousScreen={ previousScreen }
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
 						shouldSetBottomSheetMaxHeight={
 							shouldSetBottomSheetMaxHeight
 						}
-						isBottomSheetScrolling={ isBottomSheetScrolling }
 						setTextColor={ setTextColor }
 						setBackgroundColor={ setBackgroundColor }
+						setGradient={ setGradient }
 						backgroundColor={ backgroundColor }
 						textColor={ textColor }
 						onNavigationBack={ () =>
 							changeBottomSheetContent( previousScreen )
 						}
-						clientId={ clientId }
 						onCloseBottomSheet={ onCloseBottomSheet }
 						changeBottomSheetContent={ changeBottomSheetContent }
+						isBottomSheetScrolling={ isBottomSheetScrolling }
+						previousScreen={ previousScreen }
 					/>
 				</View>
 			) }

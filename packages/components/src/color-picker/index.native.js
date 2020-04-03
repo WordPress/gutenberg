@@ -10,7 +10,6 @@ import tinycolor from 'tinycolor2';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
-import { __experimentalUseGradient } from '@wordpress/block-editor';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { Icon, check, close } from '@wordpress/icons';
 /**
@@ -24,10 +23,10 @@ function ColorPicker( {
 	isBottomSheetScrolling,
 	setBackgroundColor,
 	setTextColor,
+	setGradient,
 	backgroundColor,
 	textColor,
 	onNavigationBack,
-	clientId,
 	previousScreen,
 	onCloseBottomSheet = () => {},
 	getStylesFromColorScheme,
@@ -41,7 +40,6 @@ function ColorPicker( {
 	const [ val, setValue ] = useState( 0.5 );
 	const [ savedBgColor ] = useState( backgroundColor );
 	const [ savedTextColor ] = useState( textColor );
-	const { setGradient } = __experimentalUseGradient( {}, clientId );
 
 	const {
 		paddingLeft: spacing,

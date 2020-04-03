@@ -12,10 +12,6 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	SETTINGS_DEFAULTS,
-	__experimentalUseGradient,
-} from '@wordpress/block-editor';
 import { useState, useEffect, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -30,9 +26,10 @@ const ANIMATION_DURATION = 200;
 function ColorPalette( {
 	setBackgroundColor,
 	setTextColor,
+	setGradient,
 	backgroundColor,
 	textColor,
-	clientId,
+	defaultSettings,
 	currentSegment,
 	currentScreen,
 	onCustomPress,
@@ -56,7 +53,7 @@ function ColorPalette( {
 			slug: 'black',
 			color: '#000000',
 		},
-		...SETTINGS_DEFAULTS.colors,
+		...defaultSettings.colors,
 	];
 
 	const scrollViewRef = createRef();
@@ -64,18 +61,13 @@ function ColorPalette( {
 	const isGradientSegment = currentSegment === 'Gradient';
 	const isTextScreen = currentScreen === 'Text';
 
-	const { setGradient } = __experimentalUseGradient( {}, clientId );
-
 	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
 	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
 
 	const defaultColors = map( extendedDefaultColors, 'color' );
-	const defaultGradientColors = map(
-		SETTINGS_DEFAULTS.gradients,
-		'gradient'
-	);
+	const defaultGradientColors = map( defaultSettings.gradients, 'gradient' );
 
 	useEffect( () => {
 		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );

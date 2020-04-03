@@ -23,21 +23,21 @@ $border-radius-ios: 7px;
 
 .selected {
 	position: absolute;
-	background-color: #fff;
+	background-color: $white;
 }
 
 .selectedDark {
-	background-color: rgba(255, 255, 255, 0.25);
+	background-color: $dark-quaternary;
 }
 
 .shadowIOS {
-	box-shadow: 0 0 8px rgba(0, 0, 0, 0.12);
+	box-shadow: 0 0 8px $light-dim;
 	z-index: 2;
 }
 
 .container {
 	min-height: $container-height;
-	background-color: rgba(0, 0, 0, 0.04);
+	background-color: $light-ultra-dim;
 	border-radius: $container-height / 2;
 	align-items: center;
 	flex-direction: row;
@@ -47,7 +47,7 @@ $border-radius-ios: 7px;
 }
 
 .containerDark {
-	background-color: rgba(255, 255, 255, 0.08);
+	background-color: $dark-ultra-dim;
 }
 
 .containerIOS {
@@ -61,7 +61,7 @@ $border-radius-ios: 7px;
 	min-height: $segment-height - 2 * $border-width-ios;
 	border-width: $border-width;
 	border-radius: $container-height / 2;
-	border-color: rgba(0, 0, 0, 0.04);
+	border-color: $light-ultra-dim;
 }
 
 .outlineIOS {
@@ -73,7 +73,7 @@ $border-radius-ios: 7px;
 	font-size: 12px;
 	font-weight: 600;
 	text-align: center;
-	color: rgba(0, 0, 0, 0.6);
+	color: $light-secondary;
 }
 
 .buttonTextDefaultDark {
@@ -81,7 +81,7 @@ $border-radius-ios: 7px;
 }
 
 .buttonTextSelected {
-	color: rgba(0, 0, 0, 0.87);
+	color: $light-primary;
 }
 
 .buttonTextSelectedDark {

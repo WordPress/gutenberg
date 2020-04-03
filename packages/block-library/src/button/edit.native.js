@@ -20,6 +20,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	SETTINGS_DEFAULTS,
+	__experimentalWithSetGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -352,6 +353,7 @@ class ButtonEdit extends Component {
 			onReplace,
 			setBackgroundColor,
 			setTextColor,
+			setGradient,
 		} = this.props;
 		const {
 			placeholder,
@@ -573,6 +575,7 @@ class ButtonEdit extends Component {
 											setBackgroundColor={
 												setBackgroundColor
 											}
+											setGradient={ setGradient }
 											clientId={ clientId }
 											previousScreen={ previousScreen }
 											shouldEnableBottomSheetScroll={
@@ -590,6 +593,9 @@ class ButtonEdit extends Component {
 											onBackButtonPress={
 												onBackButtonPress
 											}
+											defaultSettings={
+												SETTINGS_DEFAULTS
+											}
 										/>
 									) }
 								</>
@@ -604,6 +610,7 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withInstanceId,
+	__experimentalWithSetGradient,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );

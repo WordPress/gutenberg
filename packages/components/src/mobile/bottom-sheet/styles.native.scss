@@ -122,28 +122,28 @@
 
 .cellLabel {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	margin-right: 12px;
 	flex-shrink: 1;
 }
 
 .cellLabelCentered {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	text-align: center;
 }
 
 .cellLabelLeftAlignNoIcon {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	margin-left: 0;
 }
 
 .cellValue {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	text-align: right;
 	flex: 1;
 }
@@ -174,9 +174,9 @@
 // Color Cell
 
 .colorCircle {
-	width: 32px;
-	height: 32px;
-	border-radius: 16px;
+	width: 2 * $panel-padding;
+	height: 2 * $panel-padding;
+	border-radius: $panel-padding;
 }
 
 // Navigation Header
@@ -206,7 +206,7 @@
 }
 
 .bottomSheetHeaderTitle {
-	color: rgba(0, 0, 0, 0.87);
+	color: $light-primary;
 	text-align: center;
 	font-weight: 600;
 	font-size: 16px;
@@ -214,7 +214,7 @@
 }
 
 .bottomSheetHeaderTitleDark {
-	color: rgba(255, 255, 255, 0.87);
+	color: $dark-primary;
 }
 
 .bottomSheetButtonText {
@@ -231,9 +231,9 @@
 }
 
 .arrowLeftIcon {
-	color: #50575e;
+	color: $gray-60;
 }
 
 .arrowLeftIconDark {
-	color: rgba(255, 255, 255, 0.6);
+	color: $dark-secondary;
 }

@@ -36,7 +36,6 @@ export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
-export { default as UnsupportedFooterControl } from './unsupported-footer-control';
 export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
 

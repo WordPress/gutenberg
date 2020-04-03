@@ -16,7 +16,7 @@ import styles from './style.scss';
 function SelectedIcon( { opacity } ) {
 	return (
 		<Animated.View style={ [ styles.selected, { opacity } ] }>
-			<View style={ styles.outline } />
+			<View style={ [ styles.outline, styles.selectedOutline ] } />
 			<Icon icon={ check } style={ styles.icon } size={ 24 } />
 		</Animated.View>
 	);
@@ -43,12 +43,14 @@ function ColorIndicator( {
 				style={ [ circleStyle, style ] }
 				gradientValue={ color }
 			>
+				<View style={ styles.outline } />
 				{ isSelected && <SelectedIcon opacity={ opacity } /> }
 			</LinearGradient>
 		);
 	} else if ( custom ) {
 		return (
 			<View style={ [ circleStyle, style ] }>
+				<View style={ styles.outline } />
 				{ color.map( ( gradientValue ) => {
 					return (
 						<LinearGradient
@@ -64,6 +66,7 @@ function ColorIndicator( {
 	}
 	return (
 		<View style={ [ circleStyle, style, { backgroundColor: color } ] }>
+			<View style={ styles.outline } />
 			{ isSelected && <SelectedIcon opacity={ opacity } /> }
 		</View>
 	);

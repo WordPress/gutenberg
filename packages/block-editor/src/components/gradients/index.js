@@ -42,29 +42,25 @@ function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
-export function __experimentalUseGradient(
-	{
-		gradientAttribute = 'gradient',
-		customGradientAttribute = 'customGradient',
-	} = {},
-	customClientId
-) {
+export function __experimentalUseGradient( {
+	gradientAttribute = 'gradient',
+	customGradientAttribute = 'customGradient',
+} = {} ) {
 	const { clientId } = useBlockEditContext();
-	const id = clientId || customClientId;
 
 	const { gradients, gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select(
 				'core/block-editor'
 			);
-			const attributes = getBlockAttributes( id );
+			const attributes = getBlockAttributes( clientId );
 			return {
 				gradient: attributes[ gradientAttribute ],
 				customGradient: attributes[ customGradientAttribute ],
 				gradients: getSettings().gradients,
 			};
 		},
-		[ id, gradientAttribute, customGradientAttribute ]
+		[ clientId, gradientAttribute, customGradientAttribute ]
 	);
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
@@ -72,18 +68,18 @@ export function __experimentalUseGradient(
 		( newGradientValue ) => {
 			const slug = getGradientSlugByValue( gradients, newGradientValue );
 			if ( slug ) {
-				updateBlockAttributes( id, {
+				updateBlockAttributes( clientId, {
 					[ gradientAttribute ]: slug,
 					[ customGradientAttribute ]: undefined,
 				} );
 				return;
 			}
-			updateBlockAttributes( id, {
+			updateBlockAttributes( clientId, {
 				[ gradientAttribute ]: undefined,
 				[ customGradientAttribute ]: newGradientValue,
 			} );
 		},
-		[ gradients, id, updateBlockAttributes ]
+		[ gradients, clientId, updateBlockAttributes ]
 	);
 
 	const gradientClass = __experimentalGetGradientClass( gradient );
@@ -94,4 +90,12 @@ export function __experimentalUseGradient(
 		gradientValue = customGradient;
 	}
 	return { gradientClass, gradientValue, setGradient };
+}
+
+export function __experimentalWithSetGradient( WrappedComponent ) {
+	return ( props ) => {
+		const { setGradient } = __experimentalUseGradient();
+
+		return <WrappedComponent setGradient={ setGradient } { ...props } />;
+	};
 }
