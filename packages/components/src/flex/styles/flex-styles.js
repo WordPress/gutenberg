@@ -34,10 +34,10 @@ const gapStyle = ( { gap } ) => {
 
 	return css`
 		> * {
-			margin-right: ${value}px;
+			padding-right: ${value}px;
 
 			&:last-child {
-				margin-right: 0;
+				padding-right: 0;
 			}
 		}
 	`;

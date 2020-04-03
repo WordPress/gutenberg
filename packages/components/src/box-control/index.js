@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import ButtonGroup from '../button-group';
 import Button from '../button';
 import BoxControlIcon from './icon';
+import Tooltip from '../tooltip';
 import BaseUnitControl from '../unit-control';
 import { Flex, FlexBlock, FlexItem } from '../flex';
 
@@ -22,10 +23,20 @@ const types = [ 'all', 'pairs', 'custom' ];
 const defaultInputProps = {
 	min: 0,
 };
-const typeIconSides = {
-	all: [ 'all' ],
-	pairs: [ 'top', 'bottom' ],
-	custom: [ 'top' ],
+
+const typeProps = {
+	all: {
+		sides: [ 'all' ],
+		label: __( 'All sides' ),
+	},
+	pairs: {
+		sides: [ 'top', 'bottom' ],
+		label: __( 'Pair of sides' ),
+	},
+	custom: {
+		sides: [ 'top' ],
+		label: __( 'Individual sides' ),
+	},
 };
 
 const defaultValueProps = {
@@ -48,7 +59,7 @@ const parseType = ( type ) => {
 export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
-	label = 'Box Control',
+	label = __( 'Box Control' ),
 	type: typeProp = 'pairs',
 	values: valuesProp,
 	// Disable units for now
@@ -96,12 +107,13 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 
 	return (
 		<ControlContainer>
-			<FlexItem>
+			<IconWrapper>
 				<BoxControlIcon />
-			</FlexItem>
+			</IconWrapper>
 			<FlexBlock>
 				<UnitControl
 					{ ...props }
+					label={ __( 'All Sides' ) }
 					value={ isMixed ? '' : value }
 					placeholder={ placeholder }
 					unit={ unit }
@@ -148,9 +160,12 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 
 	return (
 		<ControlContainer>
-			<BoxControlIcon sides={ iconSide } />
+			<IconWrapper>
+				<BoxControlIcon sides={ iconSide } />
+			</IconWrapper>
 			<UnitControl
 				{ ...props }
+				label={ __( 'Left/Right' ) }
 				placeholder={ placeholder }
 				onFocus={ () => setSelected( 'vertical' ) }
 				onChange={ ( next ) => {
@@ -170,6 +185,7 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 			/>
 			<UnitControl
 				{ ...props }
+				label={ __( 'Top/Bottom' ) }
 				placeholder={ placeholder }
 				onFocus={ () => setSelected( 'horizontal' ) }
 				onChange={ ( next ) => {
@@ -200,31 +216,35 @@ function BoxCustomControl( { onChange = noop, values, ...props } ) {
 
 	return (
 		<ControlContainer>
-			<FlexItem>
+			<IconWrapper>
 				<BoxControlIcon sides={ [ selected ] } />
-			</FlexItem>
+			</IconWrapper>
 			<ControlContainer>
 				<UnitControl
 					{ ...unitControlProps.top }
 					{ ...props }
+					label={ __( 'Top' ) }
 					onFocus={ () => setSelected( 'top' ) }
 					placeholder=""
 				/>
 				<UnitControl
 					{ ...unitControlProps.right }
 					{ ...props }
+					label={ __( 'Right' ) }
 					onFocus={ () => setSelected( 'right' ) }
 					placeholder=""
 				/>
 				<UnitControl
 					{ ...unitControlProps.bottom }
 					{ ...props }
+					label={ __( 'Bottom' ) }
 					onFocus={ () => setSelected( 'bottom' ) }
 					placeholder=""
 				/>
 				<UnitControl
 					{ ...unitControlProps.left }
 					{ ...props }
+					label={ __( 'Left' ) }
 					onFocus={ () => setSelected( 'left' ) }
 					placeholder=""
 				/>
@@ -280,26 +300,37 @@ function BoxTypeControl( {
 
 	return (
 		<RadioGroup { ...radio } as={ ButtonGroup } aria-label={ label }>
-			{ types.map( ( value ) => (
-				<Radio
-					{ ...radio }
-					as={ Button }
-					isPrimary={ radio.state === value }
-					key={ value }
-					value={ value }
-				>
-					<BoxControlIcon sides={ typeIconSides[ value ] } />
-				</Radio>
-			) ) }
+			{ types.map( ( value ) => {
+				const valueProps = typeProps[ value ];
+				const isSelected = radio.state === value;
+
+				return (
+					<Tooltip key={ value } text={ valueProps.label }>
+						<Radio
+							{ ...radio }
+							as={ Button }
+							isPrimary={ isSelected }
+							value={ value }
+						>
+							<BoxControlIcon sides={ valueProps.sides } />
+						</Radio>
+					</Tooltip>
+				);
+			} ) }
 		</RadioGroup>
 	);
 }
 
-function UnitControl( props ) {
+function UnitControl( { label, ...props } ) {
 	return (
-		<UnitControlWrapper>
-			<BaseUnitControl isResetValueOnUnitChange={ false } { ...props } />
-		</UnitControlWrapper>
+		<Tooltip text={ label }>
+			<UnitControlWrapper aria-label={ label }>
+				<BaseUnitControl
+					isResetValueOnUnitChange={ false }
+					{ ...props }
+				/>
+			</UnitControlWrapper>
+		</Tooltip>
 	);
 }
 
@@ -311,9 +342,13 @@ const Header = styled( Flex )`
 	margin-bottom: 8px;
 `;
 
+const IconWrapper = styled( FlexItem )`
+	padding-right: 8px;
+`;
+
 const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
-	max-width: 80px;
+	max-width: 70px;
 `;
 
 function parseValues( values = {} ) {
