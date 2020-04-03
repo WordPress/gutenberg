@@ -57,6 +57,7 @@ describe( 'export in different ways', () => {
 	testExport( 'named-variables' );
 	testExport( 'namespace' );
 	testExport( 'namespace-commented' );
+	testExport( 'new-syntax' );
 	testExport( 'tags-function' );
 	testExport( 'tags-ts-definition' );
 	testExport( 'tags-variable' );
