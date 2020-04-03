@@ -16,6 +16,7 @@ import ButtonGroup from '../button-group';
 import Button from '../button';
 import BoxControlIcon from './icon';
 import BaseUnitControl from '../unit-control';
+import { Flex, FlexBlock, FlexItem } from '../flex';
 
 const types = [ 'all', 'pairs', 'custom' ];
 const defaultInputProps = {
@@ -66,17 +67,17 @@ export default function BoxControl( {
 	const mixedLabel = __( 'Mixed' );
 
 	return (
-		<div>
-			<div>
-				{ label }
-				<div>
+		<Root>
+			<Header>
+				<FlexItem>{ label }</FlexItem>
+				<FlexItem>
 					<BoxTypeControl
 						label={ label }
 						onChange={ setType }
 						type={ type }
 					/>
-				</div>
-			</div>
+				</FlexItem>
+			</Header>
 			<ControlComponent
 				{ ...inputProps }
 				placeholder={ mixedLabel }
@@ -84,7 +85,7 @@ export default function BoxControl( {
 				onChange={ updateValues }
 				units={ units }
 			/>
-		</div>
+		</Root>
 	);
 }
 
@@ -94,31 +95,35 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 	const isMixed = ! allValues.every( ( v ) => v === value );
 
 	return (
-		<UnitControlContainer>
-			<BoxControlIcon />
-			<UnitControl
-				{ ...props }
-				value={ isMixed ? '' : value }
-				placeholder={ placeholder }
-				unit={ unit }
-				onChange={ ( next ) => {
-					onChange( {
-						top: [ next, unit ],
-						right: [ next, unit ],
-						bottom: [ next, unit ],
-						left: [ next, unit ],
-					} );
-				} }
-				onUnitChange={ ( next ) => {
-					onChange( {
-						top: [ value, next ],
-						right: [ value, next ],
-						bottom: [ value, next ],
-						left: [ value, next ],
-					} );
-				} }
-			/>
-		</UnitControlContainer>
+		<ControlContainer>
+			<FlexItem>
+				<BoxControlIcon />
+			</FlexItem>
+			<FlexBlock>
+				<UnitControl
+					{ ...props }
+					value={ isMixed ? '' : value }
+					placeholder={ placeholder }
+					unit={ unit }
+					onChange={ ( next ) => {
+						onChange( {
+							top: [ next, unit ],
+							right: [ next, unit ],
+							bottom: [ next, unit ],
+							left: [ next, unit ],
+						} );
+					} }
+					onUnitChange={ ( next ) => {
+						onChange( {
+							top: [ value, next ],
+							right: [ value, next ],
+							bottom: [ value, next ],
+							left: [ value, next ],
+						} );
+					} }
+				/>
+			</FlexBlock>
+		</ControlContainer>
 	);
 }
 
@@ -142,7 +147,7 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 	const iconSide = iconSides[ selected ];
 
 	return (
-		<UnitControlContainer>
+		<ControlContainer>
 			<BoxControlIcon sides={ iconSide } />
 			<UnitControl
 				{ ...props }
@@ -182,7 +187,7 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 				value={ isHorizontalMixed ? '' : horizontal }
 				unit={ horizontalUnit }
 			/>
-		</UnitControlContainer>
+		</ControlContainer>
 	);
 }
 
@@ -194,33 +199,45 @@ function BoxCustomControl( { onChange = noop, values, ...props } ) {
 	} );
 
 	return (
-		<UnitControlContainer>
-			<BoxControlIcon sides={ [ selected ] } />
-			<UnitControl
-				{ ...unitControlProps.top }
-				{ ...props }
-				onFocus={ () => setSelected( 'top' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.right }
-				{ ...props }
-				onFocus={ () => setSelected( 'right' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.bottom }
-				{ ...props }
-				onFocus={ () => setSelected( 'bottom' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.left }
-				{ ...props }
-				onFocus={ () => setSelected( 'left' ) }
-				placeholder=""
-			/>
-		</UnitControlContainer>
+		<ControlContainer>
+			<FlexItem>
+				<BoxControlIcon sides={ [ selected ] } />
+			</FlexItem>
+			<ControlContainer>
+				<UnitControl
+					{ ...unitControlProps.top }
+					{ ...props }
+					onFocus={ () => setSelected( 'top' ) }
+					placeholder=""
+				/>
+				<UnitControl
+					{ ...unitControlProps.right }
+					{ ...props }
+					onFocus={ () => setSelected( 'right' ) }
+					placeholder=""
+				/>
+				<UnitControl
+					{ ...unitControlProps.bottom }
+					{ ...props }
+					onFocus={ () => setSelected( 'bottom' ) }
+					placeholder=""
+				/>
+				<UnitControl
+					{ ...unitControlProps.left }
+					{ ...props }
+					onFocus={ () => setSelected( 'left' ) }
+					placeholder=""
+				/>
+			</ControlContainer>
+		</ControlContainer>
+	);
+}
+
+function ControlContainer( { children } ) {
+	return (
+		<Flex justify="left" gap={ 1 }>
+			{ children }
+		</Flex>
 	);
 }
 
@@ -286,15 +303,17 @@ function UnitControl( props ) {
 	);
 }
 
-const UnitControlContainer = styled.div`
-	box-sizing: border-box;
-	display: flex;
+const Root = styled.div`
+	max-width: 400px;
+`;
+
+const Header = styled( Flex )`
+	margin-bottom: 8px;
 `;
 
 const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
 	max-width: 80px;
-	padding-right: 4px;
 `;
 
 function parseValues( values = {} ) {

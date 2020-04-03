@@ -3,6 +3,12 @@
  */
 import { noop } from 'lodash';
 import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -10,20 +16,23 @@ import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS } from './utils';
 
-export default function UnitControl( {
-	className,
-	isUnitSelectTabbable = true,
-	isResetValueOnUnitChange = true,
-	label,
-	onChange = noop,
-	onUnitChange = noop,
-	size = 'default',
-	style,
-	unit = 'px',
-	units = CSS_UNITS,
-	value,
-	...props
-} ) {
+function UnitControl(
+	{
+		className,
+		isUnitSelectTabbable = true,
+		isResetValueOnUnitChange = true,
+		label,
+		onChange = noop,
+		onUnitChange = noop,
+		size = 'default',
+		style,
+		unit = 'px',
+		units = CSS_UNITS,
+		value,
+		...props
+	},
+	ref
+) {
 	const handleOnUnitChange = ( unitValue, changeProps ) => {
 		const { data } = changeProps;
 		onUnitChange( unitValue, changeProps );
@@ -36,7 +45,7 @@ export default function UnitControl( {
 	const classes = classnames( 'component-unit-control', className );
 
 	return (
-		<Root className={ classes } style={ style }>
+		<Root className={ classes } ref={ ref } style={ style }>
 			<ValueInput
 				aria-label={ label }
 				{ ...props }
@@ -58,4 +67,7 @@ export default function UnitControl( {
 	);
 }
 
-UnitControl.__defaultUnits = CSS_UNITS;
+const ForwardedUnitControl = forwardRef( UnitControl );
+ForwardedUnitControl.__defaultUnits = CSS_UNITS;
+
+export default ForwardedUnitControl;
