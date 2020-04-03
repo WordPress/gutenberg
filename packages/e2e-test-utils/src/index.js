@@ -22,7 +22,7 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
-export { hasPHPError } from './has-php-error';
+export { hasPageError } from './has-page-error';
 export { insertBlock } from './insert-block';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';

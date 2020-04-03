@@ -17,6 +17,6 @@ const REGEXP_PHP_ERROR = /<b>(Fatal error|Recoverable fatal error|Warning|Parse 
  * @return {Promise} Promise resolving to a boolean reflecting whether a PHP
  *                   notice is present.
  */
-export async function hasPHPError() {
+export async function hasPageError() {
 	return REGEXP_PHP_ERROR.test( await page.content() );
 }

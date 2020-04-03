@@ -260,7 +260,7 @@ _Returns_
 
 -   `Promise`: Promise resolving with a boolean.
 
-<a name="hasPHPError" href="#hasPHPError">#</a> **hasPHPError**
+<a name="hasPageError" href="#hasPageError">#</a> **hasPageError**
 
 Returns a promise resolving to a boolean reflecting whether a PHP notice is
 present anywhere within the document's markup. This requires the environment
