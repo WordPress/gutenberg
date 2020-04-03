@@ -38,7 +38,7 @@ describe( 'Multi-entity save flow', () => {
 	const templatePartSelector = '*[data-type="core/template-part"]';
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 
-	// Re-usable assertiosn across Post/Site editors.
+	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
 		const checkedBoxes = await page.$$( checkedBoxSelector );
 		const checkboxInputs = await page.$$( checkboxInputSelector );
