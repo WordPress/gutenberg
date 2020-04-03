@@ -2,17 +2,15 @@
  * WordPress dependencies
  */
 import { PrimitiveButton } from '@wordpress/primitives';
-import { __experimentalUseTheme } from '@wordpress/components';
 
 export default function BlockBreadcrumbButton( { children, ...props } ) {
-	const theme = __experimentalUseTheme();
 	const additionalStyles = [
 		{
 			states: 'hover',
 			styles: {
 				'text-decoration': 'underline',
 				cursor: 'pointer',
-				color: theme.colors.primary,
+				color: '#0085ba',
 			},
 		},
 		{
