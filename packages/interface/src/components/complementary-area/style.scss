@@ -50,12 +50,24 @@
 
 	p {
 		margin-top: 0;
+		line-height: 1.5;
+		color: $dark-gray-500;
+		background-color: inherit;
+	}
+
+	h2 {
+		line-height: $default-line-height;
+	}
+
+	h3 {
+		line-height: 1.5;
 	}
 
 	h2,
 	h3 {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
+		background-color: inherit;
 		margin-bottom: 1.5em;
 	}
 
