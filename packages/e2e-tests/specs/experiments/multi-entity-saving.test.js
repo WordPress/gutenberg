@@ -17,6 +17,7 @@ import {
 	enableExperimentalFeatures,
 	disableExperimentalFeatures,
 } from '../../experimental-features';
+import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors.
@@ -51,6 +52,8 @@ describe( 'Multi-entity save flow', () => {
 	];
 	beforeAll( async () => {
 		await enableExperimentalFeatures( requiredExperiments );
+		await trashExistingPosts( 'wp_template' );
+		await trashExistingPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await disableExperimentalFeatures( requiredExperiments );
@@ -164,8 +167,14 @@ describe( 'Multi-entity save flow', () => {
 			);
 			await demoTemplateButton.click();
 
-			await page.click( templatePartSelector );
-			await page.keyboard.type( 'some words...' );
+			// Insert a new template part.
+			await insertBlock( 'Template Part' );
+			await page.keyboard.type( 'test-template-part2' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'test-theme' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Enter' );
+
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
 			);
