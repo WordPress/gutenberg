@@ -23,10 +23,6 @@
 	margin-bottom: $block-selected-to-content;
 }
 
-.columns-container {
-	max-width: $content-width;
-}
-
 .is-vertically-aligned-top {
 	justify-content: flex-start;
 }
@@ -41,8 +37,4 @@
 
 .flexBase {
 	flex: 1;
-}
-
-.columnMargin {
-	margin: $block-edge-to-content / 2;
 }

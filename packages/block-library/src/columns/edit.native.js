@@ -59,9 +59,9 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
-	const [ columnsSettings, setColumnsSettings ] = useState( {
-		columnsInRow: MIN_COLUMNS_NUMBER,
-	} );
+	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUMBER );
+
+	const containerMaxWidth = styles.columnsContainer.maxWidth;
 
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
@@ -69,18 +69,25 @@ function ColumnsEditContainer( {
 	useEffect( () => {
 		const newColumnCount = ! columnCount ? DEFAULT_COLUMNS : columnCount;
 		updateColumns( columnCount, newColumnCount );
-		setColumnsSettings( {
-			...columnsSettings,
-			columnsInRow: getColumnsInRow( width, newColumnCount ),
-		} );
+		setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
 	}, [ columnCount ] );
 
 	useEffect( () => {
-		setColumnsSettings( {
-			columnsInRow: getColumnsInRow( width, columnCount ),
-			width,
-		} );
+		setColumnsInRow( getColumnsInRow( width, columnCount ) );
 	}, [ width ] );
+
+	const getColumnWidth = ( containerWidth = containerMaxWidth ) => {
+		const minWidth = Math.min( containerWidth, containerMaxWidth );
+		const columnBaseWidth = minWidth / columnsInRow;
+
+		let columnWidth = columnBaseWidth;
+		if ( columnsInRow > 1 ) {
+			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
+			columnWidth = ( minWidth - margins ) / columnsInRow;
+		}
+
+		return columnWidth;
+	};
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < BREAKPOINTS.mobile ) {
@@ -88,10 +95,10 @@ function ColumnsEditContainer( {
 			return 1;
 		} else if ( containerWidth < BREAKPOINTS.large ) {
 			// show 2 Column in row for large breakpoint container width
-			return Math.min( columnCount, 2 );
+			return Math.min( Math.max( 1, columnCount ), 2 );
 		}
 		// show all Column in one row
-		return columnsNumber;
+		return Math.max( 1, columnsNumber );
 	};
 
 	const renderAppender = () => {
@@ -133,9 +140,7 @@ function ColumnsEditContainer( {
 				<InnerBlocks
 					renderAppender={ renderAppender }
 					__experimentalMoverDirection={
-						getColumnsInRow( width, columnCount ) > 1
-							? 'horizontal'
-							: undefined
+						columnsInRow > 1 ? 'horizontal' : undefined
 					}
 					flatListProps={ {
 						contentContainerStyle: styles.columnsContainer,
@@ -145,7 +150,7 @@ function ColumnsEditContainer( {
 					} }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					customBlockProps={ {
-						...columnsSettings,
+						width: getColumnWidth( width ),
 						readableContentViewStyle: { flex: 1 },
 						onAddBlock: onAddNextColumn,
 						onDeleteBlock:

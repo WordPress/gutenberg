@@ -28,24 +28,7 @@ function ColumnEdit( {
 	customBlockProps,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { columnsInRow, width: columnsContainerWidth } = customBlockProps;
-
-	const containerMaxWidth = styles[ 'columns-container' ].maxWidth;
-
-	const containerWidth = columnsContainerWidth || containerMaxWidth;
-
-	const minWidth = Math.min( containerWidth, containerMaxWidth );
-	const columnBaseWidth = minWidth / Math.max( 1, columnsInRow );
-
-	const getColumnWidth = () => {
-		let width = columnBaseWidth;
-		if ( columnsInRow > 1 ) {
-			const margins = columnsInRow * 2 * styles.columnMargin.marginLeft;
-			width = ( minWidth - margins ) / Math.max( 1, columnsInRow );
-		}
-
-		return { width };
-	};
+	const { width } = customBlockProps;
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -60,7 +43,7 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					getColumnWidth(),
+					{ width },
 					styles.columnPlaceholderNotSelected,
 				] }
 			></View>
@@ -77,7 +60,7 @@ function ColumnEdit( {
 			</BlockControls>
 			<View
 				style={ [
-					getColumnWidth(),
+					{ width },
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
 				] }
 			>
