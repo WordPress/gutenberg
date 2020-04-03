@@ -131,9 +131,11 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 
 ### `autoFocus: Boolean`
 
-*Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
+*Optional.* Whether the input should receive focus as soon as it is rendered. Defaults to `false`.
 
-If you are not conditionally rendering this component set this property to `false`.
+Note that it is usually inadvisable to use `autoFocus`, since it can be a disorienting experience for keyboard usage and for users of assistive technology. It should typically only be used when the input is displayed temporarily and it is the intended user experience that the input should be focused immediately upon being shown (e.g. showing the input only after activating a toggle button).
+
+If you are using `URLInput` in the context of a dialog, you should consider instead to use the `focusOnMount` prop of the [`Popover`](https://github.com/WordPress/gutenberg/blob/master/packages/components/src/popover/README.md#focusonmount) or [`Modal`](https://github.com/WordPress/gutenberg/blob/master/packages/components/src/modal/README.md#focusonmount) components instead, as they achieve the same effective behavior.
 
 ### `className: String`
 

@@ -383,7 +383,7 @@ class URLInput extends Component {
 			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
-			autoFocus = true,
+			autoFocus = false,
 			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 

@@ -35,6 +35,11 @@ class URLInputButton extends Component {
 		const { expanded } = this.state;
 		const buttonLabel = url ? __( 'Edit link' ) : __( 'Insert link' );
 
+		// Disable reason: The rendered URLInput is toggled in response to a
+		// click on the button, and it is expected that toggling it to be
+		// visible should shift focus from the button into the input.
+
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
@@ -57,6 +62,7 @@ class URLInputButton extends Component {
 								onClick={ this.toggle }
 							/>
 							<URLInput
+								autoFocus
 								value={ url || '' }
 								onChange={ onChange }
 							/>
@@ -70,6 +76,7 @@ class URLInputButton extends Component {
 				) }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
