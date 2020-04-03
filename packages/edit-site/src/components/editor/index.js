@@ -18,10 +18,10 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockBreadcrumb,
 	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalFullscreenMode as FullscreenMode,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { FullscreenMode } from '@wordpress/interface';
 
 /**
  * Internal dependencies
