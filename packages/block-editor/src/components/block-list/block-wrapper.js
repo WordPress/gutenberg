@@ -103,6 +103,7 @@ const BlockComponent = forwardRef(
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
 			if (
+				document.activeElement &&
 				isInsideRootBlock( wrapper.current, document.activeElement )
 			) {
 				return;

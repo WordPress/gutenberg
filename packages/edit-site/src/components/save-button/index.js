@@ -53,12 +53,13 @@ export default function SaveButton() {
 	const disabled = ! isDirty || isSaving;
 
 	const [ isOpen, setIsOpen ] = useState( false );
-	const open = useCallback( setIsOpen.bind( null, true ), [] );
-	const close = useCallback( setIsOpen.bind( null, false ), [] );
+	const open = useCallback( () => setIsOpen( true ), [] );
+	const close = useCallback( () => setIsOpen( false ), [] );
 	return (
 		<>
 			<Button
 				isPrimary
+				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				disabled={ disabled }
 				isBusy={ isSaving }

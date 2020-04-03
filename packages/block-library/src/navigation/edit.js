@@ -57,14 +57,7 @@ function Navigation( {
 	//
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
+	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
@@ -84,7 +77,6 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
@@ -157,6 +149,7 @@ function Navigation( {
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
+		'is-vertical': attributes.orientation === 'vertical',
 	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
@@ -261,7 +254,6 @@ function Navigation( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
 			<InspectorControls>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
@@ -288,7 +280,9 @@ function Navigation( {
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={ 'horizontal' }
+							__experimentalMoverDirection={
+								attributes.orientation
+							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
 							__experimentalPassedProps={ {
