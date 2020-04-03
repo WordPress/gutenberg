@@ -97,14 +97,18 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
 }
 
 <div
+  aria-activedescendant="alignment-matrix-control-0-center center"
   aria-label="Alignment Matrix Control"
   className="component-alignment-matrix-control emotion-42 emotion-43"
   id="alignment-matrix-control-0"
   onBlur={[Function]}
+  onClick={[Function]}
   onFocus={[Function]}
   onKeyDown={[Function]}
   onKeyUp={[Function]}
+  onMouseDown={[Function]}
   role="grid"
+  tabIndex={0}
 >
   <div
     className="emotion-12 emotion-13"
@@ -202,6 +206,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       />
     </span>
     <span
+      aria-selected={true}
       className="emotion-2 emotion-3"
       id="alignment-matrix-control-0-center center"
       onClick={[Function]}
@@ -210,7 +215,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Default 1`] = `
       onKeyUp={[Function]}
       onMouseDown={[Function]}
       role="gridcell"
-      tabIndex={0}
+      tabIndex={-1}
     >
       <div
         className="components-visually-hidden"
@@ -350,6 +355,7 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   outline: none;
   grid-template-rows: repeat( 3,calc( 24px / 3));
   max-width: 24px;
+  pointer-events: none;
 }
 
 .emotion-0 {
@@ -417,7 +423,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
 >
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -425,7 +430,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -433,7 +437,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -441,7 +444,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -449,7 +451,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-16 emotion-1"
@@ -457,7 +458,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -465,7 +465,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -473,7 +472,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
@@ -481,7 +479,6 @@ exports[`Storyshots Components/AlignmentMatrixControl Icon 1`] = `
   </span>
   <span
     className="emotion-2 emotion-3"
-    tabIndex={-1}
   >
     <span
       className="emotion-0 emotion-1"
