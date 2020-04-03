@@ -21,11 +21,18 @@ const rootSize = ( { size } ) => {
 	} );
 };
 
+const rootPointerEvents = ( { disablePointerEvents } ) => {
+	return css( {
+		pointerEvents: disablePointerEvents ? 'none' : null,
+	} );
+};
+
 export const Root = styled.div`
 	width: 100%;
 
 	${rootBase};
 	${rootSize};
+	${rootPointerEvents};
 `;
 
 const pointActive = ( { isActive } ) => {

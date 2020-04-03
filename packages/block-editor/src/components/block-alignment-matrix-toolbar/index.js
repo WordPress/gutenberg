@@ -6,10 +6,11 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 import {
+	Button,
 	Dropdown,
 	ToolbarGroup,
-	ToolbarButton,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 } from '@wordpress/components';
 
@@ -29,12 +30,21 @@ export function BlockAlignmentMatrixToolbar( props ) {
 			className={ className }
 			popoverProps={ { className } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
+
 				return (
 					<ToolbarGroup>
-						<ToolbarButton
+						<Button
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
+							onKeyDown={ openOnArrowDown }
 							label={ label }
 							icon={ icon }
 							showTooltip
