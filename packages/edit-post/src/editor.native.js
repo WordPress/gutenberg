@@ -67,7 +67,7 @@ class Editor extends Component {
 		}
 
 		if ( colors !== undefined ) {
-			settings.colors = colors
+			settings.colors = colors;
 		}
 
 		return settings;
