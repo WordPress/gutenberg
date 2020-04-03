@@ -21,7 +21,6 @@ import {
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -61,14 +60,6 @@ function Editor( { settings: _settings } ) {
 		};
 	}, [] );
 
-	const skeletonLabels = {
-		header: __( 'Site Editor header' ),
-		body: __( 'Site Editor content' ),
-		sidebar: __( 'Site Editor settings' ),
-		actions: __( 'Site Editor publish' ),
-		footer: __( 'Site Editor footer' ),
-	};
-
 	return template ? (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -94,7 +85,6 @@ function Editor( { settings: _settings } ) {
 											</>
 										}
 										footer={ <BlockBreadcrumb /> }
-										labels={ skeletonLabels }
 									/>
 									<Popover.Slot />
 								</FocusReturnProvider>
