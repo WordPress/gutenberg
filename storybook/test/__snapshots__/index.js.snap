@@ -4383,7 +4383,7 @@ exports[`Storyshots Components/Radio Default 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option1-radio"
+    id="default-radiogroup-1"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4401,7 +4401,7 @@ exports[`Storyshots Components/Radio Default 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option2-radio"
+    id="default-radiogroup-2"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4583,7 +4583,7 @@ exports[`Storyshots Components/RadioGroup Controlled 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option1-radio"
+    id="controlled-radiogroup-1"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4601,7 +4601,7 @@ exports[`Storyshots Components/RadioGroup Controlled 1`] = `
     aria-checked={true}
     checked={true}
     className="components-button is-primary"
-    id="option2-radio"
+    id="controlled-radiogroup-2"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4619,7 +4619,7 @@ exports[`Storyshots Components/RadioGroup Controlled 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option3-radio"
+    id="controlled-radiogroup-3"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4650,7 +4650,7 @@ exports[`Storyshots Components/RadioGroup Default 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option1-radio"
+    id="default-radiogroup-1"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4668,7 +4668,7 @@ exports[`Storyshots Components/RadioGroup Default 1`] = `
     aria-checked={true}
     checked={true}
     className="components-button is-primary"
-    id="option2-radio"
+    id="default-radiogroup-2"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4686,7 +4686,7 @@ exports[`Storyshots Components/RadioGroup Default 1`] = `
     aria-checked={false}
     checked={false}
     className="components-button is-secondary"
-    id="option3-radio"
+    id="default-radiogroup-3"
     onChange={[Function]}
     onClick={[Function]}
     onFocus={[Function]}
@@ -4695,6 +4695,91 @@ exports[`Storyshots Components/RadioGroup Default 1`] = `
     onMouseDown={[Function]}
     role="radio"
     tabIndex={-1}
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Disabled 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="disabled-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    aria-disabled={true}
+    checked={false}
+    className="components-button is-secondary"
+    disabled={true}
+    id="disabled-radiogroup-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    aria-disabled={true}
+    checked={true}
+    className="components-button is-primary"
+    disabled={true}
+    id="disabled-radiogroup-2"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    aria-disabled={true}
+    checked={false}
+    className="components-button is-secondary"
+    disabled={true}
+    id="disabled-radiogroup-3"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
     type="radio"
     value="option3"
   >
