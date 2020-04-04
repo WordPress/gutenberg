@@ -69,7 +69,8 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"appium": "1.17.0"
 	},
 	"devDependencies": {
 		"@actions/core": "1.0.0",
