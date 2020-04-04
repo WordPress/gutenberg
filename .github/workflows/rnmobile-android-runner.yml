@@ -18,6 +18,3 @@ jobs:
           # build tasks, however. These must be run.
           npx lerna run build
           npm run test-e2e:android:local
-
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v2
