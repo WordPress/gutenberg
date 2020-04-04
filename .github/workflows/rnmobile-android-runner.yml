@@ -17,7 +17,6 @@ jobs:
           # source files with `babel-jest`. Some packages have their own custom
           # build tasks, however. These must be run.
           npx lerna run build
-          npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
           npm run test-e2e:android:local
 
     - name: Setup tmate session
