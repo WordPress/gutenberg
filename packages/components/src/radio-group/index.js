@@ -15,7 +15,14 @@ import ButtonGroup from '../button-group';
 import RadioContext from '../radio-context';
 
 function RadioGroup(
-	{ accessibilityLabel, defaultChecked, checked, onChange, ...props },
+	{
+		accessibilityLabel,
+		checked,
+		defaultChecked,
+		disabled,
+		onChange,
+		...props
+	},
 	ref
 ) {
 	const radioState = useRadioState( {
@@ -24,6 +31,7 @@ function RadioGroup(
 	} );
 	const radioContext = {
 		...radioState,
+		disabled,
 		// controlled or uncontrolled
 		state: checked || radioState.state,
 		setState: onChange || radioState.setState,
