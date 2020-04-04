@@ -86,7 +86,7 @@ $input-size: 300px;
 	width: 100%;
 	border: none;
 	text-align: left;
-	@include menu-style__neutral();
+	box-shadow: none;
 
 	&:hover {
 		background: $light-gray-500;

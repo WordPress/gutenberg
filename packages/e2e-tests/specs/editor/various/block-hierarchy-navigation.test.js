@@ -135,4 +135,42 @@ describe( 'Navigating the block hierarchy', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should select the wrapper div for a group ', async () => {
+		// Insert a group block
+		await insertBlock( 'Group' );
+
+		// Insert some random blocks.
+		// The last block shouldn't be a textual block.
+		await page.click( '.block-list-appender .block-editor-inserter' );
+		const paragraphMenuItem = (
+			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
+		 )[ 0 ];
+		await paragraphMenuItem.click();
+		await page.keyboard.type( 'just a paragraph' );
+		await insertBlock( 'Separator' );
+
+		// Check the Group block content
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Unselect the blocks
+		await page.click( '.editor-post-title' );
+
+		// Try selecting the group block using the block navigation
+		await page.click( '[aria-label="Block navigation"]' );
+		const groupMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Group')]"
+			)
+		 )[ 0 ];
+		await groupMenuItem.click();
+
+		// The group block's wrapper should be selected.
+		const isGroupBlockSelected = await page.evaluate(
+			() =>
+				document.activeElement.getAttribute( 'data-type' ) ===
+				'core/group'
+		);
+		expect( isGroupBlockSelected ).toBe( true );
+	} );
 } );
