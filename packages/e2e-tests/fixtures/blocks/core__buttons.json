@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/buttons",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "blockDirection": "horizontal"
+        },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
@@ -26,6 +28,6 @@
                 "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-buttons is-direction-horizontal\">\n\t\n\n\t\n</div>"
     }
 ]

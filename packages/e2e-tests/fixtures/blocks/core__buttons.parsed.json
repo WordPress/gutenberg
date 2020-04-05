@@ -22,22 +22,13 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-buttons is-direction-horizontal\">\n\t\n\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-buttons\">\n\t",
+            "\n<div class=\"wp-block-buttons is-direction-horizontal\">\n\t",
             null,
             "\n\n\t",
             null,
             "\n</div>\n"
-        ]
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
         ]
     }
 ]
