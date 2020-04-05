@@ -19,4 +19,10 @@ jobs:
           # source files with `babel-jest`. Some packages have their own custom
           # build tasks, however. These must be run.
           npx lerna run build
+          mkdir -p test/native/screenshots
           npm run test-e2e:android:local
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v1
+      with:
+        name: upload any screenshots
+        path: test/native/screenshots
