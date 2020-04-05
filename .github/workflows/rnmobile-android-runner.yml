@@ -20,7 +20,7 @@ jobs:
           npx lerna run build
           mkdir -p test/native/screenshots
           npm run test-e2e:android:local
-    - name: Upload an screenshots
+    - name: Upload screenshots
       uses: actions/upload-artifact@v1
       with:
         name: upload any screenshots
