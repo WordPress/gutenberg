@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, useFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
-import { applyFilters } from '@wordpress/hooks';
 
 const SettingsHeader = ( {
 	openDocumentSettings,
@@ -12,11 +11,12 @@ const SettingsHeader = ( {
 	sidebarName,
 } ) => {
 	const blockLabel = __( 'Block' );
-	// translators: ARIA label for the Document sidebar tab, not selected.
-	const documentLabel = applyFilters(
-		'editor.sidebar.settingsHeader.documentLabel',
+	const documentLabel = useFilters(
+		'edit-post.sidebar.settings-header.document-label',
+		// translators: ARIA label for the Document sidebar tab, not selected.
 		__( 'Document' )
 	);
+
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
 			? // translators: ARIA label for the Document sidebar tab, selected.
