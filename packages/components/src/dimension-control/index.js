@@ -11,7 +11,7 @@ import { isFunction } from 'lodash';
  * Internal dependencies
  */
 import { Icon, SelectControl } from '../';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 import { Fragment } from '@wordpress/element';
 
