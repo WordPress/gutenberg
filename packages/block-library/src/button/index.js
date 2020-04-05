@@ -31,8 +31,8 @@ export const settings = {
 		},
 	},
 	styles: [
-		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
+		{ name: 'fill', label: _x( 'Fill', 'block style' ), isDefault: true },
+		{ name: 'outline', label: _x( 'Outline', 'block style' ) },
 	],
 	edit,
 	save,
