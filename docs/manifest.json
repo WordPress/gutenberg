@@ -1296,6 +1296,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-selenium",
+		"slug": "packages-e2e-selenium",
+		"markdown_source": "../packages/e2e-selenium/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/e2e-test-utils",
 		"slug": "packages-e2e-test-utils",
 		"markdown_source": "../packages/e2e-test-utils/README.md",
