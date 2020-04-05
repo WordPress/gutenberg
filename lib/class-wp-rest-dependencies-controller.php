@@ -1,29 +1,44 @@
 <?php
+/**
+ * Dependencies controller.
+ *
+ * @package gutenberg
+ */
 
 /**
+ * Extendable dependency class.
+ *
  * Class WP_REST_Dependencies_Controller
+ *
+ * @see WP_REST_Controller
  */
 class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 	/**
-	 * @var
+	 * Dependencies core object.
+	 *
+	 * @var Object
 	 */
 	protected $object;
 
 
 	/**
-	 * @var
+	 * $editor_block_dependency
+	 *
+	 * @var string
 	 */
 	protected $editor_block_dependency = '';
 
 
 	/**
-	 * @var
+	 * $block_dependency
+	 *
+	 * @var string
 	 */
 	protected $block_dependency = '';
 
 	/**
-	 *
+	 * Register routes.
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -66,7 +81,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Get list of dependencies.
+	 *
+	 * @param WP_REST_Request $request Request.
 	 *
 	 * @return array|WP_Error|WP_REST_Response
 	 */
@@ -99,7 +116,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Get a single depencies.
+	 *
+	 * @param WP_REST_Request $request Request.
 	 *
 	 * @return array|mixed|WP_Error|WP_REST_Response
 	 */
@@ -114,8 +133,10 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param mixed           $dependency
-	 * @param WP_REST_Request $request
+	 * Prepare item for response.
+	 *
+	 * @param mixed           $dependency Dependency.
+	 * @param WP_REST_Request $request Request.
 	 *
 	 * @return mixed|WP_Error|WP_REST_Response
 	 */
@@ -129,7 +150,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Permission check.
+	 *
+	 * @param WP_REST_Request $request Request.
 	 *
 	 * @return bool|true|WP_Error
 	 */
@@ -142,7 +165,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Permission check.
+	 *
+	 * @param WP_REST_Request $request Request.
 	 *
 	 * @return bool|true|WP_Error
 	 */
@@ -155,7 +180,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param $dependency
+	 * Prepare links.
+	 *
+	 * @param object $dependency Dependency.
 	 *
 	 * @return array
 	 */
@@ -178,6 +205,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Get collection params.
+	 *
 	 * @return array
 	 */
 	public function get_collection_params() {
@@ -185,7 +214,7 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 		$query_params['context']['default'] = 'view';
 
 		$query_params['dependency'] = array(
-			'description' => __( '', 'gutenberg' ),
+			'description' => __( 'Dependency.', 'gutenberg' ),
 			'type'        => 'string',
 		);
 
@@ -193,7 +222,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param $handle
+	 * Check handle exists and is viewable.
+	 *
+	 * @param string $handle script / style handle.
 	 *
 	 * @return bool
 	 */
@@ -222,6 +253,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Get core assets.
+	 *
 	 * @return array
 	 */
 	public function get_core_assets() {
@@ -232,7 +265,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param $field
+	 * Block asset.
+	 *
+	 * @param string $field Field to pluck from list of objects.
 	 *
 	 * @return array
 	 */
