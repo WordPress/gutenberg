@@ -6,7 +6,7 @@ import { isNumber, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
 import { useMemo, forwardRef } from '@wordpress/element';
@@ -120,7 +120,7 @@ function FontSizePicker(
 				{ ! withSlider && ! disableCustomFontSizes && (
 					<div className="components-font-size-picker__number-container">
 						<label htmlFor={ fontSizePickerNumberId }>
-							{ __( 'Custom' ) }
+							{ _x( 'Custom', 'font size' ) }
 						</label>
 						<input
 							id={ fontSizePickerNumberId }
@@ -141,7 +141,7 @@ function FontSizePicker(
 									onChange( Number( event.target.value ) );
 								}
 							} }
-							aria-label={ __( 'Custom' ) }
+							aria-label={ _x( 'Custom', 'font size' ) }
 							value={ ( isPixelValue && noUnitsValue ) || '' }
 						/>
 					</div>
