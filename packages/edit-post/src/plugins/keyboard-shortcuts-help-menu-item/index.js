@@ -14,15 +14,13 @@ export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 			} }
 			shortcut={ displayShortcut.access( 'h' ) }
 		>
-			{ __( 'Keyboard Shortcuts' ) }
+			{ __( 'Keyboard shortcuts' ) }
 		</MenuItem>
 	);
 }
 
 export default withDispatch( ( dispatch ) => {
-	const {
-		openModal,
-	} = dispatch( 'core/edit-post' );
+	const { openModal } = dispatch( 'core/edit-post' );
 
 	return {
 		openModal,

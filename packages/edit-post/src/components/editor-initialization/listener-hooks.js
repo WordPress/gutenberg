@@ -20,10 +20,7 @@ import {
  * @param {number} postId  The current post id.
  */
 export const useBlockSelectionListener = ( postId ) => {
-	const {
-		hasBlockSelection,
-		isEditorSidebarOpened,
-	} = useSelect(
+	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
 		( select ) => ( {
 			hasBlockSelection: !! select(
 				'core/block-editor'
@@ -57,12 +54,16 @@ export const useAdjustSidebarListener = ( postId ) => {
 	const { isSmall, activeGeneralSidebarName } = useSelect(
 		( select ) => ( {
 			isSmall: select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			activeGeneralSidebarName: select( STORE_KEY ).getActiveGeneralSidebarName(),
+			activeGeneralSidebarName: select(
+				STORE_KEY
+			).getActiveGeneralSidebarName(),
 		} ),
 		[ postId ]
 	);
 
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( STORE_KEY );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		STORE_KEY
+	);
 
 	const previousIsSmall = useRef( null );
 	const sidebarToReOpenOnExpand = useRef( null );
@@ -78,7 +79,10 @@ export const useAdjustSidebarListener = ( postId ) => {
 			if ( activeGeneralSidebarName ) {
 				closeGeneralSidebar();
 			}
-		} else if ( sidebarToReOpenOnExpand.current && ! activeGeneralSidebarName ) {
+		} else if (
+			sidebarToReOpenOnExpand.current &&
+			! activeGeneralSidebarName
+		) {
 			openGeneralSidebar( sidebarToReOpenOnExpand.current );
 			sidebarToReOpenOnExpand.current = null;
 		}
@@ -101,7 +105,8 @@ export const useUpdatePostLinkListener = ( postId ) => {
 	const nodeToUpdate = useRef();
 
 	useEffect( () => {
-		nodeToUpdate.current = document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
+		nodeToUpdate.current =
+			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
 			document.querySelector( VIEW_AS_LINK_SELECTOR );
 	}, [ postId ] );
 

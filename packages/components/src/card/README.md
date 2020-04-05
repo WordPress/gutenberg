@@ -51,11 +51,11 @@ const Example = () => (
 		</CardHeader>
 		<CardBody>
 			...
-		<CardBody>
+		</CardBody>
 		<CardDivider />
 		<CardBody>
 			...
-		<CardBody>
+		</CardBody>
 		<CardMedia>
 			<img src="..." />
 		</CardMedia>

@@ -1,4 +1,47 @@
-const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+/**
+ * Internal dependencies
+ */
+import requestIdleCallback from './request-idle-callback';
+
+/**
+ * Enqueued callback to invoke once idle time permits.
+ *
+ * @typedef {()=>void} WPPriorityQueueCallback
+ */
+
+/**
+ * An object used to associate callbacks in a particular context grouping.
+ *
+ * @typedef {{}} WPPriorityQueueContext
+ */
+
+/**
+ * Function to add callback to priority queue.
+ *
+ * @typedef {(element:WPPriorityQueueContext,item:WPPriorityQueueCallback)=>void} WPPriorityQueueAdd
+ */
+
+/**
+ * Function to flush callbacks from priority queue.
+ *
+ * @typedef {(element:WPPriorityQueueContext)=>boolean} WPPriorityQueueFlush
+ */
+
+/**
+ * Reset the queue.
+ *
+ * @typedef {()=>void} WPPriorityQueueReset
+ */
+
+/**
+ * Priority queue instance.
+ *
+ * @typedef {Object} WPPriorityQueue
+ *
+ * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
+ * @property {WPPriorityQueueFlush} flush Flush queue for context.
+ * @property {WPPriorityQueueReset} reset Reset queue.
+ */
 
 /**
  * Creates a context-aware queue that only executes
@@ -20,28 +63,56 @@ const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallb
  * queue.add( ctx2, () => console.log( 'This will be printed second' ) );
  *```
  *
- * @return {Object} Queue object with `add` and `flush` methods.
+ * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
 export const createQueue = () => {
-	const waitingList = [];
-	const elementsMap = new WeakMap();
+	/** @type {WPPriorityQueueContext[]} */
+	let waitingList = [];
+
+	/** @type {WeakMap<WPPriorityQueueContext,WPPriorityQueueCallback>} */
+	let elementsMap = new WeakMap();
+
 	let isRunning = false;
 
+	/* eslint-disable jsdoc/valid-types */
+	/**
+	 * Callback to process as much queue as time permits.
+	 *
+	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
+	 *                                       animation frame timestamp.
+	 */
+	/* eslint-enable */
 	const runWaitingList = ( deadline ) => {
+		const hasTimeRemaining =
+			typeof deadline === 'number'
+				? () => false
+				: () => deadline.timeRemaining() > 0;
+
 		do {
 			if ( waitingList.length === 0 ) {
 				isRunning = false;
 				return;
 			}
 
-			const nextElement = waitingList.shift();
-			elementsMap.get( nextElement )();
+			const nextElement = /** @type {WPPriorityQueueContext} */ ( waitingList.shift() );
+			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
+				nextElement
+			) );
+			callback();
 			elementsMap.delete( nextElement );
-		} while ( deadline && deadline.timeRemaining && deadline.timeRemaining() > 0 );
+		} while ( hasTimeRemaining() );
 
 		requestIdleCallback( runWaitingList );
 	};
 
+	/**
+	 * Add a callback to the queue for a given context.
+	 *
+	 * @type {WPPriorityQueueAdd}
+	 *
+	 * @param {WPPriorityQueueContext}  element Context object.
+	 * @param {WPPriorityQueueCallback} item    Callback function.
+	 */
 	const add = ( element, item ) => {
 		if ( ! elementsMap.has( element ) ) {
 			waitingList.push( element );
@@ -53,20 +124,46 @@ export const createQueue = () => {
 		}
 	};
 
+	/**
+	 * Flushes queue for a given context, returning true if the flush was
+	 * performed, or false if there is no queue for the given context.
+	 *
+	 * @type {WPPriorityQueueFlush}
+	 *
+	 * @param {WPPriorityQueueContext} element Context object.
+	 *
+	 * @return {boolean} Whether flush was performed.
+	 */
 	const flush = ( element ) => {
 		if ( ! elementsMap.has( element ) ) {
 			return false;
 		}
 
-		elementsMap.delete( element );
 		const index = waitingList.indexOf( element );
 		waitingList.splice( index, 1 );
+		const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
+			element
+		) );
+		elementsMap.delete( element );
+		callback();
 
 		return true;
+	};
+
+	/**
+	 * Reset the queue without running the pending callbacks.
+	 *
+	 * @type {WPPriorityQueueReset}
+	 */
+	const reset = () => {
+		waitingList = [];
+		elementsMap = new WeakMap();
+		isRunning = false;
 	};
 
 	return {
 		add,
 		flush,
+		reset,
 	};
 };

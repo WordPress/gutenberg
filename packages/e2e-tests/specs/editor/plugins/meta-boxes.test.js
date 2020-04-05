@@ -53,7 +53,9 @@ describe( 'Meta boxes', () => {
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x(
+			"//a[contains(text(), 'View Post')]"
+		);
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
@@ -68,17 +70,17 @@ describe( 'Meta boxes', () => {
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x(
+			"//a[contains(text(), 'View Post')]"
+		);
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
 		// Retrieve the excerpt used as meta
 		const metaExcerpt = await page.evaluate( () => {
-			return document.querySelector(
-				'meta[property="gutenberg:hello"]'
-			).getAttribute(
-				'content'
-			);
+			return document
+				.querySelector( 'meta[property="gutenberg:hello"]' )
+				.getAttribute( 'content' );
 		} );
 
 		expect( metaExcerpt ).toEqual( 'Excerpt from content.' );
@@ -91,29 +93,34 @@ describe( 'Meta boxes', () => {
 
 		// Open the excerpt panel
 		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelToggleButtonWithTitle( 'Excerpt' );
+		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
+			'Excerpt'
+		);
 		if ( excerptButton ) {
 			await excerptButton.click( 'button' );
 		}
 
 		await page.waitForSelector( '.editor-post-excerpt textarea' );
 
-		await page.type( '.editor-post-excerpt textarea', 'Explicitly set excerpt.' );
+		await page.type(
+			'.editor-post-excerpt textarea',
+			'Explicitly set excerpt.'
+		);
 
 		await publishPost();
 
 		// View the post.
-		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		const viewPostLinks = await page.$x(
+			"//a[contains(text(), 'View Post')]"
+		);
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
 		// Retrieve the excerpt used as meta
 		const metaExcerpt = await page.evaluate( () => {
-			return document.querySelector(
-				'meta[property="gutenberg:hello"]'
-			).getAttribute(
-				'content'
-			);
+			return document
+				.querySelector( 'meta[property="gutenberg:hello"]' )
+				.getAttribute( 'content' );
 		} );
 
 		expect( metaExcerpt ).toEqual( 'Explicitly set excerpt.' );

@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useCallback } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -78,17 +84,20 @@ export function useEntityId( kind, type ) {
  */
 export function useEntityProp( kind, type, prop ) {
 	const id = useEntityId( kind, type );
-
-	const value = useSelect(
+	const { value, fullValue } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-			getEntityRecord( kind, type, id ); // Trigger resolver.
-			const entity = getEditedEntityRecord( kind, type, id );
-			return entity && entity[ prop ];
+			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
+			const editedEntity = getEditedEntityRecord( kind, type, id );
+			return entity && editedEntity
+				? {
+						value: editedEntity[ prop ],
+						fullValue: entity[ prop ],
+				  }
+				: {};
 		},
 		[ kind, type, id, prop ]
 	);
-
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setValue = useCallback(
 		( newValue ) => {
@@ -99,64 +108,67 @@ export function useEntityProp( kind, type, prop ) {
 		[ kind, type, id, prop ]
 	);
 
-	return [ value, setValue ];
+	return [ value, setValue, fullValue ];
 }
 
 /**
- * Hook that returns whether the nearest provided
- * entity of the specified type is dirty, saving,
- * and a function to save it.
+ * Hook that returns block content getters and setters for
+ * the nearest provided entity of the specified type.
  *
- * The last, optional parameter is for scoping the
- * selection to a single property or a list properties.
+ * The return value has the shape `[ blocks, onInput, onChange ]`.
+ * `onInput` is for block changes that don't create undo levels
+ * or dirty the post, non-persistent changes, and `onChange` is for
+ * peristent changes. They map directly to the props of a
+ * `BlockEditorProvider` and are intended to be used with it,
+ * or similar components or hooks.
  *
- * By default, dirtyness detection and saving considers
- * and handles all properties of an entity, but this
- * last parameter lets you scope it to a single property
- * or a list of properties for each instance of this hook.
+ * @param {string} kind                            The entity kind.
+ * @param {string} type                            The entity type.
+ * @param {Object} options
+ * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
+ * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
+ * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
  *
- * @param {string}          kind    The entity kind.
- * @param {string}          type    The entity type.
- * @param {string|[string]} [props] The property name or list of property names.
+ * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
-export function __experimentalUseEntitySaving( kind, type, props ) {
-	const id = useEntityId( kind, type );
+export function useEntityBlockEditor(
+	kind,
+	type,
+	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
+) {
+	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
 
-	const [ isDirty, isSaving, edits ] = useSelect(
-		( select ) => {
-			const { getEntityRecordNonTransientEdits, isSavingEntityRecord } = select(
-				'core'
-			);
-			const _edits = getEntityRecordNonTransientEdits( kind, type, id );
-			const editKeys = Object.keys( _edits );
-			return [
-				props ?
-					editKeys.some( ( key ) =>
-						typeof props === 'string' ? key === props : props.includes( key )
-					) :
-					editKeys.length > 0,
-				isSavingEntityRecord( kind, type, id ),
-				_edits,
-			];
-		},
-		[ kind, type, id, props ]
+	const { editEntityRecord } = useDispatch( 'core' );
+	const id = useEntityId( kind, type );
+	const initialBlocks = useMemo( () => {
+		if ( initialEdits ) {
+			editEntityRecord( kind, type, id, initialEdits, {
+				undoIgnore: true,
+			} );
+		}
+
+		// Guard against other instances that might have
+		// set content to a function already.
+		if ( typeof content !== 'function' ) {
+			const parsedContent = parse( content );
+			return parsedContent.length ? parsedContent : [];
+		}
+	}, [ id ] ); // Reset when the provided entity record changes.
+	const [ blocks = initialBlocks, onInput ] = useEntityProp(
+		kind,
+		type,
+		blocksProp
 	);
 
-	const { saveEntityRecord } = useDispatch( 'core' );
-	const save = useCallback( () => {
-		let filteredEdits = edits;
-		if ( typeof props === 'string' ) {
-			filteredEdits = { [ props ]: filteredEdits[ props ] };
-		} else if ( props ) {
-			filteredEdits = filteredEdits.reduce( ( acc, key ) => {
-				if ( props.includes( key ) ) {
-					acc[ key ] = filteredEdits[ key ];
-				}
-				return acc;
-			}, {} );
-		}
-		saveEntityRecord( kind, type, { id, ...filteredEdits } );
-	}, [ kind, type, id, props, edits ] );
-
-	return [ isDirty, isSaving, save ];
+	const onChange = useCallback(
+		( nextBlocks ) => {
+			onInput( nextBlocks );
+			// Use a function edit to avoid serializing often.
+			setContent( ( { blocks: blocksToSerialize } ) =>
+				serialize( blocksToSerialize )
+			);
+		},
+		[ onInput, setContent ]
+	);
+	return [ blocks, onInput, onChange ];
 }

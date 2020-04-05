@@ -11,6 +11,7 @@ const getSymbolTagsByName = require( './get-symbol-tags-by-name' );
  *
  * @return {boolean} Whether symbol is private.
  */
-const isSymbolPrivate = ( symbol ) => getSymbolTagsByName( symbol, 'private' ).length > 0;
+const isSymbolPrivate = ( symbol ) =>
+	getSymbolTagsByName( symbol, 'private' ).length > 0;
 
 module.exports = isSymbolPrivate;

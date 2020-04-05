@@ -43,7 +43,8 @@ describe( 'PostTaxonomies', () => {
 		};
 
 		const wrapperOne = shallow(
-			<PostTaxonomies postType="book"
+			<PostTaxonomies
+				postType="book"
 				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
 			/>
 		);
@@ -51,7 +52,8 @@ describe( 'PostTaxonomies', () => {
 		expect( wrapperOne ).toHaveLength( 1 );
 
 		const wrapperTwo = shallow(
-			<PostTaxonomies postType="book"
+			<PostTaxonomies
+				postType="book"
 				taxonomies={ [
 					genresTaxonomy,
 					{
@@ -78,15 +80,14 @@ describe( 'PostTaxonomies', () => {
 		};
 
 		const wrapperOne = shallow(
-			<PostTaxonomies postType="book"
-				taxonomies={ [ genresTaxonomy ] }
-			/>
+			<PostTaxonomies postType="book" taxonomies={ [ genresTaxonomy ] } />
 		);
 
 		expect( wrapperOne.at( 0 ) ).toHaveLength( 1 );
 
 		const wrapperTwo = shallow(
-			<PostTaxonomies postType="book"
+			<PostTaxonomies
+				postType="book"
 				taxonomies={ [
 					{
 						...genresTaxonomy,

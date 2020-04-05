@@ -15,7 +15,9 @@ export const name = 'core/embed';
 
 export const settings = getEmbedBlockSettings( {
 	title: _x( 'Embed', 'block title' ),
-	description: __( 'Embed videos, images, tweets, audio, and other content from external sources.' ),
+	description: __(
+		'Embed videos, images, tweets, audio, and other content from external sources.'
+	),
 	icon: embedContentIcon,
 	// Unknown embeds should not be responsive by default.
 	responsive: false,
@@ -23,7 +25,9 @@ export const settings = getEmbedBlockSettings( {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+				isMatch: ( node ) =>
+					node.nodeName === 'P' &&
+					/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
 				transform: ( node ) => {
 					return createBlock( 'core/embed', {
 						url: node.textContent.trim(),
@@ -34,20 +38,16 @@ export const settings = getEmbedBlockSettings( {
 	},
 } );
 
-export const common = commonEmbeds.map(
-	( embedDefinition ) => {
-		return {
-			...embedDefinition,
-			settings: getEmbedBlockSettings( embedDefinition.settings ),
-		};
-	}
-);
+export const common = commonEmbeds.map( ( embedDefinition ) => {
+	return {
+		...embedDefinition,
+		settings: getEmbedBlockSettings( embedDefinition.settings ),
+	};
+} );
 
-export const others = otherEmbeds.map(
-	( embedDefinition ) => {
-		return {
-			...embedDefinition,
-			settings: getEmbedBlockSettings( embedDefinition.settings ),
-		};
-	}
-);
+export const others = otherEmbeds.map( ( embedDefinition ) => {
+	return {
+		...embedDefinition,
+		settings: getEmbedBlockSettings( embedDefinition.settings ),
+	};
+} );

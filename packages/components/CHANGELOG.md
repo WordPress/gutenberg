@@ -1,8 +1,38 @@
-# 8.3.0 (Unreleased)
+## Master
+
+## 9.2.0 (2020-02-10)
+
+### Enhancements
+
+- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
+
+### Bug Fixes
+
+- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
+
+## 9.0.0 (2020-01-13)
 
 ### New Features
 
 - Added a new `Guide` component which allows developers to easily present a user guide.
+
+### Breaking Changes
+
+- `is-button` classname has been removed from the Button component.
+- The `is-default` classname is not applied automatically anymore.
+- By default Button components come with a fixed height and hover styles.
+
+### Bug Fixes
+
+- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
+### Deprecations
+
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
+- `IconButton` has been deprecated. Use the `Button` component instead.
 
 ## 8.2.0 (2019-08-29)
 
@@ -22,7 +52,7 @@
 
 ### Deprecations
 
-- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead. 
+- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
 - `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
 
 ### Bug Fixes
@@ -85,7 +115,7 @@
 
 ### Improvements
 
-- Limit `Base Control Label` to the width of its content. 
+- Limit `Base Control Label` to the width of its content.
 
 ### Bug fixes
 

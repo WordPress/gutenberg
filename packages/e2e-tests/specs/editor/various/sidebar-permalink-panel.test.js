@@ -6,7 +6,6 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	findSidebarPanelWithTitle,
-	openDocumentSettingsSidebar,
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
@@ -23,24 +22,15 @@ describe( 'Sidebar Permalink Panel', () => {
 		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
 	} );
 
-	it( 'should not render permalink sidebar panel while the post is new', async () => {
+	it( 'should allow permalink sidebar panel to be removed', async () => {
 		await createNewPost();
-		await openDocumentSettingsSidebar();
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
-	} );
-
-	it( 'should render permalink sidebar panel after the post is published and allow its removal', async () => {
-		await createNewPost();
-		await page.keyboard.type( 'aaaaa' );
-		await publishPost();
-		// Start editing again.
-		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeDefined();
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 			removeEditorPanel( 'post-link' );
 		} );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should not render link panel when post is publicly queryable but not public', async () => {
@@ -49,7 +39,9 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should not render link panel when post is public but not publicly queryable', async () => {
@@ -58,7 +50,9 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Permalink' )
+		).toBeUndefined();
 	} );
 
 	it( 'should render link panel when post is public and publicly queryable', async () => {

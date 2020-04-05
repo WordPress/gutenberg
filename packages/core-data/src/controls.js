@@ -55,13 +55,17 @@ const controls = {
 		return triggerApiFetch( request );
 	},
 
-	SELECT: createRegistryControl( ( registry ) => ( { selectorName, args } ) => {
-		return registry.select( 'core' )[ selectorName ]( ...args );
-	} ),
+	SELECT: createRegistryControl(
+		( registry ) => ( { selectorName, args } ) => {
+			return registry.select( 'core' )[ selectorName ]( ...args );
+		}
+	),
 
 	RESOLVE_SELECT: createRegistryControl(
 		( registry ) => ( { selectorName, args } ) => {
-			return registry.__experimentalResolveSelect( 'core' )[ selectorName ]( ...args );
+			return registry
+				.__experimentalResolveSelect( 'core' )
+				[ selectorName ]( ...args );
 		}
 	),
 };

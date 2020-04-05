@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	IconButton,
+	Button,
 	PanelBody,
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
+import { pencil } from '@wordpress/icons';
 
 const EmbedControls = ( props ) => {
 	const {
@@ -25,10 +26,10 @@ const EmbedControls = ( props ) => {
 			<BlockControls>
 				<ToolbarGroup>
 					{ showEditButton && (
-						<IconButton
+						<Button
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
-							icon="edit"
+							icon={ pencil }
 							onClick={ switchBackToURLInput }
 						/>
 					) }
@@ -36,7 +37,10 @@ const EmbedControls = ( props ) => {
 			</BlockControls>
 			{ themeSupportsResponsive && blockSupportsResponsive && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+					<PanelBody
+						title={ __( 'Media settings' ) }
+						className="blocks-responsive"
+					>
 						<ToggleControl
 							label={ __( 'Resize for smaller devices' ) }
 							checked={ allowResponsive }

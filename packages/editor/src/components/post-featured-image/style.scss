@@ -1,8 +1,17 @@
 .editor-post-featured-image {
 	padding: 0;
 
+	&__container {
+		margin-bottom: 1em;
+		position: relative;
+	}
+
 	.components-spinner {
-		margin: 0;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
 	}
 
 	// Stack consecutive buttons.
@@ -29,6 +38,10 @@
 	box-shadow: 0 0 0 0 $blue-medium-500;
 }
 
+.editor-post-featured-image__preview {
+	height: auto;
+}
+
 .editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
 	box-shadow: 0 0 0 4px $blue-medium-500;
 }
@@ -36,8 +49,9 @@
 .editor-post-featured-image__toggle {
 	border: $border-width dashed $light-gray-900;
 	background-color: $light-gray-300;
+	min-height: 90px;
 	line-height: 20px;
-	padding: $grid-size 0;
+	padding: $grid-unit-10 0;
 	text-align: center;
 
 	&:hover {

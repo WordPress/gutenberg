@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Adds an annotation to a block.
@@ -25,7 +25,14 @@ import uuid from 'uuid/v4';
  *
  * @return {Object} Action object.
  */
-export function __experimentalAddAnnotation( { blockClientId, richTextIdentifier = null, range = null, selector = 'range', source = 'default', id = uuid() } ) {
+export function __experimentalAddAnnotation( {
+	blockClientId,
+	richTextIdentifier = null,
+	range = null,
+	selector = 'range',
+	source = 'default',
+	id = uuid(),
+} ) {
 	const action = {
 		type: 'ANNOTATION_ADD',
 		id,
@@ -65,7 +72,11 @@ export function __experimentalRemoveAnnotation( annotationId ) {
  *
  * @return {Object} Action object.
  */
-export function __experimentalUpdateAnnotationRange( annotationId, start, end ) {
+export function __experimentalUpdateAnnotationRange(
+	annotationId,
+	start,
+	end
+) {
 	return {
 		type: 'ANNOTATION_UPDATE_RANGE',
 		annotationId,

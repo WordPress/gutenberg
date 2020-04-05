@@ -1,0 +1,18 @@
+.edit-site-sidebar {
+	width: $sidebar-width;
+
+	> .components-panel {
+		border-left: 0;
+		border-right: 0;
+		margin-bottom: -1px;
+		margin-top: -1px;
+
+		> .components-panel__header {
+			background: $light-gray-200;
+		}
+	}
+
+	.block-editor-block-inspector__card {
+		margin: 0;
+	}
+}

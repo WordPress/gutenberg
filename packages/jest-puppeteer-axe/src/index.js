@@ -17,38 +17,41 @@ import AxePuppeteer from 'axe-puppeteer';
  * @return {string} The user friendly message to display when the matcher fails.
  */
 function formatViolations( violations ) {
-	return violations.map( ( { help, helpUrl, id, nodes } ) => {
-		let output = `Rule: "${ id }" (${ help })\n` +
-			`Help: ${ helpUrl }\n` +
-			'Affected Nodes:\n';
+	return violations
+		.map( ( { help, helpUrl, id, nodes } ) => {
+			let output =
+				`Rule: "${ id }" (${ help })\n` +
+				`Help: ${ helpUrl }\n` +
+				'Affected Nodes:\n';
 
-		nodes.forEach( ( node ) => {
-			if ( node.any.length ) {
-				output += `  ${ node.target }\n`;
-				output += '    Fix ANY of the following:\n';
-				node.any.forEach( ( item ) => {
-					output += `    - ${ item.message }\n`;
-				} );
-			}
+			nodes.forEach( ( node ) => {
+				if ( node.any.length ) {
+					output += `  ${ node.target }\n`;
+					output += '    Fix ANY of the following:\n';
+					node.any.forEach( ( item ) => {
+						output += `    - ${ item.message }\n`;
+					} );
+				}
 
-			if ( node.all.length ) {
-				output += `  ${ node.target }\n`;
-				output += '    Fix ALL of the following:\n';
-				node.all.forEach( ( item ) => {
-					output += `      - ${ item.message }.\n`;
-				} );
-			}
+				if ( node.all.length ) {
+					output += `  ${ node.target }\n`;
+					output += '    Fix ALL of the following:\n';
+					node.all.forEach( ( item ) => {
+						output += `      - ${ item.message }.\n`;
+					} );
+				}
 
-			if ( node.none.length ) {
-				output += `  ${ node.target }\n`;
-				output += '    Fix ALL of the following:\n';
-				node.none.forEach( ( item ) => {
-					output += `      - ${ item.message }.\n`;
-				} );
-			}
-		} );
-		return output;
-	} ).join( '\n' );
+				if ( node.none.length ) {
+					output += `  ${ node.target }\n`;
+					output += '    Fix ALL of the following:\n';
+					node.none.forEach( ( item ) => {
+						output += `      - ${ item.message }.\n`;
+					} );
+				}
+			} );
+			return output;
+		} )
+		.join( '\n' );
 }
 
 /**
@@ -73,7 +76,10 @@ function formatViolations( violations ) {
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
-async function toPassAxeTests( page, { include, exclude, disabledRules, options, config } = {} ) {
+async function toPassAxeTests(
+	page,
+	{ include, exclude, disabledRules, options, config } = {}
+) {
 	const axe = new AxePuppeteer( page );
 
 	if ( include ) {
@@ -99,22 +105,24 @@ async function toPassAxeTests( page, { include, exclude, disabledRules, options,
 	const { violations } = await axe.analyze();
 
 	const pass = violations.length === 0;
-	const message = pass ?
-		() => {
-			return this.utils.matcherHint( '.not.toPassAxeTests' ) +
-				'\n\n' +
-				'Expected page to contain accessibility check violations.\n' +
-				'No violations found.';
-		} :
-		() => {
-			return this.utils.matcherHint( '.toPassAxeTests' ) +
-				'\n\n' +
-				'Expected page to pass Axe accessibility tests.\n' +
-				'Violations found:\n' +
-				this.utils.RECEIVED_COLOR(
-					formatViolations( violations )
+	const message = pass
+		? () => {
+				return (
+					this.utils.matcherHint( '.not.toPassAxeTests' ) +
+					'\n\n' +
+					'Expected page to contain accessibility check violations.\n' +
+					'No violations found.'
 				);
-		};
+		  }
+		: () => {
+				return (
+					this.utils.matcherHint( '.toPassAxeTests' ) +
+					'\n\n' +
+					'Expected page to pass Axe accessibility tests.\n' +
+					'Violations found:\n' +
+					this.utils.RECEIVED_COLOR( formatViolations( violations ) )
+				);
+		  };
 
 	return {
 		message,

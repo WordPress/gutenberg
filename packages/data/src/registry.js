@@ -1,11 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	omit,
-	without,
-	mapValues,
-} from 'lodash';
+import { omit, without, mapValues } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -36,6 +32,8 @@ import createCoreDataStore from './store';
 
 /**
  * @typedef {Object} WPDataPlugin An object of registry function overrides.
+ *
+ * @property {Function} registerStore registers store.
  */
 
 /**
@@ -93,22 +91,23 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	const getResolveSelectors = memize(
 		( selectors ) => {
 			return mapValues(
-				omit(
-					selectors,
-					[
-						'getIsResolving',
-						'hasStartedResolution',
-						'hasFinishedResolution',
-						'isResolving',
-						'getCachedResolvers',
-					]
-				),
+				omit( selectors, [
+					'getIsResolving',
+					'hasStartedResolution',
+					'hasFinishedResolution',
+					'isResolving',
+					'getCachedResolvers',
+				] ),
 				( selector, selectorName ) => {
 					return ( ...args ) => {
 						return new Promise( ( resolve ) => {
-							const hasFinished = () => selectors
-								.hasFinishedResolution( selectorName, args );
-							const getResult = () => selector.apply( null, args );
+							const hasFinished = () =>
+								selectors.hasFinishedResolution(
+									selectorName,
+									args
+								);
+							const getResult = () =>
+								selector.apply( null, args );
 
 							// trigger the selector (to trigger the resolver)
 							const result = getResult();
@@ -131,10 +130,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	);
 
 	/**
- 	 * Given the name of a registered store, returns an object containing the store's
- 	 * selectors pre-bound to state so that you only need to supply additional arguments,
- 	 * and modified so that they return promises that resolve to their eventual values,
- 	 * after any resolvers have ran.
+	 * Given the name of a registered store, returns an object containing the store's
+	 * selectors pre-bound to state so that you only need to supply additional arguments,
+	 * and modified so that they return promises that resolve to their eventual values,
+	 * after any resolvers have ran.
 	 *
 	 * @param {string} reducerKey Part of the state shape to register the
 	 *                            selectors for.
@@ -241,8 +240,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 	registerGenericStore( 'core/data', createCoreDataStore( registry ) );
 
-	Object.entries( storeConfigs ).forEach(
-		( [ name, config ] ) => registry.registerStore( name, config )
+	Object.entries( storeConfigs ).forEach( ( [ name, config ] ) =>
+		registry.registerStore( name, config )
 	);
 
 	if ( parent ) {

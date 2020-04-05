@@ -46,16 +46,24 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 			webpack( options, ( err, stats ) => {
 				expect( err ).toBeNull();
 
-				const assetFiles = glob( `${ outputDirectory }/*.asset.@(json|php)` );
-				const expectedLength =
-					typeof options.entry === 'object' ? Object.keys( options.entry ).length : 1;
+				const assetFiles = glob(
+					`${ outputDirectory }/+(*.asset|assets).@(json|php)`
+				);
+				const hasCombinedAssets = ( options.plugins || [] ).some(
+					( plugin ) => !! ( plugin.options || {} ).combineAssets
+				);
+				const entrypointCount =
+					typeof options.entry === 'object'
+						? Object.keys( options.entry ).length
+						: 1;
+				const expectedLength = hasCombinedAssets ? 1 : entrypointCount;
 				expect( assetFiles ).toHaveLength( expectedLength );
 
 				// Asset files should match.
 				assetFiles.forEach( ( assetFile ) => {
-					expect( fs.readFileSync( assetFile, 'utf-8' ) ).toMatchSnapshot(
-						'Asset file should match snapshot'
-					);
+					expect(
+						fs.readFileSync( assetFile, 'utf-8' )
+					).toMatchSnapshot( 'Asset file should match snapshot' );
 				} );
 
 				// Webpack stats external modules should match.
@@ -67,7 +75,9 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 						request: module.request,
 						userRequest: module.userRequest,
 					} ) );
-				expect( externalModules ).toMatchSnapshot( 'External modules should match snapshot' );
+				expect( externalModules ).toMatchSnapshot(
+					'External modules should match snapshot'
+				);
 
 				resolve();
 			} );

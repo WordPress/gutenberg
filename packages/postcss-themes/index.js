@@ -26,10 +26,17 @@ module.exports = postcss.plugin( 'postcss-themes', function( options ) {
 					const defaultColor = options.defaults[ colorKey ];
 					value = value.replace( whole, defaultColor );
 
-					Object.entries( options.themes ).forEach( ( [ key, colors ] ) => {
-						const previousValue = themeValues[ key ] ? themeValues[ key ] : decl.value;
-						themeValues[ key ] = previousValue.replace( whole, colors[ colorKey ] );
-					} );
+					Object.entries( options.themes ).forEach(
+						( [ key, colors ] ) => {
+							const previousValue = themeValues[ key ]
+								? themeValues[ key ]
+								: decl.value;
+							themeValues[ key ] = previousValue.replace(
+								whole,
+								colors[ colorKey ]
+							);
+						}
+					);
 				}
 
 				hasThemeDecls = true;
@@ -47,11 +54,17 @@ module.exports = postcss.plugin( 'postcss-themes', function( options ) {
 			if ( hasThemeDecls ) {
 				Object.keys( options.themes ).forEach( ( key ) => {
 					const newRule = postcss.rule( {
-						selector: rule.selector.split( ',' ).map(
-							( subselector ) => 'body.' + key + ' ' + subselector.trim()
-						).join( ', ' ),
+						selector: rule.selector
+							.split( ',' )
+							.map(
+								( subselector ) =>
+									'body.' + key + ' ' + subselector.trim()
+							)
+							.join( ', ' ),
 					} );
-					themeDecls[ key ].forEach( ( decl ) => newRule.append( decl ) );
+					themeDecls[ key ].forEach( ( decl ) =>
+						newRule.append( decl )
+					);
 					rule.parent.insertAfter( rule, newRule );
 				} );
 			}

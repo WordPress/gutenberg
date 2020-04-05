@@ -42,6 +42,16 @@ exports[`splitting and merging blocks should not merge paragraphs if the selecti
 <!-- /wp:paragraph -->"
 `;
 
+exports[`splitting and merging blocks should not split with line break in front 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks should remove at most one paragraph in forward direction 1`] = `
 "<!-- wp:paragraph -->
 <p>First</p>

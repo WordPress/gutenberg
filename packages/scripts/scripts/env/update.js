@@ -13,10 +13,7 @@ const { normalize } = require( 'path' );
 /**
  * Internal dependencies
  */
-const {
-	buildWordPress,
-	downloadWordPressZip,
-} = require( '../../utils' );
+const { buildWordPress, downloadWordPressZip } = require( '../../utils' );
 
 env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 
@@ -24,9 +21,10 @@ if ( commandExistsSync( 'git' ) ) {
 	execSync( 'git pull', { cwd: env.WP_DEVELOP_DIR, stdio: 'inherit' } );
 	buildWordPress( false, false );
 } else {
-	stdout.write( "Git isn't available. Switching to downloading a zip version.\n" );
-	downloadWordPressZip()
-		.then( () => {
-			buildWordPress( false, false );
-		} );
+	stdout.write(
+		"Git isn't available. Switching to downloading a zip version.\n"
+	);
+	downloadWordPressZip().then( () => {
+		buildWordPress( false, false );
+	} );
 }

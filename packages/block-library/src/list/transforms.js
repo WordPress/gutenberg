@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	getBlockAttributes,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
 	create,
@@ -15,22 +11,26 @@ import {
 	toHTMLString,
 } from '@wordpress/rich-text';
 
-const listContentSchema = {
-	...getPhrasingContentSchema(),
-	ul: {},
-	ol: { attributes: [ 'type', 'start', 'reversed' ] },
-};
-
-// Recursion is needed.
-// Possible: ul > li > ul.
-// Impossible: ul > ul.
-[ 'ul', 'ol' ].forEach( ( tag ) => {
-	listContentSchema[ tag ].children = {
-		li: {
-			children: listContentSchema,
-		},
+function getListContentSchema( { phrasingContentSchema } ) {
+	const listContentSchema = {
+		...phrasingContentSchema,
+		ul: {},
+		ol: { attributes: [ 'type', 'start', 'reversed' ] },
 	};
-} );
+
+	// Recursion is needed.
+	// Possible: ul > li > ul.
+	// Impossible: ul > ul.
+	[ 'ul', 'ol' ].forEach( ( tag ) => {
+		listContentSchema[ tag ].children = {
+			li: {
+				children: listContentSchema,
+			},
+		};
+	} );
+
+	return listContentSchema;
+}
 
 const transforms = {
 	from: [
@@ -41,17 +41,24 @@ const transforms = {
 			transform: ( blockAttributes ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
-						value: join( blockAttributes.map( ( { content } ) => {
-							const value = create( { html: content } );
+						value: join(
+							blockAttributes.map( ( { content } ) => {
+								const value = create( { html: content } );
 
-							if ( blockAttributes.length > 1 ) {
-								return value;
-							}
+								if ( blockAttributes.length > 1 ) {
+									return value;
+								}
 
-							// When converting only one block, transform
-							// every line to a list item.
-							return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
-						} ), __UNSTABLE_LINE_SEPARATOR ),
+								// When converting only one block, transform
+								// every line to a list item.
+								return replace(
+									value,
+									/\n/g,
+									__UNSTABLE_LINE_SEPARATOR
+								);
+							} ),
+							__UNSTABLE_LINE_SEPARATOR
+						),
 						multilineTag: 'li',
 					} ),
 				} );
@@ -72,10 +79,10 @@ const transforms = {
 		{
 			type: 'raw',
 			selector: 'ol,ul',
-			schema: {
-				ol: listContentSchema.ol,
-				ul: listContentSchema.ul,
-			},
+			schema: ( args ) => ( {
+				ol: getListContentSchema( args ).ol,
+				ul: getListContentSchema( args ).ul,
+			} ),
 			transform( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
@@ -134,16 +141,18 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( { values } ) =>
-				split( create( {
-					html: values,
-					multilineTag: 'li',
-					multilineWrapperTags: [ 'ul', 'ol' ],
-				} ), __UNSTABLE_LINE_SEPARATOR )
-					.map( ( piece ) =>
-						createBlock( 'core/paragraph', {
-							content: toHTMLString( { value: piece } ),
-						} )
-					),
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/paragraph', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
 		},
 		{
 			type: 'block',

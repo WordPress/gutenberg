@@ -5,10 +5,12 @@ module.exports = {
 	},
 	create( context ) {
 		return {
-			'JSXOpeningElement[name.name=\'BaseControl\']': ( node ) => {
+			"JSXOpeningElement[name.name='BaseControl']": ( node ) => {
 				const containsAttribute = ( attrName ) => {
 					return node.attributes.some( ( attribute ) => {
-						return attribute.name && attribute.name.name === attrName;
+						return (
+							attribute.name && attribute.name.name === attrName
+						);
 					} );
 				};
 				if (
@@ -17,7 +19,8 @@ module.exports = {
 				) {
 					context.report( {
 						node,
-						message: 'When using BaseControl component if a label property is passed an id property should also be passed.',
+						message:
+							'When using BaseControl component if a label property is passed an id property should also be passed.',
 					} );
 				}
 			},

@@ -48,7 +48,9 @@ module.exports = function( babel ) {
 				}
 
 				const { scopeVariable } = getOptions( state );
-				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding( scopeVariable );
+				state.hasUndeclaredScopeVariable = ! path.scope.hasBinding(
+					scopeVariable
+				);
 			},
 			JSXFragment( path, state ) {
 				if ( state.hasUndeclaredScopeVariableFrag ) {
@@ -60,18 +62,27 @@ module.exports = function( babel ) {
 					return;
 				}
 
-				state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding( scopeVariableFrag );
+				state.hasUndeclaredScopeVariableFrag = ! path.scope.hasBinding(
+					scopeVariableFrag
+				);
 			},
 			Program: {
 				exit( path, state ) {
-					const { scopeVariable, scopeVariableFrag, source, isDefault } = getOptions( state );
+					const {
+						scopeVariable,
+						scopeVariableFrag,
+						source,
+						isDefault,
+					} = getOptions( state );
 
 					let scopeVariableSpecifier;
 					let scopeVariableFragSpecifier;
 
 					if ( state.hasUndeclaredScopeVariable ) {
 						if ( isDefault ) {
-							scopeVariableSpecifier = t.importDefaultSpecifier( t.identifier( scopeVariable ) );
+							scopeVariableSpecifier = t.importDefaultSpecifier(
+								t.identifier( scopeVariable )
+							);
 						} else {
 							scopeVariableSpecifier = t.importSpecifier(
 								t.identifier( scopeVariable ),

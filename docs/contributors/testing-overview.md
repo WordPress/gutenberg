@@ -27,12 +27,9 @@ Assuming you've followed the [instructions](/docs/contributors/getting-started.m
 npm test
 ```
 
-Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some issues can be fixed automatically by running `npm run lint:fix`.
+Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
 
-To improve your developer workflow, you're encouraged to install an editor linting integration.
-
-- [ESLint Editor Integrations](https://eslint.org/docs/user-guide/integrations)
-- [TypeScript Editor Support](https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support)
+To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/getting-started.md) for additional information.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
@@ -375,7 +372,9 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
-## End to end Testing
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
@@ -400,6 +399,25 @@ If you're using a different setup, you can provide the base URL, username and pa
 ```bash
 WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
 ```
+
+If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
+
+```
+THROTTLE_CPU=4 npm run test-e2e
+```
+
+`THROTTLE_CPU` is a slowdown factor (in this example, a 4x slowdown multiplier)
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+
+```
+DOWNLOAD_THROUGHPUT=125000 npm run test-e2e
+```
+
+`DOWNLOAD_THROUGHPUT` is a numeric value representing bytes-per-second network download (in this example, a 1Mbps download speed).
+
+Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+
 
 ### Core Block Testing
 

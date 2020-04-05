@@ -4,37 +4,47 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Icon, check } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
-import Dashicon from '../dashicon';
 
 function Option( {
 	className,
 	isSelected,
+	selectedIconProps,
 	tooltipText,
 	...additionalProps
 } ) {
 	const optionButton = (
 		<Button
-			aria-pressed={ isSelected }
+			isPressed={ isSelected }
 			className={ classnames(
 				className,
-				'components-circular-option-picker__option',
-				{ 'is-active': isSelected }
+				'components-circular-option-picker__option'
 			) }
 			{ ...additionalProps }
 		/>
 	);
 	return (
 		<div className="components-circular-option-picker__option-wrapper">
-			{ tooltipText ?
-				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
+			{ tooltipText ? (
+				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+			) : (
 				optionButton
-			}
-			{ isSelected && <Dashicon icon="saved" /> }
+			) }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }
@@ -66,11 +76,7 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( {
-	className,
-	children,
-	...additionalProps
-} ) {
+function ButtonAction( { className, children, ...additionalProps } ) {
 	return (
 		<Button
 			className={ classnames(
@@ -78,7 +84,7 @@ function ButtonAction( {
 				className
 			) }
 			isSmall
-			isDefault
+			isSecondary
 			{ ...additionalProps }
 		>
 			{ children }
@@ -90,10 +96,17 @@ export default function CircularOptionPicker( {
 	actions,
 	className,
 	options,
+	children,
 } ) {
 	return (
-		<div className={ classnames( 'components-circular-option-picker', className ) }>
+		<div
+			className={ classnames(
+				'components-circular-option-picker',
+				className
+			) }
+		>
 			{ options }
+			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">
 					{ actions }

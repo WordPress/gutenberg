@@ -48,6 +48,13 @@ A custom class to add to the modal.
 - Type: `string`
 - Required: No
 
+### contentLabel
+
+This property is used as the modal's accessibility label. It is required for accessibility reasons.
+
+- Type: `String`
+- Required: Yes
+
 ### finishButtonText
 
 Use this to customize the label of the _Finish_ button shown at the end of the guide.

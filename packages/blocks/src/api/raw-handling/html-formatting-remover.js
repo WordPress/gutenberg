@@ -1,23 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isPhrasingContent } from './phrasing-content';
-
-function getSibling( node, which ) {
-	const sibling = node[ `${ which }Sibling` ];
-
-	if ( sibling && isPhrasingContent( sibling ) ) {
-		return sibling;
-	}
-
-	const { parentNode } = node;
-
-	if ( ! parentNode || ! isPhrasingContent( parentNode ) ) {
-		return;
-	}
-
-	return getSibling( parentNode, which );
-}
+import { getSibling } from './utils';
 
 function isFormattingSpace( character ) {
 	return (
@@ -41,9 +25,21 @@ export default function( node ) {
 		return;
 	}
 
-	// Ignore pre content.
-	if ( node.parentElement.closest( 'pre' ) ) {
-		return;
+	// Ignore pre content. Note that this does not use Element#closest due to
+	// a combination of (a) node may not be Element and (b) node.parentElement
+	// does not have full support in all browsers (Internet Exporer).
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
+
+	/** @type {Node?} */
+	let parent = node;
+	while ( ( parent = parent.parentNode ) ) {
+		if (
+			parent.nodeType === window.Node.ELEMENT_NODE &&
+			parent.nodeName === 'PRE'
+		) {
+			return;
+		}
 	}
 
 	// First, replace any sequence of HTML formatting space with a single space.
@@ -73,10 +69,8 @@ export default function( node ) {
 		if (
 			! nextSibling ||
 			nextSibling.nodeName === 'BR' ||
-			(
-				nextSibling.nodeType === nextSibling.TEXT_NODE &&
-				isFormattingSpace( nextSibling.textContent[ 0 ] )
-			)
+			( nextSibling.nodeType === nextSibling.TEXT_NODE &&
+				isFormattingSpace( nextSibling.textContent[ 0 ] ) )
 		) {
 			newData = newData.slice( 0, -1 );
 		}

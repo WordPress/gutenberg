@@ -8,9 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import {
-	InnerBlocks,
-} from '@wordpress/block-editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
 /**
  * Given an HTML string for a deprecated columns inner block, returns the
@@ -32,13 +30,92 @@ function getDeprecatedLayoutColumn( originalContent ) {
 
 	doc.body.innerHTML = originalContent;
 	for ( const classListItem of doc.body.firstChild.classList ) {
-		if ( ( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) ) ) {
+		if (
+			( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) )
+		) {
 			return Number( columnMatch[ 1 ] ) - 1;
 		}
 	}
 }
 
+const migrateCustomColors = ( attributes ) => {
+	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
+		return attributes;
+	}
+	const style = { color: {} };
+	if ( attributes.customTextColor ) {
+		style.color.text = attributes.customTextColor;
+	}
+	if ( attributes.customBackgroundColor ) {
+		style.color.background = attributes.customBackgroundColor;
+	}
+	return {
+		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		style,
+	};
+};
+
 export default [
+	{
+		attributes: {
+			verticalAlignment: {
+				type: 'string',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColors,
+		save( { attributes } ) {
+			const {
+				verticalAlignment,
+				backgroundColor,
+				customBackgroundColor,
+				textColor,
+				customTextColor,
+			} = attributes;
+
+			const backgroundClass = getColorClassName(
+				'background-color',
+				backgroundColor
+			);
+
+			const textClass = getColorClassName( 'color', textColor );
+
+			const className = classnames( {
+				'has-background': backgroundColor || customBackgroundColor,
+				'has-text-color': textColor || customTextColor,
+				[ backgroundClass ]: backgroundClass,
+				[ textClass ]: textClass,
+				[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			} );
+
+			const style = {
+				backgroundColor: backgroundClass
+					? undefined
+					: customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+			};
+
+			return (
+				<div
+					className={ className ? className : undefined }
+					style={ style }
+				>
+					<InnerBlocks.Content />
+				</div>
+			);
+		},
+	},
 	{
 		attributes: {
 			columns: {
@@ -51,9 +128,9 @@ export default [
 			// Columns block and a deprecation is the unlikely case due to
 			// its subsequent migration, optimize for the `false` condition
 			// by performing a naive, inaccurate pass at inner blocks.
-			const isFastPassEligible = innerBlocks.some( ( innerBlock ) => (
+			const isFastPassEligible = innerBlocks.some( ( innerBlock ) =>
 				/layout-column-\d+/.test( innerBlock.originalContent )
-			) );
+			);
 
 			if ( ! isFastPassEligible ) {
 				return false;
@@ -61,9 +138,11 @@ export default [
 
 			// Only if the fast pass is considered eligible is the more
 			// accurate, durable, slower condition performed.
-			return innerBlocks.some( ( innerBlock ) => (
-				getDeprecatedLayoutColumn( innerBlock.originalContent ) !== undefined
-			) );
+			return innerBlocks.some(
+				( innerBlock ) =>
+					getDeprecatedLayoutColumn( innerBlock.originalContent ) !==
+					undefined
+			);
 		},
 		migrate( attributes, innerBlocks ) {
 			const columns = innerBlocks.reduce( ( accumulator, innerBlock ) => {
@@ -83,14 +162,11 @@ export default [
 				return accumulator;
 			}, [] );
 
-			const migratedInnerBlocks = columns.map( ( columnBlocks ) => (
+			const migratedInnerBlocks = columns.map( ( columnBlocks ) =>
 				createBlock( 'core/column', {}, columnBlocks )
-			) );
+			);
 
-			return [
-				omit( attributes, [ 'columns' ] ),
-				migratedInnerBlocks,
-			];
+			return [ omit( attributes, [ 'columns' ] ), migratedInnerBlocks ];
 		},
 		save( { attributes } ) {
 			const { columns } = attributes;

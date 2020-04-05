@@ -26,8 +26,19 @@ function getGradientValueBySlug( gradients, slug ) {
 	return gradient && gradient.gradient;
 }
 
-function getGradientSlugByValue( gradients, value ) {
+export function __experimentalGetGradientObjectByGradientValue(
+	gradients,
+	value
+) {
 	const gradient = find( gradients, [ 'gradient', value ] );
+	return gradient;
+}
+
+function getGradientSlugByValue( gradients, value ) {
+	const gradient = __experimentalGetGradientObjectByGradientValue(
+		gradients,
+		value
+	);
 	return gradient && gradient.slug;
 }
 
@@ -37,15 +48,20 @@ export function __experimentalUseGradient( {
 } = {} ) {
 	const { clientId } = useBlockEditContext();
 
-	const { gradients, gradient, customGradient } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSettings } = select( 'core/block-editor' );
-		const attributes = getBlockAttributes( clientId );
-		return {
-			gradient: attributes[ gradientAttribute ],
-			customGradient: attributes[ customGradientAttribute ],
-			gradients: getSettings().gradients,
-		};
-	}, [ clientId ] );
+	const { gradients, gradient, customGradient } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } = select(
+				'core/block-editor'
+			);
+			const attributes = getBlockAttributes( clientId );
+			return {
+				gradient: attributes[ gradientAttribute ],
+				customGradient: attributes[ customGradientAttribute ],
+				gradients: getSettings().gradients,
+			};
+		},
+		[ clientId, gradientAttribute, customGradientAttribute ]
+	);
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const setGradient = useCallback(

@@ -401,6 +401,10 @@ _Related_
 
 -   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
 
+_Parameters_
+
+-   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+
 _Returns_
 
 -   `Object`: Schema.
@@ -604,7 +608,6 @@ _Parameters_
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
--   _options.canUserUseUnfilteredHTML_ `[boolean]`: Whether or not the user can use unfiltered HTML.
 
 _Returns_
 
@@ -622,6 +625,15 @@ _Parameters_
 _Returns_
 
 -   `Array`: A list of blocks.
+
+<a name="registerBlockCollection" href="#registerBlockCollection">#</a> **registerBlockCollection**
+
+Registers a new block collection to group blocks in the same namespace in the inserter.
+
+_Parameters_
+
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
+-   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
 
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
@@ -646,6 +658,15 @@ _Parameters_
 _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
+<a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
+
+Registers a new block variation for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variation_ `WPBlockVariation`: Object describing a block variation.
 
 <a name="serialize" href="#serialize">#</a> **serialize**
 
@@ -751,6 +772,15 @@ _Parameters_
 _Returns_
 
 -   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
+
+<a name="unregisterBlockVariation" href="#unregisterBlockVariation">#</a> **unregisterBlockVariation**
+
+Unregisters a block variation defined for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variationName_ `string`: Name of the variation defined for the block.
 
 <a name="updateCategory" href="#updateCategory">#</a> **updateCategory**
 

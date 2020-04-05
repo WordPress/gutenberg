@@ -1,6 +1,14 @@
 .wp-block-html {
 	margin-bottom: $default-block-margin;
 
+	.block-library-html__preview-overlay {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
+
 	.block-editor-plain-text {
 		font-family: $editor-html-font;
 		color: $dark-gray-800;

@@ -57,41 +57,37 @@
 	}
 }
 
-.edit-post-layout .editor-post-publish-panel__header-publish-button {
-	justify-content: center;
-
-	// Match the size of the Publish... button.
-	.components-button {
-		height: 33px;
-		line-height: 32px;
-	}
+.interface-interface-skeleton__sidebar > div {
+	height: 100%;
 }
 
-.edit-post-toggle-publish-panel {
+.edit-post-layout .editor-post-publish-panel__header-publish-button {
+	justify-content: center;
+}
+
+
+.edit-post-layout__toggle-publish-panel,
+.edit-post-layout__toogle-sidebar-panel {
+	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
 	background-color: $white;
-	padding: 10px 10px 10px 0;
+	border: 1px dotted $light-gray-500;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
 
-	.edit-post-toggle-publish-panel__button {
-		width: auto;
-		height: auto;
-		display: block;
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0 0 0 auto;
-		padding: 15px 23px 14px;
-		line-height: normal;
-		text-decoration: none;
-		outline: none;
-		background: #f1f1f1;
-		color: theme(secondary);
-
-		&:focus {
-			position: fixed;
-			top: auto;
-			right: 10px;
-			bottom: 10px;
-			left: auto;
-		}
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within &,
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
+		top: auto;
+		bottom: 0;
 	}
 }
 
@@ -104,8 +100,13 @@
 		display: flex;
 		background: $white;
 		height: $footer-height;
-		padding: 0 $grid-size;
 		align-items: center;
 		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
 	}
 }
+
+.edit-post-layout .interface-interface-skeleton__content {
+	background-color: $light-gray-700;
+}
+

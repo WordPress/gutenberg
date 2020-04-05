@@ -2,15 +2,18 @@
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
 	align-items: center;
-	margin-bottom: $grid-size * 3;
+	margin-bottom: $grid-unit-30;
 
 	// Apply the same height as the isSmall Reset button.
-	.components-range-control__number {
+	.components-font-size-picker__number {
+		display: inline-block;
+		font-weight: 500;
 		height: 30px;
 		margin-bottom: 0;
-		margin-top: 5px;
 		margin-left: 0;
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
+		margin-top: 5px;
+		width: 54px;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -27,7 +30,7 @@
 
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
-		margin-right: $grid-size;
+		margin-right: $grid-unit-10;
 		flex-grow: 1;
 	}
 

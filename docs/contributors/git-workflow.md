@@ -1,13 +1,13 @@
 # Git Workflow
 
 A good workflow for new contributors to follow is listed below:
-- Fork Gutenberg repository
-- Clone forked repository
-- Create a new branch
-- Make code changes
-- Commit code changes within the newly created branch
-- Push branch to forked repository
-- Submit Pull Request to Gutenberg repository
+- Fork the Gutenberg repository.
+- Clone the forked repository.
+- Create a new branch.
+- Make code changes.
+- Commit the code changes within the newly created branch.
+- Push the branch to the forked repository.
+- Submit a Pull Request to the Gutenberg repository.
 
 Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
 
@@ -54,7 +54,7 @@ upstream	https://github.com/WordPress/gutenberg.git (fetch)
 upstream	https://github.com/WordPress/gutenberg.git (push)
 ```
 
-To sync your fork you need to fetch the upstream changes and merge them into your fork. These are the corresponding commands:
+To sync your fork, you first need to fetch the upstream changes and merge them into your local copy:
 
 ``` sh
 git fetch upstream
@@ -62,7 +62,7 @@ git checkout master
 git merge upstream/master
 ```
 
-This will update you local copy to update your fork on github push your changes
+Once your local copy is updated, push your changes to update your fork on GitHub:
 
 ```
 git push

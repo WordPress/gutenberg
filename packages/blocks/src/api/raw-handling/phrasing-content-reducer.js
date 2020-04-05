@@ -31,7 +31,10 @@ export default function( node, doc ) {
 		// Some DOM implementations (Safari, JSDom) don't support
 		// style.textDecorationLine, so we check style.textDecoration as a
 		// fallback.
-		if ( textDecorationLine === 'line-through' || includes( textDecoration, 'line-through' ) ) {
+		if (
+			textDecorationLine === 'line-through' ||
+			includes( textDecoration, 'line-through' )
+		) {
 			wrap( doc.createElement( 's' ), node );
 		}
 

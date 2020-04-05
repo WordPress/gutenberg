@@ -20,7 +20,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  */
 
 /**
- * Yields action objects used in signalling that a notice is to be created.
+ * Returns an action object used in signalling that a notice is to be created.
  *
  * @param {string}                [status='info']              Notice status.
  * @param {string}                content                      Notice message.
@@ -40,8 +40,10 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
+ *
+ * @return {Object} Action object.
  */
-export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	const {
 		speak = true,
 		isDismissible = true,
@@ -57,21 +59,14 @@ export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) 
 	// supported, cast to a string.
 	content = String( content );
 
-	if ( speak ) {
-		yield {
-			type: 'SPEAK',
-			message: content,
-			ariaLive: type === 'snackbar' ? 'polite' : 'assertive',
-		};
-	}
-
-	yield {
+	return {
 		type: 'CREATE_NOTICE',
 		context,
 		notice: {
 			id,
 			status,
 			content,
+			spokenMessage: speak ? content : null,
 			__unstableHTML,
 			isDismissible,
 			actions,

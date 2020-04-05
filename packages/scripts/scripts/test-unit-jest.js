@@ -18,14 +18,15 @@ const jest = require( 'jest' );
 /**
  * Internal dependencies
  */
-const {
-	fromConfigRoot,
-	getArgsFromCLI,
-	hasJestConfig,
-} = require( '../utils' );
+const { fromConfigRoot, getArgsFromCLI, hasJestConfig } = require( '../utils' );
 
-const config = ! hasJestConfig() ?
-	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-unit.config.js' ) ) ) ] :
-	[];
+const config = ! hasJestConfig()
+	? [
+			'--config',
+			JSON.stringify(
+				require( fromConfigRoot( 'jest-unit.config.js' ) )
+			),
+	  ]
+	: [];
 
 jest.run( [ ...config, ...getArgsFromCLI() ] );

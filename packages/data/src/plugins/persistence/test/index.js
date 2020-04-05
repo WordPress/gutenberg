@@ -6,10 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import plugin, {
-	createPersistenceInterface,
-	withLazySameState,
-} from '../';
+import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
@@ -29,7 +26,10 @@ describe( 'persistence', () => {
 		// TODO: Remove the `use` function in favor of `registerGenericStore`
 		registry = createRegistry()
 			.use( ( originalRegistry ) => {
-				originalRegisterStore = jest.spyOn( originalRegistry, 'registerStore' );
+				originalRegisterStore = jest.spyOn(
+					originalRegistry,
+					'registerStore'
+				);
 				return {};
 			} )
 			.use( plugin, { storage: objectStorage } );
@@ -78,21 +78,27 @@ describe( 'persistence', () => {
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1, b: null } );
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			a: 1,
+			b: null,
+		} );
 	} );
 
 	it( 'should merge persisted value with default if object-like', () => {
-		const DEFAULT_STATE = deepFreeze( { preferences: { useFoo: true, useBar: true } } );
+		const DEFAULT_STATE = deepFreeze( {
+			preferences: { useFoo: true, useBar: true },
+		} );
 
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: {
-						preferences: {
-							useFoo: false,
+				getItem: () =>
+					JSON.stringify( {
+						test: {
+							preferences: {
+								useFoo: false,
+							},
 						},
-					},
-				} ),
+					} ),
 				setItem() {},
 			},
 		} );
@@ -129,7 +135,9 @@ describe( 'persistence', () => {
 			},
 		} );
 
-		expect( registry.select( 'test' ).getState() ).toEqual( { persisted: true } );
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			persisted: true,
+		} );
 	} );
 
 	it( 'should defer to persisted state if mismatch of object-like (initial object-like)', () => {
@@ -154,9 +162,10 @@ describe( 'persistence', () => {
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {
 		registry = createRegistry().use( plugin, {
 			storage: {
-				getItem: () => JSON.stringify( {
-					test: 1,
-				} ),
+				getItem: () =>
+					JSON.stringify( {
+						test: 1,
+					} ),
 				setItem() {},
 			},
 		} );
@@ -248,7 +257,10 @@ describe( 'persistence', () => {
 
 		registry.dispatch( 'test' ).setState( { ok: true } );
 
-		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"ok":true}}' );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith(
+			'WP_DATA',
+			'{"test":{"ok":true}}'
+		);
 	} );
 
 	it( 'should persist a subset of keys', () => {
@@ -269,7 +281,10 @@ describe( 'persistence', () => {
 
 		registry.dispatch( 'test' ).setState( { foo: 1, baz: 2 } );
 
-		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
+		expect( objectStorage.setItem ).toHaveBeenCalledWith(
+			'WP_DATA',
+			'{"test":{"foo":1}}'
+		);
 	} );
 
 	it( 'should not persist an unchanging subset', () => {
@@ -306,7 +321,10 @@ describe( 'persistence', () => {
 
 		let get, set;
 		beforeEach( () => {
-			( { get, set } = createPersistenceInterface( { storage, storageKey } ) );
+			( { get, set } = createPersistenceInterface( {
+				storage,
+				storageKey,
+			} ) );
 		} );
 
 		describe( 'get', () => {
@@ -328,22 +346,33 @@ describe( 'persistence', () => {
 			it( 'sets JSON by object', () => {
 				set( 'test', {} );
 
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test":{}}'
+				);
 			} );
 
 			it( 'merges to existing', () => {
 				set( 'test1', {} );
 				set( 'test2', {} );
 
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
-				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test1":{}}'
+				);
+				expect( objectStorage.setItem ).toHaveBeenCalledWith(
+					storageKey,
+					'{"test1":{},"test2":{}}'
+				);
 			} );
 		} );
 	} );
 
 	describe( 'withLazySameState', () => {
 		it( 'should call the original reducer if action.nextState differs from state', () => {
-			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const reducer = jest
+				.fn()
+				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();
@@ -355,7 +384,9 @@ describe( 'persistence', () => {
 		} );
 
 		it( 'should not call the original reducer if action.nextState equals state', () => {
-			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const reducer = jest
+				.fn()
+				.mockImplementation( ( state, action ) => action.nextState );
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();

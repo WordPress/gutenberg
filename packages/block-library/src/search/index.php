@@ -34,7 +34,7 @@ function render_block_core_search( $attributes ) {
 	}
 
 	$input_markup = sprintf(
-		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" />',
+		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" required />',
 		$input_id,
 		esc_attr( get_search_query() ),
 		esc_attr( $attributes['placeholder'] )
@@ -57,7 +57,7 @@ function render_block_core_search( $attributes ) {
 
 	return sprintf(
 		'<form class="%s" role="search" method="get" action="%s">%s</form>',
-		$class,
+		esc_attr( $class ),
 		esc_url( home_url( '/' ) ),
 		$label_markup . $input_markup . $button_markup
 	);

@@ -9,7 +9,7 @@ import { boolean, select, text } from '@storybook/addon-knobs';
 import { DraggableWrapper } from './_utils';
 import Popover from '../';
 
-export default { title: 'Components|Popover', component: Popover };
+export default { title: 'Components/Popover', component: Popover };
 
 export const _default = () => {
 	const show = boolean( 'Example: Show', true );
@@ -96,5 +96,7 @@ export const positioning = () => {
 	const content = text( 'Example: Content', 'Popover' );
 	const noArrow = boolean( 'noArrow', false );
 
-	return <DragExample label={ label } content={ content } noArrow={ noArrow } />;
+	return (
+		<DragExample label={ label } content={ content } noArrow={ noArrow } />
+	);
 };

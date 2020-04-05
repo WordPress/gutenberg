@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
 const title = __( 'Inline Code' );
@@ -43,14 +44,17 @@ export const code = {
 
 		return value;
 	},
-	edit( { value, onChange, isActive } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
+	edit( { value, onChange, onFocus, isActive } ) {
+		function onClick() {
+			onChange( toggleFormat( value, { type: name } ) );
+			onFocus();
+		}
 
 		return (
 			<RichTextToolbarButton
-				icon="editor-code"
+				icon={ codeIcon }
 				title={ title }
-				onClick={ onToggle }
+				onClick={ onClick }
 				isActive={ isActive }
 			/>
 		);

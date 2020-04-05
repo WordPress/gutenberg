@@ -4,7 +4,17 @@
 import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { autoplay, caption, controls, loop, muted, poster, preload, src, playsInline } = attributes;
+	const {
+		autoplay,
+		caption,
+		controls,
+		loop,
+		muted,
+		poster,
+		preload,
+		src,
+		playsInline,
+	} = attributes;
 	return (
 		<figure>
 			{ src && (

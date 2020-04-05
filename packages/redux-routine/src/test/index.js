@@ -52,9 +52,8 @@ describe( 'createMiddleware', () => {
 	it( 'should throw if promise rejects', async () => {
 		expect.hasAssertions();
 		const middleware = createMiddleware( {
-			WAIT_FAIL: () => new Promise( ( resolve, reject ) =>
-				reject( 'Message' )
-			),
+			WAIT_FAIL: () =>
+				new Promise( ( resolve, reject ) => reject( 'Message' ) ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -71,9 +70,10 @@ describe( 'createMiddleware', () => {
 	it( 'should throw if promise throws', () => {
 		expect.hasAssertions();
 		const middleware = createMiddleware( {
-			WAIT_FAIL: () => new Promise( () => {
-				throw new Error( 'Message' );
-			} ),
+			WAIT_FAIL: () =>
+				new Promise( () => {
+					throw new Error( 'Message' );
+				} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -96,9 +96,10 @@ describe( 'createMiddleware', () => {
 	it( 'should handle a null returned from a caught promise error', () => {
 		expect.hasAssertions();
 		const middleware = createMiddleware( {
-			WAIT_FAIL: () => new Promise( () => {
-				throw new Error( 'Message' );
-			} ),
+			WAIT_FAIL: () =>
+				new Promise( () => {
+					throw new Error( 'Message' );
+				} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -129,9 +130,10 @@ describe( 'createMiddleware', () => {
 
 	it( 'assigns async controlled return value into yield assignment', async () => {
 		const middleware = createMiddleware( {
-			WAIT: ( action ) => new Promise( ( resolve ) => {
-				resolve( action.value );
-			} ),
+			WAIT: ( action ) =>
+				new Promise( ( resolve ) => {
+					resolve( action.value );
+				} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -144,20 +146,23 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( 2 );
 	} );
 
-	it( 'does not recurse when action like object returns from a sync ' +
-		'control', () => {
-		const post = { type: 'post' };
-		const middleware = createMiddleware( {
-			UPDATE: () => post,
-		} );
-		const store = createStoreWithMiddleware( middleware );
-		function* getPostAction() {
-			const nextState = yield { type: 'UPDATE' };
-			return { type: 'CHANGE', nextState };
+	it(
+		'does not recurse when action like object returns from a sync ' +
+			'control',
+		() => {
+			const post = { type: 'post' };
+			const middleware = createMiddleware( {
+				UPDATE: () => post,
+			} );
+			const store = createStoreWithMiddleware( middleware );
+			function* getPostAction() {
+				const nextState = yield { type: 'UPDATE' };
+				return { type: 'CHANGE', nextState };
+			}
+
+			store.dispatch( getPostAction() );
+
+			expect( store.getState() ).toEqual( post );
 		}
-
-		store.dispatch( getPostAction() );
-
-		expect( store.getState() ).toEqual( post );
-	} );
+	);
 } );

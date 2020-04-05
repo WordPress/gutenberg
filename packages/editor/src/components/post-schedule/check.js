@@ -21,7 +21,11 @@ export default compose( [
 	withSelect( ( select ) => {
 		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			postType: getCurrentPostType(),
 		};
 	} ),

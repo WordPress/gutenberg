@@ -13,8 +13,17 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const ToolbarGroupContainer = ( { getStylesFromColorScheme, passedStyle, children } ) => (
-	<View style={ [ getStylesFromColorScheme( styles.container, styles.containerDark ), passedStyle ] }>
+const ToolbarGroupContainer = ( {
+	getStylesFromColorScheme,
+	passedStyle,
+	children,
+} ) => (
+	<View
+		style={ [
+			getStylesFromColorScheme( styles.container, styles.containerDark ),
+			passedStyle,
+		] }
+	>
 		{ children }
 	</View>
 );
