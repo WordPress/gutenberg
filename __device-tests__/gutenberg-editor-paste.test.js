@@ -113,6 +113,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await longPressMiddleOfElement( driver, textViewElement2 );
 		await tapPasteAboveElement( driver, textViewElement2 );
 
+		await driver.saveScreenshot( './screenshots/beforehtml.png' );
+
 		// check styled text by verifying html contents
 		await editorPage.verifyHtmlContent( testData.pasteHtmlTextResult );
 	} );
