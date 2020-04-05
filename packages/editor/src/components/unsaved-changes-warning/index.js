@@ -30,7 +30,9 @@ class UnsavedChangesWarning extends Component {
 		const { isEditedPostDirty } = this.props;
 
 		if ( isEditedPostDirty() ) {
-			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
+			event.returnValue = __(
+				'You have unsaved changes. If you proceed, they will be lost.'
+			);
 			return event.returnValue;
 		}
 	}

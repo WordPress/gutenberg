@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,16 +18,21 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
+				<Button
 					onClick={ hasBlocks ? onToggle : undefined }
-					icon="info-outline"
+					icon={ info }
 					aria-expanded={ isOpen }
 					label={ __( 'Content structure' ) }
-					labelPosition="bottom"
+					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ ( { onClose } ) => <TableOfContentsPanel onRequestClose={ onClose } hasOutlineItemsDisabled={ hasOutlineItemsDisabled } /> }
+			renderContent={ ( { onClose } ) => (
+				<TableOfContentsPanel
+					onRequestClose={ onClose }
+					hasOutlineItemsDisabled={ hasOutlineItemsDisabled }
+				/>
+			) }
 		/>
 	);
 }

@@ -8,12 +8,7 @@ import {
 	PlainText,
 	transformStyles,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	Disabled,
-	SandBox,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { Button, Disabled, SandBox, ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
@@ -41,10 +36,9 @@ class HTMLEdit extends Component {
 			}
 		`;
 
-		this.setState( { styles: [
-			defaultStyles,
-			...transformStyles( styles ),
-		] } );
+		this.setState( {
+			styles: [ defaultStyles, ...transformStyles( styles ) ],
+		} );
 	}
 
 	switchToPreview() {
@@ -64,13 +58,15 @@ class HTMLEdit extends Component {
 				<BlockControls>
 					<ToolbarGroup>
 						<Button
-							className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
+							className="components-tab-button"
+							isPressed={ ! isPreview }
 							onClick={ this.switchToHTML }
 						>
 							<span>HTML</span>
 						</Button>
 						<Button
-							className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
+							className="components-tab-button"
+							isPressed={ isPreview }
 							onClick={ this.switchToPreview }
 						>
 							<span>{ __( 'Preview' ) }</span>
@@ -78,18 +74,33 @@ class HTMLEdit extends Component {
 					</ToolbarGroup>
 				</BlockControls>
 				<Disabled.Consumer>
-					{ ( isDisabled ) => (
-						( isPreview || isDisabled ) ? (
-							<SandBox html={ attributes.content } styles={ styles } />
+					{ ( isDisabled ) =>
+						isPreview || isDisabled ? (
+							<>
+								<SandBox
+									html={ attributes.content }
+									styles={ styles }
+								/>
+								{ /*	
+									An overlay is added when the block is not selected in order to register click events. 
+									Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it 
+									difficult to reselect the block. 
+								*/ }
+								{ ! this.props.isSelected && (
+									<div className="block-library-html__preview-overlay"></div>
+								) }
+							</>
 						) : (
 							<PlainText
 								value={ attributes.content }
-								onChange={ ( content ) => setAttributes( { content } ) }
+								onChange={ ( content ) =>
+									setAttributes( { content } )
+								}
 								placeholder={ __( 'Write HTML…' ) }
 								aria-label={ __( 'HTML' ) }
 							/>
 						)
-					) }
+					}
 				</Disabled.Consumer>
 			</div>
 		);

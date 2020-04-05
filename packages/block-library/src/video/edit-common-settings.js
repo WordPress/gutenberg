@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-	SelectControl,
-} from '@wordpress/components';
+import { ToggleControl, SelectControl } from '@wordpress/components';
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
 	const {
@@ -18,7 +15,11 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 	} = attributes;
 
 	const getAutoplayHelp = ( checked ) => {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
+		return checked
+			? __(
+					'Note: Autoplaying videos may cause usability issues for some visitors.'
+			  )
+			: null;
 	};
 
 	const toggleAttribute = ( attribute ) => {
@@ -46,7 +47,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				checked={ muted }
 			/>
 			<ToggleControl
-				label={ __( 'Playback Controls' ) }
+				label={ __( 'Playback controls' ) }
 				onChange={ toggleAttribute( 'controls' ) }
 				checked={ controls }
 			/>
@@ -64,6 +65,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 					{ value: 'metadata', label: __( 'Metadata' ) },
 					{ value: 'none', label: __( 'None' ) },
 				] }
+				separatorType={ 'none' }
 			/>
 		</>
 	);

@@ -23,11 +23,15 @@ class BlockCompare extends Component {
 
 		return difference.map( ( item, pos ) => {
 			const classes = classnames( {
-				'editor-block-compare__added block-editor-block-compare__added': item.added,
-				'editor-block-compare__removed block-editor-block-compare__removed': item.removed,
+				'block-editor-block-compare__added': item.added,
+				'block-editor-block-compare__removed': item.removed,
 			} );
 
-			return <span key={ pos } className={ classes }>{ item.value }</span>;
+			return (
+				<span key={ pos } className={ classes }>
+					{ item.value }
+				</span>
+			);
 		} );
 	}
 
@@ -43,8 +47,12 @@ class BlockCompare extends Component {
 		const newBlocks = castArray( block );
 
 		// Get converted block details
-		const newContent = newBlocks.map( ( item ) => getSaveContent( item.name, item.attributes, item.innerBlocks ) );
-		const renderedContent = newBlocks.map( ( item ) => getSaveElement( item.name, item.attributes, item.innerBlocks ) );
+		const newContent = newBlocks.map( ( item ) =>
+			getSaveContent( item.name, item.attributes, item.innerBlocks )
+		);
+		const renderedContent = newBlocks.map( ( item ) =>
+			getSaveElement( item.name, item.attributes, item.innerBlocks )
+		);
 
 		return {
 			rawContent: newContent.join( '' ),
@@ -53,16 +61,25 @@ class BlockCompare extends Component {
 	}
 
 	render() {
-		const { block, onKeep, onConvert, convertor, convertButtonText } = this.props;
+		const {
+			block,
+			onKeep,
+			onConvert,
+			convertor,
+			convertButtonText,
+		} = this.props;
 		const original = this.getOriginalContent( block );
 		const converted = this.getConvertedContent( convertor( block ) );
-		const difference = this.getDifference( original.rawContent, converted.rawContent );
+		const difference = this.getDifference(
+			original.rawContent,
+			converted.rawContent
+		);
 
 		return (
-			<div className="editor-block-compare__wrapper block-editor-block-compare__wrapper">
+			<div className="block-editor-block-compare__wrapper">
 				<BlockView
 					title={ __( 'Current' ) }
-					className="editor-block-compare__current block-editor-block-compare__current"
+					className="block-editor-block-compare__current"
 					action={ onKeep }
 					actionText={ __( 'Convert to HTML' ) }
 					rawContent={ original.rawContent }
@@ -71,7 +88,7 @@ class BlockCompare extends Component {
 
 				<BlockView
 					title={ __( 'After Conversion' ) }
-					className="editor-block-compare__converted block-editor-block-compare__converted"
+					className="block-editor-block-compare__converted"
 					action={ onConvert }
 					actionText={ convertButtonText }
 					rawContent={ difference }

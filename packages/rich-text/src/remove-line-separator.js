@@ -15,10 +15,7 @@ import { remove } from './remove';
  *
  * @return {Object|undefined} A new value with the line separator removed. Or undefined if no line separator is found on the position.
  */
-export function removeLineSeparator(
-	value,
-	backward = true,
-) {
+export function removeLineSeparator( value, backward = true ) {
 	const { replacements, text, start, end } = value;
 	const collapsed = isCollapsed( value );
 	let index = start - 1;
@@ -46,11 +43,7 @@ export function removeLineSeparator(
 			replacements: newReplacements,
 		};
 	} else {
-		newValue = remove(
-			value,
-			removeStart,
-			removeEnd
-		);
+		newValue = remove( value, removeStart, removeEnd );
 	}
 	return newValue;
 }

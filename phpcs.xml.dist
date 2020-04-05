@@ -61,6 +61,9 @@
 	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>
+	<rule ref="Generic.Commenting.DocComment.Empty">
+    	<exclude-pattern>phpunit/*</exclude-pattern>
+    </rule>
 	<rule ref="Generic.Commenting.DocComment.MissingShort">
 		<exclude-pattern>phpunit/*</exclude-pattern>
 	</rule>

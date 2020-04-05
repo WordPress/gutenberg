@@ -20,7 +20,11 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {Object} A new value with replacements applied.
  */
-export function replace( { formats, replacements, text, start, end }, pattern, replacement ) {
+export function replace(
+	{ formats, replacements, text, start, end },
+	pattern,
+	replacement
+) {
 	text = text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
 		let newText = replacement;
@@ -44,8 +48,15 @@ export function replace( { formats, replacements, text, start, end }, pattern, r
 			}
 		}
 
-		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
-		replacements = replacements.slice( 0, offset ).concat( newReplacements, replacements.slice( offset + match.length ) );
+		formats = formats
+			.slice( 0, offset )
+			.concat( newFormats, formats.slice( offset + match.length ) );
+		replacements = replacements
+			.slice( 0, offset )
+			.concat(
+				newReplacements,
+				replacements.slice( offset + match.length )
+			);
 
 		if ( start ) {
 			start = end = offset + newText.length;

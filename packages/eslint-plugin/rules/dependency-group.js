@@ -3,7 +3,8 @@ module.exports = {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
-			url: 'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+			url:
+				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
 		fixable: true,
@@ -83,7 +84,10 @@ module.exports = {
 				locality = '(External|Node)';
 			}
 
-			const pattern = new RegExp( `^\\*?\\n \\* ${ locality } dependencies\\.?\\n $`, 'i' );
+			const pattern = new RegExp(
+				`^\\*?\\n \\* ${ locality } dependencies\\.?\\n $`,
+				'i'
+			);
 			return pattern.test( value );
 		}
 
@@ -190,7 +194,10 @@ module.exports = {
 					verified.add( locality );
 
 					// Determine whether a correction must be made.
-					const correction = getDependencyBlockCorrection( child, locality );
+					const correction = getDependencyBlockCorrection(
+						child,
+						locality
+					);
 					if ( ! correction ) {
 						return;
 					}

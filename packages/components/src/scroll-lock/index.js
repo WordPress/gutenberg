@@ -35,7 +35,8 @@ export function createScrollLockComponent( {
 	 * @param {boolean} locked Whether or not scroll should be locked.
 	 */
 	function setLocked( locked ) {
-		const scrollingElement = htmlDocument.scrollingElement || htmlDocument.body;
+		const scrollingElement =
+			htmlDocument.scrollingElement || htmlDocument.body;
 
 		if ( locked ) {
 			previousScrollTop = scrollingElement.scrollTop;

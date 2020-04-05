@@ -17,7 +17,12 @@ function gutenberg_is_block_editor() {
 		return false;
 	}
 	$screen = get_current_screen();
-	return ! empty( $screen ) && ( $screen->is_block_editor() || 'gutenberg_page_gutenberg-widgets' === $screen->id );
+	return ! empty( $screen ) &&
+		(
+			$screen->is_block_editor() ||
+			'gutenberg_page_gutenberg-widgets' === $screen->id ||
+			gutenberg_is_edit_site_page( $screen->id )
+		);
 }
 
 /**

@@ -16,7 +16,5 @@ module.exports = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'global',
 	},
-	plugins: [
-		new LibraryExportDefaultPlugin( [ 'boo' ] ),
-	],
+	plugins: [ new LibraryExportDefaultPlugin( [ 'boo' ] ) ],
 };

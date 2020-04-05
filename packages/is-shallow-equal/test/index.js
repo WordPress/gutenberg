@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
-import isShallowEqual from '../';
-import isShallowEqualArrays from '../arrays';
-import isShallowEqualObjects from '../objects';
+import isShallowEqual, {
+	isShallowEqualArrays,
+	isShallowEqualObjects,
+} from '..';
 
 describe( 'isShallowEqual', () => {
 	it( 'returns false if of different types', () => {

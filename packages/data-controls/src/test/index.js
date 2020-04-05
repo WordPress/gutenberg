@@ -55,9 +55,11 @@ describe( 'controls', () => {
 				return stores[ storeKey ];
 			},
 		};
-		const getSelectorArgs = ( storeKey, selectorName, ...args ) => (
-			{ storeKey, selectorName, args }
-		);
+		const getSelectorArgs = ( storeKey, selectorName, ...args ) => ( {
+			storeKey,
+			selectorName,
+			args,
+		} );
 		beforeEach( () => {
 			selectorWithUndefinedResolver.mockReturnValue( 'foo' );
 			selectorWithFalseResolver.mockReturnValue( 'bar' );
@@ -72,20 +74,18 @@ describe( 'controls', () => {
 		} );
 		it( 'invokes selector with undefined resolver', () => {
 			const testControl = controls.SELECT( registryMock );
-			const value = testControl( getSelectorArgs(
-				'mockStore',
-				'selectorWithUndefinedResolver'
-			) );
+			const value = testControl(
+				getSelectorArgs( 'mockStore', 'selectorWithUndefinedResolver' )
+			);
 			expect( value ).toBe( 'foo' );
 			expect( selectorWithUndefinedResolver ).toHaveBeenCalled();
 			expect( hasFinishedResolution ).not.toHaveBeenCalled();
 		} );
 		it( 'invokes selector with resolver set to false', () => {
 			const testControl = controls.SELECT( registryMock );
-			const value = testControl( getSelectorArgs(
-				'mockStore',
-				'selectorWithFalseResolver'
-			) );
+			const value = testControl(
+				getSelectorArgs( 'mockStore', 'selectorWithFalseResolver' )
+			);
 			expect( value ).toBe( 'bar' );
 			expect( selectorWithFalseResolver ).toHaveBeenCalled();
 			expect( hasFinishedResolution ).not.toHaveBeenCalled();
@@ -93,23 +93,24 @@ describe( 'controls', () => {
 		describe( 'invokes selector with resolver set to true', () => {
 			const testControl = controls.SELECT( registryMock );
 			it( 'returns a promise', async () => {
-				const value = testControl( getSelectorArgs(
-					'mockStore',
-					'selectorWithResolver'
-				) );
+				const value = testControl(
+					getSelectorArgs( 'mockStore', 'selectorWithResolver' )
+				);
 				await expect( value ).resolves.toBe( 'resolved' );
 				expect( selectorWithResolver ).toHaveBeenCalled();
 			} );
-			it( 'selector with resolver resolves to expected result when ' +
-				'finished', async () => {
-				const value = testControl( getSelectorArgs(
-					'mockStore',
-					'selectorWithResolver'
-				) );
-				hasFinishedResolution.mockReturnValue( true );
-				expect( selectorWithResolver ).toHaveBeenCalled();
-				await expect( value ).resolves.toBe( 'resolved' );
-			} );
+			it(
+				'selector with resolver resolves to expected result when ' +
+					'finished',
+				async () => {
+					const value = testControl(
+						getSelectorArgs( 'mockStore', 'selectorWithResolver' )
+					);
+					hasFinishedResolution.mockReturnValue( true );
+					expect( selectorWithResolver ).toHaveBeenCalled();
+					await expect( value ).resolves.toBe( 'resolved' );
+				}
+			);
 		} );
 	} );
 	describe( 'DISPATCH', () => {

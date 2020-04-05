@@ -32,7 +32,8 @@ async function emulateSelectAll() {
 				key: isMac ? 'Meta' : 'Control',
 				code: isMac ? 'MetaLeft' : 'ControlLeft',
 				location: window.KeyboardEvent.DOM_KEY_LOCATION_LEFT,
-				getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+				getModifierState: ( keyArg ) =>
+					keyArg === ( isMac ? 'Meta' : 'Control' ),
 				ctrlKey: ! isMac,
 				metaKey: isMac,
 				charCode: 0,
@@ -47,7 +48,8 @@ async function emulateSelectAll() {
 			key: 'a',
 			code: 'KeyA',
 			location: window.KeyboardEvent.DOM_KEY_LOCATION_STANDARD,
-			getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+			getModifierState: ( keyArg ) =>
+				keyArg === ( isMac ? 'Meta' : 'Control' ),
 			ctrlKey: ! isMac,
 			metaKey: isMac,
 			charCode: 0,
@@ -55,10 +57,9 @@ async function emulateSelectAll() {
 			which: 65,
 		} );
 
-		const wasPrevented = (
+		const wasPrevented =
 			! document.activeElement.dispatchEvent( preventableEvent ) ||
-			preventableEvent.defaultPrevented
-		);
+			preventableEvent.defaultPrevented;
 
 		if ( ! wasPrevented ) {
 			document.execCommand( 'selectall', false, null );
@@ -75,9 +76,40 @@ async function emulateSelectAll() {
 				charCode: 0,
 				keyCode: isMac ? 93 : 17,
 				which: isMac ? 93 : 17,
-			} ),
+			} )
 		);
 	} );
+}
+
+async function emulateClipboard( type ) {
+	await page.evaluate( ( _type ) => {
+		if ( _type !== 'paste' ) {
+			window._clipboardData = new DataTransfer();
+
+			const selection = window.getSelection();
+			const plainText = selection.toString();
+			let html = plainText;
+
+			if ( selection.rangeCount ) {
+				const range = selection.getRangeAt( 0 );
+				const fragment = range.cloneContents();
+
+				html = Array.from( fragment.childNodes )
+					.map( ( node ) => node.outerHTML || node.nodeValue )
+					.join( '' );
+			}
+
+			window._clipboardData.setData( 'text/plain', plainText );
+			window._clipboardData.setData( 'text/html', html );
+		}
+
+		document.activeElement.dispatchEvent(
+			new ClipboardEvent( _type, {
+				bubbles: true,
+				clipboardData: window._clipboardData,
+			} )
+		);
+	}, type );
 }
 
 /**
@@ -92,13 +124,26 @@ export async function pressKeyWithModifier( modifier, key ) {
 		return await emulateSelectAll();
 	}
 
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'c' ) {
+		return await emulateClipboard( 'copy' );
+	}
+
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'x' ) {
+		return await emulateClipboard( 'cut' );
+	}
+
+	if ( modifier.toLowerCase() === 'primary' && key.toLowerCase() === 'v' ) {
+		return await emulateClipboard( 'paste' );
+	}
+
 	const isAppleOS = () => process.platform === 'darwin';
 	const overWrittenModifiers = {
 		...modifiers,
-		shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+		shiftAlt: ( _isApple ) =>
+			_isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
 	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
-	const ctrlSwap = ( mod ) => mod === CTRL ? 'control' : mod;
+	const ctrlSwap = ( mod ) => ( mod === CTRL ? 'control' : mod );
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {

@@ -71,7 +71,7 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](/docs/developers/block-api/block-templates.md).
+More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -100,7 +100,7 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/developers/block-api/block-templates.md#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/designers-developers/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
@@ -121,7 +121,7 @@ A 'render prop' function that can be used to customize the block's appender.
 
 #### Notes
 * For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted. 
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
 	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
 * Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
 
@@ -143,6 +143,14 @@ A 'render prop' function that can be used to customize the block's appender.
 />
 ```
 
+### `__experimentalCaptureToolbars`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
+
+For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
 
 
 

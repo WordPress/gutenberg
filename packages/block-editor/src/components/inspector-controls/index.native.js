@@ -20,7 +20,7 @@ const FillWithSettingsButton = ( { children, ...props } ) => {
 	return (
 		<>
 			<Fill { ...props }>{ children }</Fill>
-			{ React.Children.count( children ) > 0 && ( <BlockSettingsButton /> ) }
+			{ React.Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);
 };
@@ -33,4 +33,3 @@ InspectorControls.Slot = Slot;
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md
  */
 export default InspectorControls;
-

@@ -11,11 +11,12 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 import { pure } from '@wordpress/compose';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import Button from '../button';
 import TextControl from '../text-control';
 import VisuallyHidden from '../visually-hidden';
 import { isValidHex } from './utils';
@@ -87,7 +88,7 @@ export class Input extends Component {
 	}
 }
 
-const PureIconButton = pure( IconButton );
+const PureButton = pure( Button );
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -142,7 +143,7 @@ export class Inputs extends Component {
 			return value;
 		}
 
-		if ( value > 0 ) {
+		if ( value < 0 ) {
 			return 0;
 		} else if ( value > 1 ) {
 			return 1;
@@ -286,9 +287,10 @@ export class Inputs extends Component {
 		return (
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
-				<div className="components-color-picker__inputs-toggle">
-					<PureIconButton
-						icon="arrow-down-alt2"
+				<div className="components-color-picker__inputs-toggle-wrapper">
+					<PureButton
+						className="components-color-picker__inputs-toggle"
+						icon={ chevronDown }
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
 					/>

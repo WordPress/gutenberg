@@ -1,47 +1,53 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { size } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { Dropdown, IconButton } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 
-const defaultRenderToggle = ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
+const defaultRenderToggle = ( {
+	onToggle,
+	disabled,
+	isOpen,
+	blockTitle,
+	hasSingleBlockType,
+	toggleProps,
+} ) => {
 	let label;
 	if ( hasSingleBlockType ) {
-		// translators: %s: the name of the block when there is only one
-		label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
+		label = sprintf(
+			// translators: %s: the name of the block when there is only one
+			_x( 'Add %s', 'directly add the only allowed block' ),
+			blockTitle
+		);
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 	return (
-		<IconButton
-			icon="insert"
+		<Button
+			icon={ plus }
 			label={ label }
-			labelPosition="bottom"
-			onMouseDown={ ( event ) => {
-				event.preventDefault();
-				event.currentTarget.focus();
-			} }
+			tooltipPosition="bottom"
 			onClick={ onToggle }
-			className="editor-inserter__toggle block-editor-inserter__toggle"
+			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
+			{ ...toggleProps }
 		/>
 	);
 };
@@ -79,10 +85,18 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
+			toggleProps,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		return renderToggle( { onToggle, isOpen, disabled, blockTitle, hasSingleBlockType } );
+		return renderToggle( {
+			onToggle,
+			isOpen,
+			disabled,
+			blockTitle,
+			hasSingleBlockType,
+			toggleProps,
+		} );
 	}
 
 	/**
@@ -116,7 +130,11 @@ class Inserter extends Component {
 	}
 
 	render() {
-		const { position, hasSingleBlockType, insertOnlyAllowedBlock } = this.props;
+		const {
+			position,
+			hasSingleBlockType,
+			insertOnlyAllowedBlock,
+		} = this.props;
 
 		if ( hasSingleBlockType ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
@@ -124,8 +142,8 @@ class Inserter extends Component {
 
 		return (
 			<Dropdown
-				className="editor-inserter block-editor-inserter"
-				contentClassName="editor-inserter__popover block-editor-inserter__popover"
+				className="block-editor-inserter"
+				contentClassName="block-editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
@@ -138,15 +156,24 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
+			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
+		const { getBlockVariations } = select( 'core/blocks' );
+
+		rootClientId =
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
-		const hasSingleBlockType = allowedBlocks && ( get( allowedBlocks, [ 'length' ], 0 ) === 1 );
+		const hasSingleBlockType =
+			size( allowedBlocks ) === 1 &&
+			size(
+				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+			) === 0;
 
 		let allowedBlockType = false;
 		if ( hasSingleBlockType ) {
@@ -158,6 +185,7 @@ export default compose( [
 			hasSingleBlockType,
 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
 			allowedBlockType,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
@@ -196,9 +224,7 @@ export default compose( [
 					return getBlockOrder( rootClientId ).length;
 				}
 
-				const {
-					insertBlock,
-				} = dispatch( 'core/block-editor' );
+				const { insertBlock } = dispatch( 'core/block-editor' );
 
 				const blockToInsert = createBlock( allowedBlockType.name );
 
@@ -210,8 +236,11 @@ export default compose( [
 				);
 
 				if ( ! selectBlockOnInsert ) {
-					// translators: %s: the name of the block that has been added
-					const message = sprintf( __( '%s block added' ), allowedBlockType.title );
+					const message = sprintf(
+						// translators: %s: the name of the block that has been added
+						__( '%s block added' ),
+						allowedBlockType.title
+					);
 					speak( message );
 				}
 			},

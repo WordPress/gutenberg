@@ -70,9 +70,11 @@ describe( 'RichText', () => {
 		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'b' );
 
-		const count = await page.evaluate( () => document.querySelectorAll(
-			'*[data-rich-text-format-boundary]'
-		).length );
+		const count = await page.evaluate(
+			() =>
+				document.querySelectorAll( '*[data-rich-text-format-boundary]' )
+					.length
+		);
 
 		expect( count ).toBe( 1 );
 	} );
@@ -182,21 +184,32 @@ describe( 'RichText', () => {
 
 			window.unsubscribes = [ () => mutationObserver.disconnect() ];
 
-			document.addEventListener( 'selectionchange', () => {
-				function throwMultipleSelectionChange() {
-					throw new Error( 'Typing should only emit one selection change event.' );
-				}
+			document.addEventListener(
+				'selectionchange',
+				() => {
+					function throwMultipleSelectionChange() {
+						throw new Error(
+							'Typing should only emit one selection change event.'
+						);
+					}
 
-				document.addEventListener(
-					'selectionchange',
-					throwMultipleSelectionChange,
-					{ once: true }
-				);
+					document.addEventListener(
+						'selectionchange',
+						throwMultipleSelectionChange,
+						{
+							once: true,
+						}
+					);
 
-				window.unsubscribes.push( () => {
-					document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
-				} );
-			}, { once: true } );
+					window.unsubscribes.push( () => {
+						document.removeEventListener(
+							'selectionchange',
+							throwMultipleSelectionChange
+						);
+					} );
+				},
+				{ once: true }
+			);
 		} );
 
 		await page.keyboard.type( '4' );
@@ -206,7 +219,9 @@ describe( 'RichText', () => {
 			// one item in `window.unsubscribes`, it means that only one
 			// function is present to disconnect the `mutationObserver`.
 			if ( window.unsubscribes.length === 1 ) {
-				throw new Error( 'The selection change event listener was never called.' );
+				throw new Error(
+					'The selection change event listener was never called.'
+				);
 			}
 
 			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
@@ -275,10 +290,83 @@ describe( 'RichText', () => {
 		} );
 		// Wait for the next animation frame, see the focus event listener in
 		// RichText.
-		await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
 		await pressKeyWithModifier( 'primary', 'b' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should split rich text on paste', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'x' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not split rich text on inline paste', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'x' );
+		await page.keyboard.type( '13' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not split rich text on inline paste with formatting', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '3' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'x' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should make bold after split and merge', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Backspace' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should apply active formatting for inline paste', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '3' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

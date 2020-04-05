@@ -17,21 +17,16 @@ function SeparatorEdit( { color, setColor, className } ) {
 	return (
 		<>
 			<HorizontalRule
-				className={ classnames(
-					className, {
-						'has-background': color.color,
-						[ color.class ]: color.class,
-					}
-				) }
+				className={ classnames( className, {
+					'has-background': color.color,
+					[ color.class ]: color.class,
+				} ) }
 				style={ {
 					backgroundColor: color.color,
 					color: color.color,
 				} }
 			/>
-			<SeparatorSettings
-				color={ color }
-				setColor={ setColor }
-			/>
+			<SeparatorSettings color={ color } setColor={ setColor } />
 		</>
 	);
 }

@@ -52,7 +52,10 @@ export default class ClassicEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { clientId, attributes: { content } } = this.props;
+		const {
+			clientId,
+			attributes: { content },
+		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
 
@@ -76,7 +79,10 @@ export default class ClassicEdit extends Component {
 	}
 
 	onSetup( editor ) {
-		const { attributes: { content }, setAttributes } = this.props;
+		const {
+			attributes: { content },
+			setAttributes,
+		} = this.props;
 		const { ref } = this;
 		let bookmark;
 
@@ -107,7 +113,10 @@ export default class ClassicEdit extends Component {
 		} );
 
 		editor.on( 'keydown', ( event ) => {
-			if ( ( event.keyCode === BACKSPACE || event.keyCode === DELETE ) && isTmceEmpty( editor ) ) {
+			if (
+				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
+				isTmceEmpty( editor )
+			) {
 				// delete the block
 				this.props.onReplace( [] );
 				event.preventDefault();
@@ -139,7 +148,10 @@ export default class ClassicEdit extends Component {
 
 		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
 		editor.on( 'init', function() {
-			if ( editor.settings.toolbar1 && editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1 ) {
+			if (
+				editor.settings.toolbar1 &&
+				editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1
+			) {
 				editor.dom.addClass( ref, 'has-advanced-toolbar' );
 			}
 		} );
@@ -189,7 +201,7 @@ export default class ClassicEdit extends Component {
 			<div
 				key="toolbar"
 				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => this.ref = ref }
+				ref={ ( ref ) => ( this.ref = ref ) }
 				className="block-library-classic__toolbar"
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }

@@ -8,7 +8,7 @@ import { castArray, first, last, every } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
+import { hasBlockSupport, switchToBlockType } from '@wordpress/blocks';
 
 function BlockActions( {
 	canDuplicate,
@@ -70,83 +70,48 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, props, { select } ) => {
-		const {
-			clientIds,
-			rootClientId,
-			blocks,
-			isLocked,
-			canDuplicate,
-		} = props;
+		const { clientIds, blocks } = props;
 
 		const {
-			insertBlocks,
-			multiSelect,
 			removeBlocks,
-			insertDefaultBlock,
 			replaceBlocks,
+			duplicateBlocks,
+			insertAfterBlock,
+			insertBeforeBlock,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			onDuplicate() {
-				if ( ! canDuplicate ) {
-					return;
-				}
-
-				const { getBlockIndex } = select( 'core/block-editor' );
-				const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
-				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-				insertBlocks(
-					clonedBlocks,
-					lastSelectedIndex + 1,
-					rootClientId
-				);
-				if ( clonedBlocks.length > 1 ) {
-					multiSelect(
-						first( clonedBlocks ).clientId,
-						last( clonedBlocks ).clientId
-					);
-				}
+				return duplicateBlocks( clientIds );
 			},
 			onRemove() {
-				if ( ! isLocked ) {
-					removeBlocks( clientIds );
-				}
+				removeBlocks( clientIds );
 			},
 			onInsertBefore() {
-				if ( ! isLocked ) {
-					const { getBlockIndex } = select( 'core/block-editor' );
-					const firstSelectedIndex = getBlockIndex( first( castArray( clientIds ) ), rootClientId );
-					insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
-				}
+				insertBeforeBlock( first( castArray( clientIds ) ) );
 			},
 			onInsertAfter() {
-				if ( ! isLocked ) {
-					const { getBlockIndex } = select( 'core/block-editor' );
-					const lastSelectedIndex = getBlockIndex( last( castArray( clientIds ) ), rootClientId );
-					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
-				}
+				insertAfterBlock( last( castArray( clientIds ) ) );
 			},
 			onGroup() {
 				if ( ! blocks.length ) {
 					return;
 				}
 
-				const {
-					getGroupingBlockName,
-				} = select( 'core/blocks' );
+				const { getGroupingBlockName } = select( 'core/blocks' );
 
 				const groupingBlockName = getGroupingBlockName();
 
 				// Activate the `transform` on `core/group` which does the conversion
-				const newBlocks = switchToBlockType( blocks, groupingBlockName );
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
 
 				if ( ! newBlocks ) {
 					return;
 				}
-				replaceBlocks(
-					clientIds,
-					newBlocks
-				);
+				replaceBlocks( clientIds, newBlocks );
 			},
 
 			onUngroup() {
@@ -160,10 +125,7 @@ export default compose( [
 					return;
 				}
 
-				replaceBlocks(
-					clientIds,
-					innerBlocks
-				);
+				replaceBlocks( clientIds, innerBlocks );
 			},
 		};
 	} ),

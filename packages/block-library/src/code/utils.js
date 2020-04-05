@@ -54,5 +54,8 @@ function escapeOpeningSquareBrackets( content ) {
  *                  their HTML entity counterpart (i.e. & => &amp;)
  */
 function escapeProtocolInIsolatedUrls( content ) {
-	return content.replace( /^(\s*https?:)\/\/([^\s<>"]+\s*)$/m, '$1&#47;&#47;$2' );
+	return content.replace(
+		/^(\s*https?:)\/\/([^\s<>"]+\s*)$/m,
+		'$1&#47;&#47;$2'
+	);
 }

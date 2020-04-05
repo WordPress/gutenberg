@@ -21,7 +21,7 @@ export const AsyncModeConsumer = Consumer;
  * function BlockCount() {
  *   const count = useSelect( ( select ) => {
  *     return select( 'core/block-editor' ).getBlockCount()
- *   } );
+ *   }, [] );
  *
  *   return count;
  * }

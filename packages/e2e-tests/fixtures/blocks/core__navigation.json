@@ -4,7 +4,7 @@
         "name": "core/navigation",
         "isValid": true,
         "attributes": {
-            "automaticallyAdd": false
+            "showSubmenuIcon": true
         },
         "innerBlocks": [],
         "originalContent": ""

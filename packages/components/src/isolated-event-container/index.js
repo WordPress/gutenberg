@@ -1,35 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
-class IsolatedEventContainer extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.stopEventPropagationOutsideContainer = this.stopEventPropagationOutsideContainer.bind( this );
-	}
-
-	stopEventPropagationOutsideContainer( event ) {
-		event.stopPropagation();
-	}
-
-	render() {
-		const { children, ... props } = this.props;
-
-		// Disable reason: this stops certain events from propagating outside of the component.
-		//   - onMouseDown is disabled as this can cause interactions with other DOM elements
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<div
-				{ ... props }
-				onMouseDown={ this.stopEventPropagationOutsideContainer }
-			>
-				{ children }
-			</div>
-		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	}
+function stopPropagation( event ) {
+	event.stopPropagation();
 }
 
-export default IsolatedEventContainer;
+export default forwardRef( ( { children, ...props }, ref ) => {
+	// Disable reason: this stops certain events from propagating outside of the component.
+	//   - onMouseDown is disabled as this can cause interactions with other DOM elements
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
+	return (
+		<div { ...props } ref={ ref } onMouseDown={ stopPropagation }>
+			{ children }
+		</div>
+	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
+} );

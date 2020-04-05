@@ -37,34 +37,40 @@ module.exports = function( token ) {
 			}
 			return name;
 		};
-		return [ {
-			localName: getLocalName( token ),
-			exportName: 'default',
-			module: null,
-			lineStart: token.loc.start.line,
-			lineEnd: token.loc.end.line,
-		} ];
+		return [
+			{
+				localName: getLocalName( token ),
+				exportName: 'default',
+				module: null,
+				lineStart: token.loc.start.line,
+				lineEnd: token.loc.end.line,
+			},
+		];
 	}
 
 	if ( token.type === 'ExportAllDeclaration' ) {
-		return [ {
-			localName: '*',
-			exportName: null,
-			module: token.source.value,
-			lineStart: token.loc.start.line,
-			lineEnd: token.loc.end.line,
-		} ];
+		return [
+			{
+				localName: '*',
+				exportName: null,
+				module: token.source.value,
+				lineStart: token.loc.start.line,
+				lineEnd: token.loc.end.line,
+			},
+		];
 	}
 
 	const name = [];
 	if ( token.declaration === null ) {
-		token.specifiers.forEach( ( specifier ) => name.push( {
-			localName: specifier.local.name,
-			exportName: specifier.exported.name,
-			module: get( token.source, [ 'value' ], null ),
-			lineStart: specifier.loc.start.line,
-			lineEnd: specifier.loc.end.line,
-		} ) );
+		token.specifiers.forEach( ( specifier ) =>
+			name.push( {
+				localName: specifier.local.name,
+				exportName: specifier.exported.name,
+				module: get( token.source, [ 'value' ], null ),
+				lineStart: specifier.loc.start.line,
+				lineEnd: specifier.loc.end.line,
+			} )
+		);
 		return name;
 	}
 

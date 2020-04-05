@@ -14,8 +14,12 @@ import {
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
-import { registerCoreBlocks, __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
-import { //eslint-disable-line no-restricted-syntax
+import {
+	registerCoreBlocks,
+	__experimentalRegisterExperimentalCoreBlocks,
+} from '@wordpress/block-library';
+//eslint-disable-next-line no-restricted-syntax
+import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
 	getBlockFixtureHTML,
@@ -34,7 +38,9 @@ function normalizeParsedBlocks( blocks ) {
 		// Clone and remove React-instance-specific stuff; also, attribute
 		// values that equal `undefined` will be removed. Validation issues
 		// add too much noise so they get removed as well.
-		block = JSON.parse( JSON.stringify( omit( block, 'validationIssues' ) ) );
+		block = JSON.parse(
+			JSON.stringify( omit( block, 'validationIssues' ) )
+		);
 
 		// Change client IDs to a predictable value
 		block.clientId = '_clientId_' + index;
@@ -48,7 +54,9 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		unstable__bootstrapServerSideBlockDefinitions( require( './server-registered.json' ) );
+		unstable__bootstrapServerSideBlockDefinitions(
+			require( './server-registered.json' )
+		);
 		const settings = {
 			__experimentalEnableLegacyWidgetBlock: true,
 			__experimentalEnableFullSiteEditing: true,
@@ -82,29 +90,31 @@ describe( 'full post content fixture', () => {
 			if ( parsedJSONFixtureContent ) {
 				parserOutputExpectedString = parsedJSONFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
-				parserOutputExpectedString = JSON.stringify(
-					parserOutputActual,
-					null,
-					4
-				) + '\n';
-				writeBlockFixtureParsedJSON( basename, parserOutputExpectedString );
+				parserOutputExpectedString =
+					JSON.stringify( parserOutputActual, null, 4 ) + '\n';
+				writeBlockFixtureParsedJSON(
+					basename,
+					parserOutputExpectedString
+				);
 			} else {
 				throw new Error(
 					`Missing fixture file: ${ parsedJSONFixtureFileName }`
 				);
 			}
 
-			const parserOutputExpected = JSON.parse( parserOutputExpectedString );
+			const parserOutputExpected = JSON.parse(
+				parserOutputExpectedString
+			);
 			try {
-				expect(
-					parserOutputActual
-				).toEqual( parserOutputExpected );
+				expect( parserOutputActual ).toEqual( parserOutputExpected );
 			} catch ( err ) {
-				throw new Error( format(
-					"File '%s' does not match expected value:\n\n%s",
-					parsedJSONFixtureFileName,
-					err.message
-				) );
+				throw new Error(
+					format(
+						"File '%s' does not match expected value:\n\n%s",
+						parsedJSONFixtureFileName,
+						err.message
+					)
+				);
 			}
 
 			const blocksActual = parse( htmlFixtureContent );
@@ -121,7 +131,9 @@ describe( 'full post content fixture', () => {
 				/* eslint-enable no-console */
 			}
 
-			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
+			const blocksActualNormalized = normalizeParsedBlocks(
+				blocksActual
+			);
 			const {
 				filename: jsonFixtureFileName,
 				file: jsonFixtureContent,
@@ -132,11 +144,8 @@ describe( 'full post content fixture', () => {
 			if ( jsonFixtureContent ) {
 				blocksExpectedString = jsonFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
-				blocksExpectedString = JSON.stringify(
-					blocksActualNormalized,
-					null,
-					4
-				) + '\n';
+				blocksExpectedString =
+					JSON.stringify( blocksActualNormalized, null, 4 ) + '\n';
 				writeBlockFixtureJSON( basename, blocksExpectedString );
 			} else {
 				throw new Error(
@@ -146,15 +155,15 @@ describe( 'full post content fixture', () => {
 
 			const blocksExpected = JSON.parse( blocksExpectedString );
 			try {
-				expect(
-					blocksActualNormalized
-				).toEqual( blocksExpected );
+				expect( blocksActualNormalized ).toEqual( blocksExpected );
 			} catch ( err ) {
-				throw new Error( format(
-					"File '%s' does not match expected value:\n\n%s",
-					jsonFixtureFileName,
-					err.message
-				) );
+				throw new Error(
+					format(
+						"File '%s' does not match expected value:\n\n%s",
+						jsonFixtureFileName,
+						err.message
+					)
+				);
 			}
 
 			// `serialize` doesn't have a trailing newline, but the fixture
@@ -163,7 +172,7 @@ describe( 'full post content fixture', () => {
 			const {
 				filename: serializedHTMLFileName,
 				file: serializedHTMLFixtureContent,
-			} =	getBlockFixtureSerializedHTML( basename );
+			} = getBlockFixtureSerializedHTML( basename );
 
 			let serializedExpected;
 			if ( serializedHTMLFixtureContent ) {
@@ -180,11 +189,13 @@ describe( 'full post content fixture', () => {
 			try {
 				expect( serializedActual ).toEqual( serializedExpected );
 			} catch ( err ) {
-				throw new Error( format(
-					"File '%s' does not match expected value:\n\n%s",
-					serializedHTMLFileName,
-					err.message
-				) );
+				throw new Error(
+					format(
+						"File '%s' does not match expected value:\n\n%s",
+						serializedHTMLFileName,
+						err.message
+					)
+				);
 			}
 		} );
 	} );
@@ -197,14 +208,19 @@ describe( 'full post content fixture', () => {
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
-			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
+			.filter(
+				( name ) =>
+					name.indexOf( 'core-embed' ) !== 0 &&
+					name !== 'core/template'
+			)
 			.forEach( ( name ) => {
 				const nameToFilename = blockNameToFixtureBasename( name );
 				const foundFixtures = blockBasenames
-					.filter( ( basename ) => (
-						basename === nameToFilename ||
-						startsWith( basename, nameToFilename + '__' )
-					) )
+					.filter(
+						( basename ) =>
+							basename === nameToFilename ||
+							startsWith( basename, nameToFilename + '__' )
+					)
 					.map( ( basename ) => {
 						const {
 							filename: htmlFixtureFileName,
@@ -214,12 +230,14 @@ describe( 'full post content fixture', () => {
 						} = getBlockFixtureJSON( basename );
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
-						const parserOutput = JSON.parse(
-							jsonFixtureContent,
-						);
+						const parserOutput = JSON.parse( jsonFixtureContent );
 						// The name of the first block that this fixture file
 						// contains (if any).
-						const firstBlock = get( parserOutput, [ '0', 'name' ], null );
+						const firstBlock = get(
+							parserOutput,
+							[ '0', 'name' ],
+							null
+						);
 						return {
 							filename: htmlFixtureFileName,
 							parserOutput,
@@ -229,20 +247,24 @@ describe( 'full post content fixture', () => {
 					.filter( ( fixture ) => fixture.parserOutput !== null );
 
 				if ( ! foundFixtures.length ) {
-					errors.push( format(
-						"Expected a fixture file called '%s.html' or '%s__*.html'.",
-						nameToFilename,
-						nameToFilename
-					) );
+					errors.push(
+						format(
+							"Expected a fixture file called '%s.html' or '%s__*.html'.",
+							nameToFilename,
+							nameToFilename
+						)
+					);
 				}
 
 				foundFixtures.forEach( ( fixture ) => {
 					if ( name !== fixture.firstBlock ) {
-						errors.push( format(
-							"Expected fixture file '%s' to test the '%s' block.",
-							fixture.filename,
-							name
-						) );
+						errors.push(
+							format(
+								"Expected fixture file '%s' to test the '%s' block.",
+								fixture.filename,
+								name
+							)
+						);
 					}
 				} );
 			} );

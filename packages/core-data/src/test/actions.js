@@ -33,7 +33,9 @@ describe( 'editEntityRecord', () => {
 describe( 'saveEntityRecord', () => {
 	it( 'triggers a POST request for a new record', async () => {
 		const post = { title: 'new post' };
-		const entities = [ { name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' } ];
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
@@ -41,8 +43,13 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
+
+		// Should select __experimentalGetEntityRecordNoResolver selector (as opposed to getEntityRecord)
+		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.selectorName ).toBe(
+			'__experimentalGetEntityRecordNoResolver'
+		);
 		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
@@ -63,13 +70,17 @@ describe( 'saveEntityRecord', () => {
 				true
 			)
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
+		expect( fulfillment.next().value.type ).toBe(
+			'SAVE_ENTITY_RECORD_FINISH'
+		);
 		expect( fulfillment.next().value ).toBe( updatedRecord );
 	} );
 
 	it( 'triggers a PUT request for an existing record', async () => {
 		const post = { id: 10, title: 'new post' };
-		const entities = [ { name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' } ];
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
 		const fulfillment = saveEntityRecord( 'postType', 'post', post );
 		// Trigger generator
 		fulfillment.next();
@@ -89,13 +100,24 @@ describe( 'saveEntityRecord', () => {
 		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( post );
-		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', post, undefined, true ) );
-		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
+		expect( received ).toEqual(
+			receiveEntityRecords( 'postType', 'post', post, undefined, true )
+		);
+		expect( fulfillment.next().value.type ).toBe(
+			'SAVE_ENTITY_RECORD_FINISH'
+		);
 	} );
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {
 		const postType = { slug: 'page', title: 'Pages' };
-		const entities = [ { name: 'postType', kind: 'root', baseURL: '/wp/v2/types', key: 'slug' } ];
+		const entities = [
+			{
+				name: 'postType',
+				kind: 'root',
+				baseURL: '/wp/v2/types',
+				key: 'slug',
+			},
+		];
 		const fulfillment = saveEntityRecord( 'root', 'postType', postType );
 		// Trigger generator
 		fulfillment.next();
@@ -115,8 +137,18 @@ describe( 'saveEntityRecord', () => {
 		} );
 		// Provide response and trigger action
 		const { value: received } = fulfillment.next( postType );
-		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', postType, undefined, true ) );
-		expect( fulfillment.next().value.type ).toBe( 'SAVE_ENTITY_RECORD_FINISH' );
+		expect( received ).toEqual(
+			receiveEntityRecords(
+				'root',
+				'postType',
+				postType,
+				undefined,
+				true
+			)
+		);
+		expect( fulfillment.next().value.type ).toBe(
+			'SAVE_ENTITY_RECORD_FINISH'
+		);
 	} );
 } );
 

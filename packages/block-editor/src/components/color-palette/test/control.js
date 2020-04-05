@@ -1,25 +1,30 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { create, act } from 'react-test-renderer';
 import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { ColorPaletteControl } from '../control';
+import ColorPaletteControl from '../control';
 
 describe( 'ColorPaletteControl', () => {
-	it( 'matches the snapshot', () => {
-		const wrapper = shallow(
-			<ColorPaletteControl
-				label="Test Color"
-				value="#f00"
-				colors={ [ { color: '#f00', name: 'red' } ] }
-				onChange={ noop }
-			/>
-		);
+	it( 'matches the snapshot', async () => {
+		let root;
 
-		expect( wrapper ).toMatchSnapshot();
+		await act( async () => {
+			root = create(
+				<ColorPaletteControl
+					label="Test Color"
+					value="#f00"
+					colors={ [ { color: '#f00', name: 'red' } ] }
+					disableCustomColors={ false }
+					onChange={ noop }
+				/>
+			);
+		} );
+
+		expect( root.toJSON() ).toMatchSnapshot();
 	} );
 } );

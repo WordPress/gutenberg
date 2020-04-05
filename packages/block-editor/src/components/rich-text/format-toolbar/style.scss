@@ -1,3 +1,5 @@
-.block-editor-format-toolbar .components-dropdown-menu__toggle .components-dropdown-menu__indicator::after {
-	margin: 7px;
+.block-editor-format-toolbar {
+	.components-dropdown-menu__toggle {
+		justify-content: center;
+	}
 }

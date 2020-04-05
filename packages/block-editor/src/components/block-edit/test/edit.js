@@ -74,7 +74,9 @@ describe( 'Edit', () => {
 			<Edit name="core/test-block" attributes={ attributes } />
 		);
 
-		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe( true );
+		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe(
+			true
+		);
 		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
 	} );
 } );

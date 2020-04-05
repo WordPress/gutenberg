@@ -22,7 +22,16 @@ const getSelection = async () => {
 			return {};
 		}
 
-		const editables = Array.from( selectedBlock.querySelectorAll( '[contenteditable]' ) );
+		let editables;
+
+		if ( selectedBlock.getAttribute( 'contenteditable' ) ) {
+			editables = [ selectedBlock ];
+		} else {
+			editables = Array.from(
+				selectedBlock.querySelectorAll( '[contenteditable]' )
+			);
+		}
+
 		const editableIndex = editables.indexOf( document.activeElement );
 		const selection = window.getSelection();
 
@@ -164,12 +173,14 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'test' );
 		await saveDraft();
 		await page.reload();
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 		await pressKeyWithModifier( 'primary', 'a' );
 		await pressKeyWithModifier( 'primary', 'b' );
 		await pressKeyWithModifier( 'primary', 'z' );
 
-		const visibleResult = await page.evaluate( () => document.activeElement.innerHTML );
+		const visibleResult = await page.evaluate(
+			() => document.activeElement.innerHTML
+		);
 		expect( visibleResult ).toBe( 'test' );
 	} );
 
@@ -253,7 +264,9 @@ describe( 'undo', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 		expect( await getSelection() ).toEqual( {} );
 		// After undoing every action, there should be no more undo history.
-		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+		expect(
+			await page.$( '.editor-history__undo[aria-disabled="true"]' )
+		).not.toBeNull();
 
 		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st block.
 
@@ -265,7 +278,9 @@ describe( 'undo', () => {
 			endOffset: 0,
 		} );
 		// After redoing one change, the undo button should be enabled again.
-		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).toBeNull();
+		expect(
+			await page.$( '.editor-history__undo[aria-disabled="true"]' )
+		).toBeNull();
 
 		await pressKeyWithModifier( 'primaryShift', 'z' ); // Redo 1st paragraph text.
 
@@ -346,7 +361,9 @@ describe( 'undo', () => {
 		// regression present was accurate, it would produce the correct
 		// content. The issue had manifested in the form of what was shown to
 		// the user since the blocks state failed to sync to block editor.
-		const visibleContent = await page.evaluate( () => document.activeElement.textContent );
+		const visibleContent = await page.evaluate(
+			() => document.activeElement.textContent
+		);
 		expect( visibleContent ).toBe( 'original' );
 	} );
 
@@ -376,14 +393,18 @@ describe( 'undo', () => {
 		await page.reload();
 
 		// Expect undo button to be disabled.
-		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+		expect(
+			await page.$( '.editor-history__undo[aria-disabled="true"]' )
+		).not.toBeNull();
 
-		await page.click( '.wp-block-paragraph' );
+		await page.click( '[data-type="core/paragraph"]' );
 
 		await page.keyboard.type( '2' );
 
 		// Expect undo button to be enabled.
-		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).toBeNull();
+		expect(
+			await page.$( '.editor-history__undo[aria-disabled="true"]' )
+		).toBeNull();
 
 		await pressKeyWithModifier( 'primary', 'z' );
 

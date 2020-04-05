@@ -194,7 +194,9 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// There is a default block:
-		expect( await page.$$( '.block-editor-block-list__block' ) ).toHaveLength( 1 );
+		expect(
+			await page.$$( '.block-editor-block-list__block' )
+		).toHaveLength( 1 );
 
 		// But the effective saved content is still empty:
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -209,6 +211,18 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Enter' );
 		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not split with line break in front', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

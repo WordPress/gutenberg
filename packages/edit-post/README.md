@@ -166,6 +166,7 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
@@ -175,18 +176,19 @@ function MyButtonMoreMenuItem() {
 	return wp.element.createElement(
 		PluginMoreMenuItem,
 		{
-			icon: 'smiley',
-			onClick: onButtonClick
+			icon: moreIcon,
+			onClick: onButtonClick,
 		},
 		__( 'My button title' )
-	)
+	);
 }
 ```
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginMoreMenuItem } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
@@ -194,7 +196,7 @@ function onButtonClick() {
 
 const MyButtonMoreMenuItem = () => (
 	<PluginMoreMenuItem
-		icon="smiley"
+		icon={ more }
 		onClick={ onButtonClick }
 	>
 		{ __( 'My button title' ) }
@@ -269,7 +271,7 @@ _Returns_
 
 <a name="PluginPostStatusInfo" href="#PluginPostStatusInfo">#</a> **PluginPostStatusInfo**
 
-Renders a row in the Status & Visibility panel of the Document sidebar.
+Renders a row in the Status & visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves
 and not its location, which may change in future iterations.
 
@@ -388,6 +390,7 @@ var __ = wp.i18n.__;
 var el = wp.element.createElement;
 var PanelBody = wp.components.PanelBody;
 var PluginSidebar = wp.editPost.PluginSidebar;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function MyPluginSidebar() {
 	return el(
@@ -395,7 +398,7 @@ function MyPluginSidebar() {
 			{
 				name: 'my-sidebar',
 				title: 'My sidebar title',
-				icon: 'smiley',
+				icon: moreIcon,
 			},
 			el(
 				PanelBody,
@@ -408,15 +411,16 @@ function MyPluginSidebar() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PanelBody } = wp.components;
-const { PluginSidebar } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
+import { PluginSidebar } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
-		icon="smiley"
+		icon={ more }
 	>
 		<PanelBody>
 			{ __( 'My sidebar content' ) }
@@ -434,10 +438,6 @@ _Parameters_
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
-_Returns_
-
--   `WPComponent`: Plugin sidebar component.
-
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 
 Renders a menu item in `Plugins` group in `More Menu` drop down,
@@ -450,13 +450,14 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function MySidebarMoreMenuItem() {
 	return wp.element.createElement(
 		PluginSidebarMoreMenuItem,
 		{
 			target: 'my-sidebar',
-			icon: 'smiley',
+			icon: moreIcon,
 		},
 		__( 'My sidebar title' )
 	)
@@ -465,13 +466,14 @@ function MySidebarMoreMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginSidebarMoreMenuItem } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="smiley"
+		icon={ more }
 	>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>

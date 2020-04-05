@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, omit } from 'lodash';
+import { difference, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,12 +32,13 @@ import { InspectorAdvancedControls } from '../components';
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			className: {
 				type: 'string',
 			},
-		} );
+		};
 	}
 
 	return settings;
@@ -51,32 +52,45 @@ export function addAttribute( settings ) {
  *
  * @return {WPComponent} Wrapped component.
  */
-export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
-		if ( hasCustomClassName && props.isSelected ) {
-			return (
-				<>
-					<BlockEdit { ...props } />
-					<InspectorAdvancedControls>
-						<TextControl
-							label={ __( 'Additional CSS Class(es)' ) }
-							value={ props.attributes.className || '' }
-							onChange={ ( nextValue ) => {
-								props.setAttributes( {
-									className: nextValue !== '' ? nextValue : undefined,
-								} );
-							} }
-							help={ __( 'Separate multiple classes with spaces.' ) }
-						/>
-					</InspectorAdvancedControls>
-				</>
+export const withInspectorControl = createHigherOrderComponent(
+	( BlockEdit ) => {
+		return ( props ) => {
+			const hasCustomClassName = hasBlockSupport(
+				props.name,
+				'customClassName',
+				true
 			);
-		}
+			if ( hasCustomClassName && props.isSelected ) {
+				return (
+					<>
+						<BlockEdit { ...props } />
+						<InspectorAdvancedControls>
+							<TextControl
+								autoComplete="off"
+								label={ __( 'Additional CSS class(es)' ) }
+								value={ props.attributes.className || '' }
+								onChange={ ( nextValue ) => {
+									props.setAttributes( {
+										className:
+											nextValue !== ''
+												? nextValue
+												: undefined,
+									} );
+								} }
+								help={ __(
+									'Separate multiple classes with spaces.'
+								) }
+							/>
+						</InspectorAdvancedControls>
+					</>
+				);
+			}
 
-		return <BlockEdit { ...props } />;
-	};
-}, 'withInspectorControl' );
+			return <BlockEdit { ...props } />;
+		};
+	},
+	'withInspectorControl'
+);
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -90,8 +104,14 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
-		extraProps.className = classnames( extraProps.className, attributes.className );
+	if (
+		hasBlockSupport( blockType, 'customClassName', true ) &&
+		attributes.className
+	) {
+		extraProps.className = classnames(
+			extraProps.className,
+			attributes.className
+		);
 	}
 
 	return extraProps;
@@ -136,7 +156,9 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 		// attributes, with the exception of `className`. This will determine
 		// the default set of classes. From there, any difference in innerHTML
 		// can be considered as custom classes.
-		const attributesSansClassName = omit( blockAttributes, [ 'className' ] );
+		const attributesSansClassName = omit( blockAttributes, [
+			'className',
+		] );
 		const serialized = getSaveContent( blockType, attributesSansClassName );
 		const defaultClasses = getHTMLRootElementClasses( serialized );
 		const actualClasses = getHTMLRootElementClasses( innerHTML );
@@ -152,7 +174,23 @@ export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	return blockAttributes;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'editor.BlockEdit', 'core/editor/custom-class-name/with-inspector-control', withInspectorControl );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
-addFilter( 'blocks.getBlockAttributes', 'core/custom-class-name/addParsedDifference', addParsedDifference );
+addFilter(
+	'blocks.registerBlockType',
+	'core/custom-class-name/attribute',
+	addAttribute
+);
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/custom-class-name/with-inspector-control',
+	withInspectorControl
+);
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'core/custom-class-name/save-props',
+	addSaveProps
+);
+addFilter(
+	'blocks.getBlockAttributes',
+	'core/custom-class-name/addParsedDifference',
+	addParsedDifference
+);

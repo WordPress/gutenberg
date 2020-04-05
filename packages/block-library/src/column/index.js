@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { column as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 
@@ -24,18 +24,8 @@ export const settings = {
 		inserter: false,
 		reusable: false,
 		html: false,
-	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( Number.isFinite( width ) ) {
-			return {
-				style: {
-					flexBasis: width + '%',
-				},
-			};
-		}
+		lightBlockWrapper: true,
 	},
 	edit,
 	save,
 };
-

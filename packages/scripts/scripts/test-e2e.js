@@ -30,19 +30,22 @@ const {
 // Provides a default config path for Puppeteer when jest-puppeteer.config.js
 // wasn't found at the root of the project or a custom path wasn't defined
 // using JEST_PUPPETEER_CONFIG environment variable.
-if ( ! hasProjectFile( 'jest-puppeteer.config.js' ) && ! process.env.JEST_PUPPETEER_CONFIG ) {
+if (
+	! hasProjectFile( 'jest-puppeteer.config.js' ) &&
+	! process.env.JEST_PUPPETEER_CONFIG
+) {
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
-const config = ! hasJestConfig() ?
-	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ) ] :
-	[];
+const config = ! hasJestConfig()
+	? [
+			'--config',
+			JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ),
+	  ]
+	: [];
 
-const hasRunInBand = hasArgInCLI( '--runInBand' ) ||
-	hasArgInCLI( '-i' );
-const runInBand = ! hasRunInBand ?
-	[ '--runInBand' ] :
-	[];
+const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
+const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 
 if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';

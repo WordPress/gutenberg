@@ -6,50 +6,70 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Icon, Tooltip } from '@wordpress/components';
+import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import BlockDropZone from '../block-drop-zone';
 import Inserter from '../inserter';
 
-function ButtonBlockAppender( { rootClientId, className, __experimentalSelectBlockOnInsert: selectBlockOnInsert } ) {
+function ButtonBlockAppender( {
+	rootClientId,
+	className,
+	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+} ) {
 	return (
-		<>
-			<BlockDropZone rootClientId={ rootClientId } />
-			<Inserter
-				rootClientId={ rootClientId }
-				__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
-				renderToggle={ ( { onToggle, disabled, isOpen, blockTitle, hasSingleBlockType } ) => {
-					let label;
-					if ( hasSingleBlockType ) {
+		<Inserter
+			rootClientId={ rootClientId }
+			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
+			renderToggle={ ( {
+				onToggle,
+				disabled,
+				isOpen,
+				blockTitle,
+				hasSingleBlockType,
+			} ) => {
+				let label;
+				if ( hasSingleBlockType ) {
+					label = sprintf(
 						// translators: %s: the name of the block when there is only one
-						label = sprintf( _x( 'Add %s', 'directly add the only allowed block' ), blockTitle );
-					} else {
-						label = _x( 'Add block', 'Generic label for block inserter button' );
-					}
-					const isToggleButton = ! hasSingleBlockType;
-					return (
-						<Tooltip text={ label }>
-							<Button
-								className={ classnames( className, 'block-editor-button-block-appender' ) }
-								onClick={ onToggle }
-								aria-haspopup={ isToggleButton ? 'true' : undefined }
-								aria-expanded={ isToggleButton ? isOpen : undefined }
-								disabled={ disabled }
-								label={ label }
-							>
-								<span className="screen-reader-text">{ label }</span>
-								<Icon icon="insert" />
-							</Button>
-						</Tooltip>
+						_x( 'Add %s', 'directly add the only allowed block' ),
+						blockTitle
 					);
-				} }
-				isAppender
-			/>
-		</>
+				} else {
+					label = _x(
+						'Add block',
+						'Generic label for block inserter button'
+					);
+				}
+				const isToggleButton = ! hasSingleBlockType;
+				return (
+					<Tooltip text={ label }>
+						<Button
+							className={ classnames(
+								className,
+								'block-editor-button-block-appender'
+							) }
+							onClick={ onToggle }
+							aria-haspopup={
+								isToggleButton ? 'true' : undefined
+							}
+							aria-expanded={
+								isToggleButton ? isOpen : undefined
+							}
+							disabled={ disabled }
+							label={ label }
+						>
+							<VisuallyHidden as="span">{ label }</VisuallyHidden>
+							<Icon icon={ plus } />
+						</Button>
+					</Tooltip>
+				);
+			} }
+			isAppender
+		/>
 	);
 }
 

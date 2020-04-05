@@ -1,4 +1,4 @@
-## Master
+## 4.0.0 (2019-12-19)
 
 ### Breaking Changes
 
@@ -39,7 +39,7 @@
 
 ## 1.0.0 (2019-03-06)
 
-### New Features 
+### New Features
 
 -   Initial release.
 
