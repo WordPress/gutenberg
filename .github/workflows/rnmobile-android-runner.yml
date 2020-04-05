@@ -12,6 +12,7 @@ jobs:
       with:
         api-level: 28
         arch: x86_64
+        emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -accel-check
         script: |
           npm ci
           # It's not necessary to run the full build, since Jest can interpret
