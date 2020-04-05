@@ -3,9 +3,10 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save() {
+export default function save( { attributes } ) {
+	const { blockDirection } = attributes;
 	return (
-		<div>
+		<div className={ `is-direction-${ blockDirection }` }>
 			<InnerBlocks.Content />
 		</div>
 	);

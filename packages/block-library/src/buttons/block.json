@@ -5,5 +5,11 @@
 		"align": true,
 		"alignWide": false,
 		"lightBlockWrapper": true
+	},
+	"attributes": {
+		"blockDirection": {
+			"type": "string",
+			"default": "horizontal"
+		}
 	}
 }
