@@ -19,6 +19,10 @@ import {
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jasmine.getEnv().addReporter({
+	specStarted: result => (jasmine.currentTest = result),
+	specDone: result => (jasmine.currentTest = result),
+});
 
 describe( 'Gutenberg Editor paste tests', () => {
 	// skip iOS for now
@@ -48,6 +52,12 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await driver.setClipboard( '', 'plaintext' );
 		editorPage = new EditorPage( driver );
 	} );
+
+	afterEach(() => {
+		if (jasmine.currentTest.failedExpectations.length) {
+			await driver.saveScreenshot( `./screenshots/${jasmine.currentTest.description}.failed.png` );
+		}
+	});
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewParagraphBlock();
