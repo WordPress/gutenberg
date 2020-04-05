@@ -91,7 +91,7 @@ export default function Guide( {
 							className="components-guide__inline-finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || _x( 'Finish', 'verb' ) }
+							{ finishButtonText || _x( 'Finish', 'button label' ) }
 						</FinishButton>
 					) }
 				</div>
@@ -118,7 +118,7 @@ export default function Guide( {
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || _x( 'Finish', 'verb' ) }
+							{ finishButtonText || _x( 'Finish', 'button label' ) }
 						</FinishButton>
 					) }
 				</div>
