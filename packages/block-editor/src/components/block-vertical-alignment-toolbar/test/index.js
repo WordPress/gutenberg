@@ -12,7 +12,12 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	const alignment = 'top';
 	const onChange = jest.fn();
 
-	const wrapper = shallow( <BlockVerticalAlignmentToolbar value={ alignment } onChange={ onChange } /> );
+	const wrapper = shallow(
+		<BlockVerticalAlignmentToolbar
+			value={ alignment }
+			onChange={ onChange }
+		/>
+	);
 
 	const controls = wrapper.props().controls;
 
@@ -25,7 +30,9 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 	} );
 
 	it( 'should call onChange with undefined, when the control is already active', () => {
-		const activeControl = controls.find( ( { title } ) => title.toLowerCase().includes( alignment ) );
+		const activeControl = controls.find( ( { title } ) =>
+			title.toLowerCase().includes( alignment )
+		);
 		activeControl.onClick();
 
 		expect( activeControl.isActive ).toBe( true );
@@ -35,7 +42,9 @@ describe( 'BlockVerticalAlignmentToolbar', () => {
 
 	it( 'should call onChange with alignment value when the control is inactive', () => {
 		// note "middle" alias for "center"
-		const inactiveCenterControl = controls.find( ( { title } ) => title.toLowerCase().includes( 'middle' ) );
+		const inactiveCenterControl = controls.find( ( { title } ) =>
+			title.toLowerCase().includes( 'middle' )
+		);
 
 		inactiveCenterControl.onClick();
 

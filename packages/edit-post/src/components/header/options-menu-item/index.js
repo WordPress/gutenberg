@@ -5,11 +5,10 @@ import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 
-export function OptionsMenuItem( { openModal, onSelect } ) {
+export function OptionsMenuItem( { openModal } ) {
 	return (
 		<MenuItem
 			onClick={ () => {
-				onSelect();
 				openModal( 'edit-post/options' );
 			} }
 		>

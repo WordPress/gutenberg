@@ -9,98 +9,119 @@
  */
 
 /**
- * Filters allowed CSS attributes to include `flex-basis`, included in saved
- * markup of the Column block.
+ * Extends block editor settings to include a list of image dimensions per size.
  *
- * This can be removed when plugin support requires WordPress 5.3.0+.
+ * This can be removed when plugin support requires WordPress 5.4.0+.
  *
- * @see https://core.trac.wordpress.org/ticket/47281
- * @see https://core.trac.wordpress.org/changeset/45363
+ * @see https://core.trac.wordpress.org/ticket/49389
+ * @see https://core.trac.wordpress.org/changeset/47240
  *
- * @since 5.7.0
+ * @param array $settings Default editor settings.
  *
- * @param string[] $attr Array of allowed CSS attributes.
- *
- * @return string[] Filtered array of allowed CSS attributes.
+ * @return array Filtered editor settings.
  */
-function gutenberg_safe_style_css_column_flex_basis( $attr ) {
-	$attr[] = 'flex-basis';
-
-	return $attr;
-}
-add_filter( 'safe_style_css', 'gutenberg_safe_style_css_column_flex_basis' );
-
-/**
- * Filters inserted post data to unset any auto-draft assigned post title. The status
- * of an auto-draft should be read from its `post_status` and not inferred via its
- * title. A post with an explicit title should be created with draft status, not
- * with auto-draft status. It will also update an existing post's status to draft if
- * currently an auto-draft. This is intended to ensure that a post which is
- * explicitly updated should no longer be subject to auto-draft purge.
- *
- * @see https://core.trac.wordpress.org/ticket/43316#comment:88
- * @see https://core.trac.wordpress.org/ticket/43316#comment:89
- *
- * @param array $data    An array of slashed post data.
- * @param array $postarr An array of sanitized, but otherwise unmodified post
- *                        data.
- *
- * @return array Filtered post data.
- */
-function gutenberg_filter_wp_insert_post_data( $data, $postarr ) {
-	if ( 'auto-draft' === $postarr['post_status'] ) {
-		if ( ! empty( $postarr['ID'] ) ) {
-			$data['post_status'] = 'draft';
-		} else {
-			$data['post_title'] = '';
+function gutenberg_extend_settings_image_dimensions( $settings ) {
+	/*
+	 * Only filter settings if:
+	 * 1. `imageDimensions` is not already assigned, in which case it can be
+	 *    assumed to have been set from WordPress 5.4.0+ default settings.
+	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
+	 *    directly and not provide all properties of the settings array.
+	 */
+	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
+		$image_dimensions = array();
+		$all_sizes        = wp_get_registered_image_subsizes();
+		foreach ( $settings['imageSizes'] as $size ) {
+			$key = $size['slug'];
+			if ( isset( $all_sizes[ $key ] ) ) {
+				$image_dimensions[ $key ] = $all_sizes[ $key ];
+			}
 		}
+		$settings['imageDimensions'] = $image_dimensions;
 	}
-	return $data;
-}
-add_filter( 'wp_insert_post_data', 'gutenberg_filter_wp_insert_post_data', 10, 2 );
 
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
 
 /**
- * Shim that hooks into `pre_render_block` so as to override `render_block`
- * with a function that passes `render_callback` the block object as the
- * argument.
+ * Adds a polyfill for the WHATWG URL in environments which do not support it.
+ * The intention in how this action is handled is under the assumption that this
+ * code would eventually be placed at `wp_default_packages_vendor`, which is
+ * called as a result of `wp_default_packages` via the `wp_default_scripts`.
  *
- * @param string $pre_render The pre-rendered content. Default null.
- * @param array  $block The block being rendered.
+ * This can be removed when plugin support requires WordPress 5.4.0+.
  *
- * @return string String of rendered HTML.
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
+ * @see https://core.trac.wordpress.org/ticket/49360
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
+ * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
+ *
+ * @since 7.3.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
  */
-function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
-	global $post;
-
-	$source_block = $block;
-
-	/** This filter is documented in src/wp-includes/blocks.php */
-	$block = apply_filters( 'render_block_data', $block, $source_block );
-
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
-	$block_content = '';
-	$index         = 0;
-
-	foreach ( $block['innerContent'] as $chunk ) {
-		$block_content .= is_string( $chunk ) ? $chunk : render_block( $block['innerBlocks'][ $index++ ] );
-	}
-
-	if ( ! is_array( $block['attrs'] ) ) {
-		$block['attrs'] = array();
-	}
-
-	if ( $is_dynamic ) {
-		$global_post = $post;
-
-		$block_type->prepare_attributes_for_render( $block['attrs'] );
-		$block_content = (string) call_user_func( $block_type->render_callback, $block['attrs'], $block_content, $block );
-
-		$post = $global_post;
-	}
-
-	/** This filter is documented in src/wp-includes/blocks.php */
-	return apply_filters( 'render_block', $block_content, $block );
+function gutenberg_add_url_polyfill( $scripts ) {
+	did_action( 'init' ) && $scripts->add_inline_script(
+		'wp-polyfill',
+		wp_get_script_polyfill(
+			$scripts,
+			array(
+				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
+			)
+		)
+	);
 }
-add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
+add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
+
+/**
+ * Adds a polyfill for DOMRect in environments which do not support it.
+ *
+ * This can be removed when plugin support requires WordPress 5.4.0+.
+ *
+ * The script registration occurs in `gutenberg_register_vendor_scripts`, which
+ * should be removed in coordination with this function.
+ *
+ * @see gutenberg_register_vendor_scripts
+ * @see gutenberg_add_url_polyfill
+ * @see https://core.trac.wordpress.org/ticket/49360
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
+ * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
+ *
+ * @since 7.5.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_dom_rect_polyfill( $scripts ) {
+	did_action( 'init' ) && $scripts->add_inline_script(
+		'wp-polyfill',
+		wp_get_script_polyfill(
+			$scripts,
+			array(
+				'window.DOMRect' => 'wp-polyfill-dom-rect',
+			)
+		)
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
+
+/**
+ * Sets the current post for usage in template blocks.
+ *
+ * @return WP_Post|null The post if any, or null otherwise.
+ */
+function gutenberg_get_post_from_context() {
+	// TODO: Without this temporary fix, an infinite loop can occur where
+	// posts with post content blocks render themselves recursively.
+	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		return null;
+	}
+	if ( ! in_the_loop() ) {
+		rewind_posts();
+		the_post();
+	}
+	return get_post();
+}

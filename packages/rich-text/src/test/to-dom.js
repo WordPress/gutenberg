@@ -21,22 +21,18 @@ describe( 'recordToDom', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach( ( {
-		description,
-		multilineTag,
-		record,
-		startPath,
-		endPath,
-	} ) => {
-		it( description, () => {
-			const { body, selection } = toDom( {
-				value: record,
-				multilineTag,
+	spec.forEach(
+		( { description, multilineTag, record, startPath, endPath } ) => {
+			it( description, () => {
+				const { body, selection } = toDom( {
+					value: record,
+					multilineTag,
+				} );
+				expect( body ).toMatchSnapshot();
+				expect( selection ).toEqual( { startPath, endPath } );
 			} );
-			expect( body ).toMatchSnapshot();
-			expect( selection ).toEqual( { startPath, endPath } );
-		} );
-	} );
+		}
+	);
 } );
 
 describe( 'applyValue', () => {
@@ -100,7 +96,9 @@ describe( 'applyValue', () => {
 	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
-			const futureBody = createElement( document, future ).cloneNode( true );
+			const futureBody = createElement( document, future ).cloneNode(
+				true
+			);
 			const childNodes = Array.from( futureBody.childNodes );
 			applyValue( futureBody, body );
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {

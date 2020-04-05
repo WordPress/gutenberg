@@ -1,35 +1,5 @@
 .components-toolbar__control.components-button {
-	display: inline-flex;
-	align-items: flex-end;
-	margin: 0;
-	padding: 3px;
-	outline: none;
-	cursor: pointer;
 	position: relative;
-	width: $icon-button-size;
-	height: $icon-button-size;
-
-	// Unset icon button styles
-	&:not([aria-disabled="true"]):not(.is-default):active,
-	&:not([aria-disabled="true"]):hover,
-	&:not([aria-disabled="true"]):focus {
-		outline: none;
-		box-shadow: none;
-		background: none;
-		border: none;
-	}
-
-	// Disabled
-	&:disabled {
-		cursor: default;
-	}
-
-	& > svg {
-		padding: 5px;
-		border-radius: $radius-round-rectangle;
-		height: 30px;
-		width: 30px;
-	}
 
 	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
@@ -47,43 +17,12 @@
 		bottom: 10px;
 	}
 
-	// Assign hover style to child element, not the button itself
-	&:not(:disabled):not([aria-disabled="true"]):hover {
-		box-shadow: none;
+	// Hide focus rectangle on click.
+	&:active::before {
+		display: none;
 	}
 
-	&:not(:disabled).is-active > svg,
-	&:not(:disabled):hover > svg {
-		@include formatting-button-style__hover;
-	}
-
-	// Active & toggled style
-	&:not(:disabled).is-active > svg {
-		@include formatting-button-style__active;
-	}
-
-	&:not(:disabled).is-active[data-subscript]::after {
+	&:not(:disabled).is-pressed[data-subscript]::after {
 		color: $white;
 	}
-
-	// Focus style
-	&:not(:disabled):focus > svg {
-		@include formatting-button-style__focus;
-		// Remove outline from SVG to apply on focused element - see below.
-		outline: 0;
-	}
-
-	// Microsoft Edge in high contrast mode only displays outlines on focused elements, not their children.
-	&:not(:disabled).is-active {
-		outline: 1px dotted transparent;
-		outline-offset: -2px;
-	}
-	// Microsoft Edge in high contrast mode only displays outlines on focused elements, not their children.
-	&:not(:disabled):focus {
-		outline: 2px solid transparent;
-	}
-}
-
-.components-toolbar__control .dashicon {
-	display: block;
 }

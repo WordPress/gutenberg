@@ -29,7 +29,8 @@ import useRegistry from '../registry-provider/use-registry';
  *
  * const SaleButton = ( { children } ) => {
  *   const { stockNumber } = useSelect(
- *     ( select ) => select( 'my-shop' ).getStockNumber()
+ *     ( select ) => select( 'my-shop' ).getStockNumber(),
+ *     []
  *   );
  *   const { startSale } = useDispatch( 'my-shop' );
  *   const onClick = useCallback( () => {

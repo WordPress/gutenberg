@@ -10,6 +10,7 @@ import {
 	activatePlugin,
 	clearLocalStorage,
 	enablePageDialogAccept,
+	isOfflineMode,
 	setBrowserViewport,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -17,9 +18,25 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 /**
- * Environment variables
+ * Timeout, in seconds, that the test should be allowed to run.
+ *
+ * @type {string|undefined}
  */
-const { PUPPETEER_TIMEOUT } = process.env;
+const PUPPETEER_TIMEOUT = process.env.PUPPETEER_TIMEOUT;
+
+/**
+ * CPU slowdown factor, as a numeric multiplier.
+ *
+ * @type {string|undefined}
+ */
+const THROTTLE_CPU = process.env.THROTTLE_CPU;
+
+/**
+ * Network download speed, in bytes per second.
+ *
+ * @type {string|undefined}
+ */
+const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -66,8 +83,8 @@ async function trashExistingPosts() {
 	}
 
 	// Select all posts.
-	await page.waitForSelector( '#cb-select-all-1' );
-	await page.click( '#cb-select-all-1' );
+	await page.waitForSelector( '[id^=cb-select-all-]' );
+	await page.click( '[id^=cb-select-all-]' );
 	// Select the "bulk actions" > "trash" option.
 	await page.select( '#bulk-action-selector-top', 'trash' );
 	// Submit the form to send all draft/scheduled/published posts to the trash.
@@ -116,22 +133,46 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// A chrome advisory warning about SameSite cookies is informational
+		// about future changes, tracked separately for improvement in core.
+		//
+		// See: https://core.trac.wordpress.org/ticket/37000
+		// See: https://www.chromestatus.com/feature/5088147346030592
+		// See: https://www.chromestatus.com/feature/5633521622188032
+		if (
+			text.includes( 'A cookie associated with a cross-site resource' )
+		) {
+			return;
+		}
+
 		// Viewing posts on the front end can result in this error, which
 		// has nothing to do with Gutenberg.
 		if ( text.includes( 'net::ERR_UNKNOWN_URL_SCHEME' ) ) {
 			return;
 		}
 
-		// A bug present in WordPress 5.2 will produce console warnings when
-		// loading the Dashicons font. These can be safely ignored, as they do
-		// not otherwise regress on application behavior. This logic should be
-		// removed once the associated ticket has been closed.
-		//
-		// See: https://core.trac.wordpress.org/ticket/47183
+		// Network errors are ignored only if we are intentionally testing
+		// offline mode.
 		if (
-			text.startsWith( 'Failed to decode downloaded font:' ) ||
-			text.startsWith( 'OTS parsing error:' )
+			text.includes( 'net::ERR_INTERNET_DISCONNECTED' ) &&
+			isOfflineMode()
 		) {
+			return;
+		}
+
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
+			return;
+		}
+
+		// As of WordPress 5.3.2 in Chrome 79, navigating to the block editor
+		// (Posts > Add New) will display a console warning about
+		// non - unique IDs.
+		// See: https://core.trac.wordpress.org/ticket/23165
+		if ( text.includes( 'elements with non-unique id #_wpnonce' ) ) {
 			return;
 		}
 
@@ -148,7 +189,11 @@ function observeConsoleLogging() {
 		// correctly. Instead, the logic here synchronously inspects the
 		// internal object shape of the JSHandle to find the error text. If it
 		// cannot be found, the default text value is used instead.
-		text = get( message.args(), [ 0, '_remoteObject', 'description' ], text );
+		text = get(
+			message.args(),
+			[ 0, '_remoteObject', 'description' ],
+			text
+		);
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via
@@ -166,7 +211,7 @@ function observeConsoleLogging() {
  * @return {?Promise} Promise resolving once Axe texts are finished.
  */
 async function runAxeTestsForBlockEditor() {
-	if ( ! await page.$( '.block-editor' ) ) {
+	if ( ! ( await page.$( '.block-editor' ) ) ) {
 		return;
 	}
 
@@ -175,6 +220,8 @@ async function runAxeTestsForBlockEditor() {
 		// See: https://github.com/WordPress/gutenberg/pull/15018.
 		disabledRules: [
 			'aria-allowed-role',
+			'aria-hidden-focus',
+			'aria-input-field-name',
 			'aria-valid-attr-value',
 			'button-name',
 			'color-contrast',
@@ -194,6 +241,32 @@ async function runAxeTestsForBlockEditor() {
 	} );
 }
 
+/**
+ * Simulate slow network or throttled CPU if provided via environment variables.
+ */
+async function simulateAdverseConditions() {
+	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+		return;
+	}
+
+	const client = await page.target().createCDPSession();
+
+	if ( DOWNLOAD_THROUGHPUT ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		await client.send( 'Network.emulateNetworkConditions', {
+			// Simulated download speed (bytes/s)
+			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+		} );
+	}
+
+	if ( THROTTLE_CPU ) {
+		// See: https://chromedevtools.github.io/devtools-protocol/tot/Emulation#method-setCPUThrottlingRate
+		await client.send( 'Emulation.setCPUThrottlingRate', {
+			rate: Number( THROTTLE_CPU ),
+		} );
+	}
+}
+
 // Before every test suite run, delete all content created by the test. This ensures
 // other posts/comments/etc. aren't dirtying tests and tests don't depend on
 // each other's side-effects.
@@ -201,6 +274,7 @@ beforeAll( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();
+	await simulateAdverseConditions();
 
 	await trashExistingPosts();
 	await setupBrowser();

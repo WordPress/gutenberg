@@ -1,3 +1,21 @@
+## Master
+
+## 3.7.0 (2020-02-10)
+
+### New Features
+
+- Add new `__experimentalEditorSkeleton` component. This has been moved over from the `@wordpress/edit-post` package, where it was an internal component called `EditorRegions`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
+
+## 3.3.0 (2019-11-14)
+
+### New Features
+
+- Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
+
+### Deprecation
+
+- `dropZoneUIOnly` prop in `MediaPlaceholder` component has been deprecated in favor of `disableMediaButtons` prop.
+
 ## 3.0.0 (2019-08-05)
 
 ### New Features

@@ -5,7 +5,10 @@ const { findLast } = require( 'lodash' );
 
 const getHeadingIndex = ( ast, index ) => {
 	const astBeforeIndex = ast.children.slice( 0, index );
-	const lastHeading = findLast( astBeforeIndex, ( node ) => node.type === 'heading' );
+	const lastHeading = findLast(
+		astBeforeIndex,
+		( node ) => node.type === 'heading'
+	);
 	return lastHeading ? lastHeading.depth : 1;
 };
 
@@ -42,7 +45,11 @@ const embed = function( token, targetAst, newContentAst ) {
 				node.depth = headingIndex + 1;
 			}
 		} );
-		targetAst.children.splice( startIndex + 1, endIndex - startIndex - 1, newContentAst );
+		targetAst.children.splice(
+			startIndex + 1,
+			endIndex - startIndex - 1,
+			newContentAst
+		);
 		return true;
 	}
 	return false;

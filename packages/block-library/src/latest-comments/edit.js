@@ -34,9 +34,13 @@ class LatestComments extends Component {
 		// Create toggles for each attribute; we create them here rather than
 		// passing `this.createToggleAttribute( 'displayAvatar' )` directly to
 		// `onChange` to avoid re-renders.
-		this.toggleDisplayAvatar = this.createToggleAttribute( 'displayAvatar' );
+		this.toggleDisplayAvatar = this.createToggleAttribute(
+			'displayAvatar'
+		);
 		this.toggleDisplayDate = this.createToggleAttribute( 'displayDate' );
-		this.toggleDisplayExcerpt = this.createToggleAttribute( 'displayExcerpt' );
+		this.toggleDisplayExcerpt = this.createToggleAttribute(
+			'displayExcerpt'
+		);
 	}
 
 	createToggleAttribute( propName ) {
@@ -63,24 +67,24 @@ class LatestComments extends Component {
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Latest Comments Settings' ) }>
+					<PanelBody title={ __( 'Latest comments settings' ) }>
 						<ToggleControl
-							label={ __( 'Display Avatar' ) }
+							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
 							onChange={ this.toggleDisplayAvatar }
 						/>
 						<ToggleControl
-							label={ __( 'Display Date' ) }
+							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ this.toggleDisplayDate }
 						/>
 						<ToggleControl
-							label={ __( 'Display Excerpt' ) }
+							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ this.toggleDisplayExcerpt }
 						/>
 						<RangeControl
-							label={ __( 'Number of Comments' ) }
+							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
 							onChange={ this.setCommentsToShow }
 							min={ MIN_COMMENTS }

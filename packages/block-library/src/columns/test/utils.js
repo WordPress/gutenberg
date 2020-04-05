@@ -2,9 +2,7 @@
  * Internal dependencies
  */
 import {
-	getColumnsTemplate,
 	toWidthPrecision,
-	getAdjacentBlocks,
 	getEffectiveColumnWidth,
 	getTotalColumnsWidth,
 	getColumnWidths,
@@ -12,25 +10,6 @@ import {
 	hasExplicitColumnWidths,
 	getMappedColumnWidths,
 } from '../utils';
-
-describe( 'getColumnsTemplate', () => {
-	it( 'should return a template corresponding to columns count', () => {
-		const template = getColumnsTemplate( 4 );
-
-		expect( template ).toEqual( [
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-			[ 'core/column' ],
-		] );
-	} );
-
-	it( 'should return null if columns count is not defined', () => {
-		const template = getColumnsTemplate( undefined );
-
-		expect( template ).toBe( null );
-	} );
-} );
 
 describe( 'toWidthPrecision', () => {
 	it( 'should round value to standard precision', () => {
@@ -42,25 +21,6 @@ describe( 'toWidthPrecision', () => {
 	it( 'should return undefined for invalid number', () => {
 		expect( toWidthPrecision( null ) ).toBe( undefined );
 		expect( toWidthPrecision( undefined ) ).toBe( undefined );
-	} );
-} );
-
-describe( 'getAdjacentBlocks', () => {
-	const blockA = { clientId: 'a' };
-	const blockB = { clientId: 'b' };
-	const blockC = { clientId: 'c' };
-	const blocks = [ blockA, blockB, blockC ];
-
-	it( 'should return blocks after clientId', () => {
-		const result = getAdjacentBlocks( blocks, 'b' );
-
-		expect( result ).toEqual( [ blockC ] );
-	} );
-
-	it( 'should return blocks before clientId if clientId is last', () => {
-		const result = getAdjacentBlocks( blocks, 'c' );
-
-		expect( result ).toEqual( [ blockA, blockB ] );
 	} );
 } );
 
@@ -206,7 +166,29 @@ describe( 'hasExplicitColumnWidths', () => {
 	} );
 
 	it( 'returns true if a block has explicit width', () => {
-		const blocks = [ { attributes: { width: 10 } } ];
+		const blocks = [ { attributes: { width: 100 } } ];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if some, not all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: undefined } },
+		];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if all blocks have explicit width', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: 90 } },
+		];
 
 		const result = hasExplicitColumnWidths( blocks );
 

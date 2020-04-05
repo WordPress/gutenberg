@@ -32,9 +32,7 @@ export function hideApp( unhiddenElement ) {
 	}
 	const elements = document.body.children;
 	forEach( elements, ( element ) => {
-		if (
-			element === unhiddenElement
-		) {
+		if ( element === unhiddenElement ) {
 			return;
 		}
 		if ( elementShouldBeHidden( element ) ) {

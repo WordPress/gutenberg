@@ -1,6 +1,13 @@
+// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
+#start-resizable-editor-section {
+	display: none;
+}
+
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
+@import "./block/editor.scss";
 @import "./button/editor.scss";
+@import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./code/editor.scss";
 @import "./columns/editor.scss";
@@ -16,22 +23,25 @@
 @import "./latest-posts/editor.scss";
 @import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
-@import "./list/editor.scss";
 @import "./more/editor.scss";
-@import "./navigation-menu/editor.scss";
-@import "./navigation-menu-item/editor.scss";
+@import "./navigation/editor.scss";
+@import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
-@import "./preformatted/editor.scss";
+@import "./post-excerpt/editor.scss";
 @import "./pullquote/editor.scss";
 @import "./quote/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
+@import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
+@import "./social-link/editor.scss";
+@import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
 @import "./subhead/editor.scss";
 @import "./table/editor.scss";
 @import "./tag-cloud/editor.scss";
+@import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
@@ -40,7 +50,6 @@
  * Import styles from internal editor components used by the blocks.
  */
 @import "./block/edit-panel/editor.scss";
-@import "./block/indicator/editor.scss";
 
 /**
  * Editor Normalization Styles
@@ -51,7 +60,12 @@
 
 // Provide every block with a default base margin. This margin provides a consistent spacing
 // between blocks in the editor.
-.editor-styles-wrapper [data-block] {
+.editor-styles-wrapper .block-editor-block-list__block {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
+}
+
+// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
+#end-resizable-editor-section {
+	display: none;
 }

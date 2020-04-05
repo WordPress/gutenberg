@@ -1,3 +1,9 @@
+:root p {
+	background-color: var(--wp--color--background);
+	color: var(--wp--color--text);
+	line-height: var(--wp--typography--line-height);
+}
+
 .is-small-text {
 	font-size: 14px;
 }
@@ -26,13 +32,6 @@
 	margin: 0.05em 0.1em 0 0;
 	text-transform: uppercase;
 	font-style: normal;
-}
-
-.has-drop-cap:not(:focus)::after {
-	content: "";
-	display: table;
-	clear: both;
-	padding-top: $block-padding;
 }
 
 p.has-background {

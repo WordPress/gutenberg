@@ -18,7 +18,11 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
     <input
       onChange={[Function]}
       onKeyDown={[Function]}
-      size={1}
+      style={
+        Object {
+          "width": "1.2em",
+        }
+      }
       type="text"
       value=""
     />
@@ -44,7 +48,11 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
     <input
       onChange={[Function]}
       onKeyDown={[Function]}
-      size={1}
+      style={
+        Object {
+          "width": "1.2em",
+        }
+      }
       type="text"
       value=""
     />

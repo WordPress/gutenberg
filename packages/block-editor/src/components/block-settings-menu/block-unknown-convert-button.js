@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { getFreeformContentHandlerName, rawHandler, serialize } from '@wordpress/blocks';
+import {
+	getFreeformContentHandlerName,
+	rawHandler,
+	serialize,
+} from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -16,13 +20,15 @@ export default compose(
 
 		return {
 			block,
-			shouldRender: ( block && block.name === getFreeformContentHandlerName() ),
+			shouldRender:
+				block && block.name === getFreeformContentHandlerName(),
 		};
 	} ),
 	withDispatch( ( dispatch, { block } ) => ( {
-		onClick: () => dispatch( 'core/block-editor' ).replaceBlocks(
-			block.clientId,
-			rawHandler( { HTML: serialize( block ) } )
-		),
-	} ) ),
+		onClick: () =>
+			dispatch( 'core/block-editor' ).replaceBlocks(
+				block.clientId,
+				rawHandler( { HTML: serialize( block ) } )
+			),
+	} ) )
 )( BlockConvertButton );

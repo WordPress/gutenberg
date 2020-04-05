@@ -76,7 +76,7 @@ function isValidFocusableArea( element ) {
 export function find( context ) {
 	const elements = context.querySelectorAll( SELECTOR );
 
-	return [ ...elements ].filter( ( element ) => {
+	return Array.from( elements ).filter( ( element ) => {
 		if ( ! isVisible( element ) ) {
 			return false;
 		}

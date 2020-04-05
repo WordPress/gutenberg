@@ -4,11 +4,7 @@
 import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import {
-	getBlockType,
-	createBlock,
-	rawHandler,
-} from '@wordpress/blocks';
+import { getBlockType, createBlock, rawHandler } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -36,68 +32,92 @@ export class BlockInvalidWarning extends Component {
 	}
 
 	render() {
-		const { convertToHTML, convertToBlocks, convertToClassic, attemptBlockRecovery, block } = this.props;
+		const {
+			convertToHTML,
+			convertToBlocks,
+			convertToClassic,
+			attemptBlockRecovery,
+			block,
+		} = this.props;
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
-			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
-			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
+			{
+				title: __( 'Convert to Classic Block' ),
+				onClick: convertToClassic,
+			},
+			{
+				title: __( 'Attempt Block Recovery' ),
+				onClick: attemptBlockRecovery,
+			},
 		];
 
-		if ( compare ) {
-			return (
-				<Modal
-					title={
-						// translators: Dialog title to fix block content
-						__( 'Resolve Block' )
-					}
-					onRequestClose={ this.onCompareClose }
-					className="editor-block-compare block-editor-block-compare"
-				>
-					<BlockCompare
-						block={ block }
-						onKeep={ convertToHTML }
-						onConvert={ convertToBlocks }
-						convertor={ blockToBlocks }
-						convertButtonText={ __( 'Convert to Blocks' ) }
-					/>
-				</Modal>
-			);
-		}
-
 		return (
-			<Warning
-				actions={ [
-					<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
-						{
-							// translators: Button to fix block content
-							_x( 'Resolve', 'imperative verb' )
+			<>
+				<Warning
+					actions={ [
+						<Button
+							key="convert"
+							onClick={ this.onCompare }
+							isSecondary={ hasHTMLBlock }
+							isPrimary={ ! hasHTMLBlock }
+						>
+							{ // translators: Button to fix block content
+							_x( 'Resolve', 'imperative verb' ) }
+						</Button>,
+						hasHTMLBlock && (
+							<Button
+								key="edit"
+								onClick={ convertToHTML }
+								isPrimary
+							>
+								{ __( 'Convert to HTML' ) }
+							</Button>
+						),
+					] }
+					secondaryActions={ hiddenActions }
+				>
+					{ __(
+						'This block contains unexpected or invalid content.'
+					) }
+				</Warning>
+				{ compare && (
+					<Modal
+						title={
+							// translators: Dialog title to fix block content
+							__( 'Resolve Block' )
 						}
-					</Button>,
-					hasHTMLBlock && (
-						<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
-							{ __( 'Convert to HTML' ) }
-						</Button>
-					),
-				] }
-				secondaryActions={ hiddenActions }
-			>
-				{ __( 'This block contains unexpected or invalid content.' ) }
-			</Warning>
+						onRequestClose={ this.onCompareClose }
+						className="block-editor-block-compare"
+					>
+						<BlockCompare
+							block={ block }
+							onKeep={ convertToHTML }
+							onConvert={ convertToBlocks }
+							convertor={ blockToBlocks }
+							convertButtonText={ __( 'Convert to Blocks' ) }
+						/>
+					</Modal>
+				) }
+			</>
 		);
 	}
 }
 
-const blockToClassic = ( block ) => createBlock( 'core/freeform', {
-	content: block.originalContent,
-} );
-const blockToHTML = ( block ) => createBlock( 'core/html', {
-	content: block.originalContent,
-} );
-const blockToBlocks = ( block ) => rawHandler( {
-	HTML: block.originalContent,
-} );
-const recoverBlock = ( { name, attributes, innerBlocks } ) => createBlock( name, attributes, innerBlocks );
+const blockToClassic = ( block ) =>
+	createBlock( 'core/freeform', {
+		content: block.originalContent,
+	} );
+const blockToHTML = ( block ) =>
+	createBlock( 'core/html', {
+		content: block.originalContent,
+	} );
+const blockToBlocks = ( block ) =>
+	rawHandler( {
+		HTML: block.originalContent,
+	} );
+const recoverBlock = ( { name, attributes, innerBlocks } ) =>
+	createBlock( name, attributes, innerBlocks );
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => ( {

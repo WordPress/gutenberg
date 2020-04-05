@@ -17,8 +17,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import {
 	BlockEditorProvider,
-	BlockList
+	BlockList,
+	WritingFlow,
+	ObserveTyping
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -82,6 +85,14 @@ _Related_
 
 Undocumented declaration.
 
+<a name="BlockBreadcrumb" href="#BlockBreadcrumb">#</a> **BlockBreadcrumb**
+
+Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
+
+_Returns_
+
+-   `WPElement`: Block Breadcrumb.
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
@@ -132,12 +143,13 @@ _Related_
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
--   _viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+-   _preview_ `Object`: options for how the preview should be shown
+-   _preview.blocks_ `(Array|Object)`: A block instance (object) or an array of blocks to be previewed.
+-   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
--   `WPElement`: Rendered element.
+-   `WPComponent`: The component to be rendered.
 
 <a name="BlockSelectionClearer" href="#BlockSelectionClearer">#</a> **BlockSelectionClearer**
 
@@ -146,6 +158,12 @@ Undocumented declaration.
 <a name="BlockSettingsMenu" href="#BlockSettingsMenu">#</a> **BlockSettingsMenu**
 
 Undocumented declaration.
+
+<a name="BlockSettingsMenuControls" href="#BlockSettingsMenuControls">#</a> **BlockSettingsMenuControls**
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md>
 
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
@@ -168,6 +186,10 @@ _Related_
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md>
 
 <a name="ColorPalette" href="#ColorPalette">#</a> **ColorPalette**
+
+Undocumented declaration.
+
+<a name="ColorPaletteControl" href="#ColorPaletteControl">#</a> **ColorPaletteControl**
 
 Undocumented declaration.
 
@@ -308,6 +330,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md>
 
+<a name="MediaReplaceFlow" href="#MediaReplaceFlow">#</a> **MediaReplaceFlow**
+
+Undocumented declaration.
+
 <a name="MediaUpload" href="#MediaUpload">#</a> **MediaUpload**
 
 _Related_
@@ -320,13 +346,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md>
 
-<a name="MultiBlocksSwitcher" href="#MultiBlocksSwitcher">#</a> **MultiBlocksSwitcher**
-
-Undocumented declaration.
-
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
-Undocumented declaration.
+Scrolls the multi block selection end into view if not in view already. This
+is important to do after selection by keyboard.
 
 <a name="NavigableToolbar" href="#NavigableToolbar">#</a> **NavigableToolbar**
 
@@ -370,27 +393,34 @@ Undocumented declaration.
 
 The default editor settings
 
- alignWide                              boolean       Enable/Disable Wide/Full Alignments
- availableLegacyWidgets                 Array         Array of objects representing the legacy widgets available.
- colors                                 Array         Palette colors
- disableCustomColors                    boolean       Whether or not the custom colors are disabled
- fontSizes                              Array         Available font sizes
- disableCustomFontSizes                 boolean       Whether or not the custom font sizes are disabled
- imageSizes                             Array         Available image sizes
- maxWidth                               number        Max width to constraint resizing
- allowedBlockTypes                      boolean|Array Allowed block types
- hasFixedToolbar                        boolean       Whether or not the editor toolbar is fixed
- hasPermissionsToManageWidgets          boolean       Whether or not the user is able to manage widgets.
- focusMode                              boolean       Whether the focus mode is enabled or not
- styles                                 Array         Editor Styles
- isRTL                                  boolean       Whether the editor is in RTL mode
- bodyPlaceholder                        string        Empty post placeholder
- titlePlaceholder                       string        Empty title placeholder
- codeEditingEnabled                     string        Whether or not the user can switch to the code editor
- showInserterHelpPanel                  boolean       Whether or not the inserter help panel is shown
- **experimentalCanUserUseUnfilteredHTML string        Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- **experimentalEnableLegacyWidgetBlock  boolean       Whether the user has enabled the Legacy Widget Block
- \_\_experimentalEnableMenuBlock          boolean       Whether the user has enabled the Menu Block
+_Type Definition_
+
+-   _SETTINGS_DEFAULT_ `Object`
+
+_Properties_
+
+-   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
+-   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
+-   _colors_ `Array`: Palette colors
+-   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
+-   _fontSizes_ `Array`: Available font sizes
+-   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageSizes_ `Array`: Available image sizes
+-   _maxWidth_ `number`: Max width to constraint resizing
+-   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
+-   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
+-   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
+-   _focusMode_ `boolean`: Whether the focus mode is enabled or not
+-   _styles_ `Array`: Editor Styles
+-   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _bodyPlaceholder_ `string`: Empty post placeholder
+-   _titlePlaceholder_ `string`: Empty title placeholder
+-   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
+-   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+-   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
+-   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
+-   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
+-   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -407,6 +437,10 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
+
+Undocumented declaration.
 
 <a name="transformStyles" href="#transformStyles">#</a> **transformStyles**
 
@@ -444,6 +478,19 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md>
+
+<a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
+
+Undocumented declaration.
+
+<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+
+Function that manipulates media queries from stylesheets to simulate a given viewport width.
+
+_Parameters_
+
+-   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
+-   _width_ `number`: Viewport width to simulate.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
@@ -491,7 +538,8 @@ _Returns_
 
 <a name="WritingFlow" href="#WritingFlow">#</a> **WritingFlow**
 
-Undocumented declaration.
+Handles selection and navigation across blocks. This component should be
+wrapped around BlockList.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

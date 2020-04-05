@@ -15,6 +15,7 @@ import {
 	saving,
 	reusableBlocks,
 	postSavingLock,
+	postAutosavingLock,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -51,7 +52,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if not editing the same post properties', () => {
@@ -68,7 +71,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating the same post properties', () => {
@@ -85,7 +90,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -99,7 +106,9 @@ describe( 'state', () => {
 			};
 			const previousAction = undefined;
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if the action types are different', () => {
@@ -116,7 +125,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating same post property', () => {
@@ -133,7 +144,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -161,7 +174,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, { } ) );
+			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'DISABLE_PUBLISH_SIDEBAR',
 			} );
@@ -170,7 +183,9 @@ describe( 'state', () => {
 		} );
 
 		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
+			const original = deepFreeze(
+				preferences( { isPublishSidebarEnabled: false }, {} )
+			);
 			const state = preferences( original, {
 				type: 'ENABLE_PUBLISH_SIDEBAR',
 			} );
@@ -203,22 +218,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should add received reusable blocks', () => {
-			const state = reusableBlocks( {}, {
-				type: 'RECEIVE_REUSABLE_BLOCKS',
-				results: [ {
-					reusableBlock: {
-						id: 123,
-						title: 'My cool block',
-					},
-					parsedBlock: {
-						clientId: 'foo',
-					},
-				} ],
-			} );
+			const state = reusableBlocks(
+				{},
+				{
+					type: 'RECEIVE_REUSABLE_BLOCKS',
+					results: [
+						{
+							id: 123,
+							title: 'My cool block',
+						},
+					],
+				}
+			);
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: 'foo', title: 'My cool block' },
+					123: { id: 123, title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -235,9 +250,11 @@ describe( 'state', () => {
 			};
 
 			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+				type: 'UPDATE_REUSABLE_BLOCK',
 				id: 123,
-				title: 'My block',
+				changes: {
+					title: 'My block',
+				},
 			} );
 
 			expect( state ).toEqual( {
@@ -252,7 +269,7 @@ describe( 'state', () => {
 		it( "should update the reusable block's id if it was temporary", () => {
 			const initialState = {
 				data: {
-					reusable1: { clientId: '', title: '' },
+					reusable1: { id: 'reusable1', title: '' },
 				},
 				isSaving: {},
 			};
@@ -265,7 +282,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				data: {
-					123: { clientId: '', title: '' },
+					123: { id: 123, title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -483,6 +500,51 @@ describe( 'state', () => {
 
 			state = postSavingLock( deepFreeze( state ), {
 				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'postAutosavingLock', () => {
+		it( 'returns empty object by default', () => {
+			const state = postAutosavingLock( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'returns correct post locks when locks added and removed', () => {
+			let state = postAutosavingLock( undefined, {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+				'test-lock-2': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock-2': true,
+			} );
+
+			state = postAutosavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_AUTOSAVING',
 				lockName: 'test-lock-2',
 			} );
 

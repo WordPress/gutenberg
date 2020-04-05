@@ -31,7 +31,8 @@ export default function( {
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+	maxUploadFileSize =
+		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
 	uploadMedia( {
 		allowedTypes,

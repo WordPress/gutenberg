@@ -30,9 +30,11 @@ const HANDLED_SHORTCUTS = [
 const SHORTCUTS_ELEMENT = (
 	<KeyboardShortcuts
 		bindGlobal
-		shortcuts={ fromPairs( HANDLED_SHORTCUTS.map( ( shortcut ) => {
-			return [ shortcut, ( event ) => event.preventDefault() ];
-		} ) ) }
+		shortcuts={ fromPairs(
+			HANDLED_SHORTCUTS.map( ( shortcut ) => {
+				return [ shortcut, ( event ) => event.preventDefault() ];
+			} )
+		) }
 	/>
 );
 
@@ -40,6 +42,6 @@ const SHORTCUTS_ELEMENT = (
  * Component which registered keyboard event handlers to prevent default
  * behaviors for key combinations otherwise handled internally by RichText.
  *
- * @return {WPElement} WordPress element.
+ * @return {WPComponent} The component to be rendered.
  */
 export const RemoveBrowserShortcuts = () => SHORTCUTS_ELEMENT;

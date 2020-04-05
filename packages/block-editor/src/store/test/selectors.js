@@ -22,6 +22,8 @@ const {
 	getBlockName,
 	getBlock,
 	getBlocks,
+	getBlockParents,
+	getBlockParentsByBlockName,
 	getBlockCount,
 	getClientIdsWithDescendants,
 	getClientIdsOfDescendants,
@@ -58,10 +60,12 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
+	getLowestCommonAncestorWithSelectedBlock,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -121,6 +125,15 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/post-content-child', {
+			save: () => null,
+			category: 'common',
+			title: 'Test Block Post Content Child',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [ 'core/post-content' ],
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -132,6 +145,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/post-content-child' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -147,7 +161,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+			const name = getBlockName(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			);
 
 			expect( name ).toBe( null );
 		} );
@@ -174,7 +191,10 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+			const name = getBlockName(
+				state,
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1'
+			);
 
 			expect( name ).toBe( 'core/paragraph' );
 		} );
@@ -256,12 +276,14 @@ describe( 'selectors', () => {
 				clientId: 123,
 				name: 'core/paragraph',
 				attributes: {},
-				innerBlocks: [ {
-					clientId: 456,
-					name: 'core/paragraph',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				innerBlocks: [
+					{
+						clientId: 456,
+						name: 'core/paragraph',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 		} );
 	} );
@@ -293,9 +315,135 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
-				{ clientId: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
-				{ clientId: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
+				{
+					clientId: 123,
+					name: 'core/paragraph',
+					attributes: {},
+					innerBlocks: [],
+				},
+				{
+					clientId: 23,
+					name: 'core/heading',
+					attributes: {},
+					innerBlocks: [],
+				},
 			] );
+		} );
+	} );
+
+	describe( 'getBlockParents', () => {
+		it( 'should return parent blocks', () => {
+			const state = {
+				blocks: {
+					parents: {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+					},
+					byClientId: {
+						'client-id-01': {
+							clientId: 'client-id-01',
+							name: 'core/columns',
+						},
+						'client-id-02': {
+							clientId: 'client-id-02',
+							name: 'core/navigation',
+						},
+						'client-id-03': {
+							clientId: 'client-id-03',
+							name: 'core/navigation-link',
+						},
+						'client-id-04': {
+							clientId: 'client-id-04',
+							name: 'core/paragraph',
+						},
+					},
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+					},
+				},
+			};
+
+			expect( getBlockParents( state, 'client-id-04' ) ).toEqual( [
+				'client-id-01',
+				'client-id-02',
+				'client-id-03',
+			] );
+
+			expect( getBlockParents( state, 'client-id-0' ) ).toEqual( [] );
+		} );
+	} );
+
+	describe( 'getBlockParentsByBlockName', () => {
+		it( 'should return parent blocks', () => {
+			const state = {
+				blocks: {
+					parents: {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+						'client-id-05': 'client-id-04',
+					},
+					byClientId: {
+						'client-id-01': {
+							clientId: 'client-id-01',
+							name: 'core/navigation',
+						},
+						'client-id-02': {
+							clientId: 'client-id-02',
+							name: 'core/columns',
+						},
+						'client-id-03': {
+							clientId: 'client-id-03',
+							name: 'core/navigation',
+						},
+						'client-id-04': {
+							clientId: 'client-id-04',
+							name: 'core/navigation-link',
+						},
+						'client-id-05': {
+							clientId: 'client-id-05',
+							name: 'core/navigation-link',
+						},
+					},
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+						'client-id-05': {},
+					},
+				},
+			};
+
+			expect(
+				getBlockParentsByBlockName(
+					state,
+					'client-id-05',
+					'core/navigation'
+				)
+			).toEqual( [ 'client-id-01', 'client-id-03' ] );
+
+			expect(
+				getBlockParentsByBlockName(
+					state,
+					'client-id-05',
+					'core/columns'
+				)
+			).toEqual( [ 'client-id-02' ] );
+
+			expect(
+				getBlockParentsByBlockName(
+					state,
+					'client-id-5',
+					'core/unknown-block'
+				)
+			).toEqual( [] );
 		} );
 	} );
 
@@ -305,20 +453,38 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: {
 						'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
-						'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
-						'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+						'uuid-4': {
+							clientId: 'uuid-4',
+							name: 'core/paragraph',
+						},
+						'uuid-6': {
+							clientId: 'uuid-6',
+							name: 'core/paragraph',
+						},
 						'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
-						'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+						'uuid-10': {
+							clientId: 'uuid-10',
+							name: 'core/columns',
+						},
 						'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
 						'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
 						'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
 						'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
-						'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+						'uuid-20': {
+							clientId: 'uuid-20',
+							name: 'core/gallery',
+						},
 						'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
-						'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+						'uuid-24': {
+							clientId: 'uuid-24',
+							name: 'core/columns',
+						},
 						'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
 						'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
-						'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
+						'uuid-30': {
+							clientId: 'uuid-30',
+							name: 'core/paragraph',
+						},
 					},
 					attributes: {
 						'uuid-2': {},
@@ -339,19 +505,19 @@ describe( 'selectors', () => {
 					},
 					order: {
 						'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-						'uuid-2': [ ],
-						'uuid-4': [ ],
-						'uuid-6': [ ],
-						'uuid-8': [ ],
+						'uuid-2': [],
+						'uuid-4': [],
+						'uuid-6': [],
+						'uuid-8': [],
 						'uuid-10': [ 'uuid-12', 'uuid-14' ],
 						'uuid-12': [ 'uuid-16' ],
 						'uuid-14': [ 'uuid-18' ],
-						'uuid-16': [ ],
+						'uuid-16': [],
 						'uuid-18': [ 'uuid-24' ],
-						'uuid-20': [ ],
-						'uuid-22': [ ],
+						'uuid-20': [],
+						'uuid-22': [],
 						'uuid-24': [ 'uuid-26', 'uuid-28' ],
-						'uuid-26': [ ],
+						'uuid-26': [],
 						'uuid-28': [ 'uuid-30' ],
 					},
 					parents: {
@@ -370,7 +536,9 @@ describe( 'selectors', () => {
 					},
 				},
 			};
-			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
+			expect(
+				getClientIdsOfDescendants( state, [ 'uuid-10' ] )
+			).toEqual( [
 				'uuid-12',
 				'uuid-14',
 				'uuid-16',
@@ -389,20 +557,38 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: {
 						'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
-						'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
-						'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+						'uuid-4': {
+							clientId: 'uuid-4',
+							name: 'core/paragraph',
+						},
+						'uuid-6': {
+							clientId: 'uuid-6',
+							name: 'core/paragraph',
+						},
 						'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
-						'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+						'uuid-10': {
+							clientId: 'uuid-10',
+							name: 'core/columns',
+						},
 						'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
 						'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
 						'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
 						'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
-						'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+						'uuid-20': {
+							clientId: 'uuid-20',
+							name: 'core/gallery',
+						},
 						'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
-						'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+						'uuid-24': {
+							clientId: 'uuid-24',
+							name: 'core/columns',
+						},
 						'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
 						'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
-						'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
+						'uuid-30': {
+							clientId: 'uuid-30',
+							name: 'core/paragraph',
+						},
 					},
 					attributes: {
 						'uuid-2': {},
@@ -423,19 +609,19 @@ describe( 'selectors', () => {
 					},
 					order: {
 						'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-						'uuid-2': [ ],
-						'uuid-4': [ ],
-						'uuid-6': [ ],
-						'uuid-8': [ ],
+						'uuid-2': [],
+						'uuid-4': [],
+						'uuid-6': [],
+						'uuid-8': [],
 						'uuid-10': [ 'uuid-12', 'uuid-14' ],
 						'uuid-12': [ 'uuid-16' ],
 						'uuid-14': [ 'uuid-18' ],
-						'uuid-16': [ ],
+						'uuid-16': [],
 						'uuid-18': [ 'uuid-24' ],
-						'uuid-20': [ ],
-						'uuid-22': [ ],
+						'uuid-20': [],
+						'uuid-22': [],
 						'uuid-24': [ 'uuid-26', 'uuid-28' ],
-						'uuid-26': [ ],
+						'uuid-26': [],
 						'uuid-28': [ 'uuid-30' ],
 					},
 					parents: {
@@ -524,10 +710,8 @@ describe( 'selectors', () => {
 	describe( 'hasSelectedBlock', () => {
 		it( 'should return false if no selection', () => {
 			const state = {
-				blockSelection: {
-					start: {},
-					end: {},
-				},
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( hasSelectedBlock( state ) ).toBe( false );
@@ -535,9 +719,11 @@ describe( 'selectors', () => {
 
 		it( 'should return false if multi-selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
+				selectionStart: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+				selectionEnd: {
+					clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 				},
 			};
 
@@ -546,9 +732,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true if singular selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+				selectionStart: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+				selectionEnd: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 				},
 			};
 
@@ -597,14 +785,17 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
-			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe(
+				0
+			);
 		} );
 	} );
 
 	describe( 'getSelectedBlockClientId', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
@@ -612,7 +803,8 @@ describe( 'selectors', () => {
 
 		it( 'should return null if there is multi selection', () => {
 			const state = {
-				blockSelection: { start: { clientId: 23 }, end: { clientId: 123 } },
+				selectionStart: { clientId: 23 },
+				selectionEnd: { clientId: 123 },
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
@@ -627,7 +819,8 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				blockSelection: { start: { clientId: 23 }, end: { clientId: 23 } },
+				selectionStart: { clientId: 23 },
+				selectionEnd: { clientId: 23 },
 			};
 
 			expect( getSelectedBlockClientId( state ) ).toEqual( 23 );
@@ -656,7 +849,8 @@ describe( 'selectors', () => {
 						123: '',
 					},
 				},
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -683,7 +877,8 @@ describe( 'selectors', () => {
 						23: '',
 					},
 				},
-				blockSelection: { start: { clientId: 23 }, end: { clientId: 123 } },
+				selectionStart: { clientId: 23 },
+				selectionEnd: { clientId: 123 },
 			};
 
 			expect( getSelectedBlock( state ) ).toBe( null );
@@ -713,7 +908,8 @@ describe( 'selectors', () => {
 						23: {},
 					},
 				},
-				blockSelection: { start: { clientId: 23 }, end: { clientId: 23 } },
+				selectionStart: { clientId: 23 },
+				selectionEnd: { clientId: 23 },
 			};
 
 			expect( getSelectedBlock( state ) ).toEqual( {
@@ -822,7 +1018,8 @@ describe( 'selectors', () => {
 						23: '',
 					},
 				},
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [] );
@@ -842,7 +1039,8 @@ describe( 'selectors', () => {
 						5: '',
 					},
 				},
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 2 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 2 },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 2 ] );
@@ -862,7 +1060,8 @@ describe( 'selectors', () => {
 						5: '',
 					},
 				},
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 4 },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
@@ -887,7 +1086,8 @@ describe( 'selectors', () => {
 						9: 4,
 					},
 				},
-				blockSelection: { start: { clientId: 7 }, end: { clientId: 9 } },
+				selectionStart: { clientId: 7 },
+				selectionEnd: { clientId: 9 },
 			};
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
@@ -906,7 +1106,8 @@ describe( 'selectors', () => {
 						123: '',
 					},
 				},
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [] );
@@ -926,10 +1127,15 @@ describe( 'selectors', () => {
 						5: '',
 					},
 				},
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 4 },
 			};
 
-			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 4, 3, 2 ] );
+			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
+				4,
+				3,
+				2,
+			] );
 		} );
 
 		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
@@ -951,10 +1157,15 @@ describe( 'selectors', () => {
 						9: 4,
 					},
 				},
-				blockSelection: { start: { clientId: 7 }, end: { clientId: 9 } },
+				selectionStart: { clientId: 7 },
+				selectionEnd: { clientId: 9 },
 			};
 
-			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [ 9, 8, 7 ] );
+			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
+				9,
+				8,
+				7,
+			] );
 		} );
 	} );
 
@@ -967,19 +1178,21 @@ describe( 'selectors', () => {
 					order: {},
 					parents: {},
 				},
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
-			expect(
+			expect( getMultiSelectedBlocks( state ) ).toBe(
 				getMultiSelectedBlocks( state )
-			).toBe( getMultiSelectedBlocks( state ) );
+			);
 		} );
 	} );
 
 	describe( 'getMultiSelectedBlocksStartClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBeNull();
@@ -987,7 +1200,8 @@ describe( 'selectors', () => {
 
 		it( 'returns multi selection start', () => {
 			const state = {
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 4 },
 			};
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBe( 2 );
@@ -997,7 +1211,8 @@ describe( 'selectors', () => {
 	describe( 'getMultiSelectedBlocksEndClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBeNull();
@@ -1005,7 +1220,8 @@ describe( 'selectors', () => {
 
 		it( 'returns multi selection end', () => {
 			const state = {
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 4 },
 			};
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBe( 4 );
@@ -1118,7 +1334,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlockClientId( state, 56, '123' ) ).toEqual( 456 );
+			expect( getPreviousBlockClientId( state, 56, '123' ) ).toEqual(
+				456
+			);
 		} );
 
 		it( 'should return null for the first block', () => {
@@ -1232,7 +1450,8 @@ describe( 'selectors', () => {
 	describe( 'isBlockSelected', () => {
 		it( 'should return true if the block is selected', () => {
 			const state = {
-				blockSelection: { start: { clientId: 123 }, end: { clientId: 123 } },
+				selectionStart: { clientId: 123 },
+				selectionEnd: { clientId: 123 },
 			};
 
 			expect( isBlockSelected( state, 123 ) ).toBe( true );
@@ -1240,7 +1459,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false if a multi-selection range exists', () => {
 			const state = {
-				blockSelection: { start: { clientId: 123 }, end: { clientId: 124 } },
+				selectionStart: { clientId: 123 },
+				selectionEnd: { clientId: 124 },
 			};
 
 			expect( isBlockSelected( state, 123 ) ).toBe( false );
@@ -1248,7 +1468,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
@@ -1258,7 +1479,8 @@ describe( 'selectors', () => {
 	describe( 'hasSelectedInnerBlock', () => {
 		it( 'should return false if the selected block is a child of the given ClientId', () => {
 			const state = {
-				blockSelection: { start: { clientId: 5 }, end: { clientId: 5 } },
+				selectionStart: { clientId: 5 },
+				selectionEnd: { clientId: 5 },
 				blocks: {
 					order: {
 						4: [ 3, 2, 1 ],
@@ -1276,7 +1498,8 @@ describe( 'selectors', () => {
 
 		it( 'should return true if the selected block is a child of the given ClientId', () => {
 			const state = {
-				blockSelection: { start: { clientId: 3 }, end: { clientId: 3 } },
+				selectionStart: { clientId: 3 },
+				selectionEnd: { clientId: 3 },
 				blocks: {
 					order: {
 						4: [ 3, 2, 1 ],
@@ -1306,7 +1529,8 @@ describe( 'selectors', () => {
 						5: 6,
 					},
 				},
-				blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 2 },
+				selectionEnd: { clientId: 4 },
 			};
 			expect( hasSelectedInnerBlock( state, 6 ) ).toBe( true );
 		} );
@@ -1325,7 +1549,8 @@ describe( 'selectors', () => {
 						5: 6,
 					},
 				},
-				blockSelection: { start: { clientId: 5 }, end: { clientId: 4 } },
+				selectionStart: { clientId: 5 },
+				selectionEnd: { clientId: 4 },
 			};
 			expect( hasSelectedInnerBlock( state, 3 ) ).toBe( false );
 		} );
@@ -1334,7 +1559,8 @@ describe( 'selectors', () => {
 	describe( 'isBlockWithinSelection', () => {
 		it( 'should return true if the block is selected but not the last', () => {
 			const state = {
-				blockSelection: { start: { clientId: 5 }, end: { clientId: 3 } },
+				selectionStart: { clientId: 5 },
+				selectionEnd: { clientId: 3 },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1354,7 +1580,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is the last selected', () => {
 			const state = {
-				blockSelection: { start: { clientId: 5 }, end: { clientId: 3 } },
+				selectionStart: { clientId: 5 },
+				selectionEnd: { clientId: 3 },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1374,7 +1601,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not selected', () => {
 			const state = {
-				blockSelection: { start: { clientId: 5 }, end: { clientId: 3 } },
+				selectionStart: { clientId: 5 },
+				selectionEnd: { clientId: 3 },
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1394,7 +1622,8 @@ describe( 'selectors', () => {
 
 		it( 'should return false if there is no selection', () => {
 			const state = {
-				blockSelection: { start: {}, end: {} },
+				selectionStart: {},
+				selectionEnd: {},
 				blocks: {
 					order: {
 						'': [ 5, 4, 3, 2, 1 ],
@@ -1416,10 +1645,8 @@ describe( 'selectors', () => {
 	describe( 'hasMultiSelection', () => {
 		it( 'should return false if no selection', () => {
 			const state = {
-				blockSelection: {
-					start: {},
-					end: {},
-				},
+				selectionStart: {},
+				selectionEnd: {},
 			};
 
 			expect( hasMultiSelection( state ) ).toBe( false );
@@ -1427,9 +1654,11 @@ describe( 'selectors', () => {
 
 		it( 'should return false if singular selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
+				selectionStart: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+				selectionEnd: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 				},
 			};
 
@@ -1438,9 +1667,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true if multi-selection', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' },
-					end: { clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189' },
+				selectionStart: {
+					clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+				selectionEnd: {
+					clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 				},
 			};
 
@@ -1462,7 +1693,8 @@ describe( 'selectors', () => {
 					5: '',
 				},
 			},
-			blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+			selectionStart: { clientId: 2 },
+			selectionEnd: { clientId: 4 },
 		};
 
 		it( 'should return true if the block is multi selected', () => {
@@ -1488,7 +1720,8 @@ describe( 'selectors', () => {
 					5: '',
 				},
 			},
-			blockSelection: { start: { clientId: 2 }, end: { clientId: 4 } },
+			selectionStart: { clientId: 2 },
+			selectionEnd: { clientId: 4 },
 		};
 
 		it( 'should return true if the block is first in multi selection', () => {
@@ -1559,9 +1792,7 @@ describe( 'selectors', () => {
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
-				blockSelection: {
-					isEnabled: true,
-				},
+				isSelectionEnabled: true,
 			};
 
 			expect( isSelectionEnabled( state ) ).toBe( true );
@@ -1569,9 +1800,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if selection is disabled', () => {
 			const state = {
-				blockSelection: {
-					isEnabled: false,
-				},
+				isSelectionEnabled: false,
 			};
 
 			expect( isSelectionEnabled( state ) ).toBe( false );
@@ -1581,10 +1810,8 @@ describe( 'selectors', () => {
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the explicitly assigned insertion point', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'clientId2' },
-					end: { clientId: 'clientId2' },
-				},
+				selectionStart: { clientId: 'clientId2' },
+				selectionEnd: { clientId: 'clientId2' },
 				blocks: {
 					byClientId: {
 						clientId1: { clientId: 'clientId1' },
@@ -1618,10 +1845,8 @@ describe( 'selectors', () => {
 
 		it( 'should return an object for the selected block', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'clientId1' },
-					end: { clientId: 'clientId1' },
-				},
+				selectionStart: { clientId: 'clientId1' },
+				selectionEnd: { clientId: 'clientId1' },
 				blocks: {
 					byClientId: {
 						clientId1: { clientId: 'clientId1' },
@@ -1648,10 +1873,8 @@ describe( 'selectors', () => {
 
 		it( 'should return an object for the nested selected block', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'clientId2' },
-					end: { clientId: 'clientId2' },
-				},
+				selectionStart: { clientId: 'clientId2' },
+				selectionEnd: { clientId: 'clientId2' },
 				blocks: {
 					byClientId: {
 						clientId1: { clientId: 'clientId1' },
@@ -1682,10 +1905,8 @@ describe( 'selectors', () => {
 
 		it( 'should return an object for the last multi selected clientId', () => {
 			const state = {
-				blockSelection: {
-					start: { clientId: 'clientId1' },
-					end: { clientId: 'clientId2' },
-				},
+				selectionStart: { clientId: 'clientId1' },
+				selectionEnd: { clientId: 'clientId2' },
 				blocks: {
 					byClientId: {
 						clientId1: { clientId: 'clientId1' },
@@ -1716,10 +1937,8 @@ describe( 'selectors', () => {
 
 		it( 'should return an object for the last block if no selection', () => {
 			const state = {
-				blockSelection: {
-					start: {},
-					end: {},
-				},
+				selectionStart: {},
+				selectionEnd: {},
 				blocks: {
 					byClientId: {
 						clientId1: { clientId: 'clientId1' },
@@ -1794,7 +2013,9 @@ describe( 'selectors', () => {
 					allowedBlockTypes: [],
 				},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe( false );
+			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should allow blocks that are allowed by the editor', () => {
@@ -1808,7 +2029,9 @@ describe( 'selectors', () => {
 					allowedBlockTypes: [ 'core/test-block-a' ],
 				},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe( true );
+			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should deny blocks when the editor has a template lock', () => {
@@ -1822,7 +2045,9 @@ describe( 'selectors', () => {
 					templateLock: 'all',
 				},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe( false );
+			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should deny blocks that restrict parent from being inserted into the root', () => {
@@ -1834,7 +2059,9 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-c' ) ).toBe( false );
+			expect( canInsertBlockType( state, 'core/test-block-c' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should deny blocks that restrict parent from being inserted into a restricted parent', () => {
@@ -1850,7 +2077,9 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( false );
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block1' )
+			).toBe( false );
 		} );
 
 		it( 'should allow blocks that restrict parent to be inserted into an allowed parent', () => {
@@ -1866,7 +2095,9 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block1' )
+			).toBe( true );
 		} );
 
 		it( 'should deny restricted blocks from being inserted into a block that restricts allowedBlocks', () => {
@@ -1886,7 +2117,9 @@ describe( 'selectors', () => {
 				},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-b', 'block1' ) ).toBe( false );
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block1' )
+			).toBe( false );
 		} );
 
 		it( 'should allow allowed blocks to be inserted into a block that restricts allowedBlocks', () => {
@@ -1906,7 +2139,9 @@ describe( 'selectors', () => {
 				},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-b', 'block1' ) ).toBe( true );
+			expect(
+				canInsertBlockType( state, 'core/test-block-b', 'block1' )
+			).toBe( true );
 		} );
 
 		it( 'should prioritise parent over allowedBlocks', () => {
@@ -1926,7 +2161,41 @@ describe( 'selectors', () => {
 				},
 				settings: {},
 			};
-			expect( canInsertBlockType( state, 'core/test-block-c', 'block1' ) ).toBe( true );
+			expect(
+				canInsertBlockType( state, 'core/test-block-c', 'block1' )
+			).toBe( true );
+		} );
+
+		it( 'should deny blocks that restrict parent to core/post-content when not in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {
+						block1: { name: 'core/test-block-c' },
+					},
+					attributes: {
+						block1: {},
+					},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/post-content-child', 'block1' )
+			).toBe( false );
+		} );
+
+		it( 'should allow blocks that restrict parent to core/post-content when in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: {},
+					attributes: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/post-content-child' )
+			).toBe( true );
 		} );
 	} );
 
@@ -1934,19 +2203,21 @@ describe( 'selectors', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
 				blocks: {
-					byClientId: {
-						block1: { name: 'core/test-block-a' },
-					},
-					attributes: {
-						block1: {},
-					},
+					byClientId: {},
+					attributes: {},
 					order: {},
 					parents: {},
 					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
 					],
 				},
 				// Intentionally include a test case which considers
@@ -1957,7 +2228,9 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 			};
 			const items = getInserterItems( state );
-			const testBlockAItem = items.find( ( item ) => item.id === 'core/test-block-a' );
+			const testBlockAItem = items.find(
+				( item ) => item.id === 'core/test-block-a'
+			);
 			expect( testBlockAItem ).toEqual( {
 				id: 'core/test-block-a',
 				name: 'core/test-block-a',
@@ -1968,11 +2241,14 @@ describe( 'selectors', () => {
 				},
 				category: 'formatting',
 				keywords: [ 'testing' ],
+				variations: [],
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,
 			} );
-			const reusableBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
+			const reusableBlockItem = items.find(
+				( item ) => item.id === 'core/block/1'
+			);
 			expect( reusableBlockItem ).toEqual( {
 				id: 'core/block/1',
 				name: 'core/block',
@@ -1989,155 +2265,31 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						block1ref: {
-							name: 'core/block',
-							clientId: 'block1ref',
-						},
-						itselfBlock1: { name: 'core/test-block-a' },
-						itselfBlock2: { name: 'core/test-block-b' },
-					},
-					attributes: {
-						block1ref: {
-							attributes: {
-								ref: 1,
-							},
-						},
-						itselfBlock1: {},
-						itselfBlock2: {},
-					},
-					order: {
-						'': [ 'block1ref' ],
-					},
-					parents: {
-						block1ref: '',
-					},
-					cache: {
-						block1ref: {},
-					},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'itselfBlock1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'itselfBlock2', title: 'Reusable Block 2' },
-					],
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-			};
-			const items = getInserterItems( state, 'itselfBlock1' );
-			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
-			expect( reusableBlockItems ).toHaveLength( 1 );
-			expect( reusableBlockItems[ 0 ] ).toEqual( {
-				id: 'core/block/2',
-				name: 'core/block',
-				initialAttributes: { ref: 2 },
-				title: 'Reusable Block 2',
-				icon: {
-					src: 'test',
-				},
-				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 0,
-				frecency: 0,
-			} );
-		} );
-
-		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
-			const state = {
-				blocks: {
-					byClientId: {
-						block2ref: {
-							name: 'core/block',
-							clientId: 'block1ref',
-						},
-						referredBlock1: { name: 'core/test-block-a' },
-						referredBlock2: { name: 'core/test-block-b' },
-						childReferredBlock2: { name: 'core/test-block-a' },
-						grandchildReferredBlock2: { name: 'core/test-block-b' },
-					},
-					attributes: {
-						block2ref: {
-							attributes: {
-								ref: 2,
-							},
-						},
-						referredBlock1: {},
-						referredBlock2: {},
-						childReferredBlock2: {},
-						grandchildReferredBlock2: {},
-					},
-					order: {
-						'': [ 'block2ref' ],
-						referredBlock2: [ 'childReferredBlock2' ],
-						childReferredBlock2: [ 'grandchildReferredBlock2' ],
-					},
-					parents: {
-						block2ref: '',
-						childReferredBlock2: 'referredBlock2',
-						grandchildReferredBlock2: 'childReferredBlock2',
-					},
-					cache: {
-						block2ref: {},
-						childReferredBlock2: {},
-						grandchildReferredBlock2: {},
-					},
-				},
-
-				settings: {
-					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'referredBlock1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'referredBlock2', title: 'Reusable Block 2' },
-					],
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-			};
-			const items = getInserterItems( state, 'grandchildReferredBlock2' );
-			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
-			expect( reusableBlockItems ).toHaveLength( 1 );
-			expect( reusableBlockItems[ 0 ] ).toEqual( {
-				id: 'core/block/1',
-				name: 'core/block',
-				initialAttributes: { ref: 1 },
-				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
-				category: 'reusable',
-				keywords: [],
-				isDisabled: false,
-				utility: 0,
-				frecency: 0,
-			} );
-		} );
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				blocks: {
-					byClientId: {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-a' },
-					},
-					attributes: {
-						block1: {},
-						block2: {},
-					},
+					byClientId: {},
+					attributes: {},
 					order: {},
 					parents: {},
 					cache: {},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'block2', title: 'Reusable Block 2' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
+						{
+							id: 2,
+							isTemporary: false,
+							clientId: 'block2',
+							title: 'Reusable Block 2',
+							content: '<!-- /wp:test-block-b -->',
+						},
 					],
 				},
 				preferences: {
@@ -2148,8 +2300,11 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: {},
 			};
-			const itemIDs = getInserterItems( state ).map( ( item ) => item.id );
+			const itemIDs = getInserterItems( state ).map(
+				( item ) => item.id
+			);
 			expect( itemIDs ).toEqual( [
+				'core/post-content-child',
 				'core/block/2',
 				'core/block/1',
 				'core/test-block-b',
@@ -2162,14 +2317,10 @@ describe( 'selectors', () => {
 			const state = {
 				blocks: {
 					byClientId: {
-						block1: { name: 'core/test-block-a' },
-						block2: { name: 'core/test-block-a' },
 						block3: { name: 'core/test-block-a' },
 						block4: { name: 'core/test-block-a' },
 					},
 					attributes: {
-						block1: {},
-						block2: {},
 						block3: {},
 						block4: {},
 					},
@@ -2181,16 +2332,26 @@ describe( 'selectors', () => {
 						block4: '',
 					},
 					cache: {
-						block1: {},
-						block2: {},
 						block3: {},
 						block4: {},
 					},
 				},
 				settings: {
 					__experimentalReusableBlocks: [
-						{ id: 1, isTemporary: false, clientId: 'block1', title: 'Reusable Block 1' },
-						{ id: 2, isTemporary: false, clientId: 'block2', title: 'Reusable Block 2' },
+						{
+							id: 1,
+							isTemporary: false,
+							clientId: 'block1',
+							title: 'Reusable Block 1',
+							content: '<!-- /wp:test-block-a -->',
+						},
+						{
+							id: 2,
+							isTemporary: false,
+							clientId: 'block2',
+							title: 'Reusable Block 2',
+							content: '<!-- /wp:test-block-b -->',
+						},
 					],
 				},
 				preferences: {
@@ -2209,7 +2370,10 @@ describe( 'selectors', () => {
 			};
 
 			const firstBlockFirstCall = getInserterItems( state, 'block3' );
-			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block3' );
+			const firstBlockSecondCall = getInserterItems(
+				stateSecondBlockRestricted,
+				'block3'
+			);
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
@@ -2220,7 +2384,10 @@ describe( 'selectors', () => {
 			] );
 
 			const secondBlockFirstCall = getInserterItems( state, 'block4' );
-			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block4' );
+			const secondBlockSecondCall = getInserterItems(
+				stateSecondBlockRestricted,
+				'block4'
+			);
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
@@ -2228,16 +2395,19 @@ describe( 'selectors', () => {
 				'core/block/1',
 				'core/block/2',
 			] );
-			expect( secondBlockSecondCall.map( ( item ) => item.id ) ).toEqual( [
-				'core/test-block-b',
-			] );
+			expect(
+				secondBlockSecondCall.map( ( item ) => item.id )
+			).toEqual( [ 'core/test-block-b' ] );
 		} );
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				blocks: {
 					byClientId: {
-						block1: { clientId: 'block1', name: 'core/test-block-b' },
+						block1: {
+							clientId: 'block1',
+							name: 'core/test-block-b',
+						},
 					},
 					attributes: {
 						block1: { attribute: {} },
@@ -2256,7 +2426,9 @@ describe( 'selectors', () => {
 				settings: {},
 			};
 			const items = getInserterItems( state );
-			const testBlockBItem = items.find( ( item ) => item.id === 'core/test-block-b' );
+			const testBlockBItem = items.find(
+				( item ) => item.id === 'core/test-block-b'
+			);
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
@@ -2276,7 +2448,9 @@ describe( 'selectors', () => {
 				settings: {},
 			};
 			const items = getInserterItems( state );
-			const testBlockBItem = items.find( ( item ) => item.id === 'core/test-block-b' );
+			const testBlockBItem = items.find(
+				( item ) => item.id === 'core/test-block-b'
+			);
 			expect( testBlockBItem.utility ).toBe( INSERTER_UTILITY_LOW );
 		} );
 
@@ -2298,8 +2472,12 @@ describe( 'selectors', () => {
 				settings: {},
 			};
 			const items = getInserterItems( state );
-			const reusableBlock2Item = items.find( ( item ) => item.id === 'core/test-block-b' );
-			expect( reusableBlock2Item.utility ).toBe( INSERTER_UTILITY_MEDIUM );
+			const reusableBlock2Item = items.find(
+				( item ) => item.id === 'core/test-block-b'
+			);
+			expect( reusableBlock2Item.utility ).toBe(
+				INSERTER_UTILITY_MEDIUM
+			);
 			expect( reusableBlock2Item.frecency ).toBe( 2.5 );
 		} );
 
@@ -2329,7 +2507,9 @@ describe( 'selectors', () => {
 				settings: {},
 			};
 			const items = getInserterItems( state, 'block1' );
-			const testBlockCItem = items.find( ( item ) => item.id === 'core/test-block-c' );
+			const testBlockCItem = items.find(
+				( item ) => item.id === 'core/test-block-c'
+			);
 			expect( testBlockCItem.utility ).toBe( INSERTER_UTILITY_HIGH );
 		} );
 	} );
@@ -2435,7 +2615,79 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 			};
 
-			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+			expect( getBlockListSettings( state, 'chicken' ) ).toBe(
+				undefined
+			);
+		} );
+	} );
+
+	describe( '__experimentalGetBlockListSettingsForBlocks', () => {
+		it( 'should return the settings for a set of blocks', () => {
+			const state = {
+				blockListSettings: {
+					'test-1-dummy-clientId': {
+						setting1: false,
+					},
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-3-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [
+				'test-1-dummy-clientId',
+				'test-3-dummy-clientId',
+			];
+
+			expect(
+				__experimentalGetBlockListSettingsForBlocks(
+					state,
+					targetBlocksClientIds
+				)
+			).toEqual( [
+				{
+					setting1: false,
+				},
+				{
+					setting1: true,
+					setting2: false,
+				},
+			] );
+		} );
+
+		it( 'should return empty array if settings for the blocks don’t exist', () => {
+			// Does not include target Block clientIds
+			const state = {
+				blockListSettings: {
+					'test-2-dummy-clientId': {
+						setting1: true,
+						setting2: false,
+					},
+					'test-4-dummy-clientId': {
+						setting1: true,
+					},
+				},
+			};
+
+			const targetBlocksClientIds = [
+				'test-1-dummy-clientId',
+				'test-3-dummy-clientId',
+			];
+
+			expect(
+				__experimentalGetBlockListSettingsForBlocks(
+					state,
+					targetBlocksClientIds
+				)
+			).toEqual( [] );
 		} );
 	} );
 
@@ -2452,6 +2704,97 @@ describe( 'selectors', () => {
 			expect( result ).toEqual( {
 				block1: { fruit: 'bananas' },
 			} );
+		} );
+	} );
+
+	describe( 'getLowestCommonAncestorWithSelectedBlock', () => {
+		const blocks = {
+			order: {
+				'': [ 'a', 'b' ],
+				a: [ 'c', 'd' ],
+				d: [ 'e' ],
+				b: [ 'f' ],
+			},
+			parents: {
+				a: '',
+				b: '',
+				c: 'a',
+				d: 'a',
+				e: 'd',
+				f: 'b',
+			},
+		};
+
+		it( 'should not be defined if there is no block selected', () => {
+			const state = {
+				blocks,
+				selectionStart: {},
+				selectionEnd: {},
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'd' )
+			).not.toBeDefined();
+		} );
+
+		it( 'should not be defined if selected block has no parent', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'b' },
+				selectionEnd: { clientId: 'b' },
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'b' )
+			).toBe( 'b' );
+		} );
+
+		it( 'should not be defined if selected block has no common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'd' },
+				selectionEnd: { clientId: 'd' },
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'f' )
+			).not.toBeDefined();
+		} );
+
+		it( 'should return block id if selected block is ancestor of given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'c' },
+				selectionEnd: { clientId: 'c' },
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'a' )
+			).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block is nested child of given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'a' )
+			).toBe( 'a' );
+		} );
+
+		it( 'should return block id if selected block has common parent with given block', () => {
+			const state = {
+				blocks,
+				selectionStart: { clientId: 'e' },
+				selectionEnd: { clientId: 'e' },
+			};
+
+			expect(
+				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
+			).toBe( 'a' );
 		} );
 	} );
 } );

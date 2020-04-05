@@ -2,7 +2,7 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { reduce, omit, keys, isEqual } from 'lodash';
+import { omit, keys, isEqual, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,23 +28,6 @@ export function getPostRawValue( value ) {
 	}
 
 	return value;
-}
-
-/**
- * Returns an object against which it is safe to perform mutating operations,
- * given the original object and its current working copy.
- *
- * @param {Object} original Original object.
- * @param {Object} working  Working object.
- *
- * @return {Object} Mutation-safe object.
- */
-function getMutateSafeObject( original, working ) {
-	if ( original === working ) {
-		return { ...original };
-	}
-
-	return working;
 }
 
 /**
@@ -222,8 +205,8 @@ export function postLock( state = { isLocked: false }, action ) {
  *
  * When post saving is locked, the post cannot be published or updated.
  *
- * @param {PostSavingLockState} state  Current state.
- * @param {Object}              action Dispatched action.
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
  *
  * @return {PostLockState} Updated state.
  */
@@ -238,37 +221,44 @@ export function postSavingLock( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Post autosaving lock.
+ *
+ * When post autosaving is locked, the post will not autosave.
+ *
+ * @param {PostLockState} state  Current state.
+ * @param {Object}        action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postAutosavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_POST_AUTOSAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_POST_AUTOSAVING':
+			return omit( state, action.lockName );
+	}
+	return state;
+}
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_REUSABLE_BLOCKS': {
-				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.reusableBlock;
-					const { clientId } = result.parsedBlock;
-
-					const value = { clientId, title };
-
-					if ( ! isEqual( nextState[ id ], value ) ) {
-						nextState = getMutateSafeObject( state, nextState );
-						nextState[ id ] = value;
-					}
-
-					return nextState;
-				}, state );
+				return {
+					...state,
+					...keyBy( action.results, 'id' ),
+				};
 			}
 
-			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
-				const { id, title } = action;
-
-				if ( ! state[ id ] || state[ id ].title === title ) {
-					return state;
-				}
-
+			case 'UPDATE_REUSABLE_BLOCK': {
+				const { id, changes } = action;
 				return {
 					...state,
 					[ id ]: {
 						...state[ id ],
-						title,
+						...changes,
 					},
 				};
 			}
@@ -284,7 +274,10 @@ export const reusableBlocks = combineReducers( {
 				const value = state[ id ];
 				return {
 					...omit( state, id ),
-					[ updatedId ]: value,
+					[ updatedId ]: {
+						...value,
+						id: updatedId,
+					},
 				};
 			}
 
@@ -382,15 +375,18 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export default optimist( combineReducers( {
-	postId,
-	postType,
-	preferences,
-	saving,
-	postLock,
-	reusableBlocks,
-	template,
-	postSavingLock,
-	isReady,
-	editorSettings,
-} ) );
+export default optimist(
+	combineReducers( {
+		postId,
+		postType,
+		preferences,
+		saving,
+		postLock,
+		reusableBlocks,
+		template,
+		postSavingLock,
+		isReady,
+		editorSettings,
+		postAutosavingLock,
+	} )
+);

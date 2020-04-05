@@ -118,6 +118,7 @@ If this property is added, a label will be generated using label property as the
 
 - Type: `String`
 - Required: No
+- Platform: Web | Mobile
 
 #### help
 
@@ -125,6 +126,7 @@ If this property is added, a help text will be generated using help property as 
 
 - Type: `String|WPElement`
 - Required: No
+- Platform: Web
 
 #### beforeIcon
 
@@ -132,6 +134,7 @@ If this property is added, a DashIcon component will be rendered before the slid
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 #### afterIcon
 
@@ -139,6 +142,7 @@ If this property is added, a DashIcon component will be rendered after the slide
 
 - Type: `String`
 - Required: No
+- Platform: Web
 
 #### allowReset
 
@@ -146,6 +150,15 @@ If this property is true, a button to reset the the slider is rendered.
 
 - Type: `Boolean`
 - Required: No
+- Platform: Web | Mobile
+
+#### disabled
+
+Disables the `input`, preventing new values from being applied.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
 
 #### initialPosition
 
@@ -153,13 +166,43 @@ If no value exists this prop contains the slider starting position.
 
 - Type: `Number`
 - Required: No
+- Platform: Web | Mobile
 
-#### value
 
-The current value of the range slider.
+#### marks
 
-- Type: `Number`
-- Required: Yes
+Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
+
+Example:
+
+```jsx
+const marks = [
+	{
+		value: 0,
+		label: '0',
+	},
+	{
+		value: 1,
+		label: '1',
+	},
+	{
+		value: 8,
+		label: '8',
+	},
+	{
+		value: 10,
+		label: '10',
+	},
+];
+
+const MyRangeControl() {
+	return (<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />)
+}
+```
+
+- Type: `Array|Boolean`
+- Required: No
+- Platform: Web
 
 #### onChange
 
@@ -168,6 +211,7 @@ If allowReset is true, when onChange is called without any parameter passed it s
 
 - Type: `function`
 - Required: Yes
+- Platform: Web | Mobile
 
 #### min
 
@@ -175,7 +219,7 @@ The minimum value accepted. If smaller values are inserted onChange will not be 
 
 - Type: `Number`
 - Required: No
-
+- Platform: Web | Mobile
 
 #### max
 
@@ -183,6 +227,72 @@ The maximum value accepted. If higher values are inserted onChange will not be c
 
 - Type: `Number`
 - Required: No
+- Platform: Web | Mobile
+
+#### renderTooltipContent
+
+A way to customize the rendered UI of the value. Example:
+
+```jsx
+const customTooltipContent = value => `${value}%`
+
+const MyRangeControl() {
+	return (<RangeControl renderTooltipContent={ customTooltipContent } />)
+}
+```
+
+- Type: `Function`
+- Required: No
+- Platform: Web
+
+#### showTooltip
+
+Forcing the Tooltip UI to show or hide.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
+
+#### step
+
+The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
+
+- Type: `Number`
+- Required: No
+- Platform: Web
+
+#### value
+
+The current value of the range slider.
+
+- Type: `Number`
+- Required: Yes
+- Platform: Web | Mobile
+
+#### withInputField
+
+Determines if the `input` number field will render next to the RangeControl.
+
+- Type: `Boolean`
+- Required: No
+- Platform: Web
+
+#### icon
+
+An icon to be shown above the slider next to it's container title.
+
+- Type: `String`
+- Required: No
+- Platform: Mobile
+
+#### separatorType
+
+Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
+
+- Type: `String Enum`
+- Values: `none` | `fullWidth` | `topFullWidth`
+- Required: No
+- Platform: Mobile
 
 ## Related components
 

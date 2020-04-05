@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "14e6f0898af5e07bd8ff8b2bc6172712",
+    "content-hash": "f802871495ce4d7ed5928e17524d0cdb",
     "packages": [
         {
             "name": "composer/installers",
@@ -251,6 +251,54 @@
                 "standards"
             ],
             "time": "2019-06-27T19:58:56+00:00"
+        },
+        {
+            "name": "sirbrillig/phpcs-variable-analysis",
+            "version": "v2.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sirbrillig/phpcs-variable-analysis.git",
+                "reference": "1b1b2b503a19bb56fa75f4a2d959b12c8ed28c12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sirbrillig/phpcs-variable-analysis/zipball/1b1b2b503a19bb56fa75f4a2d959b12c8ed28c12",
+                "reference": "1b1b2b503a19bb56fa75f4a2d959b12c8ed28c12",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
+                "limedeck/phpunit-detailed-printer": "^3.1",
+                "phpstan/phpstan": "^0.11.8",
+                "phpunit/phpunit": "^6.5",
+                "sirbrillig/phpcs-import-detection": "^1.1",
+                "squizlabs/php_codesniffer": "^3.1"
+            },
+            "type": "phpcodesniffer-standard",
+            "autoload": {
+                "psr-4": {
+                    "VariableAnalysis\\": "VariableAnalysis/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Payton Swick",
+                    "email": "payton@foolord.com"
+                },
+                {
+                    "name": "Sam Graham",
+                    "email": "php-codesniffer-variableanalysis@illusori.co.uk"
+                }
+            ],
+            "description": "A PHPCS sniff to detect problems with variables.",
+            "time": "2019-06-24T23:57:11+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

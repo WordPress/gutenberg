@@ -3,6 +3,7 @@
  */
 import memize from 'memize';
 import { size, map, without } from 'lodash';
+import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -31,6 +32,8 @@ class Editor extends Component {
 		this.getEditorSettings = memize( this.getEditorSettings, {
 			maxSize: 1,
 		} );
+
+		this.setTitleRef = this.setTitleRef.bind( this );
 	}
 
 	getEditorSettings(
@@ -38,7 +41,7 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes,
+		blockTypes
 	) {
 		settings = {
 			...settings,
@@ -51,19 +54,38 @@ class Editor extends Component {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
-			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
-			);
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
-				...hiddenBlockTypes,
+				...hiddenBlockTypes
 			);
 		}
 
 		return settings;
+	}
+
+	componentDidMount() {
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
+			() => {
+				if ( this.postTitleRef ) {
+					this.postTitleRef.focus();
+				}
+			}
+		);
+	}
+
+	componentWillUnmount() {
+		if ( this.subscriptionParentSetFocusOnTitle ) {
+			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+	}
+
+	setTitleRef( titleRef ) {
+		this.postTitleRef = titleRef;
 	}
 
 	render() {
@@ -75,6 +97,7 @@ class Editor extends Component {
 			hiddenBlockTypes,
 			blockTypes,
 			post,
+			postType,
 			...props
 		} = this.props;
 
@@ -83,7 +106,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes,
+			blockTypes
 		);
 
 		const normalizedPost = post || {
@@ -97,7 +120,9 @@ class Editor extends Component {
 				// For now, let's assume: serialize( parse( html ) ) !== html
 				raw: serialize( parse( props.initialHtml || '' ) ),
 			},
-			type: 'draft',
+			type: postType,
+			status: 'draft',
+			meta: [],
 		};
 
 		return (
@@ -118,11 +143,18 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isFeatureActive, getEditorMode, getPreference } = select( 'core/edit-post' );
+		const {
+			isFeatureActive,
+			getEditorMode,
+			getPreference,
+			__experimentalGetPreviewDeviceType,
+		} = select( 'core/edit-post' );
 		const { getBlockTypes } = select( 'core/blocks' );
 
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar:
+				isFeatureActive( 'fixedToolbar' ) ||
+				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
@@ -130,9 +162,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const {
-			switchEditorMode,
-		} = dispatch( 'core/edit-post' );
+		const { switchEditorMode } = dispatch( 'core/edit-post' );
 
 		return {
 			switchEditorMode,

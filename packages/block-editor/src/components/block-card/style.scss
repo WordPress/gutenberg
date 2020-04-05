@@ -18,7 +18,9 @@
 
 .block-editor-block-card__title {
 	font-weight: 500;
-	margin-bottom: 5px;
+	&.block-editor-block-card__title {
+		margin: 0 0 5px;
+	}
 }
 
 .block-editor-block-card__description {
@@ -29,6 +31,6 @@
 	margin-left: -2px;
 	margin-right: 10px;
 	padding: 0 3px;
-	width: $icon-button-size;
-	height: $icon-button-size-small;
+	width: $button-size;
+	height: $button-size-small;
 }

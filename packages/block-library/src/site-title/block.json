@@ -1,0 +1,10 @@
+{
+	"name": "core/site-title",
+	"category": "layout",
+	"attributes": {
+		"level": {
+			"type": "number",
+			"default": 1
+		}
+	}
+}

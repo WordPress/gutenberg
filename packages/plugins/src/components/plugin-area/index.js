@@ -47,7 +47,7 @@ import { getPlugins } from '../../api';
  * );
  * ```
  *
- * @return {WPElement} Plugin area.
+ * @return {WPComponent} The component to be rendered.
  */
 class PluginArea extends Component {
 	constructor() {
@@ -72,13 +72,27 @@ class PluginArea extends Component {
 	}
 
 	componentDidMount() {
-		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered', this.setPlugins );
-		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered', this.setPlugins );
+		addAction(
+			'plugins.pluginRegistered',
+			'core/plugins/plugin-area/plugins-registered',
+			this.setPlugins
+		);
+		addAction(
+			'plugins.pluginUnregistered',
+			'core/plugins/plugin-area/plugins-unregistered',
+			this.setPlugins
+		);
 	}
 
 	componentWillUnmount() {
-		removeAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered' );
-		removeAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered' );
+		removeAction(
+			'plugins.pluginRegistered',
+			'core/plugins/plugin-area/plugins-registered'
+		);
+		removeAction(
+			'plugins.pluginUnregistered',
+			'core/plugins/plugin-area/plugins-unregistered'
+		);
 	}
 
 	setPlugins() {

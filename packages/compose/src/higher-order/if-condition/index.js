@@ -11,15 +11,16 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  *
  * @return {Function} Higher-order component.
  */
-const ifCondition = ( predicate ) => createHigherOrderComponent(
-	( WrappedComponent ) => ( props ) => {
-		if ( ! predicate( props ) ) {
-			return null;
-		}
+const ifCondition = ( predicate ) =>
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( props ) => {
+			if ( ! predicate( props ) ) {
+				return null;
+			}
 
-		return <WrappedComponent { ...props } />;
-	},
-	'ifCondition'
-);
+			return <WrappedComponent { ...props } />;
+		},
+		'ifCondition'
+	);
 
 export default ifCondition;

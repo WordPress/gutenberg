@@ -8,7 +8,11 @@ import { size, map, without } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	PostLockedModal,
+} from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
@@ -37,12 +41,12 @@ class Editor extends Component {
 	getEditorSettings(
 		settings,
 		hasFixedToolbar,
-		showInserterHelpPanel,
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
-		updatePreferredStyleVariations,
+		__experimentalLocalAutosaveInterval,
+		updatePreferredStyleVariations
 	) {
 		settings = {
 			...settings,
@@ -52,7 +56,7 @@ class Editor extends Component {
 			},
 			hasFixedToolbar,
 			focusMode,
-			showInserterHelpPanel,
+			__experimentalLocalAutosaveInterval,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -60,15 +64,14 @@ class Editor extends Component {
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
-			const defaultAllowedBlockTypes = (
-				true === settings.allowedBlockTypes ?
-					map( blockTypes, 'name' ) :
-					( settings.allowedBlockTypes || [] )
-			);
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
 
 			settings.allowedBlockTypes = without(
 				defaultAllowedBlockTypes,
-				...hiddenBlockTypes,
+				...hiddenBlockTypes
 			);
 		}
 
@@ -77,7 +80,6 @@ class Editor extends Component {
 
 	render() {
 		const {
-			preferredStyleVariations,
 			settings,
 			hasFixedToolbar,
 			focusMode,
@@ -87,7 +89,8 @@ class Editor extends Component {
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
-			showInserterHelpPanel,
+			preferredStyleVariations,
+			__experimentalLocalAutosaveInterval,
 			updatePreferredStyleVariations,
 			...props
 		} = this.props;
@@ -99,12 +102,12 @@ class Editor extends Component {
 		const editorSettings = this.getEditorSettings(
 			settings,
 			hasFixedToolbar,
-			showInserterHelpPanel,
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
 			preferredStyleVariations,
-			updatePreferredStyleVariations,
+			__experimentalLocalAutosaveInterval,
+			updatePreferredStyleVariations
 		);
 
 		return (
@@ -122,7 +125,9 @@ class Editor extends Component {
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
 									<Layout />
-									<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
+									<KeyboardShortcuts
+										shortcuts={ preventEventDiscovery }
+									/>
 								</ErrorBoundary>
 								<PostLockedModal />
 							</EditorProvider>
@@ -136,18 +141,28 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select, { postId, postType } ) => {
-		const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+		const {
+			isFeatureActive,
+			getPreference,
+			__experimentalGetPreviewDeviceType,
+		} = select( 'core/edit-post' );
 		const { getEntityRecord } = select( 'core' );
 		const { getBlockTypes } = select( 'core/blocks' );
 
 		return {
-			showInserterHelpPanel: isFeatureActive( 'showInserterHelpPanel' ),
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar:
+				isFeatureActive( 'fixedToolbar' ) ||
+				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			post: getEntityRecord( 'postType', postType, postId ),
-			preferredStyleVariations: getPreference( 'preferredStyleVariations' ),
+			preferredStyleVariations: getPreference(
+				'preferredStyleVariations'
+			),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 			blockTypes: getBlockTypes(),
+			__experimentalLocalAutosaveInterval: getPreference(
+				'localAutosaveInterval'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -13,12 +13,12 @@ import { cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import Shortcut from '../shortcut';
-import IconButton from '../icon-button';
+import Button from '../button';
 
 /**
  * Renders a generic menu item for use inside the more menu.
  *
- * @return {WPElement} More menu item.
+ * @return {WPComponent} The component to be rendered.
  */
 export function MenuItem( {
 	children,
@@ -30,18 +30,13 @@ export function MenuItem( {
 	role = 'menuitem',
 	...props
 } ) {
-	className = classnames( 'components-menu-item__button', className, {
-		'has-icon': icon,
-	} );
+	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
 		children = (
 			<span className="components-menu-item__info-wrapper">
 				{ children }
-				<span
-					className="components-menu-item__info">
-					{ info }
-				</span>
+				<span className="components-menu-item__info">{ info }</span>
 			</span>
 		);
 	}
@@ -49,23 +44,28 @@ export function MenuItem( {
 	if ( icon && ! isString( icon ) ) {
 		icon = cloneElement( icon, {
 			className: 'components-menu-items__item-icon',
-			height: 20,
-			width: 20,
 		} );
 	}
 
 	return (
-		<IconButton
+		<Button
 			icon={ icon }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
-			aria-checked={ ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? isSelected : undefined }
+			aria-checked={
+				role === 'menuitemcheckbox' || role === 'menuitemradio'
+					? isSelected
+					: undefined
+			}
 			role={ role }
 			className={ className }
 			{ ...props }
 		>
 			{ children }
-			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
-		</IconButton>
+			<Shortcut
+				className="components-menu-item__shortcut"
+				shortcut={ shortcut }
+			/>
+		</Button>
 	);
 }
 

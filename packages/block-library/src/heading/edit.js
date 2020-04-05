@@ -12,79 +12,69 @@ import HeadingToolbar from './heading-toolbar';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	withColors,
-	PanelColorSettings,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { memo } from '@wordpress/element';
+import { Platform } from '@wordpress/element';
 
-const HeadingColorUI = memo(
-	function( {
-		textColorValue,
-		setTextColor,
-	} ) {
-		return (
-			<PanelColorSettings
-				title={ __( 'Color Settings' ) }
-				initialOpen={ false }
-				colorSettings={ [
-					{
-						value: textColorValue,
-						onChange: setTextColor,
-						label: __( 'Text Color' ),
-					},
-				] }
-			/>
-		);
-	}
-);
-
-function HeadingEdit( {
-	attributes,
-	setAttributes,
-	mergeBlocks,
-	onReplace,
-	className,
-	textColor,
-	setTextColor,
-} ) {
-	const { align, content, level, placeholder } = attributes;
+function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
+	const { align, content, level, placeholder, style } = attributes;
 	const tagName = 'h' + level;
+	const isAndroid = Platform.select( {
+		android: true,
+		native: false,
+		web: false,
+	} );
+
+	const styles = {
+		color: style && style.color && style.color.text,
+	};
 
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-					<p>{ __( 'Text Alignment' ) }</p>
+				<HeadingToolbar
+					minLevel={ Platform.OS === 'web' ? 2 : 1 }
+					maxLevel={ Platform.OS === 'web' ? 5 : 7 }
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				{ ! isAndroid && (
 					<AlignmentToolbar
-						isCollapsed={ false }
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-				</PanelBody>
-				<HeadingColorUI
-					setTextColor={ setTextColor }
-					textColorValue={ textColor.color }
-				/>
-			</InspectorControls>
+				) }
+			</BlockControls>
+			{ Platform.OS === 'web' && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Heading settings' ) }>
+						<Text variant="label">{ __( 'Level' ) }</Text>
+						<HeadingToolbar
+							isCollapsed={ false }
+							minLevel={ 1 }
+							maxLevel={ 7 }
+							selectedLevel={ level }
+							onChange={ ( newLevel ) =>
+								setAttributes( { level: newLevel } )
+							}
+						/>
+					</PanelBody>
+				</InspectorControls>
+			) }
 			<RichText
 				identifier="content"
-				wrapperClassName="wp-block-heading"
-				tagName={ tagName }
+				tagName={ Block[ tagName ] }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
@@ -100,20 +90,15 @@ function HeadingEdit( {
 				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
-				className={ classnames( className, {
+				className={ classnames( {
 					[ `has-text-align-${ align }` ]: align,
-					'has-text-color': textColor.color,
-					[ textColor.class ]: textColor.class,
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
-				style={ {
-					color: textColor.color,
-				} }
+				textAlign={ align }
+				style={ styles }
 			/>
 		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-] )( HeadingEdit );
+export default HeadingEdit;

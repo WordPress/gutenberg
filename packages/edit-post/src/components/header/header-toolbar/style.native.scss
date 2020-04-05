@@ -1,10 +1,15 @@
 
 .container {
-	height: 44px;
+	height: $mobile-header-toolbar-height;
 	flex-direction: row;
 	background-color: #fff;
 	border-top-color: #e9eff3;
 	border-top-width: 1px;
+}
+
+.containerDark {
+	background-color: $background-dark-elevated;
+	border-top-color: $background-dark-elevated;
 }
 
 .scrollableContent {

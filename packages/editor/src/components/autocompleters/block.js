@@ -10,6 +10,10 @@ import { select, dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { BlockIcon } from '@wordpress/block-editor';
 
+/** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
+
+/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+
 /**
  * Returns the client ID of the parent where a newly inserted block would be
  * placed.
@@ -27,7 +31,7 @@ function defaultGetBlockInsertionParentClientId() {
  * @param {string} rootClientId Client ID of the block for which to retrieve
  *                              inserter items.
  *
- * @return {Array<Editor.InserterItem>} The inserter items for the specified
+ * @return {Array<WPEditorInserterItem>} The inserter items for the specified
  *                                      parent.
  */
 function defaultGetInserterItems( rootClientId ) {
@@ -41,7 +45,9 @@ function defaultGetInserterItems( rootClientId ) {
  *                   block is selected.
  */
 function defaultGetSelectedBlockName() {
-	const { getSelectedBlockClientId, getBlockName } = select( 'core/block-editor' );
+	const { getSelectedBlockClientId, getBlockName } = select(
+		'core/block-editor'
+	);
 	const selectedBlockClientId = getSelectedBlockClientId();
 	return selectedBlockClientId ? getBlockName( selectedBlockClientId ) : null;
 }
@@ -68,7 +74,7 @@ const fetchReusableBlocks = once( () => {
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {Completer} A blocks completer.
+ * @return {WPCompleter} A blocks completer.
  */
 export function createBlockCompleter( {
 	// Allow store-based selectors to be overridden for unit test.
@@ -95,10 +101,7 @@ export function createBlockCompleter( {
 		},
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;
-			return [
-				<BlockIcon key="icon" icon={ icon } showColors />,
-				title,
-			];
+			return [ <BlockIcon key="icon" icon={ icon } showColors />, title ];
 		},
 		allowContext( before, after ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
@@ -119,6 +122,6 @@ export function createBlockCompleter( {
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {Completer} A blocks completer.
+ * @return {WPCompleter} A blocks completer.
  */
 export default createBlockCompleter();

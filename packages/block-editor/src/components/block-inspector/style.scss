@@ -1,3 +1,21 @@
+.block-editor-block-inspector {
+	.components-base-control {
+		margin-bottom: #{ $grid-unit-30 };
+
+		&:last-child {
+			margin-bottom: $grid-unit-10;
+		}
+	}
+	.components-panel__body {
+		border: none;
+		border-top: $border-width solid $light-gray-500;
+	}
+
+	.block-editor-block-card {
+		padding: $grid-unit-20;
+	}
+}
+
 .block-editor-block-inspector__no-blocks {
 	display: block;
 	font-size: $default-font-size;

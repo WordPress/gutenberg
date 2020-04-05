@@ -32,7 +32,7 @@ export default function( HTML ) {
 
 				accu.lastChild.appendChild( node );
 			}
-		// Element nodes.
+			// Element nodes.
 		} else if ( node.nodeType === ELEMENT_NODE ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {

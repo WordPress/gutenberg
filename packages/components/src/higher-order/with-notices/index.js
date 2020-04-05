@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -17,8 +17,9 @@ import NoticeList from '../../notice/list';
 /**
  * Override the default edit UI to include notices if supported.
  *
- * @param  {Function|Component} OriginalComponent Original component.
- * @return {Component}                            Wrapped component.
+ * @param  {WPComponent} OriginalComponent Original component.
+ *
+ * @return {WPComponent} Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
 	return class WrappedBlockEdit extends Component {
@@ -70,7 +71,9 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		 */
 		removeNotice( id ) {
 			this.setState( ( state ) => ( {
-				noticeList: state.noticeList.filter( ( notice ) => notice.id !== id ),
+				noticeList: state.noticeList.filter(
+					( notice ) => notice.id !== id
+				),
 			} ) );
 		}
 
@@ -89,11 +92,13 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 					noticeList={ this.state.noticeList }
 					noticeOperations={ this.noticeOperations }
 					noticeUI={
-						this.state.noticeList.length > 0 && <NoticeList
-							className="components-with-notices-ui"
-							notices={ this.state.noticeList }
-							onRemove={ this.removeNotice }
-						/>
+						this.state.noticeList.length > 0 && (
+							<NoticeList
+								className="components-with-notices-ui"
+								notices={ this.state.noticeList }
+								onRemove={ this.removeNotice }
+							/>
+						)
 					}
 					{ ...this.props }
 				/>

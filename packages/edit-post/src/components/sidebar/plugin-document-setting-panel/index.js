@@ -17,7 +17,16 @@ import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/opti
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
+const PluginDocumentSettingFill = ( {
+	isEnabled,
+	panelName,
+	opened,
+	onToggle,
+	className,
+	title,
+	icon,
+	children,
+} ) => {
 	return (
 		<>
 			<EnablePluginDocumentSettingPanelOption
@@ -48,7 +57,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  * @param {string} [props.name] The machine-friendly name for the panel.
  * @param {string} [props.className] An optional class name added to the row.
  * @param {string} [props.title] The title of the panel
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
  * @example <caption>ES5</caption>
  * ```js
@@ -89,7 +98,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
  * ```
  *
- * @return {WPElement} The WPElement to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
@@ -99,18 +108,20 @@ const PluginDocumentSettingPanel = compose(
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
-		return (
-			{
-				opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
-				isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
-			}
-		);
+		return {
+			opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
+			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+				panelName
+			),
+		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( panelName );
+			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+				panelName
+			);
 		},
-	} ) ),
+	} ) )
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;

@@ -1,6 +1,4 @@
 .wp-block-image {
-	max-width: 100%;
-
 	// The image block is in a `figure` element, and many themes zero this out.
 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
 	margin-bottom: 1em;
@@ -17,10 +15,6 @@
 	&.alignwide img {
 		width: 100%;
 	}
-
-	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
-	margin-left: 0;
-	margin-right: 0;
 
 	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
 	.alignleft,
@@ -58,9 +52,24 @@
 		margin-left: auto;
 		margin-right: auto;
 	}
+
+	// Supply caption styles to images, even if the theme hasn't opted in.
+	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
+	// so we supply the styles so as to not appear broken or unstyled in those themes.
+	figcaption {
+		@include caption-style();
+	}
 }
 
 // Variations
+.is-style-rounded img {
+	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+	// to rectangular images. A pill-shape is better than otherwise.
+	border-radius: 9999px;
+}
+
+// The following variation is deprecated.
+// The CSS is kept here for the time being, to support blocks using the old variation.
 .is-style-circle-mask img {
 	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 	// to rectangular images. A pill-shape is better than otherwise.
@@ -76,6 +85,6 @@
 		mask-repeat: no-repeat;
 		mask-size: contain;
 		mask-position: center;
-		border-radius: none;
+		border-radius: 0;
 	}
 }

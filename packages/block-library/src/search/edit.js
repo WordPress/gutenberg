@@ -10,7 +10,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 	return (
 		<div className={ className }>
 			<RichText
-				wrapperClassName="wp-block-search__label"
+				className="wp-block-search__label"
 				aria-label={ __( 'Label text' ) }
 				placeholder={ __( 'Add label…' ) }
 				withoutInteractiveFormatting
@@ -23,13 +23,16 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
 				// which is confusing.
-				placeholder={ placeholder ? undefined : __( 'Optional placeholder…' ) }
+				placeholder={
+					placeholder ? undefined : __( 'Optional placeholder…' )
+				}
 				value={ placeholder }
-				onChange={ ( event ) => setAttributes( { placeholder: event.target.value } ) }
+				onChange={ ( event ) =>
+					setAttributes( { placeholder: event.target.value } )
+				}
 			/>
 			<RichText
-				wrapperClassName="wp-block-search__button"
-				className="wp-block-search__button-rich-text"
+				className="wp-block-search__button"
 				aria-label={ __( 'Button text' ) }
 				placeholder={ __( 'Add button text…' ) }
 				withoutInteractiveFormatting

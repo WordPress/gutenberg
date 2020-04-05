@@ -47,7 +47,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInputButton, {
+		return wp.element.createElement( wp.blockEditor.URLInputButton, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
@@ -65,8 +65,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInputButton } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInputButton } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -125,6 +125,10 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 }
 ```
 
+### `label: String`
+
+*Optional.* If this property is added, a label will be generated using label property as the content.
+
 ### `autoFocus: Boolean`
 
 *Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
@@ -161,7 +165,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInput, {
+		return wp.element.createElement( wp.blockEditor.URLInput, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
@@ -179,8 +183,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInput } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInput } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...

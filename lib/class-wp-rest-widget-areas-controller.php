@@ -49,13 +49,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 			'description'       => __( 'The sidebar’s ID.', 'gutenberg' ),
 			'type'              => 'string',
 			'required'          => true,
-			'validate_callback' => 'Experimental_WP_Widget_Blocks_Manager::is_valid_sidabar_id',
-		);
-
-		$content_argument = array(
-			'description' => __( 'Sidebar content.', 'gutenberg' ),
-			'type'        => 'string',
-			'required'    => true,
+			'validate_callback' => 'Experimental_WP_Widget_Blocks_Manager::is_valid_sidebar_id',
 		);
 
 		register_rest_route(
@@ -141,6 +135,9 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has read access, WP_Error object otherwise.
+	 *
+	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
+	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function get_items_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -152,6 +149,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 
 		return true;
 	}
+	/* phpcs:enable */
 
 	/**
 	 * Retrieves all widget areas.
@@ -192,6 +190,9 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|bool True if the request has access to update the item, error object otherwise.
+	 *
+	 * This function is overloading a function defined in WP_REST_Controller so it should have the same parameters.
+	 * phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	 */
 	public function update_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_theme_options' ) ) {
@@ -203,6 +204,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 
 		return true;
 	}
+	/* phpcs:enable */
 
 	/**
 	 * Updates a single widget area.
@@ -243,7 +245,7 @@ class WP_REST_Widget_Areas_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.7.0
 	 *
-	 * @param string $sidebar_id Indentifier of the sidebar.
+	 * @param string $sidebar_id Identifier of the sidebar.
 	 * @return object Sidebar data with a content array.
 	 */
 	protected function get_sidebar_data( $sidebar_id ) {

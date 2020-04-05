@@ -1,3 +1,50 @@
+## Master
+
+### New Features
+
+- The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
+- New Rule: [`@wordpress/i18n-text-domain`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-text-domain.md)
+- New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
+- New Rule: [`@wordpress/i18n-no-variables`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-variables.md)
+- New Rule: [`@wordpress/i18n-no-placeholders-only`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)
+- New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
+- New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
+
+### Breaking Changes
+
+- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
+- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
+- The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
+
+### Bug Fix
+
+- The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
+
+## 4.0.0 (2020-02-10)
+
+### Breaking Changes
+
+- The `recommended` ruleset checks again code formatting (whitespace, indenting, etc.). These rules are now enforced by Prettier itself through a plugin that diffs the code with its formatted output and reports the differences as lint errors. `eslint-plugin-prettier` was chosen over options like `prettier-eslint` because we don't run `eslint --fix` in hooks as we'd rather leave certain linting errors to be resolved or ignored at the author's discretion. We also don't apply any additional formatting with `eslint` over `prettier`, so the overhead would be unnecessary. `eslint-plugin-prettier` was chosen over options like `prettier --check` because it's nice to see format errors as you type as it leads you to write code with a more optimal auto-formatted output and it avoids issues like comment directives being moved out of place by `prettier` and the author not realizing it.
+
+## 3.4.1 (2020-02-04)
+
+### Bug Fix
+
+- Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
+
+## 3.4.0 (2020-02-04)
+
+### New Features
+
+- The `recommended` ruleset no longer enables rules that check code formatting (whitespace, indenting, etc.) and that could conflict with Prettier.
+- There is a new `recommended-with-formatting` ruleset that has the code formatting rules still enabled, for projects that want to opt out from Prettier and continue checking code formatting with ESLint.
+
+## 3.3.0 (2019-12-19)
+
+### Bug Fixes
+
+- The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.
+
 ## 3.0.0 (2019-08-29)
 
 ### Breaking Changes

@@ -8,24 +8,29 @@ import { find } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
+import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
-		icon: 'editor-alignleft',
-		title: __( 'Align Text Left' ),
+		icon: alignLeft,
+		title: __( 'Align text left' ),
 		align: 'left',
 	},
 	{
-		icon: 'editor-aligncenter',
-		title: __( 'Align Text Center' ),
+		icon: alignCenter,
+		title: __( 'Align text center' ),
 		align: 'center',
 	},
 	{
-		icon: 'editor-alignright',
-		title: __( 'Align Text Right' ),
+		icon: alignRight,
+		title: __( 'Align text right' ),
 		align: 'right',
 	},
 ];
+
+const POPOVER_PROPS = {
+	position: 'bottom right',
+};
 
 export function AlignmentToolbar( props ) {
 	const {
@@ -40,20 +45,25 @@ export function AlignmentToolbar( props ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
+	const activeAlignment = find(
+		alignmentControls,
+		( control ) => control.align === value
+	);
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
+			icon={ activeAlignment ? activeAlignment.icon : alignLeft }
 			label={ label }
+			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
-				const isActive = ( value === align );
+				const isActive = value === align;
 
 				return {
 					...control,
 					isActive,
+					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( align ),
 				};
 			} ) }

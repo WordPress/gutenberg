@@ -11,15 +11,25 @@ import { withSelect } from '@wordpress/data';
  * @return {Object} The enhanced component.
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
-	return withSelect( ( select, { clientId } ) => {
-		const annotations = select( 'core/annotations' ).__experimentalGetAnnotationsForBlock( clientId );
+	return withSelect( ( select, { clientId, className } ) => {
+		const annotations = select(
+			'core/annotations'
+		).__experimentalGetAnnotationsForBlock( clientId );
 
 		return {
-			className: annotations.map( ( annotation ) => {
-				return 'is-annotated-by-' + annotation.source;
-			} ).join( ' ' ),
+			className: annotations
+				.map( ( annotation ) => {
+					return 'is-annotated-by-' + annotation.source;
+				} )
+				.concat( className )
+				.filter( Boolean )
+				.join( ' ' ),
 		};
 	} )( OriginalComponent );
 };
 
-addFilter( 'editor.BlockListBlock', 'core/annotations', addAnnotationClassName );
+addFilter(
+	'editor.BlockListBlock',
+	'core/annotations',
+	addAnnotationClassName
+);

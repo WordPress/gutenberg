@@ -14,11 +14,10 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
  */
 import NavigableContainer from './container';
 
-export function NavigableMenu( {
-	role = 'menu',
-	orientation = 'vertical',
-	...rest
-}, ref ) {
+export function NavigableMenu(
+	{ role = 'menu', orientation = 'vertical', ...rest },
+	ref
+) {
 	const eventToOffset = ( evt ) => {
 		const { keyCode } = evt;
 

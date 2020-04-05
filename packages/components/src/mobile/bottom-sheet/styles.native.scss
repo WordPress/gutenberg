@@ -12,6 +12,7 @@
 	width: 36px;
 	margin: auto;
 	margin-top: 6px;
+	margin-bottom: 6px;
 	border-radius: 2px;
 }
 
@@ -21,9 +22,14 @@
 	width: 100%;
 }
 
-.emptyHeaderSpace {
-	height: 14;
+.separatorDark {
+	background-color: $gray-70;
 }
+
+.emptyHeader {
+	margin-top: $panel-padding / 2;
+}
+
 
 .background {
 	background-color: $white;
@@ -32,6 +38,10 @@
 	width: 100%;
 	max-width: 512;
 	padding-bottom: 0;
+}
+
+.backgroundDark {
+	background-color: $background-dark-elevated;
 }
 
 .content {
@@ -68,12 +78,22 @@
 	padding: 5px;
 }
 
+.resetButton {
+	font-size: 17px;
+	color: $blue-wordpress;
+}
+
+.resetButtonDark {
+	color: $blue-30;
+}
+
 // Cell
 
 .cellContainer {
 	flex-direction: row;
 	min-height: 48;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .clipToBounds {
@@ -86,9 +106,14 @@
 	width: 100%;
 }
 
+.cellSeparatorDark {
+	background-color: $gray-70;
+}
+
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	flex-shrink: 0;
 }
 
 .cellIcon {
@@ -99,6 +124,7 @@
 	font-size: 17px;
 	color: #2e4453;
 	margin-right: 12px;
+	flex-shrink: 1;
 }
 
 .cellLabelCentered {
@@ -108,6 +134,13 @@
 	text-align: center;
 }
 
+.cellLabelLeftAlignNoIcon {
+	font-size: 17px;
+	color: #2e4453;
+	flex: 1;
+	margin-left: 0;
+}
+
 .cellValue {
 	font-size: 17px;
 	color: #2e4453;
@@ -115,6 +148,25 @@
 	flex: 1;
 }
 
+.cellTextDark {
+	color: $white;
+}
+
 .cellValueRTL {
 	text-align: left;
+}
+
+.icon {
+	color: $toolbar-button;
+}
+
+.iconDark {
+	color: #c3c4c7;
+}
+
+// Unsupported Footer Cell
+
+.unsupportedFooterCell {
+	font-size: $text-editor-font-size;
+	color: $gray;
 }

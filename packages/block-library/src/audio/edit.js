@@ -5,11 +5,9 @@ import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
 	Disabled,
-	IconButton,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	Toolbar,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -17,16 +15,13 @@ import {
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaReplaceFlow,
 	RichText,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { audio as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,12 +33,6 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 class AudioEdit extends Component {
 	constructor() {
 		super( ...arguments );
-		// edit component has its own src in the state so it can be edited
-		// without setting the actual value outside of the edit UI
-		this.state = {
-			editing: ! this.props.attributes.src,
-		};
-
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
@@ -69,7 +58,6 @@ class AudioEdit extends Component {
 					},
 					onError: ( e ) => {
 						setAttributes( { src: undefined, id: undefined } );
-						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( e );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -92,17 +80,15 @@ class AudioEdit extends Component {
 		// the editing UI.
 		if ( newSrc !== src ) {
 			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newSrc } }
-			);
+			const embedBlock = createUpgradedEmbedBlock( {
+				attributes: { url: newSrc },
+			} );
 			if ( undefined !== embedBlock ) {
 				this.props.onReplace( embedBlock );
 				return;
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-
-		this.setState( { editing: false } );
 	}
 
 	onUploadError( message ) {
@@ -112,30 +98,35 @@ class AudioEdit extends Component {
 	}
 
 	getAutoplayHelp( checked ) {
-		return checked ? __( 'Note: Autoplaying audio may cause usability issues for some visitors.' ) : null;
+		return checked
+			? __(
+					'Note: Autoplaying audio may cause usability issues for some visitors.'
+			  )
+			: null;
 	}
 
 	render() {
-		const { autoplay, caption, loop, preload, src } = this.props.attributes;
+		const {
+			id,
+			autoplay,
+			caption,
+			loop,
+			preload,
+			src,
+		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeUI } = this.props;
-		const { editing } = this.state;
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
 				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
 				return;
 			}
 			// sets the block's attribute and updates the edit component from the
 			// selected media, then switches off the editing UI
 			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
 		};
-		if ( editing ) {
+		if ( ! src ) {
 			return (
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
@@ -154,17 +145,18 @@ class AudioEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="audio/*"
+						onSelect={ onSelectAudio }
+						onSelectURL={ this.onSelectURL }
+						onError={ this.onUploadError }
+					/>
 				</BlockControls>
 				<InspectorControls>
-					<PanelBody title={ __( 'Audio Settings' ) }>
+					<PanelBody title={ __( 'Audio settings' ) }>
 						<ToggleControl
 							label={ __( 'Autoplay' ) }
 							onChange={ this.toggleAttribute( 'autoplay' ) }
@@ -180,7 +172,12 @@ class AudioEdit extends Component {
 							label={ __( 'Preload' ) }
 							value={ undefined !== preload ? preload : 'none' }
 							// `undefined` is required for the preload attribute to be unset.
-							onChange={ ( value ) => setAttributes( { preload: ( 'none' !== value ) ? value : undefined } ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									preload:
+										'none' !== value ? value : undefined,
+								} )
+							}
 							options={ [
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
@@ -202,7 +199,9 @@ class AudioEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							onChange={ ( value ) =>
+								setAttributes( { caption: value } )
+							}
 							inlineToolbar
 						/>
 					) }
@@ -214,10 +213,8 @@ class AudioEdit extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { __experimentalMediaUpload } = getSettings();
-		return {
-			mediaUpload: __experimentalMediaUpload,
-		};
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
 	} ),
 	withNotices,
 ] )( AudioEdit );

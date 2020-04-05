@@ -45,22 +45,18 @@ import useSelect from '../use-select';
  * component and update automatically if the price of a hammer ever changes in
  * the store.
  *
- * @return {Component} Enhanced component with merged state data props.
+ * @return {WPComponent} Enhanced component with merged state data props.
  */
-const withSelect = ( mapSelectToProps ) => createHigherOrderComponent(
-	( WrappedComponent ) => pure(
-		( ownProps ) => {
-			const mapSelect =
-				( select, registry ) => mapSelectToProps(
-					select,
-					ownProps,
-					registry
-				);
-			const mergeProps = useSelect( mapSelect );
-			return <WrappedComponent { ...ownProps } { ...mergeProps } />;
-		}
-	),
-	'withSelect'
-);
+const withSelect = ( mapSelectToProps ) =>
+	createHigherOrderComponent(
+		( WrappedComponent ) =>
+			pure( ( ownProps ) => {
+				const mapSelect = ( select, registry ) =>
+					mapSelectToProps( select, ownProps, registry );
+				const mergeProps = useSelect( mapSelect );
+				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
+			} ),
+		'withSelect'
+	);
 
 export default withSelect;

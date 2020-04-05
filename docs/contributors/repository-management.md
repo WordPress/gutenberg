@@ -116,6 +116,10 @@ Every pull request goes through a manual code review, in addition to automated t
 
 *As a contributor*, your responsibility is to learn from suggestions and iterate your pull request should it be needed based on feedback. Seek to collaborate and produce the best possible contribution to the greater whole.
 
+Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. Following the later reviews will also help improve your reviewing confidence in the future.
+
+If you are not yet comfortable leaving a full review, try commenting on a PR. Questions about functionality or the reasoning behind a change are helpful too. You could also comment on changes to parts of the code you understand, without leaving a full review.
+
 ### Design Review
 
 If your pull request impacts the design, you should ask for a design review. To request a design review add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. As a guide, changes that should be reviewed:
@@ -138,7 +142,10 @@ A pull request can generally be merged once it is:
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
-Please make sure to assign your merged pull request to its release milestone. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into master.
+
+Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+
 
 ### Closing Pull Requests
 

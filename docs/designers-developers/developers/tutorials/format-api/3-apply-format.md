@@ -37,10 +37,10 @@ Update `my-custom-format.js` with this new code:
 ```
 {% ESNext %}
 ```js
-const { registerFormatType, toggleFormat } = wp.richText
-const { RichTextToolbarButton } = wp.blockEditor;
+import { registerFormatType, toggleFormat } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
-const MyCustomButton = props => {
+const MyCustomButton = ( props ) => {
 	return <RichTextToolbarButton
 		icon='editor-code'
 		title='Sample output'
@@ -51,7 +51,7 @@ const MyCustomButton = props => {
 			) );
 		} }
 		isActive={ props.isActive }
-	/>
+	/>;
 };
 
 registerFormatType(
