@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -60,7 +60,7 @@ function ModeSwitcher() {
 	} );
 
 	return (
-		<MenuGroup label={ __( 'Editor' ) }>
+		<MenuGroup label={ _x( 'Editor', 'text editor' ) }>
 			<MenuItemsChoice
 				choices={ choices }
 				value={ mode }
