@@ -22,6 +22,7 @@ jobs:
           npm run test-e2e:android:local
     - name: Upload screenshots
       uses: actions/upload-artifact@v1
+      if: always()
       with:
         name: upload any screenshots
         path: test/native/screenshots
