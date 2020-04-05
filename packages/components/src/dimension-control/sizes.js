@@ -10,7 +10,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Finds the correct size object from the provided sizes
@@ -25,23 +25,23 @@ export const findSizeBySlug = ( sizes, slug ) =>
 
 export default [
 	{
-		name: __( 'None' ),
+		name: _x( 'None', 'size name'  ),
 		slug: 'none',
 	},
 	{
-		name: __( 'Small' ),
+		name: _x( 'Small', 'size name' ),
 		slug: 'small',
 	},
 	{
-		name: __( 'Medium' ),
+		name: _x( 'Medium', 'size name'  ),
 		slug: 'medium',
 	},
 	{
-		name: __( 'Large' ),
+		name: _x( 'Large', 'size name'  ),
 		slug: 'large',
 	},
 	{
-		name: __( 'Extra Large' ),
+		name: _x( 'Extra Large', 'size name'  ),
 		slug: 'xlarge',
 	},
 ];

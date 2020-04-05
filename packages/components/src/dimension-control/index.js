@@ -11,7 +11,7 @@ import { isFunction } from 'lodash';
  * Internal dependencies
  */
 import { Icon, SelectControl } from '../';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 import { Fragment } from '@wordpress/element';
 
@@ -48,7 +48,7 @@ export function DimensionControl( props ) {
 
 		return [
 			{
-				label: __( 'Default' ),
+				label: _x( 'Default', 'size name' ),
 				value: '',
 			},
 		].concat( options );
