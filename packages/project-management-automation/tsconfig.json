@@ -1,0 +1,11 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "lib",
+		"declarationDir": "build-types",
+
+		// This is required due to a type error coming from missing types in @actions/github
+		"noImplicitAny": false
+	},
+	"include": [ "lib/**/*" ]
+}

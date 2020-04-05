@@ -7,8 +7,15 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import { createBlock } from '../factory';
-import { getBlockTypes, unregisterBlockType, registerBlockType } from '../registration';
-import { doBlocksMatchTemplate, synchronizeBlocksWithTemplate } from '../templates';
+import {
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+} from '../registration';
+import {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from '../templates';
 
 describe( 'templates', () => {
 	beforeAll( () => {
@@ -60,46 +67,47 @@ describe( 'templates', () => {
 		it( 'return true if the template matches the blocks with nested blocks', () => {
 			const template = [
 				[ 'core/test-block' ],
-				[ 'core/test-block-2', {}, [
-					[ 'core/test-block' ],
-				] ],
+				[ 'core/test-block-2', {}, [ [ 'core/test-block' ] ] ],
 				[ 'core/test-block-2' ],
 			];
 			const blockList = [
 				createBlock( 'core/test-block' ),
-				createBlock( 'core/test-block-2', {}, [ createBlock( 'core/test-block' ) ] ),
+				createBlock( 'core/test-block-2', {}, [
+					createBlock( 'core/test-block' ),
+				] ),
 				createBlock( 'core/test-block-2' ),
 			];
 			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( true );
 		} );
 
 		it( "return false if the template length doesn't match the blocks length", () => {
-			const template = [
-				[ 'core/test-block' ],
-				[ 'core/test-block-2' ],
-			];
+			const template = [ [ 'core/test-block' ], [ 'core/test-block-2' ] ];
 			const blockList = [
 				createBlock( 'core/test-block' ),
 				createBlock( 'core/test-block-2' ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( false );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe(
+				false
+			);
 		} );
 
 		it( "return false if the nested template doesn't match the blocks", () => {
 			const template = [
 				[ 'core/test-block' ],
-				[ 'core/test-block-2', {}, [
-					[ 'core/test-block' ],
-				] ],
+				[ 'core/test-block-2', {}, [ [ 'core/test-block' ] ] ],
 				[ 'core/test-block-2' ],
 			];
 			const blockList = [
 				createBlock( 'core/test-block' ),
-				createBlock( 'core/test-block-2', {}, [ createBlock( 'core/test-block-2' ) ] ),
+				createBlock( 'core/test-block-2', {}, [
+					createBlock( 'core/test-block-2' ),
+				] ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( false );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe(
+				false
+			);
 		} );
 	} );
 
@@ -111,7 +119,9 @@ describe( 'templates', () => {
 				[ 'core/test-block-2' ],
 			];
 			const blockList = [];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toMatchObject( [
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
 				{ name: 'core/test-block' },
 				{ name: 'core/test-block-2' },
 				{ name: 'core/test-block-2' },
@@ -120,15 +130,16 @@ describe( 'templates', () => {
 
 		it( 'should create nested blocks', () => {
 			const template = [
-				[ 'core/test-block', {}, [
-					[ 'core/test-block-2' ],
-				] ],
+				[ 'core/test-block', {}, [ [ 'core/test-block-2' ] ] ],
 			];
 			const blockList = [];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toMatchObject( [
-				{ name: 'core/test-block', innerBlocks: [
-					{ name: 'core/test-block-2' },
-				] },
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
+				{
+					name: 'core/test-block',
+					innerBlocks: [ { name: 'core/test-block-2' } ],
+				},
 			] );
 		} );
 
@@ -142,7 +153,9 @@ describe( 'templates', () => {
 			const block1 = createBlock( 'core/test-block' );
 			const block2 = createBlock( 'core/test-block-2' );
 			const blockList = [ block1, block2 ];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toMatchObject( [
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
 				block1,
 				block2,
 				{ name: 'core/test-block-2' },
@@ -159,7 +172,9 @@ describe( 'templates', () => {
 			const block1 = createBlock( 'core/test-block' );
 			const block2 = createBlock( 'core/test-block' );
 			const blockList = [ block1, block2 ];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toMatchObject( [
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toMatchObject( [
 				block1,
 				{ name: 'core/test-block-2' },
 				{ name: 'core/test-block-2' },
@@ -171,20 +186,20 @@ describe( 'templates', () => {
 			const block1 = createBlock( 'core/test-block' );
 			const block2 = createBlock( 'core/test-block' );
 			const blockList = [ block1, block2 ];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toBe( blockList );
+			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toBe(
+				blockList
+			);
 		} );
 
 		it( 'should remove blocks if extra blocks are found', () => {
-			const template = [
-				[ 'core/test-block' ],
-			];
+			const template = [ [ 'core/test-block' ] ];
 
 			const block1 = createBlock( 'core/test-block' );
 			const block2 = createBlock( 'core/test-block' );
 			const blockList = [ block1, block2 ];
-			expect( synchronizeBlocksWithTemplate( blockList, template ) ).toEqual( [
-				block1,
-			] );
+			expect(
+				synchronizeBlocksWithTemplate( blockList, template )
+			).toEqual( [ block1 ] );
 		} );
 	} );
 } );

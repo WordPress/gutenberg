@@ -18,7 +18,9 @@ export default function save( { attributes } ) {
 	return (
 		<blockquote className={ className }>
 			<RichText.Content multiline value={ value } />
-			{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+			{ ! RichText.isEmpty( citation ) && (
+				<RichText.Content tagName="cite" value={ citation } />
+			) }
 		</blockquote>
 	);
 }

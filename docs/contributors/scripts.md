@@ -30,7 +30,7 @@ The editor includes a number of packages to enable various pieces of functionali
 | [I18N](/packages/i18n/README.md) | wp-i18n | Internationalization utilities for client-side localization |
 | [Is Shallow Equal](/packages/is-shallow-equal/README.md) | wp-is-shallow-equal | A function for performing a shallow comparison between two objects or arrays |
 | [Keycodes](/packages/keycodes/README.md) | wp-keycodes | Keycodes utilities for WordPress, used to check the key pressed in events like `onKeyDown` |
-| [List Reusable Blocks](/packages/list-reusable-blocks/README.md) | wp-list-reusable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
+| [List Reusable blocks](/packages/list-reusable-blocks/README.md) | wp-list-reusable-blocks | Package used to add import/export links to the listing page of the reusable blocks |
 | [NUX](/packages/nux/README.md) | wp-nux | Components, and wp.data methods useful for onboarding a new user to the WordPress admin interface |
 | [Plugins](/packages/plugins/README.md) | wp-plugins | Plugins module for WordPress |
 | [Redux Routine](/packages/redux-routine/README.md) | wp-redux-routine | Redux middleware for generator coroutines |

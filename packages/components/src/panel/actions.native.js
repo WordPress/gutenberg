@@ -6,9 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	TextControl,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies

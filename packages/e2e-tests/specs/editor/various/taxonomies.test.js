@@ -16,43 +16,45 @@ import {
 /**
  * Module constants
  */
-const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.components-visually-hidden)';
+const TAG_TOKEN_SELECTOR =
+	'.components-form-token-field__token-text span:not(.components-visually-hidden)';
 
 describe( 'Taxonomies', () => {
 	const canCreatTermInTaxonomy = ( taxonomy ) => {
-		return page.evaluate(
-			( _taxonomy ) => {
-				const post = wp.data.select( 'core/editor' ).getCurrentPost();
-				if ( ! post._links ) {
-					return false;
-				}
-				return !! post._links[ `wp:action-create-${ _taxonomy }` ];
-			},
-			taxonomy
-		);
+		return page.evaluate( ( _taxonomy ) => {
+			const post = wp.data.select( 'core/editor' ).getCurrentPost();
+			if ( ! post._links ) {
+				return false;
+			}
+			return !! post._links[ `wp:action-create-${ _taxonomy }` ];
+		}, taxonomy );
 	};
 
 	const getSelectCategories = () => {
-		return page.evaluate(
-			() => {
-				return Array.from( document.querySelectorAll(
+		return page.evaluate( () => {
+			return Array.from(
+				document.querySelectorAll(
 					'.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked'
-				) ).map( ( node ) => {
-					return node.parentElement.nextSibling.innerText;
-				} );
-			}
-		);
+				)
+			).map( ( node ) => {
+				return node.parentElement.nextSibling.innerText;
+			} );
+		} );
 	};
 
 	const getCurrentTags = async () => {
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
-		return page.evaluate( ( node, selector ) => {
-			return Array.from( node.querySelectorAll(
-				selector
-			) ).map( ( field ) => {
-				return field.innerText;
-			} );
-		}, tagsPanel, TAG_TOKEN_SELECTOR );
+		return page.evaluate(
+			( node, selector ) => {
+				return Array.from( node.querySelectorAll( selector ) ).map(
+					( field ) => {
+						return field.innerText;
+					}
+				);
+			},
+			tagsPanel,
+			TAG_TOKEN_SELECTOR
+		);
 	};
 
 	const openSidebarPanelWithTitle = async ( title ) => {
@@ -74,10 +76,14 @@ describe( 'Taxonomies', () => {
 			return;
 		}
 
-		await page.waitForSelector( 'button.editor-post-taxonomies__hierarchical-terms-add' );
+		await page.waitForSelector(
+			'button.editor-post-taxonomies__hierarchical-terms-add'
+		);
 
 		// Click add new category button.
-		await page.click( 'button.editor-post-taxonomies__hierarchical-terms-add' );
+		await page.click(
+			'button.editor-post-taxonomies__hierarchical-terms-add'
+		);
 
 		// Type the category name in the field.
 		await page.type(
@@ -86,10 +92,14 @@ describe( 'Taxonomies', () => {
 		);
 
 		// Click the submit button.
-		await page.click( '.editor-post-taxonomies__hierarchical-terms-submit' );
+		await page.click(
+			'.editor-post-taxonomies__hierarchical-terms-submit'
+		);
 
 		// Wait for the categories to load.
-		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked' );
+		await page.waitForSelector(
+			'.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked'
+		);
 
 		let selectedCategories = await getSelectCategories();
 
@@ -107,7 +117,9 @@ describe( 'Taxonomies', () => {
 		await page.reload();
 
 		// Wait for the categories to load.
-		await page.waitForSelector( '.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked' );
+		await page.waitForSelector(
+			'.editor-post-taxonomies__hierarchical-terms-choice .components-checkbox-control__input:checked'
+		);
 
 		selectedCategories = await getSelectCategories();
 
@@ -129,14 +141,12 @@ describe( 'Taxonomies', () => {
 		}
 
 		// At the start there are no tag tokens
-		expect(
-			await page.$$(
-				TAG_TOKEN_SELECTOR
-			)
-		).toHaveLength( 0 );
+		expect( await page.$$( TAG_TOKEN_SELECTOR ) ).toHaveLength( 0 );
 
 		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
-		const tagInput = await tagsPanel.$( '.components-form-token-field__input' );
+		const tagInput = await tagsPanel.$(
+			'.components-form-token-field__input'
+		);
 
 		// Click the tag input field.
 		await tagInput.click();

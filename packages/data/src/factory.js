@@ -3,6 +3,8 @@
  */
 import defaultRegistry from './default-registry';
 
+/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+
 /**
  * Mark a selector as a registry selector.
  *
@@ -11,7 +13,8 @@ import defaultRegistry from './default-registry';
  * @return {Function} marked registry selector.
  */
 export function createRegistrySelector( registrySelector ) {
-	const selector = ( ...args ) => registrySelector( selector.registry.select )( ...args );
+	const selector = ( ...args ) =>
+		registrySelector( selector.registry.select )( ...args );
 
 	/**
 	 * Flag indicating to selector registration mapping that the selector should

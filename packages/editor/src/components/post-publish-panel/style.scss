@@ -8,24 +8,23 @@
 
 	.components-spinner {
 		display: block;
-		float: none;
 		margin: 100px auto 0;
 	}
 }
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 8px;
-	padding-right: 8px;
-	height: $header-height;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: $header-height + $border-width;
 	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
 
-	.components-icon-button {
+	.components-button.has-icon {
 		position: absolute;
-		right: 8px;
+		right: $grid-unit-10;
 	}
 }
 
@@ -79,12 +78,6 @@
 	.editor-post-visibility__dialog-legend {
 		display: none;
 	}
-
-	// The DateTime component has an intrinsic padding in order for the horizontal scrolling to function inside a popover.
-	// We unset that here when used inline.
-	.components-datetime {
-		padding: 0;
-	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {
@@ -118,7 +111,7 @@
 }
 
 .post-publish-panel__postpublish-post-address {
-	margin-bottom: $grid-size-large;
+	margin-bottom: $grid-unit-20;
 
 	input[readonly] {
 		padding: 10px;
@@ -133,7 +126,7 @@
 }
 
 .post-publish-panel__postpublish-subheader {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 }
 
 .post-publish-panel__tip {

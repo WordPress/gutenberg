@@ -1,4 +1,3 @@
-
 /**
  * This method check for copy pasted img elements to see if they don't have suspicious attributes.
  *

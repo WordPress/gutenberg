@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	isBlobURL,
-} from '../';
+import { isBlobURL } from '../';
 
 describe( 'isBlobURL', () => {
 	it( 'returns true if the url starts with "blob:"', () => {

@@ -9,9 +9,4 @@ const {
 	WP_BASE_URL = 'http://localhost:8889',
 } = process.env;
 
-export {
-	WP_ADMIN_USER,
-	WP_USERNAME,
-	WP_PASSWORD,
-	WP_BASE_URL,
-};
+export { WP_ADMIN_USER, WP_USERNAME, WP_PASSWORD, WP_BASE_URL };

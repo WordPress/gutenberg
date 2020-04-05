@@ -86,33 +86,24 @@ function gutenberg_grant_template_caps( array $allcaps ) {
 add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 /**
- * Filters capabilities to prevent deletion of the 'wp_template' post with slug 'index'.
+ * Filters `wp_template` posts slug resolution to bypass deduplication logic as
+ * template slugs should be unique.
  *
- * Similar to today's themes, this template should always exist.
- *
- * @param array  $caps    Array of the user's capabilities.
- * @param string $cap     Capability name.
- * @param int    $user_id The user ID.
- * @param array  $args    Adds the context to the cap. Typically the object ID.
- * @return array Filtered $caps.
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @param int    $post_parent   Post parent ID.
+ * @param int    $original_slug The desired slug (post_name).
+ * @return string The original, desired slug.
  */
-function gutenberg_prevent_index_template_deletion( $caps, $cap, $user_id, $args ) {
-	if ( 'delete_post' !== $cap || ! isset( $args[0] ) ) {
-		return $caps;
+function gutenberg_filter_wp_template_wp_unique_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
+	if ( 'wp_template' === $post_type ) {
+		return $original_slug;
 	}
-
-	$post = get_post( $args[0] );
-	if ( ! $post || 'wp_template' !== $post->post_type ) {
-		return $caps;
-	}
-
-	if ( 'index' === $post->post_name ) {
-		$caps[] = 'do_not_allow';
-	}
-
-	return $caps;
+	return $slug;
 }
-add_filter( 'map_meta_cap', 'gutenberg_prevent_index_template_deletion', 10, 4 );
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_slug', 10, 6 );
 
 /**
  * Fixes the label of the 'wp_template' admin menu entry.

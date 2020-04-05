@@ -7,14 +7,8 @@ const spawn = require( 'cross-spawn' );
 /**
  * Internal dependencies
  */
-const {
-	fromScriptsRoot,
-	hasScriptFile,
-} = require( './file' );
-const {
-	exit,
-	getArgsFromCLI,
-} = require( './process' );
+const { fromScriptsRoot, hasScriptFile } = require( './file' );
+const { exit, getArgsFromCLI } = require( './process' );
 
 const getArgFromCLI = ( arg ) => {
 	for ( const cliArg of getArgsFromCLI() ) {
@@ -36,15 +30,15 @@ const handleSignal = ( signal ) => {
 		// eslint-disable-next-line no-console
 		console.log(
 			'The script failed because the process exited too early. ' +
-			'This probably means the system ran out of memory or someone called ' +
-			'`kill -9` on the process.'
+				'This probably means the system ran out of memory or someone called ' +
+				'`kill -9` on the process.'
 		);
 	} else if ( signal === 'SIGTERM' ) {
 		// eslint-disable-next-line no-console
 		console.log(
 			'The script failed because the process exited too early. ' +
-			'Someone might have called `kill` or `killall`, or the system could ' +
-			'be shutting down.'
+				'Someone might have called `kill` or `killall`, or the system could ' +
+				'be shutting down.'
 		);
 	}
 	exit( 1 );
@@ -60,19 +54,20 @@ const spawnScript = ( scriptName, args = [] ) => {
 	if ( ! hasScriptFile( scriptName ) ) {
 		// eslint-disable-next-line no-console
 		console.log(
-			'Unknown script "' + scriptName + '". ' +
-			'Perhaps you need to update @wordpress/scripts?'
+			'Unknown script "' +
+				scriptName +
+				'". ' +
+				'Perhaps you need to update @wordpress/scripts?'
 		);
 		exit( 1 );
 	}
 
 	const { signal, status } = spawn.sync(
 		'node',
-		[
-			fromScriptsRoot( scriptName ),
-			...args,
-		],
-		{ stdio: 'inherit' },
+		[ fromScriptsRoot( scriptName ), ...args ],
+		{
+			stdio: 'inherit',
+		}
 	);
 
 	if ( signal ) {

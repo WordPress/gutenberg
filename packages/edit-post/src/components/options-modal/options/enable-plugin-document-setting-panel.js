@@ -8,14 +8,13 @@ import { createSlotFill } from '@wordpress/components';
  */
 import { EnablePanelOption } from './index';
 
-const { Fill, Slot } = createSlotFill( 'EnablePluginDocumentSettingPanelOption' );
+const { Fill, Slot } = createSlotFill(
+	'EnablePluginDocumentSettingPanelOption'
+);
 
 const EnablePluginDocumentSettingPanelOption = ( { label, panelName } ) => (
 	<Fill>
-		<EnablePanelOption
-			label={ label }
-			panelName={ panelName }
-		/>
+		<EnablePanelOption label={ label } panelName={ panelName } />
 	</Fill>
 );
 

@@ -1,9 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import {
+	getBlockType,
+	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,32 +20,71 @@ import BlockTitle from '../block-title';
  * descends from a root block, a button is displayed enabling the user to select
  * the root block.
  *
- * @param {string}   props.clientId        Client ID of block.
+ * @param {string} props          Component props.
+ * @param {string} props.clientId Client ID of block.
+ *
  * @return {WPComponent} The component to be rendered.
  */
-const BlockBreadcrumb = forwardRef( ( { clientId }, ref ) => {
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const { rootClientId } = useSelect( ( select ) => {
-		return {
-			rootClientId: select( 'core/block-editor' ).getBlockRootClientId( clientId ),
-		};
+function BlockBreadcrumb( {
+	clientId,
+	rootClientId,
+	moverDirection,
+	...props
+} ) {
+	const selected = useSelect(
+		( select ) => {
+			const {
+				__unstableGetBlockWithoutInnerBlocks,
+				getBlockIndex,
+			} = select( 'core/block-editor' );
+			const index = getBlockIndex( clientId, rootClientId );
+			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
+				clientId
+			);
+			return { index, name, attributes };
+		},
+		[ clientId, rootClientId ]
+	);
+	const { index, name, attributes } = selected;
+	const { setNavigationMode, removeBlock } = useDispatch(
+		'core/block-editor'
+	);
+	const ref = useRef();
+
+	// Focus the breadcrumb in navigation mode.
+	useEffect( () => {
+		ref.current.focus();
 	} );
 
+	function onKeyDown( event ) {
+		const { keyCode } = event;
+
+		if ( keyCode === BACKSPACE || keyCode === DELETE ) {
+			removeBlock( clientId );
+			event.preventDefault();
+		}
+	}
+
+	const blockType = getBlockType( name );
+	const label = getAccessibleBlockLabel(
+		blockType,
+		attributes,
+		index + 1,
+		moverDirection
+	);
+
 	return (
-		<div className="editor-block-list__breadcrumb block-editor-block-list__breadcrumb">
-			<Toolbar>
-				{ rootClientId && (
-					<>
-						<BlockTitle clientId={ rootClientId } />
-						<span className="editor-block-list__descendant-arrow block-editor-block-list__descendant-arrow" />
-					</>
-				) }
-				<Button ref={ ref } onClick={ () => setNavigationMode( false ) }>
-					<BlockTitle clientId={ clientId } />
-				</Button>
-			</Toolbar>
+		<div className="block-editor-block-list__breadcrumb" { ...props }>
+			<Button
+				ref={ ref }
+				onClick={ () => setNavigationMode( false ) }
+				onKeyDown={ onKeyDown }
+				label={ label }
+			>
+				<BlockTitle clientId={ clientId } />
+			</Button>
 		</div>
 	);
-} );
+}
 
 export default BlockBreadcrumb;

@@ -1,0 +1,15 @@
+{
+	"name": "core/template-part",
+	"category": "layout",
+	"attributes": {
+		"postId": {
+			"type": "number"
+		},
+		"slug": {
+			"type": "string"
+		},
+		"theme": {
+			"type": "string"
+		}
+	}
+}

@@ -46,16 +46,41 @@
 		border-style: double;
 	}
 
-	// Extra specificity to override default Placeholder styles.
-	&__placeholder-form.wp-block-table__placeholder-form {
-		text-align: left;
-		align-items: center;
+	figcaption {
+		@include caption-style-theme();
 	}
-	&__placeholder-input {
-		width: 100px;
+}
+
+.blocks-table__placeholder-form.blocks-table__placeholder-form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+
+	> * {
+		margin-bottom: $grid-unit-10;
 	}
-	&__placeholder-button {
-		min-width: 100px;
-		justify-content: center;
+
+	@include break-medium() {
+		flex-direction: row;
+		align-items: flex-end;
+
+		> * {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.blocks-table__placeholder-input {
+	width: $grid-unit-10 * 14;
+	margin-right: $grid-unit-10;
+	margin-bottom: 0;
+
+	input {
+		height: $button-size;
+	}
+
+
+	.components-base-control__field {
+		margin-bottom: 0;
 	}
 }

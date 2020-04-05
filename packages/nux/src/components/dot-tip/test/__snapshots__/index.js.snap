@@ -5,12 +5,12 @@ exports[`DotTip should render correctly 1`] = `
   aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
-  getAnchorRect={[Function]}
   noArrow={true}
   onClick={[Function]}
   onFocusOutside={[Function]}
   position="middle right"
   role="dialog"
+  shouldAnchorIncludePadding={true}
 >
   <p>
     It looks like you’re writing a letter. Would you like help?
@@ -22,9 +22,18 @@ exports[`DotTip should render correctly 1`] = `
       Got it
     </ForwardRef(Button)>
   </p>
-  <ForwardRef(IconButton)
+  <ForwardRef(Button)
     className="nux-dot-tip__disable"
-    icon="no-alt"
+    icon={
+      <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+        />
+      </SVG>
+    }
     label="Disable tips"
   />
 </Popover>

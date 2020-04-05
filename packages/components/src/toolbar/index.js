@@ -22,7 +22,10 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
 		return (
 			<ToolbarContainer
 				// `ToolbarGroup` already uses components-toolbar for compatibility reasons
-				className={ classnames( 'components-accessible-toolbar', className ) }
+				className={ classnames(
+					'components-accessible-toolbar',
+					className
+				) }
 				accessibilityLabel={ __experimentalAccessibilityLabel }
 				{ ...props }
 			/>

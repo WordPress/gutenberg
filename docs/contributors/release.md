@@ -87,7 +87,7 @@ git push origin release/x.x
 
 1. [Create a new release on GitHub](https://github.com/WordPress/gutenberg/releases/new).
 2. If you were releasing the `x.x.0-rc.1` release candidate, label it `x.x.0-rc.1` and use the `vx.x.x-rc.1` as a tag.
-3. Upload the a `gutenberg.zip` file into the release.
+3. Upload the `gutenberg.zip` file into the release.
 4. Use the changelog as a description of the release.
 5. Publish the release.
 
@@ -209,7 +209,7 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps:
+For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
 
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
@@ -219,12 +219,13 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 3. Remove all files from the current branch: `git rm -r .`.
 4. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 5. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
+6. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
+Aassuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
 
 Now, the branch is ready to be used to publish the npm packages.
 
-1. Run the [package release process] but when asked for the version numbers to choose for each package, (assuming the package versions are written using this format `major.minor.patch`) make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version.
-2. Update the `CHANGELOG.md` files of the published packages with the new released versions and commit to the `wp/trunk` branch.
-3. Cherry-pick the "Publish" (created by Lerna) and the CHANGELOG update commits into the `master` branch of Gutenberg.
+1. Run the [package release process] but when asked for the version numbers to choose for each package pick values based on the updated CHANGELOG files.
+2. Cherry-pick the "Publish" (created by Lerna) and the CHANGELOG update commits into the `master` branch of Gutenberg.
 
 Now, the npm packages should be ready and a patch can be created and committed into WordPress `trunk`.
 
@@ -252,6 +253,128 @@ Now, the branch is ready to be used to publish the npm packages.
 4. Cherry-pick the CHANGELOG update commits into the `master` branch of Gutenberg.
 
 Now, the npm packages should be ready and a patch can be created and committed into the corresponding WordPress SVN branch.
+
+
+### Standalone Package Releases
+
+The following workflow is needed when packages require bug fixes or security releases to be published to _npm_ outside of a WordPress release cycle.
+
+Note: Both the `master` and `wp/trunk` branches are restricted and can only be _pushed_ to by the Gutenberg Core team.
+
+Identify the commit hashes from the pull requests that need to be ported from the repo `master` branch to `wp/trunk`
+
+The `wp/trunk` branch now needs to be prepared to release and publish the packages to _npm_.
+
+Open a terminal and perform the following steps:
+1. `git checkout master`
+2. `git pull`
+3. `git checkout wp/trunk`
+4. `git pull`
+
+Before porting commits check that the `wp/trunk` branch does not have any outstanding packages waiting to be published:
+1. `git checkout wp/trunk`
+2. `npm run publish:check`
+
+Now _cherry-pick_ the commits from `master` to `wp/trunk`, use `-m 1 commithash` if the commit was a pull request merge commit:
+1. `git cherry-pick -m 1 cb150a2`
+2. `git push`
+
+Whilst waiting for the Travis CI build for  `wp/trunk` [branch to pass](https://travis-ci.com/WordPress/gutenberg/branches) identify and begin updating the `CHANGELOG.md` files:
+1. `git checkout wp/trunk`
+2. `npm run publish:check`
+> Example
+> ```shell
+> npm run publish:check
+> @wordpress/e2e-tests
+> @wordpress/jest-preset-default
+> @wordpress/scripts
+> lerna success found 3 packages ready to publish
+> ```
+
+Check the versions listed in the current `CHANGELOG.md` file, looking through the commit history of a package e.g [@wordpress/scripts](https://github.com/WordPress/gutenberg/commits/master/packages/scripts) and look out for _"chore(release): publish"_ and _"Update changelogs"_ commits to determine recent version bumps, then looking at the commits since the most recent release should aid with discovering what changes have occurred since the last release.
+
+Note: You may discover the current version of each package is not up to date, if so updating the previous released versions would be appreciated.
+
+Begin updating the _changelogs_ based on the [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#maintaining-changelogs) documentation and commit the changes:
+
+1. `git checkout wp/trunk`
+2. Update each of the `CHANGELOG.md` files
+3. Stage the _changelog_ changes `git add packages/`
+4. `git commit -m "Update changelogs"`
+5. Make a note of the commit hash of this commit
+> Example
+> ```
+> [master 278f524f16] Update changelogs` 278f524
+> ```
+6. `git push`
+
+Now that the changes have been committed to the `wp/trunk` branch and the Travis CI builds for the `wp/trunk` [branch are passing](https://travis-ci.com/WordPress/gutenberg/branches) it's time to publish the packages to npm:
+1. Once again run `npm run publish:check` to confirm there are no unexpected packages ready to be published:
+> Example
+> ```shell
+> npm run publish:check
+> @wordpress/e2e-tests
+> @wordpress/jest-preset-default
+> @wordpress/scripts
+> lerna success found 3 packages ready to publish
+> ```
+2. Run the [package release process] but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
+> Truncated example of publishing process output
+> ```
+> npm run publish:prod
+>
+> Build Progress: [==============================] 100%
+> lerna notice cli v3.18.2
+> lerna info versioning independent
+> ? Select a new version for @wordpress/e2e-tests (currently 1.9.0) Patch (1.9.1)
+> ? Select a new version for @wordpress/jest-preset-default (currently 5.3.0) Patch (5.3.1)
+> ? Select a new version for @wordpress/scripts (currently 6.1.0) Patch (6.1.1)
+>
+> Changes:
+>  - @wordpress/e2e-tests: 1.9.0 => 1.9.1
+>  - @wordpress/jest-preset-default: 5.3.0 => 5.3.1
+>  - @wordpress/scripts: 6.1.0 => 6.1.1
+>
+> ? Are you sure you want to publish these packages? Yes
+> lerna info execute Skipping releases
+> lerna info git Pushing tags...
+> lerna info publish Publishing packages to npm...
+> lerna info Verifying npm credentials
+> lerna info Checking two-factor auth mode
+> ? Enter OTP: 753566
+> lerna success published @wordpress/jest-preset-default 5.3.1
+> lerna success published @wordpress/scripts 6.1.1
+> lerna success published @wordpress/e2e-tests 1.9.1
+> Successfully published:
+>  - @wordpress/e2e-tests@1.9.1
+>  - @wordpress/jest-preset-default@5.3.1
+>  - @wordpress/scripts@6.1.1
+> lerna success published 3 packages
+> ```
+
+Now that the packages have been published the _"chore(release): publish"_ and _"Update changelogs"_ commits to `wp/trunk` need to be ported to the `master` branch:
+1. `git checkout master`
+2. `git pull`
+3. Cherry-pick the `278f524`hash you noted above from the _"Update changelogs"_ commit made to `wp/trunk`
+4. `git cherry-pick 278f524`
+5. Get the commit hash from the the lerna publish commit either from the terminal or [wp/trunk commits](https://github.com/WordPress/gutenberg/commits/wp/trunk)
+6. Cherry-pick the `fe6ae0d` "chore(release): publish"_ commit made to `wp/trunk`
+7. `git cherry-pick fe6ae0d`
+8. `git push`
+
+Confirm the packages dependencies do not contain `file://` links in the `dependencies` or `devdependencies` section of the packages released, e.g:
+> https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
+> https://unpkg.com/browse/@wordpress/scripts@6.1.1/package.json
+> https://unpkg.com/browse/@wordpress/jest-preset-default@5.3.1/package.json
+
+Time to announce the published changes in the #core-js and #core-editor Slack channels
+> ```
+> 📣 Successfully published:
+> • @wordpress/e2e-tests@1.9.1
+> • @wordpress/jest-preset-default@5.3.1
+> • @wordpress/scripts@6.1.1
+> Lerna success published 3 packages
+> ```
 
 ---------
 

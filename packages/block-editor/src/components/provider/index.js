@@ -15,6 +15,8 @@ import { compose } from '@wordpress/compose';
  */
 import withRegistryProvider from './with-registry-provider';
 
+/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+
 class BlockEditorProvider extends Component {
 	componentDidMount() {
 		this.props.updateSettings( this.props.settings );
@@ -103,19 +105,15 @@ class BlockEditorProvider extends Component {
 		let isPersistent = isLastBlockChangePersistent();
 
 		this.unsubscribe = registry.subscribe( () => {
-			const {
-				onChange = noop,
-				onInput = noop,
-			} = this.props;
+			const { onChange = noop, onInput = noop } = this.props;
 
 			const newBlocks = getBlocks();
 			const newIsPersistent = isLastBlockChangePersistent();
 
 			if (
-				newBlocks !== blocks && (
-					this.isSyncingIncomingValue ||
-					__unstableIsLastBlockChangeIgnored()
-				)
+				newBlocks !== blocks &&
+				( this.isSyncingIncomingValue ||
+					__unstableIsLastBlockChangeIgnored() )
 			) {
 				this.isSyncingIncomingValue = null;
 				blocks = newBlocks;
@@ -159,11 +157,9 @@ class BlockEditorProvider extends Component {
 export default compose( [
 	withRegistryProvider,
 	withDispatch( ( dispatch ) => {
-		const {
-			updateSettings,
-			resetBlocks,
-			resetSelection,
-		} = dispatch( 'core/block-editor' );
+		const { updateSettings, resetBlocks, resetSelection } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			updateSettings,

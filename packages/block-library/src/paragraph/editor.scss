@@ -1,17 +1,41 @@
-// Specific to the empty paragraph placeholder:
-// when shown on mobile and in nested contexts, one or more icons show up on the right.
-// This padding makes sure it doesn't overlap text.
-.block-editor-rich-text__editable.wp-block-paragraph:not(.is-selected) [data-rich-text-placeholder]::after {
-	display: inline-block;
-	padding-right: $icon-button-size * 3;
+// Overwrite the inline style to make the height collapse when the paragraph editable gets focus.
+.block-editor-block-list__block[data-type="core/paragraph"].has-drop-cap:focus {
+	min-height: auto !important;
+}
 
-	// In nested contexts only one icon shows up.
-	.wp-block .wp-block & {
-		padding-right: $icon-button-size;
+
+// Show a footprint fade effect when first selecting any block.
+.block-editor-block-list__block[data-type="core/paragraph"].is-selected {
+	&::before {
+		position: absolute;
+		z-index: 1;
+		pointer-events: none;
+		content: "";
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		animation: block-editor-block-list__block-fade-out-animation 0.3s ease-out 0.2s;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
+	}
+
+	// Only flash it if you're not typing.
+	&:not(.is-typing)::before {
+		background: rgba($black, 0.03);
+
+		// Flash a white color for dark themes.
+		.is-dark-theme & {
+			background: rgba($white, 0.1);
+		}
 	}
 }
 
-.block-editor-block-list__block[data-type="core/paragraph"] p {
-	min-height: $empty-paragraph-height / 2;
-	line-height: $editor-line-height;
+@keyframes block-editor-block-list__block-fade-out-animation {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }

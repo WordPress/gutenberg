@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "2.6.0",
+	"version": "2.8.0",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.8.3",
 		"lodash": "^4.17.15"
 	},
 	"publishConfig": {

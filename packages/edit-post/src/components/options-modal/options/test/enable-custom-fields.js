@@ -11,12 +11,17 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { EnableCustomFieldsOption, CustomFieldsConfirmation } from '../enable-custom-fields';
+import {
+	EnableCustomFieldsOption,
+	CustomFieldsConfirmation,
+} from '../enable-custom-fields';
 import BaseOption from '../base';
 
 describe( 'EnableCustomFieldsOption', () => {
 	it( 'renders a checked checkbox when custom fields are enabled', () => {
-		const renderer = TestRenderer.create( <EnableCustomFieldsOption areCustomFieldsEnabled /> );
+		const renderer = TestRenderer.create(
+			<EnableCustomFieldsOption areCustomFieldsEnabled />
+		);
 		expect( renderer ).toMatchSnapshot();
 	} );
 
@@ -28,7 +33,9 @@ describe( 'EnableCustomFieldsOption', () => {
 	} );
 
 	it( 'renders an unchecked checkbox and a confirmation message when toggled off', () => {
-		const renderer = new TestRenderer.create( <EnableCustomFieldsOption areCustomFieldsEnabled /> );
+		const renderer = new TestRenderer.create(
+			( <EnableCustomFieldsOption areCustomFieldsEnabled /> )
+		);
 		act( () => {
 			renderer.root.findByType( BaseOption ).props.onChange( false );
 		} );
@@ -37,7 +44,7 @@ describe( 'EnableCustomFieldsOption', () => {
 
 	it( 'renders a checked checkbox and a confirmation message when toggled on', () => {
 		const renderer = new TestRenderer.create(
-			<EnableCustomFieldsOption areCustomFieldsEnabled={ false } />
+			( <EnableCustomFieldsOption areCustomFieldsEnabled={ false } /> )
 		);
 		act( () => {
 			renderer.root.findByType( BaseOption ).props.onChange( true );
@@ -49,16 +56,22 @@ describe( 'EnableCustomFieldsOption', () => {
 describe( 'CustomFieldsConfirmation', () => {
 	it( 'submits the toggle-custom-fields-form', () => {
 		const submit = jest.fn();
-		const getElementById = jest.spyOn( document, 'getElementById' ).mockImplementation( () => ( {
-			submit,
-		} ) );
+		const getElementById = jest
+			.spyOn( document, 'getElementById' )
+			.mockImplementation( () => ( {
+				submit,
+			} ) );
 
-		const renderer = new TestRenderer.create( <CustomFieldsConfirmation /> );
+		const renderer = new TestRenderer.create(
+			( <CustomFieldsConfirmation /> )
+		);
 		act( () => {
 			renderer.root.findByType( Button ).props.onClick();
 		} );
 
-		expect( getElementById ).toHaveBeenCalledWith( 'toggle-custom-fields-form' );
+		expect( getElementById ).toHaveBeenCalledWith(
+			'toggle-custom-fields-form'
+		);
 		expect( submit ).toHaveBeenCalled();
 
 		getElementById.mockRestore();

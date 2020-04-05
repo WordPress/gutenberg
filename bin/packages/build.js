@@ -37,7 +37,7 @@ function getPackageName( file ) {
  * @return {Transform} Stream transform instance.
  */
 function createStyleEntryTransform() {
-	const packages = new Set;
+	const packages = new Set();
 
 	return new Transform( {
 		objectMode: true,
@@ -57,7 +57,9 @@ function createStyleEntryTransform() {
 			}
 
 			packages.add( packageName );
-			const entries = await glob( path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' ) );
+			const entries = await glob(
+				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+			);
 			entries.forEach( ( entry ) => this.push( entry ) );
 			callback();
 		},
@@ -73,12 +75,14 @@ function createStyleEntryTransform() {
  * @return {Transform} Stream transform instance.
  */
 function createBlockJsonEntryTransform() {
-	const blocks = new Set;
+	const blocks = new Set();
 
 	return new Transform( {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec( file );
+			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
+				file
+			);
 			const blockName = matches ? matches[ 1 ] : undefined;
 
 			// Only block.json files in the block-library folder are subject to this transform.
@@ -121,27 +125,25 @@ if ( files.length ) {
 
 	bar.tick( 0 );
 
-	stream = glob.stream( [
-		`${ PACKAGES_DIR }/*/src/**/*.js`,
-		`${ PACKAGES_DIR }/*/src/*.scss`,
-	], {
-		ignore: [
-			`**/benchmark/**`,
-			`**/{__mocks__,__tests__,test}/**`,
-			`**/{storybook,stories}/**`,
-		],
-		onlyFiles: true,
-	} );
+	stream = glob.stream(
+		[ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ],
+		{
+			ignore: [
+				`**/benchmark/**`,
+				`**/{__mocks__,__tests__,test}/**`,
+				`**/{storybook,stories}/**`,
+			],
+			onlyFiles: true,
+		}
+	);
 
 	// Pause to avoid data flow which would begin on the `data` event binding,
 	// but should wait until worker processing below.
 	//
 	// See: https://nodejs.org/api/stream.html#stream_two_reading_modes
-	stream
-		.pause()
-		.on( 'data', ( file ) => {
-			bar.total = files.push( file );
-		} );
+	stream.pause().on( 'data', ( file ) => {
+		bar.total = files.push( file );
+	} );
 
 	onFileComplete = () => {
 		bar.tick();
@@ -154,27 +156,29 @@ let ended = false,
 	complete = 0;
 
 stream
-	.on( 'data', ( file ) => worker( file, ( error ) => {
-		onFileComplete();
+	.on( 'data', ( file ) =>
+		worker( file, ( error ) => {
+			onFileComplete();
 
-		if ( error ) {
-			// If an error occurs, the process can't be ended immediately since
-			// other workers are likely pending. Optimally, it would end at the
-			// earliest opportunity (after the current round of workers has had
-			// the chance to complete), but this is not made directly possible
-			// through `worker-farm`. Instead, ensure at least that when the
-			// process does exit, it exits with a non-zero code to reflect the
-			// fact that an error had occurred.
-			process.exitCode = 1;
+			if ( error ) {
+				// If an error occurs, the process can't be ended immediately since
+				// other workers are likely pending. Optimally, it would end at the
+				// earliest opportunity (after the current round of workers has had
+				// the chance to complete), but this is not made directly possible
+				// through `worker-farm`. Instead, ensure at least that when the
+				// process does exit, it exits with a non-zero code to reflect the
+				// fact that an error had occurred.
+				process.exitCode = 1;
 
-			console.error( error );
-		}
+				console.error( error );
+			}
 
-		if ( ended && ++complete === files.length ) {
-			workerFarm.end( worker );
-		}
-	} ) )
-	.on( 'end', () => ended = true )
+			if ( ended && ++complete === files.length ) {
+				workerFarm.end( worker );
+			}
+		} )
+	)
+	.on( 'end', () => ( ended = true ) )
 	.resume();
 
 /* eslint-enable no-console */

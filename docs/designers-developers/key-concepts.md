@@ -38,13 +38,13 @@ Blocks can be limited or locked-in-place by Templates and custom code.
 
 In the Block Inserter (the accordion-sorted, popup modal that shows a site's available blocks to users) each accordion title is a Block Category, which are either the defaults or customized by developers through Plugins or code.
 
-## Reusable Blocks
+## Reusable blocks
 
-Reusable Blocks are a way to share a block (or multiple blocks) as a reusable, repeatable piece of content.
+Reusable blocks are a way to share a block (or multiple blocks) as a reusable, repeatable piece of content.
 
 Any edits to a reusable block are made to every usage of that repeatable block.
 
-Reusable Blocks are stored as a hidden post type and are dynamic blocks that "ref" or reference the post_id and return the post_content for that wp_block.
+Reusable blocks are stored as a hidden post type and are dynamic blocks that "ref" or reference the post_id and return the post_content for that wp_block.
 
 ## Templates
 

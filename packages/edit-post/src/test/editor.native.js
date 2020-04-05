@@ -40,8 +40,12 @@ describe( 'Editor', () => {
 		} );
 		appContainer.unmount();
 
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledTimes( 1 );
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledWith( [ 'core/notablock' ] );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledWith( [ 'core/notablock' ] );
 	} );
 } );
 
@@ -52,6 +56,7 @@ const renderEditorWith = ( content ) => {
 			initialHtml={ content }
 			initialHtmlModeEnabled={ false }
 			initialTitle={ '' }
+			postType="post"
 		/>
 	);
 };

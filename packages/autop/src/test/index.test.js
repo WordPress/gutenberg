@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	autop,
-	removep,
-} from '../';
+import { autop, removep } from '../';
 
 test( 'empty string', () => {
 	expect( autop( '' ) ).toBe( '' );
@@ -81,13 +78,16 @@ done = 0;
 	expect( autop( str ).trim() ).toBe( expected );
 
 	// Make sure HTML breaks are maintained if manually inserted
-	str = 'Look at this code\n\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n\nCool, huh?';
-	expected = '<p>Look at this code</p>\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n<p>Cool, huh?</p>';
+	str =
+		'Look at this code\n\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n\nCool, huh?';
+	expected =
+		'<p>Look at this code</p>\n<pre>Line1<br />Line2<br>Line3<br/>Line4\nActual Line 2\nActual Line 3</pre>\n<p>Cool, huh?</p>';
 	expect( autop( str ).trim() ).toBe( expected );
 } );
 
 test( 'skip input elements', () => {
-	const str = 'Username: <input type="text" id="username" name="username" /><br />Password: <input type="password" id="password1" name="password1" />';
+	const str =
+		'Username: <input type="text" id="username" name="username" /><br />Password: <input type="password" id="password1" name="password1" />';
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
 } );
 
@@ -133,7 +133,8 @@ Paragraph two.`;
 
 Paragraph two.`;
 
-	const expected = '<p>Paragraph one.</p>\n' + // line breaks only after <p>
+	const expected =
+		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
 		'<p><video class="wp-video-shortcode" id="video-0-1" width="640" height="360" preload="metadata" controls="controls">' +
 		'<source type="video/mp4" src="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4" />' +
 		'<!-- WebM/VP8 for Firefox4, Opera, and Chrome -->' +
@@ -164,7 +165,8 @@ Paragraph two.`;
 
 Paragraph two.`;
 
-	const shortcodeExpected = '<p>Paragraph one.</p>\n' + // line breaks only after <p>
+	const shortcodeExpected =
+		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
 		'<p>[video width="720" height="480" mp4="http://domain.tld/wp-content/uploads/2013/12/xyz.mp4"]' +
 		'<!-- WebM/VP8 for Firefox4, Opera, and Chrome --><source type="video/webm" src="myvideo.webm" />' +
 		'<!-- Ogg/Vorbis for older Firefox and Opera versions --><source type="video/ogg" src="myvideo.ogv" />' +
@@ -193,7 +195,8 @@ test( 'param embed elements', () => {
 
 Paragraph two.`;
 
-	const expected1 = '<p>Paragraph one.</p>\n' + // line breaks only after <p>
+	const expected1 =
+		'<p>Paragraph one.</p>\n' + // line breaks only after <p>
 		'<p><object width="400" height="224" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0">' +
 		'<param name="src" value="http://domain.tld/wp-content/uploads/2013/12/xyz.swf" />' +
 		'<param name="allowfullscreen" value="true" />' +
@@ -228,7 +231,8 @@ Paragraph two.`;
 
 Paragraph two.`;
 
-	const expected2 = '<p>Paragraph one.</p>\n' + // line breaks only after block tags
+	const expected2 =
+		'<p>Paragraph one.</p>\n' + // line breaks only after block tags
 		'<div class="video-player" id="x-video-0">\n' +
 		'<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="360" id="video-0" standby="Standby text">' +
 		'<param name="movie" value="http://domain.tld/wp-content/uploads/2013/12/xyz.swf" />' +
@@ -251,7 +255,8 @@ Paragraph two.`;
 } );
 
 test( 'skip select option elements', () => {
-	const str = 'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
+	const str =
+		'Country: <select id="state" name="state"><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option></select>';
 
 	expect( autop( str ).trim() ).toBe( '<p>' + str + '</p>' );
 } );
@@ -399,10 +404,7 @@ test( 'that autop treats inline elements as inline', () => {
 
 test( 'element sanity', () => {
 	[
-		[
-			'Hello <a\nhref="world">',
-			'<p>Hello <a\nhref="world"></p>\n',
-		],
+		[ 'Hello <a\nhref="world">', '<p>Hello <a\nhref="world"></p>\n' ],
 		[
 			'Hello <!-- a\nhref="world" -->',
 			'<p>Hello <!-- a\nhref="world" --></p>\n',
@@ -482,7 +484,8 @@ test( 'that text before blocks is peed', () => {
 } );
 
 test( 'that autop doses not add extra closing p in figure', () => {
-	const content1 = '<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
+	const content1 =
+		'<figure><img src="example.jpg" /><figcaption>Caption</figcaption></figure>';
 	const expected1 = content1;
 
 	const content2 = `<figure>
@@ -498,8 +501,10 @@ test( 'that autop doses not add extra closing p in figure', () => {
 } );
 
 test( 'that autop correctly adds a start and end tag when followed by a div', () => {
-	const content = 'Testing autop with a div\n<div class="wp-some-class">content</div>';
-	const expected = '<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
+	const content =
+		'Testing autop with a div\n<div class="wp-some-class">content</div>';
+	const expected =
+		'<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
 
 	expect( autop( content ).trim() ).toBe( expected );
 } );

@@ -31,19 +31,19 @@ import { isString } from 'lodash';
 /**
  * Object containing a React element.
  *
- * @typedef {react.ReactElement} WPElement
+ * @typedef {import('react').ReactElement} WPElement
  */
 
 /**
  * Object containing a React component.
  *
- * @typedef {react.Component} WPComponent
+ * @typedef {import('react').ComponentType} WPComponent
  */
 
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {react.SyntheticEvent} WPSyntheticEvent
+ * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
  */
 
 /**
@@ -227,11 +227,18 @@ export function concatChildren( ...childrenArguments ) {
  * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
-	return children && Children.map( children, ( elt, index ) => {
-		if ( isString( elt ) ) {
-			return createElement( nodeName, { key: index }, elt );
-		}
-		const { children: childrenProp, ...props } = elt.props;
-		return createElement( nodeName, { key: index, ...props }, childrenProp );
-	} );
+	return (
+		children &&
+		Children.map( children, ( elt, index ) => {
+			if ( isString( elt ) ) {
+				return createElement( nodeName, { key: index }, elt );
+			}
+			const { children: childrenProp, ...props } = elt.props;
+			return createElement(
+				nodeName,
+				{ key: index, ...props },
+				childrenProp
+			);
+		} )
+	);
 }

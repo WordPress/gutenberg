@@ -1,8 +1,9 @@
 module.exports = function( api ) {
 	let wpBuildOpts = {};
-	const isWPBuild = ( name ) => [ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
-		( buildName ) => name === buildName
-	);
+	const isWPBuild = ( name ) =>
+		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
+			( buildName ) => name === buildName
+		);
 
 	const isTestEnv = api.env() === 'test';
 
@@ -15,7 +16,9 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {};
+		const opts = {
+			shippedProposals: true,
+		};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -56,6 +59,7 @@ module.exports = function( api ) {
 		presets: [ getPresetEnv() ],
 		plugins: [
 			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
+			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
 				{
@@ -65,11 +69,16 @@ module.exports = function( api ) {
 					isDefault: false,
 				},
 			],
-			[ require.resolve( '@babel/plugin-transform-react-jsx' ), {
-				pragma: 'createElement',
-				pragmaFrag: 'Fragment',
-			} ],
-			require.resolve( '@babel/plugin-proposal-async-generator-functions' ),
+			[
+				require.resolve( '@babel/plugin-transform-react-jsx' ),
+				{
+					pragma: 'createElement',
+					pragmaFrag: 'Fragment',
+				},
+			],
+			require.resolve(
+				'@babel/plugin-proposal-async-generator-functions'
+			),
 			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};

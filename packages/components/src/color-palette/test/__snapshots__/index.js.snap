@@ -94,7 +94,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   onClick={[MockFunction]}
   type="button"
 >
-  Custom Color
+  Custom color
 </button>
 `;
 
@@ -121,7 +121,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         onClick={[Function]}
         type="button"
       >
-        Custom Color
+        Custom color
       </button>
     </ForwardRef(Button)>
   </div>
@@ -145,8 +145,14 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: red"
         isSelected={true}
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#000000",
+          }
+        }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -156,8 +162,10 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: white"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -167,8 +175,10 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: blue"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -215,7 +225,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         />
         <ButtonAction
           onClick={[Function]}
@@ -230,8 +240,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: red"
           isSelected={true}
           onClick={[Function]}
+          selectedIconProps={
+            Object {
+              "fill": "#000000",
+            }
+          }
           style={
             Object {
+              "backgroundColor": "#f00",
               "color": "#f00",
             }
           }
@@ -241,8 +257,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: white"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#fff",
               "color": "#fff",
             }
           }
@@ -252,8 +270,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: blue"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#00f",
               "color": "#00f",
             }
           }
@@ -270,8 +290,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={true}
         key="#f00"
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#000000",
+          }
+        }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -283,10 +309,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="red"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: red"
-              aria-pressed={true}
-              className="components-circular-option-picker__option is-active"
+              className="components-circular-option-picker__option"
+              isPressed={true}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -295,45 +321,71 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#f00",
                   "color": "#f00",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: red"
+                aria-pressed={true}
+                className="components-button components-circular-option-picker__option is-pressed"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#f00",
+                    "color": "#f00",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
-          <Dashicon
-            icon="saved"
+          <Icon
+            fill="#000000"
+            icon={
+              <SVG
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <Path
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+                />
+              </SVG>
+            }
           >
             <SVG
-              aria-hidden={true}
-              className="dashicon dashicons-saved"
-              focusable="false"
-              height={20}
-              role="img"
-              viewBox="0 0 20 20"
-              width={20}
+              fill="#000000"
+              height={24}
+              viewBox="0 0 24 24"
+              width={24}
               xmlns="http://www.w3.org/2000/svg"
             >
               <svg
                 aria-hidden="true"
-                className="dashicon dashicons-saved"
+                fill="#000000"
                 focusable="false"
-                height={20}
+                height={24}
                 role="img"
-                viewBox="0 0 20 20"
-                width={20}
+                viewBox="0 0 24 24"
+                width={24}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
-                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                 >
                   <path
-                    d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                    d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                   />
                 </Path>
               </svg>
             </SVG>
-          </Dashicon>
+          </Icon>
         </div>
       </Option>
       <Option
@@ -341,8 +393,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#fff"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -354,10 +408,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="white"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: white"
-              aria-pressed={false}
               className="components-circular-option-picker__option"
+              isPressed={false}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -366,11 +420,30 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#fff",
                   "color": "#fff",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: white"
+                aria-pressed={false}
+                className="components-button components-circular-option-picker__option"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#fff",
+                    "color": "#fff",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
         </div>
       </Option>
@@ -379,8 +452,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#00f"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -392,10 +467,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           <Tooltip
             text="blue"
           >
-            <button
+            <ForwardRef(Button)
               aria-label="Color: blue"
-              aria-pressed={false}
               className="components-circular-option-picker__option"
+              isPressed={false}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -404,11 +479,30 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#00f",
                   "color": "#00f",
                 }
               }
-              type="button"
-            />
+            >
+              <button
+                aria-label="Color: blue"
+                aria-pressed={false}
+                className="components-button components-circular-option-picker__option"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                style={
+                  Object {
+                    "backgroundColor": "#00f",
+                    "color": "#00f",
+                  }
+                }
+                type="button"
+              />
+            </ForwardRef(Button)>
           </Tooltip>
         </div>
       </Option>
@@ -427,7 +521,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         >
           <Dropdown
             className="components-circular-option-picker__dropdown-link-action"
@@ -451,7 +545,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   onClick={[Function]}
                   type="button"
                 >
-                  Custom Color
+                  Custom color
                 </button>
               </ForwardRef(Button)>
             </div>
@@ -462,13 +556,12 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         >
           <ForwardRef(Button)
             className="components-circular-option-picker__clear"
-            isDefault={true}
+            isSecondary={true}
             isSmall={true}
             onClick={[Function]}
-            type="button"
           >
             <button
-              className="components-button components-circular-option-picker__clear is-button is-default is-small"
+              className="components-button components-circular-option-picker__clear is-secondary is-small"
               onClick={[Function]}
               type="button"
             >

@@ -38,15 +38,21 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => ( {
-			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select, ownProps ) => ( {
+				data: _select( 'reactReducer' ).reactSelector(
+					ownProps.keyName
+				),
+			} ) );
 
-		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
-			<div>{ props.data }</div>
-		) );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => <div>{ props.data }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 		let testRenderer;
 		act( () => {
 			testRenderer = TestRenderer.create(
@@ -85,19 +91,23 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
-			count: _select( 'counter' ).getCount(),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select ) => ( {
+				count: _select( 'counter' ).getCount(),
+			} ) );
 
-		const mapDispatchToProps = jest.fn().mockImplementation( ( _dispatch ) => ( {
-			increment: _dispatch( 'counter' ).increment,
-		} ) );
+		const mapDispatchToProps = jest
+			.fn()
+			.mockImplementation( ( _dispatch ) => ( {
+				increment: _dispatch( 'counter' ).increment,
+			} ) );
 
-		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
-			<button onClick={ props.increment }>
-				{ props.count }
-			</button>
-		) );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => (
+				<button onClick={ props.increment }>{ props.count }</button>
+			) );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -181,13 +191,17 @@ describe( 'withSelect', () => {
 
 		const renderSpy = jest.spyOn( OriginalComponent.prototype, 'render' );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
-			count: _select( 'counter' ).getCount(),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select ) => ( {
+				count: _select( 'counter' ).getCount(),
+			} ) );
 
-		const mapDispatchToProps = jest.fn().mockImplementation( ( _dispatch ) => ( {
-			increment: _dispatch( 'counter' ).increment,
-		} ) );
+		const mapDispatchToProps = jest
+			.fn()
+			.mockImplementation( ( _dispatch ) => ( {
+				increment: _dispatch( 'counter' ).increment,
+			} ) );
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
@@ -195,11 +209,12 @@ describe( 'withSelect', () => {
 		] )( OriginalComponent );
 
 		let testRenderer, testInstance;
-		const createTestRenderer = () => TestRenderer.create(
-			<RegistryProvider value={ testRegistry }>
-				<DataBoundComponent />
-			</RegistryProvider>
-		);
+		const createTestRenderer = () =>
+			TestRenderer.create(
+				<RegistryProvider value={ testRegistry }>
+					<DataBoundComponent />
+				</RegistryProvider>
+			);
 		act( () => {
 			testRenderer = createTestRenderer();
 		} );
@@ -243,15 +258,19 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => ( {
-			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select, ownProps ) => ( {
+				count: _select( 'counter' ).getCount( ownProps.offset ),
+			} ) );
 
-		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
-			<div>{ props.count }</div>
-		) );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => <div>{ props.count }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 
 		let testRenderer;
 		act( () => {
@@ -298,7 +317,9 @@ describe( 'withSelect', () => {
 			withSelect( mapSelectToProps ),
 		] )( OriginalComponent );
 
-		const Parent = ( props ) => <DataBoundComponent propName={ props.propName } />;
+		const Parent = ( props ) => (
+			<DataBoundComponent propName={ props.propName } />
+		);
 
 		let testRenderer;
 		act( () => {
@@ -338,13 +359,17 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
-			value: _select( 'demo' ).getUnchangingValue(),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select ) => ( {
+				value: _select( 'demo' ).getUnchangingValue(),
+			} ) );
 
 		const OriginalComponent = jest.fn().mockImplementation( () => <div /> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 
 		act( () => {
 			TestRenderer.create(
@@ -453,16 +478,23 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
-			return {
-				[ ownProps.propName ]: _select( 'demo' ).getValue(),
-			};
-		} );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select, ownProps ) => {
+				return {
+					[ ownProps.propName ]: _select( 'demo' ).getValue(),
+				};
+			} );
 
-		const OriginalComponent = jest.fn()
-			.mockImplementation( ( props ) => <div>{ JSON.stringify( props ) }</div> );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => (
+				<div>{ JSON.stringify( props ) }</div>
+			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 
 		let testRenderer;
 		act( () => {
@@ -480,8 +512,12 @@ describe( 'withSelect', () => {
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
-		expect( JSON.parse( testInstance.findByType( 'div' ).props.children ) )
-			.toEqual( { foo: 'OK', propName: 'foo' } );
+		expect(
+			JSON.parse( testInstance.findByType( 'div' ).props.children )
+		).toEqual( {
+			foo: 'OK',
+			propName: 'foo',
+		} );
 
 		act( () => {
 			testRenderer.update(
@@ -493,8 +529,12 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
-		expect( JSON.parse( testInstance.findByType( 'div' ).props.children ) )
-			.toEqual( { bar: 'OK', propName: 'bar' } );
+		expect(
+			JSON.parse( testInstance.findByType( 'div' ).props.children )
+		).toEqual( {
+			bar: 'OK',
+			propName: 'bar',
+		} );
 	} );
 
 	it( 'allows undefined return from mapSelectToProps', () => {
@@ -505,19 +545,25 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select, ownProps ) => {
-			if ( ownProps.pass ) {
-				return {
-					count: _select( 'demo' ).getValue(),
-				};
-			}
-		} );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select, ownProps ) => {
+				if ( ownProps.pass ) {
+					return {
+						count: _select( 'demo' ).getValue(),
+					};
+				}
+			} );
 
-		const OriginalComponent = jest.fn().mockImplementation( (
-			( props ) => <div>{ props.count || 'Unknown' }</div>
-		) );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => (
+				<div>{ props.count || 'Unknown' }</div>
+			) );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 
 		let testRenderer;
 		act( () => {
@@ -534,7 +580,9 @@ describe( 'withSelect', () => {
 		// - 1 on effect before subscription set.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
-		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'Unknown' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe(
+			'Unknown'
+		);
 
 		act( () => {
 			testRenderer.update(
@@ -558,14 +606,15 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
-		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'Unknown' );
+		expect( testInstance.findByType( 'div' ).props.children ).toBe(
+			'Unknown'
+		);
 	} );
 
 	it( 'should limit unnecessary selections run on children', () => {
 		registry.registerStore( 'childRender', {
-			reducer: ( state = true, action ) => (
-				action.type === 'TOGGLE_RENDER' ? ! state : state
-			),
+			reducer: ( state = true, action ) =>
+				action.type === 'TOGGLE_RENDER' ? ! state : state,
 			selectors: {
 				getValue: ( state ) => state,
 			},
@@ -575,17 +624,27 @@ describe( 'withSelect', () => {
 		} );
 
 		const childMapSelectToProps = jest.fn();
-		const parentMapSelectToProps = jest.fn().mockImplementation( ( _select ) => (
-			{ isRenderingChild: _select( 'childRender' ).getValue() }
-		) );
+		const parentMapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select ) => ( {
+				isRenderingChild: _select( 'childRender' ).getValue(),
+			} ) );
 
-		const ChildOriginalComponent = jest.fn().mockImplementation( () => <div /> );
-		const ParentOriginalComponent = jest.fn().mockImplementation( ( props ) => (
-			<div>{ props.isRenderingChild ? <Child /> : null }</div>
-		) );
+		const ChildOriginalComponent = jest
+			.fn()
+			.mockImplementation( () => <div /> );
+		const ParentOriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => (
+				<div>{ props.isRenderingChild ? <Child /> : null }</div>
+			) );
 
-		const Child = withSelect( childMapSelectToProps )( ChildOriginalComponent );
-		const Parent = withSelect( parentMapSelectToProps )( ParentOriginalComponent );
+		const Child = withSelect( childMapSelectToProps )(
+			ChildOriginalComponent
+		);
+		const Parent = withSelect( parentMapSelectToProps )(
+			ParentOriginalComponent
+		);
 
 		act( () => {
 			TestRenderer.create(
@@ -626,15 +685,19 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
-			value: _select( 'demo' ).getValue(),
-		} ) );
+		const mapSelectToProps = jest
+			.fn()
+			.mockImplementation( ( _select ) => ( {
+				value: _select( 'demo' ).getValue(),
+			} ) );
 
-		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
-			<div>{ props.value }</div>
-		) );
+		const OriginalComponent = jest
+			.fn()
+			.mockImplementation( ( props ) => <div>{ props.value }</div> );
 
-		const DataBoundComponent = withSelect( mapSelectToProps )( OriginalComponent );
+		const DataBoundComponent = withSelect( mapSelectToProps )(
+			OriginalComponent
+		);
 
 		let testRenderer;
 		act( () => {

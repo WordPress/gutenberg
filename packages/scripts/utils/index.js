@@ -13,26 +13,21 @@ const {
 	getWebpackArgs,
 	hasBabelConfig,
 	hasJestConfig,
+	hasPrettierConfig,
 } = require( './config' );
 const {
 	buildWordPress,
 	downloadWordPressZip,
 	mergeYAMLConfigs,
 } = require( './env' );
-const {
-	fromConfigRoot,
-	hasProjectFile,
-} = require( './file' );
-const {
-	hasPackageProp,
-} = require( './package' );
-const {
-	camelCaseDash,
-} = require( './string' );
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
+const { hasPackageProp } = require( './package' );
+const { camelCaseDash } = require( './string' );
 
 module.exports = {
 	buildWordPress,
 	camelCaseDash,
+	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -43,6 +38,7 @@ module.exports = {
 	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
+	hasPrettierConfig,
 	hasProjectFile,
 	downloadWordPressZip,
 	mergeYAMLConfigs,

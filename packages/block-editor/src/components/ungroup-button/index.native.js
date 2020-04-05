@@ -6,10 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Toolbar,
-	ToolbarButton,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -19,10 +16,7 @@ import { compose } from '@wordpress/compose';
  */
 import UngroupIcon from './icon';
 
-export function UngroupButton( {
-	onConvertFromGroup,
-	isUngroupable = false,
-} ) {
+export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
 	if ( ! isUngroupable ) {
 		return null;
 	}
@@ -39,21 +33,22 @@ export function UngroupButton( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlock,
-		} = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlock } = select(
+			'core/block-editor'
+		);
 
-		const {
-			getGroupingBlockName,
-		} = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( 'core/blocks' );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectedBlock = getBlock( selectedId );
 
 		const groupingBlockName = getGroupingBlockName();
 
-		const isUngroupable = selectedBlock && selectedBlock.innerBlocks && !! selectedBlock.innerBlocks.length && selectedBlock.name === groupingBlockName;
+		const isUngroupable =
+			selectedBlock &&
+			selectedBlock.innerBlocks &&
+			!! selectedBlock.innerBlocks.length &&
+			selectedBlock.name === groupingBlockName;
 		const innerBlocks = isUngroupable ? selectedBlock.innerBlocks : [];
 
 		return {
@@ -63,9 +58,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId, innerBlocks, onToggle = noop } ) => {
-		const {
-			replaceBlocks,
-		} = dispatch( 'core/block-editor' );
+		const { replaceBlocks } = dispatch( 'core/block-editor' );
 
 		return {
 			onConvertFromGroup() {
@@ -73,10 +66,7 @@ export default compose( [
 					return;
 				}
 
-				replaceBlocks(
-					clientId,
-					innerBlocks
-				);
+				replaceBlocks( clientId, innerBlocks );
 
 				onToggle();
 			},

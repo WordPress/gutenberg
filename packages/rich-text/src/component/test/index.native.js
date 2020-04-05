@@ -20,7 +20,14 @@ describe( 'RichText Native', () => {
 		} );
 
 		it( 'reports false for styled text with no outer spaces', () => {
-			const html = '<p><b>Hello</b> <strong>Hello</strong> WorldWorld!</p>';
+			const html =
+				'<p><b>Hello</b> <strong>Hello</strong> WorldWorld!</p>';
+			expect( richText.willTrimSpaces( html ) ).toBe( false );
+		} );
+
+		it( 'reports false for Preformatted block', () => {
+			const html = '<pre>Hello World <br><br><br></pre>';
+			richText.props.tagName = 'pre';
 			expect( richText.willTrimSpaces( html ) ).toBe( false );
 		} );
 	} );

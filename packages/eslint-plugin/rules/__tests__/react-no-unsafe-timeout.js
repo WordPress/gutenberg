@@ -56,15 +56,30 @@ function MyComponent() {
 	invalid: [
 		{
 			code: `function MyComponent() { setTimeout(); }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 		{
 			code: `class MyComponent extends Component { componentDidMount() { setTimeout(); } }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 		{
 			code: `class MyComponent extends wp.element.Component { componentDidMount() { setTimeout(); } }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 	],
 } );

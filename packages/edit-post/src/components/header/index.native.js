@@ -7,6 +7,7 @@ import { Keyboard } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -45,7 +46,9 @@ export default class Header extends Component {
 
 	render() {
 		return (
-			<HeaderToolbar showKeyboardHideButton={ this.state.isKeyboardVisible } />
+			<HeaderToolbar
+				showKeyboardHideButton={ this.state.isKeyboardVisible }
+			/>
 		);
 	}
 }

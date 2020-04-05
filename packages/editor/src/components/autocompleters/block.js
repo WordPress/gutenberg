@@ -10,6 +10,10 @@ import { select, dispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { BlockIcon } from '@wordpress/block-editor';
 
+/** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
+
+/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+
 /**
  * Returns the client ID of the parent where a newly inserted block would be
  * placed.
@@ -41,7 +45,9 @@ function defaultGetInserterItems( rootClientId ) {
  *                   block is selected.
  */
 function defaultGetSelectedBlockName() {
-	const { getSelectedBlockClientId, getBlockName } = select( 'core/block-editor' );
+	const { getSelectedBlockClientId, getBlockName } = select(
+		'core/block-editor'
+	);
 	const selectedBlockClientId = getSelectedBlockClientId();
 	return selectedBlockClientId ? getBlockName( selectedBlockClientId ) : null;
 }
@@ -95,10 +101,7 @@ export function createBlockCompleter( {
 		},
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;
-			return [
-				<BlockIcon key="icon" icon={ icon } showColors />,
-				title,
-			];
+			return [ <BlockIcon key="icon" icon={ icon } showColors />, title ];
 		},
 		allowContext( before, after ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
