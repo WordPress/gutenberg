@@ -134,12 +134,6 @@ addFilter(
 );
 
 addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/style/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
 	'blocks.registerBlockType',
 	'core/style/addEditProps',
 	addEditProps

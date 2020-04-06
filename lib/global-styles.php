@@ -339,3 +339,82 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );
 }
+
+/**
+ * Flatten a nested Global styles config and generates the corresponding
+ * flattened CSS variables.
+ *
+ * @param  array $config Styles configuration.
+ * @return array Flattened CSS variables declaration.
+ */
+function gutenberg_get_nested_css_variables( $config ) {
+	$result = [];
+	$token = '--';
+	foreach ( $config as $key => $value ) {
+		if ( ! is_array( $value ) ) {
+			$result[ sanitize_title_with_dashes( $key ) ] = $value;
+		} else {
+			$nested_css_variables = gutenberg_get_nested_css_variables( $value );
+			foreach ( $nested_css_variables as $subkey => $subvalue ) {
+				$result[ sanitize_title_with_dashes( $key ) . $token . $subkey ] = $subvalue;
+			}
+		}
+	}
+
+	return $result;
+};
+
+/**
+ * Flatten a nested Global styles config and generates the corresponding
+ * flattened CSS variables.
+ *
+ * @param  array $styles Styles configuration.
+ * @return array Flattened CSS variables declaration.
+ */
+function gutenberg_get_css_variables( $styles = [] ) {
+	$prefix = '--wp';
+	$token = '--';
+
+	$result = [];
+	foreach ( gutenberg_get_nested_css_variables( $styles ) as $key => $value ) {
+		$result[] = $prefix . $token . $key . ':' . $value;
+	}
+	return $result;
+}
+
+/**
+ * Renders the CSS variables for blocks
+ *
+ * @param string $block_content Output of the current block.
+ * @param array $block Block Object.
+ * @return string New block output.
+ */
+function gutenberg_apply_style_attribute( $block_content, $block ) {
+	if ( isset( $block['attrs'] ) && isset( $block['attrs']['style'] ) ) {
+		$extra_styles = implode(';',gutenberg_get_css_variables($block['attrs']['style']));
+
+		// Try replacing an existing style
+		$style_regex = '/((^\s*<[a-zA-Z]+\b[^><]*)style="([^"]*)")([^><]*>.*)/';
+		$updated_content = preg_replace_callback($style_regex, function($matches) use($extra_styles) {
+			return (
+				$matches[2] .
+				'style="' . $matches[3] . ';' .  $extra_styles .'"' .
+				$matches[4]
+			);
+		}, $block_content);
+
+		// If no changes, add a new style
+		if ( $updated_content === $block_content ) {
+			$no_style_regex = '/(^\s*<[a-zA-Z]+\b[^><]*)(>.*)/';
+			$updated_content = preg_replace_callback($no_style_regex, function($matches) use($extra_styles) {
+				return $matches[1] . ' style="'. $extra_styles .'"' . $matches[2];
+			}, $block_content);
+		}
+
+        return $updated_content;
+	}
+
+    return $block_content;
+}
+
+add_filter( 'render_block', 'gutenberg_apply_style_attribute', 10, 2 );
