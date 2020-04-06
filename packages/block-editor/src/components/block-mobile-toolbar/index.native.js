@@ -23,7 +23,6 @@ const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
 	order,
-	customOnDelete,
 	horizontalDirection,
 } ) => (
 	<View style={ styles.toolbar }>
@@ -42,7 +41,7 @@ const BlockMobileToolbar = ( {
 				__( 'Remove block at row %s' ),
 				order + 1
 			) }
-			onClick={ customOnDelete || onDelete }
+			onClick={ onDelete }
 			icon={ trash }
 			extraProps={ { hint: __( 'Double tap to remove the block' ) } }
 		/>
@@ -57,13 +56,15 @@ export default compose(
 			order: getBlockIndex( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId, onDeleteBlock } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
+		const onDelete = () => {
+			Keyboard.dismiss();
+			removeBlock( clientId, rootClientId );
+		};
+
 		return {
-			onDelete: () => {
-				Keyboard.dismiss();
-				removeBlock( clientId, rootClientId );
-			},
+			onDelete: onDeleteBlock || onDelete,
 		};
 	} )
 )( BlockMobileToolbar );

@@ -8,14 +8,14 @@ export const ButtonBlockAppender = ( {
 	clientId,
 	showSeparator,
 	isFlex,
-	customOnAdd,
+	onAddBlock,
 } ) => {
 	return (
 		<BaseButtonBlockAppender
 			rootClientId={ clientId }
 			showSeparator={ showSeparator }
 			isFlex={ isFlex }
-			customOnAdd={ customOnAdd }
+			onAddBlock={ onAddBlock }
 		/>
 	);
 };

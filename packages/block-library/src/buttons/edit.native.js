@@ -48,7 +48,7 @@ function ButtonsEdit( {
 				<View style={ styles.appenderContainer }>
 					<InnerBlocks.ButtonBlockAppender
 						isFlex={ false }
-						customOnAdd={ onAddNextButton }
+						onAddBlock={ onAddNextButton }
 					/>
 				</View>
 			);
@@ -77,9 +77,9 @@ function ButtonsEdit( {
 					template={ BUTTONS_TEMPLATE }
 					renderAppender={ renderAppender }
 					__experimentalMoverDirection="horizontal"
-					style={ styles[ `is-aligned-${ align }` ] }
-					customOnDelete={ shouldDelete && onDelete }
-					customOnAdd={ onAddNextButton }
+					horizontalAlignment={ align }
+					onDeleteBlock={ shouldDelete && onDelete }
+					onAddBlock={ onAddNextButton }
 					parentWidth={ maxWidth }
 					shouldRenderFooterAppender={ shouldRenderFooterAppender }
 					marginHorizontal={ spacing }

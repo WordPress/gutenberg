@@ -108,12 +108,12 @@ export class BlockList extends Component {
 			header,
 			isReadOnly,
 			isRootList,
-			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			horizontalDirection,
+			horizontalAlignment,
 		} = this.props;
 
 		const { blockToolbar, blockBorder, headerToolbar } = styles;
@@ -145,10 +145,10 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ {
-						flex: isRootList ? 1 : 0,
-						overflow: isRootList ? 'hidden' : 'visible',
-					} }
+					scrollViewStyle={ [
+						{ flex: isRootList ? 1 : 0 },
+						! isRootList && styles.overflowVisible,
+					] }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -164,7 +164,8 @@ export class BlockList extends Component {
 					ListFooterComponent={ this.renderBlockListFooter }
 					style={ [
 						horizontalDirection && styles.horizontal,
-						style,
+						horizontalAlignment &&
+							styles[ `is-aligned-${ horizontalAlignment }` ],
 					] }
 				/>
 
@@ -192,8 +193,8 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			customOnDelete,
-			customOnAdd,
+			onDeleteBlock,
+			onAddBlock,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			horizontalDirection,
@@ -216,9 +217,9 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						parentWidth={ this.props.parentWidth }
-						customOnDelete={ customOnDelete }
+						onDeleteBlock={ onDeleteBlock }
 						horizontalDirection={ horizontalDirection }
-						customOnAdd={ customOnAdd }
+						onAddBlock={ onAddBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
