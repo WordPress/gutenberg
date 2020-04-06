@@ -142,7 +142,6 @@ function ColumnsEditContainer( {
 					__experimentalMoverDirection={
 						columnsInRow > 1 ? 'horizontal' : undefined
 					}
-					contentContainerStyle={ styles.columnsContainer }
 					style={ styles.innerBlocks }
 					horizontal={ true }
 					scrollEnabled={ false }

@@ -100,7 +100,6 @@ export class BlockList extends Component {
 			isRootList,
 			horizontal,
 			scrollEnabled,
-			contentContainerStyle,
 			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
@@ -143,7 +142,9 @@ export class BlockList extends Component {
 					} }
 					horizontal={ horizontal }
 					scrollEnabled={ scrollEnabled }
-					contentContainerStyle={ contentContainerStyle }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
 					style={ style }
 					data={ blockClientIds }
 					keyExtractor={ identity }
