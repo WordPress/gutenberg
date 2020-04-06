@@ -176,7 +176,7 @@ function gutenberg_get_post_from_context() {
  * @return string String of rendered HTML.
  */
 function gutenberg_provide_render_callback_with_block_object( $pre_render, $next_block ) {
-	global $post, $block, $block_context;
+	global $post, $block, $_block_context;
 
 	$source_block = $next_block;
 
@@ -196,24 +196,24 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 		$block['context'] = array();
 	}
 
-	$block_context_before = $block_context;
+	$block_context_before = $_block_context;
 
-	if ( ! isset( $block_context ) ) {
-		$block_context = array();
+	if ( ! isset( $_block_context ) ) {
+		$_block_context = array();
 	}
 
-	if ( ! isset( $block_context['postId'] ) || $post->ID !== $block_context['postId'] ) {
-		$block_context['postId'] = $post->ID;
+	if ( ! isset( $_block_context['postId'] ) || $post->ID !== $_block_context['postId'] ) {
+		$_block_context['postId'] = $post->ID;
 	}
 
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
-		if ( ! isset( $block_context ) ) {
-			$block_context = array();
+		if ( ! isset( $_block_context ) ) {
+			$_block_context = array();
 		}
 
 		foreach ( $block_type->providesContext as $attribute_name ) {
 			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
-				$block_context[ $attribute_name ] = $block['attrs'][ $attribute_name ];
+				$_block_context[ $attribute_name ] = $block['attrs'][ $attribute_name ];
 			}
 		}
 	}
@@ -227,8 +227,8 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	if ( $is_dynamic ) {
 		if ( isset( $block_type->context ) && is_array( $block_type->context ) ) {
 			foreach ( $block_type->context as $context_name ) {
-				if ( array_key_exists( $context_name, $block_context ) ) {
-					$block['context'][ $context_name ] = $block_context[ $context_name ];
+				if ( array_key_exists( $context_name, $_block_context ) ) {
+					$block['context'][ $context_name ] = $_block_context[ $context_name ];
 				}
 			}
 		}
@@ -238,7 +238,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 		$post          = $global_post;
 	}
 
-	$block_context = $block_context_before;
+	$_block_context = $block_context_before;
 
 	/** This filter is documented in src/wp-includes/blocks.php */
 	return apply_filters( 'render_block', $block_content, $block );
