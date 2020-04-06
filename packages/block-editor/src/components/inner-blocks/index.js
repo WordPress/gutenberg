@@ -11,6 +11,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { Component, forwardRef, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
+	getBlockType,
 	synchronizeBlocksWithTemplate,
 	withBlockContentContext,
 } from '@wordpress/blocks';
@@ -27,6 +28,7 @@ import DefaultBlockAppender from './default-block-appender';
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import { BlockContextProvider } from '../block-context';
 import { withBlockEditContext } from '../block-edit/context';
 
 class InnerBlocks extends Component {
@@ -148,6 +150,7 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
 			forwardedRef,
+			block,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -161,7 +164,7 @@ class InnerBlocks extends Component {
 			'is-capturing-toolbar': captureToolbars,
 		} );
 
-		const blockList = (
+		let blockList = (
 			<BlockList
 				{ ...props }
 				ref={ forwardedRef }
@@ -169,6 +172,18 @@ class InnerBlocks extends Component {
 				className={ classes }
 			/>
 		);
+
+		// Wrap context provider if (and only if) block has context to provide.
+		const blockType = getBlockType( block.name );
+		if ( blockType && blockType.providesContext ) {
+			const context = pick( block.attributes, blockType.providesContext );
+
+			blockList = (
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			);
+		}
 
 		if ( props.__experimentalTagName ) {
 			return blockList;
