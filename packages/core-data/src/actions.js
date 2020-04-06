@@ -250,7 +250,7 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		path,
 		method: 'DELETE',
 	} );
-	const entityRecords = select( 'getEntityRecords', kind, name );
+	const entityRecords = yield select( 'getEntityRecords', kind, name );
 	yield receiveEntityRecords( kind, name, entityRecords, undefined, true );
 }
 
