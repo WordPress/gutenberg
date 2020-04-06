@@ -116,7 +116,7 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get a single depencies.
+	 * Get a single dependency.
 	 *
 	 * @param WP_REST_Request $request Request.
 	 *
