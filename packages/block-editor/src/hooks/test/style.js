@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getCSSVariables } from '../style';
+import { getCSSVariables, getInlineStyles } from '../style';
 
 describe( 'getCSSVariables', () => {
 	it( 'should return an empty object when called with undefined', () => {
@@ -27,6 +27,29 @@ describe( 'getCSSVariables', () => {
 		).toEqual( {
 			'--wp--color--text': 'red',
 			'--wp--typography--line-height': 1.5,
+		} );
+	} );
+} );
+
+describe( 'getInlineStyles', () => {
+	it( 'should return an empty object when called with undefined', () => {
+		expect( getInlineStyles() ).toEqual( {} );
+	} );
+
+	it( 'should ignore unknown styles', () => {
+		expect( getInlineStyles( { color: 'red' } ) ).toEqual( {} );
+	} );
+
+	it( 'should return the correct inline styles', () => {
+		expect(
+			getInlineStyles( {
+				color: { text: 'red', background: 'black' },
+				typography: { lineHeight: 1.5 },
+			} )
+		).toEqual( {
+			backgroundColor: 'black',
+			color: 'red',
+			lineHeight: 1.5,
 		} );
 	} );
 } );

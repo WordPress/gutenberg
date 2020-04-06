@@ -695,3 +695,15 @@ if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_insta
 	register_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
 	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 }
+
+/**
+ * Adds the global styles support flag to the frontend.
+ */
+add_action( 'init', function() {
+	// Add global styles support flag
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf('__unstableSupportsGlobalStyles = %s;', gutenberg_experimental_global_styles_has_theme_support() ? 'true' : 'false' ),
+		'before'
+	);
+} );

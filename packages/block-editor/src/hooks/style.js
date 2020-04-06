@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { mapKeys, kebabCase, isObject, entries, identity } from 'lodash';
+import {
+	mapKeys,
+	kebabCase,
+	isObject,
+	entries,
+	has,
+	get,
+	identity,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,6 +41,9 @@ const typographySupportKeys = [
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
+
+const hasGlobalStylesSupport = () =>
+	window && window.__unstableSupportsGlobalStyles;
 
 /**
  * Flatten a nested Global styles config and generates the corresponding
@@ -75,6 +86,30 @@ export function getCSSVariables( styles = {} ) {
 }
 
 /**
+ * Returns the inline styles to add depending on the style object
+ *
+ * @param  {Object} styles Styles configuration
+ * @return {Object}        Flattened CSS variables declaration
+ */
+export function getInlineStyles( styles = {} ) {
+	const mappings = {
+		lineHeight: [ 'typography', 'lineHeight' ],
+		fontSize: [ 'typography', 'fontSize' ],
+		backgroundColor: [ 'color', 'background' ],
+		color: [ 'color', 'text' ],
+	};
+
+	const output = {};
+	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
+		if ( has( styles, objectKey ) ) {
+			output[ styleKey ] = get( styles, objectKey );
+		}
+	} );
+
+	return output;
+}
+
+/**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
  * @param  {Object} settings Original block settings
@@ -112,10 +147,17 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	const { style } = attributes;
 
-	props.style = {
-		...getCSSVariables( style ),
-		...props.style,
-	};
+	if ( hasGlobalStylesSupport() ) {
+		props.style = {
+			...getCSSVariables( style ),
+			...props.style,
+		};
+	} else {
+		props.style = {
+			...getInlineStyles( style ),
+			...props.style,
+		};
+	}
 
 	return props;
 }

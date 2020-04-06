@@ -54,6 +54,7 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
+		window.__unstableSupportsGlobalStyles = true;
 		unstable__bootstrapServerSideBlockDefinitions(
 			require( './server-registered.json' )
 		);
