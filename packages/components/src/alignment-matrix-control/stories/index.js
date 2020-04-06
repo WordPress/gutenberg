@@ -31,9 +31,5 @@ export const icon = () => {
 		size: number( 'size', 24 ),
 	};
 
-	return (
-		<>
-			<BaseIcon icon={ AlignmentMatrixControl.icon } { ...props } />
-		</>
-	);
+	return <BaseIcon icon={ AlignmentMatrixControl.icon } { ...props } />;
 };
