@@ -143,6 +143,12 @@ If this property is added, a help text will be generated using help property as 
 - Type: `String|WPElement`
 - Required: No
 
+#### isLoading
+
+If set, the placeholder of `Loading…` will render and the `select` will be disabled.
+- Type: `boolean`
+- Required: No
+
 #### multiple
 
 If this property is added, multiple values can be selected. The value passed should be an array.
