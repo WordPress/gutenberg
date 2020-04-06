@@ -37,6 +37,10 @@ import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 export const { Provider: BottomSheetProvider, Consumer } = createContext( {
 	isBottomSheetScrolling: false,
+	shouldEnableBottomSheetScroll: () => {},
+	shouldSetBottomSheetMaxHeight: () => {},
+	onCloseBottomSheet: () => {},
+	onHardwareButtonPress: () => {},
 } );
 
 class BottomSheet extends Component {
@@ -52,8 +56,8 @@ class BottomSheet extends Component {
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
 			this
 		);
-		this.onBackButtonPress = this.onBackButtonPress.bind( this );
-		this.onHandleBackButtonPress = this.onHandleBackButtonPress.bind(
+		this.onHardwareButtonPress = this.onHardwareButtonPress.bind( this );
+		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
@@ -67,7 +71,7 @@ class BottomSheet extends Component {
 			scrollEnabled: true,
 			isScrolling: false,
 			onCloseBottomSheet: null,
-			onBackButtonPress: null,
+			onHardwareButtonPress: null,
 			setMaxHeight: true,
 		};
 
@@ -212,8 +216,8 @@ class BottomSheet extends Component {
 		this.setState( { onCloseBottomSheet: action } );
 	}
 
-	onHandleBackButtonPress( action ) {
-		this.setState( { onBackButtonPress: action } );
+	onHandleHardwareButtonPress( action ) {
+		this.setState( { onHardwareButtonPress: action } );
 	}
 
 	onCloseBottomSheet() {
@@ -225,11 +229,11 @@ class BottomSheet extends Component {
 		onClose();
 	}
 
-	onBackButtonPress() {
+	onHardwareButtonPress() {
 		const { onClose } = this.props;
-		const { onBackButtonPress } = this.state;
-		if ( onBackButtonPress ) {
-			return onBackButtonPress();
+		const { onHardwareButtonPress } = this.state;
+		if ( onHardwareButtonPress ) {
+			return onHardwareButtonPress();
 		}
 		return onClose();
 	}
@@ -301,7 +305,7 @@ class BottomSheet extends Component {
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
-				onBackButtonPress={ this.onBackButtonPress }
+				onHardwareButtonPress={ this.onHardwareButtonPress }
 				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
@@ -355,7 +359,8 @@ class BottomSheet extends Component {
 								isBottomSheetScrolling: isScrolling,
 								onCloseBottomSheet: this
 									.onHandleClosingBottomSheet,
-								onBackButtonPress: this.onHandleBackButtonPress,
+								onHardwareButtonPress: this
+									.onHandleHardwareButtonPress,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>

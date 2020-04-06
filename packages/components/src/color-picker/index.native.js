@@ -18,8 +18,8 @@ import { Icon, check, close } from '@wordpress/icons';
 import styles from './style.scss';
 
 function ColorPicker( {
-	shouldEnableBottomSheetScroll = () => {},
-	shouldSetBottomSheetMaxHeight = () => {},
+	shouldEnableBottomSheetScroll,
+	shouldSetBottomSheetMaxHeight,
 	isBottomSheetScrolling,
 	setBackgroundColor,
 	setTextColor,
@@ -28,7 +28,7 @@ function ColorPicker( {
 	textColor,
 	onNavigationBack,
 	previousScreen,
-	onCloseBottomSheet = () => {},
+	onCloseBottomSheet,
 	getStylesFromColorScheme,
 } ) {
 	const isIOS = Platform.OS === 'ios';

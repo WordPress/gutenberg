@@ -66,19 +66,23 @@ const Segment = ( {
 const SegmentedControls = ( {
 	segments,
 	segmentHandler,
+	selectedIndex,
 	addonLeft,
 	addonRight,
 	getStylesFromColorScheme,
 } ) => {
-	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState( 0 );
+	const selectedSegmentIndex = selectedIndex || 0;
+	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
+		selectedSegmentIndex
+	);
 	const [ segmentsDimensions, setSegmentsDimensions ] = useState( {
-		'0': { width: 0, height: 0 },
+		[ activeSegmentIndex ]: { width: 0, height: 0 },
 	} );
 	const [ positionAnimationValue ] = useState( new Animated.Value( 0 ) );
 
 	useEffect( () => {
-		setActiveSegmentIndex( 0 );
-		segmentHandler( segments[ 0 ] );
+		setActiveSegmentIndex( selectedSegmentIndex );
+		segmentHandler( segments[ selectedSegmentIndex ] );
 	}, [] );
 
 	useEffect( () => {

@@ -20,41 +20,39 @@ import SegmentedControls from '../segmented-control';
 import styles from './style.scss';
 
 function ColorSettings( {
-	screen,
-	changeBottomSheetContent,
+	stack,
+	onReplaceSubsheet,
 	backgroundColor,
 	setBackgroundColor,
 	setGradient,
 	textColor,
 	setTextColor,
-	previousScreen,
 	shouldEnableBottomSheetScroll,
 	shouldSetBottomSheetMaxHeight,
 	isBottomSheetScrolling,
 	onCloseBottomSheet,
-	onBackButtonPress,
+	onHardwareButtonPress,
 	getStylesFromColorScheme,
 	defaultSettings,
 } ) {
-	const segments = [ __( 'Solid' ), __( 'Gradient' ) ];
-	const [ segment, setSegment ] = useState( segments[ 0 ] );
+	const segments = [ 'Solid', 'Gradient' ];
+	const isGradient = backgroundColor.includes( 'linear-gradient' );
+	const selectedSegmentIndex = isGradient ? 1 : 0;
+	const currentScreen = stack[ stack.length - 1 ];
+	const previousScreen = stack[ stack.length - 2 ];
+
+	const [ activeSegment, setActiveSegment ] = useState(
+		segments[ selectedSegmentIndex ]
+	);
 
 	useEffect( () => {
-		if ( screen === 'Background' || screen === 'Text' ) {
-			onBackButtonPress( () =>
-				changeBottomSheetContent(
-					'Settings',
-					onBackButtonPress( null )
-				)
-			);
-		} else {
-			onBackButtonPress( () =>
-				changeBottomSheetContent( previousScreen )
-			);
-		}
-	}, [ screen ] );
+		onHardwareButtonPress( () =>
+			onReplaceSubsheet( previousScreen, afterHardwareButtonPress() )
+		);
+	}, [ currentScreen ] );
 
 	useEffect( () => {
+		setActiveSegment( segments[ selectedSegmentIndex ] );
 		shouldSetBottomSheetMaxHeight( true );
 		onCloseBottomSheet( null );
 	}, [] );
@@ -64,6 +62,11 @@ function ColorSettings( {
 		styles.horizontalSeparatorDark
 	);
 
+	function afterHardwareButtonPress() {
+		onHardwareButtonPress( null );
+		shouldSetBottomSheetMaxHeight( true );
+	}
+
 	function getColorPalette() {
 		return (
 			<ColorPalette
@@ -72,30 +75,35 @@ function ColorSettings( {
 				setGradient={ setGradient }
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
-				currentSegment={ segment }
-				currentScreen={ screen }
-				onCustomPress={ () => changeBottomSheetContent( 'Custom' ) }
+				currentSegment={ activeSegment }
+				currentScreen={ currentScreen }
+				onCustomPress={ () => onReplaceSubsheet( 'Custom' ) }
 				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 				defaultSettings={ defaultSettings }
 			/>
 		);
 	}
 
+	function getNavigationHeader( screen ) {
+		return (
+			<NavigationHeader
+				screen={ screen }
+				leftButtonOnPress={ () => onReplaceSubsheet( previousScreen ) }
+			/>
+		);
+	}
+
 	return (
 		<View>
-			{ screen === 'Background' && (
+			{ currentScreen === 'Background' && (
 				<View>
-					<NavigationHeader
-						screen={ __( 'Background' ) }
-						leftButtonOnPress={ () =>
-							changeBottomSheetContent( 'Settings' )
-						}
-					/>
+					{ getNavigationHeader( __( 'Background' ) ) }
 					{ getColorPalette() }
 					<View style={ horizontalSeparatorStyle } />
 					<SegmentedControls
 						segments={ segments }
-						segmentHandler={ ( item ) => setSegment( item ) }
+						segmentHandler={ ( item ) => setActiveSegment( item ) }
+						selectedIndex={ selectedSegmentIndex }
 						addonLeft={
 							<ColorIndicator
 								color={ backgroundColor }
@@ -105,14 +113,9 @@ function ColorSettings( {
 					/>
 				</View>
 			) }
-			{ screen === 'Text' && (
+			{ currentScreen === 'Text' && (
 				<View>
-					<NavigationHeader
-						screen={ __( 'Text' ) }
-						leftButtonOnPress={ () =>
-							changeBottomSheetContent( 'Settings' )
-						}
-					/>
+					{ getNavigationHeader( __( 'Text' ) ) }
 					{ getColorPalette() }
 					<View style={ horizontalSeparatorStyle } />
 					<View style={ styles.footer }>
@@ -132,7 +135,7 @@ function ColorSettings( {
 					</View>
 				</View>
 			) }
-			{ screen === 'Custom' && (
+			{ currentScreen === 'Custom' && (
 				<View>
 					<ColorPicker
 						shouldEnableBottomSheetScroll={
@@ -147,10 +150,10 @@ function ColorSettings( {
 						backgroundColor={ backgroundColor }
 						textColor={ textColor }
 						onNavigationBack={ () =>
-							changeBottomSheetContent( previousScreen )
+							onReplaceSubsheet( previousScreen )
 						}
 						onCloseBottomSheet={ onCloseBottomSheet }
-						changeBottomSheetContent={ changeBottomSheetContent }
+						onReplaceSubsheet={ onReplaceSubsheet }
 						isBottomSheetScrolling={ isBottomSheetScrolling }
 						previousScreen={ previousScreen }
 					/>

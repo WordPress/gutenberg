@@ -110,7 +110,7 @@ function ColorPalette( {
 		] ).start();
 	}
 
-	const bounce = scale.interpolate( {
+	const scaleInterpolation = scale.interpolate( {
 		inputRange: [ 1, 1.5, 2 ],
 		outputRange: [ 1, 0.7, 1 ],
 	} );
@@ -142,7 +142,9 @@ function ColorPalette( {
 		return (
 			<>
 				{ palette.map( ( color ) => {
-					const scaleValue = isSelected( color ) ? bounce : 1;
+					const scaleValue = isSelected( color )
+						? scaleInterpolation
+						: 1;
 					return (
 						<TouchableWithoutFeedback
 							onPress={ () => onColorPress( color ) }

@@ -77,9 +77,7 @@ class ButtonEdit extends Component {
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.changeBottomSheetContent = this.changeBottomSheetContent.bind(
-			this
-		);
+		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -93,8 +91,7 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused,
-			previousScreen: '',
-			screen: 'Settings',
+			stack: [ 'Settings' ],
 		};
 	}
 
@@ -123,7 +120,7 @@ class ButtonEdit extends Component {
 			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
 			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
 		) {
-			this.setState( { screen: 'Settings' } );
+			this.setState( { stack: [ 'Settings' ] } );
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
@@ -322,8 +319,9 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	changeBottomSheetContent( destination, callback ) {
-		const { screen } = this.state;
+	onReplaceSubsheet( destination, callback ) {
+		const { stack } = this.state;
+
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
 				ANIMATION_DURATION,
@@ -331,11 +329,13 @@ class ButtonEdit extends Component {
 				LayoutAnimation.Properties.opacity
 			)
 		);
+
+		const containedInStack = stack.includes( destination );
+		const nextStack = [ ...stack, destination ];
+		const previousStack = stack.slice( 0, -1 );
+
 		this.setState(
-			{
-				screen: destination,
-				previousScreen: screen,
-			},
+			{ stack: containedInStack ? previousStack : nextStack },
 			() => {
 				if ( callback ) {
 					callback();
@@ -367,8 +367,7 @@ class ButtonEdit extends Component {
 			maxWidth,
 			isLinkSheetVisible,
 			isButtonFocused,
-			screen,
-			previousScreen,
+			stack,
 		} = this.state;
 
 		const borderRadiusValue =
@@ -381,6 +380,7 @@ class ButtonEdit extends Component {
 				  styles.button.paddingTop +
 				  styles.button.borderWidth
 				: 0;
+		const currentScreen = stack[ stack.length - 1 ];
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
@@ -489,11 +489,11 @@ class ButtonEdit extends Component {
 							shouldEnableBottomSheetScroll,
 							shouldSetBottomSheetMaxHeight,
 							onCloseBottomSheet,
-							onBackButtonPress,
+							onHardwareButtonPress,
 						} ) => {
 							return (
 								<>
-									{ screen === 'Settings' && (
+									{ currentScreen === 'Settings' && (
 										<View>
 											<PanelBody
 												title={ __(
@@ -523,7 +523,7 @@ class ButtonEdit extends Component {
 											>
 												<ColorControl
 													onPress={ () => {
-														this.changeBottomSheetContent(
+														this.onReplaceSubsheet(
 															'Background'
 														);
 													} }
@@ -533,7 +533,7 @@ class ButtonEdit extends Component {
 												/>
 												<ColorControl
 													onPress={ () => {
-														this.changeBottomSheetContent(
+														this.onReplaceSubsheet(
 															'Text'
 														);
 													} }
@@ -557,13 +557,13 @@ class ButtonEdit extends Component {
 											</PanelBody>
 										</View>
 									) }
-									{ screen !== 'Settings' && (
+									{ currentScreen !== 'Settings' && (
 										<ColorSettings
-											screen={ screen }
-											changeBottomSheetContent={ (
+											stack={ stack }
+											onReplaceSubsheet={ (
 												destination
 											) =>
-												this.changeBottomSheetContent(
+												this.onReplaceSubsheet(
 													destination
 												)
 											}
@@ -576,8 +576,6 @@ class ButtonEdit extends Component {
 												setBackgroundColor
 											}
 											setGradient={ setGradient }
-											clientId={ clientId }
-											previousScreen={ previousScreen }
 											shouldEnableBottomSheetScroll={
 												shouldEnableBottomSheetScroll
 											}
@@ -590,8 +588,8 @@ class ButtonEdit extends Component {
 											onCloseBottomSheet={
 												onCloseBottomSheet
 											}
-											onBackButtonPress={
-												onBackButtonPress
+											onHardwareButtonPress={
+												onHardwareButtonPress
 											}
 											defaultSettings={
 												SETTINGS_DEFAULTS
