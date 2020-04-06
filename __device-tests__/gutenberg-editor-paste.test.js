@@ -3,6 +3,11 @@
  * */
 
 /**
+ * External dependencies
+ */
+import * as fs from 'fs';
+
+/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -19,10 +24,6 @@ import {
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
-jasmine.getEnv().addReporter({
-	specStarted: result => (jasmine.currentTest = result),
-	specDone: result => (jasmine.currentTest = result),
-});
 
 describe( 'Gutenberg Editor paste tests', () => {
 	// skip iOS for now
@@ -45,7 +46,23 @@ describe( 'Gutenberg Editor paste tests', () => {
 		};
 
 		jasmine.getEnv().addReporter( reporter );
-	}
+	} else {
+    // add a reporter that will detect failed tests and name their ending screenshots accordingly.
+    jasmine.getEnv().addReporter({
+      specStarted: result => ( jasmine.currentTest = result ),
+      specDone: async ( result ) => {
+        jasmine.currentTest = result;
+        const origFilename = `./screenshots/${jasmine.currentTest.id}.png`;
+        if ( jasmine.currentTest.status === 'failed' ) {
+          const failedFilename = `./screenshots/${jasmine.currentTest.id}.failed.png`;
+          fs.renameSync( origFilename, failedFilename );
+        } else {
+          // delete the screenshot, the test passed
+          fs.unlinkSync( origFilename );
+        }
+      },
+    });
+  }
 
 	beforeAll( async () => {
 		driver = await setupDriver();
@@ -53,11 +70,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 		editorPage = new EditorPage( driver );
 	} );
 
-	afterEach(() => {
-		if (jasmine.currentTest.failedExpectations.length) {
-			await driver.saveScreenshot( `./screenshots/${jasmine.currentTest.description}.failed.png` );
-		}
-	});
+	afterEach( async () => {
+		await driver.saveScreenshot( `./screenshots/${jasmine.currentTest.id}.png` );
+	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewParagraphBlock();
