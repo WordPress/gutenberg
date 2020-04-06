@@ -1,5 +1,6 @@
 ## Master
 
+-   Include TypeScript type declarations ([#21248](https://github.com/WordPress/gutenberg/pull/21248))
 -   Graduated `__experimentalCreateInterpolateElement` function to stable api: `createInterpolateElement` (see [20699](https://github.com/WordPress/gutenberg/pull/20699))
 
 ## 2.10.0 (2019-12-19)

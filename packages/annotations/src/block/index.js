@@ -11,7 +11,7 @@ import { withSelect } from '@wordpress/data';
  * @return {Object} The enhanced component.
  */
 const addAnnotationClassName = ( OriginalComponent ) => {
-	return withSelect( ( select, { clientId } ) => {
+	return withSelect( ( select, { clientId, className } ) => {
 		const annotations = select(
 			'core/annotations'
 		).__experimentalGetAnnotationsForBlock( clientId );
@@ -21,6 +21,8 @@ const addAnnotationClassName = ( OriginalComponent ) => {
 				.map( ( annotation ) => {
 					return 'is-annotated-by-' + annotation.source;
 				} )
+				.concat( className )
+				.filter( Boolean )
 				.join( ' ' ),
 		};
 	} )( OriginalComponent );

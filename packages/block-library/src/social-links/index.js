@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { share as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -53,6 +54,7 @@ export const settings = {
 		{ name: 'logos-only', label: __( 'Logos Only' ) },
 		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
 	],
+	icon,
 	edit,
 	save,
 };

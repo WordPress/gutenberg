@@ -68,13 +68,21 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 } ) => {
-	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
+	const {
+		backgroundType,
+		dimRatio,
+		focalPoint,
+		minHeight,
+		url,
+		style,
+	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const { gradientValue } = __experimentalUseGradient();
 
 	const hasBackground = !! (
 		url ||
+		( style && style.color && style.color.background ) ||
 		attributes.overlayColor ||
 		overlayColor.color ||
 		gradientValue
@@ -114,9 +122,9 @@ const Cover = ( {
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
 			backgroundColor:
-				overlayColor && overlayColor.color
-					? overlayColor.color
-					: styles.overlay.color,
+				( overlayColor && overlayColor.color ) ||
+				( style && style.color && style.color.background ) ||
+				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url

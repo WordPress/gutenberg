@@ -47,13 +47,17 @@ function isKeyUpEvent( item ) {
 	return isKeyEvent( item ) && item.args.data.type === 'keyup';
 }
 
+function isFocusEvent( item ) {
+	return isKeyEvent( item ) && item.args.data.type === 'focus';
+}
+
 function getEventDurationsForType( trace, filterFunction ) {
 	return trace.traceEvents
 		.filter( filterFunction )
 		.map( ( item ) => item.dur / 1000 );
 }
 
-function getEventDurations( trace ) {
+function getTypingEventDurations( trace ) {
 	return [
 		getEventDurationsForType( trace, isKeyDownEvent ),
 		getEventDurationsForType( trace, isKeyPressEvent ),
@@ -61,8 +65,21 @@ function getEventDurations( trace ) {
 	];
 }
 
+function getSelectionEventDurations( trace ) {
+	return [ getEventDurationsForType( trace, isFocusEvent ) ];
+}
+
+jest.setTimeout( 1000000 );
+
 describe( 'Performance', () => {
-	it( '1000 paragraphs', async () => {
+	it( 'Loading, typing and selecting blocks', async () => {
+		const results = {
+			load: [],
+			domcontentloaded: [],
+			type: [],
+			focus: [],
+		};
+
 		const html = readFile(
 			join( __dirname, '../../assets/large-post.html' )
 		);
@@ -84,14 +101,9 @@ describe( 'Performance', () => {
 		}, html );
 		await saveDraft();
 
-		const results = {
-			load: [],
-			domcontentloaded: [],
-			type: [],
-		};
-
 		let i = 1;
 
+		// Measuring loading time
 		while ( i-- ) {
 			await page.reload( { waitUntil: [ 'domcontentloaded', 'load' ] } );
 			const timings = JSON.parse(
@@ -110,29 +122,26 @@ describe( 'Performance', () => {
 			);
 		}
 
+		// Measuring typing performance
 		await insertBlock( 'Paragraph' );
-
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
-
 		await page.tracing.start( {
 			path: traceFile,
 			screenshots: false,
 			categories: [ 'devtools.timeline' ],
 		} );
-
 		while ( i-- ) {
 			await page.keyboard.type( 'x' );
 		}
 
 		await page.tracing.stop();
-
-		const traceResults = JSON.parse( readFile( traceFile ) );
+		let traceResults = JSON.parse( readFile( traceFile ) );
 		const [
 			keyDownEvents,
 			keyPressEvents,
 			keyUpEvents,
-		] = getEventDurations( traceResults );
+		] = getTypingEventDurations( traceResults );
 
 		if (
 			keyDownEvents.length === keyPressEvents.length &&
@@ -144,6 +153,34 @@ describe( 'Performance', () => {
 				);
 			}
 		}
+
+		// Measuring block selection performance
+		await createNewPost();
+		await page.evaluate( () => {
+			const { createBlock } = window.wp.blocks;
+			const { dispatch } = window.wp.data;
+			const blocks = window.lodash
+				.times( 1000 )
+				.map( () => createBlock( 'core/paragraph' ) );
+			dispatch( 'core/block-editor' ).resetBlocks( blocks );
+		} );
+
+		const paragraphs = await page.$$( '.wp-block' );
+
+		await page.tracing.start( {
+			path: traceFile,
+			screenshots: false,
+			categories: [ 'devtools.timeline' ],
+		} );
+		for ( let j = 0; j < 10; j++ ) {
+			await paragraphs[ j ].click();
+		}
+
+		await page.tracing.stop();
+
+		traceResults = JSON.parse( readFile( traceFile ) );
+		const [ focusEvents ] = getSelectionEventDurations( traceResults );
+		results.focus = focusEvents;
 
 		writeFileSync(
 			__dirname + '/results.json',

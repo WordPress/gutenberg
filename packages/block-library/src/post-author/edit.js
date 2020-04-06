@@ -13,7 +13,13 @@ function PostAuthorDisplay() {
 		[ authorId ]
 	);
 	return author ? (
-		<address>{ sprintf( __( 'By %s' ), author.name ) }</address>
+		<address>
+			{ sprintf(
+				/* translators: %s: author name. */
+				__( 'By %s' ),
+				author.name
+			) }
+		</address>
 	) : null;
 }
 

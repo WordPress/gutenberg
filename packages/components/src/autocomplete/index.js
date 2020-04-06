@@ -227,6 +227,7 @@ export class Autocomplete extends Component {
 		if ( !! filteredOptions.length ) {
 			debouncedSpeak(
 				sprintf(
+					/* translators: %d: number of results. */
 					_n(
 						'%d result found, use up and down arrow keys to navigate.',
 						'%d results found, use up and down arrow keys to navigate.',
