@@ -175,6 +175,11 @@ describe( 'Multi-entity save flow', () => {
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Enter' );
 
+			// Wait to ensure template part is created/inserted before saving.
+			await new Promise( ( resolve ) => {
+				setTimeout( resolve, 1000 );
+			} );
+
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
 			);
