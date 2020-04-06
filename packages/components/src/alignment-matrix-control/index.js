@@ -53,7 +53,6 @@ export default function AlignmentMatrixControl( {
 		baseId,
 		currentId: initialCurrentId,
 		rtl: isRTL,
-		unstable_virtual: true,
 	} );
 
 	const handleOnBlur = ( event ) => {
@@ -109,9 +108,9 @@ export default function AlignmentMatrixControl( {
 						return (
 							<Cell
 								{ ...composite }
+								id={ cellId }
 								isActive={ isActive }
 								key={ cell }
-								id={ cellId }
 								value={ cell }
 								onFocus={ () => handleOnChange( cell ) }
 								onClick={ () =>
