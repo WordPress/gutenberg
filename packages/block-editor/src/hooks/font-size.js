@@ -93,9 +93,6 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-const hasFontSizeSupport = ( blockName ) =>
-	hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY );
-
 /**
  * Inspector control panel containing the font size related configuration
  *
@@ -114,7 +111,7 @@ export function FontSizeEdit( props ) {
 		select( 'core/block-editor' ).getSettings()
 	);
 
-	if ( ! hasFontSizeSupport( blockName ) ) {
+	if ( ! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ) {
 		return null;
 	}
 

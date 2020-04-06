@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,7 +20,15 @@ export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
  * @return {WPElement} Line height edit element.
  */
 export function LineHeightEdit( props ) {
-	const { style } = props.attributes;
+	const {
+		name: blockName,
+		attributes: { style },
+	} = props;
+
+	if ( ! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) ) {
+		return null;
+	}
+
 	const onChange = ( newLineHeightValue ) => {
 		const newStyle = {
 			...style,
