@@ -84,7 +84,7 @@ jobs:
             curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
-          command: yarn device-tests
+          command: yarn device-tests-canary
           environment:
             JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
       - store_test_results:
@@ -143,7 +143,7 @@ jobs:
     - run:
         name: Run Device Tests
         command: |
-          yarn device-tests
+          yarn device-tests-canary
         environment:
           JEST_JUNIT_OUTPUT: "reports/test-results/ios-test-results.xml"
     - store_test_results:
@@ -172,6 +172,6 @@ workflows:
           platform: android
           check-tests: true
       - ios-device-checks:
-          name: Test iOS on Device
+          name: Test iOS on Device - Canaries
       - android-device-checks:
-          name: Test Android on Device
+          name: Test Android on Device - Canaries
