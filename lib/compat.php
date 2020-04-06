@@ -171,36 +171,66 @@ function gutenberg_get_post_from_context() {
  * @see (TBD Trac Link)
  *
  * @param string $pre_render The pre-rendered content. Defaults to null.
- * @param array  $block      The block being rendered.
+ * @param array  $next_block The block being rendered.
  *
  * @return string String of rendered HTML.
  */
-function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
-	global $post;
+function gutenberg_provide_render_callback_with_block_object( $pre_render, $next_block ) {
+	global $post, $block, $block_context;
 
-	$source_block = $block;
+	$source_block = $next_block;
 
 	/** This filter is documented in src/wp-includes/blocks.php */
-	$block = apply_filters( 'render_block_data', $block, $source_block );
+	$block = apply_filters( 'render_block_data', $next_block, $source_block );
 
 	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
 	$block_content = '';
 	$index         = 0;
 
-	foreach ( $block['innerContent'] as $chunk ) {
-		$block_content .= is_string( $chunk ) ? $chunk : gutenberg_provide_render_callback_with_block_object( null, $block['innerBlocks'][ $index++ ] );
-	}
-
 	if ( ! is_array( $block['attrs'] ) ) {
 		$block['attrs'] = array();
 	}
 
+	if ( ! isset( $block['context'] ) ) {
+		$block['context'] = array();
+	}
+
+	$block_context_before = $block_context;
+
+	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
+		if ( ! isset( $block_context ) ) {
+			$block_context = array();
+		}
+
+		foreach ( $block_type->providesContext as $attribute_name ) {
+			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
+				$block_context[ $attribute_name ] = $block['attrs'][ $attribute_name ];
+			}
+		}
+	}
+
+	foreach ( $block['innerContent'] as $chunk ) {
+		$block_content .= is_string( $chunk ) ?
+			$chunk :
+			gutenberg_provide_render_callback_with_block_object( null, $block['innerBlocks'][ $index++ ] );
+	}
+
 	if ( $is_dynamic ) {
+		if ( isset( $block_context ) && isset( $block_type->context ) && is_array( $block_type->context ) ) {
+			foreach ( $block_type->context as $context_name ) {
+				if ( array_key_exists( $context_name, $block_context ) ) {
+					$block['context'][ $context_name ] = $block_context[ $context_name ];
+				}
+			}
+		}
+
 		$global_post   = $post;
 		$block_content = $block_type->render( $block['attrs'], $block_content );
 		$post          = $global_post;
 	}
+
+	$block_context = $block_context_before;
 
 	/** This filter is documented in src/wp-includes/blocks.php */
 	return apply_filters( 'render_block', $block_content, $block );
