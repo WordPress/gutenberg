@@ -7,8 +7,7 @@ import { View } from 'react-native';
  */
 import {
 	InnerBlocks,
-	BlockControls,
-	AlignmentToolbar,
+	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
 } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -27,7 +26,6 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 function ButtonsEdit( {
 	isSelected,
 	attributes,
-	setAttributes,
 	onDelete,
 	onAddNextButton,
 	shouldDelete,
@@ -37,10 +35,6 @@ function ButtonsEdit( {
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isSelectedButton;
 	const { marginLeft: spacing } = styles.spacing;
-
-	function updateAlignment( nextAlign ) {
-		setAttributes( { align: nextAlign } );
-	}
 
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
@@ -62,15 +56,13 @@ function ButtonsEdit( {
 		setMaxWidth( width - margins );
 	}
 
+	// Inside buttons block alignment options are not supported.
+	const alignmentHooksSetting = {
+		isEmbedButton: true,
+	};
+
 	return (
-		<>
-			<BlockControls>
-				<AlignmentToolbar
-					isCollapsed={ false }
-					value={ align }
-					onChange={ updateAlignment }
-				/>
-			</BlockControls>
+		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
 			<View onLayout={ onLayout }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
@@ -86,7 +78,7 @@ function ButtonsEdit( {
 					marginVertical={ spacing }
 				/>
 			</View>
-		</>
+		</AlignmentHookSettingsProvider>
 	);
 }
 
