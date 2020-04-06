@@ -87,6 +87,7 @@
 		"@storybook/addon-storysource": "5.3.2",
 		"@storybook/addon-viewport": "5.3.2",
 		"@storybook/react": "5.3.2",
+		"@testing-library/react": "9.4.1",
 		"@types/jest": "24.0.25",
 		"@types/lodash": "4.14.149",
 		"@types/prettier": "1.19.0",
