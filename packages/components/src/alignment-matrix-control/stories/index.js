@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select } from '@storybook/addon-knobs';
+import { number, select } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
@@ -23,7 +23,6 @@ export default {
 
 export const _default = () => {
 	const props = {
-		hasFocusBorder: boolean( 'hasFocusBorder', true ),
 		value: select( 'value', alignmentOptions, 'center center' ),
 	};
 

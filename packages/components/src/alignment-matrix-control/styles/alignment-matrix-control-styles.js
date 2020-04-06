@@ -19,17 +19,6 @@ export const rootBase = () => {
 	`;
 };
 
-const rootBorder = ( { hasFocusBorder } ) => {
-	if ( ! hasFocusBorder ) return '';
-
-	return css`
-		&:active,
-		&:focus {
-			border-color: ${color( 'blue.medium.focus' )};
-		}
-	`;
-};
-
 const rootSize = ( { size = 92 } ) => {
 	return css`
 		grid-template-rows: repeat( 3, calc( ${size}px / 3 ) );
@@ -44,7 +33,6 @@ export const Root = styled.div`
 	cursor: pointer;
 	grid-template-columns: auto;
 
-	${rootBorder};
 	${rootSize};
 `;
 

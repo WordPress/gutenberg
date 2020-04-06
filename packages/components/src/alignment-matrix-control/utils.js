@@ -38,7 +38,7 @@ export const ALIGNMENTS = GRID.reduce( ( alignments, row ) => {
  *
  * @return {string} The parsed value.
  */
-export function parseValue( value ) {
+export function transformValue( value ) {
 	const nextValue = value === 'center' ? 'center center' : value;
 
 	return nextValue.replace( '-', ' ' );
@@ -53,7 +53,7 @@ export function parseValue( value ) {
  * @return {string} The item id.
  */
 export function getItemId( prefixId, value ) {
-	const valueId = parseValue( value ).replace( '-', ' ' );
+	const valueId = transformValue( value ).replace( ' ', '-' );
 
 	return `${ prefixId }-${ valueId }`;
 }
@@ -66,7 +66,7 @@ export function getItemId( prefixId, value ) {
  * @return {number} The index of a matching alignment.
  */
 export function getAlignmentIndex( alignment = 'center' ) {
-	const item = parseValue( alignment ).replace( '-', ' ' );
+	const item = transformValue( alignment ).replace( '-', ' ' );
 	const index = ALIGNMENTS.indexOf( item );
 
 	return index > -1 ? index : undefined;

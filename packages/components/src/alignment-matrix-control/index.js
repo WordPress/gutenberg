@@ -36,10 +36,8 @@ export default function AlignmentMatrixControl( {
 	className,
 	id,
 	label = __( 'Alignment Matrix Control' ),
-	hasFocusBorder = true,
 	defaultValue = 'center center',
 	value,
-	onBlur = noop,
 	onChange = noop,
 	width = 92,
 	...props
@@ -54,18 +52,6 @@ export default function AlignmentMatrixControl( {
 		currentId: initialCurrentId,
 		rtl: isRTL,
 	} );
-
-	const handleOnBlur = ( event ) => {
-		const isItemCurrent = composite.items.some(
-			( item ) => item.ref.current === event.relatedTarget
-		);
-
-		if ( isItemCurrent ) {
-			event.stopPropagation();
-		}
-
-		onBlur( event );
-	};
 
 	const handleOnChange = ( nextValue ) => {
 		onChange( nextValue );
@@ -89,8 +75,6 @@ export default function AlignmentMatrixControl( {
 			aria-label={ label }
 			as={ Root }
 			className={ classes }
-			hasFocusBorder={ hasFocusBorder }
-			onBlur={ handleOnBlur }
 			role="grid"
 			width={ width }
 		>
