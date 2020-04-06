@@ -31,12 +31,12 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@jest/reporters": "^24.8.0",
+		"@jest/reporters": "^25.3.0",
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^24.9.0",
-		"enzyme": "^3.9.0",
-		"enzyme-adapter-react-16": "^1.10.0",
-		"enzyme-to-json": "^3.3.5"
+		"babel-jest": "^25.3.0",
+		"enzyme": "^3.11.0",
+		"enzyme-adapter-react-16": "^1.15.2",
+		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
 		"jest": ">=24"

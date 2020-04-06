@@ -30,7 +30,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.8.3",
-		"jest-matcher-utils": "^24.7.0",
+		"jest-matcher-utils": "^25.3.0",
 		"lodash": "^4.17.15"
 	},
 	"peerDependencies": {
