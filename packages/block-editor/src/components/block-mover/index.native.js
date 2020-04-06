@@ -19,9 +19,6 @@ const horizontalMover = {
 	secondButtonHint: __( 'Double tap to move the block to the right' ),
 	firstBlockTitle: __( 'Move block left' ),
 	lastBlockTitle: __( 'Move block right' ),
-	firstButtonDirection: __( 'left' ),
-	secondButtonDirection: __( 'right' ),
-	location: 'position',
 };
 
 const verticalMover = {
@@ -31,9 +28,6 @@ const verticalMover = {
 	secondButtonHint: __( 'Double tap to move the block down' ),
 	firstBlockTitle: __( 'Move block up' ),
 	lastBlockTitle: __( 'Move block down' ),
-	firstButtonDirection: __( 'up' ),
-	secondButtonDirection: __( 'down' ),
-	location: 'row',
 };
 
 const BlockMover = ( {
@@ -53,31 +47,53 @@ const BlockMover = ( {
 		secondButtonHint,
 		firstBlockTitle,
 		lastBlockTitle,
-		firstButtonDirection,
-		secondButtonDirection,
-		location,
 	} = horizontalDirection ? horizontalMover : verticalMover;
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
 	}
 
+	const getFirstMoverButtonTitle = () => {
+		if ( horizontalDirection ) {
+			return sprintf(
+				/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+				__( 'Move block left from position %1$s to position %2$s' ),
+				firstIndex + 1,
+				firstIndex
+			);
+		}
+
+		return sprintf(
+			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+			__( 'Move block up from row %1$s to row %2$s' ),
+			firstIndex + 1,
+			firstIndex
+		);
+	};
+
+	const getSecondMoverButtonTitle = () => {
+		if ( horizontalDirection ) {
+			return sprintf(
+				/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+				__( 'Move block right from position %1$s to position %2$s' ),
+				firstIndex + 1,
+				firstIndex + 2
+			);
+		}
+
+		return sprintf(
+			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+			__( 'Move block down from row %1$s to row %2$s' ),
+			firstIndex + 1,
+			firstIndex + 2
+		);
+	};
+
 	return (
 		<>
 			<ToolbarButton
 				title={
-					! isFirst
-						? sprintf(
-								/* translators: accessibility text. %1: block moving direction (string). %2: location of block - row or order number (string). %3: current block position (number). %4: next block position (number) */
-								__(
-									'Move block %2$s from %1$s %3$s to %1$s %4$s'
-								),
-								location,
-								firstButtonDirection,
-								firstIndex + 1,
-								firstIndex
-						  )
-						: firstBlockTitle
+					! isFirst ? getFirstMoverButtonTitle() : firstBlockTitle
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
@@ -87,18 +103,7 @@ const BlockMover = ( {
 
 			<ToolbarButton
 				title={
-					! isLast
-						? sprintf(
-								/* translators: accessibility text. %1: block moving direction (string). %2: location of block - row or order number (string). %3: current block position (number). %4: next block position (number) */
-								__(
-									'Move block %2$s from %1$s %3$s to %1$s %4$s'
-								),
-								location,
-								secondButtonDirection,
-								firstIndex + 1,
-								firstIndex + 2
-						  )
-						: lastBlockTitle
+					! isLast ? getSecondMoverButtonTitle() : lastBlockTitle
 				}
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
