@@ -54,39 +54,41 @@ const BlockMover = ( {
 	}
 
 	const getFirstMoverButtonTitle = () => {
-		if ( horizontalDirection ) {
-			return sprintf(
-				/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-				__( 'Move block left from position %1$s to position %2$s' ),
-				firstIndex + 1,
-				firstIndex
-			);
-		}
-
-		return sprintf(
-			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-			__( 'Move block up from row %1$s to row %2$s' ),
-			firstIndex + 1,
-			firstIndex
-		);
+		const fromIndex = firstIndex + 1;
+		const toIndex = firstIndex;
+		return horizontalDirection
+			? sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__( 'Move block left from position %1$s to position %2$s' ),
+					fromIndex,
+					toIndex
+			  )
+			: sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__( 'Move block up from row %1$s to row %2$s' ),
+					fromIndex,
+					toIndex
+			  );
 	};
 
 	const getSecondMoverButtonTitle = () => {
-		if ( horizontalDirection ) {
-			return sprintf(
-				/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-				__( 'Move block right from position %1$s to position %2$s' ),
-				firstIndex + 1,
-				firstIndex + 2
-			);
-		}
-
-		return sprintf(
-			/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-			__( 'Move block down from row %1$s to row %2$s' ),
-			firstIndex + 1,
-			firstIndex + 2
-		);
+		const fromIndex = firstIndex + 1;
+		const toIndex = firstIndex + 2;
+		return horizontalDirection
+			? sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__(
+						'Move block right from position %1$s to position %2$s'
+					),
+					fromIndex,
+					toIndex
+			  )
+			: sprintf(
+					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+					__( 'Move block down from row %1$s to row %2$s' ),
+					fromIndex,
+					toIndex
+			  );
 	};
 
 	return (
