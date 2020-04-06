@@ -142,12 +142,10 @@ function ColumnsEditContainer( {
 					__experimentalMoverDirection={
 						columnsInRow > 1 ? 'horizontal' : undefined
 					}
-					flatListProps={ {
-						contentContainerStyle: styles.columnsContainer,
-						horizontal: true,
-						scrollEnabled: false,
-						style: styles.innerBlocks,
-					} }
+					contentContainerStyle={ styles.columnsContainer }
+					style={ styles.innerBlocks }
+					horizontal={ true }
+					scrollEnabled={ false }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					contentResizeMode="stretch"
 					onAddBlock={ onAddNextColumn }

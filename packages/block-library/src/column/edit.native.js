@@ -64,10 +64,8 @@ function ColumnEdit( {
 				] }
 			>
 				<InnerBlocks
-					flatListProps={ {
-						scrollEnabled: false,
-						style: styles.innerBlocks,
-					} }
+					scrollEnabled={ false }
+					style={ styles.innerBlocks }
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}

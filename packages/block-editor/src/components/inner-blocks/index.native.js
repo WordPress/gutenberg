@@ -113,7 +113,10 @@ class InnerBlocks extends Component {
 			clientId,
 			renderAppender,
 			__experimentalMoverDirection,
-			flatListProps,
+			horizontal,
+			scrollEnabled,
+			contentContainerStyle,
+			style,
 			contentResizeMode,
 			contentStyle,
 			onAddBlock,
@@ -135,7 +138,10 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
-						flatListProps={ flatListProps }
+						contentContainerStyle={ contentContainerStyle }
+						style={ style }
+						horizontal={ horizontal }
+						scrollEnabled={ scrollEnabled }
 						contentResizeMode={ contentResizeMode }
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }
