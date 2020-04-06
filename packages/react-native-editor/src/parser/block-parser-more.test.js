@@ -1,5 +1,3 @@
-/** @format */
-
 /**
  * Internal dependencies
  */
@@ -32,6 +30,8 @@ describe( 'Parser', () => {
 		expect( moreBlockInstance.isValid ).toEqual( true );
 		expect( moreBlockInstance.name ).toEqual( 'core/more' );
 		expect( moreBlockInstance.innerBlocks ).toHaveLength( 0 );
-		expect( moreBlockInstance.originalContent ).toEqual( originalMoreBlockHtml );
+		expect( moreBlockInstance.originalContent ).toEqual(
+			originalMoreBlockHtml
+		);
 	} );
 } );

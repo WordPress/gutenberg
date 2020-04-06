@@ -30,12 +30,14 @@ module.exports = {
 		'<rootDir>/' + configPath + '/enzyme.config.js',
 	],
 	testEnvironment: 'jsdom',
-	testMatch: [ '**/test/*.native.[jt]s?(x)' ],
+	testMatch: [
+		'**/test/*.native.[jt]s?(x)',
+		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
+	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
 		'<rootDir>/wordpress/',
 		'/__device-tests__/',
-		'/react-native-editor/',
 	],
 	testURL: 'http://localhost/',
 	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis,
@@ -51,7 +53,9 @@ module.exports = {
 			'|'
 		) })$` ]: '<rootDir>/packages/$1/src',
 	},
-	modulePathIgnorePatterns: [ '<rootDir>/packages/react-native' ],
+	modulePathIgnorePatterns: [
+		'<rootDir>/packages/react-native-editor/node_modules',
+	],
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],

@@ -1,6 +1,3 @@
-/** @flow
- * @format */
-
 const main = require( './jest.config.js' );
 
 module.exports = {
@@ -8,7 +5,5 @@ module.exports = {
 	timers: 'real',
 	setupFiles: [],
 	testMatch: [ '**/__device-tests__/**/*.test.[jt]s?(x)' ],
-	testPathIgnorePatterns: [
-		'/node_modules/',
-	],
+	testPathIgnorePatterns: [ '/node_modules/' ],
 };

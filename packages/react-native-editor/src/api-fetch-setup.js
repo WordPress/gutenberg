@@ -1,7 +1,8 @@
-/** @format */
-
 /**
  * External dependencies
+ */
+/**
+ * WordPress dependencies
  */
 import { fetchRequest } from '@wordpress/react-native-bridge';
 
@@ -10,7 +11,8 @@ import { fetchRequest } from '@wordpress/react-native-bridge';
  */
 import apiFetch from '@wordpress/api-fetch';
 
-const setTimeoutPromise = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) );
+const setTimeoutPromise = ( delay ) =>
+	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 	if ( ! isPathSupported( path ) ) {

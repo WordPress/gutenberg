@@ -1,9 +1,4 @@
 /**
- * @flow
- * @format
- * */
-
-/**
  * External dependencies
  */
 import childProcess from 'child_process';
@@ -17,6 +12,7 @@ import path from 'path';
 import serverConfigs from './serverConfigs';
 import { iosServer, iosLocal, android8 } from './caps';
 import AppiumLocal from './appium-local';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'underscore';
 
 // Platform setup
@@ -28,14 +24,17 @@ const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 
 // Local App Paths
-const defaultAndroidAppPath = './android/app/build/outputs/apk/debug/app-debug.apk';
-const defaultIOSAppPath = './ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+const defaultAndroidAppPath =
+	'./android/app/build/outputs/apk/debug/app-debug.apk';
+const defaultIOSAppPath =
+	'./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
 
-const localAndroidAppPath = process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
+const localAndroidAppPath =
+	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
 const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
-let appiumProcess: ?childProcess.ChildProcess;
+let appiumProcess;
 
 // Used to map unicode and special values to keycodes on Android
 // Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
@@ -44,7 +43,7 @@ const strToKeycode = {
 	'\u0008': 67,
 };
 
-const timer = ( ms: number ) => new Promise < {} > ( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms ) => new Promise()( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
@@ -64,11 +63,16 @@ const setupDriver = async () => {
 		} catch ( err ) {
 			// Ignore error here, Appium is probably already running (Appium desktop has its own server for instance)
 			// eslint-disable-next-line no-console
-			await console.log( 'Could not start Appium server', err.toString() );
+			await console.log(
+				'Could not start Appium server',
+				err.toString()
+			);
 		}
 	}
 
-	const serverConfig = isLocalEnvironment() ? serverConfigs.local : serverConfigs.sauce;
+	const serverConfig = isLocalEnvironment()
+		? serverConfigs.local
+		: serverConfigs.sauce;
 	const driver = wd.promiseChainRemote( serverConfig );
 
 	let desiredCaps;
@@ -84,7 +88,10 @@ const setupDriver = async () => {
 				delete desiredCaps.platformVersion;
 				desiredCaps.deviceName = 'Android Emulator';
 				// eslint-disable-next-line no-console
-				console.log( 'Detected Android device running Android %s', androidVersion );
+				console.log(
+					'Detected Android device running Android %s',
+					androidVersion
+				);
 			} catch ( error ) {
 				// ignore error
 			}
@@ -119,11 +126,12 @@ const setupDriver = async () => {
 	return driver;
 };
 
-const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
+const stopDriver = async ( driver ) => {
 	if ( ! isLocalEnvironment() ) {
 		const jobID = driver.sessionID;
 
-		const hash = crypto.createHmac( 'md5', jobID )
+		const hash = crypto
+			.createHmac( 'md5', jobID )
 			.update( serverConfigs.sauce.auth )
 			.digest( 'hex' );
 		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
@@ -149,7 +157,7 @@ const stopDriver = async ( driver: wd.PromiseChainWebdriver ) => {
  *
  * On iOS: "clear" is not defaulted to true because calling element.clear when a text is present takes a very long time (approx. 23 seconds)
  */
-const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
+const typeString = async ( driver, element, str, clear ) => {
 	if ( isAndroid() ) {
 		await typeStringAndroid( driver, element, str, clear );
 	} else {
@@ -157,7 +165,7 @@ const typeString = async ( driver: wd.PromiseChainWebdriver, element: wd.Promise
 	}
 };
 
-const typeStringIos = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element, str: string, clear: boolean ) => {
+const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
 		await element.clear();
 	}
@@ -165,10 +173,10 @@ const typeStringIos = async ( driver: wd.PromiseChainWebdriver, element: wd.Prom
 };
 
 const typeStringAndroid = async (
-	driver: wd.PromiseChainWebdriver,
-	element: wd.PromiseChainWebdriver.Element,
-	str: string,
-	clear: boolean = true // see comment above for why it is defaulted to true
+	driver,
+	element,
+	str,
+	clear = true // see comment above for why it is defaulted to true
 ) => {
 	if ( str in strToKeycode ) {
 		return await driver.pressKeycode( strToKeycode[ str ] );
@@ -187,11 +195,16 @@ const typeStringAndroid = async (
 		 * of `type` always clearing the block (on Android).
 		 */
 
-		await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', '%s' ] } );
+		await driver.execute( 'mobile: shell', {
+			command: 'input',
+			args: [ 'text', '%s' ],
+		} );
 		await element.type( str );
 	} else {
 		// eslint-disable-next-line no-console
-		console.log( 'Warning: Using `adb shell input text` on Android which is rather flaky.' );
+		console.log(
+			'Warning: Using `adb shell input text` on Android which is rather flaky.'
+		);
 
 		const paragraphs = str.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
@@ -200,7 +213,10 @@ const typeStringAndroid = async (
 				await driver.pressKeycode( strToKeycode[ paragraph ] );
 			} else {
 				// Execute with adb shell input <text> since normal type auto clears field on Android
-				await driver.execute( 'mobile: shell', { command: 'input', args: [ 'text', paragraph ] } );
+				await driver.execute( 'mobile: shell', {
+					command: 'input',
+					args: [ 'text', paragraph ],
+				} );
 			}
 			if ( i !== paragraphs.length - 1 ) {
 				await driver.pressKeycode( strToKeycode[ '\n' ] );
@@ -210,18 +226,18 @@ const typeStringAndroid = async (
 };
 
 // Calculates middle x,y and clicks that position
-const clickMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const clickMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
 	const action = await new wd.TouchAction( driver );
-	action.press( { x: location.x + ( size.width / 2 ), y: location.y } );
+	action.press( { x: location.x + size.width / 2, y: location.y } );
 	action.release();
 	await action.perform();
 };
 
 // Clicks in the top left of an element
-const clickBeginningOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const clickBeginningOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: location.x, y: location.y } );
@@ -230,13 +246,13 @@ const clickBeginningOfElement = async ( driver: wd.PromiseChainWebdriver, elemen
 };
 
 // long press to activate context menu
-const longPressMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const longPressMiddleOfElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const size = await element.getSize();
 
 	const action = await new wd.TouchAction( driver );
-	const x = location.x + ( size.width / 2 );
-	const y = location.y + ( size.height / 2 );
+	const x = location.x + size.width / 2;
+	const y = location.y + size.height / 2;
 	action.press( { x, y } );
 	action.wait( 2000 );
 	action.release();
@@ -244,7 +260,7 @@ const longPressMiddleOfElement = async ( driver: wd.PromiseChainWebdriver, eleme
 };
 
 // press "Select All" in floating context menu
-const tapSelectAllAboveElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const tapSelectAllAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	const x = location.x + 300;
@@ -255,7 +271,7 @@ const tapSelectAllAboveElement = async ( driver: wd.PromiseChainWebdriver, eleme
 };
 
 // press "Copy" in floating context menu
-const tapCopyAboveElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const tapCopyAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	const x = location.x + 220;
@@ -268,7 +284,7 @@ const tapCopyAboveElement = async ( driver: wd.PromiseChainWebdriver, element: w
 };
 
 // press "Paste" in floating context menu
-const tapPasteAboveElement = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element ) => {
+const tapPasteAboveElement = async ( driver, element ) => {
 	const location = await element.getLocation();
 	const action = await new wd.TouchAction( driver );
 	action.wait( 2000 );
@@ -280,7 +296,7 @@ const tapPasteAboveElement = async ( driver: wd.PromiseChainWebdriver, element: 
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseChainWebdriver.Element = undefined ) => {
+const swipeUp = async ( driver, element = undefined ) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -290,9 +306,9 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 	}
 
 	const startX = size.width / 2;
-	const startY = y + ( size.height / 3 );
+	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY + ( startY * -1 * 0.5 );
+	const endY = startY + startY * -1 * 0.5;
 
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: startX, y: startY } );
@@ -303,14 +319,14 @@ const swipeUp = async ( driver: wd.PromiseChainWebdriver, element: wd.PromiseCha
 };
 
 // Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
+const swipeDown = async ( driver ) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
 	const startX = size.width / 2;
-	const startY = y + ( size.height / 3 );
+	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY - ( startY * -1 * 0.5 );
+	const endY = startY - startY * -1 * 0.5;
 
 	const action = await new wd.TouchAction( driver );
 	action.press( { x: startX, y: startY } );
@@ -320,7 +336,7 @@ const swipeDown = async ( driver: wd.PromiseChainWebdriver ) => {
 	await action.perform();
 };
 
-const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boolean ) => {
+const toggleHtmlMode = async ( driver, toggleOn ) => {
 	if ( isAndroid() ) {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
@@ -338,15 +354,19 @@ const toggleHtmlMode = async ( driver: wd.PromiseChainWebdriver, toggleOn: boole
 		await menuButton.click();
 		let toggleHtmlButton;
 		if ( toggleOn ) {
-			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch to HTML' );
+			toggleHtmlButton = await driver.elementByAccessibilityId(
+				'Switch to HTML'
+			);
 		} else {
-			toggleHtmlButton = await driver.elementByAccessibilityId( 'Switch To Visual' );
+			toggleHtmlButton = await driver.elementByAccessibilityId(
+				'Switch To Visual'
+			);
 		}
 		await toggleHtmlButton.click();
 	}
 };
 
-const toggleOrientation = async ( driver: wd.PromiseChainWebdriver ) => {
+const toggleOrientation = async ( driver ) => {
 	const orientation = await driver.getOrientation();
 	if ( orientation === 'LANDSCAPE' ) {
 		await driver.setOrientation( 'PORTRAIT' );

@@ -1,8 +1,4 @@
 /**
- * @format
- * */
-
-/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -14,7 +10,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor tests for List block (end)', () => {
 	let driver;
@@ -51,7 +47,10 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 		}
 
 		// Send the first list item text
-		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem1 );
+		await editorPage.sendTextToListBlock(
+			listBlockElement,
+			testData.listItem1
+		);
 
 		// send an Enter
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );

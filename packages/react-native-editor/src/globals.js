@@ -1,11 +1,11 @@
-/** @flow
- * @format */
-
 /**
  * External dependencies
  */
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
+/**
+ * WordPress dependencies
+ */
 import { nativeLoggingHook } from '@wordpress/react-native-bridge';
 
 /**
