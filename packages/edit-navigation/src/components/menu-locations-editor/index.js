@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach, find, pick } from 'lodash';
+import { find, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -55,6 +55,19 @@ export default function MenuLocationsEditor() {
 		setLocationsData( locationsData );
 	};
 
+	const saveLocations = async () => {
+		for ( const location of Object.keys( locationsData ) ) {
+			const menuId = locationsData[ location ];
+			await saveMenu( {
+				...pick( find( menus, { id: parseInt( menuId ) } ), [
+					'id',
+					'name',
+				] ),
+				locations: [ location ],
+			} );
+		}
+	};
+
 	const menusList =
 		menus &&
 		menus.map( ( menu ) => ( {
@@ -73,15 +86,7 @@ export default function MenuLocationsEditor() {
 				<form
 					onSubmit={ ( e ) => {
 						e.preventDefault();
-						forEach( locationsData, ( menuId, location ) => {
-							saveMenu( {
-								...pick(
-									find( menus, { id: parseInt( menuId ) } ),
-									[ 'id', 'name' ]
-								),
-								locations: [ location ],
-							} );
-						} );
+						saveLocations();
 					} }
 				>
 					{ menuLocations && (
