@@ -23,7 +23,7 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
-import FloatingToolbar from './block-mobile-floating-toolbar';
+import FloatingToolbar from '../block-mobile-floating-toolbar';
 import Breadcrumbs from './breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
 
@@ -94,7 +94,6 @@ class BlockListBlock extends Component {
 			hasParent,
 			isParentSelected,
 			onSelect,
-			showFloatingToolbar,
 			getStylesFromColorScheme,
 			marginVertical,
 			marginHorizontal,
@@ -113,21 +112,19 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<View accessibilityLabel={ accessibilityLabel }>
-					{ showFloatingToolbar && (
-						<FloatingToolbar>
-							{ hasParent && (
-								<Toolbar passedStyle={ styles.toolbar }>
-									<ToolbarButton
-										title={ __( 'Navigate Up' ) }
-										onClick={ () => onSelect( parentId ) }
-										icon={ NavigateUpSVG }
-									/>
-									<View style={ styles.pipe } />
-								</Toolbar>
-							) }
-							<Breadcrumbs clientId={ clientId } />
-						</FloatingToolbar>
-					) }
+					<FloatingToolbar clientId={ clientId }>
+						{ hasParent && (
+							<Toolbar passedStyle={ styles.toolbar }>
+								<ToolbarButton
+									title={ __( 'Navigate Up' ) }
+									onClick={ () => onSelect( parentId ) }
+									icon={ NavigateUpSVG }
+								/>
+								<View style={ styles.pipe } />
+							</Toolbar>
+						) }
+						<Breadcrumbs clientId={ clientId } />
+					</FloatingToolbar>
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -186,7 +183,6 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -205,10 +201,6 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -264,7 +256,6 @@ export default compose( [
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			showFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

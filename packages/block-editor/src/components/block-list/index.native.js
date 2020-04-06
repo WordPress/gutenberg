@@ -24,6 +24,7 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
+import FloatingToolbar from '../block-mobile-floating-toolbar';
 
 export class BlockList extends Component {
 	constructor() {
@@ -121,6 +122,7 @@ export class BlockList extends Component {
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
+				{ isRootList && <FloatingToolbar.Slot /> }
 				<KeyboardAwareFlatList
 					{ ...( Platform.OS === 'android'
 						? { removeClippedSubviews: false }
