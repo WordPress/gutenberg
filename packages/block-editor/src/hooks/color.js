@@ -8,7 +8,6 @@ import classnames from 'classnames';
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
@@ -115,75 +114,69 @@ export function addEditProps( settings ) {
 }
 
 /**
- * Override the default edit UI to include new inspector controls for block
- * color, if block defines support.
+ * Inspector control panel containing the color related configuration
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Object} props
+ *
+ * @return {WPElement} Color edit element.
  */
-export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const colors = useSelect( ( select ) => {
-			return select( 'core/block-editor' ).getSettings().colors;
-		}, [] );
+export function ColorEdit( props ) {
+	const { name: blockName } = props;
+	const colors = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings().colors;
+	}, [] );
 
-		if ( ! hasBlockSupport( blockName, COLOR_SUPPORT_KEY ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-		const { style, textColor, backgroundColor } = props.attributes;
+	if ( ! hasBlockSupport( blockName, COLOR_SUPPORT_KEY ) ) {
+		return null;
+	}
+	const { style, textColor, backgroundColor } = props.attributes;
 
-		const onChangeColor = ( name ) => ( value ) => {
-			const colorObject = getColorObjectByColorValue( colors, value );
-			const attributeName = name + 'Color';
-			const newStyle = {
-				...style,
-				color: {
-					...style?.color,
-					[ name ]: colorObject?.slug ? undefined : value,
-				},
-			};
-			const newNamedColor = colorObject?.slug
-				? colorObject.slug
-				: undefined;
-			props.setAttributes( {
-				style: cleanEmptyObject( newStyle ),
-				[ attributeName ]: newNamedColor,
-			} );
+	const onChangeColor = ( name ) => ( value ) => {
+		const colorObject = getColorObjectByColorValue( colors, value );
+		const attributeName = name + 'Color';
+		const newStyle = {
+			...style,
+			color: {
+				...style?.color,
+				[ name ]: colorObject?.slug ? undefined : value,
+			},
 		};
+		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
+		props.setAttributes( {
+			style: cleanEmptyObject( newStyle ),
+			[ attributeName ]: newNamedColor,
+		} );
+	};
 
-		return [
-			<ColorPanel
-				key="colors"
-				clientId={ props.clientId }
-				colorSettings={ [
-					{
-						label: __( 'Text Color' ),
-						onChange: onChangeColor( 'text' ),
+	return (
+		<ColorPanel
+			key="colors"
+			clientId={ props.clientId }
+			colorSettings={ [
+				{
+					label: __( 'Text Color' ),
+					onChange: onChangeColor( 'text' ),
+					colors,
+					value: getColorObjectByAttributeValues(
 						colors,
-						value: getColorObjectByAttributeValues(
-							colors,
-							textColor,
-							style?.color?.text
-						).color,
-					},
-					{
-						label: __( 'Background Color' ),
-						onChange: onChangeColor( 'background' ),
+						textColor,
+						style?.color?.text
+					).color,
+				},
+				{
+					label: __( 'Background Color' ),
+					onChange: onChangeColor( 'background' ),
+					colors,
+					value: getColorObjectByAttributeValues(
 						colors,
-						value: getColorObjectByAttributeValues(
-							colors,
-							backgroundColor,
-							style?.color?.background
-						).color,
-					},
-				] }
-			/>,
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withToolbarControls'
-);
+						backgroundColor,
+						style?.color?.background
+					).color,
+				},
+			] }
+		/>
+	);
+}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -201,10 +194,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/color/with-block-controls',
-	withBlockControls
 );

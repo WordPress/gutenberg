@@ -59,6 +59,8 @@ const typescriptUtilityTypes = [
 	'Required',
 	'ReturnType',
 	'ThisType',
+	'unknown',
+	'never',
 ];
 
 module.exports = {
