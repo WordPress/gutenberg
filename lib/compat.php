@@ -198,6 +198,14 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 
 	$block_context_before = $block_context;
 
+	if ( ! isset( $block_context ) ) {
+		$block_context = array();
+	}
+
+	if ( ! isset( $block_context['postId'] ) || $post->ID !== $block_context['postId'] ) {
+		$block_context['postId'] = $post->ID;
+	}
+
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
 		if ( ! isset( $block_context ) ) {
 			$block_context = array();
@@ -217,7 +225,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	}
 
 	if ( $is_dynamic ) {
-		if ( isset( $block_context ) && isset( $block_type->context ) && is_array( $block_type->context ) ) {
+		if ( isset( $block_type->context ) && is_array( $block_type->context ) ) {
 			foreach ( $block_type->context as $context_name ) {
 				if ( array_key_exists( $context_name, $block_context ) ) {
 					$block['context'][ $context_name ] = $block_context[ $context_name ];
