@@ -73,6 +73,10 @@ export function subscribeAndroidModalClosed( callback ) {
 	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
 }
 
+export function subscribeUpdateTheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+}
+
 /**
  * Request media picker for the given media source.
  *

@@ -65,6 +65,22 @@ public class Gutenberg: NSObject {
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
+        
+        /*
+        // This section provides an example of how to set the value if known at Editor launch
+        let colors = [
+             ["name":"Primary", "slug":"primary", "color":"#000000"],
+             ["name":"Secondary", "slug":"secondary", "color":"#6d6d6d"],
+             ["name":"Accent", "slug":"accent", "color":"#cd2653"]
+         ]
+        
+        initialProps["colors"] = colors
+        */
+        
+        // This mocks an async setting
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.updateTheme()
+        }
 
         return initialProps
     }
@@ -125,6 +141,17 @@ public class Gutenberg: NSObject {
         let url = sourceURL(for: bridge)
         return !(url?.isFileURL ?? true)
     }
+    
+    private func updateTheme() {
+        
+       let colors = [
+            ["name":"Primary", "slug":"primary", "color":"#000000"],
+            ["name":"Secondary", "slug":"secondary", "color":"#6d6d6d"],
+            ["name":"Accent", "slug":"accent", "color":"#cd2653"]
+        ]
+        
+        bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body: colors)
+    }
 }
 
 extension Gutenberg: RCTBridgeDelegate {
@@ -150,6 +177,7 @@ extension Gutenberg {
         static let mediaUpload = "mediaUpload"
         static let setFocusOnTitle = "setFocusOnTitle"
         static let mediaAppend = "mediaAppend"
+        static let updateTheme = "updateTheme"
     }
     
     public enum MediaUploadState: Int {
