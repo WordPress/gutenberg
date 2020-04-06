@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import TokenList from '@wordpress/token-list';
 
 /**
  * Internal dependencies
@@ -60,10 +61,11 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	const { fontSize } = attributes;
+	// Use TokenList to dedupe classes.
+	const classes = new TokenList( props.className );
+	classes.add( getFontSizeClass( attributes.fontSize ) );
+	const newClassName = classnames( classes.value );
 
-	const fontSizeClass = getFontSizeClass( fontSize );
-	const newClassName = classnames( props.className, fontSizeClass );
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
