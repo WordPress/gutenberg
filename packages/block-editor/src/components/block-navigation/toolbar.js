@@ -13,8 +13,9 @@ import BlockActions from '../block-actions';
 import BlockMover from '../block-mover';
 
 export default function BlockNavigationToolbar() {
-	const blockClientIds = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSelectedBlockClientIds()
+	const blockClientIds = useSelect(
+		( select ) => select( 'core/block-editor' ).getSelectedBlockClientIds(),
+		[]
 	);
 
 	return (

@@ -10,11 +10,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationStructurePanel( { blocks, initialOpen } ) {
-	const selectedBlockClientIds = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSelectedBlockClientIds()
+	const selectedBlockClientIds = useSelect(
+		( select ) => select( 'core/block-editor' ).getSelectedBlockClientIds(),
+		[]
 	);
-
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+
 	return (
 		<Panel className="edit-navigation-menu-editor__navigation-structure-panel">
 			<PanelBody
