@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, isEqual, find } from 'lodash';
+import { castArray, get, isEqual, find, remove } from 'lodash';
 
 /**
  * Internal dependencies
@@ -242,16 +242,40 @@ export function __unstableCreateUndoLevel() {
 export function* deleteEntityRecord( kind, name, recordId ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
+	const path = `${ entity.baseURL + '/' + recordId + '?force=true' }`;
+
 	if ( ! entity ) {
 		return;
 	}
-	const path = `${ entity.baseURL + '/' + recordId + '?force=true' }`;
-	yield apiFetch( {
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+	};
+
+	const deletedRecord = yield apiFetch( {
 		path,
 		method: 'DELETE',
 	} );
-	const entityRecords = yield select( 'getEntityRecords', kind, name );
-	yield receiveEntityRecords( kind, name, entityRecords, undefined, true );
+
+	const oldRecords = yield select( 'getEntityRecords', kind, name );
+
+	const newRecords = remove( oldRecords, ( record ) => {
+		return record.id === deletedRecord.previous.id;
+	} );
+
+	yield receiveEntityRecords( kind, name, newRecords, undefined, true );
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+	};
+
+	return newRecords;
 }
 
 /**

@@ -239,6 +239,19 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			deleting: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'DELETE_ENTITY_RECORD_START':
+					case 'DELETE_ENTITY_RECORD_FINISH':
+						delete state[ action.recordId ];
+						return {
+							...state,
+						};
+				}
+
+				return state;
+			},
 		} )
 	);
 }
