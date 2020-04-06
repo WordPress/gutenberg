@@ -149,6 +149,7 @@ function Navigation( {
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
+		'is-vertical': attributes.orientation === 'vertical',
 	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
@@ -279,7 +280,9 @@ function Navigation( {
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={ 'horizontal' }
+							__experimentalMoverDirection={
+								attributes.orientation
+							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
 							__experimentalPassedProps={ {

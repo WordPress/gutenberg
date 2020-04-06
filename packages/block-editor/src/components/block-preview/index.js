@@ -26,7 +26,11 @@ import AutoHeightBlockPreview from './auto';
  *
  * @return {WPComponent} The component to be rendered.
  */
-export function BlockPreview( { blocks, viewportWidth = 700 } ) {
+export function BlockPreview( {
+	blocks,
+	__experimentalPadding = 0,
+	viewportWidth = 700,
+} ) {
 	const settings = useSelect( ( select ) =>
 		select( 'core/block-editor' ).getSettings()
 	);
@@ -44,6 +48,7 @@ export function BlockPreview( { blocks, viewportWidth = 700 } ) {
 			<AutoHeightBlockPreview
 				key={ recompute }
 				viewportWidth={ viewportWidth }
+				__experimentalPadding={ __experimentalPadding }
 			/>
 		</BlockEditorProvider>
 	);

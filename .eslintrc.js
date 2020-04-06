@@ -38,6 +38,11 @@ module.exports = {
 	globals: {
 		wp: 'off',
 	},
+	settings: {
+		jsdoc: {
+			mode: 'typescript',
+		},
+	},
 	rules: {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/gutenberg-phase': 'error',

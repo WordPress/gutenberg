@@ -24,72 +24,84 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function EditorSkeleton( {
+function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
 	content,
-	publish,
+	actions,
+	labels,
 	className,
 } ) {
-	useHTMLClass( 'block-editor-editor-skeleton__html-container' );
+	useHTMLClass( 'interface-interface-skeleton__html-container' );
+
+	const defaultLabels = {
+		header: __( 'Header' ),
+		body: __( 'Content' ),
+		sidebar: __( 'Settings' ),
+		actions: __( 'Publish' ),
+		footer: __( 'Footer' ),
+	};
+
+	const mergedLabels = { ...defaultLabels, ...labels };
+
 	return (
 		<div
 			className={ classnames(
 				className,
-				'block-editor-editor-skeleton'
+				'interface-interface-skeleton'
 			) }
 		>
 			{ !! header && (
 				<div
-					className="block-editor-editor-skeleton__header"
+					className="interface-interface-skeleton__header"
 					role="region"
 					/* translators: accessibility text for the top bar landmark region. */
-					aria-label={ __( 'Editor top bar' ) }
+					aria-label={ mergedLabels.header }
 					tabIndex="-1"
 				>
 					{ header }
 				</div>
 			) }
-			<div className="block-editor-editor-skeleton__body">
+			<div className="interface-interface-skeleton__body">
 				<div
-					className="block-editor-editor-skeleton__content"
+					className="interface-interface-skeleton__content"
 					role="region"
 					/* translators: accessibility text for the content landmark region. */
-					aria-label={ __( 'Editor content' ) }
+					aria-label={ mergedLabels.body }
 					tabIndex="-1"
 				>
 					{ content }
 				</div>
 				{ !! sidebar && (
 					<div
-						className="block-editor-editor-skeleton__sidebar"
+						className="interface-interface-skeleton__sidebar"
 						role="region"
 						/* translators: accessibility text for the settings landmark region. */
-						aria-label={ __( 'Editor settings' ) }
+						aria-label={ mergedLabels.sidebar }
 						tabIndex="-1"
 					>
 						{ sidebar }
 					</div>
 				) }
-				{ !! publish && (
+				{ !! actions && (
 					<div
-						className="block-editor-editor-skeleton__publish"
+						className="interface-interface-skeleton__actions"
 						role="region"
 						/* translators: accessibility text for the publish landmark region. */
-						aria-label={ __( 'Editor publish' ) }
+						aria-label={ mergedLabels.actions }
 						tabIndex="-1"
 					>
-						{ publish }
+						{ actions }
 					</div>
 				) }
 			</div>
 			{ !! footer && (
 				<div
-					className="block-editor-editor-skeleton__footer"
+					className="interface-interface-skeleton__footer"
 					role="region"
 					/* translators: accessibility text for the footer landmark region. */
-					aria-label={ __( 'Editor footer' ) }
+					aria-label={ mergedLabels.footer }
 					tabIndex="-1"
 				>
 					{ footer }
@@ -99,4 +111,4 @@ function EditorSkeleton( {
 	);
 }
 
-export default navigateRegions( EditorSkeleton );
+export default navigateRegions( InterfaceSkeleton );

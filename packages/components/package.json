@@ -56,7 +56,7 @@
 		"reakit": "^1.0.0-rc.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^3.3.2"
+		"uuid": "^7.0.2"
 	},
 	"publishConfig": {
 		"access": "public"
