@@ -12,12 +12,15 @@ import {
 	pointBase,
 	Cell as CellBase,
 } from './alignment-matrix-control-styles';
-import { color } from '../../utils/style-mixins';
 
 const rootSize = () => {
+	const padding = 2;
 	const size = 24;
+
 	return css( {
-		gridTemplateRows: `repeat( 3, calc( ${ size }px / 3))`,
+		gridTemplateRows: `repeat( 3, calc( ${ size - 2 }px / 3))`,
+		padding,
+		maxHeight: size,
 		maxWidth: size,
 	} );
 };
@@ -28,8 +31,14 @@ const rootPointerEvents = ( { disablePointerEvents } ) => {
 	} );
 };
 
+export const Wrapper = styled.div`
+	box-sizing: border-box;
+	padding: 2px;
+`;
+
 export const Root = styled.div`
 	transform-origin: top left;
+	height: 100%;
 	width: 100%;
 
 	${rootBase};
@@ -38,17 +47,14 @@ export const Root = styled.div`
 `;
 
 const pointActive = ( { isActive } ) => {
-	const boxShadow = isActive
-		? `0 0 0 1px ${ color( 'blue.medium.focus' ) }`
-		: null;
-	const pointColor = isActive ? color( 'blue.medium.focus' ) : 'currentColor';
+	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
 
 	return css`
 		box-shadow: ${boxShadow};
-		color: ${pointColor};
+		color: currentColor;
 
 		*:hover > & {
-			color: ${pointColor};
+			color: currentColor;
 		}
 	`;
 };
