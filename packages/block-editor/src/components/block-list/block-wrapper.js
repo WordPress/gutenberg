@@ -27,6 +27,7 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockContext } from './block';
+import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
@@ -48,6 +49,7 @@ const BlockComponent = forwardRef(
 			name,
 			mode,
 			blockTitle,
+			wrapperProps,
 		} = useContext( BlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
@@ -94,15 +96,16 @@ const BlockComponent = forwardRef(
 
 		/**
 		 * When a block becomes selected, transition focus to an inner tabbable.
-		 *
-		 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 		 */
-		const focusTabbable = ( ignoreInnerBlocks ) => {
+		const focusTabbable = () => {
 			// Focus is captured by the wrapper node, so while focus transition
 			// should only consider tabbables within editable display, since it
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
-			if ( wrapper.current.contains( document.activeElement ) ) {
+			if (
+				document.activeElement &&
+				isInsideRootBlock( wrapper.current, document.activeElement )
+			) {
 				return;
 			}
 
@@ -110,11 +113,11 @@ const BlockComponent = forwardRef(
 			const textInputs = focus.tabbable
 				.find( wrapper.current )
 				.filter( isTextField )
-				// Exclude inner blocks
+				// Exclude inner blocks and block appenders
 				.filter(
 					( node ) =>
-						! ignoreInnerBlocks ||
-						isInsideRootBlock( wrapper.current, node )
+						isInsideRootBlock( wrapper.current, node ) &&
+						! node.closest( '.block-list-appender' )
 				);
 
 			// If reversed (e.g. merge via backspace), use the last in the set of
@@ -126,15 +129,10 @@ const BlockComponent = forwardRef(
 			placeCaretAtHorizontalEdge( target, isReverse );
 		};
 
-		// Focus the selected block's wrapper or inner input on mount and update
-		const isMounting = useRef( true );
-
 		useEffect( () => {
 			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
-				focusTabbable( ! isMounting.current );
+				focusTabbable();
 			}
-
-			isMounting.current = false;
 		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
 
 		// Block Reordering animation
@@ -203,10 +201,15 @@ const BlockComponent = forwardRef(
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
+				{ ...wrapperProps }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
-				className={ classnames( className, props.className ) }
+				className={ classnames(
+					className,
+					props.className,
+					wrapperProps && wrapperProps.className
+				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
@@ -216,6 +219,7 @@ const BlockComponent = forwardRef(
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
 				tabIndex="0"
 				style={ {
+					...( wrapperProps ? wrapperProps.style : {} ),
 					...( props.style || {} ),
 					...animationStyle,
 				} }
@@ -226,9 +230,7 @@ const BlockComponent = forwardRef(
 	}
 );
 
-const elements = [ 'p', 'div' ];
-
-const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
+const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {
 		return <BlockComponent { ...props } ref={ ref } tagName={ element } />;
 	} );

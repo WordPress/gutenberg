@@ -29,6 +29,8 @@ import Sidebar from '../sidebar';
 import SelectionObserver from './selection-observer';
 import Inserter from '../inserter';
 
+const inserterToggleProps = { isPrimary: true };
+
 function getBlockEditorSettings( blockEditorSettings, hasUploadPermissions ) {
 	if ( ! hasUploadPermissions ) {
 		return blockEditorSettings;
@@ -128,7 +130,9 @@ function WidgetArea( {
 						{ isSelectedArea && (
 							<>
 								<Inserter>
-									<BlockInserter />
+									<BlockInserter
+										toggleProps={ inserterToggleProps }
+									/>
 								</Inserter>
 								<BlockEditorKeyboardShortcuts />
 							</>

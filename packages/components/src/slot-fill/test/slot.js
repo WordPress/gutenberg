@@ -260,6 +260,46 @@ describe( 'Slot', () => {
 
 				expect( container ).toMatchSnapshot();
 			} );
+
+			it( 'should unmount two slots with the same name', () => {
+				const { rerender, container } = render(
+					<Provider>
+						<div data-position="first">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<div data-position="second">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+				rerender(
+					<Provider>
+						<div data-position="first">
+							<Slot
+								name="egg"
+								bubblesVirtually={ bubblesVirtually }
+							/>
+						</div>
+						<div data-position="second" />
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+				rerender(
+					<Provider>
+						<div data-position="first" />
+						<div data-position="second" />
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+				expect( container ).toMatchSnapshot();
+			} );
 		}
 	);
 } );

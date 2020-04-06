@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Services = {
 	// translators: title for "Services" page template
 	name: __( 'Services' ),
+	key: 'services',
 	icon: '🛠',
 	content: [
 		{
@@ -115,7 +116,7 @@ const Services = {
 		{
 			name: 'core/spacer',
 			attributes: {
-				height: 40,
+				height: 24,
 			},
 		},
 		{

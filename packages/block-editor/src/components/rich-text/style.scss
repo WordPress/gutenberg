@@ -3,19 +3,6 @@
 		margin-top: 0;
 	}
 
-	a {
-		color: $blue-medium-700;
-	}
-
-	code {
-		padding: 2px;
-		border-radius: 2px;
-		color: $dark-gray-800;
-		background: $light-gray-200;
-		font-family: $editor-html-font;
-		font-size: inherit; // This is necessary to override upstream CSS.
-	}
-
 	[data-rich-text-placeholder] {
 		pointer-events: none;
 	}
@@ -55,7 +42,7 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	.components-popover__content {
 		width: auto;
 		min-width: auto;
-		margin-bottom: $grid-unit;
+		margin-bottom: $grid-unit-10;
 		box-shadow: none;
 
 		// Block UI appearance.

@@ -26,6 +26,17 @@ exports[`Slot bubblesVirtually false should subsume another slot by the same nam
 </div>
 `;
 
+exports[`Slot bubblesVirtually false should unmount two slots with the same name 1`] = `
+<div>
+  <div
+    data-position="first"
+  />
+  <div
+    data-position="second"
+  />
+</div>
+`;
+
 exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
 <div>
   <div
@@ -55,6 +66,17 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
       Content
     </div>
   </div>
+</div>
+`;
+
+exports[`Slot bubblesVirtually true should unmount two slots with the same name 1`] = `
+<div>
+  <div
+    data-position="first"
+  />
+  <div
+    data-position="second"
+  />
 </div>
 `;
 

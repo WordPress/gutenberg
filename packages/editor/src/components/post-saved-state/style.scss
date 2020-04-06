@@ -1,7 +1,7 @@
 .editor-post-saved-state {
 	display: flex;
 	align-items: center;
-	width: $icon-button-size - $grid-unit-10;
+	width: $button-size - $grid-unit-10;
 	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
 	color: $medium-gray-text;
 	overflow: hidden;
@@ -19,7 +19,7 @@
 		padding: $grid-unit-10 #{ $grid-unit-05 * 3 };
 		text-indent: inherit;
 
-		.dashicon {
+		svg {
 			margin-right: $grid-unit-05;
 		}
 	}

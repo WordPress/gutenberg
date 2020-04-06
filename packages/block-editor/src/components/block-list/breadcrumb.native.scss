@@ -2,7 +2,7 @@
 	flex-direction: row;
 	align-items: center;
 	justify-content: flex-start;
-	padding-left: 5;
+	padding-left: 15;
 	padding-right: 15;
 	flex-shrink: 1;
 }
@@ -27,4 +27,8 @@
 	margin-top: -4px;
 	margin-left: 4;
 	margin-right: 4;
+}
+
+.densedPaddingLeft {
+	padding-left: 5;
 }

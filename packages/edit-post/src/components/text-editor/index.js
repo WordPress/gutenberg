@@ -24,7 +24,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 						icon={ close }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
-						{ __( 'Exit Code Editor' ) }
+						{ __( 'Exit code editor' ) }
 					</Button>
 					<TextEditorGlobalKeyboardShortcuts />
 				</div>

@@ -36,6 +36,20 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not work with the list input rule', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## 1. H' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should work with the format input rules', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## `code`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should create a paragraph block above when pressing enter at the start', async () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## a' );
@@ -69,7 +83,7 @@ describe( 'Heading', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#7700ff' );
-		await page.click( '[data-type="core/heading"] h3' );
+		await page.click( 'h3[data-type="core/heading"]' );
 		await page.waitForSelector(
 			'.component-color-indicator[aria-label="(Color: #7700ff)"]'
 		);
@@ -87,7 +101,7 @@ describe( 'Heading', () => {
 		const colorButtonSelector = `//button[@aria-label='Color: Luminous vivid orange']`;
 		const [ colorButton ] = await page.$x( colorButtonSelector );
 		await colorButton.click();
-		await page.click( '[data-type="core/heading"] h2' );
+		await page.click( 'h2[data-type="core/heading"]' );
 		await page.waitForXPath(
 			`${ colorButtonSelector }[@aria-pressed='true']`
 		);

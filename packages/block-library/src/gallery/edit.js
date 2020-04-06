@@ -20,9 +20,7 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
-	RangeControl,
 	SelectControl,
-	StepperControl,
 	ToggleControl,
 	withNotices,
 } from '@wordpress/components';
@@ -39,8 +37,8 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
+import ColumnsControl from './columns-control';
 
-const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -73,6 +71,7 @@ class GalleryEdit extends Component {
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
+		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
@@ -117,6 +116,16 @@ class GalleryEdit extends Component {
 			if ( this.state.selectedImage !== index ) {
 				this.setState( {
 					selectedImage: index,
+				} );
+			}
+		};
+	}
+
+	onDeselectImage( index ) {
+		return () => {
+			if ( this.state.selectedImage === index ) {
+				this.setState( {
+					selectedImage: null,
 				} );
 			}
 		};
@@ -384,7 +393,6 @@ class GalleryEdit extends Component {
 						{ images.length > 1 && (
 							<ColumnsControl
 								label={ __( 'Columns' ) }
-								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
@@ -427,6 +435,7 @@ class GalleryEdit extends Component {
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
 					onSelectImage={ this.onSelectImage }
+					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
 				/>

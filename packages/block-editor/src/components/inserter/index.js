@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { plusCircle } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -29,8 +29,8 @@ const defaultRenderToggle = ( {
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
-		// translators: %s: the name of the block when there is only one
 		label = sprintf(
+			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle
 		);
@@ -39,7 +39,7 @@ const defaultRenderToggle = ( {
 	}
 	return (
 		<Button
-			icon={ plusCircle }
+			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
 			onClick={ onToggle }
@@ -236,8 +236,8 @@ export default compose( [
 				);
 
 				if ( ! selectBlockOnInsert ) {
-					// translators: %s: the name of the block that has been added
 					const message = sprintf(
+						// translators: %s: the name of the block that has been added
 						__( '%s block added' ),
 						allowedBlockType.title
 					);

@@ -12,7 +12,10 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -114,14 +117,14 @@ class EditorProvider extends Component {
 				'templateLock',
 				'titlePlaceholder',
 				'onUpdateDefaultBlockStyles',
+				'__experimentalDisableCustomUnits',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalBlockDirectory',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
-				'__mobileEnablePageTemplates',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
-				'showInserterHelpPanel',
+				'__experimentalDisableCustomLineHeight',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
@@ -136,23 +139,6 @@ class EditorProvider extends Component {
 
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
-
-		if ( ! this.props.settings.styles ) {
-			return;
-		}
-
-		const updatedStyles = transformStyles(
-			this.props.settings.styles,
-			'.editor-styles-wrapper'
-		);
-
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
-			}
-		} );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -199,27 +185,30 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<EntityProvider kind="root" type="site">
-				<EntityProvider
-					kind="postType"
-					type={ post.type }
-					id={ post.id }
-				>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ resetEditorBlocksWithoutUndoLevel }
-						onChange={ resetEditorBlocks }
-						selectionStart={ selectionStart }
-						selectionEnd={ selectionEnd }
-						settings={ editorSettings }
-						useSubRegistry={ false }
+			<>
+				<EditorStyles styles={ settings.styles } />
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
 					>
-						{ children }
-						<ReusableBlocksButtons />
-						<ConvertToGroupButtons />
-					</BlockEditorProvider>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ resetEditorBlocksWithoutUndoLevel }
+							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
+							settings={ editorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							<ReusableBlocksButtons />
+							<ConvertToGroupButtons />
+						</BlockEditorProvider>
+					</EntityProvider>
 				</EntityProvider>
-			</EntityProvider>
+			</>
 		);
 	}
 }

@@ -22,10 +22,16 @@ function render_block_core_post_featured_image() {
  * Registers the `core/post-featured-image` block on the server.
  */
 function register_block_core_post_featured_image() {
+	$path     = __DIR__ . '/post-featured-image/block.json';
+	$metadata = json_decode( file_get_contents( $path ), true );
+
 	register_block_type(
-		'core/post-featured-image',
-		array(
-			'render_callback' => 'render_block_core_post_featured_image',
+		$metadata['name'],
+		array_merge(
+			$metadata,
+			array(
+				'render_callback' => 'render_block_core_post_featured_image',
+			)
 		)
 	);
 }

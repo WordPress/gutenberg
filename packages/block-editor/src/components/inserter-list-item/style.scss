@@ -25,16 +25,23 @@
 	height: auto;
 
 	&:disabled {
-		@include block-style__disabled();
+		opacity: 0.6;
+		cursor: default;
 	}
 
 	&:not(:disabled) {
 		&:hover {
-			@include block-style__hover();
+			border-color: $theme-color;
+			color: $theme-color !important;
 		}
 
 		&.is-active {
-			@include block-style__is-active();
+			color: $white;
+			background: $dark-gray-primary;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
 		}
 	}
 }
@@ -42,7 +49,7 @@
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
 	border-radius: $radius-round-rectangle;
-	color: $dark-gray-500;
+	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 

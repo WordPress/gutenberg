@@ -113,8 +113,8 @@
 	display: inline-block;
 
 	svg {
-		max-width: $icon-button-size;
-		max-height: $icon-button-size;
+		max-width: $button-size;
+		max-height: $button-size;
 		padding: $grid-unit-10;
 	}
 }
