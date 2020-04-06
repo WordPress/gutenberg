@@ -26,6 +26,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -38,6 +39,7 @@ import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -75,6 +77,7 @@ public class WPAndroidGlueCode {
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
+    private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -97,6 +100,7 @@ public class WPAndroidGlueCode {
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
+    private boolean mIsDarkMode;
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -152,6 +156,10 @@ public class WPAndroidGlueCode {
 
     public interface OnMediaEditorListener {
         void onMediaEditorClicked(String mediaUrl);
+    }
+
+    public interface OnLogGutenbergUserEventListener {
+        void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
     public void mediaSelectionCancelled() {
@@ -317,7 +325,12 @@ public class WPAndroidGlueCode {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnMediaEditorListener.onMediaEditorClicked(mediaUrl);
             }
-        });
+
+            @Override
+            public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
+                mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
+            }
+        }, mIsDarkMode);
 
         return Arrays.asList(
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
@@ -341,15 +354,18 @@ public class WPAndroidGlueCode {
     @Deprecated
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost, String localeString, Bundle translations) {
+                             boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
         onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations);
+        , localeString, translations, colorBackground, isDarkMode);
     }
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             String postType, boolean isNewPost, String localeString, Bundle translations) {
+                             String postType, boolean isNewPost, String localeString, Bundle translations,
+                             int colorBackground, boolean isDarkMode) {
+        mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
+        mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
@@ -363,11 +379,8 @@ public class WPAndroidGlueCode {
             builder.setBundleAssetName("index.android.bundle");
         }
         mReactInstanceManager = builder.build();
-        mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-            @Override
-            public void onReactContextInitialized(ReactContext context) {
-                mReactContext = context;
-            }
+        mReactInstanceManager.addReactInstanceEventListener(context -> {
+            mReactContext = context;
         });
         Bundle initialProps = mReactRootView.getAppProperties();
         if (initialProps == null) {
@@ -392,7 +405,10 @@ public class WPAndroidGlueCode {
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
                                   RequestExecutor fetchExecutor,
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
-                                  OnMediaEditorListener onMediaEditorListener) {
+                                  OnMediaEditorListener onMediaEditorListener,
+                                  OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
+                                  boolean isDarkMode) {
+
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -403,6 +419,7 @@ public class WPAndroidGlueCode {
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
+        mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -412,6 +429,10 @@ public class WPAndroidGlueCode {
 
         viewGroup.addView(mReactRootView, 0,
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        if (mReactContext != null) {
+            setPreferredColorScheme(isDarkMode);
+        }
 
         refocus();
     }
@@ -456,6 +477,11 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void onDetach(Activity activity) {
+        mReactInstanceManager.onHostDestroy(activity);
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().notifyModalClosed();
+    }
+
     public void onDestroy(Activity activity) {
         if (mReactRootView != null) {
             mReactRootView.unmountReactApplication();
@@ -483,6 +509,14 @@ public class WPAndroidGlueCode {
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                             .appendNewMediaBlock(mediaId, mediaUri, mediaType);
+    }
+
+    public void setPreferredColorScheme(boolean isDarkMode) {
+        if (mIsDarkMode != isDarkMode) {
+            mIsDarkMode = isDarkMode;
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .setPreferredColorScheme(isDarkMode);
+        }
     }
 
     public void setTitle(String title) {

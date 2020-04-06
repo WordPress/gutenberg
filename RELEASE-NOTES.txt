@@ -1,3 +1,21 @@
+1.25.0
+------
+* New block: Cover
+* [Android] Dark Mode
+* [Android] Improve icon on the "Take a Video" media option
+* Removed the dimming effect on unselected blocks
+* [iOS] Add alignment options for heading block
+* Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
+* Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
+* [Android] Show an "Edit" button overlay on selected image blocks
+
+1.24.0
+------
+* New block: Latest Posts
+* Fix Quote block's left border not being visible in Dark Mode
+* Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
+* Fix crash when pasting HTML content with embeded images on paragraphs
+
 1.23.0
 ------
 * New block: Group
@@ -7,10 +25,12 @@
 * Add scroll support inside block picker and block settings
 * [Android] Fix issue preventing correct placeholder image from displaying during image upload
 * [iOS] Fix diplay of large numbers on ordered lists
+* Fix issue where adding emojis to the post title add strong HTML elements to the title of the post
+* [iOS] Fix issue where alignment of paragraph blocks was not always being respected when splitting the paragraph or reading the post's html content.
+* We’ve introduced a new toolbar that floats above the block you’re editing, which makes navigating your blocks easier — especially complex ones.
 
 1.22.0
 ------
-* Add support for changing images size in Gallery block
 * Make inserter to show options on long-press to add before/after
 * Retry displaying image when connectivity restores
 * [iOS] Show an "Edit" button overlay on selected image blocks

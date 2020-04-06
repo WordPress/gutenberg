@@ -4,12 +4,6 @@
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
-		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
 		}
 	}
 }

@@ -7,8 +7,11 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
+
+export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
 
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
@@ -16,7 +19,10 @@ export const mediaSources = {
 	siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
 };
 
-export const showMediaEditorButton = isIOS;
+export const userEvents = {
+	editorSessionTemplateApply: 'editor_session_template_apply',
+	editorSessionTemplatePreview: 'editor_session_template_preview',
+};
 
 // Console polyfill from react-native
 
@@ -63,6 +69,14 @@ export function subscribeMediaUpload( callback ) {
 
 export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
+}
+
+export function subscribeAndroidModalClosed( callback ) {
+	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
+}
+
+export function subscribePreferredColorScheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
 
 /**
@@ -116,6 +130,10 @@ export function requestMediaEditor( mediaUrl, callback ) {
 
 export function fetchRequest( path ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
+}
+
+export function logUserEvent( event, properties ) {
+	return RNReactNativeGutenbergBridge.logUserEvent( event, properties );
 }
 
 export default RNReactNativeGutenbergBridge;

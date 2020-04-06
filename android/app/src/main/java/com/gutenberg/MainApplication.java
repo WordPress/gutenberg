@@ -1,6 +1,7 @@
 package com.gutenberg;
 
 import android.app.Application;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -8,6 +9,7 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactApplication;
 import com.BV.LinearGradient.LinearGradientPackage;
+import com.facebook.react.bridge.ReadableMap;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.facebook.react.bridge.ReadableArray;
@@ -102,6 +104,10 @@ public class MainApplication extends Application implements ReactApplication {
             }
 
             @Override
+            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
+            }
+
+            @Override
             public void editorDidEmitLog(String message, LogLevel logLevel) {
                 switch (logLevel) {
                     case TRACE:
@@ -121,7 +127,8 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
-        });
+
+        }, isDarkMode());
 
         return new ReactNativeHost(this) {
             @Override
@@ -146,6 +153,13 @@ public class MainApplication extends Application implements ReactApplication {
                 return "index";
             }
         };
+    }
+
+    private boolean isDarkMode() {
+        Configuration configuration = getResources().getConfiguration();
+        int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
     }
 
     @Override

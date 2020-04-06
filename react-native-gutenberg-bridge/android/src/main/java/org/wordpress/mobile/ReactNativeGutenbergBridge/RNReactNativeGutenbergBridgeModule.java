@@ -9,19 +9,23 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext mReactContext;
@@ -33,6 +37,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_FOCUS_TITLE = "setFocusOnTitle";
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_APPEND = "mediaAppend";
+    private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
+    private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
+    private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -42,6 +49,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID = "mediaServerId";
+
+    private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
 
     private static final int MEDIA_UPLOAD_STATE_UPLOADING = 1;
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -55,10 +64,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
     private static final String MEDIA_SOURCE_MEDIA_EDITOR = "MEDIA_EDITOR";
 
+    private boolean mIsDarkMode;
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
-            GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
+            GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent, boolean isDarkMode) {
         super(reactContext);
+        mIsDarkMode = isDarkMode;
         mReactContext = reactContext;
         mGutenbergBridgeJS2Parent = gutenbergBridgeJS2Parent;
     }
@@ -66,6 +77,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @Override
     public String getName() {
         return "RNReactNativeGutenbergBridge";
+    }
+
+
+    @Override
+    public Map<String, Object> getConstants() {
+        final HashMap<String, Object> constants = new HashMap<>();
+        constants.put("isInitialColorSchemeDark", mIsDarkMode);
+        return constants;
     }
 
     private void emitToJS(String eventName, @Nullable WritableMap data) {
@@ -99,6 +118,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUri);
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
+    }
+
+    public void setPreferredColorScheme(boolean isDarkMode) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putBoolean(MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK, isDarkMode);
+        emitToJS(EVENT_NAME_PREFERRED_COLOR_SCHEME, writableMap);
     }
 
     @ReactMethod
@@ -209,6 +234,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 });
     }
 
+    @ReactMethod
+    public void logUserEvent(String eventName, ReadableMap eventProperties) {
+        mGutenbergBridgeJS2Parent.logUserEvent(GutenbergUserEvent.getEnum(eventName), eventProperties);
+    }
+
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
         return new OtherMediaOptionsReceivedCallback() {
             @Override public void onOtherMediaOptionsReceived(ArrayList<MediaOption> mediaOptions) {
@@ -278,6 +308,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     public void toggleEditorMode() {
-        emitToJS("toggleHTMLMode", null);
+        emitToJS(EVENT_NAME_TOGGLE_HTML_MODE, null);
+    }
+
+    public void notifyModalClosed() {
+        emitToJS(EVENT_NAME_NOTIFY_MODAL_CLOSED, null);
     }
 }
