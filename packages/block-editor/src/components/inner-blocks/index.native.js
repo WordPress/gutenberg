@@ -115,7 +115,6 @@ class InnerBlocks extends Component {
 			__experimentalMoverDirection,
 			horizontal,
 			scrollEnabled,
-			style,
 			contentResizeMode,
 			contentStyle,
 			onAddBlock,
@@ -137,7 +136,6 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
-						style={ style }
 						horizontal={ horizontal }
 						scrollEnabled={ scrollEnabled }
 						contentResizeMode={ contentResizeMode }

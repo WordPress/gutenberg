@@ -100,7 +100,6 @@ export class BlockList extends Component {
 			isRootList,
 			horizontal,
 			scrollEnabled,
-			style,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
@@ -136,16 +135,16 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ {
-						flex: isRootList ? 1 : 0,
-						...( ! isRootList && { overflow: 'visible' } ),
-					} }
+					scrollViewStyle={ [
+						{ flex: isRootList ? 1 : 0 },
+						! isRootList && styles.overflowVisible,
+					] }
 					horizontal={ horizontal }
 					scrollEnabled={ scrollEnabled }
 					contentContainerStyle={
 						horizontal && styles.horizontalContentContainer
 					}
-					style={ style }
+					style={ ! isRootList && styles.overflowVisible }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
