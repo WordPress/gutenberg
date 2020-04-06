@@ -13,22 +13,31 @@ import {
 	Point,
 } from './styles/alignment-matrix-control-icon-styles';
 
+const BASE_SIZE = 24;
+
 export default function AlignmentMatrixControlIcon( {
 	className,
 	disablePointerEvents = true,
 	height,
-	size: sizeProp = 24,
+	size: sizeProp = BASE_SIZE,
+	style = {},
 	value = 'center',
 	width,
 	...props
 } ) {
 	const alignIndex = getAlignmentIndex( value );
-	const size = sizeProp || width || height;
+	const size = width || height || sizeProp;
+	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 
 	const classes = classnames(
 		'component-alignment-matrix-control-icon',
 		className
 	);
+
+	const styles = {
+		...style,
+		transform: `scale(${ scale })`,
+	};
 
 	return (
 		<Root
@@ -37,6 +46,7 @@ export default function AlignmentMatrixControlIcon( {
 			disablePointerEvents={ disablePointerEvents }
 			role="presentation"
 			size={ size }
+			style={ styles }
 		>
 			{ ALIGNMENTS.map( ( align, index ) => {
 				const isActive = alignIndex === index;

@@ -14,7 +14,8 @@ import {
 } from './alignment-matrix-control-styles';
 import { color } from '../../utils/style-mixins';
 
-const rootSize = ( { size } ) => {
+const rootSize = () => {
+	const size = 24;
 	return css( {
 		gridTemplateRows: `repeat( 3, calc( ${ size }px / 3))`,
 		maxWidth: size,
@@ -28,6 +29,7 @@ const rootPointerEvents = ( { disablePointerEvents } ) => {
 };
 
 export const Root = styled.div`
+	transform-origin: top left;
 	width: 100%;
 
 	${rootBase};

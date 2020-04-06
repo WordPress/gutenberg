@@ -30,20 +30,26 @@ const rootBorder = ( { hasFocusBorder } ) => {
 	`;
 };
 
+const rootSize = ( { size = 92 } ) => {
+	return css`
+		grid-template-rows: repeat( 3, calc( ${size}px / 3 ) );
+		width: ${size}px;
+	`;
+};
+
 export const Root = styled.div`
-	--width: 92px;
 	${rootBase};
 
 	border: 1px solid transparent;
 	cursor: pointer;
 	grid-template-columns: auto;
-	grid-template-rows: repeat( 3, calc( var( --width ) / 3 ) );
-	width: var( --width, 92px );
 
-	${rootBorder}
+	${rootBorder};
+	${rootSize};
 `;
 
 export const Row = styled.div`
+	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: repeat( 3, 1fr );
 `;

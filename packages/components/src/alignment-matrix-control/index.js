@@ -41,6 +41,7 @@ export default function AlignmentMatrixControl( {
 	value,
 	onBlur = noop,
 	onChange = noop,
+	width = 92,
 	...props
 } ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
@@ -67,6 +68,10 @@ export default function AlignmentMatrixControl( {
 		onBlur( event );
 	};
 
+	const handleOnChange = ( nextValue ) => {
+		onChange( nextValue );
+	};
+
 	useEffect( () => {
 		if ( typeof value !== 'undefined' ) {
 			composite.setCurrentId( getItemId( baseId, value ) );
@@ -88,6 +93,7 @@ export default function AlignmentMatrixControl( {
 			hasFocusBorder={ hasFocusBorder }
 			onBlur={ handleOnBlur }
 			role="grid"
+			width={ width }
 		>
 			{ GRID.map( ( cells, index ) => (
 				<CompositeGroup
@@ -98,15 +104,16 @@ export default function AlignmentMatrixControl( {
 				>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
+						const isActive = composite.currentId === cellId;
 
 						return (
 							<Cell
 								{ ...composite }
-								isActive={ composite.currentId === cellId }
+								isActive={ isActive }
 								key={ cell }
 								id={ cellId }
 								value={ cell }
-								onFocus={ () => onChange( cell ) }
+								onFocus={ () => handleOnChange( cell ) }
 								onClick={ () =>
 									// VoiceOver doesn't focus elements on click
 									composite.move( cellId )

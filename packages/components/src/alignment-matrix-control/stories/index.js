@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { number, select } from '@storybook/addon-knobs';
+import { boolean, number, select } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
@@ -22,7 +22,12 @@ export default {
 };
 
 export const _default = () => {
-	return <AlignmentMatrixControl />;
+	const props = {
+		hasFocusBorder: boolean( 'hasFocusBorder', true ),
+		value: select( 'value', alignmentOptions, 'center center' ),
+	};
+
+	return <AlignmentMatrixControl { ...props } />;
 };
 
 export const icon = () => {

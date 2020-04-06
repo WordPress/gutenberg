@@ -9,7 +9,7 @@ import { AlignmentMatrixControl } from '@wordpress/components';
 import { useState } from '@wordpress/elememt';
 
 const Example = () => {
-	const [ alignment, setAlignment ] = useState( 'center' );
+	const [ alignment, setAlignment ] = useState( 'center center' );
 
 	return (
 		<AlignmentMatrixControl value={ alignment } onChange={ setAlignment } />
