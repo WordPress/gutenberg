@@ -24,6 +24,7 @@ export function LineHeightEdit( props ) {
 		const newStyle = {
 			...style,
 			typography: {
+				...style?.typography,
 				lineHeight: newLineHeightValue,
 			},
 		};
