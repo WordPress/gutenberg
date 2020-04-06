@@ -2,13 +2,21 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 
-const migrateCustomColors = ( attributes ) => {
+const migrateAttributes = ( attributes ) => {
+	if ( ! attributes.tagName ) {
+		attributes = {
+			...attributes,
+			tagName: 'div',
+		};
+	}
+
 	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
 		return attributes;
 	}
@@ -20,7 +28,7 @@ const migrateCustomColors = ( attributes ) => {
 		style.color.background = attributes.customBackgroundColor;
 	}
 	return {
-		...attributes,
+		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
 		style,
 	};
 };
@@ -47,7 +55,7 @@ const deprecated = [
 			anchor: true,
 			html: false,
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		save( { attributes } ) {
 			const {
 				backgroundColor,
@@ -98,7 +106,7 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		supports: {
 			align: [ 'wide', 'full' ],
 			anchor: true,
@@ -153,7 +161,7 @@ const deprecated = [
 			anchor: true,
 			html: false,
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateAttributes,
 		save( { attributes } ) {
 			const { backgroundColor, customBackgroundColor } = attributes;
 

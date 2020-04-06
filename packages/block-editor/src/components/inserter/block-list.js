@@ -315,6 +315,7 @@ function InserterBlockList( {
 		);
 
 		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
@@ -323,11 +324,7 @@ function InserterBlockList( {
 
 	const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
-	const hasItems =
-		! isEmpty( suggestedItems ) ||
-		! isEmpty( reusableItems ) ||
-		! isEmpty( itemsPerCategory ) ||
-		! isEmpty( itemsPerCollection );
+	const hasItems = ! isEmpty( filteredItems );
 
 	return (
 		<div

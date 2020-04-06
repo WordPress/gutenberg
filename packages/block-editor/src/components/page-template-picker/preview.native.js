@@ -50,6 +50,10 @@ const Preview = ( props ) => {
 		styles.previewContainer,
 		styles.previewContainerDark
 	);
+	const previewContentStyle = usePreferredColorSchemeStyle(
+		styles.previewContent,
+		styles.previewContentDark
+	);
 
 	if ( template === undefined ) {
 		return null;
@@ -79,7 +83,9 @@ const Preview = ( props ) => {
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview blocks={ template.blocks } />
+				<View style={ previewContentStyle }>
+					<BlockPreview blocks={ template.blocks } />
+				</View>
 			</SafeAreaView>
 		</Modal>
 	);

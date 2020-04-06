@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +10,6 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,25 +20,10 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import PanelColorSettings from '../components/panel-color-settings';
-import ContrastChecker from '../components/contrast-checker';
-import InspectorControls from '../components/inspector-controls';
-import { getBlockDOMNode } from '../utils/dom';
+import { cleanEmptyObject } from './utils';
+import ColorPanel from './color-panel';
 
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
-
-export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) ) {
-		return object;
-	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
-	);
-	return isEqual( cleanedNestedObjects, {} )
-		? undefined
-		: cleanedNestedObjects;
-};
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -94,10 +77,16 @@ export function addSaveProps( props, blockType, attributes ) {
 		backgroundColor
 	);
 	const textClass = getColorClassName( 'color', textColor );
-	props.className = classnames( props.className, backgroundClass, textClass, {
-		'has-text-color': textColor || style?.color?.text,
-		'has-background': backgroundColor || style?.color?.background,
-	} );
+	const newClassName = classnames(
+		props.className,
+		backgroundClass,
+		textClass,
+		{
+			'has-text-color': textColor || style?.color?.text,
+			'has-background': backgroundColor || style?.color?.background,
+		}
+	);
+	props.className = newClassName ? newClassName : undefined;
 
 	return props;
 }
@@ -124,48 +113,6 @@ export function addEditProps( settings ) {
 
 	return settings;
 }
-
-const ColorPanel = ( { colorSettings, clientId } ) => {
-	const { getComputedStyle, Node } = window;
-
-	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
-	const [ detectedColor, setDetectedColor ] = useState();
-
-	useEffect( () => {
-		const colorsDetectionElement = getBlockDOMNode( clientId );
-		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
-
-		let backgroundColorNode = colorsDetectionElement;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
-		while (
-			backgroundColor === 'rgba(0, 0, 0, 0)' &&
-			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
-		) {
-			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
-		}
-
-		setDetectedBackgroundColor( backgroundColor );
-	} );
-
-	return (
-		<InspectorControls>
-			<PanelColorSettings
-				title={ __( 'Color settings' ) }
-				initialOpen={ false }
-				colorSettings={ colorSettings }
-			>
-				<ContrastChecker
-					backgroundColor={ detectedBackgroundColor }
-					textColor={ detectedColor }
-				/>
-			</PanelColorSettings>
-		</InspectorControls>
-	);
-};
 
 /**
  * Override the default edit UI to include new inspector controls for block

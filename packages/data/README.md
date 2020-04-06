@@ -100,20 +100,20 @@ registerStore( 'my-shop', {
 } );
 ```
 
-The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/docs/basics/Store.html) with the following methods:
+The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
 
 -   `store.getState()`: Returns the state value of the registered reducer
-    -   _Redux parallel:_ [`getState`](https://redux.js.org/api-reference/store#getState)
+    -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
 -   `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
 -   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
-    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
+    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
 
 ### Options
 
 #### `reducer`
 
-A [**reducer**](https://redux.js.org/docs/basics/Reducers.html) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
+A [**reducer**](https://redux.js.org/basics/reducers) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
 
 #### `actions`
 
@@ -148,7 +148,7 @@ The `@wordpress/data` module offers a more advanced and generic interface for th
 -   `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
 -   `getActions()`: Returns an object of action functions, pre-mapped to the store.
 -   `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+    -   Behaves as Redux [`subscribe`](https://redux.js.org/api/store#subscribelistener)
         with the following differences:
         -   Doesn't have to implement an unsubscribe, since the registry never uses it.
             			  \- Only has to support one listener (the registry).
