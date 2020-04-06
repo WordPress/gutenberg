@@ -47,6 +47,7 @@ const typescriptUtilityTypes = [
 	'IterableIterator',
 	'NonNullable',
 	'Omit',
+	'Parameters',
 	'Partial',
 	'Pick',
 	'PromiseLike',
@@ -58,6 +59,8 @@ const typescriptUtilityTypes = [
 	'Required',
 	'ReturnType',
 	'ThisType',
+	'unknown',
+	'never',
 ];
 
 module.exports = {

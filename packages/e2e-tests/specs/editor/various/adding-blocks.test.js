@@ -42,7 +42,7 @@ describe( 'adding blocks', () => {
 
 		// Click below editor to focus last field (block appender)
 		await clickAtBottom(
-			await page.$( '.block-editor-editor-skeleton__content' )
+			await page.$( '.interface-interface-skeleton__content' )
 		);
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
