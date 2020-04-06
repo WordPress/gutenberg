@@ -6,19 +6,19 @@
 }
 
 .is-small-text {
-	font-size: 14px;
+	--wp--typography--font-size: 14px;
 }
 
 .is-regular-text {
-	font-size: 16px;
+	--wp--typography--font-size: 16px;
 }
 
 .is-large-text {
-	font-size: 36px;
+	--wp--typography--font-size: 36px;
 }
 
 .is-larger-text {
-	font-size: 48px;
+	--wp--typography--font-size: 48px;
 }
 
 // Don't show the drop cap when editing the paragraph's content. It causes a
