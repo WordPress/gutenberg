@@ -161,3 +161,48 @@ function gutenberg_get_post_from_context() {
 	}
 	return get_post();
 }
+
+/**
+ * Shim that hooks into `pre_render_block` so as to override `render_block` with
+ * a function that assigns block context.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see (TBD Trac Link)
+ *
+ * @param string $pre_render The pre-rendered content. Defaults to null.
+ * @param array  $block      The block being rendered.
+ *
+ * @return string String of rendered HTML.
+ */
+function gutenberg_provide_render_callback_with_block_object( $pre_render, $block ) {
+	global $post;
+
+	$source_block = $block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$block = apply_filters( 'render_block_data', $block, $source_block );
+
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$block_content = '';
+	$index         = 0;
+
+	foreach ( $block['innerContent'] as $chunk ) {
+		$block_content .= is_string( $chunk ) ? $chunk : gutenberg_provide_render_callback_with_block_object( null, $block['innerBlocks'][ $index++ ] );
+	}
+
+	if ( ! is_array( $block['attrs'] ) ) {
+		$block['attrs'] = array();
+	}
+
+	if ( $is_dynamic ) {
+		$global_post   = $post;
+		$block_content = $block_type->render( $block['attrs'], $block_content );
+		$post          = $global_post;
+	}
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	return apply_filters( 'render_block', $block_content, $block );
+}
+add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
