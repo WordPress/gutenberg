@@ -12,7 +12,7 @@ import {
 	WritingFlow,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { Button, Panel, PanelBody } from '@wordpress/components';
+import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
 
 export default function BlockEditorPanel( { menuId, saveBlocks } ) {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
@@ -40,6 +40,7 @@ export default function BlockEditorPanel( { menuId, saveBlocks } ) {
 				>
 					<BlockToolbar hideDragHandle />
 				</NavigableToolbar>
+				<Popover.Slot name="block-toolbar" />
 				<WritingFlow>
 					<ObserveTyping>
 						<BlockList />
