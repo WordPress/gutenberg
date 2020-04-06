@@ -76,7 +76,7 @@
 
 	.is-showing-movers & {
 		opacity: 1;
-		transform: translateY(-54px);
+		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
 
 	// Hide the Parent button in Top Toolbar mode.
