@@ -6,17 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getColorClassName, RichText } from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { align, content, customTextColor, level, textColor } = attributes;
+	const { align, content, level } = attributes;
 	const tagName = 'h' + level;
 
-	const textClass = getColorClassName( 'color', textColor );
-
 	const className = classnames( {
-		[ textClass ]: textClass,
-		'has-text-color': textColor || customTextColor,
 		[ `has-text-align-${ align }` ]: align,
 	} );
 
@@ -24,9 +20,6 @@ export default function save( { attributes } ) {
 		<RichText.Content
 			className={ className ? className : undefined }
 			tagName={ tagName }
-			style={ {
-				color: textClass ? undefined : customTextColor,
-			} }
 			value={ content }
 		/>
 	);

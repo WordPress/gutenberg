@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, noop } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import { useLayoutEffect, useReducer, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockEditorProvider from '../provider';
-import ScaledBlockPreview from './scaled';
 import AutoHeightBlockPreview from './auto';
 
 /**
@@ -29,11 +28,8 @@ import AutoHeightBlockPreview from './auto';
  */
 export function BlockPreview( {
 	blocks,
+	__experimentalPadding = 0,
 	viewportWidth = 700,
-	padding,
-	autoHeight = false,
-	__experimentalOnReady = noop,
-	__experimentalScalingDelay = 100,
 } ) {
 	const settings = useSelect( ( select ) =>
 		select( 'core/block-editor' ).getSettings()
@@ -49,26 +45,11 @@ export function BlockPreview( {
 	}
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ /*
-			 * The key prop is used to force recomputing the preview
-			 * by remounting the component, ScaledBlockPreview is not meant to
-			 * be rerendered.
-			 */ }
-			{ autoHeight ? (
-				<AutoHeightBlockPreview
-					key={ recompute }
-					viewportWidth={ viewportWidth }
-				/>
-			) : (
-				<ScaledBlockPreview
-					key={ recompute }
-					blocks={ renderedBlocks }
-					viewportWidth={ viewportWidth }
-					padding={ padding }
-					onReady={ __experimentalOnReady }
-					scalingDelay={ __experimentalScalingDelay }
-				/>
-			) }
+			<AutoHeightBlockPreview
+				key={ recompute }
+				viewportWidth={ viewportWidth }
+				__experimentalPadding={ __experimentalPadding }
+			/>
 		</BlockEditorProvider>
 	);
 }

@@ -201,6 +201,14 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
+### `docker logs -f [container_id] >/dev/null` 
+
+```sh
+docker logs -f <container_id> >/dev/null 
+
+Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
@@ -209,7 +217,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 | Field         | Type          | Default                                    | Description                                                                                                               |
 | ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`      | `string|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
 | `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
 | `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
 | `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
@@ -222,8 +230,8 @@ Several types of strings can be passed into the `core`, `plugins`, and `themes` 
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| Relative path     | `.<path>\|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
 | GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 

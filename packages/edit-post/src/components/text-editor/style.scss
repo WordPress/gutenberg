@@ -5,7 +5,7 @@
 	flex-grow: 1;
 
 	// Always show outlines in code editor
-	.editor-post-title__block {
+	.editor-post-title {
 		textarea {
 			border: $border-width solid $light-gray-500;
 			margin-bottom: $block-spacing;
@@ -16,20 +16,8 @@
 				border: $border-width solid $black;
 			}
 		}
-	}
 
-	.editor-post-permalink {
-		margin-top: -6px;
-
-		// Hide the thick left border in the code editor.
-		box-shadow: none;
-		border: none;
-		outline: $border-width solid $dark-gray-primary;
-	}
-
-	@include break-small() {
-		.editor-post-title,
-		.editor-post-title__block {
+		@include break-small() {
 			padding: 0;
 		}
 	}

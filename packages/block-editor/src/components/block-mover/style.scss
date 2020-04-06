@@ -21,6 +21,10 @@
 		flex-direction: row;
 	}
 
+	.block-editor-block-mover__control {
+		height: $block-toolbar-height/2;
+	}
+
 	// Position the icons correctly.
 	.components-toolbar .block-editor-block-mover__control-up {
 		svg {
