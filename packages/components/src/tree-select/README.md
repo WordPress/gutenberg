@@ -60,6 +60,12 @@ If this property is added, a label will be generated using label property as the
 - Type: `String`
 - Required: No
 
+### isLoading
+
+If set, the placeholder of `Loading…` will render and the `select` will be disabled.
+- Type: `boolean`
+- Required: No
+
 ### noOptionLabel
 
 If this property is added, an option will be added with this label to represent empty selection.

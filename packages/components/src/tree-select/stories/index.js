@@ -38,6 +38,7 @@ export const _default = () => {
 		'Help Text',
 		'Help text to explain the select control.'
 	);
+	const isLoading = boolean( 'isLoading', false );
 	const tree = object( 'Tree', [
 		{
 			name: 'Page 1',
@@ -71,6 +72,7 @@ export const _default = () => {
 			noOptionLabel={ noOptionLabel }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
+			isLoading={ isLoading }
 			tree={ tree }
 		/>
 	);
