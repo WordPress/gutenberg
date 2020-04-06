@@ -23,7 +23,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/dom-ready": "file:../dom-ready"
 	},
 	"publishConfig": {
