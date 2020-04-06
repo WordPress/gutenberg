@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -64,8 +59,7 @@ function addSaveProps( props, blockType, attributes ) {
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
 	classes.add( getFontSizeClass( attributes.fontSize ) );
-	const newClassName = classnames( classes.value );
-
+	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
