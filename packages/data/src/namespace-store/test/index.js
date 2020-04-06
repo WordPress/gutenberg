@@ -42,7 +42,7 @@ describe( 'controls', () => {
 		} );
 	} );
 
-	it( 'resolves in expected order', ( done ) => {
+	it( 'resolves in expected order', async () => {
 		const actions = {
 			wait: () => ( { type: 'WAIT' } ),
 			receive: ( items ) => ( { type: 'RECEIVE', items } ),
@@ -74,17 +74,16 @@ describe( 'controls', () => {
 			},
 		} );
 
-		registry.subscribe( () => {
+		registry.subscribe( async () => {
 			const isFinished = registry
 				.select( 'store' )
 				.hasFinishedResolution( 'getItems' );
 			if ( isFinished ) {
-				expect( registry.select( 'store' ).getItems() ).toEqual( [
+				await expect( registry.select( 'store' ).getItems() ).toEqual( [
 					1,
 					2,
 					3,
 				] );
-				done();
 			}
 		} );
 

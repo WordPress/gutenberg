@@ -70,6 +70,7 @@ describe( 'jest-console', () => {
 		} );
 
 		describe( 'lifecycle', () => {
+			/* eslint-disable jest/no-standalone-expect */
 			beforeAll( () => {
 				// This is a difficult one to test, since the matcher's
 				// own lifecycle is defined to run before ours. Infer
@@ -79,7 +80,9 @@ describe( 'jest-console', () => {
 					console[ methodName ].assertionsNumber
 				).toBeGreaterThanOrEqual( 0 );
 			} );
+			/* eslint-enable jest/no-standalone-expect */
 
+			/* eslint-disable-next-line jest/expect-expect */
 			it( 'captures logging in lifecycle', () => {} );
 		} );
 	} );
