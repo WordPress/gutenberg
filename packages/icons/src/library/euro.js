@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { SVG, Path } from '@wordpress/primitives';
+import { Path, SVG } from '@wordpress/primitives';
 
 const euro = (
 	<SVG xmlns="http://www.w3.org/2000/SVG" viewBox="0 0 24 24">
