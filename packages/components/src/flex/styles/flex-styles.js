@@ -16,30 +16,44 @@ const alignStyle = ( { align } ) => {
 	} );
 };
 
-const justifyStyle = ( { justify } ) => {
+const justifyStyle = ( { justify, isReversed } ) => {
 	const justifies = {
 		left: 'flex-start',
 		right: 'flex-end',
 	};
-	const value = justifies[ justify ] || justify;
+	let value = justifies[ justify ] || justify;
+
+	if ( isReversed && justifies[ justify ] ) {
+		value = justify === 'left' ? justifies.right : justifies.left;
+	}
 
 	return css( {
 		justifyContent: value,
 	} );
 };
 
-const gapStyle = ( { gap } ) => {
+const gapStyle = ( { gap, isReversed } ) => {
 	const base = 4;
 	const value = typeof gap === 'number' ? base * gap : base;
+	const dir = isReversed ? 'left' : 'right';
+	const padding = `padding-${ dir }`;
 
 	return css`
 		> * {
-			padding-right: ${value}px;
+			${padding}: ${value}px;
 
 			&:last-child {
-				padding-right: 0;
+				${padding}: 0;
 			}
 		}
+	`;
+};
+
+const reversedStyles = ( { isReversed } ) => {
+	if ( ! isReversed ) return '';
+
+	return css`
+		flex-direction: row-reverse;
 	`;
 };
 
@@ -50,6 +64,7 @@ export const Flex = styled.div`
 	${alignStyle};
 	${justifyStyle};
 	${gapStyle};
+	${reversedStyles};
 `;
 
 export const Item = styled.div`

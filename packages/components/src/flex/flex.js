@@ -19,6 +19,7 @@ function Flex(
 		className,
 		gap = 2,
 		justify = 'space-between',
+		isReversed = false,
 		...props
 	},
 	ref
@@ -33,6 +34,7 @@ function Flex(
 			ref={ ref }
 			gap={ gap }
 			justify={ justify }
+			isReversed={ isReversed }
 		/>
 	);
 }

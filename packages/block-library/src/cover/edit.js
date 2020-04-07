@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -376,6 +377,7 @@ function CoverEdit( {
 									} );
 								} }
 							/>
+							<BoxControl label="Padding" />
 						</PanelBody>
 						<PanelColorGradientSettings
 							title={ __( 'Overlay' ) }

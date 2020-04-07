@@ -16,6 +16,7 @@ export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
+export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
 export { default as Card } from './card';

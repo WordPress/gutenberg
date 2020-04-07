@@ -9,8 +9,10 @@ export function useDragCursor( isDragging ) {
 	useEffect( () => {
 		if ( isDragging ) {
 			document.documentElement.style.cursor = DRAG_CURSOR;
+			document.documentElement.style.pointerEvents = 'none';
 		} else {
 			document.documentElement.style.cursor = null;
+			document.documentElement.style.pointerEvents = null;
 		}
 	}, [ isDragging ] );
 }

@@ -84,7 +84,7 @@ export default function BoxControl( {
 			<Header>
 				<FlexItem>{ label }</FlexItem>
 			</Header>
-			<Flex gap={ 1 }>
+			<Flex align="top" gap={ 1 }>
 				<FlexItem>
 					<BoxTypeDropdown
 						icon={ icon }
@@ -109,7 +109,13 @@ export default function BoxControl( {
 	);
 }
 
-function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
+function BoxAllControl( {
+	placeholder,
+	onSelect = noop,
+	onChange = noop,
+	values,
+	...props
+} ) {
 	const [ value, unit ] = values.top;
 	const allValues = getValues( values, 'top', 'right', 'bottom', 'left' );
 	const isMixed = ! allValues.every( ( v ) => v === value );
@@ -126,6 +132,7 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 					placeholder={ placeholderLabel }
 					unit={ unit }
 					onChange={ ( next ) => {
+						onSelect( 'all' );
 						onChange( {
 							top: [ next, unit ],
 							right: [ next, unit ],
@@ -247,42 +254,54 @@ function BoxCustomControl( {
 	};
 
 	return (
-		<ControlContainer>
-			<UnitControl
-				{ ...unitControlProps.top }
-				{ ...props }
-				label={ labels.top }
-				onFocus={ () => handleOnSelect( 'top' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.right }
-				{ ...props }
-				label={ labels.right }
-				onFocus={ () => handleOnSelect( 'right' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.bottom }
-				{ ...props }
-				label={ labels.bottom }
-				onFocus={ () => handleOnSelect( 'bottom' ) }
-				placeholder=""
-			/>
-			<UnitControl
-				{ ...unitControlProps.left }
-				{ ...props }
-				label={ labels.left }
-				onFocus={ () => handleOnSelect( 'left' ) }
-				placeholder=""
-			/>
-		</ControlContainer>
+		<div>
+			<ControlContainer style={ { marginBottom: 2 } }>
+				<FlexItem>
+					<UnitControl
+						{ ...unitControlProps.top }
+						{ ...props }
+						label={ labels.top }
+						onFocus={ () => handleOnSelect( 'top' ) }
+						placeholder=""
+					/>
+				</FlexItem>
+				<FlexItem>
+					<UnitControl
+						{ ...unitControlProps.right }
+						{ ...props }
+						label={ labels.right }
+						onFocus={ () => handleOnSelect( 'right' ) }
+						placeholder=""
+					/>
+				</FlexItem>
+			</ControlContainer>
+			<ControlContainer isReversed>
+				<FlexItem>
+					<UnitControl
+						{ ...unitControlProps.bottom }
+						{ ...props }
+						label={ labels.bottom }
+						onFocus={ () => handleOnSelect( 'bottom' ) }
+						placeholder=""
+					/>
+				</FlexItem>
+				<FlexItem>
+					<UnitControl
+						{ ...unitControlProps.left }
+						{ ...props }
+						label={ labels.left }
+						onFocus={ () => handleOnSelect( 'left' ) }
+						placeholder=""
+					/>
+				</FlexItem>
+			</ControlContainer>
+		</div>
 	);
 }
 
-function ControlContainer( { children } ) {
+function ControlContainer( { children, ...props } ) {
 	return (
-		<Flex justify="left" gap={ 0.5 }>
+		<Flex align="top" justify="left" gap={ 0.5 } { ...props }>
 			{ children }
 		</Flex>
 	);
@@ -314,7 +333,7 @@ function useCustomUnitControlProps( { values, onChange = noop } ) {
 	return props;
 }
 
-function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon } ) {
+function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon, type } ) {
 	const icons = {
 		all: <BoxControlIcon sides={ typeProps.all.sides } />,
 		pairs: <BoxControlIcon sides={ typeProps.pairs.sides } />,
@@ -336,20 +355,23 @@ function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon } ) {
 		{
 			title: typeProps.all.label,
 			value: 'all',
-			icon: icons.all,
+			icon: <DropdownIconWrapper>{ icons.all }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'all' ),
+			isActive: type === 'all',
 		},
 		{
 			title: typeProps.pairs.label,
 			value: 'pairs',
-			icon: icons.pairs,
+			icon: <DropdownIconWrapper>{ icons.pairs }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'pairs' ),
+			isActive: type === 'pairs',
 		},
 		{
 			title: typeProps.custom.label,
 			value: 'custom',
-			icon: icons.custom,
+			icon: <DropdownIconWrapper>{ icons.custom }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'custom' ),
+			isActive: type === 'custom',
 		},
 	];
 
@@ -362,13 +384,19 @@ function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon } ) {
 
 	const toggleProps = {
 		children: dropdownIcon,
+		isSmall: true,
+		style: {
+			height: 30,
+			lineHeight: 28,
+		},
 	};
 
 	return (
 		<DropdownMenu
-			icon={ null }
-			toggleProps={ toggleProps }
 			controls={ options }
+			icon={ null }
+			popoverProps={ { position: 'bottom' } }
+			toggleProps={ toggleProps }
 		/>
 	);
 }
@@ -412,6 +440,7 @@ function UnitControl( { onChange, label, ...props } ) {
 		const value = parseFloat( nextValue );
 		onChange( isNaN( value ) ? nextValue : value );
 	};
+
 	return (
 		<Tooltip text={ label }>
 			<UnitControlWrapper aria-label={ label }>
@@ -444,7 +473,11 @@ const UnitControlWrapper = styled.div`
 // `;
 
 const DropdownButton = styled( Flex )`
-	margin: 0 -8px;
+	margin: 0 -4px;
+`;
+
+const DropdownIconWrapper = styled.div`
+	margin-right: 8px;
 `;
 
 function parseValues( values = {} ) {
