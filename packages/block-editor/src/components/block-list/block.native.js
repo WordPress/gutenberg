@@ -7,14 +7,12 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,8 +22,6 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 import FloatingToolbar from '../block-mobile-floating-toolbar';
-import Breadcrumbs from './breadcrumb';
-import NavigateUpSVG from './nav-up-icon';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -88,10 +84,8 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			parentId,
 			isDimmed,
 			isTouchable,
-			hasParent,
 			isParentSelected,
 			onSelect,
 			getStylesFromColorScheme,
@@ -112,19 +106,10 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<View accessibilityLabel={ accessibilityLabel }>
-					<FloatingToolbar clientId={ clientId }>
-						{ hasParent && (
-							<Toolbar passedStyle={ styles.toolbar }>
-								<ToolbarButton
-									title={ __( 'Navigate Up' ) }
-									onClick={ () => onSelect( parentId ) }
-									icon={ NavigateUpSVG }
-								/>
-								<View style={ styles.pipe } />
-							</Toolbar>
-						) }
-						<Breadcrumbs clientId={ clientId } />
-					</FloatingToolbar>
+					<FloatingToolbar
+						clientId={ clientId }
+						onNavigateUp={ onSelect }
+					/>
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -212,7 +197,6 @@ export default compose( [
 			? parents[ commonAncestorIndex ]
 			: parents[ parents.length - 1 ];
 
-		const hasParent = !! parentId;
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected =
@@ -249,10 +233,8 @@ export default compose( [
 			blockType,
 			isSelected,
 			isValid,
-			parentId,
 			isParentSelected,
 			firstToSelectId,
-			hasParent,
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,

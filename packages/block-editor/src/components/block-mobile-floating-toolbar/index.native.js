@@ -7,20 +7,35 @@ import { View, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill, ToolbarButton, Toolbar } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import Breadcrumbs from '../block-list/breadcrumb';
+import NavigateUpSVG from './nav-up-icon';
 
 const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
 
-const FloatingToolbarContainer = ( { children } ) => {
+const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
 	return (
 		<TouchableWithoutFeedback accessible={ false }>
-			<View style={ styles.floatingToolbar }>{ children }</View>
+			<View style={ styles.floatingToolbar }>
+				{ !! parentId && (
+					<Toolbar passedStyle={ styles.toolbar }>
+						<ToolbarButton
+							title={ __( 'Navigate Up' ) }
+							onClick={ () => onNavigateUp( parentId ) }
+							icon={ NavigateUpSVG }
+						/>
+						<View style={ styles.pipe } />
+					</Toolbar>
+				) }
+				<Breadcrumbs clientId={ clientId } />
+			</View>
 		</TouchableWithoutFeedback>
 	);
 };
@@ -40,17 +55,20 @@ const FloatingToolbar = withSelect( ( select, { clientId } ) => {
 	const {
 		isBlockSelected,
 		getBlockHierarchyRootClientId,
+		getBlockRootClientId,
 		getBlockCount,
 	} = select( 'core/block-editor' );
 
 	const isSelected = isBlockSelected( clientId );
 	const rootBlockId = getBlockHierarchyRootClientId( clientId );
+	const parentId = getBlockRootClientId( clientId );
 	const hasRootInnerBlocks = getBlockCount( rootBlockId );
 
 	const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 	return {
 		showFloatingToolbar,
+		parentId,
 	};
 } )( FloatingToolbarFill );
 
