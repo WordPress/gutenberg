@@ -175,7 +175,7 @@ class BlockListBlock extends Component {
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
-									onDeleteBlock={ onDeleteBlock }
+									onDelete={ onDeleteBlock }
 									horizontalDirection={ horizontalDirection }
 								/>
 							) }

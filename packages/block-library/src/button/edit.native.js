@@ -510,7 +510,7 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const selectedId = getSelectedBlockClientId();
-		const isSelectedButtonsBlock = parentId === selectedId;
+		const isParentSelected = parentId === selectedId;
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
@@ -518,7 +518,7 @@ export default compose( [
 			editorSidebarOpened: isEditorSidebarOpened(),
 			parentId,
 			numOfButtons,
-			isSelectedButtonsBlock,
+			isParentSelected,
 		};
 	} ),
 	withDispatch( ( dispatch, { parentId } ) => {

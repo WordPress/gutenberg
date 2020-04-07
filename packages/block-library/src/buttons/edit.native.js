@@ -29,20 +29,20 @@ function ButtonsEdit( {
 	onDelete,
 	onAddNextButton,
 	shouldDelete,
-	isSelectedButton,
+	isInnerButtonSelected,
 } ) {
 	const { align } = attributes;
-	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ resizeObserver, { width } ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
-	const shouldRenderFooterAppender = isSelected || isSelectedButton;
+	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	const { marginLeft: spacing } = styles.spacing;
 
 	useEffect( () => {
-		const { width } = sizes || {};
 		const margins = 2 * styles.parent.marginRight;
-
-		setMaxWidth( width - margins );
-	}, [ sizes ] );
+		if ( width ) {
+			setMaxWidth( width - margins );
+		}
+	}, [ width ] );
 
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
@@ -91,11 +91,10 @@ export default compose(
 			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedButtonParents = getBlockParents(
+		const selectedBlockParents = getBlockParents(
 			selectedBlockClientId,
 			true
 		);
-		const selectedButtonParentId = selectedButtonParents[ 0 ] || '';
 
 		return {
 			// The purpose of `shouldDelete` check is giving the ability to pass to
@@ -103,7 +102,7 @@ export default compose(
 			// `Buttons` container along with the last inner button when
 			// there is exactly one button.
 			shouldDelete: getBlockCount( clientId ) === 1,
-			isSelectedButton: selectedButtonParentId === clientId,
+			isInnerButtonSelected: selectedBlockParents[ 0 ] === clientId,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId }, registry ) => {

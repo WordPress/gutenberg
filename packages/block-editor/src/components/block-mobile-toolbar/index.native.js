@@ -56,15 +56,15 @@ export default compose(
 			order: getBlockIndex( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId, onDeleteBlock } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
-		const onDelete = () => {
-			Keyboard.dismiss();
-			removeBlock( clientId, rootClientId );
-		};
-
 		return {
-			onDelete: onDeleteBlock || onDelete,
+			onDelete:
+				onDelete ||
+				( () => {
+					Keyboard.dismiss();
+					removeBlock( clientId, rootClientId );
+				} ),
 		};
 	} )
 )( BlockMobileToolbar );

@@ -45,10 +45,6 @@ export class BlockList extends Component {
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
-
-		this.state = {
-			maxWidth: null,
-		};
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -94,10 +90,12 @@ export class BlockList extends Component {
 			renderAppender,
 			shouldRenderFooterAppender = false,
 		} = this.props;
-		if ( ! shouldRenderFooterAppender ) {
-			return renderAppender && blockClientIds.length > 0;
-		}
-		return false;
+
+		return (
+			! shouldRenderFooterAppender &&
+			renderAppender &&
+			blockClientIds.length > 0
+		);
 	}
 
 	render() {
