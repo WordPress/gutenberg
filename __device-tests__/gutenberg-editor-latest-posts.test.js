@@ -18,7 +18,7 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	const lastPostBlockName = "Latest Posts";
+	const lastPostBlockName = 'Latest Posts';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
