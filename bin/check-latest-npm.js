@@ -52,7 +52,24 @@ async function getLatestNPMVersion() {
 
 				resolve( data[ 'dist-tags' ].latest );
 			}
-		);
+		).on( 'error', ( error ) => {
+			if (
+				/** @type {NodeJS.ErrnoException} */ ( error ).code ===
+				'ENOTFOUND'
+			) {
+				error = new Error( `Could not contact the NPM registry to determine latest version.
+
+This could be due to an intermittent outage of the service, or because you are not connected to the internet.
+
+Because it is important that \`package-lock.json\` files only be committed while running the latest version of NPM, this commit has been blocked.
+
+If you are certain of your changes and desire to commit anyways, you should either connect to the internet or bypass commit verification using ${ yellow(
+					'git commit --no-verify'
+				) } .` );
+			}
+
+			reject( error );
+		} );
 	} );
 }
 
@@ -85,8 +102,7 @@ Promise.all( [ getLatestNPMVersion(), getLocalNPMVersion() ] )
 
 It is required that you have the latest version of NPM installed in order to commit a change to the package-lock.json file.
 
-Run ${ yellow( 'npm install --global npm@latest' ) }, then try again.
-`
+Run ${ yellow( 'npm install --global npm@latest' ) }, then try again.`
 			);
 		}
 	} )
@@ -94,6 +110,8 @@ Run ${ yellow( 'npm install --global npm@latest' ) }, then try again.
 		// Disable reason: A failure should log to the terminal.
 
 		// eslint-disable-next-line no-console
-		console.error( 'Latest NPM check failed!\n\n' + error.toString() );
+		console.error(
+			'Latest NPM check failed!\n\n' + error.toString() + '\n'
+		);
 		process.exitCode = 1;
 	} );
