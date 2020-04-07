@@ -28,12 +28,7 @@ function gutenberg_edit_site_page() {
  * @return bool True for Site Editor pages, false otherwise.
  */
 function gutenberg_is_edit_site_page( $page ) {
-	$allowed_pages = array(
-		'gutenberg_page_gutenberg-edit-site',
-		'toplevel_page_gutenberg-edit-site',
-	);
-
-	return in_array( $page, $allowed_pages, true );
+	return 'toplevel_page_gutenberg-edit-site' === $page;
 }
 
 /**
@@ -207,6 +202,27 @@ function gutenberg_edit_site_init( $hook ) {
 	// Example: Global Styles.
 	global $post;
 	$settings = apply_filters( 'block_editor_settings', $settings, $post );
+
+	// Preload block editor paths.
+	// most of these are copied from edit-forms-blocks.php.
+	$preload_paths = array(
+		'/',
+		'/wp/v2/types?context=edit',
+		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/themes?status=active',
+		sprintf( '/wp/v2/templates/%s?context=edit', $_wp_current_template_id ),
+		array( '/wp/v2/media', 'OPTIONS' ),
+	);
+	$preload_data  = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf( 'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
+		'after'
+	);
 
 	// Initialize editor.
 	wp_add_inline_script(

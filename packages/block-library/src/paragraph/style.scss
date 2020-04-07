@@ -1,6 +1,8 @@
 :root p {
 	background-color: var(--wp--color--background);
 	color: var(--wp--color--text);
+	line-height: var(--wp--typography--line-height);
+	font-size: var(--wp--typography--font-size);
 }
 
 .is-small-text {

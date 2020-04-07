@@ -11,14 +11,12 @@ import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	FontSizePicker,
 	InspectorControls,
 	RichText,
-	withFontSizes,
 	__experimentalBlock as Block,
+	getFontSize,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
@@ -74,18 +72,32 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 
 function ParagraphBlock( {
 	attributes,
-	fontSize,
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	setFontSize,
 } ) {
-	const { align, content, dropCap, placeholder, direction } = attributes;
-
+	const {
+		align,
+		content,
+		direction,
+		dropCap,
+		placeholder,
+		fontSize,
+		style,
+	} = attributes;
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
 	const ref = useRef();
+	const fontSizeObject = getFontSize( fontSizes, fontSize, style?.fontSize );
 	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
-		fontSize.size,
+		fontSizeObject.size,
 	] );
+
+	const styles = {
+		direction,
+		minHeight: dropCapMinimumHeight,
+	};
 
 	return (
 		<>
@@ -105,10 +117,6 @@ function ParagraphBlock( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
-					/>
 					<ToggleControl
 						label={ __( 'Drop cap' ) }
 						checked={ !! dropCap }
@@ -130,13 +138,8 @@ function ParagraphBlock( {
 				className={ classnames( {
 					'has-drop-cap': dropCap,
 					[ `has-text-align-${ align }` ]: align,
-					[ fontSize.class ]: fontSize.class,
 				} ) }
-				style={ {
-					fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-					direction,
-					minHeight: dropCapMinimumHeight,
-				} }
+				style={ styles }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
@@ -172,8 +175,4 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )(
-	ParagraphBlock
-);
-
-export default ParagraphEdit;
+export default ParagraphBlock;

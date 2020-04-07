@@ -3929,6 +3929,17 @@ exports[`Storyshots Components/Modal Default 1`] = `
 </button>
 `;
 
+exports[`Storyshots Components/NumberControl Default 1`] = `
+<input
+  className="component-number-control"
+  inputMode="numeric"
+  onChange={[Function]}
+  onKeyDown={[Function]}
+  type="number"
+  value=""
+/>
+`;
+
 exports[`Storyshots Components/Panel Default 1`] = `
 <div
   className="components-panel"
@@ -8172,6 +8183,9 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
   aria-orientation="horizontal"
   className="components-accessible-toolbar"
   id="options-toolbar"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
   role="toolbar"
 >
   <div
@@ -8185,6 +8199,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
@@ -8222,6 +8237,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         onClick={[Function]}
         onFocus={[Function]}
         onKeyDown={[Function]}
+        onKeyUp={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -8253,6 +8269,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       tabIndex={-1}
       type="button"
@@ -8268,6 +8285,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
@@ -8296,6 +8314,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
@@ -8324,6 +8343,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
@@ -8357,6 +8377,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         onClick={[Function]}
         onFocus={[Function]}
         onKeyDown={[Function]}
+        onKeyUp={[Function]}
         onMouseDown={[Function]}
         onMouseEnter={[Function]}
         onMouseLeave={[Function]}
@@ -8378,6 +8399,7 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       onClick={[Function]}
       onFocus={[Function]}
       onKeyDown={[Function]}
+      onKeyUp={[Function]}
       onMouseDown={[Function]}
       onMouseEnter={[Function]}
       onMouseLeave={[Function]}
@@ -8402,12 +8424,350 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/Toolbar Toolbars 1`] = `
+<div>
+  <div
+    style={
+      Object {
+        "padding": "20px",
+      }
+    }
+  >
+    <h2>
+      Icon-only Toolbar
+    </h2>
+    <div
+      className="components-toolbar"
+    >
+      <div>
+        <button
+          aria-label="Bold"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div>
+        <button
+          aria-label="Italic"
+          aria-pressed={true}
+          className="components-button components-toolbar__control is-pressed has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.5 5L10 19h1.9l2.5-14z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div>
+        <button
+          aria-label="Link"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15.6 7.2H14v1.5h1.6c2 0 3.7 1.7 3.7 3.7s-1.7 3.7-3.7 3.7H14v1.5h1.6c2.8 0 5.2-2.3 5.2-5.2 0-2.9-2.3-5.2-5.2-5.2zM4.7 12.4c0-2 1.7-3.7 3.7-3.7H10V7.2H8.4c-2.9 0-5.2 2.3-5.2 5.2 0 2.9 2.3 5.2 5.2 5.2H10v-1.5H8.4c-2 0-3.7-1.7-3.7-3.7zm4.6.9h5.3v-1.5H9.3v1.5z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    style={
+      Object {
+        "padding": "20px",
+      }
+    }
+  >
+    <h2>
+      Text-only Toolbar
+    </h2>
+    <div
+      className="components-toolbar"
+    >
+      <div>
+        <button
+          className="components-button components-toolbar__control"
+          onClick={[Function]}
+          type="button"
+        >
+          Bold Format
+        </button>
+      </div>
+      <div>
+        <button
+          aria-pressed={true}
+          className="components-button components-toolbar__control is-pressed"
+          onClick={[Function]}
+          type="button"
+        >
+          Italic Format
+        </button>
+      </div>
+      <div>
+        <button
+          className="components-button components-toolbar__control"
+          onClick={[Function]}
+          type="button"
+        >
+          Link Format
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    style={
+      Object {
+        "padding": "20px",
+      }
+    }
+  >
+    <h2>
+      Text and Icon Toolbar
+    </h2>
+    <div
+      className="components-toolbar"
+    >
+      <div>
+        <button
+          aria-label="Bold"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div>
+        <button
+          aria-pressed={true}
+          className="components-button components-toolbar__control is-pressed"
+          onClick={[Function]}
+          type="button"
+        >
+          Bold Format
+        </button>
+      </div>
+      <div>
+        <button
+          aria-label="Italic"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.5 5L10 19h1.9l2.5-14z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div>
+        <button
+          className="components-button components-toolbar__control"
+          onClick={[Function]}
+          type="button"
+        >
+          Italic Format
+        </button>
+      </div>
+      <div>
+        <button
+          aria-label="Link"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15.6 7.2H14v1.5h1.6c2 0 3.7 1.7 3.7 3.7s-1.7 3.7-3.7 3.7H14v1.5h1.6c2.8 0 5.2-2.3 5.2-5.2 0-2.9-2.3-5.2-5.2-5.2zM4.7 12.4c0-2 1.7-3.7 3.7-3.7H10V7.2H8.4c-2.9 0-5.2 2.3-5.2 5.2 0 2.9 2.3 5.2 5.2 5.2H10v-1.5H8.4c-2 0-3.7-1.7-3.7-3.7zm4.6.9h5.3v-1.5H9.3v1.5z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div>
+        <button
+          className="components-button components-toolbar__control"
+          onClick={[Function]}
+          type="button"
+        >
+          Link Format
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    style={
+      Object {
+        "padding": "20px",
+      }
+    }
+  >
+    <h2>
+      Single Icon Button Toolbar
+    </h2>
+    <div
+      className="components-toolbar"
+    >
+      <div>
+        <button
+          aria-label="Bold"
+          className="components-button components-toolbar__control has-icon"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            focusable="false"
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14.7 11.3c1-.6 1.5-1.6 1.5-3 0-2.3-1.3-3.4-4-3.4H7v14h5.8c1.4 0 2.5-.3 3.3-1 .8-.7 1.2-1.7 1.2-2.9.1-1.9-.8-3.1-2.6-3.7zm-5.1-4h2.3c.6 0 1.1.1 1.4.4.3.3.5.7.5 1.2s-.2 1-.5 1.2c-.3.3-.8.4-1.4.4H9.6V7.3zm4.6 9c-.4.3-1 .4-1.7.4H9.6v-3.9h2.9c.7 0 1.3.2 1.7.5.4.3.6.8.6 1.5s-.2 1.2-.6 1.5z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div
+    style={
+      Object {
+        "padding": "20px",
+      }
+    }
+  >
+    <h2>
+      Single Text Button toolbar
+    </h2>
+    <div
+      className="components-toolbar"
+    >
+      <div>
+        <button
+          className="components-button components-toolbar__control"
+          onClick={[Function]}
+          type="button"
+        >
+          Bold Toolbar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Storyshots Components/Toolbar Without Group 1`] = `
 <div
   aria-label="Options"
   aria-orientation="horizontal"
   className="components-accessible-toolbar"
   id="options-toolbar-without-group"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
   role="toolbar"
 >
   <button
@@ -8419,6 +8779,7 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     onClick={[Function]}
     onFocus={[Function]}
     onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseDown={[Function]}
     onMouseEnter={[Function]}
     onMouseLeave={[Function]}
@@ -8447,6 +8808,7 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     onClick={[Function]}
     onFocus={[Function]}
     onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseDown={[Function]}
     onMouseEnter={[Function]}
     onMouseLeave={[Function]}
@@ -8475,6 +8837,7 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     onClick={[Function]}
     onFocus={[Function]}
     onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseDown={[Function]}
     onMouseEnter={[Function]}
     onMouseLeave={[Function]}
@@ -8745,6 +9108,136 @@ exports[`Storyshots Components/TreeSelect Default 1`] = `
   >
     Help text to explain the select control.
   </p>
+</div>
+`;
+
+exports[`Storyshots Components/UnitControl Default 1`] = `
+.emotion-6 {
+  max-width: 80px;
+}
+
+.emotion-4 {
+  box-sizing: border-box;
+  position: relative;
+}
+
+.emotion-0.emotion-0.emotion-0 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  border: 1px solid #000;
+  border-radius: 2px;
+  padding: 3px 8px;
+  display: block;
+  width: 100%;
+  padding-right: 20px;
+  height: 30px;
+  line-height: 30;
+  min-height: 30px;
+}
+
+.emotion-0.emotion-0.emotion-0::-webkit-outer-spin-button,
+.emotion-0.emotion-0.emotion-0::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.emotion-2.emotion-2.emotion-2 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #fff;
+  border-radius: 2px;
+  border: none;
+  box-sizing: border-box;
+  color: #555d66;
+  display: block;
+  font-size: 8px;
+  line-height: 1;
+  -webkit-letter-spacing: -0.5px;
+  -moz-letter-spacing: -0.5px;
+  -ms-letter-spacing: -0.5px;
+  letter-spacing: -0.5px;
+  outline: none;
+  padding: 2px 2px;
+  position: absolute;
+  text-align-last: center;
+  text-transform: uppercase;
+  width: 22px;
+  z-index: 1;
+  right: 4px;
+  top: 5px;
+  height: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.emotion-2.emotion-2.emotion-2:hover {
+  background-color: #edeff0;
+}
+
+.emotion-2.emotion-2.emotion-2:focus {
+  border-color: #007cba;
+  outline: 2px solid transparent;
+  outline-offset: 0;
+}
+
+<div
+  className="emotion-6 emotion-7"
+>
+  <div
+    className="component-unit-control emotion-4 emotion-5"
+  >
+    <input
+      className="component-number-control component-unit-control__input emotion-0 emotion-1"
+      inputMode="numeric"
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      size="default"
+      type="number"
+      value=""
+    />
+    <select
+      className="component-unit-control__select component-unit-control__select emotion-2 emotion-3"
+      onChange={[Function]}
+      size="default"
+      tabIndex={null}
+      value="px"
+    >
+      <option
+        value="px"
+      >
+        px
+      </option>
+      <option
+        value="%"
+      >
+        %
+      </option>
+      <option
+        value="em"
+      >
+        em
+      </option>
+      <option
+        value="rem"
+      >
+        rem
+      </option>
+      <option
+        value="vw"
+      >
+        vw
+      </option>
+      <option
+        value="vh"
+      >
+        vh
+      </option>
+    </select>
+  </div>
 </div>
 `;
 
@@ -9740,7 +10233,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 7H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5V9c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13.5h8V12H8v1.5z"
+        d="M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"
       />
     </svg>
     <svg
@@ -9753,7 +10246,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 7H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5V9c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13.5h8V12H8v1.5z"
+        d="M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"
       />
     </svg>
     <svg
@@ -9766,7 +10259,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M19 7H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5V9c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13.5h8V12H8v1.5z"
+        d="M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"
       />
     </svg>
   </div>
@@ -11096,6 +11589,120 @@ exports[`Storyshots Icons/Icon Library 1`] = `
         }
       }
     >
+      create
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 11.2h-3.2V8h-1.6v3.2H8v1.6h3.2V16h1.6v-3.2H16z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 11.2h-3.2V8h-1.6v3.2H8v1.6h3.2V16h1.6v-3.2H16z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M16 11.2h-3.2V8h-1.6v3.2H8v1.6h3.2V16h1.6v-3.2H16z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      desktop
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20.5 16h-.7V8c0-1.1-.9-2-2-2H6.2c-1.1 0-2 .9-2 2v8h-.7c-.8 0-1.5.7-1.5 1.5h20c0-.8-.7-1.5-1.5-1.5zM5.7 8c0-.3.2-.5.5-.5h11.6c.3 0 .5.2.5.5v7.6H5.7V8z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20.5 16h-.7V8c0-1.1-.9-2-2-2H6.2c-1.1 0-2 .9-2 2v8h-.7c-.8 0-1.5.7-1.5 1.5h20c0-.8-.7-1.5-1.5-1.5zM5.7 8c0-.3.2-.5.5-.5h11.6c.3 0 .5.2.5.5v7.6H5.7V8z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M20.5 16h-.7V8c0-1.1-.9-2-2-2H6.2c-1.1 0-2 .9-2 2v8h-.7c-.8 0-1.5.7-1.5 1.5h20c0-.8-.7-1.5-1.5-1.5zM5.7 8c0-.3.2-.5.5-.5h11.6c.3 0 .5.2.5.5v7.6H5.7V8z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
       dollar
     </strong>
     <svg
@@ -11894,6 +12501,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
         }
       }
     >
+      globe
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="-2 -2 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="-2 -2 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="-2 -2 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
       grid
     </strong>
     <svg
@@ -12260,7 +12924,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4.5,11h-2V9H1v6h1.5v-2.5h2V15H6V9H4.5V11z M7,10.5h1.5V15H10v-4.5h1.5V9H7V10.5z M14.5,10l-1-1H12v6h1.5v-3.9  l1,1l1-1V15H17V9h-1.5L14.5,10z M19.5,13.5V9H18v6h5v-1.5H19.5z"
+        d="M4.8 11.4H2.1V9H1v6h1.1v-2.6h2.7V15h1.1V9H4.8v2.4zm1.9-1.3h1.7V15h1.1v-4.9h1.7V9H6.7v1.1zM16.2 9l-1.5 2.7L13.3 9h-.9l-.8 6h1.1l.5-4 1.5 2.8 1.5-2.8.5 4h1.1L17 9h-.8zm3.8 5V9h-1.1v6h3.6v-1H20z"
       />
     </svg>
     <svg
@@ -12273,7 +12937,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4.5,11h-2V9H1v6h1.5v-2.5h2V15H6V9H4.5V11z M7,10.5h1.5V15H10v-4.5h1.5V9H7V10.5z M14.5,10l-1-1H12v6h1.5v-3.9  l1,1l1-1V15H17V9h-1.5L14.5,10z M19.5,13.5V9H18v6h5v-1.5H19.5z"
+        d="M4.8 11.4H2.1V9H1v6h1.1v-2.6h2.7V15h1.1V9H4.8v2.4zm1.9-1.3h1.7V15h1.1v-4.9h1.7V9H6.7v1.1zM16.2 9l-1.5 2.7L13.3 9h-.9l-.8 6h1.1l.5-4 1.5 2.8 1.5-2.8.5 4h1.1L17 9h-.8zm3.8 5V9h-1.1v6h3.6v-1H20z"
       />
     </svg>
     <svg
@@ -12286,7 +12950,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4.5,11h-2V9H1v6h1.5v-2.5h2V15H6V9H4.5V11z M7,10.5h1.5V15H10v-4.5h1.5V9H7V10.5z M14.5,10l-1-1H12v6h1.5v-3.9  l1,1l1-1V15H17V9h-1.5L14.5,10z M19.5,13.5V9H18v6h5v-1.5H19.5z"
+        d="M4.8 11.4H2.1V9H1v6h1.1v-2.6h2.7V15h1.1V9H4.8v2.4zm1.9-1.3h1.7V15h1.1v-4.9h1.7V9H6.7v1.1zM16.2 9l-1.5 2.7L13.3 9h-.9l-.8 6h1.1l.5-4 1.5 2.8 1.5-2.8.5 4h1.1L17 9h-.8zm3.8 5V9h-1.1v6h3.6v-1H20z"
       />
     </svg>
   </div>
@@ -12374,7 +13038,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"
       />
     </svg>
     <svg
@@ -12387,7 +13051,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"
       />
     </svg>
     <svg
@@ -12400,7 +13064,7 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-5h-2v5zm0-7h2V8h-2v2z"
+        d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"
       />
     </svg>
   </div>
@@ -13142,6 +13806,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M4 9h12v2H4V9z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      mobile
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15 4H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H9c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h6c.3 0 .5.2.5.5v12zm-4.5-.5h2V16h-2v1.5z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15 4H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H9c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h6c.3 0 .5.2.5.5v12zm-4.5-.5h2V16h-2v1.5z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15 4H9c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H9c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h6c.3 0 .5.2.5.5v12zm-4.5-.5h2V16h-2v1.5z"
       />
     </svg>
   </div>
@@ -15126,12 +15847,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={24}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12.14 4.18c1.87 1.87 2.11 4.75.72 6.89.12.1.22.21.36.31.2.16.47.36.81.59.34.24.56.39.66.47.42.31.73.57.94.78.32.32.6.65.84 1 .25.35.44.69.59 1.04.14.35.21.68.18 1-.02.32-.14.59-.36.81s-.49.34-.81.36c-.31.02-.65-.04-.99-.19-.35-.14-.7-.34-1.04-.59-.35-.24-.68-.52-1-.84-.21-.21-.47-.52-.77-.93-.1-.13-.25-.35-.47-.66-.22-.32-.4-.57-.56-.78-.16-.2-.29-.35-.44-.5-2.07 1.09-4.69.76-6.44-.98-2.14-2.15-2.14-5.64 0-7.78 2.15-2.15 5.63-2.15 7.78 0zm-1.41 6.36c1.36-1.37 1.36-3.58 0-4.95-1.37-1.37-3.59-1.37-4.95 0-1.37 1.37-1.37 3.58 0 4.95 1.36 1.37 3.58 1.37 4.95 0z"
+        d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"
       />
     </svg>
     <svg
@@ -15139,12 +15860,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={36}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12.14 4.18c1.87 1.87 2.11 4.75.72 6.89.12.1.22.21.36.31.2.16.47.36.81.59.34.24.56.39.66.47.42.31.73.57.94.78.32.32.6.65.84 1 .25.35.44.69.59 1.04.14.35.21.68.18 1-.02.32-.14.59-.36.81s-.49.34-.81.36c-.31.02-.65-.04-.99-.19-.35-.14-.7-.34-1.04-.59-.35-.24-.68-.52-1-.84-.21-.21-.47-.52-.77-.93-.1-.13-.25-.35-.47-.66-.22-.32-.4-.57-.56-.78-.16-.2-.29-.35-.44-.5-2.07 1.09-4.69.76-6.44-.98-2.14-2.15-2.14-5.64 0-7.78 2.15-2.15 5.63-2.15 7.78 0zm-1.41 6.36c1.36-1.37 1.36-3.58 0-4.95-1.37-1.37-3.59-1.37-4.95 0-1.37 1.37-1.37 3.58 0 4.95 1.36 1.37 3.58 1.37 4.95 0z"
+        d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"
       />
     </svg>
     <svg
@@ -15152,12 +15873,12 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       focusable="false"
       height={48}
       role="img"
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M12.14 4.18c1.87 1.87 2.11 4.75.72 6.89.12.1.22.21.36.31.2.16.47.36.81.59.34.24.56.39.66.47.42.31.73.57.94.78.32.32.6.65.84 1 .25.35.44.69.59 1.04.14.35.21.68.18 1-.02.32-.14.59-.36.81s-.49.34-.81.36c-.31.02-.65-.04-.99-.19-.35-.14-.7-.34-1.04-.59-.35-.24-.68-.52-1-.84-.21-.21-.47-.52-.77-.93-.1-.13-.25-.35-.47-.66-.22-.32-.4-.57-.56-.78-.16-.2-.29-.35-.44-.5-2.07 1.09-4.69.76-6.44-.98-2.14-2.15-2.14-5.64 0-7.78 2.15-2.15 5.63-2.15 7.78 0zm-1.41 6.36c1.36-1.37 1.36-3.58 0-4.95-1.37-1.37-3.59-1.37-4.95 0-1.37 1.37-1.37 3.58 0 4.95 1.36 1.37 3.58 1.37 4.95 0z"
+        d="M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"
       />
     </svg>
   </div>
@@ -15233,6 +15954,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
         }
       }
     >
+      share
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 11.8l6.1-4.5c.1.4.4.7.9.7h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-2c-.6 0-1 .4-1 1v.4l-6.4 4.8c-.2-.1-.4-.2-.6-.2H6c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h2c.2 0 .4-.1.6-.2l6.4 4.8v.4c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-2c-.5 0-.8.3-.9.7L9 12.2v-.4z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 11.8l6.1-4.5c.1.4.4.7.9.7h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-2c-.6 0-1 .4-1 1v.4l-6.4 4.8c-.2-.1-.4-.2-.6-.2H6c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h2c.2 0 .4-.1.6-.2l6.4 4.8v.4c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-2c-.5 0-.8.3-.9.7L9 12.2v-.4z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 11.8l6.1-4.5c.1.4.4.7.9.7h2c.6 0 1-.4 1-1V5c0-.6-.4-1-1-1h-2c-.6 0-1 .4-1 1v.4l-6.4 4.8c-.2-.1-.4-.2-.6-.2H6c-.6 0-1 .4-1 1v2c0 .6.4 1 1 1h2c.2 0 .4-.1.6-.2l6.4 4.8v.4c0 .6.4 1 1 1h2c.6 0 1-.4 1-1v-2c0-.6-.4-1-1-1h-2c-.5 0-.8.3-.9.7L9 12.2v-.4z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
       shortcode
     </strong>
     <svg
@@ -15272,63 +16050,6 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M16 4.2v1.5h2.5v12.5H16v1.5h4V4.2h-4zM4.2 19.8h4v-1.5H5.8V5.8h2.5V4.2h-4l-.1 15.6zm5.1-3.1l1.4.6 4-10-1.4-.6-4 10z"
-      />
-    </svg>
-  </div>
-  <div
-    style={
-      Object {
-        "alignItems": "center",
-        "display": "flex",
-      }
-    }
-  >
-    <strong
-      style={
-        Object {
-          "width": "120px",
-        }
-      }
-    >
-      globe
-    </strong>
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      height={24}
-      role="img"
-      viewBox="-2 -2 24 24"
-      width={24}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
-      />
-    </svg>
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      height={36}
-      role="img"
-      viewBox="-2 -2 24 24"
-      width={36}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
-      />
-    </svg>
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      height={48}
-      role="img"
-      viewBox="-2 -2 24 24"
-      width={48}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M9 0C4.03 0 0 4.03 0 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zM1.11 9.68h2.51c.04.91.167 1.814.38 2.7H1.84c-.403-.85-.65-1.764-.73-2.7zm8.57-5.4V1.19c.964.366 1.756 1.08 2.22 2 .205.347.386.708.54 1.08l-2.76.01zm3.22 1.35c.232.883.37 1.788.41 2.7H9.68v-2.7h3.22zM8.32 1.19v3.09H5.56c.154-.372.335-.733.54-1.08.462-.924 1.255-1.64 2.22-2.01zm0 4.44v2.7H4.7c.04-.912.178-1.817.41-2.7h3.21zm-4.7 2.69H1.11c.08-.936.327-1.85.73-2.7H4c-.213.886-.34 1.79-.38 2.7zM4.7 9.68h3.62v2.7H5.11c-.232-.883-.37-1.788-.41-2.7zm3.63 4v3.09c-.964-.366-1.756-1.08-2.22-2-.205-.347-.386-.708-.54-1.08l2.76-.01zm1.35 3.09v-3.04h2.76c-.154.372-.335.733-.54 1.08-.464.92-1.256 1.634-2.22 2v-.04zm0-4.44v-2.7h3.62c-.04.912-.178 1.817-.41 2.7H9.68zm4.71-2.7h2.51c-.08.936-.327 1.85-.73 2.7H14c.21-.87.337-1.757.38-2.65l.01-.05zm0-1.35c-.046-.894-.176-1.78-.39-2.65h2.16c.403.85.65 1.764.73 2.7l-2.5-.05zm1-4H13.6c-.324-.91-.793-1.76-1.39-2.52 1.244.56 2.325 1.426 3.14 2.52h.04zm-9.6-2.52c-.597.76-1.066 1.61-1.39 2.52H2.65c.815-1.094 1.896-1.96 3.14-2.52zm-3.15 12H4.4c.324.91.793 1.76 1.39 2.52-1.248-.567-2.33-1.445-3.14-2.55l-.01.03zm9.56 2.52c.597-.76 1.066-1.61 1.39-2.52h1.76c-.82 1.08-1.9 1.933-3.14 2.48l-.01.04z"
       />
     </svg>
   </div>
@@ -16202,6 +16923,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
         }
       }
     >
+      tablet
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M17 4H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v12zm-7.5-.5h4V16h-4v1.5z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M17 4H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v12zm-7.5-.5h4V16h-4v1.5z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M17 4H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v12zm-7.5-.5h4V16h-4v1.5z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
       title
     </strong>
     <svg
@@ -16298,6 +17076,63 @@ exports[`Storyshots Icons/Icon Library 1`] = `
     >
       <path
         d="M12 4h3c.6 0 1 .4 1 1v1H3V5c0-.6.5-1 1-1h3c.2-1.1 1.3-2 2.5-2s2.3.9 2.5 2zM8 4h3c-.2-.6-.9-1-1.5-1S8.2 3.4 8 4zM4 7h11l-.9 10.1c0 .5-.5.9-1 .9H5.9c-.5 0-.9-.4-1-.9L4 7z"
+      />
+    </svg>
+  </div>
+  <div
+    style={
+      Object {
+        "alignItems": "center",
+        "display": "flex",
+      }
+    }
+  >
+    <strong
+      style={
+        Object {
+          "width": "120px",
+        }
+      }
+    >
+      typography
+    </strong>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={24}
+      role="img"
+      viewBox="0 0 24 24"
+      width={24}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.9 7L3 17.8h1.7l1-2.8h4.1l1 2.8h1.7L8.6 7H6.9zm-.7 6.6l1.5-4.3 1.5 4.3h-3zM21.6 17c-.1.1-.2.2-.3.2-.1.1-.2.1-.4.1s-.3-.1-.4-.2c-.1-.1-.1-.3-.1-.6V12c0-.5 0-1-.1-1.4-.1-.4-.3-.7-.5-1-.2-.2-.5-.4-.9-.5-.4 0-.8-.1-1.3-.1s-1 .1-1.4.2c-.4.1-.7.3-1 .4-.2.2-.4.3-.6.5-.1.2-.2.4-.2.7 0 .3.1.5.2.8.2.2.4.3.8.3.3 0 .6-.1.8-.3.2-.2.3-.4.3-.7 0-.3-.1-.5-.2-.7-.2-.2-.4-.3-.6-.4.2-.2.4-.3.7-.4.3-.1.6-.1.8-.1.3 0 .6 0 .8.1.2.1.4.3.5.5.1.2.2.5.2.9v1.1c0 .3-.1.5-.3.6-.2.2-.5.3-.9.4-.3.1-.7.3-1.1.4-.4.1-.8.3-1.1.5-.3.2-.6.4-.8.7-.2.3-.3.7-.3 1.2 0 .6.2 1.1.5 1.4.3.4.9.5 1.6.5.5 0 1-.1 1.4-.3.4-.2.8-.6 1.1-1.1 0 .4.1.7.3 1 .2.3.6.4 1.2.4.4 0 .7-.1.9-.2.2-.1.5-.3.7-.4h-.3zm-3-.9c-.2.4-.5.7-.8.8-.3.2-.6.2-.8.2-.4 0-.6-.1-.9-.3-.2-.2-.3-.6-.3-1.1 0-.5.1-.9.3-1.2s.5-.5.8-.7c.3-.2.7-.3 1-.5.3-.1.6-.3.7-.6v3.4z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={36}
+      role="img"
+      viewBox="0 0 24 24"
+      width={36}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.9 7L3 17.8h1.7l1-2.8h4.1l1 2.8h1.7L8.6 7H6.9zm-.7 6.6l1.5-4.3 1.5 4.3h-3zM21.6 17c-.1.1-.2.2-.3.2-.1.1-.2.1-.4.1s-.3-.1-.4-.2c-.1-.1-.1-.3-.1-.6V12c0-.5 0-1-.1-1.4-.1-.4-.3-.7-.5-1-.2-.2-.5-.4-.9-.5-.4 0-.8-.1-1.3-.1s-1 .1-1.4.2c-.4.1-.7.3-1 .4-.2.2-.4.3-.6.5-.1.2-.2.4-.2.7 0 .3.1.5.2.8.2.2.4.3.8.3.3 0 .6-.1.8-.3.2-.2.3-.4.3-.7 0-.3-.1-.5-.2-.7-.2-.2-.4-.3-.6-.4.2-.2.4-.3.7-.4.3-.1.6-.1.8-.1.3 0 .6 0 .8.1.2.1.4.3.5.5.1.2.2.5.2.9v1.1c0 .3-.1.5-.3.6-.2.2-.5.3-.9.4-.3.1-.7.3-1.1.4-.4.1-.8.3-1.1.5-.3.2-.6.4-.8.7-.2.3-.3.7-.3 1.2 0 .6.2 1.1.5 1.4.3.4.9.5 1.6.5.5 0 1-.1 1.4-.3.4-.2.8-.6 1.1-1.1 0 .4.1.7.3 1 .2.3.6.4 1.2.4.4 0 .7-.1.9-.2.2-.1.5-.3.7-.4h-.3zm-3-.9c-.2.4-.5.7-.8.8-.3.2-.6.2-.8.2-.4 0-.6-.1-.9-.3-.2-.2-.3-.6-.3-1.1 0-.5.1-.9.3-1.2s.5-.5.8-.7c.3-.2.7-.3 1-.5.3-.1.6-.3.7-.6v3.4z"
+      />
+    </svg>
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      height={48}
+      role="img"
+      viewBox="0 0 24 24"
+      width={48}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6.9 7L3 17.8h1.7l1-2.8h4.1l1 2.8h1.7L8.6 7H6.9zm-.7 6.6l1.5-4.3 1.5 4.3h-3zM21.6 17c-.1.1-.2.2-.3.2-.1.1-.2.1-.4.1s-.3-.1-.4-.2c-.1-.1-.1-.3-.1-.6V12c0-.5 0-1-.1-1.4-.1-.4-.3-.7-.5-1-.2-.2-.5-.4-.9-.5-.4 0-.8-.1-1.3-.1s-1 .1-1.4.2c-.4.1-.7.3-1 .4-.2.2-.4.3-.6.5-.1.2-.2.4-.2.7 0 .3.1.5.2.8.2.2.4.3.8.3.3 0 .6-.1.8-.3.2-.2.3-.4.3-.7 0-.3-.1-.5-.2-.7-.2-.2-.4-.3-.6-.4.2-.2.4-.3.7-.4.3-.1.6-.1.8-.1.3 0 .6 0 .8.1.2.1.4.3.5.5.1.2.2.5.2.9v1.1c0 .3-.1.5-.3.6-.2.2-.5.3-.9.4-.3.1-.7.3-1.1.4-.4.1-.8.3-1.1.5-.3.2-.6.4-.8.7-.2.3-.3.7-.3 1.2 0 .6.2 1.1.5 1.4.3.4.9.5 1.6.5.5 0 1-.1 1.4-.3.4-.2.8-.6 1.1-1.1 0 .4.1.7.3 1 .2.3.6.4 1.2.4.4 0 .7-.1.9-.2.2-.1.5-.3.7-.4h-.3zm-3-.9c-.2.4-.5.7-.8.8-.3.2-.6.2-.8.2-.4 0-.6-.1-.9-.3-.2-.2-.3-.6-.3-1.1 0-.5.1-.9.3-1.2s.5-.5.8-.7c.3-.2.7-.3 1-.5.3-.1.6-.3.7-.6v3.4z"
       />
     </svg>
   </div>
