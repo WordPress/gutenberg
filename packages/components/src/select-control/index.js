@@ -14,6 +14,12 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 
+/**
+ * Used to render the <select /> Loading... placeholder when the isLoading
+ * state is set.
+ */
+const loadingValue = '__loading__';
+
 export default function SelectControl( {
 	disabled,
 	help,
@@ -24,6 +30,7 @@ export default function SelectControl( {
 	options = [],
 	className,
 	hideLabelFromVision,
+	value: valueProp,
 	...props
 } ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -46,6 +53,8 @@ export default function SelectControl( {
 		return null;
 	}
 
+	const value = isLoading ? loadingValue : valueProp;
+
 	// Disable reason: A select with an onchange throws a warning
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
@@ -65,6 +74,7 @@ export default function SelectControl( {
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? `${ id }__help` : undefined }
 				multiple={ multiple }
+				value={ value }
 				{ ...props }
 			>
 				<SelectOptions isLoading={ isLoading } options={ options } />
@@ -76,7 +86,11 @@ export default function SelectControl( {
 
 function SelectOptions( { isLoading, options } ) {
 	if ( isLoading ) {
-		return <option disabled>{ __( 'Loading…' ) }</option>;
+		return (
+			<option disabled value={ loadingValue }>
+				{ __( 'Loading…' ) }
+			</option>
+		);
 	}
 
 	return options.map( ( option, index ) => (
