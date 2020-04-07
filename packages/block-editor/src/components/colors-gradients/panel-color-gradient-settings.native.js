@@ -4,7 +4,7 @@
 import { PanelBody, UnsupportedFooterControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const PanelColorSettings = () => {
+const PanelColorGradientSettings = () => {
 	return (
 		<PanelBody>
 			<UnsupportedFooterControl
@@ -14,4 +14,4 @@ const PanelColorSettings = () => {
 		</PanelBody>
 	);
 };
-export default PanelColorSettings;
+export default PanelColorGradientSettings;
