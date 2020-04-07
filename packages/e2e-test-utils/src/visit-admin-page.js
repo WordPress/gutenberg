@@ -25,5 +25,8 @@ export async function visitAdminPage( adminPath, query ) {
 		await visitAdminPage( adminPath, query );
 	}
 
-	expect( await getPageError() ).toBe( null );
+	const error = await getPageError();
+	if ( error ) {
+		throw new Error( 'Unexpected error in page content: ' + error );
+	}
 }
