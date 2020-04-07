@@ -8,7 +8,7 @@ exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
     className="components-notice__content"
   >
     <p>
-      Appear animation. Origin: 
+      Appear animation. Origin:
       bottom left
       .
     </p>
@@ -44,7 +44,7 @@ exports[`Storyshots Components/Animate Appear Bottom Right 1`] = `
     className="components-notice__content"
   >
     <p>
-      Appear animation. Origin: 
+      Appear animation. Origin:
       bottom right
       .
     </p>
@@ -80,7 +80,7 @@ exports[`Storyshots Components/Animate Appear Top Left 1`] = `
     className="components-notice__content"
   >
     <p>
-      Appear animation. Origin: 
+      Appear animation. Origin:
       top left
       .
     </p>
@@ -116,7 +116,7 @@ exports[`Storyshots Components/Animate Appear Top Right 1`] = `
     className="components-notice__content"
   >
     <p>
-      Appear animation. Origin: 
+      Appear animation. Origin:
       top right
       .
     </p>
@@ -829,19 +829,19 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -857,15 +857,15 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-2.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-2.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-2.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-2.is-size-extraSmall {
@@ -888,19 +888,19 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-4.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-4.is-borderless {
@@ -958,15 +958,15 @@ exports[`Storyshots Components/Card/Body Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -1014,15 +1014,15 @@ exports[`Storyshots Components/Card/Divider Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -1095,19 +1095,19 @@ exports[`Storyshots Components/Card/Footer Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1162,19 +1162,19 @@ exports[`Storyshots Components/Card/Header Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1222,15 +1222,15 @@ exports[`Storyshots Components/Card/Media Default 1`] = `
 }
 
 .emotion-2.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-2.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-2.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-2.is-size-extraSmall {
@@ -1316,19 +1316,19 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1351,19 +1351,19 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-4.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-4.is-borderless {
@@ -1498,15 +1498,15 @@ Array [
 }
 
 .emotion-4.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
@@ -1570,19 +1570,19 @@ exports[`Storyshots Components/Card/Media Iframe Embed 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1666,15 +1666,15 @@ exports[`Storyshots Components/Card/Media On Bottom 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -2593,7 +2593,7 @@ exports[`Storyshots Components/Dashicon Default 1`] = `
 exports[`Storyshots Components/Draggable Default 1`] = `
 <div>
   <p>
-    Is Dragging? 
+    Is Dragging?
     No
   </p>
   <div
@@ -4420,7 +4420,7 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
     </p>
     <p>
       The
-       
+
       <strong
         style={
           Object {
@@ -4430,12 +4430,12 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         pink bordered
       </strong>
-       
+
       element is a parent.
     </p>
     <p>
       The
-       
+
       <strong
         style={
           Object {
@@ -4445,8 +4445,8 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
       >
         cyan bordered
       </strong>
-       
-      element is a sibling to 
+
+      element is a sibling to
       <strong>
         Popover
       </strong>
@@ -5242,7 +5242,7 @@ input[type='number'].emotion-12 {
       <span
         className="components-range-control__root emotion-14 emotion-15"
       >
-        
+
         <span
           className="components-range-control__wrapper emotion-10 emotion-11"
           color="#00669b"
@@ -5294,7 +5294,7 @@ input[type='number'].emotion-12 {
             />
           </span>
         </span>
-        
+
         <input
           aria-label="Range Label"
           className="components-range-control__number emotion-12 emotion-113"
@@ -7816,7 +7816,7 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
       </button>
       <p>
         Scroll locked:
-         
+
         <strong>
           No
         </strong>
@@ -7967,7 +7967,7 @@ exports[`Storyshots Components/TabPanel Default 1`] = `
     tabIndex="0"
   >
     <p>
-      Selected tab: 
+      Selected tab:
       Tab 1
     </p>
   </div>
@@ -8718,11 +8718,11 @@ Array [
   </div>,
   <div>
     This text will
-     
+
     <span
       className="components-visually-hidden"
     >
-      but not inline 
+      but not inline
     </span>
      always show.
   </div>,
@@ -8737,7 +8737,7 @@ Array [
     className="components-visually-hidden test-input"
   >
     Check out my class!
-     
+
   </label>,
   "Inspect the HTML to see!",
 ]
@@ -8752,7 +8752,7 @@ Array [
     data-id="test"
   >
     Check out my data attribute!
-     
+
   </span>,
   "Inspect the HTML to see!",
 ]
