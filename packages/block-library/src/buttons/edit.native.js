@@ -10,9 +10,9 @@ import {
 	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
 } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,9 +32,17 @@ function ButtonsEdit( {
 	isSelectedButton,
 } ) {
 	const { align } = attributes;
+	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isSelectedButton;
 	const { marginLeft: spacing } = styles.spacing;
+
+	useEffect( () => {
+		const { width } = sizes || {};
+		const margins = 2 * styles.parent.marginRight;
+
+		setMaxWidth( width - margins );
+	}, [ sizes ] );
 
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
@@ -50,12 +58,6 @@ function ButtonsEdit( {
 		return null;
 	}
 
-	function onLayout( { nativeEvent } ) {
-		const { width } = nativeEvent.layout;
-		const margins = 2 * styles.parent.marginRight;
-		setMaxWidth( width - margins );
-	}
-
 	// Inside buttons block alignment options are not supported.
 	const alignmentHooksSetting = {
 		isEmbedButton: true,
@@ -63,21 +65,20 @@ function ButtonsEdit( {
 
 	return (
 		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-			<View onLayout={ onLayout }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					renderAppender={ renderAppender }
-					__experimentalMoverDirection="horizontal"
-					horizontalAlignment={ align }
-					onDeleteBlock={ shouldDelete && onDelete }
-					onAddBlock={ onAddNextButton }
-					parentWidth={ maxWidth }
-					shouldRenderFooterAppender={ shouldRenderFooterAppender }
-					marginHorizontal={ spacing }
-					marginVertical={ spacing }
-				/>
-			</View>
+			{ resizeObserver }
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				template={ BUTTONS_TEMPLATE }
+				renderAppender={ renderAppender }
+				__experimentalMoverDirection="horizontal"
+				horizontalAlignment={ align }
+				onDeleteBlock={ shouldDelete && onDelete }
+				onAddBlock={ onAddNextButton }
+				parentWidth={ maxWidth }
+				shouldRenderFooterAppender={ shouldRenderFooterAppender }
+				marginHorizontal={ spacing }
+				marginVertical={ spacing }
+			/>
 		</AlignmentHookSettingsProvider>
 	);
 }
