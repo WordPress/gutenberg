@@ -32,17 +32,18 @@ function ButtonsEdit( {
 	isInnerButtonSelected,
 } ) {
 	const { align } = attributes;
-	const [ resizeObserver, { width } ] = useResizeObserver();
+	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	const { marginLeft: spacing } = styles.spacing;
 
 	useEffect( () => {
 		const margins = 2 * styles.parent.marginRight;
+		const { width } = sizes || {};
 		if ( width ) {
 			setMaxWidth( width - margins );
 		}
-	}, [ width ] );
+	}, [ sizes ] );
 
 	function renderAppender() {
 		if ( shouldRenderFooterAppender ) {
