@@ -109,7 +109,7 @@ const Container = styled.div`
 const Side = styled.div`
 	box-sizing: border-box;
 	background: ${color( 'ui.brand' )};
-	filter: brightness( 0.7 );
+	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;
 	pointer-events: none;
