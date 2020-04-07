@@ -519,7 +519,14 @@ describe( 'block parser', () => {
 			} );
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
-				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				attributes: {
+					newFruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( props ) => <div>{ props.attributes.newFruit }</div>,
 				deprecated: [
 					{
 						attributes: {

@@ -2,7 +2,16 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { flow, get, castArray, mapValues, omit, stubFalse } from 'lodash';
+import {
+	flow,
+	castArray,
+	mapValues,
+	omit,
+	stubFalse,
+	isEqual,
+	omitBy,
+	every,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +30,11 @@ import {
 } from './registration';
 import { createBlock } from './factory';
 import { getBlockContentValidationResult } from './validation';
-import { getCommentDelimitedContent, getSaveContent } from './serializer';
+import {
+	getCommentDelimitedContent,
+	getSaveContent,
+	serializeBlock,
+} from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
@@ -310,6 +323,21 @@ export function getBlockAttributes(
 	);
 }
 
+function isEquivalentBlocks( block1, block2 ) {
+	return (
+		!! block1 &&
+		!! block2 &&
+		block1.name === block2.name &&
+		isEqual(
+			omitBy( block1.attributes, ( value ) => value === undefined ),
+			omitBy( block2.attributes, ( value ) => value === undefined )
+		) &&
+		every( block1.innerBlocks, ( value, index ) =>
+			isEquivalentBlocks( value, block2.innerBlocks[ index ] )
+		)
+	);
+}
+
 /**
  * Given a block object, returns a new copy of the block with any applicable
  * deprecated migrations applied, or the original block if it was both valid
@@ -322,20 +350,25 @@ export function getBlockAttributes(
  * @return {WPBlock} Migrated block object.
  */
 export function getMigratedBlock( block, parsedAttributes ) {
-	const blockType = getBlockType( block.name );
-
-	const { deprecated: deprecatedDefinitions } = blockType;
+	const originalBlockType = getBlockType( block.name );
+	const { deprecated: deprecatedDefinitions } = originalBlockType;
 	if ( ! deprecatedDefinitions || ! deprecatedDefinitions.length ) {
 		return block;
 	}
-
 	const { originalContent, innerBlocks } = block;
-
-	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
+	let i = 0;
+	let migratedAttributes,
+		reparsedAttributes,
+		reparsedInnerBlocks,
+		migratedInnerBlocks;
+	let isMigrated = false;
+	do {
+		const currentDeprecation = deprecatedDefinitions[ i ];
+		i++;
+		const { isEligible = stubFalse, migrate } = currentDeprecation;
 		// A block can opt into a migration even if the block is valid by
 		// defining isEligible on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
-		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
 		if ( block.isValid && ! isEligible( parsedAttributes, innerBlocks ) ) {
 			continue;
 		}
@@ -344,46 +377,62 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// parsing are not considered in the deprecated block type by default,
 		// and must be explicitly provided.
 		const deprecatedBlockType = Object.assign(
-			omit( blockType, DEPRECATED_ENTRY_KEYS ),
-			deprecatedDefinitions[ i ]
+			omit( originalBlockType, DEPRECATED_ENTRY_KEYS ),
+			currentDeprecation
 		);
 
-		let migratedAttributes = getBlockAttributes(
+		// In order to retrieve the correct deprecation
+		// we parse the content usnig the deprecatoin
+		// we serialize and parse it again using the current block ddefintion
+		// the attributes shouldn't change.
+		migratedAttributes = getBlockAttributes(
 			deprecatedBlockType,
 			originalContent,
 			parsedAttributes
 		);
-
-		// Ignore the deprecation if it produces a block which is not valid.
-		const { isValid, validationIssues } = getBlockContentValidationResult(
-			deprecatedBlockType,
-			migratedAttributes,
-			originalContent
-		);
-
-		if ( ! isValid ) {
-			block = {
-				...block,
-				validationIssues: [
-					...get( block, 'validationIssues', [] ),
-					...validationIssues,
-				],
-			};
-			continue;
-		}
-
-		let migratedInnerBlocks = innerBlocks;
-
-		// A block may provide custom behavior to assign new attributes and/or
-		// inner blocks.
-		const { migrate } = deprecatedBlockType;
+		migratedInnerBlocks = innerBlocks;
+		// Migrate and add default values
 		if ( migrate ) {
 			[
 				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = innerBlocks,
 			] = castArray( migrate( migratedAttributes, innerBlocks ) );
 		}
+		/*Object.entries( originalBlockType.attributes ).forEach(
+			( [ key, value ] ) => {
+				if ( migratedAttributes[ key ] === undefined ) {
+					migratedAttributes[ key ] = value.default;
+				}
+			}
+		);*/
+		const reserializedBlocks = serializeBlock( {
+			...block,
+			isValid: true,
+			attributes: migratedAttributes,
+			innerBlocks: migratedInnerBlocks,
+		} );
+		[
+			{
+				innerBlocks: reparsedInnerBlocks,
+				attributes: reparsedAttributes,
+			},
+		] = parseWithGrammar( reserializedBlocks );
 
+		isMigrated = isEquivalentBlocks(
+			{
+				...block,
+				attributes: migratedAttributes,
+				innerBlocks: migratedInnerBlocks,
+			},
+			{
+				...block,
+				attributes: reparsedAttributes,
+				innerBlocks: reparsedInnerBlocks,
+			}
+		);
+	} while ( ! isMigrated && i < deprecatedDefinitions.length );
+
+	if ( isMigrated ) {
 		block = {
 			...block,
 			attributes: migratedAttributes,

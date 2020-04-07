@@ -189,8 +189,8 @@ addFilter(
 	'core/custom-class-name/save-props',
 	addSaveProps
 );
-addFilter(
+/*addFilter(
 	'blocks.getBlockAttributes',
 	'core/custom-class-name/addParsedDifference',
 	addParsedDifference
-);
+);*/
