@@ -95,6 +95,10 @@ export const COMMAND = 'meta';
  * Keycode for SHIFT key.
  */
 export const SHIFT = 'shift';
+/**
+ * Keycode for ZERO key.
+ */
+export const ZERO = 48;
 
 /**
  * Object that contains functions that return the available modifier

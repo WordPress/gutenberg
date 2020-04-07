@@ -121,6 +121,7 @@ export class MediaUploadProgress extends React.Component {
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
+		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
 			'Failed to insert media.\nPlease tap for options.'
 		);

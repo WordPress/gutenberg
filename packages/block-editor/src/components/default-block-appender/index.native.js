@@ -39,7 +39,10 @@ export function DefaultBlockAppender( {
 	return (
 		<TouchableWithoutFeedback onPress={ onAppend }>
 			<View
-				style={ [ styles.blockHolder, containerStyle ] }
+				style={ [
+					styles.blockHolder,
+					showSeparator && containerStyle,
+				] }
 				pointerEvents="box-only"
 			>
 				{ showSeparator ? (

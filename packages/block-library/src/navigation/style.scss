@@ -93,6 +93,18 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		}
 	}
 
+	&.is-vertical ul {
+		display: flex;
+		flex-direction: column;
+		li {
+			text-align: left;
+		}
+	}
+
+	&.is-vertical > .wp-block-navigation__container {
+		align-items: flex-start;
+	}
+
 	// Main menu
 	.wp-block-navigation-link {
 		position: relative;

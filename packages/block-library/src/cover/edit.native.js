@@ -82,6 +82,7 @@ const Cover = ( {
 		minHeight,
 		url,
 		id,
+		style,
 	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
@@ -89,6 +90,7 @@ const Cover = ( {
 
 	const hasBackground = !! (
 		url ||
+		( style && style.color && style.color.background ) ||
 		attributes.overlayColor ||
 		overlayColor.color ||
 		gradientValue
@@ -151,7 +153,8 @@ const Cover = ( {
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
-			backgroundColor: overlayColor?.color || styles.overlay.color,
+			backgroundColor: overlayColor?.color || style?.color?.background
+				|| styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url

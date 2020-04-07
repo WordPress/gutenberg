@@ -52,7 +52,9 @@ import {
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
-const { Provider, Consumer } = createContext();
+/** @typedef {import('./react').WPElement} WPElement */
+
+const { Provider, Consumer } = createContext( undefined );
 const ForwardRef = forwardRef( () => {
 	return null;
 } );
@@ -60,14 +62,14 @@ const ForwardRef = forwardRef( () => {
 /**
  * Valid attribute types.
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const ATTRIBUTES_TYPES = new Set( [ 'string', 'boolean', 'number' ] );
 
 /**
  * Element tags which can be self-closing.
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const SELF_CLOSING_TAGS = new Set( [
 	'area',
@@ -101,7 +103,7 @@ const SELF_CLOSING_TAGS = new Set( [
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const BOOLEAN_ATTRIBUTES = new Set( [
 	'allowfullscreen',
@@ -152,7 +154,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
  *
  *  - `alt`: https://blog.whatwg.org/omit-alt
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const ENUMERATED_ATTRIBUTES = new Set( [
 	'autocapitalize',
@@ -195,7 +197,7 @@ const ENUMERATED_ATTRIBUTES = new Set( [
  *     .map( ( [ key ] ) => key )
  *     .sort();
  *
- * @type {Set}
+ * @type {Set<string>}
  */
 const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 	'animation',
@@ -269,7 +271,7 @@ function isInternalAttribute( attribute ) {
  * @param {string} attribute Attribute name.
  * @param {*}      value     Non-normalized attribute value.
  *
- * @return {string} Normalized attribute value.
+ * @return {*} Normalized attribute value.
  */
 function getNormalAttributeValue( attribute, value ) {
 	switch ( attribute ) {
@@ -346,9 +348,9 @@ function getNormalStylePropertyValue( property, value ) {
 /**
  * Serializes a React element to string.
  *
- * @param {WPElement} element       Element to serialize.
- * @param {?Object}   context       Context object.
- * @param {?Object}   legacyContext Legacy context object.
+ * @param {import('react').ReactNode} element         Element to serialize.
+ * @param {Object}                    [context]       Context object.
+ * @param {Object}                    [legacyContext] Legacy context object.
  *
  * @return {string} Serialized element.
  */
@@ -369,7 +371,10 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return element.toString();
 	}
 
-	const { type, props } = element;
+	const {
+		type,
+		props,
+	} = /** @type {{type?: any, props?: any}} */ ( element );
 
 	switch ( type ) {
 		case StrictMode:
@@ -434,11 +439,11 @@ export function renderElement( element, context, legacyContext = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {?string} type          Native component type to serialize, or null if
- *                                rendering as fragment of children content.
- * @param {Object}  props         Props object.
- * @param {?Object} context       Context object.
- * @param {?Object} legacyContext Legacy context object.
+ * @param {?string} type            Native component type to serialize, or null if
+ *                                  rendering as fragment of children content.
+ * @param {Object}  props           Props object.
+ * @param {Object}  [context]       Context object.
+ * @param {Object}  [legacyContext] Legacy context object.
  *
  * @return {string} Serialized element.
  */
@@ -478,13 +483,15 @@ export function renderNativeComponent(
 	return '<' + type + attributes + '>' + content + '</' + type + '>';
 }
 
+/** @typedef {import('./react').WPComponent} WPComponent */
+
 /**
  * Serializes a non-native component type to string.
  *
- * @param {Function} Component     Component type to serialize.
- * @param {Object}   props         Props object.
- * @param {?Object}  context       Context object.
- * @param {?Object}  legacyContext Legacy context object.
+ * @param {WPComponent} Component       Component type to serialize.
+ * @param {Object}      props           Props object.
+ * @param {Object}      [context]       Context object.
+ * @param {Object}      [legacyContext] Legacy context object.
  *
  * @return {string} Serialized element
  */
@@ -494,10 +501,22 @@ export function renderComponent(
 	context,
 	legacyContext = {}
 ) {
-	const instance = new Component( props, legacyContext );
+	const instance = new /** @type {import('react').ComponentClass} */ ( Component )(
+		props,
+		legacyContext
+	);
 
-	if ( typeof instance.getChildContext === 'function' ) {
-		Object.assign( legacyContext, instance.getChildContext() );
+	if (
+		typeof (
+			// Ignore reason: Current prettier reformats parens and mangles type assertion
+			// prettier-ignore
+			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext
+		) === 'function'
+	) {
+		Object.assign(
+			legacyContext,
+			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext()
+		);
 	}
 
 	const html = renderElement( instance.render(), context, legacyContext );
@@ -508,9 +527,9 @@ export function renderComponent(
 /**
  * Serializes an array of children to string.
  *
- * @param {Array}   children      Children to serialize.
- * @param {?Object} context       Context object.
- * @param {?Object} legacyContext Legacy context object.
+ * @param {import('react').ReactNodeArray} children        Children to serialize.
+ * @param {Object}                         [context]       Context object.
+ * @param {Object}                         [legacyContext] Legacy context object.
  *
  * @return {string} Serialized children.
  */

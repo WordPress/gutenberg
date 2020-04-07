@@ -13,8 +13,9 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { COLOR_SUPPORT_KEY } from './color';
+import { LINE_HEIGHT_SUPPRT_KEY } from './line-height';
 
-const styleSupportKeys = [ COLOR_SUPPORT_KEY ];
+const styleSupportKeys = [ COLOR_SUPPORT_KEY, LINE_HEIGHT_SUPPRT_KEY ];
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );

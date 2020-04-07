@@ -48,8 +48,9 @@ function ToolbarButton( {
 					isPressed={ props.isActive }
 					disabled={ props.isDisabled }
 					{ ...extraProps }
-				/>
-				{ children }
+				>
+					{ children }
+				</Button>
 			</ToolbarButtonContainer>
 		);
 	}
