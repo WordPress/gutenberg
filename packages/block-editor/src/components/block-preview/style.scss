@@ -9,9 +9,6 @@
 	width: 100%;
 
 	overflow: hidden;
-	&.is-ready {
-		overflow: visible;
-	}
 }
 
 .block-editor-block-preview__content {
@@ -34,13 +31,6 @@
 	margin: 0;
 	overflow: visible;
 	min-height: auto;
-
-	.block-editor-block-preview__container &.is-centered {
-		.block-editor-block-list__layout,
-		.block-editor-block-list__block {
-			padding: 0;
-		}
-	}
 
 	.block-editor-block-list__insertion-point,
 	.block-editor-block-drop-zone,

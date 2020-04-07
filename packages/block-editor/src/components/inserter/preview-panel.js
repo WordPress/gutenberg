@@ -24,7 +24,6 @@ function InserterPreviewPanel( { item } ) {
 				{ isReusableBlock( item ) || hoveredItemBlockType.example ? (
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
-							padding={ 10 }
 							viewportWidth={ 500 }
 							blocks={
 								hoveredItemBlockType.example
@@ -43,7 +42,6 @@ function InserterPreviewPanel( { item } ) {
 											item.initialAttributes
 									  )
 							}
-							autoHeight
 						/>
 					</div>
 				) : (

@@ -63,19 +63,26 @@ const COVER_DEFAULT_HEIGHT = 300;
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
-	hasChildren,
 	isParentSelected,
 	onFocus,
 	overlayColor,
 	setAttributes,
 } ) => {
-	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
+	const {
+		backgroundType,
+		dimRatio,
+		focalPoint,
+		minHeight,
+		url,
+		style,
+	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const { gradientValue } = __experimentalUseGradient();
 
 	const hasBackground = !! (
 		url ||
+		( style && style.color && style.color.background ) ||
 		attributes.overlayColor ||
 		overlayColor.color ||
 		gradientValue
@@ -112,12 +119,12 @@ const Cover = ( {
 
 	const overlayStyles = [
 		styles.overlay,
-		{
+		url && { opacity: dimRatio / 100 },
+		! gradientValue && {
 			backgroundColor:
-				overlayColor && overlayColor.color
-					? overlayColor.color
-					: styles.overlay.color,
-			opacity: dimRatio / 100,
+				( overlayColor && overlayColor.color ) ||
+				( style && style.color && style.color.background ) ||
+				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -176,11 +183,6 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const containerStyles = [
-		hasChildren && ! isParentSelected && styles.regularMediaPadding,
-		hasChildren && isParentSelected && styles.innerPadding,
-	];
-
 	const background = ( openMediaOptions, getMediaOptions ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
@@ -191,19 +193,12 @@ const Cover = ( {
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 
-				{ /* When the gradient is set as a background the backgroundType is equal to IMAGE_BACKGROUND_TYPE */ }
-				{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-					( gradientValue ? (
-						<LinearGradient
-							gradientValue={ gradientValue }
-							style={ styles.background }
-						/>
-					) : (
-						<ImageWithFocalPoint
-							focalPoint={ focalPoint }
-							url={ url }
-						/>
-					) ) }
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
 						muted
@@ -220,7 +215,7 @@ const Cover = ( {
 
 	if ( ! hasBackground ) {
 		return (
-			<View style={ containerStyles }>
+			<View>
 				<MediaPlaceholder
 					__experimentalOnlyMediaLibrary
 					icon={ placeholderIcon }
@@ -236,33 +231,33 @@ const Cover = ( {
 	}
 
 	return (
-		<View style={ containerStyles }>
+		<View style={ styles.backgroundContainer }>
 			{ controls }
-			<View style={ styles.backgroundContainer }>
-				<View
-					pointerEvents="box-none"
-					style={ [
-						styles.content,
-						{ minHeight: CONTAINER_HEIGHT },
-					] }
-				>
-					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
-				</View>
 
-				{ /* We don't render overlay on top of gradient */ }
-				{ ! gradientValue && (
-					<View pointerEvents="none" style={ overlayStyles } />
-				) }
-
-				<MediaUpload
-					__experimentalOnlyMediaLibrary
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onSelect={ onSelectMedia }
-					render={ ( { open, getMediaOptions } ) => {
-						return background( open, getMediaOptions );
-					} }
-				/>
+			<View
+				pointerEvents="box-none"
+				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+			>
+				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
+
+			<View pointerEvents="none" style={ overlayStyles }>
+				{ gradientValue && (
+					<LinearGradient
+						gradientValue={ gradientValue }
+						style={ styles.background }
+					/>
+				) }
+			</View>
+
+			<MediaUpload
+				__experimentalOnlyMediaLibrary
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onSelect={ onSelectMedia }
+				render={ ( { open, getMediaOptions } ) => {
+					return background( open, getMediaOptions );
+				} }
+			/>
 		</View>
 	);
 };
@@ -270,15 +265,11 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId, getBlockCount } = select(
-			'core/block-editor'
-		);
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const hasChildren = getBlockCount( clientId );
 
 		return {
-			hasChildren,
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),

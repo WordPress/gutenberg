@@ -9,6 +9,7 @@
 .edit-site-header__toolbar {
 	display: flex;
 	flex-grow: 1;
+	padding-left: $grid-unit-10;
 
 	& > * {
 		margin-left: 5px;

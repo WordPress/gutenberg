@@ -69,6 +69,7 @@ export default compose( [
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm(
+					// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 					__(
 						'Are you sure you want to delete this Reusable Block?\n\n' +
 							'It will be permanently removed from all posts and pages that use it.'

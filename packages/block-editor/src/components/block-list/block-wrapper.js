@@ -27,6 +27,7 @@ import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockContext } from './block';
+import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
@@ -101,7 +102,10 @@ const BlockComponent = forwardRef(
 			// should only consider tabbables within editable display, since it
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
-			if ( wrapper.current.contains( document.activeElement ) ) {
+			if (
+				document.activeElement &&
+				isInsideRootBlock( wrapper.current, document.activeElement )
+			) {
 				return;
 			}
 
@@ -109,9 +113,11 @@ const BlockComponent = forwardRef(
 			const textInputs = focus.tabbable
 				.find( wrapper.current )
 				.filter( isTextField )
-				// Exclude inner blocks
-				.filter( ( node ) =>
-					isInsideRootBlock( wrapper.current, node )
+				// Exclude inner blocks and block appenders
+				.filter(
+					( node ) =>
+						isInsideRootBlock( wrapper.current, node ) &&
+						! node.closest( '.block-list-appender' )
 				);
 
 			// If reversed (e.g. merge via backspace), use the last in the set of
@@ -224,23 +230,7 @@ const BlockComponent = forwardRef(
 	}
 );
 
-const elements = [
-	'p',
-	'div',
-	'h1',
-	'h2',
-	'h3',
-	'h4',
-	'h5',
-	'h6',
-	'ol',
-	'ul',
-	'li',
-	'figure',
-	'nav',
-];
-
-const ExtendedBlockComponent = elements.reduce( ( acc, element ) => {
+const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
 	acc[ element ] = forwardRef( ( props, ref ) => {
 		return <BlockComponent { ...props } ref={ ref } tagName={ element } />;
 	} );

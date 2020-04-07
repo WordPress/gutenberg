@@ -16,10 +16,11 @@ import {
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
-	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalFullscreenMode as FullscreenMode,
+	BlockBreadcrumb,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -61,6 +62,7 @@ function Editor( { settings: _settings } ) {
 
 	return template ? (
 		<>
+			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<SlotFillProvider>
 				<DropZoneProvider>
@@ -72,7 +74,7 @@ function Editor( { settings: _settings } ) {
 						>
 							<Context.Provider value={ context }>
 								<FocusReturnProvider>
-									<EditorSkeleton
+									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
 										header={ <Header /> }
 										content={
@@ -82,6 +84,7 @@ function Editor( { settings: _settings } ) {
 												<BlockEditor />
 											</>
 										}
+										footer={ <BlockBreadcrumb /> }
 									/>
 									<Popover.Slot />
 								</FocusReturnProvider>

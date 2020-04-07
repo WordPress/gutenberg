@@ -36,8 +36,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 
 .wp-block-navigation > ul {
 	li {
-		z-index: 1;
-
 		&:hover,
 		&:focus-within {
 			cursor: pointer;
@@ -93,6 +91,18 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 			margin-top: 0;
 			margin-bottom: 0;
 		}
+	}
+
+	&.is-vertical ul {
+		display: flex;
+		flex-direction: column;
+		li {
+			text-align: left;
+		}
+	}
+
+	&.is-vertical > .wp-block-navigation__container {
+		align-items: flex-start;
 	}
 
 	// Main menu
@@ -161,7 +171,6 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		}
 
 		&.has-child .wp-block-navigation-link__content {
-			min-width: 100%;
 			padding-right: $grid-unit-10 * 4;
 			position: relative;
 		}

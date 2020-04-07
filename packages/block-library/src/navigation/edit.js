@@ -32,7 +32,8 @@ import {
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { menu } from '@wordpress/icons';
-
+import { addQueryArgs } from '@wordpress/url';
+import { useApiFetch } from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
@@ -46,9 +47,6 @@ function Navigation( {
 	clientId,
 	fontSize,
 	hasExistingNavItems,
-	hasResolvedPages,
-	isRequestingPages,
-	pages,
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
@@ -57,16 +55,9 @@ function Navigation( {
 	//
 	// HOOKS
 	//
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
+	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
@@ -87,14 +78,35 @@ function Navigation( {
 		[ fontSize.size ]
 	);
 
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
+	const baseUrl = '/wp/v2/pages';
+
+	// "view" is required to ensure Pages are returned by REST API
+	// for users with lower capabilities such as "Contributor" otherwise
+	// Pages are not returned in the request if "edit" context is set
+	const context = 'view';
+
+	const filterDefaultPages = {
+		parent: 0,
+		order: 'asc',
+		orderby: 'id',
+		context,
+	};
+
+	const queryPath = addQueryArgs( baseUrl, filterDefaultPages );
+
+	const { isLoading: isRequestingPages, data: pages } = useApiFetch(
+		queryPath
+	);
+
+	const hasPages = !! pages;
+
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
-		if ( ! pages ) {
+		if ( ! hasPages ) {
 			return null;
 		}
 
@@ -134,11 +146,10 @@ function Navigation( {
 		selectBlock( clientId );
 	}
 
-	const hasPages = hasResolvedPages && pages && pages.length;
-
 	const blockClassNames = classnames( className, {
 		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 		[ fontSize.class ]: fontSize.class,
+		'is-vertical': attributes.orientation === 'vertical',
 	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
@@ -243,7 +254,6 @@ function Navigation( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
 			<InspectorControls>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
@@ -270,12 +280,19 @@ function Navigation( {
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={ 'horizontal' }
+							__experimentalMoverDirection={
+								attributes.orientation
+							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
 							__experimentalPassedProps={ {
 								className: 'wp-block-navigation__container',
 							} }
+							__experimentalCaptureToolbars={ true }
+							// Template lock set to false here so that the Nav
+							// Block on the experimental menus screen does not
+							// inherit templateLock={ 'all' }.
+							templateLock={ false }
 						/>
 					</Block.nav>
 				</BackgroundColor>
@@ -289,31 +306,8 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
 
-		const filterDefaultPages = {
-			parent: 0,
-			order: 'asc',
-			orderby: 'id',
-		};
-
-		const pagesSelect = [
-			'core',
-			'getEntityRecords',
-			[ 'postType', 'page', filterDefaultPages ],
-		];
-
 		return {
 			hasExistingNavItems: !! innerBlocks.length,
-			pages: select( 'core' ).getEntityRecords(
-				'postType',
-				'page',
-				filterDefaultPages
-			),
-			isRequestingPages: select( 'core/data' ).isResolving(
-				...pagesSelect
-			),
-			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
-				...pagesSelect
-			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

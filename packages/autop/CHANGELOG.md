@@ -1,3 +1,9 @@
+## Master
+
+### New feature
+
+- Include TypeScript type declarations ([#20669](https://github.com/WordPress/gutenberg/pull/20669))
+
 ## 2.3.0 (2019-05-21)
 
 ### Bug Fix

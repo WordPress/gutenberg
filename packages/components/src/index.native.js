@@ -30,6 +30,7 @@ export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
 export { default as PanelActions } from './panel/actions';
 export { default as Button } from './button';
+export { default as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
@@ -46,6 +47,7 @@ export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+export * from './text';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';

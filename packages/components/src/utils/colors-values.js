@@ -1,10 +1,42 @@
 /**
+ * External dependencies
+ */
+import { merge } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { rgba } from './colors';
+
 export const BASE = {
 	black: '#000',
 	white: '#fff',
+};
+
+/**
+ * TODO: Continue to update values as "G2" design evolves.
+ *
+ * "G2" refers to the movement to advance the interface of the block editor.
+ * https://github.com/WordPress/gutenberg/issues/18667
+ */
+export const G2 = {
+	blue: {
+		medium: {
+			focus: '#007cba',
+			focusDark: '#fff',
+		},
+	},
+	darkGray: {
+		primary: '#1e1e1e',
+	},
+	mediumGray: {
+		text: '#757575',
+	},
+	lightGray: {
+		ui: '#949494',
+		secondary: '#ccc',
+		tertiary: '#e7e8e9',
+	},
 };
 
 export const DARK_GRAY = {
@@ -101,15 +133,24 @@ export const ALERT = {
 	green: '#4ab866',
 };
 
+// Namespaced values for raw colors hex codes
+export const UI = {
+	background: BASE.white,
+	border: BASE.black,
+	borderFocus: BLUE.medium.focus,
+};
+
 export const COLORS = {
 	...BASE,
-	darkGray: DARK_GRAY,
+	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
-	lightGray: LIGHT_GRAY,
+	mediumGray: G2.mediumGray,
+	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
-	blue: BLUE,
+	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
+	ui: UI,
 };
 
 export default COLORS;

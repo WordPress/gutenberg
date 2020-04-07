@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, noop } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import { useLayoutEffect, useReducer, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockEditorProvider from '../provider';
-import ScaledBlockPreview from './scaled';
 import AutoHeightBlockPreview from './auto';
 
 /**
@@ -21,17 +20,16 @@ import AutoHeightBlockPreview from './auto';
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md
  *
- * @param {Array|Object} blocks A block instance (object) or an array of blocks to be previewed.
- * @param {number} viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+ * @param {Object} preview options for how the preview should be shown
+ * @param {Array|Object} preview.blocks A block instance (object) or an array of blocks to be previewed.
+ * @param {number} preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+ *
  * @return {WPComponent} The component to be rendered.
  */
 export function BlockPreview( {
 	blocks,
+	__experimentalPadding = 0,
 	viewportWidth = 700,
-	padding,
-	autoHeight = false,
-	__experimentalOnReady = noop,
-	__experimentalScalingDelay = 100,
 } ) {
 	const settings = useSelect( ( select ) =>
 		select( 'core/block-editor' ).getSettings()
@@ -47,26 +45,11 @@ export function BlockPreview( {
 	}
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			{ /*
-			 * The key prop is used to force recomputing the preview
-			 * by remounting the component, ScaledBlockPreview is not meant to
-			 * be rerendered.
-			 */ }
-			{ autoHeight ? (
-				<AutoHeightBlockPreview
-					key={ recompute }
-					viewportWidth={ viewportWidth }
-				/>
-			) : (
-				<ScaledBlockPreview
-					key={ recompute }
-					blocks={ renderedBlocks }
-					viewportWidth={ viewportWidth }
-					padding={ padding }
-					onReady={ __experimentalOnReady }
-					scalingDelay={ __experimentalScalingDelay }
-				/>
-			) }
+			<AutoHeightBlockPreview
+				key={ recompute }
+				viewportWidth={ viewportWidth }
+				__experimentalPadding={ __experimentalPadding }
+			/>
 		</BlockEditorProvider>
 	);
 }
