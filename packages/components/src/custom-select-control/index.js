@@ -7,7 +7,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, check, chevronDown } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -119,6 +122,20 @@ export default function CustomSelectControl( {
 					'aria-labelledby': undefined,
 					className: 'components-custom-select-control__button',
 					isSmall: true,
+					onFocus: ( event ) => {
+						if (
+							event?.relatedTarget?.tagName !== 'UL' &&
+							selectedItem
+						) {
+							speak(
+								sprintf(
+									/* translators: %s: currently selected value in the select control. */
+									__( '%s currently selected' ),
+									itemToString( selectedItem )
+								)
+							);
+						}
+					},
 				} ) }
 			>
 				{ itemToString( selectedItem ) }
