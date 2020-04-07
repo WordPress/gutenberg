@@ -157,7 +157,7 @@ export const registerCoreBlocks = () => {
 		buttons,
 		latestPosts,
 		devOnly( verse ),
-		devOnly( cover ),
+		cover,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

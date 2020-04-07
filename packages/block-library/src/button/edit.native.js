@@ -53,8 +53,10 @@ class ButtonEdit extends Component {
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.onSetMaxWidth = this.onSetMaxWidth.bind( this );
+		this.dismissSheet = this.dismissSheet.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
-		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
@@ -212,9 +214,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onToggleLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	onShowLinkSettings() {
+		this.setState( { isLinkSheetVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSheetVisible: false } );
 	}
 
 	onToggleButtonFocus( value ) {
@@ -265,6 +270,13 @@ class ButtonEdit extends Component {
 		}
 	}
 
+	dismissSheet() {
+		this.setState( {
+			isLinkSheetVisible: false,
+		} );
+		this.props.closeSettingsBottomSheet();
+	}
+
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
 		return (
 			<>
@@ -274,6 +286,7 @@ class ButtonEdit extends Component {
 					value={ url || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChange={ this.onChangeURL }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
 					// eslint-disable-next-line jsx-a11y/no-autofocus
@@ -300,6 +313,7 @@ class ButtonEdit extends Component {
 					value={ rel || '' }
 					valuePlaceholder={ __( 'None' ) }
 					onChange={ this.onChangeLinkRel }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
 					separatorType={
@@ -432,9 +446,9 @@ class ButtonEdit extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ __( 'Edit image' ) }
+								title={ __( 'Edit link' ) }
 								icon={ link }
-								onClick={ this.onToggleLinkSettings }
+								onClick={ this.onShowLinkSettings }
 								isActive={ url && url !== PREPEND_HTTP }
 							/>
 						</ToolbarGroup>
@@ -443,7 +457,7 @@ class ButtonEdit extends Component {
 
 				<BottomSheet
 					isVisible={ isLinkSheetVisible }
-					onClose={ this.onToggleLinkSettings }
+					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
 					{ this.getLinkSettings( url, rel, linkTarget ) }
@@ -512,6 +526,13 @@ export default compose( [
 		return {
 			onDelete: () => {
 				removeBlock( parentId );
+			},
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
 			},
 		};
 	} ),

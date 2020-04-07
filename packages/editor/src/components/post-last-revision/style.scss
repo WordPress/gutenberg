@@ -7,19 +7,17 @@
 	}
 }
 
-// Needs specificity
-.components-button:not(:disabled):not([aria-disabled="true"]).editor-post-last-revision__title {
+.components-button.editor-post-last-revision__title {
 	height: auto;
 
 	&:hover,
 	&:active {
 		// Override the default button hover style
-		background: $light-gray-200 !important;
-		border: none !important;
-		box-shadow: none !important;
+		background: $light-gray-200;
 	}
 
 	&:focus {
-		@include menu-style__focus;
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		border-radius: 0;
 	}
 }

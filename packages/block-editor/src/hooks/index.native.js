@@ -1,8 +1,9 @@
 /**
  * Internal dependencies
  */
-import { AlignmentHookSettingsProvider } from './align';
+export { AlignmentHookSettingsProvider } from './align';
+
 import './custom-class-name';
 import './generated-class-name';
-
-export { AlignmentHookSettingsProvider };
+import './style';
+import './color';

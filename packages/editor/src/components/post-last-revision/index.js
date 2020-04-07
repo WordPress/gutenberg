@@ -24,6 +24,7 @@ function LastRevision( { lastRevisionId, revisionsCount } ) {
 				icon={ backup }
 			>
 				{ sprintf(
+					/* translators: %d: number of revisions */
 					_n( '%d Revision', '%d Revisions', revisionsCount ),
 					revisionsCount
 				) }

@@ -292,6 +292,9 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes' => array(
+				'orientation'           => array(
+					'type' => 'string',
+				),
 				'className'             => array(
 					'type' => 'string',
 				),

@@ -372,7 +372,9 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
-## End to end Testing
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 

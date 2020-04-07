@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
+import useAsyncList from './use-async-list';
 
 function BlockPattern( { pattern, onClick } ) {
 	const { title, content } = pattern;
@@ -34,14 +35,26 @@ function BlockPattern( { pattern, onClick } ) {
 			tabIndex={ 0 }
 		>
 			<div className="block-editor-patterns__item-preview">
-				<BlockPreview blocks={ blocks } />
+				<BlockPreview blocks={ blocks } __experimentalPadding={ 8 } />
 			</div>
 			<div className="block-editor-patterns__item-title">{ title }</div>
 		</div>
 	);
 }
 
+function BlockPatternPlaceholder( { pattern } ) {
+	const { title } = pattern;
+
+	return (
+		<div className="block-editor-patterns__item is-placeholder">
+			<div className="block-editor-patterns__item-preview"></div>
+			<div className="block-editor-patterns__item-title">{ title }</div>
+		</div>
+	);
+}
+
 function BlockPatterns( { patterns } ) {
+	const currentShownPatterns = useAsyncList( patterns );
 	const getBlockInsertionPoint = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlockInsertionPoint;
 	} );
@@ -69,13 +82,20 @@ function BlockPatterns( { patterns } ) {
 
 	return (
 		<div className="block-editor-patterns">
-			{ patterns.map( ( pattern, index ) => (
-				<BlockPattern
-					key={ index }
-					pattern={ pattern }
-					onClick={ onClickPattern }
-				/>
-			) ) }
+			{ patterns.map( ( pattern, index ) =>
+				currentShownPatterns[ index ] === pattern ? (
+					<BlockPattern
+						key={ index }
+						pattern={ pattern }
+						onClick={ onClickPattern }
+					/>
+				) : (
+					<BlockPatternPlaceholder
+						key={ index }
+						pattern={ pattern }
+					/>
+				)
+			) }
 		</div>
 	);
 }

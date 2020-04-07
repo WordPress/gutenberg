@@ -16,15 +16,14 @@
 	flex-direction: column;
 
 	&:focus {
-		@include block-style__focus();
+		box-shadow: 0 0 0 $border-width-focus $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 
-	&:hover {
-		@include block-style__hover;
-
-		.block-editor-block-styles__item-preview {
-			border-color: $theme-color;
-		}
+	&:hover .block-editor-block-styles__item-preview {
+		border-color: $theme-color;
 	}
 
 	&.is-active {

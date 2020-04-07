@@ -9,7 +9,7 @@ import {
 	I18nManager,
 	AccessibilityInfo,
 } from 'react-native';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,6 +88,7 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			activeOpacity,
 			onPress,
 			label,
 			value,
@@ -99,6 +100,7 @@ class BottomSheetCell extends Component {
 			cellContainerStyle = {},
 			cellRowContainerStyle = {},
 			onChangeValue,
+			onSubmit,
 			children,
 			editable = true,
 			isSelected = false,
@@ -129,7 +131,7 @@ class BottomSheetCell extends Component {
 			? cellLabelLeftAlignNoIconStyle
 			: cellLabelCenteredStyle;
 		const defaultLabelStyle =
-			showValue || customActionButton
+			showValue || customActionButton || icon
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
 
@@ -228,6 +230,7 @@ class BottomSheetCell extends Component {
 					}
 					onFocus={ startEditing }
 					onBlur={ finishEditing }
+					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
 					{ ...valueProps }
 				/>
@@ -273,6 +276,11 @@ class BottomSheetCell extends Component {
 			this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 		const { title, handler } = customActionButton || {};
 
+		const opacity =
+			activeOpacity !== undefined
+				? activeOpacity
+				: get( platformStyles, 'activeOpacity.opacity' );
+
 		return (
 			<TouchableOpacity
 				accessible={
@@ -289,6 +297,7 @@ class BottomSheetCell extends Component {
 						: accessibilityHint
 				}
 				disabled={ disabled }
+				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				style={ [ styles.clipToBounds, style ] }
 			>
@@ -317,12 +326,6 @@ class BottomSheetCell extends Component {
 							<Text style={ [ defaultLabelStyle, labelStyle ] }>
 								{ label }
 							</Text>
-							{ isSelected && (
-								<Icon
-									icon={ check }
-									fill={ platformStyles.isSelected.color }
-								/>
-							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity
@@ -335,6 +338,12 @@ class BottomSheetCell extends Component {
 							</TouchableOpacity>
 						) }
 					</View>
+					{ isSelected && (
+						<Icon
+							icon={ check }
+							fill={ platformStyles.isSelected.color }
+						/>
+					) }
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>

@@ -25,9 +25,21 @@ export default function( node ) {
 		return;
 	}
 
-	// Ignore pre content.
-	if ( node.parentElement.closest( 'pre' ) ) {
-		return;
+	// Ignore pre content. Note that this does not use Element#closest due to
+	// a combination of (a) node may not be Element and (b) node.parentElement
+	// does not have full support in all browsers (Internet Exporer).
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
+
+	/** @type {Node?} */
+	let parent = node;
+	while ( ( parent = parent.parentNode ) ) {
+		if (
+			parent.nodeType === window.Node.ELEMENT_NODE &&
+			parent.nodeName === 'PRE'
+		) {
+			return;
+		}
 	}
 
 	// First, replace any sequence of HTML formatting space with a single space.
