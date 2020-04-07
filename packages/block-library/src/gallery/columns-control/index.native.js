@@ -1,16 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { StepperControl } from '@wordpress/components';
+import { RangeControl } from '@wordpress/components';
 
 const ColumnsControl = ( { label, value, onChange, min, max } ) => (
-	<StepperControl
+	<RangeControl
 		label={ label }
 		max={ max }
 		min={ min }
 		onChange={ onChange }
 		separatorType="fullWidth"
 		value={ value }
+		type="stepper"
 	/>
 );
 
