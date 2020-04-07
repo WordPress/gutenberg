@@ -2,18 +2,19 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import { useRadioState, Radio, RadioGroup } from 'reakit/Radio';
+// import { useRadioState, Radio, RadioGroup } from 'reakit/Radio';
 import styled from '@emotion/styled';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+import { Icon, chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ButtonGroup from '../button-group';
-import Button from '../button';
+// import BaseButtonGroup from '../button-group';
+import DropdownMenu from '../dropdown-menu';
 import BoxControlIcon from './icon';
 import Tooltip from '../tooltip';
 import BaseUnitControl from '../unit-control';
@@ -67,6 +68,7 @@ export default function BoxControl( {
 } ) {
 	const [ type, setType ] = useState( parseType( typeProp ) );
 	const [ values, setValues ] = useState( parseValues( valuesProp ) );
+	const [ icon, setIcon ] = useState( parseType( typeProp ) );
 	const ControlComponent = BoxControlComponent[ type ];
 
 	const updateValues = ( nextValues ) => {
@@ -81,21 +83,28 @@ export default function BoxControl( {
 		<Root>
 			<Header>
 				<FlexItem>{ label }</FlexItem>
+			</Header>
+			<Flex gap={ 1 }>
 				<FlexItem>
-					<BoxTypeControl
+					<BoxTypeDropdown
+						icon={ icon }
 						label={ label }
 						onChange={ setType }
+						onSelect={ setIcon }
 						type={ type }
 					/>
 				</FlexItem>
-			</Header>
-			<ControlComponent
-				{ ...inputProps }
-				placeholder={ mixedLabel }
-				values={ values }
-				onChange={ updateValues }
-				units={ units }
-			/>
+				<FlexBlock>
+					<ControlComponent
+						{ ...inputProps }
+						placeholder={ mixedLabel }
+						values={ values }
+						onSelect={ setIcon }
+						onChange={ updateValues }
+						units={ units }
+					/>
+				</FlexBlock>
+			</Flex>
 		</Root>
 	);
 }
@@ -109,9 +118,6 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 
 	return (
 		<ControlContainer>
-			<IconWrapper>
-				<BoxControlIcon />
-			</IconWrapper>
 			<FlexBlock>
 				<UnitControl
 					{ ...props }
@@ -141,8 +147,13 @@ function BoxAllControl( { placeholder, onChange = noop, values, ...props } ) {
 	);
 }
 
-function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
-	const [ selected, setSelected ] = useState( 'vertical' );
+function BoxPairsControl( {
+	placeholder,
+	onChange = noop,
+	onSelect = noop,
+	values,
+	...props
+} ) {
 	const [ vertical, verticalUnit ] = values.top;
 	const [ horizontal, horizontalUnit ] = values.left;
 
@@ -158,23 +169,22 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 	const horizontalPlaceholder =
 		typeof horizontal === 'number' ? placeholder : null;
 
-	const iconSides = {
-		vertical: [ 'top', 'bottom' ],
-		horizontal: [ 'left', 'right' ],
+	const labels = {
+		vertical: __( 'Top/Bottom' ),
+		horizontal: __( 'Left/Right' ),
 	};
 
-	const iconSide = iconSides[ selected ];
+	const handleOnSelect = ( next ) => {
+		onSelect( next );
+	};
 
 	return (
 		<ControlContainer>
-			<IconWrapper>
-				<BoxControlIcon sides={ iconSide } />
-			</IconWrapper>
 			<UnitControl
 				{ ...props }
-				label={ __( 'Top/Bottom' ) }
+				label={ labels.vertical }
 				placeholder={ verticalPlaceholder }
-				onFocus={ () => setSelected( 'vertical' ) }
+				onFocus={ () => handleOnSelect( 'vertical' ) }
 				onChange={ ( next ) => {
 					onChange( {
 						top: [ next, verticalUnit ],
@@ -192,9 +202,9 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 			/>
 			<UnitControl
 				{ ...props }
-				label={ __( 'Left/Right' ) }
+				label={ labels.horizontal }
 				placeholder={ horizontalPlaceholder }
-				onFocus={ () => setSelected( 'horizontal' ) }
+				onFocus={ () => handleOnSelect( 'horizontal' ) }
 				onChange={ ( next ) => {
 					onChange( {
 						left: [ next, horizontalUnit ],
@@ -214,55 +224,65 @@ function BoxPairsControl( { placeholder, onChange = noop, values, ...props } ) {
 	);
 }
 
-function BoxCustomControl( { onChange = noop, values, ...props } ) {
-	const [ selected, setSelected ] = useState( 'top' );
+function BoxCustomControl( {
+	onSelect = noop,
+	onChange = noop,
+	values,
+	...props
+} ) {
 	const unitControlProps = useCustomUnitControlProps( {
 		values,
 		onChange,
 	} );
 
+	const labels = {
+		top: __( 'Top' ),
+		right: __( 'Right' ),
+		bottom: __( 'Bottom' ),
+		left: __( 'Left' ),
+	};
+
+	const handleOnSelect = ( next ) => {
+		onSelect( next );
+	};
+
 	return (
 		<ControlContainer>
-			<IconWrapper>
-				<BoxControlIcon sides={ [ selected ] } />
-			</IconWrapper>
-			<ControlContainer>
-				<UnitControl
-					{ ...unitControlProps.top }
-					{ ...props }
-					label={ __( 'Top' ) }
-					onFocus={ () => setSelected( 'top' ) }
-					placeholder=""
-				/>
-				<UnitControl
-					{ ...unitControlProps.right }
-					{ ...props }
-					label={ __( 'Right' ) }
-					onFocus={ () => setSelected( 'right' ) }
-					placeholder=""
-				/>
-				<UnitControl
-					{ ...unitControlProps.bottom }
-					{ ...props }
-					label={ __( 'Bottom' ) }
-					onFocus={ () => setSelected( 'bottom' ) }
-					placeholder=""
-				/>
-				<UnitControl
-					{ ...unitControlProps.left }
-					{ ...props }
-					label={ __( 'Left' ) }
-					onFocus={ () => setSelected( 'left' ) }
-					placeholder=""
-				/>
-			</ControlContainer>
+			<UnitControl
+				{ ...unitControlProps.top }
+				{ ...props }
+				label={ labels.top }
+				onFocus={ () => handleOnSelect( 'top' ) }
+				placeholder=""
+			/>
+			<UnitControl
+				{ ...unitControlProps.right }
+				{ ...props }
+				label={ labels.right }
+				onFocus={ () => handleOnSelect( 'right' ) }
+				placeholder=""
+			/>
+			<UnitControl
+				{ ...unitControlProps.bottom }
+				{ ...props }
+				label={ labels.bottom }
+				onFocus={ () => handleOnSelect( 'bottom' ) }
+				placeholder=""
+			/>
+			<UnitControl
+				{ ...unitControlProps.left }
+				{ ...props }
+				label={ labels.left }
+				onFocus={ () => handleOnSelect( 'left' ) }
+				placeholder=""
+			/>
 		</ControlContainer>
 	);
 }
 
 function ControlContainer( { children } ) {
 	return (
-		<Flex justify="left" gap={ 1 }>
+		<Flex justify="left" gap={ 0.5 }>
 			{ children }
 		</Flex>
 	);
@@ -294,39 +314,98 @@ function useCustomUnitControlProps( { values, onChange = noop } ) {
 	return props;
 }
 
-function BoxTypeControl( {
-	label = 'Box Control',
-	onChange = noop,
-	type = 'all',
-} ) {
-	const radio = useRadioState( { state: type } );
+function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon } ) {
+	const icons = {
+		all: <BoxControlIcon sides={ typeProps.all.sides } />,
+		pairs: <BoxControlIcon sides={ typeProps.pairs.sides } />,
+		custom: <BoxControlIcon sides={ typeProps.custom.sides } />,
+		vertical: <BoxControlIcon sides={ [ 'top', 'bottom' ] } />,
+		horizontal: <BoxControlIcon sides={ [ 'left', 'right' ] } />,
+		top: <BoxControlIcon sides={ [ 'top' ] } />,
+		right: <BoxControlIcon sides={ [ 'right' ] } />,
+		bottom: <BoxControlIcon sides={ [ 'bottom' ] } />,
+		left: <BoxControlIcon sides={ [ 'left' ] } />,
+	};
 
-	useEffect( () => {
-		onChange( radio.state );
-	}, [ radio.state ] );
+	const handleOnChange = ( next ) => {
+		onChange( next );
+		onSelect( next );
+	};
+
+	const options = [
+		{
+			title: typeProps.all.label,
+			value: 'all',
+			icon: icons.all,
+			onClick: () => handleOnChange( 'all' ),
+		},
+		{
+			title: typeProps.pairs.label,
+			value: 'pairs',
+			icon: icons.pairs,
+			onClick: () => handleOnChange( 'pairs' ),
+		},
+		{
+			title: typeProps.custom.label,
+			value: 'custom',
+			icon: icons.custom,
+			onClick: () => handleOnChange( 'custom' ),
+		},
+	];
+
+	const dropdownIcon = (
+		<DropdownButton gap={ 0 }>
+			{ icons[ icon ] }
+			<Icon icon={ chevronDown } size={ 16 } />
+		</DropdownButton>
+	);
+
+	const toggleProps = {
+		children: dropdownIcon,
+	};
 
 	return (
-		<RadioGroup { ...radio } as={ ButtonGroup } aria-label={ label }>
-			{ types.map( ( value ) => {
-				const valueProps = typeProps[ value ];
-				const isSelected = radio.state === value;
-
-				return (
-					<Tooltip key={ value } text={ valueProps.label }>
-						<Radio
-							{ ...radio }
-							as={ Button }
-							isPrimary={ isSelected }
-							value={ value }
-						>
-							<BoxControlIcon sides={ valueProps.sides } />
-						</Radio>
-					</Tooltip>
-				);
-			} ) }
-		</RadioGroup>
+		<DropdownMenu
+			icon={ null }
+			toggleProps={ toggleProps }
+			controls={ options }
+		/>
 	);
 }
+
+// function BoxTypeControl( {
+// 	label = 'Box Control',
+// 	onChange = noop,
+// 	type = 'all',
+// } ) {
+// 	const radio = useRadioState( { state: type } );
+
+// 	useEffect( () => {
+// 		onChange( radio.state );
+// 	}, [ radio.state ] );
+
+// 	return (
+// 		<RadioGroup { ...radio } as={ ButtonGroup } aria-label={ label }>
+// 			{ types.map( ( value ) => {
+// 				const valueProps = typeProps[ value ];
+// 				const isSelected = radio.state === value;
+
+// 				return (
+// 					<Tooltip key={ value } text={ valueProps.label }>
+// 						<Radio
+// 							{ ...radio }
+// 							as={ Button }
+// 							isPrimary={ isSelected }
+// 							value={ value }
+// 						>
+// 							<BoxControlIcon sides={ valueProps.sides } />
+// 						</Radio>
+// 					</Tooltip>
+// 				);
+// 			} ) }
+// 		</RadioGroup>
+// 	);
+// }
 
 function UnitControl( { onChange, label, ...props } ) {
 	const handleOnChange = ( nextValue ) => {
@@ -347,20 +426,25 @@ function UnitControl( { onChange, label, ...props } ) {
 }
 
 const Root = styled.div`
-	max-width: 400px;
+	max-width: 280px;
 `;
 
 const Header = styled( Flex )`
 	margin-bottom: 8px;
 `;
 
-const IconWrapper = styled( FlexItem )`
-	padding-right: 8px;
-`;
-
 const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
 	max-width: 75px;
+`;
+
+// const ButtonGroup = styled( BaseButtonGroup )`
+// 	display: flex;
+// 	margin: 0;
+// `;
+
+const DropdownButton = styled( Flex )`
+	margin: 0 -8px;
 `;
 
 function parseValues( values = {} ) {

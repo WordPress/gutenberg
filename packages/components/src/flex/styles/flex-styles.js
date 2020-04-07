@@ -53,6 +53,7 @@ export const Flex = styled.div`
 `;
 
 export const Item = styled.div`
+	box-sizing: border-box;
 	min-width: 0;
 	max-width: 100%;
 `;

@@ -3,10 +3,6 @@
  */
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
-/**
- * Internal dependencies
- */
-import { color } from '../utils/style-mixins';
 
 const BASE_ICON_SIZE = 24;
 
@@ -59,7 +55,7 @@ const Viewbox = styled.span`
 
 const strokeFocus = ( { isFocused } ) => {
 	return css( {
-		backgroundColor: color( 'ui.border' ),
+		backgroundColor: 'currentColor',
 		opacity: isFocused ? 1 : 0.3,
 	} );
 };
