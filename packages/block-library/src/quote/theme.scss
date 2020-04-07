@@ -1,12 +1,12 @@
 .wp-block-quote {
-	border-left: 4px solid var(--wp--color--border, $black);
+	border-left: 4px solid $black;
 	margin: 0 0 $default-block-margin 0;
 	padding-left: 1em;
 
 	cite,
 	footer,
 	&__citation {
-		color: var(--wp--foreground-300, $dark-gray-300);
+		color: $dark-gray-300;
 		font-size: $default-font-size;
 		margin-top: 1em;
 		position: relative;
@@ -16,7 +16,7 @@
 	&.has-text-align-right,
 	&.has-text-align-right {
 		border-left: none;
-		border-right: 4px solid var(--wp--color--border, $black);
+		border-right: 4px solid $black;
 		padding-left: 0;
 		padding-right: 1em;
 	}
