@@ -207,6 +207,22 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
+ * Given a block json, it returns an array of block selectors.
+ *
+ * @param array $block_json
+ * @return array
+ */
+function gutenberg_experimental_global_styles_extract_selectors( $block_json ) {
+	$selector = $block_json['selector'];
+	$block_name = $block_json['name'];
+	$block_selectors = array();
+	foreach( $selector as $key => $value ) {
+		$block_selectors[ $block_name . '/' . $key ] = $value;
+	}
+	return $block_selectors;
+}
+
+/**
  * Takes a Global Styles tree and returns a CSS rule
  * that contains the corresponding CSS custom properties.
  *
@@ -224,6 +240,7 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	// having to detect support by reading all core block's block.json.
 	$blocks_supported = [
 		'paragraph',
+		'heading'
 	];
 	// The block library dir may not exist if working from a fresh clone => bail out early.
 	$block_library_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
@@ -232,8 +249,10 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 			$block_json_file = $block_library_dir . $block_dir . '/block.json';
 			if ( file_exists( $block_json_file ) ) {
 				$block_json = json_decode( file_get_contents( $block_json_file ), true );
-				if ( $block_json['selector'] ) {
+				if ( array_key_exists( 'selector', $block_json ) && is_string( $block_json['selector'] ) ) {
 					$selectors[ $block_json['name'] ] = $block_json['selector'];
+				} else if ( array_key_exists( 'selector', $block_json) && is_array( $block_json['selector'] ) ) {
+					$selectors = array_merge( $selectors, gutenberg_experimental_global_styles_extract_selectors( $block_json ) );
 				}
 			}
 		}
