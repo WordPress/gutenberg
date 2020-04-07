@@ -11,6 +11,7 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { Panel, PanelBody, Button } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,6 +21,7 @@ import MenuEditorShortcuts from './shortcuts';
 
 export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -38,7 +40,10 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
 				<Panel className="edit-navigation-menu-editor__panel">
-					<PanelBody title={ __( 'Navigation structure' ) }>
+					<PanelBody
+						title={ __( 'Navigation structure' ) }
+						initialOpen={ isLargeViewport }
+					>
 						{ !! blocks.length && (
 							<__experimentalBlockNavigationList
 								blocks={ blocks }
