@@ -13,21 +13,33 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { arrowUp, arrowDown, arrowLeft, arrowRight } from '@wordpress/icons';
 
 const horizontalMover = {
-	firstButtonIcon: arrowLeft,
-	secondButtonIcon: arrowRight,
-	firstButtonHint: __( 'Double tap to move the block to the left' ),
-	secondButtonHint: __( 'Double tap to move the block to the right' ),
+	backwardButtonIcon: arrowLeft,
+	forwardButtonIcon: arrowRight,
+	backwardButtonHint: __( 'Double tap to move the block to the left' ),
+	forwardButtonHint: __( 'Double tap to move the block to the right' ),
 	firstBlockTitle: __( 'Move block left' ),
 	lastBlockTitle: __( 'Move block right' ),
+	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+	backwardButtonTitle: __(
+		'Move block left from position %1$s to position %2$s'
+	),
+	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+	forwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
 };
 
 const verticalMover = {
-	firstButtonIcon: arrowUp,
-	secondButtonIcon: arrowDown,
-	firstButtonHint: __( 'Double tap to move the block up' ),
-	secondButtonHint: __( 'Double tap to move the block down' ),
+	backwardButtonIcon: arrowUp,
+	forwardButtonIcon: arrowDown,
+	backwardButtonHint: __( 'Double tap to move the block up' ),
+	forwardButtonHint: __( 'Double tap to move the block down' ),
 	firstBlockTitle: __( 'Move block up' ),
 	lastBlockTitle: __( 'Move block down' ),
+	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+	backwardButtonTitle: __(
+		'Move block right from position %1$s to position %2$s'
+	),
+	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+	forwardButtonTitle: __( 'Move block down from row %1$s to row %2$s' ),
 };
 
 const BlockMover = ( {
@@ -41,10 +53,10 @@ const BlockMover = ( {
 	horizontalDirection,
 } ) => {
 	const {
-		firstButtonIcon,
-		secondButtonIcon,
-		firstButtonHint,
-		secondButtonHint,
+		backwardButtonIcon,
+		forwardButtonIcon,
+		backwardButtonHint,
+		forwardButtonHint,
 		firstBlockTitle,
 		lastBlockTitle,
 	} = horizontalDirection ? horizontalMover : verticalMover;
@@ -53,65 +65,42 @@ const BlockMover = ( {
 		return null;
 	}
 
-	const getFirstMoverButtonTitle = () => {
-		const fromIndex = firstIndex + 1;
-		const toIndex = firstIndex;
-		return horizontalDirection
-			? sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__( 'Move block left from position %1$s to position %2$s' ),
-					fromIndex,
-					toIndex
-			  )
-			: sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__( 'Move block up from row %1$s to row %2$s' ),
-					fromIndex,
-					toIndex
-			  );
-	};
+	const getMoverButtonTitle = ( isBackwardButton ) => {
+		const fromIndex = firstIndex + 1; // current position based on index
+		// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
+		const direction = isBackwardButton ? -1 : 1;
+		const toIndex = fromIndex + direction; // position after move
 
-	const getSecondMoverButtonTitle = () => {
-		const fromIndex = firstIndex + 1;
-		const toIndex = firstIndex + 2;
-		return horizontalDirection
-			? sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__(
-						'Move block right from position %1$s to position %2$s'
-					),
-					fromIndex,
-					toIndex
-			  )
-			: sprintf(
-					/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-					__( 'Move block down from row %1$s to row %2$s' ),
-					fromIndex,
-					toIndex
-			  );
+		const { backwardButtonTitle, forwardButtonTitle } = horizontalDirection
+			? horizontalMover
+			: verticalMover;
+
+		const buttonTitle = isBackwardButton
+			? backwardButtonTitle
+			: forwardButtonTitle;
+
+		return sprintf( buttonTitle, fromIndex, toIndex );
 	};
 
 	return (
 		<>
 			<ToolbarButton
 				title={
-					! isFirst ? getFirstMoverButtonTitle() : firstBlockTitle
+					! isFirst ? getMoverButtonTitle( true ) : firstBlockTitle
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon={ firstButtonIcon }
-				extraProps={ { hint: firstButtonHint } }
+				icon={ backwardButtonIcon }
+				extraProps={ { hint: backwardButtonHint } }
 			/>
 
 			<ToolbarButton
-				title={
-					! isLast ? getSecondMoverButtonTitle() : lastBlockTitle
-				}
+				title={ ! isLast ? getMoverButtonTitle() : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon={ secondButtonIcon }
+				icon={ forwardButtonIcon }
 				extraProps={ {
-					hint: secondButtonHint,
+					hint: forwardButtonHint,
 				} }
 			/>
 		</>
