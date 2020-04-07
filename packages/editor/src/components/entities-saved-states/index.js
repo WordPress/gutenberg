@@ -116,7 +116,7 @@ export default function EntitiesSavedStates() {
 	};
 
 	return isOpen ? (
-		<div className="editor-post-publish-panel">
+		<div className="entities-saved-states__panel">
 			{ partitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
