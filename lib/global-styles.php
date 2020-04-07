@@ -216,14 +216,29 @@ function gutenberg_experimental_global_styles_get_theme() {
 function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	$css_rules = '';
 
-	// This is only for demo purposes, it should be pluggable
-	// so new selectors can be register
-	// (3rd party blocks, custom selectors, etc).
-	$selectors = array(
-		'core'                      => ':root',
-		'core/paragraph'            => '.wp-site-blocks p',
-		'custom/paragraph-in-quote' => '.wp-site-blocks .wp-block-quote p',
-	);
+	$selectors = array( 'core' => ':root' );
+
+	// We need to provide a mechanism for blocks to opt-in into this
+	// that can be used by 3rd party blocks as well.
+	// This list is an interim approach to avoid the performance cost of
+	// having to detect support by reading all core block's block.json.
+	$blocks_supported = [
+		'paragraph',
+	];
+	// The block library dir may not exist if working from a fresh clone => bail out early.
+	$block_library_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
+	if ( file_exists( $block_library_dir ) ) {
+		foreach( $blocks_supported as $block_dir ) {
+			$block_json_file = $block_library_dir . $block_dir . '/block.json';
+			if ( file_exists( $block_json_file ) ) {
+				$block_json = json_decode( file_get_contents( $block_json_file ), true );
+				if ( $block_json['selector'] ) {
+					$selectors[ $block_json['name'] ] = $block_json['selector'];
+				}
+			}
+		}
+	}
+
 	foreach ( $global_styles as $blockname => $subtree ) {
 		$token    = '--';
 		$prefix   = '--wp' . $token;
