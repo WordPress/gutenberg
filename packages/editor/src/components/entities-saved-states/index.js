@@ -6,10 +6,17 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Button } from '@wordpress/components';
+import {
+	CheckboxControl,
+	Button,
+	Panel,
+	PanelBody,
+	PanelRow,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { close, more } from '@wordpress/icons';
 
 function EntityRecordState( { record, checked, onChange } ) {
 	return (
@@ -117,6 +124,13 @@ export default function EntitiesSavedStates() {
 
 	return isOpen ? (
 		<div className="entities-saved-states__panel">
+			<div className="entities-saved-states__panel-header">
+				<Button
+					onClick={ () => closePanel() }
+					icon={ close }
+					label={ __( 'Close panel' ) }
+				/>
+			</div>
 			{ partitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
@@ -138,6 +152,15 @@ export default function EntitiesSavedStates() {
 			>
 				{ __( 'Save' ) }
 			</Button>
+			<Panel header="My Panel">
+				<PanelBody
+					title="My Block Settings"
+					icon={ more }
+					initialOpen={ true }
+				>
+					<PanelRow>My Panel Inputs and Labels</PanelRow>
+				</PanelBody>
+			</Panel>
 		</div>
 	) : null;
 }
