@@ -20,11 +20,13 @@ import InspectorControls from '../components/inspector-controls';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
 import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
+import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
 
 const styleSupportKeys = [
 	COLOR_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
 ];
 
 const typographySupportKeys = [
@@ -144,6 +146,11 @@ export const withBlockControls = createHigherOrderComponent(
 			hasBlockSupport( blockName, key )
 		);
 
+		const hasPaddingSupport = hasBlockSupport(
+			blockName,
+			PADDING_SUPPORT_KEY
+		);
+
 		return [
 			Platform.OS === 'web' && hasTypographySupport && (
 				<InspectorControls key="typography">
@@ -155,6 +162,13 @@ export const withBlockControls = createHigherOrderComponent(
 			),
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			hasPaddingSupport && (
+				<InspectorControls key="spacing">
+					<PanelBody title={ __( 'Spacing' ) }>
+						<PaddingEdit { ...props } />
+					</PanelBody>
+				</InspectorControls>
+			),
 		];
 	},
 	'withToolbarControls'

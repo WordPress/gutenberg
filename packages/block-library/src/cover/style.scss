@@ -1,3 +1,13 @@
+:root {
+	.wp-block-cover-image,
+	.wp-block-cover {
+		padding-top: var(--wp--padding-top);
+		padding-right: var(--wp--padding-right);
+		padding-bottom: var(--wp--padding-bottom);
+		padding-left: var(--wp--padding-left);
+	}
+}
+
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;

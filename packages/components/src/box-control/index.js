@@ -16,35 +16,20 @@ import { __ } from '@wordpress/i18n';
 // import BaseButtonGroup from '../button-group';
 import DropdownMenu from '../dropdown-menu';
 import BoxControlIcon from './icon';
+import Visualizer from './visualizer';
 import Tooltip from '../tooltip';
 import BaseUnitControl from '../unit-control';
 import { Flex, FlexBlock, FlexItem } from '../flex';
+import {
+	DEFAULT_VALUES,
+	TYPE_PROPS,
+	parseValues,
+	parseType,
+	getValues,
+} from './utils';
 
-const types = [ 'all', 'pairs', 'custom' ];
 const defaultInputProps = {
 	min: 0,
-};
-
-const typeProps = {
-	all: {
-		sides: [ 'all' ],
-		label: __( 'All sides' ),
-	},
-	pairs: {
-		sides: [ 'top', 'bottom' ],
-		label: __( 'Pair of sides' ),
-	},
-	custom: {
-		sides: [ 'top' ],
-		label: __( 'Individual sides' ),
-	},
-};
-
-const defaultValueProps = {
-	top: [ 0, 'px' ],
-	right: [ 0, 'px' ],
-	bottom: [ 0, 'px' ],
-	left: [ 0, 'px' ],
 };
 
 const BoxControlComponent = {
@@ -53,28 +38,48 @@ const BoxControlComponent = {
 	custom: BoxCustomControl,
 };
 
-const parseType = ( type ) => {
-	return types.includes( type ) ? type : 'all';
-};
-
 export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
+	onSelect = noop,
 	label = __( 'Box Control' ),
-	type: typeProp = 'all',
-	values: valuesProp,
+	values: valuesProp = DEFAULT_VALUES,
 	// Disable units for now
 	units = false,
 } ) {
-	const [ type, setType ] = useState( parseType( typeProp ) );
+	const [ type, setType ] = useState( parseType( valuesProp ) );
 	const [ values, setValues ] = useState( parseValues( valuesProp ) );
-	const [ icon, setIcon ] = useState( parseType( typeProp ) );
+	const [ icon, setIcon ] = useState( parseType( valuesProp ) );
 	const ControlComponent = BoxControlComponent[ type ];
 
 	const updateValues = ( nextValues ) => {
 		const mergedValues = { ...values, ...nextValues };
 		setValues( mergedValues );
 		onChange( mergedValues );
+	};
+
+	const handleOnSelect = ( next ) => {
+		let nextSelect = [ next ];
+
+		switch ( next ) {
+			case 'all':
+				nextSelect = [ 'top', 'right', 'bottom', 'left' ];
+				break;
+			case 'vertical':
+				nextSelect = [ 'top', 'bottom' ];
+				break;
+			case 'horizontal':
+				nextSelect = [ 'right', 'left' ];
+				break;
+			case 'pairs':
+				nextSelect = [ 'top', 'bottom' ];
+				break;
+			case 'custom':
+				nextSelect = [ 'top' ];
+				break;
+		}
+
+		onSelect( nextSelect );
 	};
 
 	const mixedLabel = __( 'Mixed' );
@@ -89,7 +94,10 @@ export default function BoxControl( {
 					<BoxTypeDropdown
 						icon={ icon }
 						label={ label }
-						onChange={ setType }
+						onChange={ ( next ) => {
+							setType( next );
+							handleOnSelect( next );
+						} }
 						onSelect={ setIcon }
 						type={ type }
 					/>
@@ -99,7 +107,10 @@ export default function BoxControl( {
 						{ ...inputProps }
 						placeholder={ mixedLabel }
 						values={ values }
-						onSelect={ setIcon }
+						onSelect={ ( next ) => {
+							handleOnSelect( next );
+							setIcon( next );
+						} }
 						onChange={ updateValues }
 						units={ units }
 					/>
@@ -131,8 +142,8 @@ function BoxAllControl( {
 					value={ isMixed ? '' : value }
 					placeholder={ placeholderLabel }
 					unit={ unit }
+					onFocus={ () => onSelect( 'all' ) }
 					onChange={ ( next ) => {
-						onSelect( 'all' );
 						onChange( {
 							top: [ next, unit ],
 							right: [ next, unit ],
@@ -335,9 +346,9 @@ function useCustomUnitControlProps( { values, onChange = noop } ) {
 
 function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon, type } ) {
 	const icons = {
-		all: <BoxControlIcon sides={ typeProps.all.sides } />,
-		pairs: <BoxControlIcon sides={ typeProps.pairs.sides } />,
-		custom: <BoxControlIcon sides={ typeProps.custom.sides } />,
+		all: <BoxControlIcon sides={ TYPE_PROPS.all.sides } />,
+		pairs: <BoxControlIcon sides={ TYPE_PROPS.pairs.sides } />,
+		custom: <BoxControlIcon sides={ TYPE_PROPS.custom.sides } />,
 		vertical: <BoxControlIcon sides={ [ 'top', 'bottom' ] } />,
 		horizontal: <BoxControlIcon sides={ [ 'left', 'right' ] } />,
 		top: <BoxControlIcon sides={ [ 'top' ] } />,
@@ -353,21 +364,21 @@ function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon, type } ) {
 
 	const options = [
 		{
-			title: typeProps.all.label,
+			title: TYPE_PROPS.all.label,
 			value: 'all',
 			icon: <DropdownIconWrapper>{ icons.all }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'all' ),
 			isActive: type === 'all',
 		},
 		{
-			title: typeProps.pairs.label,
+			title: TYPE_PROPS.pairs.label,
 			value: 'pairs',
 			icon: <DropdownIconWrapper>{ icons.pairs }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'pairs' ),
 			isActive: type === 'pairs',
 		},
 		{
-			title: typeProps.custom.label,
+			title: TYPE_PROPS.custom.label,
 			value: 'custom',
 			icon: <DropdownIconWrapper>{ icons.custom }</DropdownIconWrapper>,
 			onClick: () => handleOnChange( 'custom' ),
@@ -415,7 +426,7 @@ function BoxTypeDropdown( { onChange = noop, onSelect = noop, icon, type } ) {
 // 	return (
 // 		<RadioGroup { ...radio } as={ ButtonGroup } aria-label={ label }>
 // 			{ types.map( ( value ) => {
-// 				const valueProps = typeProps[ value ];
+// 				const valueProps = TYPE_PROPS[ value ];
 // 				const isSelected = radio.state === value;
 
 // 				return (
@@ -480,27 +491,4 @@ const DropdownIconWrapper = styled.div`
 	margin-right: 8px;
 `;
 
-function parseValues( values = {} ) {
-	const nextValueProps = {};
-
-	Object.keys( defaultValueProps ).forEach( ( key ) => {
-		const defaultValue = defaultValueProps[ key ];
-		const prop = values[ key ] || [];
-
-		nextValueProps[ key ] = [
-			prop?.[ 0 ] || defaultValue[ 0 ],
-			prop?.[ 1 ] || defaultValue[ 1 ],
-		];
-	} );
-
-	return nextValueProps;
-}
-
-function getValues( values, ...args ) {
-	const nextValues = [];
-	args.forEach( ( key ) => {
-		nextValues.push( values[ key ][ 0 ] );
-	} );
-
-	return nextValues;
-}
+BoxControl.__Visualizer = Visualizer;
