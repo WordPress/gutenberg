@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 import { each } from 'lodash';
 
 /**
@@ -14,8 +14,7 @@ import { TAB, SPACE } from '@wordpress/keycodes';
  */
 import { TabbableContainer } from '../tabbable';
 
-function simulateVisible( wrapper, selector ) {
-	const elements = wrapper.getDOMNode().querySelectorAll( selector );
+function simulateVisible( elements ) {
 	each( elements, ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
@@ -23,7 +22,7 @@ function simulateVisible( wrapper, selector ) {
 	} );
 }
 
-function fireKeyDown( container, keyCode, shiftKey ) {
+function fireKeyDown( node, keyCode, shiftKey ) {
 	const interaction = {
 		stopped: false,
 	};
@@ -35,7 +34,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 	event.stopImmediatePropagation = () => {
 		interaction.stopped = true;
 	};
-	container.getDOMNode().dispatchEvent( event );
+	fireEvent( node, event );
 
 	return interaction;
 }
@@ -43,7 +42,7 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 describe( 'TabbableContainer', () => {
 	it( 'should navigate by keypresses', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -71,13 +70,9 @@ describe( 'TabbableContainer', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container.querySelectorAll( '*' ) );
 
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#section1' )
-			.focus();
+		container.querySelector( '#section1' ).focus();
 
 		// Navigate options
 		function assertKeyDown(
@@ -86,9 +81,13 @@ describe( 'TabbableContainer', () => {
 			expectedActiveIndex,
 			expectedStop
 		) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
-			expect( currentIndex ).toBe( expectedActiveIndex );
+			const interaction = fireKeyDown(
+				container.querySelector( '.wrapper' ),
+				keyCode,
+				shiftKey
+			);
 			expect( interaction.stopped ).toBe( expectedStop );
+			expect( currentIndex ).toBe( expectedActiveIndex );
 		}
 
 		assertKeyDown( TAB, false, 1, true );
@@ -104,7 +103,7 @@ describe( 'TabbableContainer', () => {
 
 	it( 'should navigate by keypresses and stop at edges', () => {
 		let currentIndex = 0;
-		const wrapper = mount(
+		const { container } = render(
 			/*
 				Disabled because of our rule restricting literal IDs, preferring
 				`withInstanceId`. In this case, it's fine to use literal IDs.
@@ -128,13 +127,9 @@ describe( 'TabbableContainer', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( wrapper, '*' );
+		simulateVisible( container.querySelectorAll( '*' ) );
 
-		const container = wrapper.find( 'div.wrapper' );
-		wrapper
-			.getDOMNode()
-			.querySelector( '#section1' )
-			.focus();
+		container.querySelector( '#section1' ).focus();
 
 		// Navigate options
 		function assertKeyDown(
@@ -143,7 +138,11 @@ describe( 'TabbableContainer', () => {
 			expectedActiveIndex,
 			expectedStop
 		) {
-			const interaction = fireKeyDown( container, keyCode, shiftKey );
+			const interaction = fireKeyDown(
+				container.querySelector( '.wrapper' ),
+				keyCode,
+				shiftKey
+			);
 			expect( currentIndex ).toBe( expectedActiveIndex );
 			expect( interaction.stopped ).toBe( expectedStop );
 		}
