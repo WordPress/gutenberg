@@ -1,3 +1,9 @@
+## Master
+
+### New Features
+
+- Added `getPageError` function, returning a promise which resolves to an error message present in the page, if any exists.
+
 ## 4.0.0 (2019-12-19)
 
 ### Breaking Changes
