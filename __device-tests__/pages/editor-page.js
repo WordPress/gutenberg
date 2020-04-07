@@ -45,8 +45,14 @@ export default class EditorPage {
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
-	async getBlockAtPosition( position: number, blockName: string, options: { autoscroll: boolean } = { autoscroll: false } ) {
-		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
+	async getBlockAtPosition(
+		blockName: string,
+		position: number = 1,
+		options: { autoscroll: boolean } = { autoscroll: false }
+	) {
+		const blockLocator = `//*[contains(@${
+			this.accessibilityIdXPathAttrib
+		}, "${ blockName } Block. Row ${ position }")]`;
 		const elements = await this.driver.elementsByXPath( blockLocator );
 		const lastElementFound = elements[ elements.length - 1 ];
 		if ( elements.length === 0 && options.autoscroll ) {
@@ -56,14 +62,19 @@ export default class EditorPage {
 			if ( ! firstBlockVisible || ! lastBlockVisible ) {
 				return lastElementFound;
 			}
-			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute( this.accessibilityIdKey );
+			const firstBlockAccessibilityId = await firstBlockVisible.getAttribute(
+				this.accessibilityIdKey
+			);
 			const firstBlockRowMatch = /Row (\d+)\./.exec( firstBlockAccessibilityId );
 			const firstBlockRow = firstBlockRowMatch && Number( firstBlockRowMatch[ 1 ] );
-			const lastBlockAccessibilityId = await lastBlockVisible.getAttribute( this.accessibilityIdKey );
+			const lastBlockAccessibilityId = await lastBlockVisible.getAttribute(
+				this.accessibilityIdKey
+			);
 			const lastBlockRowMatch = /Row (\d+)\./.exec( lastBlockAccessibilityId );
 			const lastBlockRow = lastBlockRowMatch && Number( lastBlockRowMatch[ 1 ] );
 			if ( firstBlockRow && position < firstBlockRow ) {
-				if ( firstBlockRow === 1 ) { // we're at the top already stop recursing
+				if ( firstBlockRow === 1 ) {
+					// we're at the top already stop recursing
 					return lastElementFound;
 				}
 				// scroll up
@@ -72,30 +83,36 @@ export default class EditorPage {
 				// scroll down
 				await swipeUp( this.driver );
 			}
-			return this.getBlockAtPosition( position, blockName, options );
+			return this.getBlockAtPosition( blockName, position, options );
 		}
 		return lastElementFound;
 	}
 
 	async getFirstBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		const firstBlockLocator = `//*[contains(@${
+			this.accessibilityIdXPathAttrib
+		}, " Block. Row ")]`;
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ 0 ];
 	}
 
 	async getLastBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
+		const firstBlockLocator = `//*[contains(@${
+			this.accessibilityIdXPathAttrib
+		}, " Block. Row ")]`;
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ elements.length - 1 ];
 	}
 
-	async hasBlockAtPosition( position: number, blockName: string = '' ) {
-		return undefined !== await this.getBlockAtPosition( position, blockName );
+	async hasBlockAtPosition( position: number = 1, blockName: string = '' ) {
+		return undefined !== ( await this.getBlockAtPosition( blockName, position ) );
 	}
 
 	async getTitleElement( options: { autoscroll: boolean } = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
-		const elements = await this.driver.elementsByXPath( `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]` );
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
+		);
 		if ( elements.length === 0 && options.autoscroll ) {
 			await swipeDown( this.driver );
 			return this.getTitleElement( options );
@@ -144,7 +161,9 @@ export default class EditorPage {
 		if ( isAndroid() ) {
 			return await this.driver.hideDeviceKeyboard();
 		}
-		const hideKeyboardToolbarButton = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Hide keyboard"]' );
+		const hideKeyboardToolbarButton = await this.driver.elementByXPath(
+			'//XCUIElementTypeButton[@name="Hide keyboard"]'
+		);
 		await hideKeyboardToolbarButton.click();
 	}
 
@@ -198,10 +217,14 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
+		const parentLocator = `//*[@${
+			this.accessibilityIdXPathAttrib
+		}="${ blockName } Block. Row ${ position }."]`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block up from row ${ position } to row ${ position - 1 }"]`;
+		blockLocator += `[@${
+			this.accessibilityIdXPathAttrib
+		}="Move block up from row ${ position } to row ${ position - 1 }"]`;
 		const moveUpButton = await this.driver.elementByXPath( blockLocator );
 		await moveUpButton.click();
 	}
@@ -212,27 +235,33 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
+		const parentLocator = `//*[contains(@${
+			this.accessibilityIdXPathAttrib
+		}, "${ blockName } Block. Row ${ position }.")]`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block down from row ${ position } to row ${ position + 1 }"]`;
+		blockLocator += `[@${
+			this.accessibilityIdXPathAttrib
+		}="Move block down from row ${ position } to row ${ position + 1 }"]`;
 		const moveDownButton = await this.driver.elementByXPath( blockLocator );
 		await moveDownButton.click();
 	}
 
 	// position of the block to remove
 	// Block will no longer be present if this succeeds
-	async removeBlockAtPosition( position: number, blockName: string = '' ) {
+	async removeBlockAtPosition( blockName: string = '', position: number = 1 ) {
 		if ( ! await this.hasBlockAtPosition( position, blockName ) ) {
 			throw Error( `No Block at position ${ position }` );
 		}
 
 		const buttonElementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
 		const removeButtonIdentifier = `Remove block at row ${ position }`;
-		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
+		const removeBlockLocator = `${ buttonElementName }[contains(@${
+			this.accessibilityIdXPathAttrib
+		}, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( position, blockName );
+			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
 			while ( checkList.length === 0 ) {
 				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
@@ -248,18 +277,6 @@ export default class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async addNewParagraphBlock() {
-		await this.addNewBlock( this.paragraphBlockName );
-	}
-
-	async getParagraphBlockAtPosition( position: number, options: { autoscroll: boolean } = { autoscroll: false } ) {
-		return this.getBlockAtPosition( position, this.paragraphBlockName, options );
-	}
-
-	async hasParagraphBlockAtPosition( position: number ) {
-		return this.hasBlockAtPosition( position, this.paragraphBlockName );
-	}
-
 	async getTextViewForParagraphBlock( block: wd.PromiseChainWebdriver.Element ) {
 		let textViewElementName = 'XCUIElementTypeTextView';
 		if ( isAndroid() ) {
@@ -267,26 +284,32 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify(
+			accessibilityId
+		) }]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToParagraphBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean ) {
+	async typeTextToParagraphBlock(
+		block: wd.PromiseChainWebdriver.Element,
+		text: string,
+		clear: boolean
+	) {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		await typeString( this.driver, textViewElement, text, clear );
 		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
-	async sendTextToParagraphBlockAtPosition( position: number, text: string, clear: boolean ) {
+	async sendTextToParagraphBlock( position: number, text: string, clear: boolean ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			// Select block first
-			const block = await this.getParagraphBlockAtPosition( position + i );
+			const block = await this.getBlockAtPosition( this.paragraphBlockName, position + i );
 			await block.click();
 
-			await this.sendTextToParagraphBlock( block, paragraphs[ i ], clear );
+			await this.typeTextToParagraphBlock( block, paragraphs[ i ], clear );
 			if ( i !== paragraphs.length - 1 ) {
-				await this.sendTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToParagraphBlock( block, '\n', false );
 			}
 		}
 	}
@@ -297,16 +320,12 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-	async removeParagraphBlockAtPosition( position: number ) {
-		await this.removeBlockAtPosition( position, this.paragraphBlockName );
-	}
-
 	async getTextForParagraphBlockAtPosition( position: number ) {
 		// Select block first
-		let block = await this.getParagraphBlockAtPosition( position );
+		let block = await this.getBlockAtPosition( this.paragraphBlockName, position );
 		await block.click();
 
-		block = await this.getParagraphBlockAtPosition( position );
+		block = await this.getBlockAtPosition( this.paragraphBlockName, position );
 		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
 	}
@@ -315,18 +334,6 @@ export default class EditorPage {
 	// List Block functions
 	// =========================
 
-	async addNewListBlock() {
-		await this.addNewBlock( this.listBlockName );
-	}
-
-	async getListBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.listBlockName );
-	}
-
-	async hasListBlockAtPosition( position: number ) {
-		return await this.hasBlockAtPosition( position, this.listBlockName );
-	}
-
 	async getTextViewForListBlock( block: wd.PromiseChainWebdriver.Element ) {
 		let textViewElementName = 'XCUIElementTypeTextView';
 		if ( isAndroid() ) {
@@ -334,7 +341,9 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify(
+			accessibilityId
+		) }]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
@@ -353,12 +362,8 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-	async removeListBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.listBlockName );
-	}
-
 	async getTextForListBlockAtPosition( position: number ) {
-		const block = await this.getListBlockAtPosition( position );
+		const block = await this.getBlockAtPosition( this.listBlockName, position );
 		const text = await this.getTextForListBlock( block );
 		return text.toString();
 	}
@@ -371,62 +376,33 @@ export default class EditorPage {
 	// Image Block functions
 	// =========================
 
-	async addNewImageBlock() {
-		await this.addNewBlock( this.imageBlockName );
-	}
-
-	async getImageBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.imageBlockName );
-	}
-
 	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const blockLocator = `//*[@${
+			this.accessibilityIdXPathAttrib
+		}="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
 		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 
 	async chooseMediaLibrary() {
-		const mediaLibraryButton = await this.driver.elementByAccessibilityId( 'WordPress Media Library' );
+		const mediaLibraryButton = await this.driver.elementByAccessibilityId(
+			'WordPress Media Library'
+		);
 		await mediaLibraryButton.click();
 	}
 
 	async enterCaptionToSelectedImageBlock( caption: string, clear: boolean = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		const imageBlockCaptionField = await this.driver.elementByXPath(
+			'//XCUIElementTypeButton[@name="Image caption. Empty"]'
+		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
-	}
-
-	async removeImageBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.imageBlockName );
-	}
-
-	// =========================
-	// Gallery Block functions
-	// =========================
-
-	async addNewGalleryBlock() {
-		await this.addNewBlock( this.galleryBlockName );
-	}
-
-	async getGalleryBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.galleryBlockName );
-	}
-
-	async removeGalleryBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.galleryBlockName );
 	}
 
 	// =========================
 	// Heading Block functions
 	// =========================
-	async addNewHeadingBlock() {
-		await this.addNewBlock( this.headingBlockName );
-	}
-
-	async getHeadingBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.headingBlockName );
-	}
 
 	// Inner element changes on iOS if Heading Block is empty
 	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {
@@ -436,11 +412,17 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
+		const blockLocator = `//*[@${
+			this.accessibilityIdXPathAttrib
+		}="${ accessibilityId }"]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean = true ) {
+	async sendTextToHeadingBlock(
+		block: wd.PromiseChainWebdriver.Element,
+		text: string,
+		clear: boolean = true
+	) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
