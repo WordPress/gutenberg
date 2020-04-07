@@ -248,34 +248,21 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		return;
 	}
 
-	yield {
-		type: 'DELETE_ENTITY_RECORD_START',
-		kind,
-		name,
-		recordId,
-	};
-
 	const deletedRecord = yield apiFetch( {
 		path,
 		method: 'DELETE',
 	} );
-
-	const oldRecords = yield select( 'getEntityRecords', kind, name );
-
-	const newRecords = remove( oldRecords, ( record ) => {
+	
+	/* eslint-disable prefer-const */
+	let records = yield select( 'getEntityRecords', kind, name );
+	remove( records, ( record ) => {
 		return record.id === deletedRecord.previous.id;
 	} );
+	/* eslint-enable prefer-const */
 
-	yield receiveEntityRecords( kind, name, newRecords, undefined, true );
+	yield receiveEntityRecords( kind, name, records, undefined, true );
 
-	yield {
-		type: 'DELETE_ENTITY_RECORD_FINISH',
-		kind,
-		name,
-		recordId,
-	};
-
-	return newRecords;
+	return deletedRecord;
 }
 
 /**

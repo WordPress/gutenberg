@@ -39,6 +39,17 @@ export function terms( state = {}, action ) {
 	return state;
 }
 
+export function deleteEntity( state = {}, action ) {
+	switch ( action.type ) {
+		case 'DELETE_ENTITY':
+			return {
+				...state,
+			};
+	}
+
+	return state;
+}
+
 /**
  * Reducer managing authors state. Keyed by id.
  *
@@ -234,19 +245,6 @@ function entity( entityConfig ) {
 								error: action.error,
 								isAutosave: action.isAutosave,
 							},
-						};
-				}
-
-				return state;
-			},
-
-			deleting: ( state = {}, action ) => {
-				switch ( action.type ) {
-					case 'DELETE_ENTITY_RECORD_START':
-					case 'DELETE_ENTITY_RECORD_FINISH':
-						delete state[ action.recordId ];
-						return {
-							...state,
 						};
 				}
 
@@ -514,6 +512,7 @@ export function autosaves( state = {}, action ) {
 
 export default combineReducers( {
 	terms,
+	deleteEntity,
 	users,
 	currentUser,
 	taxonomies,
