@@ -11,6 +11,7 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
+	EntitiesSavedStates,
 	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
@@ -234,30 +235,33 @@ function Layout() {
 						)
 					}
 					actions={
-						publishSidebarOpened ? (
-							<PostPublishPanel
-								onClose={ closePublishSidebar }
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								PrePublishExtension={
-									PluginPrePublishPanel.Slot
-								}
-								PostPublishExtension={
-									PluginPostPublishPanel.Slot
-								}
-							/>
-						) : (
-							<div className="edit-post-layout__toggle-publish-panel">
-								<Button
-									isSecondary
-									className="edit-post-layout__toggle-publish-panel-button"
-									onClick={ togglePublishSidebar }
-									aria-expanded={ false }
-								>
-									{ __( 'Open publish panel' ) }
-								</Button>
-							</div>
-						)
+						<>
+							<EntitiesSavedStates />
+							{ publishSidebarOpened ? (
+								<PostPublishPanel
+									onClose={ closePublishSidebar }
+									forceIsDirty={ hasActiveMetaboxes }
+									forceIsSaving={ isSaving }
+									PrePublishExtension={
+										PluginPrePublishPanel.Slot
+									}
+									PostPublishExtension={
+										PluginPostPublishPanel.Slot
+									}
+								/>
+							) : (
+								<div className="edit-post-layout__toggle-publish-panel">
+									<Button
+										isSecondary
+										className="edit-post-layout__toggle-publish-panel-button"
+										onClick={ togglePublishSidebar }
+										aria-expanded={ false }
+									>
+										{ __( 'Open publish panel' ) }
+									</Button>
+								</div>
+							) }
+						</>
 					}
 					shortcuts={ {
 						previous: previousShortcut,

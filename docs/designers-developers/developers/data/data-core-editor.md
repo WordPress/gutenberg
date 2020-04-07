@@ -921,6 +921,18 @@ _Returns_
 
 -   `boolean`: Whether the post can be saved.
 
+<a name="isEntitiesSavedStatesOpen" href="#isEntitiesSavedStatesOpen">#</a> **isEntitiesSavedStatesOpen**
+
+Returns true if save panel is open, or false otherwise.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: Whether or not save panel is open.
+
 <a name="isFirstMultiSelectedBlock" href="#isFirstMultiSelectedBlock">#</a> **isFirstMultiSelectedBlock**
 
 _Related_
@@ -1079,6 +1091,14 @@ _Parameters_
 _Related_
 
 -   clearSelectedBlock in core/block-editor store.
+
+<a name="closeEntitiesSavedStatesPanel" href="#closeEntitiesSavedStatesPanel">#</a> **closeEntitiesSavedStatesPanel**
+
+Returns an action object signaling to close the save panel and invoke callback.
+
+_Parameters_
+
+-   _callbackArg_ `*`: Argument to be used in close callback function.
 
 <a name="createUndoLevel" href="#createUndoLevel">#</a> **createUndoLevel**
 
@@ -1246,6 +1266,18 @@ _Related_
 _Related_
 
 -   multiSelect in core/block-editor store.
+
+<a name="openEntitiesSavedStatesPanel" href="#openEntitiesSavedStatesPanel">#</a> **openEntitiesSavedStatesPanel**
+
+Returns an action object signaling the save panel to be open.
+
+_Parameters_
+
+-   _onRequestClose_ `Function`: Callback to use when closing the panel.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="receiveBlocks" href="#receiveBlocks">#</a> **receiveBlocks**
 

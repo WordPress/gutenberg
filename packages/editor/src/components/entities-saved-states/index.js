@@ -6,7 +6,7 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Modal, Button } from '@wordpress/components';
+import { CheckboxControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -56,12 +56,18 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	);
 }
 
-export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
+export default function EntitiesSavedStates() {
 	const dirtyEntityRecords = useSelect(
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
+	const isOpen = useSelect( ( select ) =>
+		select( 'core/editor' ).isEntitiesSavedStatesOpen()
+	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
+	const { closeEntitiesSavedStatesPanel: closePanel } = useDispatch(
+		'core/editor'
+	);
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(
@@ -106,40 +112,32 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 			saveEditedEntityRecord( kind, name, key );
 		} );
 
-		onRequestClose( entitiesToSave );
+		closePanel( entitiesToSave );
 	};
 
-	return (
-		isOpen && (
-			<Modal
-				title={ __( 'What do you want to save?' ) }
-				onRequestClose={ () => onRequestClose() }
-				contentLabel={ __( 'Select items to save.' ) }
-			>
-				{ partitionedSavables.map( ( list ) => {
-					return (
-						<EntityTypeList
-							key={ list[ 0 ].name }
-							list={ list }
-							unselectedEntities={ unselectedEntities }
-							setUnselectedEntities={ setUnselectedEntities }
-						/>
-					);
-				} ) }
+	return isOpen ? (
+		<div className="editor-post-publish-panel">
+			{ partitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
 
-				<Button
-					isPrimary
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
-					onClick={ saveCheckedEntities }
-					className="editor-entities-saved-states__save-button"
-				>
-					{ __( 'Save' ) }
-				</Button>
-			</Modal>
-		)
-	);
+			<Button
+				isPrimary
+				disabled={
+					dirtyEntityRecords.length - unselectedEntities.length === 0
+				}
+				onClick={ saveCheckedEntities }
+				className="editor-entities-saved-states__save-button"
+			>
+				{ __( 'Save' ) }
+			</Button>
+		</div>
+	) : null;
 }

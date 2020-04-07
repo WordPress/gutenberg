@@ -16,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import EntitiesSavedStates from '../entities-saved-states';
 import PublishButtonLabel from './label';
 
 export class PostPublishButton extends Component {
@@ -49,6 +48,10 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+				// dispatch sidebar to open here:
+				this.props.openEntitiesSavedStatesPanel(
+					this.closeEntitiesSavedStates
+				);
 				return noop;
 			}
 
@@ -96,7 +99,6 @@ export class PostPublishButton extends Component {
 			visibility,
 			hasNonPostEntityChanges,
 		} = this.props;
-		const { entitiesSavedStatesCallback } = this.state;
 
 		const isButtonDisabled =
 			isSaving ||
@@ -170,10 +172,6 @@ export class PostPublishButton extends Component {
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
-				<EntitiesSavedStates
-					isOpen={ Boolean( entitiesSavedStatesCallback ) }
-					onRequestClose={ this.closeEntitiesSavedStates }
-				/>
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }
@@ -226,11 +224,15 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, savePost } = dispatch( 'core/editor' );
+		// toggleEntitiesSavedStates
+		const { editPost, savePost, openEntitiesSavedStatesPanel } = dispatch(
+			'core/editor'
+		);
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),
 			onSave: savePost,
+			openEntitiesSavedStatesPanel,
 		};
 	} ),
 ] )( PostPublishButton );
