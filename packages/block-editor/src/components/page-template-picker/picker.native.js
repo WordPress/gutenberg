@@ -54,16 +54,17 @@ const __experimentalPageTemplatePicker = ( {
 	}, [ visible ] );
 
 	const onKeyboardDidShow = () => {
-		onKeyboardChange();
+		if ( visible ) {
+			setPickerVisible( shouldShowPicker() );
+			onPickerAnimation();
+		}
 	};
 
 	const onKeyboardDidHide = () => {
-		onKeyboardChange();
-	};
-
-	const onKeyboardChange = () => {
-		setPickerVisible( shouldShowPicker() );
-		onPickerAnimation();
+		if ( visible ) {
+			setPickerVisible( true );
+			onPickerAnimation();
+		}
 	};
 
 	const shouldShowPicker = () => {
