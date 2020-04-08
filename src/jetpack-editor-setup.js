@@ -19,7 +19,7 @@ const supportedJetpackBlocks = {
 	},
 };
 
-const setJetpackData = async ( {
+const setJetpackData = ( {
 	isJetpackActive = false,
 	userData = null,
 	siteFragment = null,
@@ -39,12 +39,12 @@ const setJetpackData = async ( {
 	return jetpackEditorInitialState;
 };
 
-export default async ( jetpackState ) => {
+export default ( jetpackState ) => {
 	if ( ! jetpackState.isJetpackActive ) {
 		return;
 	}
 
-	const jetpackData = await setJetpackData( jetpackState );
+	const jetpackData = setJetpackData( jetpackState );
 
 	require( '../jetpack/extensions/editor' );
 
