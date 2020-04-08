@@ -67,6 +67,22 @@ const BlockMover = ( {
 		return null;
 	}
 
+	const switchButtonPropIfRTL = (
+		isBackwardButton,
+		forwardButtonProp,
+		backwardButtonProp
+	) => {
+		if ( isRTL && horizontalDirection ) {
+			// for RTL and horizontal direction switch prop between forward and backward button
+			if ( isBackwardButton ) {
+				return forwardButtonProp; // set forwardButtonProp for backward button
+			}
+			return backwardButtonProp; // set backwardButtonProp for forward button
+		}
+
+		return isBackwardButton ? backwardButtonProp : forwardButtonProp;
+	};
+
 	const getMoverButtonTitle = ( isBackwardButton ) => {
 		const fromIndex = firstIndex + 1; // current position based on index
 		// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
@@ -77,24 +93,21 @@ const BlockMover = ( {
 			? horizontalMover
 			: verticalMover;
 
-		const buttonTitle = isBackwardButton
-			? backwardButtonTitle
-			: forwardButtonTitle;
+		const buttonTitle = switchButtonPropIfRTL(
+			isBackwardButton,
+			forwardButtonTitle,
+			backwardButtonTitle
+		);
 
 		return sprintf( buttonTitle, fromIndex, toIndex );
 	};
 
-	const getArrowIcon = ( isBackwardButton ) => {
-		if ( isRTL && horizontalDirection ) {
-			// for RTL and horizontal direction switch the icons between forward and backward button
-			if ( isBackwardButton ) {
-				return forwardButtonIcon; // set forwardButtonIcon for backward button
-			}
-			return backwardButtonIcon; // set backwardButtonIcon for forward button
-		}
-
-		return isBackwardButton ? backwardButtonIcon : forwardButtonIcon;
-	};
+	const getArrowIcon = ( isBackwardButton ) =>
+		switchButtonPropIfRTL(
+			isBackwardButton,
+			forwardButtonIcon,
+			backwardButtonIcon
+		);
 
 	return (
 		<>
