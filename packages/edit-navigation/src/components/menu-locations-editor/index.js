@@ -16,25 +16,21 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const MenuSelectControl = ( { onChange, menus, menusList, location } ) => {
+const MenuSelectControl = ( { onChange, menusList, location } ) => {
 	const [ menuId, setMenuId ] = useState( false );
 
 	return (
-		<>
-			{ menus && (
-				<SelectControl
-					options={ menusList }
-					value={ menuId || location.menu }
-					onChange={ ( selectedMenuId ) => {
-						setMenuId( selectedMenuId );
-						onChange( {
-							location: location.name,
-							menu: selectedMenuId,
-						} );
-					} }
-				/>
-			) }
-		</>
+		<SelectControl
+			options={ menusList }
+			value={ menuId || location.menu }
+			onChange={ ( selectedMenuId ) => {
+				setMenuId( selectedMenuId );
+				onChange( {
+					location: location.name,
+					menu: parseInt( selectedMenuId ),
+				} );
+			} }
+		/>
 	);
 };
 
@@ -59,26 +55,19 @@ export default function MenuLocationsEditor() {
 		for ( const location of Object.keys( locationsData ) ) {
 			const menuId = locationsData[ location ];
 			await saveMenu( {
-				...pick( find( menus, { id: parseInt( menuId ) } ), [
-					'id',
-					'name',
-				] ),
+				...pick( find( menus, { id: menuId } ), [ 'id', 'name' ] ),
 				locations: [ location ],
 			} );
 		}
 	};
 
-	const menusList =
-		menus &&
-		menus.map( ( menu ) => ( {
+	const menusList = [
+		{ value: 0, label: __( '— Select a Menu —' ) },
+		...menus.map( ( menu ) => ( {
 			value: menu.id,
 			label: menu.name,
-		} ) );
-
-	menusList.push( {
-		value: 0,
-		label: __( '— Select a Menu —' ),
-	} );
+		} ) ),
+	];
 
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
@@ -89,29 +78,25 @@ export default function MenuLocationsEditor() {
 						saveLocations();
 					} }
 				>
-					{ menuLocations && (
-						<table>
-							{ menuLocations.map(
-								( menuLocation ) =>
-									menus && (
-										<tr>
-											<td>
-												{ menuLocation.description }
-											</td>
-											<td>
-												<MenuSelectControl
-													menus={ menus }
-													menusList={ menusList }
-													key={ menuLocation.name }
-													location={ menuLocation }
-													onChange={ setLocations }
-												/>
-											</td>
-										</tr>
-									)
-							) }
-						</table>
-					) }
+					<table>
+						<tr>
+							<th scope="col">{ __( 'Theme Location' ) }</th>
+							<th scope="col">{ __( 'Assigned Menu' ) }</th>
+						</tr>
+						{ menuLocations.map( ( menuLocation ) => (
+							<tr key={ menuLocation.name }>
+								<td>{ menuLocation.description }</td>
+								<td>
+									<MenuSelectControl
+										menus={ menus }
+										menusList={ menusList }
+										location={ menuLocation }
+										onChange={ setLocations }
+									/>
+								</td>
+							</tr>
+						) ) }
+					</table>
 					<Button type="submit" isPrimary>
 						{ __( 'Save' ) }
 					</Button>
