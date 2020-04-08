@@ -42,7 +42,7 @@
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-jest": "^24.9.0",
 		"babel-loader": "^8.0.6",
-		"chalk": "^2.4.2",
+		"chalk": "^4.0.0",
 		"check-node-version": "^3.1.1",
 		"command-exists": "^1.2.8",
 		"cross-spawn": "^5.1.0",

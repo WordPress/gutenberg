@@ -30,7 +30,7 @@
 		"wp-create-block": "./index.js"
 	},
 	"dependencies": {
-		"chalk": "^2.4.2",
+		"chalk": "^4.0.0",
 		"check-node-version": "^3.1.1",
 		"commander": "^4.1.0",
 		"execa": "^4.0.0",
