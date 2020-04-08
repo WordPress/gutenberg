@@ -14,7 +14,7 @@
 
 .edit-navigation-menu-editor__block-editor-toolbar {
 	height: 46px;
-	margin-bottom: 16px;
+	margin-bottom: 12px;
 	border: 1px solid #e2e4e7;
 
 	// Borders around toolbar segments.
@@ -33,5 +33,16 @@
 
 		// Add a border after item groups to show as separator in the block toolbar.
 		border-right: $border-width solid $light-gray-500;
+	}
+
+
+	// When entering navigation mode, hide the toolbar, but do so in a way where the
+	// outer container retains its height to avoid the blocks moving upwards.
+	&.is-hidden {
+		border-color: transparent;
+
+		.block-editor-block-toolbar {
+			display: none;
+		}
 	}
 }

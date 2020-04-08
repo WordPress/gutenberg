@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
 import {
@@ -16,6 +21,10 @@ import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
 
 export default function BlockEditorPanel( { menuId, saveBlocks } ) {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+	const isNavigationModeActive = useSelect(
+		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+		[]
+	);
 
 	// Clear the selected block when the menu is changed.
 	// Block selection isn't cleared implicity by the block-editor store.
@@ -35,7 +44,12 @@ export default function BlockEditorPanel( { menuId, saveBlocks } ) {
 		>
 			<PanelBody title={ __( 'Navigation menu' ) }>
 				<NavigableToolbar
-					className="edit-navigation-menu-editor__block-editor-toolbar"
+					className={ classnames(
+						'edit-navigation-menu-editor__block-editor-toolbar',
+						{
+							'is-hidden': isNavigationModeActive,
+						}
+					) }
 					aria-label={ __( 'Block tools' ) }
 				>
 					<BlockToolbar hideDragHandle />
