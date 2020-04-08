@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -15,14 +19,16 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
 
 	const [ menuId, setMenuId ] = useState( 0 );
+	const [ stateMenus, setStateMenus ] = useState( false );
 
 	useEffect( () => {
 		if ( menus?.length ) {
+			setStateMenus( menus );
 			setMenuId( menus[ 0 ].id );
 		}
 	}, [ menus ] );
 
-	if ( ! menus ) {
+	if ( ! stateMenus ) {
 		return <Spinner />;
 	}
 
@@ -33,7 +39,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					<SelectControl
 						className="edit-navigation-menus-editor__menu-select-control"
 						label={ __( 'Select navigation to edit:' ) }
-						options={ menus.map( ( menu ) => ( {
+						options={ stateMenus.map( ( menu ) => ( {
 							value: menu.id,
 							label: menu.name,
 						} ) ) }
@@ -47,6 +53,12 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
+					onDelete={ ( deletedMenu ) => {
+						const newStateMenus = filter( stateMenus, ( menu ) => {
+							return menu.id !== deletedMenu.id;
+						} );
+						setStateMenus( newStateMenus );
+					} }
 				/>
 			) }
 		</>

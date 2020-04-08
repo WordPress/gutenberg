@@ -66,3 +66,11 @@
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
 	-ms-grid-row-align: start;
 }
+
+.components-panel__header-actions {
+	margin-top: $grid-unit-20;
+	margin-bottom: $grid-unit-60;
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
