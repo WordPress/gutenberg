@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
 import Sandbox from '../';
 
 describe( 'Sandbox', () => {
-	global.window.MutationObserver = null;
-
 	const TestWrapper = () => {
 		const [ html, setHtml ] = useState(
 			'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
