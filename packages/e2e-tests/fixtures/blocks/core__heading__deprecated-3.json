@@ -7,10 +7,10 @@
             "content": "Text",
             "level": 2,
             "style": {
-				"color": {
-					"text": "#268ebb"
-				}
-			}
+                "color": {
+                    "text": "#268ebb"
+                }
+            }
         },
         "innerBlocks": [],
         "originalContent": "<h2 style=\"color:#268ebb\">Text</h2>"

@@ -44,9 +44,6 @@ const blockAttributes = {
 	fontSize: {
 		type: 'string',
 	},
-	customFontSize: {
-		type: 'number',
-	},
 	direction: {
 		type: 'string',
 		enum: [ 'ltr', 'rtl' ],
@@ -56,19 +53,33 @@ const blockAttributes = {
 	},
 };
 
-const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
+const migrateCustomColorsAndFontSizes = ( attributes ) => {
+	if (
+		! attributes.customTextColor &&
+		! attributes.customBackgroundColor &&
+		! attributes.customFontSize
+	) {
 		return attributes;
 	}
-	const style = { color: {} };
+	const style = {};
+	if ( attributes.customTextColor || attributes.customBackgroundColor ) {
+		style.color = {};
+	}
 	if ( attributes.customTextColor ) {
 		style.color.text = attributes.customTextColor;
 	}
 	if ( attributes.customBackgroundColor ) {
 		style.color.background = attributes.customBackgroundColor;
 	}
+	if ( attributes.customFontSize ) {
+		style.typography = { fontSize: attributes.customFontSize };
+	}
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...omit( attributes, [
+			'customTextColor',
+			'customBackgroundColor',
+			'customFontSize',
+		] ),
 		style,
 	};
 };
@@ -84,8 +95,11 @@ const deprecated = [
 			customBackgroundColor: {
 				type: 'string',
 			},
+			customFontSize: {
+				type: 'number',
+			},
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateCustomColorsAndFontSizes,
 		save( { attributes } ) {
 			const {
 				align,
@@ -146,8 +160,11 @@ const deprecated = [
 			customBackgroundColor: {
 				type: 'string',
 			},
+			customFontSize: {
+				type: 'number',
+			},
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateCustomColorsAndFontSizes,
 		save( { attributes } ) {
 			const {
 				align,
@@ -208,11 +225,14 @@ const deprecated = [
 			customBackgroundColor: {
 				type: 'string',
 			},
+			customFontSize: {
+				type: 'number',
+			},
 			width: {
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: migrateCustomColorsAndFontSizes,
 		save( { attributes } ) {
 			const {
 				width,
@@ -271,7 +291,7 @@ const deprecated = [
 					type: 'number',
 				},
 			},
-			[ 'customFontSize', 'style' ]
+			[ 'style' ]
 		),
 		save( { attributes } ) {
 			const {
@@ -305,7 +325,7 @@ const deprecated = [
 			);
 		},
 		migrate( attributes ) {
-			return migrateCustomColors(
+			return migrateCustomColorsAndFontSizes(
 				omit( {
 					...attributes,
 					customFontSize: isFinite( attributes.fontSize )

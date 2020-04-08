@@ -51,13 +51,17 @@
 	padding: 2px 5px 2px 1px;
 	color: $dark-gray-800;
 	text-align: left;
+	border-radius: $radius-block-ui;
 
 	&:disabled {
 		cursor: default;
 	}
 
 	&:focus {
-		@include button-style__focus-active;
+		box-shadow: 0 0 0 $border-width-focus $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 }
 

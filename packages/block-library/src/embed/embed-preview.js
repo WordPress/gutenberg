@@ -73,8 +73,8 @@ class EmbedPreview extends Component {
 			.splice( parsedHost.length - 2, parsedHost.length - 1 )
 			.join( '.' );
 		const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
-		// translators: %s: host providing embed content e.g: www.youtube.com
 		const iframeTitle = sprintf(
+			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
 			parsedHostBaseUrl
 		);
@@ -125,8 +125,8 @@ class EmbedPreview extends Component {
 							<a href={ url }>{ url }</a>
 						</p>
 						<p className="components-placeholder__error">
-							{ /* translators: %s: host providing embed content e.g: www.youtube.com */
-							sprintf(
+							{ sprintf(
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),

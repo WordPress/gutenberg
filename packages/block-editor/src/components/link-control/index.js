@@ -444,7 +444,11 @@ function LinkControl( {
 		const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
-			: sprintf( __( 'Search results for "%s"' ), inputValue );
+			: sprintf(
+					/* translators: %s: search term. */
+					__( 'Search results for "%s"' ),
+					inputValue
+			  );
 
 		// VisuallyHidden rightly doesn't accept custom classNames
 		// so we conditionally render it as a wrapper to visually hide the label
