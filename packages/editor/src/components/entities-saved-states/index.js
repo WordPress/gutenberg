@@ -16,7 +16,14 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { close, more } from '@wordpress/icons';
+import {
+	close,
+	more,
+	page,
+	layout,
+	grid,
+	blockDefault,
+} from '@wordpress/icons';
 
 function EntityRecordState( { record, checked, onChange } ) {
 	return (
@@ -36,9 +43,27 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 		[ firstRecord.kind, firstRecord.name ]
 	);
 
+	// Set icon based on firstRecord.name.
+	const { name } = firstRecord;
+	let icon = more;
+	if ( name === 'site' ) {
+		icon = layout;
+	} else if ( name === 'page' ) {
+		icon = page;
+	} else if ( name === 'post' || name === 'wp_template' ) {
+		icon = grid;
+	} else if ( name === 'wp_template_part' ) {
+		icon = blockDefault;
+	}
+
 	return (
-		<div className="editor-entities-saved-states__entity-type-list">
-			<h2>{ entity.label }</h2>
+		<PanelBody
+			title={ entity.label }
+			initialOpen={ true }
+			icon={ icon }
+			// className="editor-entities-saved-states__entity-type-list"
+		>
+			{ /* <h2>{ entity.label }</h2> */ }
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
@@ -59,7 +84,7 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 					/>
 				);
 			} ) }
-		</div>
+		</PanelBody>
 	);
 }
 
@@ -131,6 +156,13 @@ export default function EntitiesSavedStates() {
 					label={ __( 'Close panel' ) }
 				/>
 			</div>
+
+			<div className="entities-saved-states__text-prompt">
+				<h2>
+					{ __( 'Please review the following changes to save:' ) }
+				</h2>
+			</div>
+
 			{ partitionedSavables.map( ( list ) => {
 				return (
 					<EntityTypeList
@@ -150,17 +182,8 @@ export default function EntitiesSavedStates() {
 				onClick={ saveCheckedEntities }
 				className="editor-entities-saved-states__save-button"
 			>
-				{ __( 'Save' ) }
+				{ __( 'Save selected items' ) }
 			</Button>
-			<Panel header="My Panel">
-				<PanelBody
-					title="My Block Settings"
-					icon={ more }
-					initialOpen={ true }
-				>
-					<PanelRow>My Panel Inputs and Labels</PanelRow>
-				</PanelBody>
-			</Panel>
 		</div>
 	) : null;
 }
