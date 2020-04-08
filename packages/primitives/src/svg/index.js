@@ -10,7 +10,7 @@ import { createElement } from '@wordpress/element';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
 /* eslint-disable jsdoc/valid-types */
-/** @typedef {{className: string} & {isPressed: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
+/** @typedef {{isPressed: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
 /* eslint-enable jsdoc/valid-types */
 
 /**
@@ -80,10 +80,8 @@ export const Stop = ( props ) => createElement( 'stop', props );
 
 /**
  *
- * @param {Object}   props
- * @param {string}   props.className Class name
- * @param {boolean}  props.isPressed Is the SVG currently pressed?
- * @param {import('react').ComponentPropsWithoutRef<'svg'>} props.props Other props will be passed thru to svg element
+ * @param {SVGProps} props isPressed indicates whether the SVG should appear as pressed.
+ *                         Other props will be passed through to svg component.
  *
  * @return {JSX.Element} Stop component
  */
