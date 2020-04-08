@@ -198,6 +198,9 @@ export class PostPreviewButton extends Component {
 			<Button
 				isTertiary={ ! this.props.className }
 				className={ classNames }
+				height={ 50 }
+				color={ 'toggle' }
+				borderRadius={ 25 }
 				href={ href }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }

@@ -58,11 +58,11 @@
 }
 
 @include break-small() {
-	.editor-post-preview {
+	body .editor-post-preview {
 		display: none;
 	}
 
-	.editor-post-preview__dropdown {
+	body .editor-post-preview__dropdown {
 		display: flex;
 	}
 }

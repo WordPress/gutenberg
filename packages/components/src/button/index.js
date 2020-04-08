@@ -3,12 +3,14 @@
  */
 import classnames from 'classnames';
 import { isArray } from 'lodash';
+import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
+import { additionalStylesHelper } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -16,10 +18,14 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
+import styles from './styles';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
-export function Button( props, ref ) {
-	const {
+const PrimitiveButton = styled.button``;
+const A = styled.a``;
+
+export function Button(
+	{
 		href,
 		target,
 		isPrimary,
@@ -42,9 +48,11 @@ export function Button( props, ref ) {
 		label,
 		children,
 		__experimentalIsFocusable: isFocusable,
+		additionalStyles,
 		...additionalProps
-	} = props;
-
+	},
+	ref
+) {
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
 			alternative: 'isSecondary',
@@ -66,9 +74,9 @@ export function Button( props, ref ) {
 	} );
 
 	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const Tag = href !== undefined && ! trulyDisabled ? A : PrimitiveButton;
 	const tagProps =
-		Tag === 'a'
+		Tag === A
 			? { href, target }
 			: {
 					type: 'button',
@@ -89,6 +97,13 @@ export function Button( props, ref ) {
 		}
 	}
 
+	const propsToPass = {
+		...tagProps,
+		...additionalProps,
+		className: classes,
+		ref,
+	};
+
 	// Should show the tooltip if...
 	const shouldShowTooltip =
 		! trulyDisabled &&
@@ -106,11 +121,20 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
-			{ ...tagProps }
-			{ ...additionalProps }
-			className={ classes }
+			css={ [
+				styles.base,
+				( isDefault || isSecondary ) && styles.secondary,
+				isPrimary && styles.primary,
+				isTertiary && styles.tertiary,
+				isLink && styles.link,
+				isSmall && styles.small,
+				!! icon && styles.hasIcon,
+				isBusy && styles.busy,
+				additionalStyles && additionalStylesHelper( additionalStyles ),
+				styles.styledSystem( { ...additionalProps } ),
+			] }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
-			ref={ ref }
+			{ ...propsToPass }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }

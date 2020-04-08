@@ -38,3 +38,20 @@ export function color( value ) {
 	const fallbackColor = '#000';
 	return get( COLORS, value, fallbackColor );
 }
+
+export function shade( inputColor, amount ) {
+	return (
+		'#' +
+		inputColor
+			.replace( /^#/, '' )
+			.replace( /../g, ( col ) =>
+				(
+					'0' +
+					Math.min(
+						255,
+						Math.max( 0, parseInt( col, 16 ) + amount )
+					).toString( 16 )
+				).substr( -2 )
+			)
+	);
+}
