@@ -7,12 +7,12 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PanelColorSettings from '../components/panel-color-settings';
+import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import { getBlockDOMNode } from '../utils/dom';
 
-export default function ColorPanel( { colorSettings, clientId } ) {
+export default function ColorPanel( { settings, clientId } ) {
 	const { getComputedStyle, Node } = window;
 
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
@@ -20,6 +20,9 @@ export default function ColorPanel( { colorSettings, clientId } ) {
 
 	useEffect( () => {
 		const colorsDetectionElement = getBlockDOMNode( clientId );
+		if ( ! colorsDetectionElement ) {
+			return;
+		}
 		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
 
 		let backgroundColorNode = colorsDetectionElement;
@@ -40,16 +43,16 @@ export default function ColorPanel( { colorSettings, clientId } ) {
 
 	return (
 		<InspectorControls>
-			<PanelColorSettings
+			<PanelColorGradientSettings
 				title={ __( 'Color settings' ) }
 				initialOpen={ false }
-				colorSettings={ colorSettings }
+				settings={ settings }
 			>
 				<ContrastChecker
 					backgroundColor={ detectedBackgroundColor }
 					textColor={ detectedColor }
 				/>
-			</PanelColorSettings>
+			</PanelColorGradientSettings>
 		</InspectorControls>
 	);
 }
