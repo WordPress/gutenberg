@@ -4,6 +4,7 @@ const POSITION_CLASSNAMES = {
 	'top right': 'is-position-top-right',
 	'center left': 'is-position-center-left',
 	'center center': 'is-position-center-center',
+	center: 'is-position-center-center',
 	'center right': 'is-position-center-right',
 	'bottom left': 'is-position-bottom-left',
 	'bottom center': 'is-position-bottom-center',
