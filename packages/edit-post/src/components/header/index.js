@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,12 +24,13 @@ import PreviewOptions from '../preview-options';
 
 function Header() {
 	const {
-		shortcut,
+		getBlockSelectionStart,
 		hasActiveMetaboxes,
 		isEditorSidebarOpened,
 		isPublishSidebarOpened,
 		isSaving,
-		getBlockSelectionStart,
+		shortcut,
+		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -87,11 +93,14 @@ function Header() {
 					forceIsSaving={ isSaving }
 				/>
 				<Button
+					aria-expanded={ isEditorSidebarOpened }
+					className={ classnames( {
+						'has-text-label': showIconLabels,
+					} ) }
 					icon={ cog }
+					isPressed={ isEditorSidebarOpened }
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
 					shortcut={ shortcut }
 				/>
 				<PinnedItems.Slot scope="core/edit-post" />
