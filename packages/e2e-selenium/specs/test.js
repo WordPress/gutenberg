@@ -1,4 +1,3 @@
-/* global driver */
 const webdriver = require( 'selenium-webdriver' );
 
 it( 'Google title test', async () => {
