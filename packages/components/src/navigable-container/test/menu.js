@@ -14,7 +14,8 @@ import { UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
  */
 import { NavigableMenu } from '../menu';
 
-function simulateVisible( elements ) {
+function simulateVisible( container, selector ) {
+	const elements = container.querySelectorAll( selector );
 	each( elements, ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
@@ -70,7 +71,7 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#btn1' ).focus();
 
@@ -124,7 +125,7 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#btn1' ).focus();
 
@@ -180,7 +181,7 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#btn1' ).focus();
 
@@ -234,7 +235,7 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#btn1' ).focus();
 
@@ -279,7 +280,7 @@ describe( 'NavigableMenu', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#btn1' ).focus();
 

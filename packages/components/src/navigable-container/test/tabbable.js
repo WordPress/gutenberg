@@ -14,7 +14,8 @@ import { TAB, SPACE } from '@wordpress/keycodes';
  */
 import { TabbableContainer } from '../tabbable';
 
-function simulateVisible( elements ) {
+function simulateVisible( container, selector ) {
+	const elements = container.querySelectorAll( selector );
 	each( elements, ( elem ) => {
 		elem.getClientRects = () => [
 			'trick-jsdom-into-having-size-for-element-rect',
@@ -70,7 +71,7 @@ describe( 'TabbableContainer', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#section1' ).focus();
 
@@ -127,7 +128,7 @@ describe( 'TabbableContainer', () => {
 			/* eslint-enable no-restricted-syntax */
 		);
 
-		simulateVisible( container.querySelectorAll( '*' ) );
+		simulateVisible( container, '*' );
 
 		container.querySelector( '#section1' ).focus();
 
