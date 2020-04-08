@@ -115,7 +115,10 @@ export class RichText extends Component {
 
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing leading white spaces using `trim()` should make sure this is the case.
-		if ( !this.isIOS && ( typeof value === 'string' || value instanceof String ) ) {
+		if (
+			! this.isIOS &&
+			( typeof value === 'string' || value instanceof String )
+		) {
 			value = value.trimLeft();
 		}
 
