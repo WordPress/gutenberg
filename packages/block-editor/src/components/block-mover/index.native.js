@@ -25,7 +25,9 @@ const horizontalMover = {
 		'Move block left from position %1$s to position %2$s'
 	),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-	forwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
+	forwardButtonTitle: __(
+		'Move block right from position %1$s to position %2$s'
+	),
 };
 
 const verticalMover = {
@@ -36,9 +38,7 @@ const verticalMover = {
 	firstBlockTitle: __( 'Move block up' ),
 	lastBlockTitle: __( 'Move block down' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
-	backwardButtonTitle: __(
-		'Move block right from position %1$s to position %2$s'
-	),
+	backwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
 	forwardButtonTitle: __( 'Move block down from row %1$s to row %2$s' ),
 };
