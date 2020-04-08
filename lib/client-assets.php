@@ -694,4 +694,5 @@ if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_insta
 	register_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
 	register_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
 	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+	register_pattern( 'core/cover-e&a', gutenberg_load_block_pattern( 'cover-e&a' ) );
 }
