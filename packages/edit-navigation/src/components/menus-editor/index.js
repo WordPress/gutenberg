@@ -58,6 +58,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 							return menu.id !== deletedMenu.id;
 						} );
 						setStateMenus( newStateMenus );
+						setMenuId( newStateMenus[ 0 ].id );
 					} }
 				/>
 			) }
