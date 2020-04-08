@@ -40,7 +40,7 @@ The reason `BlockContext` is only internally available within the `@wordpress/bl
 
 ## Props
 
-`BlockContextProvider` behaves like a standard [Provider component](https://reactjs.org/docs/context.html#contextprovider). It receives `value` and `children` props. The `value` is merged with the current block context value.
+`BlockContextProvider` behaves like a standard [`Context.Provider` component](https://reactjs.org/docs/context.html#contextprovider). It receives `value` and `children` props. The `value` is merged with the current block context value.
 
 ### `value`
 
