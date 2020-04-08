@@ -6,5 +6,6 @@
 
 		"noImplicitAny": false,
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src/**/*" ],
+	"references": [ { "path": "../element" } ]
 }
