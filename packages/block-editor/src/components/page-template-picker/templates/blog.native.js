@@ -64,7 +64,6 @@ const Blog = {
 			attributes: {
 				// translators: sample content for "Blog" page template
 				text: __( 'Subscribe' ),
-				align: 'center',
 			},
 		},
 		{
