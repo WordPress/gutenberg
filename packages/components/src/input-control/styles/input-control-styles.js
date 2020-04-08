@@ -9,6 +9,8 @@ import styled from '@emotion/styled';
  */
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
+const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
+
 const rootFloatLabelStyles = ( { isFloatingLabel } ) => {
 	const paddingTop = isFloatingLabel ? 5 : 0;
 	return css( { paddingTop } );
@@ -133,8 +135,8 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	const position = isFloatingLabel ? 'absolute' : null;
 	const pointerEvents = isFloating ? null : 'none';
 
-	const marginTop = isFloating ? 0 : 2;
-	const offset = size === 'small' ? '-2px' : '-5px';
+	const marginTop = isFloating ? 0 : 1;
+	const offset = size === 'small' ? '-3px' : '-5px';
 
 	let transform = isFloating
 		? `translate( 0, calc(-100% + ${ offset }) ) scale( 0.75 )`
@@ -144,7 +146,9 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 		transform = null;
 	}
 
-	const transition = isFloatingLabel ? 'transform 50ms linear' : null;
+	const transition = isFloatingLabel
+		? `transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear`
+		: null;
 
 	return css(
 		{
@@ -164,18 +168,21 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 };
 
 export const Label = styled.label`
-	box-sizing: border-box;
-	display: block;
-	top: 50%;
-	transition: transform 50ms linear;
-	z-index: 1;
+	&&& {
+		box-sizing: border-box;
+		display: block;
+		margin: 0;
+		top: 50%;
+		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear;
+		z-index: 1;
 
-	${laberColor};
-	${labelFontSize};
-	${labelPosition};
-	${reduceMotion( 'transition' )};
+		${laberColor};
+		${labelFontSize};
+		${labelPosition};
+		${reduceMotion( 'transition' )};
 
-	${rtl( { left: 0 } )}
+		${rtl( { left: 0 } )}
+	}
 `;
 
 const fieldsetTopStyles = ( { isFloatingLabel } ) => {
@@ -189,53 +196,63 @@ const fieldsetFocusedStyles = ( { isFocused } ) => {
 		: color( 'ui.border' );
 
 	const borderWidth = isFocused ? 2 : 1;
+	const borderStyle = 'solid';
 
-	return css( { borderColor, borderWidth } );
+	return css( { borderColor, borderStyle, borderWidth } );
 };
 
 export const Fieldset = styled.fieldset`
-	box-sizing: border-box;
-	border-color: black;
-	border-radius: inherit;
-	border-style: solid;
-	border-width: 1px;
-	bottom: 0;
-	left: 0;
-	margin: 0;
-	padding: 0;
-	pointer-events: none;
-	position: absolute;
-	right: 0;
+	&&& {
+		box-sizing: border-box;
+		border-radius: inherit;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
 
-	${fieldsetFocusedStyles};
-	${fieldsetTopStyles};
-	${rtl( { paddingLeft: 2 } )}
+		${fieldsetFocusedStyles};
+		${fieldsetTopStyles};
+		${rtl( { paddingLeft: 2 } )}
+	}
 `;
 
-const legendWidth = ( { isFloating } ) => {
+const legendSize = ( { isFloating, size } ) => {
 	const maxWidth = isFloating ? 1000 : 0.01;
+	const sizes = {
+		default: 9.75,
+		small: 8.25,
+	};
+
+	const fontSize = sizes[ size ];
+
 	return css( {
+		fontSize,
 		maxWidth,
 	} );
 };
 
 export const Legend = styled.legend`
-	box-sizing: border-box;
-	width: auto;
-	height: 11px;
-	display: block;
-	padding: 0;
-	font-size: 0.75em;
-	transition: max-width 50ms linear;
-	visibility: hidden;
+	&&& {
+		box-sizing: border-box;
+		display: block;
+		height: 11px;
+		line-height: 11px;
+		margin: 0;
+		padding: 0;
+		transition: max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
+		visibility: hidden;
+		width: auto;
 
-	${legendWidth};
-	${reduceMotion( 'transition' )};
+		${legendSize};
+		${reduceMotion( 'transition' )};
+	}
 `;
 
 export const LegendText = styled.span`
 	box-sizing: border-box;
 	display: inline-block;
-	padding-left: 4px;
-	padding-right: 4px;
+	${rtl( { paddingLeft: 4, paddingRight: 5 } )}
 `;

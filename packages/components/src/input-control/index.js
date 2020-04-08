@@ -105,7 +105,7 @@ export function InputControl(
 					isFocused={ isFocused }
 				>
 					{ isFloatingLabelSet && (
-						<Legend isFloating={ isFloating }>
+						<Legend isFloating={ isFloating } size={ size }>
 							<LegendText>{ label }</LegendText>
 						</Legend>
 					) }
