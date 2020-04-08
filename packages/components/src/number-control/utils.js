@@ -24,11 +24,16 @@ export function useDragCursor( isDragging ) {
 
 function getValue( value ) {
 	const number = Number( value );
+
 	return isNaN( number ) ? 0 : number;
 }
 
 export function add( a, b ) {
 	return getValue( a ) + getValue( b );
+}
+
+export function subtract( a, b ) {
+	return getValue( a ) - getValue( b );
 }
 
 export function roundClamp(
@@ -37,8 +42,9 @@ export function roundClamp(
 	max = Infinity,
 	step = 1
 ) {
-	const clampedValue = clamp( value, min, max );
-	const rounded = Math.ceil( clampedValue / step ) * step;
+	const clampedValue = clamp( getValue( value ), min, max );
+	const stepValue = getValue( step );
+	const rounded = Math.round( clampedValue / stepValue ) * stepValue;
 
 	return rounded;
 }

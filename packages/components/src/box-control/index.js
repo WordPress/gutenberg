@@ -118,17 +118,19 @@ export default function BoxControl( {
 					</FlexBlock>
 				</Flex>
 			) }
-			<BoxUIControl
-				{ ...inputProps }
-				placeholder={ mixedLabel }
-				values={ values }
-				onSelect={ ( next ) => {
-					handleOnSelect( next );
-					setIcon( next );
-				} }
-				onChange={ updateValues }
-				units={ units }
-			/>
+			<LayoutContainer>
+				<BoxUIControl
+					{ ...inputProps }
+					placeholder={ mixedLabel }
+					values={ values }
+					onSelect={ ( next ) => {
+						handleOnSelect( next );
+						setIcon( next );
+					} }
+					onChange={ updateValues }
+					units={ units }
+				/>
+			</LayoutContainer>
 		</Root>
 	);
 }
@@ -641,6 +643,12 @@ const DropdownButton = styled( Flex )`
 
 const DropdownIconWrapper = styled.div`
 	margin-right: 8px;
+`;
+
+const LayoutContainer = styled( Flex )`
+	height: 120px;
+	justify-content: center;
+	padding-bottom: 16px;
 `;
 
 const GridUI = styled.div`

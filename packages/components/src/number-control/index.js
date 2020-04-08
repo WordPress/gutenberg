@@ -16,7 +16,13 @@ import { UP, DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { DRAG_CURSOR, useDragCursor, add, roundClampString } from './utils';
+import {
+	DRAG_CURSOR,
+	useDragCursor,
+	add,
+	subtract,
+	roundClampString,
+} from './utils';
 
 export function NumberControl(
 	{
@@ -96,7 +102,7 @@ export function NumberControl(
 			case UP:
 				event.preventDefault();
 
-				nextValue = nextValue + incrementalValue;
+				nextValue = add( nextValue, incrementalValue );
 				nextValue = roundClampString(
 					nextValue,
 					min,
@@ -111,7 +117,7 @@ export function NumberControl(
 			case DOWN:
 				event.preventDefault();
 
-				nextValue = nextValue - incrementalValue;
+				nextValue = subtract( nextValue, incrementalValue );
 				nextValue = roundClampString(
 					nextValue,
 					min,
