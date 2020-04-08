@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import ReactDOM from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import { act, fireEvent, render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -14,62 +13,58 @@ import { useState } from '@wordpress/element';
  */
 import Sandbox from '../';
 
-let container;
+describe( 'Sandbox', () => {
+	global.window.MutationObserver = null;
 
-const TestWrapper = () => {
-	const [ html, setHtml ] = useState(
-		'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
-	);
+	const TestWrapper = () => {
+		const [ html, setHtml ] = useState(
+			'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
+		);
 
-	const updateHtml = () => {
-		setHtml(
-			'<iframe class="mock-iframe" src="https://another.super.embed"></iframe>'
+		const updateHtml = () => {
+			setHtml(
+				'<iframe class="mock-iframe" src="https://another.super.embed"></iframe>'
+			);
+		};
+
+		return (
+			<div>
+				<button onClick={ updateHtml } className="mock-button">
+					Mock Button
+				</button>
+				<Sandbox html={ html } />
+			</div>
 		);
 	};
 
-	return (
-		<div>
-			<button onClick={ updateHtml } className="mock-button">
-				Mock Button
-			</button>
-			<Sandbox html={ html } />
-		</div>
-	);
-};
+	it( 'should rerender with new emdeded content if html prop changes', () => {
+		let result;
+		act( () => {
+			result = render( <TestWrapper /> );
+		} );
 
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
-} );
+		const iframe = result.container.querySelector( '.components-sandbox' );
 
-afterEach( () => {
-	document.body.removeChild( container );
-	container = null;
-} );
+		let sandboxedIframe = iframe.contentWindow.document.body.querySelector(
+			'.mock-iframe'
+		);
 
-it( 'should rerender with new emdeded content if html prop changes', () => {
-	act( () => {
-		ReactDOM.render( <TestWrapper />, container );
-	} );
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
+			'https://super.embed'
+		);
 
-	const button = container.querySelector( '.mock-button' );
-	const iframe = container.querySelector( '.components-sandbox' );
+		act( () => {
+			fireEvent.click( result.getByRole( 'button' ) );
+		} );
 
-	let sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-		'.mock-iframe'
-	);
+		sandboxedIframe = iframe.contentWindow.document.body.querySelector(
+			'.mock-iframe'
+		);
 
-	expect( sandboxedIframe.src ).toEqual( 'https://super.embed/' );
-
-	act( () => {
-		button.dispatchEvent(
-			new window.MouseEvent( 'click', { bubbles: true } )
+		expect( sandboxedIframe ).toHaveAttribute(
+			'src',
+			'https://another.super.embed'
 		);
 	} );
-
-	sandboxedIframe = iframe.contentWindow.document.body.querySelector(
-		'.mock-iframe'
-	);
-
-	expect( sandboxedIframe.src ).toEqual( 'https://another.super.embed/' );
 } );
