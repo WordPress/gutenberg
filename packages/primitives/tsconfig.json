@@ -5,7 +5,6 @@
 		"declarationDir": "build-types",
 
 		"noImplicitAny": false,
-		"strictNullChecks": false
 	},
 	"include": [ "src/**/*" ]
 }
