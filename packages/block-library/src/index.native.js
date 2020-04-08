@@ -148,6 +148,8 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
+		columns,
+		column,
 		group,
 		button,
 		spacer,
