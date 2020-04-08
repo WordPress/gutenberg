@@ -50,6 +50,26 @@ const sizeStyles = ( { size } ) => {
 	return css( style );
 };
 
+const paddingStyles = ( { disableUnits } ) => {
+	const value = disableUnits ? 3 : 20;
+
+	return css`
+		${rtl( { paddingRight: value } )()};
+	`;
+};
+
+const arrowStyles = ( { disableUnits } ) => {
+	if ( disableUnits ) return '';
+
+	return css`
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+	`;
+};
+
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -64,15 +84,11 @@ export const ValueInput = styled( NumberControl )`
 		display: block;
 		width: 100%;
 
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-
-		${rtl( { paddingRight: 20 } )}
 		${fontSizeStyles};
 		${sizeStyles};
+
+		${arrowStyles};
+		${paddingStyles};
 	}
 `;
 
@@ -128,6 +144,8 @@ const unitLabelPaddingStyles = ( { size } ) => {
 
 export const UnitLabel = styled.div`
 	&&& {
+		pointer-events: none;
+
 		${baseUnitLabelStyles};
 		${unitLabelPaddingStyles};
 	}

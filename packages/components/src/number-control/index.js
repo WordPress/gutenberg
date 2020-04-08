@@ -4,6 +4,8 @@
 import { clamp, noop } from 'lodash';
 import classNames from 'classnames';
 import { useDrag } from 'react-use-gesture';
+import { css } from '@emotion/core';
+import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
@@ -14,7 +16,7 @@ import { UP, DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { DRAG_CURSOR, useDragCursor, add } from './utils';
+import { DRAG_CURSOR, useDragCursor, add, roundClampString } from './utils';
 
 export function NumberControl(
 	{
@@ -55,8 +57,13 @@ export function NumberControl(
 			const distance = y * modifier * -1;
 
 			if ( distance !== 0 ) {
-				const nextValue = clamp( add( valueProp, distance ), min, max );
-				onChange( nextValue.toString(), { event } );
+				const nextValue = roundClampString(
+					add( valueProp, distance ),
+					min,
+					max,
+					modifier
+				);
+				onChange( nextValue, { event } );
 			}
 
 			if ( ! isDragging ) {
@@ -90,9 +97,14 @@ export function NumberControl(
 				event.preventDefault();
 
 				nextValue = nextValue + incrementalValue;
-				nextValue = clamp( nextValue, min, max );
+				nextValue = roundClampString(
+					nextValue,
+					min,
+					max,
+					incrementalValue
+				);
 
-				onChange( nextValue.toString(), { event } );
+				onChange( nextValue, { event } );
 
 				break;
 
@@ -100,9 +112,14 @@ export function NumberControl(
 				event.preventDefault();
 
 				nextValue = nextValue - incrementalValue;
-				nextValue = clamp( nextValue, min, max );
+				nextValue = roundClampString(
+					nextValue,
+					min,
+					max,
+					incrementalValue
+				);
 
-				onChange( nextValue.toString(), { event } );
+				onChange( nextValue, { event } );
 
 				break;
 		}
@@ -120,11 +137,12 @@ export function NumberControl(
 	};
 
 	return (
-		<input
+		<Input
 			inputMode="numeric"
 			{ ...props }
 			{ ...dragGestureProps() }
 			className={ classes }
+			isDragging={ isDragging }
 			ref={ ref }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
@@ -134,5 +152,23 @@ export function NumberControl(
 		/>
 	);
 }
+
+const dragStyles = ( { isDragging } ) => {
+	if ( ! isDragging ) return '';
+
+	return css`
+		user-select: none;
+
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none !important;
+			margin: 0 !important;
+		}
+	`;
+};
+
+const Input = styled.input`
+	${dragStyles};
+`;
 
 export default forwardRef( NumberControl );

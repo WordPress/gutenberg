@@ -19,6 +19,7 @@ import { CSS_UNITS } from './utils';
 function UnitControl(
 	{
 		className,
+		disableUnits = false,
 		isUnitSelectTabbable = true,
 		isResetValueOnUnitChange = true,
 		label,
@@ -49,20 +50,23 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				{ ...props }
+				disableUnits={ disableUnits }
 				className="component-unit-control__input"
 				value={ value }
 				onChange={ onChange }
 				size={ size }
 				type="number"
 			/>
-			<UnitSelectControl
-				className="component-unit-control__select"
-				isTabbable={ isUnitSelectTabbable }
-				options={ units }
-				onChange={ handleOnUnitChange }
-				size={ size }
-				value={ unit }
-			/>
+			{ ! disableUnits && (
+				<UnitSelectControl
+					className="component-unit-control__select"
+					isTabbable={ isUnitSelectTabbable }
+					options={ units }
+					onChange={ handleOnUnitChange }
+					size={ size }
+					value={ unit }
+				/>
+			) }
 		</Root>
 	);
 }

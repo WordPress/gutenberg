@@ -89,34 +89,186 @@ export default function BoxControl( {
 			<Header>
 				<FlexItem>{ label }</FlexItem>
 			</Header>
-			<Flex align="top" gap={ 1 }>
-				<FlexItem>
-					<BoxTypeDropdown
-						icon={ icon }
-						label={ label }
-						onChange={ ( next ) => {
-							setType( next );
-							handleOnSelect( next );
-						} }
-						onSelect={ setIcon }
-						type={ type }
-					/>
-				</FlexItem>
-				<FlexBlock>
-					<ControlComponent
-						{ ...inputProps }
-						placeholder={ mixedLabel }
-						values={ values }
-						onSelect={ ( next ) => {
-							handleOnSelect( next );
-							setIcon( next );
-						} }
-						onChange={ updateValues }
-						units={ units }
-					/>
-				</FlexBlock>
-			</Flex>
+			{ false && (
+				<Flex align="top" gap={ 1 }>
+					<FlexItem>
+						<BoxTypeDropdown
+							icon={ icon }
+							label={ label }
+							onChange={ ( next ) => {
+								setType( next );
+								handleOnSelect( next );
+							} }
+							onSelect={ setIcon }
+							type={ type }
+						/>
+					</FlexItem>
+					<FlexBlock>
+						<ControlComponent
+							{ ...inputProps }
+							placeholder={ mixedLabel }
+							values={ values }
+							onSelect={ ( next ) => {
+								handleOnSelect( next );
+								setIcon( next );
+							} }
+							onChange={ updateValues }
+							units={ units }
+						/>
+					</FlexBlock>
+				</Flex>
+			) }
+			<BoxUIControl
+				{ ...inputProps }
+				placeholder={ mixedLabel }
+				values={ values }
+				onSelect={ ( next ) => {
+					handleOnSelect( next );
+					setIcon( next );
+				} }
+				onChange={ updateValues }
+				units={ units }
+			/>
 		</Root>
+	);
+}
+
+function BoxUIControl( { onChange = noop, values, ...props } ) {
+	const {
+		top: [ top, unit ],
+		right: [ right ],
+		bottom: [ bottom ],
+		left: [ left ],
+	} = values;
+
+	const allValues = getValues( values, 'top', 'right', 'bottom', 'left' );
+	const isMixed = ! allValues.every( ( v ) => v === top );
+
+	const createHandleOnChange = ( side ) => ( next ) => {
+		onChange( { ...values, [ side ]: [ next, unit ] } );
+	};
+
+	const baseStyles = {
+		position: 'absolute',
+		zIndex: 1,
+		maxWidth: 50,
+	};
+
+	return (
+		<GridUI>
+			<GridIndicator
+				style={ {
+					left: '50%',
+					top: '50%',
+					transform: 'translate(0, -30px)',
+				} }
+			/>
+			<GridIndicator
+				style={ {
+					left: '50%',
+					bottom: '50%',
+					transform: 'translate(0, 30px)',
+				} }
+			/>
+			<GridIndicator
+				style={ {
+					left: '50%',
+					top: '50%',
+					transform: 'rotate(-90deg) translate(7px, -38px)',
+				} }
+			/>
+			<GridIndicator
+				style={ {
+					right: '50%',
+					top: '50%',
+					transform: 'rotate(-90deg) translate(7px, 38px)',
+				} }
+			/>
+
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ top }
+				onChange={ createHandleOnChange( 'top' ) }
+				placeholder="Top"
+				label="Top"
+				size="small"
+				style={ {
+					...baseStyles,
+					left: '50%',
+					top: 0,
+					transform: 'translateX(-50%)',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ right }
+				onChange={ createHandleOnChange( 'right' ) }
+				placeholder="Right"
+				label="Right"
+				size="small"
+				style={ {
+					...baseStyles,
+					right: 0,
+					top: '50%',
+					transform: 'translateY(-50%)',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ bottom }
+				onChange={ createHandleOnChange( 'bottom' ) }
+				placeholder="Bottom"
+				label="Bottom"
+				size="small"
+				style={ {
+					...baseStyles,
+					left: '50%',
+					bottom: 0,
+					transform: 'translateX(-50%)',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ left }
+				onChange={ createHandleOnChange( 'left' ) }
+				placeholder="Left"
+				label="Left"
+				size="small"
+				style={ {
+					...baseStyles,
+					position: 'absolute',
+					left: 0,
+					top: '50%',
+					transform: 'translateY(-50%)',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ isMixed ? '' : top }
+				onChange={ ( next ) => {
+					onChange( {
+						top: [ next, unit ],
+						right: [ next, unit ],
+						bottom: [ next, unit ],
+						left: [ next, unit ],
+					} );
+				} }
+				placeholder="All"
+				label="All"
+				size="small"
+				style={ {
+					...baseStyles,
+					left: '50%',
+					top: '50%',
+					transform: 'translate(-50%, -50%)',
+				} }
+			/>
+		</GridUI>
 	);
 }
 
@@ -489,6 +641,38 @@ const DropdownButton = styled( Flex )`
 
 const DropdownIconWrapper = styled.div`
 	margin-right: 8px;
+`;
+
+const GridUI = styled.div`
+	position: relative;
+	height: 120px;
+	width: 200px;
+`;
+
+const GridIndicator = styled.div`
+	height: 14px;
+	border-left: 1px dashed dodgerblue;
+	width: 0;
+	position: absolute;
+
+	&::before {
+		content: '';
+		position: absolute;
+		width: 7px;
+		height: 0;
+		border-top: 1px dashed dodgerblue;
+		top: 0;
+		left: -4px;
+	}
+	&::after {
+		content: '';
+		position: absolute;
+		width: 7px;
+		height: 0;
+		border-top: 1px dashed dodgerblue;
+		bottom: 0;
+		left: -4px;
+	}
 `;
 
 BoxControl.__Visualizer = Visualizer;
