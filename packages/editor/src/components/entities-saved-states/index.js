@@ -9,7 +9,6 @@ import { some, groupBy } from 'lodash';
 import {
 	CheckboxControl,
 	Button,
-	Panel,
 	PanelBody,
 	PanelRow,
 } from '@wordpress/components';
@@ -26,12 +25,38 @@ import {
 } from '@wordpress/icons';
 
 function EntityRecordState( { record, checked, onChange } ) {
+	const { name, kind, title, key } = record;
+	const { blocks, getParent } = useSelect( ( select ) => {
+		const editedEntity = select( 'core' ).getEditedEntityRecord(
+			kind,
+			name,
+			key
+		);
+		return {
+			blocks: editedEntity.blocks || [],
+			getParent: select( 'core/block-editor' ).getBlockParents,
+		};
+	} );
+
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	const parents = getParent( blocks[ 0 ]?.clientId );
+
+	const selectBlocks = () => {
+		selectBlock( parents[ parents.length - 1 ] );
+	};
+
 	return (
-		<CheckboxControl
-			label={ <strong>{ record.title || __( 'Untitled' ) }</strong> }
-			checked={ checked }
-			onChange={ onChange }
-		/>
+		<PanelRow>
+			<CheckboxControl
+				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
+				checked={ checked }
+				onChange={ onChange }
+			/>
+			{ parents.length ? (
+				<Button onClick={ selectBlocks }>{ __( 'Who am I?' ) }</Button>
+			) : null }
+		</PanelRow>
 	);
 }
 
