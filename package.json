@@ -125,7 +125,7 @@
 		"babel-plugin-require-context-hook": "1.0.0",
 		"benchmark": "2.1.4",
 		"browserslist": "4.9.1",
-		"chalk": "^2.4.2",
+		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
@@ -248,6 +248,9 @@
 		}
 	},
 	"lint-staged": {
+		"package-lock.json": [
+			"node ./bin/check-latest-npm.js"
+		],
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
 		],

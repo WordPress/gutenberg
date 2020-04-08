@@ -32,7 +32,7 @@
 		"wp-env": "bin/wp-env"
 	},
 	"dependencies": {
-		"chalk": "^2.4.2",
+		"chalk": "^4.0.0",
 		"copy-dir": "^1.2.0",
 		"docker-compose": "^0.22.2",
 		"extract-zip": "^1.6.7",
