@@ -396,7 +396,7 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should resolve promise non-action to dispatch', () => {
+		it( 'should resolve promise non-action to dispatch', async () => {
 			let shouldThrow = false;
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => {
@@ -416,6 +416,8 @@ describe( 'createRegistry', () => {
 			shouldThrow = true;
 
 			registry.select( 'demo' ).getValue();
+
+			return new Promise( ( resolve ) => process.nextTick( resolve ) );
 		} );
 
 		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {

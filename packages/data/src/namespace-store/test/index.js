@@ -74,20 +74,23 @@ describe( 'controls', () => {
 			},
 		} );
 
-		registry.subscribe( async () => {
-			const isFinished = registry
-				.select( 'store' )
-				.hasFinishedResolution( 'getItems' );
-			if ( isFinished ) {
-				await expect( registry.select( 'store' ).getItems() ).toEqual( [
-					1,
-					2,
-					3,
-				] );
-			}
-		} );
+		return new Promise( ( resolve ) => {
+			registry.subscribe( () => {
+				const isFinished = registry
+					.select( 'store' )
+					.hasFinishedResolution( 'getItems' );
+				if ( isFinished ) {
+					expect( registry.select( 'store' ).getItems() ).toEqual( [
+						1,
+						2,
+						3,
+					] );
+				}
+				resolve();
+			} );
 
-		registry.select( 'store' ).getItems();
+			registry.select( 'store' ).getItems();
+		} );
 	} );
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
 		it( 'when custom store has resolvers defined', () => {
