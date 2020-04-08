@@ -1,5 +1,6 @@
 const browserstack = require( 'browserstack-local' );
 const webdriver = require( 'selenium-webdriver' );
+const got = require( 'got' );
 require( 'dotenv' ).config();
 
 // Input capabilities
@@ -49,9 +50,24 @@ const stopBrowserStackLocal = async () => {
 	} );
 };
 
+const getResultPageLink = async ( sessionId ) => {
+	const response = await got(
+		`https://api.browserstack.com/automate/sessions/${ sessionId }.json`,
+		{
+			username: process.env.LOCAL_BROWSERSTACK_USER,
+			password: process.env.LOCAL_BROWSERSTACK_KEY,
+		}
+	);
+
+	const body = JSON.parse( response.body );
+
+	return body.automation_session.public_url;
+};
+
 module.exports = {
 	setupDriver,
 	webdriver,
 	startBrowserStackLocal,
 	stopBrowserStackLocal,
+	getResultPageLink,
 };

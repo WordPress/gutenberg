@@ -3,6 +3,7 @@ const {
 	setupDriver,
 	startBrowserStackLocal,
 	stopBrowserStackLocal,
+	getResultPageLink,
 } = require( './browserstack' );
 
 jest.setTimeout( 30000 );
@@ -16,6 +17,15 @@ beforeAll( async function() {
 } );
 
 afterAll( async function() {
+	const session = await driver.getSession();
+	const sessionId = await session.getId();
+
 	driver.quit();
 	await stopBrowserStackLocal();
+
+	const resultPage = await getResultPageLink( sessionId );
+
+	// process.stdout.write is overwritten in jest.
+	// eslint-disable-next-line no-console
+	console.log( `You can watch the result at ${ resultPage }` );
 } );
