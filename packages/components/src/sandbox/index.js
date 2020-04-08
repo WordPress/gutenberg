@@ -104,16 +104,14 @@ class Sandbox extends Component {
 				}
 
 				observer = new MutationObserver( sendResize );
-				setTimeout( function() {
-					observer.observe( document.body, {
-						attributes: true,
-						attributeOldValue: false,
-						characterData: true,
-						characterDataOldValue: false,
-						childList: true,
-						subtree: true
-					} );
-				}, 0 );
+				observer.observe( document.body, {
+					attributes: true,
+					attributeOldValue: false,
+					characterData: true,
+					characterDataOldValue: false,
+					childList: true,
+					subtree: true
+				} );
 
 				window.addEventListener( 'load', sendResize, true );
 
