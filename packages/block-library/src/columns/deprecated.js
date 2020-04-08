@@ -39,18 +39,34 @@ function getDeprecatedLayoutColumn( originalContent ) {
 }
 
 const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customTextColor && ! attributes.customBackgroundColor ) {
+	if (
+		! attributes.textColor &&
+		! attributes.backgroundColor &&
+		! attributes.customTextColor &&
+		! attributes.customBackgroundColor
+	) {
 		return attributes;
 	}
 	const style = { color: {} };
+	if ( attributes.textColor ) {
+		style.color.text = `var(--wp--colors--${ attributes.textColor })`;
+	}
 	if ( attributes.customTextColor ) {
 		style.color.text = attributes.customTextColor;
+	}
+	if ( attributes.backgroundColor ) {
+		style.color.background = `var(--wp--colors--${ attributes.backgroundColor })`;
 	}
 	if ( attributes.customBackgroundColor ) {
 		style.color.background = attributes.customBackgroundColor;
 	}
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...omit( attributes, [
+			'textColor',
+			'backgroundColor',
+			'customTextColor',
+			'customBackgroundColor',
+		] ),
 		style,
 	};
 };
@@ -75,6 +91,14 @@ export default [
 			},
 		},
 		migrate: migrateCustomColors,
+		isEligible( attribute ) {
+			return (
+				attribute.textColor ||
+				attribute.customTextColor ||
+				attribute.backgroundColor ||
+				attribute.customBackgroundColor
+			);
+		},
 		save( { attributes } ) {
 			const {
 				verticalAlignment,

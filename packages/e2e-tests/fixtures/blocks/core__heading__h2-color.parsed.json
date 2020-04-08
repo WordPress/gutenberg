@@ -2,21 +2,25 @@
     {
         "blockName": "core/heading",
         "attrs": {
-            "textColor": "accent"
+            "style": {
+                "color": {
+                    "text": "var(--wp--colors--accent)"
+                }
+            }
         },
         "innerBlocks": [],
-        "innerHTML": "\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n",
+        "innerHTML": "\n<h2 class=\"has-text-color\" style=\"color:var(--wp--colors--accent)\">Text</h2>\n",
         "innerContent": [
-            "\n<h2 class=\"has-accent-color has-text-color\">Text</h2>\n"
+            "\n<h2 class=\"has-text-color\" style=\"color:var(--wp--colors--accent)\">Text</h2>\n"
         ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n\n",
+        "innerHTML": "\n",
         "innerContent": [
-            "\n\n"
+            "\n"
         ]
     }
 ]

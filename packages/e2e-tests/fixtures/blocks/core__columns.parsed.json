@@ -2,7 +2,11 @@
     {
         "blockName": "core/columns",
         "attrs": {
-            "backgroundColor": "secondary"
+            "style": {
+                "color": {
+                    "background": "var(--wp--colors--secondary)"
+                }
+            }
         },
         "innerBlocks": [
             {
@@ -28,11 +32,11 @@
                         ]
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\n\t\t\n\t</div>\n\t",
                 "innerContent": [
                     "\n\t<div class=\"wp-block-column\">\n\t\t",
                     null,
-                    "\n\t\t",
+                    "\n\n\t\t",
                     null,
                     "\n\t</div>\n\t"
                 ]
@@ -60,21 +64,21 @@
                         ]
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\n\t\t\n\t</div>\n\t",
                 "innerContent": [
                     "\n\t<div class=\"wp-block-column\">\n\t\t",
                     null,
-                    "\n\t\t",
+                    "\n\n\t\t",
                     null,
                     "\n\t</div>\n\t"
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-columns has-background\" style=\"background-color:var(--wp--colors--secondary)\">\n\t\n\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t",
+            "\n<div class=\"wp-block-columns has-background\" style=\"background-color:var(--wp--colors--secondary)\">\n\t",
             null,
-            "\n\t",
+            "\n\n\t",
             null,
             "\n</div>\n"
         ]

@@ -26,6 +26,16 @@ function gutenberg_experimental_global_styles_has_theme_support() {
  * @return array The flattened tree.
  */
 function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix = '', $token = '--' ) {
+	if ( '--wp--colors--' === $prefix ) {
+		return array_reduce(
+			$global_styles,
+			function( $result, $color ) {
+				$result[ '--wp--colors--' . $color['slug'] ] = $color['color'];
+				return $result;
+			},
+			array()
+		);
+	}
 	$result = array();
 	foreach ( $global_styles as $key => $value ) {
 		$new_key = $prefix . str_replace( '/', '-', $key );
@@ -147,9 +157,76 @@ function gutenberg_experimental_global_styles_get_user_cpt_id() {
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_core() {
-	return gutenberg_experimental_global_styles_get_from_file(
+	$core_styles = gutenberg_experimental_global_styles_get_from_file(
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
+	// Todo: Remove this when colors are properly set on themes.json
+	// For now colors can not be set there because json files are not translatable.
+	if ( empty( $core_styles['colors'] ) ) {
+		$core_styles['colors'] = array(
+			array(
+				'name'  => __( 'Pale pink', 'gutenberg' ),
+				'slug'  => 'pale-pink',
+				'color' => '#f78da7',
+			),
+			array(
+				'name'  => __( 'Vivid red', 'gutenberg' ),
+				'slug'  => 'vivid-red',
+				'color' => '#cf2e2e',
+			),
+			array(
+				'name'  => __( 'Luminous vivid orange', 'gutenberg' ),
+				'slug'  => 'luminous-vivid-orange',
+				'color' => '#ff6900',
+			),
+			array(
+				'name'  => __( 'Luminous vivid amber', 'gutenberg' ),
+				'slug'  => 'luminous-vivid-amber',
+				'color' => '#fcb900',
+			),
+			array(
+				'name'  => __( 'Light green cyan', 'gutenberg' ),
+				'slug'  => 'light-green-cyan',
+				'color' => '#7bdcb5',
+			),
+			array(
+				'name'  => __( 'Vivid green cyan', 'gutenberg' ),
+				'slug'  => 'vivid-green-cyan',
+				'color' => '#00d084',
+			),
+			array(
+				'name'  => __( 'Pale cyan blue', 'gutenberg' ),
+				'slug'  => 'pale-cyan-blue',
+				'color' => '#8ed1fc',
+			),
+			array(
+				'name'  => __( 'Vivid cyan blue', 'gutenberg' ),
+				'slug'  => 'vivid-cyan-blue',
+				'color' => '#0693e3',
+			),
+			array(
+				'name'  => __( 'Vivid purple', 'gutenberg' ),
+				'slug'  => 'vivid-purple',
+				'color' => '#9b51e0',
+			),
+			array(
+				'name'  => __( 'Very light gray', 'gutenberg' ),
+				'slug'  => 'very-light-gray',
+				'color' => '#eeeeee',
+			),
+			array(
+				'name'  => __( 'Cyan bluish gray', 'gutenberg' ),
+				'slug'  => 'cyan-bluish-gray',
+				'color' => '#abb8c3',
+			),
+			array(
+				'name'  => __( 'Very dark gray', 'gutenberg' ),
+				'slug'  => 'very-dark-gray',
+				'color' => '#313131',
+			),
+		);
+	}
+	return $core_styles;
 }
 
 /**
@@ -158,8 +235,18 @@ function gutenberg_experimental_global_styles_get_core() {
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_theme() {
-	return gutenberg_experimental_global_styles_get_from_file(
+	$theme_styles = gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
+	);
+	$colors       = current( (array) get_theme_support( 'editor-color-palette' ) );
+	if ( empty( $colors ) ) {
+		return $theme_styles;
+	}
+	return array_merge(
+		array(
+			'colors' => $colors,
+		),
+		$theme_styles
 	);
 }
 
@@ -194,7 +281,8 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
  * and enqueues the resulting CSS custom properties for the editor.
  */
 function gutenberg_experimental_global_styles_enqueue_assets_editor() {
-	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
+	global $current_screen;
+	if ( $current_screen->is_block_editor() || gutenberg_experimental_global_styles_is_site_editor() ) {
 		gutenberg_experimental_global_styles_enqueue_assets();
 	}
 }
@@ -204,9 +292,6 @@ function gutenberg_experimental_global_styles_enqueue_assets_editor() {
  * and enqueues the resulting CSS custom properties.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
-		return;
-	}
 
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
@@ -279,13 +364,11 @@ function gutenberg_experimental_global_styles_is_site_editor() {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	if (
-		! gutenberg_experimental_global_styles_has_theme_support() ||
-		! gutenberg_experimental_global_styles_is_site_editor()
+		gutenberg_experimental_global_styles_has_theme_support() &&
+		gutenberg_experimental_global_styles_is_site_editor()
 	) {
-		return $settings;
+		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 	}
-
-	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
 	$global_styles = array_merge(
 		gutenberg_experimental_global_styles_get_core(),
@@ -293,7 +376,9 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	);
 
 	$settings['__experimentalGlobalStylesBase'] = $global_styles;
-
+	if ( ! empty( $global_styles['colors'] ) ) {
+		$settings['colors'] = $global_styles['colors'];
+	}
 	return $settings;
 }
 
@@ -334,8 +419,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 	add_filter( 'body_class', 'gutenberg_experimental_global_styles_wp_gs_class_front_end' );
 	add_filter( 'admin_body_class', 'gutenberg_experimental_global_styles_wp_gs_class_editor' );
-	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
-	// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
-	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );
 }
+add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );

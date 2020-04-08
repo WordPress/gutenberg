@@ -55,6 +55,8 @@ const blockAttributes = {
 
 const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	if (
+		! attributes.textColor &&
+		! attributes.backgroundColor &&
 		! attributes.customTextColor &&
 		! attributes.customBackgroundColor &&
 		! attributes.customFontSize
@@ -62,11 +64,22 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 		return attributes;
 	}
 	const style = {};
-	if ( attributes.customTextColor || attributes.customBackgroundColor ) {
+	if (
+		attributes.textColor ||
+		attributes.backgroundColor ||
+		attributes.customTextColor ||
+		attributes.customBackgroundColor
+	) {
 		style.color = {};
+	}
+	if ( attributes.textColor ) {
+		style.color.text = `var(--wp--colors--${ attributes.textColor })`;
 	}
 	if ( attributes.customTextColor ) {
 		style.color.text = attributes.customTextColor;
+	}
+	if ( attributes.backgroundColor ) {
+		style.color.background = `var(--wp--colors--${ attributes.backgroundColor })`;
 	}
 	if ( attributes.customBackgroundColor ) {
 		style.color.background = attributes.customBackgroundColor;
@@ -76,6 +89,8 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 	}
 	return {
 		...omit( attributes, [
+			'textColor',
+			'backgroundColor',
 			'customTextColor',
 			'customBackgroundColor',
 			'customFontSize',
@@ -89,7 +104,13 @@ const deprecated = [
 		supports,
 		attributes: {
 			...omit( blockAttributes, [ 'style' ] ),
+			textColor: {
+				type: 'string',
+			},
 			customTextColor: {
+				type: 'string',
+			},
+			backgroundColor: {
 				type: 'string',
 			},
 			customBackgroundColor: {
@@ -100,6 +121,15 @@ const deprecated = [
 			},
 		},
 		migrate: migrateCustomColorsAndFontSizes,
+		isEligible( attribute ) {
+			return (
+				attribute.textColor ||
+				attribute.customTextColor ||
+				attribute.backgroundColor ||
+				attribute.customBackgroundColor ||
+				attribute.customFontSize
+			);
+		},
 		save( { attributes } ) {
 			const {
 				align,

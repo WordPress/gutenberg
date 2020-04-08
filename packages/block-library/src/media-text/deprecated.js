@@ -17,16 +17,18 @@ import { imageFillStyles } from './media-container';
 const DEFAULT_MEDIA_WIDTH = 50;
 
 const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customBackgroundColor ) {
+	if ( ! attributes.backgroundColor && ! attributes.customBackgroundColor ) {
 		return attributes;
 	}
 	const style = {
 		color: {
-			background: attributes.customBackgroundColor,
+			background: attributes.backgroundColor
+				? `var(--wp--colors--${ attributes.backgroundColor })`
+				: attributes.customBackgroundColor,
 		},
 	};
 	return {
-		...omit( attributes, [ 'customBackgroundColor' ] ),
+		...omit( attributes, [ 'backgroundColor', 'customBackgroundColor' ] ),
 		style,
 	};
 };
@@ -70,6 +72,9 @@ export default [
 	{
 		attributes: {
 			...baseAttributes,
+			backgroundColor: {
+				type: 'string',
+			},
 			customBackgroundColor: {
 				type: 'string',
 			},
@@ -114,6 +119,9 @@ export default [
 			},
 		},
 		migrate: migrateCustomColors,
+		isEligible( attribute ) {
+			return attribute.backgroundColor || attribute.customBackgroundColor;
+		},
 		save( { attributes } ) {
 			const {
 				backgroundColor,
