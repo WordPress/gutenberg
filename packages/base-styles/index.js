@@ -58,3 +58,10 @@ exports.adminColorSchemes = {
 		},
 	},
 };
+
+exports.variables = {
+	radiusBlockUi: '2px',
+	defaultFontSize: '13px',
+	iconButtonSize: '36px',
+	borderWidth: '1px',
+};

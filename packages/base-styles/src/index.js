@@ -1,1 +1,1 @@
-export { adminColorSchemes } from '../';
+export { adminColorSchemes, variables } from '../';

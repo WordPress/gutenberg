@@ -19,33 +19,6 @@ import { plus } from '@wordpress/icons';
  */
 import InserterMenu from './menu';
 
-const additionalStyles = [
-	{
-		states: 'enabled:hover',
-		styles: {
-			color: 'green',
-		},
-	},
-	{
-		states: 'enabled:focus',
-		styles: {
-			color: 'yellow',
-		},
-	},
-	{
-		states: 'enabled:focus:hover',
-		styles: {
-			color: 'pink',
-		},
-	},
-	{
-		states: 'enabled:focus:hover:active',
-		styles: {
-			color: 'orange',
-		},
-	},
-];
-
 const defaultRenderToggle = ( {
 	onToggle,
 	disabled,
@@ -68,21 +41,12 @@ const defaultRenderToggle = ( {
 		<Button
 			icon={ plus }
 			label={ label }
-			display={ 'inline-flex' }
-			alignItems={ 'center' }
-			color={ 'dark-gray-500' }
-			background={ 'none' }
-			border={ 'none' }
-			outline={ 'none' }
-			padding={ 'medium' }
-			margin={ 0 }
 			tooltipPosition="bottom"
 			onClick={ onToggle }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
-			additionalStyles={ additionalStyles }
 			{ ...toggleProps }
 		/>
 	);

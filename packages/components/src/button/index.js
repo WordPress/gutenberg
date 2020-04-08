@@ -17,7 +17,6 @@ import { additionalStylesHelper } from '@wordpress/primitives';
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import { getTheme } from '../theme-provider';
 
 import styles from './styles';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
@@ -122,17 +121,17 @@ export function Button(
 
 	const element = (
 		<Tag
-			css={ ( theme = getTheme() ) => [
-				styles.base( theme ),
-				( isDefault || isSecondary ) && styles.secondary( theme ),
-				isPrimary && styles.primary( theme ),
-				isTertiary && styles.tertiary( theme ),
-				isLink && styles.link( theme ),
-				isSmall && styles.small( theme ),
-				!! icon && styles.hasIcon( theme ),
-				isBusy && styles.busy( theme ),
+			css={ [
+				styles.base,
+				( isDefault || isSecondary ) && styles.secondary,
+				isPrimary && styles.primary,
+				isTertiary && styles.tertiary,
+				isLink && styles.link,
+				isSmall && styles.small,
+				!! icon && styles.hasIcon,
+				isBusy && styles.busy,
 				additionalStyles && additionalStylesHelper( additionalStyles ),
-				styles.styledSystem( { ...additionalProps, theme } ),
+				styles.styledSystem( { ...additionalProps } ),
 			] }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			{ ...propsToPass }

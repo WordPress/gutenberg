@@ -14,7 +14,17 @@ import {
 	shadow,
 } from 'styled-system';
 
-const base = ( theme ) => css`
+/**
+ * WordPress dependencies
+ */
+import { adminColorSchemes, variables } from '@wordpress/base-styles';
+
+/**
+ * Internal dependencies
+ */
+import { color as getColor, shade } from '../utils/colors';
+
+const base = css`
 	border: 0;
 	cursor: pointer;
 	-webkit-appearance: none;
@@ -26,12 +36,36 @@ const base = ( theme ) => css`
 	align-items: center;
 	box-sizing: border-box;
 	overflow: hidden;
-	padding: 0 ${theme.space.medium}px;
-	border-radius: 3px;
-	height: ${theme.space.iconButtonSize}px;
-	color: ${theme.colors.darkGray[ '500' ]};
+	padding: 6 12px;
+	border-radius: ${variables.radiusBlockUi};
+	height: ${variables.iconButtonSize};
+	color: ${getColor( 'black' )};
 	@media ( prefers-reduced-motion: reduce ) {
 		transition-duration: 0s;
+	}
+
+	&[aria-expanded='true'],
+	&:hover {
+		color: ${adminColorSchemes.defaults.primary};
+	}
+
+	&:enabled:focus {
+		box-shadow: 0 0 0 2px ${adminColorSchemes.defaults.primary};
+		outline: 1px solid transparent;
+	}
+
+	&:enabled:active {
+		color: inherit;
+	}
+
+	&[aria-disabled='true']:hover {
+		color: initial;
+	}
+
+	&:disabled,
+	&[aria-disabled='true'] {
+		cursor: default;
+		opacity: 0.3;
 	}
 
 	.screen-reader-text {
@@ -44,118 +78,67 @@ const base = ( theme ) => css`
 		}
 	}
 
-	&:enabled:hover {
-		background-color: ${theme.colors.white};
-		color: ${theme.colors.darkGray[ '900' ]};
-		box-shadow: inset 0 0 0 1px ${theme.colors[ 'dark-gray-500' ]},
-			inset 0 0 0 2px ${theme.colors.white};
-	}
-
-	&:enabled:focus {
-		color: ${theme.colors.darkGray[ '900' ]};
-		box-shadow: inset 0 0 0 1px ${theme.colors.darkGray[ '300' ]},
-			inset 0 0 0 2px ${theme.colors.white};
-		outline: 2px solid transparent;
-	}
-
-	&:enabled:active {
-		color: inherit;
-	}
-
-	&:disabled,
-	&[aria-disabled='true'] {
-		cursor: default;
-		opacity: 0.3;
-	}
-`;
-
-const secondary = ( theme ) => css`
-	border-style: solid;
-	white-space: nowrap;
-	background: #f3f5f6;
-	border-width: ${theme.space.borderWidth}px;
-	color: ${theme.helpers.shade( theme.colors.primary, -5 )};
-	border-color: ${theme.helpers.shade( theme.colors.primary, -5 )};
-
-	&:hover {
-		background: #f1f1f1;
-		text-decoration: none;
-		box-shadow: none;
-		border-color: ${theme.helpers.shade( theme.colors.primary, -25 )};
-		color: ${theme.helpers.shade( theme.colors.primary, -25 )};
-	}
-
-	&:focus {
+	svg {
+		fill: currentColor;
 		outline: none;
-		background: #f3f5f6;
-		text-decoration: none;
-		color: ${theme.helpers.shade( theme.colors.primary, -25 )};
-		border-color: ${theme.helpers.shade( theme.colors.primary, -5 )};
-		box-shadow: 0 0 0 ${theme.space.borderWidth}
-			${theme.helpers.shade( theme.colors.primary, -5 )};
-	}
-
-	&:active {
-		background: #f3f5f6;
-		border-color: #7e8993;
-		box-shadow: none;
-		color: ${theme.helpers.shade( theme.colors.primary, -5 )};
-	}
-
-	&:disabled,
-	&[aria-disabled='true'] {
-		color: #a0a5aa;
-		border-color: #ddd;
-		background: #f7f7f7;
-		transform: none;
-		opacity: 1;
-		text-shadow: 0 ${theme.space.borderWidth} 0 ${theme.colors.white};
-	}
-
-	&.is-busy,
-	&.is-busy:disabled,
-	&.is-busy[aria-disabled='true'] {
-		background-size: 100px 100%;
-		opacity: 1;
-		animation: components-button__busy-animation 2500ms infinite linear;
-		background-image: repeating-linear-gradient(
-			-45deg,
-			${theme.colors.outlines},
-			${theme.colors.white} 11px,
-			${theme.colors.white} 10px,
-			${theme.colors.lightGray[ '500' ]} 20px
-		);
 	}
 `;
 
-const primary = ( theme ) => css`
+const secondaryTertiaryCommon = `
+&:hover {
+	box-shadow: inset 0 0 0 ${ variables.borderWidth }
+		${ shade( adminColorSchemes.defaults.primary, -10 ) };
+	color: ${ shade( adminColorSchemes.defaults.primary, -10 ) };
+}
+
+&:active {
+	background: ${ getColor( 'lightGray.tertiary' ) };
+	color: ${ shade( adminColorSchemes.defaults.primary, -10 ) };
+	box-shadow: none;
+}
+
+&:disabled,
+&[aria-disabled='true'],
+&[aria-disabled='true']:hover {
+	color: ${ shade( getColor( 'mediumGray.text' ), 5 ) };
+	background: ${ shade( getColor( 'lightGray.tertiary' ), 5 ) };
+	transform: none;
+	opacity: 1;
+	box-shadow: none;
+}`;
+
+const secondary = css`
+	box-shadow: inset 0 0 0 ${variables.borderWidth}
+		${adminColorSchemes.defaults.primary};
+	outline: 1px solid transparent; // Shown in high contrast mode.
+	background: transparent;
+	white-space: nowrap;
+
+	${secondaryTertiaryCommon}
+`;
+
+const primary = css`
 	border-style: solid;
 	white-space: nowrap;
 	text-shadow: none;
-	border-width: ${theme.space.borderWidth}px;
-	color: ${theme.colors.white};
-	background: ${theme.colors.primary};
-	border-color: ${theme.colors.primary};
+	color: ${getColor( 'white' )};
+	background: ${adminColorSchemes.defaults.primary};
 
 	&:hover {
-		color: ${theme.colors.white};
-		background: ${theme.helpers.shade( theme.colors.primary, -10 )};
-		border-color: ${theme.helpers.shade( theme.colors.primary, -10 )};
-		box-shadow: none;
+		color: ${getColor( 'white' )};
+		background: ${shade( adminColorSchemes.defaults.primary, -10 )};
 	}
 
-	&:focus {
-		color: ${theme.colors.white};
-		background: ${theme.helpers.shade( theme.colors.primary, -10 )};
-		border-color: ${theme.helpers.shade( theme.colors.primary, -10 )};
-		box-shadow: 0 0 0 ${theme.space.borderWidth} ${theme.colors.white},
-			0 0 0 3px ${theme.colors.primary};
+	&:enabled:focus {
+		box-shadow: inset 0 0 0 1px ${getColor( 'white' )},
+			0 0 0 2px ${adminColorSchemes.defaults.primary};
+		outline: 1px solid transparent;
 	}
 
-	&:active {
-		color: ${theme.colors.white};
-		background: ${theme.helpers.shade( theme.colors.primary, -20 )};
-		border-color: ${theme.helpers.shade( theme.colors.primary, -20 )};
+	&:enabled:active {
+		color: ${getColor( 'white' )};
+		background: ${shade( adminColorSchemes.defaults.primary, -20 )};
+		border-color: ${shade( adminColorSchemes.defaults.primary, -20 )};
 	}
 
 	&:disabled,
@@ -164,115 +147,114 @@ const primary = ( theme ) => css`
 	&[aria-disabled='true']:enabled,
 	&[aria-disabled='true']:active:enabled {
 		opacity: 1;
-		color: ${theme.helpers.shade( theme.colors.primary, 10 )};
-		background: ${theme.helpers.shade( theme.colors.primary, 10 )};
-		border-color: ${theme.helpers.shade( theme.colors.primary, 10 )};
-		background-image: linear-gradient(
-			-45deg,
-			${theme.colors.button} 28%,
-			${theme.helpers.shade( theme.colors.primary, -20 )} 28%,
-			${theme.helpers.shade( theme.colors.primary, -20 )} 72%,
-			${theme.colors.button} 72%
-		);
+		color: ${shade( adminColorSchemes.defaults.primary, 40 )};
+		background: ${shade( adminColorSchemes.defaults.primary, 10 )};
+		border-color: ${shade( adminColorSchemes.defaults.primary, 10 )};
 
 		&:focus:enabled {
-			box-shadow: 0 0 0 ${theme.space.borderWidth} ${theme.colors.white},
-				0 0 0 3px ${theme.colors.primary};
+			box-shadow: 0 0 0 ${getColor( 'white' )},
+				0 0 0 3px ${adminColorSchemes.defaults.primary};
 		}
 	}
 	&.is-busy,
 	&.is-busy:disabled,
 	&.is-busy[aria-disabled='true'] {
-		color: ${theme.colors.white};
+		color: ${getColor( 'white' )};
 		background-size: 100px 100%;
-		border-color: ${theme.colors.primary};
+		border-color: ${adminColorSchemes.defaults.primary};
+		background-image: linear-gradient(
+			-45deg,
+			${adminColorSchemes.defaults.primary} 28%,
+			${shade( adminColorSchemes.defaults.primary, -20 )} 28%,
+			${shade( adminColorSchemes.defaults.primary, -20 )} 72%,
+			${adminColorSchemes.defaults.primary} 72%
+		);
 	}
 `;
 
-const link = ( theme ) => css`
+const link = css`
+	margin: 0;
+	padding: 0;
 	box-shadow: none;
 	border: 0;
+	border-radius: 0;
 	background: none;
 	outline: none;
 	text-align: left;
 	color: #0073aa;
+	text-decoration: underline;
 	transition-property: border, background, color;
 	transition-duration: 0.05s;
 	transition-timing-function: ease-in-out;
-	height: auto;
-	text-decoration: underline;
-	padding: 0;
-	border-radius: 0;
 	@media ( prefers-reduced-motion: reduce ) {
 		transition-duration: 0s;
 	}
 
-	&:hover {
-		color: #00a0d2;
-	}
-
+	&:hover,
 	&:active {
 		color: #00a0d2;
 	}
 
-	&:focus {
+	&:enabled:focus {
 		color: #124964;
-		box-shadow: 0 0 0 ${theme.space.borderWidth} #5b9dd9,
-			0 0 2px ${theme.space.borderWidth} rgba( 30, 140, 190, 0.8 );
+		box-shadow: 0 0 0 ${variables.borderWidth} #5b9dd9,
+			0 0 2px ${variables.borderWidth} rgba( 30, 140, 190, 0.8 );
 	}
 	&.is-destructive {
-		color: ${theme.colors.alert.red};
+		color: ${getColor( 'alert.red' )};
 	}
 `;
 
-const busy = ( theme ) => css`
+const busy = css`
 	background-size: 100px 100%;
 	opacity: 1;
 	animation: components-button__busy-animation 2500ms infinite linear;
 	background-image: repeating-linear-gradient(
 		-45deg,
-		${theme.colors.outlines},
-		${theme.colors.white} 11px,
-		${theme.colors.white} 10px,
-		${theme.colors.lightGray[ '500' ]} 20px
+		${adminColorSchemes.defaults.outlines},
+		${getColor( 'white' )} 11px,
+		${getColor( 'white' )} 10px,
+		${getColor( 'lightGray.500' )} 20px
 	);
 `;
-const small = ( theme ) => css`
-	height: ${theme.space.xlarge}px;
+const small = css`
+	height: 24px;
 	line-height: 22px;
+	padding: 0 8px;
+	font-size: 11px;
+
+	&.has-icon:not( .has-text ) {
+		width: 24px;
+	}
 `;
 
-const tertiary = ( theme ) => css`
-	color: ${theme.colors.outlines};
+const tertiary = css`
+	color: ${adminColorSchemes.defaults.primary};
+	white-space: nowrap;
+	background: transparent;
+	padding: 6px;
+	${secondaryTertiaryCommon}
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+`;
 
+const hasIcon = css`
+	padding: 6px;
+	min-width: 36px;
+	justify-content: center;
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
 	}
 
-	svg {
-		fill: currentColor;
-		outline: none;
-	}
-
-	&:active:focus:enabled {
-		box-shadow: none;
-	}
-`;
-
-const hasIcon = ( theme ) => css`
-	.dashicon {
-		display: inline-block;
-		flex: 0 0 auto;
-	}
-
-	svg {
-		fill: currentColor;
-		outline: none;
+	&.has-text {
+		justify-content: left;
 	}
 
 	&.has-text svg {
-		margin-right: ${theme.space.medium}px;
+		margin-right: 8px;
 	}
 `;
 
