@@ -29,6 +29,7 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
+		"browserstack-local": "1.4.5",
 		"dotenv": "8.2.0",
 		"jest": "^24.9.0",
 		"selenium-webdriver": "3.6.0"

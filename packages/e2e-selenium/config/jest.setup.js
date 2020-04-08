@@ -1,8 +1,14 @@
-const { webdriver, setupDriver } = require( './browserstack' );
+const {
+	webdriver,
+	setupDriver,
+	startBrowserStackLocal,
+	stopBrowserStackLocal,
+} = require( './browserstack' );
 
-jest.setTimeout( 10000 );
+jest.setTimeout( 30000 );
 
 beforeAll( async function() {
+	await startBrowserStackLocal();
 	global.driver = await setupDriver();
 	global.webdriver = webdriver;
 	global.By = webdriver.By;
@@ -11,4 +17,5 @@ beforeAll( async function() {
 
 afterAll( async function() {
 	driver.quit();
+	await stopBrowserStackLocal();
 } );

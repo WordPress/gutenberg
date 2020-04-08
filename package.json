@@ -126,6 +126,7 @@
 		"babel-plugin-require-context-hook": "1.0.0",
 		"benchmark": "2.1.4",
 		"browserslist": "4.9.1",
+		"browserstack-local": "1.4.5",
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
