@@ -44,6 +44,7 @@ export function getInlineStyles( styles = {} ) {
 	const mappings = {
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
+		background: [ 'color', 'gradient' ],
 		backgroundColor: [ 'color', 'background' ],
 		color: [ 'color', 'text' ],
 	};
