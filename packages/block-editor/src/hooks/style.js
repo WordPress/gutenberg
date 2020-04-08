@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mapKeys, kebabCase, isObject, entries, identity } from 'lodash';
+import { has, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,43 +35,27 @@ const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
 
 /**
- * Flatten a nested Global styles config and generates the corresponding
- * flattened CSS variables.
+ * Returns the inline styles to add depending on the style object
  *
  * @param  {Object} styles Styles configuration
  * @return {Object}        Flattened CSS variables declaration
  */
-export function getCSSVariables( styles = {} ) {
-	const prefix = '--wp';
-	const token = '--';
-	const valueFormatters = {
-		fontSize: ( value ) => ( value ? value + 'px' : value ),
-	};
-	const getNestedCSSVariables = ( config ) => {
-		let result = {};
-		entries( config ).forEach( ( [ key, value ] ) => {
-			if ( ! isObject( value ) ) {
-				const formatter = valueFormatters[ key ] || identity;
-				result[ kebabCase( key ) ] = formatter( value );
-				return;
-			}
-
-			result = {
-				...result,
-				...mapKeys(
-					getNestedCSSVariables( value ),
-					( _, subkey ) => kebabCase( key ) + token + subkey
-				),
-			};
-		} );
-
-		return result;
+export function getInlineStyles( styles = {} ) {
+	const mappings = {
+		lineHeight: [ 'typography', 'lineHeight' ],
+		fontSize: [ 'typography', 'fontSize' ],
+		backgroundColor: [ 'color', 'background' ],
+		color: [ 'color', 'text' ],
 	};
 
-	return mapKeys(
-		getNestedCSSVariables( styles ),
-		( _, key ) => prefix + token + key
-	);
+	const output = {};
+	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
+		if ( has( styles, objectKey ) ) {
+			output[ styleKey ] = get( styles, objectKey );
+		}
+	} );
+
+	return output;
 }
 
 /**
@@ -111,9 +95,8 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
-
 	props.style = {
-		...getCSSVariables( style ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 
