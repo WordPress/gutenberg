@@ -86,8 +86,8 @@ describe( 'TabbableContainer', () => {
 				keyCode,
 				shiftKey
 			);
-			expect( interaction.stopped ).toBe( expectedStop );
 			expect( currentIndex ).toBe( expectedActiveIndex );
+			expect( interaction.stopped ).toBe( expectedStop );
 		}
 
 		assertKeyDown( TAB, false, 1, true );
