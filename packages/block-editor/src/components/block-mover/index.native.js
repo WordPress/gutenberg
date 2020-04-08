@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { I18nManager } from 'react-native';
 import { first, last, partial, castArray } from 'lodash';
 
 /**
@@ -45,6 +46,7 @@ const verticalMover = {
 const BlockMover = ( {
 	isFirst,
 	isLast,
+	isRTL,
 	isLocked,
 	onMoveDown,
 	onMoveUp,
@@ -82,6 +84,18 @@ const BlockMover = ( {
 		return sprintf( buttonTitle, fromIndex, toIndex );
 	};
 
+	const getArrowIcon = ( isBackwardButton ) => {
+		if ( isRTL && horizontalDirection ) {
+			// for RTL and horizontal direction switch the icons between forward and backward button
+			if ( isBackwardButton ) {
+				return forwardButtonIcon; // set forwardButtonIcon for backward button
+			}
+			return backwardButtonIcon; // set backwardButtonIcon for forward button
+		}
+
+		return isBackwardButton ? backwardButtonIcon : forwardButtonIcon;
+	};
+
 	return (
 		<>
 			<ToolbarButton
@@ -90,7 +104,7 @@ const BlockMover = ( {
 				}
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon={ backwardButtonIcon }
+				icon={ getArrowIcon( true ) }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
 
@@ -98,7 +112,7 @@ const BlockMover = ( {
 				title={ ! isLast ? getMoverButtonTitle() : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon={ forwardButtonIcon }
+				icon={ getArrowIcon() }
 				extraProps={ {
 					hint: forwardButtonHint,
 				} }
@@ -129,6 +143,7 @@ export default compose(
 			firstIndex,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
+			isRTL: I18nManager.isRTL,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
 			rootClientId,
 		};
