@@ -1,11 +1,5 @@
 $blocks-button__height: 56px;
 
-:root .wp-block-button {
-	background: var(--wp--color--gradient);
-	background-color: var(--wp--color--background, $dark-gray-700);
-	color: var(--wp--color--text, $white);
-}
-
 .wp-block-button {
 	&.aligncenter {
 		text-align: center;
