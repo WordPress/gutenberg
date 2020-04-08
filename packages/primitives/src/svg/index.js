@@ -80,7 +80,7 @@ export const Stop = ( props ) => createElement( 'stop', props );
 
 /**
  *
- * @param {SVGProps} props
+ * @param {Object}   props
  * @param {string}   props.className Class name
  * @param {boolean}  props.isPressed Is the SVG currently pressed?
  * @param {import('react').ComponentPropsWithoutRef<'svg'>} props.props Other props will be passed thru to svg element
