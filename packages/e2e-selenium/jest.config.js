@@ -1,7 +1,7 @@
 module.exports = {
 	setupFilesAfterEnv: [
 		//'@wordpress/jest-console',
-		'<rootDir>/jest.setup.js',
+		'<rootDir>/config/jest.setup.js',
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
