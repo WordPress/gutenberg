@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select } from '@storybook/addon-knobs';
+import { boolean, number, select, text } from '@storybook/addon-knobs';
 import styled from '@emotion/styled';
 
 /**
@@ -26,6 +26,7 @@ function Example() {
 	const props = {
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
+		label: text( 'label', 'Value' ),
 		shiftStep: number( 'shiftStep', 10 ),
 		max: number( 'max', 100 ),
 		min: number( 'min', 0 ),

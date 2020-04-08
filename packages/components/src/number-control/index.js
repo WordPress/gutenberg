@@ -16,6 +16,7 @@ import { UP, DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import InputControl from '../input-control';
 import {
 	DRAG_CURSOR,
 	useDragCursor,
@@ -27,6 +28,7 @@ import {
 export function NumberControl(
 	{
 		className,
+		label,
 		dragAxis = 'y',
 		dragThreshold = 10,
 		isDragEnabled = true,
@@ -131,8 +133,8 @@ export function NumberControl(
 		}
 	};
 
-	const handleOnChange = ( event ) => {
-		onChange( event.target.value, { event } );
+	const handleOnChange = ( value, { event } ) => {
+		onChange( value, { event } );
 	};
 
 	const classes = classNames( 'component-number-control', className );
@@ -148,6 +150,7 @@ export function NumberControl(
 			{ ...props }
 			{ ...dragGestureProps() }
 			className={ classes }
+			label={ label }
 			isDragging={ isDragging }
 			ref={ ref }
 			onChange={ handleOnChange }
@@ -173,7 +176,7 @@ const dragStyles = ( { isDragging } ) => {
 	`;
 };
 
-const Input = styled.input`
+const Input = styled( InputControl )`
 	${dragStyles};
 `;
 

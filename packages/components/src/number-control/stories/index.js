@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number } from '@storybook/addon-knobs';
+import { boolean, number, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,7 @@ function Example() {
 	const [ value, setValue ] = useState( '' );
 
 	const props = {
+		label: text( 'label', 'Number' ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		shiftStep: number( 'shiftStep', 10 ),
 		step: number( 'step', 1 ),

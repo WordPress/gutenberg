@@ -14,42 +14,6 @@ export const Root = styled.div`
 	position: relative;
 `;
 
-const fontSizeStyles = ( { size } ) => {
-	const sizes = {
-		default: null,
-		small: '11px',
-	};
-
-	const fontSize = sizes[ size ];
-
-	if ( ! fontSize ) return '';
-
-	return css`
-		@media ( min-width: 600px ) {
-			font-size: ${fontSize};
-		}
-	`;
-};
-
-const sizeStyles = ( { size } ) => {
-	const sizes = {
-		default: {
-			height: 30,
-			lineHeight: 30,
-			minHeight: 30,
-		},
-		small: {
-			height: 24,
-			lineHeight: 24,
-			minHeight: 24,
-		},
-	};
-
-	const style = sizes[ size ] || sizes.default;
-
-	return css( style );
-};
-
 const paddingStyles = ( { disableUnits } ) => {
 	const value = disableUnits ? 3 : 20;
 
@@ -83,9 +47,6 @@ export const ValueInput = styled( NumberControl )`
 		padding: 3px 8px;
 		display: block;
 		width: 100%;
-
-		${fontSizeStyles};
-		${sizeStyles};
 
 		${arrowStyles};
 		${paddingStyles};

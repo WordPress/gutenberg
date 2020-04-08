@@ -52,21 +52,23 @@ function UnitControl(
 				{ ...props }
 				disableUnits={ disableUnits }
 				className="component-unit-control__input"
+				label={ label }
 				value={ value }
 				onChange={ onChange }
 				size={ size }
 				type="number"
-			/>
-			{ ! disableUnits && (
-				<UnitSelectControl
-					className="component-unit-control__select"
-					isTabbable={ isUnitSelectTabbable }
-					options={ units }
-					onChange={ handleOnUnitChange }
-					size={ size }
-					value={ unit }
-				/>
-			) }
+			>
+				{ ! disableUnits && (
+					<UnitSelectControl
+						className="component-unit-control__select"
+						isTabbable={ isUnitSelectTabbable }
+						options={ units }
+						onChange={ handleOnUnitChange }
+						size={ size }
+						value={ unit }
+					/>
+				) }
+			</ValueInput>
 		</Root>
 	);
 }
