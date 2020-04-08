@@ -1,3 +1,4 @@
+const webdriver = require( 'selenium-webdriver' );
 require( 'dotenv' ).config();
 
 // Input capabilities
@@ -12,6 +13,14 @@ const capabilities = {
 	name: 'Bstack-[Node] Sample Test',
 };
 
+const setupDriver = async () => {
+	return new webdriver.Builder()
+		.usingServer( 'http://hub-cloud.browserstack.com/wd/hub' )
+		.withCapabilities( capabilities )
+		.build();
+};
+
 module.exports = {
-	capabilities,
+	setupDriver,
+	webdriver,
 };
