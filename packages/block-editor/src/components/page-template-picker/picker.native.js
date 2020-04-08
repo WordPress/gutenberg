@@ -36,13 +36,13 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
-	const contentOpacity = useRef( new Animated.Value( 0 ) );
+	const contentOpacity = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
 		if ( shouldShowPicker() && visible && ! pickerVisible ) {
 			setPickerVisible( true );
 		}
-		onPickerAnimation();
+		startPickerAnimation( visible );
 
 		Keyboard.addListener( 'keyboardDidShow', onKeyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', onKeyboardDidHide );
@@ -55,15 +55,14 @@ const __experimentalPageTemplatePicker = ( {
 
 	const onKeyboardDidShow = () => {
 		if ( visible ) {
-			setPickerVisible( shouldShowPicker() );
-			onPickerAnimation();
+			startPickerAnimation( shouldShowPicker() );
 		}
 	};
 
 	const onKeyboardDidHide = () => {
 		if ( visible ) {
 			setPickerVisible( true );
-			onPickerAnimation();
+			startPickerAnimation( true );
 		}
 	};
 
@@ -85,14 +84,14 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
-	const onPickerAnimation = () => {
-		Animated.timing( contentOpacity.current, {
-			toValue: visible ? 1 : 0,
+	const startPickerAnimation = ( isVisible ) => {
+		Animated.timing( contentOpacity, {
+			toValue: isVisible ? 1 : 0,
 			duration: 300,
 			useNativeDriver: true,
 		} ).start( () => {
-			if ( ! visible ) {
-				setPickerVisible( false );
+			if ( ! isVisible ) {
+				setPickerVisible( isVisible );
 			}
 		} );
 	};
@@ -102,7 +101,7 @@ const __experimentalPageTemplatePicker = ( {
 	}
 
 	return (
-		<Animated.View style={ [ { opacity: contentOpacity.current } ] }>
+		<Animated.View style={ [ { opacity: contentOpacity } ] }>
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
