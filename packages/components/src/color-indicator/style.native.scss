@@ -16,10 +16,6 @@
 	align-items: center;
 }
 
-.circleOptionDark {
-	border-color: $dark-ultra-dim;
-}
-
 .absolute {
 	position: absolute;
 	margin-right: 0;
@@ -39,6 +35,11 @@
 	border-radius: 24px;
 	border-width: $border-width;
 	position: absolute;
+	z-index: 2;
+}
+
+.outlineDark {
+	border-color: $dark-ultra-dim;
 }
 
 .selectedOutline {

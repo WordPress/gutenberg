@@ -32,30 +32,30 @@ function ColorIndicator( {
 } ) {
 	const isGradient = color.includes( 'linear-gradient' );
 
-	const circleStyle = getStylesFromColorScheme(
-		styles.circleOption,
-		styles.circleOptionDark
+	const outlineStyle = getStylesFromColorScheme(
+		styles.outline,
+		styles.outlineDark
 	);
 
 	if ( isGradient ) {
 		return (
 			<LinearGradient
-				style={ [ circleStyle, style ] }
+				style={ [ styles.circleOption, style ] }
 				gradientValue={ color }
 			>
-				<View style={ styles.outline } />
+				<View style={ outlineStyle } />
 				{ isSelected && <SelectedIcon opacity={ opacity } /> }
 			</LinearGradient>
 		);
 	} else if ( custom ) {
 		return (
-			<View style={ [ circleStyle, style ] }>
-				<View style={ styles.outline } />
+			<View style={ [ styles.circleOption, style ] }>
+				<View style={ outlineStyle } />
 				{ color.map( ( gradientValue ) => {
 					return (
 						<LinearGradient
 							gradientValue={ gradientValue }
-							style={ [ circleStyle, styles.absolute ] }
+							style={ [ styles.circleOption, styles.absolute ] }
 							key={ gradientValue }
 						/>
 					);
@@ -65,8 +65,10 @@ function ColorIndicator( {
 		);
 	}
 	return (
-		<View style={ [ circleStyle, style, { backgroundColor: color } ] }>
-			<View style={ styles.outline } />
+		<View
+			style={ [ styles.circleOption, style, { backgroundColor: color } ] }
+		>
+			<View style={ outlineStyle } />
 			{ isSelected && <SelectedIcon opacity={ opacity } /> }
 		</View>
 	);

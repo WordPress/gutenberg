@@ -202,7 +202,7 @@ function ColorPalette( {
 			ref={ scrollViewRef }
 		>
 			<TouchableWithoutFeedback>
-				{ isGradientSegment ? (
+				{ ! isTextScreen && isGradientSegment ? (
 					<Palette gradient />
 				) : (
 					<Palette custom onCustomPress={ onCustomPress } />
