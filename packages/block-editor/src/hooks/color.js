@@ -243,6 +243,7 @@ export function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
+			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
 			clientId={ props.clientId }
 			settings={ [
 				{

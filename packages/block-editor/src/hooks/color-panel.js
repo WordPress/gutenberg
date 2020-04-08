@@ -12,13 +12,21 @@ import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import { getBlockDOMNode } from '../utils/dom';
 
-export default function ColorPanel( { settings, clientId } ) {
+export default function ColorPanel( {
+	settings,
+	clientId,
+	enableContrastChecking = true,
+} ) {
 	const { getComputedStyle, Node } = window;
 
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
 	useEffect( () => {
+		if ( ! enableContrastChecking ) {
+			return;
+		}
+
 		const colorsDetectionElement = getBlockDOMNode( clientId );
 		if ( ! colorsDetectionElement ) {
 			return;
@@ -48,10 +56,12 @@ export default function ColorPanel( { settings, clientId } ) {
 				initialOpen={ false }
 				settings={ settings }
 			>
-				<ContrastChecker
-					backgroundColor={ detectedBackgroundColor }
-					textColor={ detectedColor }
-				/>
+				{ enableContrastChecking && (
+					<ContrastChecker
+						backgroundColor={ detectedBackgroundColor }
+						textColor={ detectedColor }
+					/>
+				) }
 			</PanelColorGradientSettings>
 		</InspectorControls>
 	);
