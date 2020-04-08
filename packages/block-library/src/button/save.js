@@ -11,7 +11,7 @@ import { RichText } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
 
-	const buttonClasses = classnames( {
+	const buttonClasses = classnames( 'wp-block-button__link', {
 		'no-border-radius': borderRadius === 0,
 	} );
 

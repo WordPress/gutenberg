@@ -156,7 +156,7 @@ function ButtonEdit( { attributes, setAttributes, className, isSelected } ) {
 				value={ text }
 				onChange={ ( value ) => setAttributes( { text: value } ) }
 				withoutInteractiveFormatting
-				className={ classnames( className, {
+				className={ classnames( className, 'wp-block-button__link', {
 					'no-border-radius': borderRadius === 0,
 				} ) }
 				style={ {
