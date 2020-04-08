@@ -5,6 +5,9 @@
 		"plugin:@wordpress/eslint-plugin/test-e2e"
 	],
 	"globals": {
-		"driver": "readonly"
+		"driver": "readonly",
+		"webdriver": "readonly",
+		"By": "readonly",
+		"until": "readonly"
 	}
 }

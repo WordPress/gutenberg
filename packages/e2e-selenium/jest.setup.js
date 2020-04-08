@@ -22,6 +22,9 @@ beforeAll( async function() {
 		.build();
 
 	global.driver = await driver;
+	global.webdriver = webdriver;
+	global.By = webdriver.By;
+	global.until = webdriver.until;
 } );
 
 afterAll( async function() {
