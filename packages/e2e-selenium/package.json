@@ -27,9 +27,10 @@
 	],
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"devDependencies": {
+	"dependencies": {
+		"dotenv": "8.2.0",
 		"jest": "^24.9.0",
-		"selenium-webdriver": "3.141.59"
+		"selenium-webdriver": "3.6.0"
 	},
 	"peerDependencies": {
 		"jest": ">=24"
