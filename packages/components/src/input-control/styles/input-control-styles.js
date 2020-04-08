@@ -117,14 +117,15 @@ const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
 	return css( { color: textColor } );
 };
 
-const labelFontSize = ( { size } ) => {
+const labelFontSize = ( { isFloatingLabel, size } ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
 	};
 	const fontSize = sizes[ size ];
+	const lineHeight = isFloatingLabel ? 1 : null;
 
-	return css( { fontSize } );
+	return css( { fontSize, lineHeight } );
 };
 
 const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {

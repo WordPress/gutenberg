@@ -9,7 +9,7 @@ import { Flex } from '../../flex';
 import { color } from '../../utils/style-mixins';
 
 export const Root = styled.div`
-	max-width: 280px;
+	max-width: 300px;
 `;
 
 export const Header = styled( Flex )`
