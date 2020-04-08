@@ -8,7 +8,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useRef, useState, forwardRef } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -21,33 +21,13 @@ import {
 	LegendText,
 	Root,
 } from './styles/input-control-styles';
-
-function useControlledState( initialState ) {
-	const [ state, setState ] = useState( initialState );
-	const stateRef = useRef( initialState );
-
-	useEffect( () => {
-		if ( initialState !== stateRef.current ) {
-			setState( initialState );
-			stateRef.current = initialState;
-		}
-	}, [ initialState ] );
-
-	return [ state, setState ];
-}
+import { useControlledState, isEmpty } from './utils';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
 	const id = `inspector-input-control-${ instanceId }`;
 
 	return idProp || id;
-}
-
-function isEmpty( value ) {
-	const isNullish = typeof value === 'undefined' || value === null;
-	const isEmptyString = value === '';
-
-	return isNullish || isEmptyString;
 }
 
 export function InputControl(

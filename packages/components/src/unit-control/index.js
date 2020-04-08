@@ -38,7 +38,7 @@ function UnitControl(
 		const { data } = changeProps;
 		onUnitChange( unitValue, changeProps );
 
-		if ( isResetValueOnUnitChange && ! data.default === undefined ) {
+		if ( isResetValueOnUnitChange && data.default !== undefined ) {
 			onChange( data.default, changeProps );
 		}
 	};

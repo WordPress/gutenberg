@@ -42,11 +42,12 @@ export function roundClamp(
 	max = Infinity,
 	step = 1
 ) {
-	const clampedValue = clamp( getValue( value ), min, max );
+	const baseValue = getValue( value );
 	const stepValue = getValue( step );
-	const rounded = Math.round( clampedValue / stepValue ) * stepValue;
+	const rounded = Math.round( baseValue / stepValue ) * stepValue;
+	const clampedValue = clamp( rounded, min, max );
 
-	return rounded;
+	return clampedValue;
 }
 
 export function roundClampString( ...args ) {

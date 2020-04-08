@@ -81,7 +81,10 @@ describe( 'NumberControl', () => {
 			const input = getInput();
 
 			input.value = 10;
-			Simulate.change( input );
+
+			act( () => {
+				Simulate.change( input );
+			} );
 
 			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( '10' );
 		} );
@@ -99,7 +102,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP } );
+			} );
 
 			expect( spy ).toHaveBeenCalled();
 		} );
@@ -111,7 +116,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP } );
+			} );
 
 			expect( input.value ).toBe( '6' );
 		} );
@@ -123,21 +130,28 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP } );
+			} );
 
 			expect( input.value ).toBe( '-4' );
 		} );
 
 		it( 'should increment by shiftStep on key UP + shift press', () => {
 			act( () => {
-				render( <StatefulNumberControl value={ 5 } />, container );
+				render(
+					<StatefulNumberControl value={ 5 } shiftStep={ 10 } />,
+					container
+				);
 			} );
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
 
-			expect( input.value ).toBe( '15' );
+			expect( input.value ).toBe( '20' );
 		} );
 
 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
@@ -150,9 +164,11 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
 
-			expect( input.value ).toBe( '105' );
+			expect( input.value ).toBe( '100' );
 		} );
 
 		it( 'should increment but be limited by max on shiftStep', () => {
@@ -169,7 +185,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
 
 			expect( input.value ).toBe( '99' );
 		} );
@@ -188,7 +206,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
+			} );
 
 			expect( input.value ).toBe( '6' );
 		} );
@@ -206,7 +226,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN } );
+			} );
 
 			expect( spy ).toHaveBeenCalled();
 		} );
@@ -218,7 +240,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN } );
+			} );
 
 			expect( input.value ).toBe( '4' );
 		} );
@@ -230,7 +254,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN } );
+			} );
 
 			expect( input.value ).toBe( '-6' );
 		} );
@@ -242,9 +268,11 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
 
-			expect( input.value ).toBe( '-5' );
+			expect( input.value ).toBe( '0' );
 		} );
 
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
@@ -257,9 +285,11 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
 
-			expect( input.value ).toBe( '-95' );
+			expect( input.value ).toBe( '-100' );
 		} );
 
 		it( 'should decrement but be limited by min on shiftStep', () => {
@@ -276,7 +306,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
 
 			expect( input.value ).toBe( '4' );
 		} );
@@ -295,7 +327,9 @@ describe( 'NumberControl', () => {
 
 			const input = getInput();
 
-			Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			act( () => {
+				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
+			} );
 
 			expect( input.value ).toBe( '4' );
 		} );
