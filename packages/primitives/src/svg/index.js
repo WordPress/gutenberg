@@ -93,8 +93,8 @@ export const SVG = ( { className, isPressed, ...props } ) => {
 		className:
 			classnames( className, { 'is-pressed': isPressed } ) || undefined,
 		role: 'img',
-		'aria-hidden': 'true',
-		focusable: 'false',
+		'aria-hidden': true,
+		focusable: false,
 	};
 
 	// Disable reason: We need to have a way to render HTML tag for web.
