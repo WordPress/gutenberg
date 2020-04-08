@@ -236,7 +236,7 @@ const Popover = ( {
 	// Disable reason: We generate the `...contentProps` rest as remainder
 	// of props which aren't explicitly handled by this component.
 	/* eslint-disable no-unused-vars */
-	position = 'top',
+	position = 'bottom right',
 	range,
 	focusOnMount = 'firstElement',
 	anchorRef,
