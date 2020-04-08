@@ -49,8 +49,7 @@ describe( 'Sandbox', () => {
 			'.mock-iframe'
 		);
 
-		expect( sandboxedIframe ).toHaveAttribute(
-			'src',
+		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
 			'https://super.embed'
 		);
 
@@ -62,8 +61,7 @@ describe( 'Sandbox', () => {
 			'.mock-iframe'
 		);
 
-		expect( sandboxedIframe ).toHaveAttribute(
-			'src',
+		expect( sandboxedIframe.getAttribute( 'src' ) ).toBe(
 			'https://another.super.embed'
 		);
 	} );

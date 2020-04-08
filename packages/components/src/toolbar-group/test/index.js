@@ -91,8 +91,8 @@ describe( 'ToolbarGroup', () => {
 			const buttons = getAllByRole( 'button' );
 			expect( buttons ).toHaveLength( 2 );
 			expect(
-				container.querySelector( '.has-left-divider' )
-			).toContainElement( buttons[ 1 ] );
+				container.querySelector( '.has-left-divider button' )
+			).toBe( buttons[ 1 ] );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {

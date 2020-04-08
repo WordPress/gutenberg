@@ -21,10 +21,10 @@ describe( 'Toolbar', () => {
 
 			expect(
 				getByLabelText( 'control1', { selector: 'button' } )
-			).toBeInTheDocument();
+			).toBeTruthy();
 			expect(
 				getByLabelText( 'control2', { selector: 'button' } )
-			).toBeInTheDocument();
+			).toBeTruthy();
 		} );
 	} );
 
@@ -56,13 +56,16 @@ describe( 'Toolbar', () => {
 			);
 
 			const toolbarButton = getByLabelText( 'WordPress' );
-			expect( toolbarButton ).toHaveAttribute(
-				'aria-label',
+			expect( toolbarButton.getAttribute( 'aria-label' ) ).toBe(
 				'WordPress'
 			);
-			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'false' );
-			expect( toolbarButton ).toHaveAttribute( 'data-subscript', 'wp' );
-			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
+			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
+				'false'
+			);
+			expect( toolbarButton.getAttribute( 'data-subscript' ) ).toBe(
+				'wp'
+			);
+			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
 		} );
 	} );
 } );
