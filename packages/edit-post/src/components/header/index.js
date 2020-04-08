@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -30,7 +25,7 @@ function Header() {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-		showIconLabels,
+		showIconLabel,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -46,7 +41,7 @@ function Header() {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
-			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+			showIconLabel: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
 		} ),
@@ -96,18 +91,16 @@ function Header() {
 					forceIsSaving={ isSaving }
 				/>
 				<Button
-					className={ classnames( {
-						'has-text-label': showIconLabels,
-					} ) }
 					icon={ cog }
 					label={ __( 'Settings' ) }
 					onClick={ toggleGeneralSidebar }
 					isPressed={ isEditorSidebarOpened }
 					aria-expanded={ isEditorSidebarOpened }
+					showIconLabel={ showIconLabel }
 					shortcut={ shortcut }
 				/>
 				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
+				<MoreMenu showIconLabel={ showIconLabel } />
 			</div>
 		</div>
 	);

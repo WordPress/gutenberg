@@ -58,22 +58,6 @@
 	@include break-small() {
 		padding-right: $grid-unit-20;
 	}
-
-	button.admin-settings[aria-label] {
-		&.has-text-label {
-			color: $white;
-			background: $dark-gray-500;
-			&:hover {
-				color: $white;
-				background: $dark-gray-600;
-			}
-			&::after {
-				content: attr(aria-label);
-				display: inline-block;
-				font-size: 12px;
-			}
-		}
-	}
 }
 
 

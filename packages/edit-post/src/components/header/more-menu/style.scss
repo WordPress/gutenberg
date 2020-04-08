@@ -9,11 +9,11 @@
 
 	&.show-icon-label {
 		button[aria-label] {
-			display: block;
+			display: inline-flex;
 			&::after {
 				content: attr(aria-label);
-				display: block;
 				font-size: 12px;
+				margin-left: 5px;
 			}
 		}
 	}

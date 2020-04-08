@@ -36,6 +36,7 @@ export function Button( props, ref ) {
 		disabled,
 		icon,
 		iconSize,
+		showIconLabel,
 		showTooltip,
 		tooltipPosition,
 		shortcut,
@@ -113,6 +114,7 @@ export function Button( props, ref ) {
 			ref={ ref }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ showIconLabel && <div className="label">{ label }</div> }
 			{ children }
 		</Tag>
 	);

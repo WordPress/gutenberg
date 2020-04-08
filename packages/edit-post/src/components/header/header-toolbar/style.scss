@@ -21,15 +21,28 @@
 	}
 	&.show-icon-labels {
 		button[aria-label] {
-			display: block;
+			display: inline-flex;
+			flex-wrap: nowrap;
 			&::after {
 				content: attr(aria-label);
 				display: block;
 				font-size: 12px;
+				margin-left: 5px;
 			}
 			&.is-primary {
 				&::after {
-					color: $black;
+					padding-right: 6px;
+				}
+			}
+		}
+		[aria-orientation=vertical] & {
+			display: block;
+		}
+		> div, > button {
+			[aria-orientation=vertical] & {
+				display: block;
+				button {
+					width: 100%;
 				}
 			}
 		}
