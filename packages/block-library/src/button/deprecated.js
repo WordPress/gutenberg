@@ -32,7 +32,11 @@ const migrateCustomColorsAndGradients = ( attributes ) => {
 		style.color.gradient = attributes.customGradient;
 	}
 	return {
-		...omit( attributes, [ 'customTextColor', 'customBackgroundColor' ] ),
+		...omit( attributes, [
+			'customTextColor',
+			'customBackgroundColor',
+			'customGradient',
+		] ),
 		style,
 	};
 };
