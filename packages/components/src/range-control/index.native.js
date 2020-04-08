@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import RangeCell from '../mobile/bottom-sheet/range-cell';
-import StepperControl from '../mobile/stepper-control';
+import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 
 function RangeControl( {
 	className,
@@ -24,7 +24,7 @@ function RangeControl( {
 } ) {
 	if ( type === 'stepper' ) {
 		return (
-			<StepperControl
+			<StepperCell
 				label={ label }
 				max={ max }
 				min={ min }

@@ -23,6 +23,7 @@ import {
 	SelectControl,
 	ToggleControl,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
 import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
@@ -37,7 +38,6 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
-import ColumnsControl from './columns-control';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -391,12 +391,14 @@ class GalleryEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<ColumnsControl
+							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
+								separatorType="fullWidth"
+								type="stepper"
 								required
 							/>
 						) }
