@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=10"
 	},
 	"files": [
 		"scripts",
@@ -39,7 +39,7 @@
 		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
-		"jest": ">=24"
+		"jest": ">=25"
 	},
 	"publishConfig": {
 		"access": "public"
