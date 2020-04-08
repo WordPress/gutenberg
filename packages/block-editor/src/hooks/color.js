@@ -17,7 +17,6 @@ import { useRef, useEffect, Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
@@ -56,22 +55,6 @@ function addAttributes( settings ) {
 		return settings;
 	}
 
-	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( ! settings.attributes.backgroundColor ) {
-		Object.assign( settings.attributes, {
-			backgroundColor: {
-				type: 'string',
-			},
-		} );
-	}
-	if ( ! settings.attributes.textColor ) {
-		Object.assign( settings.attributes, {
-			textColor: {
-				type: 'string',
-			},
-		} );
-	}
-
 	if ( hasGradientSupport( settings ) && ! settings.attributes.gradient ) {
 		Object.assign( settings.attributes, {
 			gradient: {
@@ -99,30 +82,15 @@ export function addSaveProps( props, blockType, attributes ) {
 	const hasGradient = hasGradientSupport( blockType );
 
 	// I'd have prefered to avoid the "style" attribute usage here
-	const { backgroundColor, textColor, gradient, style } = attributes;
+	const { gradient, style } = attributes;
 
-	const backgroundClass = getColorClassName(
-		'background-color',
-		backgroundColor
-	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
-	const textClass = getColorClassName( 'color', textColor );
-	const newClassName = classnames(
-		props.className,
-		textClass,
-		gradientClass,
-		{
-			// Don't apply the background class if there's a custom gradient
-			[ backgroundClass ]:
-				( ! hasGradient || ! style?.color?.gradient ) &&
-				!! backgroundClass,
-			'has-text-color': textColor || style?.color?.text,
-			'has-background':
-				backgroundColor ||
-				style?.color?.background ||
-				( hasGradient && ( gradient || style?.color?.gradient ) ),
-		}
-	);
+	const newClassName = classnames( props.className, gradientClass, {
+		'has-text-color': style?.color?.text,
+		'has-background':
+			style?.color?.background ||
+			( hasGradient && ( gradient || style?.color?.gradient ) ),
+	} );
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
@@ -151,6 +119,14 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
+const getColorFromAttributeValue = ( colors, attributeValue ) => {
+	const attributeParsed = /var\(--wp--colors--(.*)\)/.exec( attributeValue );
+	return getColorObjectByAttributeValues(
+		colors,
+		attributeParsed && attributeParsed[ 1 ],
+		attributeValue
+	).color;
+};
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -178,7 +154,7 @@ export function ColorEdit( props ) {
 
 	const hasGradient = hasGradientSupport( blockName );
 
-	const { style, textColor, backgroundColor, gradient } = attributes;
+	const { style, gradient } = attributes;
 	let gradientValue;
 	if ( hasGradient && gradient ) {
 		gradientValue = getGradientValueBySlug( gradients, gradient );
@@ -188,19 +164,18 @@ export function ColorEdit( props ) {
 
 	const onChangeColor = ( name ) => ( value ) => {
 		const colorObject = getColorObjectByColorValue( colors, value );
-		const attributeName = name + 'Color';
 		const newStyle = {
 			...localAttributes.current.style,
 			color: {
 				...localAttributes.current?.style?.color,
-				[ name ]: colorObject?.slug ? undefined : value,
+				[ name ]: colorObject?.slug
+					? `var(--wp--colors--${ colorObject?.slug })`
+					: value,
 			},
 		};
 
-		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
 		const newAttributes = {
 			style: cleanEmptyObject( newStyle ),
-			[ attributeName ]: newNamedColor,
 		};
 
 		props.setAttributes( newAttributes );
@@ -256,20 +231,18 @@ export function ColorEdit( props ) {
 				{
 					label: __( 'Text Color' ),
 					onColorChange: onChangeColor( 'text' ),
-					colorValue: getColorObjectByAttributeValues(
+					colorValue: getColorFromAttributeValue(
 						colors,
-						textColor,
 						style?.color?.text
-					).color,
+					),
 				},
 				{
 					label: __( 'Background Color' ),
 					onColorChange: onChangeColor( 'background' ),
-					colorValue: getColorObjectByAttributeValues(
+					colorValue: getColorFromAttributeValue(
 						colors,
-						backgroundColor,
 						style?.color?.background
-					).color,
+					),
 					gradientValue,
 					onGradientChange: hasGradient
 						? onChangeGradient

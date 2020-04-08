@@ -34,16 +34,19 @@ const blockAttributes = {
 };
 
 const migrateCustomColors = ( attributes ) => {
-	if ( ! attributes.customTextColor ) {
+	if ( ! attributes.textColor && ! attributes.customTextColor ) {
 		return attributes;
 	}
 	const style = {
 		color: {
-			text: attributes.customTextColor,
+			text: attributes.textColor
+				? `var(--wp--colors--${ attributes.textColor })`
+				: attributes.customTextColor,
 		},
 	};
+
 	return {
-		...omit( attributes, [ 'customTextColor' ] ),
+		...omit( attributes, [ 'textColor', 'customTextColor' ] ),
 		style,
 	};
 };
@@ -61,6 +64,9 @@ const deprecated = [
 			},
 		},
 		migrate: migrateCustomColors,
+		isEligible( attribute ) {
+			return attribute.textColor || attribute.customTextColor;
+		},
 		save( { attributes } ) {
 			const {
 				align,

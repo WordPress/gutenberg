@@ -3,7 +3,11 @@
         "blockName": "core/group",
         "attrs": {
             "align": "full",
-            "backgroundColor": "secondary"
+            "style": {
+                "color": {
+                    "background": "var(--wp--colors--secondary)"
+                }
+            }
         },
         "innerBlocks": [
             {
@@ -25,13 +29,13 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t</div>\n\t</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-group alignfull has-background\" style=\"background-color:var(--wp--colors--secondary)\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t\n\t</div>\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t",
+            "\n<div class=\"wp-block-group alignfull has-background\" style=\"background-color:var(--wp--colors--secondary)\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t",
             null,
             "\n\n\t\t",
             null,
-            "</div>\n\t</div>\n"
+            "\n\t</div>\n</div>\n"
         ]
     },
     {

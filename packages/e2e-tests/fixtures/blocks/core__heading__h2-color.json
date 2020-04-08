@@ -6,9 +6,13 @@
         "attributes": {
             "content": "Text",
             "level": 2,
-            "textColor": "accent"
+            "style": {
+                "color": {
+                    "text": "var(--wp--colors--accent)"
+                }
+            }
         },
         "innerBlocks": [],
-        "originalContent": "<h2 class=\"has-accent-color has-text-color\">Text</h2>"
+        "originalContent": "<h2 class=\"has-text-color\" style=\"color:var(--wp--colors--accent)\">Text</h2>"
     }
 ]

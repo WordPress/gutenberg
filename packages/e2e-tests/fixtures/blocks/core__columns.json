@@ -4,7 +4,11 @@
         "name": "core/columns",
         "isValid": true,
         "attributes": {
-            "backgroundColor": "secondary"
+            "style": {
+                "color": {
+                    "background": "var(--wp--colors--secondary)"
+                }
+            }
         },
         "innerBlocks": [
             {
@@ -36,7 +40,7 @@
                         "originalContent": "<p>Column One, Paragraph Two</p>"
                     }
                 ],
-                "originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>"
+                "originalContent": "<div class=\"wp-block-column\">\n\t\t\n\n\t\t\n\t</div>"
             },
             {
                 "clientId": "_clientId_1",
@@ -67,9 +71,9 @@
                         "originalContent": "<p>Column Three, Paragraph One</p>"
                     }
                 ],
-                "originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>"
+                "originalContent": "<div class=\"wp-block-column\">\n\t\t\n\n\t\t\n\t</div>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-columns has-background\" style=\"background-color:var(--wp--colors--secondary)\">\n\t\n\n\t\n</div>"
     }
 ]
