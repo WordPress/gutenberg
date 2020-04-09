@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,12 @@ import NavigateUpSVG from './nav-up-icon';
 
 const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
 
-const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
+const FloatingToolbarContainer = ( {
+	clientId,
+	parentId,
+	onNavigateUp,
+	isRTL,
+} ) => {
 	return (
 		<TouchableWithoutFeedback accessible={ false }>
 			<View style={ styles.floatingToolbar }>
@@ -29,7 +34,7 @@ const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={ () => onNavigateUp( parentId ) }
-							icon={ NavigateUpSVG }
+							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 						/>
 						<View style={ styles.pipe } />
 					</Toolbar>
@@ -69,6 +74,7 @@ const FloatingToolbar = withSelect( ( select, { clientId } ) => {
 	return {
 		showFloatingToolbar,
 		parentId,
+		isRTL: I18nManager.isRTL,
 	};
 } )( FloatingToolbarFill );
 

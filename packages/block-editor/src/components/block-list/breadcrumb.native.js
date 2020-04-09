@@ -9,7 +9,7 @@ import { getBlockType } from '@wordpress/blocks';
 /**
  * External dependencies
  */
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, I18nManager } from 'react-native';
 
 /**
  * Internal dependencies
@@ -24,6 +24,7 @@ const BlockBreadcrumb = ( {
 	blockIcon,
 	rootClientId,
 	rootBlockIcon,
+	isRTL,
 } ) => {
 	return (
 		<View
@@ -50,7 +51,10 @@ const BlockBreadcrumb = ( {
 							fill={ styles.icon.color }
 						/>,
 						<View key="subdirectory-icon" style={ styles.arrow }>
-							<SubdirectorSVG fill={ styles.arrow.color } />
+							<SubdirectorSVG
+								fill={ styles.arrow.color }
+								isRTL={ isRTL }
+							/>
 						</View>,
 					] }
 				<Icon
@@ -98,6 +102,7 @@ export default compose( [
 			blockIcon,
 			rootClientId,
 			rootBlockIcon,
+			isRTL: I18nManager.isRTL,
 		};
 	} ),
 ] )( BlockBreadcrumb );
