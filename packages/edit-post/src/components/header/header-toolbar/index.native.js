@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -33,6 +33,7 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
 	onHideKeyboard,
+	isRTL,
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -59,7 +60,7 @@ function HeaderToolbar( {
 				{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
 				<ToolbarButton
 					title={ __( 'Undo' ) }
-					icon={ undoIcon }
+					icon={ isRTL ? redoIcon : undoIcon }
 					isDisabled={ ! hasUndo }
 					onClick={ undo }
 					extraProps={ {
@@ -68,7 +69,7 @@ function HeaderToolbar( {
 				/>
 				<ToolbarButton
 					title={ __( 'Redo' ) }
-					icon={ redoIcon }
+					icon={ isRTL ? undoIcon : redoIcon }
 					isDisabled={ ! hasRedo }
 					onClick={ redo }
 					extraProps={ {
@@ -103,6 +104,7 @@ export default compose( [
 			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled:
 			select( 'core/edit-post' ).getEditorMode() === 'text',
+		isRTL: I18nManager.isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
