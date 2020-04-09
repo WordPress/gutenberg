@@ -90,36 +90,39 @@ const getGalleryDetailsMediaFrame = () => {
 	 */
 	return wp.media.view.MediaFrame.Post.extend( {
 		/**
-		 * Set up gallery toolbar.
+		 * Set up gallery add toolbar.
 		 *
 		 * @return {void}
 		 */
-		galleryToolbar() {
-			const editing = this.state().get( 'editing' );
+		galleryAddToolbar() {
 			this.toolbar.set(
 				new wp.media.view.Toolbar( {
 					controller: this,
 					items: {
 						insert: {
 							style: 'primary',
-							text: editing
-								? wp.media.view.l10n.updateGallery
-								: wp.media.view.l10n.insertGallery,
+							text: wp.media.view.l10n.addToGallery,
 							priority: 80,
-							requires: { library: true },
+							requires: { selection: true },
 
 							/**
 							 * @fires wp.media.controller.State#update
 							 */
 							click() {
 								const controller = this.controller,
-									state = controller.state();
+									galleryAddSelection = controller
+										.state()
+										.get( 'selection' ),
+									galleryLibrary = controller
+										.state( 'gallery-edit' )
+										.get( 'library' );
+
+								galleryLibrary.add(
+									galleryAddSelection.models
+								);
 
 								controller.close();
-								state.trigger(
-									'update',
-									state.get( 'library' )
-								);
+								controller.trigger( 'update', galleryLibrary );
 
 								// Restore and reset the default state.
 								controller.setState( controller.options.state );
@@ -156,7 +159,6 @@ const getGalleryDetailsMediaFrame = () => {
 		 * @return {void}
 		 */
 		createStates: function createStates() {
-			this.on( 'toolbar:create:main-gallery', this.galleryToolbar, this );
 			this.on( 'content:render:edit-image', this.editState, this );
 
 			this.states.add( [
