@@ -14,37 +14,40 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
-import {
-	close,
-	more,
-	page,
-	layout,
-	grid,
-	blockDefault,
-} from '@wordpress/icons';
+import { useState, useCallback } from '@wordpress/element';
+import { close, page, layout, grid, blockDefault } from '@wordpress/icons';
 
 function EntityRecordState( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
-	const { blocks, getParent } = useSelect( ( select ) => {
-		const editedEntity = select( 'core' ).getEditedEntityRecord(
+	const parentBlockId = useSelect( ( select ) => {
+		// Get entity's blocks.
+		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
 			kind,
 			name,
 			key
 		);
-		return {
-			blocks: editedEntity.blocks || [],
-			getParent: select( 'core/block-editor' ).getBlockParents,
-		};
-	} );
+		// Get parents of the entity's first block.
+		const parents = select( 'core/block-editor' ).getBlockParents(
+			blocks[ 0 ]?.clientId
+		);
+		// Return closest parent block's clientId.
+		return parents[ parents.length - 1 ];
+	}, [] );
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const selectParentBlock = useCallback(
+		() => selectBlock( parentBlockId ),
+		[]
+	);
 
-	const parents = getParent( blocks[ 0 ]?.clientId );
-
-	const selectBlocks = () => {
-		selectBlock( parents[ parents.length - 1 ] );
-	};
+	// For small sizes panel takes up entire screen, must dismiss panel on selecting blocks.
+	const { closeEntitiesSavedStates: closePanel } = useDispatch(
+		'core/editor'
+	);
+	const selectAndDismiss = useCallback( () => {
+		selectBlock( parentBlockId );
+		closePanel();
+	}, [] );
 
 	return (
 		<PanelRow>
@@ -53,8 +56,21 @@ function EntityRecordState( { record, checked, onChange } ) {
 				checked={ checked }
 				onChange={ onChange }
 			/>
-			{ parents.length ? (
-				<Button onClick={ selectBlocks }>{ __( 'Who am I?' ) }</Button>
+			{ parentBlockId ? (
+				<>
+					<Button
+						onClick={ selectParentBlock }
+						className="entities-saved-states__find-entity"
+					>
+						{ __( 'Who am I?' ) }
+					</Button>
+					<Button
+						onClick={ selectAndDismiss }
+						className="entities-saved-states__find-entity-small"
+					>
+						{ __( 'Who am I?' ) }
+					</Button>
+				</>
 			) : null }
 		</PanelRow>
 	);
@@ -68,9 +84,9 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 		[ firstRecord.kind, firstRecord.name ]
 	);
 
-	// Set icon based on firstRecord.name.
+	// Set icon based on type of entity.
 	const { name } = firstRecord;
-	let icon = more;
+	let icon = blockDefault;
 	if ( name === 'site' ) {
 		icon = layout;
 	} else if ( name === 'page' ) {
@@ -82,13 +98,7 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	}
 
 	return (
-		<PanelBody
-			title={ entity.label }
-			initialOpen={ true }
-			icon={ icon }
-			// className="editor-entities-saved-states__entity-type-list"
-		>
-			{ /* <h2>{ entity.label }</h2> */ }
+		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
@@ -114,13 +124,14 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 }
 
 export default function EntitiesSavedStates() {
-	const dirtyEntityRecords = useSelect(
-		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
-		[]
-	);
-	const isOpen = useSelect( ( select ) =>
-		select( 'core/editor' ).isEntitiesSavedStatesOpen()
-	);
+	const { dirtyEntityRecords, isOpen } = useSelect( ( select ) => {
+		return {
+			dirtyEntityRecords: select(
+				'core'
+			).__experimentalGetDirtyEntityRecords(),
+			isOpen: select( 'core/editor' ).isEntitiesSavedStatesOpen(),
+		};
+	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 	const { closeEntitiesSavedStates: closePanel } = useDispatch(
 		'core/editor'
@@ -172,11 +183,13 @@ export default function EntitiesSavedStates() {
 		closePanel( entitiesToSave );
 	};
 
+	const dismissPanel = useCallback( () => closePanel(), [] );
+
 	return isOpen ? (
 		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
-					onClick={ () => closePanel() }
+					onClick={ dismissPanel }
 					icon={ close }
 					label={ __( 'Close panel' ) }
 				/>

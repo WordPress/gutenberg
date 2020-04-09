@@ -2,12 +2,6 @@
 	display: block;
 	margin: $grid-unit-15 auto;
 }
-// .editor-entities-saved-states__entity-type-list {
-// 	h2 {
-// 		font-size: 18px;
-// 		margin: 20px 0 10px;
-// 	}
-// }
 
 // /edit-post/src - @include reset
 .entities-saved-states__panel {
@@ -31,6 +25,13 @@
 	overflow: auto;
 	box-sizing: border-box;
 
+	.entities-saved-states__find-entity {
+		display: none;
+	}
+	.entities-saved-states__find-entity-small {
+		display: block;
+	}
+
 	@include break-medium() {
 		z-index: z-index(
 			'.edit-post-layout .entities-saved-states__panel-break-medium'
@@ -52,6 +53,12 @@
 		// .is-focusing-regions & {
 		// 	transform: translateX( 0% );
 		// }
+		.entities-saved-states__find-entity {
+			display: block;
+		}
+		.entities-saved-states__find-entity-small {
+			display: none;
+		}
 	}
 
 	.entities-saved-states__panel-header {
