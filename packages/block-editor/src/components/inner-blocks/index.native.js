@@ -112,6 +112,13 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			__experimentalMoverDirection,
+			horizontal,
+			scrollEnabled,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 			marginVertical,
 			marginHorizontal,
 		} = this.props;
@@ -126,6 +133,15 @@ class InnerBlocks extends Component {
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
 						withFooter={ false }
+						__experimentalMoverDirection={
+							__experimentalMoverDirection
+						}
+						horizontal={ horizontal }
+						scrollEnabled={ scrollEnabled }
+						contentResizeMode={ contentResizeMode }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 				) }
 			</>

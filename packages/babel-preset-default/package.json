@@ -27,18 +27,16 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/core": "^7.8.3",
-		"@babel/plugin-proposal-async-generator-functions": "^7.8.3",
-		"@babel/plugin-proposal-object-rest-spread": "^7.8.3",
-		"@babel/plugin-transform-react-jsx": "^7.8.3",
-		"@babel/plugin-transform-runtime": "^7.8.3",
-		"@babel/preset-env": "^7.8.3",
-		"@babel/runtime": "^7.8.3",
+		"@babel/core": "^7.9.0",
+		"@babel/plugin-transform-react-jsx": "^7.9.4",
+		"@babel/plugin-transform-runtime": "^7.9.0",
+		"@babel/preset-env": "^7.9.0",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/element": "file:../element",
 		"@wordpress/warning": "file:../warning",
-		"core-js": "^3.1.4"
+		"core-js": "^3.6.4"
 	},
 	"publishConfig": {
 		"access": "public"
