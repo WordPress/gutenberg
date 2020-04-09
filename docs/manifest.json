@@ -930,6 +930,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "RadioGroup",
+		"slug": "radio-group",
+		"markdown_source": "../packages/components/src/radio-group/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "RangeControl",
 		"slug": "range-control",
 		"markdown_source": "../packages/components/src/range-control/README.md",
