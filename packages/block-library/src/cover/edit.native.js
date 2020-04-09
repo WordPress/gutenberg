@@ -153,8 +153,10 @@ const Cover = ( {
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
-			backgroundColor: overlayColor?.color || style?.color?.background
-				|| styles.overlay.color,
+			backgroundColor:
+				overlayColor?.color ||
+				style?.color?.background ||
+				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -213,7 +215,10 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const renderBackground = ( { open: openMediaOptions, getMediaOptions } ) => (
+	const renderBackground = ( {
+		open: openMediaOptions,
+		getMediaOptions,
+	} ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onPress={ onMediaPressed }
@@ -223,18 +228,22 @@ const Cover = ( {
 			<View style={ styles.background }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
-				<MediaUploadProgress 
+				<MediaUploadProgress
 					mediaId={ id }
 					onUpdateMediaProgress={ () => {
 						setIsUploadInProgress( true );
 					} }
 					onFinishMediaUploadWithSuccess={ ( {
-						mediaServerId: id,
-						mediaUrl: url,
+						mediaServerId,
+						mediaUrl,
 					} ) => {
 						setIsUploadInProgress( false );
 						setDidUploadFail( false );
-						setAttributes( { id, url, backgroundType } );
+						setAttributes( {
+							id: mediaServerId,
+							url: mediaUrl,
+							backgroundType,
+						} );
 					} }
 					onFinishMediaUploadWithFailure={ () => {
 						setIsUploadInProgress( false );
