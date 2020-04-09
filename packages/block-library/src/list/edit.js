@@ -21,10 +21,13 @@ import {
 } from '@wordpress/rich-text';
 import {
 	formatListBullets,
+	formatListBulletsRTL,
 	formatListNumbered,
+	formatListNumberedRTL,
 	formatIndent,
 	formatOutdent,
 } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,6 +44,13 @@ export default function ListEdit( {
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
+
+	const isRTL =
+		Platform.OS === 'web'
+			? useSelect( ( select ) => {
+					return !! select( 'core/block-editor' ).getSettings().isRTL;
+			  }, [] )
+			: true;
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
@@ -84,7 +94,9 @@ export default function ListEdit( {
 				<ToolbarGroup
 					controls={ [
 						{
-							icon: formatListBullets,
+							icon: isRTL
+								? formatListBulletsRTL
+								: formatListBullets,
 							title: __( 'Convert to unordered list' ),
 							isActive: isActiveListType( value, 'ul', tagName ),
 							onClick() {
@@ -99,7 +111,9 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: formatListNumbered,
+							icon: isRTL
+								? formatListNumberedRTL
+								: formatListNumbered,
 							title: __( 'Convert to ordered list' ),
 							isActive: isActiveListType( value, 'ol', tagName ),
 							onClick() {
@@ -114,7 +128,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: formatOutdent,
+							icon: isRTL ? formatIndent : formatOutdent,
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
 							isDisabled: ! canOutdentListItems( value ),
@@ -124,7 +138,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: formatIndent,
+							icon: isRTL ? formatOutdent : formatIndent,
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),
