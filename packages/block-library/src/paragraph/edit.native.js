@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { I18nManager } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,6 +23,8 @@ function ParagraphBlock( {
 	setAttributes,
 	style: oldStyle,
 } ) {
+	const isRTL = I18nManager.isRTL;
+
 	const { align, content, placeholder, style } = attributes;
 
 	const styles = {
@@ -30,6 +37,7 @@ function ParagraphBlock( {
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
+					isRTL={ isRTL }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }
