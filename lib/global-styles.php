@@ -363,10 +363,10 @@ function gutenberg_experimental_global_styles_is_site_editor() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if (
-		gutenberg_experimental_global_styles_has_theme_support() &&
-		gutenberg_experimental_global_styles_is_site_editor()
-	) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+		return $settings;
+	}
+	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 	}
 

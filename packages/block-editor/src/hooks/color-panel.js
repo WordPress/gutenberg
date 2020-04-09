@@ -16,6 +16,7 @@ export default function ColorPanel( {
 	settings,
 	clientId,
 	enableContrastChecking = true,
+	...props
 } ) {
 	const { getComputedStyle, Node } = window;
 
@@ -55,6 +56,7 @@ export default function ColorPanel( {
 				title={ __( 'Color settings' ) }
 				initialOpen={ false }
 				settings={ settings }
+				{ ...props }
 			>
 				{ enableContrastChecking && (
 					<ContrastChecker

@@ -8,7 +8,7 @@
             "level": 2,
             "style": {
                 "color": {
-                    "text": "var(--wp--colors--accent)"
+                    "text": "var:colors|accent"
                 }
             }
         },
