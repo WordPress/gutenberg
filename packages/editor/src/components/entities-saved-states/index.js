@@ -62,13 +62,13 @@ function EntityRecordState( { record, checked, onChange } ) {
 						onClick={ selectParentBlock }
 						className="entities-saved-states__find-entity"
 					>
-						{ __( 'Who am I?' ) }
+						{ __( 'Select Entity' ) }
 					</Button>
 					<Button
 						onClick={ selectAndDismiss }
 						className="entities-saved-states__find-entity-small"
 					>
-						{ __( 'Who am I?' ) }
+						{ __( 'Select Entity' ) }
 					</Button>
 				</>
 			) : null }
