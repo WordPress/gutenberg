@@ -34,6 +34,7 @@ $z-layers: (
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
+
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
@@ -57,8 +58,8 @@ $z-layers: (
 
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
-	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover":
-	61,
+	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
+
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
@@ -69,10 +70,12 @@ $z-layers: (
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
 	".edit-post-layout .edit-post-post-publish-panel-break-medium": 99997,
+
 	".entities-saved-states__panel": 100002,
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the multi-entity saving sidebar.
 	".entities-saved-states__panel-break-medium": 99998,
+
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
 	".interface-interface-skeleton__sidebar {greater than small}": 90,
@@ -82,6 +85,7 @@ $z-layers: (
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
+
 	// Above the block list, under the header.
 	".block-editor-block-list__block-popover": 29,
 
@@ -130,7 +134,7 @@ $z-layers: (
 
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
-	".components-circular-option-picker__option.is-pressed + svg": 2,
+	".components-circular-option-picker__option.is-pressed + svg": 2
 );
 
 @function z-index( $key ) {
