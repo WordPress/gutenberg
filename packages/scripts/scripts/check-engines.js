@@ -5,9 +5,9 @@ const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { getArgsFromCLI, hasArgInCLI } = require( '../utils' );
+const { getArgsFromCLI, hasArgInCLI } = require( '@wordpress/scripts-utils' );
 
 const args = getArgsFromCLI();
 

@@ -6,9 +6,9 @@ const { existsSync, readFileSync } = require( 'fs' );
 const chalk = require( 'chalk' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
+const { getArgFromCLI, hasArgInCLI } = require( '@wordpress/scripts-utils' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that

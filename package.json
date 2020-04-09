@@ -117,6 +117,7 @@
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
 		"@wordpress/scripts": "file:packages/scripts",
+		"@wordpress/scripts-utils": "file:packages/scripts-utils",
 		"babel-loader": "8.1.0",
 		"babel-plugin-emotion": "10.0.33",
 		"babel-plugin-inline-json-import": "0.3.2",

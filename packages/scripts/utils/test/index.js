@@ -6,75 +6,19 @@ import crossSpawn from 'cross-spawn';
 /**
  * Internal dependencies
  */
-import { hasArgInCLI, hasProjectFile, spawnScript } from '../';
-import { getPackagePath as getPackagePathMock } from '../package';
-import {
-	exit as exitMock,
-	getArgsFromCLI as getArgsFromCLIMock,
-} from '../process';
+import { spawnScript } from '../';
+import { exit as exitMock } from '../process';
 
-jest.mock( '../package', () => {
-	const module = require.requireActual( '../package' );
-
-	jest.spyOn( module, 'getPackagePath' );
-
-	return module;
-} );
 jest.mock( '../process', () => {
 	const module = require.requireActual( '../process' );
 
 	jest.spyOn( module, 'exit' );
-	jest.spyOn( module, 'getArgsFromCLI' );
 
 	return module;
 } );
 
 describe( 'utils', () => {
 	const crossSpawnMock = jest.spyOn( crossSpawn, 'sync' );
-
-	describe( 'hasArgInCLI', () => {
-		beforeAll( () => {
-			getArgsFromCLIMock.mockReturnValue( [
-				'-a',
-				'--b',
-				'--config=test',
-			] );
-		} );
-
-		afterAll( () => {
-			getArgsFromCLIMock.mockReset();
-		} );
-
-		test( 'should return false when no args passed', () => {
-			getArgsFromCLIMock.mockReturnValueOnce( [] );
-
-			expect( hasArgInCLI( '--no-args' ) ).toBe( false );
-		} );
-
-		test( 'should return false when checking for unrecognized arg', () => {
-			expect( hasArgInCLI( '--non-existent' ) ).toBe( false );
-		} );
-
-		test( 'should return true when CLI arg found', () => {
-			expect( hasArgInCLI( '-a' ) ).toBe( true );
-			expect( hasArgInCLI( '--b' ) ).toBe( true );
-			expect( hasArgInCLI( '--config' ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'hasProjectFile', () => {
-		test( 'should return false for the current directory and unknown file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
-
-			expect( hasProjectFile( 'unknown-file.name' ) ).toBe( false );
-		} );
-
-		test( 'should return true for the current directory and this file', () => {
-			getPackagePathMock.mockReturnValueOnce( __dirname );
-
-			expect( hasProjectFile( 'index.js' ) ).toBe( true );
-		} );
-	} );
 
 	describe( 'spawnScript', () => {
 		const scriptName = 'test-unit-js';

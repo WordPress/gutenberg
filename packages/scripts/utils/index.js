@@ -1,15 +1,7 @@
 /**
  * Internal dependencies
  */
-const {
-	getArgFromCLI,
-	getArgsFromCLI,
-	getFileArgsFromCLI,
-	getNodeArgsFromCLI,
-	hasArgInCLI,
-	hasFileArgInCLI,
-	spawnScript,
-} = require( './cli' );
+const { getNodeArgsFromCLI, spawnScript } = require( './cli' );
 const {
 	getWebpackArgs,
 	hasBabelConfig,
@@ -21,26 +13,17 @@ const {
 	downloadWordPressZip,
 	mergeYAMLConfigs,
 } = require( './env' );
-const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { hasPackageProp } = require( './package' );
+const { fromConfigRoot } = require( './file' );
 
 module.exports = {
 	buildWordPress,
-	fromProjectRoot,
+	downloadWordPressZip,
 	fromConfigRoot,
-	getArgFromCLI,
-	getArgsFromCLI,
-	getFileArgsFromCLI,
 	getNodeArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
-	hasArgInCLI,
-	hasFileArgInCLI,
 	hasJestConfig,
-	hasPackageProp,
 	hasPrettierConfig,
-	hasProjectFile,
-	downloadWordPressZip,
 	mergeYAMLConfigs,
 	spawnScript,
 };

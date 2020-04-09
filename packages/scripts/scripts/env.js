@@ -11,9 +11,14 @@ const { normalize } = require( 'path' );
 const { existsSync } = require( 'fs' );
 
 /**
+ * WordPress dependencies
+ */
+const { getArgsFromCLI } = require( '@wordpress/scripts-utils' );
+
+/**
  * Internal dependencies
  */
-const { getArgsFromCLI, spawnScript } = require( '../utils' );
+const { spawnScript } = require( '../utils' );
 
 const args = getArgsFromCLI();
 

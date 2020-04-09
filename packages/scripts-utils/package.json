@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/scripts-utils",
+	"version": "0.0.1",
+	"description": "Collection of scripts utils for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"scripts",
+		"utils"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/scripts-utils/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/scripts-utils"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=10"
+	},
+	"files": [
+		"lib"
+	],
+	"main": "lib/index.js",
+	"dependencies": {
+		"minimist": "^1.2.0",
+		"read-pkg-up": "^1.0.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

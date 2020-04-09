@@ -1,27 +1,18 @@
 /**
  * External dependencies
  */
-const minimist = require( 'minimist' );
 const spawn = require( 'cross-spawn' );
+
+/**
+ * WordPress dependencies
+ */
+const { getArgsFromCLI } = require( '@wordpress/scripts-utils' );
 
 /**
  * Internal dependencies
  */
+const { exit } = require( './process' );
 const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
-const { exit, getArgsFromCLI } = require( './process' );
-
-const getArgFromCLI = ( arg ) => {
-	for ( const cliArg of getArgsFromCLI() ) {
-		const [ name, value ] = cliArg.split( '=' );
-		if ( name === arg ) {
-			return value || null;
-		}
-	}
-};
-
-const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
-
-const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
 
 const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();
@@ -33,8 +24,6 @@ const getNodeArgsFromCLI = () => {
 		scriptArgs: args.slice( scriptIndex + 1 ),
 	};
 };
-
-const hasFileArgInCLI = () => getFileArgsFromCLI().length > 0;
 
 const handleSignal = ( signal ) => {
 	if ( signal === 'SIGKILL' ) {
@@ -89,11 +78,6 @@ const spawnScript = ( scriptName, args = [], nodeArgs = [] ) => {
 };
 
 module.exports = {
-	getArgFromCLI,
-	getArgsFromCLI,
-	getFileArgsFromCLI,
 	getNodeArgsFromCLI,
-	hasArgInCLI,
-	hasFileArgInCLI,
 	spawnScript,
 };

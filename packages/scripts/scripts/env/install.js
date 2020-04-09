@@ -12,10 +12,14 @@ const { normalize } = require( 'path' );
 const { existsSync } = require( 'fs' );
 
 /**
+ * WordPress dependencies
+ */
+const { hasArgInCLI } = require( '@wordpress/scripts-utils' );
+
+/**
  * Internal dependencies
  */
 const { buildWordPress, downloadWordPressZip } = require( '../../utils' );
-const { hasArgInCLI } = require( '../../utils' );
 
 env.WP_DEVELOP_DIR = normalize( cwd() + '/wordpress' );
 

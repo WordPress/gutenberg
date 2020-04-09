@@ -1,4 +1,4 @@
-const eslintConfig = {
+module.exports = {
 	root: true,
 	extends: [
 		'plugin:@wordpress/eslint-plugin/recommended',
@@ -10,5 +10,3 @@ const eslintConfig = {
 		'plugin:@wordpress/eslint-plugin/test-unit',
 	],
 };
-
-module.exports = eslintConfig;

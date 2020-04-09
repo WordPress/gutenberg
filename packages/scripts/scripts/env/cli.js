@@ -5,9 +5,9 @@ const { execSync } = require( 'child_process' );
 const { env } = require( 'process' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-const { getArgsFromCLI } = require( '../../utils' );
+const { getArgsFromCLI } = require( '@wordpress/scripts-utils' );
 
 const args = getArgsFromCLI();
 

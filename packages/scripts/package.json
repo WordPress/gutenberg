@@ -40,6 +40,7 @@
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
 		"@wordpress/prettier-config": "file:../prettier-config",
+		"@wordpress/scripts-utils": "file:../scripts-utils",
 		"babel-jest": "^25.3.0",
 		"babel-loader": "^8.1.0",
 		"chalk": "^4.0.0",

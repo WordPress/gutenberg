@@ -1536,6 +1536,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/scripts-utils",
+		"slug": "packages-scripts-utils",
+		"markdown_source": "../packages/scripts-utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
