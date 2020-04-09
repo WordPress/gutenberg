@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, I18nManager } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -76,6 +76,8 @@ export const Gallery = ( props ) => {
 		onFocusGalleryCaption();
 	};
 
+	const isRTL = I18nManager.isRTL;
+
 	return (
 		<View style={ { flex: 1 } }>
 			<Tiles
@@ -116,6 +118,7 @@ export const Gallery = ( props ) => {
 							}
 							caption={ img.caption }
 							aria-label={ ariaLabel }
+							isRTL={ isRTL }
 						/>
 					);
 				} ) }
