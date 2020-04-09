@@ -175,6 +175,7 @@ const {
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
+	isEntitiesSavedStatesOpen,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3004,6 +3005,18 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEntitiesSavedStatesOpen', () => {
+		it( 'should return isOpen property of entitiesSavedStates state', () => {
+			const state = {
+				entitiesSavedStates: {
+					isOpen: 'some-thing',
+				},
+			};
+
+			expect( isEntitiesSavedStatesOpen( state ) ).toBe( 'some-thing' );
 		} );
 	} );
 } );
