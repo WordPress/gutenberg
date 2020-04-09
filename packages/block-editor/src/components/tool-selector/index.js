@@ -75,7 +75,7 @@ function ToolSelector() {
 											{ __( 'Edit' ) }
 										</>
 									),
-									shortcut: isNavigationTool ? 'Enter' : '',
+									shortcut: isNavigationTool ? __( 'Enter' ) : '',
 								},
 								{
 									value: 'select',
@@ -85,7 +85,7 @@ function ToolSelector() {
 											{ __( 'Select' ) }
 										</>
 									),
-									shortcut: isNavigationTool ? '' : 'Escape',
+									shortcut: isNavigationTool ? '' : __( 'Escape' ),
 								},
 							] }
 						/>
