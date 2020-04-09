@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import Text from '../../text';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
 const FLOATING_LABEL_TRANSITION_SPEED = '60ms';
@@ -167,11 +168,13 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	);
 };
 
-export const Label = styled.label`
+const BaseLabel = styled( Text )`
 	&&& {
 		box-sizing: border-box;
 		display: block;
 		margin: 0;
+		padding: 0;
+		pointer-events: none;
 		top: 50%;
 		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear;
 		z-index: 1;
@@ -184,6 +187,8 @@ export const Label = styled.label`
 		${rtl( { left: 0 } )}
 	}
 `;
+
+export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
 
 const fieldsetTopStyles = ( { isFloatingLabel } ) => {
 	const top = isFloatingLabel ? -5 : 0;
@@ -251,8 +256,12 @@ export const Legend = styled.legend`
 	}
 `;
 
-export const LegendText = styled.span`
+const BaseLegendText = styled( Text )`
 	box-sizing: border-box;
 	display: inline-block;
 	${rtl( { paddingLeft: 4, paddingRight: 5 } )}
 `;
+
+export const LegendText = ( props ) => (
+	<BaseLegendText { ...props } as="span" />
+);

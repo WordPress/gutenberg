@@ -140,6 +140,7 @@ export const UI = {
 	border: BASE.black,
 	borderFocus: BLUE.medium.focus,
 	borderLight: LIGHT_GRAY[ 600 ],
+	label: DARK_GRAY[ 500 ],
 };
 
 export const COLORS = {

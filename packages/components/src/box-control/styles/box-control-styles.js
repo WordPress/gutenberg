@@ -10,10 +10,13 @@ import { color } from '../../utils/style-mixins';
 
 export const Root = styled.div`
 	max-width: 300px;
+	padding-bottom: 12px;
+	width: 100%;
 `;
 
 export const Header = styled( Flex )`
-	margin-bottom: 8px;
+	color: ${color( 'ui.label' )};
+	padding-bottom: 8px;
 `;
 
 export const UnitControlWrapper = styled.div`
@@ -24,14 +27,13 @@ export const UnitControlWrapper = styled.div`
 export const LayoutContainer = styled( Flex )`
 	height: 120px;
 	justify-content: center;
-	padding-bottom: 16px;
 `;
 
 export const Layout = styled.div`
 	box-sizing: border-box;
 	position: relative;
 	height: 120px;
-	width: 200px;
+	width: 100%;
 `;
 
 export const LayoutBox = styled.div`
@@ -46,9 +48,22 @@ export const LayoutBox = styled.div`
 `;
 
 export const SideIndicator = styled.div`
-	height: 50%;
-	border-left: 1px dashed ${color( 'ui.borderLight' )};
-	width: 0;
+	box-sizing: border-box;
 	position: absolute;
 	pointer-events: none;
+`;
+
+export const SideIndicatorX = styled( SideIndicator )`
+	border-top: 1px dashed ${color( 'ui.borderLight' )};
+	top: 50%;
+	left: 0;
+	width: 100%;
+`;
+
+export const SideIndicatorY = styled( SideIndicator )`
+	border-left: 1px dashed ${color( 'ui.borderLight' )};
+	top: 50%;
+	left: 50%;
+	transform: translate( 0, calc( -50% - 3px ) );
+	height: 50%;
 `;

@@ -8,7 +8,12 @@ import { noop } from 'lodash';
  */
 import UnitControl from './unit-control';
 import { getValues } from './utils';
-import { Layout, LayoutBox, SideIndicator } from './styles/box-control-styles';
+import {
+	Layout,
+	LayoutBox,
+	SideIndicatorX,
+	SideIndicatorY,
+} from './styles/box-control-styles';
 import { useRtl } from '../utils/style-mixins';
 
 export default function BoxInputControls( {
@@ -39,22 +44,9 @@ export default function BoxInputControls( {
 
 	return (
 		<Layout>
-			<SideIndicator
-				style={ {
-					left: '50%',
-					top: '50%',
-					transform: 'translate(0, -30px)',
-				} }
-			/>
-			<SideIndicator
-				style={ {
-					left: '50%',
-					top: '0%',
-					height: '75%',
-					transform: 'rotate(-90deg) translate(-15px, 0px)',
-				} }
-			/>
-			<LayoutBox />
+			<SideIndicatorX aria-hidden="true" />
+			<SideIndicatorY aria-hidden="true" />
+			<LayoutBox aria-hidden="true" />
 			<UnitControl
 				{ ...props }
 				disableUnits

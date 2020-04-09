@@ -22,7 +22,7 @@ export default function BoxControlVisualizer( {
 	const values = parseValues( valuesProp );
 
 	return (
-		<Container { ...props }>
+		<Container { ...props } aria-hidden="true">
 			<Sides values={ values } />
 			{ children }
 		</Container>

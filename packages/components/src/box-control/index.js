@@ -5,14 +5,15 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import Visualizer from './visualizer';
-import { FlexItem } from '../flex';
 import InputControls from './input-controls';
+import Text from '../text';
 import { DEFAULT_VALUES, parseValues } from './utils';
 import { Root, Header, LayoutContainer } from './styles/box-control-styles';
 
@@ -20,7 +21,14 @@ const defaultInputProps = {
 	min: 0,
 };
 
+function useUniqueId( idProp ) {
+	const instanceId = useInstanceId( BoxControl );
+	const id = `inspector-box-control-${ instanceId }`;
+
+	return idProp || id;
+}
 export default function BoxControl( {
+	idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
@@ -29,6 +37,8 @@ export default function BoxControl( {
 	units = false,
 } ) {
 	const [ values, setValues ] = useState( parseValues( valuesProp ) );
+	const id = useUniqueId( idProp );
+	const headingId = `${ id }-heading`;
 
 	const updateValues = ( nextValues ) => {
 		const mergedValues = { ...values, ...nextValues };
@@ -37,9 +47,9 @@ export default function BoxControl( {
 	};
 
 	return (
-		<Root>
+		<Root id={ id } role="region" aria-labelledby={ headingId }>
 			<Header>
-				<FlexItem>{ label }</FlexItem>
+				<Text id={ headingId }>{ label }</Text>
 			</Header>
 			<LayoutContainer>
 				<InputControls

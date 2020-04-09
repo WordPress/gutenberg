@@ -101,11 +101,16 @@ export function InputControl(
 					value={ value }
 				/>
 				<Fieldset
+					aria-hidden="true"
 					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 				>
 					{ isFloatingLabelSet && (
-						<Legend isFloating={ isFloating } size={ size }>
+						<Legend
+							aria-hidden="true"
+							isFloating={ isFloating }
+							size={ size }
+						>
 							<LegendText>{ label }</LegendText>
 						</Legend>
 					) }
