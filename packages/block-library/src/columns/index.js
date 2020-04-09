@@ -27,7 +27,7 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 		html: false,
 		lightBlockWrapper: true,
-		__experimentalColor: true,
+		__experimentalColor: { gradients: true },
 	},
 	variations,
 	example: {

@@ -6,6 +6,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	isTextField,
 	__unstableStripHTML as stripHTML,
+	isNumberInput,
 } from '../dom';
 
 describe( 'DOM', () => {
@@ -141,6 +142,21 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe(
 				true
 			);
+		} );
+
+		it( 'should return false for empty input element of type number', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'number';
+
+			expect( isNumberInput( input ) ).toBe( false );
+		} );
+
+		it( 'should return true for an input element of type number', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'number';
+			input.valueAsNumber = 23;
+
+			expect( isNumberInput( input ) ).toBe( true );
 		} );
 
 		it( 'should return true for a contenteditable element', () => {

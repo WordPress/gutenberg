@@ -30,7 +30,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"axe-puppeteer": "^1.0.0"
 	},
 	"peerDependencies": {

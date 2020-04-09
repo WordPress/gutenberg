@@ -3,7 +3,6 @@
 	min-height: auto !important;
 }
 
-
 // Show a footprint fade effect when first selecting any block.
 .block-editor-block-list__block[data-type="core/paragraph"].is-selected {
 	&::before {

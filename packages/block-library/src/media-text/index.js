@@ -25,7 +25,7 @@ export const settings = {
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,
-		__experimentalColor: true,
+		__experimentalColor: { gradients: true },
 	},
 	example: {
 		attributes: {
