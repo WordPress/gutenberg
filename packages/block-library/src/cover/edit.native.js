@@ -38,7 +38,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
-import { isURL, getProtocol } from '@wordpress/url';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -116,7 +116,7 @@ const Cover = ( {
 
 	// initialize upload failure flag to true if url is local
 	const [ didUploadFail, setDidUploadFail ] = useState(
-		 id && getProtocol( url ) === 'file:'
+		id && getProtocol( url ) === 'file:'
 	);
 
 	// don't show failure if upload is in progress
@@ -140,14 +140,13 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
-
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
 		} else if ( shouldShowFailure ) {
 			requestImageFailedRetryDialog( id );
 		}
-	}
+	};
 
 	const overlayStyles = [
 		styles.overlay,
@@ -256,10 +255,10 @@ const Cover = ( {
 					} }
 				/>
 				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-								<ImageWithFocalPoint
-									focalPoint={ focalPoint }
-									url={ url }
-								/>
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
 				) }
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 					<Video
@@ -321,7 +320,7 @@ const Cover = ( {
 				render={ renderBackground }
 			/>
 
-			{  shouldShowFailure && (
+			{ shouldShowFailure && (
 				<View
 					pointerEvents="none"
 					style={ styles.uploadFailedContainer }
