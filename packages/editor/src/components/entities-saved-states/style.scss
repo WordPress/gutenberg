@@ -2,7 +2,7 @@
 	@include reset;
 	background: $white;
 	position: fixed;
-	z-index: z-index( '.entities-saved-states__panel' );
+	z-index: z-index(".entities-saved-states__panel");
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
@@ -18,7 +18,7 @@
 	}
 
 	@include break-medium() {
-		z-index: z-index( '.entities-saved-states__panel-break-medium' );
+		z-index: z-index(".entities-saved-states__panel-break-medium");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
