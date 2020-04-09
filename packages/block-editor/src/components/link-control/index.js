@@ -179,7 +179,7 @@ function LinkControl( {
 	);
 	const [ isResolvingLink, setIsResolvingLink ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState( null );
-	const isEndingEditWithFocus = useRef( false );
+	const isTogglingEditingWithFocusIntent = useRef( false );
 
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -209,7 +209,7 @@ function LinkControl( {
 		// guaranteed. The link input may continue to be shown if the next value
 		// is still unassigned after calling `onChange`.
 		const hadFocusLoss =
-			isEndingEditWithFocus.current &&
+			isTogglingEditingWithFocusIntent.current &&
 			wrapperNode.current &&
 			! wrapperNode.current.contains( document.activeElement );
 
@@ -223,7 +223,7 @@ function LinkControl( {
 			nextFocusTarget.focus();
 		}
 
-		isEndingEditWithFocus.current = false;
+		isTogglingEditingWithFocusIntent.current = false;
 	}, [ isEditingLink ] );
 
 	/**
@@ -240,6 +240,40 @@ function LinkControl( {
 			}
 		};
 	}, [] );
+
+	/**
+	 * Sets editing state and marks that focus may need to be restored after
+	 * the next render, using an optional explicit `setFocus` argument. Normally
+	 * it should not be necessary to call this function, and instead rely on the
+	 * behavior of `setIsEditingLinkWithRetainedFocus`. However, in cases where
+	 * editing state is toggled in response to button clicks, this function
+	 * normalizes browser inconsistencies where focus may not be assigned,
+	 * considering any button click as effectively having focus.
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+	 *
+	 * @param {boolean} nextIsEditingLink State toggle value to set.
+	 * @param {boolean} [setFocus=true]   Whether focus should be restored.
+	 */
+	function setIsEditingLinkWithFocus( nextIsEditingLink, setFocus = true ) {
+		isTogglingEditingWithFocusIntent.current = setFocus;
+
+		setIsEditingLink( nextIsEditingLink );
+	}
+
+	/**
+	 * Sets editing state and marks that focus may need to be restored after
+	 * the next render, if focus was within the wrapper while toggled.
+	 *
+	 * @param {boolean} nextIsEditingLink State toggle value to set.
+	 */
+	function setIsEditingLinkWithRetainedFocus( nextIsEditingLink ) {
+		const setFocus =
+			!! wrapperNode.current &&
+			wrapperNode.current.contains( document.activeElement );
+
+		setIsEditingLinkWithFocus( nextIsEditingLink, setFocus );
+	}
 
 	/**
 	 * onChange LinkControlSearchInput event handler
@@ -322,18 +356,6 @@ function LinkControl( {
 	};
 
 	/**
-	 * Cancels editing state and marks that focus may need to be restored after
-	 * the next render, if focus was within the wrapper when editing finished.
-	 */
-	function stopEditing() {
-		isEndingEditWithFocus.current =
-			!! wrapperNode.current &&
-			wrapperNode.current.contains( document.activeElement );
-
-		setIsEditingLink( false );
-	}
-
-	/**
 	 * Determines whether a given value could be a URL. Note this does not
 	 * guarantee the value is a URL only that it looks like it might be one. For
 	 * example, just because a string has `www.` in it doesn't make it a URL,
@@ -386,9 +408,9 @@ function LinkControl( {
 			// Only set link if request is resolved, otherwise enable edit mode.
 			if ( newSuggestion ) {
 				onChange( newSuggestion );
-				stopEditing();
+				setIsEditingLinkWithRetainedFocus( false );
 			} else {
-				setIsEditingLink( true );
+				setIsEditingLinkWithRetainedFocus( true );
 			}
 		} catch ( error ) {
 			if ( error && error.isCanceled ) {
@@ -402,12 +424,12 @@ function LinkControl( {
 					)
 			);
 			setIsResolvingLink( false );
-			setIsEditingLink( true );
+			setIsEditingLinkWithRetainedFocus( true );
 		}
 	};
 
 	const handleSelectSuggestion = ( suggestion, _value = {} ) => {
-		setIsEditingLink( false );
+		setIsEditingLinkWithRetainedFocus( false );
 		onChange( { ..._value, ...suggestion } );
 	};
 
@@ -514,7 +536,7 @@ function LinkControl( {
 								suggestion={ suggestion }
 								index={ index }
 								onClick={ () => {
-									stopEditing();
+									setIsEditingLinkWithFocus( false );
 									onChange( { ...value, ...suggestion } );
 								} }
 								isSelected={ index === selectedSuggestion }
@@ -555,7 +577,7 @@ function LinkControl( {
 							await handleOnCreate( inputValue );
 						} else {
 							handleSelectSuggestion( suggestion, value );
-							stopEditing();
+							setIsEditingLinkWithRetainedFocus( false );
 						}
 					} }
 					renderSuggestions={
@@ -595,7 +617,7 @@ function LinkControl( {
 
 						<Button
 							isSecondary
-							onClick={ () => setIsEditingLink( true ) }
+							onClick={ () => setIsEditingLinkWithFocus( true ) }
 							className="block-editor-link-control__search-item-action"
 						>
 							{ __( 'Edit' ) }

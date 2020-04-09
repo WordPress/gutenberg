@@ -35,6 +35,28 @@ function eventLoopTick() {
 
 let container = null;
 
+beforeAll( () => {
+	// This is necessary because the implementation of `@wordpress/dom` focus
+	// utilities rely on CSSOM layout properties in order to detect an element
+	// as being focusable. These are not implemented by JSDOM, so are stubbed
+	// here instead. Ideally, this is either implemented or stubbed in JSDOM,
+	// mocked globally, or the implementation of focus is revised to not depend
+	// on these properties.
+	//
+	// See: https://github.com/jsdom/jsdom/issues/135
+	Object.defineProperties( window.HTMLElement.prototype, {
+		getClientRects: {
+			get: () => [ new window.DOMRect() ],
+		},
+		offsetHeight: {
+			get: () => 1,
+		},
+		offsetWidth: {
+			get: () => 1,
+		},
+	} );
+} );
+
 beforeEach( () => {
 	// setup a DOM element as a render target
 	container = document.createElement( 'div' );
