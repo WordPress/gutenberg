@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { find, pick } from 'lodash';
+import { map, remove, find, forIn, pick, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
 	Panel,
@@ -19,16 +19,20 @@ import { __ } from '@wordpress/i18n';
 const MenuSelectControl = ( { onChange, menusList, location } ) => {
 	const [ menuId, setMenuId ] = useState( false );
 
+	useEffect( () => {
+		setMenuId( location.menu );
+	}, [ location.menu ] );
+
 	return (
 		<SelectControl
 			options={ menusList }
-			value={ menuId || location.menu }
+			value={ menuId }
 			onChange={ ( selectedMenuId ) => {
-				setMenuId( selectedMenuId );
-				onChange( {
+				onChange( menuId, {
 					location: location.name,
 					menu: parseInt( selectedMenuId ),
 				} );
+				setMenuId( selectedMenuId );
 			} }
 		/>
 	);
@@ -42,23 +46,42 @@ export default function MenuLocationsEditor() {
 	const [ locationsData, setLocationsData ] = useState( {} );
 	const { saveMenu } = useDispatch( 'core' );
 
+	useEffect( () => {
+		if ( menus && menuLocations ) {
+			const locations = groupBy( menuLocations, 'menu' );
+			map( locations, ( location, menuId ) => {
+				locations[ menuId ] = map( location, 'name' );
+			} );
+			setLocationsData( locations );
+		}
+	}, [ menuLocations ] );
+
 	if ( ! menus || ! menuLocations ) {
 		return <Spinner />;
 	}
 
-	const setLocations = ( { location, menu } ) => {
-		locationsData[ location ] = menu;
+	const setLocations = ( prevMenuId, { location, menu } ) => {
+		remove( locationsData[ prevMenuId ], ( oldLocation ) => {
+			return oldLocation === location;
+		} );
+		if ( locationsData[ menu ] ) {
+			locationsData[ menu ].push( location );
+		} else {
+			locationsData[ menu ] = [ location ];
+		}
 		setLocationsData( locationsData );
 	};
 
 	const saveLocations = async () => {
-		for ( const location of Object.keys( locationsData ) ) {
-			const menuId = locationsData[ location ];
-			await saveMenu( {
-				...pick( find( menus, { id: menuId } ), [ 'id', 'name' ] ),
-				locations: [ location ],
-			} );
-		}
+		forIn( locationsData, async ( locations, menuId ) => {
+			menuId = parseInt( menuId );
+			if ( menuId ) {
+				await saveMenu( {
+					...pick( find( menus, { id: menuId } ), [ 'id', 'name' ] ),
+					locations,
+				} );
+			}
+		} );
 	};
 
 	const menusList = [
@@ -79,23 +102,27 @@ export default function MenuLocationsEditor() {
 					} }
 				>
 					<table>
-						<tr>
-							<th scope="col">{ __( 'Theme Location' ) }</th>
-							<th scope="col">{ __( 'Assigned Menu' ) }</th>
-						</tr>
-						{ menuLocations.map( ( menuLocation ) => (
-							<tr key={ menuLocation.name }>
-								<td>{ menuLocation.description }</td>
-								<td>
-									<MenuSelectControl
-										menus={ menus }
-										menusList={ menusList }
-										location={ menuLocation }
-										onChange={ setLocations }
-									/>
-								</td>
+						<thead>
+							<tr>
+								<th scope="col">{ __( 'Theme Location' ) }</th>
+								<th scope="col">{ __( 'Assigned Menu' ) }</th>
 							</tr>
-						) ) }
+						</thead>
+						<tbody>
+							{ menuLocations.map( ( menuLocation ) => (
+								<tr key={ menuLocation.name }>
+									<td>{ menuLocation.description }</td>
+									<td>
+										<MenuSelectControl
+											menus={ menus }
+											menusList={ menusList }
+											location={ menuLocation }
+											onChange={ setLocations }
+										/>
+									</td>
+								</tr>
+							) ) }
+						</tbody>
 					</table>
 					<Button type="submit" isPrimary>
 						{ __( 'Save' ) }
