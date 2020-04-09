@@ -8,6 +8,7 @@
 		"driver": "readonly",
 		"webdriver": "readonly",
 		"By": "readonly",
-		"until": "readonly"
+		"until": "readonly",
+		"Key": "readonly"
 	}
 }

@@ -19,7 +19,6 @@ if ( ! NAME || ! KEY ) {
 	);
 }
 
-// Input capabilities
 const capabilities = {
 	browserName: 'IE',
 	browser_version: '11.0',

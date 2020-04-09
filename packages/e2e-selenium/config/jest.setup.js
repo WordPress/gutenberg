@@ -6,7 +6,8 @@ const {
 	getResultPageLink,
 } = require( './browserstack' );
 
-jest.setTimeout( 30000 );
+// IE is super slow. So, we give each test 5 minutes.
+jest.setTimeout( 300000 );
 
 beforeAll( async function() {
 	await startBrowserStackLocal();
@@ -14,6 +15,7 @@ beforeAll( async function() {
 	global.webdriver = webdriver;
 	global.By = webdriver.By;
 	global.until = webdriver.until;
+	global.Key = webdriver.Key;
 } );
 
 afterAll( async function() {
