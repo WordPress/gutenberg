@@ -31,7 +31,7 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
 
 /**
@@ -119,6 +119,21 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
+	const [ isVideoLoading, setIsVideoLoading ] = useState( true );
+
+	const onVideoLoadStart = () => {
+		setIsVideoLoading( true );
+	};
+
+	const onVideoLoad = () => {
+		setIsVideoLoading( false );
+	};
+
+	const backgroundColor = getStylesFromColorScheme(
+		styles.backgroundSolid,
+		styles.backgroundSolidDark
+	);
+
 	const overlayStyles = [
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
@@ -129,12 +144,7 @@ const Cover = ( {
 				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
-		! overlayColor.color && ! url
-			? getStylesFromColorScheme(
-					styles.backgroundSolid,
-					styles.backgroundSolidDark
-			  )
-			: {},
+		! overlayColor.color && ! url ? backgroundColor : {},
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -194,7 +204,7 @@ const Cover = ( {
 			onLongPress={ openMediaOptions }
 			disabled={ ! isParentSelected }
 		>
-			<View style={ styles.background }>
+			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress
@@ -224,7 +234,13 @@ const Cover = ( {
 									repeat
 									resizeMode={ 'cover' }
 									source={ { uri: url } }
-									style={ styles.background }
+									onLoad={ onVideoLoad }
+									onLoadStart={ onVideoLoadStart }
+									style={ [
+										styles.background,
+										// Hide Video component since it has black background while loading the source
+										{ opacity: isVideoLoading ? 0 : 1 },
+									] }
 								/>
 							) }
 						</>
