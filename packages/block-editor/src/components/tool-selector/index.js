@@ -75,6 +75,7 @@ function ToolSelector() {
 											{ __( 'Edit' ) }
 										</>
 									),
+									shortcut: isNavigationTool ? 'Enter' : '',
 								},
 								{
 									value: 'select',
@@ -84,13 +85,14 @@ function ToolSelector() {
 											{ __( 'Select' ) }
 										</>
 									),
+									shortcut: isNavigationTool ? '' : 'Escape',
 								},
 							] }
 						/>
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.'
+							'Choose a navigation tool for interacting with blocks in your content.'
 						) }
 					</div>
 				</>
