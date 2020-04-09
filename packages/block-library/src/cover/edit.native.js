@@ -123,8 +123,10 @@ const Cover = ( {
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
 		! gradientValue && {
-			backgroundColor: overlayColor?.color || style?.color?.background
-				|| styles.overlay.color,
+			backgroundColor:
+				overlayColor?.color ||
+				style?.color?.background ||
+				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url
@@ -183,7 +185,10 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const renderBackground = ( { open: openMediaOptions, getMediaOptions } ) => (
+	const renderBackground = ( {
+		open: openMediaOptions,
+		getMediaOptions,
+	} ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
 			onLongPress={ openMediaOptions }
@@ -192,21 +197,25 @@ const Cover = ( {
 			<View style={ styles.background }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
-				<MediaUploadProgress 
+				<MediaUploadProgress
 					mediaId={ id }
 					onFinishMediaUploadWithSuccess={ ( {
-						mediaServerId: id,
-						mediaUrl: url,
+						mediaServerId,
+						mediaUrl,
 					} ) => {
-						setAttributes( { id, url, backgroundType } );
+						setAttributes( {
+							id: mediaServerId,
+							url: mediaUrl,
+							backgroundType,
+						} );
 					} }
 					renderContent={ () => (
 						<>
 							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-											<ImageWithFocalPoint
-												focalPoint={ focalPoint }
-												url={ url }
-											/>
+								<ImageWithFocalPoint
+									focalPoint={ focalPoint }
+									url={ url }
+								/>
 							) }
 							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
 								<Video
