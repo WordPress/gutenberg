@@ -156,7 +156,7 @@ export const registerCoreBlocks = () => {
 		button,
 		spacer,
 		shortcode,
-		buttons,
+		devOnly( buttons ),
 		latestPosts,
 		devOnly( verse ),
 		cover,

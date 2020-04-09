@@ -232,10 +232,10 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						parentWidth={ this.props.parentWidth }
-						onDeleteBlock={ onDeleteBlock }
 						horizontalDirection={ horizontalDirection }
-						onAddBlock={ onAddBlock }
 						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

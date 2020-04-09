@@ -52,8 +52,6 @@ class BlockListBlock extends Component {
 	}
 
 	getBlockForType() {
-		const { parentWidth } = this.props;
-
 		return (
 			<BlockEdit
 				name={ this.props.name }
@@ -68,7 +66,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
-				parentWidth={ parentWidth }
+				parentWidth={ this.props.parentWidth }
 				contentStyle={ this.props.contentStyle }
 			/>
 		);
