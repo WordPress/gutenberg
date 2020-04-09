@@ -4,14 +4,10 @@
         "name": "core/group",
         "isValid": true,
         "attributes": {
+            "backgroundColor": "lighter-blue",
             "align": "full",
             "anchor": "test-id",
-            "tagName": "div",
-            "style": {
-                "color": {
-                    "background": "var(--wp--colors--lighter-blue)"
-                }
-            }
+            "tagName": "div"
         },
         "innerBlocks": [
             {

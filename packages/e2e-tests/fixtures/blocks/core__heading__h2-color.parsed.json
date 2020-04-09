@@ -4,7 +4,7 @@
         "attrs": {
             "style": {
                 "color": {
-                    "text": "var(--wp--colors--accent)"
+                    "text": "var:colors|accent"
                 }
             }
         },

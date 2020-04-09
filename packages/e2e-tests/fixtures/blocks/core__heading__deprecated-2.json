@@ -6,7 +6,7 @@
         "attributes": {
             "content": "text",
             "level": 2,
-            "className": "has-accent-color"
+            "textColor": "accent"
         },
         "innerBlocks": [],
         "originalContent": "<h2 class=\"has-accent-color\">text</h2>"
