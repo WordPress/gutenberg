@@ -1,10 +1,11 @@
 /**
  * External dependencies
  */
-import { map, remove, find, pick, groupBy } from 'lodash';
+import { map, flatMap, remove, find, pick, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
@@ -40,11 +41,36 @@ const MenuSelectControl = ( { onChange, menusList, location } ) => {
 
 export default function MenuLocationsEditor() {
 	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
-	const menuLocations = useSelect( ( select ) =>
-		select( 'core' ).getMenuLocations()
-	);
+
+	const [ menuLocations, setMenuLocations ] = useState( false );
 	const [ locationsData, setLocationsData ] = useState( {} );
 	const { saveMenu } = useDispatch( 'core' );
+
+	const kind = 'root';
+	const name = 'menuLocation';
+	const entities = useSelect( ( select ) =>
+		select( 'core' ).getEntitiesByKind( kind )
+	);
+	const entity = find( entities, { kind, name } );
+
+	const getMenuLocations = async () => {
+		const path = `${ entity.baseURL }`;
+		let apiLocations = await apiFetch( {
+			path,
+			method: 'GET',
+		} );
+		apiLocations = flatMap( apiLocations, ( value ) => value );
+		return apiLocations;
+	};
+
+	const setLatestLocations = async () => {
+		const latestLocations = await getMenuLocations();
+		setMenuLocations( latestLocations );
+	};
+
+	useEffect( () => {
+		setLatestLocations();
+	}, [] );
 
 	useEffect( () => {
 		if ( menus && menuLocations ) {
@@ -87,6 +113,7 @@ export default function MenuLocationsEditor() {
 				}
 			}
 		}
+		await setLatestLocations();
 	};
 
 	const menusList = [
@@ -102,6 +129,7 @@ export default function MenuLocationsEditor() {
 			<PanelBody title={ __( 'Menu locations' ) }>
 				<form
 					onSubmit={ ( e ) => {
+						setMenuLocations( false );
 						e.preventDefault();
 						saveLocations();
 					} }
