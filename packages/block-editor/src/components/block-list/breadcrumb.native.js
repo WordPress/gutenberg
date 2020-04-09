@@ -79,7 +79,7 @@ export default compose( [
 
 		const blockName = getBlockName( clientId );
 		const blockType = getBlockType( blockName );
-		const blockIcon = blockType.icon;
+		const blockIcon = blockType ? blockType.icon : {};
 
 		const rootClientId = getBlockRootClientId( clientId );
 
@@ -91,7 +91,7 @@ export default compose( [
 		}
 		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );
-		const rootBlockIcon = rootBlockType.icon;
+		const rootBlockIcon = rootBlockType ? rootBlockType.icon : {};
 
 		return {
 			clientId,
