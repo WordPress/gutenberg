@@ -40,15 +40,13 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	if ( isAndroid() ) { //limit this test to Android to temporarily avoid the problem here https://app.circleci.com/pipelines/github/wordpress-mobile/gutenberg-mobile/5887/workflows/5664a5c7-2efc-4ca6-be22-eab8c1b79677/jobs/31498
-		it( 'should be able to add a Latests-Posts block', async () => {
-			await editorPage.addNewLatestPostsBlock();
-			const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition( 1 );
+	it( 'should be able to add a Latests-Posts block', async () => {
+		await editorPage.addNewLatestPostsBlock();
+		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition( 1 );
 
-			expect( latestPostsBlock ).toBeTruthy();
-			await editorPage.removeLatestPostsBlockAtPosition( 1 );
-		} );
-	}
+		expect( latestPostsBlock ).toBeTruthy();
+		await editorPage.removeLatestPostsBlockAtPosition( 1 );
+	} );
 
 	afterAll( async () => {
 		if ( ! isLocalEnvironment() ) {
