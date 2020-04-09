@@ -99,6 +99,8 @@ export class BlockList extends Component {
 			withFooter = true,
 			isReadOnly,
 			isRootList,
+			horizontal,
+			scrollEnabled,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
@@ -135,9 +137,16 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ {
-						flex: isRootList ? 1 : 0,
-					} }
+					scrollViewStyle={ [
+						{ flex: isRootList ? 1 : 0 },
+						! isRootList && styles.overflowVisible,
+					] }
+					horizontal={ horizontal }
+					scrollEnabled={ scrollEnabled }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
+					style={ ! isRootList && styles.overflowVisible }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -181,11 +190,23 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			horizontalDirection,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 		} = this.props;
 
+		const readableContentViewStyle = contentResizeMode === 'stretch' && {
+			flex: 1,
+		};
+
 		return (
-			<ReadableContentView>
-				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+			<ReadableContentView style={ readableContentViewStyle }>
+				<View
+					style={ readableContentViewStyle }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />
 					) }
@@ -199,6 +220,10 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						horizontalDirection={ horizontalDirection }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
@@ -227,7 +252,7 @@ export class BlockList extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
 		const {
 			getBlockCount,
 			getBlockOrder,
@@ -237,12 +262,16 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 
+		const horizontalDirection =
+			__experimentalMoverDirection === 'horizontal';
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
+				! horizontalDirection &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if list is empty, show the insertion point (via the default appender)
@@ -253,6 +282,7 @@ export default compose( [
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
+				! horizontalDirection &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if the insertion point is at the end of the list
@@ -273,6 +303,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			horizontalDirection,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

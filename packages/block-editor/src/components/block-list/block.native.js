@@ -62,6 +62,7 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
+				contentStyle={ this.props.contentStyle }
 			/>
 		);
 	}
@@ -86,11 +87,14 @@ class BlockListBlock extends Component {
 			title,
 			isDimmed,
 			isTouchable,
+			onDeleteBlock,
+			horizontalDirection,
 			isParentSelected,
 			onSelect,
 			getStylesFromColorScheme,
 			marginVertical,
 			marginHorizontal,
+			isInnerBlockSelected,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -99,13 +103,18 @@ class BlockListBlock extends Component {
 			order + 1
 		);
 
+		const accessible = ! ( isSelected || isInnerBlockSelected );
+
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
-				accessible={ ! isSelected }
+				accessible={ accessible }
 				accessibilityRole={ 'button' }
 			>
-				<View accessibilityLabel={ accessibilityLabel }>
+				<View
+					style={ { flex: 1 } }
+					accessibilityLabel={ accessibilityLabel }
+				>
 					<FloatingToolbar
 						clientId={ clientId }
 						onNavigateUp={ onSelect }
@@ -150,7 +159,11 @@ class BlockListBlock extends Component {
 						) }
 						<View style={ styles.neutralToolbar }>
 							{ isSelected && (
-								<BlockMobileToolbar clientId={ clientId } />
+								<BlockMobileToolbar
+									clientId={ clientId }
+									onDelete={ onDeleteBlock }
+									horizontalDirection={ horizontalDirection }
+								/>
 							) }
 						</View>
 					</View>
@@ -171,10 +184,12 @@ export default compose( [
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
+			hasSelectedInnerBlock,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
+		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 
@@ -232,6 +247,7 @@ export default compose( [
 			attributes,
 			blockType,
 			isSelected,
+			isInnerBlockSelected,
 			isValid,
 			isParentSelected,
 			firstToSelectId,

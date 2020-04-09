@@ -12,9 +12,9 @@ import memoize from 'memize';
 /**
  * Internal dependencies
  */
-import { About, Contact, Portfolio, Services, Team } from './templates';
+import { About, Blog, Contact, Portfolio, Services, Team } from './templates';
 
-const defaultTemplates = [ About, Contact, Portfolio, Services, Team ];
+const defaultTemplates = [ About, Blog, Contact, Portfolio, Services, Team ];
 
 const createInnerBlocks = ( { name, attributes, innerBlocks } ) => {
 	return createBlock(

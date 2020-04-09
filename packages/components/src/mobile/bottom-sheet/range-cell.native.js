@@ -183,6 +183,7 @@ class BottomSheetRangeCell extends Component {
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
+				activeOpacity={ 1 }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }

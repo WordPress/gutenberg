@@ -1,6 +1,10 @@
 .edit-navigation-layout__tab-panel {
 	// Matches the padding-left applied by default to the `#wpcontent` element.
-	margin-right: 20px;
+	margin-right: 10px;
+
+	@include break-medium {
+		margin-right: 20px;
+	}
 
 	.components-tab-panel__tabs {
 		margin-bottom: 10px;
