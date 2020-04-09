@@ -27,16 +27,10 @@ function render_block_core_post_date( $attributes ) {
  * Registers the `core/post-date` block on the server.
  */
 function register_block_core_post_date() {
-	$path     = __DIR__ . '/post-date/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_post_date',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/post-date',
+		array(
+			'render_callback' => 'render_block_core_post_date',
 		)
 	);
 }
