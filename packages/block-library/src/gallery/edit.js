@@ -397,7 +397,7 @@ class GalleryEdit extends Component {
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
-								separatorType="fullWidth"
+								{ ...MOBILE_CONTROL_PROPS }
 								type="stepper"
 								required
 							/>
