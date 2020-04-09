@@ -122,7 +122,7 @@ export default function EntitiesSavedStates() {
 		select( 'core/editor' ).isEntitiesSavedStatesOpen()
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
-	const { closeEntitiesSavedStatesPanel: closePanel } = useDispatch(
+	const { closeEntitiesSavedStates: closePanel } = useDispatch(
 		'core/editor'
 	);
 

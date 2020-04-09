@@ -49,7 +49,7 @@ export class PostPublishButton extends Component {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
 				// dispatch sidebar to open here:
-				this.props.openEntitiesSavedStatesPanel(
+				this.props.openEntitiesSavedStates(
 					this.closeEntitiesSavedStates
 				);
 				return noop;
@@ -225,14 +225,14 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		// toggleEntitiesSavedStates
-		const { editPost, savePost, openEntitiesSavedStatesPanel } = dispatch(
+		const { editPost, savePost, openEntitiesSavedStates } = dispatch(
 			'core/editor'
 		);
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),
 			onSave: savePost,
-			openEntitiesSavedStatesPanel,
+			openEntitiesSavedStates,
 		};
 	} ),
 ] )( PostPublishButton );

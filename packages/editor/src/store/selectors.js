@@ -51,17 +51,6 @@ const EMPTY_OBJECT = {};
 const EMPTY_ARRAY = [];
 
 /**
- * Returns true if save panel is open, or false otherwise.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether or not save panel is open.
- */
-export function isEntitiesSavedStatesOpen( state ) {
-	return state.entitiesSavedStatesPanel.isOpen;
-}
-
-/**
  * Returns true if any past editor history snapshots exist, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1388,6 +1377,17 @@ export function __unstableIsEditorReady( state ) {
  */
 export function getEditorSettings( state ) {
 	return state.editorSettings;
+}
+
+/**
+ * Returns true if save panel is open, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether or not save panel is open.
+ */
+export function isEntitiesSavedStatesOpen( state ) {
+	return state.entitiesSavedStates.isOpen;
 }
 
 /*

@@ -1092,7 +1092,7 @@ _Related_
 
 -   clearSelectedBlock in core/block-editor store.
 
-<a name="closeEntitiesSavedStatesPanel" href="#closeEntitiesSavedStatesPanel">#</a> **closeEntitiesSavedStatesPanel**
+<a name="closeEntitiesSavedStates" href="#closeEntitiesSavedStates">#</a> **closeEntitiesSavedStates**
 
 Returns an action object signaling to close the save panel and invoke callback.
 
@@ -1267,7 +1267,7 @@ _Related_
 
 -   multiSelect in core/block-editor store.
 
-<a name="openEntitiesSavedStatesPanel" href="#openEntitiesSavedStatesPanel">#</a> **openEntitiesSavedStatesPanel**
+<a name="openEntitiesSavedStates" href="#openEntitiesSavedStates">#</a> **openEntitiesSavedStates**
 
 Returns an action object signaling the save panel to be open.
 

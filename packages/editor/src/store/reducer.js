@@ -383,18 +383,18 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
  *
  * @return {Object} Updated state.
  */
-export function entitiesSavedStatesPanel(
+export function entitiesSavedStates(
 	state = { isOpen: false, onRequestClose: () => {} },
 	action
 ) {
 	switch ( action.type ) {
-		case 'OPEN_ENTITIES_SAVED_STATES_PANEL':
+		case 'OPEN_ENTITIES_SAVED_STATES':
 			return {
 				...state,
 				isOpen: true,
 				onRequestClose: action.onRequestClose || function() {},
 			};
-		case 'CLOSE_ENTITIES_SAVED_STATES_PANEL':
+		case 'CLOSE_ENTITIES_SAVED_STATES':
 			state.onRequestClose( action.callbackArg );
 			return {
 				...state,
@@ -419,6 +419,6 @@ export default optimist(
 		isReady,
 		editorSettings,
 		postAutosavingLock,
-		entitiesSavedStatesPanel,
+		entitiesSavedStates,
 	} )
 );
