@@ -3,6 +3,22 @@ const webdriver = require( 'selenium-webdriver' );
 const got = require( 'got' );
 require( 'dotenv' ).config();
 
+const {
+	LOCAL_BROWSERSTACK_USER,
+	LOCAL_BROWSERSTACK_KEY,
+	CI_BROWSERSTACK_USER,
+	CI_BROWSERSTACK_KEY,
+} = process.env;
+
+const NAME = LOCAL_BROWSERSTACK_USER || CI_BROWSERSTACK_USER;
+const KEY = LOCAL_BROWSERSTACK_KEY || CI_BROWSERSTACK_KEY;
+
+if ( ! NAME || ! KEY ) {
+	throw new Error(
+		'username or key is undefined. You cannot connect to BrowserStack.'
+	);
+}
+
 // Input capabilities
 const capabilities = {
 	browserName: 'IE',
@@ -10,8 +26,8 @@ const capabilities = {
 	os: 'Windows',
 	os_version: '10',
 	resolution: '1024x768',
-	'browserstack.user': process.env.LOCAL_BROWSERSTACK_USER,
-	'browserstack.key': process.env.LOCAL_BROWSERSTACK_KEY,
+	'browserstack.user': NAME,
+	'browserstack.key': KEY,
 	'browserstack.local': true,
 	name: 'Bstack-[Node] Sample Test',
 };
@@ -29,7 +45,7 @@ const startBrowserStackLocal = async () => {
 	return new Promise( ( resolve, reject ) => {
 		browserstackLocal.start(
 			{
-				key: process.env.LOCAL_BROWSERSTACK_KEY,
+				key: KEY,
 			},
 			function( err ) {
 				if ( err ) {
@@ -54,8 +70,8 @@ const getResultPageLink = async ( sessionId ) => {
 	const response = await got(
 		`https://api.browserstack.com/automate/sessions/${ sessionId }.json`,
 		{
-			username: process.env.LOCAL_BROWSERSTACK_USER,
-			password: process.env.LOCAL_BROWSERSTACK_KEY,
+			username: NAME,
+			password: KEY,
 		}
 	);
 
