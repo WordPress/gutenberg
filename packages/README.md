@@ -77,7 +77,7 @@ _Example:_
 @@ -43,7 +43,6 @@
                 "check-node-version": "^3.1.1",
                 "cross-spawn": "^5.1.0",
-                "eslint": "^5.16.0",
+                "eslint": "^6.8.0",
 -               "jest": "^24.7.1",
                 "jest-puppeteer": "^4.0.0",
                 "minimist": "^1.2.0",
