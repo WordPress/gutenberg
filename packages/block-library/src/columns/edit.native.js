@@ -143,7 +143,6 @@ function ColumnsEditContainer( {
 						columnsInRow > 1 ? 'horizontal' : undefined
 					}
 					horizontal={ true }
-					scrollEnabled={ false }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					contentResizeMode="stretch"
 					onAddBlock={ onAddNextColumn }
