@@ -24,16 +24,10 @@ function render_block_core_site_title( $attributes ) {
  * Registers the `core/site-title` block on the server.
  */
 function register_block_core_site_title() {
-	$path     = __DIR__ . '/site-title/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_site_title',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/site-title',
+		array(
+			'render_callback' => 'render_block_core_site_title',
 		)
 	);
 }

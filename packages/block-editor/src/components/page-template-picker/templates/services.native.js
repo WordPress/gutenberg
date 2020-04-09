@@ -7,7 +7,7 @@ const Services = {
 	// translators: title for "Services" page template
 	name: __( 'Services' ),
 	key: 'services',
-	icon: '🛠',
+	icon: '🔧',
 	content: [
 		{
 			name: 'core/paragraph',

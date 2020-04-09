@@ -106,6 +106,8 @@ export class BlockList extends Component {
 			header,
 			isReadOnly,
 			isRootList,
+			horizontal,
+			scrollEnabled,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
@@ -147,6 +149,17 @@ export class BlockList extends Component {
 						{ flex: isRootList ? 1 : 0 },
 						! isRootList && styles.overflowVisible,
 					] }
+					horizontal={ horizontal }
+					scrollEnabled={ scrollEnabled }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
+					style={ [
+						! isRootList && styles.overflowVisible,
+						horizontalDirection && styles.horizontal,
+						horizontalAlignment &&
+							styles[ `is-aligned-${ horizontalAlignment }` ],
+					] }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -160,11 +173,6 @@ export class BlockList extends Component {
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
 					ListFooterComponent={ this.renderBlockListFooter }
-					style={ [
-						horizontalDirection && styles.horizontal,
-						horizontalAlignment &&
-							styles[ `is-aligned-${ horizontalAlignment }` ],
-					] }
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
@@ -191,16 +199,25 @@ export class BlockList extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			onDeleteBlock,
-			onAddBlock,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			horizontalDirection,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 		} = this.props;
 
+		const readableContentViewStyle = contentResizeMode === 'stretch' && {
+			flex: 1,
+		};
+
 		return (
-			<ReadableContentView>
-				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+			<ReadableContentView style={ readableContentViewStyle }>
+				<View
+					style={ readableContentViewStyle }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />
 					) }
@@ -218,6 +235,7 @@ export class BlockList extends Component {
 						onDeleteBlock={ onDeleteBlock }
 						horizontalDirection={ horizontalDirection }
 						onAddBlock={ onAddBlock }
+						contentStyle={ contentStyle }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

@@ -109,10 +109,14 @@ class InnerBlocks extends Component {
 			clientId,
 			renderAppender,
 			__experimentalMoverDirection,
-			onDeleteBlock,
-			onAddBlock,
 			parentWidth,
 			shouldRenderFooterAppender,
+			horizontal,
+			scrollEnabled,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 			marginVertical,
 			marginHorizontal,
 			horizontalAlignment,
@@ -131,13 +135,17 @@ class InnerBlocks extends Component {
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
-						onDeleteBlock={ onDeleteBlock }
-						onAddBlock={ onAddBlock }
 						parentWidth={ parentWidth }
 						shouldRenderFooterAppender={
 							shouldRenderFooterAppender
 						}
 						horizontalAlignment={ horizontalAlignment }
+						horizontal={ horizontal }
+						scrollEnabled={ scrollEnabled }
+						contentResizeMode={ contentResizeMode }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 				) }
 			</>

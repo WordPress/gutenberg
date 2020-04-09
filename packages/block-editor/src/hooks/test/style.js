@@ -1,32 +1,28 @@
 /**
  * Internal dependencies
  */
-import { getCSSVariables } from '../style';
+import { getInlineStyles } from '../style';
 
-describe( 'getCSSVariables', () => {
+describe( 'getInlineStyles', () => {
 	it( 'should return an empty object when called with undefined', () => {
-		expect( getCSSVariables() ).toEqual( {} );
+		expect( getInlineStyles() ).toEqual( {} );
 	} );
 
-	it( 'should return the correct simple CSS variables', () => {
-		expect( getCSSVariables( { color: 'red' } ) ).toEqual( {
-			'--wp--color': 'red',
-		} );
+	it( 'should ignore unknown styles', () => {
+		expect( getInlineStyles( { color: 'red' } ) ).toEqual( {} );
 	} );
 
-	it( 'should omit CSS variables when the provided value is falsy', () => {
-		expect( getCSSVariables( { color: undefined } ) ).toEqual( {} );
-	} );
-
-	it( 'should flatten nested style config', () => {
+	it( 'should return the correct inline styles', () => {
 		expect(
-			getCSSVariables( {
-				color: { text: 'red' },
-				typography: { lineHeight: 1.5 },
+			getInlineStyles( {
+				color: { text: 'red', background: 'black' },
+				typography: { lineHeight: 1.5, fontSize: 10 },
 			} )
 		).toEqual( {
-			'--wp--color--text': 'red',
-			'--wp--typography--line-height': 1.5,
+			backgroundColor: 'black',
+			color: 'red',
+			lineHeight: 1.5,
+			fontSize: 10,
 		} );
 	} );
 } );
