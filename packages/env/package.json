@@ -37,7 +37,7 @@
 		"docker-compose": "^0.22.2",
 		"extract-zip": "^1.6.7",
 		"got": "^10.7.0",
-		"inquirer": "^7.0.4",
+		"inquirer": "^7.1.0",
 		"js-yaml": "^3.13.1",
 		"nodegit": "^0.26.2",
 		"ora": "^4.0.2",

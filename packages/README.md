@@ -78,8 +78,8 @@ _Example:_
                 "check-node-version": "^3.1.1",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^6.8.0",
--               "jest": "^24.7.1",
-                "jest-puppeteer": "^4.0.0",
+-               "jest": "^25.3.0",
+                "jest-puppeteer": "^4.4.0",
                 "minimist": "^1.2.0",
                 "npm-package-json-lint": "^3.6.0",
 ```
@@ -89,9 +89,8 @@ Next, you need to run `npm install` in the root of the project to ensure that `p
 #### Updating Existing Dependencies
 
 This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
-
-1.  First, remove the existing dependency as described in the previous section.
-2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+ 1. First, remove the existing dependency as described in the previous section.
+ 2. Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
 
 ### Development Dependencies
 
