@@ -1,23 +1,8 @@
-.editor-entities-saved-states__save-button {
-	display: block;
-	margin: $grid-unit-15 auto;
-}
-
-// /edit-post/src - @include reset
 .entities-saved-states__panel {
 	@include reset;
-}
-
-// /editor/src/components/post-publish-panel
-.entities-saved-states__panel {
 	background: $white;
-}
-
-// /edit-post/src/components/layout
-.edit-post-layout .entities-saved-states__panel,
-.edit-site .entities-saved-states__panel {
 	position: fixed;
-	z-index: z-index( '.edit-post-layout .entities-saved-states__panel' );
+	z-index: z-index( '.entities-saved-states__panel' );
 	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
@@ -33,26 +18,16 @@
 	}
 
 	@include break-medium() {
-		z-index: z-index(
-			'.edit-post-layout .entities-saved-states__panel-break-medium'
-		);
+		z-index: z-index( '.entities-saved-states__panel-break-medium' );
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
-		// transform: translateX( +100% );
-		// animation: edit-post-post-publish-panel__slide-in-animation 0.1s
-		// 	forwards;
-		// @include reduce-motion( 'animation' );
 
 		body.is-fullscreen-mode & {
 			top: 0;
 		}
 
-		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		// .is-focusing-regions & {
-		// 	transform: translateX( 0% );
-		// }
 		.entities-saved-states__find-entity {
 			display: block;
 		}
@@ -86,5 +61,10 @@
 			margin: 0;
 			font-size: $big-font-size;
 		}
+	}
+
+	.editor-entities-saved-states__save-button {
+		display: block;
+		margin: $grid-unit-15 auto;
 	}
 }
