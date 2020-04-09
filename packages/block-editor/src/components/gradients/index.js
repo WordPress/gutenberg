@@ -21,7 +21,15 @@ export function __experimentalGetGradientClass( gradientSlug ) {
 	return `has-${ gradientSlug }-gradient-background`;
 }
 
-function getGradientValueBySlug( gradients, slug ) {
+/**
+ * Retrieves the gradient value per slug.
+ *
+ * @param {Array} gradients Gradient Palette
+ * @param {string} slug Gradient slug
+ *
+ * @return {string} Gradient value.
+ */
+export function getGradientValueBySlug( gradients, slug ) {
 	const gradient = find( gradients, [ 'slug', slug ] );
 	return gradient && gradient.gradient;
 }
@@ -34,7 +42,14 @@ export function __experimentalGetGradientObjectByGradientValue(
 	return gradient;
 }
 
-function getGradientSlugByValue( gradients, value ) {
+/**
+ * Retrieves the gradient slug per slug.
+ *
+ * @param {Array} gradients Gradient Palette
+ * @param {string} value Gradient value
+ * @return {string} Gradient slug.
+ */
+export function getGradientSlugByValue( gradients, value ) {
 	const gradient = __experimentalGetGradientObjectByGradientValue(
 		gradients,
 		value

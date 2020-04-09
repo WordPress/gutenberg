@@ -29,8 +29,8 @@ function render_block_core_post_tags() {
  * Registers the `core/post-tags` block on the server.
  */
 function register_block_core_post_tags() {
-	register_block_type(
-		'core/post-tags',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-tags',
 		array(
 			'render_callback' => 'render_block_core_post_tags',
 		)

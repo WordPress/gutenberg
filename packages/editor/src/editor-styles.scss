@@ -131,3 +131,30 @@ ul ul,
 ol ul {
 	list-style-type: circle;
 }
+
+.wp-align-wrapper {
+	max-width: $content-width;
+
+	> .wp-block,
+	&.wp-align-full {
+		max-width: none;
+	}
+
+	&.wp-align-wide {
+		max-width: 1100px;
+	}
+}
+
+a {
+	color: inherit;
+	transition: none;
+}
+
+code,
+kbd {
+	padding: 0;
+	margin: 0;
+	background: inherit;
+	font-size: inherit;
+	font-family: monospace;
+}

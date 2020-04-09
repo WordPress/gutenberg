@@ -6,33 +6,29 @@ import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import {
 	Tooltip,
-	Icon,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
+import TemplatePreview from './preview';
 
 function TemplateLabel( { template } ) {
 	return (
-		<div className="edit-site-template-switcher__label">
+		<>
 			{ template.slug }{ ' ' }
 			{ template.status !== 'auto-draft' && (
 				<Tooltip text={ __( 'Customized' ) }>
-					<div className="edit-site-template-switcher__label-customized-icon-container">
-						<Icon
-							icon="marker"
-							className="edit-site-template-switcher__label-customized-icon-icon"
-						/>
-					</div>
+					<span className="edit-site-template-switcher__label-customized-dot" />
 				</Tooltip>
 			) }
-		</div>
+		</>
 	);
 }
 
@@ -45,6 +41,13 @@ export default function TemplateSwitcher( {
 	onActiveTemplatePartIdChange,
 	onAddTemplateId,
 } ) {
+	const [ hoveredTemplate, setHoveredTemplate ] = useState();
+	const onHoverTemplate = ( id ) => {
+		setHoveredTemplate( { id, type: 'template' } );
+	};
+	const onHoverTemplatePart = ( id ) => {
+		setHoveredTemplate( { id, type: 'template-part' } );
+	};
 	const { templates, templateParts } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
@@ -59,10 +62,10 @@ export default function TemplateSwitcher( {
 						label: template ? (
 							<TemplateLabel template={ template } />
 						) : (
-							__( 'loading…' )
+							__( 'Loading…' )
 						),
 						value: id,
-						slug: template ? template.slug : __( 'loading…' ),
+						slug: template ? template.slug : __( 'Loading…' ),
 					};
 				} ),
 				templateParts: templatePartIds.map( ( id ) => {
@@ -75,10 +78,10 @@ export default function TemplateSwitcher( {
 						label: template ? (
 							<TemplateLabel template={ template } />
 						) : (
-							__( 'loading…' )
+							__( 'Loading…' )
 						),
 						value: id,
-						slug: template ? template.slug : __( 'loading…' ),
+						slug: template ? template.slug : __( 'Loading…' ),
 					};
 				} ),
 			};
@@ -89,7 +92,11 @@ export default function TemplateSwitcher( {
 	return (
 		<>
 			<DropdownMenu
-				icon="layout"
+				popoverProps={ {
+					className: 'edit-site-template-switcher__popover',
+					position: 'bottom right',
+				} }
+				icon={ null }
 				label={ __( 'Switch Template' ) }
 				toggleProps={ {
 					children: ( isTemplatePart
@@ -107,9 +114,10 @@ export default function TemplateSwitcher( {
 									! isTemplatePart ? activeId : undefined
 								}
 								onSelect={ onActiveIdChange }
+								onHover={ onHoverTemplate }
 							/>
 							<MenuItem
-								icon="plus"
+								icon={ plus }
 								onClick={ () => {
 									onClose();
 									setIsAddTemplateOpen( true );
@@ -123,8 +131,13 @@ export default function TemplateSwitcher( {
 								choices={ templateParts }
 								value={ isTemplatePart ? activeId : undefined }
 								onSelect={ onActiveTemplatePartIdChange }
+								onHover={ onHoverTemplatePart }
 							/>
 						</MenuGroup>
+						{ !! hoveredTemplate?.id && (
+							<TemplatePreview item={ hoveredTemplate } />
+						) }
+						<div className="edit-site-template-switcher__footer" />
 					</>
 				) }
 			</DropdownMenu>

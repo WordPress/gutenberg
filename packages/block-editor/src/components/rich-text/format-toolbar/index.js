@@ -10,9 +10,10 @@ import { orderBy } from 'lodash';
 
 import { __ } from '@wordpress/i18n';
 import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
-	position: 'bottom left',
+	position: 'bottom right',
 };
 
 const FormatToolbar = () => {
@@ -31,7 +32,7 @@ const FormatToolbar = () => {
 					{ ( fills ) =>
 						fills.length !== 0 && (
 							<DropdownMenu
-								icon={ false }
+								icon={ chevronDown }
 								label={ __( 'More rich text controls' ) }
 								controls={ orderBy(
 									fills.map( ( [ { props } ] ) => props ),

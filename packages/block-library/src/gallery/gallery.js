@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -27,6 +28,7 @@ export const Gallery = ( props ) => {
 		onMoveForward,
 		onRemoveImage,
 		onSelectImage,
+		onDeselectImage,
 		onSetImageAttributes,
 		onFocusGalleryCaption,
 	} = props;
@@ -39,10 +41,6 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	const captionClassNames = classnames( 'blocks-gallery-caption', {
-		'screen-reader-text': ! isSelected && RichText.isEmpty( caption ),
-	} );
-
 	return (
 		<figure
 			className={ classnames( className, {
@@ -53,8 +51,8 @@ export const Gallery = ( props ) => {
 		>
 			<ul className="blocks-gallery-grid">
 				{ images.map( ( img, index ) => {
-					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 					const ariaLabel = sprintf(
+						/* translators: 1: the order number of the image. 2: the total number of images. */
 						__( 'image %1$d of %2$d in gallery' ),
 						index + 1,
 						images.length
@@ -78,6 +76,7 @@ export const Gallery = ( props ) => {
 								onMoveForward={ onMoveForward( index ) }
 								onRemove={ onRemoveImage( index ) }
 								onSelect={ onSelectImage( index ) }
+								onDeselect={ onDeselectImage( index ) }
 								setAttributes={ ( attrs ) =>
 									onSetImageAttributes( index, attrs )
 								}
@@ -89,9 +88,10 @@ export const Gallery = ( props ) => {
 				} ) }
 			</ul>
 			{ mediaPlaceholder }
-			<RichText
+			<RichTextVisibilityHelper
+				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
-				className={ captionClassNames }
+				className="blocks-gallery-caption"
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
 				unstableOnFocus={ onFocusGalleryCaption }
@@ -101,5 +101,13 @@ export const Gallery = ( props ) => {
 		</figure>
 	);
 };
+
+function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
+	return isHidden ? (
+		<VisuallyHidden as={ RichText } { ...richTextProps } />
+	) : (
+		<RichText { ...richTextProps } />
+	);
+}
 
 export default Gallery;

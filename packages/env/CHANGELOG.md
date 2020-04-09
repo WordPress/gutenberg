@@ -2,6 +2,7 @@
 
 ### New Feature
 
+-   URLs for ZIP files are now supported as core, plugin, and theme sources.
 -   The `.wp-env.json` coniguration file now accepts a `config` object for setting `wp-config.php` values.
 -   A `.wp-env.override.json` configuration file can now be used to override fields from `.wp-env.json`.
 -   You may now override the directory in which `wp-env` creates generated files with the `WP_ENV_HOME` environment variable. The default directory is `~/.wp-env/` (or `~/wp-env/` on Linux).

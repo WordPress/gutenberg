@@ -2,7 +2,19 @@
 /**
  * External dependencies
  */
+const util = require( 'util' );
 const NodeGit = require( 'nodegit' );
+const fs = require( 'fs' );
+const got = require( 'got' );
+const path = require( 'path' );
+
+/**
+ * Promisified dependencies
+ */
+const pipeline = util.promisify( require( 'stream' ).pipeline );
+const extractZip = util.promisify( require( 'extract-zip' ) );
+const rimraf = util.promisify( require( 'rimraf' ) );
+const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').Source} Source
@@ -21,6 +33,8 @@ const NodeGit = require( 'nodegit' );
 module.exports = async function downloadSource( source, options ) {
 	if ( source.type === 'git' ) {
 		await downloadGitSource( source, options );
+	} else if ( source.type === 'zip' ) {
+		await downloadZipSource( source, options );
 	}
 };
 
@@ -36,8 +50,7 @@ module.exports = async function downloadSource( source, options ) {
  */
 async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	const log = debug
-		? // eslint-disable-next-line no-console
-		  ( message ) => {
+		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
 		  }
@@ -93,6 +106,50 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		log( 'Ref needs to be set as detached.' );
 		await repository.setHeadDetached( source.ref );
 	}
+
+	onProgress( 1 );
+}
+
+/**
+ * Downloads and extracts the zip file at `source.url` into `source.path`.
+ *
+ * @param {Source}   source             The source to download.
+ * @param {Object}   options
+ * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {Object}   options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  options.debug      True if debug mode is enabled.
+ */
+async function downloadZipSource( source, { onProgress, spinner, debug } ) {
+	const log = debug
+		? ( message ) => {
+				spinner.info( `NodeGit: ${ message }` );
+				spinner.start();
+		  }
+		: () => {};
+	onProgress( 0 );
+
+	log( 'Downloading zip file.' );
+	const zipName = `${ source.path }.zip`;
+	const zipFile = fs.createWriteStream( zipName );
+
+	const responseStream = got.stream( source.url );
+	responseStream.on( 'downloadProgress', ( { percent } ) =>
+		onProgress( percent )
+	);
+	await pipeline( responseStream, zipFile );
+
+	log( 'Extracting to temporary folder.' );
+	const dirName = `${ source.path }.temp`;
+	await extractZip( zipName, { dir: dirName } );
+
+	log( 'Copying to mounted folder and cleaning up.' );
+	await Promise.all( [
+		rimraf( zipName ),
+		...( await fs.promises.readdir( dirName ) ).map( ( file ) =>
+			copyDir( path.join( dirName, file ), source.path )
+		),
+	] );
+	await rimraf( dirName );
 
 	onProgress( 1 );
 }

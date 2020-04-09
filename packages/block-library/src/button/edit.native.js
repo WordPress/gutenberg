@@ -24,7 +24,7 @@ import {
 	BottomSheet,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { link, external } from '@wordpress/icons';
 
@@ -52,8 +52,10 @@ class ButtonEdit extends Component {
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.dismissSheet = this.dismissSheet.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
-		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 
@@ -81,11 +83,13 @@ class ButtonEdit extends Component {
 		} = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
-		// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 		if (
 			( prevProps.editorSidebarOpened && ! editorSidebarOpened ) ||
 			( prevState.isLinkSheetVisible && ! isLinkSheetVisible )
 		) {
+			// Prepends "http://" to an url when closing link settings sheet and button settings sheet
+			setAttributes( { url: prependHTTP( url ) } );
+			// Get initial value for `isEditingURL` when closing link settings sheet or button settings sheet
 			this.isEditingURL = false;
 		}
 
@@ -102,13 +106,12 @@ class ButtonEdit extends Component {
 		}
 
 		// Paste a URL from clipboard
-		if ( isLinkSheetVisible && ! url && ! this.isEditingURL ) {
+		if (
+			( isLinkSheetVisible || editorSidebarOpened ) &&
+			! url &&
+			! this.isEditingURL
+		) {
 			this.getURLFromClipboard();
-		}
-
-		// Prepends "http://" to a url when closing link settings sheet and button settings sheet
-		if ( ! isLinkSheetVisible && ! editorSidebarOpened ) {
-			setAttributes( { url: prependHTTP( url ) } );
 		}
 
 		if ( this.richTextRef ) {
@@ -199,9 +202,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onToggleLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	onShowLinkSettings() {
+		this.setState( { isLinkSheetVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSheetVisible: false } );
 	}
 
 	onToggleButtonFocus( value ) {
@@ -227,6 +233,13 @@ class ButtonEdit extends Component {
 		this.setState( { maxWidth: width - buttonSpacing } );
 	}
 
+	dismissSheet() {
+		this.setState( {
+			isLinkSheetVisible: false,
+		} );
+		this.props.closeSettingsBottomSheet();
+	}
+
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
 		return (
 			<>
@@ -236,8 +249,13 @@ class ButtonEdit extends Component {
 					value={ url || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChange={ this.onChangeURL }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus={
+						! isCompatibleWithSettings && Platform.OS === 'ios'
+					}
 					separatorType={
 						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
 					}
@@ -258,6 +276,7 @@ class ButtonEdit extends Component {
 					value={ rel || '' }
 					valuePlaceholder={ __( 'None' ) }
 					onChange={ this.onChangeLinkRel }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
 					separatorType={
@@ -373,9 +392,9 @@ class ButtonEdit extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ __( 'Edit image' ) }
+								title={ __( 'Edit link' ) }
 								icon={ link }
-								onClick={ this.onToggleLinkSettings }
+								onClick={ this.onShowLinkSettings }
 								isActive={ url && url !== PREPEND_HTTP }
 							/>
 						</ToolbarGroup>
@@ -384,7 +403,7 @@ class ButtonEdit extends Component {
 
 				<BottomSheet
 					isVisible={ isLinkSheetVisible }
-					onClose={ this.onToggleLinkSettings }
+					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
 					{ this.getLinkSettings( url, rel, linkTarget ) }
@@ -440,6 +459,13 @@ export default compose( [
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			hasParents,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 ] )( ButtonEdit );

@@ -350,11 +350,11 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             fill="#000000"
             icon={
               <SVG
-                viewBox="-2 -2 24 24"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
-                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                 />
               </SVG>
             }
@@ -362,7 +362,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             <SVG
               fill="#000000"
               height={24}
-              viewBox="-2 -2 24 24"
+              viewBox="0 0 24 24"
               width={24}
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -372,15 +372,15 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 focusable="false"
                 height={24}
                 role="img"
-                viewBox="-2 -2 24 24"
+                viewBox="0 0 24 24"
                 width={24}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
-                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                 >
                   <path
-                    d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                    d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                   />
                 </Path>
               </svg>

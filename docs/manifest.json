@@ -84,6 +84,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Patterns (Experimental)",
+		"slug": "block-patterns",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Annotations",
 		"slug": "block-annotations",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-annotations.md",
@@ -232,6 +238,24 @@
 		"slug": "meta-box",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/meta-box.md",
 		"parent": "backward-compatibility"
+	},
+	{
+		"title": "Gutenberg as a Development Platform",
+		"slug": "platform",
+		"markdown_source": "../docs/designers-developers/developers/platform/README.md",
+		"parent": "developers"
+	},
+	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
 	},
 	{
 		"title": "Designer Documentation",
@@ -870,6 +894,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NumberControl",
+		"slug": "number-control",
+		"markdown_source": "../packages/components/src/number-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Panel",
 		"slug": "panel",
 		"markdown_source": "../packages/components/src/panel/README.md",
@@ -897,6 +927,12 @@
 		"title": "RadioControl",
 		"slug": "radio-control",
 		"markdown_source": "../packages/components/src/radio-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "RadioGroup",
+		"slug": "radio-group",
+		"markdown_source": "../packages/components/src/radio-group/README.md",
 		"parent": "components"
 	},
 	{
@@ -1005,6 +1041,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "UnitControl",
+		"slug": "unit-control",
+		"markdown_source": "../packages/components/src/unit-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1266,6 +1308,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-navigation",
+		"slug": "packages-edit-navigation",
+		"markdown_source": "../packages/edit-navigation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1341,6 +1389,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/interface",
+		"slug": "packages-interface",
+		"markdown_source": "../packages/interface/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1425,6 +1479,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/prettier-config",
+		"slug": "packages-prettier-config",
+		"markdown_source": "../packages/prettier-config/README.md",
 		"parent": "packages"
 	},
 	{

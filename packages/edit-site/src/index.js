@@ -12,6 +12,7 @@ import { render } from '@wordpress/element';
  * Internal dependencies
  */
 import './hooks';
+import './store';
 import Editor from './components/editor';
 
 /**

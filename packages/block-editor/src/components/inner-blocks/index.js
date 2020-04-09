@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withViewportMatch } from '@wordpress/viewport';
-import { Component } from '@wordpress/element';
+import { Component, forwardRef, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	synchronizeBlocksWithTemplate,
@@ -61,7 +61,7 @@ class InnerBlocks extends Component {
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( __experimentalBlocks );
+			replaceInnerBlocks( __experimentalBlocks, false );
 		}
 	}
 
@@ -125,7 +125,6 @@ class InnerBlocks extends Component {
 			parentLock,
 			__experimentalCaptureToolbars,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		} = this.props;
 
 		const newSettings = {
@@ -135,7 +134,6 @@ class InnerBlocks extends Component {
 			__experimentalCaptureToolbars:
 				__experimentalCaptureToolbars || false,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -149,26 +147,42 @@ class InnerBlocks extends Component {
 			clientId,
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
+			forwardedRef,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
 
-		const classes = classnames( 'block-editor-inner-blocks', {
+		if ( templateInProcess ) {
+			return null;
+		}
+
+		const classes = classnames( {
 			'has-overlay': enableClickThrough && hasOverlay,
 			'is-capturing-toolbar': captureToolbars,
 		} );
 
+		const blockList = (
+			<BlockList
+				{ ...props }
+				ref={ forwardedRef }
+				rootClientId={ clientId }
+				className={ classes }
+			/>
+		);
+
+		if ( props.__experimentalTagName ) {
+			return blockList;
+		}
+
 		return (
-			<div className={ classes }>
-				{ ! templateInProcess && (
-					<BlockList rootClientId={ clientId } { ...props } />
-				) }
+			<div className="block-editor-inner-blocks" ref={ forwardedRef }>
+				{ blockList }
 			</div>
 		);
 	}
 }
 
-InnerBlocks = compose( [
+const ComposedInnerBlocks = compose( [
 	withViewportMatch( { isSmallScreen: '< medium' } ),
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
@@ -211,13 +225,15 @@ InnerBlocks = compose( [
 		} = ownProps;
 
 		return {
-			replaceInnerBlocks( blocks ) {
+			replaceInnerBlocks( blocks, forceUpdateSelection ) {
 				replaceInnerBlocks(
 					clientId,
 					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
+					forceUpdateSelection !== undefined
+						? forceUpdateSelection
+						: block.innerBlocks.length === 0 &&
+								templateInsertUpdatesSelection &&
+								blocks.length !== 0
 				);
 			},
 			__unstableMarkNextChangeAsNotPersistent,
@@ -228,15 +244,22 @@ InnerBlocks = compose( [
 	} ),
 ] )( InnerBlocks );
 
-// Expose default appender placeholders as components.
-InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
-InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const fallbackRef = useRef();
+	return (
+		<ComposedInnerBlocks { ...props } forwardedRef={ ref || fallbackRef } />
+	);
+} );
 
-InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
-	<BlockContent />
-) );
+// Expose default appender placeholders as components.
+ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+
+ForwardedInnerBlocks.Content = withBlockContentContext(
+	( { BlockContent } ) => <BlockContent />
+);
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
-export default InnerBlocks;
+export default ForwardedInnerBlocks;

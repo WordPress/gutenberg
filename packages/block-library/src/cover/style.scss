@@ -1,7 +1,6 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-color: $black;
 	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
@@ -11,7 +10,6 @@
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
-
 	&.has-parallax {
 		background-attachment: fixed;
 
@@ -28,9 +26,13 @@
 		}
 	}
 
-	&.has-background-dim::before {
-		content: "";
-		background-color: inherit;
+	&.has-background-dim {
+		background-color: $black;
+
+		&::before {
+			content: "";
+			background-color: inherit;
+		}
 	}
 
 	&.has-background-dim:not(.has-background-gradient)::before,

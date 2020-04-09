@@ -257,6 +257,21 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	const zipFields = sourceString.match(
+		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
+	);
+	if ( zipFields ) {
+		return {
+			type: 'zip',
+			url: sourceString,
+			path: path.resolve(
+				workDirectoryPath,
+				encodeURIComponent( zipFields[ 1 ] )
+			),
+			basename: encodeURIComponent( zipFields[ 1 ] ),
+		};
+	}
+
 	const gitHubFields = sourceString.match( /^([^\/]+)\/([^#]+)(?:#(.+))?$/ );
 	if ( gitHubFields ) {
 		return {

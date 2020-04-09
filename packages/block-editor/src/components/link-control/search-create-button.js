@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Icon } from '@wordpress/components';
-import { __experimentalCreateInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
@@ -38,8 +38,9 @@ export const LinkControlSearchCreate = ( {
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					{ __experimentalCreateInterpolateElement(
+					{ createInterpolateElement(
 						sprintf(
+							/* translators: %s: search term. */
 							__( 'New page: <mark>%s</mark>' ),
 							searchTerm
 						),

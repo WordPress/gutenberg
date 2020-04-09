@@ -15,7 +15,7 @@
 .edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 20px;
+	bottom: 40px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
@@ -57,7 +57,7 @@
 	}
 }
 
-.block-editor-editor-skeleton__sidebar > div {
+.interface-interface-skeleton__sidebar > div {
 	height: 100%;
 }
 
@@ -82,10 +82,10 @@
 	display: flex;
 	justify-content: center;
 
-	.block-editor-editor-skeleton__publish:focus &,
-	.block-editor-editor-skeleton__publish:focus-within &,
-	.block-editor-editor-skeleton__sidebar:focus &,
-	.block-editor-editor-skeleton__sidebar:focus-within & {
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within &,
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
 		bottom: 0;
 	}
@@ -104,26 +104,9 @@
 		font-size: $default-font-size;
 		padding: 0 ($grid-unit-15 + 6px);
 	}
-
-	.table-of-contents {
-		margin: auto 0 0 auto;
-	}
-
-	.table-of-contents .components-button {
-		height: $icon-button-size-small;
-		padding: 0;
-
-		&:focus {
-			box-shadow: inset 0 0 0 2px color($theme-color);
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 1px solid transparent;
-
-		}
-	}
 }
 
-.edit-post-layout .block-editor-editor-skeleton__content {
+.edit-post-layout .interface-interface-skeleton__content {
 	background-color: $light-gray-700;
 }
 

@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Portfolio = {
 	// translators: title for "Portfolio" page template
 	name: __( 'Portfolio' ),
+	key: 'portfolio',
 	icon: '🎨',
 	content: [
 		{
