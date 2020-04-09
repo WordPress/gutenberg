@@ -185,7 +185,6 @@ const getGalleryDetailsMediaFrame = () => {
 				new wp.media.controller.GalleryEdit( {
 					library: this.options.selection,
 					editing: this.options.editing,
-					menu: 'gallery',
 					displaySettings: false,
 					multiple: true,
 				} ),
