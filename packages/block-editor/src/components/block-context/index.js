@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useMemo } from '@wordpress/element';
 
 /** @typedef {import('react').ReactNode} ReactNode */
 
@@ -25,13 +25,12 @@ const Context = createContext( {} );
  */
 export function BlockContextProvider( { value, children } ) {
 	const context = useContext( Context );
+	const nextValue = useMemo( () => ( { ...context, ...value } ), [
+		context,
+		value,
+	] );
 
-	return (
-		<Context.Provider
-			value={ { ...context, ...value } }
-			children={ children }
-		/>
-	);
+	return <Context.Provider value={ nextValue } children={ children } />;
 }
 
 export default Context;
