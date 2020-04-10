@@ -10,7 +10,7 @@ import { createElement } from '@wordpress/element';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
 /* eslint-disable jsdoc/valid-types */
-/** @typedef {{isPressed: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
+/** @typedef {{isPressed?: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
 /* eslint-enable jsdoc/valid-types */
 
 /**
