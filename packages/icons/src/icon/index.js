@@ -5,17 +5,15 @@ import { cloneElement } from '@wordpress/element';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
 /* eslint-disable jsdoc/valid-types */
-/** @typedef {import('@wordpress/primitives').ComponentPropsWithoutRef<'SVG'>} SVGProps */
 /** @typedef {{icon: string} & {size?: number} & import('@wordpress/primitives').ComponentPropsWithoutRef<'SVG'>} IconProps */
 /* eslint-enable jsdoc/valid-types */
 
 /**
  * Return an SVG icon.
  *
- * @param {IconProps} props        Icon component props
- * @param {string}    props.icon   Icon name
- * @param {number}    [props.size] Icon size in pixels
- * @param {SVGProps}  props.props  Other props will be passed to wrapped SVG component
+ * @param {IconProps} props icon is a string specifying which icon to render
+ *                          size is a number specifiying the icon size in pixels
+ *                          Other props will be passed to wrapped SVG component
  *
  * @return {JSX.Element}  Icon component
  */
