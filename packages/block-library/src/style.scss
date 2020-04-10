@@ -13,7 +13,6 @@
 @import "./embed/style.scss";
 @import "./file/style.scss";
 @import "./gallery/style.scss";
-@import "./group/style.scss";
 @import "./heading/style.scss";
 @import "./image/style.scss";
 @import "./latest-comments/style.scss";
@@ -217,28 +216,30 @@
 
 
 // Font sizes.
+:root {
+	.has-small-font-size {
+		font-size: 13px;
+	}
 
-.has-small-font-size {
-	font-size: 13px;
+	.has-regular-font-size, // Not used now, kept because of backward compatibility.
+	.has-normal-font-size {
+		font-size: 16px;
+	}
+
+	.has-medium-font-size {
+		font-size: 20px;
+	}
+
+	.has-large-font-size {
+		font-size: 36px;
+	}
+
+	.has-larger-font-size, // Not used now, kept because of backward compatibility.
+	.has-huge-font-size {
+		font-size: 42px;
+	}
 }
 
-.has-regular-font-size, // Not used now, kept because of backward compatibility.
-.has-normal-font-size {
-	font-size: 16px;
-}
-
-.has-medium-font-size {
-	font-size: 20px;
-}
-
-.has-large-font-size {
-	font-size: 36px;
-}
-
-.has-larger-font-size, // Not used now, kept because of backward compatibility.
-.has-huge-font-size {
-	font-size: 42px;
-}
 
 // Text alignments.
 .has-text-align-center {

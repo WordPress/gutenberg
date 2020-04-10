@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { isPlainObject } = require( 'lodash' );
-const request = require( 'request' );
+const got = require( 'got' );
 const DecompressZip = require( 'decompress-zip' );
 const chalk = require( 'chalk' );
 const { sprintf } = require( 'sprintf-js' );
@@ -95,10 +95,9 @@ function downloadWordPressZip() {
 
 		stdout.write( 'Downloading...\n' );
 		// Download the archive.
-		request
-			.get(
-				'https://github.com/WordPress/wordpress-develop/archive/master.zip'
-			)
+		got.stream(
+			'https://github.com/WordPress/wordpress-develop/archive/master.zip'
+		)
 			.on( 'error', ( error ) => {
 				stdout.write( "ERROR: The zip file couldn't be downloaded.\n" );
 				stdout.write( error.toString() );

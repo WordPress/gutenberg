@@ -69,10 +69,10 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
@@ -132,10 +132,10 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 		}
 
 		.is-block-content, // Floats.
@@ -585,10 +585,7 @@
 		.block-editor-block-list__breadcrumb,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
-
-			// @todo It should position the block transform dialog as the left margin of a block. It currently
-			// positions instead, the mover control.
-			margin-left: - $block-toolbar-height - $border-width;
+			margin-left: - $block-toolbar-height;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],

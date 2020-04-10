@@ -1,5 +1,8 @@
 .edit-navigation-menu-editor {
 	display: grid;
-	grid-template-columns: 280px 1fr;
-	grid-column-gap: 10px;
+	grid-gap: 10px;
+
+	@include break-medium {
+		grid-template-columns: 280px 1fr;
+	}
 }

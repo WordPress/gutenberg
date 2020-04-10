@@ -1,5 +1,14 @@
 ## Master
 
+### Breaking Changes
+
+- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
+- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
+- The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
+- The bundled `eslint-plugin-jest` dependency has been updated from requiring `^22.15.1` to requiring `^23.8.2` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^21.0.0` to requiring `^22.1.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+- The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^1.6.1` to requiring `^3.0.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
 ### New Features
 
 - The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
@@ -9,12 +18,7 @@
 - New Rule: [`@wordpress/i18n-no-placeholders-only`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)
 - New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
 - New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
-
-### Breaking Changes
-
-- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
-- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
-- The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
+- The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.14.3` to requiring `^7.19.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
 
 ### Bug Fix
 
