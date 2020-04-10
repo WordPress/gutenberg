@@ -1,4 +1,4 @@
-body.js.is-fullscreen-mode {
+body.is-fullscreen-mode {
 	@include break-medium {
 		// Reset the html.wp-topbar padding.
 		// Because this uses negative margins, we have to compensate for the height.
@@ -33,7 +33,6 @@ body.js.is-fullscreen-mode {
 			top: 60px;
 		}
 
-		.interface-interface-skeleton__header,
 		.interface-interface-skeleton__body,
 		.interface-interface-skeleton__footer {
 			transition: margin-left 0.12s ease-in-out;
@@ -46,7 +45,7 @@ body.js.is-fullscreen-mode {
 	}
 }
 
-body.js.is-showing-admin-menu {
+body.is-showing-admin-menu {
 	#adminmenumain {
 		left: 0;
 	}
@@ -56,29 +55,15 @@ body.js.is-showing-admin-menu {
 		display: block;
 	}
 
-	.interface-interface-skeleton__header,
 	.interface-interface-skeleton__body,
 	.interface-interface-skeleton__footer {
 		margin-left: 160px;
 	}
-
-	@include break-wide {
-		.interface-interface-skeleton__header {
-			margin-left: inherit;
-		}
-	}
 }
 
-body.js.is-showing-admin-menu.folded {
-	.interface-interface-skeleton__header,
+body.is-showing-admin-menu.folded {
 	.interface-interface-skeleton__body,
 	.interface-interface-skeleton__footer {
 		margin-left: 36px;
-	}
-
-	@include break-wide {
-		.interface-interface-skeleton__header {
-			margin-left: inherit;
-		}
 	}
 }
