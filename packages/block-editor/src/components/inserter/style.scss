@@ -122,7 +122,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__panel-header {
 	display: inline-flex;
 	align-items: center;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
 .block-editor-inserter__panel-content {
