@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
+import {
+	View,
+	AccessibilityInfo,
+	Platform,
+	Clipboard,
+	Text,
+} from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -60,6 +66,7 @@ class ButtonEdit extends Component {
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
+		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -70,6 +77,7 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused: true,
+			placeholderTextWidth: 0,
 		};
 	}
 
@@ -329,6 +337,29 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
+	// Render `Text` with `placeholderText` styled as a placeholder
+	// to calculate its width which then is set as a `minWidth`
+	getPlaceholderWidth( placeholderText ) {
+		const { maxWidth, placeholderTextWidth } = this.state;
+		return (
+			<Text
+				style={ styles.placeholder }
+				onTextLayout={ ( { nativeEvent } ) => {
+					const textWidth =
+						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+					if ( textWidth !== placeholderTextWidth ) {
+						this.setState( {
+							placeholderTextWidth:
+								textWidth > maxWidth ? maxWidth : textWidth,
+						} );
+					}
+				} }
+			>
+				{ placeholderText }
+			</Text>
+		);
+	}
+
 	render() {
 		const {
 			attributes,
@@ -347,7 +378,12 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
+		const {
+			maxWidth,
+			isLinkSheetVisible,
+			isButtonFocused,
+			placeholderTextWidth,
+		} = this.state;
 
 		if ( parentWidth === 0 ) {
 			return null;
@@ -370,7 +406,7 @@ class ButtonEdit extends Component {
 		const minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
 				? 1
-				: styles.button.minWidth;
+				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
@@ -383,6 +419,7 @@ class ButtonEdit extends Component {
 
 		return (
 			<View onLayout={ this.onLayout }>
+				{ this.getPlaceholderWidth( placeholderText ) }
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }

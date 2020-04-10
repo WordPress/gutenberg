@@ -45,3 +45,10 @@
 .placeholderTextColor {
 	color: rgba($color: $white, $alpha: 0.43);
 }
+
+.placeholder {
+	font-family: $default-regular-font;
+	min-height: 22px;
+	font-size: 16px;
+	display: none;
+}
