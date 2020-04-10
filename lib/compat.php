@@ -170,13 +170,19 @@ function gutenberg_get_post_from_context() {
  *
  * @see (TBD Trac Link)
  *
- * @param string $pre_render The pre-rendered content. Defaults to null.
- * @param array  $next_block The block being rendered.
+ * @param string|null $pre_render The pre-rendered content. Defaults to null.
+ * @param array       $next_block The block being rendered.
  *
  * @return string String of rendered HTML.
  */
 function gutenberg_provide_render_callback_with_block_object( $pre_render, $next_block ) {
 	global $post, $block, $_block_context;
+
+	// If a non-null value is provided, a filter has run at an earlier priority
+	// and has already handled custom rendering and should take precedence.
+	if ( null !== $pre_render ) {
+		return $pre_render;
+	}
 
 	$source_block = $next_block;
 
@@ -239,4 +245,4 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	/** This filter is documented in src/wp-includes/blocks.php */
 	return apply_filters( 'render_block', $block_content, $block );
 }
-add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 10, 2 );
+add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 9, 2 );
