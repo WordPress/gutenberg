@@ -8,5 +8,5 @@ module.exports = {
 		'<rootDir>/wordpress/',
 		'e2e-tests/specs/performance/',
 	],
-	testMatch: [ '**/test/*.[jt]s' ],
+	testMatch: [ '**/test/**/*.[jt]s' ],
 };

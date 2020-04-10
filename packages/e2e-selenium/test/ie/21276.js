@@ -1,4 +1,4 @@
-const { createNewPost } = require( '../util' );
+const { createNewPost } = require( '../../util' );
 
 it( 'can press enter key to enter into the edit mode', async () => {
 	await createNewPost();
@@ -30,6 +30,7 @@ it( 'can press enter key to enter into the edit mode', async () => {
 		.sendKeys( Key.ENTER )
 		.perform();
 
+	// If an unexpected error is thrown, the below cannot pass.
 	const text = await driver
 		.findElement( By.className( 'block-editor-block-list__block' ) )
 		.getText();
