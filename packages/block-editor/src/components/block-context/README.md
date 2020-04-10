@@ -7,7 +7,7 @@ Note that the implementation of Block Context is distinct from [the `BlockEdit` 
 
 ## Usage
 
-Currently, only the [Provider component](https://reactjs.org/docs/context.html#contextprovider) is made availble on the public interface of the `@wordpress/block-editor` module. This can be used to add or override context which can then be consumed by blocks rendered within that context.
+Currently, only the [Provider component](https://reactjs.org/docs/context.html#contextprovider) is made available on the public interface of the `@wordpress/block-editor` module. This can be used to add or override context which can then be consumed by blocks rendered within that context in the block editor.
 
 ```js
 import { BlockContextProvider } from '@wordpress/block-editor';
