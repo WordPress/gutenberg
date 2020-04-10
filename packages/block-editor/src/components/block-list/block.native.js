@@ -68,6 +68,7 @@ class BlockListBlock extends Component {
 				clientId={ this.props.clientId }
 				parentWidth={ this.props.parentWidth }
 				contentStyle={ this.props.contentStyle }
+				onDeleteBlock={ this.props.onDeleteBlock }
 			/>
 		);
 	}
