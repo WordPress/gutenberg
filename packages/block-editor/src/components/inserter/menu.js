@@ -193,7 +193,7 @@ function InserterMenu( {
 							},
 							{
 								name: 'patterns',
-								title: __( 'Block Patterns' ),
+								title: __( 'Patterns' ),
 							},
 						] }
 					>
