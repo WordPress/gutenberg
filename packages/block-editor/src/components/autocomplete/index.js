@@ -9,11 +9,14 @@ import { clone } from 'lodash';
 import { applyFilters, hasFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
 import { Autocomplete as OriginalAutocomplete } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { withBlockEditContext } from '../block-edit/context';
+import blockAutocompleter from '../../autocompleters/block';
 
 /**
  * Wrap the default Autocomplete component with one that
@@ -26,7 +29,13 @@ import { withBlockEditContext } from '../block-edit/context';
  */
 export function withFilteredAutocompleters( Autocomplete ) {
 	return ( props ) => {
-		let { completers = [] } = props;
+		let { completers = [], blockName } = props;
+		completers = useMemo( () => {
+			if ( blockName === getDefaultBlockName() ) {
+				return completers.concat( [ blockAutocompleter ] );
+			}
+			return completers;
+		}, [ completers, blockName ] );
 
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
 			completers = applyFilters(

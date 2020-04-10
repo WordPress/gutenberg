@@ -6,9 +6,13 @@ import { once } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import { select } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { BlockIcon } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import BlockIcon from '../components/block-icon';
 
 /** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
 
@@ -68,7 +72,13 @@ function defaultGetSelectedBlockName() {
  * @return {Promise} Promise resolving once reusable blocks fetched.
  */
 const fetchReusableBlocks = once( () => {
-	dispatch( 'core/editor' ).__experimentalFetchReusableBlocks();
+	const { __experimentalFetchReusableBlocks } = select(
+		'core/block-editor'
+	).getSettings();
+
+	if ( __experimentalFetchReusableBlocks ) {
+		__experimentalFetchReusableBlocks();
+	}
 } );
 
 /**
@@ -84,7 +94,7 @@ export function createBlockCompleter( {
 } = {} ) {
 	return {
 		name: 'blocks',
-		className: 'editor-autocompleters__block',
+		className: 'block-editor-autocompleters__block',
 		triggerPrefix: '/',
 		options() {
 			fetchReusableBlocks();
