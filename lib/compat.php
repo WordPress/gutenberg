@@ -212,6 +212,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 		$_block_context['postId'] = $post->ID;
 	}
 
+	/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
 		foreach ( $block_type->providesContext as $context_name => $attribute_name ) {
 			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
@@ -219,6 +220,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 			}
 		}
 	}
+	/* phpcs:enable */
 
 	foreach ( $block['innerContent'] as $chunk ) {
 		$block_content .= is_string( $chunk ) ?
