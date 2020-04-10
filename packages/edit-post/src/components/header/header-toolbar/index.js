@@ -18,7 +18,7 @@ import {
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
-function HeaderToolbar( { onToggleInserter } ) {
+function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
 		showInserter,
@@ -58,7 +58,9 @@ function HeaderToolbar( { onToggleInserter } ) {
 			aria-label={ toolbarAriaLabel }
 		>
 			<Button
+				className="edit-post-header-toolbar__inserter-toggle"
 				isPrimary
+				isPressed={ isInserterOpen }
 				onClick={ onToggleInserter }
 				disabled={ ! showInserter }
 				icon={ plus }

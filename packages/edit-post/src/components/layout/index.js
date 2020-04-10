@@ -144,6 +144,7 @@ function Layout() {
 					className={ className }
 					header={
 						<Header
+							isInserterOpen={ isInserterOpen }
 							onToggleInserter={ () =>
 								setIsInserterOpen( ! isInserterOpen )
 							}
