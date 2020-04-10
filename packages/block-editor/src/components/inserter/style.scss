@@ -84,7 +84,8 @@ $block-inserter-tabs-height: 44px;
 		}
 
 		&:focus {
-			@include input-style__focus();
+			background: $white;
+			box-shadow: 0 0 0 $border-width-focus $theme-color;
 		}
 	}
 }
