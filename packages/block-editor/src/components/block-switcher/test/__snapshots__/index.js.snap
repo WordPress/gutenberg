@@ -31,7 +31,7 @@ exports[`BlockSwitcher should render enabled block switcher with multi block whe
   contentClassName="block-editor-block-switcher__popover"
   popoverProps={
     Object {
-      "isPrimary": true,
+      "isAlternate": true,
       "position": "bottom right",
     }
   }
@@ -46,7 +46,7 @@ exports[`BlockSwitcher should render switcher with blocks 1`] = `
   contentClassName="block-editor-block-switcher__popover"
   popoverProps={
     Object {
-      "isPrimary": true,
+      "isAlternate": true,
       "position": "bottom right",
     }
   }
