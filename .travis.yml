@@ -27,7 +27,6 @@ env:
     - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - WP_DEVELOP_DIR: ./wordpress
     - LOCAL_SCRIPT_DEBUG: false
-    - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
 
 # Make sure NodeGit gets the correct C libs.
@@ -88,10 +87,6 @@ install:
       # Connect Gutenberg to WordPress.
       npm run env connect
       npm run env cli plugin activate gutenberg
-    fi
-  - |
-    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      npm run env docker-run -- php composer install --no-interaction
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -159,12 +154,11 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
+      env: LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
