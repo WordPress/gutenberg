@@ -33,7 +33,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,6 +58,7 @@ function Layout() {
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
+		closeGeneralSidebar,
 		togglePublishSidebar,
 	} = useDispatch( 'core/edit-post' );
 	const {
@@ -116,6 +117,18 @@ function Layout() {
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
+
+	// Inserter and Sidebars are mutually exclusive
+	useEffect( () => {
+		if ( sidebarIsOpened ) {
+			setIsInserterOpen( false );
+		}
+	}, [ sidebarIsOpened ] );
+	useEffect( () => {
+		if ( isInserterOpen ) {
+			closeGeneralSidebar();
+		}
+	}, [ isInserterOpen ] );
 
 	return (
 		<>
