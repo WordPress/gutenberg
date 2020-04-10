@@ -11,7 +11,6 @@ import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-//import AdminMenuToggle from './admin-menu-toggle';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
