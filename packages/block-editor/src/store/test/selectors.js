@@ -2809,7 +2809,7 @@ describe( 'selectors', () => {
 			expect( result ).toBeUndefined();
 		} );
 
-		it( 'returns the feature object when found', () => {
+		it( 'returns the feature group when found', () => {
 			const testFeature = {
 				enabled: true,
 			};
@@ -2822,6 +2822,24 @@ describe( 'selectors', () => {
 			const result = __experimentalGetFeature( state, 'testFeature' );
 
 			expect( result ).toEqual( testFeature );
+		} );
+
+		it( 'returns the feature item when found', () => {
+			const testFeature = {
+				enabled: true,
+			};
+			const state = deepFreeze( {
+				features: {
+					testFeature,
+				},
+			} );
+
+			const result = __experimentalGetFeature(
+				state,
+				'testFeature.enabled'
+			);
+
+			expect( result ).toBe( true );
 		} );
 	} );
 } );

@@ -1502,15 +1502,16 @@ export function getSettings( state ) {
 }
 
 /**
- * Returns the block editor feature by name.
+ * Returns the block editor's feature group by or individual setting by providing
+ * its path.
  *
- * @param {Object} state       Editor state.
- * @param {string} featureName Feature name.
+ * @param {Object} state Editor state.
+ * @param {string} path  The path of the feature to get.
  *
- * @return {Object} The block editor feature object.
+ * @return {any} The block editor feature object or individual value when found.
  */
-export function __experimentalGetFeature( state, featureName ) {
-	return state.features?.[ featureName ];
+export function __experimentalGetFeature( state, path ) {
+	return get( state.features, path );
 }
 
 /**
