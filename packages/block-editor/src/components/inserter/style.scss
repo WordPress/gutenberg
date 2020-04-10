@@ -189,19 +189,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__menu-preview-panel {
+.block-editor-inserter__preview-popover .components-popover__content {
 	display: none;
-	border: $border-width solid $light-gray-secondary;
 	width: 300px;
-	margin-right: 20px;
 	background: $white;
-	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
+	margin-left: $grid-unit-20;
 
 	@include break-medium {
-		position: absolute;
-		top: -$border-width;
-		left: calc(100% + #{$grid-unit-15});
 		display: block;
 	}
 
