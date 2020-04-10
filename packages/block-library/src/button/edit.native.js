@@ -347,10 +347,12 @@ class ButtonEdit extends Component {
 				onTextLayout={ ( { nativeEvent } ) => {
 					const textWidth =
 						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
-					if ( textWidth !== placeholderTextWidth ) {
+					if ( textWidth && textWidth !== placeholderTextWidth ) {
 						this.setState( {
-							placeholderTextWidth:
-								textWidth > maxWidth ? maxWidth : textWidth,
+							placeholderTextWidth: Math.min(
+								textWidth,
+								maxWidth
+							),
 						} );
 					}
 				} }
