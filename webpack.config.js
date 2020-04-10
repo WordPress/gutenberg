@@ -189,7 +189,7 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
 	watchOptions: {
-		ignored: '!packages/**/(build|build-module)/**/*',
+		ignored: '!packages/*/!(src)/**/*',
 	},
 	devtool,
 };
