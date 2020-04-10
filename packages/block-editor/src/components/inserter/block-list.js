@@ -187,11 +187,7 @@ function InserterBlockList( {
 	const hasItems = ! isEmpty( filteredItems );
 
 	return (
-		<div
-			tabIndex="0"
-			role="region"
-			aria-label={ __( 'Available block types' ) }
-		>
+		<div>
 			<ChildBlocks
 				rootClientId={ rootClientId }
 				items={ childItems }
