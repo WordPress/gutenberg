@@ -33,5 +33,13 @@
 
 		"typeRoots": [ "./node_modules/@types" ]
 	},
-	"exclude": [ "**/benchmark", "**/test/**", "**/build/**", "**/build-*/**" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/build/**",
+		"**/build-*/**",
+		"**/*.android.js",
+		"**/*.ios.js",
+		"**/*.native.js"
+	]
 }

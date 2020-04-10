@@ -92,7 +92,7 @@ export const settings = {
 		anchor: true,
 		html: false,
 		lightBlockWrapper: true,
-		__experimentalColor: true,
+		__experimentalColor: { gradients: true },
 	},
 	transforms: {
 		from: [
