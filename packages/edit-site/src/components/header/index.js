@@ -7,13 +7,12 @@ import {
 	ToolSelector,
 	Inserter,
 } from '@wordpress/block-editor';
-import { PinnedItems } from '@wordpress/interface';
+import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
@@ -51,7 +50,7 @@ export default function Header() {
 	);
 	return (
 		<div className="edit-site-header">
-			<FullscreenModeClose />
+			<AdminMenuToggle />
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
