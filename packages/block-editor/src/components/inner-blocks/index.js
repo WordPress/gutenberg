@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual } from 'lodash';
+import { mapKeys, pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -40,6 +40,24 @@ import { withBlockEditContext } from '../block-edit/context';
 const BLOCK_CONTEXT_CACHE = new WeakMap();
 
 /**
+ * Returns a namespaced string to use as key for context object, deriving
+ * namespace from the given block name.
+ *
+ * @param {string} blockName   Block name.
+ * @param {string} contextName Name of provided context.
+ *
+ * @return {string} Namespaced context name.
+ */
+export function getNamespacedBlockContextName( blockName, contextName ) {
+	const [ namespace ] = blockName.split( '/' );
+	if ( namespace !== 'core' ) {
+		contextName = namespace + '/' + contextName;
+	}
+
+	return contextName;
+}
+
+/**
  * Returns a cached context object value for a given set of attributes for the
  * block type.
  *
@@ -55,7 +73,12 @@ function getBlockContext( attributes, blockType ) {
 
 	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
 	if ( ! blockTypeCache.has( attributes ) ) {
-		const context = pick( attributes, blockType.providesContext );
+		const context = mapKeys(
+			pick( attributes, blockType.providesContext ),
+			( value, key ) =>
+				getNamespacedBlockContextName( blockType.name, key )
+		);
+
 		blockTypeCache.set( attributes, context );
 	}
 
