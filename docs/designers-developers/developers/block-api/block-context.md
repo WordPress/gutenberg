@@ -14,9 +14,7 @@ Block context is defined in the registered settings of a block. A block can prov
 
 A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an array of the attribute names which will be made available to descendent blocks via context. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
 
-Note that when context is assigned, names of context keys provided by a block are automatically namespaced using the same namespace defined in the block's name. For the core set of blocks defined by WordPress, the namespace is omitted.
-
-`post/block.json`
+_block.json_
 
 ```json
 {
@@ -30,46 +28,16 @@ Note that when context is assigned, names of context keys provided by a block ar
 }
 ```
 
-`record/block.json`
-
-```json
-{
-	"name": "my-plugin/record",
-	"attributes": {
-		"recordId": {
-			"type": "number"
-		}
-	},
-	"providesContext": [ "recordId" ]
-}
-```
-
 ### Consuming Block Context
 
 A block can inherit a context value from an ancestor provider by assigning a `context` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
 
-Note that when context is assigned, names of context keys provided by a block are automatically namespaced using the same namespace defined in the block's name. For the core set of blocks defined by WordPress, the namespace is omitted.
-
-`post-title/block.json`
+_block.json_
 
 ```json
 {
 	"name": "core/post-excerpt",
 	"context": [ "postId" ]
-}
-```
-
-`record-title/block.json`
-
-```json
-{
-	"name": "my-plugin/record-title",
-	"attributes": {
-		"recordId": {
-			"type": "number"
-		}
-	},
-	"context": [ "my-plugin/recordId" ]
 }
 ```
 

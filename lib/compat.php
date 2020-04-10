@@ -162,33 +162,6 @@ function gutenberg_get_post_from_context() {
 	return get_post();
 }
 
-if ( ! function_exists( 'get_namespaced_block_context_name' ) ) {
-	/**
-	 * Returns a namespaced string to use as key for context object, deriving
-	 * namespace from the given block name.
-	 *
-	 * This can be removed when plugin support requires WordPress 5.5.0+.
-	 *
-	 * @see (TBD Trac Link)
-	 *
-	 * @param string $block_name   Block name.
-	 * @param string $context_name Name of provided context.
-	 *
-	 * @return string Namespaced context name.
-	 */
-	function get_namespaced_block_context_name( $block_name, $context_name ) {
-		$normalized_block_name = strip_core_block_namespace( $block_name );
-		$slash_index           = strpos( $normalized_block_name, '/' );
-
-		if ( false !== $slash_index ) {
-			$namespace = substr( $normalized_block_name, 0, $slash_index );
-			$context_name = $namespace . '/' . $context_name;
-		}
-
-		return $context_name;
-	}
-}
-
 /**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
@@ -242,8 +215,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
 		foreach ( $block_type->providesContext as $attribute_name ) {
 			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
-				$context_key = get_namespaced_block_context_name( $block['blockName'], $attribute_name );
-				$_block_context[ $context_key ] = $block['attrs'][ $attribute_name ];
+				$_block_context[ $attribute_name ] = $block['attrs'][ $attribute_name ];
 			}
 		}
 	}

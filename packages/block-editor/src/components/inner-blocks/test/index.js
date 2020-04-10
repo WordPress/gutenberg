@@ -14,27 +14,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import InnerBlocks, { getNamespacedBlockContextName } from '../';
-
-describe( 'getNamespacedBlockContextName', () => {
-	it( 'omits namespace for core blocks', () => {
-		const contextName = getNamespacedBlockContextName(
-			'core/post-title',
-			'postId'
-		);
-
-		expect( contextName ).toBe( 'postId' );
-	} );
-
-	it( 'includes namespace for non-core blocks', () => {
-		const contextName = getNamespacedBlockContextName(
-			'my-plugin/example-block',
-			'recordId'
-		);
-
-		expect( contextName ).toBe( 'my-plugin/recordId' );
-	} );
-} );
+import InnerBlocks from '../';
 
 describe( 'InnerBlocks', () => {
 	afterEach( () => {
