@@ -163,24 +163,33 @@ export default class EditorPage {
 
 		// Click on block of choice
 		const blockButton = await this.findBlockButton( blockName );
-		await blockButton.click();
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', { element: blockButton, x: 10, y: 10 } );
+		}
 	}
 
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName: string ) {
-		// If running on iOS returns the result of the look up as no scrolling is necessary for offscreen items.
-		if ( ! isAndroid() ) {
+		if ( isAndroid() ) {
+			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
+			while ( ! await this.driver.hasElementByAccessibilityId( blockName ) ) {
+				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+			}
+
 			return await this.driver.elementByAccessibilityId( blockName );
 		}
 
-		// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
-		if ( ! await this.driver.hasElementByAccessibilityId( blockName ) ) {
-			for ( let step = 0; step < 5; step++ ) {
-				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
-			}
+		const blockButton = await this.driver.elementByAccessibilityId( blockName );
+		const size = await this.driver.getWindowSize();
+		const height = size.height - 5;
+
+		while ( ! await blockButton.isDisplayed() ) {
+			await this.driver.execute( 'mobile: dragFromToForDuration', { fromX: 50, fromY: height, toX: 50, toY: height - 450, duration: 0.5 } );
 		}
 
-		return await this.driver.elementByAccessibilityId( blockName );
+		return blockButton;
 	}
 
 	async clickToolBarButton( buttonName: string ) {
