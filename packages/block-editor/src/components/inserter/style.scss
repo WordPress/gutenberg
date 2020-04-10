@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 300px;
+$block-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -102,7 +102,7 @@ $block-inserter-tabs-height: 44px;
 	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
-		border-bottom: $border-width solid $light-gray-secondary;
+		border-bottom: $border-width solid $light-gray-500;
 
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
@@ -195,6 +195,7 @@ $block-inserter-tabs-height: 44px;
 	background: $white;
 	border-radius: $radius-block-ui;
 	margin-left: $grid-unit-20;
+	border-color: $light-gray-500;
 
 	@include break-medium {
 		display: block;
@@ -225,7 +226,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $light-gray-secondary;
+	border-top: $border-width solid $light-gray-500;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 }
@@ -265,4 +266,5 @@ $block-inserter-tabs-height: 44px;
 	text-align: center;
 	padding: 10px 0;
 	padding: $grid-unit-20;
+	font-size: 12px;
 }
