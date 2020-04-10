@@ -12,7 +12,7 @@ Block context is defined in the registered settings of a block. A block can prov
 
 ### Providing Block Context
 
-A block can provide a context value by assigning a `providesContext` property in its registered settings. This should be assigned as an array of the attribute names for attribute values to assign as context. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
+A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an array of the attribute names which will be made available to descendent blocks via context. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
 
 _block.json_
 
