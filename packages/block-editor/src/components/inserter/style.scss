@@ -225,6 +225,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__tips {
+	border-top: $border-width solid $light-gray-secondary;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 }
