@@ -12,19 +12,21 @@ Block context is defined in the registered settings of a block. A block can prov
 
 ### Providing Block Context
 
-A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an array of the attribute names which will be made available to descendent blocks via context. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
+A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an object which maps a context name to one of the block's own attribute. The value corresponding to that attribute value is made available to descendent blocks and can be referenced by the same context name. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
 
-_block.json_
+`record/block.json`
 
 ```json
 {
-	"name": "core/post",
+	"name": "my-plugin/record",
 	"attributes": {
-		"postId": {
+		"recordId": {
 			"type": "number"
 		}
 	},
-	"providesContext": [ "postId" ]
+	"providesContext": {
+		"my-plugin/recordId": "recordId"
+	}
 }
 ```
 
@@ -32,12 +34,12 @@ _block.json_
 
 A block can inherit a context value from an ancestor provider by assigning a `context` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
 
-_block.json_
+`record-title/block.json`
 
 ```json
 {
-	"name": "core/post-excerpt",
-	"context": [ "postId" ]
+	"name": "my-plugin/record-title",
+	"context": [ "my-plugin/recordId" ]
 }
 ```
 
@@ -47,11 +49,11 @@ Once a block has defined the context it seeks to inherit, this can be accessed i
 
 ### JavaScript
 
-_post-excerpt/edit.js_
+`record-title/edit.js`
 
 ```js
 function edit( { context } ) {
-	return 'The current post ID is: ' + context.postId;
+	return 'The current record ID is: ' + context[ 'my-plugin/recordId' ];
 }
 ```
 
@@ -59,12 +61,12 @@ function edit( { context } ) {
 
 Note that in PHP, block context is accessed using the `$block` global which is assigned at the time a block is registered. This is unlike block attributes or block content, which are provided as arguments to the `render_callback` function. At some point in the future, block context may be integrated into the function arguments signature of `render_callback`, or an alternative block settings configuration may enable a render callback to receive the full block array as its argument.
 
-_post-excerpt/index.php_
+`record-title/index.php`
 
 ```js
-function render_block_core_post_excerpt() {
+function my_plugin_render_block_record_title() {
 	global $block;
 
-	return 'The current post ID is: ' . $block['context']['postId'];
+	return 'The current record ID is: ' . $block['context']['my-plugin/recordId'];
 }
 ```

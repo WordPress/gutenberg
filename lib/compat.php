@@ -213,9 +213,9 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	}
 
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
-		foreach ( $block_type->providesContext as $attribute_name ) {
+		foreach ( $block_type->providesContext as $context_name => $attribute_name ) {
 			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
-				$_block_context[ $attribute_name ] = $block['attrs'][ $attribute_name ];
+				$_block_context[ $context_name ] = $block['attrs'][ $attribute_name ];
 			}
 		}
 	}

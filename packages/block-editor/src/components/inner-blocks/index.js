@@ -55,7 +55,11 @@ function getBlockContext( attributes, blockType ) {
 
 	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
 	if ( ! blockTypeCache.has( attributes ) ) {
-		const context = pick( attributes, blockType.providesContext );
+		const context = pick(
+			attributes,
+			Object.keys( blockType.providesContext )
+		);
+
 		blockTypeCache.set( attributes, context );
 	}
 
