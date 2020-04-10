@@ -29,7 +29,7 @@ function AdminMenuToggle() {
 
 	return (
 		<Button
-			className="edit-post-fullscreen-admin-menu-toggle"
+			className="interface-admin-menu-toggle"
 			icon={ wordpress }
 			iconSize={ 36 }
 			onClick={ toggleMenu }

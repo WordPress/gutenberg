@@ -1,4 +1,4 @@
-.edit-post-fullscreen-admin-menu-toggle.has-icon {
+.interface-admin-menu-toggle.has-icon {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
@@ -42,11 +42,11 @@
 			}
 		}
 
-		body.js.is-showing-admin-menu & {
+		body.is-showing-admin-menu & {
 			width: 160px;
 		}
 
-		body.js.is-showing-admin-menu.folded & {
+		body.is-showing-admin-menu.folded & {
 			width: $header-height;
 		}
 	}
