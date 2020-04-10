@@ -166,8 +166,8 @@ $arrow-size: 8px;
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 
-	// "Primary" treatment for popovers put them at elevation zero with high contrast.
-	.is-primary & {
+	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	.is-alternate & {
 		border: $border-width solid $dark-gray-primary;
 		box-shadow: none;
 	}

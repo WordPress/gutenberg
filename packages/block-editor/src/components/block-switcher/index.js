@@ -31,7 +31,7 @@ import BlockTypesList from '../block-types-list';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	isPrimary: true,
+	isAlternate: true,
 };
 
 export class BlockSwitcher extends Component {

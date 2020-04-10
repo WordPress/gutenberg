@@ -14,7 +14,7 @@ import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
-	isPrimary: true,
+	isAlternate: true,
 };
 
 const FormatToolbar = () => {

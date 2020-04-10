@@ -233,7 +233,7 @@ const Popover = ( {
 	children,
 	className,
 	noArrow = true,
-	isPrimary,
+	isAlternate,
 	// Disable reason: We generate the `...contentProps` rest as remainder
 	// of props which aren't explicitly handled by this component.
 	/* eslint-disable no-unused-vars */
@@ -271,7 +271,7 @@ const Popover = ( {
 	useEffect( () => {
 		if ( isExpanded ) {
 			setClass( containerRef.current, 'is-without-arrow', noArrow );
-			setClass( containerRef.current, 'is-primary', isPrimary );
+			setClass( containerRef.current, 'is-alternate', isAlternate );
 			setAttribute( containerRef.current, 'data-x-axis' );
 			setAttribute( containerRef.current, 'data-y-axis' );
 			setStyle( containerRef.current, 'top' );
@@ -394,7 +394,7 @@ const Popover = ( {
 				'is-without-arrow',
 				noArrow || ( xAxis === 'center' && yAxis === 'middle' )
 			);
-			setClass( containerRef.current, 'is-primary', isPrimary );
+			setClass( containerRef.current, 'is-alternate', isAlternate );
 			setAttribute( containerRef.current, 'data-x-axis', xAxis );
 			setAttribute( containerRef.current, 'data-y-axis', yAxis );
 			setStyle(
@@ -578,7 +578,7 @@ const Popover = ( {
 							{
 								'is-expanded': isExpanded,
 								'is-without-arrow': noArrow,
-								'is-primary': isPrimary,
+								'is-alternate': isAlternate,
 							}
 						) }
 						{ ...contentProps }
