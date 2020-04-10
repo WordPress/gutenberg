@@ -73,6 +73,7 @@ export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
+export { default as __experimentalLibrary } from './inserter/library';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';

@@ -17,7 +17,7 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import PreviewOptions from '../preview-options';
 
-function Header() {
+function Header( { onToggleInserter } ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -60,7 +60,7 @@ function Header() {
 		<div className="edit-post-header">
 			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
+				<HeaderToolbar onToggleInserter={ onToggleInserter } />
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (

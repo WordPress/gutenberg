@@ -15,7 +15,10 @@ import {
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalLibrary as Library,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -30,6 +33,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,6 +53,7 @@ import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
 function Layout() {
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const {
 		closePublishSidebar,
@@ -124,7 +129,17 @@ function Layout() {
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
-					header={ <Header /> }
+					header={
+						<Header
+							onToggleInserter={ () =>
+								setIsInserterOpen( ! isInserterOpen )
+							}
+						/>
+					}
+					leftSidebar={
+						mode === 'visual' &&
+						isInserterOpen && <Library showInserterHelpPanel />
+					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>

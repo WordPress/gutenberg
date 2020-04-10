@@ -28,6 +28,7 @@ function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
+	leftSidebar,
 	content,
 	actions,
 	labels,
@@ -38,6 +39,7 @@ function InterfaceSkeleton( {
 	const defaultLabels = {
 		header: __( 'Header' ),
 		body: __( 'Content' ),
+		leftSidebar: __( 'Left sidebar' ),
 		sidebar: __( 'Settings' ),
 		actions: __( 'Publish' ),
 		footer: __( 'Footer' ),
@@ -64,6 +66,17 @@ function InterfaceSkeleton( {
 				</div>
 			) }
 			<div className="interface-interface-skeleton__body">
+				{ !! leftSidebar && (
+					<div
+						className="interface-interface-skeleton__left-sidebar"
+						role="region"
+						/* translators: accessibility text for the settings landmark region. */
+						aria-label={ mergedLabels.leftSidebar }
+						tabIndex="-1"
+					>
+						{ leftSidebar }
+					</div>
+				) }
 				<div
 					className="interface-interface-skeleton__content"
 					role="region"
