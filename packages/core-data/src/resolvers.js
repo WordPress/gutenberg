@@ -63,6 +63,16 @@ export function* getEntityRecord( kind, name, key = '' ) {
 }
 
 /**
+ * Requests an entity's record from the REST API.
+ */
+export const getRawEntityRecord = getEntityRecord;
+
+/**
+ * Requests an entity's record from the REST API.
+ */
+export const getEditedEntityRecord = getRawEntityRecord;
+
+/**
  * Requests the entity's records from the REST API.
  *
  * @param {string}  kind   Entity kind.
