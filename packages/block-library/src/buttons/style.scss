@@ -16,4 +16,10 @@
 
 .wp-block-buttons.is-direction-vertical .wp-block-button {
 	display: block;
+	width: max-content;
+}
+
+.wp-block-buttons.aligncenter.is-direction-vertical .wp-block-button {
+	margin-left: auto;
+	margin-right: auto;
 }
