@@ -4,7 +4,8 @@
         "name": "core/buttons",
         "isValid": true,
         "attributes": {
-            "blockDirection": "horizontal"
+            "blockDirection": "vertical",
+            "className": "is-direction-vertical"
         },
         "innerBlocks": [
             {
@@ -15,7 +16,7 @@
                     "text": "My button 1"
                 },
                 "innerBlocks": [],
-                "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>"
+                "originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 1</a>"
             },
             {
                 "clientId": "_clientId_1",
@@ -25,9 +26,9 @@
                     "text": "My button 2"
                 },
                 "innerBlocks": [],
-                "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
+                "originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 2</a>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-buttons is-direction-vertical\">\n\t\n\n\t\n</div>"
     }
 ]
