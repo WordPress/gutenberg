@@ -17,12 +17,7 @@ export default class EditorPage {
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
-	listBlockName = 'List';
-	headingBlockName = 'Heading';
-	imageBlockName = 'Image';
-	galleryBlockName = 'Gallery';
 	latestPostsBlockName = 'Latest Posts';
-	unorderedListButtonName = 'Convert to unordered list';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -343,18 +338,6 @@ export default class EditorPage {
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
-	async getTextForListBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const textViewElement = await this.getTextViewForListBlock( block );
-		const text = await textViewElement.text();
-		return text.toString();
-	}
-
-	async getTextForListBlockAtPosition( position: number ) {
-		const block = await this.getBlockAtPosition( this.listBlockName, position );
-		const text = await this.getTextForListBlock( block );
-		return text.toString();
-	}
-
 	async clickOrderedListToolBarButton() {
 		await this.clickToolBarButton( this.orderedListButtonName );
 	}
@@ -362,14 +345,6 @@ export default class EditorPage {
 	// =========================
 	// Image Block functions
 	// =========================
-
-	async addNewImageBlock() {
-		await this.addNewBlock( this.imageBlockName );
-	}
-
-	async getImageBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.imageBlockName );
-	}
 
 	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
@@ -389,36 +364,9 @@ export default class EditorPage {
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
 
-	async removeImageBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.imageBlockName );
-	}
-
-	// =========================
-	// Gallery Block functions
-	// =========================
-
-	async addNewGalleryBlock() {
-		await this.addNewBlock( this.galleryBlockName );
-	}
-
-	async getGalleryBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.galleryBlockName );
-	}
-
-	async removeGalleryBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.galleryBlockName );
-	}
-
 	// =========================
 	// Heading Block functions
 	// =========================
-	async addNewHeadingBlock() {
-		await this.addNewBlock( this.headingBlockName );
-	}
-
-	async getHeadingBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.headingBlockName );
-	}
 
 	// Inner element changes on iOS if Heading Block is empty
 	async getTextViewForHeadingBlock( block: wd.PromiseChainWebdriver.Element, empty: boolean ) {
@@ -435,12 +383,6 @@ export default class EditorPage {
 	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean = true ) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text, clear );
-	}
-
-	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
-		const text = await textViewElement.text();
-		return text.toString();
 	}
 
 	// ============================
