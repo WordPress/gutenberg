@@ -52,7 +52,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		await editorPage.removeBlockAtPosition( paragraphBlockName );
 	} );
 
@@ -63,10 +63,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n', false );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\n', false );
 		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
@@ -87,10 +87,10 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\n' );
 		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
@@ -103,7 +103,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickBeginningOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\u0008' );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\u0008' );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );

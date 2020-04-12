@@ -49,19 +49,19 @@ describe( 'Gutenberg Editor tests', () => {
 
 		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await editorPage.addNewBlock( headingBlockName );
 		headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName, 4 );
-		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
+		await editorPage.typeTextToParagraphBlock( headingBlockElement, testData.heading );
 
 		await editorPage.addNewBlock( paragraphBlockName );
 		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 5 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 
 	afterAll( async () => {

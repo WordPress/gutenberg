@@ -78,7 +78,7 @@ export default class EditorPage {
 				// scroll down
 				await swipeUp( this.driver );
 			}
-			return this.getBlockAtPosition( blockName, position, options );
+			return await this.getBlockAtPosition( blockName, position, options );
 		}
 		return lastElementFound;
 	}
