@@ -394,10 +394,10 @@ export default class EditorPage {
 	}
 
 	async getLatestPostsBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( position, this.latestPostsBlockName );
+		return this.getBlockAtPosition( this.latestPostsBlockName, position );
 	}
 
 	async removeLatestPostsBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( position, this.latestPostsBlockName );
+		return await this.removeBlockAtPosition( this.latestPostsBlockName, position );
 	}
 }
