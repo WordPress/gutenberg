@@ -55,8 +55,34 @@
 	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
+	.my-popover-content-classname {
+		display: block;
+	}
+
 	@include break-small() {
 		padding-right: $grid-unit-20;
+	}
+}
+
+//temp
+.my-container-class-name {
+	> button {
+		margin-right: 1rem;
+	}
+}
+.my-popover-content-classname {
+	.components-popover__content {
+		min-width: auto;
+	}
+	.edit-post-header__settings {
+		display: block;
+		> div,
+		> button {
+			display: inline-flex;
+			margin-bottom: 1rem;
+			text-align: left;
+			width: 100%;
+		}
 	}
 }
 

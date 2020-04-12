@@ -64,31 +64,28 @@ function HeaderToolbar() {
 		  __( 'Document tools' );
 
 	return (
-		<NavigableToolbar aria-label={ toolbarAriaLabel }>
-			<div
-				className={ classnames( 'edit-post-header-toolbar', {
-					'show-icon-labels': isWideViewport && showIconLabels,
-				} ) }
-			>
-				<Inserter
-					disabled={ ! showInserter }
-					position="bottom right"
-					showInserterHelpPanel
-					toggleProps={ inserterToggleProps }
-				/>
-				<ToolSelector />
-				<EditorHistoryUndo />
-				<EditorHistoryRedo />
-				<TableOfContents
-					hasOutlineItemsDisabled={ isTextModeEnabled }
-				/>
-				<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-				{ displayBlockToolbar && (
-					<div className="edit-post-header-toolbar__block-toolbar">
-						<BlockToolbar hideDragHandle />
-					</div>
-				) }
-			</div>
+		<NavigableToolbar
+			aria-label={ toolbarAriaLabel }
+			className={ classnames( 'edit-post-header-toolbar', {
+				'show-icon-labels': isWideViewport && showIconLabels,
+			} ) }
+		>
+			<Inserter
+				disabled={ ! showInserter }
+				position="bottom right"
+				showInserterHelpPanel
+				toggleProps={ inserterToggleProps }
+			/>
+			<ToolSelector />
+			<EditorHistoryUndo />
+			<EditorHistoryRedo />
+			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
+			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
+			{ displayBlockToolbar && (
+				<div className="edit-post-header-toolbar__block-toolbar">
+					<BlockToolbar hideDragHandle />
+				</div>
+			) }
 		</NavigableToolbar>
 	);
 }
