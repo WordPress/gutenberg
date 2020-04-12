@@ -17,7 +17,6 @@ export default class EditorPage {
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
-	listBlockName = 'List';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -78,7 +77,7 @@ export default class EditorPage {
 				// scroll down
 				await swipeUp( this.driver );
 			}
-			return this.getBlockAtPosition( blockName, position, options );
+			return await this.getBlockAtPosition( blockName, position, options );
 		}
 		return lastElementFound;
 	}
@@ -358,18 +357,6 @@ export default class EditorPage {
 		const clear = false;
 
 		return await typeString( this.driver, textViewElement, text, clear );
-	}
-
-	async getTextForListBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const textViewElement = await this.getTextViewForListBlock( block );
-		const text = await textViewElement.text();
-		return text.toString();
-	}
-
-	async getTextForListBlockAtPosition( position: number ) {
-		const block = await this.getBlockAtPosition( this.listBlockName, position );
-		const text = await this.getTextForListBlock( block );
-		return text.toString();
 	}
 
 	async clickOrderedListToolBarButton() {

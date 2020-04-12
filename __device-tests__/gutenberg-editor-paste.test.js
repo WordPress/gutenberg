@@ -57,7 +57,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 
 		// copy content to clipboard
