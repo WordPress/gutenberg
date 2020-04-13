@@ -13,7 +13,7 @@ export default function PostTitleEdit( { context } ) {
 				postType,
 				postId
 			),
-		[ 'postType', 'postId' ]
+		[ postType, postId ]
 	);
 
 	if ( ! post ) {
