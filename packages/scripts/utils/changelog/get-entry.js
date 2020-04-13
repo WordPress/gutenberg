@@ -71,7 +71,7 @@ const getEntry = async ( pullRequest ) => {
 	} else {
 		title = `${ type }: ${ pullRequest.title }`;
 	}
-	return `- ${ title } [#${ pullRequest.number }](${ pullRequest.url }) ${ authorTag }`;
+	return `- ${ title } [${ pullRequest.number }](${ pullRequest.url }) ${ authorTag }`;
 };
 
 module.exports = {
