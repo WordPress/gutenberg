@@ -1,6 +1,6 @@
 'use strict';
 
-const { REPO } = require( '../../config/changelog.config' );
+const { REPO } = require( './config' );
 const { getGraphqlClient } = require( './get-entry' );
 
 /* eslint no-console: 0 */

@@ -1,6 +1,6 @@
 'use strict';
 
-const pkg = require( '../../../package.json' );
+const pkg = require( '../../package.json' );
 
 const REPO = 'WordPress/gutenberg';
 

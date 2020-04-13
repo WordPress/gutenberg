@@ -28,7 +28,6 @@ _Example:_
 {
 	"scripts": {
 		"build": "wp-scripts build",
-		"changelog": "wp-scripts changelog",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
 		"format:js": "wp-scripts format-js",
@@ -450,26 +449,6 @@ Jest will look for test files with any of the following popular naming conventio
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
-
-### `changelog`
-
-Based on a milestone, it creates a changelog entry with all PRs merged in that milestone.
-
-You will need to have a github api token, [create one here](https://github.com/settings/tokens).
-
-Token scope will require read permissions on public_repo, admin:org, and user.
-
-Export the token as variable called GH_API_TOKEN from your bash profile.
-
-_Example:_
-
-```json
-{
-	"scripts": {
-		"changelog": "wp-scripts changelog"
-	}
-}
-```
 
 ## Passing Node.js options
 

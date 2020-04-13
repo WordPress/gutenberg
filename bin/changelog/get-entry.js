@@ -1,7 +1,7 @@
 'use strict';
 
 const { graphql } = require( '@octokit/graphql' );
-const { pkg } = require( '../../config/changelog.config.js' );
+const { pkg } = require( './config' );
 
 /* eslint no-console: 0 */
 
