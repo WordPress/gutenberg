@@ -65,6 +65,11 @@ const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
 	native: { separatorType: 'none' },
 } );
 
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+	web: {},
+	native: { type: 'stepper' },
+} );
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -398,7 +403,7 @@ class GalleryEdit extends Component {
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
 								{ ...MOBILE_CONTROL_PROPS }
-								type="stepper"
+								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 								required
 							/>
 						) }
