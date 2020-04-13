@@ -7,8 +7,7 @@ const REPO = 'WordPress/gutenberg';
 const defaultConfig = {
 	labelPrefix: '[Type]',
 	skipLabel: 'no-changelog',
-	defaultPrefix: 'dev',
-	zenhub: false,
+	defaultPrefix: 'various',
 };
 pkg.changelog = Object.assign( {}, pkg.changelog, defaultConfig );
 

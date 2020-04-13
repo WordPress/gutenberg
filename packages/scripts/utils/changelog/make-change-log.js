@@ -25,7 +25,7 @@ const makeChangeLog = async () => {
 			success( `https://github.com/${ REPO }/milestones` )
 	);
 	const version = await promptly.prompt( 'Version number: ' );
-	console.log( '>> Here is the generated changelog.' );
+	console.log( '>> Here is the generated changelog:' );
 	console.log( '' );
 	make( token, version );
 };
