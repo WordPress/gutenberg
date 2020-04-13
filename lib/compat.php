@@ -214,9 +214,10 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $next_
 
 	/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
 	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
 		foreach ( $block_type->providesContext as $context_name => $attribute_name ) {
-			if ( isset( $block['attrs'][ $attribute_name ] ) ) {
-				$_block_context[ $context_name ] = $block['attrs'][ $attribute_name ];
+			if ( isset( $prepared_attributes[ $attribute_name ] ) ) {
+				$_block_context[ $context_name ] = $prepared_attributes[ $attribute_name ];
 			}
 		}
 	}
