@@ -94,6 +94,16 @@ export function receiveEntityRecords(
 	};
 }
 
+export function removeItems( kind, name, records ) {
+	return {
+		type: 'REMOVE_ITEMS',
+		items: castArray( records ),
+		kind,
+		name,
+		invalidateCache: false,
+	};
+}
+
 /**
  * Returns an action object used in signalling that the current theme has been received.
  *
@@ -136,6 +146,62 @@ export function receiveEmbedPreview( url, preview ) {
 		type: 'RECEIVE_EMBED_PREVIEW',
 		url,
 		preview,
+	};
+}
+
+export function* deleteEntityRecord( kind, name, recordId ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+	};
+	yield removeItems( kind, name, recordId );
+
+	let error;
+
+	try {
+		let path = `${ entity.baseURL }/${ recordId }`;
+
+		if ( entity.forceDelete ) {
+			path += '?force=true';
+		}
+
+		yield apiFetch( {
+			path,
+			method: 'DELETE',
+		} );
+	} catch ( _error ) {
+		error = _error;
+
+		const persistedRecord = yield select(
+			'getEntityRecord',
+			kind,
+			name,
+			recordId
+		);
+
+		yield receiveEntityRecords(
+			kind,
+			name,
+			persistedRecord,
+			undefined,
+			false
+		);
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+		error,
 	};
 }
 
@@ -418,26 +484,47 @@ export function* saveEntityRecord(
 				name,
 				recordId
 			);
-			yield receiveEntityRecords(
-				kind,
-				name,
-				{ ...persistedEntity, ...data },
-				undefined,
-				true
-			);
 
-			updatedRecord = yield apiFetch( {
-				path,
-				method: recordId ? 'PUT' : 'POST',
-				data,
-			} );
-			yield receiveEntityRecords(
-				kind,
-				name,
-				updatedRecord,
-				undefined,
-				true
-			);
+			if (
+				currentEdits &&
+				currentEdits.toDelete &&
+				currentEdits.toDelete === true
+			) {
+				let deletePath = path;
+				if ( entity.forceDelete === true ) {
+					deletePath = deletePath + '?force=true';
+				}
+
+				updatedRecord = yield apiFetch( {
+					path: deletePath,
+					method: 'DELETE',
+				} );
+
+				updatedRecord = updatedRecord.previous;
+				yield removeItems( kind, name, updatedRecord );
+			} else {
+				yield receiveEntityRecords(
+					kind,
+					name,
+					{ ...persistedEntity, ...data },
+					undefined,
+					true
+				);
+
+				updatedRecord = yield apiFetch( {
+					path,
+					method: recordId ? 'PUT' : 'POST',
+					data,
+				} );
+
+				yield receiveEntityRecords(
+					kind,
+					name,
+					updatedRecord,
+					undefined,
+					true
+				);
+			}
 		}
 	} catch ( _error ) {
 		error = _error;

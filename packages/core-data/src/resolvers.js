@@ -102,7 +102,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 	return (
-		action.type === 'RECEIVE_ITEMS' &&
+		( action.type === 'RECEIVE_ITEMS' || action.type === 'DELETE_ITEMS' ) &&
 		action.invalidateCache &&
 		kind === action.kind &&
 		name === action.name

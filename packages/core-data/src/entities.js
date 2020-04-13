@@ -76,6 +76,7 @@ export const defaultEntities = [
 		baseURL: '/__experimental/menus',
 		plural: 'menus',
 		label: __( 'Menu' ),
+		forceDelete: true,
 	},
 	{
 		name: 'menuItem',
@@ -83,6 +84,7 @@ export const defaultEntities = [
 		baseURL: '/__experimental/menu-items',
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
+		forceDelete: true,
 	},
 	{
 		name: 'menuLocation',
@@ -91,6 +93,7 @@ export const defaultEntities = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+		forceDelete: true,
 	},
 ];
 

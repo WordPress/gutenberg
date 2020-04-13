@@ -54,6 +54,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="deleteEntityRecord" href="#deleteEntityRecord">#</a> **deleteEntityRecord**
+
+Undocumented declaration.
+
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
 Returns an action object that triggers an
@@ -195,6 +199,10 @@ _Returns_
 
 Action triggered to redo the last undoed
 edit to an entity record, if any.
+
+<a name="removeItems" href="#removeItems">#</a> **removeItems**
+
+Undocumented declaration.
 
 <a name="saveEditedEntityRecord" href="#saveEditedEntityRecord">#</a> **saveEditedEntityRecord**
 
