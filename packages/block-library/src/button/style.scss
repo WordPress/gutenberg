@@ -28,7 +28,7 @@ $blocks-button__height: 56px;
 	&:focus,
 	&:active,
 	&:visited {
-		color: var(--wp--color--text, $white);
+		color: var(--wp--color--text);
 	}
 }
 
