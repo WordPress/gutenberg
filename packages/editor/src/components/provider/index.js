@@ -54,6 +54,10 @@ class EditorProvider extends Component {
 			maxSize: 1,
 		} );
 
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
+			maxSize: 1,
+		} );
+
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( props.recovery ) {
 			return;
@@ -139,6 +143,10 @@ class EditorProvider extends Component {
 		};
 	}
 
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
+	}
+
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
 	}
@@ -186,6 +194,11 @@ class EditorProvider extends Component {
 			isPostTitleSelected
 		);
 
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
+		);
+
 		return (
 			<>
 				<EditorStyles styles={ settings.styles } />
@@ -195,12 +208,7 @@ class EditorProvider extends Component {
 						type={ post.type }
 						id={ post.id }
 					>
-						<BlockContextProvider
-							value={ {
-								postId: post.id,
-								postType: post.type,
-							} }
-						>
+						<BlockContextProvider value={ defaultBlockContext }>
 							<BlockEditorProvider
 								value={ blocks }
 								onInput={ resetEditorBlocksWithoutUndoLevel }
