@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, plus } from '@wordpress/icons';
+import { Icon, create } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -63,7 +63,7 @@ function ButtonBlockAppender( {
 							label={ label }
 						>
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-							<Icon icon={ plus } />
+							<Icon icon={ create } />
 						</Button>
 					</Tooltip>
 				);
