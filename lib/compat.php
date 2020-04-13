@@ -223,9 +223,16 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	/* phpcs:enable */
 
 	foreach ( $block['innerContent'] as $chunk ) {
+		// Since the inner `render_block` is expected to assign the `$block`
+		// global for its own render, store a reference to restore after the
+		// child has finished rendering.
+		$global_block = $block;
+
 		$block_content .= is_string( $chunk ) ?
 			$chunk :
 			gutenberg_provide_render_callback_with_block_object( null, $block['innerBlocks'][ $index++ ] );
+
+		$block = $global_block;
 	}
 
 	if ( $is_dynamic ) {
