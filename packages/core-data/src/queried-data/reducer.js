@@ -40,10 +40,13 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
-	const size = Math.max(
-		itemIds.length,
-		nextItemIdsStartIndex + nextItemIds.length
-	);
+	const size =
+		itemIds.length > nextItemIds.length
+			? nextItemIds.length
+			: Math.max(
+					itemIds.length,
+					nextItemIdsStartIndex + nextItemIds.length
+			  );
 
 	// Preallocate array since size is known.
 	const mergedItemIds = new Array( size );
@@ -72,9 +75,9 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  * @return {Object} Next state.
  */
 function items( state = {}, action ) {
+	const key = action.key || DEFAULT_ENTITY_KEY;
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
-			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
 				...action.items.reduce( ( accumulator, value ) => {
@@ -86,8 +89,13 @@ function items( state = {}, action ) {
 					return accumulator;
 				}, {} ),
 			};
+		case 'REMOVE_ITEMS':
+			const newState = { ...state };
+			for ( const id of action.items ) {
+				delete newState[ id ];
+			}
+			return newState;
 	}
-
 	return state;
 }
 
