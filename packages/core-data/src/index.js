@@ -49,6 +49,8 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
 		actions.saveEntityRecord( kind, name, key );
+	result[ getMethodName( kind, name, 'delete' ) ] = ( key ) =>
+		actions.deleteEntityRecord( kind, name, key );
 	return result;
 }, {} );
 
