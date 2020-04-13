@@ -22,6 +22,7 @@ function ButtonBlockAppender( {
 } ) {
 	return (
 		<Inserter
+			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			renderToggle={ ( {
