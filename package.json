@@ -106,6 +106,7 @@
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/dependency-extraction-webpack-plugin": "file:packages/dependency-extraction-webpack-plugin",
 		"@wordpress/docgen": "file:packages/docgen",
+		"@wordpress/e2e-selenium": "file:packages/e2e-selenium",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/env": "file:packages/env",
