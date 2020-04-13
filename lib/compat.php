@@ -175,7 +175,7 @@ function gutenberg_get_post_from_context() {
  *
  * @return string String of rendered HTML.
  */
-function gutenberg_provide_render_callback_with_block_object( $pre_render, $next_block ) {
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $next_block ) {
 	global $post, $block, $_block_context;
 
 	// If a non-null value is provided, a filter has run at an earlier priority
@@ -230,7 +230,7 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 
 		$block_content .= is_string( $chunk ) ?
 			$chunk :
-			gutenberg_provide_render_callback_with_block_object( null, $block['innerBlocks'][ $index++ ] );
+			gutenberg_render_block_with_assigned_block_context( null, $block['innerBlocks'][ $index++ ] );
 
 		$block = $global_block;
 	}
@@ -254,4 +254,4 @@ function gutenberg_provide_render_callback_with_block_object( $pre_render, $next
 	/** This filter is documented in src/wp-includes/blocks.php */
 	return apply_filters( 'render_block', $block_content, $block );
 }
-add_filter( 'pre_render_block', 'gutenberg_provide_render_callback_with_block_object', 9, 2 );
+add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
