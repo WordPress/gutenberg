@@ -1,6 +1,6 @@
 const browserstack = require( 'browserstack-local' );
 const webdriver = require( 'selenium-webdriver' );
-const got = require( 'got' );
+const got = require( 'got' ).default;
 require( 'dotenv' ).config();
 
 const {
@@ -65,6 +65,9 @@ const stopBrowserStackLocal = async () => {
 	} );
 };
 
+/**
+ * @param {string} sessionId Session ID of the current test.
+ */
 const getResultPageLink = async ( sessionId ) => {
 	const response = await got(
 		`https://api.browserstack.com/automate/sessions/${ sessionId }.json`,

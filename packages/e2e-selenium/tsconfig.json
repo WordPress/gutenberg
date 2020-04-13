@@ -1,0 +1,16 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		// commented out because src folder doesn't exist in this package.
+		//"rootDir": "src",
+		// This package is for internal use. d.ts files are unnecessary.
+		"declaration": false,
+		"declarationMap": false,
+		"composite": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		//"declarationDir": "build-types"
+	},
+	"include": [ "config/**/*", "test/**/*", "util/**/*" ],
+	"exclude": [ "**/benchmark", "**/build/**", "**/build-*/**" ],
+}
