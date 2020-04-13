@@ -296,10 +296,9 @@ Define if separator line under/above control row should be disabled or full widt
 
 #### type
 
-Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. Defaults to `slider` if no option is provided.
+Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as  `stepper`. Defaults to slider if no option is provided.
 
-- Type: `String Enum`
-- Values: `none` | `slider` | `stepper`
+- Type: `String`
 - Required: No
 - Platform: Mobile
 
