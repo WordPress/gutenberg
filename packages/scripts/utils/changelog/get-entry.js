@@ -6,12 +6,18 @@ const { pkg, REPO } = require( '../../config/changelog.config.js' );
 
 /* eslint no-console: 0 */
 
-const headers = {
-	authorization: `token ${ process.env.GH_API_TOKEN }`,
-	'user-agent': 'changelog-tool',
+const getAuthenticatedRequestHeaders = ( token ) => {
+	return {
+		authorization: `token ${ token }`,
+		'user-agent': 'changelog-tool',
+	};
 };
 
-const authedGraphql = graphql.defaults( { headers } );
+const getGraphqlClient = ( token ) => {
+	return graphql.defaults( {
+		headers: getAuthenticatedRequestHeaders( token ),
+	} );
+};
 
 const getPullRequestType = ( labels ) => {
 	const typeLabel = labels.find( ( label ) =>
@@ -23,12 +29,12 @@ const getPullRequestType = ( labels ) => {
 	return typeLabel.name.replace( `${ pkg.changelog.labelPrefix } `, '' );
 };
 
-const isCollaborator = async ( username ) => {
+const isCollaborator = async ( token, username ) => {
 	return requestPromise( {
 		url: `https://api.github.com/orgs/${
 			REPO.split( '/' )[ 0 ]
 		}/members/${ username }`,
-		headers,
+		headers: getAuthenticatedRequestHeaders( token ),
 		resolveWithFullResponse: true,
 	} )
 		.then( ( response ) => {
@@ -42,7 +48,7 @@ const isCollaborator = async ( username ) => {
 		} );
 };
 
-const getEntry = async ( pullRequest ) => {
+const getEntry = async ( token, pullRequest ) => {
 	if (
 		pullRequest.labels.nodes.some(
 			( label ) => label.name === pkg.changelog.skipLabel
@@ -51,7 +57,10 @@ const getEntry = async ( pullRequest ) => {
 		return;
 	}
 
-	const collaborator = await isCollaborator( pullRequest.author.login );
+	const collaborator = await isCollaborator(
+		token,
+		pullRequest.author.login
+	);
 	const type = getPullRequestType( pullRequest.labels.nodes );
 	const authorTag = collaborator ? '' : `👏 @${ pullRequest.author.login }`;
 	let title;
@@ -75,6 +84,6 @@ const getEntry = async ( pullRequest ) => {
 };
 
 module.exports = {
-	authedGraphql,
+	getGraphqlClient,
 	getEntry,
 };

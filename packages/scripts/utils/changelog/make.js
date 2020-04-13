@@ -2,13 +2,14 @@
 
 const chalk = require( 'chalk' );
 const { getEntry } = require( './get-entry' );
+const { fetchAllPullRequests } = require( './requests' );
 
 /* eslint no-console: 0*/
 
-const make = async ( pullRequestFetcher, version ) => {
-	const pullRequests = await pullRequestFetcher( version );
+const make = async ( token, version ) => {
+	const pullRequests = await fetchAllPullRequests( token, version );
 	let entries = await Promise.all(
-		pullRequests.map( async ( pr ) => await getEntry( pr ) )
+		pullRequests.map( async ( pr ) => await getEntry( token, pr ) )
 	);
 	if ( ! entries || ! entries.length ) {
 		console.log(

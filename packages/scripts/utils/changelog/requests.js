@@ -1,11 +1,11 @@
 'use strict';
 
 const { REPO } = require( '../../config/changelog.config' );
-const { authedGraphql } = require( './get-entry' );
+const { getGraphqlClient } = require( './get-entry' );
 
 /* eslint no-console: 0 */
 
-const getMilestoneNumber = async ( version ) => {
+const getMilestoneNumber = async ( token, version ) => {
 	const [ owner, repo ] = REPO.split( '/' );
 	const query = `
 	{
@@ -19,7 +19,8 @@ const getMilestoneNumber = async ( version ) => {
 		}
 	}
 	`;
-	const data = await authedGraphql( query );
+	const client = getGraphqlClient( token );
+	const data = await client( query );
 	const matchingNode = data.repository.milestones.nodes.find(
 		( node ) => node.title === version
 	);
@@ -65,12 +66,13 @@ const getQuery = ( milestoneNumber, before ) => {
 	`;
 };
 
-const fetchAllPullRequests = async ( version ) =>
+const fetchAllPullRequests = async ( token, version ) =>
 	await ( async () => {
-		const milestoneNumber = await getMilestoneNumber( version );
+		const client = getGraphqlClient( token );
+		const milestoneNumber = await getMilestoneNumber( token, version );
 		const fetchResults = async ( before ) => {
 			const query = getQuery( milestoneNumber, before );
-			const results = await authedGraphql( query );
+			const results = await client( query );
 			if (
 				results.repository.milestone.pullRequests.pageInfo
 					.hasPreviousPage === false
