@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual } from 'lodash';
+import { mapValues, pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -55,9 +55,9 @@ function getBlockContext( attributes, blockType ) {
 
 	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
 	if ( ! blockTypeCache.has( attributes ) ) {
-		const context = pick(
-			attributes,
-			Object.keys( blockType.providesContext )
+		const context = mapValues(
+			blockType.providesContext,
+			( attributeName ) => attributes[ attributeName ]
 		);
 
 		blockTypeCache.set( attributes, context );
