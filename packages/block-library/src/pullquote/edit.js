@@ -16,6 +16,11 @@ import {
 	withColors,
 	PanelColorSettings,
 } from '@wordpress/block-editor';
+/**
+ * Internal dependencies
+ */
+import { Figure } from './figure';
+import { BlockQuote } from './blockquote';
 
 /**
  * Internal dependencies
@@ -124,12 +129,13 @@ class PullQuoteEdit extends Component {
 
 		return (
 			<>
-				<figure style={ figureStyles } className={ figureClasses }>
-					<blockquote
+				<Figure style={ figureStyles } className={ figureClasses }>
+					<BlockQuote
 						style={ blockquoteStyles }
 						className={ blockquoteClasses }
 					>
 						<RichText
+							identifier="value"
 							multiline
 							value={ value }
 							onChange={ ( nextValue ) =>
@@ -141,9 +147,11 @@ class PullQuoteEdit extends Component {
 								// translators: placeholder text used for the quote
 								__( 'Write quote…' )
 							}
+							textAlign="center"
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 							<RichText
+								identifier="citation"
 								value={ citation }
 								placeholder={
 									// translators: placeholder text used for the citation
@@ -155,10 +163,12 @@ class PullQuoteEdit extends Component {
 									} )
 								}
 								className="wp-block-pullquote__citation"
+								__unstableMobileNoFocusOnMount
+								textAlign="center"
 							/>
 						) }
-					</blockquote>
-				</figure>
+					</BlockQuote>
+				</Figure>
 				<InspectorControls>
 					<PanelColorSettings
 						title={ __( 'Color settings' ) }

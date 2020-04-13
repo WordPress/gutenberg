@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable jest/no-try-expect */
 /**
  * External dependencies
  */
@@ -415,3 +415,4 @@ async function testPortNumberValidation( portName, value ) {
 	}
 	jest.clearAllMocks();
 }
+/* eslint-enable jest/no-try-expect */

@@ -1,5 +1,10 @@
 ## Master
 
+### Breaking Changes
+
+- The peer `jest` dependency has been updated from requiring `>=24` to requiring `>=25` (see [Breaking Changes](https://jestjs.io/blog/2020/01/21/jest-25), [#20766](https://github.com/WordPress/gutenberg/pull/20766)).
+- This package requires now `node` v10.0.0 or later ([#20766](https://github.com/WordPress/gutenberg/pull/20766)).
+
 ## 5.4.0 (2020-02-04)
 
 ### Bug Fixes

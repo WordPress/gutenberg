@@ -24,7 +24,7 @@
 		"build-style/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@emotion/core": "^10.0.22",
 		"@emotion/css": "^10.0.22",
 		"@emotion/native": "^10.0.22",
