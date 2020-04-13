@@ -30,6 +30,8 @@ A block can provide a context value by assigning a `providesContext` property in
 }
 ```
 
+As seen in the above example, it is recommended that you include a namespace as part of the name of the context key so as to avoid potential conflicts with other plugins or default context values provided by WordPress. The context namespace should be specific to your plugin, and in most cases can be the same as used in the name of the block itself.
+
 ### Consuming Block Context
 
 A block can inherit a context value from an ancestor provider by assigning a `context` property in its registered settings. This should be assigned as an array of the context names the block seeks to inherit.
