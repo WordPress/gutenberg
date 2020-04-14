@@ -10,13 +10,14 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { parse, cloneBlock } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import useAsyncList from './use-async-list';
+import InserterPanel from './panel';
 
 function BlockPattern( { pattern, onClick } ) {
 	const { title, content } = pattern;
@@ -75,7 +76,7 @@ function BlockPatterns( { patterns, onInsert } ) {
 	}, [] );
 
 	return (
-		<div className="block-editor-inserter__patterns">
+		<InserterPanel title={ _x( 'All', 'patterns' ) }>
 			{ patterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
@@ -90,7 +91,7 @@ function BlockPatterns( { patterns, onInsert } ) {
 					/>
 				)
 			) }
-		</div>
+		</InserterPanel>
 	);
 }
 

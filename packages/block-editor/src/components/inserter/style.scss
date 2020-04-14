@@ -152,6 +152,7 @@ $block-inserter-tabs-height: 44px;
 	left: 0;
 	bottom: 0;
 	right: 0;
+	overflow-y: scroll;
 }
 
 .block-editor-inserter__popover .block-editor-block-types-list {
@@ -208,6 +209,10 @@ $block-inserter-tabs-height: 44px;
 	.block-editor-block-card {
 		padding: $grid-unit-20;
 	}
+
+	.block-editor-block-card__title {
+		font-size: $default-font-size;
+	}
 }
 
 .block-editor-inserter__preview-content {
@@ -235,16 +240,10 @@ $block-inserter-tabs-height: 44px;
 	flex-shrink: 0;
 }
 
-.block-editor-inserter__patterns {
-	padding: $grid-unit-20;
-	background: $light-gray-200;
-}
-
 .block-editor-inserter__patterns-item {
-	background: $white;
 	border-radius: $radius-block-ui;
 	cursor: pointer;
-	margin-bottom: $grid-unit-20;
+	margin-top: $grid-unit-20;
 	border: 1px solid $light-gray-500;
 	transition: all 0.05s ease-in-out;
 	position: relative;
