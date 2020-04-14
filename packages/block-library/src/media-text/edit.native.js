@@ -184,6 +184,7 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
+			isRTL,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -242,13 +243,13 @@ class MediaTextEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: pullLeft,
+				icon: isRTL ? pullRight : pullLeft,
 				title: __( 'Show media on left' ),
 				isActive: mediaPosition === 'left',
 				onClick: () => setAttributes( { mediaPosition: 'left' } ),
 			},
 			{
-				icon: pullRight,
+				icon: isRTL ? pullLeft : pullRight,
 				title: __( 'Show media on right' ),
 				isActive: mediaPosition === 'right',
 				onClick: () => setAttributes( { mediaPosition: 'right' } ),
@@ -302,6 +303,7 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlockRootClientId,
 			getBlockParents,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const parents = getBlockParents( clientId, true );
@@ -317,6 +319,7 @@ export default compose(
 			isSelected: selectedBlockClientId === clientId,
 			isParentSelected,
 			isAncestorSelected,
+			isRTL: getSettings().isRTL,
 		};
 	} )
 )( MediaTextEdit );
