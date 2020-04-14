@@ -11,6 +11,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -144,7 +145,7 @@ export const withBlockControls = createHigherOrderComponent(
 		);
 
 		return [
-			hasTypographySupport && (
+			Platform.OS === 'web' && hasTypographySupport && (
 				<InspectorControls key="typography">
 					<PanelBody title={ __( 'Typography' ) }>
 						<FontSizeEdit { ...props } />

@@ -53,9 +53,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             type="button"
           />
           <svg
-            aria-hidden="true"
+            aria-hidden={true}
             fill="#000000"
-            focusable="false"
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
