@@ -99,7 +99,7 @@ export { default as plusCircle } from './library/plus-circle';
 export { default as plus } from './library/plus';
 export { default as postList } from './library/post-list';
 export { default as preformatted } from './library/preformatted';
-export { default as product } from './library/product';
+export { default as box } from './library/box';
 export { default as pullLeft } from './library/pull-left';
 export { default as pullRight } from './library/pull-right';
 export { default as pullquote } from './library/pullquote';

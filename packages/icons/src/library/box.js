@@ -3,7 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/primitives';
 
-const product = (
+const box = (
 	<SVG xmlns="http://www.w3.org/2000/SVG" viewBox="0 0 24 24">
 		<Path
 			fill-rule="evenodd"
@@ -13,4 +13,4 @@ const product = (
 	</SVG>
 );
 
-export default product;
+export default box;
