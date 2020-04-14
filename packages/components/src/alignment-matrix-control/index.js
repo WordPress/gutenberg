@@ -113,4 +113,12 @@ export default function AlignmentMatrixControl( {
 }
 
 AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+
+/**
+ * Exported rendered icon, which can be used with the <Icon /> component
+ * from @wordpress/icons
+ *
+ * Example:
+ * <Icon icon={ AlignmentMatrixControl.icon } />
+ */
 AlignmentMatrixControl.icon = <AlignmentMatrixControlIcon />;
