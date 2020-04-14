@@ -120,7 +120,7 @@ class WP_Block implements ArrayAccess {
 
 		$prepared_attributes = $this->attributes;
 		if ( ! is_null( $block_type ) ) {
-			$prepared_attributes = $block_type->prepare_attributes_for_render( $this->attributes );
+			$prepared_attributes = $block_type->prepare_attributes_for_render( $prepared_attributes );
 		}
 
 		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
