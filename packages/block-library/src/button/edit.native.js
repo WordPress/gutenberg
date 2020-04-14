@@ -404,6 +404,7 @@ class ButtonEdit extends Component {
 					<BottomSheet.Cell
 						label={ __( 'Remove link' ) }
 						labelStyle={ styles.clearLinkButton }
+						separatorType={ 'none' }
 						onPress={ this.onClearSettings }
 					/>
 				</BottomSheet>
