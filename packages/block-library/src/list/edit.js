@@ -27,7 +27,7 @@ import {
 	formatIndent,
 	formatOutdent,
 } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,12 +45,9 @@ export default function ListEdit( {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const isRTL =
-		Platform.OS === 'web'
-			? useSelect( ( select ) => {
-					return !! select( 'core/block-editor' ).getSettings().isRTL;
-			  }, [] )
-			: true;
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
