@@ -21,11 +21,5 @@ describe( 'Fullscreen Mode', () => {
 		} );
 
 		expect( isFullscreenEnabled ).toBe( true );
-
-		const fullscreenAdminMenuToggle = await page.$(
-			'.edit-post-fullscreen-admin-menu-toggle'
-		);
-
-		expect( fullscreenAdminMenuToggle ).not.toBeNull();
 	} );
 } );
