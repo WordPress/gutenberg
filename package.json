@@ -101,6 +101,7 @@
 		"@types/estree": "0.0.44",
 		"@types/lodash": "4.14.149",
 		"@types/npm-package-arg": "6.1.0",
+		"@types/mousetrap": "1.6.3",
 		"@types/prettier": "1.19.0",
 		"@types/qs": "6.9.1",
 		"@types/requestidlecallback": "0.3.1",
