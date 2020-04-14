@@ -11,6 +11,8 @@ import {
 	Keyboard,
 	StatusBar,
 	TouchableHighlight,
+	LayoutAnimation,
+	UIManager,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -35,14 +37,26 @@ import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 
+const ANIMATION_DURATION = 300;
+
 export const { Provider: BottomSheetProvider, Consumer } = createContext( {
 	isBottomSheetScrolling: false,
 	shouldEnableBottomSheetScroll: () => {},
 	shouldSetBottomSheetMaxHeight: () => {},
 	onCloseBottomSheet: () => {},
 	onHardwareButtonPress: () => {},
+	onReplaceSubsheet: () => {},
+	stack: [],
 } );
 
+// It's needed to set the following flags via UIManager
+// to have `LayoutAnimation` working on Android
+if (
+	Platform.OS === 'android' &&
+	UIManager.setLayoutAnimationEnabledExperimental
+) {
+	UIManager.setLayoutAnimationEnabledExperimental( true );
+}
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
@@ -60,6 +74,7 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
+		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
@@ -73,6 +88,7 @@ class BottomSheet extends Component {
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
 			setMaxHeight: true,
+			stack: [ 'Settings' ],
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -136,6 +152,14 @@ class BottomSheet extends Component {
 		this.keyboardDidHideListener.remove();
 	}
 
+	componentDidUpdate( prevProps ) {
+		const { isVisible } = this.props;
+
+		if ( ! prevProps.isVisible && isVisible ) {
+			this.setState( { stack: [ 'Settings' ] } );
+		}
+	}
+
 	onSafeAreaInsetsUpdate( result ) {
 		const { safeAreaBottomInset } = this.state;
 		if ( this.safeAreaEventSubscription === null ) {
@@ -153,7 +177,7 @@ class BottomSheet extends Component {
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
-		// `maxHeight` when modal is opened alon with a keyboard
+		// `maxHeight` when modal is opened along with a keyboard
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( Dimensions.get( 'window' ).height -
@@ -236,6 +260,31 @@ class BottomSheet extends Component {
 			return onHardwareButtonPress();
 		}
 		return onClose();
+	}
+
+	onReplaceSubsheet( destination, callback ) {
+		const { stack } = this.state;
+
+		LayoutAnimation.configureNext(
+			LayoutAnimation.create(
+				ANIMATION_DURATION,
+				LayoutAnimation.Types.easeInEaseOut,
+				LayoutAnimation.Properties.opacity
+			)
+		);
+
+		const containedInStack = stack.includes( destination );
+		const nextStack = [ ...stack, destination ];
+		const previousStack = stack.slice( 0, -1 );
+
+		this.setState(
+			{ stack: containedInStack ? previousStack : nextStack },
+			() => {
+				if ( callback ) {
+					callback();
+				}
+			}
+		);
 	}
 
 	render() {
@@ -361,6 +410,8 @@ class BottomSheet extends Component {
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
+								onReplaceSubsheet: this.onReplaceSubsheet,
+								stack: this.state.stack,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>

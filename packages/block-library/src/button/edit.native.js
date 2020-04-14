@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	AccessibilityInfo,
-	Platform,
-	Clipboard,
-	LayoutAnimation,
-	UIManager,
-} from 'react-native';
+import { View, AccessibilityInfo, Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -52,15 +45,6 @@ const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
 const PREPEND_HTTP = 'http://';
-const ANIMATION_DURATION = 300;
-// It's needed to set the following flags via UIManager
-// to have `LayoutAnimation` working on Android
-if (
-	Platform.OS === 'android' &&
-	UIManager.setLayoutAnimationEnabledExperimental
-) {
-	UIManager.setLayoutAnimationEnabledExperimental( true );
-}
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -77,7 +61,7 @@ class ButtonEdit extends Component {
 		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
+		// this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -91,7 +75,6 @@ class ButtonEdit extends Component {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused,
-			stack: [ 'Settings' ],
 		};
 	}
 
@@ -120,7 +103,6 @@ class ButtonEdit extends Component {
 			( ! prevProps.editorSidebarOpened && editorSidebarOpened ) ||
 			( ! prevState.isLinkSheetVisible && isLinkSheetVisible )
 		) {
-			this.setState( { stack: [ 'Settings' ] } );
 			if ( Platform.OS === 'android' && this.richTextRef ) {
 				this.richTextRef.blur();
 				this.onToggleButtonFocus( false );
@@ -319,31 +301,6 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	onReplaceSubsheet( destination, callback ) {
-		const { stack } = this.state;
-
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
-
-		const containedInStack = stack.includes( destination );
-		const nextStack = [ ...stack, destination ];
-		const previousStack = stack.slice( 0, -1 );
-
-		this.setState(
-			{ stack: containedInStack ? previousStack : nextStack },
-			() => {
-				if ( callback ) {
-					callback();
-				}
-			}
-		);
-	}
-
 	render() {
 		const {
 			attributes,
@@ -363,12 +320,7 @@ class ButtonEdit extends Component {
 			linkTarget,
 			rel,
 		} = attributes;
-		const {
-			maxWidth,
-			isLinkSheetVisible,
-			isButtonFocused,
-			stack,
-		} = this.state;
+		const { maxWidth, isLinkSheetVisible, isButtonFocused } = this.state;
 
 		const borderRadiusValue =
 			borderRadius !== undefined
@@ -380,7 +332,6 @@ class ButtonEdit extends Component {
 				  styles.button.paddingTop +
 				  styles.button.borderWidth
 				: 0;
-		const currentScreen = stack[ stack.length - 1 ];
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
@@ -490,7 +441,11 @@ class ButtonEdit extends Component {
 							shouldSetBottomSheetMaxHeight,
 							onCloseBottomSheet,
 							onHardwareButtonPress,
+							onReplaceSubsheet,
+							stack,
 						} ) => {
+							const currentScreen = stack[ stack.length - 1 ];
+
 							return (
 								<>
 									{ currentScreen === 'Settings' && (
@@ -523,7 +478,7 @@ class ButtonEdit extends Component {
 											>
 												<ColorControl
 													onPress={ () => {
-														this.onReplaceSubsheet(
+														onReplaceSubsheet(
 															'Background'
 														);
 													} }
@@ -533,7 +488,7 @@ class ButtonEdit extends Component {
 												/>
 												<ColorControl
 													onPress={ () => {
-														this.onReplaceSubsheet(
+														onReplaceSubsheet(
 															'Text'
 														);
 													} }
@@ -563,9 +518,7 @@ class ButtonEdit extends Component {
 											onReplaceSubsheet={ (
 												destination
 											) =>
-												this.onReplaceSubsheet(
-													destination
-												)
+												onReplaceSubsheet( destination )
 											}
 											backgroundColor={ backgroundColor }
 											textColor={
