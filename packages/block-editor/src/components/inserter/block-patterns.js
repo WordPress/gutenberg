@@ -20,7 +20,7 @@ import useAsyncList from './use-async-list';
 import InserterPanel from './panel';
 
 function BlockPattern( { pattern, onClick } ) {
-	const { title, content } = pattern;
+	const { content } = pattern;
 	const blocks = useMemo( () => parse( content ), [ content ] );
 
 	return (
@@ -35,26 +35,14 @@ function BlockPattern( { pattern, onClick } ) {
 			} }
 			tabIndex={ 0 }
 		>
-			<div className="block-editor-inserter__patterns-item-preview">
-				<BlockPreview blocks={ blocks } __experimentalPadding={ 8 } />
-			</div>
-			<div className="block-editor-inserter__patterns-item-title">
-				{ title }
-			</div>
+			<BlockPreview blocks={ blocks } />
 		</div>
 	);
 }
 
-function BlockPatternPlaceholder( { pattern } ) {
-	const { title } = pattern;
-
+function BlockPatternPlaceholder() {
 	return (
-		<div className="block-editor-inserter__patterns-item is-placeholder">
-			<div className="block-editor-inserter__patterns-item-preview"></div>
-			<div className="block-editor-inserter__patterns-item-title">
-				{ title }
-			</div>
-		</div>
+		<div className="block-editor-inserter__patterns-item is-placeholder" />
 	);
 }
 
@@ -85,10 +73,7 @@ function BlockPatterns( { patterns, onInsert } ) {
 						onClick={ onClickPattern }
 					/>
 				) : (
-					<BlockPatternPlaceholder
-						key={ index }
-						pattern={ pattern }
-					/>
+					<BlockPatternPlaceholder key={ index } />
 				)
 			) }
 		</InserterPanel>

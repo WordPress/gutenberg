@@ -242,9 +242,9 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-item {
 	border-radius: $radius-block-ui;
+	border: none;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
-	border: 1px solid $light-gray-500;
 	transition: all 0.05s ease-in-out;
 	position: relative;
 
@@ -260,14 +260,7 @@ $block-inserter-tabs-height: 44px;
 		outline: 2px solid transparent;
 	}
 
-	&.is-placeholder .block-editor-patterns__item-preview {
+	&.is-placeholder {
 		min-height: 100px;
 	}
-}
-
-.block-editor-inserter__patterns-item-title {
-	text-align: center;
-	padding: 10px 0;
-	padding: $grid-unit-20;
-	font-size: 12px;
 }
