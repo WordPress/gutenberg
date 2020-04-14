@@ -190,13 +190,16 @@ export const getCurrentPost = createRegistrySelector(
 		const postId = getCurrentPostId( state );
 		const postType = getCurrentPostType( state );
 
-		const post = select( 'core' ).getRawEntityRecord(
-			'postType',
-			postType,
-			postId
-		);
-		if ( post ) {
-			return post;
+		if ( postId !== null && postType !== null ) {
+			const post = select( 'core' ).getRawEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+
+			if ( post ) {
+				return post;
+			}
 		}
 
 		// This exists for compatibility with the previous selector behavior
