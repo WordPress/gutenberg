@@ -3,7 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/primitives';
 
-const pound = (
+const currencyPound = (
 	<SVG xmlns="http://www.w3.org/2000/SVG" viewBox="0 0 24 24">
 		<Path
 			fill-rule="evenodd"
@@ -12,4 +12,4 @@ const pound = (
 	</SVG>
 );
 
-export default pound;
+export default currencyPound;
