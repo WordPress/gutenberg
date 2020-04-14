@@ -34,6 +34,7 @@ function BlockPattern( { pattern, onClick } ) {
 				}
 			} }
 			tabIndex={ 0 }
+			aria-label={ pattern.title }
 		>
 			<BlockPreview blocks={ blocks } />
 		</div>
