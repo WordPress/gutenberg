@@ -17,7 +17,7 @@ import useMediaQuery from '../use-media-query';
  *
  * @see _breakpoints.scss
  *
- * @type {Object<WPBreakpoint,number>}
+ * @type {Record<WPBreakpoint,number>}
  */
 const BREAKPOINTS = {
 	huge: 1440,
@@ -43,16 +43,27 @@ const CONDITIONS = {
 };
 
 /**
+ * @callback EvaluatorFunc
+ *
+ * @param {typeof BREAKPOINTS[keyof typeof BREAKPOINTS]} breakpointValue
+ * @param {number} width
+ *
+ * @return {boolean}
+ */
+
+/**
  * Object mapping media query operators to a function that given a breakpointValue and a width evaluates if the operator matches the values.
  *
- * @type {Object<WPViewportOperator,Function>}
+ * @type {Record<WPViewportOperator, EvaluatorFunc>}
  */
 const OPERATOR_EVALUATORS = {
 	'>=': ( breakpointValue, width ) => width >= breakpointValue,
 	'<': ( breakpointValue, width ) => width < breakpointValue,
 };
 
-const ViewportMatchWidthContext = createContext( null );
+const ViewportMatchWidthContext = createContext(
+	/** @type {number | null} */ ( null )
+);
 
 /**
  * Returns true if the viewport matches the given query, or false otherwise.
@@ -71,9 +82,11 @@ const ViewportMatchWidthContext = createContext( null );
  */
 const useViewportMatch = ( breakpoint, operator = '>=' ) => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
-	const mediaQuery =
-		! simulatedWidth &&
-		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+
+	const mediaQuery = simulatedWidth
+		? `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`
+		: undefined;
+
 	const mediaQueryResult = useMediaQuery( mediaQuery );
 	if ( simulatedWidth ) {
 		return OPERATOR_EVALUATORS[ operator ](
