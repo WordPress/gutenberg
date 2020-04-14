@@ -20,27 +20,26 @@ export class PanelBody extends Component {
 
 	render() {
 		const {
-			children = [],
+			children,
 			title,
 			separatorType,
 			lastSeparatorType = 'none',
 			style = {},
 		} = this.props;
-		// Filter children since sometimes it includes undefined which is cause of a crash in cloneElement.
-		const filteredChildren = Array.isArray( children )
-			? children.filter( ( child ) => !! child )
-			: [ children ];
+
+		const childrenArray = Children.toArray( children );
+
 		return (
 			<View style={ [ styles.panelContainer, style ] }>
 				{ title && (
 					<Text style={ styles.sectionHeaderText }>{ title }</Text>
 				) }
 				{ /* Set correct separator for each child. */ }
-				{ Children.map( filteredChildren, ( child, index ) => {
+				{ Children.map( childrenArray, ( child, index ) => {
 					return cloneElement( child, {
 						separatorType:
 							child.props.separatorType ||
-							( index !== filteredChildren.length - 1
+							( index !== childrenArray.length - 1
 								? separatorType
 								: lastSeparatorType ),
 					} );
