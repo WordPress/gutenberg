@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
@@ -41,13 +40,10 @@ export function LineHeightEdit( props ) {
 			style: cleanEmptyObject( newStyle ),
 		} );
 	};
-	return Platform.select( {
-		web: (
-			<LineHeightControl
-				value={ style?.typography?.lineHeight }
-				onChange={ onChange }
-			/>
-		),
-		native: null,
-	} );
+	return (
+		<LineHeightControl
+			value={ style?.typography?.lineHeight }
+			onChange={ onChange }
+		/>
+	);
 }

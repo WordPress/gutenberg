@@ -270,9 +270,9 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Patterns",
-		"slug": "design-patterns",
-		"markdown_source": "../docs/designers-developers/designers/design-patterns.md",
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/designers-developers/designers/user-interface.md",
 		"parent": "designers"
 	},
 	{

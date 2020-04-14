@@ -30,6 +30,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
+	isAlternate: true,
 };
 
 export function AlignmentToolbar( props ) {
