@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { ESCAPE, TAB } from '@wordpress/keycodes';
@@ -11,21 +10,6 @@ import { wordpress } from '@wordpress/icons';
 function AdminMenuToggle() {
 	const buttonRef = useRef();
 	const toggleMenu = useToggle( { ref: buttonRef } );
-
-	const { isActive, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( 'core/editor' );
-		const { isFeatureActive } = select( 'core/edit-post' );
-		const { getPostType } = select( 'core' );
-
-		return {
-			isActive: isFeatureActive( 'fullscreenMode' ),
-			postType: getPostType( getCurrentPostType() ),
-		};
-	}, [] );
-
-	if ( ! isActive || ! postType ) {
-		return null;
-	}
 
 	return (
 		<Button

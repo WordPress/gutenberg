@@ -7,6 +7,7 @@ import {
 	ToolSelector,
 	Inserter,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
@@ -48,9 +49,19 @@ export default function Header() {
 			} ) ),
 		[]
 	);
+
+	const { isFullscreenActive } = useSelect(
+		( select ) => ( {
+			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
+				'fullscreenMode'
+			),
+		} ),
+		[]
+	);
+
 	return (
 		<div className="edit-site-header">
-			<AdminMenuToggle />
+			{ isFullscreenActive && <AdminMenuToggle /> }
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
