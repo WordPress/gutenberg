@@ -8,4 +8,9 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
+
+	// Allow vertical paddings to collapse to better fit the flow.
+	.block-editor-writing-flow {
+		display: block;
+	}
 }

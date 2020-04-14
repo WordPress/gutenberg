@@ -7,7 +7,7 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useReducer, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,18 +35,12 @@ export function BlockPreview( {
 		select( 'core/block-editor' ).getSettings()
 	);
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
-	const [ recompute, triggerRecompute ] = useReducer(
-		( state ) => state + 1,
-		0
-	);
-	useLayoutEffect( triggerRecompute, [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;
 	}
 	return (
 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
 			<AutoHeightBlockPreview
-				key={ recompute }
 				viewportWidth={ viewportWidth }
 				__experimentalPadding={ __experimentalPadding }
 			/>

@@ -7,22 +7,56 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, getColorClassName } from '@wordpress/block-editor';
+import {
+	RichText,
+	getColorClassName,
+	__experimentalGetGradientClass,
+} from '@wordpress/block-editor';
 
-const colorsMigration = ( attributes ) => {
-	return omit(
-		{
-			...attributes,
-			customTextColor:
-				attributes.textColor && '#' === attributes.textColor[ 0 ]
-					? attributes.textColor
-					: undefined,
-			customBackgroundColor:
-				attributes.color && '#' === attributes.color[ 0 ]
-					? attributes.color
-					: undefined,
-		},
-		[ 'color', 'textColor' ]
+const migrateCustomColorsAndGradients = ( attributes ) => {
+	if (
+		! attributes.customTextColor &&
+		! attributes.customBackgroundColor &&
+		! attributes.customGradient
+	) {
+		return attributes;
+	}
+	const style = { color: {} };
+	if ( attributes.customTextColor ) {
+		style.color.text = attributes.customTextColor;
+	}
+	if ( attributes.customBackgroundColor ) {
+		style.color.background = attributes.customBackgroundColor;
+	}
+	if ( attributes.customGradient ) {
+		style.color.gradient = attributes.customGradient;
+	}
+	return {
+		...omit( attributes, [
+			'customTextColor',
+			'customBackgroundColor',
+			'customGradient',
+		] ),
+		style,
+	};
+};
+
+const oldColorsMigration = ( attributes ) => {
+	return migrateCustomColorsAndGradients(
+		omit(
+			{
+				...attributes,
+				customTextColor:
+					attributes.textColor && '#' === attributes.textColor[ 0 ]
+						? attributes.textColor
+						: undefined,
+				customBackgroundColor:
+					attributes.color && '#' === attributes.color[ 0 ]
+						? attributes.color
+						: undefined,
+			},
+			[ 'color', 'textColor' ]
+		)
 	);
 };
 
@@ -47,6 +81,116 @@ const blockAttributes = {
 };
 
 const deprecated = [
+	{
+		supports: {
+			align: true,
+			alignWide: false,
+		},
+		attributes: {
+			...blockAttributes,
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'target',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'rel',
+			},
+			placeholder: {
+				type: 'string',
+			},
+			borderRadius: {
+				type: 'number',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+			customGradient: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+		},
+		migrate: migrateCustomColorsAndGradients,
+		save( { attributes } ) {
+			const {
+				backgroundColor,
+				borderRadius,
+				customBackgroundColor,
+				customTextColor,
+				customGradient,
+				linkTarget,
+				gradient,
+				rel,
+				text,
+				textColor,
+				title,
+				url,
+			} = attributes;
+
+			const textClass = getColorClassName( 'color', textColor );
+			const backgroundClass =
+				! customGradient &&
+				getColorClassName( 'background-color', backgroundColor );
+			const gradientClass = __experimentalGetGradientClass( gradient );
+
+			const buttonClasses = classnames( 'wp-block-button__link', {
+				'has-text-color': textColor || customTextColor,
+				[ textClass ]: textClass,
+				'has-background':
+					backgroundColor ||
+					customBackgroundColor ||
+					customGradient ||
+					gradient,
+				[ backgroundClass ]: backgroundClass,
+				'no-border-radius': borderRadius === 0,
+				[ gradientClass ]: gradientClass,
+			} );
+
+			const buttonStyle = {
+				background: customGradient ? customGradient : undefined,
+				backgroundColor:
+					backgroundClass || customGradient || gradient
+						? undefined
+						: customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+				borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+			};
+
+			// The use of a `title` attribute here is soft-deprecated, but still applied
+			// if it had already been assigned, for the sake of backward-compatibility.
+			// A title will no longer be assigned for new or updated button block links.
+
+			return (
+				<div>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+						target={ linkTarget }
+						rel={ rel }
+					/>
+				</div>
+			);
+		},
+	},
 	{
 		attributes: {
 			...blockAttributes,
@@ -95,11 +239,11 @@ const deprecated = [
 					.replace( /is-style-squared[\s]?/, '' )
 					.trim();
 			}
-			return {
+			return migrateCustomColorsAndGradients( {
 				...attributes,
 				className: newClassName ? newClassName : undefined,
 				borderRadius: 0,
-			};
+			} );
 		},
 		save( { attributes } ) {
 			const {
@@ -170,6 +314,7 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+		migrate: oldColorsMigration,
 		save( { attributes } ) {
 			const {
 				url,
@@ -214,7 +359,6 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: colorsMigration,
 	},
 	{
 		attributes: {
@@ -253,7 +397,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: colorsMigration,
+		migrate: oldColorsMigration,
 	},
 	{
 		attributes: {
@@ -287,7 +431,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: colorsMigration,
+		migrate: oldColorsMigration,
 	},
 ];
 
