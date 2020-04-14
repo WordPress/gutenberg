@@ -16,8 +16,6 @@
 
 		/* Strict Type-Checking Options */
 		"strict": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
 
 		/* Additional Checks */
 		"noUnusedLocals": true,
