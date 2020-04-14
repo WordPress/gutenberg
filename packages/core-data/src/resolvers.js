@@ -24,6 +24,7 @@ import {
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch, resolveSelect } from './controls';
+import { ifNotResolved } from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -65,12 +66,18 @@ export function* getEntityRecord( kind, name, key = '' ) {
 /**
  * Requests an entity's record from the REST API.
  */
-export const getRawEntityRecord = getEntityRecord;
+export const getRawEntityRecord = ifNotResolved(
+	getEntityRecord,
+	'getEntityRecord'
+);
 
 /**
  * Requests an entity's record from the REST API.
  */
-export const getEditedEntityRecord = getRawEntityRecord;
+export const getEditedEntityRecord = ifNotResolved(
+	getRawEntityRecord,
+	'getRawEntityRecord'
+);
 
 /**
  * Requests the entity's records from the REST API.
