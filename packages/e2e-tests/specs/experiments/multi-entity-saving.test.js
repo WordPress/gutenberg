@@ -38,6 +38,10 @@ describe( 'Multi-entity save flow', () => {
 		'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
 	const templatePartSelector = '*[data-type="core/template-part"]';
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
+	const selectedTemplatePartSelector =
+		'.is-selected[data-type="core/template-part"]';
+	const uninitiatedTemplatePartSelector =
+		'//div[contains(@class, "components-placeholder")]/div[contains(., "Choose a template part by slug and theme")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -153,6 +157,28 @@ describe( 'Multi-entity save flow', () => {
 	} );
 
 	describe( 'Site Editor', () => {
+		// Site Editor specific cleanup.
+		afterAll( async () => {
+			// Delete uninitiated template part.
+			const [ uninitiatedTemplatePart ] = await page.$x(
+				uninitiatedTemplatePartSelector
+			);
+			await uninitiatedTemplatePart.click();
+			await page.waitForSelector( selectedTemplatePartSelector );
+			await page.keyboard.press( 'Backspace' );
+
+			// Save again now that it is gone.
+			const enabledButton = await page.waitForSelector(
+				activeSaveSiteSelector
+			);
+			await enabledButton.click();
+
+			const saveButton = await page.waitForSelector(
+				entitiesSaveSelector
+			);
+			await saveButton.click();
+		} );
+
 		it( 'Should be enabled after edits', async () => {
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
@@ -167,18 +193,8 @@ describe( 'Multi-entity save flow', () => {
 			);
 			await demoTemplateButton.click();
 
-			// Insert a new template part.
+			// Insert a new template part placeholder.
 			await insertBlock( 'Template Part' );
-			await page.keyboard.type( 'test-template-part2' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.type( 'test-theme' );
-			await page.keyboard.press( 'Tab' );
-			await page.keyboard.press( 'Enter' );
-
-			// Wait to ensure template part is created/inserted before saving.
-			await new Promise( ( resolve ) => {
-				setTimeout( resolve, 1000 );
-			} );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
