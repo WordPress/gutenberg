@@ -11,5 +11,11 @@
 		//"declarationDir": "build-types"
 	},
 	"include": [ "config/**/*", "test/**/*", "util/**/*" ],
-	"exclude": [ "**/benchmark", "**/build/**", "**/build-*/**" ],
+	"exclude": [
+		"**/benchmark",
+		"**/build/**",
+		// Commented out for type support in test files.
+		//"**/test/**",
+		"**/build-*/**"
+	],
 }
