@@ -450,6 +450,17 @@ export function hasRedo( state ) {
 }
 
 /**
+ * Return the current theme.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object}      The current theme.
+ */
+export function getCurrentTheme( state ) {
+	return state.currentTheme;
+}
+
+/**
  * Return theme supports data in the index.
  *
  * @param {Object} state Data state.
