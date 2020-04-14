@@ -255,6 +255,9 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 
 		$html .= '</span>';
 
+		$html .= '</a>';
+		// End anchor tag content.
+
 		// Append submenu icon to top-level item.
 		// it shows the icon as default, when 'showSubmenuIcon' is not set,
 		// or when it's set and also not False.
@@ -267,9 +270,6 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 		) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
-
-		$html .= '</a>';
-		// End anchor tag content.
 
 		if ( $has_submenu ) {
 			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes );

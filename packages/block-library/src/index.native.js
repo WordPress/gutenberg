@@ -160,6 +160,7 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		devOnly( verse ),
 		cover,
+		devOnly( pullquote ),
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

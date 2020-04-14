@@ -101,7 +101,7 @@ if ( fileArgs.length === 0 ) {
 }
 
 // Converts `foo/bar` directory to `foo/bar/**/*.js`
-const globArgs = dirGlob( fileArgs, { extensions: [ 'js' ] } );
+const globArgs = dirGlob( fileArgs, { extensions: [ 'js', 'jsx' ] } );
 
 const result = spawn(
 	resolveBin( 'prettier' ),

@@ -140,6 +140,23 @@ $arrow-size: 8px;
 		align-items: center;
 		display: flex;
 	}
+
+	// Add spacing.
+	&.is-from-top {
+		margin-top: $grid-unit-15;
+	}
+
+	&.is-from-bottom {
+		margin-top: -$grid-unit-15;
+	}
+
+	&.is-from-left:not(.is-from-top):not(.is-from-bottom) {
+		margin-left: $grid-unit-15;
+	}
+
+	&.is-from-right:not(.is-from-top):not(.is-from-bottom) {
+		margin-right: $grid-unit-15;
+	}
 }
 
 .components-popover__content {
@@ -148,6 +165,12 @@ $arrow-size: 8px;
 	border: $border-width solid $light-gray-secondary;
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
+
+	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	.is-alternate & {
+		border: $border-width solid $dark-gray-primary;
+		box-shadow: none;
+	}
 
 	.components-popover & {
 		position: absolute;
