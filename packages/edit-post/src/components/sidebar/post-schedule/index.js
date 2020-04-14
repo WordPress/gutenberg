@@ -1,19 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleLabel,
 	PostScheduleCheck,
 } from '@wordpress/editor';
+import { withSelect } from '@wordpress/data';
 
-export function PostSchedule() {
+export function PostSchedule( { publishActionText } ) {
 	return (
 		<PostScheduleCheck>
 			<PanelRow className="edit-post-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
+				<span>{ publishActionText }</span>
 				<Dropdown
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
@@ -36,4 +36,10 @@ export function PostSchedule() {
 	);
 }
 
-export default PostSchedule;
+export default withSelect( ( select ) => {
+	const { getSettings } = select( 'core/block-editor' );
+	const { publishActionText } = getSettings();
+	return {
+		publishActionText,
+	};
+} )( PostSchedule );

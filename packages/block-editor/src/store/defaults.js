@@ -27,6 +27,7 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} isRTL Whether the editor is in RTL mode
  * @property {string} bodyPlaceholder Empty post placeholder
  * @property {string} titlePlaceholder Empty title placeholder
+ * @property {string} publishActionText Text signaling the "Publish" action
  * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
  * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  * @property {boolean} __experimentalEnableLegacyWidgetBlock Whether the user has enabled the Legacy Widget Block
@@ -225,4 +226,7 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'midnight',
 		},
 	],
+
+	// Text signaling the "Publish" action.
+	publishActionText: __( 'Publish' ),
 };

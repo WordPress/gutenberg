@@ -31,12 +31,14 @@ describe( 'PublishButtonLabel', () => {
 	} );
 
 	it( 'should show publish if not published and saving in progress', () => {
+		const publishActionText = 'Publish';
 		const label = PublishButtonLabel( {
 			hasPublishAction: true,
 			isPublished: false,
 			isSaving: true,
+			publishActionText,
 		} );
-		expect( label ).toBe( 'Publish' );
+		expect( label ).toBe( publishActionText );
 	} );
 
 	it( 'should show submit for review for contributor', () => {
@@ -61,7 +63,11 @@ describe( 'PublishButtonLabel', () => {
 	} );
 
 	it( 'should show publish otherwise', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true } );
-		expect( label ).toBe( 'Publish' );
+		const publishActionText = 'Publish';
+		const label = PublishButtonLabel( {
+			hasPublishAction: true,
+			publishActionText,
+		} );
+		expect( label ).toBe( publishActionText );
 	} );
 } );

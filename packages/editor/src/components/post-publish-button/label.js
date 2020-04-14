@@ -18,6 +18,7 @@ export function PublishButtonLabel( {
 	hasPublishAction,
 	isAutosaving,
 	hasNonPostEntityChanges,
+	publishActionText,
 } ) {
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
@@ -37,7 +38,7 @@ export function PublishButtonLabel( {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
-	return __( 'Publish' );
+	return publishActionText;
 }
 
 export default compose( [
@@ -51,6 +52,8 @@ export default compose( [
 			getCurrentPostType,
 			isAutosavingPost,
 		} = select( 'core/editor' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { publishActionText } = getSettings();
 		return {
 			isPublished: isCurrentPostPublished(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
@@ -63,6 +66,7 @@ export default compose( [
 			),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
+			publishActionText,
 		};
 	} ),
 ] )( PublishButtonLabel );

@@ -454,6 +454,7 @@ _Properties_
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
+-   _publishActionText_ `string`: Text signaling the "Publish" action
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
