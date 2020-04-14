@@ -60,7 +60,7 @@ export { default as group } from './library/group';
 export { default as heading } from './library/heading';
 export { default as help } from './library/help';
 export { default as inbox } from './library/inbox';
-export { default as institute } from './library/institute';
+export { default as institution } from './library/institution';
 export { default as html } from './library/html';
 export { default as image } from './library/image';
 export { default as info } from './library/info';
