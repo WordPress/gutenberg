@@ -55,6 +55,7 @@ import WelcomeGuide from '../welcome-guide';
 function Layout() {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -120,15 +121,15 @@ function Layout() {
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
-		if ( sidebarIsOpened ) {
+		if ( sidebarIsOpened && ! isHugeViewport ) {
 			setIsInserterOpen( false );
 		}
-	}, [ sidebarIsOpened ] );
+	}, [ sidebarIsOpened, isHugeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpen ) {
+		if ( isInserterOpen && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpen ] );
+	}, [ isInserterOpen, isHugeViewport ] );
 
 	return (
 		<>
