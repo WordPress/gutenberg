@@ -43,9 +43,6 @@
 		},
 		"contentPosition": {
 			"type": "string"
-		},
-		"padding": {
-			"type": "object"
 		}
 	}
 }
