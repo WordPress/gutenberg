@@ -12,7 +12,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	/**
 	 * Registers a block type from metadata stored in the `block.json` file.
 	 *
-	 * @since 7.8.0
+	 * @since 7.9.0
 	 *
 	 * @param string $path Path to the folder where the `block.json` file is located.
 	 * @param array  $args {

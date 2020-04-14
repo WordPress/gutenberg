@@ -102,7 +102,11 @@ Promise.all( [ getLatestNPMVersion(), getLocalNPMVersion() ] )
 
 It is required that you have the latest version of NPM installed in order to commit a change to the package-lock.json file.
 
-Run ${ yellow( 'npm install --global npm@latest' ) }, then try again.`
+Run ${ yellow(
+					'npm install --global npm@latest'
+				) } to install the latest version of NPM. Before retrying your commit, run ${ yellow(
+					'npm install'
+				) } once more to ensure the package-lock.json contents are correct. If there are any changes to the file, they should be included in your commit.`
 			);
 		}
 	} )
