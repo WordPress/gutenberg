@@ -40,6 +40,34 @@ function HeaderToolbar( {
 		scrollViewRef.current.scrollTo( { x: 0 } );
 	};
 
+	const renderHistoryButtons = () => {
+		const buttons = [
+			/* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */
+			<ToolbarButton
+				key="undoButton"
+				title={ __( 'Undo' ) }
+				icon={ undoIcon }
+				isDisabled={ ! hasUndo }
+				onClick={ undo }
+				extraProps={ {
+					hint: __( 'Double tap to undo last change' ),
+				} }
+			/>,
+			<ToolbarButton
+				key="redoButton"
+				title={ __( 'Redo' ) }
+				icon={ redoIcon }
+				isDisabled={ ! hasRedo }
+				onClick={ redo }
+				extraProps={ {
+					hint: __( 'Double tap to redo last change' ),
+				} }
+			/>,
+		];
+
+		return isRTL ? buttons.reverse() : buttons;
+	};
+
 	return (
 		<View
 			style={ getStylesFromColorScheme(
@@ -57,25 +85,7 @@ function HeaderToolbar( {
 				contentContainerStyle={ styles.scrollableContent }
 			>
 				<Inserter disabled={ ! showInserter } />
-				{ /* TODO: replace with EditorHistoryRedo and EditorHistoryUndo */ }
-				<ToolbarButton
-					title={ __( 'Undo' ) }
-					icon={ isRTL ? redoIcon : undoIcon }
-					isDisabled={ ! hasUndo }
-					onClick={ undo }
-					extraProps={ {
-						hint: __( 'Double tap to undo last change' ),
-					} }
-				/>
-				<ToolbarButton
-					title={ __( 'Redo' ) }
-					icon={ isRTL ? undoIcon : redoIcon }
-					isDisabled={ ! hasRedo }
-					onClick={ redo }
-					extraProps={ {
-						hint: __( 'Double tap to redo last change' ),
-					} }
-				/>
+				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
 			{ showKeyboardHideButton && (
