@@ -48,10 +48,8 @@ function gutenberg_test_register_context_blocks() {
 		'gutenberg/test-context-consumer',
 		[
 			'context'         => [ 'gutenberg/recordId' ],
-			'render_callback' => function() {
-				global $block;
-
-				$record_id = $block['context']['gutenberg/recordId'];
+			'render_callback' => function( $block ) {
+				$record_id = $block->context['gutenberg/recordId'];
 
 				if ( ! is_int( $record_id ) ) {
 					throw new Exception( 'Expected numeric recordId' );

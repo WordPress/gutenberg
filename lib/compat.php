@@ -171,88 +171,23 @@ function gutenberg_get_post_from_context() {
  * @see (TBD Trac Link)
  *
  * @param string|null $pre_render The pre-rendered content. Defaults to null.
- * @param array       $next_block The block being rendered.
+ * @param array       $block      The block being rendered.
  *
  * @return string String of rendered HTML.
  */
-function gutenberg_render_block_with_assigned_block_context( $pre_render, $next_block ) {
-	global $post, $block, $_block_context;
-
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $block ) {
 	// If a non-null value is provided, a filter has run at an earlier priority
 	// and has already handled custom rendering and should take precedence.
 	if ( null !== $pre_render ) {
 		return $pre_render;
 	}
 
-	$source_block = $next_block;
+	$source_block = $block;
 
 	/** This filter is documented in src/wp-includes/blocks.php */
-	$block = apply_filters( 'render_block_data', $next_block, $source_block );
-
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
-	$block_content = '';
-	$index         = 0;
-
-	if ( ! is_array( $block['attrs'] ) ) {
-		$block['attrs'] = array();
-	}
-
-	if ( ! isset( $block['context'] ) ) {
-		$block['context'] = array();
-	}
-
-	$block_context_before = $_block_context;
-
-	if ( ! isset( $_block_context ) ) {
-		$_block_context = array();
-	}
-
-	if ( ! isset( $_block_context['postId'] ) || $post->ID !== $_block_context['postId'] ) {
-		$_block_context['postId'] = $post->ID;
-	}
-
-	/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
-	if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
-		$prepared_attributes = $block_type->prepare_attributes_for_render( $block['attrs'] );
-		foreach ( $block_type->providesContext as $context_name => $attribute_name ) {
-			if ( isset( $prepared_attributes[ $attribute_name ] ) ) {
-				$_block_context[ $context_name ] = $prepared_attributes[ $attribute_name ];
-			}
-		}
-	}
-	/* phpcs:enable */
-
-	foreach ( $block['innerContent'] as $chunk ) {
-		// Since the inner `render_block` is expected to assign the `$block`
-		// global for its own render, store a reference to restore after the
-		// child has finished rendering.
-		$global_block = $block;
-
-		$block_content .= is_string( $chunk ) ?
-			$chunk :
-			gutenberg_render_block_with_assigned_block_context( null, $block['innerBlocks'][ $index++ ] );
-
-		$block = $global_block;
-	}
-
-	if ( $is_dynamic ) {
-		if ( isset( $block_type->context ) && is_array( $block_type->context ) ) {
-			foreach ( $block_type->context as $context_name ) {
-				if ( array_key_exists( $context_name, $_block_context ) ) {
-					$block['context'][ $context_name ] = $_block_context[ $context_name ];
-				}
-			}
-		}
-
-		$global_post   = $post;
-		$block_content = $block_type->render( $block['attrs'], $block_content );
-		$post          = $global_post;
-	}
-
-	$_block_context = $block_context_before;
+	$block = new WP_Block( apply_filters( 'render_block_data', $block, $source_block ) );
 
 	/** This filter is documented in src/wp-includes/blocks.php */
-	return apply_filters( 'render_block', $block_content, $block );
+	return apply_filters( 'render_block', $block->render(), $block );
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );

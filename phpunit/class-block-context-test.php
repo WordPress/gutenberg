@@ -104,9 +104,8 @@ class Block_Context_Test extends WP_UnitTestCase {
 					'gutenberg/contextWithAssigned',
 					'gutenberg/contextWithoutDefault',
 				],
-				'render_callback' => function() use ( &$provided_context ) {
-					global $block;
-					$provided_context[] = $block['context'];
+				'render_callback' => function( $block ) use ( &$provided_context ) {
+					$provided_context[] = $block->context;
 
 					return '';
 				},
@@ -128,47 +127,6 @@ class Block_Context_Test extends WP_UnitTestCase {
 			],
 			$provided_context[0]
 		);
-	}
-
-	/**
-	 * Tests that a block render assigns the block global, bottom-up, and resets
-	 * it for each new block.
-	 */
-	function test_sets_and_resets_block_global() {
-		$block_globals = [];
-
-		$this->register_block_type(
-			'gutenberg/test-parent',
-			[
-				'render_callback' => function() use ( &$block_globals ) {
-					global $block;
-					$block_globals[] = $block;
-				},
-			]
-		);
-		$this->register_block_type(
-			'gutenberg/test-child',
-			[
-				'render_callback' => function() use ( &$block_globals ) {
-					global $block;
-					$block_globals[] = $block;
-				},
-			]
-		);
-
-		$parsed_blocks = parse_blocks(
-			'<!-- wp:gutenberg/test-parent -->' .
-			'<!-- wp:gutenberg/test-child /-->' .
-			'<!-- wp:gutenberg/test-child /-->' .
-			'<!-- /wp:gutenberg/test-parent -->'
-		);
-
-		render_block( $parsed_blocks[0] );
-
-		$this->assertCount( 3, $block_globals );
-		$this->assertEquals( 'gutenberg/test-child', $block_globals[0]['blockName'] );
-		$this->assertEquals( 'gutenberg/test-child', $block_globals[1]['blockName'] );
-		$this->assertEquals( 'gutenberg/test-parent', $block_globals[2]['blockName'] );
 	}
 
 }
