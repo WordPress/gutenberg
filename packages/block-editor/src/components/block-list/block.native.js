@@ -192,7 +192,7 @@ class BlockListBlock extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId, rootClientId } ) => {
+	withSelect( ( select, { clientId, rootClientId, wrapperProps } ) => {
 		const {
 			getBlockIndex,
 			isBlockSelected,
@@ -281,6 +281,12 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			showFloatingToolbar,
+			wrapperProps: {
+				...wrapperProps,
+				...( blockType.getEditWrapperProps
+					? blockType.getEditWrapperProps( attributes )
+					: {} ),
+			},
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
