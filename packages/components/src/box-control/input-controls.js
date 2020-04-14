@@ -64,34 +64,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				disableUnits
-				value={ right }
-				onChange={ createHandleOnChange( 'right' ) }
-				label="Right"
-				size="small"
-				style={ {
-					...baseStyles,
-					[ isRtl ? 'left' : 'right' ]: 0,
-					top: '50%',
-					transform: 'translateY(calc(-50% - 3px))',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				disableUnits
-				value={ bottom }
-				onChange={ createHandleOnChange( 'bottom' ) }
-				label="Bottom"
-				size="small"
-				style={ {
-					...baseStyles,
-					left: '50%',
-					bottom: 0,
-					transform: 'translateX(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				disableUnits
 				value={ left }
 				onChange={ createHandleOnChange( 'left' ) }
 				label="Left"
@@ -123,6 +95,34 @@ export default function BoxInputControls( {
 					left: '50%',
 					top: '50%',
 					transform: 'translate(-50%, calc(-50% - 3px))',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ right }
+				onChange={ createHandleOnChange( 'right' ) }
+				label="Right"
+				size="small"
+				style={ {
+					...baseStyles,
+					[ isRtl ? 'left' : 'right' ]: 0,
+					top: '50%',
+					transform: 'translateY(calc(-50% - 3px))',
+				} }
+			/>
+			<UnitControl
+				{ ...props }
+				disableUnits
+				value={ bottom }
+				onChange={ createHandleOnChange( 'bottom' ) }
+				label="Bottom"
+				size="small"
+				style={ {
+					...baseStyles,
+					left: '50%',
+					bottom: 0,
+					transform: 'translateX(-50%)',
 				} }
 			/>
 		</Layout>
