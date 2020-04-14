@@ -37,7 +37,7 @@ function register_block_core_query() {
  * @return array Return an array of args.
  */
 function core_query_attributes_to_critera( $criteria ) {
-	if ( $criteria[ 'specificMode' ] == 1 ) {
+	if ( isset( $criteria[ 'specificMode' ] ) && $criteria[ 'specificMode' ] == 1 ) {
 		$args = array(
 			'post_status' => 'publish',
 			'p' => $criteria[ 'singleId' ],
@@ -70,15 +70,17 @@ function core_query_attributes_to_critera( $criteria ) {
 function render_block_core_query( $attributes ) {
 	$blocks = ! empty( $attributes['blocks'] ) ? $attributes['blocks'] : array();
 	$args = core_query_attributes_to_critera( $attributes['criteria'] );
+	$posts_to_show = $args['posts_per_page'];
 	$args['posts_per_page'] = $args['posts_per_page'] + count( Blocks_Query::$displayedPostIds );
 
 	$query = new WP_Query( $args );
+	$posts_shown = 0;
 
 	ob_start();
 	?>
 	<div class="<?php echo esc_attr( $attributes['className']); ?>">
 		<?php if ( $query->have_posts() ) : ?>
-			<?php while ( $query->have_posts() ) : ?>
+			<?php while ( $query->have_posts() && $posts_shown < $posts_to_show) : ?>
 				<?php
 					$query->the_post();
 					$id = get_the_ID();
@@ -86,6 +88,7 @@ function render_block_core_query( $attributes ) {
 						continue;
 					} else {
 						array_push( Blocks_Query::$displayedPostIds, $id );
+						$posts_shown++;
 					}
 				?>
 				<div class="entry-wrapper">
@@ -109,8 +112,8 @@ function render_block_core_query( $attributes ) {
 				}
 				?>
 				</div>
-				<?php endwhile; ?>
-			<?php endif; ?>
+			<?php endwhile; ?>
+		<?php endif; ?>
 	</div>
 	<?php
 	return ob_get_clean();
