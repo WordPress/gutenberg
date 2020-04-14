@@ -401,12 +401,13 @@ class ButtonEdit extends Component {
 					>
 						{ this.getLinkSettings( url, rel, linkTarget ) }
 					</PanelBody>
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ this.onClearSettings }
-					/>
+					<PanelBody>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							onPress={ this.onClearSettings }
+						/>
+					</PanelBody>
 				</BottomSheet>
 
 				<InspectorControls>
