@@ -23,7 +23,7 @@ If applicable, add screenshots to help explain your problem.
 **Editor version (please complete the following information):**
 - WordPress version: [e.g: 5.3.2]
 - Does the website has Gutenberg plugin installed, or is it using the block editor that comes by default? [e.g: "gutenberg plugin", "default"]
-- If the Gutenberg is installed what the version is: [e.g., 7.6]
+- If the Gutenberg plugin is installed, which version is it? [e.g., 7.6]
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
