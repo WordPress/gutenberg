@@ -185,6 +185,7 @@ function InserterBlockList( {
 	}, [ itemsPerCategory, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
+	const hasChildItems = childItems.length > 0;
 
 	return (
 		<div>
@@ -195,7 +196,7 @@ function InserterBlockList( {
 				onHover={ onHover }
 			/>
 
-			{ !! suggestedItems.length && ! filterValue && (
+			{ ! hasChildItems && !! suggestedItems.length && ! filterValue && (
 				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 					<BlockTypesList
 						items={ suggestedItems }
@@ -205,48 +206,50 @@ function InserterBlockList( {
 				</InserterPanel>
 			) }
 
-			{ map( categories, ( category ) => {
-				const categoryItems = itemsPerCategory[ category.slug ];
-				if ( ! categoryItems || ! categoryItems.length ) {
-					return null;
-				}
-				return (
-					<InserterPanel
-						key={ category.slug }
-						title={ category.title }
-						icon={ category.icon }
-					>
-						<BlockTypesList
-							items={ categoryItems }
-							onSelect={ onSelectItem }
-							onHover={ onHover }
-						/>
-					</InserterPanel>
-				);
-			} ) }
+			{ ! hasChildItems &&
+				map( categories, ( category ) => {
+					const categoryItems = itemsPerCategory[ category.slug ];
+					if ( ! categoryItems || ! categoryItems.length ) {
+						return null;
+					}
+					return (
+						<InserterPanel
+							key={ category.slug }
+							title={ category.title }
+							icon={ category.icon }
+						>
+							<BlockTypesList
+								items={ categoryItems }
+								onSelect={ onSelectItem }
+								onHover={ onHover }
+							/>
+						</InserterPanel>
+					);
+				} ) }
 
-			{ map( collections, ( collection, namespace ) => {
-				const collectionItems = itemsPerCollection[ namespace ];
-				if ( ! collectionItems || ! collectionItems.length ) {
-					return null;
-				}
+			{ ! hasChildItems &&
+				map( collections, ( collection, namespace ) => {
+					const collectionItems = itemsPerCollection[ namespace ];
+					if ( ! collectionItems || ! collectionItems.length ) {
+						return null;
+					}
 
-				return (
-					<InserterPanel
-						key={ namespace }
-						title={ collection.title }
-						icon={ collection.icon }
-					>
-						<BlockTypesList
-							items={ collectionItems }
-							onSelect={ onSelectItem }
-							onHover={ onHover }
-						/>
-					</InserterPanel>
-				);
-			} ) }
+					return (
+						<InserterPanel
+							key={ namespace }
+							title={ collection.title }
+							icon={ collection.icon }
+						>
+							<BlockTypesList
+								items={ collectionItems }
+								onSelect={ onSelectItem }
+								onHover={ onHover }
+							/>
+						</InserterPanel>
+					);
+				} ) }
 
-			{ !! reusableItems.length && (
+			{ ! hasChildItems && !! reusableItems.length && (
 				<InserterPanel
 					className="block-editor-inserter__reusable-blocks-panel"
 					title={ __( 'Reusable' ) }
