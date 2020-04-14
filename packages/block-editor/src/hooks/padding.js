@@ -36,10 +36,12 @@ export function PaddingEdit( props ) {
 
 		const newStyle = {
 			...style,
-			paddingTop: `${ top[ 0 ] }${ top[ 1 ] }`,
-			paddingRight: `${ right[ 0 ] }${ right[ 1 ] }`,
-			paddingBottom: `${ bottom[ 0 ] }${ bottom[ 1 ] }`,
-			paddingLeft: `${ left[ 0 ] }${ left[ 1 ] }`,
+			padding: {
+				top: `${ top[ 0 ] }${ top[ 1 ] }`,
+				right: `${ right[ 0 ] }${ right[ 1 ] }`,
+				bottom: `${ bottom[ 0 ] }${ bottom[ 1 ] }`,
+				left: `${ left[ 0 ] }${ left[ 1 ] }`,
+			},
 		};
 
 		setAttributes( {
@@ -59,3 +61,10 @@ export function PaddingEdit( props ) {
 		native: null,
 	} );
 }
+
+export const paddingStyleMappings = {
+	'--wp--padding-top': [ 'padding', 'top' ],
+	'--wp--padding-right': [ 'padding', 'right' ],
+	'--wp--padding-bottom': [ 'padding', 'bottom' ],
+	'--wp--padding-left': [ 'padding', 'left' ],
+};

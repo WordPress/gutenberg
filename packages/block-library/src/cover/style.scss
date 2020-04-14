@@ -1,10 +1,10 @@
 :root {
 	.wp-block-cover-image,
 	.wp-block-cover {
-		padding-top: var(--wp--padding-top);
-		padding-right: var(--wp--padding-right);
-		padding-bottom: var(--wp--padding-bottom);
-		padding-left: var(--wp--padding-left);
+		padding-top: var(--wp--padding-top, 1em);
+		padding-right: var(--wp--padding-right, 1em);
+		padding-bottom: var(--wp--padding-bottom, 1em);
+		padding-left: var(--wp--padding-left, 1em);
 	}
 }
 

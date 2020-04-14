@@ -20,7 +20,11 @@ import InspectorControls from '../components/inspector-controls';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
 import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
-import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
+import {
+	PADDING_SUPPORT_KEY,
+	PaddingEdit,
+	paddingStyleMappings,
+} from './padding';
 
 const styleSupportKeys = [
 	COLOR_SUPPORT_KEY,
@@ -45,6 +49,7 @@ const hasStyleSupport = ( blockType ) =>
  */
 export function getInlineStyles( styles = {} ) {
 	const mappings = {
+		...paddingStyleMappings,
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
 		background: [ 'color', 'gradient' ],
