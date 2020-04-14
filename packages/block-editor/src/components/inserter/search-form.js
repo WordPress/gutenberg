@@ -28,6 +28,7 @@ function InserterSearchForm( { onChange } ) {
 				placeholder={ __( 'Search for a block' ) }
 				autoFocus
 				onChange={ ( event ) => onChange( event.target.value ) }
+				autoComplete="off"
 			/>
 			<Icon
 				className="block-editor-inserter__search-icon"
