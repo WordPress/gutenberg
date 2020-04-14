@@ -8,8 +8,10 @@
 	border-radius: 4px;
 }
 
-.noFlexAppender {
+.floatingAppender {
 	flex: none;
+	background-color: transparent;
+	border-width: 0;
 }
 
 .appenderLight {
@@ -32,5 +34,10 @@
 
 .addBlockButtonDark {
 	color: $background-dark-secondary;
+	background-color: $gray-40;
+}
+
+.floatingAddBlockButtonDark {
+	color: $black;
 	background-color: $gray-40;
 }

@@ -20,7 +20,7 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
-	isFlex = true,
+	isFloating = false,
 	onAddBlock,
 } ) {
 	const appenderStyle = {
@@ -32,7 +32,9 @@ function ButtonBlockAppender( {
 	};
 	const addBlockButtonStyle = getStylesFromColorScheme(
 		styles.addBlockButton,
-		styles.addBlockButtonDark
+		isFloating
+			? styles.floatingAddBlockButtonDark
+			: styles.addBlockButtonDark
 	);
 
 	return (
@@ -49,7 +51,7 @@ function ButtonBlockAppender( {
 						<View
 							style={ [
 								appenderStyle,
-								! isFlex && styles.noFlexAppender,
+								isFloating && styles.floatingAppender,
 							] }
 						>
 							<Icon

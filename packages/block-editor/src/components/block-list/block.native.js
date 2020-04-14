@@ -95,7 +95,7 @@ class BlockListBlock extends Component {
 			isDimmed,
 			isTouchable,
 			onDeleteBlock,
-			horizontalDirection,
+			isStackedHorizontally,
 			hasParent,
 			isParentSelected,
 			onSelect,
@@ -182,7 +182,9 @@ class BlockListBlock extends Component {
 								<BlockMobileToolbar
 									clientId={ clientId }
 									onDelete={ onDeleteBlock }
-									horizontalDirection={ horizontalDirection }
+									isStackedHorizontally={
+										isStackedHorizontally
+									}
 								/>
 							) }
 						</View>

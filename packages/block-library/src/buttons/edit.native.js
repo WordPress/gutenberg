@@ -50,7 +50,7 @@ function ButtonsEdit( {
 			return (
 				<View style={ styles.appenderContainer }>
 					<InnerBlocks.ButtonBlockAppender
-						isFlex={ false }
+						isFloating={ true }
 						onAddBlock={ onAddNextButton }
 					/>
 				</View>

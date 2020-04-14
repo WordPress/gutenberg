@@ -112,7 +112,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
-			horizontalDirection,
+			isStackedHorizontally,
 			horizontalAlignment,
 		} = this.props;
 
@@ -156,7 +156,7 @@ export class BlockList extends Component {
 					}
 					style={ [
 						! isRootList && styles.overflowVisible,
-						horizontalDirection && styles.horizontal,
+						isStackedHorizontally && styles.horizontal,
 						horizontalAlignment &&
 							styles[ `is-aligned-${ horizontalAlignment }` ],
 					] }
@@ -201,7 +201,7 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
-			horizontalDirection,
+			isStackedHorizontally,
 			contentResizeMode,
 			contentStyle,
 			onAddBlock,
@@ -232,7 +232,7 @@ export class BlockList extends Component {
 							this.onCaretVerticalPositionChange
 						}
 						parentWidth={ this.props.parentWidth }
-						horizontalDirection={ horizontalDirection }
+						isStackedHorizontally={ isStackedHorizontally }
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={ onDeleteBlock }
@@ -286,7 +286,7 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 
-		const horizontalDirection =
+		const isStackedHorizontally =
 			__experimentalMoverDirection === 'horizontal';
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -295,7 +295,7 @@ export default compose( [
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
-				! horizontalDirection &&
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if list is empty, show the insertion point (via the default appender)
@@ -306,7 +306,7 @@ export default compose( [
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
-				! horizontalDirection &&
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if the insertion point is at the end of the list
@@ -327,7 +327,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
-			horizontalDirection,
+			isStackedHorizontally,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
