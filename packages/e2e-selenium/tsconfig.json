@@ -1,8 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		// commented out because src folder doesn't exist in this package.
-		//"rootDir": "src",
+		"rootDir": "lib",
 		// This package is for internal use. d.ts files are unnecessary.
 		"declaration": false,
 		"declarationMap": false,
