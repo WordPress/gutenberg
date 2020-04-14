@@ -9393,6 +9393,7 @@ exports[`Storyshots Components/UnitControl Default 1`] = `
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  -moz-appearance: textfield;
   box-sizing: border-box;
   border: 1px solid #000;
   border-radius: 2px;
