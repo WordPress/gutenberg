@@ -30,7 +30,7 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./node_modules/@types" ]
+		"types": []
 	},
 	"exclude": [
 		"**/benchmark",
