@@ -59,8 +59,8 @@ exports[`Storyshots Components/Animate Appear Bottom Left 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -95,8 +95,8 @@ exports[`Storyshots Components/Animate Appear Bottom Right 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -131,8 +131,8 @@ exports[`Storyshots Components/Animate Appear Top Left 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -167,8 +167,8 @@ exports[`Storyshots Components/Animate Appear Top Right 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -201,8 +201,8 @@ exports[`Storyshots Components/Animate Default 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -235,8 +235,8 @@ exports[`Storyshots Components/Animate Loading 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -269,8 +269,8 @@ exports[`Storyshots Components/Animate Slide In 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -354,8 +354,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -372,8 +372,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -390,8 +390,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -408,8 +408,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -426,8 +426,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -476,8 +476,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -494,8 +494,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -512,8 +512,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -530,8 +530,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -548,8 +548,8 @@ exports[`Storyshots Components/Button Buttons 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -613,9 +613,9 @@ exports[`Storyshots Components/Button Disabled Focusable Icon 1`] = `
   type="button"
 >
   <svg
-    aria-hidden="true"
+    aria-hidden={true}
     className="dashicon dashicons-ellipsis"
-    focusable="false"
+    focusable={false}
     height={20}
     role="img"
     viewBox="0 0 20 20"
@@ -659,8 +659,8 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -684,8 +684,8 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -709,8 +709,8 @@ exports[`Storyshots Components/Button Grouped Icons 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -738,9 +738,9 @@ exports[`Storyshots Components/Button Icon 1`] = `
   type="button"
 >
   <svg
-    aria-hidden="true"
+    aria-hidden={true}
     className="dashicon dashicons-ellipsis"
-    focusable="false"
+    focusable={false}
     height={20}
     role="img"
     viewBox="0 0 20 20"
@@ -868,19 +868,19 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -896,15 +896,15 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-2.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-2.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-2.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-2.is-size-extraSmall {
@@ -927,19 +927,19 @@ exports[`Storyshots Components/Card Default 1`] = `
 }
 
 .emotion-4.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-4.is-borderless {
@@ -997,15 +997,15 @@ exports[`Storyshots Components/Card/Body Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -1053,15 +1053,15 @@ exports[`Storyshots Components/Card/Divider Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -1134,19 +1134,19 @@ exports[`Storyshots Components/Card/Footer Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1201,19 +1201,19 @@ exports[`Storyshots Components/Card/Header Default 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1261,15 +1261,15 @@ exports[`Storyshots Components/Card/Media Default 1`] = `
 }
 
 .emotion-2.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-2.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-2.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-2.is-size-extraSmall {
@@ -1355,19 +1355,19 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1390,19 +1390,19 @@ exports[`Storyshots Components/Card/Media Header And Footer 1`] = `
 }
 
 .emotion-4.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-4.is-borderless {
@@ -1537,15 +1537,15 @@ Array [
 }
 
 .emotion-4.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-4.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-4.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-4.is-size-extraSmall {
@@ -1609,19 +1609,19 @@ exports[`Storyshots Components/Card/Media Iframe Embed 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 20px 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 12px 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 8px 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
-  padding: 4px 8px;
+  padding: 8px;
 }
 
 .emotion-0.is-borderless {
@@ -1705,15 +1705,15 @@ exports[`Storyshots Components/Card/Media On Bottom 1`] = `
 }
 
 .emotion-0.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-0.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-0.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-0.is-size-extraSmall {
@@ -1792,15 +1792,15 @@ exports[`Storyshots Components/Card/Media On Top 1`] = `
 }
 
 .emotion-2.is-size-large {
-  padding: 28px;
+  padding: 24px 32px;
 }
 
 .emotion-2.is-size-medium {
-  padding: 20px;
+  padding: 16px 24px;
 }
 
 .emotion-2.is-size-small {
-  padding: 12px;
+  padding: 16px;
 }
 
 .emotion-2.is-size-extraSmall {
@@ -1886,9 +1886,9 @@ exports[`Storyshots Components/CheckboxControl All 1`] = `
         value="1"
       />
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-checkbox-control__checked"
-        focusable="false"
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -1935,9 +1935,9 @@ exports[`Storyshots Components/CheckboxControl Default 1`] = `
         value="1"
       />
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-checkbox-control__checked"
-        focusable="false"
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -2369,8 +2369,8 @@ exports[`Storyshots Components/ColorPicker Alpha Enabled 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -2543,8 +2543,8 @@ exports[`Storyshots Components/ColorPicker Default 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -2584,9 +2584,9 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="components-custom-select-control__button-icon"
-      focusable="false"
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -2613,10 +2613,10 @@ exports[`Storyshots Components/CustomSelectControl Default 1`] = `
 
 exports[`Storyshots Components/Dashicon Default 1`] = `
 <svg
-  aria-hidden="true"
+  aria-hidden={true}
   className="dashicon dashicons-wordpress"
   color="#0079AA"
-  focusable="false"
+  focusable={false}
   height={20}
   role="img"
   viewBox="0 0 20 20"
@@ -2748,8 +2748,8 @@ exports[`Storyshots Components/Draggable Default 1`] = `
       }
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -2789,8 +2789,8 @@ Array [
         type="button"
       >
         <svg
-          aria-hidden="true"
-          focusable="false"
+          aria-hidden={true}
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -2824,8 +2824,8 @@ Array [
         type="button"
       >
         <svg
-          aria-hidden="true"
-          focusable="false"
+          aria-hidden={true}
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -2856,9 +2856,9 @@ exports[`Storyshots Components/ExternalLink Default 1`] = `
     (opens in a new tab)
   </span>
   <svg
-    aria-hidden="true"
+    aria-hidden={true}
     className="components-external-link__icon"
-    focusable="false"
+    focusable={false}
     height={24}
     role="img"
     viewBox="0 0 24 24"
@@ -2906,9 +2906,9 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
       >
         Normal
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="components-custom-select-control__button-icon"
-          focusable="false"
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -3197,9 +3197,9 @@ input[type='number'].emotion-18 {
       >
         Normal
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="components-custom-select-control__button-icon"
-          focusable="false"
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -3250,8 +3250,8 @@ input[type='number'].emotion-18 {
           className="emotion-0 emotion-1"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="-2 -2 24 24"
@@ -3331,8 +3331,8 @@ input[type='number'].emotion-18 {
           className="emotion-16 emotion-17"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="-2 -2 24 24"
@@ -3396,9 +3396,9 @@ exports[`Storyshots Components/FontSizePicker Without Custom Sizes 1`] = `
       >
         Normal
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="components-custom-select-control__button-icon"
-          focusable="false"
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -3455,9 +3455,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={20}
       role="img"
       viewBox="0 0 20 20"
@@ -3489,9 +3489,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={20}
       role="img"
       viewBox="0 0 20 20"
@@ -3523,9 +3523,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={20}
       role="img"
       viewBox="0 0 20 20"
@@ -3553,9 +3553,9 @@ Array [
 exports[`Storyshots Components/Icon Default 1`] = `
 <div>
   <svg
-    aria-hidden="true"
+    aria-hidden={true}
     className="dashicon dashicons-screenoptions"
-    focusable="false"
+    focusable={false}
     height="24"
     role="img"
     viewBox="0 0 20 20"
@@ -3590,9 +3590,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={14}
       role="img"
       viewBox="0 0 20 20"
@@ -3623,9 +3623,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={16}
       role="img"
       viewBox="0 0 20 20"
@@ -3656,9 +3656,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={20}
       role="img"
       viewBox="0 0 20 20"
@@ -3689,9 +3689,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 20 20"
@@ -3722,9 +3722,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={28}
       role="img"
       viewBox="0 0 20 20"
@@ -3755,9 +3755,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={32}
       role="img"
       viewBox="0 0 20 20"
@@ -3788,9 +3788,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={40}
       role="img"
       viewBox="0 0 20 20"
@@ -3821,9 +3821,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 20 20"
@@ -3854,9 +3854,9 @@ Array [
     }
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-screenoptions"
-      focusable="false"
+      focusable={false}
       height={56}
       role="img"
       viewBox="0 0 20 20"
@@ -3883,8 +3883,8 @@ Array [
 
 exports[`Storyshots Components/Icon With A Component 1`] = `
 <svg
-  aria-hidden="true"
-  focusable="false"
+  aria-hidden={true}
+  focusable={false}
   role="img"
 >
   <path
@@ -3895,8 +3895,8 @@ exports[`Storyshots Components/Icon With A Component 1`] = `
 
 exports[`Storyshots Components/Icon With A Function 1`] = `
 <svg
-  aria-hidden="true"
-  focusable="false"
+  aria-hidden={true}
+  focusable={false}
   role="img"
 >
   <path
@@ -3907,8 +3907,8 @@ exports[`Storyshots Components/Icon With A Function 1`] = `
 
 exports[`Storyshots Components/Icon With An SVG 1`] = `
 <svg
-  aria-hidden="true"
-  focusable="false"
+  aria-hidden={true}
+  focusable={false}
   height={24}
   role="img"
   width={24}
@@ -3967,9 +3967,9 @@ exports[`Storyshots Components/Panel Default 1`] = `
           aria-hidden="true"
         >
           <svg
-            aria-hidden="true"
+            aria-hidden={true}
             className="components-panel__arrow"
-            focusable="false"
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -4020,9 +4020,9 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
           aria-hidden="true"
         >
           <svg
-            aria-hidden="true"
+            aria-hidden={true}
             className="components-panel__arrow"
-            focusable="false"
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -4059,9 +4059,9 @@ exports[`Storyshots Components/Panel Multiple Bodies 1`] = `
           aria-hidden="true"
         >
           <svg
-            aria-hidden="true"
+            aria-hidden={true}
             className="components-panel__arrow"
-            focusable="false"
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -4107,9 +4107,9 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
           aria-hidden="true"
         >
           <svg
-            aria-hidden="true"
+            aria-hidden={true}
             className="components-panel__arrow"
-            focusable="false"
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -4123,9 +4123,9 @@ exports[`Storyshots Components/Panel With Icon 1`] = `
         </span>
         My Block Settings
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="dashicon dashicons-wordpress components-panel__icon"
-          focusable="false"
+          focusable={false}
           height={20}
           role="img"
           viewBox="0 0 20 20"
@@ -4155,9 +4155,9 @@ exports[`Storyshots Components/Placeholder Default 1`] = `
     className="components-placeholder__label"
   >
     <svg
-      aria-hidden="true"
+      aria-hidden={true}
       className="dashicon dashicons-smiley"
-      focusable="false"
+      focusable={false}
       height={20}
       role="img"
       viewBox="0 0 20 20"
@@ -4369,6 +4369,55 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
 </div>
 `;
 
+exports[`Storyshots Components/Radio Default 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="default-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="default-radiogroup-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="default-radiogroup-2"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+</div>
+`;
+
 exports[`Storyshots Components/RadioControl Default 1`] = `
 <div
   className="components-base-control components-radio-control"
@@ -4517,6 +4566,225 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
   >
     The visibility level for the current post
   </p>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Controlled 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="controlled-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="controlled-radiogroup-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    checked={true}
+    className="components-button is-primary"
+    id="controlled-radiogroup-2"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="controlled-radiogroup-3"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Default 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="default-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="default-radiogroup-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    checked={true}
+    className="components-button is-primary"
+    id="default-radiogroup-2"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    checked={false}
+    className="components-button is-secondary"
+    id="default-radiogroup-3"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    tabIndex={-1}
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
+</div>
+`;
+
+exports[`Storyshots Components/RadioGroup Disabled 1`] = `
+<div
+  aria-label="options"
+  className="components-button-group"
+  id="disabled-radiogroup"
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  role="radiogroup"
+>
+  <button
+    aria-checked={false}
+    aria-disabled={true}
+    checked={false}
+    className="components-button is-secondary"
+    disabled={true}
+    id="disabled-radiogroup-1"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
+    type="radio"
+    value="option1"
+  >
+    Option 1
+  </button>
+  <button
+    aria-checked={true}
+    aria-disabled={true}
+    checked={true}
+    className="components-button is-primary"
+    disabled={true}
+    id="disabled-radiogroup-2"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
+    type="radio"
+    value="option2"
+  >
+    Option 2
+  </button>
+  <button
+    aria-checked={false}
+    aria-disabled={true}
+    checked={false}
+    className="components-button is-secondary"
+    disabled={true}
+    id="disabled-radiogroup-3"
+    onChange={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    role="radio"
+    style={
+      Object {
+        "pointerEvents": "none",
+      }
+    }
+    type="radio"
+    value="option3"
+  >
+    Option 3
+  </button>
 </div>
 `;
 
@@ -6566,9 +6834,9 @@ input[type='number'].emotion-16 {
         className="emotion-14 emotion-15"
       >
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="dashicon dashicons-wordpress"
-          focusable="false"
+          focusable={false}
           height={20}
           role="img"
           viewBox="0 0 20 20"
@@ -6815,9 +7083,9 @@ input[type='number'].emotion-16 {
         className="emotion-0 emotion-1"
       >
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="dashicon dashicons-wordpress"
-          focusable="false"
+          focusable={false}
           height={20}
           role="img"
           viewBox="0 0 20 20"
@@ -8033,8 +8301,8 @@ exports[`Storyshots Components/Tip Default 1`] = `
   className="components-tip"
 >
   <svg
-    aria-hidden="true"
-    focusable="false"
+    aria-hidden={true}
+    focusable={false}
     height="24"
     role="img"
     viewBox="0 0 24 24"
@@ -8076,9 +8344,9 @@ exports[`Storyshots Components/ToggleControl Default 1`] = `
         className="components-form-toggle__thumb"
       />
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-form-toggle__on"
-        focusable="false"
+        focusable={false}
         height="6"
         role="img"
         viewBox="0 0 2 6"
@@ -8125,9 +8393,9 @@ exports[`Storyshots Components/ToggleControl With Help Text 1`] = `
         className="components-form-toggle__thumb"
       />
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-form-toggle__on"
-        focusable="false"
+        focusable={false}
         height="6"
         role="img"
         viewBox="0 0 2 6"
@@ -8207,8 +8475,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8245,8 +8513,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
         type="button"
       >
         <svg
-          aria-hidden="true"
-          focusable="false"
+          aria-hidden={true}
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -8293,8 +8561,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8322,8 +8590,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8351,8 +8619,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8407,8 +8675,8 @@ exports[`Storyshots Components/Toolbar Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8452,8 +8720,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8480,8 +8748,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8507,8 +8775,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8592,8 +8860,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8629,8 +8897,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8665,8 +8933,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8716,8 +8984,8 @@ exports[`Storyshots Components/Toolbar Toolbars 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -8787,8 +9055,8 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -8816,8 +9084,8 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -8845,8 +9113,8 @@ exports[`Storyshots Components/Toolbar Without Group 1`] = `
     type="button"
   >
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -8879,8 +9147,8 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8906,8 +9174,8 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8933,8 +9201,8 @@ exports[`Storyshots Components/ToolbarGroup Default 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8970,8 +9238,8 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -8999,8 +9267,8 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -9028,8 +9296,8 @@ exports[`Storyshots Components/ToolbarGroup With Controls Prop 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
-        focusable="false"
+        aria-hidden={true}
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"
@@ -9125,6 +9393,7 @@ exports[`Storyshots Components/UnitControl Default 1`] = `
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  -moz-appearance: textfield;
   box-sizing: border-box;
   border: 1px solid #000;
   border-radius: 2px;
@@ -9297,8 +9566,8 @@ Array [
       Dashicons (corrected viewport)
     </h2>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9310,8 +9579,8 @@ Array [
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9323,8 +9592,8 @@ Array [
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9341,8 +9610,8 @@ Array [
       Material and Other
     </h2>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9354,8 +9623,8 @@ Array [
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9367,8 +9636,8 @@ Array [
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9426,8 +9695,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       alignCenter
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9439,8 +9708,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9452,8 +9721,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9483,8 +9752,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       alignJustify
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9496,8 +9765,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9509,8 +9778,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9540,8 +9809,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       alignLeft
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9553,8 +9822,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9566,8 +9835,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9597,8 +9866,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       alignRight
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9610,8 +9879,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9623,8 +9892,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9654,8 +9923,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       archive
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9667,8 +9936,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9680,8 +9949,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9711,8 +9980,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       arrowDown
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9724,8 +9993,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9737,8 +10006,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9768,8 +10037,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       arrowLeft
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9781,8 +10050,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9794,8 +10063,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9825,8 +10094,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       arrowRight
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9838,8 +10107,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9851,8 +10120,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9882,8 +10151,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       arrowUp
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9895,8 +10164,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9908,8 +10177,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -9939,8 +10208,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       audio
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -9952,8 +10221,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -9965,8 +10234,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -9996,8 +10265,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       backup
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10009,8 +10278,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10022,8 +10291,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10053,8 +10322,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       blockDefault
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10066,8 +10335,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10079,8 +10348,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10110,8 +10379,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       blockTable
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10123,8 +10392,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10136,8 +10405,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10167,8 +10436,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       brush
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10180,8 +10449,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10193,8 +10462,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10224,8 +10493,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       button
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10237,8 +10506,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10250,8 +10519,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10281,8 +10550,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       calendar
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10294,8 +10563,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10307,8 +10576,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10338,8 +10607,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       camera
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10351,8 +10620,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10364,8 +10633,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10395,8 +10664,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       capturePhoto
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10408,8 +10677,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10421,8 +10690,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10452,8 +10721,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       captureVideo
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10465,8 +10734,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10478,8 +10747,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10509,8 +10778,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       category
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10522,8 +10791,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10535,8 +10804,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10566,8 +10835,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       chartLine
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10579,8 +10848,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10592,8 +10861,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10623,8 +10892,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       check
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10636,8 +10905,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10649,8 +10918,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10680,8 +10949,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       chevronDown
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10693,8 +10962,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10706,8 +10975,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10737,8 +11006,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       chevronLeft
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10750,8 +11019,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10763,8 +11032,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10794,8 +11063,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       chevronRight
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10807,8 +11076,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10820,8 +11089,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10851,8 +11120,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       chevronUp
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10864,8 +11133,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10877,8 +11146,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10908,8 +11177,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       classic
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -10921,8 +11190,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -10934,8 +11203,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -10965,8 +11234,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       closeCircleFilled
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10978,8 +11247,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -10991,8 +11260,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11022,8 +11291,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       close
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11035,8 +11304,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11048,8 +11317,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11079,8 +11348,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       cloudUpload
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11092,8 +11361,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11105,8 +11374,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11136,8 +11405,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       cloud
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11149,8 +11418,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11162,8 +11431,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11193,8 +11462,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       code
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11206,8 +11475,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11219,8 +11488,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11250,8 +11519,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       cog
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11263,8 +11532,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11276,8 +11545,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11307,8 +11576,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       column
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11320,8 +11589,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11333,8 +11602,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11364,8 +11633,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       columns
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11377,8 +11646,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11390,8 +11659,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11421,8 +11690,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       comment
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11434,8 +11703,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11447,8 +11716,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11478,8 +11747,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       controlsRepeat
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11491,8 +11760,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11504,8 +11773,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -11535,8 +11804,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       cover
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11548,8 +11817,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11561,8 +11830,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11592,8 +11861,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       create
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11605,8 +11874,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11618,8 +11887,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11823,8 +12092,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       desktop
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11836,8 +12105,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11849,8 +12118,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11880,8 +12149,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       external
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11893,8 +12162,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11906,8 +12175,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11937,8 +12206,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       file
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -11950,8 +12219,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -11963,8 +12232,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -11994,8 +12263,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatBold
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12007,8 +12276,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12020,8 +12289,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12051,8 +12320,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatIndent
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12064,8 +12333,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12077,8 +12346,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12108,8 +12377,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatItalic
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12121,8 +12390,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12134,8 +12403,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12165,8 +12434,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatListBullets
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12178,8 +12447,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12191,8 +12460,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12222,8 +12491,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatListNumbered
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12235,8 +12504,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12248,8 +12517,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12279,8 +12548,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatLtr
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12292,8 +12561,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12305,8 +12574,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12336,8 +12605,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatOutdent
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12349,8 +12618,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12362,8 +12631,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12393,8 +12662,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatRtl
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12406,8 +12675,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12419,8 +12688,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12450,8 +12719,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       formatStrikethrough
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12463,8 +12732,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12476,8 +12745,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12507,8 +12776,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       gallery
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12520,8 +12789,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12533,8 +12802,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12564,8 +12833,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       globe
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12577,8 +12846,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12590,8 +12859,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12621,8 +12890,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       grid
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12634,8 +12903,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12647,8 +12916,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12678,8 +12947,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       group
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12691,8 +12960,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12704,8 +12973,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12735,8 +13004,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       heading
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12748,8 +13017,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -12761,8 +13030,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -12792,8 +13061,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       help
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12805,8 +13074,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12818,8 +13087,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -12975,8 +13244,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       html
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -12988,8 +13257,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13001,8 +13270,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13032,8 +13301,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       image
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13045,8 +13314,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13058,8 +13327,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13089,8 +13358,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       info
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13102,8 +13371,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13115,8 +13384,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13146,8 +13415,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       insertAfter
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13159,8 +13428,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13172,8 +13441,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13203,8 +13472,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       insertBefore
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13216,8 +13485,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13229,8 +13498,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13260,8 +13529,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       keyboardClose
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13273,8 +13542,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13286,8 +13555,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13317,8 +13586,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       keyboardReturn
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13330,8 +13599,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13343,8 +13612,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13374,8 +13643,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       layout
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13387,8 +13656,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13400,8 +13669,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13431,8 +13700,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       link
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13444,8 +13713,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13457,8 +13726,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13488,8 +13757,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       linkOff
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13501,8 +13770,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13514,8 +13783,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13545,8 +13814,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       list
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13558,8 +13827,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13571,8 +13840,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13602,8 +13871,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       mapMarker
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13615,8 +13884,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13628,8 +13897,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13659,8 +13928,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       media
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13672,8 +13941,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13685,8 +13954,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13716,8 +13985,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       mediaAndText
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13729,8 +13998,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13742,8 +14011,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13773,8 +14042,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       menu
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13786,8 +14055,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13799,8 +14068,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13830,8 +14099,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       minus
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13843,8 +14112,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13856,8 +14125,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -13887,8 +14156,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       mobile
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13900,8 +14169,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -13913,8 +14182,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -13944,8 +14213,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       more
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -13957,8 +14226,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14084,8 +14353,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14115,8 +14384,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       navigation
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14128,8 +14397,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14141,8 +14410,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14172,8 +14441,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pageBreak
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14185,8 +14454,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14198,8 +14467,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14229,8 +14498,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       page
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14242,8 +14511,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14255,8 +14524,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14286,8 +14555,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       paragraph
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14299,8 +14568,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14312,8 +14581,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14343,8 +14612,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       payment
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14358,8 +14627,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14373,8 +14642,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14406,8 +14675,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       percent
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14421,8 +14690,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14436,8 +14705,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14469,8 +14738,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       positionCenter
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14482,8 +14751,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14495,8 +14764,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14526,8 +14795,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       positionLeft
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14539,8 +14808,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14552,8 +14821,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14583,8 +14852,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       positionRight
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14596,8 +14865,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14609,8 +14878,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14640,8 +14909,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pencil
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14653,8 +14922,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14666,8 +14935,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14697,8 +14966,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pin
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14710,8 +14979,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14723,8 +14992,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14754,8 +15023,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       plugins
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14767,8 +15036,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14780,8 +15049,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14811,8 +15080,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       plusCircleFilled
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14824,8 +15093,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14837,8 +15106,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14868,8 +15137,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       plusCircle
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14881,8 +15150,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14894,8 +15163,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -14925,8 +15194,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       plus
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -14938,8 +15207,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -14951,8 +15220,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -14982,150 +15251,42 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       postList
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
       width={24}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="15"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="15"
-      />
       <path
-        d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z"
+        d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v12zM7 11h2V9H7v2zm0 4h2v-2H7v2zm3-4h7V9h-7v2zm0 4h7v-2h-7v2z"
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
       width={36}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="15"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="15"
-      />
       <path
-        d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z"
+        d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v12zM7 11h2V9H7v2zm0 4h2v-2H7v2zm3-4h7V9h-7v2zm0 4h7v-2h-7v2z"
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
       width={48}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="6"
-        x="11"
-        y="15"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="7"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="11"
-      />
-      <rect
-        height="2"
-        width="2"
-        x="7"
-        y="15"
-      />
       <path
-        d="M20.1,3H3.9C3.4,3,3,3.4,3,3.9v16.2C3,20.5,3.4,21,3.9,21h16.2c0.4,0,0.9-0.5,0.9-0.9V3.9C21,3.4,20.5,3,20.1,3z M19,19H5V5h14V19z"
+        d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm.5 14c0 .3-.2.5-.5.5H6c-.3 0-.5-.2-.5-.5V6c0-.3.2-.5.5-.5h12c.3 0 .5.2.5.5v12zM7 11h2V9H7v2zm0 4h2v-2H7v2zm3-4h7V9h-7v2zm0 4h7v-2h-7v2z"
       />
     </svg>
   </div>
@@ -15147,8 +15308,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       preformatted
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15160,8 +15321,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15173,8 +15334,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15267,8 +15428,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pullLeft
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15280,8 +15441,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15293,8 +15454,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15324,8 +15485,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pullRight
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15337,8 +15498,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15350,8 +15511,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15381,8 +15542,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       pullquote
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15394,8 +15555,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15407,8 +15568,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15438,8 +15599,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       quote
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15451,8 +15612,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15464,8 +15625,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15558,8 +15719,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       redo
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15571,8 +15732,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15584,8 +15745,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15615,8 +15776,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       replace
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15628,8 +15789,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15641,8 +15802,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15672,8 +15833,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       resizeCornerNE
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15685,8 +15846,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15698,8 +15859,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15729,8 +15890,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       rss
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15742,8 +15903,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15755,8 +15916,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15786,8 +15947,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       search
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15799,8 +15960,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15812,8 +15973,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15843,8 +16004,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       separator
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15856,8 +16017,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15869,8 +16030,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15900,8 +16061,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       share
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15913,8 +16074,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15926,8 +16087,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -15957,8 +16118,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       shortcode
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -15970,8 +16131,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -15983,8 +16144,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16071,8 +16232,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       starEmpty
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16084,8 +16245,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16097,8 +16258,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16128,8 +16289,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       starFilled
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16141,8 +16302,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16154,8 +16315,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16185,8 +16346,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       starHalf
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16198,8 +16359,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16211,8 +16372,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16242,8 +16403,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       stretchFullWidth
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16255,8 +16416,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -16268,8 +16429,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16356,8 +16517,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       stretchWide
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16369,8 +16530,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -16382,8 +16543,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16413,8 +16574,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableColumnAfter
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16426,8 +16587,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16439,8 +16600,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16470,8 +16631,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableColumnBefore
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16483,8 +16644,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16496,8 +16657,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16527,8 +16688,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableColumnDelete
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16540,8 +16701,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16553,8 +16714,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16584,8 +16745,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableRowAfter
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16597,8 +16758,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16610,8 +16771,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16641,8 +16802,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableRowBefore
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16654,8 +16815,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16667,8 +16828,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16698,8 +16859,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tableRowDelete
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16711,8 +16872,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16724,8 +16885,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16755,8 +16916,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       table
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16768,8 +16929,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -16781,8 +16942,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16812,8 +16973,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tag
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16825,8 +16986,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -16838,8 +16999,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16869,8 +17030,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       textColor
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16882,8 +17043,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16895,8 +17056,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -16926,8 +17087,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       tablet
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16939,8 +17100,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -16952,8 +17113,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -16983,8 +17144,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       title
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -16996,8 +17157,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17009,8 +17170,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17040,8 +17201,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       trash
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17053,8 +17214,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17066,8 +17227,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17097,8 +17258,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       typography
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17110,8 +17271,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17123,8 +17284,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17154,8 +17315,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       undo
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17167,8 +17328,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17180,8 +17341,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17211,8 +17372,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       update
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17224,8 +17385,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17237,8 +17398,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17268,8 +17429,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       upload
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17281,8 +17442,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17294,8 +17455,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17325,8 +17486,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       verse
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17338,8 +17499,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17351,8 +17512,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17382,8 +17543,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       video
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17395,8 +17556,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17408,8 +17569,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17439,8 +17600,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       widget
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="0 0 24 24"
@@ -17452,8 +17613,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="0 0 24 24"
@@ -17465,8 +17626,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="0 0 24 24"
@@ -17496,8 +17657,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       wordpress
     </strong>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={24}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17509,8 +17670,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={36}
       role="img"
       viewBox="-2 -2 24 24"
@@ -17522,8 +17683,8 @@ exports[`Storyshots Icons/Icon Library 1`] = `
       />
     </svg>
     <svg
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden={true}
+      focusable={false}
       height={48}
       role="img"
       viewBox="-2 -2 24 24"

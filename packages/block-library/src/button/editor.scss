@@ -13,10 +13,7 @@
 
 .wp-block-button {
 	position: relative;
-
-	[contenteditable] {
-		cursor: text;
-	}
+	cursor: text;
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
 	&:not(.has-text-color):not(.is-style-outline) [data-rich-text-placeholder]::after {
@@ -24,7 +21,7 @@
 	}
 
 	// Add outline to button on focus to indicate focus-state
-	.block-editor-rich-text__editable:focus {
+	&:focus {
 		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
 
 		// Windows' High Contrast mode will show this outline, but not the box-shadow.
@@ -33,7 +30,7 @@
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	[data-rich-text-placeholder]::after {
+	&[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
 }

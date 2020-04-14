@@ -58,7 +58,6 @@ module.exports = function( api ) {
 	return {
 		presets: [ getPresetEnv() ],
 		plugins: [
-			require.resolve( '@babel/plugin-proposal-object-rest-spread' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
@@ -76,9 +75,6 @@ module.exports = function( api ) {
 					pragmaFrag: 'Fragment',
 				},
 			],
-			require.resolve(
-				'@babel/plugin-proposal-async-generator-functions'
-			),
 			maybeGetPluginTransformRuntime(),
 		].filter( Boolean ),
 	};

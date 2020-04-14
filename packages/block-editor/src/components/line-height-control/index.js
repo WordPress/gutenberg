@@ -17,13 +17,13 @@ import {
 } from './utils';
 
 export default function LineHeightControl( { value: lineHeight, onChange } ) {
-	const isDisabled = useIsLineHeightControlsDisabled();
-	const isDefined = isLineHeightDefined( lineHeight );
-
 	// Don't render the controls if disabled by editor settings
+	const isDisabled = useIsLineHeightControlsDisabled();
 	if ( isDisabled ) {
 		return null;
 	}
+
+	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {
 		const { keyCode } = event;

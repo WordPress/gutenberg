@@ -252,6 +252,21 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+<a name="getPageError" href="#getPageError">#</a> **getPageError**
+
+Returns a promise resolving to one of either a string or null. A string will
+be resolved if an error message is present in the contents of the page. If no
+error is present, a null value will be resolved instead. This requires the
+environment be configured to display errors.
+
+_Related_
+
+-   <http://php.net/manual/en/function.error-reporting.php>
+
+_Returns_
+
+-   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
+
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
 Returns a boolean indicating if the current selected block has a block switcher or not.

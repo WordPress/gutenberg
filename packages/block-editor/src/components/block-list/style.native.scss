@@ -4,6 +4,16 @@
 	background-color: #fff;
 }
 
+.horizontalContentContainer {
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: stretch;
+	max-width: $content-width;
+	overflow: visible;
+	width: 100%;
+}
+
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
@@ -69,4 +79,8 @@
 
 .blockToolbar {
 	height: $mobile-block-toolbar-height;
+}
+
+.overflowVisible {
+	overflow: visible;
 }
