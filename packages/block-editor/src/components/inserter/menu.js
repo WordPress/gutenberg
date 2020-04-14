@@ -8,7 +8,7 @@ import { includes, pick } from 'lodash';
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel, Popover } from '@wordpress/components';
+import { TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
@@ -208,12 +208,9 @@ function InserterMenu( {
 				{ ! hasPatterns && blocksTab }
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<Popover
-					className="block-editor-inserter__preview-popover"
-					position="middle right right"
-				>
+				<div className="block-editor-inserter__preview-container">
 					<InserterPreviewPanel item={ hoveredItem } />
-				</Popover>
+				</div>
 			) }
 		</div>
 	);

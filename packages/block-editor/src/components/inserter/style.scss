@@ -37,6 +37,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__menu {
 	height: 100%;
+	position: relative;
+	overflow: visible;
 }
 
 .block-editor-inserter__main-area {
@@ -46,7 +48,6 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	@include break-medium {
 		width: $block-inserter-width;
-		position: relative;
 	}
 }
 
@@ -190,13 +191,15 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__preview-popover .components-popover__content {
+.block-editor-inserter__preview-container {
 	display: none;
 	width: 300px;
 	background: $white;
 	border-radius: $radius-block-ui;
-	margin-left: $grid-unit-20;
-	border-color: $light-gray-500;
+	border: $border-width solid $light-gray-500;
+	position: absolute;
+	top: $grid-unit-20;
+	left: calc(100% + #{$grid-unit-20});
 
 	@include break-medium {
 		display: block;
