@@ -1,17 +1,8 @@
 $blocks-button__height: 56px;
 
 .wp-block-button {
-	&.aligncenter {
-		text-align: center;
-	}
-
-	&.alignright {
-		/*rtl:ignore*/
-		text-align: right;
-	}
-}
-
-.wp-block-button {
+	color: $white;
+	background-color: $dark-gray-700;
 	border: none;
 	border-radius: $blocks-button__height / 2;
 	box-shadow: none;
@@ -28,7 +19,16 @@ $blocks-button__height: 56px;
 	&:focus,
 	&:active,
 	&:visited {
-		color: var(--wp--color--text, $white);
+		color: $white;
+	}
+
+	&.aligncenter {
+		text-align: center;
+	}
+
+	&.alignright {
+		/*rtl:ignore*/
+		text-align: right;
 	}
 }
 
