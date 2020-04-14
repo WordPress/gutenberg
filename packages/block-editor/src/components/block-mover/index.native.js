@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { I18nManager } from 'react-native';
 import { first, last, partial, castArray } from 'lodash';
 
 /**
@@ -141,6 +140,7 @@ export default compose(
 			getTemplateLock,
 			getBlockRootClientId,
 			getBlockOrder,
+			getSettings,
 		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
 		const firstClientId = first( normalizedClientIds );
@@ -156,7 +156,7 @@ export default compose(
 			firstIndex,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			isRTL: I18nManager.isRTL,
+			isRTL: getSettings().isRTL,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
 			rootClientId,
 		};

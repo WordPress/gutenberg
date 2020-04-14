@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { I18nManager } from 'react-native';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,6 +8,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
@@ -23,7 +19,9 @@ function ParagraphBlock( {
 	setAttributes,
 	style: oldStyle,
 } ) {
-	const isRTL = I18nManager.isRTL;
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
 
 	const { align, content, placeholder, style } = attributes;
 

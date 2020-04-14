@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useRef } from 'react';
-import { ScrollView, View, I18nManager } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ export default compose( [
 			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled:
 			select( 'core/edit-post' ).getEditorMode() === 'text',
-		isRTL: I18nManager.isRTL,
+		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );

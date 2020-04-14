@@ -52,7 +52,7 @@ export function AlignmentToolbar( props ) {
 	);
 
 	function setIcon() {
-		if ( activeAlignment ) return activeAlignment;
+		if ( activeAlignment ) return activeAlignment.icon;
 		return isRTL ? alignRight : alignLeft;
 	}
 
