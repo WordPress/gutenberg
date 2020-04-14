@@ -26,10 +26,12 @@ import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
 
 function useBaseId( id ) {
-	const instanceId = useInstanceId( AlignmentMatrixControl );
-	const prefix = id || 'alignment-matrix-control';
+	const instanceId = useInstanceId(
+		AlignmentMatrixControl,
+		'alignment-matrix-control'
+	);
 
-	return `${ prefix }-${ instanceId }`;
+	return id || instanceId;
 }
 
 export default function AlignmentMatrixControl( {
