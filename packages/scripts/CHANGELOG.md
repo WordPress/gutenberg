@@ -1,5 +1,7 @@
 ## Master
 
+## 8.0.0 (2020-04-15)
+
 ### Breaking Changes
 
 - The bundled `jest` dependency has been updated from requiring `^24.9.0` to requiring `^25.3.0` (see [Breaking Changes](https://jestjs.io/blog/2020/01/21/jest-25), [#20766](https://github.com/WordPress/gutenberg/pull/20766)).
