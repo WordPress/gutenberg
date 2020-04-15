@@ -328,7 +328,10 @@ const Cover = ( {
 					<View style={ styles.uploadFailed }>
 						<Icon
 							icon={ 'warning' }
-							{ ...styles.uploadFailedIcon }
+							{ ...getStylesFromColorScheme(
+								styles.uploadFailedIcon,
+								styles.uploadFailedIconDark
+							) }
 						/>
 					</View>
 				</View>

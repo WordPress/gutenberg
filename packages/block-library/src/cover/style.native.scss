@@ -67,7 +67,11 @@
 }
 
 .uploadFailedIcon {
-	fill: #c34629;
+	fill: $red-50;
 	width: 100%;
 	height: 100%;
+}
+
+.uploadFailedIconDark {
+	fill: $red-30;
 }
