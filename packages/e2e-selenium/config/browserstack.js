@@ -58,6 +58,8 @@ const startBrowserStackLocal = async () => {
 };
 
 const stopBrowserStackLocal = async () => {
+	// The callback of browserstackLocal.stop() doesn't return error as an argument.
+	// That's why reject is removed here.
 	return new Promise( ( resolve ) => {
 		browserstackLocal.stop( function() {
 			resolve();
