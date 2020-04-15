@@ -5,6 +5,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import NavigationStructurePanel from './navigation-structure-panel';
 
 export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -34,7 +36,10 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 			>
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
-				<NavigationStructurePanel blocks={ blocks } />
+				<NavigationStructurePanel
+					blocks={ blocks }
+					initialOpen={ isLargeViewport }
+				/>
 				<BlockEditorPanel menuId={ menuId } saveBlocks={ saveBlocks } />
 			</BlockEditorProvider>
 		</div>

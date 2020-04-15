@@ -3,17 +3,14 @@
  */
 import { __experimentalBlockNavigationList } from '@wordpress/block-editor';
 import { Panel, PanelBody } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
-export default function NavigationStructurePanel( { blocks } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-
+export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 	return (
 		<Panel>
 			<PanelBody
 				title={ __( 'Navigation structure' ) }
-				initialOpen={ isLargeViewport }
+				initialOpen={ initialOpen }
 			>
 				{ !! blocks.length && (
 					<__experimentalBlockNavigationList
