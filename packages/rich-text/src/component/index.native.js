@@ -11,13 +11,17 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
+import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
+import { ToolbarButton } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
+import { Icon, atSymbol } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,6 +30,7 @@ import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
+import { insert } from '../insert';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -33,6 +38,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
+import { addMention } from 'react-native-gutenberg-bridge';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -86,6 +92,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -173,7 +180,6 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		this.getRecord( record );
 		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
@@ -193,6 +199,13 @@ export class RichText extends Component {
 		this.onCreateUndoLevel();
 
 		this.lastAztecEventType = 'format change';
+	}
+
+	insertString( record, string ) {
+		if ( record && string ) {
+			const toInsert = insert( record, string );
+			this.onFormatChange( toInsert );
+		}
 	}
 
 	onCreateUndoLevel() {
@@ -860,15 +873,31 @@ export class RichText extends Component {
 					selectionColor={ this.props.selectionColor }
 				/>
 				{ isSelected && (
-					<FormatEdit
-						formatTypes={ formatTypes }
-						value={ record }
-						withoutInteractiveFormatting={
-							withoutInteractiveFormatting
-						}
-						onChange={ this.onFormatChange }
-						onFocus={ () => {} }
-					/>
+					<>
+						<FormatEdit
+							formatTypes={ formatTypes }
+							value={ record }
+							withoutInteractiveFormatting={
+								withoutInteractiveFormatting
+							}
+							onChange={ this.onFormatChange }
+							onFocus={ () => {} }
+						/>
+						<BlockFormatControls>
+							<ToolbarButton
+								title={ __( 'Insert mention' ) }
+								icon={ <Icon icon={ atSymbol } /> }
+								onClick={ () => {
+									addMention().then( ( mentionUserId ) => {
+										this.insertString(
+											record,
+											`@${ mentionUserId }`
+										);
+									} );
+								} }
+							/>
+						</BlockFormatControls>
+					</>
 				) }
 			</View>
 		);
