@@ -8,18 +8,41 @@ import { clamp } from 'lodash';
  */
 import { useEffect } from '@wordpress/element';
 
-export const DRAG_CURSOR = 'ns-resize';
+export function getDragCursor( dragDirection ) {
+	let dragCursor = 'n-resize';
 
-export function useDragCursor( isDragging ) {
+	switch ( dragDirection ) {
+		case 'n':
+			dragCursor = 'n-resize';
+			break;
+		case 'e':
+			dragCursor = 'e-resize';
+			break;
+		case 's':
+			dragCursor = 's-resize';
+			break;
+		case 'w':
+			dragCursor = 'w-resize';
+			break;
+	}
+
+	return dragCursor;
+}
+
+export function useDragCursor( isDragging, dragDirection ) {
+	const dragCursor = getDragCursor( dragDirection );
+
 	useEffect( () => {
 		if ( isDragging ) {
-			document.documentElement.style.cursor = DRAG_CURSOR;
+			document.documentElement.style.cursor = dragCursor;
 			document.documentElement.style.pointerEvents = 'none';
 		} else {
 			document.documentElement.style.cursor = null;
 			document.documentElement.style.pointerEvents = null;
 		}
 	}, [ isDragging ] );
+
+	return dragCursor;
 }
 
 function getValue( value ) {

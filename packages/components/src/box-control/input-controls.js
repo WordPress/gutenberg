@@ -49,8 +49,8 @@ export default function BoxInputControls( {
 			<LayoutBox aria-hidden="true" />
 			<UnitControl
 				{ ...props }
-				disableUnits
 				value={ top }
+				dragDirection="s"
 				onChange={ createHandleOnChange( 'top' ) }
 				label="Top"
 				size="small"
@@ -63,8 +63,8 @@ export default function BoxInputControls( {
 			/>
 			<UnitControl
 				{ ...props }
-				disableUnits
 				value={ left }
+				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
 				label="Left"
 				size="small"
@@ -78,7 +78,6 @@ export default function BoxInputControls( {
 			/>
 			<UnitControl
 				{ ...props }
-				disableUnits
 				value={ isMixed ? '' : top }
 				onChange={ ( next ) => {
 					onChange( {
@@ -99,8 +98,8 @@ export default function BoxInputControls( {
 			/>
 			<UnitControl
 				{ ...props }
-				disableUnits
 				value={ right }
+				dragDirection="w"
 				onChange={ createHandleOnChange( 'right' ) }
 				label="Right"
 				size="small"
@@ -113,8 +112,8 @@ export default function BoxInputControls( {
 			/>
 			<UnitControl
 				{ ...props }
-				disableUnits
 				value={ bottom }
+				dragDirection="n"
 				onChange={ createHandleOnChange( 'bottom' ) }
 				label="Bottom"
 				size="small"

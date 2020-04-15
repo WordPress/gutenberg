@@ -17,20 +17,14 @@ import { UP, DOWN } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import InputControl from '../input-control';
-import {
-	DRAG_CURSOR,
-	useDragCursor,
-	add,
-	subtract,
-	roundClampString,
-} from './utils';
+import { useDragCursor, add, subtract, roundClampString } from './utils';
 
 export function NumberControl(
 	{
 		className,
 		label,
-		dragAxis = 'y',
-		dragThreshold = 10,
+		dragDirection = 'n',
+		dragThreshold = 0,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		max = Infinity,
@@ -39,7 +33,6 @@ export function NumberControl(
 		onKeyDown = noop,
 		shiftStep = 10,
 		step = 1,
-		style: styleProp,
 		value: valueProp,
 		...props
 	},
@@ -48,24 +41,48 @@ export function NumberControl(
 	const [ isDragging, setIsDragging ] = useState( false );
 	const baseValue = clamp( 0, min, max );
 
-	useDragCursor( isDragging );
+	const dragCursor = useDragCursor( isDragging, dragDirection );
 
 	const dragGestureProps = useDrag(
 		( { dragging, delta, event, shiftKey } ) => {
 			if ( ! isDragEnabled ) return;
 			if ( ! dragging ) {
+				window.getSelection().removeAllRanges();
 				setIsDragging( false );
 				return;
 			}
 
 			event.stopPropagation();
 
-			const [ , y ] = delta;
+			const [ x, y ] = delta;
 			const modifier = shiftKey ? shiftStep : 1;
-			const distance = y * modifier * -1;
+			let directionModifier;
+			let directionBaseValue;
+
+			switch ( dragDirection ) {
+				case 'n':
+					directionBaseValue = y;
+					directionModifier = -1;
+					break;
+				case 'e':
+					directionBaseValue = x;
+					directionModifier = 1;
+					break;
+				case 's':
+					directionBaseValue = y;
+					directionModifier = 1;
+					break;
+				case 'w':
+					directionBaseValue = x;
+					directionModifier = -1;
+					break;
+			}
+
+			const distance = directionBaseValue * modifier * directionModifier;
+			let nextValue;
 
 			if ( distance !== 0 ) {
-				const nextValue = roundClampString(
+				nextValue = roundClampString(
 					add( valueProp, distance ),
 					min,
 					max,
@@ -79,7 +96,6 @@ export function NumberControl(
 			}
 		},
 		{
-			axis: dragAxis,
 			threshold: dragThreshold,
 			enabled: isDragEnabled,
 		}
@@ -138,11 +154,6 @@ export function NumberControl(
 	};
 
 	const classes = classNames( 'component-number-control', className );
-	const style = {
-		...styleProp,
-		cursor: isDragging ? DRAG_CURSOR : styleProp?.cursor,
-		userSelect: isDragging ? 'none' : styleProp?.userSelect,
-	};
 
 	return (
 		<Input
@@ -150,29 +161,46 @@ export function NumberControl(
 			{ ...props }
 			{ ...dragGestureProps() }
 			className={ classes }
+			dragCursor={ dragCursor }
 			label={ label }
 			isDragging={ isDragging }
 			ref={ ref }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
-			style={ style }
 			type="number"
 			value={ valueProp }
 		/>
 	);
 }
 
-const dragStyles = ( { isDragging } ) => {
-	if ( ! isDragging ) return '';
+const dragStyles = ( { isDragging, dragCursor } ) => {
+	let defaultArrowStyles = '';
+	let activeDragCursorStyles = '';
+
+	if ( isDragging ) {
+		defaultArrowStyles = css`
+			cursor: ${dragCursor};
+			user-select: none;
+
+			&::-webkit-outer-spin-button,
+			&::-webkit-inner-spin-button {
+				-webkit-appearance: none !important;
+				margin: 0 !important;
+			}
+		`;
+	}
+
+	if ( dragCursor ) {
+		activeDragCursorStyles = css`
+			&:active {
+				cursor: ${dragCursor};
+			}
+		`;
+	}
 
 	return css`
-		user-select: none;
-
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none !important;
-			margin: 0 !important;
-		}
+		${defaultArrowStyles};
+		${activeDragCursorStyles};
 	`;
 };
 
