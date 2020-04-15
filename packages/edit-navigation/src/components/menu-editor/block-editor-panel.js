@@ -6,9 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
-
 import {
 	BlockList,
 	BlockToolbar,
@@ -16,23 +13,24 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
-export default function BlockEditorPanel( { menuId, saveBlocks } ) {
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
-	const isNavigationModeActive = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+export default function BlockEditorPanel( { saveBlocks } ) {
+	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
+		( select ) => {
+			const { isNavigationMode, getSelectedBlock } = select(
+				'core/block-editor'
+			);
+
+			return {
+				isNavigationModeActive: isNavigationMode(),
+				hasSelectedBlock: !! getSelectedBlock(),
+			};
+		},
 		[]
 	);
-
-	// Clear the selected block when the menu is changed.
-	// Block selection isn't cleared implicity by the block-editor store.
-	// Dispatching this action fixes an issue where the toolbar
-	// for a block continues to be displayed after it no longer exists.
-	useEffect( () => {
-		clearSelectedBlock();
-	}, [ menuId ] );
 
 	return (
 		<Panel
@@ -52,7 +50,7 @@ export default function BlockEditorPanel( { menuId, saveBlocks } ) {
 					) }
 					aria-label={ __( 'Block tools' ) }
 				>
-					<BlockToolbar hideDragHandle />
+					{ hasSelectedBlock && <BlockToolbar hideDragHandle /> }
 				</NavigableToolbar>
 				<Popover.Slot name="block-toolbar" />
 				<WritingFlow>

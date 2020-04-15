@@ -40,7 +40,7 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
-				<BlockEditorPanel menuId={ menuId } saveBlocks={ saveBlocks } />
+				<BlockEditorPanel saveBlocks={ saveBlocks } />
 			</BlockEditorProvider>
 		</div>
 	);
