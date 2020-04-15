@@ -20,13 +20,19 @@ import { __ } from '@wordpress/i18n';
 export default function BlockEditorPanel( { saveBlocks } ) {
 	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
-			const { isNavigationMode, getSelectedBlock } = select(
-				'core/block-editor'
-			);
+			const {
+				isNavigationMode,
+				getBlockSelectionStart,
+				getBlock,
+			} = select( 'core/block-editor' );
+
+			const selectionStartClientId = getBlockSelectionStart();
 
 			return {
 				isNavigationModeActive: isNavigationMode(),
-				hasSelectedBlock: !! getSelectedBlock(),
+				hasSelectedBlock:
+					!! selectionStartClientId &&
+					!! getBlock( selectionStartClientId ),
 			};
 		},
 		[]
