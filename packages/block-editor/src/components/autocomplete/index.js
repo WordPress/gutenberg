@@ -19,6 +19,14 @@ import { withBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
 
 /**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
+/**
  * Wrap the default Autocomplete component with one that
  * supports a filter hook for customizing its list of autocompleters.
  *
@@ -29,7 +37,7 @@ import blockAutocompleter from '../../autocompleters/block';
  */
 export function withFilteredAutocompleters( Autocomplete ) {
 	return ( props ) => {
-		let { completers = [], blockName } = props;
+		let { completers = EMPTY_ARRAY, blockName } = props;
 		completers = useMemo( () => {
 			if ( blockName === getDefaultBlockName() ) {
 				return completers.concat( [ blockAutocompleter ] );
