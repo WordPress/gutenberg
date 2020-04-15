@@ -1,5 +1,9 @@
 ## Master
 
+### Bug Fixes
+
+- Fixes an error caused by missing `utils` directory from published package ([#21609](https://github.com/WordPress/gutenberg/pull/21609)).
+
 ## 5.0.0 (2020-04-15)
 
 ### Breaking Changes
