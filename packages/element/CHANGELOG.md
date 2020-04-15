@@ -1,5 +1,7 @@
 ## Master
 
+## 2.13.1 (2020-04-15)
+
 ### Bug Fix
 
 -   Hide TypeScript type declarations ([#21613](https://github.com/WordPress/gutenberg/pull/21613))
