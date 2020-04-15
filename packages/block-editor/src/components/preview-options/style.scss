@@ -1,5 +1,4 @@
 .block-editor-post-preview__dropdown {
-	display: none;
 	margin-right: $grid-unit-15;
 	padding: 0;
 }
@@ -29,7 +28,6 @@
 .block-editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
-		padding-bottom: 0;
 	}
 
 	.components-menu-group + .components-menu-group {
