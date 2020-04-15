@@ -37,13 +37,13 @@ export default function PreviewOptions( { isSaveable = true } ) {
 
 	return (
 		<Dropdown
-			className="editor-post-preview__dropdown"
-			contentClassName="editor-post-preview__dropdown-content"
+			className="block-editor-post-preview__dropdown"
+			contentClassName="block-editor-post-preview__dropdown-content"
 			popoverProps={ { role: 'menu' } }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					onClick={ onToggle }
-					className="editor-post-preview__button-toggle"
+					className="block-editor-post-preview__button-toggle"
 					aria-expanded={ isOpen }
 					disabled={ ! isSaveable }
 				>
@@ -55,21 +55,21 @@ export default function PreviewOptions( { isSaveable = true } ) {
 				<>
 					<MenuGroup>
 						<MenuItem
-							className="editor-post-preview__button-resize"
+							className="block-editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Desktop' ) }
 							icon={ deviceType === 'Desktop' && check }
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
 						<MenuItem
-							className="editor-post-preview__button-resize"
+							className="block-editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Tablet' ) }
 							icon={ deviceType === 'Tablet' && check }
 						>
 							{ __( 'Tablet' ) }
 						</MenuItem>
 						<MenuItem
-							className="editor-post-preview__button-resize"
+							className="block-editor-post-preview__button-resize"
 							onClick={ () => setPreviewDeviceType( 'Mobile' ) }
 							icon={ deviceType === 'Mobile' && check }
 						>
