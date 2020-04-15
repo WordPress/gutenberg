@@ -108,9 +108,9 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			renderFooterAppender,
 			__experimentalMoverDirection,
 			parentWidth,
-			shouldRenderFooterAppender,
 			horizontal,
 			scrollEnabled,
 			contentResizeMode,
@@ -131,14 +131,12 @@ class InnerBlocks extends Component {
 						marginHorizontal={ marginHorizontal }
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
+						renderFooterAppender={ renderFooterAppender }
 						withFooter={ false }
 						__experimentalMoverDirection={
 							__experimentalMoverDirection
 						}
 						parentWidth={ parentWidth }
-						shouldRenderFooterAppender={
-							shouldRenderFooterAppender
-						}
 						horizontalAlignment={ horizontalAlignment }
 						horizontal={ horizontal }
 						scrollEnabled={ scrollEnabled }

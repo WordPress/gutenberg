@@ -85,17 +85,9 @@ export class BlockList extends Component {
 	}
 
 	shouldShowInnerBlockAppender() {
-		const {
-			blockClientIds,
-			renderAppender,
-			shouldRenderFooterAppender = false,
-		} = this.props;
+		const { blockClientIds, renderAppender } = this.props;
 
-		return (
-			! shouldRenderFooterAppender &&
-			renderAppender &&
-			blockClientIds.length > 0
-		);
+		return renderAppender && blockClientIds.length > 0;
 	}
 
 	render() {
@@ -251,8 +243,7 @@ export class BlockList extends Component {
 		const {
 			isReadOnly,
 			withFooter = true,
-			renderAppender,
-			shouldRenderFooterAppender,
+			renderFooterAppender,
 		} = this.props;
 
 		if ( ! isReadOnly && withFooter ) {
@@ -268,8 +259,8 @@ export class BlockList extends Component {
 					</TouchableWithoutFeedback>
 				</>
 			);
-		} else if ( shouldRenderFooterAppender && renderAppender ) {
-			return renderAppender();
+		} else if ( renderFooterAppender ) {
+			return renderFooterAppender();
 		}
 		return null;
 	}

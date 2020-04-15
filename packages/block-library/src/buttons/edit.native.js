@@ -45,18 +45,15 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
-	function renderAppender() {
-		if ( shouldRenderFooterAppender ) {
-			return (
-				<View style={ styles.appenderContainer }>
-					<InnerBlocks.ButtonBlockAppender
-						isFloating={ true }
-						onAddBlock={ onAddNextButton }
-					/>
-				</View>
-			);
-		}
-		return null;
+	function renderFooterAppender() {
+		return (
+			<View style={ styles.appenderContainer }>
+				<InnerBlocks.ButtonBlockAppender
+					isFloating={ true }
+					onAddBlock={ onAddNextButton }
+				/>
+			</View>
+		);
 	}
 
 	// Inside buttons block alignment options are not supported.
@@ -70,13 +67,14 @@ function ButtonsEdit( {
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
-				renderAppender={ renderAppender }
+				renderFooterAppender={
+					shouldRenderFooterAppender && renderFooterAppender
+				}
 				__experimentalMoverDirection="horizontal"
 				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth }
-				shouldRenderFooterAppender={ shouldRenderFooterAppender }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 			/>
