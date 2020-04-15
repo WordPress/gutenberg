@@ -12,6 +12,8 @@ import {
 	closeModal,
 	toggleFeature,
 	requestMetaBoxUpdates,
+	openEntitiesSavedStates,
+	closeEntitiesSavedStates,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -98,6 +100,26 @@ describe( 'actions', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
 			expect( requestMetaBoxUpdates() ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
+			} );
+		} );
+	} );
+
+	describe( 'openEntitiesSavedStates', () => {
+		it( 'should return OPEN_ENTITIES_SAVED_STATES action', () => {
+			const result = openEntitiesSavedStates( 'test' );
+			expect( result ).toEqual( {
+				type: 'OPEN_ENTITIES_SAVED_STATES',
+				onRequestClose: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'closeEntitiesSavedStates', () => {
+		it( 'should return CLOSE_ENTITIES_SAVED_STATES action', () => {
+			const result = closeEntitiesSavedStates( 'test' );
+			expect( result ).toEqual( {
+				type: 'CLOSE_ENTITIES_SAVED_STATES',
+				callbackArg: 'test',
 			} );
 		} );
 	} );
