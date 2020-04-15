@@ -61,3 +61,9 @@ export { default as StepperControl } from './mobile/stepper-control';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
+
+export {
+	default as WrapperStyleContext,
+	useWrapperStyle,
+	withWrapperStyle,
+} from './mobile/wrapper-style-context';

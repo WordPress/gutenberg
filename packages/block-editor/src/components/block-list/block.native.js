@@ -7,7 +7,11 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { ToolbarButton, Toolbar } from '@wordpress/components';
+import {
+	ToolbarButton,
+	Toolbar,
+	WrapperStyleContext,
+} from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -102,6 +106,7 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
+			wrapperProps,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -113,86 +118,113 @@ class BlockListBlock extends Component {
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 
 		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onFocus }
-				accessible={ accessible }
-				accessibilityRole={ 'button' }
-			>
-				<View
-					style={ { flex: 1 } }
-					accessibilityLabel={ accessibilityLabel }
-				>
-					{ showFloatingToolbar && (
-						<FloatingToolbar>
-							{ hasParent && (
-								<Toolbar passedStyle={ styles.toolbar }>
-									<ToolbarButton
-										title={ __( 'Navigate Up' ) }
-										onClick={ () => onSelect( parentId ) }
-										icon={ NavigateUpSVG }
-									/>
-									<View style={ styles.pipe } />
-								</Toolbar>
-							) }
-							<Breadcrumbs clientId={ clientId } />
-						</FloatingToolbar>
-					) }
-					<View
-						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
-						accessibilityLabel={ accessibilityLabel }
-						style={ [
-							{ marginVertical, marginHorizontal, flex: 1 },
-							isDimmed && styles.dimmed,
-						] }
+			<WrapperStyleContext.Consumer>
+				{ ( wrapperStyle ) => (
+					<WrapperStyleContext.Provider
+						value={ {
+							style: {
+								...wrapperStyle.style,
+								...( wrapperProps || {} ).style,
+							},
+						} }
 					>
-						{ isSelected && (
+						<TouchableWithoutFeedback
+							onPress={ this.onFocus }
+							accessible={ accessible }
+							accessibilityRole={ 'button' }
+						>
 							<View
-								style={ [
-									styles.solidBorder,
-									getStylesFromColorScheme(
-										styles.solidBorderColor,
-										styles.solidBorderColorDark
-									),
-								] }
-							/>
-						) }
-						{ isParentSelected && (
-							<View
-								style={ [
-									styles.dashedBorder,
-									getStylesFromColorScheme(
-										styles.dashedBorderColor,
-										styles.dashedBorderColorDark
-									),
-								] }
-							/>
-						) }
-						{ isValid ? (
-							this.getBlockForType()
-						) : (
-							<BlockInvalidWarning
-								blockTitle={ title }
-								icon={ icon }
-							/>
-						) }
-						<View style={ styles.neutralToolbar }>
-							{ isSelected && (
-								<BlockMobileToolbar
-									clientId={ clientId }
-									onDelete={ onDeleteBlock }
-									horizontalDirection={ horizontalDirection }
-								/>
-							) }
-						</View>
-					</View>
-				</View>
-			</TouchableWithoutFeedback>
+								style={ { flex: 1 } }
+								accessibilityLabel={ accessibilityLabel }
+							>
+								{ showFloatingToolbar && (
+									<FloatingToolbar>
+										{ hasParent && (
+											<Toolbar
+												passedStyle={ styles.toolbar }
+											>
+												<ToolbarButton
+													title={ __(
+														'Navigate Up'
+													) }
+													onClick={ () =>
+														onSelect( parentId )
+													}
+													icon={ NavigateUpSVG }
+												/>
+												<View style={ styles.pipe } />
+											</Toolbar>
+										) }
+										<Breadcrumbs clientId={ clientId } />
+									</FloatingToolbar>
+								) }
+								<View
+									pointerEvents={
+										isTouchable ? 'auto' : 'box-only'
+									}
+									accessibilityLabel={ accessibilityLabel }
+									style={ [
+										{
+											marginVertical,
+											marginHorizontal,
+											flex: 1,
+										},
+										isDimmed && styles.dimmed,
+									] }
+								>
+									{ isSelected && (
+										<View
+											style={ [
+												styles.solidBorder,
+												getStylesFromColorScheme(
+													styles.solidBorderColor,
+													styles.solidBorderColorDark
+												),
+											] }
+										/>
+									) }
+									{ isParentSelected && (
+										<View
+											style={ [
+												styles.dashedBorder,
+												getStylesFromColorScheme(
+													styles.dashedBorderColor,
+													styles.dashedBorderColorDark
+												),
+											] }
+										/>
+									) }
+									{ isValid ? (
+										this.getBlockForType()
+									) : (
+										<BlockInvalidWarning
+											blockTitle={ title }
+											icon={ icon }
+										/>
+									) }
+									<View style={ styles.neutralToolbar }>
+										{ isSelected && (
+											<BlockMobileToolbar
+												clientId={ clientId }
+												onDelete={ onDeleteBlock }
+												horizontalDirection={
+													horizontalDirection
+												}
+											/>
+										) }
+									</View>
+								</View>
+							</View>
+						</TouchableWithoutFeedback>
+					</WrapperStyleContext.Provider>
+				) }
+			</WrapperStyleContext.Consumer>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { clientId, rootClientId, wrapperProps } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
 			isBlockSelected,
@@ -281,12 +313,9 @@ export default compose( [
 			isTouchable,
 			isDimmed,
 			showFloatingToolbar,
-			wrapperProps: {
-				...wrapperProps,
-				...( blockType.getEditWrapperProps
-					? blockType.getEditWrapperProps( attributes )
-					: {} ),
-			},
+			wrapperProps: blockType.getEditWrapperProps
+				? blockType.getEditWrapperProps( attributes )
+				: {},
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
