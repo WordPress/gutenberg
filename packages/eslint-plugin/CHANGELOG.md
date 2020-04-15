@@ -1,5 +1,9 @@
 ## Master
 
+### Bug Fix
+
+- Added the recommended `Prettier` config that enforces WordPress coding style guidelines ([#21602](https://github.com/WordPress/gutenberg/pull/21602)).
+
 ### Breaking Changes
 
 - There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
@@ -24,7 +28,6 @@
 
 - The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
 - `@wordpress/no-unused-vars-before-return` will correctly consider other unused variables after encountering an instance of an `excludePattern` option exception.
-- Added the recommended `Prettier` config that enforces WordPress coding style guidelines ([#21602](https://github.com/WordPress/gutenberg/pull/21602)).
 
 ## 4.0.0 (2020-02-10)
 
