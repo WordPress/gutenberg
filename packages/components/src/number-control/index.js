@@ -24,7 +24,8 @@ export function NumberControl(
 		className,
 		label,
 		dragDirection = 'n',
-		dragThreshold = 0,
+		dragThreshold = 10,
+		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		max = Infinity,
@@ -47,7 +48,6 @@ export function NumberControl(
 		( { dragging, delta, event, shiftKey } ) => {
 			if ( ! isDragEnabled ) return;
 			if ( ! dragging ) {
-				window.getSelection().removeAllRanges();
 				setIsDragging( false );
 				return;
 			}
@@ -88,7 +88,7 @@ export function NumberControl(
 					max,
 					modifier
 				);
-				onChange( nextValue, { event } );
+				handleOnChange( nextValue, { event } );
 			}
 
 			if ( ! isDragging ) {
@@ -128,7 +128,7 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				onChange( nextValue, { event } );
+				handleOnChange( nextValue, { event } );
 
 				break;
 
@@ -143,14 +143,17 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				onChange( nextValue, { event } );
+				handleOnChange( nextValue, { event } );
 
 				break;
 		}
 	};
 
 	const handleOnChange = ( value, { event } ) => {
-		onChange( value, { event } );
+		const parsedValue = parseFloat( value );
+		const nextValue = isNaN( parsedValue ) ? nextValue : parsedValue;
+
+		onChange( nextValue, { event } );
 	};
 
 	const classes = classNames( 'component-number-control', className );
@@ -162,11 +165,12 @@ export function NumberControl(
 			{ ...dragGestureProps() }
 			className={ classes }
 			dragCursor={ dragCursor }
-			label={ label }
+			hideHTMLArrows={ hideHTMLArrows }
 			isDragging={ isDragging }
-			ref={ ref }
+			label={ label }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
+			ref={ ref }
 			type="number"
 			value={ valueProp }
 		/>
@@ -204,8 +208,21 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 	`;
 };
 
+const htmlArrowStyles = ( { hideHTMLArrows } ) => {
+	if ( ! hideHTMLArrows ) return ``;
+
+	return css`
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none !important;
+			margin: 0 !important;
+		}
+	`;
+};
+
 const Input = styled( InputControl )`
 	${dragStyles};
+	${htmlArrowStyles};
 `;
 
 export default forwardRef( NumberControl );

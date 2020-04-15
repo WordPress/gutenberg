@@ -4,18 +4,17 @@
 import BaseUnitControl from '../unit-control';
 import { UnitControlWrapper } from './styles/box-control-styles';
 
-export default function BoxUnitControl( { onChange, label, ...props } ) {
-	const handleOnChange = ( nextValue ) => {
-		const value = parseFloat( nextValue );
-		onChange( isNaN( value ) ? nextValue : value );
-	};
+export default function BoxUnitControl( { label, value, ...props } ) {
+	const isEmpty = value === '' || value === undefined;
 
 	return (
 		<UnitControlWrapper aria-label={ label }>
 			<BaseUnitControl
+				disableUnits={ isEmpty }
+				hideHTMLArrows
 				label={ label }
 				isResetValueOnUnitChange={ false }
-				onChange={ handleOnChange }
+				value={ value }
 				{ ...props }
 			/>
 		</UnitControlWrapper>

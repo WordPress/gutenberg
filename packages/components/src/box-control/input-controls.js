@@ -32,8 +32,35 @@ export default function BoxInputControls( {
 	const isMixed = ! allValues.every( ( v ) => v === top );
 	const isRtl = useRtl();
 
-	const createHandleOnChange = ( side ) => ( next ) => {
-		onChange( { ...values, [ side ]: [ next, unit ] } );
+	const createHandleOnChange = ( side ) => ( next, { event } ) => {
+		const { altKey } = event;
+		const nextValues = values;
+		const nextValue = [ next, unit ];
+
+		nextValues[ side ] = nextValue;
+
+		/**
+		 * Supports changing pair sides. For example, holding the ALT key
+		 * when changing the TOP will also update BOTTOM.
+		 */
+		if ( altKey ) {
+			switch ( side ) {
+				case 'top':
+					nextValues.bottom = nextValue;
+					break;
+				case 'bottom':
+					nextValues.top = nextValue;
+					break;
+				case 'left':
+					nextValues.right = nextValue;
+					break;
+				case 'right':
+					nextValues.left = nextValue;
+					break;
+			}
+		}
+
+		onChange( nextValues );
 	};
 
 	const baseStyles = {

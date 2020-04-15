@@ -17,6 +17,11 @@ export function useControlledState( initialState ) {
 	return [ state, setState ];
 }
 
+export function useValueState( initialValue ) {
+	const value = isEmpty( initialValue ) ? '' : initialValue;
+	return useControlledState( value );
+}
+
 export function isEmpty( value ) {
 	const isNullish = typeof value === 'undefined' || value === null;
 	const isEmptyString = value === '';

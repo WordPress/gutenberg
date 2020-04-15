@@ -21,7 +21,7 @@ import {
 	LegendText,
 	Root,
 } from './styles/input-control-styles';
-import { useControlledState, isEmpty } from './utils';
+import { useValueState, isEmpty } from './utils';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
@@ -47,7 +47,7 @@ export function InputControl(
 	ref
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const [ value, setValue ] = useControlledState( valueProp );
+	const [ value, setValue ] = useValueState( valueProp );
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'component-input-control', className );
 
