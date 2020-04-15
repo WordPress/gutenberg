@@ -10,20 +10,27 @@ const hasWordPressProfile = require( './has-wordpress-profile' );
 /** @typedef {import('./get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
- * Message of comment prompting contributor to link their GitHub account from
- * their WordPress.org profile for props credit.
+ * Returns the message text to be used for the comment prompting contributor to
+ * link their GitHub account from their WordPress.org profile for props credit.
  *
- * @type {string}
+ * @param {string} author GitHub username of author.
+ *
+ * @return {string} Message text.
  */
-const ACCOUNT_LINK_PROMPT =
-	"Congratulations on your first merged pull request! We'd like to credit " +
-	'you for your contribution in the post announcing the next WordPress ' +
-	"release, but we can't find a WordPress.org profile associated with your " +
-	'GitHub account. When you have a moment, visit the following URL and ' +
-	'click "link your GitHub account" under "GitHub Username" to link your ' +
-	'accounts:\n\nhttps://profiles.wordpress.org/me/profile/edit/\n\nAnd if ' +
-	"you don't have a WordPress.org account, you can create one on this page:" +
-	'\n\nhttps://login.wordpress.org/register\n\nKudos!';
+function getPromptMessageText( author ) {
+	return (
+		'Congratulations on your first merged pull request, @' +
+		author +
+		"! We'd like to credit you for your contribution in the post " +
+		"announcing the next WordPress release, but we can't find a " +
+		'WordPress.org profile associated with your GitHub account. When you ' +
+		'have a moment, visit the following URL and click "link your GitHub ' +
+		'account" under "GitHub Username" to link your accounts:\n\n' +
+		"https://profiles.wordpress.org/me/profile/edit/\n\nAnd if you don't " +
+		'have a WordPress.org account, you can create one on this page:\n\n' +
+		'https://login.wordpress.org/register\n\nKudos!'
+	);
+}
 
 /**
  * Adds the 'First Time Contributor' label to PRs merged on behalf of
@@ -102,11 +109,15 @@ async function firstTimeContributor( payload, octokit ) {
 		return;
 	}
 
+	debug(
+		'first-time-contributor: User not known. Adding comment to prompt for account link.'
+	);
+
 	await octokit.issues.createComment( {
 		owner,
 		repo,
 		issue_number: pullRequest,
-		body: ACCOUNT_LINK_PROMPT,
+		body: getPromptMessageText( author ),
 	} );
 }
 

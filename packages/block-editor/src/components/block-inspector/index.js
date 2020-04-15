@@ -32,7 +32,6 @@ const BlockInspector = ( {
 	showNoBlockSelectedMessage = true,
 } ) => {
 	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
@@ -59,6 +58,8 @@ const BlockInspector = ( {
 		}
 		return null;
 	}
+
+	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	return (
 		<div className="block-editor-block-inspector">

@@ -31,16 +31,10 @@ function render_block_core_social_link( $attributes ) {
  * Registers the `core/social-link` blocks.
  */
 function register_block_core_social_link() {
-	$path     = __DIR__ . '/social-link/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_social_link',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/social-link',
+		array(
+			'render_callback' => 'render_block_core_social_link',
 		)
 	);
 }

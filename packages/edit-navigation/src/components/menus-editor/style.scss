@@ -3,14 +3,15 @@
 }
 
 .edit-navigation-menus-editor__menu-select-control {
-	.components-base-control__field {
-		display: flex;
-		flex-direction: row;
-		align-items: baseline;
-		margin-bottom: 0;
-	}
-
-	.components-base-control__label {
-		margin-right: 1ch;
+	@include break-small {
+		.components-base-control__field {
+			display: flex;
+			flex-direction: row;
+			align-items: baseline;
+			margin-bottom: 0;
+		}
+		.components-base-control__label {
+			margin-right: 1ch;
+		}
 	}
 }

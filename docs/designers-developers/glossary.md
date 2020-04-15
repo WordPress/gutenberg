@@ -59,7 +59,7 @@
 <dd>A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block.</dd>
 
 <dt>Template</dt>
-<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the templates documentation for more information. See <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.</dd>
+<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.</dd>
 
 <dt>Template part</dt>
 <dd>Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first. They carry some semantic meaning (could be swapped between themes such as a header) and can only be inserted in the site editor context (within “templates”). They are primarily site structure and are never to be mixed with the post content editor. </dd>

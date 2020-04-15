@@ -61,6 +61,7 @@ const typescriptUtilityTypes = [
 	'ThisType',
 	'unknown',
 	'never',
+	'NodeJS',
 ];
 
 module.exports = {

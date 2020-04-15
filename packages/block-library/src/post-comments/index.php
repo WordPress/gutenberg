@@ -16,17 +16,11 @@ function render_block_core_post_comments() {
 		return '';
 	}
 
-	ob_start();
 	// This generates a deprecate message.
 	// Ideally this deprecation is removed.
-	comments_template();
-	ob_get_clean();
-
 	ob_start();
-	wp_list_comments( array( 'page' => $post->ID ) );
-	$comments = ob_get_clean();
-
-	return $comments;
+	comments_template();
+	return ob_get_clean();
 }
 
 /**
