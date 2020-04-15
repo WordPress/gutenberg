@@ -433,7 +433,8 @@ class ButtonEdit extends Component {
 
 		return (
 			<View onLayout={ this.onLayout }>
-				{ this.getPlaceholderWidth( placeholderText ) }
+				{ placeholderText !== '' &&
+					this.getPlaceholderWidth( placeholderText ) }
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
@@ -554,15 +555,12 @@ export default compose( [
 
 		const parentId = getBlockRootClientId( clientId );
 		const selectedId = getSelectedBlockClientId();
-		const isParentSelected = parentId === selectedId;
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
-			parentId,
 			numOfButtons,
-			isParentSelected,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
