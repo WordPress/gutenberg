@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "lib",
+		"rootDirs": ["lib", "test", "config", "util"],
 		// This package is for internal use. d.ts files are unnecessary.
 		"declaration": false,
 		"declarationMap": false,
