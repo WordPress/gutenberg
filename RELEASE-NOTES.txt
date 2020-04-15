@@ -1,3 +1,7 @@
+1.27.0
+------
+* Prefill caption for image blocks when available on the Media library
+
 1.26.0
 ------
 * [iOS] Disable ripple effect in all BottomSheet's controls.
