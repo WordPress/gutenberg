@@ -9,6 +9,8 @@
 		"webdriver": "readonly",
 		"By": "readonly",
 		"until": "readonly",
-		"Key": "readonly"
+		"Key": "readonly",
+		"WP_BASE_URL": "readonly",
+		"WP_ADMIN_BASE_URL": "readonly"
 	}
 }

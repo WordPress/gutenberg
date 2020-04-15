@@ -1,5 +1,5 @@
 const createNewPost = async () => {
-	await driver.get( 'http://localhost:8888/wp-admin/post-new.php' );
+	await driver.get( `${ WP_ADMIN_BASE_URL }/post-new.php` );
 };
 
 module.exports = {

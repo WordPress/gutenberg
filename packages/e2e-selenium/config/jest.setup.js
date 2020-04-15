@@ -18,6 +18,8 @@ beforeAll( async function() {
 	global.By = webdriver.By;
 	global.until = webdriver.until;
 	global.Key = webdriver.Key;
+	global.WP_BASE_URL = 'http://localhost:8889';
+	global.WP_ADMIN_BASE_URL = `${ WP_BASE_URL }/wp-admin`;
 
 	await closeWelcomeGuide();
 } );

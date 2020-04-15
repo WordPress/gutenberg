@@ -1,5 +1,5 @@
 const login = async () => {
-	await driver.get( 'http://localhost:8888/wp-login.php' );
+	await driver.get( `${ WP_BASE_URL }/wp-login.php` );
 
 	await driver.findElement( By.id( 'user_login' ) ).sendKeys( 'admin' );
 	await driver.findElement( By.id( 'user_pass' ) ).sendKeys( 'password' );

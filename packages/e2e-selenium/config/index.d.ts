@@ -8,6 +8,8 @@ declare global {
 			By: webdriver[ 'By' ];
 			until: webdriver[ 'until' ];
 			Key: webdriver[ 'Key' ];
+			WP_BASE_URL: string;
+			WP_ADMIN_BASE_URL: string;
 		}
 	}
 
@@ -16,6 +18,8 @@ declare global {
 	const By: webdriver[ 'By' ];
 	const until: webdriver[ 'until' ];
 	const Key: webdriver[ 'Key' ];
+	const WP_BASE_URL: string;
+	const WP_ADMIN_BASE_URL: string;
 }
 
 export {};
