@@ -78,7 +78,7 @@ export async function trashExistingPosts( postType = 'post' ) {
 	await switchUserToAdmin();
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	const query = addQueryArgs( '', {
-		postType,
+		post_type: postType,
 	} ).slice( 1 );
 	await visitAdminPage( 'edit.php', query );
 
