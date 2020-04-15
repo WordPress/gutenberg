@@ -433,8 +433,7 @@ class ButtonEdit extends Component {
 
 		return (
 			<View onLayout={ this.onLayout }>
-				{ placeholderText !== '' &&
-					this.getPlaceholderWidth( placeholderText ) }
+				{ this.getPlaceholderWidth( placeholderText ) }
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
