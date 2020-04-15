@@ -123,19 +123,15 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 	);
 }
 
-export default function EntitiesSavedStates() {
-	const { dirtyEntityRecords, isOpen } = useSelect( ( select ) => {
+export default function EntitiesSavedStates( { isOpen, closePanel } ) {
+	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
 				'core'
 			).__experimentalGetDirtyEntityRecords(),
-			isOpen: select( 'core/editor' ).isEntitiesSavedStatesOpen(),
 		};
 	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
-	const { closeEntitiesSavedStates: closePanel } = useDispatch(
-		'core/editor'
-	);
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(

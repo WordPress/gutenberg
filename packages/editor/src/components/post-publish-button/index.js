@@ -225,9 +225,8 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		// toggleEntitiesSavedStates
-		const { editPost, savePost, openEntitiesSavedStates } = dispatch(
-			'core/editor'
-		);
+		const { editPost, savePost } = dispatch( 'core/editor' );
+		const { openEntitiesSavedStates } = dispatch( 'core/edit-post' );
 		return {
 			onStatusChange: ( status ) =>
 				editPost( { status }, { undoIgnore: true } ),

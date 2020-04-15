@@ -52,7 +52,7 @@ export default function SaveButton() {
 	const disabled = ! isDirty || isSaving;
 
 	const { openEntitiesSavedStates: openSavePanel } = useDispatch(
-		'core/editor'
+		'core/edit-site'
 	);
 	const openPanel = useCallback( () => openSavePanel(), [] );
 

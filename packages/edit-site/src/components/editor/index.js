@@ -7,7 +7,7 @@ import {
 	useState,
 	useMemo,
 } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -50,6 +50,11 @@ function Editor( { settings: _settings } ) {
 			),
 		[ settings.templateType, settings.templateId ]
 	);
+	const isEntitiesSavedStatesOpen = useSelect(
+		( select ) => select( 'core/edit-site' ).isEntitiesSavedStatesOpen(),
+		[]
+	);
+	const { closeEntitiesSavedStates } = useDispatch( 'core/edit-site' );
 	const context = useMemo( () => ( { settings, setSettings } ), [
 		settings,
 		setSettings,
@@ -95,7 +100,16 @@ function Editor( { settings: _settings } ) {
 												<BlockEditor />
 											</BlockSelectionClearer>
 										}
-										actions={ <EntitiesSavedStates /> }
+										actions={
+											<EntitiesSavedStates
+												isOpen={
+													isEntitiesSavedStatesOpen
+												}
+												closePanel={
+													closeEntitiesSavedStates
+												}
+											/>
+										}
 										footer={ <BlockBreadcrumb /> }
 									/>
 									<Popover.Slot />
