@@ -8,7 +8,13 @@ import { clamp } from 'lodash';
  */
 import { useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { getRtl } from '../utils/style-mixins';
+
 export function getDragCursor( dragDirection ) {
+	const isRtl = getRtl();
 	let dragCursor = 'n-resize';
 
 	switch ( dragDirection ) {
@@ -16,13 +22,13 @@ export function getDragCursor( dragDirection ) {
 			dragCursor = 'n-resize';
 			break;
 		case 'e':
-			dragCursor = 'e-resize';
+			dragCursor = isRtl ? 'w-resize' : 'e-resize';
 			break;
 		case 's':
 			dragCursor = 's-resize';
 			break;
 		case 'w':
-			dragCursor = 'w-resize';
+			dragCursor = isRtl ? 'e-resize' : 'w-resize';
 			break;
 	}
 

@@ -18,6 +18,7 @@ import { UP, DOWN } from '@wordpress/keycodes';
  */
 import InputControl from '../input-control';
 import { useDragCursor, add, subtract, roundClampString } from './utils';
+import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
 	{
@@ -41,6 +42,7 @@ export function NumberControl(
 ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const baseValue = clamp( 0, min, max );
+	const isRtl = useRtl();
 
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
@@ -66,7 +68,7 @@ export function NumberControl(
 					break;
 				case 'e':
 					directionBaseValue = x;
-					directionModifier = 1;
+					directionModifier = isRtl ? -1 : 1;
 					break;
 				case 's':
 					directionBaseValue = y;
@@ -74,7 +76,7 @@ export function NumberControl(
 					break;
 				case 'w':
 					directionBaseValue = x;
-					directionModifier = -1;
+					directionModifier = isRtl ? 1 : -1;
 					break;
 			}
 

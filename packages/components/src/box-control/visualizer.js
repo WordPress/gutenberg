@@ -11,7 +11,7 @@ import { useRef, useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { color } from '../utils/style-mixins';
+import { color, rtl } from '../utils/style-mixins';
 import { DEFAULT_VALUES, parseValues } from './utils';
 
 export default function BoxControlVisualizer( {
@@ -132,7 +132,7 @@ const TopView = styled( Side )`
 const RightView = styled( Side )`
 	top: 0;
 	bottom: 0;
-	right: 0;
+	${rtl( { right: 0 } )};
 `;
 
 const BottomView = styled( Side )`
@@ -144,5 +144,5 @@ const BottomView = styled( Side )`
 const LeftView = styled( Side )`
 	top: 0;
 	bottom: 0;
-	left: 0;
+	${rtl( { left: 0 } )};
 `;
