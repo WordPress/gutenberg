@@ -7,11 +7,7 @@ import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	createSlotFill,
-	ToolbarButton,
-	Toolbar
-} from '@wordpress/components';
+import { createSlotFill, ToolbarButton, Toolbar } from '@wordpress/components';
 import { Breadcrumb } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
