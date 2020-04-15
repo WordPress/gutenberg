@@ -11,9 +11,9 @@ const initConfig = require( '../init-config' );
 /**
  * Stops the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}            options
+ * @param {import('ora').Ora} options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}           options.debug   True if debug mode is enabled.
  */
 module.exports = async function stop( { spinner, debug } ) {
 	const { dockerComposeConfigPath } = await initConfig( {

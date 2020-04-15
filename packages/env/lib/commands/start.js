@@ -30,9 +30,9 @@ const {
 /**
  * Starts the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}            options
+ * @param {import('ora').Ora} options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}           options.debug   True if debug mode is enabled.
  */
 module.exports = async function start( { spinner, debug } ) {
 	/**
@@ -54,8 +54,11 @@ module.exports = async function start( { spinner, debug } ) {
 
 	spinner.text = 'Downloading WordPress.';
 
+	/** @type {Record<string, number>} */
 	const progresses = {};
-	const getProgressSetter = ( id ) => ( progress ) => {
+	const getProgressSetter = ( /** @type {string} */ id ) => (
+		/** @type {number} */ progress
+	) => {
 		progresses[ id ] = progress;
 		spinner.text =
 			'Downloading WordPress.\n' +

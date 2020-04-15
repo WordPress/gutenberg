@@ -42,12 +42,19 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  */
 
 /**
+ * @typedef {'local'|'zip'|'git'} WPSourceType
+ */
+
+/**
  * A WordPress installation, plugin or theme to be loaded into the environment.
  *
  * @typedef WPSource
- * @property {string} type The source type. Can be 'local' or 'git'.
- * @property {string} path The path to the WordPress installation, plugin or theme.
- * @property {string} basename Name that identifies the WordPress installation, plugin or theme.
+ * @property {WPSourceType} type        The source type.
+ * @property {string}       path        The local path to the WordPress installation, plugin or theme.
+ * @property {string}       [testsPath] The local path to the tests copy of the WordPress installation.
+ * @property {string}       basename    Name that identifies the WordPress installation, plugin or theme.
+ * @property {string}       [url]       A URL to a zip file or git remote, depending on the source type.
+ * @property {string}       [ref]       The ref to checkout locally, if this is a git source.
  */
 
 module.exports = {
@@ -58,7 +65,7 @@ module.exports = {
 	 *
 	 * @param {string} configPath Path to the .wp-env.json file.
 	 *
-	 * @return {WPConfig} A wp-env config object.
+	 * @return {Promise<WPConfig>} A wp-env config object.
 	 */
 	async readConfig( configPath ) {
 		const configDirectoryPath = path.dirname( configPath );
@@ -146,7 +153,9 @@ module.exports = {
 
 		if (
 			! Array.isArray( config.plugins ) ||
-			config.plugins.some( ( plugin ) => typeof plugin !== 'string' )
+			config.plugins.some(
+				( /** @type {any} */ plugin ) => typeof plugin !== 'string'
+			)
 		) {
 			throw new ValidationError(
 				'Invalid .wp-env.json: "plugins" must be an array of strings.'
@@ -155,7 +164,9 @@ module.exports = {
 
 		if (
 			! Array.isArray( config.themes ) ||
-			config.themes.some( ( theme ) => typeof theme !== 'string' )
+			config.themes.some(
+				( /** @type {any} */ theme ) => typeof theme !== 'string'
+			)
 		) {
 			throw new ValidationError(
 				'Invalid .wp-env.json: "themes" must be an array of strings.'
@@ -207,17 +218,22 @@ module.exports = {
 				} ),
 				{ workDirectoryPath }
 			),
-			pluginSources: config.plugins.map( ( sourceString ) =>
+			pluginSources: config.plugins.map( (
+				/** @type {string} */ sourceString
+			) =>
 				parseSourceString( sourceString, {
 					workDirectoryPath,
 				} )
 			),
-			themeSources: config.themes.map( ( sourceString ) =>
+			themeSources: config.themes.map( (
+				/** @type {string} */ sourceString
+			) =>
 				parseSourceString( sourceString, {
 					workDirectoryPath,
 				} )
 			),
 			config: config.config,
+			debug: false,
 		};
 	},
 };
@@ -227,7 +243,6 @@ module.exports = {
  *
  * @param {?string} sourceString The source string. See README.md for documentation on valid source string patterns.
  * @param {Object} options
- * @param {boolean} options.hasTests Whether or not a `testsPath` is required. Only the 'core' source needs this.
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {?WPSource} A source object.
@@ -295,8 +310,8 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  * property set correctly. Only the 'core' source requires a testsPath.
  *
  * @param {?WPSource} source                    A source object.
- * @param {Object}  options
- * @param {string}  options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @param {Object}    options
+ * @param {string}    options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  *
  * @return {?WPSource} A source object.
  */
@@ -321,7 +336,7 @@ function includeTestsPath( source, { workDirectoryPath } ) {
  * Returns null if the environment variable has not been specified.
  *
  * @param {string} varName The environment variable to check (e.g. WP_ENV_PORT).
- * @return {null|number} The number. Null if it does not exist.
+ * @return {?number} The number. Null if it does not exist.
  */
 function getNumberFromEnvVariable( varName ) {
 	// Allow use of the default if it does not exist.
@@ -329,7 +344,7 @@ function getNumberFromEnvVariable( varName ) {
 		return null;
 	}
 
-	const maybeNumber = parseInt( process.env[ varName ] );
+	const maybeNumber = parseInt( process.env[ varName ] || '' );
 
 	// Throw an error if it is not parseable as a number.
 	if ( isNaN( maybeNumber ) ) {

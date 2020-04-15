@@ -24,11 +24,11 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  * Downloads the given source if necessary. The specific action taken depends
  * on the source type.
  *
- * @param {WPSource} source             The source to download.
- * @param {Object}   options
- * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
- * @param {Object}   options.spinner    A CLI spinner which indicates progress.
- * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {WPSource}          source             The source to download.
+ * @param {Object}            options
+ * @param {Function}          options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {import('ora').Ora} options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}           options.debug      True if debug mode is enabled.
  */
 module.exports = async function downloadSource( source, options ) {
 	if ( source.type === 'git' ) {
@@ -42,15 +42,15 @@ module.exports = async function downloadSource( source, options ) {
  * Clones the git repository at `source.url` into `source.path`. If the
  * repository already exists, it is updated instead.
  *
- * @param {WPSource} source             The source to download.
- * @param {Object}   options
- * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
- * @param {Object}   options.spinner    A CLI spinner which indicates progress.
- * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {WPSource}          source             The source to download.
+ * @param {Object}            options
+ * @param {Function}          options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {import('ora').Ora} options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}           options.debug      True if debug mode is enabled.
  */
 async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	const log = debug
-		? ( message ) => {
+		? ( /** @type {string} */ message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
 		  }
@@ -60,7 +60,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	const gitFetchOptions = {
 		fetchOpts: {
 			callbacks: {
-				transferProgress( progress ) {
+				transferProgress( /** @type {any} */ progress ) {
 					// Fetches are finished when all objects are received and indexed,
 					// so received objects plus indexed objects should equal twice
 					// the total number of objects when done.
@@ -113,15 +113,15 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 /**
  * Downloads and extracts the zip file at `source.url` into `source.path`.
  *
- * @param {WPSource} source             The source to download.
- * @param {Object}   options
- * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
- * @param {Object}   options.spinner    A CLI spinner which indicates progress.
- * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {WPSource}          source             The source to download.
+ * @param {Object}            options
+ * @param {Function}          options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
+ * @param {import('ora').Ora} options.spinner    A CLI spinner which indicates progress.
+ * @param {boolean}           options.debug      True if debug mode is enabled.
  */
 async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	const log = debug
-		? ( message ) => {
+		? ( /** @type {string} */ message ) => {
 				spinner.info( `NodeGit: ${ message }` );
 				spinner.start();
 		  }

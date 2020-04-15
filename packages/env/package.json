@@ -25,9 +25,11 @@
 	},
 	"files": [
 		"bin",
-		"lib"
+		"lib",
+		"build-types"
 	],
 	"main": "lib/env.js",
+	"types": "build-types",
 	"bin": {
 		"wp-env": "bin/wp-env"
 	},

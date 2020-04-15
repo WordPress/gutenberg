@@ -15,10 +15,14 @@ const readDir = util.promisify( fs.readdir );
 const finished = util.promisify( stream.finished );
 
 /**
+ * @typedef {'core'|'plugin'|'theme'} WPDirectoryType
+ */
+
+/**
  * Detects whether the given directory is a WordPress installation, a plugin or a theme.
  *
  * @param {string} directoryPath The directory to detect.
- * @return {string|null} 'core' if the directory is a WordPress installation, 'plugin' if it is a plugin, 'theme' if it is a theme, or null if we can't tell.
+ * @return {Promise<WPDirectoryType?>} 'core' if the directory is a WordPress installation, 'plugin' if it is a plugin, 'theme' if it is a theme, or null if we can't tell.
  */
 module.exports = async function detectDirectoryType( directoryPath ) {
 	// If we have a `wp-includes/version.php` file, then this is a Core install.
@@ -46,6 +50,7 @@ module.exports = async function detectDirectoryType( directoryPath ) {
 		)
 		.map( ( fileName ) => path.join( absolutePath, fileName ) );
 
+	/** @type {import('fs').ReadStream[]} */
 	const streams = [];
 	for ( const file of files ) {
 		const fileStream = fs.createReadStream( file, 'utf8' );
