@@ -6,9 +6,9 @@ import { useEffect } from '@wordpress/element';
 export function InlineWarning( { forwardedRef } ) {
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
-			const computedStyle = window.getComputedStyle(
-				forwardedRef.current
-			);
+			const target = forwardedRef.current;
+			const { defaultView } = target.ownerDocument;
+			const computedStyle = defaultView.getComputedStyle( target );
 
 			if ( computedStyle.display === 'inline' ) {
 				// eslint-disable-next-line no-console

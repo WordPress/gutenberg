@@ -1,5 +1,9 @@
 /**
- * @return {typeof window.requestIdleCallback|typeof window.requestAnimationFrame|((callback:(timestamp:number)=>void)=>void)}
+ * @typedef {( timeOrDeadline: IdleDeadline | number ) => void} Callback
+ */
+
+/**
+ * @return {(callback: Callback) => void} RequestIdleCallback
  */
 export function createRequestIdleCallback() {
 	if ( typeof window === 'undefined' ) {

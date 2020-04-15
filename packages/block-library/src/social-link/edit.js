@@ -33,7 +33,11 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
-	// Import icon.
+	// Disable reason: The rule is currently not considering use as JSX tagName.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/16418
+
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
 
@@ -41,7 +45,11 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		<Fragment>
 			<InspectorControls>
 				<PanelBody
-					title={ sprintf( __( '%s label' ), socialLinkName ) }
+					title={ sprintf(
+						/* translators: %s: name of the social service. */
+						__( '%s label' ),
+						socialLinkName
+					) }
 					initialOpen={ false }
 				>
 					<PanelRow>

@@ -180,7 +180,10 @@ export default function InsertionPoint( {
 								}
 							) }
 						>
-							<Inserter clientId={ inserterClientId } />
+							<Inserter
+								position="bottom center"
+								clientId={ inserterClientId }
+							/>
 						</div>
 					</div>
 				</Popover>

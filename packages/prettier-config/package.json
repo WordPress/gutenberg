@@ -25,6 +25,7 @@
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
+	"types": "build-types",
 	"publishConfig": {
 		"access": "public"
 	}

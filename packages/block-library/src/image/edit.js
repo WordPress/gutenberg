@@ -541,6 +541,7 @@ export class ImageEdit extends Component {
 									defaultedAlt = alt;
 								} else if ( filename ) {
 									defaultedAlt = sprintf(
+										/* translators: %s: file name */
 										__(
 											'This image has an empty alt attribute; its file name is %s'
 										),

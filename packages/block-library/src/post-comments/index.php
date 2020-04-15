@@ -15,17 +15,12 @@ function render_block_core_post_comments() {
 	if ( ! $post ) {
 		return '';
 	}
-	$comments = get_comments(
-		array(
-			'post_id' => $post->ID,
-		)
-	);
-	$output   = '';
-	// TODO: Handle nested comments.
-	foreach ( $comments as $comment ) {
-		$output .= '<p>' . $comment->comment_author . '<br />' . $comment->comment_content . '</p>';
-	}
-	return $output;
+
+	// This generates a deprecate message.
+	// Ideally this deprecation is removed.
+	ob_start();
+	comments_template();
+	return ob_get_clean();
 }
 
 /**

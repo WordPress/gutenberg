@@ -32,7 +32,7 @@ import { isAppleOS } from './platform';
  * An object of handler functions for each of the possible modifier
  * combinations. A handler will return a value for a given key.
  *
- * @typedef {{[M in WPKeycodeModifier]:(key:string)=>any}} WPKeycodeHandlerByModifier
+ * @typedef {Record<WPKeycodeModifier, (key:string)=>any>} WPKeycodeHandlerByModifier
  */
 
 /**
@@ -95,6 +95,10 @@ export const COMMAND = 'meta';
  * Keycode for SHIFT key.
  */
 export const SHIFT = 'shift';
+/**
+ * Keycode for ZERO key.
+ */
+export const ZERO = 48;
 
 /**
  * Object that contains functions that return the available modifier

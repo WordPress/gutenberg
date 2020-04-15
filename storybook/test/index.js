@@ -25,7 +25,6 @@ initStoryshots( {
 				const parentElement = document.createElement( 'div' );
 				parentElement.appendChild( currentElement );
 			}
-
 			return currentElement;
 		},
 	} ) ),
