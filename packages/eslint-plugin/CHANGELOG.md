@@ -1,5 +1,7 @@
 ## Master
 
+## 5.0.0 (2020-04-15)
+
 ### Breaking Changes
 
 - There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
@@ -11,7 +13,6 @@
 
 ### New Features
 
-- The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
 - New Rule: [`@wordpress/i18n-text-domain`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-text-domain.md)
 - New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
 - New Rule: [`@wordpress/i18n-no-variables`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-variables.md)
@@ -24,6 +25,12 @@
 
 - The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
 - `@wordpress/no-unused-vars-before-return` will correctly consider other unused variables after encountering an instance of an `excludePattern` option exception.
+
+## 4.1.0 (2020-04-01)
+
+### New Features
+
+- The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
 
 ## 4.0.0 (2020-02-10)
 
