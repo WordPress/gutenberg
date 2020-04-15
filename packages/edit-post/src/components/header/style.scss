@@ -82,3 +82,22 @@
 		}
 	}
 }
+
+.edit-post-header-preview__grouping-external {
+	display: flex;
+	position: relative;
+	padding-bottom: 0;
+}
+
+.edit-post-header-preview__button-external {
+	padding-left: $grid-unit-10;
+
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+
+	svg {
+		margin-right: $grid-unit-10;
+	}
+}

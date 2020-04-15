@@ -39,10 +39,6 @@
 }
 
 @include break-small() {
-	.editor-post-preview {
-		display: none;
-	}
-
 	.block-editor-post-preview__dropdown {
 		display: flex;
 	}

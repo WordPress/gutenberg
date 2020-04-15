@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { PostSavedState } from '@wordpress/editor';
+import { Button, Icon, MenuGroup } from '@wordpress/components';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
 import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
@@ -21,6 +21,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		shortcut,
 		hasActiveMetaboxes,
 		isEditorSidebarOpened,
+		isPostSaveable,
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
@@ -40,6 +41,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
@@ -80,7 +82,25 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions />
+				<PreviewOptions isSaveable={ isPostSaveable }>
+					<MenuGroup>
+						<div className="edit-post-header-preview__grouping-external">
+							<PostPreviewButton
+								className={
+									'edit-post-header-preview__button-external'
+								}
+								forceIsAutosaveable={ hasActiveMetaboxes }
+								forcePreviewLink={ isSaving ? null : undefined }
+								textContent={
+									<>
+										<Icon icon={ external } />
+										{ __( 'Preview in new tab' ) }
+									</>
+								}
+							/>
+						</div>
+					</MenuGroup>
+				</PreviewOptions>
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
