@@ -84,7 +84,6 @@
 		"@storybook/addon-a11y": "5.3.2",
 		"@storybook/addon-docs": "5.3.2",
 		"@storybook/addon-knobs": "5.3.2",
-		"@storybook/addon-storyshots": "5.3.2",
 		"@storybook/addon-storysource": "5.3.2",
 		"@storybook/addon-viewport": "5.3.2",
 		"@storybook/react": "5.3.2",
