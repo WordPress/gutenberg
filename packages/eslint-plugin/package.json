@@ -25,6 +25,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
+		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-eslint": "^10.1.0",
 		"eslint-config-prettier": "^6.10.1",
 		"eslint-plugin-jest": "^23.8.2",
