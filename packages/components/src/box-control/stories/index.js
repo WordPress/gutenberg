@@ -11,7 +11,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import BoxControl from '../';
-import BoxControlIcon from '../icon';
 import BoxControlVisualizer from '../visualizer';
 import { Flex, FlexBlock } from '../../flex';
 
@@ -19,10 +18,6 @@ export default { title: 'Components/BoxControl', component: BoxControl };
 
 export const _default = () => {
 	return <BoxControl />;
-};
-
-export const icon = () => {
-	return <BoxControlIcon />;
 };
 
 function DemoExample() {
@@ -57,7 +52,7 @@ function DemoExample() {
 	);
 }
 
-export const demo = () => {
+export const visualizer = () => {
 	return <DemoExample />;
 };
 
