@@ -1,5 +1,9 @@
 ## Master
 
+### Bug fix
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^4.0.3` to requiring `^5.0.0` ([#21597](https://github.com/WordPress/gutenberg/pull/21597)). [Breaking changes](https://npmpackagejsonlint.org/docs/en/v4-to-v5) don't break anything in this package. It fixes the abrupt shutdown when `"description"` field in `package.json` is empty. 
+
 ## 8.0.0 (2020-04-15)
 
 ### Breaking Changes
