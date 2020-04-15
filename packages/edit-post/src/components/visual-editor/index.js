@@ -14,6 +14,7 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 
@@ -21,7 +22,6 @@ import { Popover } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
-import { useResizeCanvas } from '../resize-canvas';
 
 function VisualEditor() {
 	const inlineStyles = useResizeCanvas();

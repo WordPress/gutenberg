@@ -1,18 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { default as useSimulatedMediaQuery } from '../../components/use-simulated-media-query';
 
 /**
  * Function to resize the editor window.
  *
  * @return {Object} Inline styles to be added to resizable container.
  */
-export function useResizeCanvas() {
+export default function useResizeCanvas() {
 	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+		return select(
+			'core/block-editor'
+		).__experimentalGetPreviewDeviceType();
 	}, [] );
 
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );

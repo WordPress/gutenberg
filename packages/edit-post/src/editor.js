@@ -141,11 +141,11 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select, { postId, postType } ) => {
-		const {
-			isFeatureActive,
-			getPreference,
-			__experimentalGetPreviewDeviceType,
-		} = select( 'core/edit-post' );
+		const { isFeatureActive, getPreference } = select( 'core/edit-post' );
+
+		const { __experimentalGetPreviewDeviceType } = select(
+			'core/block-editor'
+		);
 		const { getEntityRecord } = select( 'core' );
 		const { getBlockTypes } = select( 'core/blocks' );
 
