@@ -1,3 +1,7 @@
+1.27.0
+------
+* Block Editor: Add dialog for mentioning other users in your post
+
 1.26.0
 ------
 * [iOS] Disable ripple effect in all BottomSheet's controls.
