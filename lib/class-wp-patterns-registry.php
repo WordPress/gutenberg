@@ -82,7 +82,7 @@ final class WP_Patterns_Registry {
 	 *               and per style.
 	 */
 	public function get_all_registered() {
-		return array_values( $this->registered_patterns );
+		return $this->registered_patterns;
 	}
 
 	/**
