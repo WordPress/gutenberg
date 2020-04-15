@@ -661,24 +661,4 @@ describe( 'Editor actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'openEntitiesSavedStates', () => {
-		it( 'should return OPEN_ENTITIES_SAVED_STATES action', () => {
-			const result = actions.openEntitiesSavedStates( 'test' );
-			expect( result ).toEqual( {
-				type: 'OPEN_ENTITIES_SAVED_STATES',
-				onRequestClose: 'test',
-			} );
-		} );
-	} );
-
-	describe( 'closeEntitiesSavedStates', () => {
-		it( 'should return CLOSE_ENTITIES_SAVED_STATES action', () => {
-			const result = actions.closeEntitiesSavedStates( 'test' );
-			expect( result ).toEqual( {
-				type: 'CLOSE_ENTITIES_SAVED_STATES',
-				callbackArg: 'test',
-			} );
-		} );
-	} );
 } );
