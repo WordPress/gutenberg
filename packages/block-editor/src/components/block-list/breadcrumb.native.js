@@ -24,7 +24,6 @@ const BlockBreadcrumb = ( {
 	blockIcon,
 	rootClientId,
 	rootBlockIcon,
-	isRTL,
 } ) => {
 	return (
 		<View
@@ -53,7 +52,7 @@ const BlockBreadcrumb = ( {
 						<View key="subdirectory-icon" style={ styles.arrow }>
 							<SubdirectorSVG
 								fill={ styles.arrow.color }
-								isRTL={ isRTL }
+								isRTL={ I18nManager.isRTL }
 							/>
 						</View>,
 					] }
@@ -102,7 +101,6 @@ export default compose( [
 			blockIcon,
 			rootClientId,
 			rootBlockIcon,
-			isRTL: I18nManager.isRTL,
 		};
 	} ),
 ] )( BlockBreadcrumb );

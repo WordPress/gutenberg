@@ -20,12 +20,7 @@ import NavigateUpSVG from './nav-up-icon';
 
 const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
 
-const FloatingToolbarContainer = ( {
-	clientId,
-	parentId,
-	onNavigateUp,
-	isRTL,
-} ) => {
+const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
 	return (
 		<TouchableWithoutFeedback accessible={ false }>
 			<View style={ styles.floatingToolbar }>
@@ -34,7 +29,9 @@ const FloatingToolbarContainer = ( {
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={ () => onNavigateUp( parentId ) }
-							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
+							icon={
+								<NavigateUpSVG isRTL={ I18nManager.isRTL } />
+							}
 						/>
 						<View style={ styles.pipe } />
 					</Toolbar>
@@ -74,7 +71,6 @@ const FloatingToolbar = withSelect( ( select, { clientId } ) => {
 	return {
 		showFloatingToolbar,
 		parentId,
-		isRTL: I18nManager.isRTL,
 	};
 } )( FloatingToolbarFill );
 

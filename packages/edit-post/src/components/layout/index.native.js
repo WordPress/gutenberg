@@ -26,6 +26,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+import FloatingToolbar from '../../../../block-editor/src/components/block-mobile-floating-toolbar';
 
 class Layout extends Component {
 	constructor() {
@@ -151,6 +152,7 @@ class Layout extends Component {
 						) }
 						<Header />
 						<BottomSheetSettings />
+						<FloatingToolbar.Slot />
 					</KeyboardAvoidingView>
 				) }
 			</SafeAreaView>
