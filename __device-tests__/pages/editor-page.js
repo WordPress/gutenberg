@@ -401,7 +401,7 @@ export default class EditorPage {
 	}
 
 	async enterCaptionToSelectedImageBlock( caption: string, clear: boolean = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Mountain"]' );
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[starts-with(@name, "Image caption.")]' );
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
