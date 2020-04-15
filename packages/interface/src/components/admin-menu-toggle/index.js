@@ -57,6 +57,8 @@ function useToggle( { ref } ) {
 	// Handles closing the admin menu when clicking outside
 	useEffect( () => {
 		const handleOnClickOutside = ( event ) => {
+			if ( ! isActive ) return;
+
 			const { target } = event;
 
 			const didClickOutside =
@@ -67,23 +69,18 @@ function useToggle( { ref } ) {
 			}
 		};
 
-		if ( isActive ) {
-			document.body.addEventListener( 'click', handleOnClickOutside );
-		}
+		document.body.addEventListener( 'click', handleOnClickOutside );
 
 		return () => {
-			if ( isActive ) {
-				document.body.removeEventListener(
-					'click',
-					handleOnClickOutside
-				);
-			}
+			document.body.removeEventListener( 'click', handleOnClickOutside );
 		};
 	}, [ isActive, buttonNode ] );
 
 	// Handles admin menu keyboard interactions
 	useEffect( () => {
 		const handleOnKeyDown = ( event ) => {
+			if ( ! isActive ) return;
+
 			const { keyCode } = event;
 
 			if ( keyCode === ESCAPE ) {
@@ -95,14 +92,10 @@ function useToggle( { ref } ) {
 			}
 		};
 
-		if ( isActive ) {
-			document.body.addEventListener( 'keydown', handleOnKeyDown );
-		}
+		document.body.addEventListener( 'keydown', handleOnKeyDown );
 
 		return () => {
-			if ( isActive ) {
-				document.body.removeEventListener( 'keydown', handleOnKeyDown );
-			}
+			document.body.removeEventListener( 'keydown', handleOnKeyDown );
 		};
 	}, [ isActive ] );
 
