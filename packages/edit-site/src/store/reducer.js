@@ -65,7 +65,38 @@ export function deviceType( state = 'Desktop', action ) {
 	return state;
 }
 
+/** Reducer returning state for the save panel.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action  Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function entitiesSavedStates(
+	state = { isOpen: false, onRequestClose: () => {} },
+	action
+) {
+	switch ( action.type ) {
+		case 'OPEN_ENTITIES_SAVED_STATES':
+			return {
+				...state,
+				isOpen: true,
+				onRequestClose: action.onRequestClose || function() {},
+			};
+		case 'CLOSE_ENTITIES_SAVED_STATES':
+			state.onRequestClose( action.callbackArg );
+			return {
+				...state,
+				isOpen: false,
+				onRequestClose: () => {},
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	preferences,
 	deviceType,
+	entitiesSavedStates,
 } );
