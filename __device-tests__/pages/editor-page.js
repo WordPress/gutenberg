@@ -390,7 +390,7 @@ export default class EditorPage {
 
 	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Row 1. Mountain"]`;
 		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
 		await imageBlockInnerElement.click();
 	}
@@ -401,7 +401,7 @@ export default class EditorPage {
 	}
 
 	async enterCaptionToSelectedImageBlock( caption: string, clear: boolean = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Row 1. Mountain"]' );
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
