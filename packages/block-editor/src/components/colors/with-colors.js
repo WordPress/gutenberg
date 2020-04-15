@@ -6,7 +6,7 @@ import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Platform } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
@@ -21,6 +21,14 @@ import {
 } from './utils';
 
 const DEFAULT_COLORS = [];
+
+const __newStyleSystem = {
+	backgroundColor: 'background',
+	'background-color': 'background',
+	textColor: 'text',
+	'text-color': 'text',
+	color: 'text',
+};
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
@@ -154,7 +162,16 @@ function createColorHOC( colorTypes, withColorPalette ) {
 									`custom${ upperFirst(
 										colorAttributeName
 									) }`
-								]
+								] ||
+									// Its temporary since we don't find a better way to handle new custom colos system
+									( Platform.OS !== 'web' &&
+										attributes.style &&
+										attributes.style.color &&
+										attributes.style.color[
+											__newStyleSystem[
+												colorAttributeName
+											] || ''
+										] )
 							);
 
 							const previousColorObject =

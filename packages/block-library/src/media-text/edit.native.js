@@ -190,7 +190,6 @@ class MediaTextEdit extends Component {
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
-			style,
 		} = attributes;
 		const { containerWidth } = this.state;
 
@@ -222,9 +221,7 @@ class MediaTextEdit extends Component {
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
-			backgroundColor:
-				( style && style.color && style.color.background ) ||
-				backgroundColor.color,
+			backgroundColor: backgroundColor.color,
 		};
 
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
