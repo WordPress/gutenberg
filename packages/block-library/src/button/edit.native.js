@@ -155,24 +155,22 @@ class ButtonEdit extends Component {
 		const { backgroundColor, attributes } = this.props;
 		const { style } = attributes;
 
-		if ( style && style.color && style.color.background ) {
-			return style.color.background;
-		} else if ( backgroundColor.color ) {
-			return backgroundColor.color;
-		}
-		return styles.fallbackButton.backgroundColor;
+		return (
+			( style && style.color && style.color.background ) ||
+			backgroundColor.color ||
+			styles.fallbackButton.backgroundColor
+		);
 	}
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
 
-		if ( style && style.color && style.color.text ) {
-			return style.color.text;
-		} else if ( textColor.color ) {
-			return textColor.color;
-		}
-		return styles.fallbackButton.color;
+		return (
+			( style && style.color && style.color.text ) ||
+			textColor.color ||
+			styles.fallbackButton.color
+		);
 	}
 
 	onChangeText( value ) {
