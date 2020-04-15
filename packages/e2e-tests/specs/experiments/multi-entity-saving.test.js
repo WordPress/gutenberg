@@ -153,28 +153,6 @@ describe( 'Multi-entity save flow', () => {
 	} );
 
 	describe( 'Site Editor', () => {
-		// Site Editor specific cleanup.
-		// afterAll( async () => {
-		// 	// Delete uninitiated template part.
-		// 	const [ uninitiatedTemplatePart ] = await page.$x(
-		// 		uninitiatedTemplatePartSelector
-		// 	);
-		// 	await uninitiatedTemplatePart.click();
-		// 	await page.waitForSelector( selectedTemplatePartSelector );
-		// 	await page.keyboard.press( 'Backspace' );
-
-		// 	// Save again now that it is gone.
-		// 	const enabledButton = await page.waitForSelector(
-		// 		activeSaveSiteSelector
-		// 	);
-		// 	await enabledButton.click();
-
-		// 	const saveButton = await page.waitForSelector(
-		// 		entitiesSaveSelector
-		// 	);
-		// 	await saveButton.click();
-		// } );
-
 		it( 'Should be enabled after edits', async () => {
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
