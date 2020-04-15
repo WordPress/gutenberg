@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/e2e-selenium",
 	"version": "1.0.0",
-	"description": "",
+	"description": "End-to-End(E2E) tests for the issues that happen only on some browsers.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
