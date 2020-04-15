@@ -1,5 +1,7 @@
 ## Master
 
+## 5.0.0 (2020-04-15)
+
 ### Breaking Changes
 
 - There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.

@@ -1,5 +1,7 @@
 ## Master
 
+## 1.9.0 (2020-04-15)
+
 ### Breaking change
 
 - Restructure package moving source files into `lib` directory. Direct imports of

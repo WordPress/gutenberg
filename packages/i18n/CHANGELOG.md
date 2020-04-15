@@ -1,5 +1,7 @@
 ## Master
 
+## 3.11.0 (2020-04-15)
+
 ### New Feature
 
 - Add `isRTL` function  ([#20298](https://github.com/WordPress/gutenberg/pull/20298))

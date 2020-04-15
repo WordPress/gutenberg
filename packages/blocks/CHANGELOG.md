@@ -1,5 +1,7 @@
 ## Master
 
+## 6.14.0 (2020-04-15)
+
 ### New Feature
 
 - Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
