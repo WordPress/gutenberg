@@ -16,7 +16,11 @@ import {
 	__experimentalWithPageTemplatePicker,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
+import {
+	HTMLTextInput,
+	KeyboardAvoidingView,
+	FloatingToolbar,
+} from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 
 /**
@@ -26,8 +30,6 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
-import FloatingToolbar from '../../../../block-editor/src/components/block-mobile-floating-toolbar';
-
 class Layout extends Component {
 	constructor() {
 		super( ...arguments );

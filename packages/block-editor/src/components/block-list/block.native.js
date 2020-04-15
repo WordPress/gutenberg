@@ -13,6 +13,7 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
+import { FloatingToolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
-import FloatingToolbar from '../block-mobile-floating-toolbar';
 
 class BlockListBlock extends Component {
 	constructor() {

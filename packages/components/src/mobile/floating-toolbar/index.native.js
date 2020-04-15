@@ -7,7 +7,12 @@ import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { createSlotFill, ToolbarButton, Toolbar } from '@wordpress/components';
+import {
+	createSlotFill,
+	ToolbarButton,
+	Toolbar
+} from '@wordpress/components';
+import { Breadcrumb } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -15,7 +20,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import Breadcrumbs from '../block-list/breadcrumb';
 import NavigateUpSVG from './nav-up-icon';
 
 const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
@@ -36,7 +40,7 @@ const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
 						<View style={ styles.pipe } />
 					</Toolbar>
 				) }
-				<Breadcrumbs clientId={ clientId } />
+				<Breadcrumb clientId={ clientId } />
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -64,7 +68,7 @@ const FloatingToolbar = withSelect( ( select, { clientId } ) => {
 	const isSelected = isBlockSelected( clientId );
 	const rootBlockId = getBlockHierarchyRootClientId( clientId );
 	const parentId = getBlockRootClientId( clientId );
-	const hasRootInnerBlocks = getBlockCount( rootBlockId );
+	const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
 
 	const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
