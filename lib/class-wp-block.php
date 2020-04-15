@@ -20,14 +20,29 @@ class WP_Block implements ArrayAccess {
 	public $name;
 
 	/**
-	 * Block type context values.
+	 * Block type associated with the instance.
+	 *
+	 * @var WP_Block_Type
+	 */
+	public $block_type;
+
+	/**
+	 * Block context values.
 	 *
 	 * @var array
 	 */
 	public $context = [];
 
 	/**
-	 * Block type attribute values.
+	 * All available context of the current hierarchy.
+	 *
+	 * @var array
+	 * @access protected
+	 */
+	protected $available_context;
+
+	/**
+	 * Block attribute values.
 	 *
 	 * @var array
 	 */
@@ -68,19 +83,59 @@ class WP_Block implements ArrayAccess {
 	 *
 	 * Populates object properties from the provided block instance argument.
 	 *
-	 * @param array $block Array of parsed block properties.
+	 * The given array of context values will not necessarily be available on
+	 * the instance itself, but is treated as the full set of values provided by
+	 * the block's ancestry. This is assigned to the private `available_context`
+	 * property. Only values which are configured to consumed by the block via
+	 * its registered type will be assigned to the block's `context` property.
+	 *
+	 * @param array                  $block    Array of parsed block properties.
+	 * @param array                  $context  Optional array of ancestry context values.
+	 * @param WP_Block_Type_Registry $registry Optional block type registry.
 	 */
-	public function __construct( $block ) {
+	public function __construct( $block, $context = [], $registry = null ) {
 		$this->name = $block['blockName'];
+
+		if ( is_null( $registry ) ) {
+			$registry = WP_Block_Type_Registry::get_instance();
+		}
+
+		$this->block_type = $registry->get_registered( $this->name );
 
 		if ( ! empty( $block['attrs'] ) ) {
 			$this->attributes = $block['attrs'];
 		}
 
+		if ( ! is_null( $this->block_type ) ) {
+			$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
+		}
+
+		$this->available_context = $context;
+
+		if ( ! empty( $this->block_type->context ) ) {
+			foreach ( $this->block_type->context as $context_name ) {
+				if ( array_key_exists( $context_name, $this->available_context ) ) {
+					$this->context[ $context_name ] = $this->available_context[ $context_name ];
+				}
+			}
+		}
+
 		if ( ! empty( $block['innerBlocks'] ) ) {
+			$child_context = $this->available_context;
+
+			/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
+			if ( ! empty( $this->block_type->providesContext ) ) {
+				foreach ( $this->block_type->providesContext as $context_name => $attribute_name ) {
+					if ( isset( $this->attributes[ $attribute_name ] ) ) {
+						$child_context[ $context_name ] = $this->attributes[ $attribute_name ];
+					}
+				}
+			}
+			/* phpcs:enable */
+
 			$this->inner_blocks = array_map(
-				function( $inner_block ) {
-					return new WP_Block( $inner_block );
+				function( $inner_block ) use ( $child_context, $registry ) {
+					return new WP_Block( $inner_block, $child_context, $registry );
 				},
 				$block['innerBlocks']
 			);
@@ -101,59 +156,23 @@ class WP_Block implements ArrayAccess {
 	 * @return string Rendered block output.
 	 */
 	public function render() {
-		global $post, $_block_context;
+		global $post;
 
-		$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $this->name );
-		$is_dynamic    = $this->name && null !== $block_type && $block_type->is_dynamic();
+		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
-		$index         = 0;
 
-		$block_context_before = $_block_context;
-
-		if ( ! isset( $_block_context ) ) {
-			$_block_context = array();
+		$index = 0;
+		foreach ( $this->inner_content as $chunk ) {
+			$block_content .= is_string( $chunk ) ?
+				$chunk :
+				$this->inner_blocks[ $index++ ]->render();
 		}
-
-		if ( ! isset( $_block_context['postId'] ) || $post->ID !== $_block_context['postId'] ) {
-			$_block_context['postId'] = $post->ID;
-		}
-
-		$prepared_attributes = $this->attributes;
-		if ( ! is_null( $block_type ) ) {
-			$prepared_attributes = $block_type->prepare_attributes_for_render( $prepared_attributes );
-		}
-
-		/* phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase */
-		if ( ! empty( $block_type->providesContext ) && is_array( $block_type->providesContext ) ) {
-			foreach ( $block_type->providesContext as $context_name => $attribute_name ) {
-				if ( isset( $prepared_attributes[ $attribute_name ] ) ) {
-					$_block_context[ $context_name ] = $prepared_attributes[ $attribute_name ];
-				}
-			}
-		}
-		/* phpcs:enable */
 
 		if ( $is_dynamic ) {
-			if ( isset( $block_type->context ) && is_array( $block_type->context ) ) {
-				foreach ( $block_type->context as $context_name ) {
-					if ( array_key_exists( $context_name, $_block_context ) ) {
-						$this->context[ $context_name ] = $_block_context[ $context_name ];
-					}
-				}
-			}
-
 			$global_post   = $post;
-			$block_content = (string) call_user_func( $block_type->render_callback, $this, $block_content );
+			$block_content = (string) call_user_func( $this->block_type->render_callback, $this, $block_content );
 			$post          = $global_post;
-		} else {
-			foreach ( $this->inner_content as $chunk ) {
-				$block_content .= is_string( $chunk ) ?
-					$chunk :
-					$this->inner_blocks[ $index++ ]->render();
-			}
 		}
-
-		$_block_context = $block_context_before;
 
 		return $block_content;
 	}
