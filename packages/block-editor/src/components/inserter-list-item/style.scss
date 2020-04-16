@@ -17,7 +17,7 @@
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -48,7 +48,7 @@
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");

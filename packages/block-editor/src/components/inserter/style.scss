@@ -242,15 +242,14 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__patterns-item {
 	border-radius: $radius-block-ui;
-	border: none;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
 	transition: all 0.05s ease-in-out;
 	position: relative;
+	border: $border-width solid transparent;
 
 	&:hover {
-		background: $white;
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-500;
+		border: $border-width solid $theme-color;
 	}
 
 	&:focus {
