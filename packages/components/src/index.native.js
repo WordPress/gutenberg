@@ -57,7 +57,6 @@ export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-l
 export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
-export { default as StepperControl } from './mobile/stepper-control';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';

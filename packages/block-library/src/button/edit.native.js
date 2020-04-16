@@ -152,12 +152,25 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor } = this.props;
-		if ( backgroundColor.color ) {
-			// `backgroundColor` which should be set when we are able to resolve it
-			return backgroundColor.color;
-		}
-		return styles.fallbackButton.backgroundColor;
+		const { backgroundColor, attributes } = this.props;
+		const { style } = attributes;
+
+		return (
+			( style && style.color && style.color.background ) ||
+			backgroundColor.color ||
+			styles.fallbackButton.backgroundColor
+		);
+	}
+
+	getTextColor() {
+		const { textColor, attributes } = this.props;
+		const { style } = attributes;
+
+		return (
+			( style && style.color && style.color.text ) ||
+			textColor.color ||
+			styles.fallbackButton.color
+		);
 	}
 
 	onChangeText( value ) {
@@ -293,13 +306,7 @@ class ButtonEdit extends Component {
 	}
 
 	render() {
-		const {
-			attributes,
-			textColor,
-			isSelected,
-			clientId,
-			onReplace,
-		} = this.props;
+		const { attributes, isSelected, clientId, onReplace } = this.props;
 		const {
 			placeholder,
 			text,
@@ -365,7 +372,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: textColor.color || '#fff',
+							color: this.getTextColor(),
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -382,7 +389,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ textColor.color || '#fff' }
+						selectionColor={ this.getTextColor() }
 						onReplace={ onReplace }
 						onRemove={ () => onReplace( [] ) }
 					/>

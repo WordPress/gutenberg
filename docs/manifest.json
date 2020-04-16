@@ -384,6 +384,12 @@
 		"parent": "document"
 	},
 	{
+		"title": "Triage",
+		"slug": "triage",
+		"markdown_source": "../docs/contributors/triage.md",
+		"parent": "contributors"
+	},
+	{
 		"title": "Localizing Gutenberg Plugin",
 		"slug": "localizing",
 		"markdown_source": "../docs/contributors/localizing.md",
