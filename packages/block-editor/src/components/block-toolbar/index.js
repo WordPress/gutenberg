@@ -12,7 +12,7 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import BlockParent from '../block-parent';
+import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
@@ -100,8 +100,8 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				ref={ nodeRef }
 			>
 				{ ! isMultiToolbar && (
-					<div className="block-editor-block-toolbar__block-parent-wrapper">
-						<BlockParent clientIds={ blockClientIds } />
+					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
+						<BlockParentSelector clientIds={ blockClientIds } />
 					</div>
 				) }
 

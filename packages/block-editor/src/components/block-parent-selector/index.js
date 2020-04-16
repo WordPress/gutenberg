@@ -12,12 +12,12 @@ import { getBlockType } from '@wordpress/blocks';
 import BlockIcon from '../block-icon';
 
 /**
- * Block parent component, displaying the hierarchy of the
+ * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
  * @return {WPElement} Block Breadcrumb.
  */
-const BlockParent = function() {
+const BlockParentSelector = function() {
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { parents } = useSelect( ( select ) => {
 		const {
@@ -46,11 +46,11 @@ const BlockParent = function() {
 	if ( parents && parents.length ) {
 		return (
 			<div
-				className="block-editor-block-parent"
+				className="block-editor-block-parent-selector"
 				key={ firstParentClientID }
 			>
 				<Button
-					className="block-editor-block-parent__button"
+					className="block-editor-block-parent-selector__button"
 					onClick={ () => selectBlock( firstParentClientID ) }
 					label={ sprintf(
 						__( 'Select parent (%s)' ),
@@ -66,4 +66,4 @@ const BlockParent = function() {
 	return null;
 };
 
-export default BlockParent;
+export default BlockParentSelector;
