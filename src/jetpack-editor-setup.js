@@ -8,11 +8,6 @@
  */
 import { JETPACK_DATA_PATH } from '../jetpack/extensions/shared/get-jetpack-data';
 
-/**
- * WordPress dependencies
- */
-import apiFetch from '@wordpress/api-fetch';
-
 const supportedJetpackBlocks = {
 	'contact-info': {
 		available: true,
