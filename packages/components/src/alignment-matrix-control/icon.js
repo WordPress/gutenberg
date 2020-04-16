@@ -18,28 +18,12 @@ const BASE_SIZE = 24;
 export default function AlignmentMatrixControlIcon( {
 	className,
 	disablePointerEvents = true,
-	height,
-	size: sizeProp = BASE_SIZE,
+	size = BASE_SIZE,
 	style = {},
 	value = 'center',
-	width,
 	...props
 } ) {
 	const alignIndex = getAlignmentIndex( value );
-	/**
-	 * When this component is used on it's own,
-	 * the size prop is preferred.
-	 *
-	 * Example:
-	 * <AligmentMatrixControlIcon size={ 20 } />
-	 *
-	 * However, when used with the <Icon /> component from @wordpress/icons,
-	 * width/height are passed in from <Icon />.
-	 *
-	 * Example:
-	 * <Icon icon={ AlignmmentMatrixControlIcon } />
-	 */
-	const size = width || height || sizeProp;
 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 
 	const classes = classnames(
