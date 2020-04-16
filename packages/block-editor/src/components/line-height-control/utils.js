@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-
 export const BASE_DEFAULT_VALUE = 1.5;
 export const STEP = 0.1;
 /**
@@ -16,21 +11,6 @@ export const STEP = 0.1;
  * in order to be considered "controlled" by props (rather than internal state).
  */
 export const RESET_VALUE = '';
-
-/**
- * Retrieves whether custom lineHeight controls should be disabled from editor settings.
- *
- * @return {boolean} Whether lineHeight controls should be disabled.
- */
-export function useIsLineHeightControlsDisabled() {
-	const isDisabled = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-
-		return !! getSettings().__experimentalDisableCustomLineHeight;
-	}, [] );
-
-	return isDisabled;
-}
 
 /**
  * Determines if the lineHeight attribute has been properly defined.
