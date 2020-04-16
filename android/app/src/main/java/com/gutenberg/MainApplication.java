@@ -128,6 +128,9 @@ public class MainApplication extends Application implements ReactApplication {
             @Override
             public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
+            @Override
+            public void onAddMention(Consumer<String> onSuccess) {}
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
