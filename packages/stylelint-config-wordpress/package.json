@@ -43,7 +43,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "^8.3.5",
 		"@commitlint/config-conventional": "^8.3.4",
-		"@wordpress/scripts": "^7.1.2",
+		"@wordpress/scripts": "^8.0.1",
 		"husky": "^4.2.3",
 		"npm-run-all": "^4.1.5",
 		"npmpub": "^5.0.0",
