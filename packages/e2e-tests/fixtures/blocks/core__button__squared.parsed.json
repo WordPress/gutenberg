@@ -2,14 +2,19 @@
     {
         "blockName": "core/button",
         "attrs": {
-            "customBackgroundColor": "#aa5a20",
-            "customTextColor": "#1b9b6c",
-            "className": "is-style-squared"
+			"align": "none",
+            "borderRadius": 0,
+            "style": {
+              "color": {
+                "background": "#aa5a20",
+                "text": "#1b9b6c"
+              }
+           }
         },
         "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-button is-style-squared\"><a class=\"wp-block-button__link has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a></div>\n",
+        "innerHTML": "\n<a class=\"wp-block-button wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-button is-style-squared\"><a class=\"wp-block-button__link has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a></div>\n"
+			"\n<a class=\"wp-block-button wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a>\n"
         ]
     },
     {

@@ -32,7 +32,11 @@ export const settings = {
 			content: __(
 				'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
 			),
-			customFontSize: 28,
+			style: {
+				typography: {
+					fontSize: 28,
+				},
+			},
 			dropCap: true,
 		},
 	},
@@ -42,6 +46,7 @@ export const settings = {
 		lightBlockWrapper: true,
 		__experimentalColor: true,
 		__experimentalLineHeight: true,
+		__experimentalFontSize: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {

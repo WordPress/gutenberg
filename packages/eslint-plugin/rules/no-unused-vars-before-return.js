@@ -74,7 +74,7 @@ module.exports = {
 							declaratorCandidate.node.init.callee.name
 						)
 					) {
-						return;
+						continue;
 					}
 
 					// The first entry in `references` is the declaration

@@ -58,7 +58,8 @@ class ButtonEdit extends Component {
 		this.onLayout = this.onLayout.bind( this );
 		this.dismissSheet = this.dismissSheet.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
-		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 		// this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
@@ -156,20 +157,35 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { attributes, backgroundColor } = this.props;
-		const { gradient, customGradient } = attributes;
+		const { backgroundColor, attributes } = this.props;
+		const { style, gradient, customGradient } = attributes;
 		const fallbackBackgroundColor = styles.fallbackButton.backgroundColor;
 		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
-		if ( gradient ) {
-			const gradientColor = defaultGradients.find(
-				( defaultGradient ) => defaultGradient.slug === gradient
-			).gradient;
-			return gradientColor;
-		} else if ( customGradient ) {
-			return customGradient;
+		if ( customGradient || gradient ) {
+			return (
+				customGradient ||
+				defaultGradients.find(
+					( defaultGradient ) => defaultGradient.slug === gradient
+				).gradient
+			);
 		}
-		return backgroundColor.color || fallbackBackgroundColor;
+		return (
+			( style && style.color && style.color.background ) ||
+			backgroundColor.color ||
+			fallbackBackgroundColor
+		);
+	}
+
+	getTextColor() {
+		const { textColor, attributes } = this.props;
+		const { style } = attributes;
+
+		return (
+			( style && style.color && style.color.text ) ||
+			textColor.color ||
+			styles.fallbackButton.color
+		);
 	}
 
 	onChangeText( value ) {
@@ -214,9 +230,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onToggleLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	onShowLinkSettings() {
+		this.setState( { isLinkSheetVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSheetVisible: false } );
 	}
 
 	onToggleButtonFocus( value ) {
@@ -304,7 +323,6 @@ class ButtonEdit extends Component {
 	render() {
 		const {
 			attributes,
-			textColor,
 			isSelected,
 			clientId,
 			onReplace,
@@ -349,6 +367,7 @@ class ButtonEdit extends Component {
 				: placeholder || __( 'Add text…' );
 
 		const backgroundColor = this.getBackgroundColor();
+		const textColor = this.getTextColor();
 
 		return (
 			<View style={ { flex: 1 } } onLayout={ this.onLayout }>
@@ -383,7 +402,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: textColor.color || '#ffffff',
+							color: this.getTextColor(),
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -400,7 +419,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ textColor.color || '#ffffff' }
+						selectionColor={ this.getTextColor() }
 						onReplace={ onReplace }
 						onRemove={ () => onReplace( [] ) }
 					/>
@@ -410,9 +429,9 @@ class ButtonEdit extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ __( 'Edit image' ) }
+								title={ __( 'Edit link' ) }
 								icon={ link }
-								onClick={ this.onToggleLinkSettings }
+								onClick={ this.onShowLinkSettings }
 								isActive={ url && url !== PREPEND_HTTP }
 							/>
 						</ToolbarGroup>
@@ -421,7 +440,7 @@ class ButtonEdit extends Component {
 
 				<BottomSheet
 					isVisible={ isLinkSheetVisible }
-					onClose={ this.onToggleLinkSettings }
+					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
 					{ this.getLinkSettings( url, rel, linkTarget ) }
@@ -493,10 +512,7 @@ class ButtonEdit extends Component {
 														);
 													} }
 													label={ __( 'Text' ) }
-													color={
-														textColor.color ||
-														'#ffffff'
-													}
+													color={ textColor }
 													separatorType="none"
 												/>
 											</PanelBody>
@@ -521,9 +537,7 @@ class ButtonEdit extends Component {
 												onReplaceSubsheet( destination )
 											}
 											backgroundColor={ backgroundColor }
-											textColor={
-												textColor.color || '#ffffff'
-											}
+											textColor={ textColor }
 											setTextColor={ setTextColor }
 											setBackgroundColor={
 												setBackgroundColor

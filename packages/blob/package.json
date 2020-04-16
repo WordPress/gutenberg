@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blob",
-	"version": "2.7.0",
+	"version": "2.8.0",
 	"description": "Blob utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.8.3"
+		"@babel/runtime": "^7.9.2"
 	},
 	"publishConfig": {
 		"access": "public"
