@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 7.9.1 =
+
+### Bug Fixes
+
+ - Make sidebar plugins pinned by default.
+ - Fix the button styles for old content.
+
+
 = 7.9.0 =
 
 ### Features
