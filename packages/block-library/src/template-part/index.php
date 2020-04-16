@@ -22,9 +22,8 @@ function render_block_core_template_part( $attributes ) {
 	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
 		// Else, if the template part was provided by the active theme,
 		// render the corresponding file content.
-		$template_part_file_path =
-				get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-		if ( file_exists( $template_part_file_path ) ) {
+		$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+		if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
 			$content = file_get_contents( $template_part_file_path );
 		}
 	}
