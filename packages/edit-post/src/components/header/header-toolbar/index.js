@@ -21,7 +21,8 @@ import { plus } from '@wordpress/icons';
 function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
-		showInserter,
+		isInserterEnabled,
+		isInserterVisible,
 		isTextModeEnabled,
 		previewDeviceType,
 	} = useSelect(
@@ -30,9 +31,10 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 				'fixedToolbar'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			showInserter:
+			isInserterEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			isInserterVisible: select( 'core/block-editor' ).hasInserterItems(),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
@@ -57,18 +59,20 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<Button
-				className="edit-post-header-toolbar__inserter-toggle"
-				isPrimary
-				isPressed={ isInserterOpen }
-				onClick={ onToggleInserter }
-				disabled={ ! showInserter }
-				icon={ plus }
-				label={ _x(
-					'Add block',
-					'Generic label for block inserter button'
-				) }
-			/>
+			{ isInserterVisible && (
+				<Button
+					className="edit-post-header-toolbar__inserter-toggle"
+					isPrimary
+					isPressed={ isInserterOpen }
+					onClick={ onToggleInserter }
+					disabled={ ! isInserterEnabled }
+					icon={ plus }
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
+					) }
+				/>
+			) }
 			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />

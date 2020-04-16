@@ -7,6 +7,7 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressKeyWithModifier,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -22,6 +23,7 @@ describe( 'RichText', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
+		await openDocumentSettingsSidebar();
 		await page.click( '[aria-label="Heading 3"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -6,8 +6,8 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressKeyTimes,
-	switchEditorModeTo,
 	setBrowserViewport,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -92,6 +92,7 @@ describe( 'adding blocks', () => {
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
 		await page.click( '.editor-post-title__input' );
+		await closeGlobalBlockInserter();
 
 		// Using the between inserter
 		const insertionPoint = await page.$( '[data-type="core/quote"]' );
@@ -111,15 +112,13 @@ describe( 'adding blocks', () => {
 			() =>
 				document.activeElement &&
 				document.activeElement.classList.contains(
-					'block-editor-inserter__search'
+					'block-editor-inserter__search-input'
 				)
 		);
 		await page.keyboard.type( 'para' );
-		await pressKeyTimes( 'Tab', 3 );
+		await pressKeyTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
-
-		await switchEditorModeTo( 'Code' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -137,7 +136,7 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search'
+			'block-editor-inserter__search-input'
 		);
 
 		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
@@ -148,10 +147,11 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search'
+			'block-editor-inserter__search-input'
 		);
 
 		// Tab to the block search results
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
 		// Expect the search results to be the active element.
@@ -159,7 +159,7 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__results'
+			'components-tab-panel__tab-content'
 		);
 
 		// Try using the up arrow key
@@ -170,7 +170,7 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__results'
+			'components-tab-panel__tab-content'
 		);
 
 		// Press escape to close the block inserter.
