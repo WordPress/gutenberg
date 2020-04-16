@@ -86,7 +86,7 @@
 }
 
 .wp-block-navigation-link__submenu-icon {
-	padding-left: 1ch;
+	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	svg {
 		fill: currentColor;
