@@ -80,13 +80,14 @@ function ColorSettings( {
 
 	function setColor( color ) {
 		if ( isBackgroundScreen ) {
-			setBackgroundColor( isSolidSegment ? color : '' );
-			setGradient( isSolidSegment ? '' : color );
+			if ( isSolidSegment ) {
+				setBackgroundColor( color );
+			} else setGradient( color );
 		} else if ( isCustomScreen ) {
 			if ( isBackgroundPrevScreen ) {
 				setBackgroundColor( color );
-				setGradient( '' );
-			} else setTextColor( color );
+			}
+			setTextColor( color );
 		} else setTextColor( color );
 	}
 

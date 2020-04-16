@@ -62,6 +62,9 @@ class ButtonEdit extends Component {
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
+		this.setBackgroundColor = this.setBackgroundColor.bind( this );
+		this.setTextColor = this.setTextColor.bind( this );
+		this.setColor = this.setColor.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -319,14 +322,34 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
+	setBackgroundColor( color ) {
+		const { setGradient } = this.props;
+		setGradient( '' );
+		this.setColor( 'background', color );
+	}
+
+	setTextColor( color ) {
+		this.setColor( 'text', color );
+	}
+
+	setColor( attributeName, color ) {
+		const { setAttributes, attributes } = this.props;
+		const { style } = attributes;
+
+		setAttributes( {
+			style: {
+				...style,
+				color: { ...style?.color, [ attributeName ]: color },
+			},
+		} );
+	}
+
 	render() {
 		const {
 			attributes,
 			isSelected,
 			clientId,
 			onReplace,
-			setBackgroundColor,
-			setTextColor,
 			setGradient,
 		} = this.props;
 		const {
@@ -537,9 +560,9 @@ class ButtonEdit extends Component {
 											}
 											backgroundColor={ backgroundColor }
 											textColor={ textColor }
-											setTextColor={ setTextColor }
+											setTextColor={ this.setTextColor }
 											setBackgroundColor={
-												setBackgroundColor
+												this.setBackgroundColor
 											}
 											setGradient={ setGradient }
 											shouldEnableBottomSheetScroll={
