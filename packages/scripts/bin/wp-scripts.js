@@ -3,8 +3,12 @@
 /**
  * Internal dependencies
  */
-const { getArgsFromCLI, spawnScript } = require( '../utils' );
+const { getNodeArgsFromCLI, spawnScript } = require( '../utils' );
 
-const [ scriptName, ...nodesArgs ] = getArgsFromCLI();
+const { scriptName, scriptArgs, nodeArgs } = getNodeArgsFromCLI( [
+	'--inspect-brk',
+	'--inspect-port',
+	'--inspect',
+] );
 
-spawnScript( scriptName, nodesArgs );
+spawnScript( scriptName, scriptArgs, nodeArgs );
