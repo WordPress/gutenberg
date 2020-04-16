@@ -99,7 +99,6 @@ export class BlockList extends Component {
 			isReadOnly,
 			isRootList,
 			horizontal,
-			scrollEnabled,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
@@ -140,7 +139,7 @@ export class BlockList extends Component {
 						! isRootList && styles.overflowVisible,
 					] }
 					horizontal={ horizontal }
-					scrollEnabled={ scrollEnabled }
+					scrollEnabled={ isRootList }
 					contentContainerStyle={
 						horizontal && styles.horizontalContentContainer
 					}

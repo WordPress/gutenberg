@@ -114,7 +114,6 @@ class InnerBlocks extends Component {
 			renderAppender,
 			__experimentalMoverDirection,
 			horizontal,
-			scrollEnabled,
 			contentResizeMode,
 			contentStyle,
 			onAddBlock,
@@ -137,7 +136,6 @@ class InnerBlocks extends Component {
 							__experimentalMoverDirection
 						}
 						horizontal={ horizontal }
-						scrollEnabled={ scrollEnabled }
 						contentResizeMode={ contentResizeMode }
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }

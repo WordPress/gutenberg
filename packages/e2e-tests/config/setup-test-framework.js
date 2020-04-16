@@ -228,6 +228,7 @@ async function runAxeTestsForBlockEditor() {
 			'dlitem',
 			'duplicate-id',
 			'label',
+			'landmark-one-main',
 			'link-name',
 			'listitem',
 			'region',
