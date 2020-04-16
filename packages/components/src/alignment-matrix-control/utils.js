@@ -23,13 +23,7 @@ export const ALIGNMENT_LABEL = {
 };
 
 // Transforms GRID into a flat Array of values
-export const ALIGNMENTS = GRID.reduce( ( alignments, row ) => {
-	row.forEach( ( cell ) => {
-		alignments.push( cell );
-	} );
-
-	return alignments;
-}, [] );
+export const ALIGNMENTS = GRID.flat();
 
 /**
  * Parses and transforms an incoming value to better match the alignment values
