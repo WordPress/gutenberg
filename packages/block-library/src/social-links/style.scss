@@ -414,3 +414,26 @@
 		padding-right: 16px;
 	}
 }
+
+// Inherit colors when checked.
+.wp-block-social-links.has-inherited-color {
+	// This then passes on the color inheritance.
+	.wp-social-link {
+		color: currentColor;
+		background-color: currentColor;
+
+		svg {
+			filter: invert(1);
+		}
+	}
+
+	&.is-style-logos-only {
+		.wp-social-link {
+			background: none;
+
+			svg {
+				filter: invert(0);
+			}
+		}
+	}
+}
