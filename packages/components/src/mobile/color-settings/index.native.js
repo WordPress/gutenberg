@@ -86,8 +86,7 @@ function ColorSettings( {
 		} else if ( isCustomScreen ) {
 			if ( isBackgroundPrevScreen ) {
 				setBackgroundColor( color );
-			}
-			setTextColor( color );
+			} else setTextColor( color );
 		} else setTextColor( color );
 	}
 
