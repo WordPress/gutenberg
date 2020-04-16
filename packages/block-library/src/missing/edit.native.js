@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { requestUnsupportedBlockFallback } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -19,11 +18,12 @@ import { help, plugins } from '@wordpress/icons';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { UnsupportedBlockEditor } from '../unsupported-block-editor/index.native.js';
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
 		super( props );
-		this.state = { showHelp: false };
+		this.state = { showHelp: false, isModalVisible: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
 	}
@@ -67,11 +67,11 @@ export class UnsupportedBlockEdit extends Component {
 
 	requestFallback() {
 		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true } );
+		this.setState( { sendFallbackMessage: true, isModalVisible: true } );
 	}
 
 	renderSheet( title ) {
-		const { getStylesFromColorScheme, attributes } = this.props;
+		const { getStylesFromColorScheme } = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
 			styles.infoTextDark
@@ -102,18 +102,6 @@ export class UnsupportedBlockEdit extends Component {
 				isVisible={ this.state.showHelp }
 				hideHeader
 				onClose={ this.toggleSheet }
-				onModalHide={ () => {
-					if ( this.state.sendFallbackMessage ) {
-						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
-						// A small delay will ensure that the controller has already been removed.
-						this.timeout = setTimeout( () => {
-							requestUnsupportedBlockFallback(
-								attributes.originalContent
-							);
-						}, 100 );
-						this.setState( { sendFallbackMessage: false } );
-					}
-				} }
 			>
 				<View style={ styles.infoContainer }>
 					<Icon
@@ -136,7 +124,14 @@ export class UnsupportedBlockEdit extends Component {
 						<BottomSheet.Cell
 							label={ __( 'Edit post on Web Browser' ) }
 							separatorType="topFullWidth"
-							onPress={ this.requestFallback }
+							onPress={ () => {
+								this.toggleSheet();
+								this.timeout = setTimeout( () => {
+									this.setState( {
+										isModalVisible: true,
+									} );
+								}, 1000 );
+							} }
 						/>
 						<BottomSheet.Cell
 							label={ __( 'Dismiss' ) }
@@ -177,22 +172,25 @@ export class UnsupportedBlockEdit extends Component {
 		);
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<View
-				style={ getStylesFromColorScheme(
-					styles.unsupportedBlock,
-					styles.unsupportedBlockDark
-				) }
-			>
-				{ this.renderHelpIcon() }
-				<Icon
-					className={ iconClassName }
-					icon={ icon && icon.src ? icon.src : icon }
-					color={ iconStyle.color }
-				/>
-				<Text style={ titleStyle }>{ title }</Text>
-				{ subtitle }
-				{ this.renderSheet( title ) }
-			</View>
+			<>
+				<UnsupportedBlockEditor />
+				<View
+					style={ getStylesFromColorScheme(
+						styles.unsupportedBlock,
+						styles.unsupportedBlockDark
+					) }
+				>
+					{ this.renderHelpIcon() }
+					<Icon
+						className={ iconClassName }
+						icon={ icon && icon.src ? icon.src : icon }
+						color={ iconStyle.color }
+					/>
+					<Text style={ titleStyle }>{ title }</Text>
+					{ subtitle }
+					{ this.renderSheet( title ) }
+				</View>
+			</>
 		);
 	}
 }
