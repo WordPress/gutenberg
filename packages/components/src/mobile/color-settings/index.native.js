@@ -41,9 +41,20 @@ function ColorSettings( {
 	const currentScreen = stack[ stack.length - 1 ];
 	const previousScreen = stack[ stack.length - 2 ];
 
+	const isBackgroundScreen = currentScreen === 'Background';
+	const isBackgroundPrevScreen = previousScreen === 'Background';
+	const isCustomScreen = currentScreen === 'Custom';
+
 	const [ activeSegment, setActiveSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
+
+	const activeColor =
+		isBackgroundScreen || isBackgroundPrevScreen
+			? backgroundColor
+			: textColor;
+	const currentSegment = isBackgroundScreen ? activeSegment : segments[ 0 ];
+	const isSolidSegment = activeSegment === 'Solid';
 
 	useEffect( () => {
 		onHardwareButtonPress( () =>
@@ -67,15 +78,24 @@ function ColorSettings( {
 		shouldSetBottomSheetMaxHeight( true );
 	}
 
+	function setColor( color ) {
+		if ( isBackgroundScreen ) {
+			setBackgroundColor( isSolidSegment ? color : '' );
+			setGradient( isSolidSegment ? '' : color );
+		} else if ( isCustomScreen ) {
+			if ( isBackgroundPrevScreen ) {
+				setBackgroundColor( color );
+				setGradient( '' );
+			} else setTextColor( color );
+		} else setTextColor( color );
+	}
+
 	function getColorPalette() {
 		return (
 			<ColorPalette
-				setBackgroundColor={ setBackgroundColor }
-				setTextColor={ setTextColor }
-				setGradient={ setGradient }
-				backgroundColor={ backgroundColor }
-				textColor={ textColor }
-				currentSegment={ activeSegment }
+				setColor={ setColor }
+				activeColor={ activeColor }
+				currentSegment={ currentSegment }
 				currentScreen={ currentScreen }
 				onCustomPress={ () => onReplaceSubsheet( 'Custom' ) }
 				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
@@ -95,7 +115,7 @@ function ColorSettings( {
 
 	return (
 		<View>
-			{ currentScreen === 'Background' && (
+			{ isBackgroundScreen && (
 				<View>
 					{ getNavigationHeader( __( 'Background' ) ) }
 					{ getColorPalette() }
@@ -135,7 +155,7 @@ function ColorSettings( {
 					</View>
 				</View>
 			) }
-			{ currentScreen === 'Custom' && (
+			{ isCustomScreen && (
 				<View>
 					<ColorPicker
 						shouldEnableBottomSheetScroll={
@@ -144,11 +164,8 @@ function ColorSettings( {
 						shouldSetBottomSheetMaxHeight={
 							shouldSetBottomSheetMaxHeight
 						}
-						setTextColor={ setTextColor }
-						setBackgroundColor={ setBackgroundColor }
-						setGradient={ setGradient }
-						backgroundColor={ backgroundColor }
-						textColor={ textColor }
+						setColor={ setColor }
+						activeColor={ activeColor }
 						onNavigationBack={ () =>
 							onReplaceSubsheet( previousScreen )
 						}

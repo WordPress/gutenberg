@@ -24,14 +24,10 @@ import ColorIndicator from '../color-indicator';
 const ANIMATION_DURATION = 200;
 
 function ColorPalette( {
-	setBackgroundColor,
-	setTextColor,
-	setGradient,
-	backgroundColor,
-	textColor,
+	setColor,
+	activeColor,
 	defaultSettings,
 	currentSegment,
-	currentScreen,
 	onCustomPress,
 	getStylesFromColorScheme,
 	shouldEnableBottomSheetScroll,
@@ -59,10 +55,8 @@ function ColorPalette( {
 	const scrollViewRef = createRef();
 
 	const isGradientSegment = currentSegment === 'Gradient';
-	const isTextScreen = currentScreen === 'Text';
+	const isGradient = activeColor.includes( 'linear-gradient' );
 
-	const [ activeBgColor, setActiveBgColor ] = useState( backgroundColor );
-	const [ activeTextColor, setActiveTextColor ] = useState( textColor );
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
 
@@ -73,23 +67,15 @@ function ColorPalette( {
 		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 	}, [ currentSegment ] );
 
-	function isSelected( color ) {
-		const isSelectedBgColor = color === activeBgColor;
-		const isSelectedTextColor = color === activeTextColor;
-		return isTextScreen ? isSelectedTextColor : isSelectedBgColor;
+	function isSelectedCustom() {
+		const colors = isGradientSegment
+			? defaultGradientColors
+			: defaultColors;
+		return ! isGradient && ! colors.includes( activeColor );
 	}
 
-	function isSelectedCustom() {
-		const isSelectedCustomBgColor =
-			! defaultColors.includes( activeBgColor ) &&
-			! defaultGradientColors.includes( activeBgColor );
-		const isSelectedCustomTextColor = ! defaultColors.includes(
-			activeTextColor
-		);
-
-		return isTextScreen
-			? isSelectedCustomTextColor
-			: isSelectedCustomBgColor;
+	function isSelected( color ) {
+		return ! isSelectedCustom() && activeColor === color;
 	}
 
 	function timingAnimation( property, toValue ) {
@@ -100,8 +86,8 @@ function ColorPalette( {
 		} );
 	}
 
-	function performAnimation( value ) {
-		opacity.setValue( isSelected( value ) ? 1 : 0 );
+	function performAnimation( color ) {
+		opacity.setValue( isSelected( color ) ? 1 : 0 );
 		scale.setValue( 1 );
 
 		Animated.parallel( [
@@ -115,25 +101,15 @@ function ColorPalette( {
 		outputRange: [ 1, 0.7, 1 ],
 	} );
 
-	function onColorPress( value ) {
-		performAnimation( value );
-
-		setActiveBgColor( value );
-		setActiveTextColor( value );
-
-		if ( isTextScreen ) {
-			setTextColor( value );
-		} else if ( ! isTextScreen && isGradientSegment ) {
-			setGradient( value );
-			setBackgroundColor();
-		} else {
-			setBackgroundColor( value );
-			setGradient();
-		}
+	function onColorPress( color ) {
+		performAnimation( color );
+		setColor( color );
 	}
 
-	function Palette( { gradient, custom } ) {
-		const palette = gradient ? defaultGradientColors : defaultColors;
+	function Palette( { isGradientPalette, withCustomPicker } ) {
+		const palette = isGradientPalette
+			? defaultGradientColors
+			: defaultColors;
 		const verticalSeparatorStyle = getStylesFromColorScheme(
 			styles.verticalSeparator,
 			styles.verticalSeparatorDark
@@ -161,7 +137,6 @@ function ColorPalette( {
 							>
 								<ColorIndicator
 									color={ color }
-									gradient
 									isSelected={ isSelected( color ) }
 									opacity={ opacity }
 									style={ styles.colorIndicator }
@@ -170,13 +145,13 @@ function ColorPalette( {
 						</TouchableWithoutFeedback>
 					);
 				} ) }
-				{ custom && (
+				{ withCustomPicker && (
 					<>
 						<View style={ verticalSeparatorStyle } />
 						<TouchableWithoutFeedback onPress={ onCustomPress }>
 							<View>
 								<ColorIndicator
-									custom
+									withCustomPicker
 									color={ customSwatchGradients }
 									isSelected={ isSelectedCustom() }
 									style={ styles.colorIndicator }
@@ -202,11 +177,11 @@ function ColorPalette( {
 			ref={ scrollViewRef }
 		>
 			<TouchableWithoutFeedback>
-				{ ! isTextScreen && isGradientSegment ? (
-					<Palette gradient />
-				) : (
-					<Palette custom onCustomPress={ onCustomPress } />
-				) }
+				<Palette
+					withCustomPicker={ ! isGradientSegment }
+					onCustomPress={ onCustomPress }
+					isGradientPalette={ isGradientSegment }
+				/>
 			</TouchableWithoutFeedback>
 		</ScrollView>
 	);

@@ -25,7 +25,7 @@ function SelectedIcon( { opacity } ) {
 function ColorIndicator( {
 	color,
 	isSelected,
-	custom,
+	withCustomPicker,
 	style,
 	getStylesFromColorScheme,
 	opacity,
@@ -47,7 +47,7 @@ function ColorIndicator( {
 				{ isSelected && <SelectedIcon opacity={ opacity } /> }
 			</LinearGradient>
 		);
-	} else if ( custom ) {
+	} else if ( withCustomPicker ) {
 		return (
 			<View style={ [ styles.circleOption, style ] }>
 				<View style={ outlineStyle } />

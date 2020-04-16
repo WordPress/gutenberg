@@ -21,25 +21,20 @@ function ColorPicker( {
 	shouldEnableBottomSheetScroll,
 	shouldSetBottomSheetMaxHeight,
 	isBottomSheetScrolling,
-	setBackgroundColor,
-	setTextColor,
-	setGradient,
-	backgroundColor,
-	textColor,
+	setColor,
+	activeColor,
 	onNavigationBack,
-	previousScreen,
 	onCloseBottomSheet,
 	getStylesFromColorScheme,
 } ) {
 	const isIOS = Platform.OS === 'ios';
-
+	const isGradient = activeColor.includes( 'linear-gradient' );
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 	const [ hue, setHue ] = useState( 0 );
 	const [ sat, setSaturation ] = useState( 0.5 );
 	const [ val, setValue ] = useState( 0.5 );
-	const [ savedBgColor ] = useState( backgroundColor );
-	const [ savedTextColor ] = useState( textColor );
+	const [ savedColor ] = useState( activeColor );
 
 	const {
 		paddingLeft: spacing,
@@ -70,9 +65,6 @@ function ColorPicker( {
 		`hsv ${ hue } ${ sat } ${ val }`
 	).toHexString();
 
-	const isGradient = backgroundColor.includes( 'linear-gradient' );
-	const isTextScreen = previousScreen === 'Text';
-
 	function setHSVFromHex( color ) {
 		const { h, s, v } = tinycolor( color ).toHsv();
 
@@ -82,25 +74,14 @@ function ColorPicker( {
 	}
 
 	useEffect( () => {
-		if ( isTextScreen ) {
-			setTextColor( currentColor );
-		} else {
-			setBackgroundColor( currentColor );
-		}
+		setColor( currentColor );
 	}, [ currentColor ] );
 
 	useEffect( () => {
-		if ( isTextScreen ) {
-			setHSVFromHex( textColor );
-			setTextColor( textColor );
-		} else {
-			if ( ! isGradient ) {
-				setHSVFromHex( backgroundColor );
-			}
-
-			setBackgroundColor( backgroundColor );
-			setGradient();
+		if ( ! isGradient ) {
+			setHSVFromHex( activeColor );
 		}
+		setColor( activeColor );
 		shouldSetBottomSheetMaxHeight( false );
 		onCloseBottomSheet( resetColors );
 	}, [] );
@@ -115,8 +96,7 @@ function ColorPicker( {
 	}
 
 	function resetColors() {
-		setBackgroundColor( savedBgColor );
-		setTextColor( savedTextColor );
+		setColor( savedColor );
 	}
 
 	function onPressCancelButton() {
@@ -130,11 +110,7 @@ function ColorPicker( {
 		onNavigationBack();
 		onCloseBottomSheet( null );
 		shouldSetBottomSheetMaxHeight( true );
-
-		if ( isTextScreen ) {
-			return setTextColor( currentColor );
-		}
-		return setBackgroundColor( currentColor );
+		setColor( currentColor );
 	}
 
 	return (
