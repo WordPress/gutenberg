@@ -1,5 +1,6 @@
 .edit-navigation-menu-editor {
 	display: grid;
+	align-items: self-start;
 	grid-gap: 10px;
 
 	@include break-medium {
