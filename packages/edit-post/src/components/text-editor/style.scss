@@ -5,7 +5,7 @@
 	flex-grow: 1;
 
 	// Always show outlines in code editor
-	.editor-post-title {
+	.wp-block.editor-post-title {
 		max-width: none;
 
 		textarea {
@@ -13,9 +13,8 @@
 			margin-bottom: -$border-width;
 			padding: $grid-unit-20;
 
-			&:focus,
-			&:hover {
-				border: $border-width solid $black;
+			&:focus {
+				border: $border-width solid $dark-gray-primary;
 			}
 		}
 
@@ -55,16 +54,17 @@
 
 .edit-post-text-editor__body {
 	width: 100%;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-60 $grid-unit-20;
 	max-width: $break-wide;
 	margin-left: auto;
 	margin-right: auto;
 
 	@include break-large() {
-		padding: $grid-unit-20 $grid-unit-60;
+		padding: $grid-unit-20 $grid-unit-60 #{ $grid-unit-60 * 2 } $grid-unit-60;
 	}
 
-	.editor-post-title__input {
+	// This needs specificity to change the title block appearance on the code editor.
+	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
 		font-family: $editor-html-font;
 		font-size: 2em;
 	}
