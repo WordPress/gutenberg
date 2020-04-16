@@ -14,7 +14,6 @@ import { useSelect } from '@wordpress/data';
 import InserterMenu from './menu';
 
 function InserterLibrary( {
-	className,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -35,7 +34,6 @@ function InserterLibrary( {
 
 	return (
 		<InserterMenu
-			className={ className }
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }

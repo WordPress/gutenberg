@@ -35,6 +35,7 @@ import {
 	InterfaceSkeleton,
 } from '@wordpress/interface';
 import { useState, useEffect } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -160,10 +161,33 @@ function Layout() {
 								options={ { origin: 'right' } }
 							>
 								{ ( { className: animationClassName } ) => (
-									<Library
-										className={ animationClassName }
-										showInserterHelpPanel
-									/>
+									<div
+										className={ classnames(
+											'edit-post-layout__inserter-panel',
+											animationClassName
+										) }
+									>
+										<div className="edit-post-layout__inserter-panel-header">
+											<Button
+												icon={ close }
+												onClick={ () =>
+													setIsInserterOpen( false )
+												}
+											/>
+										</div>
+										<div className="edit-post-layout__inserter-panel-content">
+											<Library
+												showInserterHelpPanel
+												onSelect={ () => {
+													if ( isMobileViewport ) {
+														setIsInserterOpen(
+															false
+														);
+													}
+												} }
+											/>
+										</div>
+									</div>
 								) }
 							</Animate>
 						)
