@@ -1,4 +1,5 @@
 .block-editor-post-preview__dropdown {
+	display: none;
 	margin-right: $grid-unit-15;
 	padding: 0;
 }
@@ -39,6 +40,10 @@
 }
 
 @include break-small() {
+	.editor-post-preview {
+		display: none;
+	}
+
 	.block-editor-post-preview__dropdown {
 		display: flex;
 	}
