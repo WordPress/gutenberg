@@ -193,7 +193,7 @@ add_action( 'init', 'register_block_core_latest_posts' );
 function block_core_latest_posts_migrate_categories( $block ) {
 	if (
 		'core/latest-posts' === $block['blockName'] &&
-		isset( $block['attrs']['categories'] ) &&
+		! empty( $block['attrs']['categories'] ) &&
 		is_string( $block['attrs']['categories'] )
 	) {
 		$block['attrs']['categories'] = array(
