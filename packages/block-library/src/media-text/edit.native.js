@@ -15,7 +15,7 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { ToolbarGroup, withWrapperStyle } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { pullLeft, pullRight } from '@wordpress/icons';
@@ -184,7 +184,7 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
-			wrapperStyle,
+			wrapperProps,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -223,7 +223,7 @@ class MediaTextEdit extends Component {
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
 			backgroundColor:
-				wrapperStyle.style.backgroundColor || backgroundColor.color,
+				wrapperProps?.style?.backgroundColor || backgroundColor.color,
 		};
 
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
@@ -296,7 +296,6 @@ class MediaTextEdit extends Component {
 
 export default compose(
 	withColors( 'backgroundColor' ),
-	withWrapperStyle,
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,

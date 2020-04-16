@@ -9,8 +9,6 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 
-import { useWrapperStyle } from '@wordpress/components';
-
 const name = 'core/paragraph';
 
 function ParagraphBlock( {
@@ -18,15 +16,15 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
+	wrapperProps,
+	globalStyle,
 	style,
 } ) {
-	const wrapperStyle = useWrapperStyle();
-
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
 		...style,
-		color: wrapperStyle.style.color,
+		color: wrapperProps?.style?.color || globalStyle.color,
 	};
 
 	return (

@@ -57,21 +57,34 @@ class BlockListBlock extends Component {
 
 	getBlockForType() {
 		return (
-			<BlockEdit
-				name={ this.props.name }
-				isSelected={ this.props.isSelected }
-				attributes={ this.props.attributes }
-				setAttributes={ this.props.onChange }
-				onFocus={ this.onFocus }
-				onReplace={ this.props.onReplace }
-				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.props.mergeBlocks }
-				onCaretVerticalPositionChange={
-					this.props.onCaretVerticalPositionChange
-				}
-				clientId={ this.props.clientId }
-				contentStyle={ this.props.contentStyle }
-			/>
+			<WrapperStyleContext.Consumer>
+				{ ( globalStyle ) => (
+					<WrapperStyleContext.Provider
+						value={ {
+							...globalStyle,
+							...( this.props.wrapperProps || {} ).style,
+						} }
+					>
+						<BlockEdit
+							name={ this.props.name }
+							isSelected={ this.props.isSelected }
+							attributes={ this.props.attributes }
+							setAttributes={ this.props.onChange }
+							onFocus={ this.onFocus }
+							onReplace={ this.props.onReplace }
+							insertBlocksAfter={ this.insertBlocksAfter }
+							mergeBlocks={ this.props.mergeBlocks }
+							onCaretVerticalPositionChange={
+								this.props.onCaretVerticalPositionChange
+							}
+							wrapperProps={ this.props.wrapperProps }
+							globalStyle={ globalStyle }
+							clientId={ this.props.clientId }
+							contentStyle={ this.props.contentStyle }
+						/>
+					</WrapperStyleContext.Provider>
+				) }
+			</WrapperStyleContext.Consumer>
 		);
 	}
 
@@ -106,7 +119,6 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
-			wrapperProps,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -118,107 +130,80 @@ class BlockListBlock extends Component {
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 
 		return (
-			<WrapperStyleContext.Consumer>
-				{ ( wrapperStyle ) => (
-					<WrapperStyleContext.Provider
-						value={ {
-							style: {
-								...wrapperStyle.style,
-								...( wrapperProps || {} ).style,
-							},
-						} }
+			<TouchableWithoutFeedback
+				onPress={ this.onFocus }
+				accessible={ accessible }
+				accessibilityRole={ 'button' }
+			>
+				<View
+					style={ { flex: 1 } }
+					accessibilityLabel={ accessibilityLabel }
+				>
+					{ showFloatingToolbar && (
+						<FloatingToolbar>
+							{ hasParent && (
+								<Toolbar passedStyle={ styles.toolbar }>
+									<ToolbarButton
+										title={ __( 'Navigate Up' ) }
+										onClick={ () => onSelect( parentId ) }
+										icon={ NavigateUpSVG }
+									/>
+									<View style={ styles.pipe } />
+								</Toolbar>
+							) }
+							<Breadcrumbs clientId={ clientId } />
+						</FloatingToolbar>
+					) }
+					<View
+						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
+						accessibilityLabel={ accessibilityLabel }
+						style={ [
+							{ marginVertical, marginHorizontal, flex: 1 },
+							isDimmed && styles.dimmed,
+						] }
 					>
-						<TouchableWithoutFeedback
-							onPress={ this.onFocus }
-							accessible={ accessible }
-							accessibilityRole={ 'button' }
-						>
+						{ isSelected && (
 							<View
-								style={ { flex: 1 } }
-								accessibilityLabel={ accessibilityLabel }
-							>
-								{ showFloatingToolbar && (
-									<FloatingToolbar>
-										{ hasParent && (
-											<Toolbar
-												passedStyle={ styles.toolbar }
-											>
-												<ToolbarButton
-													title={ __(
-														'Navigate Up'
-													) }
-													onClick={ () =>
-														onSelect( parentId )
-													}
-													icon={ NavigateUpSVG }
-												/>
-												<View style={ styles.pipe } />
-											</Toolbar>
-										) }
-										<Breadcrumbs clientId={ clientId } />
-									</FloatingToolbar>
-								) }
-								<View
-									pointerEvents={
-										isTouchable ? 'auto' : 'box-only'
-									}
-									accessibilityLabel={ accessibilityLabel }
-									style={ [
-										{
-											marginVertical,
-											marginHorizontal,
-											flex: 1,
-										},
-										isDimmed && styles.dimmed,
-									] }
-								>
-									{ isSelected && (
-										<View
-											style={ [
-												styles.solidBorder,
-												getStylesFromColorScheme(
-													styles.solidBorderColor,
-													styles.solidBorderColorDark
-												),
-											] }
-										/>
-									) }
-									{ isParentSelected && (
-										<View
-											style={ [
-												styles.dashedBorder,
-												getStylesFromColorScheme(
-													styles.dashedBorderColor,
-													styles.dashedBorderColorDark
-												),
-											] }
-										/>
-									) }
-									{ isValid ? (
-										this.getBlockForType()
-									) : (
-										<BlockInvalidWarning
-											blockTitle={ title }
-											icon={ icon }
-										/>
-									) }
-									<View style={ styles.neutralToolbar }>
-										{ isSelected && (
-											<BlockMobileToolbar
-												clientId={ clientId }
-												onDelete={ onDeleteBlock }
-												horizontalDirection={
-													horizontalDirection
-												}
-											/>
-										) }
-									</View>
-								</View>
-							</View>
-						</TouchableWithoutFeedback>
-					</WrapperStyleContext.Provider>
-				) }
-			</WrapperStyleContext.Consumer>
+								style={ [
+									styles.solidBorder,
+									getStylesFromColorScheme(
+										styles.solidBorderColor,
+										styles.solidBorderColorDark
+									),
+								] }
+							/>
+						) }
+						{ isParentSelected && (
+							<View
+								style={ [
+									styles.dashedBorder,
+									getStylesFromColorScheme(
+										styles.dashedBorderColor,
+										styles.dashedBorderColorDark
+									),
+								] }
+							/>
+						) }
+						{ isValid ? (
+							this.getBlockForType()
+						) : (
+							<BlockInvalidWarning
+								blockTitle={ title }
+								icon={ icon }
+							/>
+						) }
+						<View style={ styles.neutralToolbar }>
+							{ isSelected && (
+								<BlockMobileToolbar
+									clientId={ clientId }
+									onDelete={ onDeleteBlock }
+									horizontalDirection={ horizontalDirection }
+								/>
+							) }
+						</View>
+					</View>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
