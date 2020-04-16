@@ -10,14 +10,15 @@ import { select } from '@wordpress/data-controls';
  * This only considers resolution state, and notably does not support resolver
  * custom `isFulfilled` behavior.
  *
- * @template {Function} R
+ * @param {Function} resolver     Original resolver.
+ * @param {string}   selectorName Selector name associated with resolver.
  *
- * @param {R}      resolver     Original resolver.
- * @param {string} selectorName Selector name associated with resolver.
- *
- * @return {R} Enhanced resolver.
+ * @return {Function} Enhanced resolver.
  */
 const ifNotResolved = ( resolver, selectorName ) =>
+	/**
+	 * @param {...any} args Original resolver arguments.
+	 */
 	function* resolveIfNotResolved( ...args ) {
 		const hasStartedResolution = yield select(
 			'core',
