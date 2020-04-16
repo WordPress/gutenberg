@@ -41,7 +41,9 @@ export default ( jetpackState ) => {
 
 	const jetpackData = setJetpackData( jetpackState );
 
-	require( '../jetpack/extensions/editor' );
+	if ( __DEV__ ) {
+		require( '../jetpack/extensions/editor' );
+	}
 
 	return jetpackData;
 };
