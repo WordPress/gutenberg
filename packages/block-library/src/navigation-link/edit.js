@@ -279,12 +279,12 @@ function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
+					{ showSubmenuIcon && (
+						<span className="wp-block-navigation-link__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					) }
 				</div>
-				{ showSubmenuIcon && (
-					<span className="wp-block-navigation-link__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
-				) }
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
