@@ -23,8 +23,8 @@ async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
 	await editorPage.click( '.block-editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.edit-post-preview__button-external' );
-	await editorPage.click( '.edit-post-preview__button-external' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -50,7 +50,9 @@ async function openPreviewPage( editorPage ) {
  */
 async function waitForPreviewDropdownOpen( editorPage ) {
 	await editorPage.click( '.block-editor-post-preview__button-toggle' );
-	return editorPage.waitForSelector( '.edit-post-preview__button-external' );
+	return editorPage.waitForSelector(
+		'.edit-post-header-preview__button-external'
+	);
 }
 
 /**
@@ -62,7 +64,7 @@ async function waitForPreviewDropdownOpen( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.edit-post-preview__button-external' );
+	await page.click( '.edit-post-header-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
 
