@@ -62,7 +62,6 @@ class ButtonEdit extends Component {
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
-		// this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -180,11 +179,11 @@ class ButtonEdit extends Component {
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
-
+		const fallbackTextColor = '#ffffff';
 		return (
 			( style && style.color && style.color.text ) ||
 			textColor.color ||
-			styles.fallbackButton.color
+			fallbackTextColor
 		);
 	}
 
