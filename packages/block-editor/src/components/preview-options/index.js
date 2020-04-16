@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -24,7 +29,11 @@ const downArrow = (
 	</SVG>
 );
 
-export default function PreviewOptions( { children, isSaveable = true } ) {
+export default function PreviewOptions( {
+	children,
+	className,
+	isEnabled = true,
+} ) {
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 	} = useDispatch( 'core/block-editor' );
@@ -38,14 +47,17 @@ export default function PreviewOptions( { children, isSaveable = true } ) {
 	return (
 		<Dropdown
 			className="block-editor-post-preview__dropdown"
-			contentClassName="block-editor-post-preview__dropdown-content"
+			contentClassName={ classnames(
+				className,
+				'block-editor-post-preview__dropdown-content'
+			) }
 			popoverProps={ { role: 'menu' } }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					onClick={ onToggle }
 					className="block-editor-post-preview__button-toggle"
 					aria-expanded={ isOpen }
-					disabled={ ! isSaveable }
+					disabled={ ! isEnabled }
 				>
 					{ __( 'Preview' ) }
 					{ downArrow }

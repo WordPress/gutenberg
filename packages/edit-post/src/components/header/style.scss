@@ -70,7 +70,7 @@
 	.editor-post-saved-state,
 	.components-button.editor-post-switch-to-draft,
 	.components-button.editor-post-preview,
-	.components-button.editor-post-preview__dropdown,
+	.components-button.block-editor-post-preview__dropdown,
 	.components-button.editor-post-publish-button,
 	.components-button.editor-post-publish-panel__toggle {
 		padding: 0 6px;
@@ -99,5 +99,11 @@
 
 	svg {
 		margin-right: $grid-unit-10;
+	}
+}
+
+.edit-post-post-preview-dropdown {
+	.components-popover__content {
+		padding-bottom: 0;
 	}
 }

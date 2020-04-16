@@ -82,7 +82,10 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions isSaveable={ isPostSaveable }>
+				<PreviewOptions
+					isEnabled={ isPostSaveable }
+					className="edit-post-post-preview-dropdown"
+				>
 					<MenuGroup>
 						<div className="edit-post-header-preview__grouping-external">
 							<PostPreviewButton
