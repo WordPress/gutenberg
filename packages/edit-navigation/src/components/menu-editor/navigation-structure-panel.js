@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 
 export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 	return (
-		<Panel>
+		<Panel className="edit-navigation-menu-editor__navigation-structure-panel">
 			<PanelBody
 				title={ __( 'Navigation structure' ) }
 				initialOpen={ initialOpen }

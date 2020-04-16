@@ -47,3 +47,19 @@
 		}
 	}
 }
+
+.edit-navigation-menu-editor__navigation-structure-panel {
+	// IE11 requires the column to be explicity declared.
+	grid-column: 1;
+
+	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
+	-ms-grid-row-align: start;
+}
+
+.edit-navigation-menu-editor__block-editor-panel {
+	// IE11 requires the column to be explicity declared.
+	grid-column: 2;
+
+	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
+	-ms-grid-row-align: start;
+}
