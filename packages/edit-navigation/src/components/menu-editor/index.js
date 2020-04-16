@@ -36,15 +36,11 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 			>
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
-				<div>
-					<NavigationStructurePanel
-						blocks={ blocks }
-						initialOpen={ isLargeViewport }
-					/>
-				</div>
-				<div>
-					<BlockEditorPanel saveBlocks={ saveBlocks } />
-				</div>
+				<NavigationStructurePanel
+					blocks={ blocks }
+					initialOpen={ isLargeViewport }
+				/>
+				<BlockEditorPanel saveBlocks={ saveBlocks } />
 			</BlockEditorProvider>
 		</div>
 	);
