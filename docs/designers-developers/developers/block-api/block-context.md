@@ -47,28 +47,30 @@ A block can inherit a context value from an ancestor provider by assigning a `co
 
 ## Using Block Context
 
-Once a block has defined the context it seeks to inherit, this can be accessed in the implementation of `edit` (JavaScript) and `render_callback` (PHP). It is provided as an object (JavaScript) or associative array (PHP) of the context values which have been defined for the block. Note that even if there is an ancestor which provides a context value, the value will only be made available if the block explicitly defines a desire to inherit that value.
+Once a block has defined the context it seeks to inherit, this can be accessed in the implementation of `edit` (JavaScript) and `render_callback` (PHP). It is provided as an object (JavaScript) or associative array (PHP) of the context values which have been defined for the block. Note that a context value will only be made available if the block explicitly defines a desire to inherit that value.
 
 ### JavaScript
 
-`record-title/edit.js`
+`record-title/index.js`
 
 ```js
-function edit( { context } ) {
-	return 'The current record ID is: ' + context[ 'my-plugin/recordId' ];
-}
+registerBlockType( 'my-plugin/record-title', {
+	edit( { context } ) {
+		return 'The current record ID is: ' + context[ 'my-plugin/recordId' ];
+	},
+} );
 ```
 
 ### PHP
 
-Note that in PHP, block context is accessed using the `$block` global which is assigned at the time a block is registered. This is unlike block attributes or block content, which are provided as arguments to the `render_callback` function. At some point in the future, block context may be integrated into the function arguments signature of `render_callback`, or an alternative block settings configuration may enable a render callback to receive the full block array as its argument.
+A block's context values are available from the `context` property of the `$block` argument passed to the `render_callback` function.
 
 `record-title/index.php`
 
-```js
-function my_plugin_render_block_record_title() {
-	global $block;
-
-	return 'The current record ID is: ' . $block['context']['my-plugin/recordId'];
-}
+```php
+register_block_type( 'my-plugin/record-title', [
+	'render_callback' => function( $block ) {
+		return 'The current record ID is: ' . $block->context['my-plugin/recordId'];
+	},
+] );
 ```
