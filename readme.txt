@@ -52,4 +52,4 @@ The four phases of the project are Editing, Customization, Collaboration, and Mu
 
 == Changelog ==
 
-To read the changelog for Gutenberg 7.8.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.8.1">release page</a>.
+To read the changelog for Gutenberg 7.9.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v7.9.1">release page</a>.

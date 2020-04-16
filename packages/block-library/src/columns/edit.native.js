@@ -8,7 +8,7 @@ import { dropRight, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, StepperControl } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -116,7 +116,7 @@ function ColumnsEditContainer( {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Columns Settings' ) }>
-					<StepperControl
+					<RangeControl
 						label={ __( 'Number of columns' ) }
 						icon="columns"
 						value={ columnCount }
@@ -126,6 +126,7 @@ function ColumnsEditContainer( {
 						min={ MIN_COLUMNS_NUMBER }
 						max={ columnCount + 1 }
 						separatorType={ 'none' }
+						type="stepper"
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -143,7 +144,6 @@ function ColumnsEditContainer( {
 						columnsInRow > 1 ? 'horizontal' : undefined
 					}
 					horizontal={ true }
-					scrollEnabled={ false }
 					allowedBlocks={ ALLOWED_BLOCKS }
 					contentResizeMode="stretch"
 					onAddBlock={ onAddNextColumn }

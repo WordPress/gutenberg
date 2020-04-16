@@ -54,7 +54,7 @@
 	] },
 	{ "docs/designers-developers/designers/README.md": [
 		{ "docs/designers-developers/designers/block-design.md": [] },
-		{ "docs/designers-developers/designers/design-patterns.md": [] },
+		{ "docs/designers-developers/designers/user-interface.md": [] },
 		{ "docs/designers-developers/designers/design-resources.md": [] },
 		{ "docs/designers-developers/designers/animation.md": [] }
 	] },
@@ -77,6 +77,7 @@
 		{ "docs/contributors/document.md": [
 			{ "docs/contributors/copy-guide.md": [] }
 		] },
+		{ "docs/contributors/triage.md": [] },
 		{ "docs/contributors/localizing.md": [] },
 		{ "docs/contributors/repository-management.md": [] }
 	] },

@@ -64,7 +64,6 @@ function ColumnEdit( {
 				] }
 			>
 				<InnerBlocks
-					scrollEnabled={ false }
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
