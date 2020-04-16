@@ -7985,8 +7985,8 @@ exports[`Storyshots Components/SelectControl Default 1`] = `
 
 exports[`Storyshots Components/Snackbar Default 1`] = `
 <div
+  aria-label="Dismiss this notice"
   className="components-snackbar"
-  label="Dismiss this notice"
   onClick={[Function]}
   onKeyPress={[Function]}
   role="button"
@@ -8002,8 +8002,8 @@ exports[`Storyshots Components/Snackbar Default 1`] = `
 
 exports[`Storyshots Components/Snackbar With Actions 1`] = `
 <div
+  aria-label="Dismiss this notice"
   className="components-snackbar"
-  label="Dismiss this notice"
   onClick={[Function]}
   onKeyPress={[Function]}
   role="button"
