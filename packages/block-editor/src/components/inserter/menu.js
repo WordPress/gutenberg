@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { includes, pick } from 'lodash';
 
 /**
@@ -31,6 +32,7 @@ function InserterMenu( {
 	__experimentalSelectBlockOnInsert,
 	onSelect,
 	showInserterHelpPanel,
+	className,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -177,7 +179,7 @@ function InserterMenu( {
 	/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 	return (
 		<div
-			className="block-editor-inserter__menu"
+			className={ classnames( className, 'block-editor-inserter__menu' ) }
 			onKeyPress={ stopKeyPropagation }
 			onKeyDown={ onKeyDown }
 		>

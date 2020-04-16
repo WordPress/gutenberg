@@ -24,6 +24,7 @@ import {
 	ScrollLock,
 	Popover,
 	FocusReturnProvider,
+	Animate,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -153,7 +154,19 @@ function Layout() {
 					}
 					leftSidebar={
 						mode === 'visual' &&
-						isInserterOpen && <Library showInserterHelpPanel />
+						isInserterOpen && (
+							<Animate
+								type="slide-in"
+								options={ { origin: 'right' } }
+							>
+								{ ( { className: animationClassName } ) => (
+									<Library
+										className={ animationClassName }
+										showInserterHelpPanel
+									/>
+								) }
+							</Animate>
+						)
 					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (
