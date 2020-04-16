@@ -81,7 +81,8 @@
 }
 
 .wp-block-navigation-link__label {
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: break-word;
 }
 
 .wp-block-navigation-link__submenu-icon {
