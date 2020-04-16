@@ -230,6 +230,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
         self.delegate?.gutenbergDidLogUserEvent(logEvent)
     }
+
+    @objc
+    func addMention(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+        print("Add Mention")
+        resolver(["SergioEstevao"])
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
