@@ -10,7 +10,7 @@ import { Component } from '@wordpress/element';
 import {
 	ToolbarButton,
 	Toolbar,
-	WrapperStyleContext,
+	GlobalStylesContext,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -57,9 +57,9 @@ class BlockListBlock extends Component {
 
 	getBlockForType() {
 		return (
-			<WrapperStyleContext.Consumer>
+			<GlobalStylesContext.Consumer>
 				{ ( globalStyle ) => (
-					<WrapperStyleContext.Provider
+					<GlobalStylesContext.Provider
 						value={ {
 							...globalStyle,
 							...( this.props.wrapperProps || {} ).style,
@@ -82,9 +82,9 @@ class BlockListBlock extends Component {
 							clientId={ this.props.clientId }
 							contentStyle={ this.props.contentStyle }
 						/>
-					</WrapperStyleContext.Provider>
+					</GlobalStylesContext.Provider>
 				) }
-			</WrapperStyleContext.Consumer>
+			</GlobalStylesContext.Consumer>
 		);
 	}
 
