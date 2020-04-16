@@ -40,6 +40,7 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 
 	return (
 		<Panel
+			className="edit-navigation-menu-editor__block-editor-panel"
 			header={
 				<Button isPrimary onClick={ saveBlocks }>
 					{ __( 'Save navigation' ) }
