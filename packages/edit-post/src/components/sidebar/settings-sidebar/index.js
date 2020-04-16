@@ -40,6 +40,7 @@ const SettingsSidebar = () => {
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
 			headerClassName="edit-post-sidebar__panel-tabs"
+			isPinnable={ false }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>
