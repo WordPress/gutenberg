@@ -13,7 +13,7 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +35,15 @@ export const Edit = ( props ) => {
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
 
+	// Assign context values using the block type's declared context needs.
+	const context = useMemo(
+		() =>
+			blockType && blockType.context
+				? pick( blockContext, blockType.context )
+				: DEFAULT_BLOCK_CONTEXT,
+		[ blockType, blockContext ]
+	);
+
 	if ( ! blockType ) {
 		return null;
 	}
@@ -50,7 +59,7 @@ export const Edit = ( props ) => {
 	);
 
 	if ( lightBlockWrapper ) {
-		return <Component { ...props } />;
+		return <Component { ...props } context={ context } />;
 	}
 
 	// Generate a class name for the block's editable form
@@ -58,11 +67,6 @@ export const Edit = ( props ) => {
 		? getBlockDefaultClassName( name )
 		: null;
 	const className = classnames( generatedClassName, attributes.className );
-
-	// Assign context values using the block type's declared context needs.
-	const context = blockType.context
-		? pick( blockContext, blockType.context )
-		: DEFAULT_BLOCK_CONTEXT;
 
 	return (
 		<Component { ...props } context={ context } className={ className } />
