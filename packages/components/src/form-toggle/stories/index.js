@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import FormToggle from '../';
 
-export default { title: Components/'FormToggle', component: FormToggle };
+export default { title: Components / 'FormToggle', component: FormToggle };
 
 const FormToggleWithState = ( { checked, ...props } ) => {
 	const [ isChecked, setChecked ] = useState( checked );
@@ -16,17 +16,13 @@ const FormToggleWithState = ( { checked, ...props } ) => {
 		<FormToggle
 			{ ...props }
 			checked={ isChecked }
-			onChange={
-				() => {
-					setChecked( ! isChecked );
-				}
-			}
+			onChange={ () => {
+				setChecked( ! isChecked );
+			} }
 		/>
 	);
 };
 
 export const _default = () => {
-	return <FormToggleWithState
-		checked
-	/>;
+	return <FormToggleWithState checked />;
 };
