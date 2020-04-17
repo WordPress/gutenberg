@@ -23,9 +23,6 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	BottomSheet,
-	BottomSheetConsumer,
-	ColorControl,
-	ColorSettings,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -62,9 +59,6 @@ class ButtonEdit extends Component {
 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.setBackgroundColor = this.setBackgroundColor.bind( this );
-		this.setTextColor = this.setTextColor.bind( this );
-		this.setColor = this.setColor.bind( this );
 
 		// `isEditingURL` property is used to prevent from automatically pasting
 		// URL from clipboard while trying to clear `Button URL` field and then
@@ -322,36 +316,8 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	setBackgroundColor( color ) {
-		const { setGradient } = this.props;
-		setGradient( '' );
-		this.setColor( 'background', color );
-	}
-
-	setTextColor( color ) {
-		this.setColor( 'text', color );
-	}
-
-	setColor( attributeName, color ) {
-		const { setAttributes, attributes } = this.props;
-		const { style } = attributes;
-
-		setAttributes( {
-			style: {
-				...style,
-				color: { ...style?.color, [ attributeName ]: color },
-			},
-		} );
-	}
-
 	render() {
-		const {
-			attributes,
-			isSelected,
-			clientId,
-			onReplace,
-			setGradient,
-		} = this.props;
+		const { attributes, isSelected, clientId, onReplace } = this.props;
 		const {
 			placeholder,
 			text,
@@ -424,7 +390,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: this.getTextColor(),
+							color: textColor,
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -441,7 +407,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ this.getTextColor() }
+						selectionColor={ textColor }
 						onReplace={ onReplace }
 						onRemove={ () => onReplace( [] ) }
 					/>
@@ -475,120 +441,19 @@ class ButtonEdit extends Component {
 				</BottomSheet>
 
 				<InspectorControls>
-					<BottomSheetConsumer>
-						{ ( {
-							isBottomSheetScrolling,
-							shouldEnableBottomSheetScroll,
-							shouldSetBottomSheetMaxHeight,
-							onCloseBottomSheet,
-							onHardwareButtonPress,
-							onReplaceSubsheet,
-							stack,
-						} ) => {
-							const currentScreen = stack[ stack.length - 1 ];
-
-							return (
-								<>
-									{ currentScreen === 'Settings' && (
-										<View>
-											<PanelBody
-												title={ __(
-													'Border Settings'
-												) }
-											>
-												<RangeControl
-													label={ __(
-														'Border Radius'
-													) }
-													minimumValue={
-														MIN_BORDER_RADIUS_VALUE
-													}
-													maximumValue={
-														MAX_BORDER_RADIUS_VALUE
-													}
-													value={ borderRadiusValue }
-													onChange={
-														this
-															.onChangeBorderRadius
-													}
-													separatorType="none"
-												/>
-											</PanelBody>
-											<PanelBody
-												title={ __( 'Color Settings' ) }
-											>
-												<ColorControl
-													onPress={ () => {
-														onReplaceSubsheet(
-															'Background'
-														);
-													} }
-													label={ __( 'Background' ) }
-													color={ backgroundColor }
-													separatorType="fullWidth"
-												/>
-												<ColorControl
-													onPress={ () => {
-														onReplaceSubsheet(
-															'Text'
-														);
-													} }
-													label={ __( 'Text' ) }
-													color={ textColor }
-													separatorType="none"
-												/>
-											</PanelBody>
-											<PanelBody
-												title={ __( 'Link Settings' ) }
-											>
-												{ this.getLinkSettings(
-													url,
-													rel,
-													linkTarget,
-													true
-												) }
-											</PanelBody>
-										</View>
-									) }
-									{ currentScreen !== 'Settings' && (
-										<ColorSettings
-											stack={ stack }
-											onReplaceSubsheet={ (
-												destination
-											) =>
-												onReplaceSubsheet( destination )
-											}
-											backgroundColor={ backgroundColor }
-											textColor={ textColor }
-											setTextColor={ this.setTextColor }
-											setBackgroundColor={
-												this.setBackgroundColor
-											}
-											setGradient={ setGradient }
-											shouldEnableBottomSheetScroll={
-												shouldEnableBottomSheetScroll
-											}
-											isBottomSheetScrolling={
-												isBottomSheetScrolling
-											}
-											shouldSetBottomSheetMaxHeight={
-												shouldSetBottomSheetMaxHeight
-											}
-											onCloseBottomSheet={
-												onCloseBottomSheet
-											}
-											onHardwareButtonPress={
-												onHardwareButtonPress
-											}
-											defaultSettings={
-												SETTINGS_DEFAULTS
-											}
-										/>
-									) }
-								</>
-							);
-						} }
-					</BottomSheetConsumer>
+					<PanelBody title={ __( 'Border Settings' ) }>
+						<RangeControl
+							label={ __( 'Border Radius' ) }
+							minimumValue={ MIN_BORDER_RADIUS_VALUE }
+							maximumValue={ MAX_BORDER_RADIUS_VALUE }
+							value={ borderRadiusValue }
+							onChange={ this.onChangeBorderRadius }
+							separatorType="none"
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Link Settings' ) }>
+						{ this.getLinkSettings( url, rel, linkTarget, true ) }
+					</PanelBody>
 				</InspectorControls>
 			</View>
 		);

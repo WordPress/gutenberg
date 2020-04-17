@@ -46,7 +46,8 @@ export const { Provider: BottomSheetProvider, Consumer } = createContext( {
 	onCloseBottomSheet: () => {},
 	onHardwareButtonPress: () => {},
 	onReplaceSubsheet: () => {},
-	stack: [],
+	extraProps: {},
+	currentScreen: undefined,
 } );
 
 // It's needed to set the following flags via UIManager
@@ -88,7 +89,8 @@ class BottomSheet extends Component {
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
 			setMaxHeight: true,
-			stack: [ 'Settings' ],
+			stack: [],
+			extraProps: {},
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -156,7 +158,7 @@ class BottomSheet extends Component {
 		const { isVisible } = this.props;
 
 		if ( ! prevProps.isVisible && isVisible ) {
-			this.setState( { stack: [ 'Settings' ] } );
+			this.setState( { stack: [] } );
 		}
 	}
 
@@ -262,7 +264,7 @@ class BottomSheet extends Component {
 		return onClose();
 	}
 
-	onReplaceSubsheet( destination, callback ) {
+	onReplaceSubsheet( destination, extraProps, callback ) {
 		const { stack } = this.state;
 
 		LayoutAnimation.configureNext(
@@ -276,9 +278,11 @@ class BottomSheet extends Component {
 		const containedInStack = stack.includes( destination );
 		const nextStack = [ ...stack, destination ];
 		const previousStack = stack.slice( 0, -1 );
-
 		this.setState(
-			{ stack: containedInStack ? previousStack : nextStack },
+			{
+				stack: containedInStack ? previousStack : nextStack,
+				extraProps: extraProps || {},
+			},
 			() => {
 				if ( callback ) {
 					callback();
@@ -411,7 +415,10 @@ class BottomSheet extends Component {
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
 								onReplaceSubsheet: this.onReplaceSubsheet,
-								stack: this.state.stack,
+								extraProps: this.state.extraProps,
+								currentScreen: this.state.stack[
+									Math.max( this.state.stack.length - 1, 0 )
+								],
 							} }
 						>
 							<TouchableHighlight accessible={ false }>

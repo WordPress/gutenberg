@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	ColorSettings,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -24,7 +28,22 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<InspectorControls.Slot />
+			<BottomSheetConsumer>
+				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
+					switch ( currentScreen ) {
+						case 'Color':
+							return (
+								<ColorSettings
+									{ ...bottomSheetProps }
+									{ ...extraProps }
+								/>
+							);
+						case 'Settings':
+						default:
+							return <InspectorControls.Slot />;
+					}
+				} }
+			</BottomSheetConsumer>
 		</BottomSheet>
 	);
 }
