@@ -1,23 +1,77 @@
 /**
+ * External dependencies
+ */
+import { concat } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
+import { isURL } from '@wordpress/url';
+import { __unstableStripHTML } from '@wordpress/dom';
 
-const transforms = {
-	from: [
+/**
+ * Internal dependencies
+ */
+import { getEmbedBlockSettings } from './settings';
+import { matchesPatterns } from './util';
+
+/**
+ * Generate "from" transform for embed with eligibility check.
+ *
+ * @param  {Object} embedDefinition Embed definition.
+ * @return {Array}                  "from" transform which can convert
+ *                                  a paragraph block into a valid embed.
+ */
+const getTransformsFrom = ( embedDefinition ) => {
+	return [
 		{
-			type: 'raw',
-			isMatch: ( node ) =>
-				node.nodeName === 'P' &&
-				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
-			transform: ( node ) => {
-				return createBlock( 'core/embed', {
-					url: node.textContent.trim(),
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: ( { content } ) =>
+				isURL( __unstableStripHTML( content ).trim() ) &&
+				embedDefinition?.patterns &&
+				matchesPatterns(
+					__unstableStripHTML( content ).trim(),
+					embedDefinition?.patterns
+				),
+			transform: ( { content } ) => {
+				return createBlock( embedDefinition.name, {
+					url: __unstableStripHTML( content ).trim(),
 				} );
 			},
 		},
-	],
+	];
+};
+
+/**
+ * Merge common transforms with the embed specific transforms.
+ *
+ * @param  {Object} embedDefinition Embed definition.
+ * @return {Object}                 Updated Embed definition with all the transforms together.
+ */
+export const _mergeTransforms = ( embedDefinition ) => {
+	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
+	return {
+		...embedDefinition,
+		settings: {
+			...embedSettings,
+			transforms: {
+				from: concat(
+					getTransformsFrom( embedDefinition ),
+					embedSettings?.transforms?.from ?? []
+				).filter( Boolean ),
+				to: concat(
+					transforms?.to ?? [],
+					embedSettings?.transforms?.to ?? []
+				).filter( Boolean ),
+			},
+		},
+	};
+};
+
+const transforms = {
 	to: [
 		{
 			type: 'block',

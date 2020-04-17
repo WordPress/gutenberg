@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { concat } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { common as commonEmbeds, others as otherEmbeds } from './core-embeds';
 import { embedContentIcon } from './icons';
 import { getEmbedBlockSettings } from './settings';
-import transforms from './transforms';
+import transforms, { _mergeTransforms } from './transforms';
 
 /**
  * WordPress dependencies
@@ -29,42 +24,6 @@ export const settings = getEmbedBlockSettings( {
 	transforms,
 } );
 
-export const common = commonEmbeds.map( ( embedDefinition ) => {
-	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
-	return {
-		...embedDefinition,
-		settings: {
-			...embedSettings,
-			transforms: {
-				from: concat(
-					transforms?.from ?? [],
-					embedSettings?.transforms?.from ?? []
-				).filter( Boolean ),
-				to: concat(
-					transforms?.to ?? [],
-					embedSettings?.transforms?.to ?? []
-				).filter( Boolean ),
-			},
-		},
-	};
-} );
+export const common = commonEmbeds.map( _mergeTransforms );
 
-export const others = otherEmbeds.map( ( embedDefinition ) => {
-	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
-	return {
-		...embedDefinition,
-		settings: {
-			...embedSettings,
-			transforms: {
-				from: concat(
-					transforms?.from ?? [],
-					embedSettings?.transforms?.from ?? []
-				).filter( Boolean ),
-				to: concat(
-					transforms?.to ?? [],
-					embedSettings?.transforms?.to ?? []
-				).filter( Boolean ),
-			},
-		},
-	};
-} );
+export const others = otherEmbeds.map( _mergeTransforms );

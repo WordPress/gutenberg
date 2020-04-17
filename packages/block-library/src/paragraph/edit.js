@@ -168,7 +168,6 @@ function ParagraphBlock( {
 					placeholder ||
 					__( 'Start writing or type / to choose a block' )
 				}
-				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>
 		</>
