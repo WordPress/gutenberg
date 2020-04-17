@@ -3,13 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const formatListNumbered = (
+const formatListNumberedRTL = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path
-			d="M11.1 15.8H20v-1.5h-8.9v1.5zM4 7.2v1.5h16V7.2H4zm.2 6.8l.8-.3V17h1v-4.7l-2.2.7.4 1z"
-			transform="scale(-1,1) translate(-24,0)"
-		/>
+		<Path d="M20 8.75H4V7.25H20V8.75ZM12.8889 15.75H4V14.25H12.8889V15.75ZM20 13V12.3063L19.3419 12.5257L17.8419 13.0257L18.1581 13.9743L19 13.6937V17H20V13Z" />
 	</SVG>
 );
 
-export default formatListNumbered;
+export default formatListNumberedRTL;

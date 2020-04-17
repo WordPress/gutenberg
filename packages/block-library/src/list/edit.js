@@ -25,7 +25,9 @@ import {
 	formatListNumbered,
 	formatListNumberedRTL,
 	formatIndent,
+	formatIndentRTL,
 	formatOutdent,
+	formatOutdentRTL,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
@@ -125,7 +127,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: isRTL ? formatIndent : formatOutdent,
+							icon: isRTL ? formatOutdentRTL : formatOutdent,
 							title: __( 'Outdent list item' ),
 							shortcut: _x( 'Backspace', 'keyboard key' ),
 							isDisabled: ! canOutdentListItems( value ),
@@ -135,7 +137,7 @@ export default function ListEdit( {
 							},
 						},
 						{
-							icon: isRTL ? formatOutdent : formatIndent,
+							icon: isRTL ? formatIndentRTL : formatIndent,
 							title: __( 'Indent list item' ),
 							shortcut: _x( 'Space', 'keyboard key' ),
 							isDisabled: ! canIndentListItems( value ),
