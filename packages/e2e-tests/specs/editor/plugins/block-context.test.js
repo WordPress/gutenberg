@@ -89,7 +89,7 @@ describe( 'Block context', () => {
 		);
 		await editorPage.keyboard.press( 'ArrowRight' );
 		await editorPage.keyboard.type( '123' );
-		await editorPage.waitForSelector( '.editor-post-save-draft' ); // TODO: Why is Save not available immediately?
+		await editorPage.waitForSelector( '.editor-post-save-draft' ); // Not entirely clear why it's asynchronous, but likely React scheduling prioritizing keyboard event and deferring the UI update.
 		await saveDraft();
 
 		// Check non-default context values are populated.
