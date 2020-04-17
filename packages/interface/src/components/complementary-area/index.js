@@ -67,7 +67,7 @@ function ComplementaryArea( {
 	const { pinItem, unpinItem } = useDispatch( 'core/interface' );
 	return (
 		<>
-			{ isPinned && (
+			{ isPinned && isPinnable && (
 				<PinnedItems scope={ scope }>
 					<Button
 						icon={ icon }
