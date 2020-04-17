@@ -206,6 +206,10 @@ function traverseDepTree( deps ) {
 					`${ ERROR } Unable to locate path for ${ dep.name }@${ dep.version }. `
 				);
 			}
+		} else if ( dep.missing ) {
+			process.stdout.write(
+				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
+			);
 		} else {
 			checkDepLicense( dep.path );
 		}
