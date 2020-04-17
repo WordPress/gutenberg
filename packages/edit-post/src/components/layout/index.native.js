@@ -30,6 +30,7 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
+
 class Layout extends Component {
 	constructor() {
 		super( ...arguments );
