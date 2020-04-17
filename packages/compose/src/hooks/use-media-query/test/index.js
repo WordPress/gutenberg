@@ -67,6 +67,13 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	it( 'should correctly update the value when the query evaluation matches', async () => {
+		// first render
+		global.matchMedia.mockReturnValueOnce( {
+			addListener,
+			removeListener,
+			matches: true,
+		} );
+		// the query within useEffect
 		global.matchMedia.mockReturnValueOnce( {
 			addListener,
 			removeListener,
