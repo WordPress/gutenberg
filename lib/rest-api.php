@@ -57,11 +57,10 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  *
  * @todo Remove once https://core.trac.wordpress.org/ticket/49906 is fixed.
  * @see https://github.com/WordPress/wordpress-develop/pull/222
- *
  */
 function gutenberg_filter_rest_prepare_theme( $response, $theme, $data ) {
-	$data = $response->get_data();
-	$field_mappings    = array(
+	$data           = $response->get_data();
+	$field_mappings = array(
 		'author'      => 'Author',
 		'author_name' => 'Author Name',
 		'author_uri'  => 'Author URI',
