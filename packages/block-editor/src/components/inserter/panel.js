@@ -5,7 +5,7 @@ import { Icon } from '@wordpress/components';
 
 function InserterPanel( { title, icon, children } ) {
 	return (
-		<div>
+		<>
 			<div className="block-editor-inserter__panel-header">
 				<span className="block-editor-inserter__panel-title">
 					{ title }
@@ -15,7 +15,7 @@ function InserterPanel( { title, icon, children } ) {
 			<div className="block-editor-inserter__panel-content">
 				{ children }
 			</div>
-		</div>
+		</>
 	);
 }
 
