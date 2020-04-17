@@ -169,6 +169,9 @@ function gutenberg_get_post_from_context() {
 	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 		return null;
 	}
+
+	_deprecated_function( __FUNCTION__, '8.1.0' );
+
 	if ( ! in_the_loop() ) {
 		rewind_posts();
 		the_post();
