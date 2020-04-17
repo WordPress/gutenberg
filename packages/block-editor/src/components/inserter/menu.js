@@ -189,10 +189,12 @@ function InserterMenu( {
 						tabs={ [
 							{
 								name: 'blocks',
+								/* translators: Blocks tab title in the block inserter. */
 								title: __( 'Blocks' ),
 							},
 							{
 								name: 'patterns',
+								/* translators: Patterns tab title in the block inserter. */
 								title: __( 'Patterns' ),
 							},
 						] }
