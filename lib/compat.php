@@ -52,7 +52,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = get_theme_support( 'disable-drop-cap' );
+	$settings['__experimentalDisableDropCap'] = false;
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
