@@ -24,7 +24,6 @@ import {
 	ScrollLock,
 	Popover,
 	FocusReturnProvider,
-	Animate,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -161,40 +160,26 @@ function Layout() {
 					leftSidebar={
 						mode === 'visual' &&
 						isInserterOpen && (
-							<Animate
-								type="slide-in"
-								options={ { origin: 'right' } }
-							>
-								{ ( { className: animationClassName } ) => (
-									<div
-										className={ classnames(
-											'edit-post-layout__inserter-panel',
-											animationClassName
-										) }
-									>
-										<div className="edit-post-layout__inserter-panel-header">
-											<Button
-												icon={ close }
-												onClick={ () =>
-													setIsInserterOpen( false )
-												}
-											/>
-										</div>
-										<div className="edit-post-layout__inserter-panel-content">
-											<Library
-												showInserterHelpPanel
-												onSelect={ () => {
-													if ( isMobileViewport ) {
-														setIsInserterOpen(
-															false
-														);
-													}
-												} }
-											/>
-										</div>
-									</div>
-								) }
-							</Animate>
+							<div className="edit-post-layout__inserter-panel">
+								<div className="edit-post-layout__inserter-panel-header">
+									<Button
+										icon={ close }
+										onClick={ () =>
+											setIsInserterOpen( false )
+										}
+									/>
+								</div>
+								<div className="edit-post-layout__inserter-panel-content">
+									<Library
+										showInserterHelpPanel
+										onSelect={ () => {
+											if ( isMobileViewport ) {
+												setIsInserterOpen( false );
+											}
+										} }
+									/>
+								</div>
+							</div>
 						)
 					}
 					sidebar={

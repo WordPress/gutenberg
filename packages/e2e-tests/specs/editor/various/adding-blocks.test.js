@@ -150,27 +150,27 @@ describe( 'adding blocks', () => {
 			'block-editor-inserter__search-input'
 		);
 
-		// Tab to the block search results
+		// Tab to the block list
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
-		// Expect the search results to be the active element.
+		// Expect the block list to be the active element.
 		activeElementClassList = await page.evaluate(
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'components-tab-panel__tab-content'
+			'block-editor-block-types-list__item'
 		);
 
 		// Try using the up arrow key
 		await page.keyboard.press( 'ArrowUp' );
 
-		// Expect the search results to still be the active element.
+		// Expect the block list to still be the active element.
 		activeElementClassList = await page.evaluate(
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'components-tab-panel__tab-content'
+			'block-editor-block-types-list__item'
 		);
 
 		// Press escape to close the block inserter.
