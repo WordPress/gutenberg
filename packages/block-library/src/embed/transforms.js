@@ -18,13 +18,44 @@ import { getEmbedBlockSettings } from './settings';
 import { matchesPatterns } from './util';
 
 /**
- * Generate "from" transform for embed with eligibility check.
+ * Default transforms for generic embeds.
+ */
+const transforms = {
+	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			isMatch: ( { content } ) =>
+				isURL( __unstableStripHTML( content ).trim() ),
+			transform: ( { content } ) => {
+				return createBlock( 'core/embed', {
+					url: __unstableStripHTML( content ).trim(),
+				} );
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { url, caption } ) => {
+				const link = <a href={ url }>{ caption || url }</a>;
+				return createBlock( 'core/paragraph', {
+					content: renderToString( link ),
+				} );
+			},
+		},
+	],
+};
+
+/**
+ * Generate "from" transform for common/other embeds with eligibility check.
  *
  * @param  {Object} embedDefinition Embed definition.
  * @return {Array}                  "from" transform which can convert
  *                                  a paragraph block into a valid embed.
  */
-const getTransformsFrom = ( embedDefinition ) => {
+const _getTransformsFrom = ( embedDefinition ) => {
 	return [
 		{
 			type: 'block',
@@ -46,7 +77,7 @@ const getTransformsFrom = ( embedDefinition ) => {
 };
 
 /**
- * Merge common transforms with the embed specific transforms.
+ * Merge default transforms with the embed (common/other) specific transforms.
  *
  * @param  {Object} embedDefinition Embed definition.
  * @return {Object}                 Updated Embed definition with all the transforms together.
@@ -59,7 +90,7 @@ export const _mergeTransforms = ( embedDefinition ) => {
 			...embedSettings,
 			transforms: {
 				from: concat(
-					getTransformsFrom( embedDefinition ),
+					_getTransformsFrom( embedDefinition ),
 					embedSettings?.transforms?.from ?? []
 				).filter( Boolean ),
 				to: concat(
@@ -69,21 +100,6 @@ export const _mergeTransforms = ( embedDefinition ) => {
 			},
 		},
 	};
-};
-
-const transforms = {
-	to: [
-		{
-			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			transform: ( { url, caption } ) => {
-				const link = <a href={ url }>{ caption || url }</a>;
-				return createBlock( 'core/paragraph', {
-					content: renderToString( link ),
-				} );
-			},
-		},
-	],
 };
 
 export default transforms;
