@@ -128,7 +128,7 @@ export class MediaPlaceholder extends Component {
 			// array with replacement newMedia values.
 
 			// Get a reference to the image array on the Gallery.
-			const currentMedia = this.props.value;
+			const currentMedia = this.props.value || [];
 
 			// Define an array to store urls from newMedia between subsequent function calls.
 			let lastMediaPassed = [];
@@ -140,7 +140,7 @@ export class MediaPlaceholder extends Component {
 					if ( item.id ) {
 						return ! lastMediaPassed.some(
 							// Soft equal since int can get turned to string in gallery.
-							( { id } ) => id == item.id
+							( { id } ) => Number( id ) === Number( item.id )
 						);
 					}
 					// Compare transient images via .includes since gallery may append extra info onto the url.
