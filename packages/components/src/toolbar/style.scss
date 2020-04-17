@@ -58,6 +58,10 @@
 		&.is-pressed {
 			background: transparent;
 
+			&:hover {
+				background: transparent;
+			}
+
 			&::before {
 				background: $dark-gray-primary;
 			}
