@@ -139,7 +139,7 @@ export class MediaPlaceholder extends Component {
 					// If Item has id, only remove it if lastMediaPassed has an item with that id.
 					if ( item.id ) {
 						return ! lastMediaPassed.some(
-							// Soft equal since int can get turned to string in gallery.
+							// Be sure to convert to number for comparison.
 							( { id } ) => Number( id ) === Number( item.id )
 						);
 					}
