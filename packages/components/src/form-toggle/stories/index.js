@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import FormToggle from '../';
 
-export default { title: 'Form Toggle', component: FormToggle };
+export default { title: Components/'FormToggle', component: FormToggle };
 
 const FormToggleWithState = ( { checked, ...props } ) => {
 	const [ isChecked, setChecked ] = useState( checked );
