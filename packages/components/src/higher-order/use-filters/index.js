@@ -5,7 +5,7 @@ import { useEffect, useCallback, useState } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 
 const useFilters = ( hookName, originalValue, ...args ) => {
-	const namespace = 'core/use-filter/' + hookName;
+	const namespace = `core/use-filter/${ hookName }`;
 
 	const [ filteredValue, setFilteredValue ] = useState(
 		applyFilters( hookName, originalValue, ...args )
