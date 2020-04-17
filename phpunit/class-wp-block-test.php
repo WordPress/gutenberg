@@ -186,6 +186,47 @@ class WP_Block_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_constructor_assigns_merged_context() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes'      => array(
+					'value' => array(
+						'type' => array( 'string', 'null' ),
+					),
+				),
+				'providesContext' => array(
+					'core/value' => 'value',
+				),
+				'context'         => array( 'core/value' ),
+			)
+		);
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:example {"value":"merged"} -->' .
+			'<!-- wp:example {"value":null} -->' .
+			'<!-- wp:example /-->' .
+			'<!-- /wp:example -->' .
+			'<!-- /wp:example -->'
+		);
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array( 'core/value' => 'original' );
+		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$this->assertEquals(
+			array( 'core/value' => 'original' ),
+			$block->context
+		);
+		$this->assertEquals(
+			array( 'core/value' => 'merged' ),
+			$block->inner_blocks[0]->context
+		);
+		$this->assertEquals(
+			array( 'core/value' => null ),
+			$block->inner_blocks[0]->inner_blocks[0]->context
+		);
+	}
+
 	function test_render_static_block_type_returns_own_content() {
 		$this->registry->register( 'core/static', array() );
 		$this->registry->register(
