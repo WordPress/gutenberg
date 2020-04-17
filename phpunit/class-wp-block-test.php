@@ -334,4 +334,37 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertSame( 'abc', $block->render() );
 	}
 
+	function test_array_access_attributes() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'value' => array(
+						'type' => 'string',
+					),
+				),
+			)
+		);
+		$parsed_block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array( 'value' => 'ok' ),
+		);
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$this->assertTrue( isset( $block['value'] ) );
+		$this->assertFalse( isset( $block['nonsense'] ) );
+		$this->assertEquals( 'ok', $block['value'] );
+
+		$block['value'] = 'changed';
+		$this->assertEquals( 'changed', $block['value'] );
+		$this->assertEquals( 'changed', $block->attributes['value'] );
+
+		unset( $block['value'] );
+		$this->assertFalse( isset( $block['value'] ) );
+
+		$block[] = 'invalid, but still supported';
+		$this->assertEquals( 'invalid, but still supported', $block[0] );
+	}
+
 }
