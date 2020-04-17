@@ -413,7 +413,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Records.
+-   `?Array`: Records.
 
 <a name="getLastEntitySaveError" href="#getLastEntitySaveError">#</a> **getLastEntitySaveError**
 
