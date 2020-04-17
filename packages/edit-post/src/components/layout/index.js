@@ -54,6 +54,10 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
+const interfaceLabels = {
+	leftSidebar: __( 'Block Library' ),
+};
+
 function Layout() {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -145,6 +149,7 @@ function Layout() {
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
+					labels={ interfaceLabels }
 					header={
 						<Header
 							isInserterOpen={ isInserterOpen }
