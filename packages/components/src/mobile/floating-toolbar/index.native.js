@@ -7,9 +7,10 @@ import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { createSlotFill, ToolbarButton, Toolbar } from '@wordpress/components';
+import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { Breadcrumb } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,10 +19,13 @@ import { __ } from '@wordpress/i18n';
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
 
-const { Fill, Slot } = createSlotFill( 'FloatingToolbar' );
-
-const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
-	return (
+const FloatingToolbar = ( {
+	clientId,
+	parentId,
+	showFloatingToolbar,
+	onNavigateUp,
+} ) =>
+	showFloatingToolbar && (
 		<TouchableWithoutFeedback accessible={ false }>
 			<View style={ styles.floatingToolbar }>
 				{ !! parentId && (
@@ -40,40 +44,38 @@ const FloatingToolbarContainer = ( { clientId, parentId, onNavigateUp } ) => {
 			</View>
 		</TouchableWithoutFeedback>
 	);
-};
 
-const FloatingToolbarFill = ( { showFloatingToolbar, ...props } ) => {
-	if ( showFloatingToolbar ) {
-		return (
-			<Fill>
-				<FloatingToolbarContainer { ...props } />
-			</Fill>
-		);
-	}
-	return null;
-};
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockHierarchyRootClientId,
+			getBlockRootClientId,
+			getBlockCount,
+		} = select( 'core/block-editor' );
 
-const FloatingToolbar = withSelect( ( select, { clientId } ) => {
-	const {
-		isBlockSelected,
-		getBlockHierarchyRootClientId,
-		getBlockRootClientId,
-		getBlockCount,
-	} = select( 'core/block-editor' );
+		const clientId = getSelectedBlockClientId();
 
-	const isSelected = isBlockSelected( clientId );
-	const rootBlockId = getBlockHierarchyRootClientId( clientId );
-	const parentId = getBlockRootClientId( clientId );
-	const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+		const isSelected = !! clientId;
+		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const parentId = getBlockRootClientId( clientId );
+		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
 
-	const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
-	return {
-		showFloatingToolbar,
-		parentId,
-	};
-} )( FloatingToolbarFill );
+		return {
+			clientId,
+			showFloatingToolbar,
+			parentId,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { selectBlock } = dispatch( 'core/block-editor' );
 
-FloatingToolbar.Slot = Slot;
-
-export default FloatingToolbar;
+		return {
+			onNavigateUp( clientId, initialPosition ) {
+				selectBlock( clientId, initialPosition );
+			},
+		};
+	} ),
+] )( FloatingToolbar );

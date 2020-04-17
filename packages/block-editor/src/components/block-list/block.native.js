@@ -13,7 +13,6 @@ import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { FloatingToolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -90,7 +89,6 @@ class BlockListBlock extends Component {
 			onDeleteBlock,
 			horizontalDirection,
 			isParentSelected,
-			onSelect,
 			getStylesFromColorScheme,
 			marginVertical,
 			marginHorizontal,
@@ -115,10 +113,6 @@ class BlockListBlock extends Component {
 					style={ { flex: 1 } }
 					accessibilityLabel={ accessibilityLabel }
 				>
-					<FloatingToolbar
-						clientId={ clientId }
-						onNavigateUp={ onSelect }
-					/>
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
