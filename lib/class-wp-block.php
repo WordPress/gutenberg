@@ -89,11 +89,11 @@ class WP_Block implements ArrayAccess {
 	 * property. Only values which are configured to consumed by the block via
 	 * its registered type will be assigned to the block's `context` property.
 	 *
-	 * @param array                  $block    Array of parsed block properties.
-	 * @param array                  $context  Optional array of ancestry context values.
-	 * @param WP_Block_Type_Registry $registry Optional block type registry.
+	 * @param array                  $block             Array of parsed block properties.
+	 * @param array                  $available_context Optional array of ancestry context values.
+	 * @param WP_Block_Type_Registry $registry          Optional block type registry.
 	 */
-	public function __construct( $block, $context = array(), $registry = null ) {
+	public function __construct( $block, $available_context = array(), $registry = null ) {
 		$this->name = $block['blockName'];
 
 		if ( is_null( $registry ) ) {
@@ -110,7 +110,7 @@ class WP_Block implements ArrayAccess {
 			$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
 		}
 
-		$this->available_context = $context;
+		$this->available_context = $available_context;
 
 		if ( ! empty( $this->block_type->context ) ) {
 			foreach ( $this->block_type->context as $context_name ) {
