@@ -125,6 +125,7 @@ class EditorProvider extends Component {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
 				'__experimentalDisableCustomLineHeight',
+				'__experimentalBlockPatterns',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,

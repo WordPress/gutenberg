@@ -31,7 +31,6 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 			aria-hidden
 			style={ {
 				height: contentHeight * scale + 2 * __experimentalPadding,
-				padding: __experimentalPadding,
 			} }
 		>
 			{ containerResizeListener }

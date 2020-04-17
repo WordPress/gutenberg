@@ -7,6 +7,7 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
@@ -43,6 +44,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
+		await openDocumentSettingsSidebar();
 		await page.focus(
 			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
 		);
@@ -73,6 +75,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
+		await openDocumentSettingsSidebar();
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
