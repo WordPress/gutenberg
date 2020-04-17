@@ -269,6 +269,10 @@
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 		}
+
+		&:hover:not(:disabled) {
+			background: $dark-gray-primary;
+		}
 	}
 
 	svg {
