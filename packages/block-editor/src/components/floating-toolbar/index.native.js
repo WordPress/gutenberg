@@ -8,7 +8,6 @@ import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
  * WordPress dependencies
  */
 import { ToolbarButton, Toolbar } from '@wordpress/components';
-import { Breadcrumb } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -18,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './styles.scss';
 import NavigateUpSVG from './nav-up-icon';
+import Breadcrumb from '../block-list/breadcrumb.native';
 
 const FloatingToolbar = ( {
 	clientId,
