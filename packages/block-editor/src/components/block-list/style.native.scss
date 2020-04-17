@@ -81,6 +81,10 @@
 	height: $mobile-block-toolbar-height;
 }
 
+.floatingToolbar {
+	height: $mobile-floating-toolbar-height + $mobile-floating-toolbar-margin;
+}
+
 .overflowVisible {
 	overflow: visible;
 }
