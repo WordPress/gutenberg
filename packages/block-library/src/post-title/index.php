@@ -8,14 +8,16 @@
 /**
  * Renders the `core/post-title` block on the server.
  *
+ * @param WP_Block $block The block instance.
+ *
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
-function render_block_core_post_title() {
-	$post = gutenberg_get_post_from_context();
-	if ( ! $post ) {
+function render_block_core_post_title( $block ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	return '<h1>' . get_the_title( $post ) . '</h1>';
+
+	return '<h1>' . get_the_title( $block->context['postId'] ) . '</h1>';
 }
 
 /**
