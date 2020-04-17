@@ -188,7 +188,7 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 
 	/** This filter is documented in src/wp-includes/blocks.php */
 	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
-	$context      = [ 'postId' => $post->ID ];
+	$context      = array( 'postId' => $post->ID );
 	$block        = new WP_Block( $parsed_block, $context );
 
 	/** This filter is documented in src/wp-includes/blocks.php */

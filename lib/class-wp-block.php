@@ -31,7 +31,7 @@ class WP_Block implements ArrayAccess {
 	 *
 	 * @var array
 	 */
-	public $context = [];
+	public $context = array();
 
 	/**
 	 * All available context of the current hierarchy.
@@ -46,14 +46,14 @@ class WP_Block implements ArrayAccess {
 	 *
 	 * @var array
 	 */
-	public $attributes = [];
+	public $attributes = array();
 
 	/**
 	 * List of inner blocks (of this same class)
 	 *
 	 * @var WP_Block[]
 	 */
-	public $inner_blocks = [];
+	public $inner_blocks = array();
 
 	/**
 	 * Resultant HTML from inside block comment delimiters after removing inner
@@ -76,7 +76,7 @@ class WP_Block implements ArrayAccess {
 	 *
 	 * @var array
 	 */
-	public $inner_content = [];
+	public $inner_content = array();
 
 	/**
 	 * Constructor.
@@ -93,7 +93,7 @@ class WP_Block implements ArrayAccess {
 	 * @param array                  $context  Optional array of ancestry context values.
 	 * @param WP_Block_Type_Registry $registry Optional block type registry.
 	 */
-	public function __construct( $block, $context = [], $registry = null ) {
+	public function __construct( $block, $context = array(), $registry = null ) {
 		$this->name = $block['blockName'];
 
 		if ( is_null( $registry ) ) {

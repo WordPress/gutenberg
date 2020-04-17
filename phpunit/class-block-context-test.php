@@ -12,7 +12,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	private $registered_block_names = [];
+	private $registered_block_names = array();
 
 	/**
 	 * Sets up each test method.
@@ -67,49 +67,49 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * its inner blocks.
 	 */
 	function test_provides_block_context() {
-		$provided_context = [];
+		$provided_context = array();
 
 		$this->register_block_type(
 			'gutenberg/test-context-provider',
-			[
-				'attributes'      => [
-					'contextWithAssigned'   => [
+			array(
+				'attributes'      => array(
+					'contextWithAssigned'   => array(
 						'type' => 'number',
-					],
-					'contextWithDefault'    => [
+					),
+					'contextWithDefault'    => array(
 						'type'    => 'number',
 						'default' => 0,
-					],
-					'contextWithoutDefault' => [
+					),
+					'contextWithoutDefault' => array(
 						'type' => 'number',
-					],
-					'contextNotRequested'   => [
+					),
+					'contextNotRequested'   => array(
 						'type' => 'number',
-					],
-				],
-				'providesContext' => [
+					),
+				),
+				'providesContext' => array(
 					'gutenberg/contextWithAssigned'   => 'contextWithAssigned',
 					'gutenberg/contextWithDefault'    => 'contextWithDefault',
 					'gutenberg/contextWithoutDefault' => 'contextWithoutDefault',
 					'gutenberg/contextNotRequested'   => 'contextNotRequested',
-				],
-			]
+				),
+			)
 		);
 
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
-			[
-				'context'         => [
+			array(
+				'context'         => array(
 					'gutenberg/contextWithDefault',
 					'gutenberg/contextWithAssigned',
 					'gutenberg/contextWithoutDefault',
-				],
+				),
 				'render_callback' => function( $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
 					return '';
 				},
-			]
+			)
 		);
 
 		$parsed_blocks = parse_blocks(
@@ -121,10 +121,10 @@ class Block_Context_Test extends WP_UnitTestCase {
 		render_block( $parsed_blocks[0] );
 
 		$this->assertEquals(
-			[
+			array(
 				'gutenberg/contextWithDefault'  => 0,
 				'gutenberg/contextWithAssigned' => 10,
-			],
+			),
 			$provided_context[0]
 		);
 	}
