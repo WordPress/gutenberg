@@ -200,10 +200,6 @@ function traverseDepTree( deps ) {
 				process.stdout.write(
 					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
 				);
-				console.log(
-					'::: traverseDepTree -> process.exitCode',
-					process.exitCode
-				);
 			} else {
 				process.exitCode = 1;
 				process.stdout.write(
