@@ -13,13 +13,16 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 			<BottomSheetConsumer>
 				{ ( { onReplaceSubsheet } ) =>
 					settings.map(
-						( {
-							onColorChange,
-							colorValue = '#ffffff',
-							onGradientChange,
-							gradientValue,
-							label,
-						} ) => (
+						(
+							{
+								onColorChange,
+								colorValue = '#ffffff',
+								onGradientChange,
+								gradientValue,
+								label,
+							},
+							index
+						) => (
 							<ColorControl
 								onPress={ () => {
 									onReplaceSubsheet( 'Color', {
@@ -33,6 +36,11 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 								key={ `color-setting-${ label }` }
 								label={ label }
 								color={ gradientValue || colorValue }
+								separatorType={
+									index !== settings.length - 1
+										? 'fullWidth'
+										: 'none'
+								}
 							/>
 						)
 					)
