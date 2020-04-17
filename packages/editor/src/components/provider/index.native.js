@@ -7,6 +7,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
+	subscribeReplaceBlock,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -79,6 +80,12 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
+		this.subscriptionParentReplaceBlock = subscribeReplaceBlock(
+			( payload ) => {
+				this.replaceBlockAction( payload.html, payload.clientId );
+			}
+		);
+
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
@@ -113,6 +120,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateHtml ) {
 			this.subscriptionParentUpdateHtml.remove();
+		}
+
+		if ( this.subscriptionParentReplaceBlock ) {
+			this.subscriptionParentReplaceBlock.remove();
 		}
 
 		if ( this.subscriptionParentMediaAppend ) {
@@ -162,6 +173,11 @@ class NativeEditorProvider extends Component {
 	updateHtmlAction( html ) {
 		const parsed = parse( html );
 		this.props.resetEditorBlocksWithoutUndoLevel( parsed );
+	}
+
+	replaceBlockAction( html, blockClientId ) {
+		const parsed = parse( html );
+		this.props.replaceBlock( blockClientId, parsed );
 	}
 
 	toggleMode() {
@@ -217,7 +233,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		const { clearSelectedBlock, insertBlock } = dispatch(
+		const { clearSelectedBlock, insertBlock, replaceBlock } = dispatch(
 			'core/block-editor'
 		);
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
@@ -239,6 +255,7 @@ export default compose( [
 			switchMode( mode ) {
 				switchEditorMode( mode );
 			},
+			replaceBlock,
 		};
 	} ),
 ] )( NativeEditorProvider );

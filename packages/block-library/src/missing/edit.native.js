@@ -71,7 +71,7 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	renderSheet( title ) {
-		const { getStylesFromColorScheme, attributes } = this.props;
+		const { getStylesFromColorScheme, attributes, clientId } = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
 			styles.infoTextDark
@@ -108,7 +108,8 @@ export class UnsupportedBlockEdit extends Component {
 						// A small delay will ensure that the controller has already been removed.
 						this.timeout = setTimeout( () => {
 							requestUnsupportedBlockFallback(
-								attributes.originalContent
+								attributes.originalContent,
+								clientId
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
