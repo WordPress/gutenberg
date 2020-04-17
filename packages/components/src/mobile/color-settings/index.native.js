@@ -38,23 +38,24 @@ function ColorSettings( {
 	const segments = [ 'Solid', 'Gradient' ];
 	const isGradient = backgroundColor.includes( 'linear-gradient' );
 	const selectedSegmentIndex = isGradient ? 1 : 0;
-	const currentScreen = stack[ stack.length - 1 ];
-	const previousScreen = stack[ stack.length - 2 ];
-
-	const isBackgroundScreen = currentScreen === 'Background';
-	const isBackgroundPrevScreen = previousScreen === 'Background';
-	const isCustomScreen = currentScreen === 'Custom';
 
 	const [ activeSegment, setActiveSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
 
+	const currentScreen = stack[ stack.length - 1 ];
+	const previousScreen = stack[ stack.length - 2 ];
+	const isBackgroundScreen = currentScreen === 'Background';
+	const isBackgroundPrevScreen = previousScreen === 'Background';
+	const isCustomScreen = currentScreen === 'Custom';
+
+	const currentSegment = isBackgroundScreen ? activeSegment : segments[ 0 ];
+	const isSolidSegment = activeSegment === 'Solid';
+
 	const activeColor =
 		isBackgroundScreen || isBackgroundPrevScreen
 			? backgroundColor
 			: textColor;
-	const currentSegment = isBackgroundScreen ? activeSegment : segments[ 0 ];
-	const isSolidSegment = activeSegment === 'Solid';
 
 	useEffect( () => {
 		onHardwareButtonPress( () =>

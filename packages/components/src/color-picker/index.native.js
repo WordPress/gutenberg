@@ -83,7 +83,7 @@ function ColorPicker( {
 		}
 		setColor( activeColor );
 		shouldSetBottomSheetMaxHeight( false );
-		onCloseBottomSheet( resetColors );
+		onCloseBottomSheet( () => setColor( savedColor ) );
 	}, [] );
 
 	function onHuePickerChange( { hue: h } ) {
@@ -95,22 +95,11 @@ function ColorPicker( {
 		setValue( v );
 	}
 
-	function resetColors() {
-		setColor( savedColor );
-	}
-
-	function onPressCancelButton() {
+	function onButtonPress( action ) {
 		onNavigationBack();
 		onCloseBottomSheet( null );
 		shouldSetBottomSheetMaxHeight( true );
-		resetColors();
-	}
-
-	function onPressApplyButton() {
-		onNavigationBack();
-		onCloseBottomSheet( null );
-		shouldSetBottomSheetMaxHeight( true );
-		setColor( currentColor );
+		setColor( action === 'apply' ? currentColor : savedColor );
 	}
 
 	return (
@@ -152,7 +141,7 @@ function ColorPicker( {
 			/>
 			<View style={ footerStyle }>
 				<TouchableWithoutFeedback
-					onPress={ onPressCancelButton }
+					onPress={ () => onButtonPress( 'cancel' ) }
 					hitSlop={ hitSlop }
 				>
 					<View>
@@ -173,7 +162,7 @@ function ColorPicker( {
 					{ currentColor.toUpperCase() }
 				</Text>
 				<TouchableWithoutFeedback
-					onPress={ onPressApplyButton }
+					onPress={ () => onButtonPress( 'apply' ) }
 					hitSlop={ hitSlop }
 				>
 					<View>
