@@ -60,7 +60,7 @@ const interfaceLabels = {
 function Layout() {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isLargeViewport = useViewportMatch( 'large', '>=' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
@@ -126,15 +126,15 @@ function Layout() {
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
-		if ( sidebarIsOpened && ! isHugeViewport ) {
+		if ( sidebarIsOpened && ! isLargeViewport ) {
 			setIsInserterOpen( false );
 		}
-	}, [ sidebarIsOpened, isHugeViewport ] );
+	}, [ sidebarIsOpened, isLargeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpen && ! isHugeViewport ) {
+		if ( isInserterOpen && ! isLargeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpen, isHugeViewport ] );
+	}, [ isInserterOpen, isLargeViewport ] );
 
 	return (
 		<>
