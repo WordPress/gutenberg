@@ -4,6 +4,7 @@
 import {
 	__experimentalBlockNavigationToolbar as BlockNavigationToolbar,
 	__experimentalBlockNavigationList as BlockNavigationList,
+	NavigableToolbar,
 } from '@wordpress/block-editor';
 import { Panel, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -24,7 +25,11 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 			>
 				{ !! blocks.length && (
 					<>
-						<BlockNavigationToolbar />
+						<NavigableToolbar
+							aria-label={ __( 'Navigation structure tools' ) }
+						>
+							<BlockNavigationToolbar />
+						</NavigableToolbar>
 						<BlockNavigationList
 							blocks={ blocks }
 							selectedBlockClientId={
