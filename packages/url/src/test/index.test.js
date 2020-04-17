@@ -666,7 +666,7 @@ describe( 'filterURLForDisplay', () => {
 
 describe( 'cleanForSlug', () => {
 	it( 'should return string prepared for use as url slug', () => {
-		expect( cleanForSlug( ' /Déjà_vu. ' ) ).toBe( 'deja-vu' );
+		expect( cleanForSlug( '/Is th@t Déjà_vu? ' ) ).toBe( 'is-tht-deja_vu' );
 	} );
 
 	it( 'should return an empty string for missing argument', () => {
