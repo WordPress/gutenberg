@@ -298,22 +298,38 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 		castArray( blocks ),
 		yield select( 'core/block-editor', 'getSettings' )
 	);
-	const rootClientId = yield select(
-		'core/block-editor',
-		'getBlockRootClientId',
-		first( clientIds )
-	);
-	// Replace is valid if the new blocks can be inserted in the root block.
-	for ( let index = 0; index < blocks.length; index++ ) {
-		const block = blocks[ index ];
-		const canInsertBlock = yield select(
+
+	let isReplacingReusableBlock;
+	if ( clientIds.length === 1 ) {
+		const blockName = yield select(
 			'core/block-editor',
-			'canInsertBlockType',
-			block.name,
-			rootClientId
+			'getBlockName',
+			first( clientIds )
 		);
-		if ( ! canInsertBlock ) {
-			return;
+		isReplacingReusableBlock = blockName === 'core/block';
+	}
+	// If the block being replaced is a reusable block assume we are in the presence of
+	// a convert to regular block operation. In that case, checking if the blocks can be inserted is not desirable.
+	// A single button can not be be inserted now (outside buttons), but in the past users could insert them
+	// so if they are used inside a reusable block it should still be possible to convert them to regular blocks.
+	if ( ! isReplacingReusableBlock ) {
+		const rootClientId = yield select(
+			'core/block-editor',
+			'getBlockRootClientId',
+			first( clientIds )
+		);
+		// Replace is valid if the new blocks can be inserted in the root block.
+		for ( let index = 0; index < blocks.length; index++ ) {
+			const block = blocks[ index ];
+			const canInsertBlock = yield select(
+				'core/block-editor',
+				'canInsertBlockType',
+				block.name,
+				rootClientId
+			);
+			if ( ! canInsertBlock ) {
+				return;
+			}
 		}
 	}
 	yield {
