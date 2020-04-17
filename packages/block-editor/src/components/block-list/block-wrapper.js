@@ -24,7 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../utils/dom';
-import useMovingAnimation from './moving-animation';
+import useMovingAnimation from '../use-moving-animation';
 import { Context, BlockNodes } from './root-container';
 import { BlockContext } from './block';
 import ELEMENTS from './block-elements';
