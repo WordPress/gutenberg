@@ -8,23 +8,25 @@
 /**
  * Renders the `core/post-comments-count` block on the server.
  *
- * @param array $attributes The block attributes.
- *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post comments count for the current post.
  */
-function render_block_core_post_comments_count( $attributes ) {
-	$post = gutenberg_get_post_from_context();
-	if ( ! $post ) {
+function render_block_core_post_comments_count( $attributes, $content, $block ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
+
 	$class = 'wp-block-post-comments-count';
 	if ( isset( $attributes['className'] ) ) {
 		$class .= ' ' . $attributes['className'];
 	}
+
 	return sprintf(
 		'<span class="%1$s">%2$s</span>',
 		esc_attr( $class ),
-		get_comments_number( $post )
+		get_comments_number( $block->context['postId'] )
 	);
 }
 

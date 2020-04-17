@@ -1,4 +1,5 @@
 {
 	"name": "core/post-comments-count",
-	"category": "layout"
+	"category": "layout",
+	"context": [ "postId" ]
 }
