@@ -210,7 +210,7 @@ class InnerBlocks extends Component {
 
 		// Wrap context provider if (and only if) block has context to provide.
 		const blockType = getBlockType( block.name );
-		if ( blockType?.providesContext ) {
+		if ( blockType && blockType.providesContext ) {
 			const context = getBlockContext( block.attributes, blockType );
 
 			blockList = (
