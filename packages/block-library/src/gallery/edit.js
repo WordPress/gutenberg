@@ -369,11 +369,10 @@ class GalleryEdit extends Component {
 		} = attributes;
 
 		const hasImages = !! images.length;
-		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImagesWithId }
+				addToGallery={ true }
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
