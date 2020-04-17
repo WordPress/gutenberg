@@ -134,6 +134,9 @@ class Layout extends Component {
 					) }
 				>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+					{ ! isHtmlView && Platform.OS === 'android' && (
+						<FloatingToolbar.Slot />
+					) }
 				</View>
 				<View
 					style={ {
@@ -152,9 +155,9 @@ class Layout extends Component {
 								visible={ isTemplatePickerVisible }
 							/>
 						) }
+						{ Platform.OS === 'ios' && <FloatingToolbar.Slot /> }
 						<Header />
 						<BottomSheetSettings />
-						<FloatingToolbar.Slot />
 					</KeyboardAvoidingView>
 				) }
 			</SafeAreaView>
