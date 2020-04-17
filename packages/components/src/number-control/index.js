@@ -153,7 +153,9 @@ export function NumberControl(
 
 	const handleOnChange = ( value, { event } ) => {
 		const parsedValue = parseFloat( value );
-		const nextValue = isNaN( parsedValue ) ? nextValue : parsedValue;
+		const nextValue = isNaN( parsedValue )
+			? nextValue
+			: parsedValue.toString();
 
 		onChange( nextValue, { event } );
 	};

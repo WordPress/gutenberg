@@ -86,7 +86,7 @@ describe( 'UnitControl', () => {
 				Simulate.change( input, { target: { value: 62 } } );
 			} );
 
-			expect( state ).toBe( 62 );
+			expect( state ).toBe( '62' );
 		} );
 
 		it( 'should increment value on UP press', () => {
