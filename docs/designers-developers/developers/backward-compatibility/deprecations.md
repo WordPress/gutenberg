@@ -241,11 +241,11 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://github.com/WordPress/gutenberg/blob/v3.0.0/editor/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](https://github.com/WordPress/gutenberg/blob/v2.8.0/components/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 
