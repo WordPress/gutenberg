@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	receiveUserQuery,
+	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
@@ -90,6 +91,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the current theme.
+ */
+export function* getCurrentTheme() {
+	const activeThemes = yield apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
+	yield receiveCurrentTheme( activeThemes[ 0 ] );
+}
 
 /**
  * Requests theme supports data from the index.
