@@ -3,6 +3,7 @@
  */
 const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
+const { castArray } = require( 'lodash' );
 
 /**
  * Promisified dependencies
@@ -100,8 +101,52 @@ async function configureWordPress( environment, config ) {
 		await dockerRun( command );
 	}
 
-	// Activate all plugins.
-	await dockerRun( 'wp plugin activate --all' );
+	// Get a list of plugins which should not be active on the instance.
+	const deactivatedPlugins = castArray( config.pluginSources ).filter(
+		( { isActive } ) => ! isActive
+	);
+
+	// Get the list of plugins whichh WP knows about (includes plugins inside directories).
+	const availablePlugins = JSON.parse(
+		( await dockerRun( 'wp plugin list --format=json' ) ).out
+	);
+
+	// Removes any installed plugin whose name begins with the basename of a plugin
+	// which should be deactivated. Since directory-mapped plugins begin with the
+	// directory basename (e.g. "my-plugins/single-plugin"), and since single plugin
+	// names are equal to a source basename, this lets us handle both the directory
+	// of plugins and single plugin cases.
+	const pluginsToActivate = availablePlugins
+		.filter(
+			( { name, status } ) =>
+				status === 'inactive' &&
+				! deactivatedPlugins.some( ( { basename } ) =>
+					name.startsWith( basename )
+				)
+		)
+		.map( ( { name } ) => name )
+		.join( ' ' );
+
+	// Activate inactive plugins which are not in our list of plugins which should be deactivated.
+	if ( pluginsToActivate.length ) {
+		await dockerRun( `wp plugin activate ${ pluginsToActivate }` );
+	}
+
+	// Deactivate active pulgins which are in our list of plugins which should be deactivated.
+	const pluginsToDeactivate = availablePlugins
+		.filter(
+			( { name, status } ) =>
+				status === 'active' &&
+				deactivatedPlugins.some( ( { basename } ) =>
+					name.startsWith( basename )
+				)
+		)
+		.map( ( { name } ) => name )
+		.join( ' ' );
+
+	if ( pluginsToDeactivate.length ) {
+		await dockerRun( `wp plugin deactivate ${ pluginsToDeactivate }` );
+	}
 
 	const getThemeToActivate = async () => {
 		// Use the first if a list of themes is passed.
