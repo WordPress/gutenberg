@@ -1,76 +1,82 @@
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from '../';
+import { getActiveStyles, removeStyle, addStyle } from '../';
 
-describe( 'getActiveStyle', () => {
-	it( 'Should return the undefined if no active style', () => {
+describe( 'getActiveStyles', () => {
+	it( 'Should return empty array if no active styles', () => {
 		const styles = [ { name: 'small' }, { name: 'big' } ];
 		const className = 'custom-className';
 
-		expect( getActiveStyle( styles, className ) ).toBeUndefined();
+		expect( getActiveStyles( styles, className ) ).toEqual( [] );
 	} );
 
 	it( 'Should return the default style if no active style', () => {
 		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
 		const className = 'custom-className';
 
-		expect( getActiveStyle( styles, className ).name ).toBe( 'big' );
+		expect( getActiveStyles( styles, className ) ).toEqual( [
+			{ name: 'big', isDefault: true },
+		] );
 	} );
 
-	it( 'Should return the active style', () => {
-		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
-		const className = 'this-is-custom is-style-small';
-
-		expect( getActiveStyle( styles, className ).name ).toBe( 'small' );
-	} );
-
-	it( 'Should return the first active style', () => {
+	it( 'Should return all active styles', () => {
 		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
 		const className = 'this-is-custom is-style-small is-style-big';
 
-		expect( getActiveStyle( styles, className ).name ).toBe( 'small' );
+		expect(
+			getActiveStyles( styles, className ).map( ( s ) => s.name )
+		).toEqual( [ 'small', 'big' ] );
 	} );
 } );
 
-describe( 'replaceActiveStyle', () => {
-	it( 'Should add the new style if no active style', () => {
-		const activeStyle = undefined;
-		const newStyle = { name: 'small' };
+describe( 'addStyle', () => {
+	it( 'Should add the new style if no active styles', () => {
+		const style = { name: 'small' };
 		const className = 'custom-class';
 
-		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
+		expect( addStyle( className, style ) ).toBe(
 			'custom-class is-style-small'
 		);
 	} );
 
-	it( 'Should add the new style if no active style (no existing class)', () => {
-		const activeStyle = undefined;
-		const newStyle = { name: 'small' };
+	it( 'Should add the new style if no active style or class', () => {
+		const style = { name: 'small' };
 		const className = '';
 
-		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
-			'is-style-small'
-		);
+		expect( addStyle( className, style ) ).toBe( 'is-style-small' );
 	} );
 
-	it( 'Should add the new style if no active style (unassigned default)', () => {
-		const activeStyle = { name: 'default' };
-		const newStyle = { name: 'small' };
-		const className = '';
+	it( 'Should not add the new style if it is already active', () => {
+		const style = { name: 'small' };
+		const className = 'custom-class is-style-small';
 
-		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
-			'is-style-small'
-		);
-	} );
-
-	it( 'Should replace the previous active style', () => {
-		const activeStyle = { name: 'large' };
-		const newStyle = { name: 'small' };
-		const className = 'custom-class is-style-large';
-
-		expect( replaceActiveStyle( className, activeStyle, newStyle ) ).toBe(
+		expect( addStyle( className, style ) ).toBe(
 			'custom-class is-style-small'
 		);
+	} );
+} );
+
+describe( 'removeStyle', () => {
+	it( 'Should remove the style if it is an active style', () => {
+		const style = { name: 'small' };
+		const className = 'custom-class is-style-small';
+
+		expect( removeStyle( className, style ) ).toBe( 'custom-class' );
+	} );
+
+	it( "Should not do anything if the style isn't active", () => {
+		const style = { name: 'small' };
+		const className = '';
+
+		expect( removeStyle( className, style ) ).toBe( '' );
+	} );
+
+	it( 'Should remove the style if it is defined multiple times', () => {
+		const style = { name: 'small' };
+		const className =
+			'is-style-small custom-class is-style-small is-style-small';
+
+		expect( removeStyle( className, style ) ).toBe( 'custom-class' );
 	} );
 } );
