@@ -218,27 +218,29 @@ You can customize the WordPress installation, plugins and themes that the develo
 | Field         | Type           | Default                                       | Description                                                                                                               |
 | ------------- | -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `"core"`      | `string\|null` | `null`      | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`   | `string[]\|string` | `[]`    | A list of plugins to install and activate in the environment. To mount a directory as `wp-content/plugins`, the value should be a path to the applicable directory instead of an array. |
-| `"mu-plugins"`    | `string[]\|string`| `[]` | A list of mu-plugins to install in the environment. To mount a directory as `wp-content/mu-plugins`, the value should be a path to the applicable directory instead of an array. |
-| `"themes"`    | `string[]\|string` | `[]`    | A list of themes to install in the environment. The first theme in the list will be activated. To mount a directory as `wp-content/themes`, the value should be a path to the applicable directory instead of an array. |
+| `"plugins"`   | `SingleSource\|SingleSource[]` | `[]`    | A list of plugins to install and activate in the environment. To mount a directory as `wp-content/plugins`, the value should be a path to the applicable directory instead of an array. |
+| `"mu-plugins"`    | `SingleSource\|SingleSource[]`| `[]` | A list of mu-plugins to install in the environment. To mount a directory as `wp-content/mu-plugins`, the value should be a path to the applicable directory instead of an array. |
+| `"themes"`    | `SingleSource\|SingleSource[]` | `[]`    | A list of themes to install in the environment. The first theme in the list will be activated. To mount a directory as `wp-content/themes`, the value should be a path to the applicable directory instead of an array. |
 | `"port"`      | `integer`      | `8888`      | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
 | `"testsPort"` | `integer`      | `8889`      | The port number to use for the tests instance.                                                                            |
 | `"config"`    | `Object`       | `{ "WP_DEBUG": true, "SCRIPT_DEBUG": true }"` | Mapping of wp-config.php constants to their desired values.                             |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
-Several types of strings can be passed into the `core`, `plugins`, `mu-plugins`, and `themes` fields:
+Adding plugins, themes and mu-pllugins to the WordPress instance is done with just one `SingleSource`, or an array of `SingleSource`. To clarify, the `SingleSource` type is `SourceString|{ source: SourceString, active?: boolean }`. For the most part, you can specify all your sources as strings, but the object format is useful for individual sources which should not be activated by default on the WordPress instance. **By default, every specified plugin is activated each time you run `wp-env start`.**
+
+The `SourceString` is just a plain string which supports different types of local and remote sources:
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
 | GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
-For plugins, mu-plugins, and themes, you may also specify a single directory which maps directly to the corresponding wp-content directory. To do so, specify a source string instead of an array of source strings. For example, if you set `{ "themes": "../my-themes" }`, then the `my-themes` directory will be mounted to the Docker instance directly as `wp-content/themes`. This might be useful if you are developing an entire directory of themes — you won't have to specify each theme one by one.
+For plugins, mu-plugins, and themes, you may also specify a single directory which maps directly to the corresponding wp-content directory. To do so, specify one `SingleSource` instead of an array of `SingleSource`. For example, if you set `{ "themes": "../my-themes" }`, then the `my-themes` directory will be mounted to the Docker instance directly as `wp-content/themes`. This might be useful if you are developing an entire directory of themes — you won't have to specify each theme one by one.
 
 ## .wp-env.override.json
 
@@ -316,5 +318,25 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 	"testsPort": 4012
 }
 ```
+
+#### Install plugins without activating them
+
+By default, `wp-env` activates all specified plugins on the WordPress instance. Override this with the `active` property for an individual source;
+
+```json
+{
+	"plugins": [
+		".",
+		{
+			"source": "path/to/test-plugins",
+			"active" false
+		}
+	],
+	"port": 4013,
+	"testsPort": 4012
+}
+```
+
+In this scenario, `"path/to/test-plulgins"` is a directory containing many plugins. Since they are test plugins, you don't want them to be active all the time, so you set `active` to false. `wp-env` is smart enough to determine which plugins are in this directory, and makes sure that they are not active when you start the WordPress instance.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
