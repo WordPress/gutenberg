@@ -1,5 +1,10 @@
 ## Master
 
+### New Feature
+
+-   The `.wp-env.json` coniguration file now accepts "mu-plugins" sources.
+-   Themes, plugins, and mu-plugins directories may now be mounted directly as the corresponding wp-content subdirectory.
+
 ## 1.1.0 (2020-04-01)
 
 ### New Feature

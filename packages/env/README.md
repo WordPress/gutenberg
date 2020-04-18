@@ -215,18 +215,19 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports five fields:
 
-| Field         | Type          | Default                                    | Description                                                                                                               |
-| ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
-| `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `integer`      | `8889`                                   | The port number to use for the tests instance.                                                                            |
-| `"config"`    | `Object`      | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+| Field         | Type           | Default                                       | Description                                                                                                               |
+| ------------- | -------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`      | `string\|null` | `null`      | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"plugins"`   | `string[]\|string` | `[]`    | A list of plugins to install and activate in the environment. To mount a directory as `wp-content/plugins`, the value should be a path to the applicable directory instead of an array. |
+| `"mu-plugins"`    | `string[]\|string`| `[]` | A list of mu-plugins to install in the environment. To mount a directory as `wp-content/mu-plugins`, the value should be a path to the applicable directory instead of an array. |
+| `"themes"`    | `string[]\|string` | `[]`    | A list of themes to install in the environment. The first theme in the list will be activated. To mount a directory as `wp-content/themes`, the value should be a path to the applicable directory instead of an array. |
+| `"port"`      | `integer`      | `8888`      | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`      | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`       | `{ "WP_DEBUG": true, "SCRIPT_DEBUG": true }"` | Mapping of wp-config.php constants to their desired values.                             |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
-Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
+Several types of strings can be passed into the `core`, `plugins`, `mu-plugins`, and `themes` fields:
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
@@ -236,6 +237,8 @@ Several types of strings can be passed into the `core`, `plugins`, and `themes` 
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
+
+For plugins, mu-plugins, and themes, you may also specify a single directory which maps directly to the corresponding wp-content directory. To do so, specify a source string instead of an array of source strings. For example, if you set `{ "themes": "../my-themes" }`, then the `my-themes` directory will be mounted to the Docker instance directly as `wp-content/themes`. This might be useful if you are developing an entire directory of themes — you won't have to specify each theme one by one.
 
 ## .wp-env.override.json
 
@@ -254,14 +257,28 @@ This is useful for plugin development.
 }
 ```
 
-#### Latest development WordPress + current directory as a plugin
+#### Latest production WordPress + a directory of themes
+
+This is useful if you need to mount many themes which all live in a single directory, or to override the entire wp-content/themes directory. (You may do the same for plugins and mu-plugins.)
+
+```json
+{
+	"core": null,
+	"themes": "../path/to/all-my-themes"
+}
+```
+
+#### Latest development WordPress + current directory as a plugin + directory of mu-plugins
 
 This is useful for plugin development when upstream Core changes need to be tested.
+
+It may be useful if you have a directory of mu-plugins to mount as well.
 
 ```json
 {
 	"core": "WordPress/WordPress#master",
-	"plugins": [ "." ]
+	"plugins": [ "." ],
+	"mu-plugins": "./e2e-tests/mu-plugins"
 }
 ```
 
