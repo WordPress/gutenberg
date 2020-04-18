@@ -103,7 +103,7 @@ describe( 'readConfig', () => {
 			await readConfig( '.wp-env.json' );
 		} catch ( error ) {
 			expect( error ).toBeInstanceOf( ValidationError );
-			expect( error.message ).toContain( 'must be an array of strings' );
+			expect( error.message ).toContain( 'must be a string or an array' );
 		}
 	} );
 
@@ -116,7 +116,7 @@ describe( 'readConfig', () => {
 			await readConfig( '.wp-env.json' );
 		} catch ( error ) {
 			expect( error ).toBeInstanceOf( ValidationError );
-			expect( error.message ).toContain( 'must be an array of strings' );
+			expect( error.message ).toContain( 'must be a string or an array' );
 		}
 	} );
 
@@ -147,6 +147,42 @@ describe( 'readConfig', () => {
 					basename: 'home',
 				},
 			],
+		} );
+	} );
+
+	it( 'should parse single source strings', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					plugins: './relative',
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			pluginSources: {
+				type: 'local',
+				path: expect.stringMatching( /^\/.*relative$/ ),
+				basename: 'relative',
+			},
+		} );
+	} );
+
+	it( 'should accept mu-plugins', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					'mu-plugins': './relative',
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			muPluginsSources: {
+				type: 'local',
+				path: expect.stringMatching( /^\/.*relative$/ ),
+				basename: 'relative',
+			},
 		} );
 	} );
 
