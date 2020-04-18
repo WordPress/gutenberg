@@ -6,6 +6,7 @@ const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const os = require( 'os' );
 const crypto = require( 'crypto' );
+const { get } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -49,6 +50,18 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {string} type The source type. Can be 'local' or 'git'.
  * @property {string} path The path to the WordPress installation, plugin or theme.
  * @property {string} basename Name that identifies the WordPress installation, plugin or theme.
+ * @property {boolean} isActive Whether the source should be activated in the WP instance. Defaults to true.
+ */
+
+/**
+ * The object format which can be used as a config for individual sources in .wp-env.json.
+ *
+ * @typedef ConfigSourceObject An object configuring a source. Primarily used to set other options, like `active`.
+ * @property {string} source A source string.
+ * @property {boolean} [active] True if the source should be activated on the WP install, mostly applicable to plugins.
+ *
+ * @typedef {string|ConfigSourceObject} SingleSource    Used to specify individual sources in the config file.
+ * @typedef {SingleSource|SingleSource[]} ConfigSources Used to specify one or more sources for a particular type of source (e.g. "plugins")
  */
 
 module.exports = {
@@ -209,22 +222,26 @@ module.exports = {
 /**
  * Throws an error if the passed source value is invalid.
  *
- * @param {string|string[]} sources    An array of sources from the config object.
- * @param {string}          sourceType The type of source. Used to inform the
- *                                     user which config property needs fixed.
+ * @param {ConfigSources} sources    One or more config sources to validate.
+ * @param {string}        sourceType The type of source. Used to inform the
+ *                                   user which config property needs fixed.
  */
 function validateSources( sources, sourceType ) {
-	// A string is a valid source.
-	if ( typeof sources === 'string' ) {
+	const isValidSource = ( singleSource ) =>
+		typeof singleSource === 'string' ||
+		typeof get( singleSource, 'source', null ) === 'string';
+
+	if ( isValidSource( sources ) ) {
 		return;
 	}
-	// Otherwise, source must be an array of strings.
+
+	// If `sources` isn't valid as itself, it may be valid as an array.
 	if (
 		! Array.isArray( sources ) ||
-		sources.some( ( source ) => typeof source !== 'string' )
+		sources.some( ( source ) => ! isValidSource( source ) )
 	) {
 		throw new ValidationError(
-			`Invalid .wp-env.json: "${ sourceType }" must be a string or an array of strings.`
+			`Invalid .wp-env.json: "${ sourceType }". A source can be a string, an object with the string property 'source', or an array of sources.`
 		);
 	}
 }
@@ -232,29 +249,35 @@ function validateSources( sources, sourceType ) {
 /**
  * Parses source objects out of the source config.
  *
- * @param {string|string[]} source A path or an array of paths to sources.
- * @param {string} workDirectoryPath The path of the working directory.
+ * @param {ConfigSources} sources           One or more config sources.
+ * @param {string}        workDirectoryPath The path of the working directory.
  * @return {Source|Source[]} A Source or an array of Sources.
  */
-function getSources( source, workDirectoryPath ) {
-	if ( typeof source === 'string' ) {
-		return parseSourceString( source, { workDirectoryPath } );
+function getSources( sources, workDirectoryPath ) {
+	if ( Array.isArray( sources ) ) {
+		return sources.map( ( sourceString ) =>
+			parseSourceString( sourceString, { workDirectoryPath } )
+		);
 	}
-	return source.map( ( sourceString ) =>
-		parseSourceString( sourceString, { workDirectoryPath } )
-	);
+
+	return parseSourceString( sources, { workDirectoryPath } );
 }
 
 /**
- * Parses a source string into a source object.
+ * Parses a ConfigSource into a source object.
  *
- * @param {string|null} sourceString The source string. See README.md for documentation on valid source string patterns.
+ * @param {SingleSource} singleSource A single source to parse from the config format. See README.md for documentation on valid source string patterns.
  * @param {Object} options
  * @param {boolean} options.hasTests Whether or not a `testsPath` is required. Only the 'core' source needs this.
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {Source|null} A source object.
  */
-function parseSourceString( sourceString, { workDirectoryPath } ) {
+function parseSourceString( singleSource, { workDirectoryPath } ) {
+	const sourceString = get( singleSource, 'source', singleSource );
+
+	// By default, all sources are active.
+	const isActive = !! get( singleSource, 'active', true );
+
 	if ( sourceString === null ) {
 		return null;
 	}
@@ -278,6 +301,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 			type: 'local',
 			path: sourcePath,
 			basename,
+			isActive,
 		};
 	}
 
@@ -293,6 +317,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 				encodeURIComponent( zipFields[ 1 ] )
 			),
 			basename: encodeURIComponent( zipFields[ 1 ] ),
+			isActive,
 		};
 	}
 
@@ -304,6 +329,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 			ref: gitHubFields[ 3 ] || 'master',
 			path: path.resolve( workDirectoryPath, gitHubFields[ 2 ] ),
 			basename: gitHubFields[ 2 ],
+			isActive,
 		};
 	}
 
