@@ -121,7 +121,7 @@ async function configureWordPress( environment, config ) {
 	};
 
 	// Activate a theme if we can find one.
-	const theme = getThemeToActivate( config );
+	const theme = await getThemeToActivate( config );
 	if ( theme ) {
 		await dockerRun( [ 'wp', 'theme', 'activate', theme ] );
 	}
