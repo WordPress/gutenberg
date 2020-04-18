@@ -38,6 +38,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -120,6 +121,7 @@ function RichTextWrapper(
 		reversed,
 		style,
 		preserveWhiteSpace,
+		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		...props
@@ -389,10 +391,20 @@ function RichTextWrapper(
 				return;
 			}
 
+			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
+
+			if (
+				__unstableEmbedURLOnPaste &&
+				isEmpty( value ) &&
+				isURL( plainText.trim() )
+			) {
+				mode = 'BLOCKS';
+			}
+
 			const content = pasteHandler( {
 				HTML: html,
 				plainText,
-				mode: onReplace && onSplit ? 'AUTO' : 'INLINE',
+				mode,
 				tagName,
 			} );
 
@@ -430,7 +442,14 @@ function RichTextWrapper(
 				}
 			}
 		},
-		[ tagName, onReplace, onSplit, splitValue, multiline ]
+		[
+			tagName,
+			onReplace,
+			onSplit,
+			splitValue,
+			__unstableEmbedURLOnPaste,
+			multiline,
+		]
 	);
 
 	const inputRule = useCallback(

@@ -8,14 +8,11 @@ import { concat } from 'lodash';
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { isURL } from '@wordpress/url';
-import { __unstableStripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import { getEmbedBlockSettings } from './settings';
-import { matchesPatterns } from './util';
 
 /**
  * Default transforms for generic embeds.
@@ -23,13 +20,13 @@ import { matchesPatterns } from './util';
 const transforms = {
 	from: [
 		{
-			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: ( { content } ) =>
-				isURL( __unstableStripHTML( content ).trim() ),
-			transform: ( { content } ) => {
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+			transform: ( node ) => {
 				return createBlock( 'core/embed', {
-					url: __unstableStripHTML( content ).trim(),
+					url: node.textContent.trim(),
 				} );
 			},
 		},
@@ -49,34 +46,6 @@ const transforms = {
 };
 
 /**
- * Generate "from" transform for common/other embeds with eligibility check.
- *
- * @param  {Object} embedDefinition Embed definition.
- * @return {Array}                  "from" transform which can convert
- *                                  a paragraph block into a valid embed.
- */
-const _getTransformsFrom = ( embedDefinition ) => {
-	return [
-		{
-			type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: ( { content } ) =>
-				isURL( __unstableStripHTML( content ).trim() ) &&
-				embedDefinition?.patterns &&
-				matchesPatterns(
-					__unstableStripHTML( content ).trim(),
-					embedDefinition?.patterns
-				),
-			transform: ( { content } ) => {
-				return createBlock( embedDefinition.name, {
-					url: __unstableStripHTML( content ).trim(),
-				} );
-			},
-		},
-	];
-};
-
-/**
  * Merge default transforms with the embed (common/other) specific transforms.
  *
  * @param  {Object} embedDefinition Embed definition.
@@ -90,7 +59,7 @@ export const _mergeTransforms = ( embedDefinition ) => {
 			...embedSettings,
 			transforms: {
 				from: concat(
-					_getTransformsFrom( embedDefinition ),
+					transforms?.from ?? [],
 					embedSettings?.transforms?.from ?? []
 				).filter( Boolean ),
 				to: concat(
