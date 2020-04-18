@@ -1,5 +1,5 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ ".", "./packages/e2e-tests/plugins" ],
+	"plugins": [ ".", { "source": "./packages/e2e-tests/plugins", "active": false } ],
 	"mu-plugins": "./packages/e2e-tests/mu-plugins"
 }
