@@ -33,8 +33,9 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {string}      workDirectoryPath       Path to the work directory located in ~/.wp-env.
  * @property {string}      dockerComposeConfigPath Path to the docker-compose.yml file.
  * @property {Source|null} coreSource              The WordPress installation to load in the environment.
- * @property {Source[]}    pluginSources           Plugins to load in the environment.
- * @property {Source[]}    themeSources            Themes to load in the environment.
+ * @property {Source|Source[]} pluginSources       Plugins to load in the environment.
+ * @property {Source|Source[]} muPluginsSources    MU plugins to load in the environment.
+ * @property {Source|Source[]} themeSources        Themes to load in the environment.
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
@@ -124,6 +125,7 @@ module.exports = {
 			{
 				core: null,
 				plugins: [],
+				'mu-plugins': [],
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
@@ -143,23 +145,10 @@ module.exports = {
 			);
 		}
 
-		if (
-			! Array.isArray( config.plugins ) ||
-			config.plugins.some( ( plugin ) => typeof plugin !== 'string' )
-		) {
-			throw new ValidationError(
-				'Invalid .wp-env.json: "plugins" must be an array of strings.'
-			);
-		}
-
-		if (
-			! Array.isArray( config.themes ) ||
-			config.themes.some( ( theme ) => typeof theme !== 'string' )
-		) {
-			throw new ValidationError(
-				'Invalid .wp-env.json: "themes" must be an array of strings.'
-			);
-		}
+		// Throw an error if any of the sources are invalid.
+		validateSources( config.plugins, 'plugins' );
+		validateSources( config.themes, 'plugins' );
+		validateSources( config[ 'mu-plugins' ], 'mu-plugins' );
 
 		if ( ! Number.isInteger( config.port ) ) {
 			throw new ValidationError(
@@ -206,20 +195,55 @@ module.exports = {
 				} ),
 				{ workDirectoryPath }
 			),
-			pluginSources: config.plugins.map( ( sourceString ) =>
-				parseSourceString( sourceString, {
-					workDirectoryPath,
-				} )
+			pluginSources: getSources( config.plugins, workDirectoryPath ),
+			muPluginsSources: getSources(
+				config[ 'mu-plugins' ],
+				workDirectoryPath
 			),
-			themeSources: config.themes.map( ( sourceString ) =>
-				parseSourceString( sourceString, {
-					workDirectoryPath,
-				} )
-			),
+			themeSources: getSources( config.themes, workDirectoryPath ),
 			config: config.config,
 		};
 	},
 };
+
+/**
+ * Throws an error if the passed source value is invalid.
+ *
+ * @param {string|string[]} sources    An array of sources from the config object.
+ * @param {string}          sourceType The type of source. Used to inform the
+ *                                     user which config property needs fixed.
+ */
+function validateSources( sources, sourceType ) {
+	// A string is a valid source.
+	if ( typeof sources === 'string' ) {
+		return;
+	}
+	// Otherwise, source must be an array of strings.
+	if (
+		! Array.isArray( sources ) ||
+		sources.some( ( source ) => typeof source !== 'string' )
+	) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ sourceType }" must be a string or an array of strings.`
+		);
+	}
+}
+
+/**
+ * Parses source objects out of the source config.
+ *
+ * @param {string|string[]} source A path or an array of paths to sources.
+ * @param {string} workDirectoryPath The path of the working directory.
+ * @return {Source|Source[]} A Source or an array of Sources.
+ */
+function getSources( source, workDirectoryPath ) {
+	if ( typeof source === 'string' ) {
+		return parseSourceString( source, { workDirectoryPath } );
+	}
+	return source.map( ( sourceString ) =>
+		parseSourceString( sourceString, { workDirectoryPath } )
+	);
+}
 
 /**
  * Parses a source string into a source object.

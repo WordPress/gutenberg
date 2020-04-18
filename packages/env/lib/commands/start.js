@@ -6,6 +6,7 @@ const util = require( 'util' );
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
 const inquirer = require( 'inquirer' );
+const { castArray } = require( 'lodash' );
 
 /**
  * Promisified dependencies
@@ -67,6 +68,13 @@ module.exports = async function start( { spinner, debug } ) {
 				.join( '\n' );
 	};
 
+	const getDownloader = ( source ) =>
+		downloadSource( source, {
+			onProgress: getProgressSetter( source.basename ),
+			spinner,
+			debug: config.debug,
+		} );
+
 	await Promise.all( [
 		// Preemptively start the database while we wait for sources to download.
 		dockerCompose.upOne( 'mysql', {
@@ -88,21 +96,9 @@ module.exports = async function start( { spinner, debug } ) {
 			}
 		} )(),
 
-		...config.pluginSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-
-		...config.themeSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
+		...castArray( config.pluginSources ).map( getDownloader ),
+		...castArray( config.muPluginsSources ).map( getDownloader ),
+		...castArray( config.themeSources ).map( getDownloader ),
 	] );
 
 	spinner.text = 'Starting WordPress.';
