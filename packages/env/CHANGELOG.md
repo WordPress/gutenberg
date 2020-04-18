@@ -4,6 +4,7 @@
 
 -   The `.wp-env.json` coniguration file now accepts "mu-plugins" sources.
 -   Themes, plugins, and mu-plugins directories may now be mounted directly as the corresponding wp-content subdirectory.
+-   You may now specify if a certain plugin source should be deactivated on the WP instance. Previously, wp-env activated all plugins it knew about. This includes support for deactivating or activating a mapped directory of plugins.
 
 ## 1.1.0 (2020-04-01)
 
