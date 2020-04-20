@@ -24,7 +24,7 @@ function ParagraphBlock( {
 
 	const styles = {
 		...style,
-		color: wrapperProps?.style?.color || globalStyle.color,
+		color: wrapperProps?.style?.color || globalStyle?.color,
 	};
 
 	return (
