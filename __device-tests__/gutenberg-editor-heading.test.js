@@ -48,7 +48,7 @@ describe( 'Gutenberg Editor tests', () => {
 		if ( isAndroid() ) {
 			await headingBlockElement.click();
 		}
-		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
+		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading, false );
 
 		await editorPage.addNewParagraphBlock();
 		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
@@ -60,7 +60,7 @@ describe( 'Gutenberg Editor tests', () => {
 
 		await editorPage.addNewHeadingBlock();
 		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
-		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
+		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading, false );
 
 		await editorPage.addNewParagraphBlock();
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 5 );
