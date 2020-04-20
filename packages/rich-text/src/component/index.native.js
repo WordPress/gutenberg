@@ -5,6 +5,7 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
+import { addMention } from 'react-native-gutenberg-bridge';
 import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
@@ -38,7 +39,6 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
-import { addMention } from 'react-native-gutenberg-bridge';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
