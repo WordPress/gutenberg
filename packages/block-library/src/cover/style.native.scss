@@ -52,26 +52,25 @@
 	width: 100%;
 	height: 100%;
 	padding: 8px;
-	justify-content: flex-start;
-	align-items: flex-end;
+	justify-content: flex-end;
+	align-items: flex-start;
 	z-index: 3;
 }
 
 .uploadFailed {
 	width: 24px;
 	height: 24px;
-	border-radius: 12px;
 	justify-content: center;
 	align-items: center;
-	background-color: #fff;
 }
 
-.uploadFailedIcon {
-	fill: $red-50;
-	width: 100%;
-	height: 100%;
+.errorIconBorder {
+	fill: #fff;
+	opacity: 0.18;
 }
-
-.uploadFailedIconDark {
-	fill: $red-30;
+.errorIconOuter {
+	fill: $red-40;
+}
+.errorIconInner {
+	fill: #fff;
 }

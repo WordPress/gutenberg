@@ -50,6 +50,7 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
+import ErrorIcon from './error-icon';
 
 /**
  * Constants
@@ -326,13 +327,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
-							icon={ 'warning' }
-							{ ...getStylesFromColorScheme(
-								styles.uploadFailedIcon,
-								styles.uploadFailedIconDark
-							) }
-						/>
+						<ErrorIcon size="100%" />
 					</View>
 				</View>
 			) }
