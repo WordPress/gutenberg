@@ -21,6 +21,7 @@ export default class EditorPage {
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 	galleryBlockName = 'Gallery';
+	latestPostsBlockName = 'Latest Posts';
 	unorderedListButtonName = 'Convert to unordered list';
 	orderedListButtonName = 'Convert to ordered list';
 
@@ -161,8 +162,34 @@ export default class EditorPage {
 		await addButton.click();
 
 		// Click on block of choice
+		const blockButton = await this.findBlockButton( blockName );
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', { element: blockButton, x: 10, y: 10 } );
+		}
+	}
+
+	// Attempts to find the given block button in the block inserter control.
+	async findBlockButton( blockName: string ) {
+		if ( isAndroid() ) {
+			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
+			while ( ! await this.driver.hasElementByAccessibilityId( blockName ) ) {
+				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+			}
+
+			return await this.driver.elementByAccessibilityId( blockName );
+		}
+
 		const blockButton = await this.driver.elementByAccessibilityId( blockName );
-		await blockButton.click();
+		const size = await this.driver.getWindowSize();
+		const height = size.height - 5;
+
+		while ( ! await blockButton.isDisplayed() ) {
+			await this.driver.execute( 'mobile: dragFromToForDuration', { fromX: 50, fromY: height, toX: 50, toY: height - 450, duration: 0.5 } );
+		}
+
+		return blockButton;
 	}
 
 	async clickToolBarButton( buttonName: string ) {
@@ -253,13 +280,13 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToParagraphBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean = true ) {
+	async sendTextToParagraphBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean ) {
 		const textViewElement = await this.getTextViewForParagraphBlock( block );
 		await typeString( this.driver, textViewElement, text, clear );
 		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
-	async sendTextToParagraphBlockAtPosition( position: number, text: string, clear: boolean = true ) {
+	async sendTextToParagraphBlockAtPosition( position: number, text: string, clear: boolean ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			// Select block first
@@ -374,7 +401,7 @@ export default class EditorPage {
 	}
 
 	async enterCaptionToSelectedImageBlock( caption: string, clear: boolean = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Image caption. Empty"]' );
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[starts-with(@name, "Image caption.")]' );
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
@@ -431,5 +458,21 @@ export default class EditorPage {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
 		const text = await textViewElement.text();
 		return text.toString();
+	}
+
+	// ============================
+	// Latest-Posts Block functions
+	// ============================
+
+	async addNewLatestPostsBlock() {
+		await this.addNewBlock( this.latestPostsBlockName );
+	}
+
+	async getLatestPostsBlockAtPosition( position: number ) {
+		return this.getBlockAtPosition( position, this.latestPostsBlockName );
+	}
+
+	async removeLatestPostsBlockAtPosition( position: number ) {
+		return await this.removeBlockAtPosition( position, this.latestPostsBlockName );
 	}
 }

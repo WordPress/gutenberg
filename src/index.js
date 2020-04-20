@@ -22,6 +22,7 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+import setupJetpackEditor from './jetpack-editor-setup';
 
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
@@ -55,6 +56,7 @@ export class RootComponent extends React.Component {
 		super( props );
 		setupLocale( props.locale, props.translations );
 		setupApiFetch();
+		setupJetpackEditor( props.jetpackState || { blogId: 1, isJetpackActive: true } );
 		require( '@wordpress/edit-post' ).initializeEditor();
 
 		const isHermes = () => global.HermesInternal !== null;
@@ -64,9 +66,6 @@ export class RootComponent extends React.Component {
 
 	render() {
 		const { initialHtmlModeEnabled } = this.props;
-		const settings = {
-			__mobileEnablePageTemplates: !! __DEV__,
-		};
 		let initialData = this.props.initialData;
 		let initialTitle = this.props.initialTitle;
 		let postType = this.props.postType;
@@ -87,7 +86,6 @@ export class RootComponent extends React.Component {
 				initialHtmlModeEnabled={ initialHtmlModeEnabled }
 				initialTitle={ initialTitle }
 				postType={ postType }
-				settings={ settings }
 			/>
 		);
 	}

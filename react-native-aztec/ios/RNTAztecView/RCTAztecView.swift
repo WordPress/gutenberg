@@ -327,9 +327,10 @@ class RCTAztecView: Aztec.TextView {
     }
 
     public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
-        let text = dictationResult.reduce("") { $0 + $1.text }
-        insertText(text)
+        let objectPlaceholder = "\u{FFFC}"
+        let dictationText = dictationResult.reduce("") { $0 + $1.text }
         isInsertingDictationResult = false
+        self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
     }
 
     // MARK: - Custom Edit Intercepts
