@@ -2,7 +2,8 @@
  * External dependencies
  */
 import cssTree from 'css-tree';
-import { some } from 'lodash';
+import { map, some } from 'lodash';
+import ltrim from 'ltrim';
 
 const ROOT_SELECTORS = [
 	{
@@ -30,22 +31,30 @@ const ROOT_SELECTORS = [
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
+	const wrapperClassNameCleaned = ltrim( wrapperClassName, '.' );
+
 	const wrapperSelector = cssTree.fromPlainObject( {
 		type: 'ClassSelector',
-		name: wrapperClassName,
+		name: wrapperClassNameCleaned,
 	} );
 
-	const ast = cssTree.parse( styles );
+	const output = map( styles, ( { css } ) => {
+		const ast = cssTree.parse( css );
 
-	cssTree.walk( ast, ( node, item, list ) => {
-		if ( ! some( ROOT_SELECTORS, { type: node.type, name: node.name } ) )
-			return;
+		cssTree.walk( ast, ( node, item, list ) => {
+			if (
+				! some( ROOT_SELECTORS, { type: node.type, name: node.name } )
+			)
+				return;
 
-		const wrapperSelectorItem = list.createItem( wrapperSelector );
-		list.replace( item, wrapperSelectorItem );
+			const wrapperSelectorItem = list.createItem( wrapperSelector );
+			list.replace( item, wrapperSelectorItem );
+		} );
+
+		return cssTree.generate( ast );
 	} );
 
-	return cssTree.generate( ast );
+	return output;
 };
 
 export default transformStyles;
