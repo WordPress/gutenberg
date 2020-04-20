@@ -2,6 +2,11 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
@@ -31,8 +36,9 @@ import {
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -102,7 +108,22 @@ const Cover = ( {
 		}
 	}, [ setAttributes ] );
 
+	// sync with local media store
+	useEffect( mediaUploadSync, [] );
+
+	// initialize uploading flag to false, awaiting sync
+	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+
+	// initialize upload failure flag to true if url is local
+	const [ didUploadFail, setDidUploadFail ] = useState(
+		id && getProtocol( url ) === 'file:'
+	);
+
+	// don't show failure if upload is in progress
+	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
+
 	const onSelectMedia = ( media ) => {
+		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
 		// Remove gradient attribute
 		setAttributes( { gradient: undefined, customGradient: undefined } );
@@ -119,6 +140,29 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
+	const onMediaPressed = () => {
+		if ( isUploadInProgress ) {
+			requestImageUploadCancelDialog( id );
+		} else if ( shouldShowFailure ) {
+			requestImageFailedRetryDialog( id );
+		}
+	};
+
+	const [ isVideoLoading, setIsVideoLoading ] = useState( true );
+
+	const onVideoLoadStart = () => {
+		setIsVideoLoading( true );
+	};
+
+	const onVideoLoad = () => {
+		setIsVideoLoading( false );
+	};
+
+	const backgroundColor = getStylesFromColorScheme(
+		styles.backgroundSolid,
+		styles.backgroundSolidDark
+	);
+
 	const overlayStyles = [
 		styles.overlay,
 		url && { opacity: dimRatio / 100 },
@@ -129,12 +173,7 @@ const Cover = ( {
 				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
-		! overlayColor.color && ! url
-			? getStylesFromColorScheme(
-					styles.backgroundSolid,
-					styles.backgroundSolidDark
-			  )
-			: {},
+		! overlayColor.color && ! url ? backgroundColor : {},
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -191,45 +230,62 @@ const Cover = ( {
 	} ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
+			onPress={ onMediaPressed }
 			onLongPress={ openMediaOptions }
 			disabled={ ! isParentSelected }
 		>
-			<View style={ styles.background }>
+			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress
 					mediaId={ id }
+					onUpdateMediaProgress={ () => {
+						setIsUploadInProgress( true );
+					} }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,
 					} ) => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
 						setAttributes( {
 							id: mediaServerId,
 							url: mediaUrl,
 							backgroundType,
 						} );
 					} }
-					renderContent={ () => (
-						<>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-								<ImageWithFocalPoint
-									focalPoint={ focalPoint }
-									url={ url }
-								/>
-							) }
-							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-								<Video
-									muted
-									disableFocus
-									repeat
-									resizeMode={ 'cover' }
-									source={ { uri: url } }
-									style={ styles.background }
-								/>
-							) }
-						</>
-					) }
+					onFinishMediaUploadWithFailure={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( true );
+					} }
+					onMediaUploadStateReset={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
+						setAttributes( { id: undefined, url: undefined } );
+					} }
 				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						onLoad={ onVideoLoad }
+						onLoadStart={ onVideoLoadStart }
+						style={ [
+							styles.background,
+							// Hide Video component since it has black background while loading the source
+							{ opacity: isVideoLoading ? 0 : 1 },
+						] }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -279,6 +335,20 @@ const Cover = ( {
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
+
+			{ shouldShowFailure && (
+				<View
+					pointerEvents="none"
+					style={ styles.uploadFailedContainer }
+				>
+					<View style={ styles.uploadFailed }>
+						<Icon
+							icon={ 'warning' }
+							{ ...styles.uploadFailedIcon }
+						/>
+					</View>
+				</View>
+			) }
 		</View>
 	);
 };

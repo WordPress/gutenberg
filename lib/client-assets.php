@@ -636,7 +636,7 @@ function gutenberg_load_block_pattern( $name ) {
 }
 
 /**
- * Extends block editor settings to include a list of default block patterns.
+ * Extends block editor settings to include a list of default patterns.
  *
  * @param array $settings Default editor settings.
  *

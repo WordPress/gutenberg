@@ -27,6 +27,8 @@ function MyApp() {
 }
 ```
 
+Many components include CSS to add style, you will need to include for the components to appear correctly. The component stylesheet can be found in `node_modules/@wordpress/components/build-style/style.css`, you can link directly or copy and include it in your project.
+
 ## Development Scripts
 
 The [wp-scripts package](https://developer.wordpress.org/block-editor/packages/packages-scripts/) is a collection of reusable scripts for JavaScript development — includes scripts for building, linting, and testing — all with no additional configuration files.

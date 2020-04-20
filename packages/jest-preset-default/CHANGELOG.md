@@ -1,5 +1,7 @@
 ## Master
 
+## 6.0.0 (2020-04-15)
+
 ### Breaking Changes
 
 - The peer `jest` dependency has been updated from requiring `>=24` to requiring `>=25` (see [Breaking Changes](https://jestjs.io/blog/2020/01/21/jest-25), [#20766](https://github.com/WordPress/gutenberg/pull/20766)).
