@@ -20,5 +20,6 @@ export const settings = {
 		html: false,
 		align: true,
 	},
+	example: {},
 	edit,
 };
