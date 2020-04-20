@@ -5,11 +5,6 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import SidebarHeader from '../sidebar-header';
-
 const SettingsHeader = ( {
 	openDocumentSettings,
 	openBlockSettings,
@@ -30,35 +25,30 @@ const SettingsHeader = ( {
 			: // translators: ARIA label for the Settings Sidebar tab, not selected.
 			  [ __( 'Block' ), '' ];
 
+	/* Use a list so screen readers will announce how many tabs there are. */
 	return (
-		<SidebarHeader
-			className="edit-post-sidebar__panel-tabs"
-			closeLabel={ __( 'Close settings' ) }
-		>
-			{ /* Use a list so screen readers will announce how many tabs there are. */ }
-			<ul>
-				<li>
-					<Button
-						onClick={ openDocumentSettings }
-						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
-						aria-label={ documentAriaLabel }
-						data-label={ __( 'Document' ) }
-					>
-						{ __( 'Document' ) }
-					</Button>
-				</li>
-				<li>
-					<Button
-						onClick={ openBlockSettings }
-						className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
-						aria-label={ blockAriaLabel }
-						data-label={ blockLabel }
-					>
-						{ blockLabel }
-					</Button>
-				</li>
-			</ul>
-		</SidebarHeader>
+		<ul>
+			<li>
+				<Button
+					onClick={ openDocumentSettings }
+					className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
+					aria-label={ documentAriaLabel }
+					data-label={ __( 'Document' ) }
+				>
+					{ __( 'Document' ) }
+				</Button>
+			</li>
+			<li>
+				<Button
+					onClick={ openBlockSettings }
+					className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
+					aria-label={ blockAriaLabel }
+					data-label={ blockLabel }
+				>
+					{ blockLabel }
+				</Button>
+			</li>
+		</ul>
 	);
 };
 

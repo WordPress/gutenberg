@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, isEqual } from 'lodash';
+import { mapValues, pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -11,6 +11,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { Component, forwardRef, useRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
+	getBlockType,
 	synchronizeBlocksWithTemplate,
 	withBlockContentContext,
 } from '@wordpress/blocks';
@@ -27,7 +28,43 @@ import DefaultBlockAppender from './default-block-appender';
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import { BlockContextProvider } from '../block-context';
 import { withBlockEditContext } from '../block-edit/context';
+
+/**
+ * Block context cache, implemented as a WeakMap mapping block types to a
+ * WeakMap mapping attributes object to context value.
+ *
+ * @type {WeakMap<string,WeakMap<string,*>>}
+ */
+const BLOCK_CONTEXT_CACHE = new WeakMap();
+
+/**
+ * Returns a cached context object value for a given set of attributes for the
+ * block type.
+ *
+ * @param {Record<string,*>} attributes Block attributes object.
+ * @param {WPBlockType}      blockType  Block type settings.
+ *
+ * @return {Record<string,*>} Context value.
+ */
+function getBlockContext( attributes, blockType ) {
+	if ( ! BLOCK_CONTEXT_CACHE.has( blockType ) ) {
+		BLOCK_CONTEXT_CACHE.set( blockType, new WeakMap() );
+	}
+
+	const blockTypeCache = BLOCK_CONTEXT_CACHE.get( blockType );
+	if ( ! blockTypeCache.has( attributes ) ) {
+		const context = mapValues(
+			blockType.providesContext,
+			( attributeName ) => attributes[ attributeName ]
+		);
+
+		blockTypeCache.set( attributes, context );
+	}
+
+	return blockTypeCache.get( attributes );
+}
 
 class InnerBlocks extends Component {
 	constructor() {
@@ -125,7 +162,6 @@ class InnerBlocks extends Component {
 			parentLock,
 			__experimentalCaptureToolbars,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		} = this.props;
 
 		const newSettings = {
@@ -135,7 +171,6 @@ class InnerBlocks extends Component {
 			__experimentalCaptureToolbars:
 				__experimentalCaptureToolbars || false,
 			__experimentalMoverDirection,
-			__experimentalUIParts,
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -150,6 +185,7 @@ class InnerBlocks extends Component {
 			hasOverlay,
 			__experimentalCaptureToolbars: captureToolbars,
 			forwardedRef,
+			block,
 			...props
 		} = this.props;
 		const { templateInProcess } = this.state;
@@ -163,7 +199,7 @@ class InnerBlocks extends Component {
 			'is-capturing-toolbar': captureToolbars,
 		} );
 
-		const blockList = (
+		let blockList = (
 			<BlockList
 				{ ...props }
 				ref={ forwardedRef }
@@ -171,6 +207,18 @@ class InnerBlocks extends Component {
 				className={ classes }
 			/>
 		);
+
+		// Wrap context provider if (and only if) block has context to provide.
+		const blockType = getBlockType( block.name );
+		if ( blockType && blockType.providesContext ) {
+			const context = getBlockContext( block.attributes, blockType );
+
+			blockList = (
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			);
+		}
 
 		if ( props.__experimentalTagName ) {
 			return blockList;

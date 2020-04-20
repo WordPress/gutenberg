@@ -438,10 +438,6 @@ _Parameters_
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
-_Returns_
-
--   `WPComponent`: Plugin sidebar component.
-
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 
 Renders a menu item in `Plugins` group in `More Menu` drop down,

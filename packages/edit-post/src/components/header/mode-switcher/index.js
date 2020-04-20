@@ -42,16 +42,16 @@ function ModeSwitcher() {
 	);
 	const { switchEditorMode } = useDispatch( 'core/edit-post' );
 
+	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
+		return null;
+	}
+
 	const choices = MODES.map( ( choice ) => {
 		if ( choice.value !== mode ) {
 			return { ...choice, shortcut };
 		}
 		return choice;
 	} );
-
-	if ( ! isRichEditingEnabled || ! isCodeEditingEnabled ) {
-		return null;
-	}
 
 	return (
 		<MenuGroup label={ __( 'Editor' ) }>

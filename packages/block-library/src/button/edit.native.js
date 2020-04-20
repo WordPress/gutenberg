@@ -24,7 +24,7 @@ import {
 	BottomSheet,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { link, external } from '@wordpress/icons';
 
@@ -52,8 +52,10 @@ class ButtonEdit extends Component {
 		this.onChangeURL = this.onChangeURL.bind( this );
 		this.onClearSettings = this.onClearSettings.bind( this );
 		this.onLayout = this.onLayout.bind( this );
+		this.dismissSheet = this.dismissSheet.bind( this );
 		this.getURLFromClipboard = this.getURLFromClipboard.bind( this );
-		this.onToggleLinkSettings = this.onToggleLinkSettings.bind( this );
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 
@@ -150,12 +152,25 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor } = this.props;
-		if ( backgroundColor.color ) {
-			// `backgroundColor` which should be set when we are able to resolve it
-			return backgroundColor.color;
-		}
-		return styles.fallbackButton.backgroundColor;
+		const { backgroundColor, attributes } = this.props;
+		const { style } = attributes;
+
+		return (
+			( style && style.color && style.color.background ) ||
+			backgroundColor.color ||
+			styles.fallbackButton.backgroundColor
+		);
+	}
+
+	getTextColor() {
+		const { textColor, attributes } = this.props;
+		const { style } = attributes;
+
+		return (
+			( style && style.color && style.color.text ) ||
+			textColor.color ||
+			styles.fallbackButton.color
+		);
 	}
 
 	onChangeText( value ) {
@@ -200,9 +215,12 @@ class ButtonEdit extends Component {
 		} );
 	}
 
-	onToggleLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		this.setState( { isLinkSheetVisible: ! isLinkSheetVisible } );
+	onShowLinkSettings() {
+		this.setState( { isLinkSheetVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSheetVisible: false } );
 	}
 
 	onToggleButtonFocus( value ) {
@@ -228,6 +246,13 @@ class ButtonEdit extends Component {
 		this.setState( { maxWidth: width - buttonSpacing } );
 	}
 
+	dismissSheet() {
+		this.setState( {
+			isLinkSheetVisible: false,
+		} );
+		this.props.closeSettingsBottomSheet();
+	}
+
 	getLinkSettings( url, rel, linkTarget, isCompatibleWithSettings ) {
 		return (
 			<>
@@ -237,6 +262,7 @@ class ButtonEdit extends Component {
 					value={ url || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChange={ this.onChangeURL }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
 					// eslint-disable-next-line jsx-a11y/no-autofocus
@@ -263,6 +289,7 @@ class ButtonEdit extends Component {
 					value={ rel || '' }
 					valuePlaceholder={ __( 'None' ) }
 					onChange={ this.onChangeLinkRel }
+					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
 					separatorType={
@@ -279,13 +306,7 @@ class ButtonEdit extends Component {
 	}
 
 	render() {
-		const {
-			attributes,
-			textColor,
-			isSelected,
-			clientId,
-			onReplace,
-		} = this.props;
+		const { attributes, isSelected, clientId, onReplace } = this.props;
 		const {
 			placeholder,
 			text,
@@ -351,7 +372,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: textColor.color || '#fff',
+							color: this.getTextColor(),
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -368,7 +389,7 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
-						selectionColor={ textColor.color || '#fff' }
+						selectionColor={ this.getTextColor() }
 						onReplace={ onReplace }
 						onRemove={ () => onReplace( [] ) }
 					/>
@@ -378,9 +399,9 @@ class ButtonEdit extends Component {
 					<BlockControls>
 						<ToolbarGroup>
 							<ToolbarButton
-								title={ __( 'Edit image' ) }
+								title={ __( 'Edit link' ) }
 								icon={ link }
-								onClick={ this.onToggleLinkSettings }
+								onClick={ this.onShowLinkSettings }
 								isActive={ url && url !== PREPEND_HTTP }
 							/>
 						</ToolbarGroup>
@@ -389,7 +410,7 @@ class ButtonEdit extends Component {
 
 				<BottomSheet
 					isVisible={ isLinkSheetVisible }
-					onClose={ this.onToggleLinkSettings }
+					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
 					{ this.getLinkSettings( url, rel, linkTarget ) }
@@ -445,6 +466,13 @@ export default compose( [
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			hasParents,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 ] )( ButtonEdit );

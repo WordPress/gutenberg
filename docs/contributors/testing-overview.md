@@ -344,12 +344,6 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-### StoryShots
-
-> [StoryShots](https://www.npmjs.com/package/@storybook/addon-storyshots) adds automatic Jest Snapshot Testing for [Storybook](https://storybook.js.org/).
-
-Whenever a new story is added to Storybook, `npm run test-unit` needs to be executed to generate the corresponding snapshots. In the case when the existing story gets updated or removed, please refer to [Working with snapshots](#working-with-snapshots) section.
-
 #### Troubleshooting
 
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
@@ -372,7 +366,9 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
-## End to end Testing
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 

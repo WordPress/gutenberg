@@ -28,12 +28,19 @@ import requestIdleCallback from './request-idle-callback';
  */
 
 /**
+ * Reset the queue.
+ *
+ * @typedef {()=>void} WPPriorityQueueReset
+ */
+
+/**
  * Priority queue instance.
  *
  * @typedef {Object} WPPriorityQueue
  *
  * @property {WPPriorityQueueAdd}   add   Add callback to queue for context.
  * @property {WPPriorityQueueFlush} flush Flush queue for context.
+ * @property {WPPriorityQueueReset} reset Reset queue.
  */
 
 /**
@@ -56,25 +63,25 @@ import requestIdleCallback from './request-idle-callback';
  * queue.add( ctx2, () => console.log( 'This will be printed second' ) );
  *```
  *
- * @return {WPPriorityQueue} Queue object with `add` and `flush` methods.
+ * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
 export const createQueue = () => {
 	/** @type {WPPriorityQueueContext[]} */
-	const waitingList = [];
+	let waitingList = [];
 
 	/** @type {WeakMap<WPPriorityQueueContext,WPPriorityQueueCallback>} */
-	const elementsMap = new WeakMap();
+	let elementsMap = new WeakMap();
 
 	let isRunning = false;
 
+	/* eslint-disable jsdoc/valid-types */
 	/**
 	 * Callback to process as much queue as time permits.
-	 *
-	 * @type {IdleRequestCallback & FrameRequestCallback}
 	 *
 	 * @param {IdleDeadline|number} deadline Idle callback deadline object, or
 	 *                                       animation frame timestamp.
 	 */
+	/* eslint-enable */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining =
 			typeof deadline === 'number'
@@ -143,8 +150,20 @@ export const createQueue = () => {
 		return true;
 	};
 
+	/**
+	 * Reset the queue without running the pending callbacks.
+	 *
+	 * @type {WPPriorityQueueReset}
+	 */
+	const reset = () => {
+		waitingList = [];
+		elementsMap = new WeakMap();
+		isRunning = false;
+	};
+
 	return {
 		add,
 		flush,
+		reset,
 	};
 };

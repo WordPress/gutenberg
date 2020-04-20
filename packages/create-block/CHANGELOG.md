@@ -1,5 +1,7 @@
 ## Master
 
+## 0.10.0 (2020-04-01)
+
 ### New Features
 
 - Added readme.txt file to the existing templates to make your entry in the plugin browser most useful ([#20694](https://github.com/WordPress/gutenberg/pull/20694)).

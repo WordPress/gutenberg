@@ -184,14 +184,13 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
-			isParentSelected,
-			isAncestorSelected,
 		} = this.props;
 		const {
 			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
+			style,
 		} = attributes;
 		const { containerWidth } = this.state;
 
@@ -202,11 +201,14 @@ class MediaTextEdit extends Component {
 			: this.state.mediaWidth || mediaWidth;
 		const widthString = `${ temporaryMediaWidth }%`;
 
-		const innerBlockContainerStyle = ! shouldStack && {
-			...styles.paddingHorizontalNone,
-			...( mediaPosition === 'right' && styles.innerPaddingMediaOnRight ),
-			...( mediaPosition === 'left' && styles.innerPaddingMediaOnLeft ),
-		};
+		const innerBlockContainerStyle = ! shouldStack
+			? styles.innerBlock
+			: {
+					...( mediaPosition === 'left'
+						? styles.innerBlockStackMediaLeft
+						: styles.innerBlockStackMediaRight ),
+			  };
+
 		const containerStyles = {
 			...styles[ 'wp-block-media-text' ],
 			...styles[
@@ -215,20 +217,28 @@ class MediaTextEdit extends Component {
 			...( mediaPosition === 'right'
 				? styles[ 'has-media-on-the-right' ]
 				: {} ),
-			...( shouldStack ? styles[ 'is-stacked-on-mobile' ] : {} ),
+			...( shouldStack && styles[ 'is-stacked-on-mobile' ] ),
 			...( shouldStack && mediaPosition === 'right'
 				? styles[ 'is-stacked-on-mobile.has-media-on-the-right' ]
 				: {} ),
-			backgroundColor: backgroundColor.color,
+			...( isSelected && styles[ 'is-selected' ] ),
+			backgroundColor:
+				( style && style.color && style.color.background ) ||
+				backgroundColor.color,
 		};
+
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
 		const innerBlockWidthString = `${ innerBlockWidth }%`;
-		const mediaContainerStyle = {
-			...( isParentSelected || isAncestorSelected
-				? styles.denseMediaPadding
-				: styles.regularMediaPadding ),
-			...( isSelected && styles.innerPadding ),
-		};
+
+		const mediaContainerStyle = shouldStack
+			? {
+					...( mediaPosition === 'left' && styles.mediaStackLeft ),
+					...( mediaPosition === 'right' && styles.mediaStackRight ),
+			  }
+			: {
+					...( mediaPosition === 'left' && styles.mediaLeft ),
+					...( mediaPosition === 'right' && styles.mediaRight ),
+			  };
 
 		const toolbarControls = [
 			{
@@ -256,7 +266,6 @@ class MediaTextEdit extends Component {
 					<BlockVerticalAlignmentToolbar
 						onChange={ onVerticalAlignmentChange }
 						value={ verticalAlignment }
-						isCollapsed={ false }
 					/>
 				</BlockControls>
 				<View

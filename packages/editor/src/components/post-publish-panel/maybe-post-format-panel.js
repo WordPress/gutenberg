@@ -46,6 +46,7 @@ const PostFormatPanel = ( { suggestion, onUpdatePostFormat } ) => {
 					onUpdatePostFormat={ onUpdatePostFormat }
 					suggestedPostFormat={ suggestion.id }
 					suggestionText={ sprintf(
+						/* translators: %s: post format */
 						__( 'Apply the "%1$s" format.' ),
 						suggestion.caption
 					) }

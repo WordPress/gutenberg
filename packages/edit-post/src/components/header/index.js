@@ -6,6 +6,7 @@ import { Button } from '@wordpress/components';
 import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -13,11 +14,10 @@ import { cog } from '@wordpress/icons';
 import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
-import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import PreviewOptions from '../preview-options';
 
-function Header() {
+function Header( { onToggleInserter, isInserterOpen } ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -60,7 +60,10 @@ function Header() {
 		<div className="edit-post-header">
 			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
+				<HeaderToolbar
+					onToggleInserter={ onToggleInserter }
+					isInserterOpen={ isInserterOpen }
+				/>
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
@@ -94,7 +97,7 @@ function Header() {
 					aria-expanded={ isEditorSidebarOpened }
 					shortcut={ shortcut }
 				/>
-				<PinnedPlugins.Slot />
+				<PinnedItems.Slot scope="core/edit-post" />
 				<MoreMenu />
 			</div>
 		</div>

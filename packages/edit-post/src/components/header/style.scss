@@ -64,24 +64,7 @@
 /**
  * Buttons in the Toolbar
  */
-
-.edit-post-header__toolbar {
-	.block-editor-inserter__toggle {
-		// Special dimensions for this button.
-		min-width: 32px;
-		height: 32px;
-		margin-right: $grid-unit-10;
-	}
-}
-
-
 .edit-post-header__settings {
-	// Header toggle buttons.
-	.components-button.is-pressed {
-		color: $white;
-		background: $dark-gray-primary;
-	}
-
 	// Adjust button paddings to scale better to mobile.
 	.components-button.editor-post-save-draft,
 	.editor-post-saved-state,
