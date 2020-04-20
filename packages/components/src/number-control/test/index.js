@@ -86,7 +86,7 @@ describe( 'NumberControl', () => {
 				Simulate.change( input );
 			} );
 
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( '10' );
+			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
 		} );
 	} );
 
