@@ -173,3 +173,34 @@ function register_block_core_latest_posts() {
 	);
 }
 add_action( 'init', 'register_block_core_latest_posts' );
+
+/**
+ * Handles outdated versions of the `core/latest-posts` block by converting
+ * attribute `categories` from a numeric string to an array with key `id`.
+ *
+ * This is done to accommodate the changes introduced in #20781 that sought to
+ * add support for multiple categories to the block. However, given that this
+ * block is dynamic, the usual provisions for block migration are insufficient,
+ * as they only act when a block is loaded in the editor.
+ *
+ * TODO: Remove when and if the bottom client-side deprecation for this block
+ * is removed.
+ *
+ * @param array $block A single parsed block object.
+ *
+ * @return array The migrated block object.
+ */
+function block_core_latest_posts_migrate_categories( $block ) {
+	if (
+		'core/latest-posts' === $block['blockName'] &&
+		! empty( $block['attrs']['categories'] ) &&
+		is_string( $block['attrs']['categories'] )
+	) {
+		$block['attrs']['categories'] = array(
+			array( 'id' => absint( $block['attrs']['categories'] ) ),
+		);
+	}
+
+	return $block;
+}
+add_filter( 'render_block_data', 'block_core_latest_posts_migrate_categories' );
