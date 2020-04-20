@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
 
 /**
@@ -20,12 +19,12 @@ import NavigateUpSVG from './nav-up-icon';
 import Breadcrumb from '../block-list/breadcrumb.native';
 
 const FloatingToolbar = ( {
-	clientId,
+	selectedClientId,
 	parentId,
 	showFloatingToolbar,
 	onNavigateUp,
 } ) =>
-	showFloatingToolbar && (
+	!! showFloatingToolbar && (
 		<TouchableWithoutFeedback accessible={ false }>
 			<View style={ styles.floatingToolbar }>
 				{ !! parentId && (
@@ -40,7 +39,7 @@ const FloatingToolbar = ( {
 						<View style={ styles.pipe } />
 					</Toolbar>
 				) }
-				<Breadcrumb clientId={ clientId } />
+				<Breadcrumb clientId={ selectedClientId } />
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -54,19 +53,16 @@ export default compose( [
 			getBlockCount,
 		} = select( 'core/block-editor' );
 
-		const clientId = getSelectedBlockClientId();
+		const selectedClientId = getSelectedBlockClientId();
 
-		const isSelected = !! clientId;
-		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const parentId = getBlockRootClientId( clientId );
-		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+		if ( ! selectedClientId ) return;
 
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
+		const rootBlockId = getBlockHierarchyRootClientId( selectedClientId );
 
 		return {
-			clientId,
-			showFloatingToolbar,
-			parentId,
+			selectedClientId,
+			showFloatingToolbar: !! getBlockCount( rootBlockId ),
+			parentId: getBlockRootClientId( selectedClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

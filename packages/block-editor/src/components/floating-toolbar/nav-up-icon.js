@@ -16,7 +16,7 @@ const NavigateUp = ( { isRTL } ) => (
 			fillRule="evenodd"
 			clipRule="evenodd"
 			d="M17,11  z L15.58,12.42 L12,8.83 L12,18 L22,18 L22,20 L10,20 L10,8.83 L6.42,12.42 L5,11 L11,5 L17,11"
-			transform={ `${ isRTL ? 'scale(-1,1) translate(-24,0)' : '' }` }
+			transform={ isRTL ? 'scale(-1,1) translate(-24,0)' : undefined }
 		/>
 	</SVG>
 );
