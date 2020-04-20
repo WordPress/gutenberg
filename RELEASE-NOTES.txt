@@ -1,3 +1,7 @@
+1.27.0
+------
+* New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
+
 1.26.0
 ------
 * [iOS] Disable ripple effect in all BottomSheet's controls.
