@@ -2,7 +2,7 @@
 	display: block;
 	width: 33.33%;
 	padding: 0;
-	margin: 0 0 12px;
+	margin: 0;
 }
 
 .components-button.block-editor-block-types-list__item {
@@ -11,13 +11,13 @@
 	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
-	padding: 0 4px;
+	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -48,7 +48,7 @@
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -66,4 +66,5 @@
 
 .block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
+	font-size: 12px;
 }

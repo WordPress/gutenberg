@@ -188,5 +188,8 @@ module.exports = {
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
+	watchOptions: {
+		ignored: '!packages/*/!(src)/**/*',
+	},
 	devtool,
 };

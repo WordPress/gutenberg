@@ -65,23 +65,6 @@ const assertNoResultsMessageNotToBePresent = ( element ) => {
 	expect( noResultsMessage ).toBe( null );
 };
 
-const assertOpenedPanels = ( element, expectedOpen = 0 ) => {
-	expect(
-		element.querySelectorAll( '.components-panel__body.is-opened ' )
-	).toHaveLength( expectedOpen );
-};
-
-const getTabButtonWithContent = ( element, content ) => {
-	let foundButton;
-	const buttons = element.querySelectorAll( '.components-button' );
-	buttons.forEach( ( button ) => {
-		if ( button.textContent === content ) {
-			foundButton = button;
-		}
-	} );
-	return foundButton;
-};
-
 describe( 'InserterMenu', () => {
 	beforeEach( () => {
 		useSelect.mockImplementation( () => ( {
@@ -89,14 +72,6 @@ describe( 'InserterMenu', () => {
 			collections,
 			items,
 		} ) );
-	} );
-
-	it( 'should show the suggested tab by default', () => {
-		const element = initializeMenuDefaultStateAndReturnElement();
-		const activeCategory = element.querySelector(
-			'.components-panel__body.is-opened > .components-panel__body-title'
-		);
-		expect( activeCategory.textContent ).toBe( 'Most used' );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
@@ -118,7 +93,10 @@ describe( 'InserterMenu', () => {
 
 	it( 'should show only high utility items in the suggested tab', () => {
 		const element = initializeMenuDefaultStateAndReturnElement();
-		const visibleBlocks = element.querySelectorAll(
+		const firstPanel = element.querySelector(
+			'.block-editor-inserter__panel-content'
+		);
+		const visibleBlocks = firstPanel.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 		expect( visibleBlocks ).toHaveLength( 3 );
@@ -129,71 +107,70 @@ describe( 'InserterMenu', () => {
 
 	it( 'should show items from the embed category in the embed tab', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const embedTab = getTabButtonWithContent( element, 'Embeds' );
-
-		TestUtils.Simulate.click( embedTab );
-
-		assertOpenedPanels( element, 1 );
-
-		const visibleBlocks = element.querySelectorAll(
+		const embedTabContent = element.querySelectorAll(
+			'.block-editor-inserter__panel-content'
+		)[ 4 ];
+		const embedTabTitle = element.querySelectorAll(
+			'.block-editor-inserter__panel-title'
+		)[ 4 ];
+		const blocks = embedTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 2 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'YouTube' );
-		expect( visibleBlocks[ 1 ].textContent ).toBe( 'A Text Embed' );
+		expect( embedTabTitle.textContent ).toBe( 'Embeds' );
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].textContent ).toBe( 'YouTube' );
+		expect( blocks[ 1 ].textContent ).toBe( 'A Text Embed' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show reusable items in the reusable tab', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const reusableTab = getTabButtonWithContent( element, 'Reusable' );
-
-		TestUtils.Simulate.click( reusableTab );
-
-		assertOpenedPanels( element, 1 );
-
-		const visibleBlocks = element.querySelectorAll(
+		const reusableTabContent = element.querySelectorAll(
+			'.block-editor-inserter__panel-content'
+		)[ 6 ];
+		const reusableTabTitle = element.querySelectorAll(
+			'.block-editor-inserter__panel-title'
+		)[ 6 ];
+		const blocks = reusableTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( reusableTabTitle.textContent ).toBe( 'Reusable' );
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should show the common category blocks', () => {
 		const element = initializeAllClosedMenuStateAndReturnElement();
-		const commonBlocksTab = getTabButtonWithContent(
-			element,
-			'Common blocks'
-		);
-
-		TestUtils.Simulate.click( commonBlocksTab );
-
-		assertOpenedPanels( element, 1 );
-
-		const visibleBlocks = element.querySelectorAll(
+		const commonTabContent = element.querySelectorAll(
+			'.block-editor-inserter__panel-content'
+		)[ 1 ];
+		const commonTabTitle = element.querySelectorAll(
+			'.block-editor-inserter__panel-title'
+		)[ 1 ];
+		const blocks = commonTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].textContent ).toBe( 'Some Other Block' );
+		expect( commonTabTitle.textContent ).toBe( 'Common blocks' );
+		expect( blocks ).toHaveLength( 3 );
+		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
-		const element = initializeMenuDefaultStateAndReturnElement();
-		const layoutTab = getTabButtonWithContent( element, 'Layout elements' );
-
-		TestUtils.Simulate.click( layoutTab );
-
-		const disabledBlocks = element.querySelectorAll(
+		const element = initializeAllClosedMenuStateAndReturnElement();
+		const layoutTabContent = element.querySelectorAll(
+			'.block-editor-inserter__panel-content'
+		)[ 2 ];
+		const disabledBlocks = layoutTabContent.querySelectorAll(
 			'.block-editor-block-types-list__item[disabled], .block-editor-block-types-list__item[aria-disabled="true"]'
 		);
 
@@ -206,24 +183,22 @@ describe( 'InserterMenu', () => {
 			filterValue: 'text',
 		} );
 
-		assertOpenedPanels( element, 3 );
-
 		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
+			'.block-editor-inserter__panel-title'
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = element.querySelectorAll(
+		const blocks = element.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 5 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+		expect( blocks ).toHaveLength( 5 );
+		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );
@@ -233,24 +208,22 @@ describe( 'InserterMenu', () => {
 			filterValue: ' text',
 		} );
 
-		assertOpenedPanels( element, 3 );
-
 		const matchingCategories = element.querySelectorAll(
-			'.components-panel__body-toggle'
+			'.block-editor-inserter__panel-title'
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const visibleBlocks = element.querySelectorAll(
+		const blocks = element.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
-		expect( visibleBlocks ).toHaveLength( 5 );
-		expect( visibleBlocks[ 0 ].textContent ).toBe( 'Text' );
-		expect( visibleBlocks[ 1 ].textContent ).toBe( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+		expect( blocks ).toHaveLength( 5 );
+		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
+		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
+		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );

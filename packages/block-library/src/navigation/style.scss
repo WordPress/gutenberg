@@ -75,13 +75,14 @@
 .wp-block-navigation-link__content {
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
-	@include break-small {
-		width: max-content;
-	}
-
 	.has-text-color & {
 		color: inherit;
 	}
+}
+
+.wp-block-navigation-link__label {
+	word-break: normal;
+	overflow-wrap: break-word;
 }
 
 .wp-block-navigation-link__submenu-icon {
