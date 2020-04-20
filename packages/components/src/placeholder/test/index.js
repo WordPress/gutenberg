@@ -2,23 +2,24 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import useResizeAware from 'react-resize-aware';
 
 /**
  * WordPress dependencies
  */
 import { more } from '@wordpress/icons';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Placeholder from '../';
 
-jest.mock( 'react-resize-aware' );
-
 describe( 'Placeholder', () => {
 	beforeEach( () => {
-		useResizeAware.mockReturnValue( [ <div key="1" />, { width: 320 } ] );
+		useResizeObserver.mockReturnValue( [
+			<div key="1" />,
+			{ width: 320 },
+		] );
 	} );
 
 	describe( 'basic rendering', () => {
@@ -109,8 +110,8 @@ describe( 'Placeholder', () => {
 	} );
 
 	describe( 'resize aware', () => {
-		it( 'should not assign modifier class in first-pass `null` width from `useResizeAware`', () => {
-			useResizeAware.mockReturnValue( [
+		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
+			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 320 },
 			] );
@@ -123,7 +124,7 @@ describe( 'Placeholder', () => {
 		} );
 
 		it( 'should assign modifier class', () => {
-			useResizeAware.mockReturnValue( [
+			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },
 			] );

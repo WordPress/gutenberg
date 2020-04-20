@@ -9,7 +9,6 @@ import { dropRight, get, map, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 
 import {
 	InspectorControls,
@@ -17,7 +16,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -45,7 +44,6 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
-	className,
 	updateAlignment,
 	updateColumns,
 	clientId,
@@ -61,23 +59,7 @@ function ColumnsEditContainer( {
 		[ clientId ]
 	);
 
-	const ref = useRef();
-	const {
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		TextColor,
-	} = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [ { backgroundColor: true, textColor: true } ],
-			colorDetector: { targetRef: ref },
-		}
-	);
-
-	const classes = classnames( className, {
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
@@ -100,17 +82,14 @@ function ColumnsEditContainer( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<BackgroundColor>
-				<TextColor>
-					<div className={ classes } ref={ ref }>
-						<InnerBlocks
-							allowedBlocks={ ALLOWED_BLOCKS }
-							__experimentalMoverDirection="horizontal"
-						/>
-					</div>
-				</TextColor>
-			</BackgroundColor>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				__experimentalMoverDirection="horizontal"
+				__experimentalTagName={ Block.div }
+				__experimentalPassedProps={ {
+					className: classes,
+				} }
+			/>
 		</>
 	);
 }
@@ -255,25 +234,27 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<__experimentalBlockVariationPicker
-			icon={ get( blockType, [ 'icon', 'src' ] ) }
-			label={ get( blockType, [ 'title' ] ) }
-			variations={ variations }
-			onSelect={ ( nextVariation = defaultVariation ) => {
-				if ( nextVariation.attributes ) {
-					props.setAttributes( nextVariation.attributes );
-				}
-				if ( nextVariation.innerBlocks ) {
-					replaceInnerBlocks(
-						props.clientId,
-						createBlocksFromInnerBlocksTemplate(
-							nextVariation.innerBlocks
-						)
-					);
-				}
-			} }
-			allowSkip
-		/>
+		<Block.div>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						props.setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							props.clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							)
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</Block.div>
 	);
 };
 

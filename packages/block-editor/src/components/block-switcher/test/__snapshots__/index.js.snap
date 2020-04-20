@@ -29,7 +29,12 @@ exports[`BlockSwitcher should render enabled block switcher with multi block whe
 <Dropdown
   className="block-editor-block-switcher"
   contentClassName="block-editor-block-switcher__popover"
-  position="bottom right"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
   renderContent={[Function]}
   renderToggle={[Function]}
 />
@@ -39,7 +44,12 @@ exports[`BlockSwitcher should render switcher with blocks 1`] = `
 <Dropdown
   className="block-editor-block-switcher"
   contentClassName="block-editor-block-switcher__popover"
-  position="bottom right"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
   renderContent={[Function]}
   renderToggle={[Function]}
 />

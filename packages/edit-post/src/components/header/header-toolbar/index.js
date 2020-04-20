@@ -3,22 +3,26 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
-	Inserter,
 	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
 } from '@wordpress/block-editor';
-import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
+import {
+	TableOfContents,
+	EditorHistoryRedo,
+	EditorHistoryUndo,
+} from '@wordpress/editor';
+import { Button } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 
-const inserterToggleProps = { isPrimary: true };
-
-function HeaderToolbar() {
+function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
-		showInserter,
+		isInserterEnabled,
+		isInserterVisible,
 		isTextModeEnabled,
 		previewDeviceType,
 	} = useSelect(
@@ -27,9 +31,10 @@ function HeaderToolbar() {
 				'fixedToolbar'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			showInserter:
+			isInserterEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			isInserterVisible: select( 'core/block-editor' ).hasInserterItems(),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
@@ -54,15 +59,24 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<Inserter
-				disabled={ ! showInserter }
-				position="bottom right"
-				showInserterHelpPanel
-				toggleProps={ inserterToggleProps }
-			/>
+			{ isInserterVisible && (
+				<Button
+					className="edit-post-header-toolbar__inserter-toggle"
+					isPrimary
+					isPressed={ isInserterOpen }
+					onClick={ onToggleInserter }
+					disabled={ ! isInserterEnabled }
+					icon={ plus }
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
+					) }
+				/>
+			) }
 			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
+			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">

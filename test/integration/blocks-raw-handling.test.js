@@ -398,11 +398,7 @@ describe( 'Blocks raw handling', () => {
 					throw new Error( `Expected fixtures for type ${ type }` );
 				}
 
-				const converted = pasteHandler( {
-					HTML,
-					plainText,
-					canUserUseUnfilteredHTML: true,
-				} );
+				const converted = pasteHandler( { HTML, plainText } );
 				const serialized =
 					typeof converted === 'string'
 						? converted

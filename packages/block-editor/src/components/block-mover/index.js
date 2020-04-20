@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button, ToolbarGroup } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
@@ -82,17 +82,17 @@ export class BlockMover extends Component {
 			return null;
 		};
 
-		const getMovementDirection = ( moveDirection ) => {
+		const getMovementDirectionLabel = ( moveDirection ) => {
 			if ( moveDirection === 'up' ) {
 				if ( orientation === 'horizontal' ) {
-					return isRTL ? 'right' : 'left';
+					return isRTL ? __( 'Move right' ) : __( 'Move left' );
 				}
-				return 'up';
+				return __( 'Move up' );
 			} else if ( moveDirection === 'down' ) {
 				if ( orientation === 'horizontal' ) {
-					return isRTL ? 'left' : 'right';
+					return isRTL ? __( 'Move left' ) : __( 'Move right' );
 				}
-				return 'down';
+				return __( 'Move down' );
 			}
 			return null;
 		};
@@ -118,11 +118,7 @@ export class BlockMover extends Component {
 								className="block-editor-block-mover__control block-editor-block-mover__control-up"
 								onClick={ isFirst ? null : onMoveUp }
 								icon={ getArrowIcon( 'up' ) }
-								// translators: %s: Horizontal direction of block movement ( left, right )
-								label={ sprintf(
-									__( 'Move %s' ),
-									getMovementDirection( 'up' )
-								) }
+								label={ getMovementDirectionLabel( 'up' ) }
 								aria-describedby={ `block-editor-block-mover__up-description-${ instanceId }` }
 								aria-disabled={ isFirst }
 								onFocus={ this.onFocus }
@@ -133,11 +129,7 @@ export class BlockMover extends Component {
 								className="block-editor-block-mover__control block-editor-block-mover__control-down"
 								onClick={ isLast ? null : onMoveDown }
 								icon={ getArrowIcon( 'down' ) }
-								// translators: %s: Horizontal direction of block movement ( left, right )
-								label={ sprintf(
-									__( 'Move %s' ),
-									getMovementDirection( 'down' )
-								) }
+								label={ getMovementDirectionLabel( 'down' ) }
 								aria-describedby={ `block-editor-block-mover__down-description-${ instanceId }` }
 								aria-disabled={ isLast }
 								onFocus={ this.onFocus }

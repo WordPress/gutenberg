@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip } from '@wordpress/components';
+import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, plusCircle } from '@wordpress/icons';
+import { Icon, create } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ function ButtonBlockAppender( {
 } ) {
 	return (
 		<Inserter
+			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			renderToggle={ ( {
@@ -33,8 +34,8 @@ function ButtonBlockAppender( {
 			} ) => {
 				let label;
 				if ( hasSingleBlockType ) {
-					// translators: %s: the name of the block when there is only one
 					label = sprintf(
+						// translators: %s: the name of the block when there is only one
 						_x( 'Add %s', 'directly add the only allowed block' ),
 						blockTitle
 					);
@@ -62,10 +63,8 @@ function ButtonBlockAppender( {
 							disabled={ disabled }
 							label={ label }
 						>
-							<span className="screen-reader-text">
-								{ label }
-							</span>
-							<Icon icon={ plusCircle } />
+							<VisuallyHidden as="span">{ label }</VisuallyHidden>
+							<Icon icon={ create } />
 						</Button>
 					</Tooltip>
 				);

@@ -117,7 +117,9 @@ describe( 'Reusable blocks', () => {
 		await insertBlock( 'Greeting block' );
 
 		// Put the reusable block in edit mode
-		const [ editButton ] = await page.$x( '//button[text()="Edit"]' );
+		const editButton = await page.waitForXPath(
+			'//button[text()="Edit" and not(@disabled)]'
+		);
 		await editButton.click();
 
 		// Change the block's title
@@ -160,6 +162,56 @@ describe( 'Reusable blocks', () => {
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
+	} );
+
+	it( 'can be inserted after refresh', async () => {
+		// Step 1. Insert a paragraph block
+
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Awesome Paragraph' );
+
+		await clickBlockToolbarButton( 'More options' );
+
+		const convertButton = await page.waitForXPath(
+			'//button[text()="Add to Reusable blocks"]'
+		);
+		await convertButton.click();
+
+		// Wait for creation to finish
+		await page.waitForXPath(
+			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+
+		// Select all of the text in the title field.
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		// Give the reusable block a title
+		await page.keyboard.type( 'Awesome block' );
+
+		// Save the reusable block
+		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
+		await saveButton.click();
+
+		// Step 2. Create new post.
+
+		await createNewPost();
+
+		// Step 3. Insert the block created in Step 1.
+
+		await insertBlock( 'Awesome block' );
+
+		// Check that we have a reusable block on the page
+		const block = await page.$(
+			'.block-editor-block-list__block[data-type="core/block"]'
+		);
+		expect( block ).not.toBeNull();
+
+		// Check that its title is displayed
+		const title = await page.$eval(
+			'.reusable-block-edit-panel__info',
+			( element ) => element.innerText
+		);
+		expect( title ).toBe( 'Awesome block' );
 	} );
 
 	it( 'can be converted to a regular block', async () => {

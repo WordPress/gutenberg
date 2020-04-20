@@ -25,11 +25,10 @@ function useSlotRegistry() {
 
 	const unregisterSlot = useCallback( ( name, ref ) => {
 		setSlots( ( prevSlots ) => {
-			// eslint-disable-next-line no-unused-vars
 			const { [ name ]: slot, ...nextSlots } = prevSlots;
 			// Make sure we're not unregistering a slot registered by another element
 			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
-			if ( slot.ref === ref ) {
+			if ( slot?.ref === ref ) {
 				return nextSlots;
 			}
 			return prevSlots;

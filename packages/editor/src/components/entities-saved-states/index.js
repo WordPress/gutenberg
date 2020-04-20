@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import EquivalentKeyMap from 'equivalent-key-map';
+import { some, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,58 +11,104 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-const EntitiesSavedStatesCheckbox = ( {
-	id,
-	name,
-	changes: { rawRecord },
-	checked,
-	setCheckedById,
-} ) => (
-	<CheckboxControl
-		label={ `${ name }: "${ rawRecord.name ||
-			rawRecord.slug ||
-			rawRecord.title ||
-			__( 'Untitled' ) }"` }
-		checked={ checked }
-		onChange={ ( nextChecked ) => setCheckedById( id, nextChecked ) }
-	/>
-);
+function EntityRecordState( { record, checked, onChange } ) {
+	return (
+		<CheckboxControl
+			label={ <strong>{ record.title || __( 'Untitled' ) }</strong> }
+			checked={ checked }
+			onChange={ onChange }
+		/>
+	);
+}
 
-export default function EntitiesSavedStates( {
-	isOpen,
-	onRequestClose,
-	ignoredForSave = new EquivalentKeyMap(),
-} ) {
-	const entityRecordChangesByRecord = useSelect( ( select ) =>
-		select( 'core' ).getEntityRecordChangesByRecord()
+function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
+	const firstRecord = list[ 0 ];
+	const entity = useSelect(
+		( select ) =>
+			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
+		[ firstRecord.kind, firstRecord.name ]
+	);
+
+	return (
+		<div className="editor-entities-saved-states__entity-type-list">
+			<h2>{ entity.label }</h2>
+			{ list.map( ( record ) => {
+				return (
+					<EntityRecordState
+						key={ record.key || 'site' }
+						record={ record }
+						checked={
+							! some(
+								unselectedEntities,
+								( elt ) =>
+									elt.kind === record.kind &&
+									elt.name === record.name &&
+									elt.key === record.key
+							)
+						}
+						onChange={ ( value ) =>
+							setUnselectedEntities( record, value )
+						}
+					/>
+				);
+			} ) }
+		</div>
+	);
+}
+
+export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
+	const dirtyEntityRecords = useSelect(
+		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
+		[]
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ checkedById, _setCheckedById ] = useState(
-		() => new EquivalentKeyMap()
+	// To group entities by type.
+	const partitionedSavables = Object.values(
+		groupBy( dirtyEntityRecords, 'name' )
 	);
-	const setCheckedById = ( id, checked ) =>
-		_setCheckedById( ( prevCheckedById ) => {
-			const nextCheckedById = new EquivalentKeyMap( prevCheckedById );
-			if ( checked ) {
-				nextCheckedById.set( id, true );
-			} else {
-				nextCheckedById.delete( id );
-			}
-			return nextCheckedById;
-		} );
+
+	// Unchecked entities to be ignored by save function.
+	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+
+	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
+		if ( checked ) {
+			_setUnselectedEntities(
+				unselectedEntities.filter(
+					( elt ) =>
+						elt.kind !== kind ||
+						elt.name !== name ||
+						elt.key !== key
+				)
+			);
+		} else {
+			_setUnselectedEntities( [
+				...unselectedEntities,
+				{ kind, name, key },
+			] );
+		}
+	};
+
 	const saveCheckedEntities = () => {
-		checkedById.forEach( ( _checked, id ) => {
-			if ( ! ignoredForSave.has( id ) ) {
-				saveEditedEntityRecord(
-					...id.filter(
-						( s, i ) => i !== id.length - 1 || s !== 'undefined'
-					)
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key } ) => {
+				return ! some(
+					unselectedEntities,
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key
 				);
 			}
+		);
+
+		entitiesToSave.forEach( ( { kind, name, key } ) => {
+			saveEditedEntityRecord( kind, name, key );
 		} );
-		onRequestClose( checkedById );
+
+		onRequestClose( entitiesToSave );
 	};
+
 	return (
 		isOpen && (
 			<Modal
@@ -70,41 +116,24 @@ export default function EntitiesSavedStates( {
 				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
-				{ Object.keys( entityRecordChangesByRecord ).map(
-					( changedKind ) =>
-						Object.keys(
-							entityRecordChangesByRecord[ changedKind ]
-						).map( ( changedName ) =>
-							Object.keys(
-								entityRecordChangesByRecord[ changedKind ][
-									changedName
-								]
-							).map( ( changedKey ) => {
-								const id = [
-									changedKind,
-									changedName,
-									changedKey,
-								];
-								return (
-									<EntitiesSavedStatesCheckbox
-										key={ id.join( ' | ' ) }
-										id={ id }
-										name={ changedName }
-										changes={
-											entityRecordChangesByRecord[
-												changedKind
-											][ changedName ][ changedKey ]
-										}
-										checked={ checkedById.get( id ) }
-										setCheckedById={ setCheckedById }
-									/>
-								);
-							} )
-						)
-				) }
+				{ partitionedSavables.map( ( list ) => {
+					return (
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
+						/>
+					);
+				} ) }
+
 				<Button
 					isPrimary
-					disabled={ checkedById.size === 0 }
+					disabled={
+						dirtyEntityRecords.length -
+							unselectedEntities.length ===
+						0
+					}
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>

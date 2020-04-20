@@ -14,6 +14,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
@@ -38,6 +39,7 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	rootClientId,
+	isHighlighted,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -60,7 +62,6 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	isMultiSelecting,
-	hasSelectedUI = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -86,7 +87,7 @@ function BlockListBlock( {
 		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( ! lightBlockWrapper && blockType.getEditWrapperProps ) {
+	if ( blockType.getEditWrapperProps ) {
 		wrapperProps = {
 			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
@@ -94,16 +95,23 @@ function BlockListBlock( {
 	}
 
 	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
+	const generatedClassName =
+		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
+			? getBlockDefaultClassName( name )
+			: null;
+	const customClassName = lightBlockWrapper ? attributes.className : null;
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
 	// block.
 	const wrapperClassName = classnames(
+		generatedClassName,
+		customClassName,
 		'wp-block block-editor-block-list__block',
 		{
-			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
+			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -139,7 +147,7 @@ function BlockListBlock( {
 	// For aligned blocks, provide a wrapper element so the block can be
 	// positioned relative to the block column. This is enabled with the
 	// .is-block-content className.
-	if ( isAligned ) {
+	if ( ! lightBlockWrapper && isAligned ) {
 		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
 	}
 
@@ -163,6 +171,7 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
+		wrapperProps,
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
@@ -219,6 +228,7 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
+			isBlockHighlighted,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -239,6 +249,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isHighlighted: isBlockHighlighted( clientId ),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||

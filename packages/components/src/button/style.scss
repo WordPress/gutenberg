@@ -9,13 +9,13 @@
 	background: none;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-	height: $icon-button-size;
+	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
 	padding: 6px 12px;
 	overflow: hidden;
 	border-radius: $radius-block-ui;
-	color: $black;
+	color: $dark-gray-primary;
 
 	&[aria-expanded="true"],
 	&:hover {
@@ -30,7 +30,7 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 2px color($theme-color);
+		box-shadow: 0 0 0 $border-width-focus $theme-color;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 1px solid transparent;
@@ -59,7 +59,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 2px color($theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 1px solid transparent;
@@ -188,7 +188,7 @@
 			color: #124964;
 			box-shadow:
 				0 0 0 $border-width #5b9dd9,
-				0 0 2px $border-width rgba(30, 140, 190, 0.8);
+				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
 		}
 	}
 
@@ -212,9 +212,18 @@
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
 		animation: components-button__busy-animation 2500ms infinite linear;
-		background-size: 100px 100%;
-		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
 		opacity: 1;
+		background-size: 100px 100%;
+		// Disable reason: This function call looks nicer when each argument is on its own line.
+		/* stylelint-disable */
+		background-image: linear-gradient(
+			-45deg,
+			color($white shade(2%)) 28%,
+			color($white shade(12%)) 28%,
+			color($white shade(12%)) 72%,
+			color($white shade(2%)) 72%
+		);
+		/* stylelint-enable */
 	}
 
 	&.is-small {
@@ -232,7 +241,7 @@
 		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
 
 		// Icon buttons are square.
-		min-width: $icon-button-size;
+		min-width: $button-size;
 		justify-content: center;
 
 		.dashicon {
@@ -249,6 +258,23 @@
 		}
 	}
 
+	// Toggled style.
+	&.is-pressed {
+		color: $white;
+		background: $dark-gray-primary;
+
+		&:focus:not(:disabled) {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+
+		&:hover:not(:disabled) {
+			background: $dark-gray-primary;
+		}
+	}
+
 	svg {
 		fill: currentColor;
 		outline: none;
@@ -256,7 +282,7 @@
 
 	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
 	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.screen-reader-text {
+	.components-visually-hidden {
 		height: auto;
 	}
 }

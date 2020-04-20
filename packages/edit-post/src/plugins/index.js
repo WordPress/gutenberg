@@ -14,13 +14,11 @@ import ManageBlocksMenuItem from './manage-blocks-menu-item';
 import KeyboardShortcutsHelpMenuItem from './keyboard-shortcuts-help-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
-import BlockPatterns from './block-patterns';
 
 registerPlugin( 'edit-post', {
 	render() {
 		return (
 			<>
-				<BlockPatterns />
 				<ToolsMoreMenuGroup>
 					{ ( { onClose } ) => (
 						<>
@@ -43,7 +41,8 @@ registerPlugin( 'edit-post', {
 								href={ __(
 									'https://wordpress.org/support/article/wordpress-editor/'
 								) }
-								target="_new"
+								target="_blank"
+								rel="noopener noreferrer"
 							>
 								{ __( 'Help' ) }
 							</MenuItem>

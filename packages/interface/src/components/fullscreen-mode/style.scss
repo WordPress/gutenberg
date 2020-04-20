@@ -1,0 +1,19 @@
+body.js.is-fullscreen-mode {
+
+	@include break-medium {
+		// Reset the html.wp-topbar padding.
+		// Because this uses negative margins, we have to compensate for the height.
+		margin-top: -$admin-bar-height;
+		height: calc(100% + #{ $admin-bar-height });
+
+		#adminmenumain,
+		#wpadminbar {
+			display: none;
+		}
+
+		#wpcontent,
+		#wpfooter {
+			margin-left: 0;
+		}
+	}
+}

@@ -236,12 +236,6 @@ class Typewriter extends Component {
 	}
 
 	render() {
-		// There are some issues with Internet Explorer, which are probably not
-		// worth spending time on. Let's disable it.
-		if ( isIE ) {
-			return this.props.children;
-		}
-
 		// Disable reason: Wrapper itself is non-interactive, but must capture
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -262,11 +256,22 @@ class Typewriter extends Component {
 }
 
 /**
+ * The exported component. The implementation of Typewriter faced technical
+ * challenges in Internet Explorer, and is simply skipped, rendering the given
+ * props children instead.
+ *
+ * @type {WPComponent}
+ */
+const TypewriterOrIEBypass = isIE
+	? ( props ) => props.children
+	: withSelect( ( select ) => {
+			const { getSelectedBlockClientId } = select( 'core/block-editor' );
+			return { selectedBlockClientId: getSelectedBlockClientId() };
+	  } )( Typewriter );
+
+/**
  * Ensures that the text selection keeps the same vertical distance from the
  * viewport during keyboard events within this component. The vertical distance
  * can vary. It is the last clicked or scrolled to position.
  */
-export default withSelect( ( select ) => {
-	const { getSelectedBlockClientId } = select( 'core/block-editor' );
-	return { selectedBlockClientId: getSelectedBlockClientId() };
-} )( Typewriter );
+export default TypewriterOrIEBypass;

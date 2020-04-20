@@ -28,6 +28,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -192,8 +193,8 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div
-				className={ classnames( 'wp-block-navigation-link', {
+			<Block.li
+				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
 					'is-selected': isSelected,
 					'has-link': !! url,
@@ -218,6 +219,7 @@ function NavigationLinkEdit( {
 							setAttributes( { label: labelValue } )
 						}
 						placeholder={ itemLabelPlaceholder }
+						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
 						allowedFormats={ [
 							'core/bold',
@@ -226,11 +228,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
@@ -283,6 +280,11 @@ function NavigationLinkEdit( {
 						</Popover>
 					) }
 				</div>
+				{ showSubmenuIcon && (
+					<span className="wp-block-navigation-link__submenu-icon">
+						<ItemSubmenuIcon />
+					</span>
+				) }
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
@@ -291,8 +293,18 @@ function NavigationLinkEdit( {
 							? InnerBlocks.DefaultAppender
 							: false
 					}
+					__experimentalTagName="ul"
+					__experimentalAppenderTagName="li"
+					__experimentalPassedProps={ {
+						className: classnames(
+							'wp-block-navigation__container',
+							{
+								'is-parent-of-selected-block': isParentOfSelectedBlock,
+							}
+						),
+					} }
 				/>
-			</div>
+			</Block.li>
 		</Fragment>
 	);
 }

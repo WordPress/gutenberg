@@ -7,6 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -36,7 +37,6 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	className,
 	isSelected,
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
@@ -146,12 +146,12 @@ export default function ListEdit( {
 			<RichText
 				identifier="values"
 				multiline="li"
-				tagName={ tagName }
+				__unstableMultilineRootTag={ tagName }
+				tagName={ Block[ tagName ] }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
-				className={ className }
 				placeholder={ __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>

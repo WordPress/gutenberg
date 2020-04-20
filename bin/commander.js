@@ -16,7 +16,7 @@ const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
 const Octokit = require( '@octokit/rest' );
 const os = require( 'os' );
-const uuid = require( 'uuid/v4' );
+const { v4: uuid } = require( 'uuid' );
 
 // Config
 const gitRepoOwner = 'WordPress';

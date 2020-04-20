@@ -16,6 +16,7 @@ import {
 	switchUserToTest,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Timeout, in seconds, that the test should be allowed to run.
@@ -69,12 +70,17 @@ async function setupBrowser() {
 /**
  * Navigates to the post listing screen and bulk-trashes any posts which exist.
  *
+ * @param {string} postType - String slug for type of post to trash.
+ *
  * @return {Promise} Promise resolving once posts have been trashed.
  */
-async function trashExistingPosts() {
+export async function trashExistingPosts( postType = 'post' ) {
 	await switchUserToAdmin();
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
-	await visitAdminPage( 'edit.php' );
+	const query = addQueryArgs( '', {
+		post_type: postType,
+	} ).slice( 1 );
+	await visitAdminPage( 'edit.php', query );
 
 	// If this selector doesn't exist there are no posts for us to delete.
 	const bulkSelector = await page.$( '#bulk-action-selector-top' );
@@ -228,6 +234,7 @@ async function runAxeTestsForBlockEditor() {
 			'dlitem',
 			'duplicate-id',
 			'label',
+			'landmark-one-main',
 			'link-name',
 			'listitem',
 			'region',

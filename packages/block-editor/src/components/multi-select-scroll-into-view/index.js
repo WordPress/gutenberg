@@ -21,19 +21,25 @@ import { getBlockDOMNode } from '../../utils/dom';
  */
 export default function MultiSelectScrollIntoView() {
 	const selector = ( select ) => {
-		const { getBlockSelectionEnd, isMultiSelecting } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockSelectionEnd,
+			hasMultiSelection,
+			isMultiSelecting,
+		} = select( 'core/block-editor' );
 
 		return {
 			selectionEnd: getBlockSelectionEnd(),
+			isMultiSelection: hasMultiSelection(),
 			isMultiSelecting: isMultiSelecting(),
 		};
 	};
-	const { selectionEnd, isMultiSelecting } = useSelect( selector, [] );
+	const { isMultiSelection, selectionEnd, isMultiSelecting } = useSelect(
+		selector,
+		[]
+	);
 
 	useEffect( () => {
-		if ( ! selectionEnd || isMultiSelecting ) {
+		if ( ! selectionEnd || isMultiSelecting || ! isMultiSelection ) {
 			return;
 		}
 
@@ -54,7 +60,7 @@ export default function MultiSelectScrollIntoView() {
 		scrollIntoView( extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
-	}, [ selectionEnd, isMultiSelecting ] );
+	}, [ isMultiSelection, selectionEnd, isMultiSelecting ] );
 
 	return null;
 }

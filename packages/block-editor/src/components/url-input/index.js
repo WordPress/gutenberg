@@ -178,6 +178,7 @@ class URLInput extends Component {
 				if ( !! suggestions.length ) {
 					this.props.debouncedSpeak(
 						sprintf(
+							/* translators: %s: number of results. */
 							_n(
 								'%d result found, use up and down arrow keys to navigate.',
 								'%d results found, use up and down arrow keys to navigate.',
@@ -214,7 +215,7 @@ class URLInput extends Component {
 
 		this.props.onChange( inputValue );
 		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue );
+			this.updateSuggestions( inputValue.trim() );
 		}
 	}
 
@@ -231,7 +232,7 @@ class URLInput extends Component {
 			! ( suggestions && suggestions.length )
 		) {
 			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value );
+			this.updateSuggestions( value.trim() );
 		}
 	}
 

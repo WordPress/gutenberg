@@ -31,13 +31,13 @@
 
 .components-notice__content {
 	flex-grow: 1;
-	margin: $grid-unit-05 #{ $icon-button-size-small + $border-width } $grid-unit-05 0;
+	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
 .components-notice__action.components-button {
 	&,
 	&.is-link {
-		margin-left: 4px;
+		margin-left: $grid-unit-15;
 	}
 	&.is-secondary {
 		vertical-align: initial;
@@ -72,12 +72,12 @@
 	.components-notice__content {
 		margin-top: $grid-unit-15;
 		margin-bottom: $grid-unit-15;
-		line-height: 1.6;
+		line-height: 2;
 	}
 
-	// Reduce margins on inline buttons so that they don't add too much extra line-height.
 	.components-notice__action.components-button {
-		margin-top: -2px;
-		margin-bottom: -2px;
+		display: block;
+		margin-left: 0;
+		margin-top: $grid-unit-10;
 	}
 }

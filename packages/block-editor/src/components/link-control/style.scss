@@ -24,7 +24,7 @@ $block-editor-link-control-number-of-actions: 1;
 		width: calc(100% - #{$grid-unit-20*2});
 		display: block;
 		padding: 11px $grid-unit-20;
-		padding-right: ( $icon-button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
+		padding-right: ( $button-size * $block-editor-link-control-number-of-actions ); // width of reset and submit buttons
 		margin: $grid-unit-20;
 		position: relative;
 		border: 1px solid $light-gray-500;
@@ -41,10 +41,14 @@ $block-editor-link-control-number-of-actions: 1;
 			@include input-style__focus();
 		}
 	}
+
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
 }
 
 .block-editor-link-control__search-error {
-	margin: -$grid-size-large/2 $grid-size-large $grid-size-large; // negative margin to bring the error a bit closer to the button
+	margin: -$grid-unit-20/2 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
 }
 
 .block-editor-link-control__search-actions {
@@ -54,15 +58,15 @@ $block-editor-link-control-number-of-actions: 1;
 	 * when suggestions are rendered.
 	 *
 	 * Compensate for:
-	 *  - Input margin ($grid-size-large)
+	 *  - Input margin ($grid-unit-20)
 	 *  - Border (1px)
 	 *  - Vertically, for the difference in height between the input (40px) and
 	 *    the icon buttons.
 	 *  - Horizontally, pad to the minimum of: default input padding, or the
 	 *    equivalent of the vertical padding.
 	 */
-	top: $grid-size-large + 1px + ( ( 40px - $icon-button-size ) / 2 );
-	right: $grid-size-large + 1px + min($grid-size, ( 40px - $icon-button-size ) / 2);
+	top: $grid-unit-20 + 1px + ( ( 40px - $button-size ) / 2 );
+	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
 }
 
 .block-editor-link-control__search-results-wrapper {
@@ -103,7 +107,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-results {
 	margin: 0;
-	padding: $grid-unit-20/2 $grid-unit-20 $grid-unit-20;
+	padding: $grid-unit-20/2 $grid-unit-20 $grid-unit-20/2;
 	max-height: 200px;
 	overflow-y: auto; // allow results list to scroll
 
@@ -151,6 +155,8 @@ $block-editor-link-control-number-of-actions: 1;
 	.block-editor-link-control__search-item-header {
 		display: block;
 		margin-right: $grid-unit-30;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 
 	.block-editor-link-control__search-item-icon {
@@ -160,9 +166,9 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		text-overflow: ellipsis;
 		max-width: 230px;
 		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.block-editor-link-control__search-item-title mark {
@@ -203,7 +209,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__loading {
-	margin: $grid-size-large; // when only loading control is shown it requires it's own spacing.
+	margin: $grid-unit-20; // when only loading control is shown it requires it's own spacing.
 	display: flex;
 	align-items: center;
 
@@ -265,7 +271,7 @@ $block-editor-link-control-number-of-actions: 1;
 		 * Position spinner to the left of the actions.
 		 *
 		 * Compensate for:
-		 *  - Input margin ($grid-size-large)
+		 *  - Input margin ($grid-unit-20)
 		 *  - Border (1px)
 		 *  - Vertically, for the difference in height between the input (40px)
 		 *    and the spinner.
@@ -273,8 +279,8 @@ $block-editor-link-control-number-of-actions: 1;
 		 *    then artificially create spacing that mimics as if the spinner
 		 *    were center-padded to the same width as an icon button.
 		 */
-		top: $grid-size-large + 1px + ( ( 40px - $spinner-size ) / 2 );
-		right: $grid-size-large + 1px + ( $icon-button-size * $block-editor-link-control-number-of-actions ) + ( ( $icon-button-size - $spinner-size ) / 2 );
+		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) / 2 );
+		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) / 2 );
 	}
 }
 

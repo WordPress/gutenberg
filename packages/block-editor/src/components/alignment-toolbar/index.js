@@ -28,6 +28,11 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 	},
 ];
 
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
+
 export function AlignmentToolbar( props ) {
 	const {
 		value,
@@ -49,8 +54,9 @@ export function AlignmentToolbar( props ) {
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
+			icon={ activeAlignment ? activeAlignment.icon : alignLeft }
 			label={ label }
+			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = value === align;

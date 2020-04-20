@@ -20,18 +20,9 @@ $tree-item-height: 36px;
 	outline: none;
 	background: none;
 	padding: $grid-unit-10;
+	padding: 6px;
 	margin-left: 0.8em;
-	width: $icon-button-size;
-	border-radius: 4px;
-
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
-		outline: none;
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
-	}
+	width: calc(100% - 0.8em);
 }
 
 .block-editor-block-navigation__list .block-editor-block-navigation__list {
@@ -90,10 +81,12 @@ $tree-item-height: 36px;
 		margin-right: 6px;
 	}
 
-	&.is-selected,
-	&.is-selected:focus {
+	&.is-selected svg,
+	&.is-selected:focus svg {
 		color: $white;
 		background: $dark-gray-primary;
+		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		border-radius: $border-width;
 	}
 }
 

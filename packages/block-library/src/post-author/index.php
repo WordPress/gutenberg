@@ -23,8 +23,8 @@ function render_block_core_post_author() {
  * Registers the `core/post-author` block on the server.
  */
 function register_block_core_post_author() {
-	register_block_type(
-		'core/post-author',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-author',
 		array(
 			'render_callback' => 'render_block_core_post_author',
 		)

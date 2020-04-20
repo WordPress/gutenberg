@@ -12,7 +12,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
-	getUnregisteredTypeHandlerName,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -67,6 +66,9 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
+				parentWidth={ this.props.parentWidth }
+				contentStyle={ this.props.contentStyle }
+				onDeleteBlock={ this.props.onDeleteBlock }
 			/>
 		);
 	}
@@ -77,104 +79,6 @@ class BlockListBlock extends Component {
 				<Text>BlockType: { this.props.name }</Text>
 			</View>
 		);
-	}
-
-	applySelectedBlockStyle() {
-		const { hasChildren, getStylesFromColorScheme } = this.props;
-
-		const fullSolidBorderStyle = {
-			// define style for full border
-			...styles.fullSolidBordered,
-			...getStylesFromColorScheme(
-				styles.solidBorderColor,
-				styles.solidBorderColorDark
-			),
-		};
-
-		if ( hasChildren ) {
-			// if block has children apply style for selected parent
-			return { ...styles.selectedParent, ...fullSolidBorderStyle };
-		}
-
-		/* selected block is one of below:
-				1. does not have children
-				2. is not on root list level
-				3. is an emty group block on root or nested level	*/
-		return { ...styles.selectedLeaf, ...fullSolidBorderStyle };
-	}
-
-	applyUnSelectedBlockStyle() {
-		const {
-			hasChildren,
-			isParentSelected,
-			isAncestorSelected,
-			hasParent,
-			getStylesFromColorScheme,
-			isLastBlock,
-		} = this.props;
-
-		// if block does not have parent apply neutral or full
-		// margins depending if block has children or not
-		if ( ! hasParent ) {
-			return hasChildren ? styles.neutral : styles.full;
-		}
-
-		if ( isParentSelected ) {
-			// parent of a block is selected
-			const dashedBorderStyle = {
-				// define style for dashed border
-				...styles.dashedBordered,
-				...getStylesFromColorScheme(
-					styles.dashedBorderColor,
-					styles.dashedBorderColorDark
-				),
-			};
-
-			// return apply childOfSelected or childOfSelectedLeaf
-			// margins depending if block has children or not
-			return {
-				...( hasChildren
-					? styles.childOfSelected
-					: styles.childOfSelectedLeaf ),
-				...dashedBorderStyle,
-				...( ! isLastBlock && styles.marginVerticalChild ),
-			};
-		}
-
-		if ( isAncestorSelected ) {
-			// ancestor of a block is selected
-			return {
-				...styles.descendantOfSelectedLeaf,
-				...( hasChildren && {
-					...styles.marginHorizontalNone,
-					...styles.marginVerticalNone,
-				} ),
-				...( ! isLastBlock && styles.marginVerticalDescendant ),
-			};
-		}
-
-		// if none of above condition are met return apply neutral or full
-		// margins depending if block has children or not
-		return hasChildren ? styles.neutral : styles.full;
-	}
-
-	applyBlockStyle() {
-		const { isSelected, isDimmed } = this.props;
-
-		return [
-			isSelected
-				? this.applySelectedBlockStyle()
-				: this.applyUnSelectedBlockStyle(),
-			isDimmed && styles.dimmed,
-		];
-	}
-
-	applyToolbarStyle() {
-		const { hasChildren, isUnregisteredBlock } = this.props;
-
-		if ( ! hasChildren || isUnregisteredBlock ) {
-			return styles.neutralToolbar;
-		}
 	}
 
 	render() {
@@ -188,7 +92,18 @@ class BlockListBlock extends Component {
 			order,
 			title,
 			parentId,
+			isDimmed,
 			isTouchable,
+			onDeleteBlock,
+			isStackedHorizontally,
+			hasParent,
+			isParentSelected,
+			onSelect,
+			showFloatingToolbar,
+			getStylesFromColorScheme,
+			marginVertical,
+			marginHorizontal,
+			isInnerBlockSelected,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -197,33 +112,63 @@ class BlockListBlock extends Component {
 			order + 1
 		);
 
+		const accessible = ! ( isSelected || isInnerBlockSelected );
+
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.onFocus }
-				accessible={ ! isSelected }
+				accessible={ accessible }
 				accessibilityRole={ 'button' }
 			>
-				<View accessibilityLabel={ accessibilityLabel }>
-					{ isSelected && (
+				<View
+					style={ { flex: 1 } }
+					accessibilityLabel={ accessibilityLabel }
+				>
+					{ showFloatingToolbar && (
 						<FloatingToolbar>
-							<Toolbar passedStyle={ styles.toolbar }>
-								<ToolbarButton
-									title={ __( 'Navigate Up' ) }
-									onClick={ () =>
-										this.props.onSelect( parentId )
-									}
-									icon={ NavigateUpSVG }
-								/>
-								<View style={ styles.pipe } />
-							</Toolbar>
+							{ hasParent && (
+								<Toolbar passedStyle={ styles.toolbar }>
+									<ToolbarButton
+										title={ __( 'Navigate Up' ) }
+										onClick={ () => onSelect( parentId ) }
+										icon={ NavigateUpSVG }
+									/>
+									<View style={ styles.pipe } />
+								</Toolbar>
+							) }
 							<Breadcrumbs clientId={ clientId } />
 						</FloatingToolbar>
 					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
-						style={ this.applyBlockStyle() }
+						style={ [
+							{ marginVertical, marginHorizontal, flex: 1 },
+							isDimmed && styles.dimmed,
+						] }
 					>
+						{ isSelected && (
+							<View
+								style={ [
+									styles.solidBorder,
+									getStylesFromColorScheme(
+										styles.solidBorderColor,
+										styles.solidBorderColorDark
+									),
+								] }
+							/>
+						) }
+						{ isParentSelected && (
+							<View
+								style={ [
+									styles.dashedBorder,
+									getStylesFromColorScheme(
+										styles.dashedBorderColor,
+										styles.dashedBorderColorDark
+									),
+								] }
+							/>
+						) }
 						{ isValid ? (
 							this.getBlockForType()
 						) : (
@@ -232,9 +177,15 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ this.applyToolbarStyle() }>
+						<View style={ styles.neutralToolbar }>
 							{ isSelected && (
-								<BlockMobileToolbar clientId={ clientId } />
+								<BlockMobileToolbar
+									clientId={ clientId }
+									onDelete={ onDeleteBlock }
+									isStackedHorizontally={
+										isStackedHorizontally
+									}
+								/>
 							) }
 						</View>
 					</View>
@@ -252,19 +203,19 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
+			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
-			getBlockCount,
+			hasSelectedInnerBlock,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
-		const isLastBlock = order === getBlockCount( rootClientId ) - 1;
+		const isInnerBlockSelected = hasSelectedInnerBlock( clientId );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const { name, attributes, isValid } = block || {};
 
-		const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 		const blockType = getBlockType( name || 'core/missing' );
 		const title = blockType.title;
 		const icon = blockType.icon;
@@ -273,6 +224,10 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
+		const rootBlock = getBlock( rootBlockId );
+		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
+
+		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -284,8 +239,6 @@ export default compose( [
 			? parents[ commonAncestorIndex ]
 			: parents[ parents.length - 1 ];
 
-		const hasChildren =
-			! isUnregisteredBlock && !! getBlockCount( clientId );
 		const hasParent = !! parentId;
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
@@ -321,18 +274,17 @@ export default compose( [
 			title,
 			attributes,
 			blockType,
-			isLastBlock,
 			isSelected,
+			isInnerBlockSelected,
 			isValid,
 			parentId,
 			isParentSelected,
 			firstToSelectId,
-			hasChildren,
 			hasParent,
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			isUnregisteredBlock,
+			showFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

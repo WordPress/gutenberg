@@ -43,13 +43,56 @@ module.exports = function buildDockerComposeConfig( config ) {
 		...themeMounts,
 	];
 
-	const testsMounts = [
-		`${
-			config.coreSource ? config.coreSource.testsPath : 'tests-wordpress'
-		}:/var/www/html`,
-		...pluginMounts,
-		...themeMounts,
-	];
+	let testsMounts;
+	if ( config.coreSource ) {
+		testsMounts = [
+			`${ config.coreSource.testsPath }:/var/www/html`,
+
+			// When using a local source for "core" we want to ensure two things:
+			//
+			// 1. That changes the user makes within the "core" directory are
+			//    served in both the development and tests environments.
+			// 2. That the development and tests environment use separate
+			//    databases and `wp-content/uploads`.
+			//
+			// To do this we copy the local "core" files ($wordpress) to a tests
+			// directory ($tests-wordpress) and instruct the tests environment
+			// to source its files like so:
+			//
+			// - wp-config.php        <- $tests-wordpress/wp-config.php
+			// - wp-config-sample.php <- $tests-wordpress/wp-config.php
+			// - wp-content           <- $tests-wordpress/wp-content
+			// - *                    <- $wordpress/*
+			//
+			// https://github.com/WordPress/gutenberg/issues/21164
+			...( config.coreSource.type === 'local'
+				? fs
+						.readdirSync( config.coreSource.path )
+						.filter(
+							( filename ) =>
+								filename !== 'wp-config.php' &&
+								filename !== 'wp-config-sample.php' &&
+								filename !== 'wp-content'
+						)
+						.map(
+							( filename ) =>
+								`${ path.join(
+									config.coreSource.path,
+									filename
+								) }:/var/www/html/${ filename }`
+						)
+				: [] ),
+
+			...pluginMounts,
+			...themeMounts,
+		];
+	} else {
+		testsMounts = [
+			'tests-wordpress:/var/www/html',
+			...pluginMounts,
+			...themeMounts,
+		];
+	}
 
 	// Set the default ports based on the config values.
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.port }}:80`;
@@ -66,9 +109,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 		services: {
 			mysql: {
 				image: 'mariadb',
+				ports: [ '3306' ],
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},
+				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
@@ -108,6 +153,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		volumes: {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			mysql: {},
 		},
 	};
 };

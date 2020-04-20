@@ -27,14 +27,9 @@ function render_block_core_post_date( $attributes ) {
  * Registers the `core/post-date` block on the server.
  */
 function register_block_core_post_date() {
-	register_block_type(
-		'core/post-date',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-date',
 		array(
-			'attributes'      => array(
-				'format' => array(
-					'type' => 'string',
-				),
-			),
 			'render_callback' => 'render_block_core_post_date',
 		)
 	);
