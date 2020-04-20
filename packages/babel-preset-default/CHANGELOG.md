@@ -1,5 +1,7 @@
 ## Master
 
+## 4.12.0 (2020-04-15)
+
 ### New Features
 
 - The bundled `@babel/core` dependency has been updated from requiring `^7.8.3` to requiring `^7.9.0`. All other Babel plugins were updated to the latest version (see [Highlights](https://babeljs.io/blog/2020/03/16/7.9.0)).

@@ -12,6 +12,7 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	insertBlock,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const createButtonLabel = 'Create Table';
@@ -99,6 +100,7 @@ describe( 'Table', () => {
 
 	it( 'allows header and footer rows to be switched on and off', async () => {
 		await insertBlock( 'Table' );
+		await openDocumentSettingsSidebar();
 
 		const headerSwitchSelector = "//label[text()='Header section']";
 		const footerSwitchSelector = "//label[text()='Footer section']";
@@ -144,6 +146,7 @@ describe( 'Table', () => {
 
 	it( 'allows adding and deleting columns across the table header, body and footer', async () => {
 		await insertBlock( 'Table' );
+		await openDocumentSettingsSidebar();
 
 		// Create the table.
 		await clickButton( createButtonLabel );
@@ -217,6 +220,7 @@ describe( 'Table', () => {
 	// Testing for regressions of https://github.com/WordPress/gutenberg/issues/14904.
 	it( 'allows cells to be selected when the cell area outside of the RichText is clicked', async () => {
 		await insertBlock( 'Table' );
+		await openDocumentSettingsSidebar();
 
 		// Create the table.
 		await clickButton( createButtonLabel );

@@ -23,7 +23,6 @@ export default function Layout( { blockEditorSettings } ) {
 				<DropZoneProvider>
 					<FocusReturnProvider>
 						{ /* <Notices /> */ }
-						<Popover.Slot name="block-toolbar" />
 						<TabPanel
 							className="edit-navigation-layout__tab-panel"
 							tabs={ [

@@ -2,13 +2,28 @@
 
 ### Breaking Changes
 
+- The bundled `puppeteer` (`^2.0.0`) dependency has been replaced with `puppeteer-core` in version `3.0.0`. Puppeteer uses Chromium v81 instead of Chromium v79. See the [full list of changes](https://github.com/puppeteer/puppeteer/releases/tag/v3.0.0). It also allowed preventing Chromium installation together with `@wordpress/scripts`. It happens now on-demand when running `test-e2e` script, and it re-triggers only when a new version is required.
+
+### Bug fix
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^4.0.3` to requiring `^5.0.0` ([#21597](https://github.com/WordPress/gutenberg/pull/21597)). [Breaking changes](https://npmpackagejsonlint.org/docs/en/v4-to-v5) don't break anything in this package. It fixes the abrupt shutdown when `"description"` field in `package.json` is empty.
+
+## 8.0.0 (2020-04-15)
+
+### Breaking Changes
+
 - The bundled `jest` dependency has been updated from requiring `^24.9.0` to requiring `^25.3.0` (see [Breaking Changes](https://jestjs.io/blog/2020/01/21/jest-25), [#20766](https://github.com/WordPress/gutenberg/pull/20766)).
+
+### Enhancements
+
+- The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
+## 7.2.0 (2020-04-01)
 
 ### Enhancements
 
 - Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
 - All webpack dependencies got minor version update if applicable.
-- The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
 
 ### Internal
 

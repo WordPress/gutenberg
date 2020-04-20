@@ -152,6 +152,9 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -200,6 +203,9 @@ describe( 'Links', () => {
 
 		// Click on the Submit button
 		await page.keyboard.press( 'Enter' );
+
+		// Reselect the link.
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 	};
 
 	it( 'can be edited', async () => {
@@ -490,13 +496,6 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 		await page.keyboard.type( 'w.org' );
 
-		// Insert the link
-		await page.keyboard.press( 'Enter' );
-
-		// Navigate back to the popover
-		await pressKeyWithModifier( 'primary', 'k' );
-		await waitForAutoFocus();
-
 		// Navigate to and toggle the "Open in new tab" checkbox.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -508,7 +507,8 @@ describe( 'Links', () => {
 
 		// Close dialog. Expect that "Open in new tab" would have been applied
 		// immediately.
-		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -519,9 +519,10 @@ describe( 'Links', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/pull/15573
 
-		// Collapse selection.
+		// Move caret back into the link.
 		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
+
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
@@ -532,6 +533,10 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Navigate back to the popover
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		// Navigate back to inputs to verify appears as changed.
 		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 
