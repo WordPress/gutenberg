@@ -57,7 +57,7 @@ function Navigation( {
 	//
 	// HOOKS
 	//
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
+
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
@@ -81,7 +81,6 @@ function Navigation( {
 		[ fontSize.size ]
 	);
 
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
