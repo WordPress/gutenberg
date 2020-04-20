@@ -19,18 +19,6 @@
 			"source": "html",
 			"selector": "a"
 		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"textColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
-		},
 		"linkTarget": {
 			"type": "string",
 			"source": "attribute",
@@ -48,12 +36,6 @@
 		},
 		"borderRadius": {
 			"type": "number"
-		},
-		"gradient": {
-			"type": "string"
-		},
-		"customGradient": {
-			"type": "string"
 		}
 	}
 }

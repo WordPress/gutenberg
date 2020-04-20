@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.25.0",
+  "version": "1.26.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -149,6 +149,7 @@
     "classnames": "^2.2.5",
     "dom-react": "^2.2.1",
     "domutils": "^1.7.0",
+    "email-validator": "2.0.4",
     "emotion": "^10.0.27",
     "emotion-theming": "^10.0.27",
     "fast-average-color": "^4.3.0",
