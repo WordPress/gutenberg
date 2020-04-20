@@ -66,7 +66,9 @@ class BlockListBlock extends Component {
 					this.props.onCaretVerticalPositionChange
 				}
 				clientId={ this.props.clientId }
+				parentWidth={ this.props.parentWidth }
 				contentStyle={ this.props.contentStyle }
+				onDeleteBlock={ this.props.onDeleteBlock }
 			/>
 		);
 	}
@@ -93,7 +95,7 @@ class BlockListBlock extends Component {
 			isDimmed,
 			isTouchable,
 			onDeleteBlock,
-			horizontalDirection,
+			isStackedHorizontally,
 			hasParent,
 			isParentSelected,
 			onSelect,
@@ -180,7 +182,9 @@ class BlockListBlock extends Component {
 								<BlockMobileToolbar
 									clientId={ clientId }
 									onDelete={ onDeleteBlock }
-									horizontalDirection={ horizontalDirection }
+									isStackedHorizontally={
+										isStackedHorizontally
+									}
 								/>
 							) }
 						</View>
