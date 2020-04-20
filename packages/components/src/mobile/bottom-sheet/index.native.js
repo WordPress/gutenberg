@@ -312,6 +312,8 @@ class BottomSheet extends Component {
 			isScrolling,
 			scrollEnabled,
 			setMaxHeight,
+			extraProps,
+			stack,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -358,7 +360,7 @@ class BottomSheet extends Component {
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.onCloseBottomSheet }
-				onHardwareButtonPress={ this.onHardwareButtonPress }
+				onBackButtonPress={ this.onHardwareButtonPress }
 				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
@@ -415,10 +417,9 @@ class BottomSheet extends Component {
 								onHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
 								onReplaceSubsheet: this.onReplaceSubsheet,
-								extraProps: this.state.extraProps,
-								currentScreen: this.state.stack[
-									Math.max( this.state.stack.length - 1, 0 )
-								],
+								extraProps,
+								currentScreen:
+									stack[ Math.max( stack.length - 1, 0 ) ],
 							} }
 						>
 							<TouchableHighlight accessible={ false }>

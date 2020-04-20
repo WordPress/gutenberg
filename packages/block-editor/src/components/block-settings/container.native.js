@@ -8,7 +8,10 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	SETTINGS_DEFAULTS as defaultSettings,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -34,6 +37,7 @@ function BottomSheetSettings( {
 						case 'Color':
 							return (
 								<ColorSettings
+									defaultSettings={ defaultSettings }
 									{ ...bottomSheetProps }
 									{ ...extraProps }
 								/>

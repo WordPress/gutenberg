@@ -16,7 +16,7 @@ export default function PanelColorGradientSettings( { settings, title } ) {
 						(
 							{
 								onColorChange,
-								colorValue = '#ffffff',
+								colorValue,
 								onGradientChange,
 								gradientValue,
 								label,

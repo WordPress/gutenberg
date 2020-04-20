@@ -6,8 +6,8 @@ import React from 'react';
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
-
+import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
+import { View } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -19,7 +19,13 @@ const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 const FillWithSettingsButton = ( { children, ...props } ) => {
 	return (
 		<>
-			<Fill { ...props }>{ children }</Fill>
+			<Fill { ...props }>
+				{
+					<BottomSheetConsumer>
+						{ () => <View>{ children }</View> }
+					</BottomSheetConsumer>
+				}
+			</Fill>
 			{ React.Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>
 	);

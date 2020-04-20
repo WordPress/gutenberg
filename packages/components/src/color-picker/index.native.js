@@ -28,7 +28,7 @@ function ColorPicker( {
 	getStylesFromColorScheme,
 } ) {
 	const isIOS = Platform.OS === 'ios';
-	const isGradient = activeColor.includes( 'linear-gradient' );
+	const isGradient = activeColor?.includes( 'linear-gradient' );
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 	const [ hue, setHue ] = useState( 0 );
@@ -78,7 +78,7 @@ function ColorPicker( {
 	}, [ currentColor ] );
 
 	useEffect( () => {
-		if ( ! isGradient ) {
+		if ( ! isGradient && activeColor ) {
 			setHSVFromHex( activeColor );
 		}
 		setColor( activeColor );

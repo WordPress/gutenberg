@@ -30,7 +30,7 @@ function ColorIndicator( {
 	getStylesFromColorScheme,
 	opacity,
 } ) {
-	const isGradient = color.includes( 'linear-gradient' );
+	const isGradient = color?.includes( 'linear-gradient' );
 
 	const outlineStyle = getStylesFromColorScheme(
 		styles.outline,

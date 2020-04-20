@@ -8,7 +8,6 @@ import { View, Text, LayoutAnimation } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { SETTINGS_DEFAULTS as defaultSettings } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
@@ -32,13 +31,14 @@ function ColorSettings( {
 	onCloseBottomSheet,
 	onHardwareButtonPress,
 	getStylesFromColorScheme,
+	defaultSettings,
 } ) {
 	const segments = [ 'Solid', 'Gradient' ];
-	const isGradient = colorValue.includes( 'linear-gradient' );
-	const selectedSegmentIndex = isGradient ? 1 : 0;
-
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
+	const isGradient = colorValue?.includes( 'linear-gradient' );
+	const selectedSegmentIndex = isGradient ? 1 : 0;
+
 	const [ activeSegment, setActiveSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
@@ -46,10 +46,15 @@ function ColorSettings( {
 	const currentSegment = onGradientChange ? activeSegment : segments[ 0 ];
 	const isSolidSegment = activeSegment === 'Solid';
 
+	const horizontalSeparatorStyle = getStylesFromColorScheme(
+		styles.horizontalSeparator,
+		styles.horizontalSeparatorDark
+	);
+
 	useEffect( () => {
 		onHardwareButtonPress( () => {
 			if ( isCustomScreen ) {
-				setIsCustomScreen( false );
+				onCustomScreenToggle( false );
 			} else {
 				onReplaceSubsheet( 'Settings', {}, afterHardwareButtonPress() );
 			}
@@ -80,85 +85,95 @@ function ColorSettings( {
 
 	function setColor( color ) {
 		setCurrentValue( color );
-		if ( isSolidSegment && onColorChange ) {
+		if ( isSolidSegment && onColorChange && onGradientChange ) {
+			onColorChange( color );
+			onGradientChange( '' );
+		} else if ( isSolidSegment && onColorChange ) {
 			onColorChange( color );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
 		}
 	}
 
-	if ( isCustomScreen ) {
-		return (
-			<View>
-				<ColorPicker
-					shouldEnableBottomSheetScroll={
-						shouldEnableBottomSheetScroll
-					}
-					shouldSetBottomSheetMaxHeight={
-						shouldSetBottomSheetMaxHeight
-					}
-					setColor={ setColor }
-					activeColor={ currentValue }
-					onNavigationBack={ () => {
-						onCustomScreenToggle( false );
-					} }
-					onCloseBottomSheet={ onCloseBottomSheet }
-					isBottomSheetScrolling={ isBottomSheetScrolling }
-				/>
-			</View>
-		);
-	}
-
-	return (
-		<View>
-			<NavigationHeader
-				screen={ label }
-				leftButtonOnPress={ () => onReplaceSubsheet( 'Settings' ) }
-			/>
-			<ColorPalette
-				setColor={ setColor }
-				activeColor={ currentValue }
-				currentSegment={ currentSegment }
-				isCustomScreen={ isCustomScreen }
-				onCustomPress={ () => {
-					onCustomScreenToggle( true );
-				} }
-				shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
-				defaultSettings={ defaultSettings }
-			/>
-			<View
-				style={ getStylesFromColorScheme(
-					styles.horizontalSeparator,
-					styles.horizontalSeparatorDark
-				) }
-			/>
-			{ onGradientChange ? (
+	function getFooter() {
+		if ( onGradientChange ) {
+			return (
 				<SegmentedControls
 					segments={ segments }
 					segmentHandler={ ( item ) => setActiveSegment( item ) }
 					selectedIndex={ selectedSegmentIndex }
 					addonLeft={
 						<ColorIndicator
-							color={ colorValue }
+							color={ currentValue }
 							style={ styles.colorIndicator }
 						/>
 					}
 				/>
-			) : (
-				<View style={ styles.footer }>
-					<View style={ styles.flex }>
-						<ColorIndicator
-							color={ currentValue }
-							style={ styles.colorIndicator }
-						/>
-					</View>
-					<Text
-						style={ styles.selectColorText }
-						maxFontSizeMultiplier={ 2 }
-					>
-						{ __( 'Select a color' ) }
-					</Text>
-					<View style={ styles.flex } />
+			);
+		}
+		return (
+			<View style={ styles.footer }>
+				<View style={ styles.flex }>
+					<ColorIndicator
+						color={ currentValue }
+						style={ styles.colorIndicator }
+					/>
+				</View>
+				<Text
+					style={ styles.selectColorText }
+					maxFontSizeMultiplier={ 2 }
+				>
+					{ __( 'Select a color' ) }
+				</Text>
+				<View style={ styles.flex } />
+			</View>
+		);
+	}
+
+	return (
+		<View renderToHardwareTextureAndroid>
+			{ isCustomScreen && (
+				<View>
+					<ColorPicker
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						shouldSetBottomSheetMaxHeight={
+							shouldSetBottomSheetMaxHeight
+						}
+						setColor={ setColor }
+						activeColor={ currentValue }
+						onNavigationBack={ () => {
+							onCustomScreenToggle( false );
+						} }
+						onCloseBottomSheet={ onCloseBottomSheet }
+						isBottomSheetScrolling={ isBottomSheetScrolling }
+					/>
+				</View>
+			) }
+			{ ! isCustomScreen && (
+				<View>
+					<NavigationHeader
+						screen={ label }
+						leftButtonOnPress={ () =>
+							onReplaceSubsheet( 'Settings' )
+						}
+					/>
+					<ColorPalette
+						setColor={ setColor }
+						activeColor={ currentValue }
+						currentSegment={ currentSegment }
+						isCustomScreen={ isCustomScreen }
+						onCustomPress={ () => {
+							onCustomScreenToggle( true );
+						} }
+						shouldEnableBottomSheetScroll={
+							shouldEnableBottomSheetScroll
+						}
+						defaultSettings={ defaultSettings }
+					/>
+					<View style={ horizontalSeparatorStyle } />
+					{ getFooter() }
 				</View>
 			) }
 		</View>

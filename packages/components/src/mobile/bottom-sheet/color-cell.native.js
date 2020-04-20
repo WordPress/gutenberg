@@ -23,9 +23,11 @@ export default function BottomSheetColorCell( props ) {
 			}
 			onPress={ onPress }
 			editable={ false }
-			value={ '' }
+			value={ ! color && 'Default' }
 		>
-			<ColorIndicator color={ color } style={ styles.colorCircle } />
+			{ color && (
+				<ColorIndicator color={ color } style={ styles.colorCircle } />
+			) }
 			<Icon icon={ chevronRight }></Icon>
 		</Cell>
 	);
