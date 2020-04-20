@@ -8,23 +8,24 @@ import { map } from 'lodash';
  */
 import { useMemo, useCallback } from '@wordpress/element';
 import { parse, cloneBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import useAsyncList from './use-async-list';
+import InserterPanel from './panel';
 
 function BlockPattern( { pattern, onClick } ) {
-	const { title, content } = pattern;
+	const { content } = pattern;
 	const blocks = useMemo( () => parse( content ), [ content ] );
 
 	return (
 		<div
-			className="block-editor-patterns__item"
+			className="block-editor-inserter__patterns-item"
 			role="button"
 			onClick={ () => onClick( pattern, blocks ) }
 			onKeyDown={ ( event ) => {
@@ -33,41 +34,24 @@ function BlockPattern( { pattern, onClick } ) {
 				}
 			} }
 			tabIndex={ 0 }
+			aria-label={ pattern.title }
 		>
-			<div className="block-editor-patterns__item-preview">
-				<BlockPreview blocks={ blocks } __experimentalPadding={ 8 } />
-			</div>
-			<div className="block-editor-patterns__item-title">{ title }</div>
+			<BlockPreview blocks={ blocks } />
 		</div>
 	);
 }
 
-function BlockPatternPlaceholder( { pattern } ) {
-	const { title } = pattern;
-
+function BlockPatternPlaceholder() {
 	return (
-		<div className="block-editor-patterns__item is-placeholder">
-			<div className="block-editor-patterns__item-preview"></div>
-			<div className="block-editor-patterns__item-title">{ title }</div>
-		</div>
+		<div className="block-editor-inserter__patterns-item is-placeholder" />
 	);
 }
 
-function BlockPatterns( { patterns } ) {
+function BlockPatterns( { patterns, onInsert } ) {
 	const currentShownPatterns = useAsyncList( patterns );
-	const getBlockInsertionPoint = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockInsertionPoint;
-	} );
-	const { insertBlocks } = useDispatch( 'core/block-editor' );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		const { index, rootClientId } = getBlockInsertionPoint();
-		insertBlocks(
-			map( blocks, ( block ) => cloneBlock( block ) ),
-			index,
-			rootClientId,
-			false
-		);
+		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
@@ -81,7 +65,7 @@ function BlockPatterns( { patterns } ) {
 	}, [] );
 
 	return (
-		<div className="block-editor-patterns">
+		<InserterPanel title={ _x( 'All', 'patterns' ) }>
 			{ patterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
@@ -90,13 +74,10 @@ function BlockPatterns( { patterns } ) {
 						onClick={ onClickPattern }
 					/>
 				) : (
-					<BlockPatternPlaceholder
-						key={ index }
-						pattern={ pattern }
-					/>
+					<BlockPatternPlaceholder key={ index } />
 				)
 			) }
-		</div>
+		</InserterPanel>
 	);
 }
 

@@ -179,7 +179,7 @@ export const getRawEntityRecord = createSelector(
  * @param {string}  name   Entity name.
  * @param {?Object} query  Optional terms query.
  *
- * @return {Array} Records.
+ * @return {?Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
 	const queriedState = get( state.entities.data, [

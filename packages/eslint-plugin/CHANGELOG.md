@@ -1,5 +1,9 @@
 ## Master
 
+### Bug Fixes
+
+- The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
+
 ## 5.0.1 (2020-04-15)
 
 ### Bug Fixes

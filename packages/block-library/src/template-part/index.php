@@ -38,7 +38,11 @@ function render_block_core_template_part( $attributes ) {
 	$content = convert_smilies( $content );
 	$content = wpautop( $content );
 	$content = shortcode_unautop( $content );
-	$content = wp_make_content_images_responsive( $content );
+	if ( function_exists( 'wp_filter_content_tags' ) ) {
+		$content = wp_filter_content_tags( $content );
+	} else {
+		$content = wp_make_content_images_responsive( $content );
+	}
 	$content = do_shortcode( $content );
 
 	return str_replace( ']]>', ']]&gt;', $content );

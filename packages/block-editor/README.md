@@ -93,6 +93,18 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
+<a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
+
+Component which merges passed value with current consumed block context.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md>
+
+_Parameters_
+
+-   _props_ `BlockContextProviderProps`: 
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.

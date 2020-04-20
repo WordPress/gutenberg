@@ -1,5 +1,6 @@
 // Block Creation Components
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { BlockContextProvider } from './block-context';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';

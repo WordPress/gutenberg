@@ -152,6 +152,9 @@ describe( 'Links', () => {
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );

@@ -10,7 +10,7 @@
 	justify-content: center;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	border: $border-width solid $light-gray-500;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
