@@ -137,7 +137,9 @@ public class MainApplication extends Application implements ReactApplication {
             public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
-            public void onAddMention(Consumer<String> onSuccess) {}
+            public void onAddMention(Consumer<String> onSuccess) {
+                onSuccess.accept("matt");
+            }
 
         }, isDarkMode());
 
