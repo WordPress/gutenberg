@@ -98,6 +98,7 @@ class Video extends Component {
 					ref={ ( ref ) => {
 						this.player = ref;
 					} }
+					pointerEvents={ isSelected ? undefined : 'none' }
 					controls={ ! forceFullscreen }
 					ignoreSilentSwitch={ 'ignore' }
 					onLayout={ this.onVideoLayout }
