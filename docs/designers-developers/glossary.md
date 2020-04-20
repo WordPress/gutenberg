@@ -19,8 +19,8 @@
 <dt>Block name</dt>
 <dd>A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. <code>core/image</code></dd>
 
-<dt>Block patterns</dt>
-<dd>Block patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
+<dt>Patterns</dt>
+<dd>Patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
 
 <dt>Block type</dt>
 <dd>In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.</dd>

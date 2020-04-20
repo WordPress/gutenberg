@@ -56,7 +56,11 @@
 
 		// Toggled style.
 		&.is-pressed {
-			color: $white;
+			background: transparent;
+
+			&:hover {
+				background: transparent;
+			}
 
 			&::before {
 				background: $dark-gray-primary;

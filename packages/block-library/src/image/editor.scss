@@ -1,10 +1,6 @@
 .wp-block-image {
 	position: relative;
 
-	// This resets the intrinsic margin on the figure in non-floated, wide, and full-wide alignments.
-	margin-left: 0;
-	margin-right: 0;
-
 	&.is-transient img {
 		opacity: 0.3;
 	}
