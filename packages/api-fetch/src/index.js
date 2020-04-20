@@ -168,8 +168,6 @@ function useApiFetch( path ) {
 		version: '7.11.0',
 		alternative: 'apiFetch',
 		plugin: 'Gutenberg',
-		hint:
-			'It is recommended to prefer using apiFetch directly over the useApiFetch hook.',
 	} );
 
 	// Indicate the fetching status
