@@ -106,11 +106,3 @@ export function __experimentalUseGradient( {
 	}
 	return { gradientClass, gradientValue, setGradient };
 }
-
-export function __experimentalWithSetGradient( WrappedComponent ) {
-	return ( props ) => {
-		const { setGradient } = __experimentalUseGradient();
-
-		return <WrappedComponent setGradient={ setGradient } { ...props } />;
-	};
-}

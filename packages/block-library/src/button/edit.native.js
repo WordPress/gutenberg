@@ -19,7 +19,6 @@ import {
 	InspectorControls,
 	BlockControls,
 	SETTINGS_DEFAULTS,
-	__experimentalWithSetGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -547,7 +546,6 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withInstanceId,
-	__experimentalWithSetGradient,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
