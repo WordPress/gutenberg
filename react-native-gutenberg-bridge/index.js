@@ -11,6 +11,8 @@ const isAndroid = Platform.OS === 'android';
 
 const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
+export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
+
 export const mediaSources = {
 	deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
 	deviceCamera: 'DEVICE_CAMERA',
@@ -75,6 +77,10 @@ export function subscribeAndroidModalClosed( callback ) {
 
 export function subscribeUpdateTheme( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+}
+
+export function subscribePreferredColorScheme( callback ) {
+	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
 
 /**
