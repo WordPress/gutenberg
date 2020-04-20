@@ -53,6 +53,7 @@ const BlockParentSelector = function() {
 					className="block-editor-block-parent-selector__button"
 					onClick={ () => selectBlock( firstParentClientID ) }
 					label={ sprintf(
+						/* translators: %s: Name of the block's parent. */
 						__( 'Select parent (%s)' ),
 						parentBlockType.title
 					) }
