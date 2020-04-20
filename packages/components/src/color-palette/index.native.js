@@ -75,7 +75,7 @@ function ColorPalette( {
 	}
 
 	function isSelected( color ) {
-		return ! isSelectedCustom() && activeColor && activeColor === color;
+		return ! isSelectedCustom() && activeColor === color;
 	}
 
 	function timingAnimation( property, toValue ) {
