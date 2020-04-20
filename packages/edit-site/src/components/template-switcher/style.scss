@@ -22,6 +22,14 @@
 	width: 100%;
 }
 
+/*
+ * This doesn't contain anything but it's needed because of dropdown jumpiness
+ * when there's a div after the last menu group.
+ */
+.edit-site-template-switcher__footer {
+	margin-bottom: -$grid-unit-15;
+}
+
 .edit-site-template-switcher__preview {
 	display: none;
 	border: $border-width solid $light-gray-secondary;
@@ -33,7 +41,6 @@
 	position: absolute;
 	top: -$border-width;
 	left: calc(100% + #{$grid-unit-15});
-
 
 	@include break-medium {
 		display: block;

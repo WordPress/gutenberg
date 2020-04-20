@@ -1,3 +1,9 @@
+## Master
+
+### Bug Fixes
+
+- `isKeyboardEvent` now tests expected modifiers as an exclusive set, fixing an issue where additional modifiers would wrongly report as satisfying a test for a subset of those modifiers [#20733](https://github.com/WordPress/gutenberg/pull/20733).
+
 ## 2.0.5 (2018-11-21)
 
 ## 2.0.4 (2018-11-20)

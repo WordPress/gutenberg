@@ -79,12 +79,5 @@
 		display: block;
 		margin-left: 0;
 		margin-top: $grid-unit-10;
-
-		// Beyond mobile, align the action button on the right to use the space, and reduce margins so they don't add too much extra line-height.
-		@include break-medium() {
-			float: right;
-			margin-top: -$grid-unit-05;
-			margin-bottom: -$grid-unit-05;
-		}
 	}
 }

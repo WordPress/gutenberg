@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
+
 /**
  * Internal dependencies
  */
@@ -188,3 +190,5 @@ describe( 'createI18n', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */

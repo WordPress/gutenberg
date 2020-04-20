@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
+import { some, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,48 +12,69 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 function EntityRecordState( { record, checked, onChange } ) {
-	const entity = useSelect(
-		( select ) => select( 'core' ).getEntity( record.kind, record.name ),
-		[ record.kind, record.name ]
-	);
-
 	return (
 		<CheckboxControl
-			label={
-				<>
-					{ entity.label }
-					{ !! record.title && (
-						<>
-							{ ': ' }
-							<strong>
-								{ record.title || __( 'Untitled' ) }
-							</strong>
-						</>
-					) }
-				</>
-			}
-			checked={ ! checked }
+			label={ <strong>{ record.title || __( 'Untitled' ) }</strong> }
+			checked={ checked }
 			onChange={ onChange }
 		/>
 	);
 }
 
-export default function EntitiesSavedStates( {
-	isOpen,
-	onRequestClose,
-	ignoredForSave = [],
-} ) {
+function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
+	const firstRecord = list[ 0 ];
+	const entity = useSelect(
+		( select ) =>
+			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
+		[ firstRecord.kind, firstRecord.name ]
+	);
+
+	return (
+		<div className="editor-entities-saved-states__entity-type-list">
+			<h2>{ entity.label }</h2>
+			{ list.map( ( record ) => {
+				return (
+					<EntityRecordState
+						key={ record.key || 'site' }
+						record={ record }
+						checked={
+							! some(
+								unselectedEntities,
+								( elt ) =>
+									elt.kind === record.kind &&
+									elt.name === record.name &&
+									elt.key === record.key
+							)
+						}
+						onChange={ ( value ) =>
+							setUnselectedEntities( record, value )
+						}
+					/>
+				);
+			} ) }
+		</div>
+	);
+}
+
+export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 	const dirtyEntityRecords = useSelect(
 		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
 		[]
 	);
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ unsavedEntityRecords, _setUnsavedEntityRecords ] = useState( [] );
-	const setUnsavedEntityRecords = ( { kind, name, key }, checked ) => {
+	// To group entities by type.
+	const partitionedSavables = Object.values(
+		groupBy( dirtyEntityRecords, 'name' )
+	);
+
+	// Unchecked entities to be ignored by save function.
+	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+
+	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
 		if ( checked ) {
-			_setUnsavedEntityRecords(
-				unsavedEntityRecords.filter(
+			_setUnselectedEntities(
+				unselectedEntities.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
@@ -61,17 +82,18 @@ export default function EntitiesSavedStates( {
 				)
 			);
 		} else {
-			_setUnsavedEntityRecords( [
-				...unsavedEntityRecords,
+			_setUnselectedEntities( [
+				...unselectedEntities,
 				{ kind, name, key },
 			] );
 		}
 	};
+
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
-					ignoredForSave.concat( unsavedEntityRecords ),
+					unselectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -86,6 +108,7 @@ export default function EntitiesSavedStates( {
 
 		onRequestClose( entitiesToSave );
 	};
+
 	return (
 		isOpen && (
 			<Modal
@@ -93,23 +116,13 @@ export default function EntitiesSavedStates( {
 				onRequestClose={ () => onRequestClose() }
 				contentLabel={ __( 'Select items to save.' ) }
 			>
-				{ dirtyEntityRecords.map( ( record ) => {
+				{ partitionedSavables.map( ( list ) => {
 					return (
-						<EntityRecordState
-							key={ record.key }
-							record={ record }
-							checked={
-								! some(
-									unsavedEntityRecords,
-									( elt ) =>
-										elt.kind === record.kind &&
-										elt.name === record.name &&
-										elt.key === record.key
-								)
-							}
-							onChange={ ( value ) =>
-								setUnsavedEntityRecords( record, value )
-							}
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
 						/>
 					);
 				} ) }
@@ -118,7 +131,7 @@ export default function EntitiesSavedStates( {
 					isPrimary
 					disabled={
 						dirtyEntityRecords.length -
-							unsavedEntityRecords.length ===
+							unselectedEntities.length ===
 						0
 					}
 					onClick={ saveCheckedEntities }

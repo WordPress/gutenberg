@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.2.6",
+	"version": "9.4.1",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
 		"build-style/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@emotion/core": "^10.0.22",
 		"@emotion/css": "^10.0.22",
 		"@emotion/native": "^10.0.22",
@@ -56,7 +56,7 @@
 		"reakit": "^1.0.0-rc.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^3.3.2"
+		"uuid": "^7.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

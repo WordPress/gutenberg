@@ -39,7 +39,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.click( ':focus [aria-label="Two columns; equal split"]' );
 		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector( ':focus.block-editor-inserter__search' );
+		await page.waitForSelector(
+			':focus.block-editor-inserter__search-input'
+		);
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -50,7 +52,9 @@ describe( 'Writing Flow', () => {
 		// is a temporary solution.
 		await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
 		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector( ':focus.block-editor-inserter__search' );
+		await page.waitForSelector(
+			':focus.block-editor-inserter__search-input'
+		);
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.

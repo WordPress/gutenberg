@@ -13,7 +13,8 @@
 			{ "docs/designers-developers/developers/block-api/block-registration.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-edit-save.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
-			{"docs/designers-developers/developers/block-api/block-deprecation.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-context.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-deprecation.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] }
@@ -54,7 +55,7 @@
 	] },
 	{ "docs/designers-developers/designers/README.md": [
 		{ "docs/designers-developers/designers/block-design.md": [] },
-		{ "docs/designers-developers/designers/design-patterns.md": [] },
+		{ "docs/designers-developers/designers/user-interface.md": [] },
 		{ "docs/designers-developers/designers/design-resources.md": [] },
 		{ "docs/designers-developers/designers/animation.md": [] }
 	] },
@@ -77,6 +78,7 @@
 		{ "docs/contributors/document.md": [
 			{ "docs/contributors/copy-guide.md": [] }
 		] },
+		{ "docs/contributors/triage.md": [] },
 		{ "docs/contributors/localizing.md": [] },
 		{ "docs/contributors/repository-management.md": [] }
 	] },

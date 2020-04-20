@@ -10,6 +10,10 @@
 		display: block;
 		box-shadow: none;
 	}
+	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
+	.widget.open {
+		z-index: 0;
+	}
 }
 
 .wp-block-legacy-widget__update-button {

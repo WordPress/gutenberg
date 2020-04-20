@@ -85,28 +85,6 @@ export function multipleEnableItems(
 	}
 	const currentTypeState = state[ itemType ] || {};
 	const currentScopeState = currentTypeState[ scope ] || {};
-	if (
-		! isEnable &&
-		! get( DEFAULTS.enableItems.multipleEnableItems, [
-			itemType,
-			scope,
-			item,
-		] )
-	) {
-		const newScopeState = omit( currentScopeState, [ item ] );
-		const newTypeState = isEmpty( newScopeState )
-			? omit( currentTypeState, [ scope ] )
-			: {
-					...currentScopeState,
-					[ scope ]: newScopeState,
-			  };
-		return isEmpty( newTypeState )
-			? omit( state, [ itemType ] )
-			: {
-					...state,
-					[ itemType ]: newTypeState,
-			  };
-	}
 
 	return {
 		...state,

@@ -1,3 +1,8 @@
+.block-editor-block-list__block {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {
@@ -69,18 +74,18 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 
 			// 2px outside.
-			box-shadow: 0 0 0 2px $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
 			}
 		}
 	}
@@ -132,17 +137,17 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 		}
 
 		.is-block-content, // Floats.
 		&::after { // Everything else.
 			// 2px outside.
-			box-shadow: 0 0 0 2px $blue-medium-focus;
-			border-radius: $radius-block-ui;
+			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
 
@@ -151,7 +156,7 @@
 
 			// Show a lighter color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 2px $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
 			}
 		}
 
@@ -189,7 +194,7 @@
 		bottom: 0;
 		left: 0;
 		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 2px transparent;
+		box-shadow: 0 0 0 $border-width-focus transparent;
 		transition: box-shadow 0.1s ease-in;
 		@include reduce-motion("transition");
 	}
@@ -325,7 +330,7 @@
 .block-editor-block-list__insertion-point-indicator {
 	position: absolute;
 	top: calc(50% - #{ $border-width });
-	height: 2px;
+	height: $border-width-focus;
 	left: 0;
 	right: 0;
 	background: theme(primary);
@@ -477,21 +482,6 @@
 	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
 }
 
-.edit-post-header-toolbar__block-toolbar,
-.block-editor-block-contextual-toolbar {
-	// Adapt the height of the toolbar items.
-	.components-toolbar {
-		height: $block-toolbar-height;
-		background: none;
-	}
-
-	// Adapt the height of all toolbar buttons.
-	.components-button {
-		height: $block-toolbar-height;
-	}
-}
-
-
 /**
  * Block Toolbar when contextual.
  */
@@ -516,30 +506,28 @@
 	display: block;
 	z-index: z-index(".block-editor-block-list__breadcrumb");
 
-	.components-toolbar {
-		display: flex;
-		border: none;
-		background: none;
+	// The button here has a special style to appear as a toolbar.
+	.components-button {
+		font-size: $default-font-size;
+		height: $block-toolbar-height - $border-width - $border-width;
+		padding: $grid-unit-15 $grid-unit-20;
 
-		// The button here has a special style to appear as a toolbar.
-		.components-button {
-			font-size: $default-font-size;
-			height: $block-toolbar-height;
-			padding: $grid-unit-15 $grid-unit-20;
+		// Position this to align with the block toolbar.
+		position: relative;
+		top: -$border-width;
 
-			// Block UI appearance.
-			border: $border-width solid $dark-gray-primary;
-			border-radius: $radius-block-ui;
-			background-color: $white;
+		// Block UI appearance.
+		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+		background-color: $white;
 
-			// When button is focused, it receives a box-shadow instead of the border.
-			&:focus {
-				border: none;
-				box-shadow: inset 0 0 0 1px color($theme-color), 0 0 0 1px color($theme-color);
-			}
+		// Indent to align with block toolbar.
+		margin-left: $block-toolbar-height + $border-width;
+
+		// When button is focused, it receives a box-shadow instead of the border.
+		&:focus {
+			box-shadow: 0 0 0 $border-width-focus $theme-color;
 		}
-
-		// @todo, it should have the block type icon here.
 	}
 }
 
@@ -601,11 +589,8 @@
 		// Position the block toolbar.
 		.block-editor-block-list__breadcrumb,
 		.block-editor-block-contextual-toolbar {
-			margin-bottom: $grid-unit-20;
-
-			// @todo It should position the block transform dialog as the left margin of a block. It currently
-			// positions instead, the mover control.
-			margin-left: - $block-toolbar-height - $border-width;
+			margin-bottom: $grid-unit-15;
+			margin-left: - $block-toolbar-height;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],
@@ -628,6 +613,8 @@
 // The purpose of this padding is to ensure that on small viewports, there is
 // room for the block border that sits 14px ($block-padding) offset from the
 // block footprint.
+// These paddings and margins are removed from the BlockPreview component's style
+// Any change need to be reflected there.
 .block-editor-block-list__layout.is-root-container {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
@@ -636,9 +623,7 @@
 		padding-left: $block-side-ui-width;
 		padding-right: $block-side-ui-width;
 	}
-}
 
-.block-editor-block-list__layout.is-root-container {
 	// Full-wide. (to account for the padddings added above)
 	// The first two rules account for the alignment wrapper div for the image block.
 	> div:not(.block-editor-block-list__block) > .block-editor-block-list__block[data-align="full"],

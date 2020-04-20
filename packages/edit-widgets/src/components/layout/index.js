@@ -8,11 +8,9 @@ import {
 	FocusReturnProvider,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import {
-	BlockEditorKeyboardShortcuts,
-	__experimentalEditorSkeleton as EditorSkeleton,
-} from '@wordpress/block-editor';
+import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { InterfaceSkeleton } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -32,7 +30,7 @@ function Layout( { blockEditorSettings } ) {
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
-						<EditorSkeleton
+						<InterfaceSkeleton
 							header={ <Header /> }
 							sidebar={ ! isMobile && <Sidebar /> }
 							content={

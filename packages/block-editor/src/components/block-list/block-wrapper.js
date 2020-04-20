@@ -103,6 +103,7 @@ const BlockComponent = forwardRef(
 			// may be the wrapper itself or a side control which triggered the
 			// focus event, don't unnecessary transition to an inner tabbable.
 			if (
+				document.activeElement &&
 				isInsideRootBlock( wrapper.current, document.activeElement )
 			) {
 				return;
@@ -112,9 +113,11 @@ const BlockComponent = forwardRef(
 			const textInputs = focus.tabbable
 				.find( wrapper.current )
 				.filter( isTextField )
-				// Exclude inner blocks
-				.filter( ( node ) =>
-					isInsideRootBlock( wrapper.current, node )
+				// Exclude inner blocks and block appenders
+				.filter(
+					( node ) =>
+						isInsideRootBlock( wrapper.current, node ) &&
+						! node.closest( '.block-list-appender' )
 				);
 
 			// If reversed (e.g. merge via backspace), use the last in the set of
