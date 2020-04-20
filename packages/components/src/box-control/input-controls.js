@@ -13,6 +13,7 @@ import {
 	LayoutBox,
 	SideIndicatorX,
 	SideIndicatorY,
+	Prefix,
 } from './styles/box-control-styles';
 import { useRtl } from '../utils/style-mixins';
 
@@ -66,7 +67,7 @@ export default function BoxInputControls( {
 	const baseStyles = {
 		position: 'absolute',
 		zIndex: 1,
-		maxWidth: 60,
+		maxWidth: 70,
 	};
 
 	return (
@@ -80,11 +81,11 @@ export default function BoxInputControls( {
 				dragDirection="s"
 				onChange={ createHandleOnChange( 'top' ) }
 				label="Top"
+				prefix={ <Prefix>↑</Prefix> }
 				size="small"
 				style={ {
 					...baseStyles,
 					left: '50%',
-					top: -5,
 					transform: 'translateX(-50%)',
 				} }
 			/>
@@ -94,13 +95,14 @@ export default function BoxInputControls( {
 				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
 				label="Left"
+				prefix={ <Prefix>←</Prefix> }
 				size="small"
 				style={ {
 					...baseStyles,
 					position: 'absolute',
 					[ isRtl ? 'right' : 'left' ]: 0,
 					top: '50%',
-					transform: 'translateY(calc(-50% - 3px))',
+					transform: 'translateY(-50%)',
 				} }
 			/>
 			<UnitControl
@@ -115,12 +117,13 @@ export default function BoxInputControls( {
 					} );
 				} }
 				label="All"
+				prefix={ <Prefix>⁘</Prefix> }
 				size="small"
 				style={ {
 					...baseStyles,
 					left: '50%',
 					top: '50%',
-					transform: 'translate(-50%, calc(-50% - 3px))',
+					transform: 'translate(-50%, -50%)',
 				} }
 			/>
 			<UnitControl
@@ -129,12 +132,13 @@ export default function BoxInputControls( {
 				dragDirection="w"
 				onChange={ createHandleOnChange( 'right' ) }
 				label="Right"
+				prefix={ <Prefix>→</Prefix> }
 				size="small"
 				style={ {
 					...baseStyles,
 					[ isRtl ? 'left' : 'right' ]: 0,
 					top: '50%',
-					transform: 'translateY(calc(-50% - 3px))',
+					transform: 'translateY(-50%)',
 				} }
 			/>
 			<UnitControl
@@ -143,6 +147,7 @@ export default function BoxInputControls( {
 				dragDirection="n"
 				onChange={ createHandleOnChange( 'bottom' ) }
 				label="Bottom"
+				prefix={ <Prefix>↓</Prefix> }
 				size="small"
 				style={ {
 					...baseStyles,

@@ -64,6 +64,17 @@ export const SideIndicatorY = styled( SideIndicator )`
 	border-left: 1px dashed ${color( 'ui.borderLight' )};
 	top: 50%;
 	left: 50%;
-	transform: translate( 0, calc( -50% - 3px ) );
+	transform: translate( 0, -50% );
 	height: 50%;
+`;
+
+export const Prefix = styled.div`
+	box-sizing: border-box;
+	color: ${color( 'ui.label' )};
+	font-size: 12px;
+	line-height: 1;
+	margin-right: -8px;
+	text-align: center;
+	width: 20px;
+	user-select: none;
 `;

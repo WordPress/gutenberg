@@ -12,6 +12,7 @@ import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import VisuallyHidden from '../visually-hidden';
 import {
 	Container,
 	Fieldset,
@@ -19,6 +20,7 @@ import {
 	Label,
 	Legend,
 	LegendText,
+	Prefix,
 	Root,
 } from './styles/input-control-styles';
 import { useValueState, isEmpty } from './utils';
@@ -37,7 +39,9 @@ export function InputControl(
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
+		hideLabelFromVision = false,
 		id: idProp,
+		prefix,
 		isFloatingLabel = true,
 		label,
 		size = 'default',
@@ -70,12 +74,16 @@ export function InputControl(
 
 	const isFilled = ! isEmpty( value );
 	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
-	const isFloatingLabelSet = isFloatingLabel && label;
+	const isFloatingLabelSet =
+		! hideLabelFromVision && isFloatingLabel && label;
+
+	const LabelComponent = hideLabelFromVision ? VisuallyHidden : Label;
 
 	return (
 		<Root isFloatingLabel={ isFloatingLabelSet }>
 			{ label && (
-				<Label
+				<LabelComponent
+					as="label"
 					htmlFor={ id }
 					isFloatingLabel={ isFloatingLabel }
 					isFilled={ isFilled }
@@ -83,9 +91,10 @@ export function InputControl(
 					size={ size }
 				>
 					{ label }
-				</Label>
+				</LabelComponent>
 			) }
 			<Container isFocused={ isFocused }>
+				{ prefix && <Prefix>{ prefix }</Prefix> }
 				<Input
 					{ ...props }
 					className={ classes }

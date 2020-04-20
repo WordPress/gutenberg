@@ -11,6 +11,7 @@ export default function BoxUnitControl( { label, value, ...props } ) {
 		<UnitControlWrapper aria-label={ label }>
 			<BaseUnitControl
 				disableUnits={ isEmpty }
+				hideLabelFromVision
 				hideHTMLArrows
 				label={ label }
 				isResetValueOnUnitChange={ false }

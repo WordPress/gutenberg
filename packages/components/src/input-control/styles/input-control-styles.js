@@ -31,7 +31,10 @@ const containerBorder = ( { isFocused } ) => {
 };
 
 export const Container = styled.div`
+	align-items: center;
+	background-color: ${color( 'white' )};
 	box-sizing: border-box;
+	display: flex;
 	position: relative;
 	${containerBorder};
 `;
@@ -96,6 +99,7 @@ const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
 
 export const Input = styled.input`
 	&&& {
+		background-color: transparent;
 		box-sizing: border-box;
 		border: none !important;
 		box-shadow: none !important;
@@ -265,3 +269,8 @@ const BaseLegendText = styled( Text )`
 export const LegendText = ( props ) => (
 	<BaseLegendText { ...props } as="span" />
 );
+
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
