@@ -80,7 +80,9 @@ class BlockListBlock extends Component {
 							wrapperProps={ this.props.wrapperProps }
 							globalStyle={ globalStyle }
 							clientId={ this.props.clientId }
+							parentWidth={ this.props.parentWidth }
 							contentStyle={ this.props.contentStyle }
+							onDeleteBlock={ this.props.onDeleteBlock }
 						/>
 					</GlobalStylesContext.Provider>
 				) }
@@ -110,7 +112,7 @@ class BlockListBlock extends Component {
 			isDimmed,
 			isTouchable,
 			onDeleteBlock,
-			horizontalDirection,
+			isStackedHorizontally,
 			hasParent,
 			isParentSelected,
 			onSelect,
@@ -197,7 +199,9 @@ class BlockListBlock extends Component {
 								<BlockMobileToolbar
 									clientId={ clientId }
 									onDelete={ onDeleteBlock }
-									horizontalDirection={ horizontalDirection }
+									isStackedHorizontally={
+										isStackedHorizontally
+									}
 								/>
 							) }
 						</View>

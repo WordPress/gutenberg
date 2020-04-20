@@ -109,7 +109,8 @@ class PostTitle extends Component {
 						*/
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus={
-							document.body === document.activeElement &&
+							( document.body === document.activeElement ||
+								! document.activeElement ) &&
 							isCleanNewPost
 						}
 						/* eslint-enable jsx-a11y/no-autofocus */

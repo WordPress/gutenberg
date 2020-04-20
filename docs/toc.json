@@ -13,7 +13,8 @@
 			{ "docs/designers-developers/developers/block-api/block-registration.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-edit-save.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
-			{"docs/designers-developers/developers/block-api/block-deprecation.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-context.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-deprecation.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] }
