@@ -238,7 +238,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             case .success(let mention):
                 resolver([mention])
             case .failure(let error):
-                rejecter("MENTION_ERROR", "1", error)
+                rejecter(error.domain, "\(error.code)", error)
             }
         })        
     }
