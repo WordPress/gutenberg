@@ -2,4 +2,9 @@
 	background: $white;
 	border: 1px solid $dark-gray-primary;
 	border-radius: $radius-block-ui;
+
+	.block-editor-block-parent-selector__button {
+		padding: 0 12px;
+		min-height: 48px;
+	}
 }
