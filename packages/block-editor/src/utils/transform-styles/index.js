@@ -1,19 +1,26 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import cssTree from 'css-tree';
+import { some } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import traverse from './traverse';
-import urlRewrite from './transforms/url-rewrite';
-import wrap from './transforms/wrap';
+const ROOT_SELECTORS = [
+	{
+		// html
+		type: 'TypeSelector',
+		name: 'html',
+	},
+	{
+		// body
+		type: 'TypeSelector',
+		name: 'body',
+	},
+	{
+		// :root
+		type: 'PseudoClassSelector',
+		name: 'root',
+	},
+];
 
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
@@ -23,20 +30,22 @@ import wrap from './transforms/wrap';
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperClassName = '' ) => {
-	return map( styles, ( { css, baseURL } ) => {
-		const transforms = [];
-		if ( wrapperClassName ) {
-			transforms.push( wrap( wrapperClassName ) );
-		}
-		if ( baseURL ) {
-			transforms.push( urlRewrite( baseURL ) );
-		}
-		if ( transforms.length ) {
-			return traverse( css, compose( transforms ) );
-		}
-
-		return css;
+	const wrapperSelector = cssTree.fromPlainObject( {
+		type: 'ClassSelector',
+		name: wrapperClassName,
 	} );
+
+	const ast = cssTree.parse( styles );
+
+	cssTree.walk( ast, ( node, item, list ) => {
+		if ( ! some( ROOT_SELECTORS, { type: node.type, name: node.name } ) )
+			return;
+
+		const wrapperSelectorItem = list.createItem( wrapperSelector );
+		list.replace( item, wrapperSelectorItem );
+	} );
+
+	return cssTree.generate( ast );
 };
 
 export default transformStyles;
