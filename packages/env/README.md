@@ -244,12 +244,22 @@ wp-env destroy
 Destroy the WordPress environment. Delete docker containers and remove local files.
 ```
 
-### `docker logs -f [container_id] >/dev/null`
+### `wp-env logs [environment] [watch]`
 
-```sh
-docker logs -f <container_id> >/dev/null
+````sh
+wp-env logs
 
-Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
+displays PHP and Docker logs for given WordPress environment.
+
+Positionals:
+  environment  Which environment to display the logs from.
+      [string] [choices: "development", "tests", "all"] [default: "development"]
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
 ## .wp-env.json
@@ -373,3 +383,4 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+````
