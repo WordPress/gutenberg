@@ -1,4 +1,4 @@
-package org.wordpress.mobile.WPAndroidGlue;
+package com.gutenberg;
 
 import androidx.annotation.NonNull;
 
@@ -21,28 +21,6 @@ public class Media implements RNMedia {
         this.mType = type;
         this.mCaption = caption;
     }
-
-    public Media(int id, String url) {
-        this.mId = id;
-        this.mUrl = url;
-        this.mType = "";
-        this.mCaption = "";
-    }
-
-    public static Media createRNMediaUsingMimeType(final int id, final String url, @NonNull final String mimeType, final String caption) {
-        String type;
-
-        if (mimeType.startsWith(MediaType.IMAGE.name().toLowerCase(Locale.ROOT))) {
-            type =  MediaType.IMAGE.name().toLowerCase(Locale.ROOT);
-        } else if (mimeType.startsWith(MediaType.VIDEO.name().toLowerCase(Locale.ROOT))) {
-            type =  MediaType.VIDEO.name().toLowerCase(Locale.ROOT);
-        } else {
-            type = MediaType.OTHER.name().toLowerCase(Locale.ROOT);
-        }
-
-        return new Media(id, url, type, caption);
-    }
-
 
     public int getId() {
         return mId;
