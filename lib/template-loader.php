@@ -167,12 +167,17 @@ function gutenberg_find_template( $template_file ) {
 	// See if there is a theme block template with higher priority than the resolved template post.
 	$higher_priority_block_template_path     = null;
 	$higher_priority_block_template_priority = PHP_INT_MAX;
-	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html' ) ?: array();
+	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html' );
+	$block_template_files                    = is_array( $block_template_files ) ? $block_template_files : array();
 	if ( is_child_theme() ) {
-		$block_template_files = array_merge( $block_template_files, glob( get_template_directory() . '/block-templates/*.html' ) ?: array() );
+		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
+		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
+		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-		$block_template_files = array_merge( $block_template_files, glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' ) ?: array() );
+		$demo_block_template_files = glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' );
+		$demo_block_template_files = is_array( $demo_block_template_files ) ? $demo_block_template_files : array();
+		$block_template_files      = array_merge( $block_template_files, $demo_block_template_files );
 	}
 	foreach ( $block_template_files as $path ) {
 		if ( ! isset( $slug_priorities[ basename( $path, '.html' ) ] ) ) {
@@ -265,7 +270,11 @@ function gutenberg_render_the_template() {
 	$content = $wp_embed->autoembed( $content );
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
-	$content = wp_make_content_images_responsive( $content );
+	if ( function_exists( 'wp_filter_content_tags' ) ) {
+		$content = wp_filter_content_tags( $content );
+	} else {
+		$content = wp_make_content_images_responsive( $content );
+	}
 	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles

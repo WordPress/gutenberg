@@ -38,7 +38,13 @@ module.exports = {
 	globals: {
 		wp: 'off',
 	},
+	settings: {
+		jsdoc: {
+			mode: 'typescript',
+		},
+	},
 	rules: {
+		'jest/expect-expect': 'off',
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/gutenberg-phase': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
@@ -162,6 +168,9 @@ module.exports = {
 		{
 			files: [ 'packages/e2e-test*/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
+			rules: {
+				'jest/expect-expect': 'off',
+			},
 		},
 	],
 };

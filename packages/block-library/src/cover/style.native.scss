@@ -46,3 +46,28 @@
 .backgroundSolidDark {
 	background-color: $background-dark-secondary;
 }
+
+.uploadFailedContainer {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+	justify-content: flex-start;
+	align-items: flex-end;
+	z-index: 3;
+}
+
+.uploadFailed {
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+	justify-content: center;
+	align-items: center;
+	background-color: #fff;
+}
+
+.uploadFailedIcon {
+	fill: $red-40;
+	width: 100%;
+	height: 100%;
+}

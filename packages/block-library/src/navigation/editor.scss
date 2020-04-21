@@ -19,6 +19,10 @@ $navigation-item-height: 46px;
 	align-items: center;
 }
 
+.wp-block-navigation.is-vertical .block-list-appender {
+	margin: $grid-unit-10;
+}
+
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
 }

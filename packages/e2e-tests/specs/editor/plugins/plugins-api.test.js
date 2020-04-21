@@ -67,6 +67,9 @@ describe( 'Using Plugins API', () => {
 	} );
 
 	describe( 'Sidebar', () => {
+		const SIDEBAR_PINNED_ITEM_BUTTON =
+			'.interface-pinned-items button[aria-label="Sidebar title plugin"]';
+		const SIDEBAR_PANEL_SELECTOR = '.sidebar-title-plugin-panel';
 		it( 'Should open plugins sidebar using More Menu item and render content', async () => {
 			await clickOnMoreMenuItem( 'Sidebar title plugin' );
 
@@ -75,6 +78,36 @@ describe( 'Using Plugins API', () => {
 				( el ) => el.innerHTML
 			);
 			expect( pluginSidebarContent ).toMatchSnapshot();
+		} );
+
+		it( 'Should be pinned by default and can be opened and closed using pinned items', async () => {
+			const sidebarPinnedItem = await page.$(
+				SIDEBAR_PINNED_ITEM_BUTTON
+			);
+			expect( sidebarPinnedItem ).not.toBeNull();
+			await sidebarPinnedItem.click();
+			expect( await page.$( SIDEBAR_PANEL_SELECTOR ) ).not.toBeNull();
+			await sidebarPinnedItem.click();
+			expect( await page.$( SIDEBAR_PANEL_SELECTOR ) ).toBeNull();
+		} );
+
+		it( 'Can be pinned and unpinned', async () => {
+			await ( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).click();
+			const unpinButton = await page.$(
+				'button[aria-label="Unpin from toolbar"]'
+			);
+			await unpinButton.click();
+			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).toBeNull();
+			await page.click(
+				'.interface-complementary-area-header button[aria-label="Close plugin"]'
+			);
+			await page.reload();
+			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).toBeNull();
+			await clickOnMoreMenuItem( 'Sidebar title plugin' );
+			await page.click( 'button[aria-label="Pin to toolbar"]' );
+			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).not.toBeNull();
+			await page.reload();
+			expect( await page.$( SIDEBAR_PINNED_ITEM_BUTTON ) ).not.toBeNull();
 		} );
 
 		it( 'Should close plugins sidebar using More Menu item', async () => {

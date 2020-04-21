@@ -5,15 +5,16 @@
 	flex-grow: 1;
 
 	// Always show outlines in code editor
-	.editor-post-title {
-		textarea {
-			border: $border-width solid $light-gray-500;
-			margin-bottom: $block-spacing;
-			padding: $block-padding;
+	.wp-block.editor-post-title {
+		max-width: none;
 
-			&:focus,
-			&:hover {
-				border: $border-width solid $black;
+		textarea {
+			border: $border-width solid $light-gray-secondary;
+			margin-bottom: -$border-width;
+			padding: $grid-unit-20;
+
+			&:focus {
+				border: $border-width solid $dark-gray-primary;
 			}
 		}
 
@@ -29,18 +30,21 @@
 // Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
 	position: absolute;
-	top: $grid-unit-10;
+	top: 0;
 	left: 0;
 	right: 0;
-	height: $block-toolbar-height;
-	line-height: $block-toolbar-height;
-	padding: 0 $grid-unit-10 0 $grid-unit-20;
+	padding: $grid-unit-15;
 	display: flex;
 
+	@include break-large() {
+		padding: $grid-unit-15 $grid-unit-30;
+	}
+
 	h2 {
+		line-height: $button-size;
 		margin: 0 auto 0 0;
 		font-size: $default-font-size;
-		color: $dark-gray-500;
+		color: $dark-gray-primary;
 	}
 
 	.components-button svg {
@@ -49,14 +53,19 @@
 }
 
 .edit-post-text-editor__body {
-	max-width: calc(100% - #{$grid-unit-20 * 2});
-	margin-left: $grid-unit-20;
-	margin-right: $grid-unit-20;
-	padding-top: $grid-unit-50;
+	width: 100%;
+	padding: $grid-unit-20 $grid-unit-15 $grid-unit-60 $grid-unit-15;
+	max-width: $break-wide;
+	margin-left: auto;
+	margin-right: auto;
 
-	@include break-small() {
-		max-width: $content-width;
-		margin-left: auto;
-		margin-right: auto;
+	@include break-large() {
+		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
+	}
+
+	// This needs specificity to change the title block appearance on the code editor.
+	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
+		font-family: $editor-html-font;
+		font-size: 2em;
 	}
 }

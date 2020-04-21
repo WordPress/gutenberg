@@ -3,7 +3,7 @@
  */
 const {
 	TRANSLATION_FUNCTIONS,
-	REGEXP_PLACEHOLDER,
+	REGEXP_SPRINTF_PLACEHOLDER,
 	getTranslateFunctionName,
 	getTranslateFunctionArgs,
 	getTextContentFromNode,
@@ -45,10 +45,10 @@ module.exports = {
 				}
 
 				const hasPlaceholders = candidates.some( ( candidate ) =>
-					REGEXP_PLACEHOLDER.test( candidate )
+					REGEXP_SPRINTF_PLACEHOLDER.test( candidate )
 				);
 				// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test#Using_test()_on_a_regex_with_the_global_flag.
-				REGEXP_PLACEHOLDER.lastIndex = 0;
+				REGEXP_SPRINTF_PLACEHOLDER.lastIndex = 0;
 
 				if ( ! hasPlaceholders ) {
 					return;

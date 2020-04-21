@@ -294,6 +294,7 @@ export class ImageEdit extends React.Component {
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
+			caption: media.caption,
 		};
 
 		let additionalAttributes;

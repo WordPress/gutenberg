@@ -20,11 +20,10 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
-	RangeControl,
 	SelectControl,
-	StepperControl,
 	ToggleControl,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
 import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
@@ -40,7 +39,6 @@ import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
-const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -54,6 +52,11 @@ const PLACEHOLDER_TEXT = Platform.select( {
 		'Drag images, upload new ones or select files from your library.'
 	),
 	native: __( 'ADD MEDIA' ),
+} );
+
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+	web: {},
+	native: { type: 'stepper' },
 } );
 
 class GalleryEdit extends Component {
@@ -378,12 +381,13 @@ class GalleryEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<ColumnsControl
+							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
+								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 								required
 							/>
 						) }

@@ -86,6 +86,7 @@ export class BlockList extends Component {
 
 	shouldShowInnerBlockAppender() {
 		const { blockClientIds, renderAppender } = this.props;
+
 		return renderAppender && blockClientIds.length > 0;
 	}
 
@@ -95,13 +96,15 @@ export class BlockList extends Component {
 			blockClientIds,
 			title,
 			header,
-			withFooter = true,
 			isReadOnly,
 			isRootList,
+			horizontal,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			isStackedHorizontally,
+			horizontalAlignment,
 		} = this.props;
 
 		const { blockToolbar, blockBorder, headerToolbar } = styles;
@@ -133,9 +136,21 @@ export class BlockList extends Component {
 					}
 					inputAccessoryViewHeight={ headerToolbar.height }
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ {
-						flex: isRootList ? 1 : 0,
-					} }
+					scrollViewStyle={ [
+						{ flex: isRootList ? 1 : 0 },
+						! isRootList && styles.overflowVisible,
+					] }
+					horizontal={ horizontal }
+					scrollEnabled={ isRootList }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
+					style={ [
+						! isRootList && styles.overflowVisible,
+						isStackedHorizontally && styles.horizontal,
+						horizontalAlignment &&
+							styles[ `is-aligned-${ horizontalAlignment }` ],
+					] }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -148,9 +163,7 @@ export class BlockList extends Component {
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
-					ListFooterComponent={
-						! isReadOnly && withFooter && this.renderBlockListFooter
-					}
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
@@ -179,11 +192,23 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			isStackedHorizontally,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 		} = this.props;
 
+		const readableContentViewStyle = contentResizeMode === 'stretch' && {
+			flex: 1,
+		};
+
 		return (
-			<ReadableContentView>
-				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+			<ReadableContentView style={ readableContentViewStyle }>
+				<View
+					style={ readableContentViewStyle }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />
 					) }
@@ -197,6 +222,11 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						parentWidth={ this.props.parentWidth }
+						isStackedHorizontally={ isStackedHorizontally }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
@@ -209,23 +239,34 @@ export class BlockList extends Component {
 
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
-		return (
-			<>
-				<TouchableWithoutFeedback
-					accessibilityLabel={ __( 'Add paragraph block' ) }
-					onPress={ () => {
-						this.addBlockToEndOfPost( paragraphBlock );
-					} }
-				>
-					<View style={ styles.blockListFooter } />
-				</TouchableWithoutFeedback>
-			</>
-		);
+		const {
+			isReadOnly,
+			withFooter = true,
+			renderFooterAppender,
+		} = this.props;
+
+		if ( ! isReadOnly && withFooter ) {
+			return (
+				<>
+					<TouchableWithoutFeedback
+						accessibilityLabel={ __( 'Add paragraph block' ) }
+						onPress={ () => {
+							this.addBlockToEndOfPost( paragraphBlock );
+						} }
+					>
+						<View style={ styles.blockListFooter } />
+					</TouchableWithoutFeedback>
+				</>
+			);
+		} else if ( renderFooterAppender ) {
+			return renderFooterAppender();
+		}
+		return null;
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
 		const {
 			getBlockCount,
 			getBlockOrder,
@@ -235,12 +276,16 @@ export default compose( [
 			getSettings,
 		} = select( 'core/block-editor' );
 
+		const isStackedHorizontally =
+			__experimentalMoverDirection === 'horizontal';
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if list is empty, show the insertion point (via the default appender)
@@ -251,6 +296,7 @@ export default compose( [
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if the insertion point is at the end of the list
@@ -271,6 +317,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			isStackedHorizontally,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

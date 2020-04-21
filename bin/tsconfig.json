@@ -13,5 +13,8 @@
 		// ignored `.cache` file to hide tsbuildinfo and d.ts files.
 		"outDir": ".cache"
 	},
-	"files": [ "./api-docs/update-api-docs.js" ]
+	"files": [
+		"./api-docs/update-api-docs.js",
+		"./check-latest-npm.js"
+	]
 }

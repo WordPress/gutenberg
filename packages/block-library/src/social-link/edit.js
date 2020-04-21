@@ -33,7 +33,6 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
-	// Import icon.
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
 

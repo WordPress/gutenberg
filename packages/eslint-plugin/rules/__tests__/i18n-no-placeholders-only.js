@@ -20,6 +20,9 @@ ruleTester.run( 'i18n-no-placeholders-only', rule, {
 			code: `__( 'Hello %s' )`,
 		},
 		{
+			code: `i18n.__( 'Hello %s' )`,
+		},
+		{
 			code: `__( '%d%%' )`,
 		},
 	],
@@ -32,11 +35,10 @@ ruleTester.run( 'i18n-no-placeholders-only', rule, {
 			code: `__( '%s%s' )`,
 			errors: [ { messageId: 'noPlaceholdersOnly' } ],
 		},
-		// @todo: Update placeholder regex, see https://github.com/WordPress/gutenberg/pull/20574.
-		/*{
+		{
 			code: `_x( '%1$s' )`,
 			errors: [ { messageId: 'noPlaceholdersOnly' } ],
-		},*/
+		},
 		{
 			code: `_n( '%s', '%s', number)`,
 			errors: [
