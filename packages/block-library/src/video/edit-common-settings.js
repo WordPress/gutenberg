@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl, SelectControl, PanelBody } from '@wordpress/components';
+import { ToggleControl, SelectControl } from '@wordpress/components';
 
-const VideoSettings = ( { setAttributes, attributes, children } ) => {
+const VideoSettings = ( { setAttributes, attributes } ) => {
 	const {
 		autoplay,
 		controls,
@@ -29,7 +29,7 @@ const VideoSettings = ( { setAttributes, attributes, children } ) => {
 	};
 
 	return (
-		<PanelBody title={ __( 'Video settings' ) }>
+		<>
 			<ToggleControl
 				label={ __( 'Autoplay' ) }
 				onChange={ toggleAttribute( 'autoplay' ) }
@@ -66,8 +66,7 @@ const VideoSettings = ( { setAttributes, attributes, children } ) => {
 					{ value: 'none', label: __( 'None' ) },
 				] }
 			/>
-			{ children }
-		</PanelBody>
+		</>
 	);
 };
 
