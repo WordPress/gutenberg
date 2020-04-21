@@ -197,7 +197,7 @@ transforms: {
 A transformation of type `files` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `files`.
-- **transform** _(function)_: a callback that receives the array of files being processed to operate of them.
+- **transform** _(function)_: a callback that receives the array of files being processed to operate on them.
 - **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
@@ -268,15 +268,17 @@ transforms: {
 
 ### Type `prefix`
 
-**Parameters**
-
-- type
-- isMatch (optional)
-- priority (optional)
-
-**Example**
-
 A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
+
+A transformation of type `prefix` is an object that takes the following parameters:
+
+- **type** _(string)_: the value `files`.
+- **prefix** _(string)_: the character or sequence of characters that match this transfrom.
+- **transform** _(function)_: a callback that receives the content introduced to operate on it.
+
+**Example: from text to block**
+
+We want to create a block the user types the question mark.
 
 {% codetabs %}
 {% ES5 %}
