@@ -28,8 +28,8 @@ A transformation of type `block` is an object that takes the following parameter
 
 - **type** _(string)_: the value `block`.
 - **blocks** _(array)_: a list of known block types. It also accepts the wildcard (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
-- **transform** _(function)_: the function that holds the transform behavior.
-- **isMatch** _(function, optional)_: a predicate that allows performing additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **transform** _(function)_: a callback that holds the transform behavior.
+- **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph to Heading**
@@ -116,15 +116,15 @@ transforms: {
 
 ### Type `shortcode`
 
-**Parameters**
+A transformation of type `block` is an object that takes the following parameters:
 
-- type
-- tag
-- attributes
-- isMatch (optional)
-- priority (optional)
+- **type** _(string)_: the value `shortcode`.
+- **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
+- **attributes** _(object)_: object representing where the block attributes should be sourced from.
+- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example**
+**Example: from shortcode to block**
 
 An existing shortcode can be transformed into its block counterpart.
 
@@ -136,17 +136,14 @@ transforms: {
     from: [
         {
             type: 'shortcode',
-            // Shortcode tag can also be an array of shortcode aliases
             tag: 'caption',
             attributes: {
-                // An attribute can be source from a tag attribute in the shortcode content
                 url: {
                     type: 'string',
                     source: 'attribute',
                     attribute: 'src',
                     selector: 'img',
                 },
-                // An attribute can be source from the shortcode attributes
                 align: {
                     type: 'string',
                     shortcode: function( attributes ) {
@@ -154,6 +151,9 @@ transforms: {
                         return align.replace( 'align', '' );
                     },
                 },
+            },
+            isMatch: function( attributes ) {
+                return attributes.named.id === 'my-id';
             },
         },
     ]
@@ -167,17 +167,14 @@ transforms: {
     from: [
         {
             type: 'shortcode',
-            // Shortcode tag can also be an array of shortcode aliases
             tag: 'caption',
             attributes: {
-                // An attribute can be source from a tag attribute in the shortcode content
                 url: {
                     type: 'string',
                     source: 'attribute',
                     attribute: 'src',
                     selector: 'img',
                 },
-                // An attribute can be source from the shortcode attributes
                 align: {
                     type: 'string',
                     shortcode: ( { named: { align = 'alignnone' } } ) => {
@@ -185,32 +182,11 @@ transforms: {
                     },
                 },
             },
+            isMatch( { named: { id } } ) {
+                return id === 'my-id';
+            },
         },
     ]
-},
-
-```
-
-{% end %}
-
-**isMatch**
-
-In the case of shortcode transforms, `isMatch` receives shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API):
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-isMatch: function( attributes ) {
-	return attributes.named.id === 'my-id';
-},
-```
-
-{% ESNext %}
-
-```js
-isMatch( { named: { id } } ) {
-	return id === 'my-id';
 },
 ```
 
