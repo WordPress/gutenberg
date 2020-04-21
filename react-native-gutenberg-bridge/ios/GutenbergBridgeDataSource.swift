@@ -39,6 +39,9 @@ public protocol GutenbergBridgeDataSource: class {
 
     /// Asks the delegate for a list of Media Sources to show on the Media Source Picker.
     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
+
+    /// Asks the delegate for a list of theme colors
+    func gutenbergThemeColors() -> [[String : String]]?
 }
 
 public extension GutenbergBridgeDataSource {

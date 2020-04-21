@@ -65,21 +65,9 @@ public class Gutenberg: NSObject {
         if let translations = dataSource.gutenbergTranslations() {
             initialProps["translations"] = translations
         }
-        
-        /*
-        // This section provides an example of how to set the value if known at Editor launch
-        let colors = [
-             ["name":"Primary", "slug":"primary", "color":"#000000"],
-             ["name":"Secondary", "slug":"secondary", "color":"#6d6d6d"],
-             ["name":"Accent", "slug":"accent", "color":"#cd2653"]
-         ]
-        
-        initialProps["colors"] = colors
-        */
-        
-        // This mocks an async setting
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
-            self.updateTheme()
+
+        if let colors = dataSource.gutenbergThemeColors() {
+            initialProps["colors"] = dataSource.gutenbergThemeColors()
         }
 
         return initialProps
@@ -141,15 +129,9 @@ public class Gutenberg: NSObject {
         let url = sourceURL(for: bridge)
         return !(url?.isFileURL ?? true)
     }
-    
-    private func updateTheme() {
-        
-       let colors = [
-            ["name":"Primary", "slug":"primary", "color":"#000000"],
-            ["name":"Secondary", "slug":"secondary", "color":"#6d6d6d"],
-            ["name":"Accent", "slug":"accent", "color":"#cd2653"]
-        ]
-        
+
+    public func updateTheme(_ colors:[[String:String]]?) {
+        guard let colors = colors else { return }
         bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body: colors)
     }
 }
