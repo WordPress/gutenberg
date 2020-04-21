@@ -10,27 +10,27 @@ body.is-fullscreen-mode {
 			display: none;
 		}
 
-		// Display the sidebar offscreen, and then transition in when needed.
+		// Layer the sidebar above the editor's top bar and
+		// setup the transition
 		#adminmenumain {
-			position: relative;
+			z-index: 1;
+			transform: translateX(-160px);
+			transition: transform 0.12s ease-in-out;
+		}
+
+		// Display the sidebar offscreen, and then transition in when needed.
+		#adminmenumain,
+		#adminmenuback {
+			position: fixed;
 			top: 60px;
-			left: -160px;
-			transition: left 0.12s ease-in-out;
+			left: 0;
+			bottom: 0;
 		}
 
 		// Hides the admin menu
 		// This prevents keyboard navigation from accessing inner links
 		#adminmenuwrap {
-			display: none;
-		}
-
-		#adminmenu {
-			position: relative;
-			bottom: auto;
-		}
-
-		#adminmenuback {
-			top: 60px;
+			//display: none;
 		}
 
 		.interface-interface-skeleton__body,
@@ -47,7 +47,7 @@ body.is-fullscreen-mode {
 
 body.is-showing-admin-menu {
 	#adminmenumain {
-		left: 0;
+		transform: translateX(0);
 	}
 
 	// Show the admin menu
