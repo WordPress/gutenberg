@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +36,7 @@ export const settings = {
 		alignWide: false,
 		reusable: false,
 		lightBlockWrapper: true,
-		__experimentalColor: { gradients: true },
+		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	parent: [ 'core/buttons' ],
 	styles: [

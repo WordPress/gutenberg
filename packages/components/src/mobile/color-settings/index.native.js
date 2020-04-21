@@ -116,10 +116,12 @@ function ColorSettings( {
 		return (
 			<View style={ styles.footer }>
 				<View style={ styles.flex }>
-					<ColorIndicator
-						color={ currentValue }
-						style={ styles.colorIndicator }
-					/>
+					{ currentValue && (
+						<ColorIndicator
+							color={ currentValue }
+							style={ styles.colorIndicator }
+						/>
+					) }
 				</View>
 				<Text
 					style={ styles.selectColorText }
