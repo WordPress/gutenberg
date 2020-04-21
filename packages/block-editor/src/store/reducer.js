@@ -1092,7 +1092,7 @@ function selection( state = {}, action ) {
 				return state;
 			}
 
-			return { clientId: blockToSelect.clientId };
+			return { clientId: blockToSelect.clientId, initialPosition: -1 };
 		}
 	}
 
@@ -1199,7 +1199,12 @@ export function isSelectionEnabled( state = true, action ) {
  * @return {?number} Initial position: -1 or undefined.
  */
 export function initialPosition( state, action ) {
-	if ( action.type === 'SELECT_BLOCK' ) {
+	if (
+		action.type === 'REPLACE_BLOCKS' &&
+		typeof action.initialPosition === 'number'
+	) {
+		return action.initialPosition;
+	} else if ( action.type === 'SELECT_BLOCK' ) {
 		return action.initialPosition;
 	} else if ( action.type === 'REMOVE_BLOCKS' ) {
 		return state;

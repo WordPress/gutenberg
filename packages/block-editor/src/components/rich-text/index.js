@@ -315,7 +315,11 @@ function RichTextWrapper(
 			// Otherwise, set the selection to the second block.
 			const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
 
-			onReplace( blocks, indexToSelect );
+			// If there are pasted blocks, move the caret to the end of the selected block
+			// Otherwise, retain the default value.
+			const initialPosition = hasPastedBlocks ? -1 : null;
+
+			onReplace( blocks, indexToSelect, initialPosition );
 		},
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
@@ -436,7 +440,7 @@ function RichTextWrapper(
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( content, content.length - 1, -1 );
 				} else {
 					splitValue( value, content );
 				}
