@@ -17,7 +17,7 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
-import TemplatePreview from './preview';
+import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
 
 function TemplateLabel( { template } ) {
