@@ -6,7 +6,7 @@ import {
 	searchForBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
-	switchEditorModeTo,
+	getAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -74,7 +74,7 @@ const block = `( function() {
 	} );
 } )();`;
 
-export function getResponseObject( obj, contentType ) {
+function getResponseObject( obj, contentType ) {
 	return {
 		status: 200,
 		contentType,
@@ -82,7 +82,7 @@ export function getResponseObject( obj, contentType ) {
 	};
 }
 
-export function createResponse( mockResponse, contentType = undefined ) {
+function createResponse( mockResponse, contentType = undefined ) {
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
@@ -114,12 +114,10 @@ describe( 'adding blocks from block directory', () => {
 
 		const selectorContent = await page.evaluate(
 			() =>
-				document.querySelector( '.block-editor-inserter__results' )
+				document.querySelector( '.block-editor-inserter__block-list' )
 					.innerHTML
 		);
-		expect( selectorContent ).not.toContain(
-			'.block-editor-block-types-list'
-		);
+		expect( selectorContent ).toContain( 'has-no-results' );
 	} );
 
 	it( 'Should be able to add (the first) block.', async () => {
@@ -159,8 +157,8 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
-		// To be honest, not sure why this is necessary, but the getEditedPostContent returns empty without it.
-		await switchEditorModeTo( 'Code' );
+		// To be honest, not sure why this is necessary, but the getEditedPostContent returns empty without querying wp.data first.
+		await getAllBlocks();
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
