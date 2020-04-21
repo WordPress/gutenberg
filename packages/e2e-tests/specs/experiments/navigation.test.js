@@ -163,6 +163,10 @@ describe( 'Navigation', () => {
 		);
 		await createFromExistingButton.click();
 
+		expect( console ).toHaveWarnedWith(
+			'useApiFetch is deprecated and will be removed from Gutenberg in version 8.1.0. Please use apiFetch instead.'
+		);
+
 		// Snapshot should contain the mocked pages.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -234,6 +238,10 @@ describe( 'Navigation', () => {
 			label: 'Contact',
 			type: 'entity',
 		} );
+
+		expect( console ).toHaveWarnedWith(
+			'useApiFetch is deprecated and will be removed from Gutenberg in version 8.1.0. Please use apiFetch instead.'
+		);
 
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -312,7 +320,12 @@ describe( 'Navigation', () => {
 				document.activeElement.innerText ===
 					'A really long page name that will not exist'
 		);
+
 		expect( isInLinkRichText ).toBe( true );
+
+		expect( console ).toHaveWarnedWith(
+			'useApiFetch is deprecated and will be removed from Gutenberg in version 8.1.0. Please use apiFetch instead.'
+		);
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
