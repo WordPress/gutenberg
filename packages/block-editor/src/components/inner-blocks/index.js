@@ -98,9 +98,9 @@ class InnerBlocks extends Component {
 
 		// Set controlled blocks value from parent, if any.
 		if ( __experimentalBlocks ) {
+			controlInnerBlocks();
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( __experimentalBlocks, false );
-			controlInnerBlocks();
 		}
 	}
 
