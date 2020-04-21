@@ -117,10 +117,10 @@ function Editor( { settings: _settings } ) {
 													}
 												/>
 											) : (
-												<div className="edit-post-layout__toggle-publish-panel">
+												<div className="edit-site-editor__toggle-save-panel">
 													<Button
 														isSecondary
-														className="edit-post-layout__toggle-publish-panel-button"
+														className="edit-site-editor__toggle-save-panel-button"
 														onClick={
 															openSavePanel
 														}

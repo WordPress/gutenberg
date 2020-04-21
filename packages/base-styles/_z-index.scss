@@ -75,6 +75,7 @@ $z-layers: (
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the multi-entity saving sidebar.
 	".entities-saved-states__panel-break-medium": 99998,
+	".edit-site-editor__toggle-save-panel": 100000,
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }

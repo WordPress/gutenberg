@@ -1,0 +1,23 @@
+.edit-site-editor__toggle-save-panel {
+	z-index: z-index(".edit-site-editor__toogle-save-panel");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
+	background-color: $white;
+	border: 1px dotted $light-gray-500;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
+
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within &,
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
+		top: auto;
+		bottom: 0;
+	}
+}
