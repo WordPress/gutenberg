@@ -92,7 +92,7 @@ function render_block_core_rss( $attributes ) {
 		$class .= ' ' . $attributes['className'];
 	}
 
-	return sprintf( "<ul class='%s'>%s</ul>", esc_attr( $class ), $list_items );
+	return sprintf( '<ul class="%s">%s</ul>', esc_attr( $class ), $list_items );
 }
 
 /**
