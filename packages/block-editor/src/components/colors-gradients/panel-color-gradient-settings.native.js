@@ -9,7 +9,6 @@ const PanelColorGradientSettings = () => {
 		<PanelBody>
 			<UnsupportedFooterControl
 				label={ __( 'Color settings are coming soon.' ) }
-				separatorType="none"
 			/>
 		</PanelBody>
 	);
