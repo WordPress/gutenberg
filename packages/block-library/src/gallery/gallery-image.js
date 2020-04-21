@@ -184,12 +184,15 @@ class GalleryImage extends Component {
 			'is-selected': isSelected,
 			'is-transient': isBlobURL( url ),
 		} );
-
+		// Safari: give the figure a tab index to make it focusable,
+		// so that the blur event is canceled when a child inside it is focused (see this.onFocus)
+		// see: https://github.com/Automattic/wp-calypso/issues/40531#issuecomment-617384307
 		return (
 			<figure
 				className={ className }
 				onBlur={ this.onBlur }
 				onFocus={ this.onFocus }
+				tabIndex="0"
 			>
 				{ href ? <a href={ href }>{ img }</a> : img }
 				<div className="block-library-gallery-item__move-menu">
