@@ -8,7 +8,9 @@ Under the `transforms` key within the [block configuration](insert link here) yo
 
 What happens when a block declares `to`? Is the transform also visible in the other block?
 
-## Block to Block
+## Transforms Types
+
+### `block`
 
 **Parameters**
 
@@ -231,7 +233,7 @@ transforms: {
 
 To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-## Shortcode to Block
+### `shortcode`
 
 **Parameters**
 
@@ -333,7 +335,7 @@ isMatch( { named: { id } } ) {
 
 {% end %}
 
-## File to Block
+### `files`
 
 **Parameters**
 
@@ -405,7 +407,7 @@ transforms: {
 
 {% end %}
 
-## Prefix Transform
+### `prefix`
 
 **Parameters**
 
@@ -455,3 +457,11 @@ transforms: {
 ```
 
 {% end %}
+
+### `raw`
+
+TODO
+
+### `enter`
+
+TODO
