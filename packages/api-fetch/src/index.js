@@ -165,7 +165,7 @@ function apiFetch( options ) {
  */
 function useApiFetch( path ) {
 	deprecated( 'useApiFetch', {
-		version: '7.11.0',
+		version: '8.1.0',
 		alternative: 'apiFetch',
 		plugin: 'Gutenberg',
 	} );
