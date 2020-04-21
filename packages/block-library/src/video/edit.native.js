@@ -17,7 +17,12 @@ import {
 /**
  * WordPress dependencies
  */
-import { Icon, ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	Icon,
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+} from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	BlockCaption,
@@ -235,10 +240,12 @@ class VideoEdit extends React.Component {
 						<BlockControls>{ toolbarEditButton }</BlockControls>
 					) }
 					<InspectorControls>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
+						<PanelBody title={ __( 'Video settings' ) }>
+							<VideoCommonSettings
+								setAttributes={ setAttributes }
+								attributes={ attributes }
+							/>
+						</PanelBody>
 					</InspectorControls>
 					<MediaUploadProgress
 						mediaId={ id }
