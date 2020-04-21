@@ -28,7 +28,7 @@ A transformation of type `block` is an object that takes the following parameter
 
 - **type** _(string)_: the value `block`.
 - **blocks** _(array)_: a list of known block types. It also accepts the wildcard (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
-- **transform** _(function)_: a callback that holds the transform behavior.
+- **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed to operate on it.
 - **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
@@ -116,7 +116,7 @@ transforms: {
 
 ### Type `shortcode`
 
-A transformation of type `block` is an object that takes the following parameters:
+A transformation of type `shortcode` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `shortcode`.
 - **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
@@ -194,14 +194,14 @@ transforms: {
 
 ### Type `files`
 
-**Parameters**
+A transformation of type `files` is an object that takes the following parameters:
 
-- type
-- transform
-- isMatch (optional)
-- priority (optional)
+- **type** _(string)_: the value `files`.
+- **transform** _(function)_: a callback that receives the array of files being processed to operate of them.
+- **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example**
+**Example: from file to block**
 
 A file can be dropped into the editor and converted into a block with a matching transform.
 
@@ -216,8 +216,9 @@ transforms: {
 			isMatch: function( files ) {
 				return files.length === 1;
 			},
-			// We define a lower priority (higher number) than the default of 10. This
-			// ensures that the File block is only created as a fallback.
+			// By defining a lower priority than the default of 10,
+			// we make that the File block to be created as a fallback,
+			// if no other transform is found.
 			priority: 15,
 			transform: function( files ) {
 				var file = files[ 0 ];
@@ -243,8 +244,9 @@ transforms: {
 		{
 			type: 'files',
 			isMatch: ( files ) => files.length === 1,
-			// We define a lower priority (higher number) than the default of 10. This
-			// ensures that the File block is only created as a fallback.
+			// By defining a lower priority than the default of 10,
+			// we make that the File block to be created as a fallback,
+			// if no other transform is found.
 			priority: 15,
 			transform: ( files ) => {
 				const file = files[ 0 ];
