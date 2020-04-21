@@ -6,6 +6,7 @@ import {
 	useContext,
 	useState,
 	useMemo,
+	useCallback,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -13,6 +14,7 @@ import {
 	DropZoneProvider,
 	Popover,
 	FocusReturnProvider,
+	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
@@ -24,6 +26,7 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
 import { EntitiesSavedStates } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -54,7 +57,10 @@ function Editor( { settings: _settings } ) {
 		( select ) => select( 'core/edit-site' ).isEntitiesSavedStatesOpen(),
 		[]
 	);
-	const { closeEntitiesSavedStates } = useDispatch( 'core/edit-site' );
+	const { closeEntitiesSavedStates, openEntitiesSavedStates } = useDispatch(
+		'core/edit-site'
+	);
+
 	const context = useMemo( () => ( { settings, setSettings } ), [
 		settings,
 		setSettings,
@@ -73,6 +79,8 @@ function Editor( { settings: _settings } ) {
 	}, [] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
+
+	const openSavePanel = useCallback( () => openEntitiesSavedStates(), [] );
 
 	return template ? (
 		<>
@@ -101,14 +109,29 @@ function Editor( { settings: _settings } ) {
 											</BlockSelectionClearer>
 										}
 										actions={
-											<EntitiesSavedStates
-												isOpen={
-													isEntitiesSavedStatesOpen
-												}
-												closePanel={
-													closeEntitiesSavedStates
-												}
-											/>
+											isEntitiesSavedStatesOpen ? (
+												<EntitiesSavedStates
+													isOpen={ true }
+													closePanel={
+														closeEntitiesSavedStates
+													}
+												/>
+											) : (
+												<div className="edit-post-layout__toggle-publish-panel">
+													<Button
+														isSecondary
+														className="edit-post-layout__toggle-publish-panel-button"
+														onClick={
+															openSavePanel
+														}
+														aria-expanded={ false }
+													>
+														{ __(
+															'Open save panel'
+														) }
+													</Button>
+												</div>
+											)
 										}
 										footer={ <BlockBreadcrumb /> }
 									/>
