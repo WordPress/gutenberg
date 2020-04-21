@@ -7,17 +7,9 @@ import { truncate } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { createInterpolateElement } from '@wordpress/element';
 
 function ThemePreview( {
-	theme: {
-		author_name: authorName,
-		author_uri: authorUri,
-		description,
-		name,
-		screenshot,
-		version,
-	},
+	theme: { author_name: authorName, description, name, screenshot, version },
 } ) {
 	return (
 		<div className="edit-site-template-switcher__theme-preview">
@@ -28,14 +20,8 @@ function ThemePreview( {
 				{ 'v' + version }
 			</span>
 			<div className="edit-site-template-switcher__theme-preview-byline">
-				{ createInterpolateElement(
-					// translators: %s: theme author name.
-					sprintf( __( 'By <a>%s</a>' ), [ authorName ] ),
-					{
-						// eslint-disable-next-line jsx-a11y/anchor-has-content
-						a: <a href={ authorUri } />,
-					}
-				) }
+				{ // translators: %s: theme author name.
+				sprintf( __( 'By %s' ), [ authorName ] ) }
 			</div>
 			<img
 				className="edit-site-template-switcher__theme-preview-screenshot"
