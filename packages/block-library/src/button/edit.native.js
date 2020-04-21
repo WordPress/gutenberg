@@ -408,20 +408,21 @@ class ButtonEdit extends Component {
 			isButtonFocused,
 			placeholderTextWidth,
 		} = this.state;
+		const {
+			borderRadius: fallbackBorderRadius,
+			paddingTop: spacing,
+			borderWidth,
+		} = styles.button;
 
 		if ( parentWidth === 0 ) {
 			return null;
 		}
 
 		const borderRadiusValue =
-			borderRadius !== undefined
-				? borderRadius
-				: styles.button.borderRadius;
+			borderRadius !== undefined ? borderRadius : fallbackBorderRadius;
 		const outlineBorderRadius =
 			borderRadiusValue > 0
-				? borderRadiusValue +
-				  styles.button.paddingTop +
-				  styles.button.borderWidth
+				? borderRadiusValue + spacing + borderWidth
 				: 0;
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
