@@ -1,28 +1,40 @@
 # Block Transforms
 
-Block Transforms is the API that allows a block to converted to and from other entities. Existing entities from which blocks can be transformed include blocks, shortshortcodes, files, regular expressions, or raw DOM nodes.
+Block Transforms is the API that allows a block to be transformed _from_ and _to_ other entities. Existing entities that work with this API include blocks, shortshortcodes, files, regular expressions, or raw DOM nodes.
 
-## Transforms: to and from
+## Transform direction: `to` and `from`
 
-Under the `transforms` key within the [block configuration](insert link here) you can find the `to` and `from` subkeys representing the list of available transforms for a block.
+A block declares which transformations it supports via the optional `transforms` key of the block configuration, whose subkeys `to` and `from` hold an array of available transforms for every direction. Example:
 
-What happens when a block declares `to`? Is the transform also visible in the other block?
+```js
+export const settings = {
+	title: 'My Block Title',
+	description: 'My block description',
+	/* ... */
+	transforms: {
+		from: [ /* supported from transforms */ ],
+		to: [ /* supported to transforms */ ],
+	}
+}
+```
 
-## Transforms Types
+## Transformations Types
 
-### `block`
+This section goes through the existing types of transformations available.
 
-**Parameters**
+### Type `block`
 
-- type
-- blocks
-- transform
-- isMatch (optional)
-- priority (optional)
+A transformation of type `block` is an object that takes the following parameters:
 
-**Example**
+- **type** _(string)_: the value `block`.
+- **blocks** _(array)_: a list of known block types. It also accepts the wildcard (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
+- **transform** _(function)_: the function that holds the transform behavior.
+- **isMatch** _(function, optional)_: a predicate that allows performing additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-For example, a Paragraph block can be transformed into a Heading block. This uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
+**Example: from Paragraph to Heading**
+
+To declare this transformation we add the following transform into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
 {% codetabs %}
 {% ES5 %}
@@ -63,87 +75,7 @@ transforms: {
 
 {% end %}
 
-**Paragraph to Heading**
-
-A block can also be transformed into another block type. For example, a Heading block can be transformed into a Paragraph block.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: function( attributes ) {
-                return createBlock( 'core/paragraph', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-            blocks: [ 'core/paragraph' ],
-            transform: ( { content } ) => {
-                return createBlock( 'core/paragraph', {
-                    content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-In addition to accepting an array of known block types, the `blocks` option also accepts a "wildcard" (`"*"`). This allows for transformations which apply to _all_ block types (eg: all blocks can transform into `core/group`):
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ '*' ], // wildcard - match any block
-            transform: function( attributes, innerBlocks ) {
-                // transform logic here
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    from: [
-        {
-            type: 'block',
-            blocks: [ '*' ], // wildcard - match any block
-            transform: ( attributes, innerBlocks ) => {
-                // transform logic here
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-**Blocks that have InnerBlocks**
+**Example: blocks that have InnerBlocks**
 
 A block with InnerBlocks can also be transformed from and to another block with InnerBlocks.
 
@@ -182,58 +114,7 @@ transforms: {
 
 {% end %}
 
-**isMatch**
-
-An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
-
-{% codetabs %}
-{% ES5 %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: function( attributes ) {
-				return attributes.isText;
-			},
-            transform: function( attributes ) {
-                return createBlock( 'core/paragraph', {
-                    content: attributes.content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% ESNext %}
-
-```js
-transforms: {
-    to: [
-        {
-            type: 'block',
-			blocks: [ 'core/paragraph' ],
-			isMatch: ( { isText } ) => isText,
-            transform: ( { content } ) => {
-                return createBlock( 'core/paragraph', {
-                    content,
-                } );
-            },
-        },
-    ],
-},
-```
-
-{% end %}
-
-**priority**
-
-To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
-
-### `shortcode`
+### Type `shortcode`
 
 **Parameters**
 
@@ -335,7 +216,7 @@ isMatch( { named: { id } } ) {
 
 {% end %}
 
-### `files`
+### Type `files`
 
 **Parameters**
 
@@ -407,7 +288,7 @@ transforms: {
 
 {% end %}
 
-### `prefix`
+### Type `prefix`
 
 **Parameters**
 
@@ -458,10 +339,10 @@ transforms: {
 
 {% end %}
 
-### `raw`
+### Type `raw`
 
 TODO
 
-### `enter`
+### Type `enter`
 
 TODO
