@@ -74,6 +74,7 @@ private func dummy() {
     _ = NSLocalizedString("Here is the panel content!", comment: "")
     _ = NSLocalizedString("Hide keyboard", comment: "")
     _ = NSLocalizedString("Image caption. %s", comment: "translators: accessibility text. %s: image caption.")
+    _ = NSLocalizedString("Insert mention", comment: "")
     _ = NSLocalizedString("Inspiration", comment: "translators: sample content for \"Services\" page template")
     _ = NSLocalizedString("It is our choices, Harry, that show what we truly are, far more than our abilities.", comment: "translators: sample content for \"About\" page template")
     _ = NSLocalizedString("J.K. Rowling", comment: "translators: sample content for \"About\" page template")
