@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { UP, DOWN, LEFT, RIGHT, ENTER } from '@wordpress/keycodes';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -15,25 +16,64 @@ import { forwardRef } from '@wordpress/element';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS } from './utils';
+import { useValueState, isEmpty } from '../input-control/utils';
 
 function UnitControl(
 	{
 		className,
 		disableUnits = false,
-		isUnitSelectTabbable = true,
+		isPressEnterToChange = true,
 		isResetValueOnUnitChange = true,
+		isUnitSelectTabbable = true,
 		label,
+		onBlur = noop,
 		onChange = noop,
+		onKeyDown = noop,
 		onUnitChange = noop,
 		size = 'default',
 		style,
 		unit = 'px',
 		units = CSS_UNITS,
-		value,
+		value: valueProp,
 		...props
 	},
 	ref
 ) {
+	const [ value, setValue ] = useValueState( valueProp );
+
+	const handleOnBlur = ( event ) => {
+		onBlur( event );
+		if ( isPressEnterToChange && ! isEmpty( value ) ) {
+			onChange( value, { event } );
+		}
+	};
+
+	const handleOnKeyDown = ( event ) => {
+		onKeyDown( event );
+
+		if ( isPressEnterToChange && event.keyCode === ENTER ) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			onChange( value, { event } );
+		}
+	};
+
+	const handleOnChange = ( nextValue, changeProps ) => {
+		const { event } = changeProps;
+		setValue( nextValue );
+
+		if ( ! isPressEnterToChange || event.type === 'mousemove' ) {
+			onChange( nextValue, changeProps );
+		} else if (
+			[ UP, DOWN, LEFT, RIGHT ].some(
+				( keyCode ) => keyCode === changeProps.event.keyCode
+			)
+		) {
+			onChange( nextValue, changeProps );
+		}
+	};
+
 	const handleOnUnitChange = ( unitValue, changeProps ) => {
 		const { data } = changeProps;
 		onUnitChange( unitValue, changeProps );
@@ -65,7 +105,9 @@ function UnitControl(
 				className="component-unit-control__input"
 				label={ label }
 				value={ value }
-				onChange={ onChange }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onKeyDown={ handleOnKeyDown }
 				size={ size }
 				suffix={ inputSuffix }
 				type="number"
