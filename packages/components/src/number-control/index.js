@@ -4,8 +4,6 @@
 import { clamp, noop } from 'lodash';
 import classNames from 'classnames';
 import { useDrag } from 'react-use-gesture';
-import { css } from '@emotion/core';
-import styled from '@emotion/styled';
 
 /**
  * WordPress dependencies
@@ -16,7 +14,7 @@ import { UP, DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import InputControl from '../input-control';
+import { Input } from './styles/number-control-styles';
 import { useDragCursor, add, subtract, roundClampString } from './utils';
 import { useRtl } from '../utils/style-mixins';
 
@@ -178,53 +176,5 @@ export function NumberControl(
 		/>
 	);
 }
-
-const dragStyles = ( { isDragging, dragCursor } ) => {
-	let defaultArrowStyles = '';
-	let activeDragCursorStyles = '';
-
-	if ( isDragging ) {
-		defaultArrowStyles = css`
-			cursor: ${dragCursor};
-			user-select: none;
-
-			&::-webkit-outer-spin-button,
-			&::-webkit-inner-spin-button {
-				-webkit-appearance: none !important;
-				margin: 0 !important;
-			}
-		`;
-	}
-
-	if ( dragCursor ) {
-		activeDragCursorStyles = css`
-			&:active {
-				cursor: ${dragCursor};
-			}
-		`;
-	}
-
-	return css`
-		${defaultArrowStyles};
-		${activeDragCursorStyles};
-	`;
-};
-
-const htmlArrowStyles = ( { hideHTMLArrows } ) => {
-	if ( ! hideHTMLArrows ) return ``;
-
-	return css`
-		&::-webkit-outer-spin-button,
-		&::-webkit-inner-spin-button {
-			-webkit-appearance: none !important;
-			margin: 0 !important;
-		}
-	`;
-};
-
-const Input = styled( InputControl )`
-	${dragStyles};
-	${htmlArrowStyles};
-`;
 
 export default forwardRef( NumberControl );
