@@ -93,7 +93,7 @@ export default function BoxInputControls( {
 				value={ left }
 				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
-				label={ LABELS.Left }
+				label={ LABELS.left }
 				style={ {
 					position: 'absolute',
 					[ isRtl ? 'right' : 'left' ]: 0,
