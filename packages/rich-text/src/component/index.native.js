@@ -419,17 +419,11 @@ export class RichText extends Component {
 	onFocus() {
 		this.isTouched = true;
 
-		const { unstableOnFocus, onSelectionChange } = this.props;
+		const { unstableOnFocus } = this.props;
 
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
-
-		// We know for certain that on focus, the old selection is invalid. It
-		// will be recalculated on `selectionchange`.
-		const index = undefined;
-
-		onSelectionChange( index, index );
 
 		this.lastAztecEventType = 'focus';
 	}
