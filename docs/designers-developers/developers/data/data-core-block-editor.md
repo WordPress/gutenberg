@@ -253,6 +253,8 @@ _Returns_
 Returns all block objects for the current post being edited as an array in
 the order they appear in the post.
 
+Does not include InnerBlocks of blocks which control their own InnerBlocks.
+
 Note: It's important to memoize this selector to avoid return a new instance
 on each call
 
@@ -260,6 +262,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
+-   _withControlledInnerBlocks_ `?boolean`: If true, include inner blocks that are controlled by their parent.
 
 _Returns_
 
@@ -306,6 +309,10 @@ _Parameters_
 _Returns_
 
 -   `?string`: Client ID of block selection start.
+
+<a name="getBlockWithoutControlledInnerBlocks" href="#getBlockWithoutControlledInnerBlocks">#</a> **getBlockWithoutControlledInnerBlocks**
+
+Undocumented declaration.
 
 <a name="getClientIdsOfDescendants" href="#getClientIdsOfDescendants">#</a> **getClientIdsOfDescendants**
 

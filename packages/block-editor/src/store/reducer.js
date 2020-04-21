@@ -248,9 +248,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			do {
 				result.push( current );
 				current = state.parents[ current ];
-				// We do not want to include the parent clientID if its inner
-				// blocks are controlled so that its cache key stay the same.
-			} while ( current && ! state.controlledInnerBlocks[ current ] );
+			} while ( current );
 			return result;
 		}, [] );
 	};
@@ -267,10 +265,7 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 			const updatedBlockUids = keys( flattenBlocks( action.blocks ) );
 
 			// Only include the rootClientId if its inner blocks are uncontrolled.
-			if (
-				action.rootClientId &&
-				! state.controlledInnerBlocks[ action.rootClientId ]
-			) {
+			if ( action.rootClientId ) {
 				updatedBlockUids.push( action.rootClientId );
 			}
 			newState.cache = {
