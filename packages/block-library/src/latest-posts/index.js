@@ -23,6 +23,7 @@ export const settings = {
 		align: true,
 		html: false,
 	},
+	example: {},
 	edit,
 	deprecated,
 };
