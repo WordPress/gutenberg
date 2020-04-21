@@ -888,12 +888,14 @@ export class RichText extends Component {
 								title={ __( 'Insert mention' ) }
 								icon={ <Icon icon={ atSymbol } /> }
 								onClick={ () => {
-									addMention().then( ( mentionUserId ) => {
-										this.insertString(
-											record,
-											`@${ mentionUserId }`
-										);
-									} );
+									addMention()
+										.then( ( mentionUserId ) => {
+											this.insertString(
+												record,
+												`@${ mentionUserId }`
+											);
+										} )
+										.catch( () => {} );
 								} }
 							/>
 						</BlockFormatControls>
