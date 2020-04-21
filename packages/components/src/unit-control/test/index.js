@@ -86,7 +86,7 @@ describe( 'UnitControl', () => {
 				Simulate.change( input, { target: { value: 62 } } );
 			} );
 
-			expect( state ).toBe( '62' );
+			expect( state ).toBe( 62 );
 		} );
 
 		it( 'should increment value on UP press', () => {
@@ -106,7 +106,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: UP } );
 			} );
 
-			expect( state ).toBe( '51' );
+			expect( state ).toBe( 51 );
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', () => {
@@ -126,7 +126,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
 			} );
 
-			expect( state ).toBe( '60' );
+			expect( state ).toBe( 60 );
 		} );
 
 		it( 'should decrement value on DOWN press', () => {
@@ -146,7 +146,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: DOWN } );
 			} );
 
-			expect( state ).toBe( '49' );
+			expect( state ).toBe( 49 );
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
@@ -166,7 +166,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
 			} );
 
-			expect( state ).toBe( '40' );
+			expect( state ).toBe( 40 );
 		} );
 	} );
 

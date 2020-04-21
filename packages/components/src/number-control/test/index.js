@@ -69,7 +69,7 @@ describe( 'NumberControl', () => {
 	} );
 
 	describe( 'onChange handling', () => {
-		it( 'should provide onChange callback with string value', () => {
+		it( 'should provide onChange callback with number value', () => {
 			const spy = jest.fn();
 			act( () => {
 				render(
@@ -86,7 +86,9 @@ describe( 'NumberControl', () => {
 				Simulate.change( input );
 			} );
 
-			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
+			const changeValue = spy.mock.calls[ 0 ][ 0 ];
+
+			expect( changeValue ).toBe( 10 );
 		} );
 	} );
 

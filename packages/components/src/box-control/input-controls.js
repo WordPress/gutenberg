@@ -7,13 +7,12 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { getValues } from './utils';
+import { LABELS, getValues } from './utils';
 import {
 	Layout,
 	LayoutBox,
 	SideIndicatorX,
 	SideIndicatorY,
-	Prefix,
 } from './styles/box-control-styles';
 import { useRtl } from '../utils/style-mixins';
 
@@ -29,9 +28,11 @@ export default function BoxInputControls( {
 		left: [ left ],
 	} = values;
 
+	const isRtl = useRtl();
+
 	const allValues = getValues( values, 'top', 'right', 'bottom', 'left' );
 	const isMixed = ! allValues.every( ( v ) => v === top );
-	const isRtl = useRtl();
+	const allValue = isMixed ? '' : top;
 
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
@@ -39,6 +40,13 @@ export default function BoxInputControls( {
 		const nextValue = [ next, unit ];
 
 		nextValues[ side ] = nextValue;
+
+		if ( side === 'all' ) {
+			nextValues.top = nextValue;
+			nextValues.bottom = nextValue;
+			nextValues.left = nextValue;
+			nextValues.right = nextValue;
+		}
 
 		/**
 		 * Supports changing pair sides. For example, holding the ALT key
@@ -64,12 +72,6 @@ export default function BoxInputControls( {
 		onChange( nextValues );
 	};
 
-	const baseStyles = {
-		position: 'absolute',
-		zIndex: 1,
-		maxWidth: 60,
-	};
-
 	return (
 		<Layout>
 			<SideIndicatorX aria-hidden="true" />
@@ -80,11 +82,8 @@ export default function BoxInputControls( {
 				value={ top }
 				dragDirection="s"
 				onChange={ createHandleOnChange( 'top' ) }
-				label="Top"
-				prefix={ <Prefix>↑</Prefix> }
-				size="small"
+				label={ LABELS.top }
 				style={ {
-					...baseStyles,
 					left: '50%',
 					transform: 'translateX(-50%)',
 				} }
@@ -94,11 +93,8 @@ export default function BoxInputControls( {
 				value={ left }
 				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
-				label="Left"
-				prefix={ <Prefix>←</Prefix> }
-				size="small"
+				label={ LABELS.Left }
 				style={ {
-					...baseStyles,
 					position: 'absolute',
 					[ isRtl ? 'right' : 'left' ]: 0,
 					top: '50%',
@@ -107,20 +103,10 @@ export default function BoxInputControls( {
 			/>
 			<UnitControl
 				{ ...props }
-				value={ isMixed ? '' : top }
-				onChange={ ( next ) => {
-					onChange( {
-						top: [ next, unit ],
-						right: [ next, unit ],
-						bottom: [ next, unit ],
-						left: [ next, unit ],
-					} );
-				} }
-				label="All"
-				prefix={ <Prefix>⁘</Prefix> }
-				size="small"
+				value={ allValue }
+				onChange={ createHandleOnChange( 'all' ) }
+				label={ LABELS.all }
 				style={ {
-					...baseStyles,
 					left: '50%',
 					top: '50%',
 					transform: 'translate(-50%, -50%)',
@@ -131,11 +117,8 @@ export default function BoxInputControls( {
 				value={ right }
 				dragDirection="w"
 				onChange={ createHandleOnChange( 'right' ) }
-				label="Right"
-				prefix={ <Prefix>→</Prefix> }
-				size="small"
+				label={ LABELS.right }
 				style={ {
-					...baseStyles,
 					[ isRtl ? 'left' : 'right' ]: 0,
 					top: '50%',
 					transform: 'translateY(-50%)',
@@ -146,11 +129,8 @@ export default function BoxInputControls( {
 				value={ bottom }
 				dragDirection="n"
 				onChange={ createHandleOnChange( 'bottom' ) }
-				label="Bottom"
-				prefix={ <Prefix>↓</Prefix> }
-				size="small"
+				label={ LABELS.bottom }
 				style={ {
-					...baseStyles,
 					left: '50%',
 					bottom: 0,
 					transform: 'translateX(-50%)',

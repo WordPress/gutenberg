@@ -9,6 +9,7 @@ import { Flex } from '../../flex';
 import { color } from '../../utils/style-mixins';
 
 export const Root = styled.div`
+	box-sizing: border-box;
 	max-width: 300px;
 	padding-bottom: 12px;
 	width: 100%;
@@ -37,20 +38,20 @@ export const Layout = styled.div`
 `;
 
 export const LayoutBox = styled.div`
-	position: absolute;
-	box-sizing: border-box;
-	top: 12px;
-	bottom: 12px;
-	left: 30px;
-	right: 30px;
-	pointer-events: none;
 	border: 1px dashed ${color( 'ui.borderLight' )};
+	bottom: 12px;
+	box-sizing: border-box;
+	left: 30px;
+	pointer-events: none;
+	position: absolute;
+	right: 30px;
+	top: 12px;
 `;
 
 export const SideIndicator = styled.div`
 	box-sizing: border-box;
-	position: absolute;
 	pointer-events: none;
+	position: absolute;
 `;
 
 export const SideIndicatorX = styled( SideIndicator )`
@@ -66,15 +67,4 @@ export const SideIndicatorY = styled( SideIndicator )`
 	left: 50%;
 	transform: translate( 0, -50% );
 	height: 100%;
-`;
-
-export const Prefix = styled.div`
-	box-sizing: border-box;
-	color: ${color( 'ui.label' )};
-	font-size: 12px;
-	line-height: 1;
-	margin-right: -8px;
-	text-align: center;
-	width: 20px;
-	user-select: none;
 `;

@@ -18,7 +18,7 @@ import {
 	Container,
 	Fieldset,
 	Input,
-	Label,
+	Label as BaseLabel,
 	Legend,
 	LegendText,
 	Root,
@@ -46,6 +46,7 @@ export function InputControl(
 		isFloatingLabel = true,
 		label,
 		size = 'default',
+		tooltipPosition = 'top',
 		value: valueProp,
 		...props
 	},
@@ -78,25 +79,25 @@ export function InputControl(
 	const isFloatingLabelSet =
 		! hideLabelFromVision && isFloatingLabel && label;
 
-	const LabelComponent = hideLabelFromVision ? VisuallyHidden : Label;
-
 	return (
 		<Root isFloatingLabel={ isFloatingLabelSet }>
 			{ label && (
-				<LabelComponent
+				<Label
 					as="label"
+					hideLabelFromVision={ hideLabelFromVision }
 					htmlFor={ id }
-					isFloatingLabel={ isFloatingLabel }
 					isFilled={ isFilled }
 					isFloating={ isFloating }
+					isFloatingLabel={ isFloatingLabel }
 					size={ size }
 				>
 					{ label }
-				</LabelComponent>
+				</Label>
 			) }
 			<Tooltip
 				hideLabelFromVision={ hideLabelFromVision }
 				label={ label }
+				position={ tooltipPosition }
 			>
 				<Container isFocused={ isFocused }>
 					<Input
@@ -136,9 +137,29 @@ export function InputControl(
 	);
 }
 
-function Tooltip( { children, hideLabelFromVision, label } ) {
+function Label( { children, hideLabelFromVision, htmlFor, ...props } ) {
+	if ( hideLabelFromVision ) {
+		return (
+			<VisuallyHidden as="label" htmlFor={ htmlFor }>
+				{ children }
+			</VisuallyHidden>
+		);
+	}
+
+	return (
+		<BaseLabel htmlFor={ htmlFor } { ...props }>
+			{ children }
+		</BaseLabel>
+	);
+}
+
+function Tooltip( { children, hideLabelFromVision, label, ...props } ) {
 	if ( label && hideLabelFromVision ) {
-		return <BaseTooltip text={ label }>{ children }</BaseTooltip>;
+		return (
+			<BaseTooltip text={ label } { ...props }>
+				{ children }
+			</BaseTooltip>
+		);
 	}
 
 	return children;
