@@ -103,10 +103,12 @@ function ColorSettings( {
 					segmentHandler={ ( item ) => setActiveSegment( item ) }
 					selectedIndex={ selectedSegmentIndex }
 					addonLeft={
-						<ColorIndicator
-							color={ currentValue }
-							style={ styles.colorIndicator }
-						/>
+						currentValue && (
+							<ColorIndicator
+								color={ currentValue }
+								style={ styles.colorIndicator }
+							/>
+						)
 					}
 				/>
 			);

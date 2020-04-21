@@ -132,54 +132,57 @@ export class InserterMenu extends Component {
 				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
 			>
-				<FlatList
-					onLayout={ this.onLayout }
-					scrollEnabled={ false }
-					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-					keyboardShouldPersistTaps="always"
-					numColumns={ numberOfColumns }
-					data={ items }
-					ItemSeparatorComponent={ () => (
-						<View style={ styles.rowSeparator } />
-					) }
-					keyExtractor={ ( item ) => item.name }
-					renderItem={ ( { item } ) => (
-						<TouchableHighlight
-							style={ styles.touchableArea }
-							underlayColor="transparent"
-							activeOpacity={ 0.5 }
-							accessibilityLabel={ item.title }
-							onPress={ () => onSelect( item ) }
-						>
-							<View
-								style={ [
-									styles.modalItem,
-									{ width: columnProperties.maxWidth },
-								] }
+				<TouchableHighlight accessible={ false }>
+					<FlatList
+						onLayout={ this.onLayout }
+						scrollEnabled={ false }
+						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+						keyboardShouldPersistTaps="always"
+						numColumns={ numberOfColumns }
+						data={ items }
+						ItemSeparatorComponent={ () => (
+							<View style={ styles.rowSeparator } />
+						) }
+						keyExtractor={ ( item ) => item.name }
+						renderItem={ ( { item } ) => (
+							<TouchableHighlight
+								style={ styles.touchableArea }
+								underlayColor="transparent"
+								activeOpacity={ 0.5 }
+								accessibilityLabel={ item.title }
+								onPress={ () => onSelect( item ) }
 							>
 								<View
 									style={ [
-										modalIconWrapperStyle,
-										columnProperties.itemWidth && {
-											width: columnProperties.itemWidth,
-										},
+										styles.modalItem,
+										{ width: columnProperties.maxWidth },
 									] }
 								>
-									<View style={ modalIconStyle }>
-										<Icon
-											icon={ item.icon.src }
-											fill={ modalIconStyle.fill }
-											size={ modalIconStyle.width }
-										/>
+									<View
+										style={ [
+											modalIconWrapperStyle,
+											columnProperties.itemWidth && {
+												width:
+													columnProperties.itemWidth,
+											},
+										] }
+									>
+										<View style={ modalIconStyle }>
+											<Icon
+												icon={ item.icon.src }
+												fill={ modalIconStyle.fill }
+												size={ modalIconStyle.width }
+											/>
+										</View>
 									</View>
+									<Text style={ modalItemLabelStyle }>
+										{ item.title }
+									</Text>
 								</View>
-								<Text style={ modalItemLabelStyle }>
-									{ item.title }
-								</Text>
-							</View>
-						</TouchableHighlight>
-					) }
-				/>
+							</TouchableHighlight>
+						) }
+					/>
+				</TouchableHighlight>
 			</BottomSheet>
 		);
 	}

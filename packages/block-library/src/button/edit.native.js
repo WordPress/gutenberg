@@ -195,7 +195,7 @@ class ButtonEdit extends Component {
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
-		const fallbackTextColor = '#ffffff';
+		const fallbackTextColor = styles.fallbackButton.color;
 		return (
 			( style && style.color && style.color.text ) ||
 			textColor.color ||

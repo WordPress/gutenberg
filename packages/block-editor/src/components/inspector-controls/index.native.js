@@ -2,12 +2,11 @@
  * External dependencies
  */
 import React from 'react';
-
+import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
-import { View } from 'react-native';
 /**
  * Internal dependencies
  */
