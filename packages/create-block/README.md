@@ -33,13 +33,17 @@ The following command generates PHP, JS and CSS code for registering a block.
 $ npm init @wordpress/block [options] [slug]
 ```
 
-`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values.
+`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overriden with some of the options listed below.
 
 Options:
-```bash
--t, --template <name>  template type name, allowed values: "es5", "esnext" (default: "esnext")
--V, --version          output the version number
--h, --help             output usage information
+```
+-V, --version                output the version number
+-t, --template <name>        template type name, allowed values: "es5", "esnext" (default: "esnext")
+--namespace <namespace>      internal namespace for the block name
+--title <title>              display title for the block
+--description <description>  short description for the block
+--category <category>        category name for the block
+-h, --help                   output usage information
 ```
 
 _Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
