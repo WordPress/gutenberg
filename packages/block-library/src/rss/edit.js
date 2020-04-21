@@ -55,7 +55,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			<Placeholder icon={ rss } label="RSS">
 				<form
 					onSubmit={ onSubmitURL }
-					className="blocks-rss__placeholder-form"
+					className="wp-block-rss__placeholder-form"
 				>
 					<TextControl
 						placeholder={ __( 'Enter URL here…' ) }
@@ -63,7 +63,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onChange={ ( value ) =>
 							setAttributes( { feedURL: value } )
 						}
-						className="blocks-rss__placeholder-input"
+						className="wp-block-rss__placeholder-input"
 					/>
 					<Button isPrimary type="submit">
 						{ __( 'Use URL' ) }
