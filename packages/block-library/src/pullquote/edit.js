@@ -105,7 +105,7 @@ class PullQuoteEdit extends Component {
 			className,
 		} = this.props;
 
-		const { value, citation } = attributes;
+		const { value, citation, align } = attributes;
 
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 		const figureStyles = isSolidColorStyle
@@ -115,6 +115,7 @@ class PullQuoteEdit extends Component {
 		const figureClasses = classnames( className, {
 			'has-background': isSolidColorStyle && mainColor.color,
 			[ mainColor.class ]: isSolidColorStyle && mainColor.class,
+			[ `align${ align }` ]: align,
 		} );
 
 		const blockquoteStyles = {
