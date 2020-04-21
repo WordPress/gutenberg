@@ -1,5 +1,5 @@
 .edit-site-editor__toggle-save-panel {
-	z-index: z-index(".edit-site-editor__toogle-save-panel");
+	z-index: z-index(".edit-site-editor__toggle-save-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
