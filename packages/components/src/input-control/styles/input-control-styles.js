@@ -101,12 +101,13 @@ export const Input = styled.input`
 	&&& {
 		background-color: transparent;
 		box-sizing: border-box;
-		border: none !important;
+		border: none;
 		box-shadow: none !important;
+		color: ${color( 'black' )};
 		display: block;
 		outline: none;
-		padding-left: 8px !important;
-		padding-right: 8px !important;
+		padding-left: 8px;
+		padding-right: 8px;
 		width: 100%;
 
 		${fontSizeStyles};
@@ -270,7 +271,7 @@ export const LegendText = ( props ) => (
 	<BaseLegendText { ...props } as="span" />
 );
 
-export const Prefix = styled.span`
+export const Suffix = styled.span`
 	box-sizing: border-box;
 	display: block;
 `;

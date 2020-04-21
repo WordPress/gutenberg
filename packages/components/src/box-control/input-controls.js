@@ -67,7 +67,7 @@ export default function BoxInputControls( {
 	const baseStyles = {
 		position: 'absolute',
 		zIndex: 1,
-		maxWidth: 70,
+		maxWidth: 60,
 	};
 
 	return (

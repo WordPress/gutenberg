@@ -12,6 +12,7 @@ import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import BaseTooltip from '../tooltip';
 import VisuallyHidden from '../visually-hidden';
 import {
 	Container,
@@ -20,8 +21,8 @@ import {
 	Label,
 	Legend,
 	LegendText,
-	Prefix,
 	Root,
+	Suffix,
 } from './styles/input-control-styles';
 import { useValueState, isEmpty } from './utils';
 
@@ -41,7 +42,7 @@ export function InputControl(
 		onFocus = noop,
 		hideLabelFromVision = false,
 		id: idProp,
-		prefix,
+		suffix,
 		isFloatingLabel = true,
 		label,
 		size = 'default',
@@ -93,41 +94,54 @@ export function InputControl(
 					{ label }
 				</LabelComponent>
 			) }
-			<Container isFocused={ isFocused }>
-				{ prefix && <Prefix>{ prefix }</Prefix> }
-				<Input
-					{ ...props }
-					className={ classes }
-					id={ id }
-					isFilled={ isFilled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabel }
-					onBlur={ handleOnBlur }
-					onChange={ handleOnChange }
-					onFocus={ handleOnFocus }
-					ref={ ref }
-					size={ size }
-					value={ value }
-				/>
-				<Fieldset
-					aria-hidden="true"
-					isFloatingLabel={ isFloatingLabelSet }
-					isFocused={ isFocused }
-				>
-					{ isFloatingLabelSet && (
-						<Legend
-							aria-hidden="true"
-							isFloating={ isFloating }
-							size={ size }
-						>
-							<LegendText>{ label }</LegendText>
-						</Legend>
-					) }
-				</Fieldset>
-				{ children }
-			</Container>
+			<Tooltip
+				hideLabelFromVision={ hideLabelFromVision }
+				label={ label }
+			>
+				<Container isFocused={ isFocused }>
+					<Input
+						{ ...props }
+						className={ classes }
+						id={ id }
+						isFilled={ isFilled }
+						isFloating={ isFloating }
+						isFloatingLabel={ isFloatingLabel }
+						onBlur={ handleOnBlur }
+						onChange={ handleOnChange }
+						onFocus={ handleOnFocus }
+						ref={ ref }
+						size={ size }
+						value={ value }
+					/>
+					{ suffix && <Suffix>{ suffix }</Suffix> }
+					<Fieldset
+						aria-hidden="true"
+						isFloatingLabel={ isFloatingLabelSet }
+						isFocused={ isFocused }
+					>
+						{ isFloatingLabelSet && (
+							<Legend
+								aria-hidden="true"
+								isFloating={ isFloating }
+								size={ size }
+							>
+								<LegendText>{ label }</LegendText>
+							</Legend>
+						) }
+					</Fieldset>
+					{ children }
+				</Container>
+			</Tooltip>
 		</Root>
 	);
+}
+
+function Tooltip( { children, hideLabelFromVision, label } ) {
+	if ( label && hideLabelFromVision ) {
+		return <BaseTooltip text={ label }>{ children }</BaseTooltip>;
+	}
+
+	return children;
 }
 
 export default forwardRef( InputControl );

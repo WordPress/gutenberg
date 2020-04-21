@@ -44,7 +44,7 @@ export const LayoutBox = styled.div`
 	left: 30px;
 	right: 30px;
 	pointer-events: none;
-	border: 1px solid ${color( 'ui.borderLight' )};
+	border: 1px dashed ${color( 'ui.borderLight' )};
 `;
 
 export const SideIndicator = styled.div`
@@ -54,14 +54,14 @@ export const SideIndicator = styled.div`
 `;
 
 export const SideIndicatorX = styled( SideIndicator )`
-	border-top: 1px dashed ${color( 'ui.borderLight' )};
+	border-top: 1px solid ${color( 'ui.borderLight' )};
 	top: 50%;
 	left: 0;
 	width: 100%;
 `;
 
 export const SideIndicatorY = styled( SideIndicator )`
-	border-left: 1px dashed ${color( 'ui.borderLight' )};
+	border-left: 1px solid ${color( 'ui.borderLight' )};
 	top: 50%;
 	left: 50%;
 	transform: translate( 0, -50% );

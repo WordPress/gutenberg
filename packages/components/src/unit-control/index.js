@@ -45,6 +45,17 @@ function UnitControl(
 
 	const classes = classnames( 'component-unit-control', className );
 
+	const inputSuffix = ! disableUnits ? (
+		<UnitSelectControl
+			className="component-unit-control__select"
+			isTabbable={ isUnitSelectTabbable }
+			options={ units }
+			onChange={ handleOnUnitChange }
+			size={ size }
+			value={ unit }
+		/>
+	) : null;
+
 	return (
 		<Root className={ classes } ref={ ref } style={ style }>
 			<ValueInput
@@ -56,19 +67,9 @@ function UnitControl(
 				value={ value }
 				onChange={ onChange }
 				size={ size }
+				suffix={ inputSuffix }
 				type="number"
-			>
-				{ ! disableUnits && (
-					<UnitSelectControl
-						className="component-unit-control__select"
-						isTabbable={ isUnitSelectTabbable }
-						options={ units }
-						onChange={ handleOnUnitChange }
-						size={ size }
-						value={ unit }
-					/>
-				) }
-			</ValueInput>
+			></ValueInput>
 		</Root>
 	);
 }
