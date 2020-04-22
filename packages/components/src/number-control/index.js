@@ -128,6 +128,8 @@ export function NumberControl(
 		if ( ! isPressEnterToChange || _forceUpdate ) {
 			onChange( nextValue, changeProps );
 			setValue( nextValue );
+		} else {
+			setValue( next );
 		}
 	};
 

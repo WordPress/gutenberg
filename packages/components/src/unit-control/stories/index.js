@@ -20,10 +20,10 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '10' );
-	const [ unit, setUnit ] = useState( 'px' );
+	const [ value, setValue ] = useState( '10px' );
 
 	const props = {
+		disableUnits: boolean( 'disableUnits', false ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
 		label: text( 'label', 'Value' ),
@@ -47,8 +47,6 @@ function Example() {
 				{ ...props }
 				value={ value }
 				onChange={ ( v ) => setValue( v ) }
-				unit={ unit }
-				onUnitChange={ ( v ) => setUnit( v ) }
 			/>
 		</ControlWrapperView>
 	);

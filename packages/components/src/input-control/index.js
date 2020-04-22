@@ -43,7 +43,7 @@ export function InputControl(
 		hideLabelFromVision = false,
 		id: idProp,
 		suffix,
-		isFloatingLabel = true,
+		isFloatingLabel = false,
 		label,
 		size = 'default',
 		tooltipPosition = 'top',
@@ -110,7 +110,7 @@ export function InputControl(
 						id={ id }
 						isFilled={ isFilled }
 						isFloating={ isFloating }
-						isFloatingLabel={ isFloatingLabel }
+						isFloatingLabel={ isFloatingLabelSet }
 						onBlur={ handleOnBlur }
 						onChange={ handleOnChange }
 						onFocus={ handleOnFocus }

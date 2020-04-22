@@ -142,6 +142,7 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	const pointerEvents = isFloating ? null : 'none';
 
 	const marginTop = isFloating ? 0 : 1;
+	const marginLeft = isFloatingLabel ? 8 : 0;
 	const offset = size === 'small' ? '-3px' : '-5px';
 
 	let transform = isFloating
@@ -165,7 +166,7 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 			transition,
 			transform,
 		},
-		rtl( { marginLeft: 8 } )(),
+		rtl( { marginLeft } )(),
 		rtl(
 			{ transformOrigin: 'top left' },
 			{ transformOrigin: 'top right' }

@@ -26,5 +26,6 @@ export function useControlledState( initialState ) {
 
 export function useValueState( initialValue ) {
 	const value = isValueEmpty( initialValue ) ? '' : initialValue;
+
 	return useControlledState( value );
 }

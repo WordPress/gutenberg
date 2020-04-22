@@ -12,18 +12,24 @@ export const LABELS = {
 };
 
 export const DEFAULT_VALUES = {
-	top: [ 0, 'px' ],
-	right: [ 0, 'px' ],
-	bottom: [ 0, 'px' ],
-	left: [ 0, 'px' ],
+	top: '0px',
+	right: '0px',
+	bottom: '0px',
+	left: '0px',
 };
+
+export function isValuesMixed( values ) {
+	const vals = Object.values( values );
+
+	return ! vals.every( ( v ) => v === vals[ 0 ] );
+}
 
 export function getValues( values, ...args ) {
 	const nextValues = [];
 
-	args.forEach( ( key ) => {
+	for ( const key in args ) {
 		nextValues.push( values[ key ] );
-	} );
+	}
 
 	return nextValues;
 }
