@@ -12,7 +12,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 export default function useMediaQuery( query ) {
 	const [ match, setMatch ] = useState(
-		query && window.matchMedia( query ).matches
+		!! query && window.matchMedia( query ).matches
 	);
 
 	useEffect( () => {
