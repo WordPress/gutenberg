@@ -21,7 +21,6 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 				label={ label }
 				isResetValueOnUnitChange={ false }
 				placeholder={ 0 }
-				size="small"
 				style={ styles }
 				value={ value }
 				{ ...props }

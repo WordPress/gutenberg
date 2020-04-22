@@ -32,16 +32,9 @@ export function PaddingEdit( props ) {
 	}
 
 	const onChange = ( next ) => {
-		const { top, right, bottom, left } = next;
-
 		const newStyle = {
 			...style,
-			padding: {
-				top: `${ top[ 0 ] }${ top[ 1 ] }`,
-				right: `${ right[ 0 ] }${ right[ 1 ] }`,
-				bottom: `${ bottom[ 0 ] }${ bottom[ 1 ] }`,
-				left: `${ left[ 0 ] }${ left[ 1 ] }`,
-			},
+			padding: next,
 		};
 
 		setAttributes( {

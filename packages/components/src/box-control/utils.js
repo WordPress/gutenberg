@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -17,6 +18,13 @@ export const DEFAULT_VALUES = {
 	bottom: '0px',
 	left: '0px',
 };
+
+export function useBoxControlState( values = {} ) {
+	return useState( {
+		...DEFAULT_VALUES,
+		...values,
+	} );
+}
 
 export function isValuesMixed( values ) {
 	const vals = Object.values( values );

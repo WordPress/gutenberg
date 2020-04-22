@@ -6,7 +6,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -14,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 import Visualizer from './visualizer';
 import InputControls from './input-controls';
 import Text from '../text';
-import { DEFAULT_VALUES } from './utils';
+import { useBoxControlState } from './utils';
 import { Root, Header, LayoutContainer } from './styles/box-control-styles';
 
 const defaultInputProps = {
@@ -32,10 +31,10 @@ export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	values: valuesProp = DEFAULT_VALUES,
+	values: valuesProp,
 	units,
 } ) {
-	const [ values, setValues ] = useState( valuesProp );
+	const [ values, setValues ] = useBoxControlState( valuesProp );
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 

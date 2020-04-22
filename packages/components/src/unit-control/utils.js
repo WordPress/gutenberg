@@ -51,7 +51,7 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 
 	if ( hasUnits( units ) ) {
 		const match = units.find( ( item ) => item.value === unit );
-		unit = match ? match.value : unit;
+		unit = match?.value;
 	}
 
 	output[ 0 ] = isNaN( num ) ? '' : num;
