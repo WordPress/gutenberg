@@ -1,4 +1,8 @@
 /**
+ * @format
+ * */
+
+/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -12,7 +16,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
 describe( 'Gutenberg Editor Image Block tests', () => {
 	let driver;
@@ -57,9 +61,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption
-			);
+			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption, true );
 			await editorPage.dismissKeyboard();
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
@@ -79,23 +81,16 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
 			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption
-			);
+			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
 			await editorPage.dismissKeyboard();
 		}
 
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			2
-		);
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			2,
-			testData.longText
-		);
+		await editorPage.sendTextToParagraphBlockAtPosition( 2, testData.longText );
 
 		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {

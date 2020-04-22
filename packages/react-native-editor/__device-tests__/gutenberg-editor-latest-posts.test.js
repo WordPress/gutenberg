@@ -14,7 +14,7 @@ import {
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
-describe( 'Gutenberg Editor Gallery Block tests', () => {
+describe( 'Gutenberg Editor Latest Post Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -39,12 +39,12 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to add a gallery block', async () => {
-		await editorPage.addNewGalleryBlock();
-		const galleryBlock = await editorPage.getGalleryBlockAtPosition( 1 );
+	it( 'should be able to add a Latests-Posts block', async () => {
+		await editorPage.addNewLatestPostsBlock();
+		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition( 1 );
 
-		expect( galleryBlock ).toBeTruthy();
-		await editorPage.removeGalleryBlockAtPosition( 1 );
+		expect( latestPostsBlock ).toBeTruthy();
+		await editorPage.removeLatestPostsBlockAtPosition( 1 );
 	} );
 
 	afterAll( async () => {

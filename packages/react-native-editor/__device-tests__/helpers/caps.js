@@ -9,13 +9,15 @@ const ios = {
 	appiumVersion: '1.15.0', // SauceLabs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 	processArguments: {
-		args: [ 'uitesting' ],
+		args: [
+			'uitesting',
+		],
 	},
 };
 
 exports.iosLocal = {
 	...ios,
-	platformVersion: '13.3',
+	platformVersion: '13.4',
 	deviceName: 'iPhone 11',
 };
 

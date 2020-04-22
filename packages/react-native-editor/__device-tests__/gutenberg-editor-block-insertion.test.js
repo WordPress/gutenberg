@@ -1,4 +1,8 @@
 /**
+ * @format
+ * */
+
+/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -12,7 +16,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
 describe( 'Gutenberg Editor tests for Block insertion', () => {
 	let driver;
@@ -42,32 +46,20 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block into post', async () => {
 		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
-		);
+		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			1,
-			testData.longText
-		);
+		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			2
-		);
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
 		await paragraphBlockElement.click();
 
 		await editorPage.addNewParagraphBlock();
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			3
-		);
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
 		await paragraphBlockElement.click();
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			3,
-			testData.mediumText
-		);
+		await editorPage.sendTextToParagraphBlockAtPosition( 3, testData.mediumText );
 
 		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
 
@@ -76,19 +68,13 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		// Workaround for now since deleting the first element causes a crash on CI for Android
 		if ( isAndroid() ) {
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-				3,
-				{ autoscroll: true }
-			);
+			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3, { autoscroll: true } );
 			await paragraphBlockElement.click();
 			await editorPage.removeParagraphBlockAtPosition( 3 );
 			for ( let i = 3; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
-				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-					i,
-					{ autoscroll: true }
-				);
+				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( i, { autoscroll: true } );
 				await paragraphBlockElement.click();
 				await editorPage.removeParagraphBlockAtPosition( i );
 			}
@@ -96,9 +82,7 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 			for ( let i = 4; i > 0; i-- ) {
 				// wait for accessibility ids to update
 				await driver.sleep( 1000 );
-				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-					1
-				);
+				paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 				await clickMiddleOfElement( driver, paragraphBlockElement );
 				await editorPage.removeParagraphBlockAtPosition( 1 );
 			}
@@ -107,16 +91,11 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 	it( 'should be able to insert block at the beginning of post from the title', async () => {
 		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
-		);
+		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			1,
-			testData.longText
-		);
+		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
 		// Should have 3 paragraph blocks at this point
 
 		if ( isAndroid() ) {
@@ -124,25 +103,16 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		}
 
 		await swipeDown( driver );
-		const titleElement = await editorPage.getTitleElement( {
-			autoscroll: true,
-		} );
+		const titleElement = await editorPage.getTitleElement( { autoscroll: true } );
 		await titleElement.click();
 		await titleElement.click();
 
 		await editorPage.addNewParagraphBlock();
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
-		);
+		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 		await clickMiddleOfElement( driver, paragraphBlockElement );
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			1,
-			testData.mediumText
-		);
+		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.mediumText );
 		await paragraphBlockElement.click();
-		await editorPage.verifyHtmlContent(
-			testData.blockInsertionHtmlFromTitle
-		);
+		await editorPage.verifyHtmlContent( testData.blockInsertionHtmlFromTitle );
 	} );
 
 	afterAll( async () => {

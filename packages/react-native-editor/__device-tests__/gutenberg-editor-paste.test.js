@@ -1,4 +1,8 @@
 /**
+ * @format
+ * */
+
+/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
@@ -14,12 +18,13 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
 describe( 'Gutenberg Editor paste tests', () => {
 	// skip iOS for now
 	if ( ! isAndroid() ) {
-		it( 'skips the tests on any platform other than Android', async () => {} );
+		it( 'skips the tests on any platform other than Android', async () => {
+		} );
 		return;
 	}
 
@@ -46,21 +51,14 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
-		);
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock(
-			paragraphBlockElement,
-			testData.pastePlainText
-		);
-		const textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
+		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
+		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 
 		// copy content to clipboard
 		await longPressMiddleOfElement( driver, textViewElement );
@@ -69,17 +67,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		// create another paragraph block
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition(
-			2
-		);
+		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
 
 		if ( isAndroid() ) {
 			await paragraphBlockElement2.click();
 		}
 
-		const textViewElement2 = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement2
-		);
+		const textViewElement2 = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement2 );
 
 		// paste into second paragraph block
 		await longPressMiddleOfElement( driver, textViewElement2 );
@@ -92,17 +86,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 	it( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// create paragraph block with styled text by editing html
 		await editorPage.setHtmlContentAndroid( testData.pasteHtmlText );
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
-		);
+		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
 
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		const textViewElement = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement
-		);
+		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 
 		// copy content to clipboard
 		await longPressMiddleOfElement( driver, textViewElement );
@@ -111,17 +101,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		// create another paragraph block
 		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition(
-			2
-		);
+		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
 
 		if ( isAndroid() ) {
 			await paragraphBlockElement2.click();
 		}
 
-		const textViewElement2 = await editorPage.getTextViewForParagraphBlock(
-			paragraphBlockElement2
-		);
+		const textViewElement2 = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement2 );
 
 		// paste into second paragraph block
 		await longPressMiddleOfElement( driver, textViewElement2 );

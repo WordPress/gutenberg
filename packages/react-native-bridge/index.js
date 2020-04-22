@@ -1,3 +1,5 @@
+/** @format */
+
 /**
  * External dependencies
  */
@@ -5,10 +7,9 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
 
-const gutenbergBridgeEvents = new NativeEventEmitter(
-	RNReactNativeGutenbergBridge
-);
+const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
 export const { isInitialColorSchemeDark } = RNReactNativeGutenbergBridge;
 
@@ -22,8 +23,6 @@ export const userEvents = {
 	editorSessionTemplateApply: 'editor_session_template_apply',
 	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
-
-export const showMediaEditorButton = isIOS;
 
 // Console polyfill from react-native
 
@@ -72,11 +71,12 @@ export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
 
+export function subscribeAndroidModalClosed( callback ) {
+	return isAndroid ? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback ) : undefined;
+}
+
 export function subscribePreferredColorScheme( callback ) {
-	return gutenbergBridgeEvents.addListener(
-		'preferredColorScheme',
-		callback
-	);
+	return gutenbergBridgeEvents.addListener( 'preferredColorScheme', callback );
 }
 
 /**
@@ -90,12 +90,7 @@ export function subscribePreferredColorScheme( callback ) {
  * @param {Function}       callback  RN Callback function to be called with the selected media objects.
  */
 export function requestMediaPicker( source, filter, multiple, callback ) {
-	RNReactNativeGutenbergBridge.requestMediaPickFrom(
-		source,
-		filter,
-		multiple,
-		callback
-	);
+	RNReactNativeGutenbergBridge.requestMediaPickFrom( source, filter, multiple, callback );
 }
 
 export function requestMediaImport( url, callback ) {
@@ -107,15 +102,11 @@ export function mediaUploadSync() {
 }
 
 export function requestImageFailedRetryDialog( mediaId ) {
-	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog(
-		mediaId
-	);
+	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog( mediaId );
 }
 
 export function requestImageUploadCancelDialog( mediaId ) {
-	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog(
-		mediaId
-	);
+	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog( mediaId );
 }
 
 export function requestImageUploadCancel( mediaId ) {
@@ -123,32 +114,18 @@ export function requestImageUploadCancel( mediaId ) {
 }
 
 export function getOtherMediaOptions( filter, callback ) {
-	return RNReactNativeGutenbergBridge.getOtherMediaOptions(
-		filter,
-		callback
-	);
+	return RNReactNativeGutenbergBridge.getOtherMediaOptions( filter, callback );
 }
 
-export function requestImageFullscreenPreview(
-	currentImageUrl,
-	originalImageUrl
-) {
+export function requestImageFullscreenPreview( currentImageUrl, originalImageUrl ) {
 	if ( isIOS ) {
-		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview(
-			currentImageUrl,
-			originalImageUrl
-		);
+		return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( currentImageUrl, originalImageUrl );
 	}
-	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview(
-		originalImageUrl || currentImageUrl
-	);
+	return RNReactNativeGutenbergBridge.requestImageFullscreenPreview( originalImageUrl || currentImageUrl );
 }
 
 export function requestMediaEditor( mediaUrl, callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaEditor(
-		mediaUrl,
-		callback
-	);
+	return RNReactNativeGutenbergBridge.requestMediaEditor( mediaUrl, callback );
 }
 
 export function fetchRequest( path ) {
