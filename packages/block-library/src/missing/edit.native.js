@@ -27,7 +27,9 @@ export class UnsupportedBlockEdit extends Component {
 		this.state = { showHelp: false, showUnsupportedBlockModal: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
-		this.closeUnsupportedBlockModal = this.closeUnsupportedBlockModal.bind( this );
+		this.closeUnsupportedBlockModal = this.closeUnsupportedBlockModal.bind(
+			this
+		);
 	}
 
 	toggleSheet() {
