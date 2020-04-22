@@ -339,3 +339,41 @@ A transformation of type `enter` is an object that takes the following parameter
 - **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
 - **transform** _(function)_: a callback that receives the value to operate on it.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+
+**Example: from text to block**
+
+To create a separator block when the user types `-` three times and then enter we can use the following transformation:
+
+{% codetabs %}
+
+{% ES5 %}
+
+```js
+transforms = {
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: function( value ) {
+				return createBlock( 'core/separator' );
+			},
+		},
+	]
+}
+```
+
+{% ESNext %}
+
+```js
+transforms = {
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: () => createBlock( 'core/separator' ),
+		},
+	]
+}
+```
+
+{% end %}
