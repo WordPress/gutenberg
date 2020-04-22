@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess, JsonSerializable {
+class WP_Block implements ArrayAccess, JsonSerializable, Iterator {
 
 	/**
 	 * Name of block.
@@ -259,6 +259,59 @@ class WP_Block implements ArrayAccess, JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return $this->attributes;
+	}
+
+	/*
+	 * Iterator interface methods.
+	 */
+
+	/**
+	 * Rewinds back to the first element of the Iterator.
+	 *
+	 * @link https://www.php.net/manual/en/iterator.rewind.php
+	 */
+	public function rewind() {
+		reset( $this->attributes );
+	}
+
+	/**
+	 * Returns the current element of the attributes array.
+	 *
+	 * @link https://www.php.net/manual/en/iterator.current.php
+	 *
+	 * @return mixed Current element.
+	 */
+	public function current() {
+		return current( $this->attributes );
+	}
+
+	/**
+	 * Returns the key of the current element of the attributes array.
+	 *
+	 * @link https://www.php.net/manual/en/iterator.key.php
+	 *
+	 * @return mixed Key of the current element.
+	 */
+	public function key() {
+		return key( $this->attributes );
+	}
+
+	/**
+	 * Moves the current position of the attributes array to the next element.
+	 *
+	 * @link https://www.php.net/manual/en/iterator.next.php
+	 */
+	public function next() {
+		next( $this->attributes );
+	}
+
+	/**
+	 * Checks if current position is valid.
+	 *
+	 * @link https://www.php.net/manual/en/iterator.valid.php
+	 */
+	public function valid() {
+		return null !== key( $this->attributes );
 	}
 
 }

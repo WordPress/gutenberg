@@ -389,4 +389,29 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertEquals( '{"value":"ok"}', $result );
 	}
 
+	function test_iterable_as_attributes_array() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'value' => array(
+						'type'    => 'string',
+						'default' => 'ok',
+					),
+				),
+			)
+		);
+
+		$parsed_block = array( 'blockName' => 'core/example' );
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$result_attributes = array();
+		foreach ( $block as $key => $value ) {
+			$result_attributes[ $key ] = $value;
+		}
+
+		$this->assertEquals( array( 'value' => 'ok' ), $result_attributes );
+	}
+
 }
