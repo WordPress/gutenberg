@@ -173,6 +173,10 @@ function gutenberg_print_tinymce_scripts() {
 		wp_print_tinymce_scripts();
 	} else {
 		echo "<!-- Skipping TinyMCE in favor of loading async -->";
+		echo "<script type='text/javascript'>\n" .
+			"window.wpMceTranslation = function() {\n" .
+				_WP_Editors::wp_mce_translation() .
+			"\n};\n</script>\n";
 	}
 }
 remove_action( 'print_tinymce_scripts', 'wp_print_tinymce_scripts' );
