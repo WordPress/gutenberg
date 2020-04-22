@@ -886,7 +886,7 @@ export class RichText extends Component {
 										.then( ( mentionUserId ) => {
 											this.insertString(
 												record,
-												`@${ mentionUserId }`
+												`@${ mentionUserId } `
 											);
 										} )
 										.catch( () => {} );
