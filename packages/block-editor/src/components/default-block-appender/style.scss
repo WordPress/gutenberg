@@ -13,6 +13,8 @@
 	}
 
 	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
+		font-family: inherit;
+		font-size: inherit;
 		border: none;
 		background: none;
 		box-shadow: none;
