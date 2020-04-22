@@ -161,3 +161,25 @@ function gutenberg_rest_nonce() {
 	exit( wp_create_nonce( 'wp_rest' ) );
 }
 add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );
+
+/**
+ * Prints TinyMCE scripts when we're outside of the block editor.
+ * Otherwise, use the default TinyMCE script printing behavior.
+ *
+ * @since 7.9.1
+ */
+function gutenberg_print_tinymce_scripts() {
+	$current_screen = get_current_screen();
+	if ( ! $current_screen->is_block_editor() ) {
+		// maybe also need to check a setting/feature flag? Put this behind phase 2?
+		wp_print_tinymce_scripts();
+	} else {
+		echo "<!-- Skipping TinyMCE in favor of loading async -->";
+		echo "<script type='text/javascript'>\n" .
+			"window.wpMceTranslation = function() {\n" .
+				_WP_Editors::wp_mce_translation() .
+			"\n};\n</script>\n";
+	}
+}
+remove_action( 'print_tinymce_scripts', 'wp_print_tinymce_scripts' );
+add_action( 'print_tinymce_scripts', 'gutenberg_print_tinymce_scripts' );
