@@ -7,25 +7,27 @@ import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { BottomSheet, Icon } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
-import { normalizeIconObject } from '@wordpress/blocks';
+import { normalizeIconObject, parse } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import { UnsupportedBlockEditor } from '../unsupported-block-editor/index.native.js';
+import UnsupportedBlockModal from '../unsupported-block-modal/index.native.js';
 
 export class UnsupportedBlockEdit extends Component {
 	constructor( props ) {
 		super( props );
-		this.state = { showHelp: false, isModalVisible: false };
+		this.state = { showHelp: false, showUnsupportedBlockModal: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
+		this.closeUnsupportedBlockModal = this.closeUnsupportedBlockModal.bind( this );
 	}
 
 	toggleSheet() {
@@ -66,8 +68,14 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	requestFallback() {
-		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true, isModalVisible: true } );
+		// this.setState( { showHelp: false } );
+		this.setState( { showUnsupportedBlockModal: true } );
+	}
+
+	closeUnsupportedBlockModal( updatedContent ) {
+		this.setState( { showUnsupportedBlockModal: false } );
+		const updatedBlock = parse( updatedContent );
+		this.props.replaceBlockWithHTML( updatedBlock );
 	}
 
 	renderSheet( title ) {
@@ -127,9 +135,7 @@ export class UnsupportedBlockEdit extends Component {
 							onPress={ () => {
 								this.toggleSheet();
 								this.timeout = setTimeout( () => {
-									this.setState( {
-										isModalVisible: true,
-									} );
+									this.requestFallback();
 								}, 1000 );
 							} }
 						/>
@@ -145,7 +151,7 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	render() {
-		const { originalName } = this.props.attributes;
+		const { originalName, originalContent } = this.props.attributes;
 		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
 		const blockType = coreBlocks[ originalName ];
 
@@ -173,7 +179,13 @@ export class UnsupportedBlockEdit extends Component {
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
 			<>
-				<UnsupportedBlockEditor />
+				<UnsupportedBlockModal
+					visible={ this.state.showUnsupportedBlockModal }
+					blockHTML={ originalContent }
+					closeModal={ ( updatedContent ) =>
+						this.closeUnsupportedBlockModal( updatedContent )
+					}
+				/>
 				<View
 					style={ getStylesFromColorScheme(
 						styles.unsupportedBlock,
@@ -195,4 +207,13 @@ export class UnsupportedBlockEdit extends Component {
 	}
 }
 
-export default withPreferredColorScheme( UnsupportedBlockEdit );
+export default compose( [
+	withDispatch( ( dispatch, { clientId } ) => {
+		return {
+			replaceBlockWithHTML( html ) {
+				dispatch( 'core/block-editor' ).replaceBlock( clientId, html );
+			},
+		};
+	} ),
+	withPreferredColorScheme,
+] )( UnsupportedBlockEdit );
