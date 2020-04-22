@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess, JsonSerializable, Serializable, IteratorAggregate {
+class WP_Block implements ArrayAccess, JsonSerializable, Serializable, IteratorAggregate, Countable {
 
 	/**
 	 * Name of block.
@@ -301,6 +301,21 @@ class WP_Block implements ArrayAccess, JsonSerializable, Serializable, IteratorA
 	 */
 	public function getIterator() {
 		return new ArrayIterator( $this->attributes );
+	}
+
+	/*
+	 * Countable interface methods.
+	 */
+
+	/**
+	 * Returns the count of the block attributes.
+	 *
+	 * @link https://www.php.net/manual/en/countable.count.php
+	 *
+	 * @return int Count of the block attributes.
+	 */
+	public function count() {
+		return count( $this->attributes );
 	}
 
 }

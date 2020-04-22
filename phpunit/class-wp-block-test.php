@@ -436,4 +436,26 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertEquals( array( 'value' => 'ok' ), $result_attributes );
 	}
 
+	function test_countable_as_attributes_array() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'value' => array(
+						'type'    => 'string',
+						'default' => 'ok',
+					),
+				),
+			)
+		);
+
+		$parsed_block = array( 'blockName' => 'core/example' );
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$result = count( $block );
+
+		$this->assertEquals( 1, $result );
+	}
+
 }
