@@ -78,6 +78,7 @@ export { default as list } from './library/list';
 export { default as mapMarker } from './library/map-marker';
 export { default as media } from './library/media';
 export { default as mediaAndText } from './library/media-and-text';
+export { default as megaphone } from './library/megaphone';
 export { default as menu } from './library/menu';
 export { default as minus } from './library/minus';
 export { default as mobile } from './library/mobile';
