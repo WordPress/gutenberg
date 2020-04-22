@@ -6,12 +6,11 @@ import { Button } from '@wordpress/components';
 import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
@@ -25,6 +24,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
+		isFullscreenActive,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -40,6 +40,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 		} ),
 		[]
 	);
@@ -58,7 +61,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			{ isFullscreenActive && <AdminMenuToggle /> }
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }

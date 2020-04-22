@@ -1,0 +1,53 @@
+.interface-admin-menu-toggle.has-icon {
+	// Do not show the toolbar icon on small screens,
+	// when Fullscreen Mode is not an option in the "More" menu.
+	display: none;
+
+	@include break-medium() {
+		display: flex;
+		align-items: center;
+		align-self: stretch;
+		border: none;
+		border-radius: 0;
+		height: auto;
+		margin-right: -8px;
+		width: $header-height;
+		background: #23282e; // WP-admin gray.
+		transition: all 0.12s ease-in-out;
+
+		svg {
+			padding: 6px;
+			pointer-events: none;
+			border-radius: 2px;
+			width: 44px;
+			height: 44px;
+			fill: $white;
+		}
+
+		&:hover {
+			svg {
+				fill: rgba($white, 0.8);
+			}
+		}
+
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+
+			svg {
+				box-shadow: 0 0 0 1.5px color($theme-color);
+			}
+		}
+
+		body.is-showing-admin-menu & {
+			width: 160px;
+		}
+
+		body.is-showing-admin-menu.folded & {
+			width: $header-height;
+		}
+	}
+}
