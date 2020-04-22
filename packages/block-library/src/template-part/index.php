@@ -24,7 +24,7 @@ function render_block_core_template_part( $attributes ) {
 			array(
 				'post_type'      => 'wp_template_part',
 				'post_status'    => 'publish',
-				'post_name'      => $attributes['slug'],
+				'name'           => $attributes['slug'],
 				'meta_key'       => 'theme',
 				'meta_value'     => $attributes['theme'],
 				'posts_per_page' => 1,
