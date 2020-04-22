@@ -201,9 +201,11 @@ class WP_Block implements ArrayAccess {
 	 * @return mixed|null Attribute value if exists, or null.
 	 */
 	public function offsetGet( $attribute_name ) {
-		// This may cause an "Undefined index" notice if the attribute name does
-		// not exist. This is expected, since the purpose of this implementation
-		// is to align exactly to the expectations of operating on an array.
+		/*
+		 * This may cause an "Undefined index" notice if the attribute name does
+		 * not exist. This is expected, since the purpose of this implementation
+		 * is to align exactly to the expectations of operating on an array.
+		 */
 		return $this->attributes[ $attribute_name ];
 	}
 
@@ -217,9 +219,11 @@ class WP_Block implements ArrayAccess {
 	 */
 	public function offsetSet( $attribute_name, $value ) {
 		if ( is_null( $attribute_name ) ) {
-			// This is not technically a valid use-case for attributes. Since
-			// this implementation is expected to align to expectations of
-			// operating on an array, it is still supported.
+			/*
+			 * This is not technically a valid use-case for attributes. Since
+			 * this implementation is expected to align to expectations of
+			 * operating on an array, it is still supported.
+			 */
 			$this->attributes[] = $value;
 		} else {
 			$this->attributes[ $attribute_name ] = $value;
