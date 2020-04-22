@@ -137,7 +137,7 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	}
 	$classnames = esc_attr( $class );
 
-	$block_content = ! empty( $comments ) ? sprintf(
+	return ! empty( $comments ) ? sprintf(
 		'<ol class="%1$s">%2$s</ol>',
 		$classnames,
 		$list_items_markup
@@ -146,8 +146,6 @@ function render_block_core_latest_comments( $attributes = array() ) {
 		$classnames,
 		__( 'No comments to show.' )
 	);
-
-	return $block_content;
 }
 
 /**

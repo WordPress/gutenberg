@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { parse, resolve } from 'url';
-
-/**
  * Return `true` if the given path is http/https.
  *
  * @param  {string}  filePath path
@@ -34,7 +29,10 @@ function isAbsolutePath( filePath ) {
  */
 function isValidURL( meta ) {
 	// ignore hashes or data uris
-	if ( meta.value.indexOf( 'data:' ) === 0 || meta.value.indexOf( '#' ) === 0 ) {
+	if (
+		meta.value.indexOf( 'data:' ) === 0 ||
+		meta.value.indexOf( '#' ) === 0
+	) {
 		return false;
 	}
 
@@ -55,15 +53,11 @@ function isValidURL( meta ) {
  *
  * @param  {string} str          the url
  * @param  {string} baseURL      base URL
- * @param  {string} absolutePath the absolute path
  *
  * @return {string}              the full path to the file
  */
 function getResourcePath( str, baseURL ) {
-	const pathname = parse( str ).pathname;
-	const filePath = resolve( baseURL, pathname );
-
-	return filePath;
+	return new URL( str, baseURL ).toString();
 }
 
 /**

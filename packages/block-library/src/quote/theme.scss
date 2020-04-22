@@ -13,16 +13,16 @@
 		font-style: normal;
 	}
 
-	&[style*="text-align:right"],
-	&[style*="text-align: right"] {
+	&.has-text-align-right,
+	&.has-text-align-right {
 		border-left: none;
 		border-right: 4px solid $black;
 		padding-left: 0;
 		padding-right: 1em;
 	}
 
-	&[style*="text-align:center"],
-	&[style*="text-align: center"] {
+	&.has-text-align-center,
+	&.has-text-align-center {
 		border: none;
 		padding-left: 0;
 	}

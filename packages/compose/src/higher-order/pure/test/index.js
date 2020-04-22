@@ -32,15 +32,17 @@ describe( 'pure', () => {
 
 	it( 'class component should rerender if the props or state change', () => {
 		let i = 0;
-		const MyComp = pure( class extends Component {
-			constructor() {
-				super( ...arguments );
-				this.state = {};
+		const MyComp = pure(
+			class extends Component {
+				constructor() {
+					super( ...arguments );
+					this.state = {};
+				}
+				render() {
+					return <p>{ ++i }</p>;
+				}
 			}
-			render() {
-				return <p>{ ++i }</p>;
-			}
-		} );
+		);
 		const wrapper = mount( <MyComp /> );
 		wrapper.update(); // Updating with same props doesn't rerender
 		expect( wrapper.html() ).toBe( '<p>1</p>' );

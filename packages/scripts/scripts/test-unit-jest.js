@@ -12,19 +12,21 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
+/* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
 
 /**
  * Internal dependencies
  */
-const {
-	fromConfigRoot,
-	getCliArgs,
-	hasJestConfig,
-} = require( '../utils' );
+const { fromConfigRoot, getArgsFromCLI, hasJestConfig } = require( '../utils' );
 
-const config = ! hasJestConfig() ?
-	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-unit.config.js' ) ) ) ] :
-	[];
+const config = ! hasJestConfig()
+	? [
+			'--config',
+			JSON.stringify(
+				require( fromConfigRoot( 'jest-unit.config.js' ) )
+			),
+	  ]
+	: [];
 
-jest.run( [ ...config, ...getCliArgs() ] );
+jest.run( [ ...config, ...getArgsFromCLI() ] );

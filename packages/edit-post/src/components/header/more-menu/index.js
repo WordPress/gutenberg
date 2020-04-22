@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,14 +14,21 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
+const POPOVER_PROPS = {
+	className: 'edit-post-more-menu__content',
+	position: 'bottom left',
+};
+const TOGGLE_PROPS = {
+	tooltipPosition: 'bottom',
+};
+
 const MoreMenu = () => (
 	<DropdownMenu
 		className="edit-post-more-menu"
-		position="bottom left"
-		icon="ellipsis"
+		icon={ moreVertical }
 		label={ __( 'More tools & options' ) }
-		__unstableLabelPosition="bottom"
-		__unstablePopoverClassName="edit-post-more-menu__content"
+		popoverProps={ POPOVER_PROPS }
+		toggleProps={ TOGGLE_PROPS }
 	>
 		{ ( { onClose } ) => (
 			<>
@@ -29,7 +37,7 @@ const MoreMenu = () => (
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup>
-					<OptionsMenuItem onSelect={ onClose } />
+					<OptionsMenuItem />
 				</MenuGroup>
 			</>
 		) }

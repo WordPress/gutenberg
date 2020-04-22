@@ -47,9 +47,18 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import edit from './edit';`,
 			errors: [
-				{ message: 'Expected preceding "External dependencies" comment block' },
-				{ message: 'Expected preceding "WordPress dependencies" comment block' },
-				{ message: 'Expected preceding "Internal dependencies" comment block' },
+				{
+					message:
+						'Expected preceding "External dependencies" comment block',
+				},
+				{
+					message:
+						'Expected preceding "WordPress dependencies" comment block',
+				},
+				{
+					message:
+						'Expected preceding "Internal dependencies" comment block',
+				},
 			],
 			output: `
 /**

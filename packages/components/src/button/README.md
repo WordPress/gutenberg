@@ -61,7 +61,7 @@ Since a high-emphasis button commands the most attention, a layout should contai
 
 #### Text label
 
-All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does (e.g. an IconButton component).
+All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does.
 
 ![](https://make.wordpress.org/design/files/2019/03/do-link-button.png)
 
@@ -112,7 +112,7 @@ Renders a button with default style.
 import { Button } from "@wordpress/components";
 
 const MyButton = () => (
-	<Button isDefault>
+	<Button isSecondary>
 		Click me!
 	</Button>
 );
@@ -122,16 +122,19 @@ const MyButton = () => (
 
 The presence of a `href` prop determines whether an `anchor` element is rendered instead of a `button`.
 
+Props not included in this set will be applied to the `a` or `button` element.
+
 Name | Type | Default | Description
 --- | --- | --- | ---
+`disabled` | `bool` | `false` | Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
 `href` | `string` | `undefined` | If provided, renders `a` instead of `button`.
-`isDefault` | `bool` | `false` | Renders a default button style.
+`isSecondary` | `bool` | `false` | Renders a default button style.
 `isPrimary` | `bool` | `false` | Renders a primary button style.
 `isTertiary` | `bool` | `false` | Renders a text-based button style.
 `isDestructive` | `bool` | `false` | Renders a red text-based button style to indicate destructive behavior.
 `isLarge` | `bool` | `false` | Increases the size of the button.
 `isSmall` | `bool` | `false` | Decreases the size of the button.
-`isToggled` | `bool` | `false` | Renders a toggled button style.
+`isPressed` | `bool` | `false` | Renders a pressed button style.
 `isBusy` | `bool` | `false` | Indicates activity while a action is being performed.
 `isLink` | `bool` | `false` | Renders a button with an anchor style.
 `focus` | `bool` | `false` | Whether the button is focused.
@@ -139,4 +142,4 @@ Name | Type | Default | Description
 ## Related components
 
 - To group buttons together, use the `ButtonGroup` component.
-- To display an icon inside the button, use the `IconButton` component.
+

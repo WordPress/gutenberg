@@ -29,19 +29,31 @@ export const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFormats, suggestedFormat, instanceId } ) {
+function PostFormat( {
+	onUpdatePostFormat,
+	postFormat = 'standard',
+	supportedFormats,
+	suggestedFormat,
+	instanceId,
+} ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
-	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
-	const suggestion = find( formats, ( format ) => format.id === suggestedFormat );
+	const formats = POST_FORMATS.filter( ( format ) =>
+		includes( supportedFormats, format.id )
+	);
+	const suggestion = find(
+		formats,
+		( format ) => format.id === suggestedFormat
+	);
 
 	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
 
-	/* eslint-disable jsx-a11y/no-onchange */
 	return (
 		<PostFormatCheck>
 			<div className="editor-post-format">
 				<div className="editor-post-format__content">
-					<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
+					<label htmlFor={ postFormatSelectorId }>
+						{ __( 'Post Format' ) }
+					</label>
 					<SelectControl
 						value={ postFormat }
 						onChange={ ( format ) => onUpdatePostFormat( format ) }
@@ -56,7 +68,12 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 				{ suggestion && suggestion.id !== postFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
-						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+						<Button
+							isLink
+							onClick={ () =>
+								onUpdatePostFormat( suggestion.id )
+							}
+						>
 							{ suggestion.caption }
 						</Button>
 					</div>
@@ -64,17 +81,21 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 			</div>
 		</PostFormatCheck>
 	);
-	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
+		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
+			'core/editor'
+		);
 		const postFormat = getEditedPostAttribute( 'format' );
 		const themeSupports = select( 'core' ).getThemeSupports();
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
-		const supportedFormats = union( [ postFormat ], get( themeSupports, [ 'formats' ], [] ) );
+		const supportedFormats = union(
+			[ postFormat ],
+			get( themeSupports, [ 'formats' ], [] )
+		);
 		return {
 			postFormat,
 			supportedFormats,

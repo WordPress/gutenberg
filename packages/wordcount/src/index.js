@@ -31,12 +31,18 @@ function loadSettings( type, userSettings ) {
 	settings.shortcodes = settings.l10n.shortcodes || {};
 
 	if ( settings.shortcodes && settings.shortcodes.length ) {
-		settings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
+		settings.shortcodesRegExp = new RegExp(
+			'\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]',
+			'g'
+		);
 	}
 
 	settings.type = type || settings.l10n.type;
 
-	if ( settings.type !== 'characters_excluding_spaces' && settings.type !== 'characters_including_spaces' ) {
+	if (
+		settings.type !== 'characters_excluding_spaces' &&
+		settings.type !== 'characters_including_spaces'
+	) {
 		settings.type = 'words';
 	}
 
@@ -60,7 +66,7 @@ function matchWords( text, regex, settings ) {
 		stripSpaces.bind( this, settings ),
 		stripHTMLEntities.bind( this, settings ),
 		stripConnectors.bind( this, settings ),
-		stripRemovables.bind( this, settings ),
+		stripRemovables.bind( this, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
@@ -82,7 +88,7 @@ function matchCharacters( text, regex, settings ) {
 		stripShortcodes.bind( this, settings ),
 		stripSpaces.bind( this, settings ),
 		transposeAstralsToCountableChar.bind( this, settings ),
-		transposeHTMLEntitiesToCountableChars.bind( this, settings ),
+		transposeHTMLEntitiesToCountableChars.bind( this, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
@@ -91,8 +97,8 @@ function matchCharacters( text, regex, settings ) {
 /**
  * Count some words.
  *
- * @param {String} text         The text being processed
- * @param {String} type         The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {string} text         The text being processed
+ * @param {string} type         The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @param {Object} userSettings Custom settings object.
  *
  * @example
@@ -101,7 +107,7 @@ function matchCharacters( text, regex, settings ) {
  * const numberOfWords = count( 'Words to count', 'words', {} )
  * ```
  *
- * @return {Number} The word or character count.
+ * @return {number} The word or character count.
  */
 
 export function count( text, type, userSettings ) {
@@ -112,9 +118,10 @@ export function count( text, type, userSettings ) {
 	if ( text ) {
 		const settings = loadSettings( type, userSettings );
 		const matchRegExp = settings[ type + 'RegExp' ];
-		const results = ( 'words' === settings.type ) ?
-			matchWords( text, matchRegExp, settings ) :
-			matchCharacters( text, matchRegExp, settings );
+		const results =
+			'words' === settings.type
+				? matchWords( text, matchRegExp, settings )
+				: matchCharacters( text, matchRegExp, settings );
 
 		return results ? results.length : 0;
 	}

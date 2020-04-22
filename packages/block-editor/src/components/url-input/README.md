@@ -47,7 +47,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInputButton, {
+		return wp.element.createElement( wp.blockEditor.URLInputButton, {
 			className: props.className,
 			url: props.attributes.url,
 			onChange: function( url, post ) {
@@ -65,8 +65,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInputButton } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInputButton } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -125,6 +125,10 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
 }
 ```
 
+### `label: String`
+
+*Optional.* If this property is added, a label will be generated using label property as the content.
+
 ### `autoFocus: Boolean`
 
 *Optional.* By default, the input will gain focus when it is rendered, as typically it is displayed conditionally. For example when clicking on `URLInputButton` or editing a block.
@@ -134,6 +138,14 @@ If you are not conditionally rendering this component set this property to `fals
 ### `className: String`
 
 *Optional.* Adds and optional class to the parent `div` that wraps the URLInput field and popover
+
+### `disableSuggestions: Boolean`
+
+*Optional.* Provides additional control over whether suggestions are disabled.
+
+When hiding the URLInput using CSS (as is sometimes done for accessibility purposes), the suggestions can still be displayed. This is because they're rendered in a popover in a different part of the DOM, so any styles applied to the URLInput's container won't affect the popover.
+
+This prop allows the suggestions list to be programmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
 
 ## Example
 
@@ -153,7 +165,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.URLInput, {
+		return wp.element.createElement( wp.blockEditor.URLInput, {
 			className: props.className,
 			value: props.attributes.url,
 			onChange: function( url, post ) {
@@ -171,8 +183,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType } = wp.blocks;
-const { URLInput } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { URLInput } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...

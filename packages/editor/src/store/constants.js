@@ -4,12 +4,11 @@
  *
  * @type {Set}
  */
-export const EDIT_MERGE_PROPERTIES = new Set( [
-	'meta',
-] );
+export const EDIT_MERGE_PROPERTIES = new Set( [ 'meta' ] );
 
 /**
  * Constant for the store module (or reducer) key.
+ *
  * @type {string}
  */
 export const STORE_KEY = 'core/editor';

@@ -20,7 +20,7 @@ const getTypeAsString = require( './get-type-as-string' );
 module.exports = function( token ) {
 	let jsdoc;
 	const comments = getLeadingComments( token );
-	if ( comments && comments.startsWith( '*\n' ) ) {
+	if ( comments && /^\*\r?\n/.test( comments ) ) {
 		jsdoc = doctrine.parse( comments, {
 			unwrap: true,
 			recoverable: true,

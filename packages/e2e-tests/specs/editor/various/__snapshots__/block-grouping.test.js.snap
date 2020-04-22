@@ -1,0 +1,115 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Block Grouping Group creation creates a group from multiple blocks of different types via block transforms 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via block transforms 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Group creation creates a group from multiple blocks of the same type via options toolbar 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Group creation groups and ungroups multiple blocks of different types via options toolbar 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Group creation groups and ungroups multiple blocks of different types via options toolbar 2`] = `
+"<!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Block Grouping Preserving selected blocks attributes preserves width alignment settings of selected blocks 1`] = `
+"<!-- wp:group {\\"align\\":\\"full\\"} -->
+<div class=\\"wp-block-group alignfull\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:heading -->
+<h2>Group Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {\\"align\\":\\"full\\"} -->
+<figure class=\\"wp-block-image alignfull\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Some paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Block Grouping Registering alternative Blocks to handle Grouping interactions should use registered grouping block for grouping interactions 1`] = `
+"<!-- wp:test/alternative-group-block -->
+<!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph -->
+<!-- /wp:test/alternative-group-block -->"
+`;

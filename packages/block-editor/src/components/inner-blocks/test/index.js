@@ -50,11 +50,9 @@ describe( 'InnerBlocks', () => {
 		} );
 
 		const saved = renderToString(
-			getSaveElement(
-				'core/fruit',
-				{ fruit: 'Bananas' },
-				[ createBlock( 'core/fruit', { fruit: 'Apples' } ) ],
-			)
+			getSaveElement( 'core/fruit', { fruit: 'Bananas' }, [
+				createBlock( 'core/fruit', { fruit: 'Apples' } ),
+			] )
 		);
 
 		expect( saved ).toMatchSnapshot();
@@ -94,11 +92,9 @@ describe( 'InnerBlocks', () => {
 			title: 'block title',
 		};
 		registerBlockType( 'core/test-block', blockType );
-		const block = createBlock(
-			'core/test-block',
-			{ content: 'Invalid' },
-			[ createBlock( 'core/test-block' ) ]
-		);
+		const block = createBlock( 'core/test-block', { content: 'Invalid' }, [
+			createBlock( 'core/test-block' ),
+		] );
 
 		block.isValid = false;
 		block.originalContent = 'Original';

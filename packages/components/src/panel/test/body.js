@@ -12,7 +12,9 @@ describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', () => {
 			const panelBody = shallow( <PanelBody /> );
-			expect( panelBody.hasClass( 'components-panel__body' ) ).toBe( true );
+			expect( panelBody.hasClass( 'components-panel__body' ) ).toBe(
+				true
+			);
 			expect( panelBody.type() ).toBe( 'div' );
 		} );
 
@@ -21,20 +23,35 @@ describe( 'PanelBody', () => {
 			const button = panelBody.find( '.components-panel__body-toggle' );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
-			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
+			expect( button.prop( 'onClick' ) ).toBe(
+				panelBody.instance().toggle
+			);
 			expect( button.childAt( 0 ).name() ).toBe( 'span' );
-			expect( button.childAt( 0 ).childAt( 0 ).name() ).toBe( 'SVG' );
+			expect(
+				button
+					.childAt( 0 )
+					.childAt( 0 )
+					.name()
+			).toBe( 'Icon' );
 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
 		} );
 
 		it( 'should change state and class when sidebar is closed', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" initialOpen={ false } /> );
+			const panelBody = shallow(
+				<PanelBody title="Some Text" initialOpen={ false } />
+			);
 			expect( panelBody.state( 'opened' ) ).toBe( false );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( false );
 		} );
 
 		it( 'should use the "opened" prop instead of state if provided', () => {
-			const panelBody = shallow( <PanelBody title="Some Text" opened={ true } initialOpen={ false } /> );
+			const panelBody = shallow(
+				<PanelBody
+					title="Some Text"
+					opened={ true }
+					initialOpen={ false }
+				/>
+			);
 			expect( panelBody.state( 'opened' ) ).toBe( false );
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 		} );
@@ -46,7 +63,9 @@ describe( 'PanelBody', () => {
 		} );
 
 		it( 'should pass children prop but not render when sidebar is closed', () => {
-			const panelBody = shallow( <PanelBody children="Some Text" initialOpen={ false } /> );
+			const panelBody = shallow(
+				<PanelBody children="Some Text" initialOpen={ false } />
+			);
 			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
 			// Text should be empty even though props.children is set.
 			expect( panelBody.text() ).toBe( '' );

@@ -1,10 +1,21 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { check } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import MenuItem from '../menu-item';
 
 export default function MenuItemsChoice( {
 	choices = [],
+	onHover = noop,
 	onSelect,
 	value,
 } ) {
@@ -14,14 +25,17 @@ export default function MenuItemsChoice( {
 			<MenuItem
 				key={ item.value }
 				role="menuitemradio"
-				icon={ isSelected && 'yes' }
+				icon={ isSelected && check }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
+				className="components-menu-items-choice"
 				onClick={ () => {
 					if ( ! isSelected ) {
 						onSelect( item.value );
 					}
 				} }
+				onMouseEnter={ () => onHover( item.value ) }
+				onMouseLeave={ () => onHover( null ) }
 			>
 				{ item.label }
 			</MenuItem>

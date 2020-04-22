@@ -9,9 +9,18 @@ import { withSelect } from '@wordpress/data';
  */
 import WidgetArea from '../widget-area';
 
-function WidgetAreas( { areas, blockEditorSettings } ) {
+const EMPTY_ARRAY = [];
+
+function WidgetAreas( {
+	areas,
+	blockEditorSettings,
+	selectedArea,
+	setSelectedArea,
+} ) {
 	return areas.map( ( { id }, index ) => (
 		<WidgetArea
+			isSelectedArea={ index === selectedArea }
+			onBlockSelected={ () => setSelectedArea( index ) }
 			blockEditorSettings={ blockEditorSettings }
 			key={ id }
 			id={ id }
@@ -22,8 +31,8 @@ function WidgetAreas( { areas, blockEditorSettings } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getWidgetAreas } = select( 'core/edit-widgets' );
-		const areas = getWidgetAreas();
+		const { getEntityRecords } = select( 'core' );
+		const areas = getEntityRecords( 'root', 'widgetArea' ) || EMPTY_ARRAY;
 		return {
 			areas,
 		};

@@ -11,13 +11,12 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import fixtures from './fixtures';
 import TokenField from '../../';
 
-const suggestions = [
-	'the', 'of', 'and', 'to', 'a', 'in', 'for', 'is', 'on', 'that', 'by', 'this', 'with', 'i', 'you', 'it',
-	'not', 'or', 'be', 'are', 'from', 'at', 'as', 'your', 'all', 'have', 'new', 'more', 'an', 'was', 'we',
-	'associate', 'snake', 'pipes', 'sound',
-];
+const {
+	specialSuggestions: { default: suggestions },
+} = fixtures;
 
 function unescapeAndFormatSpaces( str ) {
 	const nbsp = String.fromCharCode( 160 );
@@ -38,7 +37,9 @@ class TokenFieldWrapper extends Component {
 	render() {
 		return (
 			<TokenField
-				suggestions={ this.state.isExpanded ? this.state.tokenSuggestions : null }
+				suggestions={
+					this.state.isExpanded ? this.state.tokenSuggestions : null
+				}
 				value={ this.state.tokens }
 				displayTransform={ unescapeAndFormatSpaces }
 				onChange={ this.onTokensChange }

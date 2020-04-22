@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 5.9.0-rc.1
+ * Version: 7.9.1
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -43,14 +43,38 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
-	add_submenu_page(
-		'gutenberg',
-		__( 'Widgets (beta)', 'gutenberg' ),
-		__( 'Widgets (beta)', 'gutenberg' ),
-		'edit_theme_options',
-		'gutenberg-widgets',
-		'the_gutenberg_widgets'
-	);
+	if ( get_option( 'gutenberg-experiments' ) ) {
+		if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Widgets (beta)', 'gutenberg' ),
+				__( 'Widgets (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-widgets',
+				'the_gutenberg_widgets'
+			);
+		}
+		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
+			add_submenu_page(
+				'gutenberg',
+				__( 'Navigation (beta)', 'gutenberg' ),
+				__( 'Navigation (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-navigation',
+				'gutenberg_navigation_page'
+			);
+		}
+		if ( array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) ) {
+			add_menu_page(
+				__( 'Site Editor (beta)', 'gutenberg' ),
+				__( 'Site Editor (beta)', 'gutenberg' ),
+				'edit_theme_options',
+				'gutenberg-edit-site',
+				'gutenberg_edit_site_page',
+				'dashicons-layout'
+			);
+		}
+	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
 		$submenu['gutenberg'][] = array(
@@ -65,6 +89,15 @@ function gutenberg_menu() {
 			'https://developer.wordpress.org/block-editor/',
 		);
 	}
+
+	add_submenu_page(
+		'gutenberg',
+		__( 'Experiments Settings', 'gutenberg' ),
+		__( 'Experiments', 'gutenberg' ),
+		'edit_posts',
+		'gutenberg-experiments',
+		'the_gutenberg_experiments'
+	);
 }
 add_action( 'admin_menu', 'gutenberg_menu' );
 
@@ -76,7 +109,7 @@ add_action( 'admin_menu', 'gutenberg_menu' );
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
 	/* translators: %s: Minimum required version */
-	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.0.0' );
+	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.3.0' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -99,6 +132,7 @@ function gutenberg_build_files_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
+	global $wp_version;
 	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
@@ -110,10 +144,18 @@ function gutenberg_pre_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '5.0.0', '<' ) ) {
+	if ( version_compare( $version, '5.3.0', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 }
+
+/**
+ * Outputs a WP REST API nonce.
+ */
+function gutenberg_rest_nonce() {
+	exit( wp_create_nonce( 'wp_rest' ) );
+}
+add_action( 'wp_ajax_gutenberg_rest_nonce', 'gutenberg_rest_nonce' );

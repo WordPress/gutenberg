@@ -2,13 +2,13 @@
 
 exports[`core/embed block edit matches snapshot 1`] = `
 <div
-  class="components-placeholder wp-block-embed"
+  class="components-placeholder wp-block-embed is-large"
 >
   <div
     class="components-placeholder__label"
   >
     <span
-      class="editor-block-icon block-editor-block-icon has-colors"
+      class="block-editor-block-icon has-colors"
     >
       <svg
         aria-hidden="true"
@@ -28,6 +28,11 @@ exports[`core/embed block edit matches snapshot 1`] = `
     Embed URL
   </div>
   <div
+    class="components-placeholder__instructions"
+  >
+    Paste a link to the content you want to display on your site.
+  </div>
+  <div
     class="components-placeholder__fieldset"
   >
     <form>
@@ -39,12 +44,43 @@ exports[`core/embed block edit matches snapshot 1`] = `
         value=""
       />
       <button
-        class="components-button is-button is-default is-large"
+        class="components-button is-primary"
         type="submit"
       >
         Embed
       </button>
     </form>
+    <div
+      class="components-placeholder__learn-more"
+    >
+      <a
+        class="components-external-link"
+        href="https://wordpress.org/support/article/embeds/"
+        rel="external noreferrer noopener"
+        target="_blank"
+      >
+        Learn more about embeds
+        <span
+          class="components-visually-hidden"
+        >
+          (opens in a new tab)
+        </span>
+        <svg
+          aria-hidden="true"
+          class="components-external-link__icon"
+          focusable="false"
+          height="24"
+          role="img"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M18.2 17c0 .7-.6 1.2-1.2 1.2H7c-.7 0-1.2-.6-1.2-1.2V7c0-.7.6-1.2 1.2-1.2h3.2V4.2H7C5.5 4.2 4.2 5.5 4.2 7v10c0 1.5 1.2 2.8 2.8 2.8h10c1.5 0 2.8-1.2 2.8-2.8v-3.6h-1.5V17zM14.9 3v1.5h3.7l-6.4 6.4 1.1 1.1 6.4-6.4v3.7h1.5V3h-6.3z"
+          />
+        </svg>
+      </a>
+    </div>
   </div>
 </div>
 `;

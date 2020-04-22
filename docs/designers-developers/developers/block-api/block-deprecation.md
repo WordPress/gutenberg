@@ -10,12 +10,12 @@ A block can have several deprecated versions. A deprecation will be tried if a p
 Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
 
 - `attributes` (Object): The [attributes definition](/docs/designers-developers/developers/block-api/block-attributes.md) of the deprecated form of the block.
-- `support` (Object): The [supports definition](/docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
+- `supports` (Object): The [supports definition](/docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
 - `save` (Function): The [save implementation](/docs/designers-developers/developers/block-api/block-edit-save.md) of the deprecated form of the block.
 - `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block.
-- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
+- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This function is not called when the block is invalid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
 
-It's important to note that `attributes`, `support`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
+It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
 
 ### Example:
 
@@ -275,6 +275,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 ```
 {% end %}
 
-In the example above we updated the block to use an inner paragraph block with a title instead of a title attribute.
+In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 
-*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](/packages/block-library/src/README.md). Core blocks have been updated across releases and contain simple and complex deprecations.*
+*Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations.*

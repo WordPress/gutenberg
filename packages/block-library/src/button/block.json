@@ -19,17 +19,23 @@
 			"source": "html",
 			"selector": "a"
 		},
-		"backgroundColor": {
+		"linkTarget": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "target"
+		},
+		"rel": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "rel"
+		},
+		"placeholder": {
 			"type": "string"
 		},
-		"textColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
-		"customTextColor": {
-			"type": "string"
+		"borderRadius": {
+			"type": "number"
 		}
 	}
 }

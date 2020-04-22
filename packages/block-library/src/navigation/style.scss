@@ -1,0 +1,133 @@
+.wp-block-navigation__container {
+	// Reset the default list styles
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
+
+	// Vertical layout
+
+	.is-vertical & {
+		display: block;
+	}
+}
+
+.wp-block-navigation-link {
+	display: flex;
+	align-items: center;
+	position: relative;
+	margin: 0;
+	padding: $grid-unit-10;
+}
+
+// Styles for submenu flyout
+.has-child {
+	.wp-block-navigation__container {
+		border: $border-width solid rgba(0, 0, 0, 0.15);
+		padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+		background-color: inherit;
+		color: inherit;
+		position: absolute;
+		left: 0;
+		top: 100%;
+		z-index: 1;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		visibility: hidden;
+
+		// Nested submenus sit to the left on large breakpoints
+		@include break-medium {
+			.wp-block-navigation__container {
+				left: 100%;
+				top: -$border-width;
+			}
+		}
+	}
+	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
+	// We will need to replace focus-within with a JS solution for IE keyboard support.
+	&:hover {
+		cursor: pointer;
+
+		> .wp-block-navigation__container {
+			visibility: visible;
+			opacity: 1;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	&:focus-within {
+		cursor: pointer;
+
+		> .wp-block-navigation__container {
+			visibility: visible;
+			opacity: 1;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+}
+
+// All links
+.wp-block-navigation-link__content {
+	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+
+	.has-text-color & {
+		color: inherit;
+	}
+}
+
+.wp-block-navigation-link__label {
+	word-break: normal;
+	overflow-wrap: break-word;
+}
+
+.wp-block-navigation-link__submenu-icon {
+	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+
+	svg {
+		fill: currentColor;
+
+		@include break-medium {
+			// reset rotation of submenu indicator icons on nested levels
+			transform: rotate(0);
+		}
+	}
+}
+
+// Default / Light styles
+.wp-block-navigation-link,
+.is-style-light .wp-block-navigation-link {
+	&:not(.has-text-color) .wp-block-navigation-link__content {
+		color: $light-style-sub-menu-text-color;
+	}
+}
+.is-style-light:not(.has-background) .wp-block-navigation__container {
+	background-color: $light-style-sub-menu-background-color;
+}
+
+// Dark styles.
+.is-style-dark .wp-block-navigation-link {
+	&:not(.has-text-color) .wp-block-navigation-link__content {
+		color: $dark-style-sub-menu-text-color;
+	}
+}
+.is-style-dark:not(.has-background) .wp-block-navigation__container {
+	background-color: $dark-style-sub-menu-background-color;
+}
+
+// Jutification.
+.items-justified-left > ul {
+	justify-content: flex-start;
+}
+
+.items-justified-center > ul {
+	justify-content: center;
+}
+
+.items-justified-right > ul {
+	justify-content: flex-end;
+}

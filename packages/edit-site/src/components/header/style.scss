@@ -1,0 +1,39 @@
+.edit-site-header {
+	align-items: center;
+	display: flex;
+	height: $header-height;
+	justify-content: space-between;
+	box-sizing: border-box;
+}
+
+.edit-site-header__toolbar {
+	display: flex;
+	flex-grow: 1;
+	padding-left: $grid-unit-10;
+
+	& > * {
+		margin-left: 5px;
+	}
+}
+.edit-site-header__actions {
+	display: flex;
+	margin-right: 8px;
+}
+
+.edit-site-header__actions-more-menu {
+	margin-left: -4px;
+
+	// The padding and margin of the more menu is intentionally non-standard.
+	.components-icon-button {
+		padding: 8px 2px;
+		width: auto;
+	}
+
+	@include break-small() {
+		margin-left: 4px;
+
+		.components-icon-button {
+			padding: 8px 4px;
+		}
+	}
+}

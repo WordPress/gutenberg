@@ -18,7 +18,7 @@ export async function createNewPost( {
 	title,
 	content,
 	excerpt,
-	enableTips = false,
+	showWelcomeGuide = false,
 } = {} ) {
 	const query = addQueryArgs( '', {
 		post_type: postType,
@@ -26,14 +26,29 @@ export async function createNewPost( {
 		content,
 		excerpt,
 	} ).slice( 1 );
+
 	await visitAdminPage( 'post-new.php', query );
 
-	await page.evaluate( ( _enableTips ) => {
-		const action = _enableTips ? 'enableTips' : 'disableTips';
-		wp.data.dispatch( 'core/nux' )[ action ]();
-	}, enableTips );
+	const isWelcomeGuideActive = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+	);
+	const isFullscreenMode = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+	);
 
-	if ( enableTips ) {
+	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
+		await page.evaluate( () =>
+			wp.data.dispatch( 'core/edit-post' ).toggleFeature( 'welcomeGuide' )
+		);
+
 		await page.reload();
+	}
+
+	if ( isFullscreenMode ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'fullscreenMode' )
+		);
 	}
 }

@@ -1,0 +1,29 @@
+[
+    {
+        "blockName": "core/button",
+        "attrs": {
+			"align": "none",
+            "borderRadius": 0,
+            "style": {
+              "color": {
+                "background": "#aa5a20",
+                "text": "#1b9b6c"
+              }
+           }
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<a class=\"wp-block-button wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a>\n",
+        "innerContent": [
+			"\n<a class=\"wp-block-button wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

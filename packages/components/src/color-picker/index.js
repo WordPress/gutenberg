@@ -49,20 +49,23 @@ const toLowerCase = ( value ) => String( value ).toLowerCase();
 const isValueEmpty = ( data ) => {
 	if ( data.source === 'hex' && ! data.hex ) {
 		return true;
-	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
+	} else if (
+		data.source === 'hsl' &&
+		( ! data.h || ! data.s || ! data.l )
+	) {
 		return true;
-	} else if ( data.source === 'rgb' && (
+	} else if (
+		data.source === 'rgb' &&
 		( ! data.r || ! data.g || ! data.b ) &&
 		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
 		( ! data.h || ! data.s || ! data.l || ! data.a )
-	) ) {
+	) {
 		return true;
 	}
 	return false;
 };
-const isValidColor = ( colors ) => colors.hex ?
-	isValidHex( colors.hex ) :
-	simpleCheckForValidColor( colors );
+const isValidColor = ( colors ) =>
+	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
 
 /**
  * Function that creates the new color object
@@ -85,7 +88,7 @@ const isValidColor = ( colors ) => colors.hex ?
  * @param {Object} oldColors.draftHsl Same format as oldColors.hsl
  * @param {Object} data Data containing the new value to update.
  * @param {Object} data.source One of `hex`, `rgb`, `hsl`.
- * @param {string\number} data.value Value to update.
+ * @param {string|number} data.value Value to update.
  * @param {string} data.valueKey Depends on `data.source` values:
  *   - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
  *   - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
@@ -126,13 +129,14 @@ export default class ColorPicker extends Component {
 
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
-			this.setState( {
-				...colors,
-				draftHex: toLowerCase( colors.hex ),
-				draftHsl: colors.hsl,
-				draftRgb: colors.rgb,
-			},
-			debounce( partial( onChangeComplete, colors ), 100 )
+			this.setState(
+				{
+					...colors,
+					draftHex: toLowerCase( colors.hex ),
+					draftHsl: colors.hsl,
+					draftRgb: colors.rgb,
+				},
+				debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
 	}
@@ -209,7 +213,8 @@ export default class ColorPicker extends Component {
 							<div
 								className="components-color-picker__active"
 								style={ {
-									backgroundColor: color && color.toRgbString(),
+									backgroundColor:
+										color && color.toRgbString(),
 								} }
 							/>
 						</div>

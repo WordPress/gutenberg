@@ -2,11 +2,11 @@ $tree-border-width: 2px;
 $tree-item-height: 36px;
 
 .block-editor-block-navigation__container {
-	padding: $grid-size - $border-width;
+	padding: $grid-unit-10 - $border-width;
 }
 
 .block-editor-block-navigation__label {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 	color: $dark-gray-300;
 }
 
@@ -14,6 +14,15 @@ $tree-item-height: 36px;
 .block-editor-block-navigation__paragraph {
 	padding: 0;
 	margin: 0;
+}
+
+.block-editor-block-navigation__list .block-editor-button-block-appender {
+	outline: none;
+	background: none;
+	padding: $grid-unit-10;
+	padding: 6px;
+	margin-left: 0.8em;
+	width: calc(100% - 0.8em);
 }
 
 .block-editor-block-navigation__list .block-editor-block-navigation__list {
@@ -42,6 +51,7 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation__item-button {
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
+		height: auto;
 	}
 
 	& > li:last-child {
@@ -65,23 +75,21 @@ $tree-item-height: 36px;
 	padding: 6px;
 	text-align: left;
 	color: $dark-gray-600;
-	border-radius: 4px;
+	border-radius: 2px;
 
 	.block-editor-block-icon {
 		margin-right: 6px;
 	}
 
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
+	&.is-selected svg,
+	&.is-selected:focus svg {
+		color: $white;
+		background: $dark-gray-primary;
+		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		border-radius: $border-width;
 	}
+}
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
-	}
-
-	&.is-selected,
-	&.is-selected:focus {
-		color: $dark-gray-700;
-		background: $light-gray-300;
-	}
+.components-popover.block-editor-block-navigation__popover {
+	z-index: z-index(".components-popover.block-editor-block-navigation__popover");
 }

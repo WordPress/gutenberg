@@ -2,10 +2,12 @@
 	text-align: center;
 }
 
-.editor-video-poster-control .components-button {
-	margin-right: 8px;
-}
+.editor-video-poster-control {
+	.components-base-control__label {
+		display: block;
+	}
 
-.editor-video-poster-control .components-button + .components-button {
-	margin-top: 1em;
+	.components-button {
+		margin-right: $grid-unit-10;
+	}
 }

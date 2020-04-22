@@ -1,7 +1,13 @@
 /**
  * Internal dependencies
  */
-import { isHorizontalEdge, placeCaretAtHorizontalEdge, isTextField } from '../dom';
+import {
+	isHorizontalEdge,
+	placeCaretAtHorizontalEdge,
+	isTextField,
+	__unstableStripHTML as stripHTML,
+	isNumberInput,
+} from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
@@ -112,12 +118,7 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [
-			'text',
-			'password',
-			'search',
-			'url',
-		];
+		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
@@ -138,7 +139,24 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for an textarea element', () => {
-			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe( true );
+			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'should return false for empty input element of type number', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'number';
+
+			expect( isNumberInput( input ) ).toBe( false );
+		} );
+
+		it( 'should return true for an input element of type number', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'number';
+			input.valueAsNumber = 23;
+
+			expect( isNumberInput( input ) ).toBe( true );
 		} );
 
 		it( 'should return true for a contenteditable element', () => {
@@ -150,7 +168,23 @@ describe( 'DOM', () => {
 		} );
 
 		it( 'should return true for a normal div element', () => {
-			expect( isTextField( document.createElement( 'div' ) ) ).toBe( false );
+			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'stripHTML', () => {
+		it( 'removes any HTML from a text string', () => {
+			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
+				'This is emphasized'
+			);
+		} );
+
+		it( 'removes script tags, but does not execute them', () => {
+			const html = 'This will not <script>throw "Error"</script>';
+			expect( stripHTML( html ) ).toBe( 'This will not throw "Error"' );
+			expect( () => stripHTML( html ) ).not.toThrow();
 		} );
 	} );
 } );

@@ -1,16 +1,20 @@
 /**
+ * External dependencies
+ */
+import { useMemoOne } from 'use-memo-one';
+
+/**
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
 import {
 	useLayoutEffect,
 	useRef,
-	useMemo,
 	useCallback,
 	useEffect,
 	useReducer,
 } from '@wordpress/element';
-import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -78,14 +82,17 @@ export default function useSelect( _mapSelect, deps ) {
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const queueContext = useMemo( () => ( { queue: true } ), [ registry ] );
+	// React can sometimes clear the `useMemo` cache.
+	// We use the cache-stable `useMemoOne` to avoid
+	// losing queues.
+	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
 	const latestMapSelect = useRef();
 	const latestIsAsync = useRef( isAsync );
 	const latestMapOutput = useRef();
 	const latestMapOutputError = useRef();
-	const isMounted = useRef();
+	const isMountedAndNotUnsubscribing = useRef();
 
 	let mapOutput;
 
@@ -107,36 +114,46 @@ export default function useSelect( _mapSelect, deps ) {
 			errorMessage += 'Original stack trace:';
 
 			throw new Error( errorMessage );
+		} else {
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
 		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
+		latestMapOutput.current = mapOutput;
+		latestMapOutputError.current = undefined;
+		isMountedAndNotUnsubscribing.current = true;
+
+		// This has to run after the other ref updates
+		// to avoid using stale values in the flushed
+		// callbacks or potentially overwriting a
+		// changed `latestMapOutput.current`.
 		if ( latestIsAsync.current !== isAsync ) {
 			latestIsAsync.current = isAsync;
 			renderQueue.flush( queueContext );
 		}
-		latestMapOutput.current = mapOutput;
-		latestMapOutputError.current = undefined;
-		isMounted.current = true;
 	} );
 
 	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
-			if ( isMounted.current ) {
+			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
 					const newMapOutput = latestMapSelect.current(
 						registry.select,
 						registry
 					);
-					if ( isShallowEqualObjects( latestMapOutput.current, newMapOutput ) ) {
+					if (
+						isShallowEqual( latestMapOutput.current, newMapOutput )
+					) {
 						return;
 					}
 					latestMapOutput.current = newMapOutput;
 				} catch ( error ) {
 					latestMapOutputError.current = error;
 				}
-				forceRender( {} );
+				forceRender();
 			}
 		};
 
@@ -157,7 +174,7 @@ export default function useSelect( _mapSelect, deps ) {
 		} );
 
 		return () => {
-			isMounted.current = false;
+			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};

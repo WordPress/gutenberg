@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Using Hooks API Pressing reset block button resets the block 1`] = `""`;

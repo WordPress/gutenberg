@@ -1,28 +1,98 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
-<BaseControl
-  className="editor-color-palette-control block-editor-color-palette-control"
+<div
+  className="components-base-control block-editor-color-gradient-control"
 >
-  <Component>
-    Test Color
-    <ColorIndicator
-      aria-label="(current test color: red)"
-      colorValue="#f00"
-    />
-  </Component>
-  <WithColorContext(ColorPalette)
-    className="editor-color-palette-control__color-palette block-editor-color-palette-control__color-palette"
-    colors={
-      Array [
-        Object {
-          "color": "#f00",
-          "name": "red",
-        },
-      ]
-    }
-    onChange={[Function]}
-    value="#f00"
-  />
-</BaseControl>
+  <div
+    className="components-base-control__field"
+  >
+    <fieldset>
+      <legend>
+        <div
+          className="block-editor-color-gradient-control__color-indicator"
+        >
+          <span
+            className="components-base-control__label"
+          >
+            Test Color
+            <span
+              aria-label="(Color: #f00)"
+              className="component-color-indicator"
+              style={
+                Object {
+                  "background": "#f00",
+                }
+              }
+            />
+          </span>
+        </div>
+      </legend>
+      <div
+        className="components-circular-option-picker"
+      >
+        <div
+          className="components-circular-option-picker__option-wrapper"
+        >
+          <button
+            aria-label="Color: red"
+            aria-pressed={true}
+            className="components-button components-circular-option-picker__option is-pressed"
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#f00",
+                "color": "#f00",
+              }
+            }
+            type="button"
+          />
+          <svg
+            aria-hidden={true}
+            fill="#000000"
+            focusable={false}
+            height={24}
+            role="img"
+            viewBox="0 0 24 24"
+            width={24}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+            />
+          </svg>
+        </div>
+        <div
+          className="components-circular-option-picker__custom-clear-wrapper"
+        >
+          <div
+            className="components-dropdown components-circular-option-picker__dropdown-link-action"
+          >
+            <button
+              aria-expanded={false}
+              aria-label="Custom color picker"
+              className="components-button is-link"
+              onClick={[Function]}
+              type="button"
+            >
+              Custom color
+            </button>
+          </div>
+          <button
+            className="components-button components-circular-option-picker__clear is-secondary is-small"
+            onClick={[Function]}
+            type="button"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
 `;

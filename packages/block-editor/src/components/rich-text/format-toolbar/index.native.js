@@ -4,12 +4,15 @@
 
 import { Toolbar, Slot } from '@wordpress/components';
 
-const FormatToolbar = ( { controls } ) => {
+const FormatToolbar = () => {
 	return (
 		<Toolbar>
-			{ controls.map( ( format ) =>
-				<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
-			) }
+			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
+				<Slot
+					name={ `RichText.ToolbarControls.${ format }` }
+					key={ format }
+				/>
+			) ) }
 			<Slot name="RichText.ToolbarControls" />
 		</Toolbar>
 	);

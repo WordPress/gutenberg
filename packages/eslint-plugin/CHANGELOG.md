@@ -1,9 +1,110 @@
 ## Master
 
+### Bug Fixes
+
+- The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
+
+## 5.0.1 (2020-04-15)
+
+### Bug Fixes
+
+- Fixes an error caused by missing `utils` directory from published package ([#21609](https://github.com/WordPress/gutenberg/pull/21609)).
+- Added the recommended `Prettier` config that enforces WordPress coding style guidelines ([#21602](https://github.com/WordPress/gutenberg/pull/21602)).
+
+## 5.0.0 (2020-04-15)
+
+### Breaking Changes
+
+- There is a new `i18n` ruleset that includes all i18n-related rules and is included in the `recommended` ruleset.
+- The `@wordpress/valid-sprintf` rule has been moved from the `custom` ruleset to the `i18n` ruleset.
+- The `@wordpress/valid-sprintf` rule now recognizes mix of ordered and non-ordered placeholders.
+- The bundled `eslint-plugin-jest` dependency has been updated from requiring `^22.15.1` to requiring `^23.8.2` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+- The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^21.0.0` to requiring `^22.1.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+- The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^1.6.1` to requiring `^3.0.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
+### New Features
+
+- New Rule: [`@wordpress/i18n-text-domain`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-text-domain.md)
+- New Rule: [`@wordpress/i18n-translator-comments`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)
+- New Rule: [`@wordpress/i18n-no-variables`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-variables.md)
+- New Rule: [`@wordpress/i18n-no-placeholders-only`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)
+- New Rule: [`@wordpress/i18n-no-collapsible-whitespace`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)
+- New Rule: [`@wordpress/i18n-ellipsis`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)
+- The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.14.3` to requiring `^7.19.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
+### Bug Fixes
+
+- The `@wordpress/valid-sprintf` rule now detects usage of `sprintf` via `i18n.sprintf` (e.g. when using `import * as i18n from '@wordpress/i18n'`).
+- `@wordpress/no-unused-vars-before-return` will correctly consider other unused variables after encountering an instance of an `excludePattern` option exception.
+
+## 4.1.0 (2020-04-01)
+
+### New Features
+
+- The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
+
+## 4.0.0 (2020-02-10)
+
+### Breaking Changes
+
+- The `recommended` ruleset checks again code formatting (whitespace, indenting, etc.). These rules are now enforced by Prettier itself through a plugin that diffs the code with its formatted output and reports the differences as lint errors. `eslint-plugin-prettier` was chosen over options like `prettier-eslint` because we don't run `eslint --fix` in hooks as we'd rather leave certain linting errors to be resolved or ignored at the author's discretion. We also don't apply any additional formatting with `eslint` over `prettier`, so the overhead would be unnecessary. `eslint-plugin-prettier` was chosen over options like `prettier --check` because it's nice to see format errors as you type as it leads you to write code with a more optimal auto-formatted output and it avoids issues like comment directives being moved out of place by `prettier` and the author not realizing it.
+
+## 3.4.1 (2020-02-04)
+
+### Bug Fix
+
+- Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
+
+## 3.4.0 (2020-02-04)
+
+### New Features
+
+- The `recommended` ruleset no longer enables rules that check code formatting (whitespace, indenting, etc.) and that could conflict with Prettier.
+- There is a new `recommended-with-formatting` ruleset that has the code formatting rules still enabled, for projects that want to opt out from Prettier and continue checking code formatting with ESLint.
+
+## 3.3.0 (2019-12-19)
+
+### Bug Fixes
+
+- The React ruleset now correctly references the WordPress ESLint plugin, resolving an error about an unfound rule.
+
+## 3.0.0 (2019-08-29)
+
+### Breaking Changes
+
+- The [`@wordpress/no-unused-vars-before-return` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) has been improved to exempt object destructuring only if destructuring to more than one property.
+- Stricter JSDoc linting using [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc).
+- Stricter validation enabled for test files only using new `test-e2e` and `test-unit` rulesets.
+
+### New Features
+
+- New Rule: [`@wordpress/no-unguarded-get-range-at`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)
+- Enable `wp` global by default in the `recommended` config.
+- New ruleset `test-e2e` added for end-to-end tests validation.
+- New ruleset `test-unit` added for unit tests validation.
+
+### Enhancements
+
+- Remove `@wordpress/dependency-group` and `@wordpress/gutenberg-phase` rules from the `custom` and `recommended` configs and leave them as opt-in features.
+
+## 2.4.0 (2019-08-05)
+
+### New Features
+
+- [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
+
+### Improvements
+
+- The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
+- The plugin now uses [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), rather than the `valid-jsdoc` rule, for more reliable linting of JSDoc blocks.
+
+## 2.3.0 (2019-06-12)
+
 ### Bug Fix
 
 - Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
 - Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
+- Fixed false positive with `react-no-unsafe-timeout` which would wrongly flag errors when assigning `setTimeout` result to a variable (for example, in a `useEffect` hook).
 
 ## 2.2.0 (2019-05-21)
 

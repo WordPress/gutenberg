@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
-import isShallowEqual from '../';
-import isShallowEqualArrays from '../arrays';
-import isShallowEqualObjects from '../objects';
+import isShallowEqual, {
+	isShallowEqualArrays,
+	isShallowEqualObjects,
+} from '..';
 
 describe( 'isShallowEqual', () => {
 	it( 'returns false if of different types', () => {
@@ -46,9 +47,9 @@ describe( 'isShallowEqual', () => {
 		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
-	it( 'returns false if b object has different key than a', () => {
-		const a = { foo: 1, baz: 2 };
-		const b = { foo: 1, bar: 2 };
+	it( 'returns false if a object has undefined key not in b', () => {
+		const a = { foo: undefined };
+		const b = { bar: 2 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
 		expect( isShallowEqual( b, a ) ).toBe( false );

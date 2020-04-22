@@ -9,45 +9,52 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  */
 const {
 	fromConfigRoot,
-	getCliArgs,
-	hasCliArg,
-	hasFileInCliArgs,
+	getArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
-const args = getCliArgs();
+const args = getArgsFromCLI();
 
-const defaultFilesArgs = hasFileInCliArgs() ? [] : [ '.' ];
+const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 
 // See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
-const hasLintConfig = hasCliArg( '-c' ) ||
-	hasCliArg( '--config' ) ||
+const hasLintConfig =
+	hasArgInCLI( '-c' ) ||
+	hasArgInCLI( '--config' ) ||
 	hasProjectFile( '.eslintrc.js' ) ||
+	hasProjectFile( '.eslintrc.json' ) ||
 	hasProjectFile( '.eslintrc.yaml' ) ||
 	hasProjectFile( '.eslintrc.yml' ) ||
-	hasProjectFile( '.eslintrc.json' ) ||
+	hasProjectFile( 'eslintrc.config.js' ) ||
 	hasProjectFile( '.eslintrc' ) ||
 	hasPackageProp( 'eslintConfig' );
 
 // When a configuration is not provided by the project, use from the default
 // provided with the scripts module. Instruct ESLint to avoid discovering via
 // the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
-const defaultConfigArgs = ! hasLintConfig ?
-	[ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ] :
-	[];
+const defaultConfigArgs = ! hasLintConfig
+	? [ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ]
+	: [];
 
 // See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
-const hasIgnoredFiles = hasCliArg( '--ignore-path' ) ||
-	hasProjectFile( '.eslintignore' );
+const hasIgnoredFiles =
+	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.eslintignore' );
 
-const defaultIgnoreArgs = ! hasIgnoredFiles ?
-	[ '--ignore-path', fromConfigRoot( '.eslintignore' ) ] :
-	[];
+const defaultIgnoreArgs = ! hasIgnoredFiles
+	? [ '--ignore-path', fromConfigRoot( '.eslintignore' ) ]
+	: [];
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[ ...defaultConfigArgs, ...defaultIgnoreArgs, ...args, ...defaultFilesArgs ],
+	[
+		...defaultConfigArgs,
+		...defaultIgnoreArgs,
+		...args,
+		...defaultFilesArgs,
+	],
 	{ stdio: 'inherit' }
 );
 

@@ -22,15 +22,21 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
+export { getPageError } from './get-page-error';
 export { insertBlock } from './insert-block';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
-export { observeFocusLoss } from './observe-focus-loss';
-export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
+export {
+	enableFocusLossObservation,
+	disableFocusLossObservation,
+} from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
-export { openGlobalBlockInserter } from './open-global-block-inserter';
+export {
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+} from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
@@ -44,6 +50,8 @@ export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
+export { toggleMoreMenu } from './toggle-more-menu';
+export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';

@@ -73,6 +73,19 @@ function enqueue_plugins_api_plugin_scripts() {
 		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/annotations-sidebar.js' ),
 		true
 	);
+
+	wp_enqueue_script(
+		'gutenberg-test-plugins-api-document-setting',
+		plugins_url( 'plugins-api/document-setting.js', __FILE__ ),
+		array(
+			'wp-edit-post',
+			'wp-element',
+			'wp-i18n',
+			'wp-plugins',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/document-setting.js' ),
+		true
+	);
 }
 
 add_action( 'init', 'enqueue_plugins_api_plugin_scripts' );

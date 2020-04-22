@@ -1,3 +1,15 @@
+.block-editor-url-popover__additional-controls {
+	border-top: $border-width solid $light-gray-500;
+}
+
+.block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
+	box-shadow: none;
+}
+
+.block-editor-url-popover__additional-controls div[role="menu"] > .components-button {
+	padding-left: 2px;
+}
+
 .block-editor-url-popover__row {
 	display: flex;
 }
@@ -9,7 +21,7 @@
 }
 
 // Mimic toolbar component styles for the icons in this popover.
-.block-editor-url-popover .components-icon-button {
+.block-editor-url-popover .components-button.has-icon {
 	padding: 3px;
 
 	> svg {
@@ -19,19 +31,11 @@
 		width: 30px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-		box-shadow: none;
-
-		> svg {
-			@include formatting-button-style__hover;
-		}
-	}
-
 	&:not(:disabled):focus {
 		box-shadow: none;
 
 		> svg {
-			@include formatting-button-style__focus;
+			@include block-toolbar-button-style__focus();
 		}
 	}
 }
@@ -48,12 +52,42 @@
 		transform: rotate(180deg);
 	}
 }
-
-.block-editor-url-popover__settings {
-	padding: $panel-padding;
-	border-top: $border-width solid $light-gray-500;
-
+.block-editor-url-popover__input-container {
+	.components-base-control:last-child,
 	.components-base-control:last-child .components-base-control__field {
 		margin-bottom: 0;
+	}
+}
+
+.block-editor-url-popover__settings {
+	display: block;
+	padding: $panel-padding;
+	border-top: $border-width solid $light-gray-500;
+}
+
+.block-editor-url-popover__link-editor,
+.block-editor-url-popover__link-viewer {
+	display: flex;
+
+	.block-editor-url-input .components-base-control__field {
+		margin-bottom: 0;
+	}
+	.block-editor-url-input .components-spinner {
+		bottom: $input-padding + 1;
+	}
+}
+
+.block-editor-url-popover__link-viewer-url {
+	margin: $grid-unit-10 - $border-width;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-width: 150px;
+	max-width: 500px;
+
+	&.has-invalid-link {
+		color: $alert-red;
 	}
 }

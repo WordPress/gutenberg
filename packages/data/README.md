@@ -100,20 +100,20 @@ registerStore( 'my-shop', {
 } );
 ```
 
-The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/docs/basics/Store.html) with the following methods:
+The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
 
 -   `store.getState()`: Returns the state value of the registered reducer
-    -   _Redux parallel:_ [`getState`](https://redux.js.org/api-reference/store#getState)
+    -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
 -   `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
 -   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
-    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
+    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
 
 ### Options
 
 #### `reducer`
 
-A [**reducer**](https://redux.js.org/docs/basics/Reducers.html) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
+A [**reducer**](https://redux.js.org/basics/reducers) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
 
 #### `actions`
 
@@ -130,8 +130,6 @@ A **resolver** is a side-effect for a selector. If your selector result may need
 The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
 #### `controls`
-
-_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](/packages/data/src/plugins/README.md))._
 
 A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
 
@@ -150,7 +148,7 @@ The `@wordpress/data` module offers a more advanced and generic interface for th
 -   `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
 -   `getActions()`: Returns an object of action functions, pre-mapped to the store.
 -   `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+    -   Behaves as Redux [`subscribe`](https://redux.js.org/api/store#subscribelistener)
         with the following differences:
         -   Doesn't have to implement an unsubscribe, since the registry never uses it.
             			  \- Only has to support one listener (the registry).
@@ -236,7 +234,7 @@ registerGenericStore( 'custom-data', createCustomStore() );
 
 ## Comparison with Redux
 
-The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
+The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
 
@@ -252,6 +250,46 @@ Specific implementation differences from Redux and React Redux:
 ## API
 
 <!-- START TOKEN(Autogenerated API docs) -->
+
+<a name="AsyncModeProvider" href="#AsyncModeProvider">#</a> **AsyncModeProvider**
+
+Context Provider Component used to switch the data module component rerendering
+between Sync and Async modes.
+
+_Usage_
+
+```js
+import { useSelect, AsyncModeProvider } from '@wordpress/data';
+
+function BlockCount() {
+  const count = useSelect( ( select ) => {
+    return select( 'core/block-editor' ).getBlockCount()
+  }, [] );
+
+  return count;
+}
+
+function App() {
+  return (
+    <AsyncModeProvider value={ true }>
+      <BlockCount />
+    </AsyncModeProvider>
+  );
+}
+```
+
+In this example, the BlockCount component is rerendered asynchronously.
+It means if a more critical task is being performed (like typing in an input),
+the rerendering is delayed until the browser becomes IDLE.
+It is possible to nest multiple levels of AsyncModeProvider to fine-tune the rendering behavior.
+
+_Parameters_
+
+-   _props.value_ `boolean`: Enable Async Mode.
+
+_Returns_
+
+-   `WPComponent`: The component to be rendered.
 
 <a name="combineReducers" href="#combineReducers">#</a> **combineReducers**
 
@@ -314,11 +352,11 @@ Mark a control as a registry control.
 
 _Parameters_
 
--   _registryControl_ `function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `Function`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `function`: marked registry control.
+-   `Function`: marked registry control.
 
 <a name="createRegistrySelector" href="#createRegistrySelector">#</a> **createRegistrySelector**
 
@@ -326,11 +364,11 @@ Mark a selector as a registry selector.
 
 _Parameters_
 
--   _registrySelector_ `function`: Function receiving a registry object and returning a state selector.
+-   _registrySelector_ `Function`: Function receiving a registry object and returning a state selector.
 
 _Returns_
 
--   `function`: marked registry selector.
+-   `Function`: marked registry selector.
 
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
@@ -350,7 +388,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
@@ -400,7 +438,7 @@ You can read more about the react context api here:
 
 _Usage_
 
-````js
+```js
 const {
   RegistryProvider,
   RegistryConsumer,
@@ -421,6 +459,7 @@ const App = ( { props } ) => {
     </RegistryConsumer>
   </RegistryProvider>
 }
+```
 
 <a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
 
@@ -436,17 +475,17 @@ Given the name of a registered store, returns an object of the store's selectors
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
-*Usage*
+_Usage_
 
 ```js
 const { select } = wp.data;
 
 select( 'my-shop' ).getPrice( 'hammer' );
-````
+```
 
 _Parameters_
 
--   _name_ `string`: Store name
+-   _name_ `string`: Store name.
 
 _Returns_
 
@@ -509,7 +548,8 @@ function Button( { onClick, children } ) {
 
 const SaleButton = ( { children } ) => {
   const { stockNumber } = useSelect(
-    ( select ) => select( 'my-shop' ).getStockNumber()
+    ( select ) => select( 'my-shop' ).getStockNumber(),
+    []
   );
   const { startSale } = useDispatch( 'my-shop' );
   const onClick = useCallback( () => {
@@ -694,7 +734,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: Enhanced component with merged dispatcher props.
+-   `WPComponent`: Enhanced component with merged dispatcher props.
 
 <a name="withRegistry" href="#withRegistry">#</a> **withRegistry**
 
@@ -751,7 +791,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: Enhanced component with merged state data props.
+-   `WPComponent`: Enhanced component with merged state data props.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

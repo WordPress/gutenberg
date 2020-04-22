@@ -1,5 +1,76 @@
 ## Master
 
+## 9.2.0 (2020-02-10)
+
+### Enhancements
+
+- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
+
+### Bug Fixes
+
+- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
+
+## 9.0.0 (2020-01-13)
+
+### New Features
+
+- Added a new `Guide` component which allows developers to easily present a user guide.
+
+### Breaking Changes
+
+- `is-button` classname has been removed from the Button component.
+- The `is-default` classname is not applied automatically anymore.
+- By default Button components come with a fixed height and hover styles.
+
+### Bug Fixes
+
+- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
+### Deprecations
+
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
+- `IconButton` has been deprecated. Use the `Button` component instead.
+
+## 8.2.0 (2019-08-29)
+
+### New Features
+
+- The bundled `re-resizable` dependency has been updated from requiring `5.0.1` to requiring `^6.0.0` ([#17011](https://github.com/WordPress/gutenberg/pull/17011)).
+
+## 8.1.0 (2019-08-05)
+
+### New Features
+
+- Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `Popover` component.
+- Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
+- Added a new `popoverProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `Popover` component.
+- Added a new `toggleProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `IconButton` component.
+- Added a new `menuProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `NavigableMenu` component.
+
+### Deprecations
+
+- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
+- `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
+
+### Bug Fixes
+
+- The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
+
+### Deprecations
+
+- The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
+
+### Internal
+
+- The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+- The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
+- Package no longer depends on external `react-click-outside` library.
+
+## 8.0.0 (2019-06-12)
+
 ### New Feature
 
 - Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
@@ -41,6 +112,10 @@
 - Added a new `BaseControl.VisualLabel` component.
 - Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
 - Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+
+### Improvements
+
+- Limit `Base Control Label` to the width of its content.
 
 ### Bug fixes
 

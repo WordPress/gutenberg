@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -13,6 +15,11 @@ import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
+import mediaUploadMiddleware from './middlewares/media-upload';
+import {
+	parseResponseAndNormalizeError,
+	parseAndThrowError,
+} from './utils/response';
 
 /**
  * Default set of header values which should be sent with every request unless
@@ -49,6 +56,14 @@ function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+const checkStatus = ( response ) => {
+	if ( response.status >= 200 && response.status < 300 ) {
+		return response;
+	}
+
+	throw response;
+};
+
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -62,65 +77,36 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
-		url || path,
-		{
-			...DEFAULT_OPTIONS,
-			...remainingOptions,
-			body,
-			headers,
-		}
-	);
-	const checkStatus = ( response ) => {
-		if ( response.status >= 200 && response.status < 300 ) {
-			return response;
-		}
+	const responsePromise = window.fetch( url || path, {
+		...DEFAULT_OPTIONS,
+		...remainingOptions,
+		body,
+		headers,
+	} );
 
-		throw response;
-	};
-
-	const parseResponse = ( response ) => {
-		if ( parse ) {
-			if ( response.status === 204 ) {
-				return null;
-			}
-
-			return response.json ? response.json() : Promise.reject( response );
-		}
-
-		return response;
-	};
-
-	return responsePromise
-		.then( checkStatus )
-		.then( parseResponse )
-		.catch( ( response ) => {
-			if ( ! parse ) {
-				throw response;
-			}
-
-			const invalidJsonError = {
-				code: 'invalid_json',
-				message: __( 'The response is not a valid JSON response.' ),
-			};
-
-			if ( ! response || ! response.json ) {
-				throw invalidJsonError;
-			}
-
-			return response.json()
-				.catch( () => {
-					throw invalidJsonError;
-				} )
-				.then( ( error ) => {
-					const unknownError = {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
+	return (
+		responsePromise
+			// Return early if fetch errors. If fetch error, there is most likely no
+			// network connection. Unfortunately fetch just throws a TypeError and
+			// the message might depend on the browser.
+			.then(
+				( value ) =>
+					Promise.resolve( value )
+						.then( checkStatus )
+						.catch( ( response ) =>
+							parseAndThrowError( response, parse )
+						)
+						.then( ( response ) =>
+							parseResponseAndNormalizeError( response, parse )
+						),
+				() => {
+					throw {
+						code: 'fetch_error',
+						message: __( 'You are probably offline.' ),
 					};
-
-					throw error || unknownError;
-				} );
-		} );
+				}
+			)
+	);
 };
 
 let fetchHandler = defaultFetchHandler;
@@ -148,7 +134,70 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return createRunStep( 0 )( options );
+	return new Promise( function( resolve, reject ) {
+		createRunStep( 0 )( options )
+			.then( resolve )
+			.catch( ( error ) => {
+				if ( error.code !== 'rest_cookie_invalid_nonce' ) {
+					return reject( error );
+				}
+
+				// If the nonce is invalid, refresh it and try again.
+				window
+					.fetch( apiFetch.nonceEndpoint )
+					.then( checkStatus )
+					.then( ( data ) => data.text() )
+					.then( ( text ) => {
+						apiFetch.nonceMiddleware.nonce = text;
+						apiFetch( options )
+							.then( resolve )
+							.catch( reject );
+					} )
+					.catch( reject );
+			} );
+	} );
+}
+
+/**
+ * Function that fetches data using apiFetch, and updates the status.
+ *
+ * @param {string} path Query path.
+ */
+function useApiFetch( path ) {
+	deprecated( 'useApiFetch', {
+		version: '8.1.0',
+		alternative: 'apiFetch',
+		plugin: 'Gutenberg',
+	} );
+
+	// Indicate the fetching status
+	const [ isLoading, setIsLoading ] = useState( true );
+	const [ data, setData ] = useState( null );
+	const [ error, setError ] = useState( null );
+
+	useEffect( () => {
+		setIsLoading( true );
+		setData( null );
+		setError( null );
+
+		apiFetch( { path } )
+			.then( ( fetchedData ) => {
+				setData( fetchedData );
+				// We've stopped fetching
+				setIsLoading( false );
+			} )
+			.catch( ( err ) => {
+				setError( err );
+				// We've stopped fetching
+				setIsLoading( false );
+			} );
+	}, [ path ] );
+
+	return {
+		isLoading,
+		data,
+		error,
+	};
 }
 
 apiFetch.use = registerMiddleware;
@@ -158,5 +207,8 @@ apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
+apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
+
+apiFetch.useApiFetch = useApiFetch;
 
 export default apiFetch;

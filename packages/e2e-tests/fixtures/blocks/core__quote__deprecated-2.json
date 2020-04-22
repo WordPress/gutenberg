@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/quote",
+        "isValid": true,
+        "attributes": {
+            "value": "<p>Testing deprecated quote block...</p>",
+            "citation": "...with a caption",
+            "align": "right"
+        },
+        "innerBlocks": [],
+        "originalContent": "<blockquote style=\"text-align:right\" class=\"wp-block-quote\">\n\t<p>Testing deprecated quote block...</p>\n\t<cite>...with a caption</cite>\n</blockquote>"
+    }
+]

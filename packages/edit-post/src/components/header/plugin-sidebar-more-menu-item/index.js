@@ -4,15 +4,21 @@
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withPluginContext } from '@wordpress/plugins';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import PluginMoreMenuItem from '../plugin-more-menu-item';
 
-const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
+const PluginSidebarMoreMenuItem = ( {
+	children,
+	icon,
+	isSelected,
+	onClick,
+} ) => (
 	<PluginMoreMenuItem
-		icon={ isSelected ? 'yes' : icon }
+		icon={ isSelected ? check : icon }
 		isSelected={ isSelected }
 		role="menuitemcheckbox"
 		onClick={ onClick }
@@ -28,43 +34,47 @@ const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) =>
  *
  * @param {Object} props Component props.
  * @param {string} props.target A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
- * @param {string|Element} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+ * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function MySidebarMoreMenuItem() {
  * 	return wp.element.createElement(
  * 		PluginSidebarMoreMenuItem,
  * 		{
  * 			target: 'my-sidebar',
- * 			icon: 'smiley',
+ * 			icon: moreIcon,
  * 		},
  * 		__( 'My sidebar title' )
  * 	)
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginSidebarMoreMenuItem } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * const MySidebarMoreMenuItem = () => (
  * 	<PluginSidebarMoreMenuItem
  * 		target="my-sidebar"
- * 		icon="smiley"
+ * 		icon={ more }
  * 	>
  * 		{ __( 'My sidebar title' ) }
  * 	</PluginSidebarMoreMenuItem>
  * );
  * ```
  *
- * @return {WPElement} The element to be rendered.
+ * @return {WPComponent} The component to be rendered.
  */
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
@@ -74,23 +84,20 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { sidebarName } ) => {
-		const {
-			getActiveGeneralSidebarName,
-		} = select( 'core/edit-post' );
+		const { getActiveGeneralSidebarName } = select( 'core/edit-post' );
 
 		return {
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-		} = dispatch( 'core/edit-post' );
-		const onClick = isSelected ?
-			closeGeneralSidebar :
-			() => openGeneralSidebar( sidebarName );
+		const { closeGeneralSidebar, openGeneralSidebar } = dispatch(
+			'core/edit-post'
+		);
+		const onClick = isSelected
+			? closeGeneralSidebar
+			: () => openGeneralSidebar( sidebarName );
 
 		return { onClick };
-	} ),
+	} )
 )( PluginSidebarMoreMenuItem );

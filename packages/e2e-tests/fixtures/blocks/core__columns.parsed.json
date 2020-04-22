@@ -2,7 +2,7 @@
     {
         "blockName": "core/columns",
         "attrs": {
-            "columns": 3
+            "backgroundColor": "secondary"
         },
         "innerBlocks": [
             {
@@ -70,9 +70,9 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-columns has-3-columns\">\n\t",
+            "\n<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t",
             null,
             "\n\t",
             null,

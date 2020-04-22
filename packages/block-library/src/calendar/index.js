@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { calendar as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 
 export const name = 'core/calendar';
 
@@ -20,5 +20,6 @@ export const settings = {
 	supports: {
 		align: true,
 	},
+	example: {},
 	edit,
 };

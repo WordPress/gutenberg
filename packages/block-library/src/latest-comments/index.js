@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { comment as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 
 export const name = 'core/latest-comments';
 
@@ -21,5 +21,6 @@ export const settings = {
 		align: true,
 		html: false,
 	},
+	example: {},
 	edit,
 };

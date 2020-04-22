@@ -11,7 +11,9 @@ import { PostTextEditor } from '../';
 
 // "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
 // props interface.
-jest.mock( 'react-autosize-textarea', () => ( props ) => <textarea { ...props } /> );
+jest.mock( 'react-autosize-textarea', () => ( props ) => (
+	<textarea { ...props } />
+) );
 
 describe( 'PostTextEditor', () => {
 	it( 'should render via the prop value', () => {
@@ -24,10 +26,7 @@ describe( 'PostTextEditor', () => {
 	it( 'should render via the state value when edits made', () => {
 		const onChange = jest.fn();
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
+			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
@@ -40,20 +39,14 @@ describe( 'PostTextEditor', () => {
 	it( 'should render via the state value when edits made, even if prop value changes', () => {
 		const onChange = jest.fn();
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
+			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: 'Hello Chicken' } } );
 
 		wrapper.update(
-			<PostTextEditor
-				value="Goodbye World"
-				onChange={ onChange }
-			/>
+			<PostTextEditor value="Goodbye World" onChange={ onChange } />
 		);
 
 		expect( textarea.props.value ).toBe( 'Hello Chicken' );
@@ -63,20 +56,14 @@ describe( 'PostTextEditor', () => {
 	it( 'should render via the state value when edits made, even if prop value changes and state value empty', () => {
 		const onChange = jest.fn();
 		const wrapper = create(
-			<PostTextEditor
-				value="Hello World"
-				onChange={ onChange }
-			/>
+			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
 		const textarea = wrapper.root.findByType( Textarea );
 		textarea.props.onChange( { target: { value: '' } } );
 
 		wrapper.update(
-			<PostTextEditor
-				value="Goodbye World"
-				onChange={ onChange }
-			/>
+			<PostTextEditor value="Goodbye World" onChange={ onChange } />
 		);
 
 		expect( textarea.props.value ).toBe( '' );

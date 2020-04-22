@@ -12,7 +12,7 @@ body {
 	font-family: $editor-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
-	color: $dark-gray-900;
+	color: $dark-gray-primary;
 }
 
 /* Headings */
@@ -104,6 +104,8 @@ ul,
 ol {
 	margin-bottom: $default-block-margin;
 	padding: inherit;
+	padding-left: 1.3em;
+	margin-left: 1.3em;
 
 	// Remove bottom margin from nested lists.
 	ul,
@@ -128,4 +130,31 @@ ol {
 ul ul,
 ol ul {
 	list-style-type: circle;
+}
+
+.wp-align-wrapper {
+	max-width: $content-width;
+
+	> .wp-block,
+	&.wp-align-full {
+		max-width: none;
+	}
+
+	&.wp-align-wide {
+		max-width: 1100px;
+	}
+}
+
+a {
+	color: inherit;
+	transition: none;
+}
+
+code,
+kbd {
+	padding: 0;
+	margin: 0;
+	background: inherit;
+	font-size: inherit;
+	font-family: monospace;
 }

@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Group can be created using the block inserter 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Group can be created using the slash inserter 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"></div></div>
+<!-- /wp:group -->"
+`;
+
+exports[`Group can have other blocks appended to it using the button appender 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph -->
+<p>Group Block with a Paragraph</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:group -->"
+`;

@@ -1,0 +1,20 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/button",
+        "isValid": true,
+        "attributes": {
+            "text": "My button",
+			"align": "none",
+			"style": {
+				"color": {
+					"background": "#aa5a20",
+					"text": "#1b9b6c"
+				}
+			},
+            "borderRadius": 0
+        },
+        "innerBlocks": [],
+        "originalContent": "<a class=\"wp-block-button wp-block-button__link no-border-radius has-text-color has-background\" style=\"background-color:#aa5a20;color:#1b9b6c\">My button</a>"
+    }
+]

@@ -31,10 +31,27 @@ $input-size: 300px;
 		}
 	}
 
+	&.has-border input[type="text"] {
+		border: 1px solid $dark-gray-500;
+		border-radius: 4px;
+	}
+
+	&.is-full-width {
+		width: 100%;
+
+		input[type="text"] {
+			width: 100%;
+		}
+
+		&__suggestions {
+			width: 100%;
+		}
+	}
+
 	.components-spinner {
 		position: absolute;
 		right: $input-padding;
-		top: $input-padding + 1;
+		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
 	}
 }
@@ -69,7 +86,7 @@ $input-size: 300px;
 	width: 100%;
 	border: none;
 	text-align: left;
-	@include menu-style__neutral();
+	box-shadow: none;
 
 	&:hover {
 		background: $light-gray-500;
@@ -119,7 +136,7 @@ $input-size: 300px;
 
 	.components-button {
 		flex-shrink: 0;
-		width: $icon-button-size;
-		height: $icon-button-size;
+		width: $button-size;
+		height: $button-size;
 	}
 }

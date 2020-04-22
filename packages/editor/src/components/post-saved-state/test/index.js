@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -10,12 +10,13 @@ import { PostSavedState } from '../';
 
 describe( 'PostSavedState', () => {
 	it( 'should display saving while save in progress, even if not saveable', () => {
-		const wrapper = shallow(
+		const wrapper = mount(
 			<PostSavedState
 				isNew
 				isDirty={ false }
 				isSaving={ true }
-				isSaveable={ false } />
+				isSaveable={ false }
+			/>
 		);
 
 		expect( wrapper.text() ).toContain( 'Saving' );
@@ -27,7 +28,8 @@ describe( 'PostSavedState', () => {
 				isNew
 				isDirty={ false }
 				isSaving={ false }
-				isSaveable={ false } />
+				isSaveable={ false }
+			/>
 		);
 
 		expect( wrapper.type() ).toBeNull();
@@ -45,10 +47,11 @@ describe( 'PostSavedState', () => {
 				isNew={ false }
 				isDirty={ false }
 				isSaving={ false }
-				isSaveable={ true } />
+				isSaveable={ true }
+			/>
 		);
 
-		expect( wrapper.childAt( 0 ).name() ).toBe( 'Dashicon' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );
 		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
 	} );
 
@@ -66,7 +69,9 @@ describe( 'PostSavedState', () => {
 		);
 
 		expect( wrapper ).toMatchSnapshot();
-		wrapper.simulate( 'click' );
+		wrapper.simulate( 'click', {} );
 		expect( saveSpy ).toHaveBeenCalled();
+		// Regression: Verify the event object is not passed to prop callback.
+		expect( saveSpy.mock.calls[ 0 ] ).toEqual( [] );
 	} );
 } );

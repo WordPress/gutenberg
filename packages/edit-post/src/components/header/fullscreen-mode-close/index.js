@@ -6,38 +6,39 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { wordpress } from '@wordpress/icons';
 
-function FullscreenModeClose( { isActive, postType } ) {
+function FullscreenModeClose() {
+	const { isActive, postType } = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( 'core/editor' );
+		const { isFeatureActive } = select( 'core/edit-post' );
+		const { getPostType } = select( 'core' );
+
+		return {
+			isActive: isFeatureActive( 'fullscreenMode' ),
+			postType: getPostType( getCurrentPostType() ),
+		};
+	}, [] );
+
 	if ( ! isActive || ! postType ) {
 		return null;
 	}
 
 	return (
-		<Toolbar className="edit-post-fullscreen-mode-close__toolbar">
-			<IconButton
-				icon="arrow-left-alt2"
-				href={ addQueryArgs( 'edit.php', { post_type: postType.slug } ) }
-				label={ get(
-					postType,
-					[ 'labels', 'view_items' ],
-					__( 'Back' )
-				) }
-			/>
-		</Toolbar>
+		<Button
+			className="edit-post-fullscreen-mode-close"
+			icon={ wordpress }
+			iconSize={ 36 }
+			href={ addQueryArgs( 'edit.php', {
+				post_type: postType.slug,
+			} ) }
+			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
+		/>
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getCurrentPostType } = select( 'core/editor' );
-	const { isFeatureActive } = select( 'core/edit-post' );
-	const { getPostType } = select( 'core' );
-
-	return {
-		isActive: isFeatureActive( 'fullscreenMode' ),
-		postType: getPostType( getCurrentPostType() ),
-	};
-} )( FullscreenModeClose );
+export default FullscreenModeClose;

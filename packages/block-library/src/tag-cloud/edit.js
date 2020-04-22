@@ -7,15 +7,11 @@ import { map, filter } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import {
-	PanelBody,
-	ToggleControl,
-	SelectControl,
-	ServerSideRender,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, SelectControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 class TagCloudEdit extends Component {
 	constructor() {
@@ -34,6 +30,7 @@ class TagCloudEdit extends Component {
 		const selectOption = {
 			label: __( '- Select -' ),
 			value: '',
+			disabled: true,
 		};
 		const taxonomyOptions = map( taxonomies, ( taxonomy ) => {
 			return {
@@ -65,7 +62,7 @@ class TagCloudEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Tag Cloud Settings' ) }>
+				<PanelBody title={ __( 'Tag Cloud settings' ) }>
 					<SelectControl
 						label={ __( 'Taxonomy' ) }
 						options={ taxonomyOptions }

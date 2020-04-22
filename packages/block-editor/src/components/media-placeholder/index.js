@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	every,
-	get,
-	isArray,
-	noop,
-	startsWith,
-} from 'lodash';
+import { every, get, isArray, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,13 +12,14 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	IconButton,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { keyboardReturn } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -36,20 +31,20 @@ import URLPopover from '../url-popover';
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
 		<form
-			className="editor-media-placeholder__url-input-form block-editor-media-placeholder__url-input-form"
+			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
 			<input
-				className="editor-media-placeholder__url-input-field block-editor-media-placeholder__url-input-field"
+				className="block-editor-media-placeholder__url-input-field"
 				type="url"
 				aria-label={ __( 'URL' ) }
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
 				value={ src }
 			/>
-			<IconButton
-				className="editor-media-placeholder__url-input-submit-button block-editor-media-placeholder__url-input-submit-button"
-				icon="editor-break"
+			<Button
+				className="block-editor-media-placeholder__url-input-submit-button"
+				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
 				type="submit"
 			/>
@@ -78,7 +73,9 @@ export class MediaPlaceholder extends Component {
 			return false;
 		}
 		return every( allowedTypes, ( allowedType ) => {
-			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+			return (
+				allowedType === 'image' || startsWith( allowedType, 'image/' )
+			);
 		} );
 	}
 
@@ -87,7 +84,10 @@ export class MediaPlaceholder extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( get( prevProps.value, [ 'src' ], '' ) !== get( this.props.value, [ 'src' ], '' ) ) {
+		if (
+			get( prevProps.value, [ 'src' ], '' ) !==
+			get( this.props.value, [ 'src' ], '' )
+		) {
 			this.setState( { src: get( this.props.value, [ 'src' ], '' ) } );
 		}
 	}
@@ -159,13 +159,16 @@ export class MediaPlaceholder extends Component {
 			notices,
 			onSelectURL,
 			mediaUpload,
+			children,
 		} = this.props;
 
 		let instructions = labels.instructions;
 		let title = labels.title;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
-			instructions = __( 'To edit this block, you need permission to upload media.' );
+			instructions = __(
+				'To edit this block, you need permission to upload media.'
+			);
 		}
 
 		if ( instructions === undefined || title === undefined ) {
@@ -175,14 +178,22 @@ export class MediaPlaceholder extends Component {
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( instructions === undefined && mediaUpload ) {
-				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+				instructions = __(
+					'Upload a media file or pick one from your media library.'
+				);
 
 				if ( isAudio ) {
-					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+					instructions = __(
+						'Upload an audio file, pick one from your media library, or add one with a URL.'
+					);
 				} else if ( isImage ) {
-					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+					instructions = __(
+						'Upload an image file, pick one from your media library, or add one with a URL.'
+					);
 				} else if ( isVideo ) {
-					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+					instructions = __(
+						'Upload a video file, pick one from your media library, or add one with a URL.'
+					);
 				}
 			}
 
@@ -201,9 +212,10 @@ export class MediaPlaceholder extends Component {
 
 		const placeholderClassName = classnames(
 			'block-editor-media-placeholder',
-			'editor-media-placeholder',
 			className,
-			{ 'is-appender': isAppender }
+			{
+				'is-appender': isAppender,
+			}
 		);
 
 		return (
@@ -218,12 +230,18 @@ export class MediaPlaceholder extends Component {
 				preview={ mediaPreview }
 			>
 				{ content }
+				{ children }
 			</Placeholder>
 		);
 	}
 
 	renderDropZone() {
-		const { onHTMLDrop = noop } = this.props;
+		const { disableDropZone, onHTMLDrop = noop } = this.props;
+
+		if ( disableDropZone ) {
+			return null;
+		}
+
 		return (
 			<DropZone
 				onFilesDrop={ this.onFilesUpload }
@@ -233,39 +251,34 @@ export class MediaPlaceholder extends Component {
 	}
 
 	renderCancelLink() {
-		const {
-			onCancel,
-		} = this.props;
-		return ( onCancel &&
-			<Button
-				className="block-editor-media-placeholder__cancel-button"
-				title={ __( 'Cancel' ) }
-				isLink
-				onClick={ onCancel }
-			>
-				{ __( 'Cancel' ) }
-			</Button>
+		const { onCancel } = this.props;
+		return (
+			onCancel && (
+				<Button
+					className="block-editor-media-placeholder__cancel-button"
+					title={ __( 'Cancel' ) }
+					isLink
+					onClick={ onCancel }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+			)
 		);
 	}
 
 	renderUrlSelectionUI() {
-		const {
-			onSelectURL,
-		} = this.props;
+		const { onSelectURL } = this.props;
 		if ( ! onSelectURL ) {
 			return null;
 		}
-		const {
-			isURLInputVisible,
-			src,
-		} = this.state;
+		const { isURLInputVisible, src } = this.state;
 		return (
-			<div className="editor-media-placeholder__url-input-container block-editor-media-placeholder__url-input-container">
+			<div className="block-editor-media-placeholder__url-input-container">
 				<Button
-					className="editor-media-placeholder__button block-editor-media-placeholder__button"
+					className="block-editor-media-placeholder__button"
 					onClick={ this.openURLInput }
-					isToggled={ isURLInputVisible }
-					isLarge
+					isPressed={ isURLInputVisible }
+					isTertiary
 				>
 					{ __( 'Insert from URL' ) }
 				</Button>
@@ -301,18 +314,12 @@ export class MediaPlaceholder extends Component {
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
 				value={
-					isArray( value ) ?
-						value.map( ( { id } ) => id ) :
-						value.id
+					isArray( value ) ? value.map( ( { id } ) => id ) : value.id
 				}
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isLarge
-							className={ classnames(
-								'editor-media-placeholder__button',
-								'editor-media-placeholder__media-library-button'
-							) }
+							isTertiary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();
@@ -336,37 +343,38 @@ export class MediaPlaceholder extends Component {
 						render={ ( { openFileDialog } ) => {
 							const content = (
 								<>
-									<IconButton
-										isLarge
+									<Button
+										isPrimary
 										className={ classnames(
 											'block-editor-media-placeholder__button',
-											'editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
-										icon="upload"
 									>
 										{ __( 'Upload' ) }
-									</IconButton>
+									</Button>
 									{ mediaLibraryButton }
 									{ this.renderUrlSelectionUI() }
 									{ this.renderCancelLink() }
 								</>
 							);
-							return this.renderPlaceholder( content, openFileDialog );
+							return this.renderPlaceholder(
+								content,
+								openFileDialog
+							);
 						} }
 					/>
 				</>
 			);
 		}
+
 		if ( mediaUpload ) {
 			const content = (
 				<>
 					{ this.renderDropZone() }
 					<FormFileUpload
-						isLarge
+						isPrimary
 						className={ classnames(
 							'block-editor-media-placeholder__button',
-							'editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
 						) }
 						onChange={ this.onUpload }
@@ -382,25 +390,33 @@ export class MediaPlaceholder extends Component {
 			);
 			return this.renderPlaceholder( content );
 		}
+
 		return this.renderPlaceholder( mediaLibraryButton );
 	}
 
 	render() {
-		const {
-			dropZoneUIOnly,
-		} = this.props;
+		const { disableMediaButtons, dropZoneUIOnly } = this.props;
 
-		if ( dropZoneUIOnly ) {
+		if ( dropZoneUIOnly || disableMediaButtons ) {
+			if ( dropZoneUIOnly ) {
+				deprecated(
+					'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop',
+					{
+						alternative: 'disableMediaButtons',
+					}
+				);
+			}
+
 			return (
-				<MediaUploadCheck>
-					{ this.renderDropZone() }
-				</MediaUploadCheck>
+				<MediaUploadCheck>{ this.renderDropZone() }</MediaUploadCheck>
 			);
 		}
 
 		return (
 			<MediaUploadCheck
-				fallback={ this.renderPlaceholder( this.renderUrlSelectionUI() ) }
+				fallback={ this.renderPlaceholder(
+					this.renderUrlSelectionUI()
+				) }
 			>
 				{ this.renderMediaUploadChecked() }
 			</MediaUploadCheck>
@@ -412,7 +428,7 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { getSettings } = select( 'core/block-editor' );
 
 	return {
-		mediaUpload: getSettings().__experimentalMediaUpload,
+		mediaUpload: getSettings().mediaUpload,
 	};
 } );
 
@@ -421,5 +437,5 @@ const applyWithSelect = withSelect( ( select ) => {
  */
 export default compose(
 	applyWithSelect,
-	withFilters( 'editor.MediaPlaceholder' ),
+	withFilters( 'editor.MediaPlaceholder' )
 )( MediaPlaceholder );

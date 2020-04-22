@@ -1,11 +1,15 @@
 module.exports = {
+	extends: [ require.resolve( './jsdoc.js' ) ],
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
 		'array-callback-return': 'error',
 		'brace-style': [ 'error', '1tbs' ],
-		camelcase: [ 'error', {
-			properties: 'never',
-		} ],
+		camelcase: [
+			'error',
+			{
+				properties: 'never',
+			},
+		],
 		'comma-dangle': [ 'error', 'always-multiline' ],
 		'comma-spacing': 'error',
 		'comma-style': [ 'error', 'last' ],
@@ -54,49 +58,31 @@ module.exports = {
 		'no-with': 'error',
 		'object-curly-spacing': [ 'error', 'always' ],
 		'one-var-declaration-per-line': [ 'error', 'initializations' ],
-		'operator-linebreak': [ 'error', 'after' ],
+		'operator-linebreak': 'error',
 		'padded-blocks': [ 'error', 'never' ],
 		'quote-props': [ 'error', 'as-needed' ],
 		quotes: [ 'error', 'single', { avoidEscape: true } ],
 		semi: 'error',
 		'semi-spacing': 'error',
 		'space-before-blocks': [ 'error', 'always' ],
-		'space-before-function-paren': [ 'error', {
-			anonymous: 'never',
-			named: 'never',
-			asyncArrow: 'always',
-		} ],
+		'space-before-function-paren': [
+			'error',
+			{
+				anonymous: 'never',
+				named: 'never',
+				asyncArrow: 'always',
+			},
+		],
 		'space-in-parens': [ 'error', 'always' ],
 		'space-infix-ops': 'error',
-		'space-unary-ops': [ 'error', {
-			overrides: {
-				'!': true,
+		'space-unary-ops': [
+			'error',
+			{
+				overrides: {
+					'!': true,
+				},
 			},
-		} ],
-		'valid-jsdoc': [ 'error', {
-			prefer: {
-				arg: 'param',
-				argument: 'param',
-				extends: 'augments',
-				returns: 'return',
-			},
-			preferType: {
-				array: 'Array',
-				bool: 'boolean',
-				Boolean: 'boolean',
-				float: 'number',
-				Float: 'number',
-				int: 'number',
-				integer: 'number',
-				Integer: 'number',
-				Number: 'number',
-				object: 'Object',
-				String: 'string',
-				Void: 'void',
-			},
-			requireParamDescription: false,
-			requireReturn: false,
-		} ],
+		],
 		'valid-typeof': 'error',
 		'vars-on-top': 'error',
 		'wrap-iife': 'error',

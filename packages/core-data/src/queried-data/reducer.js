@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
-import { keyBy, map, flowRight } from 'lodash';
+import { map, flowRight } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import {
+	conservativeMapItem,
 	ifMatchingAction,
 	replaceAction,
 	onSubKey,
@@ -41,14 +46,13 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
-		const isInNextItemsRange = (
+		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length
-		);
+			i < nextItemIdsStartIndex + nextItemIds.length;
 
-		mergedItemIds[ i ] = isInNextItemsRange ?
-			nextItemIds[ i - nextItemIdsStartIndex ] :
-			itemIds[ i ];
+		mergedItemIds[ i ] = isInNextItemsRange
+			? nextItemIds[ i - nextItemIdsStartIndex ]
+			: itemIds[ i ];
 	}
 
 	return mergedItemIds;
@@ -66,9 +70,17 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 function items( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
+			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
-				...keyBy( action.items, action.key || DEFAULT_ENTITY_KEY ),
+				...action.items.reduce( ( accumulator, value ) => {
+					const itemId = value[ key ];
+					accumulator[ itemId ] = conservativeMapItem(
+						state[ itemId ],
+						value
+					);
+					return accumulator;
+				}, {} ),
 			};
 	}
 

@@ -273,6 +273,19 @@ _Returns_
 
 -   `string`: The block's default class.
 
+<a name="getBlockFromExample" href="#getBlockFromExample">#</a> **getBlockFromExample**
+
+Create a block object from the example API.
+
+_Parameters_
+
+-   _name_ `string`: 
+-   _example_ `Object`: 
+
+_Returns_
+
+-   `Object`: block.
+
 <a name="getBlockMenuDefaultClassName" href="#getBlockMenuDefaultClassName">#</a> **getBlockMenuDefaultClassName**
 
 Returns the block's default menu item classname from its name.
@@ -370,7 +383,15 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
+
+<a name="getGroupingBlockName" href="#getGroupingBlockName">#</a> **getGroupingBlockName**
+
+Retrieves name of block used for handling grouping interactions.
+
+_Returns_
+
+-   `?string`: Block name.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -379,6 +400,10 @@ Get schema of possible paths for phrasing content.
 _Related_
 
 -   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
 
 _Returns_
 
@@ -434,7 +459,7 @@ handler has been defined.
 
 _Returns_
 
--   `?string`: Blog name.
+-   `?string`: Block name.
 
 <a name="hasBlockSupport" href="#hasBlockSupport">#</a> **hasBlockSupport**
 
@@ -540,11 +565,11 @@ in the codebase.
 
 _Parameters_
 
--   _icon_ `(Object|string|WPElement)`: Slug of the Dashicon to be shown as the icon for the block in the inserter, or element or an object describing the icon.
+-   _icon_ `WPBlockTypeIconRender`: Render behavior of a block type icon; one of a Dashicon slug, an element, or a component.
 
 _Returns_
 
--   `Object`: Object describing the icon.
+-   `WPBlockTypeIconDescriptor`: Object describing the icon.
 
 <a name="parse" href="#parse">#</a> **parse**
 
@@ -578,11 +603,11 @@ Converts an HTML string to known blocks. Strips everything else.
 
 _Parameters_
 
+-   _options_ `Object`: 
 -   _options.HTML_ `[string]`: The HTML to convert.
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
--   _options.canUserUseUnfilteredHTML_ `[boolean]`: Whether or not the user can use unfiltered HTML.
 
 _Returns_
 
@@ -594,11 +619,21 @@ Converts an HTML string to known blocks.
 
 _Parameters_
 
+-   _$1_ `Object`: 
 -   _$1.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
 -   `Array`: A list of blocks.
+
+<a name="registerBlockCollection" href="#registerBlockCollection">#</a> **registerBlockCollection**
+
+Registers a new block collection to group blocks in the same namespace in the inserter.
+
+_Parameters_
+
+-   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace
+-   _settings_ `Object`: An object composed of a title to show in the inserter, and an icon to show in the inserter
 
 <a name="registerBlockStyle" href="#registerBlockStyle">#</a> **registerBlockStyle**
 
@@ -624,6 +659,15 @@ _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
 
+<a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
+
+Registers a new block variation for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variation_ `WPBlockVariation`: Object describing a block variation.
+
 <a name="serialize" href="#serialize">#</a> **serialize**
 
 Takes a block or set of blocks and returns the serialized post content.
@@ -631,6 +675,7 @@ Takes a block or set of blocks and returns the serialized post content.
 _Parameters_
 
 -   _blocks_ `Array`: Block(s) to serialize.
+-   _options_ `WPBlockSerializationOptions`: Serialization options.
 
 _Returns_
 
@@ -659,6 +704,14 @@ Assigns name of block for handling non-block content.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
+
+<a name="setGroupingBlockName" href="#setGroupingBlockName">#</a> **setGroupingBlockName**
+
+Assigns name of block for handling block grouping interactions.
+
+_Parameters_
+
+-   _name_ `string`: Block name.
 
 <a name="setUnregisteredTypeHandlerName" href="#setUnregisteredTypeHandlerName">#</a> **setUnregisteredTypeHandlerName**
 
@@ -720,6 +773,15 @@ _Returns_
 
 -   `?WPBlock`: The previous block value, if it has been successfully unregistered; otherwise `undefined`.
 
+<a name="unregisterBlockVariation" href="#unregisterBlockVariation">#</a> **unregisterBlockVariation**
+
+Unregisters a block variation defined for the given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of the block (example: “core/columns”).
+-   _variationName_ `string`: Name of the variation defined for the block.
+
 <a name="updateCategory" href="#updateCategory">#</a> **updateCategory**
 
 Updates a category.
@@ -736,7 +798,7 @@ wrapped component.
 
 _Returns_
 
--   `Component`: Enhanced component with injected BlockContent as prop.
+-   `WPComponent`: Enhanced component with injected BlockContent as prop.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

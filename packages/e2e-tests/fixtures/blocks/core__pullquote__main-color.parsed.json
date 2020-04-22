@@ -1,0 +1,24 @@
+[
+    {
+        "blockName": "core/pullquote",
+        "attrs": {
+            "customMainColor": "#2207d0",
+            "textColor": "subtle-background",
+            "className": "has-background is-style-default"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>\n",
+        "innerContent": [
+            "\n<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	receiveUserQuery,
+	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
@@ -23,12 +24,15 @@ import {
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch, resolveSelect } from './controls';
+import { ifNotResolved } from './utils';
 
 /**
  * Requests authors from the REST API.
  */
 export function* getAuthors() {
-	const users = yield apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	const users = yield apiFetch( {
+		path: '/wp/v2/users/?who=authors&per_page=-1',
+	} );
 	yield receiveUserQuery( 'authors', users );
 }
 
@@ -47,15 +51,33 @@ export function* getCurrentUser() {
  * @param {string} name   Entity name.
  * @param {number} key    Record's key
  */
-export function* getEntityRecord( kind, name, key ) {
+export function* getEntityRecord( kind, name, key = '' ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
 	}
-	const record = yield apiFetch( { path: `${ entity.baseURL }/${ key }?context=edit` } );
+	const record = yield apiFetch( {
+		path: `${ entity.baseURL }/${ key }?context=edit`,
+	} );
 	yield receiveEntityRecords( kind, name, record );
 }
+
+/**
+ * Requests an entity's record from the REST API.
+ */
+export const getRawEntityRecord = ifNotResolved(
+	getEntityRecord,
+	'getEntityRecord'
+);
+
+/**
+ * Requests an entity's record from the REST API.
+ */
+export const getEditedEntityRecord = ifNotResolved(
+	getRawEntityRecord,
+	'getRawEntityRecord'
+);
 
 /**
  * Requests the entity's records from the REST API.
@@ -88,10 +110,22 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 };
 
 /**
+ * Requests the current theme.
+ */
+export function* getCurrentTheme() {
+	const activeThemes = yield apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
+	yield receiveCurrentTheme( activeThemes[ 0 ] );
+}
+
+/**
  * Requests theme supports data from the index.
  */
 export function* getThemeSupports() {
-	const activeThemes = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
+	const activeThemes = yield apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
 	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
 }
 
@@ -102,7 +136,9 @@ export function* getThemeSupports() {
  */
 export function* getEmbedPreview( url ) {
 	try {
-		const embedProxyResponse = yield apiFetch( { path: addQueryArgs( '/oembed/1.0/proxy', { url } ) } );
+		const embedProxyResponse = yield apiFetch( {
+			path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
+		} );
 		yield receiveEmbedPreview( url, embedProxyResponse );
 	} catch ( error ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
@@ -187,8 +223,13 @@ export function* canUser( action, resource, id ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosaves( postType, postId ) {
-	const { rest_base: restBase } = yield resolveSelect( 'getPostType', postType );
-	const autosaves = yield apiFetch( { path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit` } );
+	const { rest_base: restBase } = yield resolveSelect(
+		'getPostType',
+		postType
+	);
+	const autosaves = yield apiFetch( {
+		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+	} );
 
 	if ( autosaves && autosaves.length ) {
 		yield receiveAutosaves( postId, autosaves );

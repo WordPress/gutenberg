@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/heading",
+        "isValid": true,
+        "attributes": {
+            "align": "right",
+            "content": "A picture is worth a thousand words, or so the saying goes",
+            "level": 3
+        },
+        "innerBlocks": [],
+        "originalContent": "<h3 style=\"text-align:right\">A picture is worth a thousand words, or so the saying goes</h3>"
+    }
+]

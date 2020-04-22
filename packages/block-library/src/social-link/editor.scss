@@ -1,0 +1,10 @@
+.wp-social-link {
+	// Frontend outputs a link, backend a button. Both should have the same padding.
+	// Therefore, the following exactly matches the padding on the frontend link.
+	padding: 6px;
+}
+
+.wp-block-social-links.is-style-pill-shape .wp-social-link {
+	padding-left: 16px;
+	padding-right: 16px;
+}

@@ -1,0 +1,15 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/navigation-link",
+        "isValid": true,
+        "attributes": {
+            "label": "WordPress",
+            "nofollow": false,
+            "opensInNewTab": false,
+            "url": "https://wordpress.org/"
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]

@@ -10,21 +10,19 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     title="General"
   >
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
-      label="Enable Pre-publish Checks"
-    />
-    <WithSelect(WithDispatch(DeferredOption))
-      label="Enable Tips"
+      label="Pre-publish checks"
     />
   </Section>
   <Section
-    title="Document Panels"
+    title="Document panels"
   >
+    <EnablePluginDocumentSettingPanelOptionSlot />
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />
     <PostFeaturedImageCheck>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
-        label="Featured Image"
+        label="Featured image"
         panelName="featured-image"
       />
     </PostFeaturedImageCheck>
@@ -49,13 +47,13 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     </WithSelect(PostTypeSupportCheck)>
     <WithSelect(PageAttributesCheck)>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
-        label="Page Attributes"
+        label="Page attributes"
         panelName="page-attributes"
       />
     </WithSelect(PageAttributesCheck)>
   </Section>
   <WithSelect(MetaBoxesSection)
-    title="Advanced Panels"
+    title="Advanced panels"
   />
 </WithInstanceId(Modal)>
 `;

@@ -3,7 +3,7 @@
  */
 
 import {
-	escapeHTML,
+	escapeEditableHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
@@ -18,16 +18,19 @@ import { toTree } from './to-tree';
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
  * provided, text separated by a line separator will be wrapped in it.
  *
- * @param {Object} $1                        Named argements.
- * @param {Object} $1.value                  Rich text value.
- * @param {string} [$1.multilineTag]         Multiline tag.
+ * @param {Object}   $1                      Named argements.
+ * @param {Object}   $1.value                Rich text value.
+ * @param {string}   [$1.multilineTag]       Multiline tag.
+ * @param {?boolean} [$1.preserveWhiteSpace] Whether or not to use newline
+ *                                           characters for line breaks.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, multilineTag } ) {
+export function toHTMLString( { value, multilineTag, preserveWhiteSpace } ) {
 	const tree = toTree( {
 		value,
 		multilineTag,
+		preserveWhiteSpace,
 		createEmpty,
 		append,
 		getLastChild,
@@ -94,18 +97,26 @@ function createElementHTML( { type, attributes, object, children } ) {
 			continue;
 		}
 
-		attributeString += ` ${ key }="${ escapeAttribute( attributes[ key ] ) }"`;
+		attributeString += ` ${ key }="${ escapeAttribute(
+			attributes[ key ]
+		) }"`;
 	}
 
 	if ( object ) {
 		return `<${ type }${ attributeString }>`;
 	}
 
-	return `<${ type }${ attributeString }>${ createChildrenHTML( children ) }</${ type }>`;
+	return `<${ type }${ attributeString }>${ createChildrenHTML(
+		children
+	) }</${ type }>`;
 }
 
 function createChildrenHTML( children = [] ) {
-	return children.map( ( child ) => {
-		return child.text === undefined ? createElementHTML( child ) : escapeHTML( child.text );
-	} ).join( '' );
+	return children
+		.map( ( child ) => {
+			return child.text === undefined
+				? createElementHTML( child )
+				: escapeEditableHTML( child.text );
+		} )
+		.join( '' );
 }

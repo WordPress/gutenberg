@@ -11,7 +11,7 @@ import { withWeakMapCache } from '../utils';
 /**
  * An object of properties describing a specific query.
  *
- * @typedef {WPQueriedDataQueryParts}
+ * @typedef {Object} WPQueriedDataQueryParts
  *
  * @property {number} page      The query page (1-based index, default 1).
  * @property {number} perPage   Items per page for query (default 10).
@@ -61,10 +61,9 @@ export function getQueryParts( query ) {
 				// should accept a key value pair, which may optimize its
 				// implementation for our use here, vs. iterating an object
 				// with only a single key.
-				parts.stableKey += (
+				parts.stableKey +=
 					( parts.stableKey ? '&' : '' ) +
-					addQueryArgs( '', { [ key ]: value } ).slice( 1 )
-				);
+					addQueryArgs( '', { [ key ]: value } ).slice( 1 );
 		}
 	}
 

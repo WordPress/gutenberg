@@ -27,6 +27,8 @@ add_action( 'enqueue_block_editor_assets', 'my_custom_format_enqueue_assets_edit
 
 Then add a new file named `my-custom-format.js` with the following contents:
 
+{% codetabs %}
+{% ES5 %}
 ```js
 ( function( wp ) {
 	wp.richText.registerFormatType(
@@ -38,6 +40,19 @@ Then add a new file named `my-custom-format.js` with the following contents:
 	);
 } )( window.wp );
 ```
+{% ESNext %}
+```js
+import { registerFormatType } from '@wordpress/rich-text';
+
+registerFormatType(
+	'my-custom-format/sample-output', {
+		title: 'Sample output',
+		tagName: 'samp',
+		className: null,
+	}
+);
+```
+{% end %}
 
 Make that plugin available in your WordPress setup and activate it. Then, load a new page/post.
 

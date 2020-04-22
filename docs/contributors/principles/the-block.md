@@ -23,5 +23,5 @@ The placeholder content in the content area of the block can be thought of as a 
 ### The block toolbar is the place for critical options that can’t be incorporated into placeholder UI.
 Basic block settings won’t always make sense in the context of the placeholder / content UI. As a secondary option, options that are critical to the functionality of a block can live in the block toolbar. The block toolbar is one step removed from direct manipulation, but is still highly contextual and visible on all screen sizes, so it is a great secondary option.
 
-### The block sidebar should only be used for advanced, tertiary controls.
-The sidebar is not visible by default on a small / mobile screen, and may also be collapsed even in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that only power users may discover.
+### The Settings Sidebar should only be used for advanced, tertiary controls.
+The Settings Sidebar is not visible by default on a small / mobile screen, and may also be collapsed even in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that only power users may discover.

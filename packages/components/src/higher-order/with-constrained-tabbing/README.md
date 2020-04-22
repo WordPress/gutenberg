@@ -32,7 +32,7 @@ const MyComponentWithConstrainedTabbing = withState( {
 	return (
 		<div>
 			{ form }
-			<Button isDefault onClick={ toggleConstrain }>
+			<Button isSecondary onClick={ toggleConstrain }>
 				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain tabbing
 			</Button>
 		</div>

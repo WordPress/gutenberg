@@ -1,92 +1,69 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Component, createRef, useMemo } from '@wordpress/element';
-import {
-	ExternalLink,
-	IconButton,
-	ToggleControl,
-	withSpokenMessages,
-} from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { getRectangleFromRange } from '@wordpress/dom';
-import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
-import {
-	create,
-	insert,
-	isCollapsed,
-	applyFormat,
-	getTextContent,
-	slice,
-} from '@wordpress/rich-text';
-import { URLInput, URLPopover } from '@wordpress/block-editor';
+import { withSpokenMessages, Popover } from '@wordpress/components';
+import { prependHTTP } from '@wordpress/url';
+import { create, insert, isCollapsed, applyFormat } from '@wordpress/rich-text';
+import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
 
-const stopKeyPropagation = ( event ) => event.stopPropagation();
+function InlineLinkUI( {
+	isActive,
+	activeAttributes,
+	addingLink,
+	value,
+	onChange,
+	speak,
+	stopAddingLink,
+} ) {
+	/**
+	 * A unique key is generated when switching between editing and not editing
+	 * a link, based on:
+	 *
+	 * - This component may be rendered _either_ when a link is active _or_
+	 *   when adding or editing a link.
+	 * - It's only desirable to shift focus into the Popover when explicitly
+	 *   adding or editing a link, not when in the inline boundary of a link.
+	 * - Focus behavior can only be controlled on a Popover at the time it
+	 *   mounts, so a new instance of the component must be mounted to
+	 *   programmatically enact the focusOnMount behavior.
+	 *
+	 * @type {string}
+	 */
+	const mountingKey = useMemo( uniqueId, [ addingLink ] );
 
-function isShowingInput( props, state ) {
-	return props.addingLink || state.editLink;
-}
+	/**
+	 * Pending settings to be applied to the next link. When inserting a new
+	 * link, toggle values cannot be applied immediately, because there is not
+	 * yet a link for them to apply to. Thus, they are maintained in a state
+	 * value until the time that the link can be inserted or edited.
+	 *
+	 * @type {[Object|undefined,Function]}
+	 */
+	const [ nextLinkValue, setNextLinkValue ] = useState();
 
-const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
-	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-	<form
-		className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-		onKeyPress={ stopKeyPropagation }
-		onKeyDown={ onKeyDown }
-		onSubmit={ submitLink }
-	>
-		<URLInput
-			value={ value }
-			onChange={ onChangeInputValue }
-			autocompleteRef={ autocompleteRef }
-		/>
-		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-	</form>
-	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-);
-
-const LinkViewerUrl = ( { url } ) => {
-	const prependedURL = prependHTTP( url );
-	const linkClassName = classnames( 'editor-format-toolbar__link-container-value block-editor-format-toolbar__link-container-value', {
-		'has-invalid-link': ! isValidHref( prependedURL ),
-	} );
-
-	if ( ! url ) {
-		return <span className={ linkClassName }></span>;
-	}
-
-	return (
-		<ExternalLink
-			className={ linkClassName }
-			href={ url }
-		>
-			{ filterURLForDisplay( safeDecodeURI( url ) ) }
-		</ExternalLink>
-	);
-};
-
-const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
-	const anchorRect = useMemo( () => {
+	const anchorRef = useMemo( () => {
 		const selection = window.getSelection();
-		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-		if ( ! range ) {
+
+		if ( ! selection.rangeCount ) {
 			return;
 		}
 
-		if ( addingLink ) {
-			return getRectangleFromRange( range );
+		const range = selection.getRangeAt( 0 );
+
+		if ( addingLink && ! isActive ) {
+			return range;
 		}
 
 		let element = range.startContainer;
@@ -98,127 +75,78 @@ const URLPopoverAtLink = ( { isActive, addingLink, value, ...props } ) => {
 			element = element.parentNode;
 		}
 
-		const closest = element.closest( 'a' );
-		if ( closest ) {
-			return closest.getBoundingClientRect();
-		}
-	}, [ isActive, addingLink, value.start, value.end ] );
+		return element.closest( 'a' );
+	}, [ addingLink, value.start, value.end ] );
 
-	if ( ! anchorRect ) {
-		return null;
-	}
+	const linkValue = {
+		url: activeAttributes.url,
+		opensInNewTab: activeAttributes.target === '_blank',
+		...nextLinkValue,
+	};
 
-	return <URLPopover anchorRect={ anchorRect } { ...props } />;
-};
-
-const LinkViewer = ( { url, editLink } ) => {
-	return (
-		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		<div
-			className="editor-format-toolbar__link-container-content block-editor-format-toolbar__link-container-content"
-			onKeyPress={ stopKeyPropagation }
-		>
-			<LinkViewerUrl url={ url } />
-			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
-		</div>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	);
-};
-
-class InlineLinkUI extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.editLink = this.editLink.bind( this );
-		this.submitLink = this.submitLink.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onChangeInputValue = this.onChangeInputValue.bind( this );
-		this.setLinkTarget = this.setLinkTarget.bind( this );
-		this.onClickOutside = this.onClickOutside.bind( this );
-		this.resetState = this.resetState.bind( this );
-		this.autocompleteRef = createRef();
-
-		this.state = {
-			opensInNewWindow: false,
-			inputValue: '',
+	function onChangeLink( nextValue ) {
+		// Merge with values from state, both for the purpose of assigning the
+		// next state value, and for use in constructing the new link format if
+		// the link is ready to be applied.
+		nextValue = {
+			...nextLinkValue,
+			...nextValue,
 		};
-	}
 
-	static getDerivedStateFromProps( props, state ) {
-		const { activeAttributes: { url, target } } = props;
-		const opensInNewWindow = target === '_blank';
+		// LinkControl calls `onChange` immediately upon the toggling a setting.
+		const didToggleSetting =
+			linkValue.opensInNewTab !== nextValue.opensInNewTab &&
+			linkValue.url === nextValue.url;
 
-		if ( ! isShowingInput( props, state ) ) {
-			if ( url !== state.inputValue ) {
-				return { inputValue: url };
-			}
+		// If change handler was called as a result of a settings change during
+		// link insertion, it must be held in state until the link is ready to
+		// be applied.
+		const didToggleSettingForNewLink =
+			didToggleSetting && nextValue.url === undefined;
 
-			if ( opensInNewWindow !== state.opensInNewWindow ) {
-				return { opensInNewWindow };
-			}
+		// If link will be assigned, the state value can be considered flushed.
+		// Otherwise, persist the pending changes.
+		setNextLinkValue( didToggleSettingForNewLink ? nextValue : undefined );
+
+		if ( didToggleSettingForNewLink ) {
+			return;
 		}
 
-		return null;
-	}
-
-	onKeyDown( event ) {
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
-	}
-
-	onChangeInputValue( inputValue ) {
-		this.setState( { inputValue } );
-	}
-
-	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url = '' }, value, onChange } = this.props;
-
-		this.setState( { opensInNewWindow } );
-
-		// Apply now if URL is not being edited.
-		if ( ! isShowingInput( this.props, this.state ) ) {
-			const selectedText = getTextContent( slice( value ) );
-
-			onChange( applyFormat( value, createLinkFormat( {
-				url,
-				opensInNewWindow,
-				text: selectedText,
-			} ) ) );
-		}
-	}
-
-	editLink( event ) {
-		this.setState( { editLink: true } );
-		event.preventDefault();
-	}
-
-	submitLink( event ) {
-		const { isActive, value, onChange, speak } = this.props;
-		const { inputValue, opensInNewWindow } = this.state;
-		const url = prependHTTP( inputValue );
-		const selectedText = getTextContent( slice( value ) );
+		const newUrl = prependHTTP( nextValue.url );
 		const format = createLinkFormat( {
-			url,
-			opensInNewWindow,
-			text: selectedText,
+			url: newUrl,
+			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
-		event.preventDefault();
-
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			const newText = nextValue.title || newUrl;
+			const toInsert = applyFormat(
+				create( { text: newText } ),
+				format,
+				0,
+				newText.length
+			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			onChange( applyFormat( value, format ) );
+			const newValue = applyFormat( value, format );
+			newValue.start = newValue.end;
+			newValue.activeFormats = [];
+			onChange( newValue );
 		}
 
-		this.resetState();
+		// Focus should only be shifted back to the formatted segment when the
+		// URL is submitted.
+		if ( ! didToggleSetting ) {
+			stopAddingLink();
+		}
 
-		if ( ! isValidHref( url ) ) {
-			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
+		if ( ! isValidHref( newUrl ) ) {
+			speak(
+				__(
+					'Warning: the link has been inserted but may have errors. Please test it.'
+				),
+				'assertive'
+			);
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
@@ -226,67 +154,21 @@ class InlineLinkUI extends Component {
 		}
 	}
 
-	onClickOutside( event ) {
-		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occurred in the
-		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
-		// return to avoid the popover being closed.
-		const autocompleteElement = this.autocompleteRef.current;
-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
-			return;
-		}
-
-		this.resetState();
-	}
-
-	resetState() {
-		this.props.stopAddingLink();
-		this.setState( { editLink: false } );
-	}
-
-	render() {
-		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
-
-		if ( ! isActive && ! addingLink ) {
-			return null;
-		}
-
-		const { inputValue, opensInNewWindow } = this.state;
-		const showInput = isShowingInput( this.props, this.state );
-
-		return (
-			<URLPopoverAtLink
-				value={ value }
-				isActive={ isActive }
-				addingLink={ addingLink }
-				onClickOutside={ this.onClickOutside }
-				onClose={ this.resetState }
-				focusOnMount={ showInput ? 'firstElement' : false }
-				renderSettings={ () => (
-					<ToggleControl
-						label={ __( 'Open in New Tab' ) }
-						checked={ opensInNewWindow }
-						onChange={ this.setLinkTarget }
-					/>
-				) }
-			>
-				{ showInput ? (
-					<LinkEditor
-						value={ inputValue }
-						onChangeInputValue={ this.onChangeInputValue }
-						onKeyDown={ this.onKeyDown }
-						submitLink={ this.submitLink }
-						autocompleteRef={ this.autocompleteRef }
-					/>
-				) : (
-					<LinkViewer
-						url={ url }
-						editLink={ this.editLink }
-					/>
-				) }
-			</URLPopoverAtLink>
-		);
-	}
+	return (
+		<Popover
+			key={ mountingKey }
+			anchorRef={ anchorRef }
+			focusOnMount={ addingLink ? 'firstElement' : false }
+			onClose={ stopAddingLink }
+			position="bottom center"
+		>
+			<LinkControl
+				value={ linkValue }
+				onChange={ onChangeLink }
+				forceIsEditingLink={ addingLink }
+			/>
+		</Popover>
+	);
 }
 
 export default withSpokenMessages( InlineLinkUI );

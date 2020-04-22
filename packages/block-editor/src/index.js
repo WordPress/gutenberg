@@ -2,16 +2,15 @@
  * WordPress dependencies
  */
 import '@wordpress/blocks';
-import '@wordpress/core-data';
 import '@wordpress/rich-text';
 import '@wordpress/viewport';
+import '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
-import './store';
-import './hooks';
-
+import { AlignmentHookSettingsProvider as __experimentalAlignmentHookSettingsProvider } from './hooks';
+export { __experimentalAlignmentHookSettingsProvider };
 export * from './components';
 export * from './utils';
 export { storeConfig } from './store';

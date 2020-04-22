@@ -1,0 +1,5 @@
+{
+	"name": "core/post-title",
+	"category": "layout",
+	"context": [ "postId", "postType" ]
+}

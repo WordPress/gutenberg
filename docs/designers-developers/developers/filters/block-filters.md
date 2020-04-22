@@ -53,13 +53,78 @@ wp.domReady( function() {
 } );
 ```
 
+### Server-side registration helper
+
+While the samples provided do allow full control of block styles, they do require a considerable amount of code.
+
+To simplify the process of registering and unregistering block styles, two server-side functions are also available: `register_block_style`, and `unregister_block_style`.
+
+#### register_block_style
+
+The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
+
+The properties of the style array must include `name` and `label`: 
+ - `name`: The identifier of the style used to compute a CSS class.
+ - `label`: A human-readable label for the style.
+
+Besides the two mandatory properties, the styles properties array should also include an `inline_style`  or a `style_handle` property:
+
+ - `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
+ - `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
+
+The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
+
+```php
+register_block_style(
+    'core/quote',
+    array(
+        'name'         => 'blue-quote',
+        'label'        => __( 'Blue Quote' ),
+        'inline_style' => '.wp-block-quote.is-style-blue-quote { color: blue; }',
+    )
+);
+```
+
+Alternatively, if a stylesheet was already registered which contains the CSS for the style variation, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueue.
+
+The following code sample provides an example of this use case:
+
+```php
+wp_register_style( 'myguten-style', get_template_directory_uri() . '/custom-style.css' );
+
+// ...
+
+register_block_style(
+    'core/quote',
+    array(
+        'name'         => 'fancy-quote',
+        'label'        => 'Fancy Quote',
+        'style_handle' => 'myguten-style',
+    )
+);
+```
+
+#### unregister_block_style
+
+`unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
+
+The function's first argument is the registered name of the block, and the name of the style as the second argument.
+
+The following code sample unregisters the style named 'fancy-quote'  from the quote block:
+
+```php
+unregister_block_style( 'core/quote', 'fancy-quote' );
+```
+
+**Important:** The function `unregister_block_style` only unregisters styles that were registered on the server using `register_block_style`. The function does not unregister a style registered using client-side code.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
 
 #### `blocks.registerBlockType`
 
-Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
 
 _Example:_
 
@@ -259,12 +324,25 @@ wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-nam
 
 Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
 
+{% codetabs %}
+{% ES5 %}
 ```js
 // my-plugin.js
 wp.domReady( function() {
 	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
+{% ESNext %}
+```js
+// my-plugin.js
+import { unregisterBlockType } from '@wordpress/blocks';
+import domReady from '@wordpress/dom-ready'
+
+domReady( function() {
+	unregisterBlockType( 'core/verse' );
+} );
+```
+{% end %}
 
 and load this script in the Editor
 
@@ -281,6 +359,8 @@ function my_plugin_blacklist_blocks() {
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
 ```
+
+**Important:** When unregistering a block, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the block, or unregistering the block. You want your unregister code to run last. The way to do that is specify the component that is registering the block as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
 ### Using a whitelist
 
@@ -349,16 +429,15 @@ add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 
-It is possible to set an SVG as the icon of the category if a custom icon is needed. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
+You can also set a custom icon in SVG format. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
 ```js
 ( function() {
 	var el = wp.element.createElement;
-	var SVG = wp.components.SVG;
+	var SVG = wp.primitives.SVG;
 	var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
 	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
 ```
-

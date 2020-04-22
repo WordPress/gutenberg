@@ -30,6 +30,21 @@ class NavigableContainer extends Component {
 		this.getFocusableIndex = this.getFocusableIndex.bind( this );
 	}
 
+	componentDidMount() {
+		// We use DOM event listeners instead of React event listeners
+		// because we want to catch events from the underlying DOM tree
+		// The React Tree can be different from the DOM tree when using
+		// portals. Block Toolbars for instance are rendered in a separate
+		// React Trees.
+		this.container.addEventListener( 'keydown', this.onKeyDown );
+		this.container.addEventListener( 'focus', this.onFocus );
+	}
+
+	componentWillUnmount() {
+		this.container.removeEventListener( 'keydown', this.onKeyDown );
+		this.container.removeEventListener( 'focus', this.onFocus );
+	}
+
 	bindContainer( ref ) {
 		const { forwardedRef } = this.props;
 		this.container = ref;
@@ -66,22 +81,25 @@ class NavigableContainer extends Component {
 		}
 
 		const { getFocusableContext } = this;
-		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
+		const {
+			cycle = true,
+			eventToOffset,
+			onNavigate = noop,
+			stopNavigationEvents,
+		} = this.props;
 
 		const offset = eventToOffset( event );
 
 		// eventToOffset returns undefined if the event is not handled by the component
 		if ( offset !== undefined && stopNavigationEvents ) {
 			// Prevents arrow key handlers bound to the document directly interfering
-			event.nativeEvent.stopImmediatePropagation();
+			event.stopImmediatePropagation();
 
 			// When navigating a collection of items, prevent scroll containers
 			// from scrolling.
 			if ( event.target.getAttribute( 'role' ) === 'menuitem' ) {
 				event.preventDefault();
 			}
-
-			event.stopPropagation();
 		}
 
 		if ( ! offset ) {
@@ -94,7 +112,9 @@ class NavigableContainer extends Component {
 		}
 
 		const { index, focusables } = context;
-		const nextIndex = cycle ? cycleValue( index, focusables.length, offset ) : index + offset;
+		const nextIndex = cycle
+			? cycleValue( index, focusables.length, offset )
+			: index + offset;
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
@@ -103,24 +123,22 @@ class NavigableContainer extends Component {
 
 	render() {
 		const { children, ...props } = this.props;
-		// Disable reason: Assumed role is applied by parent via props spread.
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div ref={ this.bindContainer }
+			<div
+				ref={ this.bindContainer }
 				{ ...omit( props, [
 					'stopNavigationEvents',
 					'eventToOffset',
 					'onNavigate',
+					'onKeyDown',
 					'cycle',
 					'onlyBrowserTabstops',
 					'forwardedRef',
 				] ) }
-				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }>
+			>
 				{ children }
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 

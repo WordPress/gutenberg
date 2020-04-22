@@ -1,4 +1,22 @@
-## Master
+## 2.12.0 (2020-01-13)
+
+### Bug Fixes
+
+- Fixes a regression published in version 2.9.2 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
+## 2.7.0 (2019-08-05)
+
+### Enhancements
+
+- Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
+- Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
+
+### Bug Fixes
+
+- Fixed insertion of columns in the table block, which now inserts columns for all table sections ([#16410](https://github.com/WordPress/gutenberg/pull/16410))
+
+## 2.6.0 (2019-06-12)
 
 - Fixed an issue with creating upgraded embed blocks that are not registered ([#15883](https://github.com/WordPress/gutenberg/issues/15883)).
 

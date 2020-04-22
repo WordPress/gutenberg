@@ -39,8 +39,8 @@ In the WordPress context, API functions can be called via the global `wp.hooks` 
 * `doingFilter( 'hookName' )`
 * `didAction( 'hookName' )`
 * `didFilter( 'hookName' )`
-* `hasAction( 'hookName' )`
-* `hasFilter( 'hookName' )`
+* `hasAction( 'hookName', 'namespace' )`
+* `hasFilter( 'hookName', 'namespace' )`
 * `actions`
 * `filters`
 

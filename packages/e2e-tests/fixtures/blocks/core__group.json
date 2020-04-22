@@ -4,8 +4,9 @@
         "name": "core/group",
         "isValid": true,
         "attributes": {
-            "backgroundColor": "secondary",
-            "align": "full"
+            "tagName": "div",
+            "align": "full",
+            "backgroundColor": "secondary"
         },
         "innerBlocks": [
             {
@@ -31,6 +32,6 @@
                 "originalContent": "<p>Group block content.</p>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t\n\n\t</div>"
+        "originalContent": "<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t</div>\n\t</div>"
     }
 ]

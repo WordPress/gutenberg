@@ -1,11 +1,13 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 /**
  * Default request to global transformation
  *
  * Transform @wordpress dependencies:
- *   @wordpress/api-fetch -> wp.apiFetch
- *   @wordpress/i18n -> wp.i18n
+ *
+ *   request `@wordpress/api-fetch` becomes `wp.apiFetch`
+ *   request `@wordpress/i18n` becomes `wp.i18n`
  *
  * @param {string} request Requested module
  *
@@ -33,8 +35,15 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 	}
 
+	if ( BUNDLED_PACKAGES.includes( request ) ) {
+		return undefined;
+	}
+
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
-		return [ 'wp', camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ) ];
+		return [
+			'wp',
+			camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ),
+		];
 	}
 }
 
@@ -42,8 +51,9 @@ function defaultRequestToExternal( request ) {
  * Default request to WordPress script handle transformation
  *
  * Transform @wordpress dependencies:
- *   @wordpress/i18n -> wp-i18n
- *   @wordpress/escape-html -> wp-escape-html
+ *
+ *   request `@wordpress/i18n` becomes `wp-i18n`
+ *   request `@wordpress/escape-html` becomes `wp-escape-html`
  *
  * @param {string} request Requested module
  *
@@ -69,17 +79,18 @@ function defaultRequestToHandle( request ) {
  * converting to uppercase, where Lodash will also capitalize letters
  * following numbers.
  *
- * Temporarily duplicated from @wordpress/scripts/utils.
- *
  * @param {string} string Input dash-delimited string.
  *
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {
-	return string.replace( /-([a-z])/g, ( match, letter ) => letter.toUpperCase() );
+	return string.replace( /-([a-z])/g, ( match, letter ) =>
+		letter.toUpperCase()
+	);
 }
 
 module.exports = {
+	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
 };
