@@ -28,6 +28,7 @@ import com.facebook.soloader.SoLoader;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -56,6 +57,13 @@ public class MainApplication extends Application implements ReactApplication {
 
             @Override
             public void requestMediaPickFromMediaLibrary(MediaUploadCallback mediaUploadCallback, Boolean allowMultipleSelection, MediaType mediaType) {
+                List<RNMedia> rnMediaList = new ArrayList<>();
+                if (mediaType == MediaType.IMAGE) {
+                    rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain" ));
+                } else if (mediaType == MediaType.VIDEO) {
+                    rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup" ));
+                }
+                mediaUploadCallback.onUploadMediaFileSelected(rnMediaList);                
             }
 
 

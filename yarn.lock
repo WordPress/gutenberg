@@ -9637,11 +9637,6 @@ jszip@^3.1.3:
     readable-stream "~2.3.6"
     set-immediate-shim "~1.0.1"
 
-keymirror@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/keymirror/-/keymirror-0.1.1.tgz#918889ea13f8d0a42e7c557250eee713adc95c35"
-  integrity sha1-kYiJ6hP40KQufFVyUO7nE63JXDU=
-
 keypather@^1.10.2:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/keypather/-/keypather-1.10.2.tgz#e0449632d4b3e516f21cc014ce7c5644fddce614"
@@ -12477,13 +12472,11 @@ react-native-url-polyfill@^1.1.2:
     buffer "^5.4.3"
     whatwg-url-without-unicode "8.0.0-1"
 
-"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#c43bdf6b06d361da399b98b8d2e32b578fa188ac":
+"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948":
   version "5.0.1"
-  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#c43bdf6b06d361da399b98b8d2e32b578fa188ac"
+  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948"
   dependencies:
-    keymirror "^0.1.1"
     prop-types "^15.5.10"
-    shaka-player "^2.4.4"
 
 react-native@0.61.5:
   version "0.61.5"
@@ -13491,11 +13484,6 @@ sha.js@^2.4.0, sha.js@^2.4.8:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
-
-shaka-player@^2.4.4:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.3.tgz#f32f47024a6aed3dd66d8098e08b1a16546f3683"
-  integrity sha512-9HwdBXiMNglq2IcjTWCMIwv4s1gucyHEOYWc6YX5NcxyiyQfVP+VG3eADWJXgFv3RF3mma1YPKX83q0PbyxoAQ==
 
 shallowequal@^1.0.2:
   version "1.1.0"
