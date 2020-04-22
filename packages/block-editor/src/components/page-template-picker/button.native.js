@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, Platform, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -38,6 +38,7 @@ const PickerButton = ( { icon, isMoreOption, label, onPress } ) => {
 			styles.buttonIcon,
 			styles.buttonIconDark
 		),
+		Platform.OS === 'android' && { fontSize: 16 },
 		isMoreOption && styles.buttonIconIsMore,
 	];
 
