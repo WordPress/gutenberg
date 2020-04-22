@@ -23,6 +23,23 @@ $grid-size: 8px;
 $grid-size-large: 16px;
 $grid-size-xlarge: 24px;
 
+
+/**
+ * Grid System.
+ * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
+ */
+
+$grid-unit: 8px;
+$grid-unit-05: 0.5 * $grid-unit;   // 4px
+$grid-unit-10: 1 * $grid-unit;     // 8px
+$grid-unit-15: 1.5 * $grid-unit;   // 12px
+$grid-unit-20: 2 * $grid-unit;     // 16px
+$grid-unit-30: 3 * $grid-unit;     // 24px
+$grid-unit-40: 4 * $grid-unit;     // 32px
+$grid-unit-50: 5 * $grid-unit;     // 40px
+$grid-unit-60: 6 * $grid-unit;     // 48px
+
+
 // Widths, heights & dimensions
 $panel-padding: 16px;
 $header-height: 56px;
