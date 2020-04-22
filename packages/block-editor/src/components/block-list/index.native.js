@@ -7,7 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -24,6 +24,8 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
+
+const BlockListContext = createContext();
 
 export class BlockList extends Component {
 	constructor() {
@@ -91,6 +93,25 @@ export class BlockList extends Component {
 	}
 
 	render() {
+		const { isRootList } = this.props;
+
+		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
+		return isRootList ? (
+			<BlockListContext.Provider value={ this.scrollViewRef }>
+				{ this.renderList() }
+			</BlockListContext.Provider>
+		) : (
+			<BlockListContext.Consumer>
+				{ ( ref ) =>
+					this.renderList( {
+						parentScrollRef: ref,
+					} )
+				}
+			</BlockListContext.Consumer>
+		);
+	}
+
+	renderList( extraProps = {} ) {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
@@ -107,6 +128,7 @@ export class BlockList extends Component {
 			isStackedHorizontally,
 			horizontalAlignment,
 		} = this.props;
+		const { parentScrollRef } = extraProps;
 
 		const {
 			blockToolbar,
@@ -136,7 +158,9 @@ export class BlockList extends Component {
 						: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
-					innerRef={ this.scrollViewInnerRef }
+					innerRef={ ( ref ) => {
+						this.scrollViewInnerRef( parentScrollRef || ref );
+					} }
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
 					}
