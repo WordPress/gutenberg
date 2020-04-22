@@ -175,6 +175,8 @@ transforms = {
 
 ### Type `files`
 
+This type of transformation is applied when some files are dropped into the editor.
+
 A transformation of type `files` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `files`.
@@ -182,9 +184,9 @@ A transformation of type `files` is an object that takes the following parameter
 - **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from file to block**
+**Example: from file to File block**
 
-A file can be dropped into the editor and converted into a block with a matching transform.
+To create a File block when the user drops a file into the editor we can use the following code:
 
 {% codetabs %}
 {% ES5 %}
