@@ -126,7 +126,7 @@ transforms: {
 
 ### Type `enter`
 
-The transformations of this type are applied when the user types some content and then the ENTER key.
+The transformations of this type are applied when the user types some content and then the ENTER key in a new line.
 
 A transformation of type `enter` is an object that takes the following parameters:
 
@@ -251,7 +251,7 @@ transforms: {
 
 ### Type `prefix`
 
-This type of transformations are applied when, in a blank line, the user types some text and then adds a trailing space.
+This type of transformations are applied when the user types some text and then adds a trailing space in a new line.
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
