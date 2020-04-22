@@ -62,7 +62,11 @@ function Editor( { settings: _settings } ) {
 		};
 	}, [] );
 
-	const inlineStyles = useResizeCanvas();
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const inlineStyles = useResizeCanvas( deviceType );
 
 	return template ? (
 		<>

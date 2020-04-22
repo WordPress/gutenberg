@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, Icon, MenuGroup } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
+import { cog, external } from '@wordpress/icons';
 import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
@@ -26,6 +26,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		isSaving,
 		getBlockSelectionStart,
 		isFullscreenActive,
+		deviceType,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -45,12 +46,17 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = useDispatch( 'core/edit-post' );
 
 	const toggleGeneralSidebar = isEditorSidebarOpened
 		? closeGeneralSidebar
@@ -85,6 +91,8 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PreviewOptions
 					isEnabled={ isPostSaveable }
 					className="edit-post-post-preview-dropdown"
+					deviceType={ deviceType }
+					setDeviceType={ setPreviewDeviceType }
 				>
 					<MenuGroup>
 						<div className="edit-post-header-preview__grouping-external">

@@ -38,7 +38,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
-				'core/block-editor'
+				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]

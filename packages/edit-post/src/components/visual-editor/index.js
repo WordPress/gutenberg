@@ -22,9 +22,14 @@ import { Popover } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockInspectorButton from './block-inspector-button';
+import { useSelect } from '@wordpress/data';
 
 function VisualEditor() {
-	const inlineStyles = useResizeCanvas();
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const inlineStyles = useResizeCanvas( deviceType );
 
 	return (
 		<BlockSelectionClearer

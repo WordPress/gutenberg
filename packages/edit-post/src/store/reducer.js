@@ -221,6 +221,23 @@ export function metaBoxLocations( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_PREVIEW_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
@@ -232,4 +249,5 @@ export default combineReducers( {
 	preferences,
 	publishSidebarActive,
 	removedPanels,
+	deviceType,
 } );

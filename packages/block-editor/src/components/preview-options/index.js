@@ -14,7 +14,6 @@ import {
 	Path,
 	SVG,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
@@ -33,17 +32,9 @@ export default function PreviewOptions( {
 	children,
 	className,
 	isEnabled = true,
+	deviceType,
+	setDeviceType,
 } ) {
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( 'core/block-editor' );
-
-	const deviceType = useSelect( ( select ) => {
-		return select(
-			'core/block-editor'
-		).__experimentalGetPreviewDeviceType();
-	}, [] );
-
 	return (
 		<Dropdown
 			className="block-editor-post-preview__dropdown"
@@ -68,21 +59,21 @@ export default function PreviewOptions( {
 					<MenuGroup>
 						<MenuItem
 							className="block-editor-post-preview__button-resize"
-							onClick={ () => setPreviewDeviceType( 'Desktop' ) }
+							onClick={ () => setDeviceType( 'Desktop' ) }
 							icon={ deviceType === 'Desktop' && check }
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
 						<MenuItem
 							className="block-editor-post-preview__button-resize"
-							onClick={ () => setPreviewDeviceType( 'Tablet' ) }
+							onClick={ () => setDeviceType( 'Tablet' ) }
 							icon={ deviceType === 'Tablet' && check }
 						>
 							{ __( 'Tablet' ) }
 						</MenuItem>
 						<MenuItem
 							className="block-editor-post-preview__button-resize"
-							onClick={ () => setPreviewDeviceType( 'Mobile' ) }
+							onClick={ () => setDeviceType( 'Mobile' ) }
 							icon={ deviceType === 'Mobile' && check }
 						>
 							{ __( 'Mobile' ) }
