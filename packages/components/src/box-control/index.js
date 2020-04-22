@@ -41,9 +41,8 @@ export default function BoxControl( {
 	const headingId = `${ id }-heading`;
 
 	const updateValues = ( nextValues ) => {
-		const mergedValues = { ...values, ...nextValues };
-		setValues( mergedValues );
-		onChange( mergedValues );
+		setValues( nextValues );
+		onChange( nextValues );
 	};
 
 	return (
@@ -51,12 +50,12 @@ export default function BoxControl( {
 			<Header>
 				<Text id={ headingId }>{ label }</Text>
 			</Header>
-			<LayoutContainer>
+			<LayoutContainer className="component-box-control__input-controls-wrapper">
 				<InputControls
 					{ ...inputProps }
-					values={ values }
 					onChange={ updateValues }
 					units={ units }
+					values={ values }
 				/>
 			</LayoutContainer>
 		</Root>

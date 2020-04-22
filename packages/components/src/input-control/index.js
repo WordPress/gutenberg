@@ -24,7 +24,7 @@ import {
 	Root,
 	Suffix,
 } from './styles/input-control-styles';
-import { useValueState, isEmpty } from './utils';
+import { useValueState, isValueEmpty } from './utils';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
@@ -74,16 +74,17 @@ export function InputControl(
 		setValue( nextValue );
 	};
 
-	const isFilled = ! isEmpty( value );
+	const isFilled = ! isValueEmpty( value );
 	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
 	const isFloatingLabelSet =
 		! hideLabelFromVision && isFloatingLabel && label;
 
 	return (
-		<Root isFloatingLabel={ isFloatingLabelSet }>
+		<Root className={ classes } isFloatingLabel={ isFloatingLabelSet }>
 			{ label && (
 				<Label
 					as="label"
+					className="component-input-control__label"
 					hideLabelFromVision={ hideLabelFromVision }
 					htmlFor={ id }
 					isFilled={ isFilled }
@@ -99,10 +100,13 @@ export function InputControl(
 				label={ label }
 				position={ tooltipPosition }
 			>
-				<Container isFocused={ isFocused }>
+				<Container
+					className="component-input-control__container"
+					isFocused={ isFocused }
+				>
 					<Input
 						{ ...props }
-						className={ classes }
+						className="component-input-control__input"
 						id={ id }
 						isFilled={ isFilled }
 						isFloating={ isFloating }
@@ -114,19 +118,27 @@ export function InputControl(
 						size={ size }
 						value={ value }
 					/>
-					{ suffix && <Suffix>{ suffix }</Suffix> }
+					{ suffix && (
+						<Suffix className="component-input-control__suffix">
+							{ suffix }
+						</Suffix>
+					) }
 					<Fieldset
 						aria-hidden="true"
+						className="component-input-control__fieldset"
 						isFloatingLabel={ isFloatingLabelSet }
 						isFocused={ isFocused }
 					>
 						{ isFloatingLabelSet && (
 							<Legend
 								aria-hidden="true"
+								className="component-input-control__fieldset-label"
 								isFloating={ isFloating }
 								size={ size }
 							>
-								<LegendText>{ label }</LegendText>
+								<LegendText className="component-input-control__fieldset-text">
+									{ label }
+								</LegendText>
 							</Legend>
 						) }
 					</Fieldset>

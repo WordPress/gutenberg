@@ -39,13 +39,15 @@ const arrowStyles = ( { disableUnits } ) => {
 
 export const ValueInput = styled( NumberControl )`
 	&&& {
-		appearance: none;
-		-moz-appearance: textfield;
-		display: block;
-		width: 100%;
+		input {
+			appearance: none;
+			-moz-appearance: textfield;
+			display: block;
+			width: 100%;
 
-		${arrowStyles};
-		${paddingStyles};
+			${arrowStyles};
+			${paddingStyles};
+		}
 	}
 `;
 

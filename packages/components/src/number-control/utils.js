@@ -51,18 +51,24 @@ export function useDragCursor( isDragging, dragDirection ) {
 	return dragCursor;
 }
 
-function getValue( value ) {
+function getNumberValue( value ) {
 	const number = Number( value );
 
 	return isNaN( number ) ? 0 : number;
 }
 
+export function getValue( value ) {
+	const parsedValue = parseFloat( value );
+
+	return isNaN( parsedValue ) ? value : parsedValue;
+}
+
 export function add( a, b ) {
-	return getValue( a ) + getValue( b );
+	return getNumberValue( a ) + getNumberValue( b );
 }
 
 export function subtract( a, b ) {
-	return getValue( a ) - getValue( b );
+	return getNumberValue( a ) - getNumberValue( b );
 }
 
 export function roundClamp(
@@ -71,8 +77,8 @@ export function roundClamp(
 	max = Infinity,
 	step = 1
 ) {
-	const baseValue = getValue( value );
-	const stepValue = getValue( step );
+	const baseValue = getNumberValue( value );
+	const stepValue = getNumberValue( step );
 	const rounded = Math.round( baseValue / stepValue ) * stepValue;
 	const clampedValue = clamp( rounded, min, max );
 

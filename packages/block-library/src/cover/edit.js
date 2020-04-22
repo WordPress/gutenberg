@@ -117,6 +117,7 @@ function CoverHeightInput( {
 		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
 			<UnitControl
 				id={ inputId }
+				isResetValueOnUnitChange
 				min={ min }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }

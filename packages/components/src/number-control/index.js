@@ -9,13 +9,20 @@ import { useDrag } from 'react-use-gesture';
  * WordPress dependencies
  */
 import { forwardRef, useState } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import { useDragCursor, add, subtract, roundClampString } from './utils';
+import {
+	add,
+	getValue,
+	roundClampString,
+	subtract,
+	useDragCursor,
+} from './utils';
+import { isValueEmpty, useValueState } from '../input-control/utils';
 import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
@@ -26,9 +33,12 @@ export function NumberControl(
 		dragThreshold = 10,
 		hideHTMLArrows = false,
 		isDragEnabled = true,
+		isPressEnterToChange = true,
 		isShiftStepEnabled = true,
 		max = Infinity,
 		min = -Infinity,
+		onBlur = noop,
+		onBeforeChange = ( value ) => value,
 		onChange = noop,
 		onKeyDown = noop,
 		shiftStep = 10,
@@ -38,6 +48,7 @@ export function NumberControl(
 	},
 	ref
 ) {
+	const [ value, setValue ] = useValueState( valueProp );
 	const [ isDragging, setIsDragging ] = useState( false );
 	const baseValue = clamp( 0, min, max );
 	const isRtl = useRtl();
@@ -56,6 +67,7 @@ export function NumberControl(
 
 			const [ x, y ] = delta;
 			const modifier = shiftKey ? shiftStep : 1;
+			const _forceUpdate = true;
 			let directionModifier;
 			let directionBaseValue;
 
@@ -88,7 +100,8 @@ export function NumberControl(
 					max,
 					modifier
 				);
-				handleOnChange( nextValue, { event } );
+
+				handleOnChange( nextValue, { event }, _forceUpdate );
 			}
 
 			if ( ! isDragging ) {
@@ -101,17 +114,38 @@ export function NumberControl(
 		}
 	);
 
+	const handleOnBlur = ( event ) => {
+		const _forceUpdate = true;
+		onBlur( event );
+
+		if ( isPressEnterToChange && ! isValueEmpty( value ) ) {
+			handleOnChange( value, { event }, _forceUpdate );
+		}
+	};
+
+	const handleOnChange = ( next, changeProps, _forceUpdate = false ) => {
+		const baseNextValue = getValue( next );
+		setValue( baseNextValue );
+
+		if ( ! isPressEnterToChange || _forceUpdate ) {
+			const nextValue = onBeforeChange( baseNextValue, changeProps );
+			if ( nextValue === false ) return;
+
+			onChange( nextValue, changeProps );
+		}
+	};
+
 	const handleOnKeyDown = ( event ) => {
 		onKeyDown( event );
-		const { value } = event.target;
+		const { value: currentValue } = event.target;
 
-		const isEmpty = value === '';
+		const _forceUpdate = true;
 		const enableShift = event.shiftKey && isShiftStepEnabled;
 
 		const incrementalValue = enableShift
 			? parseFloat( shiftStep )
 			: parseFloat( step );
-		let nextValue = isEmpty ? baseValue : value;
+		let nextValue = isValueEmpty( currentValue ) ? baseValue : currentValue;
 
 		// Convert to a number to use math
 		nextValue = parseFloat( nextValue );
@@ -128,7 +162,7 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				handleOnChange( nextValue, { event } );
+				handleOnChange( nextValue, { event }, _forceUpdate );
 
 				break;
 
@@ -143,17 +177,25 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				handleOnChange( nextValue, { event } );
+				handleOnChange( nextValue, { event }, _forceUpdate );
 
 				break;
+
+			case ENTER:
+				if ( isPressEnterToChange ) {
+					event.preventDefault();
+
+					nextValue = roundClampString(
+						nextValue,
+						min,
+						max,
+						incrementalValue
+					);
+
+					handleOnChange( nextValue, { event }, _forceUpdate );
+				}
+				break;
 		}
-	};
-
-	const handleOnChange = ( value, { event } ) => {
-		const parsedValue = parseFloat( value );
-		const nextValue = isNaN( parsedValue ) ? nextValue : parsedValue;
-
-		onChange( nextValue, { event } );
 	};
 
 	const classes = classNames( 'component-number-control', className );
@@ -161,6 +203,7 @@ export function NumberControl(
 	return (
 		<Input
 			inputMode="numeric"
+			type="number"
 			{ ...props }
 			{ ...dragGestureProps() }
 			className={ classes }
@@ -168,10 +211,10 @@ export function NumberControl(
 			hideHTMLArrows={ hideHTMLArrows }
 			isDragging={ isDragging }
 			label={ label }
+			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
 			ref={ ref }
-			type="number"
 			value={ valueProp }
 		/>
 	);

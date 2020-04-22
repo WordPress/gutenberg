@@ -43,3 +43,13 @@ export function getValues( values, ...args ) {
 
 	return nextValues;
 }
+
+export function getUnits( values, ...args ) {
+	const nextValues = [];
+
+	args.forEach( ( key ) => {
+		nextValues.push( values[ key ][ 1 ] );
+	} );
+
+	return nextValues;
+}

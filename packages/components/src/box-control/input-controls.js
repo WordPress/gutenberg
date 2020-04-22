@@ -36,16 +36,18 @@ export default function BoxInputControls( {
 
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
-		const nextValues = values;
-		const nextValue = [ next, unit ];
+		const nextValues = { ...values };
 
-		nextValues[ side ] = nextValue;
+		const nextSide = side === 'all' ? 'top' : side;
+		const nextValue = [ next, values[ nextSide ][ 1 ] ];
 
 		if ( side === 'all' ) {
 			nextValues.top = nextValue;
 			nextValues.bottom = nextValue;
 			nextValues.left = nextValue;
 			nextValues.right = nextValue;
+		} else {
+			nextValues[ side ] = nextValue;
 		}
 
 		/**
@@ -73,13 +75,14 @@ export default function BoxInputControls( {
 	};
 
 	return (
-		<Layout>
+		<Layout className="component-box-control__input-controls">
 			<SideIndicatorX aria-hidden="true" />
 			<SideIndicatorY aria-hidden="true" />
 			<LayoutBox aria-hidden="true" />
 			<UnitControl
 				{ ...props }
 				value={ top }
+				unit={ values.top[ 1 ] }
 				dragDirection="s"
 				onChange={ createHandleOnChange( 'top' ) }
 				label={ LABELS.top }
@@ -91,6 +94,7 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ left }
+				unit={ values.left[ 1 ] }
 				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
 				label={ LABELS.left }
@@ -104,6 +108,7 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ allValue }
+				unit={ unit }
 				onChange={ createHandleOnChange( 'all' ) }
 				label={ LABELS.all }
 				style={ {
@@ -115,6 +120,7 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ right }
+				unit={ values.right[ 1 ] }
 				dragDirection="w"
 				onChange={ createHandleOnChange( 'right' ) }
 				label={ LABELS.right }
@@ -127,6 +133,7 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ bottom }
+				unit={ values.bottom[ 1 ] }
 				dragDirection="n"
 				onChange={ createHandleOnChange( 'bottom' ) }
 				label={ LABELS.bottom }

@@ -15,6 +15,7 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 	return (
 		<UnitControlWrapper aria-label={ label }>
 			<BaseUnitControl
+				className="component-box-control__unit-control"
 				hideLabelFromVision
 				hideHTMLArrows
 				label={ label }

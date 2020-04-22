@@ -22,10 +22,10 @@ export const _default = () => {
 
 function DemoExample() {
 	const [ values, setValues ] = useState( {
-		top: [ 10 ],
-		right: [ 10 ],
-		bottom: [ 10 ],
-		left: [ 10 ],
+		top: [ 10, 'px' ],
+		right: [ 10, 'px' ],
+		bottom: [ 10, 'px' ],
+		left: [ 10, 'px' ],
 	} );
 
 	return (
