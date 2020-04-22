@@ -179,6 +179,14 @@ export class ImageEdit extends Component {
 					imageFileName: currentlyUploadingImage( media ),
 				} );
 			} else {
+				// Reset current component for undo.
+				this.props.setAttributes( {
+					url: undefined,
+					alt: undefined,
+					id: undefined,
+					title: undefined,
+					caption: undefined,
+				} );
 				this.props.replaceWithMultipleImageBlocks( media );
 			}
 		} else {
