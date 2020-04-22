@@ -34,9 +34,9 @@ A transformation of type `block` is an object that takes the following parameter
 - **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from Paragraph to Heading**
+**Example: from Paragraph block to Heading block**
 
-To declare this transformation we add the following transform into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
+To declare this transformation we add the following code into the heading block configuration, which uses the `createBlock` function from the [`wp-blocks` package](/packages/blocks/README.md#createBlock).
 
 {% codetabs %}
 {% ES5 %}
@@ -91,7 +91,11 @@ transforms: {
             type: 'block',
             blocks: [ 'some/block-with-innerblocks' ],
             transform: function( attributes, innerBlocks ) {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
+                return createBlock(
+                    'some/other-block-with-innerblocks',
+                    attributes,
+                    innerBlocks
+                );
             },
         },
     ],
@@ -107,7 +111,11 @@ transforms: {
             type: 'block',
             blocks: [ 'some/block-with-innerblocks' ],
             transform: ( attributes, innerBlocks ) => {
-                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
+                return createBlock(
+					'some/other-block-with-innerblocks',
+					attributes,
+					innerBlocks
+				);
             },
         },
     ],
@@ -118,6 +126,8 @@ transforms: {
 
 ### Type `enter`
 
+The transformations of this type are applied when the user types some content and then the ENTER key.
+
 A transformation of type `enter` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `enter`.
@@ -125,9 +135,9 @@ A transformation of type `enter` is an object that takes the following parameter
 - **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from text to block**
+**Example: from text to Separator block**
 
-To create a separator block when the user types `-` three times and then enter we can use the following transformation:
+To create a separator block when the user types `-` three times and then enter we can use the following code:
 
 {% codetabs %}
 
