@@ -10,6 +10,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
+import { useCustomUnits } from '../components/unit-control';
 
 export const PADDING_SUPPORT_KEY = '__experimentalPadding';
 
@@ -26,6 +27,8 @@ export function PaddingEdit( props ) {
 		attributes: { padding, style },
 		setAttributes,
 	} = props;
+
+	const units = useCustomUnits();
 
 	if ( ! hasBlockSupport( blockName, PADDING_SUPPORT_KEY ) ) {
 		return null;
@@ -49,6 +52,7 @@ export function PaddingEdit( props ) {
 				values={ padding }
 				onChange={ onChange }
 				label={ __( 'Padding' ) }
+				units={ units }
 			/>
 		),
 		native: null,
