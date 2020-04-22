@@ -1,6 +1,6 @@
 # Block Transforms
 
-Block Transforms is the API that allows a block to be transformed _from_ and _to_ other entities. Existing entities that work with this API include blocks, shortshortcodes, files, regular expressions, or raw DOM nodes.
+Block Transforms is the API that allows a block to be transformed _from_ and _to_ other entities. Existing entities that work with this API include blocks, sortcodes, files, regular expressions, and raw DOM nodes.
 
 ## Transform direction: `to` and `from`
 
@@ -20,15 +20,17 @@ export const settings = {
 
 ## Transformations Types
 
-This section goes through the existing types of transformations available.
+This section goes through the existing types of transformations a block can support.
 
 ### Type `block`
+
+This transformation allows a block to be converted into a different one. This type of transformation is surfaced in the block UI.
 
 A transformation of type `block` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `block`.
 - **blocks** _(array)_: a list of known block types. It also accepts the wildcard (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
-- **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed to operate on it.
+- **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
 - **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
@@ -120,7 +122,7 @@ A transformation of type `enter` is an object that takes the following parameter
 
 - **type** _(string)_: the value `enter`.
 - **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
-- **transform** _(function)_: a callback that receives the value to operate on it.
+- **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from text to block**
@@ -166,7 +168,7 @@ transforms = {
 A transformation of type `files` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `files`.
-- **transform** _(function)_: a callback that receives the array of files being processed to operate on them.
+- **transform** _(function)_: a callback that receives the array of files being processed. It should return a block object or an array of block objects.
 - **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
@@ -243,7 +245,7 @@ A transformation of type `prefix` is an object that takes the following paramete
 
 - **type** _(string)_: the value `files`.
 - **prefix** _(string)_: the character or sequence of characters that match this transfrom.
-- **transform** _(function)_: a callback that receives the content introduced to operate on it.
+- **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from text to block**
@@ -295,7 +297,7 @@ A transformation of type `raw` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `raw`.
 - **schema** _(object|function, optional)_: TODO.
-- **transform** _(function, optional)_: a callback that receives the node being processed to operate on it.
+- **transform** _(function, optional)_: a callback that receives the node being processed. It should return a block object or an array of block objects.
 - **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is an alternative to using `isMatch`, which, if present, will take precedence.
 - **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
