@@ -3,6 +3,8 @@
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { MenuBottomSheet } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -21,6 +23,13 @@ import Preview from './preview';
 // Used to hide the picker if there's no enough space in the window
 const PICKER_HEIGHT_OFFSET = 150;
 
+function getTemplatesForMenu( templates ) {
+	return templates.map( ( template ) => ( {
+		...template,
+		title: template.name,
+	} ) );
+}
+
 const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
 	visible,
@@ -36,7 +45,9 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
+	const [ bottomPickerVisible, setBottomPickerVisible ] = useState();
 	const contentOpacity = useRef( new Animated.Value( 0 ) ).current;
+	const timerRef = useRef( null );
 
 	useEffect( () => {
 		if ( shouldShowPicker() && visible && ! pickerVisible ) {
@@ -50,6 +61,7 @@ const __experimentalPageTemplatePicker = ( {
 		return () => {
 			Keyboard.removeListener( 'keyboardDidShow', onKeyboardDidShow );
 			Keyboard.removeListener( 'keyboardDidHide', onKeyboardDidHide );
+			clearTimeout( timerRef.current );
 		};
 	}, [ visible ] );
 
@@ -84,6 +96,28 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
+	const onPressMore = () => {
+		setBottomPickerVisible( true );
+	};
+
+	const onCloseBottomPicker = () => {
+		setBottomPickerVisible( false );
+	};
+
+	const onPressTemplate = ( template ) => {
+		onCloseBottomPicker();
+
+		if ( timerRef.current ) {
+			clearTimeout( timerRef.current );
+		}
+
+		// Timer needed since we can't have two modals
+		// opened at the same time
+		timerRef.current = setTimeout( () => {
+			setTemplatePreview( template );
+		}, 350 );
+	};
+
 	const startPickerAnimation = ( isVisible ) => {
 		Animated.timing( contentOpacity, {
 			toValue: isVisible ? 1 : 0,
@@ -103,7 +137,7 @@ const __experimentalPageTemplatePicker = ( {
 	return (
 		<Animated.View style={ [ { opacity: contentOpacity } ] }>
 			<Container>
-				{ templates.map( ( template ) => (
+				{ templates.slice( 0, 4 ).map( ( template ) => (
 					<Button
 						key={ template.key }
 						icon={ template.icon }
@@ -119,7 +153,20 @@ const __experimentalPageTemplatePicker = ( {
 						} }
 					/>
 				) ) }
+				<Button
+					icon="..."
+					isMoreOption={ true }
+					label={ __( 'More' ) }
+					onPress={ onPressMore }
+				/>
 			</Container>
+			<MenuBottomSheet
+				isVisible={ bottomPickerVisible }
+				items={ getTemplatesForMenu( templates ) }
+				onClose={ onCloseBottomPicker }
+				onSelect={ onPressTemplate }
+				title={ __( 'Templates' ) }
+			/>
 			<Preview
 				template={ templatePreview }
 				onDismiss={ () => setTemplatePreview( undefined ) }

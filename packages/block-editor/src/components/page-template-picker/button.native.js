@@ -14,19 +14,32 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const PickerButton = ( { icon, label, onPress } ) => {
-	const butonWrapperStyles = usePreferredColorSchemeStyle(
-		styles.buttonWrapper,
-		styles.buttonWrapperDark
-	);
-	const buttonStyles = usePreferredColorSchemeStyle(
-		styles.button,
-		styles.buttonDark
-	);
+const PickerButton = ( { icon, isMoreOption, label, onPress } ) => {
+	const butonWrapperStyles = [
+		usePreferredColorSchemeStyle(
+			styles.buttonWrapper,
+			styles.buttonWrapperDark
+		),
+		isMoreOption && styles.buttonWrapperMoreOption,
+	];
+
+	const buttonStyles = [
+		usePreferredColorSchemeStyle( styles.button, styles.buttonDark ),
+		isMoreOption && styles.buttonIsMore,
+	];
+
 	const buttonTextStyles = usePreferredColorSchemeStyle(
 		styles.buttonText,
 		styles.buttonTextDark
 	);
+
+	const buttonIconStyles = [
+		usePreferredColorSchemeStyle(
+			styles.buttonIcon,
+			styles.buttonIconDark
+		),
+		isMoreOption && styles.buttonIconIsMore,
+	];
 
 	return (
 		<TouchableOpacity
@@ -37,7 +50,7 @@ const PickerButton = ( { icon, label, onPress } ) => {
 			style={ butonWrapperStyles }
 		>
 			<View style={ buttonStyles }>
-				<Text style={ styles.buttonIcon }>{ icon }</Text>
+				<Text style={ buttonIconStyles }>{ icon }</Text>
 				<Text style={ buttonTextStyles }>{ label }</Text>
 			</View>
 		</TouchableOpacity>

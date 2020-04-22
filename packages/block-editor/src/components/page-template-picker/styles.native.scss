@@ -17,20 +17,46 @@
 	background-color: $black;
 }
 
+.buttonWrapperMoreOption {
+	background-color: transparent;
+	overflow: visible;
+}
+
 .button {
 	background-color: rgba($black, 0.04);
 	padding: 9px 18px 9px 14px;
 	flex-direction: row;
 	align-items: center;
+	border-color: $light-gray-200;
 }
 
 .buttonDark {
 	background-color: rgba($white, 0.08);
+	border-color: #141414;
+}
+
+.buttonIsMore {
+	background-color: transparent;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 20px;
 }
 
 .buttonIcon {
 	margin-right: 6px;
 	font-size: 18px;
+}
+
+.buttonIconDark {
+	color: $light-opacity-700;
+}
+
+.buttonIconIsMore {
+	line-height: 11px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	overflow: hidden;
+	font-weight: 800;
 }
 
 .buttonText {
