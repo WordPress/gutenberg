@@ -174,7 +174,7 @@ class ButtonEdit extends Component {
 	getBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
 		const { style, gradient, customGradient } = attributes;
-		const fallbackBackgroundColor = styles.fallbackButton.backgroundColor;
+		const fallbackBackgroundColor = styles.defaultButton.backgroundColor;
 		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
@@ -195,7 +195,7 @@ class ButtonEdit extends Component {
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
-		const fallbackTextColor = styles.fallbackButton.color;
+		const fallbackTextColor = styles.defaultButton.color;
 		return (
 			( style && style.color && style.color.text ) ||
 			textColor.color ||
@@ -277,7 +277,7 @@ class ButtonEdit extends Component {
 	onSetMaxWidth( width ) {
 		const { maxWidth } = this.state;
 		const { parentWidth } = this.props;
-		const { marginRight: spacing } = styles.button;
+		const { marginRight: spacing } = styles.defaultButton;
 
 		const isParentWidthChanged = maxWidth !== parentWidth;
 		const isWidthChanged = maxWidth !== width;
@@ -412,7 +412,7 @@ class ButtonEdit extends Component {
 			borderRadius: fallbackBorderRadius,
 			paddingTop: spacing,
 			borderWidth,
-		} = styles.button;
+		} = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
 			return null;
