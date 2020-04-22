@@ -132,7 +132,7 @@ export class UnsupportedBlockEdit extends Component {
 					</Text>
 				</View>
 				{ // eslint-disable-next-line no-undef
-				__DEV__ && (
+				( //__DEV__  && ( Temporarely removing dev flag
 					<>
 						<BottomSheet.Cell
 							label={ __( 'Edit post on Web Browser' ) }
