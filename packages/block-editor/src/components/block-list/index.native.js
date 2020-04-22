@@ -103,11 +103,17 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
 		} = this.props;
 
-		const { blockToolbar, blockBorder, headerToolbar } = styles;
+		const {
+			blockToolbar,
+			blockBorder,
+			headerToolbar,
+			floatingToolbar,
+		} = styles;
 
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
@@ -134,7 +140,12 @@ export class BlockList extends Component {
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
 					}
-					inputAccessoryViewHeight={ headerToolbar.height }
+					inputAccessoryViewHeight={
+						headerToolbar.height +
+						( isFloatingToolbarVisible
+							? floatingToolbar.height
+							: 0 )
+					}
 					keyboardShouldPersistTaps="always"
 					scrollViewStyle={ [
 						{ flex: isRootList ? 1 : 0 },
@@ -274,6 +285,7 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
+			getBlockHierarchyRootClientId,
 		} = select( 'core/block-editor' );
 
 		const isStackedHorizontally =
@@ -308,6 +320,14 @@ export default compose( [
 
 		const isReadOnly = getSettings().readOnly;
 
+		const rootBlockId = getBlockHierarchyRootClientId(
+			selectedBlockClientId
+		);
+		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+
+		const isFloatingToolbarVisible =
+			!! selectedBlockClientId && hasRootInnerBlocks;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -317,6 +337,7 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			isFloatingToolbarVisible,
 			isStackedHorizontally,
 		};
 	} ),
