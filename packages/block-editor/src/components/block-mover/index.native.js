@@ -51,7 +51,7 @@ const BlockMover = ( {
 	onMoveUp,
 	firstIndex,
 	rootClientId,
-	horizontalDirection,
+	isStackedHorizontally,
 } ) => {
 	const {
 		backwardButtonIcon,
@@ -60,7 +60,7 @@ const BlockMover = ( {
 		forwardButtonHint,
 		firstBlockTitle,
 		lastBlockTitle,
-	} = horizontalDirection ? horizontalMover : verticalMover;
+	} = isStackedHorizontally ? horizontalMover : verticalMover;
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
@@ -71,7 +71,7 @@ const BlockMover = ( {
 		forwardButtonProp,
 		backwardButtonProp
 	) => {
-		if ( isRTL && horizontalDirection ) {
+		if ( isRTL && isStackedHorizontally ) {
 			// for RTL and horizontal direction switch prop between forward and backward button
 			if ( isBackwardButton ) {
 				return forwardButtonProp; // set forwardButtonProp for backward button
@@ -88,9 +88,10 @@ const BlockMover = ( {
 		const direction = isBackwardButton ? -1 : 1;
 		const toIndex = fromIndex + direction; // position after move
 
-		const { backwardButtonTitle, forwardButtonTitle } = horizontalDirection
-			? horizontalMover
-			: verticalMover;
+		const {
+			backwardButtonTitle,
+			forwardButtonTitle,
+		} = isStackedHorizontally ? horizontalMover : verticalMover;
 
 		const buttonTitle = switchButtonPropIfRTL(
 			isBackwardButton,

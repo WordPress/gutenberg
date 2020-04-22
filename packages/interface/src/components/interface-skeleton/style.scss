@@ -24,7 +24,7 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 
 	// Adjust to admin-bar going small.
-	@include break-medium() {
+	@media (min-width: #{ ($break-medium + 1) }) {
 		top: $admin-bar-height;
 
 		.is-fullscreen-mode & {
@@ -73,6 +73,7 @@ html.interface-interface-skeleton__html-container {
 
 }
 
+.interface-interface-skeleton__left-sidebar,
 .interface-interface-skeleton__sidebar {
 	display: block;
 	width: auto; // Keep the sidebar width flexible.
@@ -88,10 +89,21 @@ html.interface-interface-skeleton__html-container {
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
-		overflow: auto;
-		border-left: $border-width solid $light-gray-500;
 		position: relative !important;
 		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+	}
+}
+
+.interface-interface-skeleton__sidebar {
+	@include break-medium() {
+		overflow: auto;
+		border-left: $border-width solid $light-gray-500;
+	}
+}
+
+.interface-interface-skeleton__left-sidebar {
+	@include break-medium() {
+		border-right: $border-width solid $light-gray-500;
 	}
 }
 

@@ -51,8 +51,12 @@ function InsertPoint( {
 				<Button
 					aria-expanded={ isOpen }
 					onClick={ () => {
-						setAlreadyInsertedPoint( false );
-						onOpenInserter();
+						if ( isOpen ) {
+							onCloseInserter();
+						} else {
+							setAlreadyInsertedPoint( false );
+							onOpenInserter();
+						}
 						onToggle();
 					} }
 					className="components-custom-gradient-picker__insert-point"

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import RangeCell from '../mobile/bottom-sheet/range-cell';
+import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 
 function RangeControl( {
 	className,
@@ -17,12 +18,24 @@ function RangeControl( {
 	initialPosition,
 	min,
 	max,
+	type,
+	separatorType,
 	...props
 } ) {
+	if ( type === 'stepper' ) {
+		return (
+			<StepperCell
+				label={ label }
+				max={ max }
+				min={ min }
+				onChange={ onChange }
+				separatorType={ separatorType }
+				value={ value }
+			/>
+		);
+	}
 	const id = `inspector-range-control-${ instanceId }`;
-
 	const currentInputValue = currentInput === null ? value : currentInput;
-
 	const initialSliderValue = isFinite( currentInputValue )
 		? currentInputValue
 		: initialPosition;
