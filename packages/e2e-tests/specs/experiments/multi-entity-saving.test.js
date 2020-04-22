@@ -173,6 +173,9 @@ describe( 'Multi-entity save flow', () => {
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
 			);
+			expect( console ).toHaveWarnedWith(
+				'useApiFetch is deprecated and will be removed from Gutenberg in version 8.1.0. Please use apiFetch instead.'
+			);
 			expect( enabledButton ).not.toBeNull();
 		} );
 

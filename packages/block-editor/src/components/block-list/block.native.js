@@ -7,14 +7,12 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { ToolbarButton, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,9 +21,6 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
-import FloatingToolbar from './block-mobile-floating-toolbar';
-import Breadcrumbs from './breadcrumb';
-import NavigateUpSVG from './nav-up-icon';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -91,15 +86,11 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			parentId,
 			isDimmed,
 			isTouchable,
 			onDeleteBlock,
 			isStackedHorizontally,
-			hasParent,
 			isParentSelected,
-			onSelect,
-			showFloatingToolbar,
 			getStylesFromColorScheme,
 			marginVertical,
 			marginHorizontal,
@@ -124,21 +115,6 @@ class BlockListBlock extends Component {
 					style={ { flex: 1 } }
 					accessibilityLabel={ accessibilityLabel }
 				>
-					{ showFloatingToolbar && (
-						<FloatingToolbar>
-							{ hasParent && (
-								<Toolbar passedStyle={ styles.toolbar }>
-									<ToolbarButton
-										title={ __( 'Navigate Up' ) }
-										onClick={ () => onSelect( parentId ) }
-										icon={ NavigateUpSVG }
-									/>
-									<View style={ styles.pipe } />
-								</Toolbar>
-							) }
-							<Breadcrumbs clientId={ clientId } />
-						</FloatingToolbar>
-					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -203,7 +179,6 @@ export default compose( [
 			__unstableGetBlockWithoutInnerBlocks,
 			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
 			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
@@ -224,10 +199,6 @@ export default compose( [
 		const parentId = parents[ 0 ] || '';
 
 		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -239,7 +210,6 @@ export default compose( [
 			? parents[ commonAncestorIndex ]
 			: parents[ parents.length - 1 ];
 
-		const hasParent = !! parentId;
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 		const isAncestorSelected =
@@ -277,14 +247,11 @@ export default compose( [
 			isSelected,
 			isInnerBlockSelected,
 			isValid,
-			parentId,
 			isParentSelected,
 			firstToSelectId,
-			hasParent,
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
-			showFloatingToolbar,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
