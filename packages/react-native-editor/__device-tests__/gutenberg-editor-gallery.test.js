@@ -6,13 +6,9 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-} from './helpers/utils';
+import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor Gallery Block tests', () => {
 	let driver;

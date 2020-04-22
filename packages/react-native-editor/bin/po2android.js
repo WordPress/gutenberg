@@ -54,8 +54,10 @@ function escapeResourceXML( unsafeXMLValue ) {
 function androidReplacements( XMLValue ) {
 	return XMLValue.replace( /(-|\.\.\.)/gm, function( character ) {
 		switch ( character ) {
-			case '-': return '–'; // Android lint rule: TypographyDashes.
-			case '...': return '…'; // Android lint rule: TypographyEllipsis
+			case '-':
+				return '–'; // Android lint rule: TypographyDashes.
+			case '...':
+				return '…'; // Android lint rule: TypographyEllipsis
 		}
 	} );
 }
@@ -106,20 +108,28 @@ const getUniqueName = ( function() {
 function po2Android( poInput ) {
 	const po = gettextParser.po.parse( poInput );
 	const translations = po.translations[ '' ];
-	const androidResourcesMap = Object.values( translations ).reduce( ( result, translation ) => {
-		if ( ! translation.msgid ) {
-			return result;
-		}
-		const uniqueName = getUniqueName( translation.msgid );
-		const escapedValue = androidReplacements( escapeResourceXML( translation.msgid ) );
-		const escapedValuePlural = androidReplacements( escapeResourceXML( translation.msgid_plural || '' ) );
-		const comment = translation.comments.extracted || '';
-		let localizedEntry = '';
-		if ( comment ) {
-			localizedEntry += `${ indent }<!-- ${ comment.replace( '--', '—' ) } -->\n`;
-		}
-		if ( translation.msgid_plural ) {
-			localizedEntry += `${ indent }<string-array name="${ uniqueName }" tools:ignore="UnusedResources">
+	const androidResourcesMap = Object.values( translations ).reduce(
+		( result, translation ) => {
+			if ( ! translation.msgid ) {
+				return result;
+			}
+			const uniqueName = getUniqueName( translation.msgid );
+			const escapedValue = androidReplacements(
+				escapeResourceXML( translation.msgid )
+			);
+			const escapedValuePlural = androidReplacements(
+				escapeResourceXML( translation.msgid_plural || '' )
+			);
+			const comment = translation.comments.extracted || '';
+			let localizedEntry = '';
+			if ( comment ) {
+				localizedEntry += `${ indent }<!-- ${ comment.replace(
+					'--',
+					'—'
+				) } -->\n`;
+			}
+			if ( translation.msgid_plural ) {
+				localizedEntry += `${ indent }<string-array name="${ uniqueName }" tools:ignore="UnusedResources">
 ${ indent }${ indent }<item>${ escapedValue }</item>
 ${ indent }${ indent }<item>${ escapedValuePlural }</item>
 ${ indent }</string-array>

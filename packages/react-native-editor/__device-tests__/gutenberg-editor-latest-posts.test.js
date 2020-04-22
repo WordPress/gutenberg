@@ -6,13 +6,9 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-} from './helpers/utils';
+import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor Latest Post Block tests', () => {
 	let driver;
@@ -41,7 +37,9 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 
 	it( 'should be able to add a Latests-Posts block', async () => {
 		await editorPage.addNewLatestPostsBlock();
-		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition( 1 );
+		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition(
+			1
+		);
 
 		expect( latestPostsBlock ).toBeTruthy();
 		await editorPage.removeLatestPostsBlockAtPosition( 1 );
