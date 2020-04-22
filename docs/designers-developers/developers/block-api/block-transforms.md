@@ -275,6 +275,7 @@ A transformation of type `prefix` is an object that takes the following paramete
 - **type** _(string)_: the value `files`.
 - **prefix** _(string)_: the character or sequence of characters that match this transfrom.
 - **transform** _(function)_: a callback that receives the content introduced to operate on it.
+- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from text to block**
 
@@ -337,3 +338,4 @@ A transformation of type `enter` is an object that takes the following parameter
 - **type** _(string)_: the value `enter`.
 - **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
 - **transform** _(function)_: a callback that receives the value to operate on it.
+- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
