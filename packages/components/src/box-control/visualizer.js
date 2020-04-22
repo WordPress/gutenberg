@@ -12,18 +12,16 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { color, rtl } from '../utils/style-mixins';
-import { DEFAULT_VALUES, parseValues } from './utils';
+import { DEFAULT_VALUES } from './utils';
 
 export default function BoxControlVisualizer( {
 	children,
 	values: valuesProp = DEFAULT_VALUES,
 	...props
 } ) {
-	const values = parseValues( valuesProp );
-
 	return (
 		<Container { ...props } aria-hidden="true">
-			<Sides values={ values } />
+			<Sides values={ valuesProp } />
 			{ children }
 		</Container>
 	);
@@ -43,28 +41,28 @@ function Sides( { values } ) {
 }
 
 function Top( { value } ) {
-	const [ height ] = value;
+	const height = value;
 	const animationProps = useSideAnimation( height );
 
 	return <TopView { ...animationProps } style={ { height } } />;
 }
 
 function Right( { value } ) {
-	const [ width ] = value;
+	const width = value;
 	const animationProps = useSideAnimation( width );
 
 	return <RightView { ...animationProps } style={ { width } } />;
 }
 
 function Bottom( { value } ) {
-	const [ height ] = value;
+	const height = value;
 	const animationProps = useSideAnimation( height );
 
 	return <BottomView { ...animationProps } style={ { height } } />;
 }
 
 function Left( { value } ) {
-	const [ width ] = value;
+	const width = value;
 	const animationProps = useSideAnimation( width );
 
 	return <LeftView { ...animationProps } style={ { width } } />;

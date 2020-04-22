@@ -14,33 +14,51 @@ import { forwardRef } from '@wordpress/element';
  */
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import { CSS_UNITS } from './utils';
+import { CSS_UNITS, parseUnit } from './utils';
+import { useValueState } from '../input-control/utils';
 
 function UnitControl(
 	{
 		className,
 		disableUnits = false,
 		isResetValueOnUnitChange = false,
-		isUnitSelectTabbable = true,
+		isUnitSelectTabbable = false,
 		label,
 		onChange = noop,
-		onUnitChange = noop,
 		size = 'default',
 		style,
-		unit = 'px',
 		units = CSS_UNITS,
-		value,
+		value: valueProp,
 		...props
 	},
 	ref
 ) {
-	const handleOnUnitChange = ( unitValue, changeProps ) => {
+	const [ valueState, setValueState ] = useValueState( valueProp );
+	const [ value, unit ] = parseUnit( valueState );
+
+	const handleOnChange = ( next, changeProps ) => {
+		const { event } = changeProps;
+		const [ parsedValue, parsedUnit ] = parseUnit( event.target.value );
+
+		const baseValue = parsedUnit ? parsedValue : next;
+		const baseUnit = parsedUnit || unit;
+
+		const nextValue = `${ baseValue }${ baseUnit }`;
+
+		setValueState( nextValue );
+		onChange( nextValue, changeProps );
+	};
+
+	const handleOnUnitChange = ( next, changeProps ) => {
 		const { data } = changeProps;
-		onUnitChange( unitValue, changeProps );
+
+		let nextValue = `${ value }${ next }`;
 
 		if ( isResetValueOnUnitChange && data.default !== undefined ) {
-			onChange( data.default, changeProps );
+			nextValue = `${ data.default }${ next }`;
 		}
+
+		onChange( nextValue, changeProps );
 	};
 
 	const classes = classnames( 'component-unit-control', className );
@@ -61,13 +79,14 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				{ ...props }
-				disableUnits={ disableUnits }
 				className="component-unit-control__input"
+				disableUnits={ disableUnits }
 				label={ label }
-				value={ value }
-				onChange={ onChange }
+				onChange={ handleOnChange }
 				size={ size }
 				suffix={ inputSuffix }
+				type="text"
+				value={ value }
 			></ValueInput>
 		</Root>
 	);

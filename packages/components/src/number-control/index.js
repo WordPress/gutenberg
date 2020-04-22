@@ -38,7 +38,6 @@ export function NumberControl(
 		max = Infinity,
 		min = -Infinity,
 		onBlur = noop,
-		onBeforeChange = ( value ) => value,
 		onChange = noop,
 		onKeyDown = noop,
 		shiftStep = 10,
@@ -124,14 +123,11 @@ export function NumberControl(
 	};
 
 	const handleOnChange = ( next, changeProps, _forceUpdate = false ) => {
-		const baseNextValue = getValue( next );
-		setValue( baseNextValue );
+		const nextValue = getValue( next );
 
 		if ( ! isPressEnterToChange || _forceUpdate ) {
-			const nextValue = onBeforeChange( baseNextValue, changeProps );
-			if ( nextValue === false ) return;
-
 			onChange( nextValue, changeProps );
+			setValue( nextValue );
 		}
 	};
 
@@ -194,6 +190,7 @@ export function NumberControl(
 
 					handleOnChange( nextValue, { event }, _forceUpdate );
 				}
+
 				break;
 		}
 	};
@@ -215,7 +212,7 @@ export function NumberControl(
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
 			ref={ ref }
-			value={ valueProp }
+			value={ value }
 		/>
 	);
 }

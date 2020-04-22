@@ -8,7 +8,7 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 	const styles = {
 		position: 'absolute',
 		zIndex: 1,
-		maxWidth: 60,
+		maxWidth: 70,
 		...style,
 	};
 

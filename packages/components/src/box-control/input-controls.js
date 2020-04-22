@@ -21,12 +21,7 @@ export default function BoxInputControls( {
 	values,
 	...props
 } ) {
-	const {
-		top: [ top, unit ],
-		right: [ right ],
-		bottom: [ bottom ],
-		left: [ left ],
-	} = values;
+	const { top, right, bottom, left } = values;
 
 	const isRtl = useRtl();
 
@@ -38,16 +33,13 @@ export default function BoxInputControls( {
 		const { altKey } = event;
 		const nextValues = { ...values };
 
-		const nextSide = side === 'all' ? 'top' : side;
-		const nextValue = [ next, values[ nextSide ][ 1 ] ];
-
 		if ( side === 'all' ) {
-			nextValues.top = nextValue;
-			nextValues.bottom = nextValue;
-			nextValues.left = nextValue;
-			nextValues.right = nextValue;
+			nextValues.top = next;
+			nextValues.bottom = next;
+			nextValues.left = next;
+			nextValues.right = next;
 		} else {
-			nextValues[ side ] = nextValue;
+			nextValues[ side ] = next;
 		}
 
 		/**
@@ -57,16 +49,16 @@ export default function BoxInputControls( {
 		if ( altKey ) {
 			switch ( side ) {
 				case 'top':
-					nextValues.bottom = nextValue;
+					nextValues.bottom = next;
 					break;
 				case 'bottom':
-					nextValues.top = nextValue;
+					nextValues.top = next;
 					break;
 				case 'left':
-					nextValues.right = nextValue;
+					nextValues.right = next;
 					break;
 				case 'right':
-					nextValues.left = nextValue;
+					nextValues.left = next;
 					break;
 			}
 		}
@@ -82,7 +74,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ top }
-				unit={ values.top[ 1 ] }
 				dragDirection="s"
 				onChange={ createHandleOnChange( 'top' ) }
 				label={ LABELS.top }
@@ -94,7 +85,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ left }
-				unit={ values.left[ 1 ] }
 				dragDirection="e"
 				onChange={ createHandleOnChange( 'left' ) }
 				label={ LABELS.left }
@@ -108,7 +98,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ allValue }
-				unit={ unit }
 				onChange={ createHandleOnChange( 'all' ) }
 				label={ LABELS.all }
 				style={ {
@@ -120,7 +109,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ right }
-				unit={ values.right[ 1 ] }
 				dragDirection="w"
 				onChange={ createHandleOnChange( 'right' ) }
 				label={ LABELS.right }
@@ -133,7 +121,6 @@ export default function BoxInputControls( {
 			<UnitControl
 				{ ...props }
 				value={ bottom }
-				unit={ values.bottom[ 1 ] }
 				dragDirection="n"
 				onChange={ createHandleOnChange( 'bottom' ) }
 				label={ LABELS.bottom }

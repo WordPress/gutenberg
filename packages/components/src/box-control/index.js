@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import Visualizer from './visualizer';
 import InputControls from './input-controls';
 import Text from '../text';
-import { DEFAULT_VALUES, parseValues } from './utils';
+import { DEFAULT_VALUES } from './utils';
 import { Root, Header, LayoutContainer } from './styles/box-control-styles';
 
 const defaultInputProps = {
@@ -33,10 +33,9 @@ export default function BoxControl( {
 	onChange = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp = DEFAULT_VALUES,
-	// Disable units for now
-	units = false,
+	units,
 } ) {
-	const [ values, setValues ] = useState( parseValues( valuesProp ) );
+	const [ values, setValues ] = useState( valuesProp );
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 

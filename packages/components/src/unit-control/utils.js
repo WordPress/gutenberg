@@ -14,9 +14,10 @@ export function parseUnit( initialValue ) {
 
 	const value = String( initialValue );
 	const num = parseFloat( value, 10 );
+	const unit = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
 
-	output[ 0 ] = num;
-	output[ 1 ] = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ] || '';
+	output[ 0 ] = isNaN( num ) ? '' : num;
+	output[ 1 ] = unit !== 'undefined' ? unit : '';
 
 	return output;
 }
