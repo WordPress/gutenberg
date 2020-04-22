@@ -26,6 +26,7 @@ const ANIMATION_DURATION = 200;
 function ColorPalette( {
 	setColor,
 	activeColor,
+	isGradientColor,
 	defaultSettings,
 	currentSegment,
 	onCustomPress,
@@ -55,7 +56,6 @@ function ColorPalette( {
 	const scrollViewRef = createRef();
 
 	const isGradientSegment = currentSegment === 'Gradient';
-	const isGradient = activeColor?.includes( 'linear-gradient' );
 
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
@@ -69,7 +69,9 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		return ! isGradient && activeColor && ! colors.includes( activeColor );
+		return (
+			! isGradientColor && activeColor && ! colors.includes( activeColor )
+		);
 	}
 
 	function isSelected( color ) {

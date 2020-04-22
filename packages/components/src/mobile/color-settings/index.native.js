@@ -34,17 +34,16 @@ function ColorSettings( {
 	defaultSettings,
 } ) {
 	const segments = [ 'Solid', 'Gradient' ];
+	const isGradientColor = colorValue?.includes( 'linear-gradient' );
+	const selectedSegmentIndex = isGradientColor ? 1 : 0;
+
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
-	const isGradient = colorValue?.includes( 'linear-gradient' );
-	const selectedSegmentIndex = isGradient ? 1 : 0;
-
-	const [ activeSegment, setActiveSegment ] = useState(
+	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
 
-	const currentSegment = onGradientChange ? activeSegment : segments[ 0 ];
-	const isSolidSegment = activeSegment === 'Solid';
+	const isSolidSegment = currentSegment === 'Solid';
 
 	const horizontalSeparatorStyle = getStylesFromColorScheme(
 		styles.horizontalSeparator,
@@ -62,7 +61,7 @@ function ColorSettings( {
 	}, [ isCustomScreen ] );
 
 	useEffect( () => {
-		setActiveSegment( segments[ selectedSegmentIndex ] );
+		setCurrentSegment( segments[ selectedSegmentIndex ] );
 		shouldDisableBottomSheetMaxHeight( true );
 		onCloseBottomSheet( null );
 	}, [] );
@@ -100,7 +99,7 @@ function ColorSettings( {
 			return (
 				<SegmentedControls
 					segments={ segments }
-					segmentHandler={ ( item ) => setActiveSegment( item ) }
+					segmentHandler={ ( item ) => setCurrentSegment( item ) }
 					selectedIndex={ selectedSegmentIndex }
 					addonLeft={
 						currentValue && (
@@ -147,6 +146,7 @@ function ColorSettings( {
 						}
 						setColor={ setColor }
 						activeColor={ currentValue }
+						isGradientColor={ isGradientColor }
 						onNavigationBack={ () => {
 							onCustomScreenToggle( false );
 						} }
@@ -168,6 +168,7 @@ function ColorSettings( {
 					<ColorPalette
 						setColor={ setColor }
 						activeColor={ currentValue }
+						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
 						isCustomScreen={ isCustomScreen }
 						onCustomPress={ () => {

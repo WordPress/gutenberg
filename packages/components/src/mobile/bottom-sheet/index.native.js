@@ -103,7 +103,7 @@ class BottomSheet extends Component {
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
 			isMaxHeightDisabled: true,
-			stack: [],
+			currentScreen: '',
 			extraProps: {},
 		};
 
@@ -172,7 +172,7 @@ class BottomSheet extends Component {
 		const { isVisible } = this.props;
 
 		if ( ! prevProps.isVisible && isVisible ) {
-			this.setState( { stack: [] } );
+			this.setState( { currentScreen: '' } );
 		}
 	}
 
@@ -279,8 +279,6 @@ class BottomSheet extends Component {
 	}
 
 	onReplaceSubsheet( destination, extraProps, callback ) {
-		const { stack } = this.state;
-
 		LayoutAnimation.configureNext(
 			LayoutAnimation.create(
 				ANIMATION_DURATION,
@@ -289,19 +287,12 @@ class BottomSheet extends Component {
 			)
 		);
 
-		const containedInStack = stack.includes( destination );
-		const nextStack = [ ...stack, destination ];
-		const previousStack = stack.slice( 0, -1 );
 		this.setState(
 			{
-				stack: containedInStack ? previousStack : nextStack,
+				currentScreen: destination,
 				extraProps: extraProps || {},
 			},
-			() => {
-				if ( callback ) {
-					callback();
-				}
-			}
+			callback
 		);
 	}
 
@@ -327,7 +318,7 @@ class BottomSheet extends Component {
 			scrollEnabled,
 			isMaxHeightDisabled,
 			extraProps,
-			stack,
+			currentScreen,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -432,8 +423,7 @@ class BottomSheet extends Component {
 									.onHandleHardwareButtonPress,
 								onReplaceSubsheet: this.onReplaceSubsheet,
 								extraProps,
-								currentScreen:
-									stack[ Math.max( stack.length - 1, 0 ) ],
+								currentScreen,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
