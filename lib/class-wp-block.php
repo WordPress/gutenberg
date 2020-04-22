@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess, JsonSerializable, Iterator {
+class WP_Block implements ArrayAccess, JsonSerializable, IteratorAggregate {
 
 	/**
 	 * Name of block.
@@ -262,56 +262,18 @@ class WP_Block implements ArrayAccess, JsonSerializable, Iterator {
 	}
 
 	/*
-	 * Iterator interface methods.
+	 * IteratorAggregate interface methods.
 	 */
 
 	/**
-	 * Rewinds back to the first element of the Iterator.
+	 * Returns an iterator of the block attributes.
 	 *
-	 * @link https://www.php.net/manual/en/iterator.rewind.php
+	 * @link https://www.php.net/manual/en/iteratoraggregate.getiterator.php
+	 *
+	 * @return Traversable Attributes iterator.
 	 */
-	public function rewind() {
-		reset( $this->attributes );
-	}
-
-	/**
-	 * Returns the current element of the attributes array.
-	 *
-	 * @link https://www.php.net/manual/en/iterator.current.php
-	 *
-	 * @return mixed Current element.
-	 */
-	public function current() {
-		return current( $this->attributes );
-	}
-
-	/**
-	 * Returns the key of the current element of the attributes array.
-	 *
-	 * @link https://www.php.net/manual/en/iterator.key.php
-	 *
-	 * @return mixed Key of the current element.
-	 */
-	public function key() {
-		return key( $this->attributes );
-	}
-
-	/**
-	 * Moves the current position of the attributes array to the next element.
-	 *
-	 * @link https://www.php.net/manual/en/iterator.next.php
-	 */
-	public function next() {
-		next( $this->attributes );
-	}
-
-	/**
-	 * Checks if current position is valid.
-	 *
-	 * @link https://www.php.net/manual/en/iterator.valid.php
-	 */
-	public function valid() {
-		return null !== key( $this->attributes );
+	public function getIterator() {
+		return new ArrayIterator( $this->attributes );
 	}
 
 }
