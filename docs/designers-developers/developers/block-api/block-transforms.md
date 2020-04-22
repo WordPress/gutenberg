@@ -114,80 +114,49 @@ transforms: {
 
 {% end %}
 
-### Type `shortcode`
+### Type `enter`
 
-A transformation of type `shortcode` is an object that takes the following parameters:
+A transformation of type `enter` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `shortcode`.
-- **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
-- **attributes** _(object)_: object representing where the block attributes should be sourced from.
-- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **type** _(string)_: the value `enter`.
+- **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
+- **transform** _(function)_: a callback that receives the value to operate on it.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from shortcode to block**
+**Example: from text to block**
 
-An existing shortcode can be transformed into its block counterpart.
+To create a separator block when the user types `-` three times and then enter we can use the following transformation:
 
 {% codetabs %}
+
 {% ES5 %}
 
 ```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'caption',
-            attributes: {
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                align: {
-                    type: 'string',
-                    shortcode: function( attributes ) {
-                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-            isMatch: function( attributes ) {
-                return attributes.named.id === 'my-id';
-            },
-        },
-    ]
-},
+transforms = {
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: function( value ) {
+				return createBlock( 'core/separator' );
+			},
+		},
+	]
+}
 ```
 
 {% ESNext %}
 
 ```js
-transforms: {
-    from: [
-        {
-            type: 'shortcode',
-            tag: 'caption',
-            attributes: {
-                url: {
-                    type: 'string',
-                    source: 'attribute',
-                    attribute: 'src',
-                    selector: 'img',
-                },
-                align: {
-                    type: 'string',
-                    shortcode: ( { named: { align = 'alignnone' } } ) => {
-                        return align.replace( 'align', '' );
-                    },
-                },
-            },
-            isMatch( { named: { id } } ) {
-                return id === 'my-id';
-            },
-        },
-    ]
-},
+transforms = {
+	from: [
+		{
+			type: 'enter',
+			regExp: /^-{3,}$/,
+			transform: () => createBlock( 'core/separator' ),
+		},
+	]
+}
 ```
 
 {% end %}
@@ -331,49 +300,80 @@ A transformation of type `raw` is an object that takes the following parameters:
 - **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-### Type `enter`
+### Type `shortcode`
 
-A transformation of type `enter` is an object that takes the following parameters:
+A transformation of type `shortcode` is an object that takes the following parameters:
 
-- **type** _(string)_: the value `enter`.
-- **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
-- **transform** _(function)_: a callback that receives the value to operate on it.
+- **type** _(string)_: the value `shortcode`.
+- **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
+- **attributes** _(object)_: object representing where the block attributes should be sourced from.
+- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from text to block**
+**Example: from shortcode to block**
 
-To create a separator block when the user types `-` three times and then enter we can use the following transformation:
+An existing shortcode can be transformed into its block counterpart.
 
 {% codetabs %}
-
 {% ES5 %}
 
 ```js
-transforms = {
-	from: [
-		{
-			type: 'enter',
-			regExp: /^-{3,}$/,
-			transform: function( value ) {
-				return createBlock( 'core/separator' );
-			},
-		},
-	]
-}
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'caption',
+            attributes: {
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                align: {
+                    type: 'string',
+                    shortcode: function( attributes ) {
+                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+            isMatch: function( attributes ) {
+                return attributes.named.id === 'my-id';
+            },
+        },
+    ]
+},
 ```
 
 {% ESNext %}
 
 ```js
-transforms = {
-	from: [
-		{
-			type: 'enter',
-			regExp: /^-{3,}$/,
-			transform: () => createBlock( 'core/separator' ),
-		},
-	]
-}
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            tag: 'caption',
+            attributes: {
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                align: {
+                    type: 'string',
+                    shortcode: ( { named: { align = 'alignnone' } } ) => {
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+            isMatch( { named: { id } } ) {
+                return id === 'my-id';
+            },
+        },
+    ]
+},
 ```
 
 {% end %}
