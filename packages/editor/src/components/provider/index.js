@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
+	BlockContextProvider,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
@@ -50,6 +51,10 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
+			maxSize: 1,
+		} );
+
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
 			maxSize: 1,
 		} );
 
@@ -125,6 +130,7 @@ class EditorProvider extends Component {
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
 				'__experimentalDisableCustomLineHeight',
+				'__experimentalBlockPatterns',
 				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
@@ -135,6 +141,10 @@ class EditorProvider extends Component {
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		};
+	}
+
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
 	}
 
 	componentDidMount() {
@@ -184,6 +194,11 @@ class EditorProvider extends Component {
 			isPostTitleSelected
 		);
 
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
+		);
+
 		return (
 			<>
 				<EditorStyles styles={ settings.styles } />
@@ -193,19 +208,21 @@ class EditorProvider extends Component {
 						type={ post.type }
 						id={ post.id }
 					>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ resetEditorBlocksWithoutUndoLevel }
-							onChange={ resetEditorBlocks }
-							selectionStart={ selectionStart }
-							selectionEnd={ selectionEnd }
-							settings={ editorSettings }
-							useSubRegistry={ false }
-						>
-							{ children }
-							<ReusableBlocksButtons />
-							<ConvertToGroupButtons />
-						</BlockEditorProvider>
+						<BlockContextProvider value={ defaultBlockContext }>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockContextProvider>
 					</EntityProvider>
 				</EntityProvider>
 			</>

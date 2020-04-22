@@ -8,10 +8,11 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	searchForBlock,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 const INSERTER_BUTTON_SELECTOR =
-	'.components-popover__content .block-editor-block-types-list__item';
+	'.block-editor-inserter__block-list .block-editor-block-types-list__item';
 const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-types-list__item-icon`;
 const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-icon`;
 const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .block-editor-block-icon';
@@ -89,6 +90,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
+			await openDocumentSettingsSidebar();
 			await selectFirstBlock();
 			validateIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 		} );
@@ -127,6 +129,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders the icon in the inspector with the correct colors', async () => {
 			await insertBlock( blockTitle );
+			await openDocumentSettingsSidebar();
 			await selectFirstBlock();
 			validateDashIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 			expect(
@@ -153,6 +156,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
+			await openDocumentSettingsSidebar();
 			await selectFirstBlock();
 			validateSvgIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 			expect(

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "4.1.0",
+	"version": "5.0.1",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,10 +20,12 @@
 	"files": [
 		"configs",
 		"rules",
+		"utils",
 		"index.js"
 	],
 	"main": "index.js",
 	"dependencies": {
+		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-eslint": "^10.1.0",
 		"eslint-config-prettier": "^6.10.1",
 		"eslint-plugin-jest": "^23.8.2",

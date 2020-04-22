@@ -48,10 +48,11 @@ export default function TemplateSwitcher( {
 	const onHoverTemplatePart = ( id ) => {
 		setHoveredTemplate( { id, type: 'template-part' } );
 	};
-	const { templates, templateParts } = useSelect(
+	const { currentTheme, templates, templateParts } = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( 'core' );
+			const { getCurrentTheme, getEntityRecord } = select( 'core' );
 			return {
+				currentTheme: getCurrentTheme(),
 				templates: ids.map( ( id ) => {
 					const template = getEntityRecord(
 						'postType',
@@ -133,6 +134,9 @@ export default function TemplateSwitcher( {
 								onSelect={ onActiveTemplatePartIdChange }
 								onHover={ onHoverTemplatePart }
 							/>
+						</MenuGroup>
+						<MenuGroup label={ __( 'Current theme' ) }>
+							<MenuItem>{ currentTheme.name }</MenuItem>
 						</MenuGroup>
 						{ !! hoveredTemplate?.id && (
 							<TemplatePreview item={ hoveredTemplate } />

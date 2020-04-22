@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import blockCompleter, { createBlockCompleter } from '../block';
-import '../../../';
+import '../../store';
 
 describe( 'block', () => {
 	let originalFetch;
