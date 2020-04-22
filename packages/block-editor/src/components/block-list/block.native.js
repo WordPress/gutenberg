@@ -62,7 +62,7 @@ class BlockListBlock extends Component {
 					<GlobalStylesContext.Provider
 						value={ {
 							...globalStyle,
-							...( this.props.wrapperProps || {} ).style,
+							...this.props.wrapperProps.style,
 						} }
 					>
 						<BlockEdit
@@ -303,7 +303,7 @@ export default compose( [
 			isDimmed,
 			showFloatingToolbar,
 			wrapperProps: blockType.getEditWrapperProps
-				? blockType.getEditWrapperProps( attributes )
+				? blockType.getEditWrapperProps( attributes ) || {}
 				: {},
 		};
 	} ),
