@@ -39,6 +39,8 @@ import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 const ANIMATION_DURATION = 300;
 
+// Context in BottomSheet is necessary for controlling the
+// transition flow between subsheets and replacing a content inside them
 export const { Provider: BottomSheetProvider, Consumer } = createContext( {
 	isBottomSheetScrolling: false,
 	shouldEnableBottomSheetScroll: () => {},

@@ -11,17 +11,16 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 export default function BottomSheetColorCell( props ) {
-	const { onPress, color, ...cellProps } = props;
+	const { color, ...cellProps } = props;
 
 	return (
 		<Cell
 			{ ...cellProps }
 			accessibilityRole={ 'none' }
 			accessibilityHint={
-				/* translators: accessibility text (hint for switches) */
+				/* translators: accessibility text (hint for moving to color settings) */
 				__( 'Double tap to go to color settings' )
 			}
-			onPress={ onPress }
 			editable={ false }
 			value={ ! color && 'Default' }
 		>

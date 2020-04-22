@@ -62,15 +62,13 @@ function ColorPalette( {
 
 	const defaultColors = map( extendedDefaultColors, 'color' );
 	const defaultGradientColors = map( defaultSettings.gradients, 'gradient' );
+	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
 	useEffect( () => {
 		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const colors = isGradientSegment
-			? defaultGradientColors
-			: defaultColors;
 		return ! isGradient && activeColor && ! colors.includes( activeColor );
 	}
 
@@ -106,10 +104,7 @@ function ColorPalette( {
 		setColor( color );
 	}
 
-	function Palette( { isGradientPalette, withCustomPicker } ) {
-		const palette = isGradientPalette
-			? defaultGradientColors
-			: defaultColors;
+	function Palette() {
 		const verticalSeparatorStyle = getStylesFromColorScheme(
 			styles.verticalSeparator,
 			styles.verticalSeparatorDark
@@ -117,7 +112,7 @@ function ColorPalette( {
 
 		return (
 			<>
-				{ palette.map( ( color ) => {
+				{ colors.map( ( color ) => {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
@@ -145,13 +140,13 @@ function ColorPalette( {
 						</TouchableWithoutFeedback>
 					);
 				} ) }
-				{ withCustomPicker && (
+				{ ! isGradientSegment && (
 					<>
 						<View style={ verticalSeparatorStyle } />
 						<TouchableWithoutFeedback onPress={ onCustomPress }>
 							<View>
 								<ColorIndicator
-									withCustomPicker
+									withCustomPicker={ ! isGradientSegment }
 									color={ customSwatchGradients }
 									isSelected={ isSelectedCustom() }
 									style={ styles.colorIndicator }
@@ -177,11 +172,7 @@ function ColorPalette( {
 			ref={ scrollViewRef }
 		>
 			<TouchableWithoutFeedback>
-				<Palette
-					withCustomPicker={ ! isGradientSegment }
-					onCustomPress={ onCustomPress }
-					isGradientPalette={ isGradientSegment }
-				/>
+				<Palette />
 			</TouchableWithoutFeedback>
 		</ScrollView>
 	);
