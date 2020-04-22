@@ -173,6 +173,7 @@ describe( 'Multi-entity save flow', () => {
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
 			);
+
 			expect( enabledButton ).not.toBeNull();
 		} );
 

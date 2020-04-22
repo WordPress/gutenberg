@@ -72,6 +72,7 @@ class PostTitle extends Component {
 		const { isSelected } = this.state;
 
 		// The wp-block className is important for editor styles.
+		// This same block is used in both the visual and the code editor.
 		const className = classnames(
 			'wp-block editor-post-title editor-post-title__block',
 			{

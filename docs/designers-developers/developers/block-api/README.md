@@ -2,10 +2,12 @@
 
 Blocks are the fundamental element of the editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor.
 
-## Registering a block
+The following sections will walk you through the existing block APIs:
 
-All blocks must be registered before they can be used in the editor. You can learn about block registration, and the available options, in the [block registration](/docs/designers-developers/developers/block-api/block-registration.md) documentation.
-
-## Block `edit` and `save`
-
-The `edit` function defines the components for the block in the editor interface the user interacts with. The `save` function defines the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](/docs/designers-developers/developers/block-api/block-edit-save.md).
+- [Block registration](/docs/designers-developers/developers/block-api/block-registration.md).
+- [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md)
+- [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md)
+- [Deprecated blocks](/docs/designers-developers/developers/block-api/block-deprecation.md)
+- [Templates](/docs/designers-developers/developers/block-api/block-templates.md)
+- [Annotations](/docs/designers-developers/developers/block-api/block-annotations.md)
+- [Patterns (experimental)](/docs/designers-developers/developers/block-api/block-patterns.md)
