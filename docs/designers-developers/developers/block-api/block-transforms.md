@@ -332,4 +332,8 @@ A transformation of type `raw` is an object that takes the following parameters:
 
 ### Type `enter`
 
-TODO
+A transformation of type `enter` is an object that takes the following parameters:
+
+- **type** _(string)_: the value `enter`.
+- **regExp** _(RegExp)_: the Regular Expression to use as a matcher. If the value matches, the transformation will be applied.
+- **transform** _(function)_: a callback that receives the value to operate on it.
