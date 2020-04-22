@@ -19,8 +19,8 @@ import styles from './style.scss';
 
 function ColorPicker( {
 	shouldEnableBottomSheetScroll,
-	shouldSetBottomSheetMaxHeight,
-	isBottomSheetScrolling,
+	shouldDisableBottomSheetMaxHeight,
+	isBottomSheetContentScrolling,
 	setColor,
 	activeColor,
 	onNavigationBack,
@@ -82,7 +82,7 @@ function ColorPicker( {
 			setHSVFromHex( activeColor );
 		}
 		setColor( activeColor );
-		shouldSetBottomSheetMaxHeight( false );
+		shouldDisableBottomSheetMaxHeight( false );
 		onCloseBottomSheet( () => setColor( savedColor ) );
 	}, [] );
 
@@ -98,7 +98,7 @@ function ColorPicker( {
 	function onButtonPress( action ) {
 		onNavigationBack();
 		onCloseBottomSheet( null );
-		shouldSetBottomSheetMaxHeight( true );
+		shouldDisableBottomSheetMaxHeight( true );
 		setColor( action === 'apply' ? currentColor : savedColor );
 	}
 
@@ -108,14 +108,14 @@ function ColorPicker( {
 				huePickerHue={ hue }
 				onHuePickerDragMove={ onHuePickerChange }
 				onHuePickerPress={
-					! isBottomSheetScrolling && onHuePickerChange
+					! isBottomSheetContentScrolling && onHuePickerChange
 				}
 				satValPickerHue={ hue }
 				satValPickerSaturation={ sat }
 				satValPickerValue={ val }
 				onSatValPickerDragMove={ onSatValPickerChange }
 				onSatValPickerPress={
-					! isBottomSheetScrolling && onSatValPickerChange
+					! isBottomSheetContentScrolling && onSatValPickerChange
 				}
 				onSatValPickerDragStart={ () => {
 					shouldEnableBottomSheetScroll( false );

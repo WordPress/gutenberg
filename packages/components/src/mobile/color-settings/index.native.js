@@ -26,8 +26,8 @@ function ColorSettings( {
 	colorValue,
 	onReplaceSubsheet,
 	shouldEnableBottomSheetScroll,
-	shouldSetBottomSheetMaxHeight,
-	isBottomSheetScrolling,
+	shouldDisableBottomSheetMaxHeight,
+	isBottomSheetContentScrolling,
 	onCloseBottomSheet,
 	onHardwareButtonPress,
 	getStylesFromColorScheme,
@@ -63,13 +63,13 @@ function ColorSettings( {
 
 	useEffect( () => {
 		setActiveSegment( segments[ selectedSegmentIndex ] );
-		shouldSetBottomSheetMaxHeight( true );
+		shouldDisableBottomSheetMaxHeight( true );
 		onCloseBottomSheet( null );
 	}, [] );
 
 	function afterHardwareButtonPress() {
 		onHardwareButtonPress( null );
-		shouldSetBottomSheetMaxHeight( true );
+		shouldDisableBottomSheetMaxHeight( true );
 	}
 
 	function onCustomScreenToggle( shouldShow ) {
@@ -142,8 +142,8 @@ function ColorSettings( {
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
-						shouldSetBottomSheetMaxHeight={
-							shouldSetBottomSheetMaxHeight
+						shouldDisableBottomSheetMaxHeight={
+							shouldDisableBottomSheetMaxHeight
 						}
 						setColor={ setColor }
 						activeColor={ currentValue }
@@ -151,7 +151,9 @@ function ColorSettings( {
 							onCustomScreenToggle( false );
 						} }
 						onCloseBottomSheet={ onCloseBottomSheet }
-						isBottomSheetScrolling={ isBottomSheetScrolling }
+						isBottomSheetContentScrolling={
+							isBottomSheetContentScrolling
+						}
 					/>
 				</View>
 			) }

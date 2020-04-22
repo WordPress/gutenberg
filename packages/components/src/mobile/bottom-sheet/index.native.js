@@ -42,13 +42,23 @@ const ANIMATION_DURATION = 300;
 // Context in BottomSheet is necessary for controlling the
 // transition flow between subsheets and replacing a content inside them
 export const { Provider: BottomSheetProvider, Consumer } = createContext( {
-	isBottomSheetScrolling: false,
+	// Specifies whether content is currently scrolling
+	isBottomSheetContentScrolling: false,
+	// Function called to enable scroll within bottom sheet
 	shouldEnableBottomSheetScroll: () => {},
-	shouldSetBottomSheetMaxHeight: () => {},
+	// Function called to disable bottom sheet max height.
+	// E.g. used to extend bottom sheet on full screen in ColorPicker,
+	// which is helpful on small devices with set the largest font/display size.
+	shouldDisableBottomSheetMaxHeight: () => {},
+	// Callback that is called on closing bottom sheet
 	onCloseBottomSheet: () => {},
+	// Android only: Function called to control android hardware back button functionality
 	onHardwareButtonPress: () => {},
+	// Function called to navigate to another subsheet
 	onReplaceSubsheet: () => {},
+	// Object contains extra data passed to the current subsheet
 	extraProps: {},
+	// Specifies the currently active subsheet name
 	currentScreen: undefined,
 } );
 
@@ -67,7 +77,9 @@ class BottomSheet extends Component {
 		this.onScroll = this.onScroll.bind( this );
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
-		this.onShouldSetMaxHeight = this.onShouldSetMaxHeight.bind( this );
+		this.onShouldDisableBottomSheetMaxHeight = this.onShouldDisableBottomSheetMaxHeight.bind(
+			this
+		);
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -90,7 +102,7 @@ class BottomSheet extends Component {
 			isScrolling: false,
 			onCloseBottomSheet: null,
 			onHardwareButtonPress: null,
-			setMaxHeight: true,
+			isMaxHeightDisabled: true,
 			stack: [],
 			extraProps: {},
 		};
@@ -232,8 +244,8 @@ class BottomSheet extends Component {
 		this.setState( { scrollEnabled: value } );
 	}
 
-	onShouldSetMaxHeight( value ) {
-		this.setState( { setMaxHeight: value } );
+	onShouldDisableBottomSheetMaxHeight( value ) {
+		this.setState( { isMaxHeightDisabled: value } );
 	}
 
 	isScrolling( value ) {
@@ -313,7 +325,7 @@ class BottomSheet extends Component {
 			safeAreaBottomInset,
 			isScrolling,
 			scrollEnabled,
-			setMaxHeight,
+			isMaxHeightDisabled,
 			extraProps,
 			stack,
 		} = this.state;
@@ -398,7 +410,7 @@ class BottomSheet extends Component {
 						onScrollBeginDrag={ () => this.isScrolling( true ) }
 						onScrollEndDrag={ () => this.isScrolling( false ) }
 						scrollEventThrottle={ 16 }
-						style={ setMaxHeight ? { maxHeight } : {} }
+						style={ isMaxHeightDisabled ? { maxHeight } : {} }
 						contentContainerStyle={ [
 							styles.content,
 							hideHeader && styles.emptyHeader,
@@ -411,9 +423,9 @@ class BottomSheet extends Component {
 							value={ {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
-								shouldSetBottomSheetMaxHeight: this
-									.onShouldSetMaxHeight,
-								isBottomSheetScrolling: isScrolling,
+								shouldDisableBottomSheetMaxHeight: this
+									.onShouldDisableBottomSheetMaxHeight,
+								isBottomSheetContentScrolling: isScrolling,
 								onCloseBottomSheet: this
 									.onHandleClosingBottomSheet,
 								onHardwareButtonPress: this
