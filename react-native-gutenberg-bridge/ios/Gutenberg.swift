@@ -130,7 +130,7 @@ public class Gutenberg: NSObject {
         return !(url?.isFileURL ?? true)
     }
 
-    public func updateTheme(_ colors:[[String:String]]?) {
+    public func updateTheme(_ colors:[[String:AnyHashable]]?) {
         guard let colors = colors else { return }
         bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body: colors)
     }
