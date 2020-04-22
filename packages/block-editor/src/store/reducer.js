@@ -1092,7 +1092,11 @@ function selection( state = {}, action ) {
 				return state;
 			}
 
-			return { clientId: blockToSelect.clientId, initialPosition: -1 };
+			const newState = { clientId: blockToSelect.clientId };
+			if ( typeof action.initialPosition === "number" ) {
+				newState.initialPosition = action.initialPosition;
+			}
+			return newState;
 		}
 	}
 
@@ -1189,9 +1193,9 @@ export function isSelectionEnabled( state = true, action ) {
 /**
  * Reducer returning the intial block selection.
  *
- * Currently this in only used to restore the selection after block deletion.
- * This reducer should eventually be removed in favour of setting selection
- * directly.
+ * Currently this in only used to restore the selection after block deletion and
+ * pasting new content.This reducer should eventually be removed in favour of setting
+ * selection directly.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
