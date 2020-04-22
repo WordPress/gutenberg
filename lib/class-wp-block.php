@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess {
+class WP_Block implements ArrayAccess, JsonSerializable {
 
 	/**
 	 * Name of block.
@@ -177,6 +177,10 @@ class WP_Block implements ArrayAccess {
 		return $block_content;
 	}
 
+	/*
+	 * ArrayAccess interface methods.
+	 */
+
 	/**
 	 * Returns true if an attribute exists by the specified attribute name, or
 	 * false otherwise.
@@ -239,6 +243,22 @@ class WP_Block implements ArrayAccess {
 	 */
 	public function offsetUnset( $attribute_name ) {
 		unset( $this->attributes[ $attribute_name ] );
+	}
+
+	/*
+	 * JsonSerializable interface methods.
+	 */
+
+	/**
+	 * Serializes the object to an array of attributes that can be serialized
+	 * natively by json_encode().
+	 *
+	 * @link https://www.php.net/manual/en/jsonserializable.jsonserialize.php
+	 *
+	 * @return array Array data which can be serialized by json_encode().
+	 */
+	public function jsonSerialize() {
+		return $this->attributes;
 	}
 
 }

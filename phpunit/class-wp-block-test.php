@@ -367,4 +367,26 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'invalid, but still supported', $block[0] );
 	}
 
+	function test_block_json_serializable_as_attributes_array() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'value' => array(
+						'type'    => 'string',
+						'default' => 'ok',
+					),
+				),
+			)
+		);
+
+		$parsed_block = array( 'blockName' => 'core/example' );
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$result = json_encode( $block );
+
+		$this->assertEquals( '{"value":"ok"}', $result );
+	}
+
 }
