@@ -251,7 +251,7 @@ transforms: {
 
 ### Type `prefix`
 
-A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the Paragraph block with a given pattern and a trailing space.
+This type of transformations are applied when, in a blank line, the user types some text and then adds a trailing space.
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
@@ -260,9 +260,9 @@ A transformation of type `prefix` is an object that takes the following paramete
 - **transform** _(function)_: a callback that receives the content introduced. It should return a block object or an array of block objects.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from text to block**
+**Example: from text to custom block**
 
-We want to create a block the user types the question mark.
+If we want to create a custom block when the user types the question mark, we could use this code:
 
 {% codetabs %}
 {% ES5 %}
