@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess, JsonSerializable, IteratorAggregate {
+class WP_Block implements ArrayAccess, JsonSerializable, Serializable, IteratorAggregate {
 
 	/**
 	 * Name of block.
@@ -243,6 +243,33 @@ class WP_Block implements ArrayAccess, JsonSerializable, IteratorAggregate {
 	 */
 	public function offsetUnset( $attribute_name ) {
 		unset( $this->attributes[ $attribute_name ] );
+	}
+
+	/*
+	 * Serializable interface methods.
+	 */
+
+	/**
+	 * Returns the string representation of the block attributes.
+	 *
+	 * @link https://www.php.net/manual/en/serializable.serialize.php
+	 *
+	 * @return string String representation of the block attributes.
+	 */
+	public function serialize() {
+		return serialize( $this->attributes );
+	}
+
+	/**
+	 * Constructs the object from a serialized representation of block
+	 * attributes.
+	 *
+	 * @link https://www.php.net/manual/en/serializable.unserialize.php
+	 *
+	 * @param string The string representation of the block attributes.
+	 */
+	public function unserialize( $serialized ) {
+		$this->attributes = unserialize( $serialized );
 	}
 
 	/*
