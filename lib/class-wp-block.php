@@ -30,7 +30,7 @@ function gutenberg_block_type_render_callback_receives_block( $block_type ) {
 	}
 
 	$first_param_class = $params[0]->getClass();
-	return $first_param_class && $first_param_class->name === WP_Block::class;
+	return $first_param_class && WP_Block::class === $first_param_class->name;
 }
 
 /**
