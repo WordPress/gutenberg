@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, isValuesMixed } from './utils';
+import { LABELS, getAllValue } from './utils';
 import {
 	Layout,
 	LayoutBox,
@@ -24,9 +24,7 @@ export default function BoxInputControls( {
 	const { top, right, bottom, left } = values;
 
 	const isRtl = useRtl();
-	const isMixed = isValuesMixed( values );
-
-	const allValue = isMixed ? '' : top;
+	const allValue = getAllValue( values );
 
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;

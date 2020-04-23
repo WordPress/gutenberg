@@ -75,11 +75,11 @@ function UnitControl(
 		onUnitChange( next, changeProps );
 	};
 
-	const classes = classnames( 'component-unit-control', className );
+	const classes = classnames( 'components-unit-control', className );
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
-			className="component-unit-control__select"
+			className="components-unit-control__select"
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }
 			onChange={ handleOnUnitChange }
@@ -89,7 +89,7 @@ function UnitControl(
 	) : null;
 
 	return (
-		<Root className="component-unit-control-wrapper" style={ style }>
+		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
 				aria-label={ label }
 				{ ...props }

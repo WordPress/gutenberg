@@ -220,7 +220,7 @@ export function NumberControl(
 		}
 	};
 
-	const classes = classNames( 'component-number-control', className );
+	const classes = classNames( 'components-number-control', className );
 
 	return (
 		<Input
@@ -232,6 +232,7 @@ export function NumberControl(
 			dragCursor={ dragCursor }
 			hideHTMLArrows={ hideHTMLArrows }
 			isDragging={ isDragging }
+			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }

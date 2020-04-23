@@ -27,11 +27,12 @@ afterEach( () => {
 	container = null;
 } );
 
-const getComponent = () => container.querySelector( '.component-unit-control' );
+const getComponent = () =>
+	container.querySelector( '.components-unit-control' );
 const getInput = () =>
-	container.querySelector( '.component-unit-control input' );
+	container.querySelector( '.components-unit-control input' );
 const getSelect = () =>
-	container.querySelector( '.component-unit-control select' );
+	container.querySelector( '.components-unit-control select' );
 
 describe( 'UnitControl', () => {
 	describe( 'Basic rendering', () => {

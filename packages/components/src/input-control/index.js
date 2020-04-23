@@ -55,7 +55,7 @@ export function InputControl(
 	const [ value, setValue ] = useValueState( valueProp );
 
 	const id = useUniqueId( idProp );
-	const classes = classNames( 'component-input-control', className );
+	const classes = classNames( 'components-input-control', className );
 
 	const handleOnBlur = ( event ) => {
 		onBlur( event );
@@ -84,7 +84,7 @@ export function InputControl(
 			{ label && (
 				<Label
 					as="label"
-					className="component-input-control__label"
+					className="components-input-control__label"
 					hideLabelFromVision={ hideLabelFromVision }
 					htmlFor={ id }
 					isFilled={ isFilled }
@@ -96,12 +96,12 @@ export function InputControl(
 				</Label>
 			) }
 			<Container
-				className="component-input-control__container"
+				className="components-input-control__container"
 				isFocused={ isFocused }
 			>
 				<Input
 					{ ...props }
-					className="component-input-control__input"
+					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
 					isFilled={ isFilled }
@@ -115,24 +115,24 @@ export function InputControl(
 					value={ value }
 				/>
 				{ suffix && (
-					<Suffix className="component-input-control__suffix">
+					<Suffix className="components-input-control__suffix">
 						{ suffix }
 					</Suffix>
 				) }
 				<Fieldset
 					aria-hidden="true"
-					className="component-input-control__fieldset"
+					className="components-input-control__fieldset"
 					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 				>
 					{ isFloatingLabelSet && (
 						<Legend
 							aria-hidden="true"
-							className="component-input-control__fieldset-label"
+							className="components-input-control__fieldset-label"
 							isFloating={ isFloating }
 							size={ size }
 						>
-							<LegendText className="component-input-control__fieldset-text">
+							<LegendText className="components-input-control__fieldset-text">
 								{ label }
 							</LegendText>
 						</Legend>

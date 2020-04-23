@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { parseUnit } from '../unit-control/utils';
+
 export const LABELS = {
 	all: __( 'All' ),
 	top: __( 'Top' ),
@@ -40,4 +45,25 @@ export function getValues( values, ...args ) {
 	}
 
 	return nextValues;
+}
+
+export function getAllValue( values = {} ) {
+	const parsedValues = Object.keys( values ).reduce( ( acc, key ) => {
+		const value = values[ key ];
+		return [ ...acc, parseUnit( value ) ];
+	}, [] );
+
+	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
+	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
+
+	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
+		? allValues[ 0 ]
+		: '';
+	const unit = allUnits.every( ( v ) => v === allUnits[ 0 ] )
+		? allUnits[ 0 ]
+		: '';
+
+	const allValue = `${ value }${ unit }`;
+
+	return allValue;
 }

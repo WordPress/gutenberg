@@ -34,7 +34,7 @@ export default function UnitSelectControl( {
 		onChange( unitValue, { event, data } );
 	};
 
-	const classes = classnames( 'component-unit-control__select', className );
+	const classes = classnames( 'components-unit-control__select', className );
 
 	return (
 		<UnitSelect
