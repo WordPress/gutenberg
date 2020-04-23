@@ -24,10 +24,8 @@ branches:
 
 env:
   global:
-    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - WP_DEVELOP_DIR: ./wordpress
     - LOCAL_SCRIPT_DEBUG: false
-    - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
 
 # Make sure NodeGit gets the correct C libs.
@@ -88,10 +86,6 @@ install:
       # Connect Gutenberg to WordPress.
       npm run env connect
       npm run env cli plugin activate gutenberg
-    fi
-  - |
-    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      npm run env docker-run -- php composer install --no-interaction
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
@@ -159,59 +153,58 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
+      env: LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (2/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (3/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (4/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (1/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (2/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (3/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (4/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )

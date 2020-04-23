@@ -8,10 +8,10 @@ import {
 	getAllBlockInserterItemTitles,
 	getEditedPostContent,
 	insertBlock,
-	openAllBlockInserterCategories,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-const INSERTER_RESULTS_SELECTOR = '.block-editor-inserter__results';
+const INSERTER_RESULTS_SELECTOR = '.block-editor-inserter__block-list';
 const QUOTE_INSERT_BUTTON_SELECTOR = '//button[.="Quote"]';
 const APPENDER_SELECTOR = '.my-custom-awesome-appender';
 const DYNAMIC_APPENDER_SELECTOR = 'my-dynamic-blocks-appender';
@@ -32,6 +32,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 	it( 'Users can customize the appender and can still insert blocks using exposed components', async () => {
 		// Insert the InnerBlocks renderAppender block.
 		await insertBlock( 'InnerBlocks renderAppender' );
+		await closeGlobalBlockInserter();
 		// Wait for the custom block appender to appear.
 		await page.waitForSelector( APPENDER_SELECTOR );
 		// Verify if the custom block appender text is the expected one.
@@ -46,8 +47,6 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		await page.click(
 			`${ APPENDER_SELECTOR } .block-editor-button-block-appender`
 		);
-		await openAllBlockInserterCategories();
-
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [
 			'Quote',
@@ -69,6 +68,7 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 	it( 'Users can dynamically customize the appender', async () => {
 		// Insert the InnerBlocks renderAppender dynamic block.
 		await insertBlock( 'InnerBlocks renderAppender dynamic' );
+		await closeGlobalBlockInserter();
 
 		// Wait for the custom dynamic block appender to appear.
 		await page.waitForSelector( '.' + DYNAMIC_APPENDER_SELECTOR );
@@ -81,7 +81,6 @@ describe( 'RenderAppender prop of InnerBlocks ', () => {
 		// Open the inserter of our custom block appender and expand all the categories.
 		const blockAppenderButtonSelector = `.${ DYNAMIC_APPENDER_SELECTOR } .block-editor-button-block-appender`;
 		await page.click( blockAppenderButtonSelector );
-		await openAllBlockInserterCategories();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
 		expect( await getAllBlockInserterItemTitles() ).toEqual( [

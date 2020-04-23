@@ -151,13 +151,13 @@
 	#{$selector} { /* Set left position when auto-fold is not on the body element. */
 		left: 0;
 
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width;
 		}
 	}
 
 	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto collapses. */
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width-collapsed;
 		}
 
@@ -170,13 +170,13 @@
 	.folded #{$selector} {
 		left: 0;
 
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width-collapsed;
 		}
 	}
 
 	/* Mobile menu opened. */
-	@media (max-width: #{ ($break-medium) }) {
+	@media (max-width: #{ ($break-medium + 1) }) {
 		.auto-fold .wp-responsive-open #{$selector} {
 			left: $admin-sidebar-width-big;
 		}
