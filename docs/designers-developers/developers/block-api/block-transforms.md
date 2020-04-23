@@ -31,7 +31,7 @@ This section goes through the existing types of transformations blocks support:
 
 ### Block
 
-This transformation allows a block to be converted _from_ and _to_ a different block. It has a corresponding UI control within the block toolbar.
+This type of transformations support both _from_ and _to_ directions, allowing blocks to be converted into a different one. It has a corresponding UI control within the block toolbar.
 
 A transformation of type `block` is an object that takes the following parameters:
 
@@ -133,7 +133,7 @@ transforms: {
 
 ### Enter
 
-The transformations of this type allow to create a block _from_ some content introduced by the user. They're applied in a new block line, after the user has introduced some content and then hit the ENTER key.
+This type of transformations support the _from_ direction, allowing blocks to be created from some content introduced by the user. They're applied in a new block line after the user has introduced some content and hit the ENTER key.
 
 A transformation of type `enter` is an object that takes the following parameters:
 
@@ -182,7 +182,7 @@ transforms = {
 
 ### Files
 
-This type of transformations allow to create blocks _from_ files dropped into the editor.
+This type of transformations support the _from_ direction, allowing blocks to be created from files dropped into the editor.
 
 A transformation of type `files` is an object that takes the following parameters:
 
@@ -258,7 +258,7 @@ transforms: {
 
 ### Prefix
 
-The prefix transformation allows to create a block _from_ some text typed by the user. They're applied when, in a new block line, the user types some text and then adds a trailing space.
+This type of transformations support the _from_ direction, allowing blocks to be created from some text typed by the user. They're applied when, in a new block line, the user types some text and then adds a trailing space.
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
@@ -312,6 +312,8 @@ transforms: {
 
 ### Raw
 
+This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action frow within the block setting UI menu, as well as when some content is pasted into the editor.
+
 A transformation of type `raw` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `raw`.
@@ -322,6 +324,8 @@ A transformation of type `raw` is an object that takes the following parameters:
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 ### Shortcode
+
+This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes.
 
 A transformation of type `shortcode` is an object that takes the following parameters:
 
