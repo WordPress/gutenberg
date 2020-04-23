@@ -8,13 +8,13 @@ A block declares which transformations it supports via the optional `transforms`
 
 ```js
 export const settings = {
-	title: 'My Block Title',
-	description: 'My block description',
-	/* ... */
-	transforms: {
-		from: [ /* supported from transforms */ ],
-		to: [ /* supported to transforms */ ],
-	}
+    title: 'My Block Title',
+    description: 'My block description',
+    /* ... */
+    transforms: {
+        from: [ /* supported from transforms */ ],
+        to: [ /* supported to transforms */ ],
+    }
 }
 ```
 
@@ -119,10 +119,10 @@ transforms: {
             blocks: [ 'some/block-with-innerblocks' ],
             transform: ( attributes, innerBlocks ) => {
                 return createBlock(
-					'some/other-block-with-innerblocks',
-					attributes,
-					innerBlocks
-				);
+                    'some/other-block-with-innerblocks',
+                    attributes,
+                    innerBlocks
+                );
             },
         },
     ],
@@ -152,15 +152,15 @@ To create a separator block when the user types the hypen three times and then h
 
 ```js
 transforms = {
-	from: [
-		{
-			type: 'enter',
-			regExp: /^-{3,}$/,
-			transform: function( value ) {
-				return createBlock( 'core/separator' );
-			},
-		},
-	]
+    from: [
+        {
+            type: 'enter',
+            regExp: /^-{3,}$/,
+            transform: function( value ) {
+                return createBlock( 'core/separator' );
+            },
+        },
+    ]
 }
 ```
 
@@ -168,13 +168,13 @@ transforms = {
 
 ```js
 transforms = {
-	from: [
-		{
-			type: 'enter',
-			regExp: /^-{3,}$/,
-			transform: () => createBlock( 'core/separator' ),
-		},
-	]
+    from: [
+        {
+            type: 'enter',
+            regExp: /^-{3,}$/,
+            transform: () => createBlock( 'core/separator' ),
+        },
+    ]
 }
 ```
 
@@ -200,29 +200,28 @@ To create a File block when the user drops a file into the editor we can use the
 
 ```js
 transforms: {
-	from: [
-		{
-			type: 'files',
-			isMatch: function( files ) {
-				return files.length === 1;
-			},
-			// By defining a lower priority than the default of 10,
-			// we make that the File block to be created as a fallback,
-			// if no other transform is found.
-			priority: 15,
-			transform: function( files ) {
-				var file = files[ 0 ];
-				var blobURL = createBlobURL( file );
-
-				// File will be uploaded in componentDidMount()
-				return createBlock( 'core/file', {
-					href: blobURL,
-					fileName: file.name,
-					textLinkHref: blobURL,
-				} );
-			},
-		},
-	];
+    from: [
+        {
+            type: 'files',
+            isMatch: function( files ) {
+                return files.length === 1;
+            },
+            // By defining a lower priority than the default of 10,
+            // we make that the File block to be created as a fallback,
+            // if no other transform is found.
+            priority: 15,
+            transform: function( files ) {
+                var file = files[ 0 ];
+                var blobURL = createBlobURL( file );
+                // File will be uploaded in componentDidMount()
+                return createBlock( 'core/file', {
+                    href: blobURL,
+                    fileName: file.name,
+                    textLinkHref: blobURL,
+                } );
+            },
+        },
+    ];
 }
 ```
 
@@ -230,27 +229,26 @@ transforms: {
 
 ```js
 transforms: {
-	from: [
-		{
-			type: 'files',
-			isMatch: ( files ) => files.length === 1,
-			// By defining a lower priority than the default of 10,
-			// we make that the File block to be created as a fallback,
-			// if no other transform is found.
-			priority: 15,
-			transform: ( files ) => {
-				const file = files[ 0 ];
-				const blobURL = createBlobURL( file );
-
-				// File will be uploaded in componentDidMount()
-				return createBlock( 'core/file', {
-					href: blobURL,
-					fileName: file.name,
-					textLinkHref: blobURL,
-				} );
-			},
-		},
-	];
+    from: [
+        {
+            type: 'files',
+            isMatch: ( files ) => files.length === 1,
+            // By defining a lower priority than the default of 10,
+            // we make that the File block to be created as a fallback,
+            // if no other transform is found.
+            priority: 15,
+            transform: ( files ) => {
+                const file = files[ 0 ];
+                const blobURL = createBlobURL( file );
+                // File will be uploaded in componentDidMount()
+                return createBlock( 'core/file', {
+                    href: blobURL,
+                    fileName: file.name,
+                    textLinkHref: blobURL,
+                } );
+            },
+        },
+    ];
 }
 ```
 
@@ -276,17 +274,17 @@ If we want to create a custom block when the user types the question mark, we co
 
 ```js
 transforms: {
-	from: [
-		{
-			type: 'prefix',
-			prefix: '?',
-			transform: function( content ) {
-				return createBlock( 'my-plugin/question', {
-					content,
-				} );
-			},
-		},
-	];
+    from: [
+        {
+            type: 'prefix',
+            prefix: '?',
+            transform: function( content ) {
+                return createBlock( 'my-plugin/question', {
+                    content,
+                } );
+            },
+        },
+    ];
 }
 ```
 
@@ -294,17 +292,17 @@ transforms: {
 
 ```js
 transforms: {
-	from: [
-		{
-			type: 'prefix',
-			prefix: '?',
-			transform( content ) {
-				return createBlock( 'my-plugin/question', {
-					content,
-				} );
-			},
-		},
-	];
+    from: [
+        {
+            type: 'prefix',
+            prefix: '?',
+            transform( content ) {
+                return createBlock( 'my-plugin/question', {
+                    content,
+                } );
+            },
+        },
+    ];
 }
 ```
 
