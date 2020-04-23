@@ -312,13 +312,13 @@ transforms: {
 
 ### Raw
 
-This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action frow within the block setting UI menu, as well as when some content is pasted into the editor.
+This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action frow within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
 
 A transformation of type `raw` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `raw`.
-- **schema** _(object|function, optional)_: TODO.
 - **transform** _(function, optional)_: a callback that receives the node being processed. It should return a block object or an array of block objects.
+- **schema** _(object|function, optional)_: it defines the attributes and children of the node that will be preserved on paste, according to its [HTML content model](https://html.spec.whatwg.org/multipage/dom.html#content-models). Take a look at [pasteHandler](https://developer.wordpress.org/block-editor/packages/packages-blocks/#pasteHandler) for more info.
 - **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is a shorthand and alternative to using `isMatch`, which, if present, will take precedence.
 - **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applieddisplayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
