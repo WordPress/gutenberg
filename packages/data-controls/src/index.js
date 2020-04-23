@@ -64,6 +64,38 @@ export function select( storeKey, selectorName, ...args ) {
 }
 
 /**
+ * Dispatches a control action for triggering a registry select.
+ *
+ * Note: This functions like the `select` control, but does not wait
+ * for resolvers.
+ *
+ * @param {string} storeKey     The key for the store the selector belongs to.
+ * @param {string} selectorName The name of the selector.
+ * @param {Array}  args         Arguments for the select.
+ *
+ * @example
+ * ```js
+ * import { syncSelect } from '@wordpress/data-controls';
+ *
+ * // Action generator using `syncSelect`.
+ * export function* myAction() {
+ * 	const isEditorSideBarOpened = yield syncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
+ * 	// Do stuff with the result from the `syncSelect`.
+ * }
+ * ```
+ *
+ * @return {Object} The control descriptor.
+ */
+export function syncSelect( storeKey, selectorName, ...args ) {
+	return {
+		type: 'SYNC_SELECT',
+		storeKey,
+		selectorName,
+		args,
+	};
+}
+
+/**
  * Dispatches a control action for triggering a registry dispatch.
  *
  * @param {string} storeKey    The key for the store the action belongs to
@@ -131,6 +163,11 @@ export const controls = {
 					? '__experimentalResolveSelect'
 					: 'select'
 			]( storeKey )[ selectorName ]( ...args );
+		}
+	),
+	SYNC_SELECT: createRegistryControl(
+		( registry ) => ( { storeKey, selectorName, args } ) => {
+			return registry.select( storeKey )[ selectorName ]( ...args );
 		}
 	),
 	DISPATCH: createRegistryControl(
