@@ -138,7 +138,6 @@
 			right: $border-width;
 		}
 
-		// .is-block-content, // Floats.
 		&::after { // Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
