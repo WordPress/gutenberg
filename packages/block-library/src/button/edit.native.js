@@ -174,7 +174,6 @@ class ButtonEdit extends Component {
 	getBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
 		const { style, gradient, customGradient } = attributes;
-		const fallbackBackgroundColor = styles.defaultButton.backgroundColor;
 		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
@@ -188,18 +187,17 @@ class ButtonEdit extends Component {
 		return (
 			( style && style.color && style.color.background ) ||
 			backgroundColor.color ||
-			fallbackBackgroundColor
+			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
-		const fallbackTextColor = styles.defaultButton.color;
 		return (
 			( style && style.color && style.color.text ) ||
 			textColor.color ||
-			fallbackTextColor
+			styles.defaultButton.color
 		);
 	}
 
@@ -408,18 +406,15 @@ class ButtonEdit extends Component {
 			isButtonFocused,
 			placeholderTextWidth,
 		} = this.state;
-		const {
-			borderRadius: fallbackBorderRadius,
-			paddingTop: spacing,
-			borderWidth,
-		} = styles.defaultButton;
+		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
 			return null;
 		}
 
-		const borderRadiusValue =
-			borderRadius !== undefined ? borderRadius : fallbackBorderRadius;
+		const borderRadiusValue = Number.isInteger( borderRadius )
+			? borderRadius
+			: styles.defaultButton.borderRadius;
 		const outlineBorderRadius =
 			borderRadiusValue > 0
 				? borderRadiusValue + spacing + borderWidth
