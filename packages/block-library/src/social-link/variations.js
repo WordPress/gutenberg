@@ -33,6 +33,7 @@ import {
 	SnapchatIcon,
 	SoundCloudIcon,
 	SpotifyIcon,
+	TikTokIcon,
 	TumblrIcon,
 	TwitchIcon,
 	TwitterIcon,
@@ -237,6 +238,12 @@ const variations = [
 		attributes: { service: 'spotify' },
 		title: 'Spotify',
 		icon: SpotifyIcon,
+	},
+	{
+		name: 'tiktok',
+		attributes: { service: 'tiktok' },
+		title: 'TikTok',
+		icon: TikTokIcon,
 	},
 	{
 		name: 'tumblr',
