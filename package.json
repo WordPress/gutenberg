@@ -184,6 +184,7 @@
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
+		"analyze-bundles": "WP_BUNDLE_ANALYZER=true npm run build",
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",

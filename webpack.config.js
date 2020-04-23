@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
@@ -38,7 +39,15 @@ const gutenbergPackages = Object.keys( dependencies )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
+const analyzingBundles =
+	process.env.WP_BUNDLE_ANALYZER &&
+	process.env.WP_BUNDLE_ANALYZER !== 'false';
+
 module.exports = {
+	optimization: {
+		// Don't concatenate modules when analyzing bundles.
+		concatenateModules: ! analyzingBundles,
+	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
@@ -62,6 +71,7 @@ module.exports = {
 		] ),
 	},
 	plugins: [
+		analyzingBundles && new BundleAnalyzerPlugin(),
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
@@ -189,7 +199,7 @@ module.exports = {
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	],
+	].filter( Boolean ),
 	watchOptions: {
 		ignored: '!packages/*/!(src)/**/*',
 	},
