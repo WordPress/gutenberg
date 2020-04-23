@@ -325,14 +325,14 @@ A transformation of type `raw` is an object that takes the following parameters:
 
 ### Shortcode
 
-This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes.
+This type of transformations support the _from_ direction, allowing blocks to be created from shortcodes. It's applied as part of the `raw` transformation process.
 
 A transformation of type `shortcode` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `shortcode`.
 - **tag** _(string|array)_: the shortcode tag or list of shortcode aliases this transform can work with.
-- **attributes** _(object)_: object representing where the block attributes should be sourced from.
-- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **attributes** _(object)_: object representing where the block attributes should be sourced from, according to the attributes shape defined by the [block configuration object](./block-registration.md). If a particular attribute contains a `shortcode` key, it should be a function that receives the shortcode attributes as the first arguments and the [WPShortcodeMatch](https://developer.wordpress.org/block-editor/packages/packages-shortcode/#next) as second, and returns a value for the attribute that will be sourced in the block's comment.
+- **isMatch** _(function, optional)_: a callback that receives the shortcode attributes per the [Shortcode API](https://codex.wordpress.org/Shortcode_API) and should return a boolean. Returning `false` from this function will prevent the shortcode to be transformed into this block.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from shortcode to block**
@@ -357,12 +357,18 @@ transforms: {
                 },
                 align: {
                     type: 'string',
+                    // The shortcode function will extract
+                    // the shortcode atts into a value
+                    // to be sourced in the block's comment.
                     shortcode: function( attributes ) {
                         var align = attributes.named.align ? attributes.named.align : 'alignnone';
                         return align.replace( 'align', '' );
                     },
                 },
             },
+            // Prevent the shortcode to be converted
+            // into this block when it doesn't
+            // have the proper ID.
             isMatch: function( attributes ) {
                 return attributes.named.id === 'my-id';
             },
@@ -388,11 +394,17 @@ transforms: {
                 },
                 align: {
                     type: 'string',
+                    // The shortcode function will extract
+                    // the shortcode atts into a value
+                    // to be sourced in the block's comment.
                     shortcode: ( { named: { align = 'alignnone' } } ) => {
                         return align.replace( 'align', '' );
                     },
                 },
             },
+            // Prevent the shortcode to be converted
+            // into this block when it doesn't
+            // have the proper ID.
             isMatch( { named: { id } } ) {
                 return id === 'my-id';
             },
