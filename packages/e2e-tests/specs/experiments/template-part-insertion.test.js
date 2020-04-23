@@ -20,7 +20,7 @@ import {
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Template part insertion by placeholder block', () => {
-	// Constants
+	// Test constants for template part.
 	const testSlug = 'test-template-part';
 	const testTheme = 'test-theme';
 	const testContent = 'some words...';
