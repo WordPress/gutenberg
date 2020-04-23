@@ -24,6 +24,12 @@ export const DEFAULT_VALUES = {
 	left: '0px',
 };
 
+/**
+ * Custom hook that merges default values with values prop to use as state.
+ *
+ * @param {Object} values Box values.
+ * @return {Array<Object, Function>} Hook state and setter.
+ */
 export function useBoxControlState( values = {} ) {
 	return useState( {
 		...DEFAULT_VALUES,
@@ -31,27 +37,31 @@ export function useBoxControlState( values = {} ) {
 	} );
 }
 
-export function isValuesMixed( values ) {
-	const vals = Object.values( values );
-
-	return ! vals.every( ( v ) => v === vals[ 0 ] );
+/**
+ * Gets an items with the most occurance within an array
+ * https://stackoverflow.com/a/20762713
+ *
+ * @param {Array<any>} arr Array of items to check.
+ * @return {any} The item with the most occurances.
+ */
+function mode( arr ) {
+	return arr
+		.sort(
+			( a, b ) =>
+				arr.filter( ( v ) => v === a ).length -
+				arr.filter( ( v ) => v === b ).length
+		)
+		.pop();
 }
 
-export function getValues( values, ...args ) {
-	const nextValues = [];
-
-	for ( const key in args ) {
-		nextValues.push( values[ key ] );
-	}
-
-	return nextValues;
-}
-
+/**
+ * Gets the 'all' input value and unit from values data.
+ *
+ * @param {Object} values Box values.
+ * @return {string} A value + unit for the 'all' input.
+ */
 export function getAllValue( values = {} ) {
-	const parsedValues = Object.keys( values ).reduce( ( acc, key ) => {
-		const value = values[ key ];
-		return [ ...acc, parseUnit( value ) ];
-	}, [] );
+	const parsedValues = Object.values( values ).map( parseUnit );
 
 	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
 	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
@@ -59,9 +69,7 @@ export function getAllValue( values = {} ) {
 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
 		? allValues[ 0 ]
 		: '';
-	const unit = allUnits.every( ( v ) => v === allUnits[ 0 ] )
-		? allUnits[ 0 ]
-		: '';
+	const unit = mode( allUnits );
 
 	const allValue = `${ value }${ unit }`;
 

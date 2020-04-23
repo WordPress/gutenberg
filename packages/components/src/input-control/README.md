@@ -26,6 +26,15 @@ If true, the `input` will be disabled.
 
 -   Type: `Boolean`
 -   Required: No
+-   Default: `false`
+
+### isPressEnterToChange
+
+If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ### isFloatingLabel
 

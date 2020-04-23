@@ -9,7 +9,7 @@ import { useDrag } from 'react-use-gesture';
  * WordPress dependencies
  */
 import { forwardRef, useState } from '@wordpress/element';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -32,16 +32,14 @@ export function NumberControl(
 		dragThreshold = 10,
 		hideHTMLArrows = false,
 		isDragEnabled = true,
-		isPressEnterToChange = false,
 		isShiftStepEnabled = true,
 		label,
 		max = Infinity,
 		min = -Infinity,
-		onDragStart = noop,
+		onChange = noop,
 		onDrag = noop,
 		onDragEnd = noop,
-		onBlur = noop,
-		onChange = noop,
+		onDragStart = noop,
 		onKeyDown = noop,
 		shiftStep = 10,
 		step = 1,
@@ -52,7 +50,6 @@ export function NumberControl(
 ) {
 	const [ value, setValue ] = useValueState( valueProp );
 	const [ isDragging, setIsDragging ] = useState( false );
-	const [ isDirty, setIsDirty ] = useState( false );
 	const isRtl = useRtl();
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
@@ -129,41 +126,17 @@ export function NumberControl(
 		}
 	);
 
-	const handleOnBlur = ( event ) => {
-		const _forceUpdate = true;
-		onBlur( event );
-
-		/**
-		 * If isPressEnterToChange is set, this submits the value to
-		 * the onChange callback.
-		 */
-		if ( isPressEnterToChange && ! isValueEmpty( value ) && isDirty ) {
-			handleOnChange( value, { event }, _forceUpdate );
-		}
-	};
-
-	const handleOnChange = ( next, changeProps, _forceUpdate = false ) => {
-		/**
-		 * The _forceUpdate parameter is used to better control when
-		 * isPressEnterToChange is set.
-		 */
+	const handleOnChange = ( next, changeProps ) => {
 		const nextValue = getValue( next );
 
-		if ( ! isPressEnterToChange || _forceUpdate ) {
-			setIsDirty( false );
-			onChange( nextValue, changeProps );
-			setValue( nextValue );
-		} else {
-			setIsDirty( true );
-			setValue( next );
-		}
+		onChange( nextValue, changeProps );
+		setValue( nextValue );
 	};
 
 	const handleOnKeyDown = ( event ) => {
 		onKeyDown( event );
 		const { value: currentValue } = event.target;
 
-		const _forceUpdate = true;
 		const enableShift = event.shiftKey && isShiftStepEnabled;
 
 		const incrementalValue = enableShift
@@ -186,7 +159,7 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				handleOnChange( nextValue, { event }, _forceUpdate );
+				handleOnChange( nextValue, { event } );
 
 				break;
 
@@ -201,23 +174,7 @@ export function NumberControl(
 					incrementalValue
 				);
 
-				handleOnChange( nextValue, { event }, _forceUpdate );
-
-				break;
-
-			case ENTER:
-				if ( isPressEnterToChange ) {
-					event.preventDefault();
-
-					nextValue = roundClampString(
-						nextValue,
-						min,
-						max,
-						incrementalValue
-					);
-
-					handleOnChange( nextValue, { event }, _forceUpdate );
-				}
+				handleOnChange( nextValue, { event } );
 
 				break;
 		}
@@ -235,11 +192,10 @@ export function NumberControl(
 			dragCursor={ dragCursor }
 			hideHTMLArrows={ hideHTMLArrows }
 			isDragging={ isDragging }
-			isPressEnterToChange={ isPressEnterToChange }
 			label={ label }
-			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
+			transformValueOnChange={ getValue }
 			ref={ ref }
 			value={ value }
 		/>

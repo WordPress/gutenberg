@@ -54,15 +54,6 @@ If true, enables mouse drag gesture to increment/decrement the number value. Hol
 
 -   Type: `Boolean`
 -   Required: No
--   Default: `true`
-
-### isPressEnterToChange
-
-If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ### isShiftStepEnabled
 

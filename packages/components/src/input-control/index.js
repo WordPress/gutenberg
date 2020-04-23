@@ -9,6 +9,8 @@ import classNames from 'classnames';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useState, forwardRef } from '@wordpress/element';
+import { ENTER } from '@wordpress/keycodes';
+
 /**
  * Internal dependencies
  */
@@ -36,30 +38,44 @@ export function InputControl(
 	{
 		children,
 		className,
-		disabled,
+		disabled = false,
 		hideLabelFromVision = false,
 		id: idProp,
+		isPressEnterToChange = false,
 		isFloatingLabel = false,
 		label,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
+		onKeyDown = noop,
 		size = 'default',
 		suffix,
+		transformValueOnChange = ( value ) => value,
 		value: valueProp,
 		...props
 	},
 	ref
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
+	const [ isDirty, setIsDirty ] = useState( false );
 	const [ value, setValue ] = useValueState( valueProp );
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
 	const handleOnBlur = ( event ) => {
+		const _forceUpdate = true;
+
 		onBlur( event );
 		setIsFocused( false );
+
+		/**
+		 * If isPressEnterToChange is set, this submits the value to
+		 * the onChange callback.
+		 */
+		if ( isPressEnterToChange && ! isValueEmpty( value ) && isDirty ) {
+			handleOnChange( event, _forceUpdate );
+		}
 	};
 
 	const handleOnFocus = ( event ) => {
@@ -67,11 +83,30 @@ export function InputControl(
 		setIsFocused( true );
 	};
 
-	const handleOnChange = ( event ) => {
+	const handleOnChange = ( event, _forceUpdate ) => {
 		const nextValue = event.target.value;
 
-		onChange( nextValue, { event } );
-		setValue( nextValue );
+		if ( ! isPressEnterToChange || _forceUpdate ) {
+			const transformedValue = transformValueOnChange( nextValue );
+			setValue( transformedValue );
+
+			onChange( nextValue, { event } );
+
+			setIsDirty( false );
+		} else {
+			setValue( nextValue );
+			setIsDirty( true );
+		}
+	};
+
+	const handleOnKeyDown = ( event ) => {
+		const _forceUpdate = true;
+		onKeyDown( event );
+
+		if ( isPressEnterToChange && event.keyCode === ENTER ) {
+			event.preventDefault();
+			handleOnChange( event, _forceUpdate );
+		}
 	};
 
 	const isFilled = ! isValueEmpty( value );
@@ -110,6 +145,7 @@ export function InputControl(
 					onBlur={ handleOnBlur }
 					onChange={ handleOnChange }
 					onFocus={ handleOnFocus }
+					onKeyDown={ handleOnKeyDown }
 					ref={ ref }
 					size={ size }
 					value={ value }
