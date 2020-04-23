@@ -75,18 +75,18 @@ export function select( storeKey, selectorName, ...args ) {
  *
  * @example
  * ```js
- * import { syncSelect } from '@wordpress/data-controls';
+ * import { __unstableSyncSelect } from '@wordpress/data-controls';
  *
- * // Action generator using `syncSelect`.
+ * // Action generator using `__unstableSyncSelect`.
  * export function* myAction() {
- * 	const isEditorSideBarOpened = yield syncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
- * 	// Do stuff with the result from the `syncSelect`.
+ * 	const isEditorSideBarOpened = yield __unstableSyncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
+ * 	// Do stuff with the result from the `__unstableSyncSelect`.
  * }
  * ```
  *
  * @return {Object} The control descriptor.
  */
-export function syncSelect( storeKey, selectorName, ...args ) {
+export function __unstableSyncSelect( storeKey, selectorName, ...args ) {
 	return {
 		type: 'SYNC_SELECT',
 		storeKey,
