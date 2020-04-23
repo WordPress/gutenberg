@@ -8,11 +8,6 @@
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
-
-		// @include break-small() {
-		// 	min-height: $image-height;
-		// 	padding-left: $image-width + $grid-unit-30;
-		// }
 	}
 
 	&__heading {
@@ -27,15 +22,6 @@
 		background: #1386bf;
 		height: 240px;
 		margin-bottom: $grid-unit-40;
-
-		// @include break-small() {
-		// 	position: absolute;
-		// 	left: 0;
-		// 	top: 50%;
-		// 	height: $image-height;
-		// 	width: $image-width;
-		// 	margin-top: -0.5 * $image-height;
-		// }
 	}
 
 	&__text {
@@ -50,8 +36,4 @@
 		position: relative;
 		top: 4px;
 	}
-
-	// @include break-small() {
-	// 	width: 600px;
-	// }
 }
