@@ -11,20 +11,27 @@ import { includes, castArray } from 'lodash';
 import { useEffect, useRef } from '@wordpress/element';
 
 /**
+ * @template {Element} T
+ * @typedef {import('react').MutableRefObject<T>} ElementRef
+ */
+
+/**
  * A block selection object.
+ *
+ * @template {Element} T
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
- * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}       [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}        [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}       [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {ElementRef<T>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
  * Return true if platform is MacOS.
  *
- * @param {Object} _window   window object by default; used for DI testing.
+ * @param {Window} _window window object by default; used for DI testing.
  *
  * @return {boolean} True if MacOS; false otherwise.
  */
@@ -40,9 +47,11 @@ function isAppleOS( _window = window ) {
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
- * @param {Function}                callback   Shortcut callback.
- * @param {WPKeyboardShortcutConfig} options    Shortcut options.
+ * @template {Element} T
+ *
+ * @param {string[]|string}                           shortcuts Keyboard Shortcuts.
+ * @param {(e: KeyboardEvent, combo: string) => void} callback  Shortcut callback.
+ * @param {WPKeyboardShortcutConfig<T>}               options   Shortcut options.
  */
 function useKeyboardShortcut(
 	shortcuts,
@@ -63,7 +72,7 @@ function useKeyboardShortcut(
 		if ( isDisabled ) {
 			return;
 		}
-		const mousetrap = new Mousetrap( target ? target.current : document );
+		const mousetrap = new Mousetrap( target ? target.current : undefined );
 		castArray( shortcuts ).forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
 			// Determines whether a key is a modifier by the length of the string.
@@ -86,8 +95,10 @@ function useKeyboardShortcut(
 				);
 			}
 
-			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			mousetrap[ bindFn ](
+			const bindFn = bindGlobal
+				? Mousetrap.bindGlobal.bind( Mousetrap )
+				: mousetrap.bind.bind( mousetrap );
+			bindFn(
 				shortcut,
 				( ...args ) => currentCallback.current( ...args ),
 				eventName

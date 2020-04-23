@@ -173,8 +173,8 @@ Attach a keyboard shortcut handler.
 _Parameters_
 
 -   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
--   _callback_ `Function`: Shortcut callback.
--   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+-   _callback_ (unknown type): Shortcut callback.
+-   _options_ `WPKeyboardShortcutConfig<T>`: Shortcut options.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
