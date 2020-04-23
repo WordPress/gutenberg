@@ -18,7 +18,7 @@ import {
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField, withFilters } from '@wordpress/components';
+import { FormTokenField, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -34,6 +34,7 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
+const MAX_RELATED_TERMS_SUGGESTIONS = 10;
 const isSameTermName = ( termA, termB ) =>
 	termA.toLowerCase() === termB.toLowerCase();
 
@@ -70,10 +71,15 @@ class FlatTermSelector extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
+		this.appendTerm = this.appendTerm.bind( this );
+		this.toggleRelatedTerms = this.toggleRelatedTerms.bind( this );
+		this.fetchRelatedTerms = this.fetchRelatedTerms.bind( this );
 		this.state = {
 			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
 			selectedTerms: [],
+			relatedTerms: [],
+			areRelatedTermsHidden: true,
 		};
 	}
 
@@ -83,20 +89,29 @@ class FlatTermSelector extends Component {
 				include: this.props.terms.join( ',' ),
 				per_page: -1,
 			} );
-			this.initRequest.then(
-				() => {
+		} else this.initRequest = Promise.resolve( [] );
+
+		this.initRequest.then(
+			( response ) => {
+				this.relatedTermsRequest = this.fetchRelatedTerms( {
+					order: 'desc',
+					orderby: 'count',
+					per_page: MAX_RELATED_TERMS_SUGGESTIONS + response.length,
+				} );
+
+				this.relatedTermsRequest.then( () => {
 					this.setState( { loading: false } );
-				},
-				( xhr ) => {
-					if ( xhr.statusText === 'abort' ) {
-						return;
-					}
-					this.setState( {
-						loading: false,
-					} );
+				} );
+			},
+			( xhr ) => {
+				if ( xhr.statusText === 'abort' ) {
+					return;
 				}
-			);
-		}
+				this.setState( {
+					loading: false,
+				} );
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -130,6 +145,37 @@ class FlatTermSelector extends Component {
 				),
 			} ) );
 			this.updateSelectedTerms( this.props.terms );
+		} );
+
+		return request;
+	}
+
+	fetchRelatedTerms( params = {} ) {
+		const { taxonomy } = this.props;
+		const query = { ...DEFAULT_QUERY, ...params };
+		const request = apiFetch( {
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
+		} );
+		request.then( unescapeTerms ).then( ( terms ) => {
+			let newRelatedTerms = terms.filter(
+				( term ) =>
+					! find(
+						this.state.selectedTerms,
+						( updatedTerm ) => updatedTerm === term.name
+					)
+			);
+			const newAvailableTerms = this.state.availableTerms.concat(
+				newRelatedTerms
+			);
+
+			newRelatedTerms = newRelatedTerms.splice(
+				0,
+				MAX_RELATED_TERMS_SUGGESTIONS
+			);
+			this.setState( {
+				relatedTerms: newRelatedTerms,
+				availableTerms: newAvailableTerms,
+			} );
 		} );
 
 		return request;
@@ -225,6 +271,27 @@ class FlatTermSelector extends Component {
 		this.searchRequest = this.fetchTerms( { search } );
 	}
 
+	appendTerm( newTerm ) {
+		if (
+			find( this.state.selectedTerms, ( selectedTerm ) =>
+				isSameTermName( selectedTerm, newTerm.name )
+			)
+		)
+			return;
+
+		const newSelectedTerms = this.state.selectedTerms.concat( [
+			newTerm.name,
+		] );
+
+		this.onChange( newSelectedTerms );
+	}
+
+	toggleRelatedTerms() {
+		this.setState( ( state ) => ( {
+			areRelatedTermsHidden: ! state.areRelatedTermsHidden,
+		} ) );
+	}
+
 	render() {
 		const { slug, taxonomy, hasAssignAction } = this.props;
 
@@ -259,22 +326,56 @@ class FlatTermSelector extends Component {
 			_x( 'Remove %s', 'term' ),
 			singularName
 		);
+		const tagsButtonDescription = _x(
+			'Choose from the most used tags',
+			'term'
+		);
 
 		return (
-			<FormTokenField
-				value={ selectedTerms }
-				suggestions={ termNames }
-				onChange={ this.onChange }
-				onInputChange={ this.searchTerms }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				disabled={ loading }
-				label={ newTermLabel }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-			/>
+			<div>
+				<FormTokenField
+					value={ selectedTerms }
+					suggestions={ termNames }
+					onChange={ this.onChange }
+					onInputChange={ this.searchTerms }
+					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+					disabled={ loading }
+					label={ newTermLabel }
+					messages={ {
+						added: termAddedLabel,
+						removed: termRemovedLabel,
+						remove: removeTermLabel,
+					} }
+				/>
+				<div>
+					<p>
+						<Button
+							className="is-link"
+							onClick={ () => this.toggleRelatedTerms() }
+						>
+							{ tagsButtonDescription }
+						</Button>
+					</p>
+					{ this.state.areRelatedTermsHidden === false ? (
+						<ul className="editor-post-taxonomies__flat-terms-related-list">
+							{ this.state.relatedTerms.map( ( term ) => (
+								<li key={ term.id }>
+									<Button
+										className="is-link"
+										onClick={ () =>
+											this.appendTerm( term )
+										}
+									>
+										{ term.name }
+									</Button>
+								</li>
+							) ) }
+						</ul>
+					) : (
+						<ul></ul>
+					) }
+				</div>
+			</div>
 		);
 	}
 }
