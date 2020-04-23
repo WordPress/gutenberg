@@ -20,11 +20,29 @@ function render_block_core_template_part( $attributes ) {
 		// is user-customized, render the corresponding post content.
 		$content = get_post( $attributes['postId'] )->post_content;
 	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
-		// Else, if the template part was provided by the active theme,
-		// render the corresponding file content.
-		$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-		if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
-			$content = file_get_contents( $template_part_file_path );
+		$template_part_query = new WP_Query(
+			array(
+				'post_type'      => 'wp_template_part',
+				'post_status'    => 'publish',
+				'name'           => $attributes['slug'],
+				'meta_key'       => 'theme',
+				'meta_value'     => $attributes['theme'],
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+			)
+		);
+		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+		if ( $template_part_post ) {
+			// A published post might already exist if this template part was customized elsewhere
+			// or if it's part of a customized template.
+			$content = $template_part_post->post_content;
+		} else {
+			// Else, if the template part was provided by the active theme,
+			// render the corresponding file content.
+			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+			if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
+				$content = file_get_contents( $template_part_file_path );
+			}
 		}
 	}
 
