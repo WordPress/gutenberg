@@ -89,15 +89,16 @@ function UnitControl(
 	) : null;
 
 	return (
-		<Root className={ classes } ref={ ref } style={ style }>
+		<Root className="component-unit-control-wrapper" style={ style }>
 			<ValueInput
 				aria-label={ label }
 				{ ...props }
 				autoComplete={ autoComplete }
-				className="component-unit-control__input-control"
+				className={ classes }
 				disableUnits={ disableUnits }
 				label={ label }
 				onChange={ handleOnChange }
+				ref={ ref }
 				size={ size }
 				suffix={ inputSuffix }
 				type={ type }
