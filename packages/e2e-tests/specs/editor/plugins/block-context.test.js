@@ -17,9 +17,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.editor-post-preview__button-external' );
-	await editorPage.click( '.editor-post-preview__button-external' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
