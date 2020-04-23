@@ -34,10 +34,10 @@ You're now ready to use `wp-env`!
 
 ### Installation as a local package
 
-If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally:
+If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally as a dev dependency:
 
 ```sh
-$ npm i @wordpress/env
+$ npm i @wordpress/env --save-dev
 ```
 
 Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
