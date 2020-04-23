@@ -203,8 +203,10 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
+			this.lastEventCount = undefined;
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
+			
 		}
 	}
 
@@ -419,11 +421,16 @@ export class RichText extends Component {
 	onFocus() {
 		this.isTouched = true;
 
-		const { unstableOnFocus } = this.props;
+		const { unstableOnFocus, onSelectionChange } = this.props;
 
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
+
+		// We know for certain that on focus, the old selection is invalid. It
+		// will be recalculated on `selectionchange`.
+
+		onSelectionChange( this.selectionStart, this.selectionEnd );
 
 		this.lastAztecEventType = 'focus';
 	}
