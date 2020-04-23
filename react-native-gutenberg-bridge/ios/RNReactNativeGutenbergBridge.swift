@@ -282,10 +282,11 @@ extension RNReactNativeGutenbergBridge {
 }
 
 extension RNReactNativeGutenbergBridge {
-    enum mediaDictKeys {
-        static let IDKey = "id"
-        static let URLKey = "url"
-        static let TypeKey = "type"
+    enum MediaKey {
+        static let id = "id"
+        static let url = "url"
+        static let type = "type"
+        static let caption = "caption"
     }
 }
 
@@ -293,9 +294,10 @@ extension MediaInfo {
 
     func encodeForJS() -> [String: Any] {
         return [
-            RNReactNativeGutenbergBridge.mediaDictKeys.IDKey: id as Any,
-            RNReactNativeGutenbergBridge.mediaDictKeys.URLKey: url as Any,
-            RNReactNativeGutenbergBridge.mediaDictKeys.TypeKey: type as Any
+            RNReactNativeGutenbergBridge.MediaKey.id: id as Any,
+            RNReactNativeGutenbergBridge.MediaKey.url: url as Any,
+            RNReactNativeGutenbergBridge.MediaKey.type: type as Any,
+            RNReactNativeGutenbergBridge.MediaKey.caption: caption as Any
         ]
     }
 }

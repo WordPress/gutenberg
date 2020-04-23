@@ -17,6 +17,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         String getUrl();
         int getId();
         String getType();
+        String getCaption();
         WritableMap toMap();
     }
 

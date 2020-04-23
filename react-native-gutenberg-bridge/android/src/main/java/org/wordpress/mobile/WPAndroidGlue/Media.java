@@ -13,20 +13,23 @@ public class Media implements RNMedia {
     private int mId;
     private String mUrl;
     private String mType;
+    private String mCaption;
 
-    public Media(int id, String url, String type) {
+    public Media(int id, String url, String type, String caption) {
         this.mId = id;
         this.mUrl = url;
         this.mType = type;
+        this.mCaption = caption;
     }
 
     public Media(int id, String url) {
         this.mId = id;
         this.mUrl = url;
         this.mType = "";
+        this.mCaption = "";
     }
 
-    public static Media createRNMediaUsingMimeType(final int id, final String url, @NonNull final String mimeType) {
+    public static Media createRNMediaUsingMimeType(final int id, final String url, @NonNull final String mimeType, final String caption) {
         String type;
 
         if (mimeType.startsWith(MediaType.IMAGE.name().toLowerCase(Locale.ROOT))) {
@@ -37,7 +40,7 @@ public class Media implements RNMedia {
             type = MediaType.OTHER.name().toLowerCase(Locale.ROOT);
         }
 
-        return new Media(id, url, type);
+        return new Media(id, url, type, caption);
     }
 
 
@@ -65,11 +68,20 @@ public class Media implements RNMedia {
         this.mType = mediaType;
     }
 
+    public String getCaption() {
+        return mCaption;
+    }
+
+    public void setCaption(String caption) {
+        this.mCaption = caption;
+    }
+
     public WritableMap toMap() {
         WritableMap map = new WritableNativeMap();
         map.putInt("id", mId);
         map.putString("url", mUrl);
         map.putString("type", mType);
+        map.putString("caption", mCaption);
         return map;
     }
 }
