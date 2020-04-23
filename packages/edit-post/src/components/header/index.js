@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Icon, MenuGroup } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cog, external } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
@@ -14,19 +14,17 @@ import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
+import { default as DevicePreview } from '../device-preview';
 
 function Header( { onToggleInserter, isInserterOpen } ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
 		isEditorSidebarOpened,
-		isPostSaveable,
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
 		isFullscreenActive,
-		deviceType,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -52,11 +50,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		} ),
 		[]
 	);
-	const {
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( 'core/edit-post' );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 
 	const toggleGeneralSidebar = isEditorSidebarOpened
 		? closeGeneralSidebar
@@ -88,30 +84,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					isEnabled={ isPostSaveable }
-					className="edit-post-post-preview-dropdown"
-					deviceType={ deviceType }
-					setDeviceType={ setPreviewDeviceType }
-				>
-					<MenuGroup>
-						<div className="edit-post-header-preview__grouping-external">
-							<PostPreviewButton
-								className={
-									'edit-post-header-preview__button-external'
-								}
-								forceIsAutosaveable={ hasActiveMetaboxes }
-								forcePreviewLink={ isSaving ? null : undefined }
-								textContent={
-									<>
-										<Icon icon={ external } />
-										{ __( 'Preview in new tab' ) }
-									</>
-								}
-							/>
-						</div>
-					</MenuGroup>
-				</PreviewOptions>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
