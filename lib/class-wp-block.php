@@ -6,9 +6,37 @@
  */
 
 /**
+ * Returns true if the given block type's `render_callback` includes a type hint
+ * on its first argument to receive an instance of WP_Block.
+ *
+ * UPSTREAM PORT NOTE: It's suggested that this be implemented as an instance
+ * method of the WP_Block_Type class (WP_Block_Type::is_rendered_with_block),
+ * optionally reusing or composing with the existing `is_dynamic` method. It
+ * would also be prudent to consider performance ramifications of reflection,
+ * especially if many blocks of the same type are rendered. Caching the result
+ * of this function to reuse for all rendering of the same block type would be
+ * wise if reflection is non-trivial.
+ *
+ * @param WP_Block_Type $block_type Block type to check.
+ *
+ * @return bool Whether block type render callback receives block instance.
+ */
+function gutenberg_block_type_render_callback_receives_block( $block_type ) {
+	$reflect = new ReflectionFunction( $block_type->render_callback );
+	$params  = $reflect->getParameters();
+
+	if ( 0 === count( $params ) ) {
+		return false;
+	}
+
+	$first_arg_type = $params[0]->getType();
+	return $first_arg_type && $first_arg_type->getName() === WP_Block::class;
+}
+
+/**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess {
+class WP_Block {
 
 	/**
 	 * Name of block.
@@ -169,72 +197,17 @@ class WP_Block implements ArrayAccess {
 		}
 
 		if ( $is_dynamic ) {
-			$global_post   = $post;
-			$block_content = (string) call_user_func( $this->block_type->render_callback, $this, $block_content );
-			$post          = $global_post;
+			$global_post    = $post;
+			$receives_block = gutenberg_block_type_render_callback_receives_block( $this->block_type );
+			$block_content  = (string) call_user_func(
+				$this->block_type->render_callback,
+				$receives_block ? $this : $this->attributes,
+				$block_content
+			);
+			$post           = $global_post;
 		}
 
 		return $block_content;
-	}
-
-	/**
-	 * Returns true if an attribute exists by the specified attribute name, or
-	 * false otherwise.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetexists.php
-	 *
-	 * @param string $attribute_name Name of attribute to check.
-	 *
-	 * @return bool Whether attribute exists.
-	 */
-	public function offsetExists( $attribute_name ) {
-		return isset( $this->attributes[ $attribute_name ] );
-	}
-
-	/**
-	 * Returns the value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetget.php
-	 *
-	 * @param string $attribute_name Name of attribute value to retrieve.
-	 *
-	 * @return mixed|null Attribute value if exists, or null.
-	 */
-	public function offsetGet( $attribute_name ) {
-		// This may cause an "Undefined index" notice if the attribute name does
-		// not exist. This is expected, since the purpose of this implementation
-		// is to align exactly to the expectations of operating on an array.
-		return $this->attributes[ $attribute_name ];
-	}
-
-	/**
-	 * Assign an attribute value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to set.
-	 * @param mixed  $value          Attribute value.
-	 */
-	public function offsetSet( $attribute_name, $value ) {
-		if ( is_null( $attribute_name ) ) {
-			// This is not technically a valid use-case for attributes. Since
-			// this implementation is expected to align to expectations of
-			// operating on an array, it is still supported.
-			$this->attributes[] = $value;
-		} else {
-			$this->attributes[ $attribute_name ] = $value;
-		}
-	}
-
-	/**
-	 * Unset an attribute.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetunset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to unset.
-	 */
-	public function offsetUnset( $attribute_name ) {
-		unset( $this->attributes[ $attribute_name ] );
 	}
 
 }

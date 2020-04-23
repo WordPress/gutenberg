@@ -104,7 +104,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 					'gutenberg/contextWithAssigned',
 					'gutenberg/contextWithoutDefault',
 				),
-				'render_callback' => function( $block ) use ( &$provided_context ) {
+				'render_callback' => function( WP_Block $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
 					return '';

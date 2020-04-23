@@ -69,7 +69,7 @@ A block's context values are available from the `context` property of the `$bloc
 
 ```php
 register_block_type( 'my-plugin/record-title', [
-	'render_callback' => function( $block ) {
+	'render_callback' => function( WP_Block $block ) {
 		return 'The current record ID is: ' . $block->context['my-plugin/recordId'];
 	},
 ] );
