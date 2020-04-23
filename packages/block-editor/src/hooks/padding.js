@@ -24,7 +24,7 @@ export const PADDING_SUPPORT_KEY = '__experimentalPadding';
 export function PaddingEdit( props ) {
 	const {
 		name: blockName,
-		attributes: { padding, style },
+		attributes: { style },
 		setAttributes,
 	} = props;
 
@@ -41,7 +41,6 @@ export function PaddingEdit( props ) {
 		};
 
 		setAttributes( {
-			padding: next,
 			style: cleanEmptyObject( newStyle ),
 		} );
 	};
@@ -49,7 +48,7 @@ export function PaddingEdit( props ) {
 	return Platform.select( {
 		web: (
 			<BoxControl
-				values={ padding }
+				values={ style?.padding }
 				onChange={ onChange }
 				label={ __( 'Padding' ) }
 				units={ units }
