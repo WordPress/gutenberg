@@ -1,6 +1,6 @@
 # Block Transforms
 
-Block Transforms is the API that allows a block to be transformed _from_ and _to_ other entities. Existing entities that work with this API include blocks, sortcodes, files, regular expressions, and raw DOM nodes.
+Block Transforms is the API that allows a block to be transformed _from_ and _to_ other blocks, as well as _from_ other entities. Existing entities that work with this API include shortcodes, files, regular expressions, and raw DOM nodes.
 
 ## Transform direction: `to` and `from`
 
@@ -20,19 +20,26 @@ export const settings = {
 
 ## Transformations Types
 
-This section goes through the existing types of transformations a block can support.
+This section goes through the existing types of transformations blocks support:
 
-### Type `block`
+* block
+* enter
+* files
+* prefix
+* raw
+* shortcode
 
-This transformation allows a block to be converted into a different one. This type of transformation is surfaced in the block UI.
+### Block
+
+This transformation allows a block to be converted _from_ and _to_ a different block. It has a corresponding UI control within the block toolbar.
 
 A transformation of type `block` is an object that takes the following parameters:
 
 - **type** _(string)_: the value `block`.
-- **blocks** _(array)_: a list of known block types. It also accepts the wildcard (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
+- **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
 - **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
 - **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
-- **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+- **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph block to Heading block**
 
@@ -124,9 +131,9 @@ transforms: {
 
 {% end %}
 
-### Type `enter`
+### Enter
 
-The transformations of this type are applied when the user types some content and then the ENTER key in a new line.
+The transformations of this type allow to create a block _from_ some content introduced by the user. They're applied in a new block line, after the user has introduced some content and then hit the ENTER key.
 
 A transformation of type `enter` is an object that takes the following parameters:
 
@@ -135,9 +142,9 @@ A transformation of type `enter` is an object that takes the following parameter
 - **transform** _(function)_: a callback that receives the value that has been entered. It should return a block object or an array of block objects.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-**Example: from text to Separator block**
+**Example: from --- to Separator block**
 
-To create a separator block when the user types `-` three times and then enter we can use the following code:
+To create a separator block when the user types the hypen three times and then hits the ENTER key we can use the following code:
 
 {% codetabs %}
 
@@ -173,9 +180,9 @@ transforms = {
 
 {% end %}
 
-### Type `files`
+### Files
 
-This type of transformation is applied when some files are dropped into the editor.
+This type of transformations allow to create blocks _from_ files dropped into the editor.
 
 A transformation of type `files` is an object that takes the following parameters:
 
@@ -249,9 +256,9 @@ transforms: {
 
 {% end %}
 
-### Type `prefix`
+### Prefix
 
-This type of transformations are applied when the user types some text and then adds a trailing space in a new line.
+The prefix transformation allows to create a block _from_ some text typed by the user. They're applied when, in a new block line, the user types some text and then adds a trailing space.
 
 A transformation of type `prefix` is an object that takes the following parameters:
 
@@ -303,7 +310,7 @@ transforms: {
 
 {% end %}
 
-### Type `raw`
+### Raw
 
 A transformation of type `raw` is an object that takes the following parameters:
 
@@ -314,7 +321,7 @@ A transformation of type `raw` is an object that takes the following parameters:
 - **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
-### Type `shortcode`
+### Shortcode
 
 A transformation of type `shortcode` is an object that takes the following parameters:
 
