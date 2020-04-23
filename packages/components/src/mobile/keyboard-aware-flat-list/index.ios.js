@@ -50,6 +50,7 @@ export const KeyboardAwareFlatList = ( {
 		onKeyboardWillShow={ () => {
 			this.keyboardWillShowIndicator = true;
 		} }
+		scrollEnabled={ listProps.scrollEnabled }
 		onScroll={ ( event ) => {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }

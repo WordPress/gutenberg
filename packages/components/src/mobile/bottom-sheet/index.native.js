@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
+import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * WordPress dependencies
@@ -69,6 +70,14 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		if ( Platform.OS === 'android' ) {
+			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
+				() => {
+					this.props.onClose();
+				}
+			);
+		}
+
 		this.keyboardWillShowListener = Keyboard.addListener(
 			'keyboardWillShow',
 			this.keyboardWillShow
@@ -87,6 +96,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		if ( this.androidModalClosedSubscription ) {
+			this.androidModalClosedSubscription.remove();
+		}
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}

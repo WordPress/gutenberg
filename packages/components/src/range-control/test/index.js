@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import TestUtils, { act } from 'react-dom/test-utils';
+import { render, unmountComponentAtNode } from 'react-dom';
+import TestUtils, { act, Simulate } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -13,6 +14,19 @@ import RangeControl from '../';
  */
 import { Component } from '@wordpress/element';
 import { Dashicon } from '@wordpress/components';
+
+let container = null;
+
+beforeEach( () => {
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
+} );
+
+afterEach( () => {
+	unmountComponentAtNode( container );
+	container.remove();
+	container = null;
+} );
 
 describe( 'RangeControl', () => {
 	class TestWrapper extends Component {
@@ -323,6 +337,79 @@ describe( 'RangeControl', () => {
 			const inputElement = getInputElement( wrapper );
 
 			expect( inputElement.value ).toBe( '10' );
+		} );
+	} );
+
+	describe( 'input field', () => {
+		it( 'should render an input field by default', () => {
+			act( () => {
+				render( <RangeControl />, container );
+			} );
+			const field = container.querySelector( 'input[type="number"]' );
+
+			expect( field ).toBeTruthy();
+		} );
+
+		it( 'should not render an input field, if disabled', () => {
+			act( () => {
+				render( <RangeControl withInputField={ false } />, container );
+			} );
+			const field = container.querySelector( 'input[type="number"]' );
+
+			expect( field ).toBeFalsy();
+		} );
+
+		it( 'should render a zero value into input range and field', () => {
+			act( () => {
+				render( <RangeControl value={ 0 } />, container );
+			} );
+			const range = container.querySelector( 'input[type="range"]' );
+			const field = container.querySelector( 'input[type="number"]' );
+
+			expect( range.value ).toBe( '0' );
+			expect( field.value ).toBe( '0' );
+		} );
+
+		it( 'should update both field and range on change', () => {
+			act( () => {
+				render( <RangeControl value={ 0 } />, container );
+			} );
+			const range = container.querySelector( 'input[type="range"]' );
+			const field = container.querySelector( 'input[type="number"]' );
+
+			act( () => {
+				Simulate.change( range, { target: { value: 13 } } );
+			} );
+
+			expect( range.value ).toBe( '13' );
+			expect( field.value ).toBe( '13' );
+
+			act( () => {
+				Simulate.change( field, { target: { value: 7 } } );
+			} );
+
+			expect( range.value ).toBe( '7' );
+			expect( field.value ).toBe( '7' );
+		} );
+
+		it( 'should reset input values if next value is removed', () => {
+			act( () => {
+				render( <RangeControl value={ 13 } />, container );
+			} );
+			const range = container.querySelector( 'input[type="range"]' );
+			const field = container.querySelector( 'input[type="number"]' );
+
+			expect( range.value ).toBe( '13' );
+			expect( field.value ).toBe( '13' );
+
+			act( () => {
+				Simulate.change( field, { target: { value: undefined } } );
+			} );
+
+			// Reset to 50. Median value of min: 0, max: 100
+			expect( range.value ).toBe( '50' );
+			// Input field should be blank
+			expect( field.value ).toBe( '' );
 		} );
 	} );
 

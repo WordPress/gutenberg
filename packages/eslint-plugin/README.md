@@ -36,6 +36,7 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 - `jsdoc`
 - `jsx-a11y`
 - `react`
+- `i18n`
 - `test-e2e`
 - `test-unit`
 

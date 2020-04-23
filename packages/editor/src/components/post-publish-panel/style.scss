@@ -14,9 +14,9 @@
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 8px;
-	padding-right: 8px;
-	height: $header-height;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	height: $header-height + $border-width;
 	border-bottom: $border-width solid $light-gray-500;
 	display: flex;
 	align-items: center;
@@ -24,7 +24,7 @@
 
 	.components-button.has-icon {
 		position: absolute;
-		right: 8px;
+		right: $grid-unit-10;
 	}
 }
 

@@ -87,8 +87,7 @@ describe( 'Sidebar', () => {
 
 		await setBrowserViewport( 'large' );
 
-		const sidebarsDesktop = await page.$$( SIDEBAR_SELECTOR );
-		expect( sidebarsDesktop ).toHaveLength( 1 );
+		await page.waitForSelector( SIDEBAR_SELECTOR );
 	} );
 
 	it( 'should preserve tab order while changing active tab', async () => {

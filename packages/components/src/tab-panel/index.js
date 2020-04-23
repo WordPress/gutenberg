@@ -103,7 +103,6 @@ class TabPanel extends Component {
 						role="tabpanel"
 						id={ selectedId + '-view' }
 						className="components-tab-panel__tab-content"
-						tabIndex="0"
 					>
 						{ this.props.children( selectedTab ) }
 					</div>
