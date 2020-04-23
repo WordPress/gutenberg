@@ -10,9 +10,6 @@ import {
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import {
 	enableExperimentalFeatures,
 	disableExperimentalFeatures,
@@ -26,7 +23,8 @@ describe( 'Template part insertion by placeholder block', () => {
 	const testContent = 'some words...';
 
 	// Selectors
-	const chooseButtonSelector = '//button[text()="Choose"]';
+	const chooseButtonSelector =
+		'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const savePostSelector = '.editor-post-publish-button__button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
