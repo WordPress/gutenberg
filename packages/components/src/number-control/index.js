@@ -52,6 +52,7 @@ export function NumberControl(
 ) {
 	const [ value, setValue ] = useValueState( valueProp );
 	const [ isDragging, setIsDragging ] = useState( false );
+	const [ isDirty, setIsDirty ] = useState( false );
 	const isRtl = useRtl();
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
@@ -136,7 +137,7 @@ export function NumberControl(
 		 * If isPressEnterToChange is set, this submits the value to
 		 * the onChange callback.
 		 */
-		if ( isPressEnterToChange && ! isValueEmpty( value ) ) {
+		if ( isPressEnterToChange && ! isValueEmpty( value ) && isDirty ) {
 			handleOnChange( value, { event }, _forceUpdate );
 		}
 	};
@@ -149,9 +150,11 @@ export function NumberControl(
 		const nextValue = getValue( next );
 
 		if ( ! isPressEnterToChange || _forceUpdate ) {
+			setIsDirty( false );
 			onChange( nextValue, changeProps );
 			setValue( nextValue );
 		} else {
+			setIsDirty( true );
 			setValue( next );
 		}
 	};
