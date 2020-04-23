@@ -23,8 +23,15 @@ import {
 } from '@wordpress/block-editor';
 import { Platform } from '@wordpress/element';
 
-function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
-	const { align, content, level, placeholder, style } = attributes;
+function HeadingEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+	onReplace,
+	wrapperProps,
+	globalStyle,
+} ) {
+	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 	const isAndroid = Platform.select( {
 		android: true,
@@ -33,7 +40,8 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	} );
 
 	const styles = {
-		color: style && style.color && style.color.text,
+		...wrapperProps?.style,
+		color: wrapperProps?.style?.color || globalStyle?.color,
 	};
 
 	return (

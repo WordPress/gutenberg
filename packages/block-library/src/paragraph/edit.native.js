@@ -23,8 +23,9 @@ function ParagraphBlock( {
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
+		...globalStyle,
+		...wrapperProps?.style,
 		...style,
-		color: wrapperProps?.style?.color || globalStyle?.color,
 	};
 
 	return (
