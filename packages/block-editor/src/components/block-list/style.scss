@@ -264,9 +264,6 @@
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".wp-block {core/image aligned left or right}");
-
 		width: 100%;
 
 		// When images are floated, the block itself should collapse to zero height.
@@ -275,6 +272,12 @@
 		&::before {
 			content: none;
 		}
+	}
+
+	&[data-align="left"] > *,
+	&[data-align="right"] > * {
+		// Without z-index, won't be clickable as "above" adjacent content.
+		z-index: z-index("{core/image aligned left or right} .wp-block");
 	}
 
 	// Left.
