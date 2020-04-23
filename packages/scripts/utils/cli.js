@@ -7,7 +7,7 @@ const spawn = require( 'cross-spawn' );
 /**
  * Internal dependencies
  */
-const { fromScriptsRoot, hasScriptFile } = require( './file' );
+const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
 const { exit, getArgsFromCLI } = require( './process' );
 
 const getArgFromCLI = ( arg ) => {
@@ -23,12 +23,10 @@ const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
 const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
 
-const getNodeArgsFromCLI = ( supportedNodeArgs = [] ) => {
+const getNodeArgsFromCLI = () => {
 	const args = getArgsFromCLI();
-	const scriptIndex = args.findIndex(
-		( arg ) =>
-			! supportedNodeArgs.some( ( nodeArg ) => arg.startsWith( nodeArg ) )
-	);
+	const scripts = getScripts();
+	const scriptIndex = args.findIndex( ( arg ) => scripts.includes( arg ) );
 	return {
 		nodeArgs: args.slice( 0, scriptIndex ),
 		scriptName: args[ scriptIndex ],

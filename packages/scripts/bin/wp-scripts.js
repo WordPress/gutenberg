@@ -5,10 +5,6 @@
  */
 const { getNodeArgsFromCLI, spawnScript } = require( '../utils' );
 
-const { scriptName, scriptArgs, nodeArgs } = getNodeArgsFromCLI( [
-	'--inspect-brk',
-	'--inspect-port',
-	'--inspect',
-] );
+const { scriptName, scriptArgs, nodeArgs } = getNodeArgsFromCLI();
 
 spawnScript( scriptName, scriptArgs, nodeArgs );
