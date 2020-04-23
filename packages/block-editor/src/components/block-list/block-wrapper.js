@@ -30,7 +30,16 @@ import { BlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
-	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
+	(
+		{
+			children,
+			tagName = 'div',
+			__unstableIsHtml,
+			wrapperProps: parentWrapperProps,
+			...props
+		},
+		wrapper
+	) => {
 		const onSelectionStart = useContext( Context );
 		const [ , setBlockNodes ] = useContext( BlockNodes );
 		const {
@@ -49,7 +58,7 @@ const BlockComponent = forwardRef(
 			name,
 			mode,
 			blockTitle,
-			wrapperProps,
+			wrapperProps: contextWrapperProps,
 		} = useContext( BlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
@@ -69,7 +78,11 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-
+		const wrapperProps = {
+			...contextWrapperProps,
+			...parentWrapperProps,
+		};
+		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		// Provide the selected node, or the first and last nodes of a multi-
@@ -196,13 +209,24 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column. This is enabled with the
+		// .is-block-content className.
+		const blockEdit = isAligned ? (
+			<div { ...props } className="is-block-content">
+				{ children }
+			</div>
+		) : (
+			children
+		);
+
 		return (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
 				{ ...wrapperProps }
-				{ ...props }
+				{ ...( ! isAligned ? props : {} ) }
 				id={ blockElementId }
 				ref={ wrapper }
 				className={ classnames(
@@ -224,7 +248,7 @@ const BlockComponent = forwardRef(
 					...animationStyle,
 				} }
 			>
-				{ children }
+				{ blockEdit }
 			</Animated>
 		);
 	}
