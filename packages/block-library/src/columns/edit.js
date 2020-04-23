@@ -234,7 +234,7 @@ const ColumnsEdit = ( props ) => {
 	}
 
 	return (
-		<Block.div>
+		<Block.div className="has-placeholder">
 			<__experimentalBlockVariationPicker
 				icon={ get( blockType, [ 'icon', 'src' ] ) }
 				label={ get( blockType, [ 'title' ] ) }
