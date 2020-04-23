@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"doctrine": "^2.1.0",
-		"espree": "^4.0.0",
+		"@babel/parser": "^7.9.2",
 		"lodash": "^4.17.15",
 		"mdast-util-inject": "1.1.0",
 		"optionator": "0.8.2",
