@@ -6,27 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Dropdown,
-	MenuGroup,
-	MenuItem,
-	Path,
-	SVG,
-} from '@wordpress/components';
+import { Button, Dropdown, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
-
-const downArrow = (
-	<SVG
-		width="24"
-		height="24"
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-	>
-		<Path d="M12.3 16.1l-5.8-5.6 1-1 4.7 4.4 4.3-4.4 1 1z" />
-	</SVG>
-);
+import { Icon, check, chevronDown } from '@wordpress/icons';
 
 export default function PreviewOptions( {
 	children,
@@ -51,7 +33,7 @@ export default function PreviewOptions( {
 					disabled={ ! isEnabled }
 				>
 					{ __( 'Preview' ) }
-					{ downArrow }
+					<Icon icon={ chevronDown } />
 				</Button>
 			) }
 			renderContent={ () => (
