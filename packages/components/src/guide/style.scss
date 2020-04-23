@@ -2,10 +2,11 @@
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
+		margin-bottom: 0;
 
 		.components-button {
 			align-self: flex-start;
-			margin-top: $grid-unit-30;
+			margin: $grid-unit-10 $grid-unit-10 0 0;
 			position: static;
 		}
 	}
@@ -43,9 +44,15 @@
 			height: 30px;
 		}
 	}
+
+	.components-modal__content {
+		padding: 0;
+	}
 }
 
 .components-modal__frame.components-guide {
+	border: none;
+
 	@media (max-width: $break-small) {
 		bottom: 15%;
 		left: $grid-unit-30;
