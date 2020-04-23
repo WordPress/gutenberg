@@ -1,6 +1,7 @@
 .edit-post-welcome-guide {
 	$image-height: 300px;
-	$image-width: 320px;
+	$image-width: 312px;
+	width: 312px;
 
 	&__page {
 		display: flex;
@@ -22,9 +23,8 @@
 	}
 
 	&__image {
-		background: #66c6e4;
-		border-radius: $radius-round-rectangle;
-		height: 200px;
+		background: #1386bf;
+		height: 240px;
 		margin: $grid-unit-10 0;
 
 		@include break-small() {
@@ -49,7 +49,7 @@
 		top: 4px;
 	}
 
-	@include break-small() {
-		width: 600px;
-	}
+	// @include break-small() {
+	// 	width: 600px;
+	// }
 }
