@@ -24,7 +24,7 @@ The local environment will be available at http://localhost:8888.
 
 ### Installation as a global package
 
-After confirming that the prerequisits are installed, you can install `wp-env` globally like so:
+After confirming that the prerequisites are installed, you can install `wp-env` globally like so:
 
 ```sh
 $ npm -g i @wordpress/env
