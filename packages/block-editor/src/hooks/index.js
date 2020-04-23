@@ -8,6 +8,5 @@ import './generated-class-name';
 import './style';
 import './color';
 import './font-size';
-import './use-resize-canvas';
 
 export { AlignmentHookSettingsProvider };

@@ -19,6 +19,7 @@ import {
 	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
@@ -30,7 +31,6 @@ import Notices from '../notices';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import BlockEditor from '../block-editor';
-import { applyFilters } from '@wordpress/hooks';
 
 const Context = createContext();
 export function useEditorContext() {
@@ -66,10 +66,7 @@ function Editor( { settings: _settings } ) {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
-	const inlineStyles = applyFilters(
-		'edit-post.visualEditor.useResizeCanvas',
-		deviceType
-	);
+	const inlineStyles = useResizeCanvas( deviceType );
 
 	return template ? (
 		<>
