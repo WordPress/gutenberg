@@ -66,5 +66,5 @@ export const SideIndicatorY = styled( SideIndicator )`
 	top: 50%;
 	left: 50%;
 	transform: translate( 0, -50% );
-	height: 100%;
+	height: 50%;
 `;

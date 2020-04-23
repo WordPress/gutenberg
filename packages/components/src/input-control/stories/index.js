@@ -22,6 +22,7 @@ function Example() {
 	const [ value, setValue ] = useState( '' );
 
 	const props = {
+		disabled: boolean( 'disabled', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		label: text( 'label', 'Value' ),
 		placeholder: text( 'placeholder', 'Placeholder' ),

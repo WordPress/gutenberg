@@ -77,6 +77,7 @@ export default function BoxInputControls( {
 				onChange={ createHandleOnChange( 'top' ) }
 				label={ LABELS.top }
 				style={ {
+					marginTop: -5,
 					left: '50%',
 					transform: 'translateX(-50%)',
 				} }
@@ -125,6 +126,7 @@ export default function BoxInputControls( {
 				label={ LABELS.bottom }
 				style={ {
 					left: '50%',
+					marginTop: -5,
 					bottom: 0,
 					transform: 'translateX(-50%)',
 				} }

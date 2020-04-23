@@ -141,6 +141,7 @@ export const UI = {
 	borderFocus: BLUE.medium.focus,
 	borderLight: LIGHT_GRAY[ 600 ],
 	label: DARK_GRAY[ 500 ],
+	textDisabled: DARK_GRAY[ 150 ],
 };
 
 export const COLORS = {

@@ -15,7 +15,7 @@ export const Root = styled.div`
 `;
 
 const paddingStyles = ( { disableUnits } ) => {
-	const value = disableUnits ? 3 : 20;
+	const value = disableUnits ? 3 : 28;
 
 	return css`
 		${rtl( { paddingRight: value } )()};

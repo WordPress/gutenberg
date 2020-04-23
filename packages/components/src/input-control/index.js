@@ -37,6 +37,7 @@ export function InputControl(
 	{
 		children,
 		className,
+		disabled,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
@@ -107,6 +108,7 @@ export function InputControl(
 					<Input
 						{ ...props }
 						className="component-input-control__input"
+						disabled={ disabled }
 						id={ id }
 						isFilled={ isFilled }
 						isFloating={ isFloating }

@@ -39,6 +39,14 @@ export const Container = styled.div`
 	${containerBorder};
 `;
 
+const disabledStyles = ( { disabled } ) => {
+	if ( ! disabled ) return '';
+
+	return css( {
+		color: color( 'ui.textDisabled' ),
+	} );
+};
+
 const fontSizeStyles = ( { size } ) => {
 	const sizes = {
 		default: '13px',
@@ -110,6 +118,7 @@ export const Input = styled.input`
 		padding-right: 8px;
 		width: 100%;
 
+		${disabledStyles};
 		${fontSizeStyles};
 		${sizeStyles};
 
@@ -120,7 +129,9 @@ export const Input = styled.input`
 const laberColor = ( { isFloatingLabel, isFilled, isFloating } ) => {
 	const isPlaceholder = isFloatingLabel && ! isFilled;
 	const textColor =
-		isPlaceholder || isFloating ? color( 'lightGray.900' ) : 'currentColor';
+		isPlaceholder || isFloating
+			? color( 'ui.textDisabled' )
+			: 'currentColor';
 
 	return css( { color: textColor } );
 };
