@@ -11,6 +11,7 @@ import {
 	RawHTML,
 	Platform,
 	useRef,
+	useState,
 	useCallback,
 	forwardRef,
 } from '@wordpress/element';
@@ -139,6 +140,7 @@ function RichTextWrapper(
 		onCaretVerticalPositionChange,
 		isSelected: blockIsSelected,
 	} = useBlockEditContext();
+
 	const selector = ( select ) => {
 		const {
 			isCaretWithinFormattedText,
@@ -490,6 +492,8 @@ function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
+	const [isFocused, setIsFocused] = useState(false);
+
 	const content = (
 		<RichText
 			{ ...props }
@@ -498,6 +502,8 @@ function RichTextWrapper(
 			ref={ ref }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
+			unstableOnFocus={ () => {setIsFocused( true ); } }
+			onBlur={ () => {setIsFocused( false ); } }
 			selectionStart={ selectionStart }
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
@@ -545,7 +551,7 @@ function RichTextWrapper(
 			} ) => (
 				<>
 					{ children && children( { value, onChange, onFocus } ) }
-					{ nestedIsSelected && hasFormats && (
+					{ nestedIsSelected && hasFormats && isFocused && (
 						<FormatToolbarContainer
 							inline={ inlineToolbar }
 							anchorRef={ ref.current }

@@ -436,6 +436,9 @@ class RichText extends Component {
 			'selectionchange',
 			this.onSelectionChange
 		);
+		if ( this.props.onBlur ) {
+			this.props.onBlur();
+		}
 	}
 
 	/**
