@@ -1,8 +1,4 @@
 /**
- * @format
- * */
-
-/**
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
