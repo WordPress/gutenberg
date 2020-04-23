@@ -35,18 +35,16 @@ function VisualEditor() {
 			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
 			<Typewriter>
-				<CopyHandler>
-					<WritingFlow>
-						<ObserveTyping>
-							<CopyHandler>
-								<div className="edit-post-visual-editor__post-title-wrapper">
-									<PostTitle />
-								</div>
-								<BlockList />
-							</CopyHandler>
-						</ObserveTyping>
-					</WritingFlow>
-				</CopyHandler>
+				<WritingFlow>
+					<ObserveTyping>
+						<CopyHandler>
+							<div className="edit-post-visual-editor__post-title-wrapper">
+								<PostTitle />
+							</div>
+							<BlockList />
+						</CopyHandler>
+					</ObserveTyping>
+				</WritingFlow>
 			</Typewriter>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
