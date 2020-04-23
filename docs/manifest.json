@@ -84,6 +84,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-templates.md",
