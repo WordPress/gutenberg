@@ -2,7 +2,9 @@
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
-		margin-bottom: 0;
+		width: 100%;
+		padding: 0;
+		margin: 0;
 
 		.components-button {
 			align-self: flex-start;
@@ -23,13 +25,14 @@
 		display: flex;
 		height: 30px;
 		justify-content: center;
-		margin: auto 0 $grid-unit-30 0;
+		margin: 0 0 $grid-unit-40 0;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 
-		@include break-small() {
-			margin: $grid-unit-30 0 0;
-		}
+		// @include break-small() {
+		// 	margin: $grid-unit-30 0 0;
+		// }
 	}
 
 	&__page-control {
@@ -37,11 +40,11 @@
 
 		li {
 			display: inline-block;
-			margin: 0 2px;
 		}
 
 		.components-button {
 			height: 30px;
+			min-width: 20px;
 		}
 	}
 
@@ -52,6 +55,7 @@
 
 .components-modal__frame.components-guide {
 	border: none;
+	min-width: 312px;
 
 	@media (max-width: $break-small) {
 		bottom: 15%;
@@ -84,33 +88,33 @@
 	}
 
 	&.components-guide__back-button {
-		left: 0;
+		left: $grid-unit-40;
 
-		@include break-small() {
-			padding: 4px 8px 4px 2px;
+		// @include break-small() {
+		// 	padding: 4px 8px 4px 2px;
 
-			&.has-text svg {
-				margin-right: 4px;
-			}
-		}
+		// 	&.has-text svg {
+		// 		margin-right: 4px;
+		// 	}
+		// }
 	}
 
 	&.components-guide__forward-button {
-		right: 0;
+		right: $grid-unit-40;
 
-		@include break-small() {
-			padding: 4px 2px 4px 8px;
+		// @include break-small() {
+		// 	padding: 4px 2px 4px 8px;
 
-			&.has-text svg {
-				margin-left: 4px;
-				order: 1;
-			}
-		}
+		// 	&.has-text svg {
+		// 		margin-left: 4px;
+		// 		order: 1;
+		// 	}
+		// }
 	}
 
 	&.components-guide__finish-button {
 		display: none;
-		right: 0;
+		right: $grid-unit-40;
 
 		@include break-small() {
 			display: block;
