@@ -29,8 +29,8 @@ function gutenberg_block_type_render_callback_receives_block( $block_type ) {
 		return false;
 	}
 
-	$first_arg_type = $params[0]->getType();
-	return $first_arg_type && $first_arg_type->getName() === WP_Block::class;
+	$first_param_class = $params[0]->getClass();
+	return $first_param_class && $first_param_class->name === WP_Block::class;
 }
 
 /**
