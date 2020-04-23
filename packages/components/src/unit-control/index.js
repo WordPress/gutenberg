@@ -93,7 +93,7 @@ function UnitControl(
 				aria-label={ label }
 				{ ...props }
 				autoComplete={ autoComplete }
-				className="component-unit-control__input"
+				className="component-unit-control__input-control"
 				disableUnits={ disableUnits }
 				label={ label }
 				onChange={ handleOnChange }
@@ -101,7 +101,7 @@ function UnitControl(
 				suffix={ inputSuffix }
 				type={ type }
 				value={ value }
-			></ValueInput>
+			/>
 		</Root>
 	);
 }

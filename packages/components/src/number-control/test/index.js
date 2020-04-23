@@ -62,9 +62,9 @@ describe( 'NumberControl', () => {
 				render( <NumberControl className="hello" />, container );
 			} );
 
-			const input = getInput();
+			const input = container.querySelector( '.hello' );
 
-			expect( input.classList.contains( 'hello' ) ).toBe( true );
+			expect( input ).toBeTruthy();
 		} );
 	} );
 

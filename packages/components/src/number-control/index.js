@@ -33,7 +33,7 @@ export function NumberControl(
 		dragThreshold = 10,
 		hideHTMLArrows = false,
 		isDragEnabled = true,
-		isPressEnterToChange = true,
+		isPressEnterToChange = false,
 		isShiftStepEnabled = true,
 		max = Infinity,
 		min = -Infinity,

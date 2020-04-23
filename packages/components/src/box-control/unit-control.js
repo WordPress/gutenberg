@@ -18,6 +18,7 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 			<BaseUnitControl
 				className="component-box-control__unit-control"
 				hideHTMLArrows
+				isPressEnterToChange
 				isFloatingLabel
 				label={ label }
 				isResetValueOnUnitChange={ false }
