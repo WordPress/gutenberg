@@ -14,9 +14,9 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
-	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -29,7 +29,10 @@ function VisualEditor() {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
-	const inlineStyles = useResizeCanvas( deviceType );
+	const inlineStyles = applyFilters(
+		'edit-post.visualEditor.useResizeCanvas',
+		deviceType
+	);
 
 	return (
 		<BlockSelectionClearer
