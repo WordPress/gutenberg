@@ -60,7 +60,9 @@ instead of:
 $ wp-env start
 ```
 
-## Starting the environment
+## Usage
+
+### Starting the environment
 
 First, ensure that Docker is running. You can do this by clicking on the Docker icon in the system tray or menu bar.
 
@@ -78,7 +80,7 @@ $ wp-env start
 
 Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated. Default login credentials are username: `admin` password: `password`.
 
-## Stopping the environment
+### Stopping the environment
 
 To stop the local environment:
 
