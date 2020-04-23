@@ -18,7 +18,7 @@ The local environment will be available at http://localhost:8888.
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-`wp-env` is also distributed through NPM (Node Package Manager), so Node.js and NPM are required. The LTS version of Node.js was used to develop `wp-env` and is recommended.
+`wp-env` is also distributed through NPM (Node Package Manager), so Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
 
 ## Installation
 
