@@ -28,15 +28,18 @@ import { useRtl } from '../utils/style-mixins';
 export function NumberControl(
 	{
 		className,
-		label,
 		dragDirection = 'n',
 		dragThreshold = 10,
 		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isPressEnterToChange = false,
 		isShiftStepEnabled = true,
+		label,
 		max = Infinity,
 		min = -Infinity,
+		onDragStart = noop,
+		onDrag = noop,
+		onDragEnd = noop,
 		onBlur = noop,
 		onChange = noop,
 		onKeyDown = noop,
@@ -49,24 +52,35 @@ export function NumberControl(
 ) {
 	const [ value, setValue ] = useValueState( valueProp );
 	const [ isDragging, setIsDragging ] = useState( false );
-	const baseValue = clamp( 0, min, max );
 	const isRtl = useRtl();
-
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
+	const baseValue = clamp( 0, min, max );
+
 	const dragGestureProps = useDrag(
-		( { dragging, delta, event, shiftKey } ) => {
+		( dragProps ) => {
+			const { dragging, delta, event, shiftKey } = dragProps;
+
 			if ( ! isDragEnabled ) return;
+
+			/**
+			 * Quick return if no longer dragging.
+			 * This prevents unnecessary value calculations.
+			 */
 			if ( ! dragging ) {
+				onDragEnd( dragProps );
 				setIsDragging( false );
+
 				return;
 			}
 
 			event.stopPropagation();
+			onDrag( dragProps );
 
 			const [ x, y ] = delta;
 			const modifier = shiftKey ? shiftStep : 1;
 			const _forceUpdate = true;
+
 			let directionModifier;
 			let directionBaseValue;
 
@@ -104,6 +118,7 @@ export function NumberControl(
 			}
 
 			if ( ! isDragging ) {
+				onDragStart( dragProps );
 				setIsDragging( true );
 			}
 		},
@@ -117,12 +132,20 @@ export function NumberControl(
 		const _forceUpdate = true;
 		onBlur( event );
 
+		/**
+		 * If isPressEnterToChange is set, this submits the value to
+		 * the onChange callback.
+		 */
 		if ( isPressEnterToChange && ! isValueEmpty( value ) ) {
 			handleOnChange( value, { event }, _forceUpdate );
 		}
 	};
 
 	const handleOnChange = ( next, changeProps, _forceUpdate = false ) => {
+		/**
+		 * The _forceUpdate parameter is used to better control when
+		 * isPressEnterToChange is set.
+		 */
 		const nextValue = getValue( next );
 
 		if ( ! isPressEnterToChange || _forceUpdate ) {

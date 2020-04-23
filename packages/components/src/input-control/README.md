@@ -54,7 +54,7 @@ If this property is added, a label will be generated using label property as the
 
 A function that receives the value of the input.
 
--   Type: `function`
+-   Type: `Function`
 -   Required: Yes
 
 #### size
