@@ -38,10 +38,10 @@ export default function WelcomeGuide() {
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 		>
 			<GuidePage className="edit-post-welcome-guide__page">
+				<CanvasImage className="edit-post-welcome-guide__image" />
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Welcome to the block editor' ) }
 				</h1>
-				<CanvasImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __(
 						'In the WordPress editor, each paragraph, image, or video is presented as a distinct “block” of content.'
@@ -50,10 +50,10 @@ export default function WelcomeGuide() {
 			</GuidePage>
 
 			<GuidePage className="edit-post-welcome-guide__page">
+				<EditorImage className="edit-post-welcome-guide__image" />
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Make each block your own' ) }
 				</h1>
-				<EditorImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __(
 						'Each block comes with its own set of controls for changing things like color, width, and alignment. These will show and hide automatically when you have a block selected.'
@@ -62,10 +62,10 @@ export default function WelcomeGuide() {
 			</GuidePage>
 
 			<GuidePage className="edit-post-welcome-guide__page">
+				<BlockLibraryImage className="edit-post-welcome-guide__image" />
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Get to know the block library' ) }
 				</h1>
-				<BlockLibraryImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ createInterpolateElement(
 						__(
@@ -81,10 +81,10 @@ export default function WelcomeGuide() {
 			</GuidePage>
 
 			<GuidePage className="edit-post-welcome-guide__page">
+				<DocumentationImage className="edit-post-welcome-guide__image" />
 				<h1 className="edit-post-welcome-guide__heading">
 					{ __( 'Learn how to use the block editor' ) }
 				</h1>
-				<DocumentationImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __(
 						'New to the block editor? Want to learn more about using it? '
