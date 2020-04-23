@@ -48,6 +48,7 @@ function UnitControl(
 
 		const [ parsedValue, parsedUnit ] = parseUnit( inputValue, units );
 
+		// Evaluates current/next value and units
 		const baseValue = next === value ? parsedValue : next;
 		const baseUnit = parsedUnit || unit || DEFAULT_UNIT.value;
 

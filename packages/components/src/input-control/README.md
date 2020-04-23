@@ -2,9 +2,7 @@
 
 InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
 
-## Development guidelines
-
-### Usage
+## Usage
 
 Render a user interface to input the name of an additional css class.
 
@@ -20,44 +18,44 @@ const Example = () => {
 ) );
 ```
 
-### Props
+## Props
 
-#### disabled
+### disabled
 
 If true, the `input` will be disabled.
 
 -   Type: `Boolean`
 -   Required: No
 
-#### isFloatingLabel
+### isFloatingLabel
 
 If true, the `label` will render with a floating interaction.
 
 -   Type: `Boolean`
 -   Required: No
 
-#### hideLabelFromVision
+### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
 
 -   Type: `Boolean`
 -   Required: No
 
-#### label
+### label
 
 If this property is added, a label will be generated using label property as the content.
 
 -   Type: `String`
 -   Required: No
 
-#### onChange
+### onChange
 
 A function that receives the value of the input.
 
 -   Type: `Function`
 -   Required: Yes
 
-#### size
+### size
 
 Adjusts the size of the input.
 Sizes include: `default`, `small`
@@ -66,14 +64,14 @@ Sizes include: `default`, `small`
 -   Required: No
 -   Default: `default`
 
-#### suffix
+### suffix
 
 Renders an element on the right side of the input.
 
 -   Type: `React.ReactNode`
 -   Required: No
 
-#### type
+### type
 
 Type of the input element to render. Defaults to "text".
 
@@ -81,7 +79,7 @@ Type of the input element to render. Defaults to "text".
 -   Required: No
 -   Default: "text"
 
-#### value
+### value
 
 The current value of the input.
 

@@ -35,10 +35,23 @@ export function useUnitValueState( value, unit ) {
 	return useValueState( initialValue );
 }
 
+/**
+ * Checks if units are defined.
+ *
+ * @param {any} units Units to check.
+ * @return {boolean} Whether units are defined.
+ */
 export function hasUnits( units ) {
 	return ! isEmpty( units ) && units.length > 1 && units !== false;
 }
 
+/**
+ * Parses a number and unit from a value.
+ *
+ * @param {string} initialValue Value to parse
+ * @param {Array<Object>} units Units to derive from.
+ * @return {Array<number, string>} The extracted number and unit.
+ */
 export function parseUnit( initialValue, units = CSS_UNITS ) {
 	const output = [ 0, '' ];
 	const value = String( initialValue );

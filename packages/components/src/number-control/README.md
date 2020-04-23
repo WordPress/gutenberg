@@ -21,9 +21,9 @@ const Example = () => {
 };
 ```
 
-### Props
+## Props
 
-#### dragDirection
+### dragDirection
 
 Determines the drag axis to increment/decrement the value.
 Directions: `n` | `e` | `s` | `w`
@@ -32,7 +32,7 @@ Directions: `n` | `e` | `s` | `w`
 -   Required: No
 -   Default: `n`
 
-#### dragThreshold
+### dragThreshold
 
 If `isDragEnabled` is true, this controls the amount of `px` to have been dragged before the value changes.
 
@@ -40,7 +40,7 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 -   Required: No
 -   Default: `10`
 
-#### hideHTMLArrows
+### hideHTMLArrows
 
 If true, the default `input` HTML arrows will be hidden.
 
@@ -48,7 +48,7 @@ If true, the default `input` HTML arrows will be hidden.
 -   Required: No
 -   Default: `false`
 
-#### isDragEnabled
+### isDragEnabled
 
 If true, enables mouse drag gesture to increment/decrement the number value. Holding `SHIFT` while dragging will increase the value by the `shiftStep`.
 
@@ -56,7 +56,7 @@ If true, enables mouse drag gesture to increment/decrement the number value. Hol
 -   Required: No
 -   Default: `true`
 
-#### isPressEnterToChange
+### isPressEnterToChange
 
 If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
 
@@ -64,7 +64,7 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
-#### isShiftStepEnabled
+### isShiftStepEnabled
 
 If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
 
@@ -72,7 +72,7 @@ If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the v
 -   Required: No
 -   Default: `true`
 
-#### shiftStep
+### shiftStep
 
 Amount to increment by when the `SHIFT` key is held down.
 
@@ -80,7 +80,7 @@ Amount to increment by when the `SHIFT` key is held down.
 -   Required: No
 -   Default: `10`
 
-#### step
+### step
 
 Amount to increment by when incrementing/decrementing.
 
