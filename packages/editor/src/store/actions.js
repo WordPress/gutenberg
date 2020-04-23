@@ -7,7 +7,12 @@ import { has, castArray } from 'lodash';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { dispatch, select, apiFetch } from '@wordpress/data-controls';
+import {
+	dispatch,
+	select,
+	syncSelect,
+	apiFetch,
+} from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
@@ -672,7 +677,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
-			( yield select(
+			( yield syncSelect(
 				'core',
 				'getEditedEntityRecord',
 				'postType',
