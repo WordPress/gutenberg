@@ -209,30 +209,20 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
-		// For aligned blocks, provide a wrapper element so the block can be
-		// positioned relative to the block column. This is enabled with the
-		// .is-block-content className.
-		const blockEdit = isAligned ? (
-			<div { ...props } className="is-block-content">
-				{ children }
-			</div>
-		) : (
-			children
-		);
-
-		return (
+		const blockWrapper = (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
-				{ ...wrapperProps }
-				{ ...( ! isAligned ? props : {} ) }
+				{ ...omit( wrapperProps, [ 'data-align' ] ) }
+				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className
+					wrapperProps && wrapperProps.className,
+					! isAligned && 'wp-block'
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -248,9 +238,25 @@ const BlockComponent = forwardRef(
 					...animationStyle,
 				} }
 			>
-				{ blockEdit }
+				{ children }
 			</Animated>
 		);
+
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column. This is enabled with the
+		// .is-block-content className.
+		if ( isAligned ) {
+			const alignmentWrapperProps = {
+				'data-align': wrapperProps[ 'data-align' ],
+			};
+			return (
+				<div className="wp-block" { ...alignmentWrapperProps }>
+					{ blockWrapper }
+				</div>
+			);
+		}
+
+		return blockWrapper;
 	}
 );
 

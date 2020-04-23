@@ -107,7 +107,7 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		generatedClassName,
 		customClassName,
-		'wp-block block-editor-block-list__block',
+		'block-editor-block-list__block',
 		{
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,

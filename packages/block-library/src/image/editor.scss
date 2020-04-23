@@ -1,3 +1,7 @@
+figure.wp-block-image:not(.wp-block) {
+	margin: 0;
+}
+
 .wp-block-image {
 	position: relative;
 
@@ -46,20 +50,20 @@
 	}
 }
 
-[data-type="core/image"][data-align="wide"],
-[data-type="core/image"][data-align="full"] {
+[data-align="wide"] > .wp-block-image,
+[data-align="full"] > .wp-block-image {
 	img {
 		width: 100%;
 	}
 }
 
-[data-type="core/image"][data-align="left"] .is-block-content {
+.wp-block[data-align="left"] > .wp-block-image {
 	margin-right: 1em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
 
-[data-type="core/image"][data-align="right"] .is-block-content {
+.wp-block[data-align="right"] > .wp-block-image {
 	margin-left: 1em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
