@@ -37,6 +37,7 @@ export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
+export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
 
 // Higher-Order Components
@@ -50,7 +51,10 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 export * from './text';
 
 // Mobile Components
-export { default as BottomSheet } from './mobile/bottom-sheet';
+export {
+	default as BottomSheet,
+	BottomSheetConsumer,
+} from './mobile/bottom-sheet';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
@@ -60,6 +64,7 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
+export { default as ColorSettings } from './mobile/color-settings';
 
 export {
 	default as GlobalStylesContext,

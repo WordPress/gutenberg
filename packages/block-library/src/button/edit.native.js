@@ -18,13 +18,13 @@ import {
 	withColors,
 	InspectorControls,
 	BlockControls,
+	SETTINGS_DEFAULTS,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
 	ToggleControl,
 	PanelBody,
 	RangeControl,
-	UnsupportedFooterControl,
 	ToolbarGroup,
 	ToolbarButton,
 	BottomSheet,
@@ -39,7 +39,7 @@ import { link, external } from '@wordpress/icons';
  */
 import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
-import ColorBackground from './color-background.native';
+import ColorBackground from './color-background';
 import LinkRelIcon from './link-rel';
 
 const NEW_TAB_REL = 'noreferrer noopener';
@@ -173,23 +173,31 @@ class ButtonEdit extends Component {
 
 	getBackgroundColor() {
 		const { backgroundColor, attributes } = this.props;
-		const { style } = attributes;
+		const { style, gradient, customGradient } = attributes;
+		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
+		if ( customGradient || gradient ) {
+			return (
+				customGradient ||
+				defaultGradients.find(
+					( defaultGradient ) => defaultGradient.slug === gradient
+				).gradient
+			);
+		}
 		return (
 			( style && style.color && style.color.background ) ||
 			backgroundColor.color ||
-			styles.fallbackButton.backgroundColor
+			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
 		const { style } = attributes;
-
 		return (
 			( style && style.color && style.color.text ) ||
 			textColor.color ||
-			styles.fallbackButton.color
+			styles.defaultButton.color
 		);
 	}
 
@@ -267,7 +275,7 @@ class ButtonEdit extends Component {
 	onSetMaxWidth( width ) {
 		const { maxWidth } = this.state;
 		const { parentWidth } = this.props;
-		const { marginRight: spacing } = styles.button;
+		const { marginRight: spacing } = styles.defaultButton;
 
 		const isParentWidthChanged = maxWidth !== parentWidth;
 		const isWidthChanged = maxWidth !== width;
@@ -398,20 +406,18 @@ class ButtonEdit extends Component {
 			isButtonFocused,
 			placeholderTextWidth,
 		} = this.state;
+		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
 			return null;
 		}
 
-		const borderRadiusValue =
-			borderRadius !== undefined
-				? borderRadius
-				: styles.button.borderRadius;
+		const borderRadiusValue = Number.isInteger( borderRadius )
+			? borderRadius
+			: styles.defaultButton.borderRadius;
 		const outlineBorderRadius =
 			borderRadiusValue > 0
-				? borderRadiusValue +
-				  styles.button.paddingTop +
-				  styles.button.borderWidth
+				? borderRadiusValue + spacing + borderWidth
 				: 0;
 
 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
@@ -430,6 +436,7 @@ class ButtonEdit extends Component {
 				: placeholder || __( 'Add text…' );
 
 		const backgroundColor = this.getBackgroundColor();
+		const textColor = this.getTextColor();
 
 		return (
 			<View onLayout={ this.onLayout }>
@@ -458,7 +465,7 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
-							color: this.getTextColor(),
+							color: textColor,
 						} }
 						textAlign="center"
 						placeholderTextColor={
@@ -475,11 +482,11 @@ class ButtonEdit extends Component {
 							this.onToggleButtonFocus( true )
 						}
 						__unstableMobileNoFocusOnMount={ ! isSelected }
+						selectionColor={ textColor }
 						onBlur={ () => {
 							this.onToggleButtonFocus( false );
 							this.onSetMaxWidth();
 						} }
-						selectionColor={ this.getTextColor() }
 						onReplace={ onReplace }
 						onRemove={ this.onRemove }
 						onMerge={ mergeBlocks }
@@ -526,14 +533,6 @@ class ButtonEdit extends Component {
 					</PanelBody>
 					<PanelBody title={ __( 'Link Settings' ) }>
 						{ this.getLinkSettings( url, rel, linkTarget, true ) }
-					</PanelBody>
-					<PanelBody>
-						<UnsupportedFooterControl
-							label={ __(
-								'Button color settings are coming soon.'
-							) }
-							separatorType="none"
-						/>
 					</PanelBody>
 				</InspectorControls>
 			</View>
