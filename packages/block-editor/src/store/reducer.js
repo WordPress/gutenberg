@@ -1093,7 +1093,7 @@ function selection( state = {}, action ) {
 			}
 
 			const newState = { clientId: blockToSelect.clientId };
-			if ( typeof action.initialPosition === "number" ) {
+			if ( typeof action.initialPosition === 'number' ) {
 				newState.initialPosition = action.initialPosition;
 			}
 			return newState;
