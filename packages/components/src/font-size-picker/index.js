@@ -124,6 +124,7 @@ export default function FontSizePicker( {
 							id={ fontSizePickerNumberId }
 							className="components-font-size-picker__number"
 							type="number"
+							min={ 0 }
 							onChange={ onChangeValue }
 							aria-label={ __( 'Custom' ) }
 							value={ value || '' }
