@@ -17,6 +17,7 @@ import {
 import { useRtl } from '../utils/style-mixins';
 
 export default function BoxInputControls( {
+	isLinked = true,
 	onChange = noop,
 	values,
 	...props
@@ -64,71 +65,78 @@ export default function BoxInputControls( {
 	};
 
 	return (
-		<Layout className="component-box-control__input-controls">
-			<SideIndicatorX aria-hidden="true" />
-			<SideIndicatorY aria-hidden="true" />
-			<LayoutBox aria-hidden="true" />
-			<UnitControl
-				{ ...props }
-				value={ top }
-				dragDirection="s"
-				onChange={ createHandleOnChange( 'top' ) }
-				label={ LABELS.top }
-				style={ {
-					marginTop: -5,
-					left: '50%',
-					transform: 'translateX(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				value={ left }
-				dragDirection="e"
-				onChange={ createHandleOnChange( 'left' ) }
-				label={ LABELS.left }
-				style={ {
-					position: 'absolute',
-					[ isRtl ? 'right' : 'left' ]: 0,
-					top: '50%',
-					transform: 'translateY(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				value={ allValue }
-				onChange={ createHandleOnChange( 'all' ) }
-				label={ LABELS.all }
-				style={ {
-					left: '50%',
-					top: '50%',
-					transform: 'translate(-50%, -50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				value={ right }
-				dragDirection="w"
-				onChange={ createHandleOnChange( 'right' ) }
-				label={ LABELS.right }
-				style={ {
-					[ isRtl ? 'left' : 'right' ]: 0,
-					top: '50%',
-					transform: 'translateY(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				value={ bottom }
-				dragDirection="n"
-				onChange={ createHandleOnChange( 'bottom' ) }
-				label={ LABELS.bottom }
-				style={ {
-					left: '50%',
-					marginTop: -5,
-					bottom: 0,
-					transform: 'translateX(-50%)',
-				} }
-			/>
-		</Layout>
+		<>
+			<Layout className="component-box-control__input-controls">
+				<SideIndicatorX aria-hidden="true" />
+				<SideIndicatorY aria-hidden="true" />
+				<LayoutBox aria-hidden="true" />
+				<UnitControl
+					{ ...props }
+					disabled={ isLinked }
+					value={ top }
+					dragDirection="s"
+					onChange={ createHandleOnChange( 'top' ) }
+					label={ LABELS.top }
+					style={ {
+						marginTop: -5,
+						left: '50%',
+						transform: 'translateX(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					disabled={ isLinked }
+					value={ left }
+					dragDirection="e"
+					onChange={ createHandleOnChange( 'left' ) }
+					label={ LABELS.left }
+					style={ {
+						position: 'absolute',
+						[ isRtl ? 'right' : 'left' ]: 0,
+						top: '50%',
+						transform: 'translateY(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					disabled={ ! isLinked }
+					value={ allValue }
+					onChange={ createHandleOnChange( 'all' ) }
+					label={ LABELS.all }
+					style={ {
+						left: '50%',
+						top: '50%',
+						transform: 'translate(-50%, -50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					disabled={ isLinked }
+					value={ right }
+					dragDirection="w"
+					onChange={ createHandleOnChange( 'right' ) }
+					label={ LABELS.right }
+					style={ {
+						[ isRtl ? 'left' : 'right' ]: 0,
+						top: '50%',
+						transform: 'translateY(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					disabled={ isLinked }
+					value={ bottom }
+					dragDirection="n"
+					onChange={ createHandleOnChange( 'bottom' ) }
+					label={ LABELS.bottom }
+					style={ {
+						left: '50%',
+						marginTop: -5,
+						bottom: 0,
+						transform: 'translateX(-50%)',
+					} }
+				/>
+			</Layout>
+		</>
 	);
 }

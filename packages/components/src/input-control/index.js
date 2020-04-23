@@ -132,6 +132,7 @@ export function InputControl(
 			) }
 			<Container
 				className="components-input-control__container"
+				disabled={ disabled }
 				isFocused={ isFocused }
 			>
 				<Input
@@ -158,6 +159,7 @@ export function InputControl(
 				<Fieldset
 					aria-hidden="true"
 					className="components-input-control__fieldset"
+					disabled={ disabled }
 					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 				>

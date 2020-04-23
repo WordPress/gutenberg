@@ -20,6 +20,7 @@ function UnitControl(
 	{
 		autoComplete = 'off',
 		className,
+		disabled = false,
 		disableUnits = false,
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = false,
@@ -80,6 +81,7 @@ function UnitControl(
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
 			className="components-unit-control__select"
+			disabled={ disabled }
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }
 			onChange={ handleOnUnitChange }
@@ -96,6 +98,7 @@ function UnitControl(
 				autoComplete={ autoComplete }
 				className={ classes }
 				disableUnits={ disableUnits }
+				disabled={ disabled }
 				label={ label }
 				onChange={ handleOnChange }
 				ref={ ref }

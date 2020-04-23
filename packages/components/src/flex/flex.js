@@ -12,6 +12,8 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Flex as BaseFlex } from './styles/flex-styles';
+import Block from './block';
+import Item from './item';
 
 function Flex(
 	{
@@ -39,4 +41,8 @@ function Flex(
 	);
 }
 
-export default forwardRef( Flex );
+const ForwardedComponent = forwardRef( Flex );
+ForwardedComponent.Block = Block;
+ForwardedComponent.Item = Item;
+
+export default ForwardedComponent;

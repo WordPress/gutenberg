@@ -71,7 +71,7 @@ const unitSizeStyles = ( { size } ) => {
 const baseUnitLabelStyles = ( props ) => {
 	return css`
 		appearance: none;
-		background: ${color( 'ui.background' )};
+		background: transparent;
 		border-radius: 2px;
 		border: none;
 		box-sizing: border-box;
@@ -124,6 +124,14 @@ export const UnitSelect = styled.select`
 			border-color: ${color( 'ui.borderFocus' )};
 			outline: 2px solid transparent;
 			outline-offset: 0;
+		}
+
+		&:disabled {
+			cursor: initial;
+
+			&:hover {
+				background-color: transparent;
+			}
 		}
 	}
 `;

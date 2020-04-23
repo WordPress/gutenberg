@@ -30,13 +30,22 @@ const containerBorder = ( { isFocused } ) => {
 	return css( { borderRadius } );
 };
 
+const containerDisabledStyle = ( { disabled } ) => {
+	const backgroundColor = disabled
+		? color( 'ui.backgroundDisabled' )
+		: color( 'ui.background' );
+
+	return css( { backgroundColor } );
+};
+
 export const Container = styled.div`
 	align-items: center;
-	background-color: ${color( 'white' )};
 	box-sizing: border-box;
 	display: flex;
 	position: relative;
+
 	${containerBorder};
+	${containerDisabledStyle};
 `;
 
 const disabledStyles = ( { disabled } ) => {
@@ -212,10 +221,14 @@ const fieldsetTopStyles = ( { isFloatingLabel } ) => {
 	return css( { top } );
 };
 
-const fieldsetFocusedStyles = ( { isFocused } ) => {
-	const borderColor = isFocused
+const fieldsetFocusedStyles = ( { disabled, isFocused } ) => {
+	let borderColor = isFocused
 		? color( 'ui.borderFocus' )
 		: color( 'ui.border' );
+
+	if ( disabled ) {
+		borderColor = 'ui.borderDisabled';
+	}
 
 	const borderWidth = isFocused ? 2 : 1;
 	const borderStyle = 'solid';
