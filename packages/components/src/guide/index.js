@@ -16,7 +16,6 @@ import Modal from '../modal';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import Button from '../button';
 import PageControl from './page-control';
-import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
 export default function Guide( {
@@ -78,7 +77,6 @@ export default function Guide( {
 					{ canGoBack && (
 						<Button
 							className="components-guide__back-button"
-							icon={ <BackButtonIcon /> }
 							onClick={ goBack }
 						>
 							{ __( 'Previous' ) }
@@ -92,7 +90,6 @@ export default function Guide( {
 					{ canGoForward && (
 						<Button
 							className="components-guide__forward-button"
-							icon={ <ForwardButtonIcon /> }
 							onClick={ goForward }
 						>
 							{ __( 'Next' ) }
