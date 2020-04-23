@@ -38,7 +38,7 @@ A transformation of type `block` is an object that takes the following parameter
 - **type** _(string)_: the value `block`.
 - **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
 - **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
-- **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
 - **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph block to Heading block**
@@ -188,7 +188,7 @@ A transformation of type `files` is an object that takes the following parameter
 
 - **type** _(string)_: the value `files`.
 - **transform** _(function)_: a callback that receives the array of files being processed. It should return a block object or an array of block objects.
-- **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
+- **isMatch** _(function, optional)_: a callback that receives the array of files being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from file to File block**
@@ -318,7 +318,7 @@ A transformation of type `raw` is an object that takes the following parameters:
 - **transform** _(function, optional)_: a callback that receives the node being processed. It should return a block object or an array of block objects.
 - **schema** _(object|function, optional)_: it defines the attributes and children of the node that will be preserved on paste, according to its [HTML content model](https://html.spec.whatwg.org/multipage/dom.html#content-models). Take a look at [pasteHandler](/packages/blocks/README.md#pasteHandler) for more info.
 - **selector** _(string, optional)_: a CSS selector string to determine whether the element matches according to the [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element/matches) method. The transform won't be executed if the element doesn't match. This is a shorthand and alternative to using `isMatch`, which, if present, will take precedence.
-- **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applieddisplayed as an option to the user.
+- **isMatch** _(function, optional)_: a callback that receives the node being processed and should return a boolean. Returning `false` from this function will prevent the transform from being applied.
 - **priority** _(number, optional)_: controls the priority with which a transform is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from URLs to Embed block**
