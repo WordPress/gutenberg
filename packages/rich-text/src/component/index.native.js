@@ -111,7 +111,7 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { selectionStart: start, selectionEnd: end } = this.props;
-		let { value } = this.props;
+		const { value } = this.props;
 
 		const { formats, replacements, text } = this.formatToValue( value );
 		const { activeFormats } = this.state;
