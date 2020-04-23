@@ -23,6 +23,7 @@ function Example() {
 
 	const props = {
 		disabled: boolean( 'disabled', false ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		label: text( 'label', 'Value' ),
 		placeholder: text( 'placeholder', 'Placeholder' ),
@@ -34,13 +35,17 @@ function Example() {
 			},
 			'default'
 		),
+		suffix: text( 'suffix', '' ),
 	};
+
+	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
 
 	return (
 		<InputControl
 			{ ...props }
-			value={ value }
 			onChange={ ( v ) => setValue( v ) }
+			suffix={ suffixMarkup }
+			value={ value }
 		/>
 	);
 }

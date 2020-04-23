@@ -12,7 +12,6 @@ import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BaseTooltip from '../tooltip';
 import VisuallyHidden from '../visually-hidden';
 import {
 	Container,
@@ -38,16 +37,15 @@ export function InputControl(
 		children,
 		className,
 		disabled,
+		hideLabelFromVision = false,
+		id: idProp,
+		isFloatingLabel = false,
+		label,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
-		hideLabelFromVision = false,
-		id: idProp,
-		suffix,
-		isFloatingLabel = false,
-		label,
 		size = 'default',
-		tooltipPosition = 'top',
+		suffix,
 		value: valueProp,
 		...props
 	},
@@ -55,6 +53,7 @@ export function InputControl(
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ value, setValue ] = useValueState( valueProp );
+
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'component-input-control', className );
 
@@ -96,57 +95,51 @@ export function InputControl(
 					{ label }
 				</Label>
 			) }
-			<Tooltip
-				hideLabelFromVision={ hideLabelFromVision }
-				label={ label }
-				position={ tooltipPosition }
+			<Container
+				className="component-input-control__container"
+				isFocused={ isFocused }
 			>
-				<Container
-					className="component-input-control__container"
+				<Input
+					{ ...props }
+					className="component-input-control__input"
+					disabled={ disabled }
+					id={ id }
+					isFilled={ isFilled }
+					isFloating={ isFloating }
+					isFloatingLabel={ isFloatingLabelSet }
+					onBlur={ handleOnBlur }
+					onChange={ handleOnChange }
+					onFocus={ handleOnFocus }
+					ref={ ref }
+					size={ size }
+					value={ value }
+				/>
+				{ suffix && (
+					<Suffix className="component-input-control__suffix">
+						{ suffix }
+					</Suffix>
+				) }
+				<Fieldset
+					aria-hidden="true"
+					className="component-input-control__fieldset"
+					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
 				>
-					<Input
-						{ ...props }
-						className="component-input-control__input"
-						disabled={ disabled }
-						id={ id }
-						isFilled={ isFilled }
-						isFloating={ isFloating }
-						isFloatingLabel={ isFloatingLabelSet }
-						onBlur={ handleOnBlur }
-						onChange={ handleOnChange }
-						onFocus={ handleOnFocus }
-						ref={ ref }
-						size={ size }
-						value={ value }
-					/>
-					{ suffix && (
-						<Suffix className="component-input-control__suffix">
-							{ suffix }
-						</Suffix>
+					{ isFloatingLabelSet && (
+						<Legend
+							aria-hidden="true"
+							className="component-input-control__fieldset-label"
+							isFloating={ isFloating }
+							size={ size }
+						>
+							<LegendText className="component-input-control__fieldset-text">
+								{ label }
+							</LegendText>
+						</Legend>
 					) }
-					<Fieldset
-						aria-hidden="true"
-						className="component-input-control__fieldset"
-						isFloatingLabel={ isFloatingLabelSet }
-						isFocused={ isFocused }
-					>
-						{ isFloatingLabelSet && (
-							<Legend
-								aria-hidden="true"
-								className="component-input-control__fieldset-label"
-								isFloating={ isFloating }
-								size={ size }
-							>
-								<LegendText className="component-input-control__fieldset-text">
-									{ label }
-								</LegendText>
-							</Legend>
-						) }
-					</Fieldset>
-					{ children }
-				</Container>
-			</Tooltip>
+				</Fieldset>
+				{ children }
+			</Container>
 		</Root>
 	);
 }
@@ -165,18 +158,6 @@ function Label( { children, hideLabelFromVision, htmlFor, ...props } ) {
 			{ children }
 		</BaseLabel>
 	);
-}
-
-function Tooltip( { children, hideLabelFromVision, label, ...props } ) {
-	if ( label && hideLabelFromVision ) {
-		return (
-			<BaseTooltip text={ label } { ...props }>
-				{ children }
-			</BaseTooltip>
-		);
-	}
-
-	return children;
 }
 
 export default forwardRef( InputControl );
