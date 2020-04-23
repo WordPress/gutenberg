@@ -106,60 +106,10 @@ function ColorPalette( {
 		setColor( color );
 	}
 
-	function Palette() {
-		const verticalSeparatorStyle = getStylesFromColorScheme(
-			styles.verticalSeparator,
-			styles.verticalSeparatorDark
-		);
-
-		return (
-			<>
-				{ colors.map( ( color ) => {
-					const scaleValue = isSelected( color )
-						? scaleInterpolation
-						: 1;
-					return (
-						<TouchableWithoutFeedback
-							onPress={ () => onColorPress( color ) }
-							key={ color }
-						>
-							<Animated.View
-								style={ {
-									transform: [
-										{
-											scale: scaleValue,
-										},
-									],
-								} }
-							>
-								<ColorIndicator
-									color={ color }
-									isSelected={ isSelected( color ) }
-									opacity={ opacity }
-									style={ styles.colorIndicator }
-								/>
-							</Animated.View>
-						</TouchableWithoutFeedback>
-					);
-				} ) }
-				{ ! isGradientSegment && (
-					<>
-						<View style={ verticalSeparatorStyle } />
-						<TouchableWithoutFeedback onPress={ onCustomPress }>
-							<View>
-								<ColorIndicator
-									withCustomPicker={ ! isGradientSegment }
-									color={ customSwatchGradients }
-									isSelected={ isSelectedCustom() }
-									style={ styles.colorIndicator }
-								/>
-							</View>
-						</TouchableWithoutFeedback>
-					</>
-				) }
-			</>
-		);
-	}
+	const verticalSeparatorStyle = getStylesFromColorScheme(
+		styles.verticalSeparator,
+		styles.verticalSeparatorDark
+	);
 
 	return (
 		<ScrollView
@@ -173,9 +123,47 @@ function ColorPalette( {
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
 			ref={ scrollViewRef }
 		>
-			<TouchableWithoutFeedback>
-				<Palette />
-			</TouchableWithoutFeedback>
+			{ colors.map( ( color ) => {
+				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
+				return (
+					<TouchableWithoutFeedback
+						onPress={ () => onColorPress( color ) }
+						key={ `${ color }-${ isSelected( color ) }` }
+					>
+						<Animated.View
+							style={ {
+								transform: [
+									{
+										scale: scaleValue,
+									},
+								],
+							} }
+						>
+							<ColorIndicator
+								color={ color }
+								isSelected={ isSelected( color ) }
+								opacity={ opacity }
+								style={ styles.colorIndicator }
+							/>
+						</Animated.View>
+					</TouchableWithoutFeedback>
+				);
+			} ) }
+			{ ! isGradientSegment && (
+				<>
+					<View style={ verticalSeparatorStyle } />
+					<TouchableWithoutFeedback onPress={ onCustomPress }>
+						<View>
+							<ColorIndicator
+								withCustomPicker={ ! isGradientSegment }
+								color={ customSwatchGradients }
+								isSelected={ isSelectedCustom() }
+								style={ styles.colorIndicator }
+							/>
+						</View>
+					</TouchableWithoutFeedback>
+				</>
+			) }
 		</ScrollView>
 	);
 }
