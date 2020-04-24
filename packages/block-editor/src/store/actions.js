@@ -288,7 +288,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * @param {(string|string[])} clientIds     Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks        Replacement block(s).
  * @param {number}            indexToSelect Index of replacement block to select.
- * @param {bool}              initialPosition Index of caret after in the selected block after the operation.
+ * @param {number}            initialPosition Index of caret after in the selected block after the operation.
  *
  * @yield {Object} Action object.
  */
