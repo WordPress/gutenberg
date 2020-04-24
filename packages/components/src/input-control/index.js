@@ -64,7 +64,9 @@ export function InputControl(
 		setIsFocused( true );
 	};
 
-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
+	const isInputFilled = isFilled || ! isValueEmpty( value );
+
+	const isFloating = isFloatingLabel ? isInputFilled || isFocused : false;
 	const isFloatingLabelSet =
 		! hideLabelFromVision && isFloatingLabel && label;
 

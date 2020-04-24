@@ -22,7 +22,6 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 				isFloatingLabel
 				label={ label }
 				isResetValueOnUnitChange={ false }
-				placeholder={ 0 }
 				size="small"
 				style={ styles }
 				value={ value }
