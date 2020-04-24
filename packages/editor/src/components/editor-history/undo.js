@@ -8,7 +8,7 @@ import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 import { undo as undoIcon } from '@wordpress/icons';
 
-function EditorHistoryUndo( { hasUndo, undo } ) {
+function EditorHistoryUndo( { hasUndo, showTooltip, undo } ) {
 	return (
 		<Button
 			icon={ undoIcon }
@@ -20,6 +20,7 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 			aria-disabled={ ! hasUndo }
 			onClick={ hasUndo ? undo : undefined }
 			className="editor-history__undo"
+			showTooltip={ showTooltip }
 		/>
 	);
 }

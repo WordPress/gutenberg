@@ -35,7 +35,7 @@
 			}
 			&.is-primary {
 				&::after {
-					padding-right: 6px;
+					padding-right: 8px;
 				}
 			}
 		}
@@ -112,7 +112,6 @@
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.
 	min-width: 32px;
-	width: 32px;
 	height: 32px;
 	padding: 0;
 }

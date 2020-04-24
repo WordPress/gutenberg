@@ -34,7 +34,7 @@ const selectIcon = (
 	</SVG>
 );
 
-function ToolSelector() {
+function ToolSelector( { showTooltip } ) {
 	const isNavigationTool = useSelect(
 		( select ) => select( 'core/block-editor' ).isNavigationMode(),
 		[]
@@ -57,6 +57,7 @@ function ToolSelector() {
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					label={ __( 'Tools' ) }
+					showTooltip={ showTooltip }
 				/>
 			) }
 			position="bottom right"

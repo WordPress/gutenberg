@@ -58,6 +58,8 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
 
+	const showTooltip = ! showIconLabels;
+
 	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		  __( 'Document and block tools' )
@@ -68,7 +70,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 		<NavigableToolbar
 			aria-label={ toolbarAriaLabel }
 			className={ classnames( 'edit-post-header-toolbar', {
-				'show-icon-labels': isWideViewport && showIconLabels,
+				'show-icon-labels': showIconLabels,
 			} ) }
 		>
 			{ isInserterVisible && (
@@ -83,13 +85,20 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 						'Add block',
 						'Generic label for block inserter button'
 					) }
+					showTooltip={ showTooltip }
 				/>
 			) }
-			<ToolSelector />
-			<EditorHistoryUndo />
-			<EditorHistoryRedo />
-			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
+			<ToolSelector showTooltip={ showTooltip } />
+			<EditorHistoryUndo showTooltip={ showTooltip } />
+			<EditorHistoryRedo showTooltip={ showTooltip } />
+			<TableOfContents
+				hasOutlineItemsDisabled={ isTextModeEnabled }
+				showTooltip={ showTooltip }
+			/>
+			<BlockNavigationDropdown
+				isDisabled={ isTextModeEnabled }
+				showTooltip={ showTooltip }
+			/>
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

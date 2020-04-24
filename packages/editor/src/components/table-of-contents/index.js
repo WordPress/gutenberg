@@ -11,7 +11,11 @@ import { info } from '@wordpress/icons';
  */
 import TableOfContentsPanel from './panel';
 
-function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
+function TableOfContents( {
+	hasBlocks,
+	hasOutlineItemsDisabled,
+	showTooltip,
+} ) {
 	return (
 		<Dropdown
 			position="bottom"
@@ -25,6 +29,7 @@ function TableOfContents( { hasBlocks, hasOutlineItemsDisabled } ) {
 					label={ __( 'Content structure' ) }
 					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
+					showTooltip={ showTooltip }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (

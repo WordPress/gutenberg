@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { flatMap, isEmpty, isFunction } from 'lodash';
+import { flatMap, isEmpty, isFunction, isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -124,7 +124,11 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
-						showTooltip
+						showTooltip={
+							isUndefined( mergedToggleProps.showTooltip )
+								? true
+								: mergedToggleProps.showTooltip
+						}
 					>
 						{ mergedToggleProps.children }
 					</Button>

@@ -8,7 +8,7 @@ import { compose } from '@wordpress/compose';
 import { displayShortcut } from '@wordpress/keycodes';
 import { redo as redoIcon } from '@wordpress/icons';
 
-function EditorHistoryRedo( { hasRedo, redo } ) {
+function EditorHistoryRedo( { hasRedo, redo, showTooltip } ) {
 	return (
 		<Button
 			icon={ redoIcon }
@@ -20,6 +20,7 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 			aria-disabled={ ! hasRedo }
 			onClick={ hasRedo ? redo : undefined }
 			className="editor-history__redo"
+			showTooltip={ showTooltip }
 		/>
 	);
 }

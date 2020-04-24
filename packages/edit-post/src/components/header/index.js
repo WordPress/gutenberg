@@ -2,22 +2,26 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Dropdown } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
+import { Button } from '@wordpress/components';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	setEntitiesSavedStatesCallback,
+} ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -25,7 +29,6 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-		showIconLabel,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -42,23 +45,15 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
 			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
-			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
-				'fullscreenMode'
-			),
 			deviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
-			showIconLabel: select( 'core/edit-post' ).isFeatureActive(
-				'showIconLabels'
-			),
 		} ),
 		[]
 	);
 	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
 		'core/edit-post'
 	);
-
-	const isLargeViewport = useViewportMatch( 'large' );
 
 	const toggleGeneralSidebar = isEditorSidebarOpened
 		? closeGeneralSidebar
@@ -69,48 +64,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						: 'edit-post/document'
 				);
 
-	const headerSettings = (
-		<div className="edit-post-header__settings">
-			{ ! isPublishSidebarOpened && (
-				// This button isn't completely hidden by the publish sidebar.
-				// We can't hide the whole toolbar when the publish sidebar is open because
-				// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-				// We track that DOM node to return focus to the PostPublishButtonOrToggle
-				// when the publish sidebar has been closed.
-				<PostSavedState
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/>
-			) }
-			<PreviewOptions
-				forceIsAutosaveable={ hasActiveMetaboxes }
-				forcePreviewLink={ isSaving ? null : undefined }
-			/>
-			<PostPreviewButton
-				forceIsAutosaveable={ hasActiveMetaboxes }
-				forcePreviewLink={ isSaving ? null : undefined }
-			/>
-			<PostPublishButtonOrToggle
-				forceIsDirty={ hasActiveMetaboxes }
-				forceIsSaving={ isSaving }
-			/>
-			<Button
-				icon={ cog }
-				label={ __( 'Settings' ) }
-				onClick={ toggleGeneralSidebar }
-				isPressed={ isEditorSidebarOpened }
-				aria-expanded={ isEditorSidebarOpened }
-				showIconLabel={ showIconLabel }
-				shortcut={ shortcut }
-			/>
-			<PinnedItems.Slot scope="core/edit-post" />
-			<MoreMenu showIconLabel={ showIconLabel } />
-		</div>
-	);
-
 	return (
 		<div className="edit-post-header">
-			{ isFullscreenActive && <AdminMenuToggle /> }
+			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }
@@ -137,6 +93,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<Button
 					icon={ cog }
@@ -149,23 +108,6 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PinnedItems.Slot scope="core/edit-post" />
 				<MoreMenu />
 			</div>
-			{ isLargeViewport && headerSettings }
-			{ ! isLargeViewport && (
-				<Dropdown
-					className="my-container-class-name"
-					contentClassName="my-popover-content-classname"
-					position="bottom right"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button
-							isPrimary
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-							icon="menu"
-						/>
-					) }
-					renderContent={ () => headerSettings }
-				/>
-			) }
 		</div>
 	);
 }
