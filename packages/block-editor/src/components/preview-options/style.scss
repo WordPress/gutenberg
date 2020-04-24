@@ -1,10 +1,10 @@
-.editor-post-preview__dropdown {
+.block-editor-post-preview__dropdown {
 	display: none;
 	margin-right: $grid-unit-15;
 	padding: 0;
 }
 
-.editor-post-preview__button-toggle {
+.block-editor-post-preview__button-toggle {
 	display: flex;
 	justify-content: space-between;
 	padding: 0 $grid-unit-10 0 $grid-unit-15;
@@ -18,7 +18,7 @@
 	}
 }
 
-.editor-post-preview__button-resize.editor-post-preview__button-resize {
+.block-editor-post-preview__button-resize.block-editor-post-preview__button-resize {
 	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 
 	&.has-icon {
@@ -26,10 +26,9 @@
 	}
 }
 
-.editor-post-preview__dropdown-content {
+.block-editor-post-preview__dropdown-content {
 	.components-popover__content {
 		overflow-y: visible;
-		padding-bottom: 0;
 	}
 
 	.components-menu-group + .components-menu-group {
@@ -40,29 +39,12 @@
 	}
 }
 
-.editor-post-preview__grouping-external {
-	display: flex;
-	position: relative;
-}
-
-.editor-post-preview__button-external {
-	padding-left: $grid-unit-10;
-	margin-right: auto;
-	width: 100%;
-	display: flex;
-	justify-content: flex-start;
-
-	svg {
-		margin-right: $grid-unit-10;
-	}
-}
-
 @include break-small() {
 	.editor-post-preview {
 		display: none;
 	}
 
-	.editor-post-preview__dropdown {
+	.block-editor-post-preview__dropdown {
 		display: flex;
 	}
 }

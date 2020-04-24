@@ -69,6 +69,26 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
+ * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
+ * template part slugs should be unique.
+ *
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @param int    $post_parent   Post parent ID.
+ * @param int    $original_slug The desired slug (post_name).
+ * @return string The original, desired slug.
+ */
+function gutenberg_filter_wp_template_part_wp_unique_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
+	if ( 'wp_template_part' === $post_type ) {
+		return $original_slug;
+	}
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_part_wp_unique_post_slug', 10, 6 );
+
+/**
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {

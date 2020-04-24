@@ -26,20 +26,25 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 					'postType',
 					'wp_template_part',
 					{
-						status: 'auto-draft',
+						status: [ 'publish', 'auto-draft' ],
 						slug,
 						meta: { theme },
 					}
 				);
+				const foundPosts = posts?.filter(
+					( post ) =>
+						post.slug === slug &&
+						post.meta &&
+						post.meta.theme === theme
+				);
+				// A published post might already exist if this template part was customized elsewhere
+				// or if it's part of a customized template.
 				const foundPost =
-					posts &&
-					posts.find(
-						( post ) =>
-							post.slug === slug &&
-							post.meta &&
-							post.meta.theme === theme
+					foundPosts?.find( ( post ) => post.status === 'publish' ) ||
+					foundPosts?.find(
+						( post ) => post.status === 'auto-draft'
 					);
-				return foundPost && foundPost.id;
+				return foundPost?.id;
 			}
 		},
 		[ postId, slug, theme ]

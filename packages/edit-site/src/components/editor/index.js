@@ -16,8 +16,10 @@ import {
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
+	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
@@ -60,6 +62,12 @@ function Editor( { settings: _settings } ) {
 		};
 	}, [] );
 
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const inlineStyles = useResizeCanvas( deviceType );
+
 	return template ? (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -78,11 +86,13 @@ function Editor( { settings: _settings } ) {
 										sidebar={ ! isMobile && <Sidebar /> }
 										header={ <Header /> }
 										content={
-											<>
+											<BlockSelectionClearer
+												style={ inlineStyles }
+											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
 												<BlockEditor />
-											</>
+											</BlockSelectionClearer>
 										}
 										footer={ <BlockBreadcrumb /> }
 									/>

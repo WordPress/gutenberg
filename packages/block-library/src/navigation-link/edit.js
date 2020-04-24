@@ -212,7 +212,6 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
-						tagName="span"
 						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) =>

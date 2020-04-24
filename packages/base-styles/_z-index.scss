@@ -46,8 +46,8 @@ $z-layers: (
 	".components-drop-zone": 40,
 	".components-drop-zone__content": 50,
 
-	// The block mover for floats should overlap the controls of adjacent blocks.
-	".block-editor-block-list__block {core/image aligned left or right}": 21,
+	// The floated blocks should be above the other blocks to allow selection.
+	"{core/image aligned left or right} .wp-block": 21,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
