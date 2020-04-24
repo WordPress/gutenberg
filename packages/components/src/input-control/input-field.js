@@ -36,6 +36,12 @@ function InputField(
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ value, setValue ] = useValueState( valueProp );
 
+	const resetValue = () => {
+		setValue( valueProp );
+		setIsDirty( false );
+		onUpdateValue( ! isValueEmpty( valueProp ) );
+	};
+
 	const handleOnBlur = ( event ) => {
 		const _forceUpdate = true;
 
@@ -45,8 +51,12 @@ function InputField(
 		 * If isPressEnterToChange is set, this submits the value to
 		 * the onChange callback.
 		 */
-		if ( isPressEnterToChange && ! isValueEmpty( value ) && isDirty ) {
-			handleOnChange( event, _forceUpdate );
+		if ( isPressEnterToChange && isDirty ) {
+			if ( ! isValueEmpty( value ) ) {
+				handleOnChange( event, _forceUpdate );
+			} else {
+				resetValue();
+			}
 		}
 	};
 
