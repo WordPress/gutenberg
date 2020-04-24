@@ -106,7 +106,6 @@
 		"@wordpress/docgen": "file:packages/docgen",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
-		"@wordpress/env": "file:packages/env",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",
@@ -181,7 +180,8 @@
 		"typescript": "3.8.3",
 		"uuid": "7.0.2",
 		"webpack": "4.42.0",
-		"worker-farm": "1.7.0"
+		"worker-farm": "1.7.0",
+		"wp-env": "file:packages/wp-env"
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
@@ -200,7 +200,7 @@
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
-		"fixtures:server-registered": "packages/env/bin/wp-env run wordpress ./wp-content/plugins/gutenberg/bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
+		"fixtures:server-registered": "wp-env run wordpress ./wp-content/plugins/gutenberg/bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format-js": "wp-scripts format-js",
@@ -242,7 +242,7 @@
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"preenv": "npm run check-engines",
 		"env": "wp-scripts env",
-		"wp-env": "packages/env/bin/wp-env"
+		"wp-env": "packages/wp-env/bin/wp-env"
 	},
 	"husky": {
 		"hooks": {

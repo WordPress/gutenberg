@@ -8,7 +8,7 @@ Ensure that Docker is running, then:
 
 ```sh
 $ cd /path/to/a/wordpress/plugin
-$ npm -g i @wordpress/env
+$ npm -g i wp-env
 $ wp-env start
 ```
 
@@ -27,7 +27,7 @@ Node.js and NPM are required. The latest LTS version of Node.js is used to devel
 After confirming that the prerequisites are installed, you can install `wp-env` globally like so:
 
 ```sh
-$ npm -g i @wordpress/env
+$ npm -g i wp-env
 ```
 
 You're now ready to use `wp-env`!
@@ -37,7 +37,7 @@ You're now ready to use `wp-env`!
 If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally as a dev dependency:
 
 ```sh
-$ npm i @wordpress/env --save-dev
+$ npm i wp-env --save-dev
 ```
 
 Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):

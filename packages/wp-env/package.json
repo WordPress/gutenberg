@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/env",
+	"name": "wp-env",
 	"version": "1.2.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
@@ -10,11 +10,11 @@
 		"wordpress-environment",
 		"docker"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/env#readme",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/wp-env#readme",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/env"
+		"directory": "packages/wp-env"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

@@ -1,5 +1,9 @@
 ## Master
 
+### New Feature
+
+-   The `@wordpress/env` package was renamed to `wp-env` to match the name of the binary.
+
 ## 1.1.0 (2020-04-01)
 
 ### New Feature

@@ -87,7 +87,7 @@
 /packages/block-editor/src/components/rich-text @ellatrix @jorgefilipecosta @daniloercoli @sergioestevao @etoledom
 
 # wp-env
-/packages/env                                   @epiqueras @noahtallen @noisysocks
+/packages/wp-env                                   @epiqueras @noahtallen @noisysocks
 
 # PHP
 /lib                                            @timothybjacobs

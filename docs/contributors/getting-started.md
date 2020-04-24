@@ -23,7 +23,7 @@ If you don't have a local WordPress environment to load Gutenberg in, we can hel
 
 ### Step 1: Installing a Local Environment
 
-The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/wp-env), which is developed within the Gutenberg source repository, and published as `wp-env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/wp-env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
 
 If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
 
@@ -42,7 +42,7 @@ npx wp-env start
 #### Accessing the Local WordPress Install
 
 The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
-If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
+If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/wp-env/README.md).
 
 To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
 
@@ -52,7 +52,7 @@ WordPress comes with specific [debug systems](https://wordpress.org/support/arti
 
 #### Troubleshooting
 
-See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
+See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/wp-env#troubleshooting-common-problems).
 
 ## On A Remote Server
 
