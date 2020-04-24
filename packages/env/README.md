@@ -40,6 +40,14 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
+Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+
+```json
+"scripts": {
+	"wp-env": "packages/env/bin/wp-env"
+}
+```
+
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
