@@ -15,7 +15,7 @@ const getAST = ( source ) => {
 		cache: () => {}, // To bypass api.cache is not a function error.
 	} );
 
-	return babel.parse( source, {
+	return babel.parse( source || '', {
 		presets,
 		plugins: [ ...plugins, 'jsx' ],
 		sourceType: 'module',
