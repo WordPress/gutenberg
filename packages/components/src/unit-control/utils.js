@@ -3,11 +3,6 @@
  */
 import { isEmpty } from 'lodash';
 
-/**
- * Internal dependencies
- */
-import { useValueState } from '../input-control/utils';
-
 export const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: 0 },
 	{ value: '%', label: '%', default: 10 },
@@ -20,7 +15,7 @@ export const CSS_UNITS = [
 export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
 
 /**
- * Custom hook to handle legacy value + unit handling.
+ * Handles legacy value + unit handling.
  * This component use to manage both incoming value and units separately.
  *
  * Moving forward, ideally the value should be a string that contains both
@@ -28,11 +23,13 @@ export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
  *
  * @param {number|string} value Value
  * @param {string} unit Unit value
+ * @param {Array<Object>} units Units to derive from.
+ * @return {Array<number, string>} The extracted number and unit.
  */
-export function useUnitValueState( value, unit ) {
+export function getParsedValue( value, unit, units ) {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
-	return useValueState( initialValue );
+	return parseUnit( initialValue, units );
 }
 
 /**

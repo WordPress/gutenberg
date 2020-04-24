@@ -22,7 +22,7 @@ import {
 	subtract,
 	useDragCursor,
 } from './utils';
-import { isValueEmpty, useValueState } from '../input-control/utils';
+import { isValueEmpty } from '../input-control/utils';
 import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
@@ -48,7 +48,6 @@ export function NumberControl(
 	},
 	ref
 ) {
-	const [ value, setValue ] = useValueState( valueProp );
 	const [ isDragging, setIsDragging ] = useState( false );
 	const isRtl = useRtl();
 	const dragCursor = useDragCursor( isDragging, dragDirection );
@@ -77,7 +76,6 @@ export function NumberControl(
 
 			const [ x, y ] = delta;
 			const modifier = shiftKey ? shiftStep : 1;
-			const _forceUpdate = true;
 
 			let directionModifier;
 			let directionBaseValue;
@@ -112,7 +110,7 @@ export function NumberControl(
 					modifier
 				);
 
-				handleOnChange( nextValue, { event }, _forceUpdate );
+				handleOnChange( nextValue, { event } );
 			}
 
 			if ( ! isDragging ) {
@@ -130,7 +128,6 @@ export function NumberControl(
 		const nextValue = getValue( next );
 
 		onChange( nextValue, changeProps );
-		setValue( nextValue );
 	};
 
 	const handleOnKeyDown = ( event ) => {
@@ -197,7 +194,7 @@ export function NumberControl(
 			onKeyDown={ handleOnKeyDown }
 			transformValueOnChange={ getValue }
 			ref={ ref }
-			value={ value }
+			value={ valueProp }
 		/>
 	);
 }

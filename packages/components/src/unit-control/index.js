@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import { CSS_UNITS, DEFAULT_UNIT, parseUnit, useUnitValueState } from './utils';
+import { CSS_UNITS, DEFAULT_UNIT, getParsedValue, parseUnit } from './utils';
 
 function UnitControl(
 	{
@@ -37,25 +37,17 @@ function UnitControl(
 	},
 	ref
 ) {
-	const [ valueState, setValueState ] = useUnitValueState(
-		valueProp,
-		unitProp
-	);
-	const [ value, unit ] = parseUnit( valueState, units );
+	const [ value, unit ] = getParsedValue( valueProp, unitProp, units );
 
 	const handleOnChange = ( next, changeProps ) => {
 		const { event } = changeProps;
 		const inputValue = event.target.value;
 
-		const [ parsedValue, parsedUnit ] = parseUnit( inputValue, units );
-
-		// Evaluates current/next value and units
-		const baseValue = next === value ? parsedValue : next;
+		const [ , parsedUnit ] = parseUnit( inputValue, units );
 		const baseUnit = parsedUnit || unit || DEFAULT_UNIT.value;
 
-		const nextValue = `${ baseValue }${ baseUnit }`;
+		const nextValue = `${ next }${ baseUnit }`;
 
-		setValueState( nextValue );
 		onChange( nextValue, changeProps );
 
 		if ( unit !== baseUnit ) {

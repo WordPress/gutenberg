@@ -24,12 +24,14 @@ function Example() {
 
 	const props = {
 		disableUnits: boolean( 'disableUnits', false ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
 		label: text( 'label', 'Value' ),
-		shiftStep: number( 'shiftStep', 10 ),
-		max: number( 'max', 100 ),
 		min: number( 'min', 0 ),
+		max: number( 'max', 100 ),
+		shiftStep: number( 'shiftStep', 10 ),
 		size: select(
 			'size',
 			{

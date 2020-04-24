@@ -19,11 +19,17 @@ export default {
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '' );
+	const [ value, setValue ] = useState( '0' );
 
 	const props = {
-		label: text( 'label', 'Number' ),
+		disabled: boolean( 'disabled', false ),
+		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
+		label: text( 'label', 'Number' ),
+		min: number( 'min', 0 ),
+		max: number( 'max', 100 ),
+		placeholder: text( 'placeholder', 0 ),
 		shiftStep: number( 'shiftStep', 10 ),
 		step: number( 'step', 1 ),
 	};
