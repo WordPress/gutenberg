@@ -446,7 +446,7 @@ Jest will look for test files with any of the following popular naming conventio
 
 #### Debugging Jest unit tests
 
-Tests can be debugged any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
+Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
 Follow the instructions for debugging Node.js with your favorite supported browser or IDE. When the instructions say to use `node --inspect script.js` or `node --inspect-brk script.js`, simply use `wp-scripts --inspect test-unit-js` or `wp-scripts --inspect-brk test-unit-js` instead.
 
