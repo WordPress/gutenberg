@@ -186,6 +186,11 @@ public class ReactAztecText extends AztecText {
         return isPreTag();
     }
 
+    @Override
+    public boolean shouldIgnoreWhitespace() {
+        return false;
+    }
+
     // VisibleForTesting from {@link TextInputEventsTestCase}.
     public void requestFocusFromJS() {
         mIsJSSettingFocus = true;
