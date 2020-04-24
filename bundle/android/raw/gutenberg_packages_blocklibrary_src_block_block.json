@@ -1,0 +1,9 @@
+{
+	"name": "core/block",
+	"category": "reusable",
+	"attributes": {
+		"ref": {
+			"type": "number"
+		}
+	}
+}
