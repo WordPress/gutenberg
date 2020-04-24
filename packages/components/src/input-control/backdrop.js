@@ -1,9 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { memo } from '@wordpress/element';
+/**
  * Internal dependencies
  */
 import { Fieldset, Legend, LegendText } from './styles/input-control-styles';
 
-export default function Backdrop( {
+function Backdrop( {
 	disabled = false,
 	isFloating = false,
 	isFloatingLabel = false,
@@ -34,3 +38,7 @@ export default function Backdrop( {
 		</Fieldset>
 	);
 }
+
+const MemoizedBackdrop = memo( Backdrop );
+
+export default MemoizedBackdrop;

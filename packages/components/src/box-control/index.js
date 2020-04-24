@@ -16,7 +16,6 @@ import InputControls from './input-controls';
 import Text from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
-import { useBoxControlState } from './utils';
 import { Root, Header, LayoutContainer } from './styles/box-control-styles';
 
 const defaultInputProps = {
@@ -34,18 +33,12 @@ export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	values: valuesProp,
+	values,
 	units,
 } ) {
-	const [ values, setValues ] = useBoxControlState( valuesProp );
 	const [ isLinked, setIsLinked ] = useState( true );
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
-
-	const updateValues = ( nextValues ) => {
-		setValues( nextValues );
-		onChange( nextValues );
-	};
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
 
@@ -70,7 +63,7 @@ export default function BoxControl( {
 			<LayoutContainer className="component-box-control__input-controls-wrapper">
 				<InputControls
 					{ ...inputProps }
-					onChange={ updateValues }
+					onChange={ onChange }
 					isLinked={ isLinked }
 					units={ units }
 					values={ values }

@@ -80,12 +80,12 @@ const sizeStyles = ( { size } ) => {
 	const sizes = {
 		default: {
 			height: 30,
-			lineHeight: 30,
+			lineHeight: 1,
 			minHeight: 30,
 		},
 		small: {
 			height: 24,
-			lineHeight: 24,
+			lineHeight: 1,
 			minHeight: 24,
 		},
 	};

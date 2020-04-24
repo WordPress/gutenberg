@@ -97,8 +97,8 @@ function UnitControl(
 				{ ...props }
 				autoComplete={ autoComplete }
 				className={ classes }
-				disableUnits={ disableUnits }
 				disabled={ disabled }
+				disableUnits={ disableUnits }
 				label={ label }
 				onChange={ handleOnChange }
 				ref={ ref }
