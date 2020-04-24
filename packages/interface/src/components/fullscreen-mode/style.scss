@@ -27,10 +27,14 @@ body.is-fullscreen-mode {
 			bottom: 0;
 		}
 
-		// Hides the admin menu
-		// This prevents keyboard navigation from accessing inner links
-		#adminmenuwrap {
-			//display: none;
+		// Allow the menu to scroll on smaller viewports.
+		#adminmenu {
+			position: fixed;
+			top: 0;
+			bottom: 0;
+			overflow-y: auto;
+			margin: 0;
+			padding-bottom: 16px; // Clear some room for browser UI, like Chrome's floating URL tooltip.
 		}
 
 		.interface-interface-skeleton__body,
