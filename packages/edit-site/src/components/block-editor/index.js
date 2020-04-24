@@ -74,16 +74,11 @@ export default function BlockEditor() {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							templateIds={ settings.templateIds }
 							activeId={ settings.templateId }
 							onActiveIdChange={ setActiveTemplateId }
 						/>
 					),
-					[
-						settings.templateIds,
-						settings.templateId,
-						setActiveTemplateId,
-					]
+					[ settings.templateId, setActiveTemplateId ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
 			<Sidebar.InspectorFill>
