@@ -14,7 +14,11 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { ToolbarButton } from '@wordpress/components';
+import {
+	ToolbarButton,
+	SiteCapabilitiesContext,
+	isMentionsSupported,
+} from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
@@ -200,7 +204,6 @@ export class RichText extends Component {
 			this.lastEventCount = undefined;
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
-			
 		}
 	}
 
@@ -879,20 +882,28 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							<ToolbarButton
-								title={ __( 'Insert mention' ) }
-								icon={ <Icon icon={ atSymbol } /> }
-								onClick={ () => {
-									addMention()
-										.then( ( mentionUserId ) => {
-											this.insertString(
-												record,
-												`@${ mentionUserId } `
-											);
-										} )
-										.catch( () => {} );
-								} }
-							/>
+							<SiteCapabilitiesContext.Consumer>
+								{ ( capabilities ) =>
+									isMentionsSupported( capabilities ) && (
+										<ToolbarButton
+											title={ __( 'Insert mention' ) }
+											icon={ <Icon icon={ atSymbol } /> }
+											onClick={ () => {
+												addMention()
+													.then(
+														( mentionUserId ) => {
+															this.insertString(
+																record,
+																`@${ mentionUserId } `
+															);
+														}
+													)
+													.catch( () => {} );
+											} }
+										/>
+									)
+								}
+							</SiteCapabilitiesContext.Consumer>
 						</BlockFormatControls>
 					</>
 				) }

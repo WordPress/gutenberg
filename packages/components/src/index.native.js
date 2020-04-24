@@ -60,3 +60,5 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
+
+export { SiteCapabilitiesContext, isMentionsSupported } from './mobile/site-capabilities';
