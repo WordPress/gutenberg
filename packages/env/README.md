@@ -8,24 +8,59 @@ Ensure that Docker is running, then:
 
 ```sh
 $ cd /path/to/a/wordpress/plugin
-$ npx wp-env start
+$ npm -g i @wordpress/env
+$ wp-env start
 ```
 
 The local environment will be available at http://localhost:8888.
 
-## Instructions
-
-### Installation
+## Prerequisites
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After confirming that Docker is installed, you can install `wp-env` globally like so:
+Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+
+## Installation
+
+### Installation as a global package
+
+After confirming that the prerequisites are installed, you can install `wp-env` globally like so:
 
 ```sh
 $ npm -g i @wordpress/env
 ```
 
 You're now ready to use `wp-env`!
+
+### Installation as a local package
+
+If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally as a dev dependency:
+
+```sh
+$ npm i @wordpress/env --save-dev
+```
+
+Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+
+```json
+"scripts": {
+	"wp-env": "wp-env"
+}
+```
+
+When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
+
+```sh
+$ npm run wp-env start
+```
+
+instead of:
+
+```sh
+$ wp-env start
+```
+
+## Usage
 
 ### Starting the environment
 
