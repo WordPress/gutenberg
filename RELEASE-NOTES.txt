@@ -4,6 +4,9 @@
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
 * [iOS]: Video in video blocks can now be played inline on the editor.
 * Add support for upload options in Cover block
+* [Android] Floating toolbar, previously located above nested blocks, is now placed at the top of the screen
+* [iOS] Floating toolbar, previously located above nested blocks, is now placed at the bottom of the screen
+* Fix the icons in FloatingToolbar on RTL mode
 
 1.26.0
 ------
