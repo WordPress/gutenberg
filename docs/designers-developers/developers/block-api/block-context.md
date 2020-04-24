@@ -63,13 +63,15 @@ registerBlockType( 'my-plugin/record-title', {
 
 ### PHP
 
-A block's context values are available from the `context` property of the `$block` argument passed to the `render_callback` function.
+Note that in PHP, block context is accessed using the `$block` global which is assigned at the time a block is rendered. This is unlike block attributes or block content, which are provided as arguments to the `render_callback` function. At some point in the future, block context may be integrated into the function arguments signature of `render_callback`, or an alternative block settings configuration may enable a render callback to receive the full block array as its argument.
 
 `record-title/index.php`
 
 ```php
 register_block_type( 'my-plugin/record-title', [
-	'render_callback' => function( $block ) {
+	'render_callback' => function() {
+		global $block;
+
 		return 'The current record ID is: ' . $block->context['my-plugin/recordId'];
 	},
 ] );
