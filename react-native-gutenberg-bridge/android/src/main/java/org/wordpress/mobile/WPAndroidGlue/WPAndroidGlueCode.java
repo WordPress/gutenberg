@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
@@ -98,6 +99,8 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
+    public static final String PROP_NAME_CAPABILITIES = "capabilities";
+    public static final String PROP_NAME_CAPABILITIES_MENTIONS = "mentions";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -357,17 +360,43 @@ public class WPAndroidGlueCode {
     }
 
     @Deprecated
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
-        onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations, colorBackground, isDarkMode);
+    public void onCreateView(Context initContext,
+                             boolean htmlModeEnabled,
+                             Application application,
+                             boolean isDebug,
+                             boolean buildGutenbergFromSource,
+                             boolean isNewPost,
+                             String localeString,
+                             Bundle translations,
+                             int colorBackground,
+                             boolean isDarkMode) {
+        onCreateView(
+                initContext,
+                htmlModeEnabled,
+                application,
+                isDebug,
+                buildGutenbergFromSource,
+                "post",
+                isNewPost,
+                localeString,
+                translations,
+                colorBackground,
+                isDarkMode,
+                null);
     }
 
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             String postType, boolean isNewPost, String localeString, Bundle translations,
-                             int colorBackground, boolean isDarkMode) {
+    public void onCreateView(Context initContext,
+                             boolean htmlModeEnabled,
+                             Application application,
+                             boolean isDebug,
+                             boolean buildGutenbergFromSource,
+                             String postType,
+                             boolean isNewPost,
+                             String localeString,
+                             Bundle translations,
+                             int colorBackground,
+                             boolean isDarkMode,
+                             @Nullable Boolean isSiteUsingWpComRestApi) {
         mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
@@ -397,6 +426,12 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_POST_TYPE, postType);
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
+
+        Bundle capabilities = new Bundle();
+        if (isSiteUsingWpComRestApi != null) {
+            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
+        }
+        initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
