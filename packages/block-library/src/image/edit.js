@@ -352,9 +352,6 @@ export class ImageEdit extends Component {
 			sizeSlug,
 		} = attributes;
 
-		const wrapperProps = {
-			'data-align': align,
-		};
 		const isExternal = isExternalImage( id, url );
 		const controls = (
 			<BlockControls>
@@ -422,9 +419,7 @@ export class ImageEdit extends Component {
 			return (
 				<>
 					{ controls }
-					<Block.div wrapperProps={ wrapperProps }>
-						{ mediaPlaceholder }
-					</Block.div>
+					<Block.div>{ mediaPlaceholder }</Block.div>
 				</>
 			);
 		}
@@ -502,10 +497,7 @@ export class ImageEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<Block.figure
-					className={ classes }
-					wrapperProps={ wrapperProps }
-				>
+				<Block.figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
 							const {

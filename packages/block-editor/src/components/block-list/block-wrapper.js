@@ -30,16 +30,7 @@ import { BlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
-	(
-		{
-			children,
-			tagName = 'div',
-			__unstableIsHtml,
-			wrapperProps: parentWrapperProps,
-			...props
-		},
-		wrapper
-	) => {
+	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
 		const onSelectionStart = useContext( Context );
 		const [ , setBlockNodes ] = useContext( BlockNodes );
 		const {
@@ -58,7 +49,7 @@ const BlockComponent = forwardRef(
 			name,
 			mode,
 			blockTitle,
-			wrapperProps: contextWrapperProps,
+			wrapperProps,
 		} = useContext( BlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
@@ -78,10 +69,6 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-		const wrapperProps = {
-			...contextWrapperProps,
-			...parentWrapperProps,
-		};
 		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
