@@ -60,6 +60,8 @@ export { default as withColorContext } from './color-palette/with-color-context'
 
 export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
+export { default as __experimentalPreviewOptions } from './preview-options';
+export { default as __experimentalUseResizeCanvas } from './resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { Block as __experimentalBlock } from './block-list/block-wrapper';
