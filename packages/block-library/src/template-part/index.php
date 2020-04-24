@@ -70,20 +70,9 @@ function render_block_core_template_part( $attributes ) {
  * Registers the `core/template-part` block on the server.
  */
 function register_block_core_template_part() {
-	register_block_type(
-		'core/template-part',
+	register_block_type_from_metadata(
+		__DIR__ . '/template-part',
 		array(
-			'attributes'      => array(
-				'postId' => array(
-					'type' => 'number',
-				),
-				'slug'   => array(
-					'type' => 'string',
-				),
-				'theme'  => array(
-					'type' => 'string',
-				),
-			),
 			'render_callback' => 'render_block_core_template_part',
 		)
 	);
