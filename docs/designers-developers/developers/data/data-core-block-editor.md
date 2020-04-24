@@ -1124,7 +1124,7 @@ _Parameters_
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
--   _initialPosition_ `bool`: Index of caret after in the selected block after the operation.
+-   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 
