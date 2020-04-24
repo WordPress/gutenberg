@@ -18,6 +18,7 @@ import {
 	embedTumblrIcon,
 	embedAmazonIcon,
 	embedAnimotoIcon,
+	embedDailymotionIcon,
 } from './icons';
 
 /**
@@ -186,7 +187,7 @@ export const others = [
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
-			icon: embedVideoIcon,
+			icon: embedDailymotionIcon,
 			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a Dailymotion video.' ),
 		},
