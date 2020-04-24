@@ -51,7 +51,7 @@ export function hasUnits( units ) {
  */
 export function parseUnit( initialValue, units = CSS_UNITS ) {
 	const output = [ 0, '' ];
-	const value = String( initialValue );
+	const value = String( initialValue ).trim();
 
 	const num = parseFloat( value, 10 );
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
