@@ -102,13 +102,11 @@ body.block-editor-page {
 .wp-block {
 	max-width: $content-width;
 
-	&[data-align="wide"],
-	&.alignwide {
+	&[data-align="wide"] {
 		max-width: 1100px;
 	}
 
-	&[data-align="full"],
-	&.alignfull {
+	&[data-align="full"] {
 		max-width: none;
 	}
 }
