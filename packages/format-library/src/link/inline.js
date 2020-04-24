@@ -128,7 +128,10 @@ function InlineLinkUI( {
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			onChange( applyFormat( value, format ) );
+			const newValue = applyFormat( value, format );
+			newValue.start = newValue.end;
+			newValue.activeFormats = [];
+			onChange( newValue );
 		}
 
 		// Focus should only be shifted back to the formatted segment when the

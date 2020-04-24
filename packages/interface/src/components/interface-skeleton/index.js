@@ -28,6 +28,7 @@ function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
+	leftSidebar,
 	content,
 	actions,
 	labels,
@@ -36,10 +37,17 @@ function InterfaceSkeleton( {
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
+		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
+		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
+		/* translators: accessibility text for the left sidebar landmark region. */
+		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
+		/* translators: accessibility text for the publish landmark region. */
 		actions: __( 'Publish' ),
+		/* translators: accessibility text for the footer landmark region. */
 		footer: __( 'Footer' ),
 	};
 
@@ -56,7 +64,6 @@ function InterfaceSkeleton( {
 				<div
 					className="interface-interface-skeleton__header"
 					role="region"
-					/* translators: accessibility text for the top bar landmark region. */
 					aria-label={ mergedLabels.header }
 					tabIndex="-1"
 				>
@@ -64,10 +71,19 @@ function InterfaceSkeleton( {
 				</div>
 			) }
 			<div className="interface-interface-skeleton__body">
+				{ !! leftSidebar && (
+					<div
+						className="interface-interface-skeleton__left-sidebar"
+						role="region"
+						aria-label={ mergedLabels.leftSidebar }
+						tabIndex="-1"
+					>
+						{ leftSidebar }
+					</div>
+				) }
 				<div
 					className="interface-interface-skeleton__content"
 					role="region"
-					/* translators: accessibility text for the content landmark region. */
 					aria-label={ mergedLabels.body }
 					tabIndex="-1"
 				>
@@ -77,7 +93,6 @@ function InterfaceSkeleton( {
 					<div
 						className="interface-interface-skeleton__sidebar"
 						role="region"
-						/* translators: accessibility text for the settings landmark region. */
 						aria-label={ mergedLabels.sidebar }
 						tabIndex="-1"
 					>
@@ -88,7 +103,6 @@ function InterfaceSkeleton( {
 					<div
 						className="interface-interface-skeleton__actions"
 						role="region"
-						/* translators: accessibility text for the publish landmark region. */
 						aria-label={ mergedLabels.actions }
 						tabIndex="-1"
 					>
@@ -100,7 +114,6 @@ function InterfaceSkeleton( {
 				<div
 					className="interface-interface-skeleton__footer"
 					role="region"
-					/* translators: accessibility text for the footer landmark region. */
 					aria-label={ mergedLabels.footer }
 					tabIndex="-1"
 				>

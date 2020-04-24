@@ -71,6 +71,8 @@ export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
 export { default as QueryControls } from './query-controls';
+export { default as __experimentalRadio } from './radio';
+export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';

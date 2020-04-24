@@ -69,10 +69,10 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
@@ -132,13 +132,12 @@
 			z-index: 1;
 			pointer-events: none;
 			content: "";
-			top: 0;
-			bottom: 0;
-			left: 0;
-			right: 0;
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
 		}
 
-		.is-block-content, // Floats.
 		&::after { // Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
@@ -243,53 +242,6 @@
 		cursor: default;
 	}
 
-	.alignleft,
-	.alignright {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-	}
-
-	// Alignments.
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content.
-		z-index: z-index(".block-editor-block-list__block {core/image aligned left or right}");
-		width: 100%;
-
-		// When images are floated, the block itself should collapse to zero height.
-		height: 0;
-
-		&::before {
-			content: none;
-		}
-	}
-
-	// Left.
-	&[data-align="left"] > .is-block-content {
-		// This is in the editor only; the image should be floated on the frontend.
-		/*!rtl:begin:ignore*/
-		float: left;
-		margin-right: 2em;
-		/*!rtl:end:ignore*/
-	}
-
-	// Right.
-	&[data-align="right"] > .is-block-content {
-		// Right: This is in the editor only; the image should be floated on the frontend.
-		/*!rtl:begin:ignore*/
-		float: right;
-		margin-left: 2em;
-		/*!rtl:end:ignore*/
-	}
-
-	// Wide and full-wide.
-	&[data-align="full"],
-	&[data-align="wide"],
-	&.alignfull,
-	&.alignwide {
-		clear: both;
-	}
-
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
@@ -302,6 +254,54 @@
 			left: auto;
 			right: $grid-unit-10;
 		}
+	}
+}
+
+.wp-block {
+	margin-left: auto;
+	margin-right: auto;
+
+	// Alignments.
+	&[data-align="left"],
+	&[data-align="right"] {
+		width: 100%;
+
+		// When images are floated, the block itself should collapse to zero height.
+		height: 0;
+
+		&::before {
+			content: none;
+		}
+	}
+
+	&[data-align="left"] > *,
+	&[data-align="right"] > * {
+		// Without z-index, won't be clickable as "above" adjacent content.
+		z-index: z-index("{core/image aligned left or right} .wp-block");
+	}
+
+	// Left.
+	&[data-align="left"] > * {
+		// This is in the editor only; the image should be floated on the frontend.
+		/*!rtl:begin:ignore*/
+		float: left;
+		margin-right: 2em;
+		/*!rtl:end:ignore*/
+	}
+
+	// Right.
+	&[data-align="right"] > * {
+		// Right: This is in the editor only; the image should be floated on the frontend.
+		/*!rtl:begin:ignore*/
+		float: right;
+		margin-left: 2em;
+		/*!rtl:end:ignore*/
+	}
+
+	// Wide and full-wide.
+	&[data-align="full"],
+	&[data-align="wide"] {
+		clear: both;
 	}
 }
 
@@ -585,10 +585,7 @@
 		.block-editor-block-list__breadcrumb,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
-
-			// @todo It should position the block transform dialog as the left margin of a block. It currently
-			// positions instead, the mover control.
-			margin-left: - $block-toolbar-height - $border-width;
+			margin-left: - $block-toolbar-height;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],
@@ -611,6 +608,8 @@
 // The purpose of this padding is to ensure that on small viewports, there is
 // room for the block border that sits 14px ($block-padding) offset from the
 // block footprint.
+// These paddings and margins are removed from the BlockPreview component's style
+// Any change need to be reflected there.
 .block-editor-block-list__layout.is-root-container {
 	padding-left: $block-padding;
 	padding-right: $block-padding;
@@ -619,15 +618,9 @@
 		padding-left: $block-side-ui-width;
 		padding-right: $block-side-ui-width;
 	}
-}
 
-.block-editor-block-list__layout.is-root-container {
-	// Full-wide. (to account for the padddings added above)
-	// The first two rules account for the alignment wrapper div for the image block.
-	> div:not(.block-editor-block-list__block) > .block-editor-block-list__block[data-align="full"],
-	> div:not(.block-editor-block-list__block) > .block-editor-block-list__block.alignfull,
-	> .block-editor-block-list__block[data-align="full"],
-	> .block-editor-block-list__block.alignfull {
+	// Full-wide. (to account for the paddings added above)
+	> .wp-block[data-align="full"] {
 		margin-left: -$block-padding;
 		margin-right: -$block-padding;
 

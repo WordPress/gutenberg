@@ -34,6 +34,8 @@ export const settings = {
 		align: true,
 		alignWide: false,
 		reusable: false,
+		lightBlockWrapper: true,
+		__experimentalColor: { gradients: true },
 	},
 	parent: [ 'core/buttons' ],
 	styles: [

@@ -71,15 +71,20 @@ describe( 'jest-console', () => {
 
 		describe( 'lifecycle', () => {
 			beforeAll( () => {
+				// Disable reason:
 				// This is a difficult one to test, since the matcher's
 				// own lifecycle is defined to run before ours. Infer
 				// that we're being watched by testing the console
 				// method as being a spy.
+				// eslint-disable-next-line jest/no-standalone-expect
 				expect(
 					console[ methodName ].assertionsNumber
 				).toBeGreaterThanOrEqual( 0 );
 			} );
 
+			// Disable reason:
+			// See beforeAll implementation and explanation added there.
+			// eslint-disable-next-line jest/expect-expect
 			it( 'captures logging in lifecycle', () => {} );
 		} );
 	} );

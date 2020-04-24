@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.4.0",
+	"version": "1.5.1",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",

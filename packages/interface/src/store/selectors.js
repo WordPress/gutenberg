@@ -40,16 +40,14 @@ export function getActiveComplementaryArea( state, scope ) {
  * @param {string} scope    Scope.
  * @param {string} item     Item to check.
  *
- * @return {boolean} True if the item is enabled and false otherwise.
+ * @return {boolean|undefined} True if the item is enabled, false otherwise if the item is explicitly disabled, and undefined if there is no information for that item.
  */
 function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
-	return (
-		get( state.enableItems.multipleEnableItems, [
-			itemType,
-			scope,
-			item,
-		] ) === true
-	);
+	return get( state.enableItems.multipleEnableItems, [
+		itemType,
+		scope,
+		item,
+	] );
 }
 
 /**
@@ -62,5 +60,8 @@ function isMultipleEnabledItemEnabled( state, itemType, scope, item ) {
  * @return {boolean} True if the item is pinned and false otherwise.
  */
 export function isItemPinned( state, scope, item ) {
-	return isMultipleEnabledItemEnabled( state, 'pinnedItems', scope, item );
+	return (
+		isMultipleEnabledItemEnabled( state, 'pinnedItems', scope, item ) !==
+		false
+	);
 }

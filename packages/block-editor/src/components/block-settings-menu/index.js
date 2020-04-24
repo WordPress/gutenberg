@@ -29,7 +29,7 @@ import BlockSettingsMenuControls from '../block-settings-menu-controls';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	position: 'bottom right',
-	noArrow: true,
+	isAlternate: true,
 };
 
 export function BlockSettingsMenu( { clientIds } ) {

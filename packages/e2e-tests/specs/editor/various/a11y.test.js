@@ -23,7 +23,7 @@ describe( 'a11y', () => {
 			':focus',
 			( focusedElement ) => {
 				return focusedElement.classList.contains(
-					'block-editor-inserter__toggle'
+					'edit-post-header-toolbar__inserter-toggle'
 				);
 			}
 		);

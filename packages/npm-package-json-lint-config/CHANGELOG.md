@@ -1,5 +1,7 @@
 ## Master
 
+## 3.0.0 (2020-04-15)
+
 ### Breaking Change
 
 - Add `types` to the order of preferred properties. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))

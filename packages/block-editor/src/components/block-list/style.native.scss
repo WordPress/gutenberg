@@ -4,6 +4,16 @@
 	background-color: #fff;
 }
 
+.horizontalContentContainer {
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: stretch;
+	max-width: $content-width;
+	overflow: visible;
+	width: 100%;
+}
+
 .switch {
 	flex-direction: row;
 	justify-content: flex-start;
@@ -69,4 +79,29 @@
 
 .blockToolbar {
 	height: $mobile-block-toolbar-height;
+}
+
+.floatingToolbar {
+	height: $mobile-floating-toolbar-height + 2 * $mobile-floating-toolbar-margin;
+}
+
+.horizontal {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.is-aligned-left {
+	justify-content: flex-start;
+}
+
+.is-aligned-center {
+	justify-content: center;
+}
+
+.is-aligned-right {
+	justify-content: flex-end;
+}
+
+.overflowVisible {
+	overflow: visible;
 }
