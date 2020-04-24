@@ -68,3 +68,8 @@ figure.wp-block-image:not(.wp-block) {
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
+
+.wp-block[data-align="center"] > .wp-block-image {
+	margin-left: auto;
+	margin-right: auto;
+}
