@@ -186,7 +186,7 @@ To release a patch for the older major or minor version of packages, run the fol
 npm run publish:patch
 ```
 
-This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress.
+This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.
 
 ## TypeScript
 
