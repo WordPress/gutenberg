@@ -16,14 +16,13 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	__unstableEditorStyles as EditorStyles,
-	__experimentalFetchLinkSuggestions,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
-import { mediaUpload } from '../../utils';
+import { mediaUpload, __experimentalFetchLinkSuggestions } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 

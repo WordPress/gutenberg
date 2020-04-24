@@ -6,7 +6,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
-import { __experimentalFetchLinkSuggestions } from '@wordpress/block-editor';
+import { __experimentalFetchLinkSuggestions } from '@wordpress/editor';
 
 /**
  * Internal dependencies
