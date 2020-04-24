@@ -17,6 +17,7 @@ import {
 	embedRedditIcon,
 	embedTumblrIcon,
 	embedAmazonIcon,
+	embedAnimotoIcon,
 } from './icons';
 
 /**
@@ -129,7 +130,7 @@ export const others = [
 		name: 'core-embed/animoto',
 		settings: {
 			title: 'Animoto',
-			icon: embedVideoIcon,
+			icon: embedAnimotoIcon,
 			description: __( 'Embed an Animoto video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
