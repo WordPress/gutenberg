@@ -304,7 +304,7 @@ Checks if current URL is a WordPress path.
 _Parameters_
 
 -   _WPPath_ `string`: String to be serialized as pathname.
--   _query_ `?string`: String to be serialized as query portion of URL.
+-   _query_ `[string]`: Optional string to be serialized as query portion of URL. If omitted, any querystring is allowed.
 
 _Returns_
 

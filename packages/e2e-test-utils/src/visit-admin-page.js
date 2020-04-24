@@ -12,6 +12,24 @@ import { loginUser } from './login-user';
 import { getPageError } from './get-page-error';
 
 /**
+ * Runs database upgrade, assuming that the browser has been redirected to the
+ * database upgrade page `wp-admin/upgrade.php`.
+ */
+async function runDatabaseUpgrade() {
+	// Click "Update WordPress Database" at Step 1
+	await Promise.all( [
+		page.waitForNavigation(),
+		page.click( 'a.button-primary' ),
+	] );
+
+	// Click "Continue" at Step 2
+	await Promise.all( [
+		page.waitForNavigation(),
+		page.click( 'a.button-large' ),
+	] );
+}
+
+/**
  * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
  *
  * @param {string} adminPath String to be serialized as pathname.
@@ -19,6 +37,10 @@ import { getPageError } from './get-page-error';
  */
 export async function visitAdminPage( adminPath, query ) {
 	await page.goto( createURL( join( 'wp-admin', adminPath ), query ) );
+
+	if ( isCurrentURL( 'wp-admin/upgrade.php' ) ) {
+		await runDatabaseUpgrade();
+	}
 
 	if ( isCurrentURL( 'wp-login.php' ) ) {
 		await loginUser();
