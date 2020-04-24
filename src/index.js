@@ -65,11 +65,10 @@ export class RootComponent extends React.Component {
 	}
 
 	render() {
-		const { initialHtmlModeEnabled } = this.props;
+		const { initialHtmlModeEnabled, capabilities = { } } = this.props;
 		let initialData = this.props.initialData;
 		let initialTitle = this.props.initialTitle;
 		let postType = this.props.postType;
-		const capabilities = this.props.capabilities;
 
 		if ( initialData === undefined && __DEV__ ) {
 			initialData = initialHtml;
