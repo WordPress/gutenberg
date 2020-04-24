@@ -491,4 +491,56 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (paste to empty editor)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'Backspace' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (paste mid-block)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+		// This code path triggers an unrelated React warning. Without the check below,
+		// this test would fail. Let's remove it below once the warning is fixed.
+		expect( console ).toHaveErroredWith( "Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in %s.%s the componentWillUnmount method \n    in r (created by Context.Consumer)\n    in v (created by S)\n    in S (created by Ql)\n    in div (created by Qa)\n    in Qa (created by ei)\n    in ei (created by Ss)\n    in Ss (created by Ql)\n    in div (created by Ql)\n    in Ql (created by es)\n    in D (created by C)\n    in C (created by BlockFormatControlsFill)\n    in BlockFormatControlsFill (created by Context.Consumer)\n    in IfBlockEditSelected(BlockFormatControlsFill) (created by es)\n    in es (created by n)" );
+	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (replace)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
