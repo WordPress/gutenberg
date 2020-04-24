@@ -1,4 +1,45 @@
 {
 	"name": "core/post-author",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"id": {
+			"type": "number"
+		},
+		"name": {
+			"type": "string"
+		},
+		"avatarSize": {
+			"type": "number"
+		},
+		"avatarUrl": {
+			"type": "string"
+		},
+		"showAvatar": {
+			"type": "boolean"
+		},
+		"showBio": {
+			"type": "boolean"
+		},
+		"byline": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
+		}
+	}
 }
