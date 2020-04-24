@@ -13,6 +13,12 @@ import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import Edit from './edit';
+import save from './save';
+
+/**
  * Every block starts by registering a new block type definition.
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
@@ -61,36 +67,12 @@ registerBlockType( '{{namespace}}/{{slug}}', {
 	},
 
 	/**
-	 * The edit function describes the structure of your block in the context of the editor.
-	 * This represents what the editor will render when the block is used.
-	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
-	 *
-	 * @param {Object} [props] Properties passed from the editor.
-	 *
-	 * @return {WPElement} Element to render.
+	 * @see ./edit.js
 	 */
-	edit( { className } ) {
-		return (
-			<p className={ className }>
-				{ __( '{{title}} – hello from the editor!', '{{textdomain}}' ) }
-			</p>
-		);
-	},
+	edit: Edit,
 
 	/**
-	 * The save function defines the way in which the different attributes should be combined
-	 * into the final markup, which is then serialized by the block editor into `post_content`.
-	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
-	 *
-	 * @return {WPElement} Element to render.
+	 * @see ./save.js
 	 */
-	save() {
-		return (
-			<p>
-				{ __( '{{title}} – hello from the saved content!', '{{textdomain}}' ) }
-			</p>
-		);
-	},
+	save,
 } );
