@@ -118,7 +118,6 @@ export { default as search } from './library/search';
 export { default as separator } from './library/separator';
 export { default as share } from './library/share';
 export { default as shortcode } from './library/shortcode';
-export { default as star } from './library/star';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';
 export { default as starHalf } from './library/star-half';
