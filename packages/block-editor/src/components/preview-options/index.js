@@ -25,6 +25,7 @@ export default function PreviewOptions( {
 				'block-editor-post-preview__dropdown-content'
 			) }
 			popoverProps={ { role: 'menu' } }
+			position="bottom left"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					onClick={ onToggle }
