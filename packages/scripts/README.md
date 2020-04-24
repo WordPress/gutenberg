@@ -462,11 +462,11 @@ A breakpoint will be set at the first line of the script (this is done to give y
 
 ##### Debugging in Visual Studio Code
 
-Debugging NPM scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
+Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
 
 First, set a breakpoint in your tests by clicking on a line in the editor's left margin by the line numbers.
 
-Then open NPM Scripts in the Explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the NPM scripts. To start the tests, click the debug icon next to `test:unit:debug`.
+Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the npm scripts. To start the tests, click the debug icon next to `test:unit:debug`.
 
 The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
 
