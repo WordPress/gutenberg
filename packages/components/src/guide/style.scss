@@ -29,10 +29,6 @@
 		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
-
-		// @include break-small() {
-		// 	margin: $grid-unit-30 0 0;
-		// }
 	}
 
 	&__page-control {
@@ -89,28 +85,12 @@
 
 	&.components-guide__back-button {
 		left: $grid-unit-40;
-
-		// @include break-small() {
-		// 	padding: 4px 8px 4px 2px;
-
-		// 	&.has-text svg {
-		// 		margin-right: 4px;
-		// 	}
-		// }
 	}
 
 	&.components-guide__forward-button {
 		right: $grid-unit-40;
 		color: #1386bf;
 		font-weight: bold;
-		// @include break-small() {
-		// 	padding: 4px 2px 4px 8px;
-
-		// 	&.has-text svg {
-		// 		margin-left: 4px;
-		// 		order: 1;
-		// 	}
-		// }
 	}
 
 	&.components-guide__finish-button {
