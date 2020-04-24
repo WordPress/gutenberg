@@ -9,23 +9,15 @@ import classNames from 'classnames';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useState, forwardRef } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../visually-hidden';
-import {
-	Container,
-	Fieldset,
-	Input,
-	Label as BaseLabel,
-	Legend,
-	LegendText,
-	Root,
-	Suffix,
-} from './styles/input-control-styles';
-import { useValueState, isValueEmpty } from './utils';
+import Backdrop from './backdrop';
+import InputField from './input-field';
+import Label from './label';
+import { Container, Root, Suffix } from './styles/input-control-styles';
+import { isValueEmpty } from './utils';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
@@ -50,32 +42,21 @@ export function InputControl(
 		onKeyDown = noop,
 		size = 'default',
 		suffix,
-		transformValueOnChange = ( value ) => value,
-		value: valueProp,
+		transformValueOnChange = ( v ) => v,
+		value,
 		...props
 	},
 	ref
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const [ isDirty, setIsDirty ] = useState( false );
-	const [ value, setValue ] = useValueState( valueProp );
+	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
 
 	const handleOnBlur = ( event ) => {
-		const _forceUpdate = true;
-
 		onBlur( event );
 		setIsFocused( false );
-
-		/**
-		 * If isPressEnterToChange is set, this submits the value to
-		 * the onChange callback.
-		 */
-		if ( isPressEnterToChange && ! isValueEmpty( value ) && isDirty ) {
-			handleOnChange( event, _forceUpdate );
-		}
 	};
 
 	const handleOnFocus = ( event ) => {
@@ -83,72 +64,45 @@ export function InputControl(
 		setIsFocused( true );
 	};
 
-	const handleOnChange = ( event, _forceUpdate ) => {
-		const nextValue = event.target.value;
-
-		if ( ! isPressEnterToChange || _forceUpdate ) {
-			const transformedValue = transformValueOnChange( nextValue );
-			setValue( transformedValue );
-
-			onChange( nextValue, { event } );
-
-			setIsDirty( false );
-		} else {
-			setValue( nextValue );
-			setIsDirty( true );
-		}
-	};
-
-	const handleOnKeyDown = ( event ) => {
-		const _forceUpdate = true;
-		onKeyDown( event );
-
-		if ( isPressEnterToChange && event.keyCode === ENTER ) {
-			event.preventDefault();
-			handleOnChange( event, _forceUpdate );
-		}
-	};
-
-	const isFilled = ! isValueEmpty( value );
 	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
 	const isFloatingLabelSet =
 		! hideLabelFromVision && isFloatingLabel && label;
 
 	return (
 		<Root className={ classes } isFloatingLabel={ isFloatingLabelSet }>
-			{ label && (
-				<Label
-					as="label"
-					className="components-input-control__label"
-					hideLabelFromVision={ hideLabelFromVision }
-					htmlFor={ id }
-					isFilled={ isFilled }
-					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabel }
-					size={ size }
-				>
-					{ label }
-				</Label>
-			) }
+			<Label
+				className="components-input-control__label"
+				hideLabelFromVision={ hideLabelFromVision }
+				htmlFor={ id }
+				isFilled={ isFilled }
+				isFloating={ isFloating }
+				isFloatingLabel={ isFloatingLabel }
+				size={ size }
+			>
+				{ label }
+			</Label>
 			<Container
 				className="components-input-control__container"
 				disabled={ disabled }
 				isFocused={ isFocused }
 			>
-				<Input
+				<InputField
 					{ ...props }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
-					isFilled={ isFilled }
 					isFloating={ isFloating }
-					isFloatingLabel={ isFloatingLabelSet }
+					isFloatingLabelSet={ isFloatingLabelSet }
+					isPressEnterToChange={ isPressEnterToChange }
 					onBlur={ handleOnBlur }
-					onChange={ handleOnChange }
+					onChange={ onChange }
 					onFocus={ handleOnFocus }
-					onKeyDown={ handleOnKeyDown }
+					onKeyDown={ onKeyDown }
+					onUpdateValue={ setIsFilled }
 					ref={ ref }
+					setIsFocused={ setIsFocused }
 					size={ size }
+					transformValueOnChange={ transformValueOnChange }
 					value={ value }
 				/>
 				{ suffix && (
@@ -156,45 +110,19 @@ export function InputControl(
 						{ suffix }
 					</Suffix>
 				) }
-				<Fieldset
+				<Backdrop
 					aria-hidden="true"
 					className="components-input-control__fieldset"
 					disabled={ disabled }
+					isFloating={ isFloating }
 					isFloatingLabel={ isFloatingLabelSet }
 					isFocused={ isFocused }
-				>
-					{ isFloatingLabelSet && (
-						<Legend
-							aria-hidden="true"
-							className="components-input-control__fieldset-label"
-							isFloating={ isFloating }
-							size={ size }
-						>
-							<LegendText className="components-input-control__fieldset-text">
-								{ label }
-							</LegendText>
-						</Legend>
-					) }
-				</Fieldset>
+					label={ label }
+					size={ size }
+				/>
 				{ children }
 			</Container>
 		</Root>
-	);
-}
-
-function Label( { children, hideLabelFromVision, htmlFor, ...props } ) {
-	if ( hideLabelFromVision ) {
-		return (
-			<VisuallyHidden as="label" htmlFor={ htmlFor }>
-				{ children }
-			</VisuallyHidden>
-		);
-	}
-
-	return (
-		<BaseLabel htmlFor={ htmlFor } { ...props }>
-			{ children }
-		</BaseLabel>
 	);
 }
 
