@@ -1,3 +1,7 @@
+figure.wp-block-image:not(.wp-block) {
+	margin: 0;
+}
+
 .wp-block-image {
 	position: relative;
 
@@ -17,19 +21,6 @@
 		margin-top: -9px;
 		margin-left: -9px;
 	}
-
-	// These need specificity to override an inherited left/right block margin in the editor.
-	&.wp-block-image.alignleft {
-		margin-right: 1em;
-		margin-top: 0.5em;
-		margin-bottom: 0.5em;
-	}
-
-	&.wp-block-image.alignright {
-		margin-left: 1em;
-		margin-top: 0.5em;
-		margin-bottom: 0.5em;
-	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
@@ -48,18 +39,6 @@
 	display: block;
 }
 
-.block-editor-block-list__block[data-type="core/image"][data-align="center"] {
-	.wp-block-image {
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	&[data-resized="false"] .wp-block-image > div {
-		margin-left: auto;
-		margin-right: auto;
-	}
-}
-
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
@@ -71,26 +50,28 @@
 	}
 }
 
-// Although the float markup is different in the editor compared to the frontend,
-// this CSS uses the same technique to allow floats in a wide images context.
-// That is, the block retains its centering and max-width, and a child inside
-// is floated instead of the block itself.
-[data-type="core/image"][data-align="center"],
-[data-type="core/image"][data-align="left"],
-[data-type="core/image"][data-align="right"] {
-	figure {
-		margin: 0;
-	}
-}
-
-[data-type="core/image"][data-align="wide"],
-[data-type="core/image"][data-align="full"] {
-	figure img {
+[data-align="wide"] > .wp-block-image,
+[data-align="full"] > .wp-block-image {
+	img {
 		width: 100%;
 	}
 }
 
-// This is similar to above but for resized unfloated images only, where the markup is different.
-[data-type="core/image"] figure.is-resized {
-	margin: 0;
+.wp-block[data-align="left"] > .wp-block-image {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block[data-align="right"] > .wp-block-image {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block[data-align="center"] > .wp-block-image {
+	margin-left: auto;
+	margin-right: auto;
 }
