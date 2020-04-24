@@ -660,6 +660,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BoxControl",
+		"slug": "box-control",
+		"markdown_source": "../packages/components/src/box-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ButtonGroup",
 		"slug": "button-group",
 		"markdown_source": "../packages/components/src/button-group/README.md",
@@ -765,6 +771,12 @@
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "../packages/components/src/external-link/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Flex",
+		"slug": "flex",
+		"markdown_source": "../packages/components/src/flex/README.md",
 		"parent": "components"
 	},
 	{
