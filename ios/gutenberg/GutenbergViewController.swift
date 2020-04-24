@@ -218,6 +218,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergCapabilities() -> [String : Bool]? {
+        return ["mentions": true]
+    }
+
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {
         return ExampleAttachmentDelegate()
     }
