@@ -1,5 +1,9 @@
 ## Master
 
+### Enhancements
+
+- Update `esnext` template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code.
+
 ## 0.10.0 (2020-04-01)
 
 ### New Features

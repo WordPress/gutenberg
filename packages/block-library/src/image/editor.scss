@@ -17,6 +17,19 @@
 		margin-top: -9px;
 		margin-left: -9px;
 	}
+
+	// These need specificity to override an inherited left/right block margin in the editor.
+	&.wp-block-image.alignleft {
+		margin-right: 1em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+	}
+
+	&.wp-block-image.alignright {
+		margin-left: 1em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
