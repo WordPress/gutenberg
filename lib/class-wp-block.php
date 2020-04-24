@@ -156,7 +156,7 @@ class WP_Block {
 	 * @return string Rendered block output.
 	 */
 	public function render() {
-		global $post, $block;
+		global $post, $_experimental_block;
 
 		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
@@ -169,12 +169,12 @@ class WP_Block {
 		}
 
 		if ( $is_dynamic ) {
-			$global_post   = $post;
-			$global_block  = $block;
-			$block         = $this;
-			$block_content = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content );
-			$block         = $global_block;
-			$post          = $global_post;
+			$global_post         = $post;
+			$global_block        = $_experimental_block;
+			$_experimental_block = $this;
+			$block_content       = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content );
+			$_experimental_block = $global_block;
+			$post                = $global_post;
 		}
 
 		return $block_content;

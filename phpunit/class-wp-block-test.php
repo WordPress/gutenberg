@@ -260,12 +260,12 @@ class WP_Block_Test extends WP_UnitTestCase {
 					),
 				),
 				'render_callback' => function() {
-					global $block;
+					global $_experimental_block;
 
 					return sprintf(
 						'Hello %s%s',
-						$block->attributes['toWhom'],
-						$block->attributes['punctuation']
+						$_experimental_block->attributes['toWhom'],
+						$_experimental_block->attributes['punctuation']
 					);
 				},
 			)
