@@ -29,7 +29,7 @@ function useUniqueId( idProp ) {
 	return idProp || id;
 }
 export default function BoxControl( {
-	idProp,
+	id: idProp,
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),

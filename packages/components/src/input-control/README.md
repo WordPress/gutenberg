@@ -11,11 +11,15 @@ import { __experimentalInputControl as InputControl } from '@wordpress/component
 import { useState } from '@wordpress/compose';
 
 const Example = () => {
-	const [value, setValue] = useState('')
+	const [ value, setValue ] = useState( '' );
 
-	return <InputControl value={value} onChange={(nextValue) => setValue(nextValue)} />
-
-) );
+	return (
+		<InputControl
+			value={ value }
+			onChange={ ( nextValue ) => setValue( nextValue ) }
+		/>
+	);
+};
 ```
 
 ## Props
