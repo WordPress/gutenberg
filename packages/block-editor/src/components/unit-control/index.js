@@ -8,16 +8,11 @@ import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/compone
  */
 import useEditorFeature from '../use-editor-feature';
 
-const { __defaultUnits } = BaseUnitControl;
-
 export default function UnitControl( { units: unitsProp, ...props } ) {
 	const units = useCustomUnits( unitsProp );
 
 	return <BaseUnitControl units={ units } { ...props } />;
 }
-
-// Hoisting statics from the BaseUnitControl
-UnitControl.__defaultUnits = __defaultUnits;
 
 /**
  * Filters available units based on values defined by settings.

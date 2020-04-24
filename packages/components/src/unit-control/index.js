@@ -112,6 +112,5 @@ function UnitControl(
 }
 
 const ForwardedUnitControl = forwardRef( UnitControl );
-ForwardedUnitControl.__defaultUnits = CSS_UNITS;
 
 export default ForwardedUnitControl;
