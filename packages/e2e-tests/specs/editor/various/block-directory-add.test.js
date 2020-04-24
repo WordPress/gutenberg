@@ -81,10 +81,13 @@ function getResponseObject( obj, contentType ) {
 		body: obj,
 	};
 }
-
+/* eslint no-console: 0 */
 function createResponse( mockResponse, contentType = undefined ) {
-	return async ( request ) =>
+	return async ( request ) => {
+		console.log( request );
+
 		request.respond( getResponseObject( mockResponse, contentType ) );
+	};
 }
 
 const matchUrl = ( reqUrl, urls ) => {
@@ -157,8 +160,12 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
+		console.log( await getEditedPostContent() );
+
 		// To be honest, not sure why this is necessary, but the getEditedPostContent returns empty without querying wp.data first.
 		await getAllBlocks();
+
+		console.log( await getEditedPostContent() );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
