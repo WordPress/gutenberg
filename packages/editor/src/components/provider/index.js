@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo } from 'lodash';
+import { pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -16,10 +16,8 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	__unstableEditorStyles as EditorStyles,
+	__experimentalFetchLinkSuggestions,
 } from '@wordpress/block-editor';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -28,23 +26,6 @@ import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
-
-const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
-	const posts = await apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post',
-		} ),
-	} );
-
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
-};
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -137,7 +118,7 @@ class EditorProvider extends Component {
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchReusableBlocks,
-			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
