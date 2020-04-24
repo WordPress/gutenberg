@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
-import { useResizeObserver } from '@wordpress/compose';
+import { useResizeObserver, pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
+
+// This is used to avoid rendering the block list if the sizes change.
+const MemoizedBlockList = pure( BlockList );
 
 function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const [
@@ -28,7 +31,6 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 			aria-hidden
 			style={ {
 				height: contentHeight * scale + 2 * __experimentalPadding,
-				padding: __experimentalPadding,
 			} }
 		>
 			{ containerResizeListener }
@@ -43,7 +45,7 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 				className="block-editor-block-preview__content"
 			>
 				{ containtResizeListener }
-				<BlockList />
+				<MemoizedBlockList />
 			</Disabled>
 		</div>
 	);

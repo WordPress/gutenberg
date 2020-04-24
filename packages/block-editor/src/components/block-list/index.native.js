@@ -7,7 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -24,6 +24,8 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import BlockInsertionPoint from './insertion-point';
+
+const BlockListContext = createContext();
 
 export class BlockList extends Component {
 	constructor() {
@@ -86,25 +88,54 @@ export class BlockList extends Component {
 
 	shouldShowInnerBlockAppender() {
 		const { blockClientIds, renderAppender } = this.props;
+
 		return renderAppender && blockClientIds.length > 0;
 	}
 
 	render() {
+		const { isRootList } = this.props;
+
+		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
+		return isRootList ? (
+			<BlockListContext.Provider value={ this.scrollViewRef }>
+				{ this.renderList() }
+			</BlockListContext.Provider>
+		) : (
+			<BlockListContext.Consumer>
+				{ ( ref ) =>
+					this.renderList( {
+						parentScrollRef: ref,
+					} )
+				}
+			</BlockListContext.Consumer>
+		);
+	}
+
+	renderList( extraProps = {} ) {
 		const {
 			clearSelectedBlock,
 			blockClientIds,
 			title,
 			header,
-			withFooter = true,
 			isReadOnly,
 			isRootList,
+			horizontal,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			isFloatingToolbarVisible,
+			isStackedHorizontally,
+			horizontalAlignment,
 		} = this.props;
+		const { parentScrollRef } = extraProps;
 
-		const { blockToolbar, blockBorder, headerToolbar } = styles;
+		const {
+			blockToolbar,
+			blockBorder,
+			headerToolbar,
+			floatingToolbar,
+		} = styles;
 
 		const forceRefresh =
 			shouldShowInsertionPointBefore || shouldShowInsertionPointAfter;
@@ -127,15 +158,34 @@ export class BlockList extends Component {
 						: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 					accessibilityLabel="block-list"
 					autoScroll={ this.props.autoScroll }
-					innerRef={ this.scrollViewInnerRef }
+					innerRef={ ( ref ) => {
+						this.scrollViewInnerRef( parentScrollRef || ref );
+					} }
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
 					}
-					inputAccessoryViewHeight={ headerToolbar.height }
+					inputAccessoryViewHeight={
+						headerToolbar.height +
+						( isFloatingToolbarVisible
+							? floatingToolbar.height
+							: 0 )
+					}
 					keyboardShouldPersistTaps="always"
-					scrollViewStyle={ {
-						flex: isRootList ? 1 : 0,
-					} }
+					scrollViewStyle={ [
+						{ flex: isRootList ? 1 : 0 },
+						! isRootList && styles.overflowVisible,
+					] }
+					horizontal={ horizontal }
+					scrollEnabled={ isRootList }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
+					style={ [
+						! isRootList && styles.overflowVisible,
+						isStackedHorizontally && styles.horizontal,
+						horizontalAlignment &&
+							styles[ `is-aligned-${ horizontalAlignment }` ],
+					] }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					extraData={ forceRefresh }
@@ -148,9 +198,7 @@ export class BlockList extends Component {
 					ListEmptyComponent={
 						! isReadOnly && this.renderDefaultBlockAppender
 					}
-					ListFooterComponent={
-						! isReadOnly && withFooter && this.renderBlockListFooter
-					}
+					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 
 				{ this.shouldShowInnerBlockAppender() && (
@@ -179,11 +227,23 @@ export class BlockList extends Component {
 			shouldShowInsertionPointAfter,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			isStackedHorizontally,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 		} = this.props;
 
+		const readableContentViewStyle = contentResizeMode === 'stretch' && {
+			flex: 1,
+		};
+
 		return (
-			<ReadableContentView>
-				<View pointerEvents={ isReadOnly ? 'box-only' : 'auto' }>
+			<ReadableContentView style={ readableContentViewStyle }>
+				<View
+					style={ readableContentViewStyle }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+				>
 					{ shouldShowInsertionPointBefore( clientId ) && (
 						<BlockInsertionPoint />
 					) }
@@ -197,6 +257,11 @@ export class BlockList extends Component {
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
+						parentWidth={ this.props.parentWidth }
+						isStackedHorizontally={ isStackedHorizontally }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (
@@ -209,23 +274,34 @@ export class BlockList extends Component {
 
 	renderBlockListFooter() {
 		const paragraphBlock = createBlock( 'core/paragraph' );
-		return (
-			<>
-				<TouchableWithoutFeedback
-					accessibilityLabel={ __( 'Add paragraph block' ) }
-					onPress={ () => {
-						this.addBlockToEndOfPost( paragraphBlock );
-					} }
-				>
-					<View style={ styles.blockListFooter } />
-				</TouchableWithoutFeedback>
-			</>
-		);
+		const {
+			isReadOnly,
+			withFooter = true,
+			renderFooterAppender,
+		} = this.props;
+
+		if ( ! isReadOnly && withFooter ) {
+			return (
+				<>
+					<TouchableWithoutFeedback
+						accessibilityLabel={ __( 'Add paragraph block' ) }
+						onPress={ () => {
+							this.addBlockToEndOfPost( paragraphBlock );
+						} }
+					>
+						<View style={ styles.blockListFooter } />
+					</TouchableWithoutFeedback>
+				</>
+			);
+		} else if ( renderFooterAppender ) {
+			return renderFooterAppender();
+		}
+		return null;
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
 		const {
 			getBlockCount,
 			getBlockOrder,
@@ -233,7 +309,11 @@ export default compose( [
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
+			getBlockHierarchyRootClientId,
 		} = select( 'core/block-editor' );
+
+		const isStackedHorizontally =
+			__experimentalMoverDirection === 'horizontal';
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
@@ -241,6 +321,7 @@ export default compose( [
 		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
 		const shouldShowInsertionPointBefore = ( clientId ) => {
 			return (
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if list is empty, show the insertion point (via the default appender)
@@ -251,6 +332,7 @@ export default compose( [
 		};
 		const shouldShowInsertionPointAfter = ( clientId ) => {
 			return (
+				! isStackedHorizontally &&
 				blockInsertionPointIsVisible &&
 				insertionPoint.rootClientId === rootClientId &&
 				// if the insertion point is at the end of the list
@@ -262,6 +344,14 @@ export default compose( [
 
 		const isReadOnly = getSettings().readOnly;
 
+		const rootBlockId = getBlockHierarchyRootClientId(
+			selectedBlockClientId
+		);
+		const hasRootInnerBlocks = !! getBlockCount( rootBlockId );
+
+		const isFloatingToolbarVisible =
+			!! selectedBlockClientId && hasRootInnerBlocks;
+
 		return {
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
@@ -271,6 +361,8 @@ export default compose( [
 			selectedBlockClientId,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
+			isFloatingToolbarVisible,
+			isStackedHorizontally,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

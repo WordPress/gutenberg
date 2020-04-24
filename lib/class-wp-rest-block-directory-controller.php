@@ -303,7 +303,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block->humanized_updated = sprintf(
 			/* translators: %s: Human-readable time difference. */
 			__( '%s ago', 'gutenberg' ),
-			human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) )
+			human_time_diff( strtotime( $plugin['last_updated'] ), time() )
 		);
 
 		return $block;

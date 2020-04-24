@@ -93,6 +93,18 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
+<a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
+
+Component which merges passed value with current consumed block context.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md>
+
+_Parameters_
+
+-   _props_ `BlockContextProviderProps`: 
+
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
 Undocumented declaration.
@@ -316,6 +328,32 @@ _Parameters_
 _Returns_
 
 -   `Object`: Font size object.
+
+<a name="getGradientSlugByValue" href="#getGradientSlugByValue">#</a> **getGradientSlugByValue**
+
+Retrieves the gradient slug per slug.
+
+_Parameters_
+
+-   _gradients_ `Array`: Gradient Palette
+-   _value_ `string`: Gradient value
+
+_Returns_
+
+-   `string`: Gradient slug.
+
+<a name="getGradientValueBySlug" href="#getGradientValueBySlug">#</a> **getGradientValueBySlug**
+
+Retrieves the gradient value per slug.
+
+_Parameters_
+
+-   _gradients_ `Array`: Gradient Palette
+-   _slug_ `string`: Gradient slug
+
+_Returns_
+
+-   `string`: Gradient value.
 
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 

@@ -7,18 +7,17 @@ import { useViewportMatch } from '@wordpress/compose';
 import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header() {
+function Header( { onToggleInserter, isInserterOpen } ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -42,6 +41,13 @@ function Header() {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 			showIconLabel: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
@@ -104,9 +110,44 @@ function Header() {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			{ isFullscreenActive && <AdminMenuToggle /> }
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
+				<HeaderToolbar
+					onToggleInserter={ onToggleInserter }
+					isInserterOpen={ isInserterOpen }
+				/>
+			</div>
+			<div className="edit-post-header__settings">
+				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
+				) }
+				<DevicePreview />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
+				<PostPublishButtonOrToggle
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+				<Button
+					icon={ cog }
+					label={ __( 'Settings' ) }
+					onClick={ toggleGeneralSidebar }
+					isPressed={ isEditorSidebarOpened }
+					aria-expanded={ isEditorSidebarOpened }
+					shortcut={ shortcut }
+				/>
+				<PinnedItems.Slot scope="core/edit-post" />
+				<MoreMenu />
 			</div>
 			{ isLargeViewport && headerSettings }
 			{ ! isLargeViewport && (

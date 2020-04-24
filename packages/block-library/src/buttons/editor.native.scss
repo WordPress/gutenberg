@@ -1,0 +1,12 @@
+.parent {
+	margin: $block-edge-to-content;
+}
+
+.appenderContainer {
+	flex: 1;
+	margin: $block-selected-margin;
+}
+
+.spacing {
+	margin: 2 * $block-selected-margin;
+}

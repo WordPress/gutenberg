@@ -13,7 +13,6 @@
 @import "./embed/style.scss";
 @import "./file/style.scss";
 @import "./gallery/style.scss";
-@import "./group/style.scss";
 @import "./heading/style.scss";
 @import "./image/style.scss";
 @import "./latest-comments/style.scss";
@@ -260,4 +259,9 @@
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
+}
+
+// Block alignments.
+.aligncenter {
+	clear: both;
 }

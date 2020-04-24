@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize } from 'lodash';
+import { get, mapValues, includes, capitalize, xor } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -224,6 +224,20 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 } );
 
 /**
+ * From a given KeyboardEvent, returns an array of active modifier constants for
+ * the event.
+ *
+ * @param {KeyboardEvent} event Keyboard event.
+ *
+ * @return {Array<ALT|CTRL|COMMAND|SHIFT>} Active modifier constants.
+ */
+function getEventModifiers( event ) {
+	return [ ALT, CTRL, COMMAND, SHIFT ].filter(
+		( key ) => event[ `${ key }Key` ]
+	);
+}
+
+/**
  * An object that contains functions to check if a keyboard event matches a
  * predefined shortcut combination.
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
@@ -234,8 +248,9 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 	return ( event, character, _isApple = isAppleOS ) => {
 		const mods = getModifiers( _isApple );
+		const eventMods = getEventModifiers( event );
 
-		if ( ! mods.every( ( key ) => event[ `${ key }Key` ] ) ) {
+		if ( xor( mods, eventMods ).length ) {
 			return false;
 		}
 

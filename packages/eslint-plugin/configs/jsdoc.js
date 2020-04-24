@@ -17,6 +17,7 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockSerializationOptions',
 	'WPBlock',
 	'WPBlockPattern',
+	'WPBlockType',
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
@@ -61,6 +62,7 @@ const typescriptUtilityTypes = [
 	'ThisType',
 	'unknown',
 	'never',
+	'NodeJS',
 ];
 
 module.exports = {

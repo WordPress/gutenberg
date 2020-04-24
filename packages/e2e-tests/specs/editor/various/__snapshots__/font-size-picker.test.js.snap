@@ -2,7 +2,7 @@
 
 exports[`Font Size Picker should apply a custom font size using the font size input 1`] = `
 "<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":23}}} -->
-<p style=\\"--wp--typography--font-size:23px\\">Paragraph to be made \\"small\\"</p>
+<p style=\\"font-size:23px\\">Paragraph to be made \\"small\\"</p>
 <!-- /wp:paragraph -->"
 `;
 

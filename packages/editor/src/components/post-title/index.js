@@ -72,6 +72,7 @@ class PostTitle extends Component {
 		const { isSelected } = this.state;
 
 		// The wp-block className is important for editor styles.
+		// This same block is used in both the visual and the code editor.
 		const className = classnames(
 			'wp-block editor-post-title editor-post-title__block',
 			{
@@ -109,7 +110,8 @@ class PostTitle extends Component {
 						*/
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus={
-							document.body === document.activeElement &&
+							( document.body === document.activeElement ||
+								! document.activeElement ) &&
 							isCleanNewPost
 						}
 						/* eslint-enable jsx-a11y/no-autofocus */

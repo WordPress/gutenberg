@@ -32,9 +32,11 @@ export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,
 } from './observe-focus-loss';
-export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
-export { openGlobalBlockInserter } from './open-global-block-inserter';
+export {
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+} from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';

@@ -30,6 +30,7 @@ function KeyboardShortcuts() {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
+		toggleFeature,
 	} = useDispatch( 'core/edit-post' );
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 
@@ -41,6 +42,16 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-post/toggle-fullscreen',
+			category: 'global',
+			description: __( 'Toggle fullscreen mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'f',
 			},
 		} );
 
@@ -117,6 +128,16 @@ function KeyboardShortcuts() {
 		{
 			bindGlobal: true,
 			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+		}
+	);
+
+	useShortcut(
+		'core/edit-post/toggle-fullscreen',
+		() => {
+			toggleFeature( 'fullscreenMode' );
+		},
+		{
+			bindGlobal: true,
 		}
 	);
 
