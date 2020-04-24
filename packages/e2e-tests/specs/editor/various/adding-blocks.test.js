@@ -6,8 +6,8 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressKeyTimes,
-	switchEditorModeTo,
 	setBrowserViewport,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -92,6 +92,7 @@ describe( 'adding blocks', () => {
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter
 		await page.click( '.editor-post-title__input' );
+		await closeGlobalBlockInserter();
 
 		// Using the between inserter
 		const insertionPoint = await page.$( '[data-type="core/quote"]' );
@@ -111,15 +112,13 @@ describe( 'adding blocks', () => {
 			() =>
 				document.activeElement &&
 				document.activeElement.classList.contains(
-					'block-editor-inserter__search'
+					'block-editor-inserter__search-input'
 				)
 		);
 		await page.keyboard.type( 'para' );
-		await pressKeyTimes( 'Tab', 3 );
+		await pressKeyTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
-
-		await switchEditorModeTo( 'Code' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -137,7 +136,7 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search'
+			'block-editor-inserter__search-input'
 		);
 
 		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
@@ -148,29 +147,30 @@ describe( 'adding blocks', () => {
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__search'
+			'block-editor-inserter__search-input'
 		);
 
-		// Tab to the block search results
+		// Tab to the block list
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 
-		// Expect the search results to be the active element.
+		// Expect the block list to be the active element.
 		activeElementClassList = await page.evaluate(
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__results'
+			'block-editor-block-types-list__item'
 		);
 
 		// Try using the up arrow key
 		await page.keyboard.press( 'ArrowUp' );
 
-		// Expect the search results to still be the active element.
+		// Expect the block list to still be the active element.
 		activeElementClassList = await page.evaluate(
 			() => document.activeElement.classList
 		);
 		expect( Object.values( activeElementClassList ) ).toContain(
-			'block-editor-inserter__results'
+			'block-editor-block-types-list__item'
 		);
 
 		// Press escape to close the block inserter.

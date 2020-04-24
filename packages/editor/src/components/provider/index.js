@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
+	BlockContextProvider,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
@@ -50,6 +51,10 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
+			maxSize: 1,
+		} );
+
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
 			maxSize: 1,
 		} );
 
@@ -94,9 +99,19 @@ class EditorProvider extends Component {
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalDisableCustomUnits',
+				'__experimentalDisableCustomLineHeight',
+				'__experimentalDisableDropCap',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBase',
+				'__experimentalPreferredStyleVariations',
 				'alignWide',
 				'allowedBlockTypes',
-				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -106,26 +121,18 @@ class EditorProvider extends Component {
 				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'onUpdateDefaultBlockStyles',
-				'__experimentalDisableCustomUnits',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalBlockDirectory',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
-				'__experimentalGlobalStylesUserEntityId',
-				'__experimentalGlobalStylesBase',
-				'__experimentalDisableCustomLineHeight',
-				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -135,6 +142,10 @@ class EditorProvider extends Component {
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		};
+	}
+
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
 	}
 
 	componentDidMount() {
@@ -184,6 +195,11 @@ class EditorProvider extends Component {
 			isPostTitleSelected
 		);
 
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
+		);
+
 		return (
 			<>
 				<EditorStyles styles={ settings.styles } />
@@ -193,19 +209,21 @@ class EditorProvider extends Component {
 						type={ post.type }
 						id={ post.id }
 					>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ resetEditorBlocksWithoutUndoLevel }
-							onChange={ resetEditorBlocks }
-							selectionStart={ selectionStart }
-							selectionEnd={ selectionEnd }
-							settings={ editorSettings }
-							useSubRegistry={ false }
-						>
-							{ children }
-							<ReusableBlocksButtons />
-							<ConvertToGroupButtons />
-						</BlockEditorProvider>
+						<BlockContextProvider value={ defaultBlockContext }>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockContextProvider>
 					</EntityProvider>
 				</EntityProvider>
 			</>

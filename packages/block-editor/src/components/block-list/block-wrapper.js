@@ -69,7 +69,7 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-
+		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		// Provide the selected node, or the first and last nodes of a multi-
@@ -196,19 +196,20 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
-		return (
+		const blockWrapper = (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
-				{ ...wrapperProps }
+				{ ...omit( wrapperProps, [ 'data-align' ] ) }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className
+					wrapperProps && wrapperProps.className,
+					! isAligned && 'wp-block'
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -227,6 +228,22 @@ const BlockComponent = forwardRef(
 				{ children }
 			</Animated>
 		);
+
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column. This is enabled with the
+		// .is-block-content className.
+		if ( isAligned ) {
+			const alignmentWrapperProps = {
+				'data-align': wrapperProps[ 'data-align' ],
+			};
+			return (
+				<div className="wp-block" { ...alignmentWrapperProps }>
+					{ blockWrapper }
+				</div>
+			);
+		}
+
+		return blockWrapper;
 	}
 );
 

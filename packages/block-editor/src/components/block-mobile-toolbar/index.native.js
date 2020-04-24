@@ -23,12 +23,12 @@ const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
 	order,
-	horizontalDirection,
+	isStackedHorizontally,
 } ) => (
 	<View style={ styles.toolbar }>
 		<BlockMover
 			clientIds={ [ clientId ] }
-			horizontalDirection={ horizontalDirection }
+			isStackedHorizontally={ isStackedHorizontally }
 		/>
 
 		<View style={ styles.spacer } />

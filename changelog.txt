@@ -1,6 +1,14 @@
 == Changelog ==
 
-= 7.9.0-rc.1 =
+= 7.9.1 =
+
+### Bug Fixes
+
+ - Make sidebar plugins pinned by default.
+ - Fix the button styles for old content.
+
+
+= 7.9.0 =
 
 ### Features
 
@@ -195,6 +203,7 @@
 - REST API error message: Remove unnecessary space. [21178](https://github.com/WordPress/gutenberg/pull/21178)
 - SlotFill: Guard property access to possibly-undefined slot. [21205](https://github.com/WordPress/gutenberg/pull/21205)
 - Build: Add TypeScript version validation [21208](https://github.com/WordPress/gutenberg/pull/21208)
+
 
 
 = 7.8.1 =

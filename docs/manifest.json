@@ -72,9 +72,21 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Context",
+		"slug": "block-context",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-context.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Deprecated Blocks",
 		"slug": "block-deprecation",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-deprecation.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Block Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",
 		"parent": "block-api"
 	},
 	{
@@ -382,6 +394,12 @@
 		"slug": "copy-guide",
 		"markdown_source": "../docs/contributors/copy-guide.md",
 		"parent": "document"
+	},
+	{
+		"title": "Triage",
+		"slug": "triage",
+		"markdown_source": "../docs/contributors/triage.md",
+		"parent": "contributors"
 	},
 	{
 		"title": "Localizing Gutenberg Plugin",
