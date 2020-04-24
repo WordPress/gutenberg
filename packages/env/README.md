@@ -44,7 +44,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 
 ```json
 "scripts": {
-	"wp-env": "packages/env/bin/wp-env"
+	"wp-env": "wp-env"
 }
 ```
 
