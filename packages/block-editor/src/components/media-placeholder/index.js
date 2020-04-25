@@ -65,6 +65,7 @@ export class MediaPlaceholder extends Component {
 		this.onFilesUpload = this.onFilesUpload.bind( this );
 		this.openURLInput = this.openURLInput.bind( this );
 		this.closeURLInput = this.closeURLInput.bind( this );
+		this.defaultGetValue = this.defaultGetValue.bind( this );
 	}
 
 	onlyAllowsImages() {
@@ -108,6 +109,10 @@ export class MediaPlaceholder extends Component {
 		this.onFilesUpload( event.target.files );
 	}
 
+	defaultGetValue() {
+		return this.props.value || [];
+	}
+
 	onFilesUpload( files ) {
 		const {
 			addToGallery,
@@ -116,6 +121,7 @@ export class MediaPlaceholder extends Component {
 			multiple,
 			onError,
 			onSelect,
+			getValue = this.defaultGetValue,
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
@@ -129,15 +135,12 @@ export class MediaPlaceholder extends Component {
 				// previously returned to the gallery before adding and returning the image
 				// array with replacement newMedia values.
 
-				// Get a reference to the image array on the Gallery.
-				const currentMedia = this.props.value || [];
-
 				// Define an array to store urls from newMedia between subsequent function calls.
 				let lastMediaPassed = [];
 				setMedia = ( newMedia ) => {
 					// Remove any images this upload group is responsible for (lastMediaPassed).
 					// Their replacements are contained in newMedia.
-					const filteredMedia = currentMedia.filter( ( item ) => {
+					const filteredMedia = getValue().filter( ( item ) => {
 						// If Item has id, only remove it if lastMediaPassed has an item with that id.
 						if ( item.id ) {
 							return ! lastMediaPassed.some(

@@ -90,8 +90,7 @@ class GalleryEdit extends Component {
 		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
 		this.updateImagesSize = this.updateImagesSize.bind( this );
-		// We need to keep a consistent reference to this array for the MediaPlaceholder.
-		this.images = [];
+		this.getValue = this.getValue.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -317,14 +316,6 @@ class GalleryEdit extends Component {
 		this.setAttributes( { images: updatedImages, sizeSlug } );
 	}
 
-	/**
-	 * Sets the images in our array without redifining reference.
-	 */
-	setImages() {
-		this.images.length = 0;
-		this.images.push( ...this.props.attributes.images );
-	}
-
 	componentDidMount() {
 		const { attributes, mediaUpload } = this.props;
 		const { images } = attributes;
@@ -342,7 +333,6 @@ class GalleryEdit extends Component {
 				allowedTypes: [ 'image' ],
 			} );
 		}
-		this.setImages();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -353,9 +343,10 @@ class GalleryEdit extends Component {
 				captionSelected: false,
 			} );
 		}
-		if ( this.props.attributes.images !== prevProps.attributes.images ) {
-			this.setImages();
-		}
+	}
+
+	getValue() {
+		return this.props.attributes.images;
 	}
 
 	render() {
@@ -385,7 +376,8 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ this.images }
+				value={ images }
+				getValue={ this.getValue }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }
