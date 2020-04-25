@@ -85,4 +85,17 @@ describe( 'Image', () => {
 
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );
+
+	it( 'can be right aligned and selected', async () => {
+		await insertBlock( 'Image' );
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+
+		await page.click( '[aria-label="Change alignment"]' );
+		await clickButton( 'Align right' );
+
+		const regex = new RegExp(
+			`<!-- wp:image {"align":"right","id":\\d+,"sizeSlug":"large"} -->\\s*<div class="wp-block-image"><figure class="alignright size-large"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+"/></figure></div>\\s*<!-- \\/wp:image -->`
+		);
+		expect( await getEditedPostContent() ).toMatch( regex );
+	} );
 } );
