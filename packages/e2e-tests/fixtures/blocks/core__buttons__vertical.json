@@ -4,7 +4,7 @@
         "name": "core/buttons",
         "isValid": true,
         "attributes": {
-            "blockDirection": "vertical",
+            "blockDirection": "horizontal",
             "className": "is-direction-vertical"
         },
         "innerBlocks": [
