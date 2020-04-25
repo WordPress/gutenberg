@@ -2,73 +2,91 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * External dependencies
  */
 import { noop } from 'lodash';
 
+const getPath = ( fileType, dependencies ) =>
+	`/wp/v2/${ fileType }/?${ dependencies.map(
+		( dependency ) => `dependency=${ dependency }`
+	) }`;
+
 export default class LazyLoad extends Component {
-	static loadedScripts = new Set();
-	static loadedStyles = new Set();
-	static defaultProps = {
-		scripts: [],
-		styles: [],
-		placeholder: null,
-		onLoaded: () => Promise.resolve(),
-		onError: noop,
-	};
+	constructor( props ) {
+		super( props );
 
-	state = {
-		loaded: false,
-	};
+		this.state = {
+			loaded: false,
+		};
 
-	loadScripts = async () => {
+		this.loadScripts = this.loadScripts.bind( this );
+		this.loadStyles = this.loadStyles.bind( this );
+	}
+
+	async loadScripts() {
 		const scriptsToLoad = this.props.scripts.filter(
-			( script ) => ! this.loadedScripts.has( script )
+			( script ) => ! LazyLoad.loadedScripts.has( script )
 		);
 
 		if ( scriptsToLoad.length === 0 ) {
 			return Promise.resolve();
 		}
 
-		await new Promise( ( resolve, reject ) => {
-			const scriptElement = document.createElement( 'script' );
-			// can't use load-scripts.php, so this would need to be replaced
-			scriptElement.src = `/wp-admin/load-scripts.php?load=${ scriptsToLoad.join(
-				','
-			) }`;
-			scriptElement.onload = resolve;
-			scriptElement.onerror = reject;
-			document.head.appendChild( scriptElement );
-		} );
+		const path = getPath( 'scripts', scriptsToLoad );
 
-		scriptsToLoad.forEach( ( script ) => this.loadedScripts.add( script ) );
-	};
+		const scriptsWithDeps = await apiFetch( { path } );
 
-	loadStyles = async () => {
+		await Promise.all(
+			scriptsWithDeps.map( ( { src: scriptSrc } ) => {
+				return new Promise( ( resolve, reject ) => {
+					const scriptElement = document.createElement( 'script' );
+					scriptElement.src = scriptSrc;
+					scriptElement.defer = true;
+					scriptElement.onload = resolve;
+					scriptElement.onerror = reject;
+					document.body.appendChild( scriptElement );
+				} );
+			} )
+		);
+
+		scriptsWithDeps.forEach( ( { handle } ) =>
+			LazyLoad.loadedScripts.add( handle )
+		);
+	}
+
+	async loadStyles() {
 		const stylesToLoad = this.props.styles.filter(
-			( style ) => ! this.loadedStyles.has( style )
+			( style ) => ! LazyLoad.loadedStyles.has( style )
 		);
 
 		if ( stylesToLoad.length === 0 ) {
 			return Promise.resolve();
 		}
 
-		await new Promise( ( resolve, reject ) => {
-			const linkElement = document.createElement( 'link' );
-			linkElement.rel = 'stylesheet';
-			// can't use load-styles.php, so this would need to be replaced
-			linkElement.href = `/wp-admin/load-styles.php?load=${ stylesToLoad.join(
-				','
-			) }`;
-			linkElement.onload = resolve;
-			linkElement.onerror = reject;
-			document.head.appendChild( linkElement );
-		} );
+		const path = getPath( 'styles', stylesToLoad );
 
-		stylesToLoad.forEach( ( style ) => this.loadedStyles.add( style ) );
-	};
+		const stylesWithDeps = await apiFetch( { path } );
+
+		await Promise.all(
+			stylesWithDeps.map( ( { src: styleHref } ) => {
+				return new Promise( ( resolve, reject ) => {
+					const linkElement = document.createElement( 'link' );
+					linkElement.rel = 'stylesheet';
+					linkElement.href = styleHref;
+					linkElement.onload = resolve;
+					linkElement.onerror = reject;
+					document.head.appendChild( linkElement );
+				} );
+			} )
+		);
+
+		stylesWithDeps.forEach( ( { handle } ) =>
+			LazyLoad.loadedStyles.add( handle )
+		);
+	}
 
 	componentDidMount() {
 		Promise.all( [ this.loadScripts(), this.loadStyles() ] )
@@ -87,3 +105,14 @@ export default class LazyLoad extends Component {
 		return this.props.placeholder;
 	}
 }
+
+LazyLoad.defaultProps = {
+	scripts: [],
+	styles: [],
+	placeholder: null,
+	onLoaded: () => Promise.resolve(),
+	onError: noop,
+};
+
+LazyLoad.loadedScripts = new Set();
+LazyLoad.loadedStyles = new Set();

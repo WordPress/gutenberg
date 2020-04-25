@@ -225,8 +225,12 @@ class ClassicEdit extends Component {
 const LazyClassicEdit = ( props ) => (
 	<LazyLoad
 		scripts={ [ 'wp-tinymce' ] }
-		styles={ [ 'wp-tinymce' ] }
-		onLoaded={ () => window.wpMceTranslation() }
+		onLoaded={ () =>
+			new Promise( ( resolve ) => {
+				window.wpMceTranslation();
+				resolve();
+			} )
+		}
 		placeholder={ <div>Loading...</div> }
 	>
 		<ClassicEdit { ...props } />
