@@ -39,9 +39,7 @@ class WP_REST_Styles_Controller extends WP_REST_Dependencies_Controller {
 	 * @return array
 	 */
 	public function get_core_assets() {
-		$wp_styles = new WP_Styles();
-		wp_default_styles( $wp_styles );
-		$handles = wp_list_pluck( $wp_styles->registered, 'handle' );
+		$handles = wp_list_pluck( $this->object->registered, 'handle' );
 		$handles = array_values( $handles );
 
 		return $handles;

@@ -49,11 +49,7 @@ class WP_REST_Scripts_Controller extends WP_REST_Dependencies_Controller {
 	 * @return array
 	 */
 	public function get_core_assets() {
-		$wp_scripts = new WP_Scripts();
-		wp_default_scripts( $wp_scripts );
-		wp_default_packages_vendor( $wp_scripts );
-		wp_default_packages_scripts( $wp_scripts );
-		$handles = wp_list_pluck( $wp_scripts->registered, 'handle' );
+		$handles = wp_list_pluck( $this->object->registered, 'handle' );
 		$handles = array_values( $handles );
 
 		return $handles;
