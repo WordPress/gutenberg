@@ -215,7 +215,7 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 		$query_params['dependency'] = array(
 			'description' => __( 'Dependency.', 'gutenberg' ),
-			'type'        => 'string',
+			'type'        => 'array',
 		);
 
 		return $query_params;
