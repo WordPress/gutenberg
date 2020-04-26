@@ -2,7 +2,7 @@
 
 ### New Features
 
-- Add more CLI options: `--namespace`, `--title`, `--description` and `--category`. The goal is to make it easier to override default values used for scaffolding ([#21751](https://github.com/WordPress/gutenberg/pull/21751)).
+- Add more CLI options: `--namespace`, `--title`, `--short-description` and `--category`. The goal is to make it easier to override default values used for scaffolding ([#21751](https://github.com/WordPress/gutenberg/pull/21751)).
 
 ### Enhancements
 

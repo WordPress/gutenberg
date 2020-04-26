@@ -3,7 +3,7 @@
  */
 const inquirer = require( 'inquirer' );
 const program = require( 'commander' );
-const { startCase } = require( 'lodash' );
+const { pickBy, startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -33,60 +33,56 @@ program
 		'template type name, allowed values: "es5", "esnext"',
 		'esnext'
 	)
-	.option(
-		'--namespace <namespace>',
-		'internal namespace for the block name'
-	)
-	.option( '--title <title>', 'display title for the block' )
-	.option( '--description <description>', 'short description for the block' )
-	.option( '--category <category>', 'category name for the block' )
-	.action( async ( slug, commandObject ) => {
-		const { template } = commandObject;
-		const optionsValues = [
-			'namespace',
-			'title',
-			'description',
-			'category',
-		]
-			.filter( ( optionName ) => commandObject[ optionName ] )
-			.reduce( ( accumulator, optionName ) => {
-				accumulator[ optionName ] = commandObject[ optionName ];
-				return accumulator;
-			}, {} );
-
-		await checkSystemRequirements( engines );
-		try {
-			const defaultValues = getDefaultValues( template );
-			if ( slug ) {
-				const answers = {
-					...defaultValues,
-					slug,
-					// Transforms slug to title as a fallback.
-					title: startCase( slug ),
-					...optionsValues,
-				};
-				await scaffold( template, answers );
-			} else {
-				const propmpts = getPrompts( template ).filter(
-					( { name } ) =>
-						! Object.keys( optionsValues ).includes( name )
-				);
-				const answers = await inquirer.prompt( propmpts );
-				await scaffold( template, {
-					...defaultValues,
-					...optionsValues,
-					...answers,
+	.option( '--namespace <value>', 'internal namespace for the block name' )
+	.option( '--title <value>', 'display title for the block' )
+	// The name "description" is used internally so it couldn't be used.
+	.option( '--short-description <value>', 'short description for the block' )
+	.option( '--category <name>', 'category name for the block' )
+	.action(
+		async (
+			slug,
+			{ category, namespace, shortDescription, template, title }
+		) => {
+			await checkSystemRequirements( engines );
+			try {
+				const defaultValues = getDefaultValues( template );
+				const optionsValues = pickBy( {
+					category,
+					description: shortDescription,
+					namespace,
+					title,
 				} );
-			}
-		} catch ( error ) {
-			if ( error instanceof CLIError ) {
-				log.error( error.message );
-				process.exit( 1 );
-			} else {
-				throw error;
+				if ( slug ) {
+					const answers = {
+						...defaultValues,
+						slug,
+						// Transforms slug to title as a fallback.
+						title: startCase( slug ),
+						...optionsValues,
+					};
+					await scaffold( template, answers );
+				} else {
+					const propmpts = getPrompts( template ).filter(
+						( { name } ) =>
+							! Object.keys( optionsValues ).includes( name )
+					);
+					const answers = await inquirer.prompt( propmpts );
+					await scaffold( template, {
+						...defaultValues,
+						...optionsValues,
+						...answers,
+					} );
+				}
+			} catch ( error ) {
+				if ( error instanceof CLIError ) {
+					log.error( error.message );
+					process.exit( 1 );
+				} else {
+					throw error;
+				}
 			}
 		}
-	} )
+	)
 	.on( '--help', function() {
 		log.info( '' );
 		log.info( 'Examples:' );

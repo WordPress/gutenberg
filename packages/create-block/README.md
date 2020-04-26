@@ -39,10 +39,10 @@ Options:
 ```
 -V, --version                output the version number
 -t, --template <name>        template type name, allowed values: "es5", "esnext" (default: "esnext")
---namespace <namespace>      internal namespace for the block name
---title <title>              display title for the block
---description <description>  short description for the block
---category <category>        category name for the block
+--namespace <value>          internal namespace for the block name
+--title <value>              display title for the block
+--short-description <value>  short description for the block
+--category <name>            category name for the block
 -h, --help                   output usage information
 ```
 
