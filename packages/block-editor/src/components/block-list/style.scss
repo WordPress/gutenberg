@@ -161,12 +161,6 @@
 			}
 		}
 	}
-
-	// Hide the focus indicator for collapsed blocks.
-	// These serve as only as column containers for floated blocks.
-	.block-editor-block-list__block.is-block-collapsed::after {
-		content: none;
-	}
 }
 
 
