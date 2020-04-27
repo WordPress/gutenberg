@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
 import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
@@ -14,7 +14,7 @@ import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
 function Header( { onToggleInserter, isInserterOpen } ) {
 	const {
@@ -40,9 +40,13 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
@@ -80,10 +84,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }

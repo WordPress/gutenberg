@@ -49,6 +49,10 @@ body.toplevel_page_gutenberg-edit-site {
 	.interface-complementary-area__pin-unpin-item.components-button {
 		display: none;
 	}
+
+	.interface-interface-skeleton__content {
+		background-color: $light-gray-700;
+	}
 }
 
 /**

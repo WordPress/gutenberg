@@ -9,7 +9,6 @@ $footer-height: $button-size-small;
 @import "./components/layout/style.scss";
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/preview-options/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -102,13 +101,11 @@ body.block-editor-page {
 .wp-block {
 	max-width: $content-width;
 
-	&[data-align="wide"],
-	&.alignwide {
+	&[data-align="wide"] {
 		max-width: 1100px;
 	}
 
-	&[data-align="full"],
-	&.alignfull {
+	&[data-align="full"] {
 		max-width: none;
 	}
 }
