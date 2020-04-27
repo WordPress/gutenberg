@@ -15,6 +15,7 @@ import memize from 'memize';
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
+	Toolbar,
 	ToolbarButton,
 	SiteCapabilitiesContext,
 	isMentionsSupported,
@@ -885,22 +886,28 @@ export class RichText extends Component {
 							<SiteCapabilitiesContext.Consumer>
 								{ ( capabilities ) =>
 									isMentionsSupported( capabilities ) && (
-										<ToolbarButton
-											title={ __( 'Insert mention' ) }
-											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ () => {
-												addMention()
-													.then(
-														( mentionUserId ) => {
-															this.insertString(
-																record,
-																`@${ mentionUserId } `
-															);
-														}
-													)
-													.catch( () => {} );
-											} }
-										/>
+										<Toolbar>
+											<ToolbarButton
+												title={ __( 'Insert mention' ) }
+												icon={
+													<Icon icon={ atSymbol } />
+												}
+												onClick={ () => {
+													addMention()
+														.then(
+															(
+																mentionUserId
+															) => {
+																this.insertString(
+																	record,
+																	`@${ mentionUserId } `
+																);
+															}
+														)
+														.catch( () => {} );
+												} }
+											/>
+										</Toolbar>
 									)
 								}
 							</SiteCapabilitiesContext.Consumer>
