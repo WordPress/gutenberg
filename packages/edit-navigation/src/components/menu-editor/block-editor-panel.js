@@ -44,9 +44,7 @@ export default function BlockEditorPanel( { onDelete, menuId, saveBlocks } ) {
 	);
 
 	return (
-		<Panel
-			className="edit-navigation-menu-editor__block-editor-panel"
-		>
+		<Panel className="edit-navigation-menu-editor__block-editor-panel">
 			<PanelBody title={ __( 'Navigation menu' ) }>
 				<div className="components-panel__header-actions">
 					<Button isPrimary onClick={ saveBlocks }>
@@ -71,10 +69,7 @@ export default function BlockEditorPanel( { onDelete, menuId, saveBlocks } ) {
 					</ObserveTyping>
 				</WritingFlow>
 				<div className="components-panel__footer-actions">
-					<MenuDelete
-						menuId={ menuId }
-						onDelete={ onDelete }
-					/>
+					<MenuDelete menuId={ menuId } onDelete={ onDelete } />
 				</div>
 			</PanelBody>
 		</Panel>
