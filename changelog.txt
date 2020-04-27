@@ -1,5 +1,10 @@
 == Changelog ==
 
+= 8.0.0-rc.1 =
+
+Release notes coming soon.
+
+
 = 7.9.1 =
 
 ### Bug Fixes
