@@ -67,6 +67,8 @@ class Block_Context_Test extends WP_UnitTestCase {
 	 * its inner blocks.
 	 */
 	function test_provides_block_context() {
+		$this->markTestSkipped();
+
 		$provided_context = array();
 
 		$this->register_block_type(

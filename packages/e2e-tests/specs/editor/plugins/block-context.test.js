@@ -70,7 +70,12 @@ describe( 'Block context', () => {
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
 	} );
 
-	test( 'Block context is reflected in the preview', async () => {
+	// Disable reason: Block context PHP implementation is temporarily reverted.
+	// This will be unskipped once the implementation is restored. Skipping was
+	// the most direct option for revert given time constraints.
+
+	/* eslint-disable-next-line jest/no-disabled-tests */
+	test.skip( 'Block context is reflected in the preview', async () => {
 		await insertBlock( 'Test Context Provider' );
 		const editorPage = page;
 		const previewPage = await openPreviewPage( editorPage );
