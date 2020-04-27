@@ -133,12 +133,13 @@ export class UnsupportedBlockEdit extends Component {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device\'s web browser.'
+							"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
 						) }
 					</Text>
 				</View>
-				{ // eslint-disable-next-line no-undef
-				( //__DEV__  && ( Temporarely removing dev flag
+				{
+					// eslint-disable-next-line no-undef
+					//__DEV__  && ( Temporarely removing dev flag
 					<>
 						<BottomSheet.Cell
 							label={ __( 'Edit block in web browser' ) }
@@ -152,7 +153,7 @@ export class UnsupportedBlockEdit extends Component {
 							onPress={ this.toggleSheet }
 						/>
 					</>
-				) }
+				}
 			</BottomSheet>
 		);
 	}
