@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -33,12 +28,7 @@ const SpacerEdit = ( {
 	return (
 		<>
 			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{
-						'is-selected': isSelected,
-					}
-				) }
+				className="block-library-spacer__resize-container"
 				size={ {
 					height,
 				} }
@@ -53,7 +43,6 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				isSelected={ isSelected }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -63,6 +52,7 @@ const SpacerEdit = ( {
 					);
 					updateHeight( spacerHeight );
 				} }
+				showHandle={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
