@@ -498,7 +498,7 @@ The code executed in the node context includes all of the test files _excluding_
 
 Test code (node context) can be debugged normally using the instructions above.
 
-To also debug the browser context, run `wp-scripts --inspect-brk test-e2e -- --puppeteer-devtools`. The `--puppeteer-devtools` option and the `PUPPETEER_DEVTOOLS="true"` environment variable will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
+To also debug the browser context, run `wp-scripts --inspect-brk test-e2e -- --puppeteer-devtools`. The `--puppeteer-devtools` option (or the `PUPPETEER_DEVTOOLS="true"` environment variable when used with `PUPPETEER_HEADLESS="false"`) will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
 
 For more e2e debugging tips check out the [Puppeteer debugging docs](https://developers.google.com/web/tools/puppeteer/debugging).
 
