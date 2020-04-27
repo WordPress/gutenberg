@@ -7,7 +7,7 @@ import { View, Animated } from 'react-native';
  */
 import { Icon, check } from '@wordpress/icons';
 import { LinearGradient } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -27,12 +27,11 @@ function ColorIndicator( {
 	isSelected,
 	withCustomPicker,
 	style,
-	getStylesFromColorScheme,
 	opacity,
 } ) {
 	const isGradient = color?.includes( 'linear-gradient' );
 
-	const outlineStyle = getStylesFromColorScheme(
+	const outlineStyle = usePreferredColorSchemeStyle(
 		styles.outline,
 		styles.outlineDark
 	);
@@ -73,4 +72,4 @@ function ColorIndicator( {
 		</View>
 	);
 }
-export default withPreferredColorScheme( ColorIndicator );
+export default ColorIndicator;

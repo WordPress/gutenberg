@@ -7,32 +7,28 @@ import { View, TouchableWithoutFeedback, Text, Platform } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronLeft, arrowLeft } from '@wordpress/icons';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
 
-function BottomSheetNavigationHeader( {
-	leftButtonOnPress,
-	screen,
-	getStylesFromColorScheme,
-} ) {
+function BottomSheetNavigationHeader( { leftButtonOnPress, screen } ) {
 	const isIOS = Platform.OS === 'ios';
 
-	const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+	const bottomSheetHeaderTitleStyle = usePreferredColorSchemeStyle(
 		styles.bottomSheetHeaderTitle,
 		styles.bottomSheetHeaderTitleDark
 	);
-	const bottomSheetButtonTextStyle = getStylesFromColorScheme(
+	const bottomSheetButtonTextStyle = usePreferredColorSchemeStyle(
 		styles.bottomSheetButtonText,
 		styles.bottomSheetButtonTextDark
 	);
-	const chevronLeftStyle = getStylesFromColorScheme(
+	const chevronLeftStyle = usePreferredColorSchemeStyle(
 		styles.chevronLeftIcon,
 		styles.chevronLeftIconDark
 	);
-	const arrowLeftStyle = getStylesFromColorScheme(
+	const arrowLeftStyle = usePreferredColorSchemeStyle(
 		styles.arrowLeftIcon,
 		styles.arrowLeftIconDark
 	);
@@ -75,4 +71,4 @@ function BottomSheetNavigationHeader( {
 	);
 }
 
-export default withPreferredColorScheme( BottomSheetNavigationHeader );
+export default BottomSheetNavigationHeader;

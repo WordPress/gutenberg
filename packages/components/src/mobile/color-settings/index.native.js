@@ -7,7 +7,7 @@ import { View, Text, LayoutAnimation } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -16,6 +16,7 @@ import ColorPalette from '../../color-palette';
 import ColorIndicator from '../../color-indicator';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import SegmentedControls from '../segmented-control';
+import { colorsUtils } from './utils';
 
 import styles from './style.scss';
 
@@ -30,10 +31,9 @@ function ColorSettings( {
 	isBottomSheetContentScrolling,
 	onCloseBottomSheet,
 	onHardwareButtonPress,
-	getStylesFromColorScheme,
 	defaultSettings,
 } ) {
-	const segments = [ 'Solid', 'Gradient' ];
+	const { segments, subsheets } = colorsUtils;
 	const isGradientColor = colorValue?.includes( 'linear-gradient' );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
 
@@ -43,9 +43,9 @@ function ColorSettings( {
 		segments[ selectedSegmentIndex ]
 	);
 
-	const isSolidSegment = currentSegment === 'Solid';
+	const isSolidSegment = currentSegment === segments[ 0 ];
 
-	const horizontalSeparatorStyle = getStylesFromColorScheme(
+	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
 	);
@@ -55,7 +55,11 @@ function ColorSettings( {
 			if ( isCustomScreen ) {
 				onCustomScreenToggle( false );
 			} else {
-				onReplaceSubsheet( 'Settings', {}, afterHardwareButtonPress() );
+				onReplaceSubsheet(
+					subsheets[ 0 ],
+					{},
+					afterHardwareButtonPress()
+				);
 			}
 		} );
 	}, [ isCustomScreen ] );
@@ -162,7 +166,7 @@ function ColorSettings( {
 					<NavigationHeader
 						screen={ label }
 						leftButtonOnPress={ () =>
-							onReplaceSubsheet( 'Settings' )
+							onReplaceSubsheet( subsheets[ 0 ] )
 						}
 					/>
 					<ColorPalette
@@ -187,4 +191,4 @@ function ColorSettings( {
 	);
 }
 
-export default withPreferredColorScheme( ColorSettings );
+export default ColorSettings;

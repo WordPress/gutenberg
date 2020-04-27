@@ -15,7 +15,7 @@ import { take, values, map, reduce } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,26 +26,20 @@ const ANIMATION_DURATION = 200;
 
 const isIOS = Platform.OS === 'ios';
 
-const Segment = ( {
-	isSelected,
-	title,
-	onPress,
-	getStylesFromColorScheme,
-	onLayout,
-} ) => {
+const Segment = ( { isSelected, title, onPress, onLayout } ) => {
 	const isSelectedIOS = isIOS && isSelected;
 
 	const segmentStyle = [ styles.segment, isIOS && styles.segmentIOS ];
 
-	const textStyle = getStylesFromColorScheme(
+	const textStyle = usePreferredColorSchemeStyle(
 		styles.buttonTextDefault,
 		styles.buttonTextDefaultDark
 	);
-	const selectedTextStyle = getStylesFromColorScheme(
+	const selectedTextStyle = usePreferredColorSchemeStyle(
 		styles.buttonTextSelected,
 		styles.buttonTextSelectedDark
 	);
-	const shadowStyle = getStylesFromColorScheme( styles.shadowIOS, {} );
+	const shadowStyle = usePreferredColorSchemeStyle( styles.shadowIOS, {} );
 
 	return (
 		<View style={ isSelectedIOS && shadowStyle }>
@@ -69,7 +63,6 @@ const SegmentedControls = ( {
 	selectedIndex,
 	addonLeft,
 	addonRight,
-	getStylesFromColorScheme,
 } ) => {
 	const selectedSegmentIndex = selectedIndex || 0;
 	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
@@ -91,12 +84,12 @@ const SegmentedControls = ( {
 		);
 	}, [ segmentsDimensions ] );
 
-	const containerStyle = getStylesFromColorScheme(
+	const containerStyle = usePreferredColorSchemeStyle(
 		styles.container,
 		styles.containerDark
 	);
 
-	function pefrormAnimation( index ) {
+	function performAnimation( index ) {
 		Animated.timing( positionAnimationValue, {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
@@ -129,7 +122,7 @@ const SegmentedControls = ( {
 		);
 		setActiveSegmentIndex( index );
 		segmentHandler( segment );
-		pefrormAnimation( index, segment );
+		performAnimation( index, segment );
 	}
 
 	function segmentOnLayout( event, index ) {
@@ -141,7 +134,7 @@ const SegmentedControls = ( {
 		} );
 	}
 
-	const selectedStyle = getStylesFromColorScheme(
+	const selectedStyle = usePreferredColorSchemeStyle(
 		styles.selected,
 		styles.selectedDark
 	);
@@ -162,9 +155,6 @@ const SegmentedControls = ( {
 							onPress={ () => onHandlePress( segment, index ) }
 							isSelected={ activeSegmentIndex === index }
 							key={ index }
-							getStylesFromColorScheme={
-								getStylesFromColorScheme
-							}
 							onLayout={ ( event ) =>
 								segmentOnLayout( event, index )
 							}
@@ -188,4 +178,4 @@ const SegmentedControls = ( {
 	);
 };
 
-export default withPreferredColorScheme( SegmentedControls );
+export default SegmentedControls;

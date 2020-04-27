@@ -14,12 +14,13 @@ import { map } from 'lodash';
  */
 import { useState, useEffect, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
+import { colorsUtils } from '../mobile/color-settings/utils';
 
 const ANIMATION_DURATION = 200;
 
@@ -30,7 +31,6 @@ function ColorPalette( {
 	defaultSettings,
 	currentSegment,
 	onCustomPress,
-	getStylesFromColorScheme,
 	shouldEnableBottomSheetScroll,
 } ) {
 	const customSwatchGradients = [
@@ -55,7 +55,7 @@ function ColorPalette( {
 
 	const scrollViewRef = createRef();
 
-	const isGradientSegment = currentSegment === 'Gradient';
+	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
 
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
@@ -106,7 +106,7 @@ function ColorPalette( {
 		setColor( color );
 	}
 
-	const verticalSeparatorStyle = getStylesFromColorScheme(
+	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.verticalSeparator,
 		styles.verticalSeparatorDark
 	);
@@ -168,4 +168,4 @@ function ColorPalette( {
 	);
 }
 
-export default withPreferredColorScheme( ColorPalette );
+export default ColorPalette;

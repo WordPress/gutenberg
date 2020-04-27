@@ -10,7 +10,7 @@ import tinycolor from 'tinycolor2';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { Icon, check, close } from '@wordpress/icons';
 /**
  * Internal dependencies
@@ -26,7 +26,6 @@ function ColorPicker( {
 	isGradientColor,
 	onNavigationBack,
 	onCloseBottomSheet,
-	getStylesFromColorScheme,
 } ) {
 	const isIOS = Platform.OS === 'ios';
 	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
@@ -44,19 +43,19 @@ function ColorPicker( {
 	const { height: pickerPointerSize } = styles.pickerPointer;
 	const pickerWidth = BottomSheet.getWidth() - 2 * spacing;
 
-	const applyButtonStyle = getStylesFromColorScheme(
+	const applyButtonStyle = usePreferredColorSchemeStyle(
 		styles.applyButton,
 		styles.applyButtonDark
 	);
-	const cancelButtonStyle = getStylesFromColorScheme(
+	const cancelButtonStyle = usePreferredColorSchemeStyle(
 		styles.cancelButton,
 		styles.cancelButtonDark
 	);
-	const colorTextStyle = getStylesFromColorScheme(
+	const colorTextStyle = usePreferredColorSchemeStyle(
 		styles.colorText,
 		styles.colorTextDark
 	);
-	const footerStyle = getStylesFromColorScheme(
+	const footerStyle = usePreferredColorSchemeStyle(
 		styles.footer,
 		styles.footerDark
 	);
@@ -184,4 +183,4 @@ function ColorPicker( {
 	);
 }
 
-export default withPreferredColorScheme( ColorPicker );
+export default ColorPicker;

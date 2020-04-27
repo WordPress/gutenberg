@@ -5,6 +5,7 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	ColorSettings,
+	colorsUtils,
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -34,7 +35,7 @@ function BottomSheetSettings( {
 			<BottomSheetConsumer>
 				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
 					switch ( currentScreen ) {
-						case 'Color':
+						case colorsUtils.subsheets[ 1 ]:
 							return (
 								<ColorSettings
 									defaultSettings={ defaultSettings }
@@ -42,7 +43,7 @@ function BottomSheetSettings( {
 									{ ...extraProps }
 								/>
 							);
-						case 'Settings':
+						case colorsUtils.subsheets[ 0 ]:
 						default:
 							return <InspectorControls.Slot />;
 					}
