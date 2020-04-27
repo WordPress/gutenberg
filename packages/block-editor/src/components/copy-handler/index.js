@@ -64,7 +64,12 @@ function CopyHandler( { children } ) {
 				canUserUseUnfilteredHTML,
 			} );
 
-			replaceBlocks( selectedBlockClientIds, blocks, blocks.length - 1, -1 );
+			replaceBlocks(
+				selectedBlockClientIds,
+				blocks,
+				blocks.length - 1,
+				-1
+			);
 		}
 	};
 
