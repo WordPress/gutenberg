@@ -166,10 +166,13 @@ apply_filters( 'rest_wp_template_part_collection_params', 'filter_rest_wp_templa
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( $request['theme'] ) {
-		$args += array(
-			'meta_key'   => 'theme',
-			'meta_value' => $request['theme'],
+		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
+		$meta_query[] = array(
+			'key'   => 'theme',
+			'value' => $request['theme'],
 		);
+
+		$args['meta_query'] = $meta_query;
 	}
 	return $args;
 }
