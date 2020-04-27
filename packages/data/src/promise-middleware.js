@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import isPromise from 'is-promise';
+import { isPromise } from '@wordpress/redux-routine';
 
 /**
  * Simplest possible promise redux middleware.

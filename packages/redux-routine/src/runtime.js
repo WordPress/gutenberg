@@ -3,12 +3,12 @@
  */
 import { create } from 'rungen';
 import { map } from 'lodash';
-import isPromise from 'is-promise';
 
 /**
  * Internal dependencies
  */
 import { isActionOfType, isAction } from './is-action';
+import { isPromise } from './is-promise';
 
 /**
  * Create a co-routine runtime.

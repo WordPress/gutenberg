@@ -28,3 +28,5 @@ export default function createMiddleware( controls = {} ) {
 		};
 	};
 }
+
+export { default as isPromise } from './is-promise';
