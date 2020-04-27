@@ -48,6 +48,11 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 			}
 		>
 			<PanelBody title={ __( 'Navigation menu' ) }>
+				<div className="components-panel__header-actions">
+					<Button isPrimary onClick={ saveBlocks }>
+						{ __( 'Save navigation' ) }
+					</Button>
+				</div>
 				<NavigableToolbar
 					className={ classnames(
 						'edit-navigation-menu-editor__block-editor-toolbar',
@@ -65,6 +70,12 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 						<BlockList />
 					</ObserveTyping>
 				</WritingFlow>
+				<div className="components-panel__footer-actions">
+					<MenuDelete
+						menuId={ menuId }
+						onDelete={ onDelete }
+					/>
+				</div>
 			</PanelBody>
 		</Panel>
 	);

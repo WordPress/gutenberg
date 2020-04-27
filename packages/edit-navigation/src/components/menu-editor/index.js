@@ -24,7 +24,6 @@ export default function MenuEditor( {
 	blockEditorSettings,
 	onDelete,
 } ) {
-
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 	const isLargeViewport = useViewportMatch( 'medium' );
 

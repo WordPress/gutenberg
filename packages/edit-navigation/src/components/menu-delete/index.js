@@ -26,7 +26,12 @@ export default function MenuDelete( { menuId, onDelete } ) {
 	};
 
 	return (
-		<Button isPrimary onClick={ askToDelete }>
+		<Button
+			className="menu-editor-button__delete"
+			isPrimary
+			onClick={ askToDelete }
+			isLink
+		>
 			{ __( 'Delete navigation' ) }
 		</Button>
 	);
