@@ -109,7 +109,8 @@ export class UnsupportedBlockEdit extends Component {
 						this.timeout = setTimeout( () => {
 							requestUnsupportedBlockFallback(
 								attributes.originalContent,
-								clientId
+								clientId,
+								title
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
