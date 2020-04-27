@@ -5,13 +5,14 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { LinearGradient } from '@wordpress/components';
+import { LinearGradient, colorsUtils } from '@wordpress/components';
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
 
 function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
+	const { isGradient } = colorsUtils;
 	const wrapperStyles = [
 		styles.richTextWrapper,
 		{
@@ -20,11 +21,9 @@ function ColorBackground( { children, borderRadiusValue, backgroundColor } ) {
 		},
 	];
 
-	const isGradient = backgroundColor.includes( 'linear-gradient' );
-
 	return (
 		<View style={ wrapperStyles }>
-			{ isGradient && (
+			{ isGradient( backgroundColor ) && (
 				<LinearGradient
 					gradientValue={ backgroundColor }
 					angleCenter={ { x: 0.5, y: 0.5 } }

@@ -12,6 +12,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { colorsUtils } from '../mobile/color-settings/utils';
 
 function SelectedIcon( { opacity } ) {
 	return (
@@ -29,14 +30,14 @@ function ColorIndicator( {
 	style,
 	opacity,
 } ) {
-	const isGradient = color?.includes( 'linear-gradient' );
+	const { isGradient } = colorsUtils;
 
 	const outlineStyle = usePreferredColorSchemeStyle(
 		styles.outline,
 		styles.outlineDark
 	);
 
-	if ( isGradient ) {
+	if ( isGradient( color ) ) {
 		return (
 			<LinearGradient
 				style={ [ styles.circleOption, style ] }

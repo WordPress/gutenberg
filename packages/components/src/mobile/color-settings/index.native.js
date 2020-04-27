@@ -33,9 +33,8 @@ function ColorSettings( {
 	onHardwareButtonPress,
 	defaultSettings,
 } ) {
-	const { segments, subsheets } = colorsUtils;
-	const isGradientColor = colorValue?.includes( 'linear-gradient' );
-	const selectedSegmentIndex = isGradientColor ? 1 : 0;
+	const { segments, subsheets, isGradient } = colorsUtils;
+	const selectedSegmentIndex = isGradient( colorValue ) ? 1 : 0;
 
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
@@ -150,7 +149,7 @@ function ColorSettings( {
 						}
 						setColor={ setColor }
 						activeColor={ currentValue }
-						isGradientColor={ isGradientColor }
+						isGradientColor={ isGradient( currentValue ) }
 						onNavigationBack={ () => {
 							onCustomScreenToggle( false );
 						} }
@@ -172,7 +171,7 @@ function ColorSettings( {
 					<ColorPalette
 						setColor={ setColor }
 						activeColor={ currentValue }
-						isGradientColor={ isGradientColor }
+						isGradientColor={ isGradient( currentValue ) }
 						currentSegment={ currentSegment }
 						isCustomScreen={ isCustomScreen }
 						onCustomPress={ () => {
