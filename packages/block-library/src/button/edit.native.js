@@ -172,22 +172,20 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
-		const { style } = attributes;
+		const { backgroundColor, wrapperProps } = this.props;
 
 		return (
-			( style && style.color && style.color.background ) ||
+			wrapperProps?.style?.backgroundColor ||
 			backgroundColor.color ||
 			styles.fallbackButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { textColor, attributes } = this.props;
-		const { style } = attributes;
+		const { textColor, wrapperProps } = this.props;
 
 		return (
-			( style && style.color && style.color.text ) ||
+			wrapperProps?.style?.color ||
 			textColor.color ||
 			styles.fallbackButton.color
 		);
