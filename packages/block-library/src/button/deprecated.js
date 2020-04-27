@@ -125,6 +125,11 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+
+		isEligible: ( attributes ) =>
+			!! attributes.customTextColor ||
+			!! attributes.customBackgroundColor ||
+			!! attributes.customGradient,
 		migrate: migrateCustomColorsAndGradients,
 		save( { attributes } ) {
 			const {
