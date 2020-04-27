@@ -8,18 +8,12 @@ const { flatten } = require( 'lodash' );
  * Internal dependencies.
  */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
-const babelConfig = require( '../../../babel.config' );
 
 const getAST = ( source ) => {
-	const { presets, plugins } = babelConfig( {
-		cache: () => {}, // To bypass api.cache is not a function error.
-	} );
-
 	return babel.parse( source || '', {
-		presets,
-		plugins: [ ...plugins, 'jsx' ],
+		plugins: [ 'jsx' ],
 		sourceType: 'module',
-	} ).program; // unlike espree, the root of babel AST is File, not Program.
+	} ).program;
 };
 
 const getExportTokens = ( ast ) =>
