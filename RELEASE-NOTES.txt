@@ -9,6 +9,7 @@
 * Fix the icons in FloatingToolbar on RTL mode
 * [Android] Add alignment options for heading block
 * Fix quote block so it visually reflects selected alignment
+* New block: Pullquote
 
 1.26.0
 ------
