@@ -32,11 +32,6 @@ function HeadingEdit( {
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-	const isAndroid = Platform.select( {
-		android: true,
-		native: false,
-		web: false,
-	} );
 
 	return (
 		<>
@@ -49,14 +44,12 @@ function HeadingEdit( {
 						setAttributes( { level: newLevel } )
 					}
 				/>
-				{ ! isAndroid && (
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				) }
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
 			</BlockControls>
 			{ Platform.OS === 'web' && (
 				<InspectorControls>

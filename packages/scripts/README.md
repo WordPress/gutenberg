@@ -425,7 +425,8 @@ _Example:_
 	"scripts": {
 		"test:unit": "wp-scripts test-unit-js",
 		"test:unit:help": "wp-scripts test-unit-js --help",
-		"test:unit:watch": "wp-scripts test-unit-js --watch"
+		"test:unit:watch": "wp-scripts test-unit-js --watch",
+		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache"
 	}
 }
 ```
@@ -435,12 +436,41 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
+* `npm run test:unit:debug` - runs all unit tests with the node debugger enabled.
 
 Jest will look for test files with any of the following popular naming conventions:
 
 - Files with `.js` (or `.ts`) suffix located at any level of depth in `__tests__` folders.
 - Files with `.js` (or `.ts`) suffix directly located in `test` folders.
 - Files with `.test.js` (or `.test.ts`) suffix.
+
+#### Debugging Jest unit tests
+
+Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
+
+Follow the instructions for debugging Node.js with your favorite supported browser or IDE. When the instructions say to use `node --inspect script.js` or `node --inspect-brk script.js`, simply use `wp-scripts --inspect test-unit-js` or `wp-scripts --inspect-brk test-unit-js` instead.
+
+Google Chrome and Visual Studio Code are used as examples below.
+
+##### Debugging in Google Chrome
+
+Place `debugger;` statements in any test and run `npm run test:unit:debug`.
+
+Then open `about:inspect` in Google Chrome and select `inspect` on your process.
+
+A breakpoint will be set at the first line of the script (this is done to give you time to open the developer tools and to prevent Jest from executing before you have time to do so). Click the resume button in the upper right panel of the dev tools to continue execution. When Jest executes the test that contains the debugger statement, execution will pause and you can examine the current scope and call stack.
+
+##### Debugging in Visual Studio Code
+
+Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
+
+First, set a breakpoint in your tests by clicking on a line in the editor's left margin by the line numbers.
+
+Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the npm scripts. To start the tests, click the debug icon next to `test:unit:debug`.
+
+The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
+
+See [Debugging in Visual Studio Code](https://code.visualstudio.com/Docs/editor/debugging) for more details on using the Visual Studio Code debugger.
 
 #### Advanced information
 

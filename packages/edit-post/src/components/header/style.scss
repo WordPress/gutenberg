@@ -70,7 +70,7 @@
 	.editor-post-saved-state,
 	.components-button.editor-post-switch-to-draft,
 	.components-button.editor-post-preview,
-	.components-button.editor-post-preview__dropdown,
+	.components-button.block-editor-post-preview__dropdown,
 	.components-button.editor-post-publish-button,
 	.components-button.editor-post-publish-panel__toggle {
 		padding: 0 6px;
@@ -80,5 +80,30 @@
 			padding: 0 12px;
 			margin-right: $grid-unit-15;
 		}
+	}
+}
+
+.edit-post-header-preview__grouping-external {
+	display: flex;
+	position: relative;
+	padding-bottom: 0;
+}
+
+.edit-post-header-preview__button-external {
+	padding-left: $grid-unit-10;
+
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+
+	svg {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.edit-post-post-preview-dropdown {
+	.components-popover__content {
+		padding-bottom: 0;
 	}
 }

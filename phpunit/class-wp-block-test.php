@@ -246,7 +246,7 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertSame( 'abc', $block->render() );
 	}
 
-	function test_render_passes_instance_to_render_callback() {
+	function test_render_assigns_instance_global_for_render_callback() {
 		$this->registry->register(
 			'core/greeting',
 			array(
@@ -259,11 +259,13 @@ class WP_Block_Test extends WP_UnitTestCase {
 						'default' => '!',
 					),
 				),
-				'render_callback' => function( $block ) {
+				'render_callback' => function() {
+					global $_experimental_block;
+
 					return sprintf(
 						'Hello %s%s',
-						$block->attributes['toWhom'],
-						$block->attributes['punctuation']
+						$_experimental_block->attributes['toWhom'],
+						$_experimental_block->attributes['punctuation']
 					);
 				},
 			)
@@ -312,7 +314,7 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/outer',
 			array(
-				'render_callback' => function( $block, $content ) {
+				'render_callback' => function( $block_attributes, $content ) {
 					return $content;
 				},
 			)
@@ -332,39 +334,6 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$this->assertSame( 'abc', $block->render() );
-	}
-
-	function test_array_access_attributes() {
-		$this->registry->register(
-			'core/example',
-			array(
-				'attributes' => array(
-					'value' => array(
-						'type' => 'string',
-					),
-				),
-			)
-		);
-		$parsed_block = array(
-			'blockName' => 'core/example',
-			'attrs'     => array( 'value' => 'ok' ),
-		);
-		$context      = array();
-		$block        = new WP_Block( $parsed_block, $context, $this->registry );
-
-		$this->assertTrue( isset( $block['value'] ) );
-		$this->assertFalse( isset( $block['nonsense'] ) );
-		$this->assertEquals( 'ok', $block['value'] );
-
-		$block['value'] = 'changed';
-		$this->assertEquals( 'changed', $block['value'] );
-		$this->assertEquals( 'changed', $block->attributes['value'] );
-
-		unset( $block['value'] );
-		$this->assertFalse( isset( $block['value'] ) );
-
-		$block[] = 'invalid, but still supported';
-		$this->assertEquals( 'invalid, but still supported', $block[0] );
 	}
 
 }

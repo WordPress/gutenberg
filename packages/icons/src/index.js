@@ -120,6 +120,8 @@ export { default as starHalf } from './library/star-half';
 export { default as stretchFullWidth } from './library/stretch-full-width';
 export { default as shipping } from './library/shipping';
 export { default as stretchWide } from './library/stretch-wide';
+export { default as subscript } from './library/subscript';
+export { default as superscript } from './library/superscript';
 export { default as tableColumnAfter } from './library/table-column-after';
 export { default as tableColumnBefore } from './library/table-column-before';
 export { default as tableColumnDelete } from './library/table-column-delete';

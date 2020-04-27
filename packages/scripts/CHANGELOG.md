@@ -4,6 +4,10 @@
 
 - The bundled `puppeteer` (`^2.0.0`) dependency has been replaced with `puppeteer-core` in version `3.0.0`. Puppeteer uses Chromium v81 instead of Chromium v79. See the [full list of changes](https://github.com/puppeteer/puppeteer/releases/tag/v3.0.0). It also allowed preventing Chromium installation together with `@wordpress/scripts`. It happens now on-demand when running `test-e2e` script, and it re-triggers only when a new version is required.
 
+### New Features
+
+- Add debugging support for `test-unit-js` script ([#21631](https://github.com/WordPress/gutenberg/pull/21631)). Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
+
 ### Bug fix
 
 - The bundled `npm-package-json-lint` dependency has been updated from requiring `^4.0.3` to requiring `^5.0.0` ([#21597](https://github.com/WordPress/gutenberg/pull/21597)). [Breaking changes](https://npmpackagejsonlint.org/docs/en/v4-to-v5) don't break anything in this package. It fixes the abrupt shutdown when `"description"` field in `package.json` is empty.
