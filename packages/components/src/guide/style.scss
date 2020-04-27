@@ -73,10 +73,11 @@
 	min-width: 312px;
 
 	@media (max-width: $break-small) {
-		bottom: 10%;
-		left: $grid-unit-30;
-		right: $grid-unit-30;
-		top: 10%;
+		bottom: 5%;
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		top: 5%;
+		margin: 0 auto;
 	}
 }
 
