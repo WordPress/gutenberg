@@ -6,14 +6,15 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 	Inserter,
+	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
-import { PinnedItems } from '@wordpress/interface';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
@@ -49,9 +50,27 @@ export default function Header() {
 			} ) ),
 		[]
 	);
+
+	const { isFullscreenActive } = useSelect(
+		( select ) => ( {
+			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
+				'fullscreenMode'
+			),
+		} ),
+		[]
+	);
+
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const {
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = useDispatch( 'core/edit-site' );
+
 	return (
 		<div className="edit-site-header">
-			<FullscreenModeClose />
+			{ isFullscreenActive && <AdminMenuToggle /> }
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
@@ -73,6 +92,10 @@ export default function Header() {
 				<ToolSelector />
 			</div>
 			<div className="edit-site-header__actions">
+				<PreviewOptions
+					deviceType={ deviceType }
+					setDeviceType={ setPreviewDeviceType }
+				/>
 				<SaveButton />
 				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />

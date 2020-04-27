@@ -107,7 +107,7 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		generatedClassName,
 		customClassName,
-		'wp-block block-editor-block-list__block',
+		'block-editor-block-list__block',
 		{
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
@@ -143,13 +143,6 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 		/>
 	);
-
-	// For aligned blocks, provide a wrapper element so the block can be
-	// positioned relative to the block column. This is enabled with the
-	// .is-block-content className.
-	if ( ! lightBlockWrapper && isAligned ) {
-		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
-	}
 
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;

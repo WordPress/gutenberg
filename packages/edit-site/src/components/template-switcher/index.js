@@ -17,7 +17,8 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
-import TemplatePreview from './preview';
+import TemplatePreview from './template-preview';
+import ThemePreview from './theme-preview';
 
 function TemplateLabel( { template } ) {
 	return (
@@ -42,12 +43,22 @@ export default function TemplateSwitcher( {
 	onAddTemplateId,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
+	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
+
 	const onHoverTemplate = ( id ) => {
 		setHoveredTemplate( { id, type: 'template' } );
 	};
 	const onHoverTemplatePart = ( id ) => {
 		setHoveredTemplate( { id, type: 'template-part' } );
 	};
+
+	const onMouseEnterTheme = () => {
+		setThemePreviewVisible( () => true );
+	};
+	const onMouseLeaveTheme = () => {
+		setThemePreviewVisible( () => false );
+	};
+
 	const { currentTheme, templates, templateParts } = useSelect(
 		( select ) => {
 			const { getCurrentTheme, getEntityRecord } = select( 'core' );
@@ -136,10 +147,18 @@ export default function TemplateSwitcher( {
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Current theme' ) }>
-							<MenuItem>{ currentTheme.name }</MenuItem>
+							<MenuItem
+								onMouseEnter={ onMouseEnterTheme }
+								onMouseLeave={ onMouseLeaveTheme }
+							>
+								{ currentTheme.name }
+							</MenuItem>
 						</MenuGroup>
 						{ !! hoveredTemplate?.id && (
 							<TemplatePreview item={ hoveredTemplate } />
+						) }
+						{ themePreviewVisible && (
+							<ThemePreview theme={ currentTheme } />
 						) }
 						<div className="edit-site-template-switcher__footer" />
 					</>
