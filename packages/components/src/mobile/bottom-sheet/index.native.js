@@ -12,7 +12,6 @@ import {
 	StatusBar,
 	TouchableHighlight,
 	LayoutAnimation,
-	UIManager,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -21,7 +20,7 @@ import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
@@ -36,43 +35,10 @@ import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
+import { BottomSheetProvider } from './bottom-sheet-context';
 
 const ANIMATION_DURATION = 300;
 
-// Context in BottomSheet is necessary for controlling the
-// transition flow between subsheets and replacing a content inside them
-export const {
-	Provider: BottomSheetProvider,
-	Consumer: BottomSheetConsumer,
-} = createContext( {
-	// Specifies whether content is currently scrolling
-	isBottomSheetContentScrolling: false,
-	// Function called to enable scroll within bottom sheet
-	shouldEnableBottomSheetScroll: () => {},
-	// Function called to disable bottom sheet max height.
-	// E.g. used to extend bottom sheet on full screen in ColorPicker,
-	// which is helpful on small devices with set the largest font/display size.
-	shouldDisableBottomSheetMaxHeight: () => {},
-	// Callback that is called on closing bottom sheet
-	onCloseBottomSheet: () => {},
-	// Android only: Function called to control android hardware back button functionality
-	onHardwareButtonPress: () => {},
-	// Function called to navigate to another subsheet
-	onReplaceSubsheet: () => {},
-	// Object contains extra data passed to the current subsheet
-	extraProps: {},
-	// Specifies the currently active subsheet name
-	currentScreen: undefined,
-} );
-
-// It's needed to set the following flags via UIManager
-// to have `LayoutAnimation` working on Android
-if (
-	Platform.OS === 'android' &&
-	UIManager.setLayoutAnimationEnabledExperimental
-) {
-	UIManager.setLayoutAnimationEnabledExperimental( true );
-}
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
