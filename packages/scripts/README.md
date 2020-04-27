@@ -398,6 +398,7 @@ This is how you execute those scripts using the presented setup:
 * `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+* `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
@@ -488,6 +489,16 @@ Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts Vie
 The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
 
 See [Debugging in Visual Studio Code](https://code.visualstudio.com/Docs/editor/debugging) for more details on using the Visual Studio Code debugger.
+
+#### Debugging e2e tests
+
+Since e2e tests run both in the node context _and_ the (usually headless) browser context, not all lines of code can have breakpoints set within the inspector client—only the node context is debugged in the inspector client.
+
+The code executed in the node context includes all of the test files _excluding_ code within `page.evaluate` functions. The `page.evaluate` functions and the rest of your app code is executed within the browser context.
+
+Test code (node context) can be debugged normally using the instructions above.
+
+To also debug the browser context, run `wp-scripts --inspect-brk test-e2e -- --puppeteer-devtools`. The `--puppeteer-devtools` option and the `PUPPETEER_DEVTOOLS="true"` environment variable will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
 
 ## Advanced Usage
 
