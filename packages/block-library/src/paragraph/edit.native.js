@@ -16,15 +16,13 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	wrapperProps,
-	globalStyle,
+	mergedStyle,
 	style,
 } ) {
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...globalStyle,
-		...wrapperProps?.style,
+		...mergedStyle,
 		...style,
 	};
 

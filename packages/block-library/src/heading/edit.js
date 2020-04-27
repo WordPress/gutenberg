@@ -28,8 +28,7 @@ function HeadingEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	wrapperProps,
-	globalStyle,
+	mergedStyle,
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
@@ -38,11 +37,6 @@ function HeadingEdit( {
 		native: false,
 		web: false,
 	} );
-
-	const styles = {
-		...wrapperProps?.style,
-		color: wrapperProps?.style?.color || globalStyle?.color,
-	};
 
 	return (
 		<>
@@ -103,7 +97,7 @@ function HeadingEdit( {
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				textAlign={ align }
-				style={ styles }
+				style={ mergedStyle }
 			/>
 		</>
 	);

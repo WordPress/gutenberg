@@ -50,34 +50,35 @@ class BlockListBlock extends Component {
 	getBlockForType() {
 		return (
 			<GlobalStylesContext.Consumer>
-				{ ( globalStyle ) => (
-					<GlobalStylesContext.Provider
-						value={ {
-							...globalStyle,
-							...this.props.wrapperProps.style,
-						} }
-					>
-						<BlockEdit
-							name={ this.props.name }
-							isSelected={ this.props.isSelected }
-							attributes={ this.props.attributes }
-							setAttributes={ this.props.onChange }
-							onFocus={ this.onFocus }
-							onReplace={ this.props.onReplace }
-							insertBlocksAfter={ this.insertBlocksAfter }
-							mergeBlocks={ this.props.mergeBlocks }
-							onCaretVerticalPositionChange={
-								this.props.onCaretVerticalPositionChange
-							}
-							wrapperProps={ this.props.wrapperProps }
-							globalStyle={ globalStyle }
-							clientId={ this.props.clientId }
-							parentWidth={ this.props.parentWidth }
-							contentStyle={ this.props.contentStyle }
-							onDeleteBlock={ this.props.onDeleteBlock }
-						/>
-					</GlobalStylesContext.Provider>
-				) }
+				{ ( globalStyle ) => {
+					const mergedStyle = {
+						...globalStyle,
+						...this.props.wrapperProps.style,
+					};
+					return (
+						<GlobalStylesContext.Provider value={ mergedStyle }>
+							<BlockEdit
+								name={ this.props.name }
+								isSelected={ this.props.isSelected }
+								attributes={ this.props.attributes }
+								setAttributes={ this.props.onChange }
+								onFocus={ this.onFocus }
+								onReplace={ this.props.onReplace }
+								insertBlocksAfter={ this.insertBlocksAfter }
+								mergeBlocks={ this.props.mergeBlocks }
+								onCaretVerticalPositionChange={
+									this.props.onCaretVerticalPositionChange
+								}
+								wrapperProps={ this.props.wrapperProps }
+								mergedStyle={ mergedStyle }
+								clientId={ this.props.clientId }
+								parentWidth={ this.props.parentWidth }
+								contentStyle={ this.props.contentStyle }
+								onDeleteBlock={ this.props.onDeleteBlock }
+							/>
+						</GlobalStylesContext.Provider>
+					);
+				} }
 			</GlobalStylesContext.Consumer>
 		);
 	}
