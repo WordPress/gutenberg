@@ -438,7 +438,7 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
-* `npm run test:unit:debug` - runs all unit tests with the node debugger enabled.
+* `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
