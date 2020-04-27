@@ -44,6 +44,8 @@ export default function ActionsPanel() {
 
 	const openSavePanel = useCallback( () => openEntitiesSavedStates(), [] );
 
+	// It is ok for these components to be unmounted when not in visual use.
+	// So we can use them in a return cascade since only 1 is to be present at a time.
 	const Unmountables = () => {
 		if ( publishSidebarOpened ) {
 			return (
@@ -86,6 +88,8 @@ export default function ActionsPanel() {
 		);
 	};
 
+	// Since EntitiesSavedStates controls its own panel, we can keep it
+	// always mounted to retain its own component state (such as checkboxes).
 	return (
 		<>
 			<EntitiesSavedStates
