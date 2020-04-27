@@ -47,6 +47,11 @@
 		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
+
+		@media (max-width: $break-small) {
+			position: absolute;
+			bottom: 0;
+		}
 	}
 
 	&__page-control {
