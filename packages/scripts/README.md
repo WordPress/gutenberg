@@ -450,7 +450,7 @@ Jest will look for test files with any of the following popular naming conventio
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
 
-## Advanced script usage
+## Passing Node options
 
 `wp-scripts` supports the full array of [node CLI options](https://nodejs.org/api/cli.html). They can be passed after the `wp-scripts` command and before the script name.
 
