@@ -35,7 +35,6 @@
 
 		@include break-small() {
 			min-height: $image-height;
-			padding-left: $image-width + $grid-unit-30;
 		}
 	}
 
@@ -52,6 +51,7 @@
 
 	&__page-control {
 		margin: 0;
+		text-align: center;
 
 		li {
 			display: inline-block;
