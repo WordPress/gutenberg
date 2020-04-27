@@ -17,7 +17,7 @@ import { Component } from '@wordpress/element';
 import {
 	Toolbar,
 	ToolbarButton,
-	SiteCapabilitiesContext,
+	withSiteCapabilities,
 	isMentionsSupported,
 } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -712,6 +712,7 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
+			capabilities,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -883,34 +884,24 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							<SiteCapabilitiesContext.Consumer>
-								{ ( capabilities ) =>
-									isMentionsSupported( capabilities ) && (
-										<Toolbar>
-											<ToolbarButton
-												title={ __( 'Insert mention' ) }
-												icon={
-													<Icon icon={ atSymbol } />
-												}
-												onClick={ () => {
-													addMention()
-														.then(
-															(
-																mentionUserId
-															) => {
-																this.insertString(
-																	record,
-																	`@${ mentionUserId } `
-																);
-															}
-														)
-														.catch( () => {} );
-												} }
-											/>
-										</Toolbar>
-									)
-								}
-							</SiteCapabilitiesContext.Consumer>
+							{ isMentionsSupported( capabilities ) && (
+								<Toolbar>
+									<ToolbarButton
+										title={ __( 'Insert mention' ) }
+										icon={ <Icon icon={ atSymbol } /> }
+										onClick={ () => {
+											addMention()
+												.then( ( mentionUserId ) => {
+													this.insertString(
+														record,
+														`@${ mentionUserId } `
+													);
+												} )
+												.catch( () => {} );
+										} }
+									/>
+								</Toolbar>
+							) }
 						</BlockFormatControls>
 					</>
 				) }
@@ -939,4 +930,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withSiteCapabilities,
 ] )( RichText );
