@@ -8,7 +8,7 @@
 * [iOS] Floating toolbar, previously located above nested blocks, is now placed at the bottom of the screen
 * Fix the icons in FloatingToolbar on RTL mode
 * [Android] Add alignment options for heading block
-* Fix quote block so it visually reflects selected alignment
+* Fix Quote block so it visually reflects selected alignment
 
 1.26.0
 ------
