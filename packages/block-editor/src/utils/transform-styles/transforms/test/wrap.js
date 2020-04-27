@@ -77,4 +77,15 @@ describe( 'CSS selector wrap', () => {
 
 		expect( output ).toMatchSnapshot();
 	} );
+
+	it( 'should not throw an exception for valid data URLs that contain `url()` inside (e.g. inline SVGs with mask)', () => {
+		const callback = wrap( '.test' );
+		const input = `
+		.wp-block-group {
+          background: url("url(t);");
+        }`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
 } );
