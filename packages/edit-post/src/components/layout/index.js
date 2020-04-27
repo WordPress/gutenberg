@@ -53,6 +53,7 @@ import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import ActionsPanel from './actions-panel';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
@@ -147,61 +148,61 @@ function Layout() {
 		}
 	}, [ isInserterOpen, isHugeViewport ] );
 
-	const ActionsPanel = () => {
-		const openSavePanel = useCallback(
-			() => openEntitiesSavedStates(),
-			[]
-		);
+	// const ActionsPanel = () => {
+	// 	const openSavePanel = useCallback(
+	// 		() => openEntitiesSavedStates(),
+	// 		[]
+	// 	);
 
-		if ( isEntitiesSavedStatesOpen ) {
-			return (
-				<EntitiesSavedStates
-					isOpen={ true }
-					closePanel={ closeEntitiesSavedStates }
-				/>
-			);
-		}
+	// 	if ( isEntitiesSavedStatesOpen ) {
+	// 		return (
+	// 			<EntitiesSavedStates
+	// 				isOpen={ true }
+	// 				closePanel={ closeEntitiesSavedStates }
+	// 			/>
+	// 		);
+	// 	}
 
-		if ( publishSidebarOpened ) {
-			return (
-				<PostPublishPanel
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					PrePublishExtension={ PluginPrePublishPanel.Slot }
-					PostPublishExtension={ PluginPostPublishPanel.Slot }
-				/>
-			);
-		}
+	// 	if ( publishSidebarOpened ) {
+	// 		return (
+	// 			<PostPublishPanel
+	// 				onClose={ closePublishSidebar }
+	// 				forceIsDirty={ hasActiveMetaboxes }
+	// 				forceIsSaving={ isSaving }
+	// 				PrePublishExtension={ PluginPrePublishPanel.Slot }
+	// 				PostPublishExtension={ PluginPostPublishPanel.Slot }
+	// 			/>
+	// 		);
+	// 	}
 
-		if ( hasNonPostEntityChanges ) {
-			return (
-				<div className="edit-post-layout__toggle-publish-panel">
-					<Button
-						isSecondary
-						className="edit-post-layout__toggle-publish-panel-button"
-						onClick={ openSavePanel }
-						aria-expanded={ false }
-					>
-						{ __( 'Open save panel' ) }
-					</Button>
-				</div>
-			);
-		}
+	// 	if ( hasNonPostEntityChanges ) {
+	// 		return (
+	// 			<div className="edit-post-layout__toggle-publish-panel">
+	// 				<Button
+	// 					isSecondary
+	// 					className="edit-post-layout__toggle-publish-panel-button"
+	// 					onClick={ openSavePanel }
+	// 					aria-expanded={ false }
+	// 				>
+	// 					{ __( 'Open save panel' ) }
+	// 				</Button>
+	// 			</div>
+	// 		);
+	// 	}
 
-		return (
-			<div className="edit-post-layout__toggle-publish-panel">
-				<Button
-					isSecondary
-					className="edit-post-layout__toggle-publish-panel-button"
-					onClick={ togglePublishSidebar }
-					aria-expanded={ false }
-				>
-					{ __( 'Open publish panel' ) }
-				</Button>
-			</div>
-		);
-	};
+	// 	return (
+	// 		<div className="edit-post-layout__toggle-publish-panel">
+	// 			<Button
+	// 				isSecondary
+	// 				className="edit-post-layout__toggle-publish-panel-button"
+	// 				onClick={ togglePublishSidebar }
+	// 				aria-expanded={ false }
+	// 			>
+	// 				{ __( 'Open publish panel' ) }
+	// 			</Button>
+	// 		</div>
+	// 	);
+	// };
 
 	return (
 		<>
