@@ -73,10 +73,10 @@
 	min-width: 312px;
 
 	@media (max-width: $break-small) {
-		bottom: 15%;
+		bottom: 10%;
 		left: $grid-unit-30;
 		right: $grid-unit-30;
-		top: 15%;
+		top: 10%;
 	}
 }
 
@@ -90,15 +90,11 @@
 
 	&.components-guide__back-button,
 	&.components-guide__forward-button {
-		font-size: 0;
+		font-size: $default-font-size;
 		padding: 4px 2px;
 
 		&.has-text svg {
 			margin: 0;
-		}
-
-		@include break-small() {
-			font-size: $default-font-size;
 		}
 	}
 
