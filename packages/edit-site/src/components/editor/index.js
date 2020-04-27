@@ -109,29 +109,34 @@ function Editor( { settings: _settings } ) {
 											</BlockSelectionClearer>
 										}
 										actions={
-											isEntitiesSavedStatesOpen ? (
+											<>
 												<EntitiesSavedStates
-													isOpen={ true }
+													isOpen={
+														isEntitiesSavedStatesOpen
+													}
 													closePanel={
 														closeEntitiesSavedStates
 													}
 												/>
-											) : (
-												<div className="edit-site-editor__toggle-save-panel">
-													<Button
-														isSecondary
-														className="edit-site-editor__toggle-save-panel-button"
-														onClick={
-															openSavePanel
-														}
-														aria-expanded={ false }
-													>
-														{ __(
-															'Open save panel'
-														) }
-													</Button>
-												</div>
-											)
+												{ ! isEntitiesSavedStatesOpen && (
+													<div className="edit-site-editor__toggle-save-panel">
+														<Button
+															isSecondary
+															className="edit-site-editor__toggle-save-panel-button"
+															onClick={
+																openSavePanel
+															}
+															aria-expanded={
+																false
+															}
+														>
+															{ __(
+																'Open save panel'
+															) }
+														</Button>
+													</div>
+												) }
+											</>
 										}
 										footer={ <BlockBreadcrumb /> }
 									/>
