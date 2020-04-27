@@ -3,25 +3,17 @@
 	$image-width: 312px;
 	width: 312px;
 
-	&__page {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
-	}
-
-	&__heading {
-		font-family: $editor-font;
-		font-size: 24px;
-		line-height: 1.4;
-		margin: 0 0 $grid-unit-20 0;
-		padding: 0 $grid-unit-40;
-	}
-
 	&__image {
 		background: #1386bf;
 		height: 240px;
 		margin-bottom: $grid-unit-40;
+	}
+
+	&__heading {
+		font-family: $editor-font;
+		font-size: 21px;
+		line-height: 1.4;
+		margin: $grid-unit-10 0;
 	}
 
 	&__text {

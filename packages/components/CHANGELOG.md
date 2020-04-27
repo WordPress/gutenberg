@@ -1,5 +1,10 @@
 ## Master
 
+### Deprecations
+
+- The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+- The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
+
 ## 9.2.0 (2020-02-10)
 
 ### Enhancements
