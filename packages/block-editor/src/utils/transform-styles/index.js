@@ -4,6 +4,10 @@
 import cssTree from 'css-tree';
 import { map, some } from 'lodash';
 import ltrim from 'ltrim';
+/**
+ * Internal dependencies
+ */
+import trimUrlStr from './trimUrlStr';
 
 const ROOT_SELECTORS = [
 	{
@@ -38,23 +42,38 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 		name: wrapperClassNameCleaned,
 	} );
 
-	const output = map( styles, ( { css } ) => {
+	return map( styles, ( { css, baseURL } ) => {
 		const ast = cssTree.parse( css );
 
 		cssTree.walk( ast, ( node, item, list ) => {
+			// wrapper
 			if (
-				! some( ROOT_SELECTORS, { type: node.type, name: node.name } )
-			)
-				return;
+				some( ROOT_SELECTORS, { type: node.type, name: node.name } )
+			) {
+				const wrapperSelectorItem = list.createItem( wrapperSelector );
+				list.replace( item, wrapperSelectorItem );
+			}
 
-			const wrapperSelectorItem = list.createItem( wrapperSelector );
-			list.replace( item, wrapperSelectorItem );
+			// baseURL
+			if ( baseURL && node.type === 'Url' ) {
+				const urlValue = node.value;
+
+				let urlQuote = '';
+				let urlValueStr = urlValue.value;
+				if ( urlValue.type === 'String' ) {
+					// String type nodes have the value always wrapped in quotes (like `'` or `"`)
+					const urlValueStrQuoted = urlValue.value;
+					urlQuote = urlValueStrQuoted.charAt( 0 );
+					urlValueStr = trimUrlStr( urlValueStrQuoted );
+				}
+
+				const basedUrl = new URL( urlValueStr, baseURL );
+				urlValue.value = urlQuote + basedUrl.toString() + urlQuote;
+			}
 		} );
 
 		return cssTree.generate( ast );
 	} );
-
-	return output;
 };
 
 export default transformStyles;
