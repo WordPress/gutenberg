@@ -127,7 +127,7 @@ export class UnsupportedBlockEdit extends Component {
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
 						{ __(
-							'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
+							'We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device\'s web browser.'
 						) }
 					</Text>
 				</View>
@@ -135,9 +135,10 @@ export class UnsupportedBlockEdit extends Component {
 				( //__DEV__  && ( Temporarely removing dev flag
 					<>
 						<BottomSheet.Cell
-							label={ __( 'Edit post on Web Browser' ) }
+							label={ __( 'Edit block in web browser' ) }
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
+							labelStyle={ styles.actionButton }
 						/>
 						<BottomSheet.Cell
 							label={ __( 'Dismiss' ) }
