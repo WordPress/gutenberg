@@ -386,7 +386,7 @@ _Example:_
 	"scripts": {
 		"test:e2e": "wp-scripts test-e2e",
 		"test:e2e:help": "wp-scripts test-e2e --help",
-		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e -- --puppeteer-devtools"
+		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e --puppeteer-devtools"
 	}
 }
 ```
