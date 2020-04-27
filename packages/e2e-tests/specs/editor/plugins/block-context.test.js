@@ -11,7 +11,6 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	insertBlock,
-	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 async function openPreviewPage( editorPage ) {
@@ -76,33 +75,10 @@ describe( 'Block context', () => {
 		const previewPage = await openPreviewPage( editorPage );
 
 		// Check default context values are populated.
-		let content = await previewPage.$eval(
+		const content = await previewPage.$eval(
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
 		expect( content ).toBe( 'The record ID is: 0' );
-
-		// Return to editor to change context value to non-default.
-		await editorPage.bringToFront();
-		await editorPage.focus(
-			'[data-type="gutenberg/test-context-provider"] input'
-		);
-		await editorPage.keyboard.press( 'ArrowRight' );
-		await editorPage.keyboard.type( '123' );
-		await editorPage.waitForSelector( '.editor-post-save-draft' ); // Not entirely clear why it's asynchronous, but likely React scheduling prioritizing keyboard event and deferring the UI update.
-		await saveDraft();
-
-		// Check non-default context values are populated.
-		await previewPage.bringToFront();
-		await previewPage.reload();
-		content = await previewPage.$eval(
-			'.entry-content',
-			( contentWrapper ) => contentWrapper.textContent.trim()
-		);
-		expect( content ).toBe( 'The record ID is: 123' );
-
-		// Clean up
-		await editorPage.bringToFront();
-		await previewPage.close();
 	} );
 } );
