@@ -21,14 +21,6 @@ describe( 'URL rewrite', () => {
 		expect( output ).toMatchSnapshot();
 	} );
 
-	it( 'should not replace absolute paths', () => {
-		const callback = rewrite( 'http://wp-site.local/themes/gut/css/' );
-		const input = `h1 { background: url(/images/test.png); }`;
-		const output = traverse( input, callback );
-
-		expect( output ).toMatchSnapshot();
-	} );
-
 	it( 'should not replace remote paths', () => {
 		const callback = rewrite( 'http://wp-site.local/themes/gut/css/' );
 		const input = `h1 { background: url(http://wp.org/images/test.png); }`;

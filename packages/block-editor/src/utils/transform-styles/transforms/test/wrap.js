@@ -22,7 +22,12 @@ describe( 'CSS selector wrap', () => {
 	} );
 
 	it( 'should ignore selectors', () => {
-		const callback = wrap( '.my-namespace', 'body' );
+		const callback = wrap( '.my-namespace', [
+			{
+				type: 'TypeSelector',
+				name: 'body',
+			},
+		] );
 		const input = `h1, body { color: red; }`;
 		const output = traverse( input, callback );
 

@@ -1,19 +1,14 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import { compose } from '@wordpress/compose';
+import { map, compose } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import traverse from './traverse';
 import urlRewrite from './transforms/url-rewrite';
 import wrap from './transforms/wrap';
+import traverse from './traverse';
 
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
@@ -31,11 +26,7 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 		if ( baseURL ) {
 			transforms.push( urlRewrite( baseURL ) );
 		}
-		if ( transforms.length ) {
-			return traverse( css, compose( transforms ) );
-		}
-
-		return css;
+		return traverse( css, compose( transforms ) );
 	} );
 };
 

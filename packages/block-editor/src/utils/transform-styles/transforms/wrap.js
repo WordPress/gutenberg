@@ -1,38 +1,90 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import csstree from 'css-tree';
+import { some } from 'lodash';
 
-/**
- * @constant string IS_ROOT_TAG Regex to check if the selector is a root tag selector.
- */
-const IS_ROOT_TAG = /^(body|html|:root).*$/;
+const ROOT_SELECTORS = [
+	{
+		// html
+		type: 'TypeSelector',
+		name: 'html',
+	},
+	{
+		// body
+		type: 'TypeSelector',
+		name: 'body',
+	},
+	{
+		// :root
+		type: 'PseudoClassSelector',
+		name: 'root',
+	},
+];
 
-const wrap = ( namespace, ignore = [] ) => ( node ) => {
-	const updateSelector = ( selector ) => {
-		if ( includes( ignore, selector.trim() ) ) {
-			return selector;
+const WHITESPACE_CSS = csstree.fromPlainObject( {
+	type: 'WhiteSpace',
+	value: ' ',
+} );
+
+const wrap = function( namespace, ignore = [] ) {
+	const namespaceCleaned = trimClassnameDot( namespace ); // ensure a pure classname without `.`
+	const wrapperSelector = csstree.fromPlainObject( {
+		type: 'ClassSelector',
+		name: namespaceCleaned,
+	} );
+
+	return function( node, item, list ) {
+		// prepend wrapper to selectors that start with non-root selectors
+		if ( node.type === 'Selector' ) {
+			const firstChildNode = node.children.first();
+
+			// skip selectors that ...
+			if (
+				// ... contain ignorable nodes as first child
+				some( ignore, {
+					type: firstChildNode.type,
+					name: firstChildNode.name,
+				} ) ||
+				// ... start with root selectors
+				some( ROOT_SELECTORS, {
+					type: firstChildNode.type,
+					name: firstChildNode.name,
+				} ) ||
+				// ... start with keyframe specific selectors
+				firstChildNode.name === 'from' ||
+				firstChildNode.name === 'to'
+			)
+				return;
+
+			// add white space between wrapper selector + existing selector
+			const whitespaceCssItem = node.children.createItem(
+				WHITESPACE_CSS
+			);
+			node.children.prepend( whitespaceCssItem );
+
+			const wrapperSelectorItem = node.children.createItem(
+				wrapperSelector
+			);
+			node.children.prepend( wrapperSelectorItem );
 		}
 
-		// Anything other than a root tag is always prefixed.
-		{
-			if ( ! selector.match( IS_ROOT_TAG ) ) {
-				return namespace + ' ' + selector;
-			}
+		// replace the root selectors with wrapper selectors
+		if (
+			// must not be an ignorable selector
+			! some( ignore, { type: node.type, name: node.name } ) &&
+			// must be a root selector
+			some( ROOT_SELECTORS, { type: node.type, name: node.name } )
+		) {
+			const wrapperSelectorItem = list.createItem( wrapperSelector );
+			list.replace( item, wrapperSelectorItem );
 		}
-
-		// HTML and Body elements cannot be contained within our container so lets extract their styles.
-		return selector.replace( /^(body|html|:root)/, namespace );
 	};
+};
 
-	if ( node.type === 'rule' ) {
-		return {
-			...node,
-			selectors: node.selectors.map( updateSelector ),
-		};
-	}
-
-	return node;
+const trimClassnameDot = ( str ) => {
+	if ( str.trim().charAt( 0 ) !== '.' ) return str;
+	return str.substring( 1 );
 };
 
 export default wrap;
