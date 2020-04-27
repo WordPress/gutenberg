@@ -217,21 +217,14 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 			( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
 			'<a class="wp-block-navigation-link__content"';
 
-		// Start appending HTML attributes to anchor tag.
 		if (
-			isset( $block['attrs']['url'] ) &&
-			isset( $block['attrs']['type'] ) &&
-			'URL' === $block['attrs']['type']
+			isset( $block['attrs']['id'] )
 		) {
+			$html .= ' href="' .
+				esc_url( get_permalink( $block['attrs']['id'] ) ) .
+			'"';
+		} else {
 			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
-		}
-
-		if (
-			isset( $block['attrs']['type'] ) &&
-			isset( $block['attrs']['id'] ) &&
-			'URL' !== $block['attrs']['type']
-		) {
-			$html .= ' href="' . get_permalink( $block['attrs']['id'] ) . '"';
 		}
 
 		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {

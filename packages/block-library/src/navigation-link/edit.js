@@ -258,7 +258,6 @@ function NavigationLinkEdit( {
 									title: newTitle = '',
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
-									type,
 									id,
 								} = {} ) =>
 									setAttributes( {
@@ -286,8 +285,7 @@ function NavigationLinkEdit( {
 											return escape( normalizedURL );
 										} )(),
 										opensInNewTab: newOpensInNewTab,
-										type,
-										id,
+										id: id ? Number( id ) : undefined,
 									} )
 								}
 							/>

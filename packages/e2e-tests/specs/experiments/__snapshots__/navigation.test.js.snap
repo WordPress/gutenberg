@@ -9,16 +9,16 @@ exports[`Navigation allows a navigation menu to be created from an empty menu us
 
 exports[`Navigation allows a navigation menu to be created using existing pages 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/page/contact\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/page/contact\\"} /-->
 <!-- /wp:navigation -->"
 `;
 
 exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
 <!-- /wp:navigation -->"
 `;
