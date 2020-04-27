@@ -11,8 +11,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	EntitiesSavedStates,
-	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -34,7 +32,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 
 /**
@@ -50,8 +48,6 @@ import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
 
@@ -63,14 +59,9 @@ function Layout() {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		closePublishSidebar,
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		togglePublishSidebar,
-		closeEntitiesSavedStates,
-		openEntitiesSavedStates,
-	} = useDispatch( 'core/edit-post' );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 	const {
 		mode,
 		isFullscreenActive,
@@ -79,13 +70,10 @@ function Layout() {
 		pluginSidebarOpened,
 		publishSidebarOpened,
 		hasActiveMetaboxes,
-		isSaving,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
-		isEntitiesSavedStatesOpen,
-		hasNonPostEntityChanges,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -107,7 +95,6 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			previousShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations(
@@ -116,12 +103,6 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
-			isEntitiesSavedStatesOpen: select(
-				'core/edit-post'
-			).isEntitiesSavedStatesOpen(),
-			hasNonPostEntityChanges: select(
-				'core/editor'
-			).hasNonPostEntityChanges(),
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -147,62 +128,6 @@ function Layout() {
 			closeGeneralSidebar();
 		}
 	}, [ isInserterOpen, isHugeViewport ] );
-
-	// const ActionsPanel = () => {
-	// 	const openSavePanel = useCallback(
-	// 		() => openEntitiesSavedStates(),
-	// 		[]
-	// 	);
-
-	// 	if ( isEntitiesSavedStatesOpen ) {
-	// 		return (
-	// 			<EntitiesSavedStates
-	// 				isOpen={ true }
-	// 				closePanel={ closeEntitiesSavedStates }
-	// 			/>
-	// 		);
-	// 	}
-
-	// 	if ( publishSidebarOpened ) {
-	// 		return (
-	// 			<PostPublishPanel
-	// 				onClose={ closePublishSidebar }
-	// 				forceIsDirty={ hasActiveMetaboxes }
-	// 				forceIsSaving={ isSaving }
-	// 				PrePublishExtension={ PluginPrePublishPanel.Slot }
-	// 				PostPublishExtension={ PluginPostPublishPanel.Slot }
-	// 			/>
-	// 		);
-	// 	}
-
-	// 	if ( hasNonPostEntityChanges ) {
-	// 		return (
-	// 			<div className="edit-post-layout__toggle-publish-panel">
-	// 				<Button
-	// 					isSecondary
-	// 					className="edit-post-layout__toggle-publish-panel-button"
-	// 					onClick={ openSavePanel }
-	// 					aria-expanded={ false }
-	// 				>
-	// 					{ __( 'Open save panel' ) }
-	// 				</Button>
-	// 			</div>
-	// 		);
-	// 	}
-
-	// 	return (
-	// 		<div className="edit-post-layout__toggle-publish-panel">
-	// 			<Button
-	// 				isSecondary
-	// 				className="edit-post-layout__toggle-publish-panel-button"
-	// 				onClick={ togglePublishSidebar }
-	// 				aria-expanded={ false }
-	// 			>
-	// 				{ __( 'Open publish panel' ) }
-	// 			</Button>
-	// 		</div>
-	// 	);
-	// };
 
 	return (
 		<>
