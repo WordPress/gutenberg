@@ -40,6 +40,7 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$context       = array();
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
+		$this->assertSame( $parsed_block, $block->parsed_block );
 		$this->assertEquals( $parsed_block['blockName'], $block->name );
 		$this->assertEquals( $parsed_block['attrs'], $block->attributes );
 		$this->assertEquals( $parsed_block['innerContent'], $block->inner_content );

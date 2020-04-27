@@ -175,3 +175,36 @@ function gutenberg_get_post_from_context() {
 	}
 	return get_post();
 }
+
+/**
+ * Shim that hooks into `pre_render_block` so as to override `render_block` with
+ * a function that assigns block context.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49927
+ *
+ * @param string|null $pre_render   The pre-rendered content. Defaults to null.
+ * @param array       $parsed_block The parsed block being rendered.
+ *
+ * @return string String of rendered HTML.
+ */
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
+	global $post;
+
+	// If a non-null value is provided, a filter has run at an earlier priority
+	// and has already handled custom rendering and should take precedence.
+	if ( null !== $pre_render ) {
+		return $pre_render;
+	}
+
+	$source_block = $parsed_block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
+	$context      = array( 'postId' => $post->ID );
+	$block        = new WP_Block( $parsed_block, $context );
+
+	return $block->render();
+}
+add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );

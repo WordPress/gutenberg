@@ -11,6 +11,13 @@
 class WP_Block {
 
 	/**
+	 * Original parsed array representation of block.
+	 *
+	 * @var array
+	 */
+	public $parsed_block;
+
+	/**
 	 * Name of block.
 	 *
 	 * @example "core/paragraph"
@@ -94,7 +101,8 @@ class WP_Block {
 	 * @param WP_Block_Type_Registry $registry          Optional block type registry.
 	 */
 	public function __construct( $block, $available_context = array(), $registry = null ) {
-		$this->name = $block['blockName'];
+		$this->parsed_block = $block;
+		$this->name         = $block['blockName'];
 
 		if ( is_null( $registry ) ) {
 			$registry = WP_Block_Type_Registry::get_instance();
@@ -177,7 +185,8 @@ class WP_Block {
 			$post                = $global_post;
 		}
 
-		return $block_content;
+		/** This filter is documented in src/wp-includes/blocks.php */
+		return apply_filters( 'render_block', $block_content, $this->parsed_block );
 	}
 
 }
