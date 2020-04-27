@@ -208,4 +208,6 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	/** This filter is documented in src/wp-includes/blocks.php */
 	return apply_filters( 'render_block', $block->render(), $parsed_block );
 }
-add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+// TODO: Normally, commented code would not be left lingering. However, due to
+// time constraints, this was the most direct approach for a last-minute revert.
+// add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
