@@ -31,7 +31,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { Block } from './block-wrapper';
 
-export const BlockContext = createContext();
+export const BlockListBlockContext = createContext();
 
 function BlockListBlock( {
 	mode,
@@ -167,7 +167,7 @@ function BlockListBlock( {
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
 	return (
-		<BlockContext.Provider value={ memoizedValue }>
+		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
 				{ isValid && lightBlockWrapper && (
 					<>
@@ -199,7 +199,7 @@ function BlockListBlock( {
 					<BlockCrashWarning />
 				</Block.div>
 			) }
-		</BlockContext.Provider>
+		</BlockListBlockContext.Provider>
 	);
 }
 
