@@ -97,6 +97,11 @@ export class UnsupportedBlockEdit extends Component {
 				  __( "'%s' isn't yet supported on WordPress for iOS" );
 		const infoTitle = sprintf( titleFormat, title );
 
+		const actionButtonStyle = getStylesFromColorScheme(
+			styles.actionButton,
+			styles.actionButtonDark
+		);
+
 		return (
 			<BottomSheet
 				isVisible={ this.state.showHelp }
@@ -139,7 +144,7 @@ export class UnsupportedBlockEdit extends Component {
 							label={ __( 'Edit block in web browser' ) }
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
-							labelStyle={ styles.actionButton }
+							labelStyle={ actionButtonStyle }
 						/>
 						<BottomSheet.Cell
 							label={ __( 'Dismiss' ) }
