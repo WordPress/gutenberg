@@ -227,14 +227,12 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->assertSame( 'abc', $block->render() );
 	}
 
-	function test_render_assigns_instance_global_for_render_callback() {
+	function test_render_passes_block_for_render_callback() {
 		$this->registry->register(
 			'core/greeting',
 			array(
-				'render_callback' => function() {
-					global $_experimental_block;
-
-					return sprintf( 'Hello from %s', $_experimental_block->name );
+				'render_callback' => function( $attributes, $content, $block ) {
+					return sprintf( 'Hello from %s', $block->name );
 				},
 			)
 		);

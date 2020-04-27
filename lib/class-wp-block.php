@@ -160,7 +160,7 @@ class WP_Block {
 	 * @return string Rendered block output.
 	 */
 	public function render() {
-		global $post, $_experimental_block;
+		global $post;
 
 		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
@@ -178,12 +178,9 @@ class WP_Block {
 				$attributes = $this->block_type->prepare_attributes_for_render( $attributes );
 			}
 
-			$global_post         = $post;
-			$global_block        = $_experimental_block;
-			$_experimental_block = $this;
-			$block_content       = (string) call_user_func( $this->block_type->render_callback, $attributes, $block_content );
-			$_experimental_block = $global_block;
-			$post                = $global_post;
+			$global_post   = $post;
+			$block_content = (string) call_user_func( $this->block_type->render_callback, $attributes, $block_content, $this );
+			$post          = $global_post;
 		}
 
 		/** This filter is documented in src/wp-includes/blocks.php */
