@@ -230,8 +230,7 @@ const BlockComponent = forwardRef(
 		);
 
 		// For aligned blocks, provide a wrapper element so the block can be
-		// positioned relative to the block column. This is enabled with the
-		// .is-block-content className.
+		// positioned relative to the block column.
 		if ( isAligned ) {
 			const alignmentWrapperProps = {
 				'data-align': wrapperProps[ 'data-align' ],

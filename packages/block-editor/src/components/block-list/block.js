@@ -94,7 +94,6 @@ function BlockListBlock( {
 		};
 	}
 
-	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
 	const generatedClassName =
 		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
 			? getBlockDefaultClassName( name )
@@ -120,7 +119,6 @@ function BlockListBlock( {
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
-			'is-block-collapsed': isAligned,
 		},
 		className
 	);
