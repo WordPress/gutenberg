@@ -121,3 +121,35 @@ describe( 'registerPlugin', () => {
 		);
 	} );
 } );
+
+describe( 'getPlugins', () => {
+	beforeEach( () => {
+		const Component = () => 'plugin content';
+		const icon = 'smiley';
+		registerPlugin( 'unscoped', {
+			render: Component,
+			icon,
+		} );
+		registerPlugin( 'scoped', {
+			render: Component,
+			icon,
+			scope: 'my-scope',
+		} );
+	} );
+
+	afterEach( () => {
+		getPlugins().forEach( ( plugin ) => {
+			unregisterPlugin( plugin.name );
+		} );
+	} );
+
+	it( 'returns all plugins', () => {
+		expect( getPlugins() ).toHaveLength( 2 );
+	} );
+
+	it( 'returns all plugins of a given scope', () => {
+		const scopedPlugins = getPlugins( 'my-scope' );
+		expect( scopedPlugins ).toHaveLength( 1 );
+		expect( scopedPlugins[ 0 ].name ).toBe( 'scoped' );
+	} );
+} );
