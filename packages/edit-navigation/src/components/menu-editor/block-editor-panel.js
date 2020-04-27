@@ -17,7 +17,12 @@ import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function BlockEditorPanel( { saveBlocks } ) {
+/**
+ * Internal dependencies
+ */
+import MenuDelete from '../menu-delete';
+
+export default function BlockEditorPanel( { onDelete, menuId, saveBlocks } ) {
 	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
@@ -41,11 +46,6 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 	return (
 		<Panel
 			className="edit-navigation-menu-editor__block-editor-panel"
-			header={
-				<Button isPrimary onClick={ saveBlocks }>
-					{ __( 'Save navigation' ) }
-				</Button>
-			}
 		>
 			<PanelBody title={ __( 'Navigation menu' ) }>
 				<div className="components-panel__header-actions">
