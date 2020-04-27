@@ -2,25 +2,6 @@
 	$image-height: 300px;
 	$image-width: 320px;
 
-	&__page {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
-
-		@include break-small() {
-			min-height: $image-height;
-			padding-left: $image-width + $grid-unit-30;
-		}
-	}
-
-	&__heading {
-		font-family: $editor-font;
-		font-size: 21px;
-		line-height: 1.4;
-		margin: $grid-unit-10 0;
-	}
-
 	&__image {
 		background: #66c6e4;
 		border-radius: $radius-round-rectangle;
@@ -37,6 +18,13 @@
 		}
 	}
 
+	&__heading {
+		font-family: $editor-font;
+		font-size: 21px;
+		line-height: 1.4;
+		margin: $grid-unit-10 0;
+	}
+
 	&__text {
 		font-size: $editor-font-size;
 		line-height: 1.4;
@@ -47,9 +35,5 @@
 		margin: 0 4px;
 		position: relative;
 		top: 4px;
-	}
-
-	@include break-small() {
-		width: 600px;
 	}
 }
