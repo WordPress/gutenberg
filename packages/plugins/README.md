@@ -32,6 +32,10 @@ _Returns_
 
 Returns all registered plugins.
 
+_Parameters_
+
+-   _scope_ `string`: Plugin scope.
+
 _Returns_
 
 -   `Array<WPPlugin>`: Plugin settings.
@@ -147,6 +151,7 @@ _Parameters_
 
 -   _name_ `string`: A string identifying the plugin.Must be unique across all registered plugins.
 -   _settings_ `WPPlugin`: The settings for this plugin.
+-   _scope_ `string`: The scope for this plugin.
 
 _Returns_
 

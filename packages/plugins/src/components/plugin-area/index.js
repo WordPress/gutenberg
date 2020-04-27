@@ -60,8 +60,9 @@ class PluginArea extends Component {
 	}
 
 	getCurrentPluginsState() {
+		const { scope } = this.props;
 		return {
-			plugins: map( getPlugins(), ( { icon, name, render } ) => {
+			plugins: map( getPlugins( scope ), ( { icon, name, render } ) => {
 				return {
 					Plugin: render,
 					context: {

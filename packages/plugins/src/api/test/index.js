@@ -27,6 +27,29 @@ describe( 'registerPlugin', () => {
 		} );
 	} );
 
+	it( 'successfully registers a plugin with a scope', () => {
+		const name = 'plugin';
+		const icon = 'smiley';
+		const Component = () => 'plugin content';
+		const scope = 'scope';
+
+		registerPlugin(
+			name,
+			{
+				render: Component,
+				icon,
+			},
+			scope
+		);
+
+		expect( getPlugin( name ) ).toEqual( {
+			name,
+			render: Component,
+			icon,
+			scope,
+		} );
+	} );
+
 	it( 'fails to register a plugin without a settings object', () => {
 		registerPlugin();
 		expect( console ).toHaveErroredWith( 'No settings object provided!' );
@@ -37,7 +60,7 @@ describe( 'registerPlugin', () => {
 			render: () => {},
 		} );
 		expect( console ).toHaveErroredWith(
-			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
+			'Plugin names and scopes must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 	} );
 
@@ -48,7 +71,9 @@ describe( 'registerPlugin', () => {
 				render: () => {},
 			}
 		);
-		expect( console ).toHaveErroredWith( 'Plugin names must be strings.' );
+		expect( console ).toHaveErroredWith(
+			'Plugin names and scopes must be strings.'
+		);
 	} );
 
 	it( 'fails to register a plugin without a render function', () => {
@@ -67,6 +92,32 @@ describe( 'registerPlugin', () => {
 		} );
 		expect( console ).toHaveErroredWith(
 			'Plugin "plugin" is already registered.'
+		);
+	} );
+
+	it( 'fails to register a plugin with a non-string scope', () => {
+		registerPlugin(
+			'plugin',
+			{
+				render: () => {},
+			},
+			{}
+		);
+		expect( console ).toHaveErroredWith(
+			'Plugin names and scopes must be strings.'
+		);
+	} );
+
+	it( 'fails to register a plugin with special character in the scope', () => {
+		registerPlugin(
+			'plugin',
+			{
+				render: () => {},
+			},
+			'plugin/scope/with/special/characters'
+		);
+		expect( console ).toHaveErroredWith(
+			'Plugin names and scopes must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 		);
 	} );
 } );

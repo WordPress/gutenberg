@@ -40,6 +40,7 @@ const plugins = {};
  * @param {string}   name     A string identifying the plugin.Must be
  *                            unique across all registered plugins.
  * @param {WPPlugin} settings The settings for this plugin.
+ * @param {string}   scope    The scope for this plugin.
  *
  * @example
  * <caption>ES5</caption>
@@ -111,19 +112,28 @@ const plugins = {};
  *
  * @return {WPPlugin} The final plugin settings object.
  */
-export function registerPlugin( name, settings ) {
+export function registerPlugin( name, settings, scope ) {
 	if ( typeof settings !== 'object' ) {
 		console.error( 'No settings object provided!' );
 		return null;
 	}
+	const charactersErrorMsg =
+		'Plugin names and scopes must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".';
+	const stringsErrorMsg = 'Plugin names and scopes must be strings.';
 	if ( typeof name !== 'string' ) {
-		console.error( 'Plugin names must be strings.' );
+		console.error( stringsErrorMsg );
 		return null;
 	}
 	if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
-			'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
-		);
+		console.error( charactersErrorMsg );
+		return null;
+	}
+	if ( scope && typeof scope !== 'string' ) {
+		console.error( stringsErrorMsg );
+		return null;
+	}
+	if ( ! /^[a-z][a-z0-9-]*$/.test( scope ) ) {
+		console.error( charactersErrorMsg );
 		return null;
 	}
 	if ( plugins[ name ] ) {
@@ -142,6 +152,7 @@ export function registerPlugin( name, settings ) {
 	plugins[ name ] = {
 		name,
 		icon: pluginsIcon,
+		scope,
 		...settings,
 	};
 
@@ -203,8 +214,12 @@ export function getPlugin( name ) {
 /**
  * Returns all registered plugins.
  *
+ * @param {string} scope Plugin scope.
+ *
  * @return {WPPlugin[]} Plugin settings.
  */
-export function getPlugins() {
-	return Object.values( plugins );
+export function getPlugins( scope ) {
+	return Object.values( plugins ).filter( ( plugin ) => {
+		return scope ? plugin.scope === scope : true;
+	} );
 }
