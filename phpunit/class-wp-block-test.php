@@ -69,60 +69,6 @@ class WP_Block_Test extends WP_UnitTestCase {
 		);
 	}
 
-	function test_constructor_assigns_attributes_with_defaults() {
-		$this->registry->register(
-			'core/example',
-			array(
-				'attributes' => array(
-					'defaulted' => array(
-						'type'    => 'number',
-						'default' => 10,
-					),
-				),
-			)
-		);
-
-		$parsed_block = array(
-			'blockName' => 'core/example',
-			'attrs'     => array(
-				'explicit' => 20,
-			),
-		);
-		$context      = array();
-		$block        = new WP_Block( $parsed_block, $context, $this->registry );
-
-		$this->assertEquals(
-			array(
-				'defaulted' => 10,
-				'explicit'  => 20,
-			),
-			$block->attributes
-		);
-	}
-
-	function test_constructor_assigns_attributes_with_only_defaults() {
-		$this->registry->register(
-			'core/example',
-			array(
-				'attributes' => array(
-					'defaulted' => array(
-						'type'    => 'number',
-						'default' => 10,
-					),
-				),
-			)
-		);
-
-		$parsed_block = array(
-			'blockName' => 'core/example',
-			'attrs'     => array(),
-		);
-		$context      = array();
-		$block        = new WP_Block( $parsed_block, $context, $this->registry );
-
-		$this->assertEquals( array( 'defaulted' => 10 ), $block->attributes );
-	}
-
 	function test_constructor_assigns_context_from_block_type() {
 		$this->registry->register(
 			'core/example',
@@ -228,6 +174,40 @@ class WP_Block_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_render_assigns_attributes_with_defaults() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes'      => array(
+					'defaulted' => array(
+						'type'    => 'number',
+						'default' => 10,
+					),
+				),
+				'render_callback' => function( $attributes ) {
+					return json_encode(
+						array(
+							'explicit'  => $attributes['explicit'],
+							'defaulted' => $attributes['defaulted'],
+						)
+					);
+				}
+			)
+		);
+
+		$parsed_block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array(
+				'explicit' => 20,
+			),
+		);
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+		$content      = $block->render();
+
+		$this->assertEquals( '{"explicit":20,"defaulted":10}', $content );
+	}
+
 	function test_render_static_block_type_returns_own_content() {
 		$this->registry->register( 'core/static', array() );
 		$this->registry->register(
@@ -251,33 +231,20 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/greeting',
 			array(
-				'attributes'      => array(
-					'toWhom'      => array(
-						'type' => 'string',
-					),
-					'punctuation' => array(
-						'type'    => 'string',
-						'default' => '!',
-					),
-				),
 				'render_callback' => function() {
 					global $_experimental_block;
 
-					return sprintf(
-						'Hello %s%s',
-						$_experimental_block->attributes['toWhom'],
-						$_experimental_block->attributes['punctuation']
-					);
+					return sprintf( 'Hello from %s', $_experimental_block->name );
 				},
 			)
 		);
 
-		$parsed_blocks = parse_blocks( '<!-- wp:greeting {"toWhom":"world"} /-->' );
+		$parsed_blocks = parse_blocks( '<!-- wp:greeting /-->' );
 		$parsed_block  = $parsed_blocks[0];
 		$context       = array();
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
-		$this->assertSame( 'Hello world!', $block->render() );
+		$this->assertSame( 'Hello from core/greeting', $block->render() );
 	}
 
 	function test_passes_attributes_to_render_callback() {

@@ -114,10 +114,6 @@ class WP_Block {
 			$this->attributes = $block['attrs'];
 		}
 
-		if ( ! is_null( $this->block_type ) ) {
-			$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
-		}
-
 		$this->available_context = $available_context;
 
 		if ( ! empty( $this->block_type->context ) ) {
@@ -177,10 +173,15 @@ class WP_Block {
 		}
 
 		if ( $is_dynamic ) {
+			$attributes = $this->attributes;
+			if ( ! is_null( $this->block_type ) ) {
+				$attributes = $this->block_type->prepare_attributes_for_render( $attributes );
+			}
+
 			$global_post         = $post;
 			$global_block        = $_experimental_block;
 			$_experimental_block = $this;
-			$block_content       = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content );
+			$block_content       = (string) call_user_func( $this->block_type->render_callback, $attributes, $block_content );
 			$_experimental_block = $global_block;
 			$post                = $global_post;
 		}
