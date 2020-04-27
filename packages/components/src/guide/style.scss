@@ -115,17 +115,10 @@
 	}
 
 	&.components-guide__finish-button {
-		display: none;
 		right: $grid-unit-40;
-
-		@include break-small() {
-			display: block;
-		}
 	}
 
 	&.components-guide__inline-finish-button {
-		@include break-small() {
-			display: none;
-		}
+		display: none;
 	}
 }
