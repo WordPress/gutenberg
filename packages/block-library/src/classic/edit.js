@@ -9,6 +9,7 @@ import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import LazyLoad from './lazy';
+import apiFetch from '@wordpress/api-fetch';
 
 const { wp } = window;
 
@@ -225,12 +226,17 @@ class ClassicEdit extends Component {
 const LazyClassicEdit = ( props ) => (
 	<LazyLoad
 		scripts={ [ 'wp-tinymce' ] }
-		onLoaded={ () =>
-			new Promise( ( resolve ) => {
-				window.wpMceTranslation();
-				resolve();
-			} )
-		}
+		onLoaded={ async () => {
+			const {
+				translations,
+				locale,
+				locale_script_handle: localeScriptHandle,
+			} = await apiFetch( { path: '/wp/v2/tinymce-i18n' } );
+
+			const { tinymce } = window;
+			tinymce.addI18n( locale, JSON.stringify( translations ) );
+			tinymce.ScriptLoader.markDone( localeScriptHandle );
+		} }
 		placeholder={ <div>Loading...</div> }
 	>
 		<ClassicEdit { ...props } />

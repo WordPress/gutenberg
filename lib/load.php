@@ -57,6 +57,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Styles_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-styles-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_TinyMCE_I81n_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-tinymce-i18n-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/

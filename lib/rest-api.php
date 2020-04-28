@@ -151,6 +151,10 @@ function gutenberg_register_script_style() {
 	// Styles.
 	$controller = new WP_REST_Styles_Controller();
 	$controller->register_routes();
+
+	// TinyMCE translations
+	$controller = new WP_REST_TinyMCE_I18n_Controller();
+	$controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_script_style' );
 
