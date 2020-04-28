@@ -160,7 +160,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * @return string Path to the canvas file to include.
  */
 function gutenberg_template_include_filter( $template_file ) {
-	global $_wp_current_template_id, $_wp_current_template_name, $_wp_current_template_content, $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
 
 	// Bail if no relevant template hierarchy was determined, or if the template file
 	// was overridden another way.
@@ -168,16 +168,10 @@ function gutenberg_template_include_filter( $template_file ) {
 		return $template_file;
 	}
 
-	$slugs = array_map(
-		'gutenberg_strip_php_suffix',
-		$_wp_current_template_hierarchy
-	);
-
-	$current_template_post = gutenberg_find_template_post( $slugs );
+	$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
 
 	if ( $current_template_post ) {
 		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_name    = $current_template_post->post_name;
 		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
 	}
 
@@ -191,15 +185,20 @@ function gutenberg_template_include_filter( $template_file ) {
 }
 
 /**
- * Return the correct 'wp_template' post for the current hierarchy of template slugs.
+ * Return the correct 'wp_template' post for the current template hierarchy.
  *
- * @param  string[]     $slugs  A list of candidate template slugs, ordered by priority in the current template hierarchy.
+ * @param  string[]     $slugs  The current template hierarchy, ordered by priority.
  * @return WP_Post|null         A template post object, or null if none could be found.
  */
-function gutenberg_find_template_post( $slugs ) {
-	if ( ! $slugs ) {
+function gutenberg_find_template_post( $template_hierarchy ) {
+	if ( ! $template_hierarchy ) {
 		return null;
 	}
+
+	$slugs = array_map(
+		'gutenberg_strip_php_suffix',
+		$template_hierarchy
+	);
 
 	// Find most specific 'wp_template' post matching the hierarchy.
 	$template_query = new WP_Query(
