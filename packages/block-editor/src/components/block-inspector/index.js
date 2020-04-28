@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -31,7 +32,6 @@ const BlockInspector = ( {
 	showNoBlockSelectedMessage = true,
 } ) => {
 	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
@@ -59,6 +59,8 @@ const BlockInspector = ( {
 		return null;
 	}
 
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
@@ -66,7 +68,13 @@ const BlockInspector = ( {
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles clientId={ selectedBlockClientId } />
-						<DefaultStylePicker blockName={ blockType.name } />
+						{ hasBlockSupport(
+							blockType.name,
+							'defaultStylePicker',
+							true
+						) && (
+							<DefaultStylePicker blockName={ blockType.name } />
+						) }
 					</PanelBody>
 				</div>
 			) }

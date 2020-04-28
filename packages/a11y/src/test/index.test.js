@@ -8,7 +8,7 @@ import domReady from '@wordpress/dom-ready';
  */
 import { setup, speak } from '../';
 import clear from '../clear';
-import filterMessage from '../filterMessage';
+import filterMessage from '../filter-message';
 
 jest.mock( '../clear', () => {
 	return jest.fn();
@@ -18,7 +18,7 @@ jest.mock( '@wordpress/dom-ready', () => {
 		callback();
 	} );
 } );
-jest.mock( '../filterMessage', () => {
+jest.mock( '../filter-message', () => {
 	return jest.fn( ( message ) => {
 		return message;
 	} );
@@ -82,9 +82,9 @@ describe( 'speak', () => {
 		it( 'should set the textcontent of the polite aria-live region', () => {
 			speak( 'message', 'assertive' );
 			expect( containerPolite.textContent ).toBe( 'message' );
-			expect( document.getElementById( 'a11y-speak-assertive' ) ).toBe(
-				null
-			);
+			expect(
+				document.getElementById( 'a11y-speak-assertive' )
+			).toBeNull();
 		} );
 	} );
 
@@ -103,12 +103,10 @@ describe( 'speak', () => {
 		} );
 
 		it( 'should set the textcontent of the polite aria-live region', () => {
-			expect( document.getElementById( 'a11y-speak-polite' ) ).toBe(
-				null
-			);
-			expect( document.getElementById( 'a11y-speak-assertive' ) ).toBe(
-				null
-			);
+			expect( document.getElementById( 'a11y-speak-polite' ) ).toBeNull();
+			expect(
+				document.getElementById( 'a11y-speak-assertive' )
+			).toBeNull();
 		} );
 	} );
 

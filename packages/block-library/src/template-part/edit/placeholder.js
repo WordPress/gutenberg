@@ -22,14 +22,14 @@ function TemplatePartPreview() {
 			<div className="wp-block-template-part__placeholder-preview-title">
 				{ __( 'Preview' ) }
 			</div>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 		</div>
 	);
 }
 
 export default function TemplatePartPlaceholder( { setAttributes } ) {
-	const [ slug, _setSlug ] = useState();
-	const [ theme, setTheme ] = useState();
+	const [ slug, _setSlug ] = useState( '' );
+	const [ theme, setTheme ] = useState( '' );
 	const [ help, setHelp ] = useState();
 
 	// Try to find an existing template part.

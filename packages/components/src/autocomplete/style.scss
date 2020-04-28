@@ -4,6 +4,9 @@
 
 .components-autocomplete__result.components-button {
 	display: flex;
+	height: auto;
+	min-height: $button-size;
+	text-align: left;
 	width: 100%;
 
 	&.is-selected {

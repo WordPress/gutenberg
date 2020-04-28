@@ -49,7 +49,6 @@ function Indicator( { clientId } ) {
 }
 
 export default function InsertionPoint( {
-	className,
 	isMultiSelecting,
 	hasMultiSelection,
 	selectedBlockClientId,
@@ -72,7 +71,11 @@ export default function InsertionPoint( {
 	} );
 
 	function onMouseMove( event ) {
-		if ( event.target.className !== className ) {
+		if (
+			! event.target.classList.contains(
+				'block-editor-block-list__layout'
+			)
+		) {
 			if ( isInserterShown ) {
 				setIsInserterShown( false );
 			}
@@ -177,7 +180,10 @@ export default function InsertionPoint( {
 								}
 							) }
 						>
-							<Inserter clientId={ inserterClientId } />
+							<Inserter
+								position="bottom center"
+								clientId={ inserterClientId }
+							/>
 						</div>
 					</div>
 				</Popover>

@@ -114,124 +114,32 @@
 }
 
 /**
- * Button states and focus styles
- */
-
-// Buttons with rounded corners.
-@mixin button-style__disabled {
-	opacity: 0.6;
-	cursor: default;
-}
-
-@mixin button-style__active() {
-	outline: none;
-	background-color: $white;
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $light-gray-700, inset 0 0 0 2px $white;
-}
-
-@mixin button-style__focus-active() {
-	box-shadow: 0 0 0 1px color($theme-color);
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 1px solid transparent;
-}
-
-// Switch.
-@mixin switch-style__focus-active() {
-	box-shadow: 0 0 0 2px $white, 0 0 0 3px $dark-gray-300;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: 2px;
-}
-
-
-/**
- * Block Toolbar/Formatting Buttons
+ * Focus styles.
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 4px $white; // Inner halo makes this work on top of a toggled button.
-	outline: 2px solid transparent; // Shown to Windows 10 High Contrast Mode.
-}
+	box-shadow: inset 0 0 0 $border-width-focus $theme-color, inset 0 0 0 4px $white;
 
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	outline: 2px solid transparent;
+}
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
-	border-radius: $radius-round-rectangle;
-	border: $border-width solid $dark-gray-200;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $medium-gray-text;
 	@include reduce-motion("transition");
 }
 
+
 @mixin input-style__focus() {
-	color: $dark-gray-900;
-	border-color: $blue-medium-focus;
-	box-shadow: 0 0 0 1px $blue-medium-focus;
+	border-color: color($theme-color);
+	box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-}
-
-// Square buttons.
-@mixin square-style__neutral() {
-	outline-offset: -1px;
-}
-
-@mixin square-style__focus() {
-	color: $dark-gray-900;
-	outline-offset: -1px;
-	outline: 1px dotted $dark-gray-500;
-}
-
-// Menu items.
-@mixin menu-style__neutral() {
-	border: none;
-	box-shadow: none;
-}
-
-@mixin menu-style__hover() {
-	color: $dark-gray-900;
-	border: none;
-	box-shadow: none;
-	background: $light-gray-200;
-}
-
-@mixin menu-style__focus() {
-	color: $dark-gray-900;
-	border: none;
-	box-shadow: none;
-	outline-offset: -2px;
-	outline: 1px dotted $dark-gray-500;
-}
-
-// Blocks in the Library.
-@mixin block-style__disabled {
-	opacity: 0.6;
-	cursor: default;
-}
-
-@mixin block-style__hover {
-	border-color: $theme-color;
-	color: $theme-color !important;
-}
-
-@mixin block-style__focus() {
-	box-shadow: inset 0 0 0 1px $white, 0 0 0 2px $theme-color;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
-
-@mixin block-style__is-active() {
-	color: $white;
-	background: $dark-gray-primary;
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: -2px;
 }
 
 
@@ -243,13 +151,13 @@
 	#{$selector} { /* Set left position when auto-fold is not on the body element. */
 		left: 0;
 
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width;
 		}
 	}
 
 	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto collapses. */
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width-collapsed;
 		}
 
@@ -262,13 +170,13 @@
 	.folded #{$selector} {
 		left: 0;
 
-		@include break-medium() {
+		@media (min-width: #{ ($break-medium + 1) }) {
 			left: $admin-sidebar-width-collapsed;
 		}
 	}
 
 	/* Mobile menu opened. */
-	@media (max-width: #{ ($break-medium) }) {
+	@media (max-width: #{ ($break-medium + 1) }) {
 		.auto-fold .wp-responsive-open #{$selector} {
 			left: $admin-sidebar-width-big;
 		}
@@ -416,7 +324,7 @@
 		}
 
 		&:checked:focus {
-			box-shadow: 0 0 0 2px $medium-gray-text;
+			box-shadow: 0 0 0 $border-width-focus $medium-gray-text;
 		}
 	}
 
@@ -459,7 +367,7 @@
 			}
 
 			&:focus {
-				box-shadow: 0 0 0 2px $dark-gray-500;
+				box-shadow: 0 0 0 $border-width-focus $dark-gray-500;
 			}
 		}
 	}
