@@ -3,6 +3,12 @@
  */
 import { NativeModules } from 'react-native';
 
+jest.mock( '@wordpress/element', () => {
+	return {
+		render: jest.fn(),
+	};
+} );
+
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
