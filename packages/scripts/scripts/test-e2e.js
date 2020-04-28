@@ -61,6 +61,11 @@ if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_SLOWMO = getArgFromCLI( '--puppeteer-slowmo' ) || 80;
 }
 
+if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
+	process.env.PUPPETEER_HEADLESS = 'false';
+	process.env.PUPPETEER_DEVTOOLS = 'true';
+}
+
 const configsMapping = {
 	WP_BASE_URL: '--wordpress-base-url',
 	WP_USERNAME: '--wordpress-username',

@@ -274,6 +274,7 @@ function RichTextWrapper(
 			const blocks = [];
 			const [ before, after ] = split( record );
 			const hasPastedBlocks = pastedBlocks.length > 0;
+			let lastPastedBlockIndex = -1;
 
 			// Create a block with the content before the caret if there's no pasted
 			// blocks, or if there are pasted blocks and the value is not empty.
@@ -288,10 +289,12 @@ function RichTextWrapper(
 						} )
 					)
 				);
+				lastPastedBlockIndex += 1;
 			}
 
 			if ( hasPastedBlocks ) {
 				blocks.push( ...pastedBlocks );
+				lastPastedBlockIndex += pastedBlocks.length;
 			} else if ( onSplitMiddle ) {
 				blocks.push( onSplitMiddle() );
 			}
@@ -313,9 +316,13 @@ function RichTextWrapper(
 
 			// If there are pasted blocks, set the selection to the last one.
 			// Otherwise, set the selection to the second block.
-			const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
+			const indexToSelect = hasPastedBlocks ? lastPastedBlockIndex : 1;
 
-			onReplace( blocks, indexToSelect );
+			// If there are pasted blocks, move the caret to the end of the selected block
+			// Otherwise, retain the default value.
+			const initialPosition = hasPastedBlocks ? -1 : null;
+
+			onReplace( blocks, indexToSelect, initialPosition );
 		},
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
@@ -436,7 +443,7 @@ function RichTextWrapper(
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( content, content.length - 1, -1 );
 				} else {
 					splitValue( value, content );
 				}

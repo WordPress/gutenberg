@@ -8,7 +8,7 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess {
+class WP_Block {
 
 	/**
 	 * Name of block.
@@ -156,7 +156,7 @@ class WP_Block implements ArrayAccess {
 	 * @return string Rendered block output.
 	 */
 	public function render() {
-		global $post;
+		global $post, $_experimental_block;
 
 		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
@@ -169,72 +169,15 @@ class WP_Block implements ArrayAccess {
 		}
 
 		if ( $is_dynamic ) {
-			$global_post   = $post;
-			$block_content = (string) call_user_func( $this->block_type->render_callback, $this, $block_content );
-			$post          = $global_post;
+			$global_post         = $post;
+			$global_block        = $_experimental_block;
+			$_experimental_block = $this;
+			$block_content       = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content );
+			$_experimental_block = $global_block;
+			$post                = $global_post;
 		}
 
 		return $block_content;
-	}
-
-	/**
-	 * Returns true if an attribute exists by the specified attribute name, or
-	 * false otherwise.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetexists.php
-	 *
-	 * @param string $attribute_name Name of attribute to check.
-	 *
-	 * @return bool Whether attribute exists.
-	 */
-	public function offsetExists( $attribute_name ) {
-		return isset( $this->attributes[ $attribute_name ] );
-	}
-
-	/**
-	 * Returns the value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetget.php
-	 *
-	 * @param string $attribute_name Name of attribute value to retrieve.
-	 *
-	 * @return mixed|null Attribute value if exists, or null.
-	 */
-	public function offsetGet( $attribute_name ) {
-		// This may cause an "Undefined index" notice if the attribute name does
-		// not exist. This is expected, since the purpose of this implementation
-		// is to align exactly to the expectations of operating on an array.
-		return $this->attributes[ $attribute_name ];
-	}
-
-	/**
-	 * Assign an attribute value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to set.
-	 * @param mixed  $value          Attribute value.
-	 */
-	public function offsetSet( $attribute_name, $value ) {
-		if ( is_null( $attribute_name ) ) {
-			// This is not technically a valid use-case for attributes. Since
-			// this implementation is expected to align to expectations of
-			// operating on an array, it is still supported.
-			$this->attributes[] = $value;
-		} else {
-			$this->attributes[ $attribute_name ] = $value;
-		}
-	}
-
-	/**
-	 * Unset an attribute.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetunset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to unset.
-	 */
-	public function offsetUnset( $attribute_name ) {
-		unset( $this->attributes[ $attribute_name ] );
 	}
 
 }

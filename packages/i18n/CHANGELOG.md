@@ -1,5 +1,9 @@
 ## Master
 
+### Bug Fix
+
+- Relax type of `sprintf` arguments type ([#21919](https://github.com/WordPress/gutenberg/pull/21919))
+
 ## 3.11.0 (2020-04-15)
 
 ### New Features

@@ -31,7 +31,7 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 _Parameters_
 
 -   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Object`: Query arguments to apply to URL.
+-   _args_ `[Object]`: Query arguments to apply to URL.
 
 _Returns_
 
