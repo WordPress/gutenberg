@@ -9,17 +9,30 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { noop, sum } from 'lodash';
 
-const getPath = ( dependencyType, dependencies ) =>
-	`/wp/v2/${ dependencyType }/?${ dependencies.map(
-		( dependency ) => `dependency=${ dependency }`
+/**
+ * @typedef {'scripts' | 'styles'} WPLazyDependencyType
+ */
+
+/**
+ * Gets the path corresponding to the dependency type and list of dependency
+ * handles to load.
+ *
+ * @see {WP_REST_Styles_Controller}
+ *
+ * @param {WPLazyDependencyType} dependencyType The type of dependency for which to build the path.
+ * @param {string[]} dependencyHandles List of dependency handles for which to build the path.
+ */
+const getPath = ( dependencyType, dependencyHandles ) =>
+	`/wp/v2/${ dependencyType }/?${ dependencyHandles.map(
+		( handle ) => `dependency=${ handle }`
 	) }`;
 
 /**
  *
- * @param {'scripts' | 'styles'} dependencyType The type of dependency
- * @param {Function} createElement A function accepting a URI for a dependency and returning an element to append to head
+ * @param {WPLazyDependencyType} dependencyType The type of dependency
+ * @param {(dependencyUri: string) => (HTMLScriptElement | HTMLLinkElement)} createElement A function accepting a URI for a dependency and returning an element to append to head
  *
- * @return {Function} A file loader function acepting a list of dependencies and returning a Promise which resolves when all the files have been loaded
+ * @return {(dependencies: string[]) => Promise<number>} A file loader function acepting a list of dependencies and returning a Promise which resolves when all the files have been loaded
  */
 const createDependencyLoader = ( dependencyType, createElement ) => {
 	const previouslyLoadedDependencies = new Set();
@@ -88,6 +101,36 @@ const loadStyles = createDependencyLoader( 'styles', ( dependencyUri ) => {
 	return linkElement;
 } );
 
+/**
+ * A component which blocks the rendering of its children until the dependencies
+ * declared in scripts and styles have been loaded and the optional onLoaded
+ * function has successfully resolved. Allows asynchronously loading library
+ * dependencies for blocks (for example TinyMCE for the Classic Block).
+ *
+ * @example
+ * <caption>Given a library called `map-library` which loads an object onto window.mapLibrary, we can initialize this dependency using LazyLoad:</caption>
+ *
+ * const EmbeddedMapBlockEdit = () => {
+ *		window.mapLibrary.drawMap();
+ * };
+ *
+ * const LazyEmbeddedMapBlockEdit = ( props ) => (
+ *		<LazyLoad
+ *			scripts={ [ 'map-library' ] }
+ *			onLoaded={ () => window.mapLibrary.init() }
+ *		>
+ *			<EmbeddedMapBlockEdit { ...props } />
+ *		</LazyLoad>
+ * );
+ *
+ * @param {Object} props
+ * @param {string[]} props.scripts List of script handles to load for children
+ * @param {string[]} props.styles List of style handles to load for children
+ * @param {import('@wordpress/element').WPNode} props.children Children to render after loading dependencies
+ * @param {import('@wordpress/element').WPNode} props.placeholder Placeholder to render while loading dependencies
+ * @param {() => Promise<void>} props.onLoaded
+ * @param {(e: Error) => void} props.onError Function to handle errors while loading dependencies
+ */
 const LazyLoad = ( {
 	scripts,
 	styles,
