@@ -30,7 +30,7 @@
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"equivalent-key-map": "^0.2.2",
-		"is-promise": "^2.1.0",
+		"is-promise": "^4.0.0",
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",
 		"redux": "^4.0.0",
