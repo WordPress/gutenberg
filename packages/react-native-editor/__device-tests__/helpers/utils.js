@@ -43,7 +43,7 @@ const strToKeycode = {
 	'\u0008': 67,
 };
 
-const timer = ( ms ) => new Promise()( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
