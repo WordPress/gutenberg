@@ -17,6 +17,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { close, page, layout, grid, blockDefault } from '@wordpress/icons';
 
+const ENTITY_NAME_ICONS = {
+	site: layout,
+	page,
+	post: grid,
+	wp_template: grid,
+};
+
 function EntityRecordState( { record, checked, onChange, closePanel } ) {
 	const { name, kind, title, key } = record;
 	const parentBlockId = useSelect( ( select ) => {
@@ -86,16 +93,7 @@ function EntityTypeList( {
 
 	// Set icon based on type of entity.
 	const { name } = firstRecord;
-	let icon = blockDefault;
-	if ( name === 'site' ) {
-		icon = layout;
-	} else if ( name === 'page' ) {
-		icon = page;
-	} else if ( name === 'post' || name === 'wp_template' ) {
-		icon = grid;
-	} else if ( name === 'wp_template_part' ) {
-		icon = blockDefault;
-	}
+	const icon = ENTITY_NAME_ICONS[ name ] || blockDefault;
 
 	return (
 		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
