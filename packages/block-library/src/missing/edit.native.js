@@ -151,6 +151,7 @@ export class UnsupportedBlockEdit extends Component {
 							label={ __( 'Dismiss' ) }
 							separatorType="topFullWidth"
 							onPress={ this.toggleSheet }
+							labelStyle={ actionButtonStyle }
 						/>
 					</>
 				}
