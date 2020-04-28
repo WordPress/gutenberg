@@ -81,12 +81,12 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 			{ filteredPatterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
-						key={ index }
+						key={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 					/>
 				) : (
-					<BlockPatternPlaceholder key={ index } />
+					<BlockPatternPlaceholder key={ pattern.name } />
 				)
 			) }
 		</InserterPanel>
