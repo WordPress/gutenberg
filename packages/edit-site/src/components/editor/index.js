@@ -8,7 +8,7 @@ import {
 	useMemo,
 	useCallback,
 } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -53,13 +53,6 @@ function Editor( { settings: _settings } ) {
 			),
 		[ settings.templateType, settings.templateId ]
 	);
-	const isEntitiesSavedStatesOpen = useSelect(
-		( select ) => select( 'core/edit-site' ).isEntitiesSavedStatesOpen(),
-		[]
-	);
-	const { closeEntitiesSavedStates, openEntitiesSavedStates } = useDispatch(
-		'core/edit-site'
-	);
 
 	const context = useMemo( () => ( { settings, setSettings } ), [
 		settings,
@@ -80,7 +73,17 @@ function Editor( { settings: _settings } ) {
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
-	const openSavePanel = useCallback( () => openEntitiesSavedStates(), [] );
+	const [ isEntitiesSavedStatesOpen, setEntitiesSavedStates ] = useState(
+		false
+	);
+	const openEntitiesSavedStates = useCallback(
+		() => setEntitiesSavedStates( true ),
+		[]
+	);
+	const closeEntitiesSavedStates = useCallback(
+		() => setEntitiesSavedStates( false ),
+		[]
+	);
 
 	return template ? (
 		<>
@@ -124,7 +127,7 @@ function Editor( { settings: _settings } ) {
 															isSecondary
 															className="edit-site-editor__toggle-save-panel-button"
 															onClick={
-																openSavePanel
+																openEntitiesSavedStates
 															}
 															aria-expanded={
 																false
