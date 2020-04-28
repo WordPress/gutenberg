@@ -101,7 +101,13 @@ function Editor( { settings: _settings } ) {
 								<FocusReturnProvider>
 									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
-										header={ <Header /> }
+										header={
+											<Header
+												openEntitiesSavedStates={
+													openEntitiesSavedStates
+												}
+											/>
+										}
 										content={
 											<BlockSelectionClearer
 												style={ inlineStyles }

@@ -22,7 +22,7 @@ import SaveButton from '../save-button';
 
 const inserterToggleProps = { isPrimary: true };
 
-export default function Header() {
+export default function Header( { openEntitiesSavedStates } ) {
 	const { settings, setSettings } = useEditorContext();
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
@@ -88,7 +88,9 @@ export default function Header() {
 					deviceType={ deviceType }
 					setDeviceType={ setPreviewDeviceType }
 				/>
-				<SaveButton />
+				<SaveButton
+					openEntitiesSavedStates={ openEntitiesSavedStates }
+				/>
 				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />
 			</div>
