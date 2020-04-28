@@ -393,6 +393,12 @@ Sometimes it's useful to observe the browser while running tests. To do so you c
 PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
 ```
 
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+PUPPETEER_HEADLESS=false PUPPETEER_DEVTOOLS=true npm run test-e2e:watch
+```
+
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
