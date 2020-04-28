@@ -3,10 +3,13 @@
 	width: 100%;
 	background-color: $white;
 	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
 
 	// Always show outlines in code editor
 	.wp-block.editor-post-title {
 		max-width: none;
+		width: 100%;
 
 		textarea {
 			border: $border-width solid $light-gray-secondary;
@@ -22,19 +25,16 @@
 			padding: 0;
 		}
 	}
-
-	// Make room for toolbar.
-	padding-top: $block-toolbar-height + $grid-unit-10;
 }
 
 // Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	padding: $grid-unit-15;
 	display: flex;
+	padding: $grid-unit-05 $grid-unit-15;
+
+	@include break-small() {
+		padding: $grid-unit-15;
+	}
 
 	@include break-large() {
 		padding: $grid-unit-15 $grid-unit-30;
@@ -54,13 +54,15 @@
 
 .edit-post-text-editor__body {
 	width: 100%;
-	padding: $grid-unit-20 $grid-unit-15 $grid-unit-60 $grid-unit-15;
+	padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
 	max-width: $break-wide;
 	margin-left: auto;
 	margin-right: auto;
+	display: flex;
+	flex-direction: column;
 
 	@include break-large() {
-		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
+		padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
 	}
 
 	// This needs specificity to change the title block appearance on the code editor.
