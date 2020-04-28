@@ -176,6 +176,7 @@ class ButtonEdit extends Component {
 
 		return (
 			wrapperProps?.style?.backgroundColor ||
+			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.fallbackButton.backgroundColor
 		);
@@ -186,6 +187,7 @@ class ButtonEdit extends Component {
 
 		return (
 			wrapperProps?.style?.color ||
+			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.fallbackButton.color
 		);

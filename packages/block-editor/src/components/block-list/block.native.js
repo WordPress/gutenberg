@@ -69,7 +69,9 @@ class BlockListBlock extends Component {
 								onCaretVerticalPositionChange={
 									this.props.onCaretVerticalPositionChange
 								}
+								// Block level styles
 								wrapperProps={ this.props.wrapperProps }
+								// inherited styles merged with block level styles
 								mergedStyle={ mergedStyle }
 								clientId={ this.props.clientId }
 								parentWidth={ this.props.parentWidth }
