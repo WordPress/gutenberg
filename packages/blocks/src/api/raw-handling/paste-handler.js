@@ -196,18 +196,18 @@ export function pasteHandler( {
 		}
 	}
 
-	// An array of HTML strings and block objects.
-	// The blocks replace matched shortcodes.
+	if ( mode === 'INLINE' ) {
+		return filterInlineHTML( HTML );
+	}
+
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
 
 	// The call to shortcodeConverter will always return more than one element
 	// if shortcodes are matched. The reason is when shortcodes are matched
 	// empty HTML strings are included.
 	const hasShortcodes = pieces.length > 1;
-
-	if ( mode === 'INLINE' && ! hasShortcodes ) {
-		return filterInlineHTML( HTML );
-	}
 
 	if (
 		mode === 'AUTO' &&
