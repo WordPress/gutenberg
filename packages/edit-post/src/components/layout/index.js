@@ -32,7 +32,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 
 /**
@@ -128,6 +128,19 @@ function Layout() {
 			closeGeneralSidebar();
 		}
 	}, [ isInserterOpen, isHugeViewport ] );
+
+	// Local state for save panel.
+	const [ isEntitiesSavedStatesOpen, setEntitiesSavedStates ] = useState(
+		false
+	);
+	const openEntitiesSavedStates = useCallback(
+		() => setEntitiesSavedStates( true ),
+		[]
+	);
+	const closeEntitiesSavedStates = useCallback(
+		() => setEntitiesSavedStates( false ),
+		[]
+	);
 
 	return (
 		<>
@@ -226,7 +239,17 @@ function Layout() {
 							</div>
 						)
 					}
-					actions={ <ActionsPanel /> }
+					actions={
+						<ActionsPanel
+							openEntitiesSavedStates={ openEntitiesSavedStates }
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								isEntitiesSavedStatesOpen
+							}
+						/>
+					}
 					shortcuts={ {
 						previous: previousShortcut,
 						next: nextShortcut,
