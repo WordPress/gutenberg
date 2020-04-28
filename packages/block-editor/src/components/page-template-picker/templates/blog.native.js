@@ -60,11 +60,16 @@ const Blog = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				// translators: sample content for "Blog" page template
-				text: __( 'Subscribe' ),
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						// translators: sample content for "Blog" page template
+						text: __( 'Subscribe' ),
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',
