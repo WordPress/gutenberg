@@ -12,7 +12,7 @@ const chalk = require( 'chalk' );
 const { getEntry, getPullRequestType } = require( './get-entry' );
 const { fetchAllPullRequests } = require( './requests' );
 
-/* eslint no-console: 0*/
+/* eslint-disable no-console */
 
 const make = async ( token, version ) => {
 	const pullRequests = await fetchAllPullRequests( token, version );
@@ -35,3 +35,5 @@ const make = async ( token, version ) => {
 };
 
 module.exports = { make };
+
+/* eslint-enable no-console */

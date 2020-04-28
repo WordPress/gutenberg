@@ -12,8 +12,9 @@ const chalk = require( 'chalk' );
 const { REPO } = require( './config' );
 const { make } = require( './make' );
 
-/* eslint no-console: 0 */
 const success = chalk.bold.green;
+
+/* eslint-disable no-console */
 
 const makeChangeLog = async () => {
 	console.log(
@@ -51,3 +52,5 @@ const makeChangeLog = async () => {
 module.exports = {
 	makeChangeLog,
 };
+
+/* eslint-enable no-console */
