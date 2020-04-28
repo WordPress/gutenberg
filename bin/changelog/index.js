@@ -10,7 +10,7 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const { REPO } = require( './config' );
-const { make } = require( './make' );
+const getChangelog = require( './get-changelog' );
 
 const success = chalk.bold.green;
 
@@ -44,9 +44,16 @@ const makeChangeLog = async () => {
 		},
 	] );
 
+	let changelog;
+	try {
+		changelog = await getChangelog( token, milestone );
+	} catch ( error ) {
+		changelog = chalk.yellow( error.message );
+	}
+
 	console.log( '>> Here is the generated changelog:' );
 	console.log( '' );
-	make( token, milestone );
+	console.log( changelog );
 };
 
 module.exports = {

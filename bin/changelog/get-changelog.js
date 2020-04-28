@@ -4,7 +4,6 @@
  * External dependencies
  */
 const { groupBy } = require( 'lodash' );
-const chalk = require( 'chalk' );
 
 /*
  * Internal dependencies
@@ -12,28 +11,29 @@ const chalk = require( 'chalk' );
 const { getEntry, getPullRequestType } = require( './get-entry' );
 const { fetchAllPullRequests } = require( './requests' );
 
-/* eslint-disable no-console */
-
-const make = async ( token, version ) => {
+async function getChangelog( token, version ) {
 	const pullRequests = await fetchAllPullRequests( token, version );
 	if ( ! pullRequests || ! pullRequests.length ) {
-		console.log(
-			chalk.yellow( "This version doesn't have any associated PR." )
+		throw new Error(
+			"This version doesn't have an associated pull request."
 		);
-		return;
 	}
+
+	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getPullRequestType );
 	for ( const group of Object.keys( groupedPullRequests ) ) {
-		console.log( '### ' + group + '\n' );
+		changelog += '### ' + group + '\n\n';
+
 		const groupPullRequests = groupedPullRequests[ group ];
-		for ( const PR of groupPullRequests ) {
-			console.log( await getEntry( PR ) );
+		for ( const pullRequest of groupPullRequests ) {
+			changelog += ( await getEntry( pullRequest ) ) + '\n';
 		}
-		console.log( '' );
+
+		changelog += '\n';
 	}
-};
 
-module.exports = { make };
+	return changelog;
+}
 
-/* eslint-enable no-console */
+module.exports = getChangelog;
