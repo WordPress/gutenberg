@@ -133,13 +133,20 @@ function Layout() {
 	const [ isEntitiesSavedStatesOpen, setEntitiesSavedStates ] = useState(
 		false
 	);
+	const [
+		closeEntitiesCallback,
+		setCloseEntitiesCallback,
+	] = useState( () => () => {} );
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStates( true ),
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
-		() => setEntitiesSavedStates( false ),
-		[]
+		( callbackArg ) => {
+			closeEntitiesCallback( callbackArg );
+			setEntitiesSavedStates( false );
+		},
+		[ closeEntitiesCallback ]
 	);
 
 	return (
@@ -160,6 +167,10 @@ function Layout() {
 							isInserterOpen={ isInserterOpen }
 							onToggleInserter={ () =>
 								setIsInserterOpen( ! isInserterOpen )
+							}
+							openEntitiesSavedStates={ openEntitiesSavedStates }
+							setCloseEntitiesCallback={
+								setCloseEntitiesCallback
 							}
 						/>
 					}

@@ -17,7 +17,12 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	openEntitiesSavedStates,
+	setCloseEntitiesCallback,
+} ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -89,6 +94,8 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					openEntitiesSavedStates={ openEntitiesSavedStates }
+					setCloseEntitiesCallback={ setCloseEntitiesCallback }
 				/>
 				<Button
 					icon={ cog }
