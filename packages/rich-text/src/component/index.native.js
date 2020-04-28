@@ -892,9 +892,13 @@ export class RichText extends Component {
 										onClick={ () => {
 											addMention()
 												.then( ( mentionUserId ) => {
+													let stringToInsert = `@${ mentionUserId }`;
+													if ( this.isIOS ) {
+														stringToInsert += ' ';
+													}
 													this.insertString(
 														record,
-														`@${ mentionUserId } `
+														stringToInsert
 													);
 												} )
 												.catch( () => {} );
