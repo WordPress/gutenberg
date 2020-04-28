@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-const babel = require( '@babel/parser' );
+const babel = require( '@babel/core' );
 const { flatten } = require( 'lodash' );
 
 /**
@@ -10,10 +10,7 @@ const { flatten } = require( 'lodash' );
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 const getAST = ( source ) => {
-	return babel.parse( source || '', {
-		plugins: [ 'jsx' ],
-		sourceType: 'module',
-	} ).program;
+	return babel.parse( source || '' ).program;
 };
 
 const getExportTokens = ( ast ) =>

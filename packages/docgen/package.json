@@ -22,7 +22,7 @@
 		"docgen": "./bin/cli.js"
 	},
 	"dependencies": {
-		"@babel/parser": "^7.9.2",
+		"@babel/core": "^7.9.0",
 		"doctrine": "^2.1.0",
 		"lodash": "^4.17.15",
 		"mdast-util-inject": "1.1.0",
