@@ -5,17 +5,8 @@
 		"align": {
 			"type": "string"
 		},
-		"id": {
-			"type": "number"
-		},
-		"name": {
-			"type": "string"
-		},
 		"avatarSize": {
 			"type": "number"
-		},
-		"avatarUrl": {
-			"type": "string"
 		},
 		"showAvatar": {
 			"type": "boolean"
@@ -24,9 +15,6 @@
 			"type": "boolean"
 		},
 		"byline": {
-			"type": "string"
-		},
-		"description": {
 			"type": "string"
 		},
 		"backgroundColor": {

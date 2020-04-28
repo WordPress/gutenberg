@@ -99,7 +99,7 @@ function render_block_core_post_author( $block ) {
 		return '';
 	}
 
-	$post = gutenberg_get_post_from_context();
+	$post = gutenberg_get_post_from_context();	
 
 	if ( ! $post ) {
 		return '';
@@ -110,9 +110,7 @@ function render_block_core_post_author( $block ) {
 		$attributes['avatarSize']
 	) : null;
 
-
-	$author_name = $attributes['name'];
-	$byline      = ! empty( $attributes['byline'] ) ? $attributes['byline'] : __( 'Written by:' );
+	$byline      = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
 
 	$colors     = post_author_build_css_colors( $attributes );
 	$font_sizes = post_author_build_css_font_sizes( $attributes );
@@ -134,8 +132,8 @@ function render_block_core_post_author( $block ) {
 		( $attributes['showAvatar'] ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
 		'<div class="wp-block-post-author__content">' .
 			( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .
-			'<p class="wp-block-post-author__name">' . $author_name . '</p>' .
-			( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . $attributes['description'] . '</p>' : '' ) .
+			'<p class="wp-block-post-author__name">' . get_the_author_meta( 'display_name' ) . '</p>' .
+			( ! empty( $attributes['showBio'] ) ? '<p class="wp-block-post-author__bio">' . get_the_author_meta( 'user_description' ) . '</p>' : '' ) .
 		'</div>' .
 	'</div>';
 }
