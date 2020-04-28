@@ -6,7 +6,7 @@
 const { REPO } = require( './config' );
 const { getGraphqlClient } = require( './get-entry' );
 
-const getMilestoneNumber = async ( token, version ) => {
+const getMilestoneNumber = async ( token, milestone ) => {
 	const [ owner, repo ] = REPO.split( '/' );
 	const query = `
 	{
@@ -23,11 +23,11 @@ const getMilestoneNumber = async ( token, version ) => {
 	const client = getGraphqlClient( token );
 	const data = await client( query );
 	const matchingNode = data.repository.milestones.nodes.find(
-		( node ) => node.title === version
+		( node ) => node.title === milestone
 	);
 	if ( ! matchingNode ) {
 		throw new Error(
-			`Unable to find a milestone matching the given version ${ version }`
+			`Unable to find a milestone matching the given milestone ${ milestone }`
 		);
 	}
 	return matchingNode.number;
@@ -67,10 +67,10 @@ const getQuery = ( milestoneNumber, before ) => {
 	`;
 };
 
-const fetchAllPullRequests = async ( token, version ) =>
+const fetchAllPullRequests = async ( token, milestone ) =>
 	await ( async () => {
 		const client = getGraphqlClient( token );
-		const milestoneNumber = await getMilestoneNumber( token, version );
+		const milestoneNumber = await getMilestoneNumber( token, milestone );
 		const fetchResults = async ( before ) => {
 			const query = getQuery( milestoneNumber, before );
 			const results = await client( query );
