@@ -53,7 +53,6 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				isSelected={ isSelected }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -63,6 +62,7 @@ const SpacerEdit = ( {
 					);
 					updateHeight( spacerHeight );
 				} }
+				showHandle={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
