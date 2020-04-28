@@ -162,11 +162,7 @@ async function getPullRequestsByMilestone( octokit, owner, repo, milestone ) {
 
 	for await ( const response of responses ) {
 		const issues = response.data;
-		for ( const issue of issues ) {
-			if ( issue.pull_request ) {
-				pulls.push( issue );
-			}
-		}
+		pulls.push( ...issues.filter( ( issue ) => issue.pull_request ) );
 	}
 
 	return pulls;
