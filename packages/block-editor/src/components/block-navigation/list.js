@@ -2,23 +2,28 @@
  * External dependencies
  */
 import { isNil, map, omitBy } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Slot, Fill } from '@wordpress/components';
 import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+	Children,
+	cloneElement,
+	useContext,
+	createContext,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
+import BlockNavigationListItem from './list-item';
 import ButtonBlockAppender from '../button-block-appender';
+import { BlockListBlockContext } from '../block-list/block';
+
+export const BlockNavigationContext = createContext( {
+	withBlockNavigationSlots: true,
+} );
 
 export default function BlockNavigationList( {
 	blocks,
@@ -30,6 +35,7 @@ export default function BlockNavigationList( {
 	showNestedBlocks,
 	parentBlockClientId,
 } ) {
+	const { withBlockNavigationSlots } = useContext( BlockNavigationContext );
 	const shouldShowAppender = showAppender && !! parentBlockClientId;
 
 	return (
@@ -40,30 +46,15 @@ export default function BlockNavigationList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul className="block-editor-block-navigation__list" role="list">
 			{ map( omitBy( blocks, isNil ), ( block ) => {
-				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
-
 				return (
-					<li key={ block.clientId }>
-						<div className="block-editor-block-navigation__item">
-							<Button
-								className={ classnames(
-									'block-editor-block-navigation__item-button',
-									{
-										'is-selected': isSelected,
-									}
-								) }
-								onClick={ () => selectBlock( block.clientId ) }
-							>
-								<BlockIcon icon={ blockType.icon } showColors />
-								{ getBlockLabel( blockType, block.attributes ) }
-								{ isSelected && (
-									<VisuallyHidden as="span">
-										{ __( '(selected block)' ) }
-									</VisuallyHidden>
-								) }
-							</Button>
-						</div>
+					<BlockNavigationBranch
+						withSlot={ withBlockNavigationSlots }
+						block={ block }
+						key={ block.clientId }
+						isSelected={ isSelected }
+						onClick={ () => selectBlock( block.clientId ) }
+					>
 						{ showNestedBlocks &&
 							!! block.innerBlocks &&
 							!! block.innerBlocks.length && (
@@ -78,7 +69,7 @@ export default function BlockNavigationList( {
 									showNestedBlocks
 								/>
 							) }
-					</li>
+					</BlockNavigationBranch>
 				);
 			} ) }
 			{ shouldShowAppender && (
@@ -95,3 +86,43 @@ export default function BlockNavigationList( {
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }
+
+BlockNavigationList.defaultProps = {
+	selectBlock: () => {},
+};
+
+const BlockNavigationBranch = ( { withSlot, children, ...props } ) => {
+	if ( ! withSlot ) {
+		return <BlockNavigationListItem { ...props } />;
+	}
+
+	return (
+		<li>
+			<BlockNavigationListItemSlot blockId={ props.block.clientId }>
+				{ ( fills ) => {
+					if ( ! fills.length ) {
+						return <BlockNavigationListItem { ...props } />;
+					}
+
+					return Children.map( fills, ( fill ) =>
+						cloneElement( fill, {
+							...props,
+							...fill.props,
+						} )
+					);
+				} }
+			</BlockNavigationListItemSlot>
+			{ children }
+		</li>
+	);
+};
+
+const listItemSlotName = ( blockId ) => `BlockNavigationList-item-${ blockId }`;
+
+export const BlockNavigationListItemSlot = ( { blockId, ...props } ) => (
+	<Slot { ...props } name={ listItemSlotName( blockId ) } />
+);
+export const BlockNavigationListItemFill = ( props ) => {
+	const { clientId } = useContext( BlockListBlockContext );
+	return <Fill { ...props } name={ listItemSlotName( clientId ) } />;
+};

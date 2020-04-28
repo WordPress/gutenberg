@@ -29,9 +29,17 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
+	__experimentalBlockNavigationListItemFill as BlockNavigationListItemFill,
+	__experimentalBlockNavigationListItem as BlockNavigationListItem,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useState,
+	useEffect,
+	useRef,
+	cloneElement,
+} from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 
@@ -39,6 +47,8 @@ import { link as linkIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+
+const noop = () => {};
 
 function NavigationLinkEdit( {
 	attributes,
@@ -129,6 +139,25 @@ function NavigationLinkEdit( {
 		};
 	}
 
+	const editField = (
+		<RichText
+			className="wp-block-navigation-link__label"
+			value={ label }
+			onChange={ ( labelValue ) =>
+				setAttributes( { label: labelValue } )
+			}
+			placeholder={ itemLabelPlaceholder }
+			keepPlaceholderOnFocus
+			withoutInteractiveFormatting
+			allowedFormats={ [
+				'core/bold',
+				'core/italic',
+				'core/image',
+				'core/strikethrough',
+			] }
+		/>
+	);
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -193,6 +222,14 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<BlockNavigationListItemFill>
+				<BlockNavigationListItem
+					wrapperComponent="div"
+					onClick={ noop }
+				>
+					{ editField }
+				</BlockNavigationListItem>
+			</BlockNavigationListItemFill>
 			<Block.li
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
@@ -210,23 +247,7 @@ function NavigationLinkEdit( {
 				} }
 			>
 				<div className="wp-block-navigation-link__content">
-					<RichText
-						ref={ ref }
-						className="wp-block-navigation-link__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						placeholder={ itemLabelPlaceholder }
-						keepPlaceholderOnFocus
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-					/>
+					{ cloneElement( editField, { ref } ) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
