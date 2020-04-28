@@ -93,6 +93,10 @@ function getAllowedFormats( {
 
 getAllowedFormats.EMPTY_ARRAY = [];
 
+// The given text is considered a shortcode if
+// starts by the [ character and ends by the ] character.
+const isShortcode = ( text ) => new RegExp( '^\\[.*\\]$' ).test( text );
+
 function RichTextWrapper(
 	{
 		children,
@@ -392,6 +396,18 @@ function RichTextWrapper(
 			}
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
+
+			// Force the blocks mode when the user is pasting
+			// on a new line & the content resembles a shortcode.
+			// Otherwise it's going to be detected as inline
+			// and the shortcode won't be replaced.
+			if (
+				mode === 'AUTO' &&
+				isEmpty( value ) &&
+				isShortcode( plainText )
+			) {
+				mode = 'BLOCKS';
+			}
 
 			if (
 				__unstableEmbedURLOnPaste &&
