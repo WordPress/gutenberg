@@ -43,6 +43,7 @@ export function NumberControl(
 		onKeyDown = noop,
 		shiftStep = 10,
 		step = 1,
+		transformValueOnChange = ( v ) => v,
 		value: valueProp,
 		...props
 	},
@@ -177,6 +178,10 @@ export function NumberControl(
 		}
 	};
 
+	const handleTransformValueOnChange = ( value ) => {
+		return transformValueOnChange( getValue( value ) );
+	};
+
 	const classes = classNames( 'components-number-control', className );
 
 	return (
@@ -192,7 +197,7 @@ export function NumberControl(
 			label={ label }
 			onChange={ handleOnChange }
 			onKeyDown={ handleOnKeyDown }
-			transformValueOnChange={ getValue }
+			transformValueOnChange={ handleTransformValueOnChange }
 			ref={ ref }
 			value={ valueProp }
 		/>

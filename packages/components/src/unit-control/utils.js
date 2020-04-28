@@ -69,3 +69,23 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 
 	return output;
 }
+
+/**
+ * Parses a number and unit from a value. Validates parsed value, using fallback
+ * value if invalid.
+ *
+ * @param {number|string} next The next value.
+ * @param {Array<Object>} units Units to derive from.
+ * @param {number|string} fallback The fallback value.
+ * @return {Array<number, string>} The extracted number and unit.
+ */
+export function getValidParsedUnit( next, units, fallback ) {
+	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
+	let baseValue = parsedValue;
+
+	if ( isNaN( parsedValue ) || parsedValue === '' ) {
+		baseValue = fallback;
+	}
+
+	return [ baseValue, parsedUnit ];
+}
