@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, sum } from 'lodash';
 
 const getPath = ( dependencyType, dependencies ) =>
 	`/wp/v2/${ dependencyType }/?${ dependencies.map(
@@ -30,7 +30,7 @@ const createDependencyLoader = ( dependencyType, createElement ) => {
 		);
 
 		if ( dependenciesToLoad.length === 0 ) {
-			return;
+			return 0;
 		}
 
 		const path = getPath( dependencyType, dependenciesToLoad );
@@ -41,7 +41,8 @@ const createDependencyLoader = ( dependencyType, createElement ) => {
 		 * Programatically added `script` tags get parsed and executed as though they
 		 * had `async` on them. That means that if we have script A and B, where B
 		 * depends on A and we add both to the DOM at the same time, there's no
-		 * guaranteed order of execution, B could execute before A and break.
+		 * guaranteed order of execution, B could execute before A and break, even if
+		 * A's script element was added before B.
 		 *
 		 * Therefore, we need to block on each script's loading until the next one down
 		 * the list.
@@ -68,6 +69,8 @@ const createDependencyLoader = ( dependencyType, createElement ) => {
 		orderedDependenciesWithDependencies.forEach( ( { handle } ) =>
 			previouslyLoadedDependencies.add( handle )
 		);
+
+		return orderedDependenciesWithDependencies.length;
 	};
 };
 
@@ -94,8 +97,18 @@ const LazyLoad = ( {
 	onError,
 } ) => {
 	const [ loaded, setLoaded ] = useState( false );
+
 	Promise.all( [ loadScripts( scripts ), loadStyles( styles ) ] )
-		.then( () => onLoaded() )
+		.then( ( loadedCounts ) => {
+			/**
+			 * skip `onLoaded` if no dependencies were loaded, for example,
+			 * if they were previously loaded
+			 */
+			if ( sum( loadedCounts ) > 0 ) {
+				return onLoaded();
+			}
+			return Promise.resolve();
+		} )
 		.then( () => {
 			setLoaded( true );
 		} )
