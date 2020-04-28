@@ -18,7 +18,6 @@ import {
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
 	isEditorPanelRemoved,
-	isEntitiesSavedStatesOpen,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -377,18 +376,6 @@ describe( 'selectors', () => {
 			const result = isMetaBoxLocationActive( state, 'side' );
 
 			expect( result ).toBe( true );
-		} );
-	} );
-
-	describe( 'isEntitiesSavedStatesOpen', () => {
-		it( 'should return isOpen property of entitiesSavedStates state', () => {
-			const state = {
-				entitiesSavedStates: {
-					isOpen: 'some-thing',
-				},
-			};
-
-			expect( isEntitiesSavedStatesOpen( state ) ).toBe( 'some-thing' );
 		} );
 	} );
 } );

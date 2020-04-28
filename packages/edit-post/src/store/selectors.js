@@ -304,17 +304,6 @@ export function isSavingMetaBoxes( state ) {
 }
 
 /**
- * Returns true if save panel is open, or false otherwise.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether or not save panel is open.
- */
-export function isEntitiesSavedStatesOpen( state ) {
-	return state.entitiesSavedStates.isOpen;
-}
-
-/**
  * Returns the current editing canvas device type.
  *
  * @param {Object} state Global application state.
