@@ -5,11 +5,6 @@
  */
 const { graphql } = require( '@octokit/graphql' );
 
-/*
- * Internal dependencies
- */
-const { pkg } = require( './config' );
-
 const getAuthenticatedRequestHeaders = ( token ) => {
 	return {
 		authorization: `token ${ token }`,
@@ -25,23 +20,13 @@ const getGraphqlClient = ( token ) => {
 
 const getPullRequestType = ( pullRequest ) => {
 	const typeLabel = pullRequest.labels.nodes.find( ( label ) =>
-		label.name.includes( pkg.changelog.labelPrefix )
+		label.name.startsWith( '[Type]' )
 	);
-	if ( ! typeLabel ) {
-		return pkg.changelog.defaultPrefix;
-	}
-	return typeLabel.name.replace( `${ pkg.changelog.labelPrefix } `, '' );
+
+	return typeLabel ? typeLabel.name.replace( /^\[Type\] /, '' ) : 'Various';
 };
 
 const getEntry = ( pullRequest ) => {
-	if (
-		pullRequest.labels.nodes.some(
-			( label ) => label.name === pkg.changelog.skipLabel
-		)
-	) {
-		return;
-	}
-
 	let title;
 	if ( /### Changelog\r\n\r\n> /.test( pullRequest.body ) ) {
 		const bodyParts = pullRequest.body.split( '### Changelog\r\n\r\n> ' );
