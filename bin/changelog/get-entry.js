@@ -1,6 +1,13 @@
 'use strict';
 
+/*
+ * External dependencies
+ */
 const { graphql } = require( '@octokit/graphql' );
+
+/*
+ * Internal dependencies
+ */
 const { pkg } = require( './config' );
 
 /* eslint no-console: 0 */

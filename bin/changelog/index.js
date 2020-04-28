@@ -1,6 +1,14 @@
 'use strict';
+
+/*
+ * External dependencies
+ */
 const inquirer = require( 'inquirer' );
 const chalk = require( 'chalk' );
+
+/*
+ * Internal dependencies
+ */
 const { REPO } = require( './config' );
 const { make } = require( './make' );
 

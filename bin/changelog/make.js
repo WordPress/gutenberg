@@ -1,7 +1,14 @@
 'use strict';
 
+/*
+ * External dependencies
+ */
 const { groupBy } = require( 'lodash' );
 const chalk = require( 'chalk' );
+
+/*
+ * Internal dependencies
+ */
 const { getEntry, getPullRequestType } = require( './get-entry' );
 const { fetchAllPullRequests } = require( './requests' );
 

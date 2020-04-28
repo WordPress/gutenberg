@@ -1,5 +1,8 @@
 'use strict';
 
+/*
+ * Internal dependencies
+ */
 const { REPO } = require( './config' );
 const { getGraphqlClient } = require( './get-entry' );
 

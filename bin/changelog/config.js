@@ -1,5 +1,8 @@
 'use strict';
 
+/*
+ * Internal dependencies
+ */
 const pkg = require( '../../package.json' );
 
 const REPO = 'WordPress/gutenberg';
