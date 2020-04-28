@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -28,7 +33,12 @@ const SpacerEdit = ( {
 	return (
 		<>
 			<ResizableBox
-				className="block-library-spacer__resize-container"
+				className={ classnames(
+					'block-library-spacer__resize-container',
+					{
+						'is-selected': isSelected,
+					}
+				) }
 				size={ {
 					height,
 				} }
