@@ -7,13 +7,11 @@ const blacklistElements = blacklist( [
 	new RegExp( path.basename( __dirname ) + '/gutenberg/node_modules/.*' ),
 	new RegExp( path.basename( __dirname ) + '/gutenberg/gutenberg-mobile/.*' ),
 ] );
-const enm = require( './extra-node-modules.config.js' );
 
 module.exports = {
 	resolver: {
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
-		extraNodeModules: enm,
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer.js' ),

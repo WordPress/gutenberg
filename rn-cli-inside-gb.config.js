@@ -7,8 +7,6 @@ const blacklistElements = blacklist( [
 	new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ),
 ] );
 
-const enm = require( './extra-node-modules.config.js' );
-
 const { lstatSync, readdirSync } = require( 'fs' );
 const getDirectoryNames = ( dir ) =>
 	readdirSync( dir ).filter( ( name ) => lstatSync( path.resolve( dir, name ) ).isDirectory() );
@@ -31,7 +29,6 @@ module.exports = {
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
 		providesModuleNodeModules: [ 'react-native-svg', 'react-native' ],
-		extraNodeModules: Object.assign( enm, wppackages ),
 	},
 	transformer: {
 		babelTransformerPath: require.resolve( './sass-transformer-inside-gb.js' ),
