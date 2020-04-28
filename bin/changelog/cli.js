@@ -4,13 +4,15 @@
 /*
  * External dependencies
  */
-const inquirer = require( 'inquirer' );
 const chalk = require( 'chalk' );
 
 /*
  * Internal dependencies
  */
 const getChangelog = require( './get-changelog' );
+const getMilestone = require( './get-milestone' );
+// @ts-ignore
+const { version } = require( '../../package.json' );
 
 /**
  * @typedef WPChangelogSettings
@@ -28,45 +30,34 @@ const getChangelog = require( './get-changelog' );
  */
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-const success = chalk.bold.green;
+/**
+ * Optional explicit milestone title to use for generating changelog.
+ *
+ * @type {string=}
+ */
+const MILESTONE = process.env.MILESTONE;
 
 /* eslint-disable no-console */
 
 /**
  * Generates and logs changelog for a milestone.
  *
- * @param {Partial<WPChangelogSettings>} settings Changelog settings.
+ * @param {WPChangelogSettings} settings Changelog settings.
  */
 async function createChangelog( settings ) {
 	console.log(
-		chalk.bold( '💃 Time to prepare the Gutenberg Changelog 🕺\n\n' )
+		chalk.bold(
+			`💃Preparing changelog for milestone: "${ settings.milestone }"\n\n`
+		)
 	);
-
-	/** @type {{milestone:string}} */
-	const { milestone } = await inquirer.prompt( [
-		{
-			type: 'input',
-			name: 'milestone',
-			message:
-				'The milestone name is needed to generate the changelog. ' +
-				'Write it as it appears on the milestones page: ' +
-				success(
-					`https://github.com/${ settings.owner }/${ settings.repo }/milestones`
-				),
-		},
-	] );
 
 	let changelog;
 	try {
-		changelog = await getChangelog(
-			/** @type {WPChangelogSettings} */ ( { ...settings, milestone } )
-		);
+		changelog = await getChangelog( settings );
 	} catch ( error ) {
 		changelog = chalk.yellow( error.stack );
 	}
 
-	console.log( '>> Here is the generated changelog:' );
-	console.log( '' );
 	console.log( changelog );
 }
 
@@ -74,6 +65,7 @@ createChangelog( {
 	owner: 'WordPress',
 	repo: 'gutenberg',
 	token: GITHUB_TOKEN,
+	milestone: MILESTONE === undefined ? getMilestone( version ) : MILESTONE,
 } );
 
 /* eslint-enable no-console */

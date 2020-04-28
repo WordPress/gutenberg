@@ -20,5 +20,6 @@
 		"./changelog/get-changelog.js",
 		"./changelog/get-entry.js",
 		"./changelog/requests.js",
+		"./changelog/get-milestone.js",
 	]
 }
