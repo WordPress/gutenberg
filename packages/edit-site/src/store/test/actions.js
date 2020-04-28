@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	toggleFeature,
-	openEntitiesSavedStates,
-	closeEntitiesSavedStates,
-} from '../actions';
+import { toggleFeature } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'toggleFeature', () => {
@@ -15,26 +11,6 @@ describe( 'actions', () => {
 				type: 'TOGGLE_FEATURE',
 				feature,
 			} );
-		} );
-	} );
-} );
-
-describe( 'openEntitiesSavedStates', () => {
-	it( 'should return OPEN_ENTITIES_SAVED_STATES action', () => {
-		const result = openEntitiesSavedStates( 'test' );
-		expect( result ).toEqual( {
-			type: 'OPEN_ENTITIES_SAVED_STATES',
-			onRequestClose: 'test',
-		} );
-	} );
-} );
-
-describe( 'closeEntitiesSavedStates', () => {
-	it( 'should return CLOSE_ENTITIES_SAVED_STATES action', () => {
-		const result = closeEntitiesSavedStates( 'test' );
-		expect( result ).toEqual( {
-			type: 'CLOSE_ENTITIES_SAVED_STATES',
-			callbackArg: 'test',
 		} );
 	} );
 } );

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFeatureActive, isEntitiesSavedStatesOpen } from '../selectors';
+import { isFeatureActive } from '../selectors';
 
 describe( 'selectors', () => {
 	describe( 'isFeatureActive', () => {
@@ -46,18 +46,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isEntitiesSavedStatesOpen', () => {
-		it( 'should return isOpen property of entitiesSavedStates state', () => {
-			const state = {
-				entitiesSavedStates: {
-					isOpen: 'some-thing',
-				},
-			};
-
-			expect( isEntitiesSavedStatesOpen( state ) ).toBe( 'some-thing' );
 		} );
 	} );
 } );
