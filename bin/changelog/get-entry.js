@@ -59,7 +59,7 @@ const getEntry = ( pullRequest ) => {
 	} else {
 		title = `${ pullRequest.title }`;
 	}
-	return `- ${ title } [${ pullRequest.number }](${ pullRequest.url })`;
+	return `- ${ title } ([${ pullRequest.number }](${ pullRequest.url }))`;
 };
 
 module.exports = {
