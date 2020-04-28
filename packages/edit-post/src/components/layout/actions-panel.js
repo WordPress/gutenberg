@@ -23,7 +23,7 @@ export default function ActionsPanel( {
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
-		isSaving,
+		isSavingMetaBoxes,
 		hasNonPostEntityChanges,
 	} = useSelect( ( select ) => {
 		return {
@@ -31,7 +31,7 @@ export default function ActionsPanel( {
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			isSavingMetaBoxes: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			hasNonPostEntityChanges: select(
 				'core/editor'
 			).hasNonPostEntityChanges(),
@@ -39,36 +39,33 @@ export default function ActionsPanel( {
 	}, [] );
 
 	// It is ok for these components to be unmounted when not in visual use.
-	// So we can use them in a return cascade since only 1 is to be present at a time.
-	const Unmountables = () => {
-		if ( publishSidebarOpened ) {
-			return (
-				<PostPublishPanel
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					PrePublishExtension={ PluginPrePublishPanel.Slot }
-					PostPublishExtension={ PluginPostPublishPanel.Slot }
-				/>
-			);
-		}
-
-		if ( hasNonPostEntityChanges ) {
-			return (
-				<div className="edit-post-layout__toggle-publish-panel">
-					<Button
-						isSecondary
-						className="edit-post-layout__toggle-publish-panel-button"
-						onClick={ openEntitiesSavedStates }
-						aria-expanded={ false }
-					>
-						{ __( 'Open save panel' ) }
-					</Button>
-				</div>
-			);
-		}
-
-		return (
+	// We don't want more than one present at a time, decide which to render.
+	let unmountableContent;
+	if ( publishSidebarOpened ) {
+		unmountableContent = (
+			<PostPublishPanel
+				onClose={ closePublishSidebar }
+				forceIsDirty={ hasActiveMetaboxes }
+				forceIsSaving={ isSavingMetaBoxes }
+				PrePublishExtension={ PluginPrePublishPanel.Slot }
+				PostPublishExtension={ PluginPostPublishPanel.Slot }
+			/>
+		);
+	} else if ( hasNonPostEntityChanges ) {
+		unmountableContent = (
+			<div className="edit-post-layout__toggle-publish-panel">
+				<Button
+					isSecondary
+					className="edit-post-layout__toggle-publish-panel-button"
+					onClick={ openEntitiesSavedStates }
+					aria-expanded={ false }
+				>
+					{ __( 'Open save panel' ) }
+				</Button>
+			</div>
+		);
+	} else {
+		unmountableContent = (
 			<div className="edit-post-layout__toggle-publish-panel">
 				<Button
 					isSecondary
@@ -80,7 +77,7 @@ export default function ActionsPanel( {
 				</Button>
 			</div>
 		);
-	};
+	}
 
 	// Since EntitiesSavedStates controls its own panel, we can keep it
 	// always mounted to retain its own component state (such as checkboxes).
@@ -90,7 +87,7 @@ export default function ActionsPanel( {
 				isOpen={ isEntitiesSavedStatesOpen }
 				closePanel={ closeEntitiesSavedStates }
 			/>
-			{ ! isEntitiesSavedStatesOpen && <Unmountables /> }
+			{ ! isEntitiesSavedStatesOpen && <>{ unmountableContent }</> }
 		</>
 	);
 }
