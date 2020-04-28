@@ -210,9 +210,9 @@ async function getChangelog( settings ) {
 	} );
 
 	const pullRequests = await fetchAllPullRequests( octokit, settings );
-	if ( ! pullRequests || ! pullRequests.length ) {
+	if ( ! pullRequests.length ) {
 		throw new Error(
-			"This milestone doesn't have an associated pull request."
+			'There are no pull requests associated with the milestone.'
 		);
 	}
 
