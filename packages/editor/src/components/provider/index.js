@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -17,14 +17,46 @@ import {
 	BlockContextProvider,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
-import { mediaUpload, __experimentalFetchLinkSuggestions } from '../../utils';
+import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
+
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * wordpress/editor/src/components/provider/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {Object} search
+ * @param {number} perPage
+ * @return {Promise<Object[]>} List of suggestions
+ */
+const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
+	const posts = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: perPage,
+			type: 'post',
+		} ),
+	} );
+
+	return map( posts, ( post ) => ( {
+		id: post.id,
+		url: post.url,
+		title: decodeEntities( post.title ) || __( '(no title)' ),
+		type: post.subtype || post.type,
+	} ) );
+};
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -117,7 +149,7 @@ class EditorProvider extends Component {
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchReusableBlocks,
-			__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
