@@ -99,7 +99,7 @@ function getEntry( issue ) {
 	} else {
 		title = `${ issue.title }`;
 	}
-	return `- ${ title } ([${ issue.number }](${ issue.url }))`;
+	return `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
 }
 
 /**
