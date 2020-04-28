@@ -11,13 +11,12 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const getChangelog = require( './get-changelog' );
-const { REPO } = require( './config' );
 
 const success = chalk.bold.green;
 
 /* eslint-disable no-console */
 
-async function createChangelog() {
+async function createChangelog( { repository } ) {
 	console.log(
 		chalk.bold( '💃 Time to prepare the Gutenberg Changelog 🕺\n\n' )
 	);
@@ -41,15 +40,15 @@ async function createChangelog() {
 			message:
 				'The milestone name is needed to generate the changelog. ' +
 				'Write it as it appears on the milestones page: ' +
-				success( `https://github.com/${ REPO }/milestones` ),
+				success( `https://github.com/${ repository }/milestones` ),
 		},
 	] );
 
 	let changelog;
 	try {
-		changelog = await getChangelog( token, milestone );
+		changelog = await getChangelog( token, repository, milestone );
 	} catch ( error ) {
-		changelog = chalk.yellow( error.message );
+		changelog = chalk.yellow( error.stack );
 	}
 
 	console.log( '>> Here is the generated changelog:' );
@@ -57,6 +56,8 @@ async function createChangelog() {
 	console.log( changelog );
 }
 
-createChangelog();
+createChangelog( {
+	repository: 'WordPress/gutenberg',
+} );
 
 /* eslint-enable no-console */

@@ -11,8 +11,12 @@ const { groupBy } = require( 'lodash' );
 const { getEntry, getPullRequestType } = require( './get-entry' );
 const { fetchAllPullRequests } = require( './requests' );
 
-async function getChangelog( token, milestone ) {
-	const pullRequests = await fetchAllPullRequests( token, milestone );
+async function getChangelog( token, repository, milestone ) {
+	const pullRequests = await fetchAllPullRequests(
+		token,
+		repository,
+		milestone
+	);
 	if ( ! pullRequests || ! pullRequests.length ) {
 		throw new Error(
 			"This milestone doesn't have an associated pull request."

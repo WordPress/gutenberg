@@ -3,14 +3,13 @@
 /*
  * Internal dependencies
  */
-const { REPO } = require( './config' );
 const { getGraphqlClient } = require( './get-entry' );
 
-const getMilestoneNumber = async ( token, milestone ) => {
-	const [ owner, repo ] = REPO.split( '/' );
+const getMilestoneNumber = async ( token, repository, milestone ) => {
+	const [ owner, name ] = repository.split( '/' );
 	const query = `
 	{
-		repository(owner: "${ owner }", name: "${ repo }") {
+		repository(owner: "${ owner }", name: "${ name }") {
 			milestones(last: 50) {
 				nodes {
 					title
@@ -33,12 +32,12 @@ const getMilestoneNumber = async ( token, milestone ) => {
 	return matchingNode.number;
 };
 
-const getQuery = ( milestoneNumber, before ) => {
-	const [ owner, repo ] = REPO.split( '/' );
+const getQuery = ( repository, milestoneNumber, before ) => {
+	const [ owner, name ] = repository.split( '/' );
 	const paging = before ? `, before: "${ before }"` : '';
 	return `
 	{
-		repository(owner: "${ owner }", name: "${ repo }") {
+		repository(owner: "${ owner }", name: "${ name }") {
 			milestone(number: ${ milestoneNumber }) {
 				pullRequests(last: 100, states: [MERGED]${ paging }) {
 					totalCount
@@ -67,12 +66,16 @@ const getQuery = ( milestoneNumber, before ) => {
 	`;
 };
 
-const fetchAllPullRequests = async ( token, milestone ) =>
+const fetchAllPullRequests = async ( token, repository, milestone ) =>
 	await ( async () => {
 		const client = getGraphqlClient( token );
-		const milestoneNumber = await getMilestoneNumber( token, milestone );
+		const milestoneNumber = await getMilestoneNumber(
+			token,
+			repository,
+			milestone
+		);
 		const fetchResults = async ( before ) => {
-			const query = getQuery( milestoneNumber, before );
+			const query = getQuery( repository, milestoneNumber, before );
 			const results = await client( query );
 			if (
 				results.repository.milestone.pullRequests.pageInfo
