@@ -82,7 +82,7 @@ function BlockPatterns( { patterns } ) {
 
 	return (
 		<div className="block-editor-patterns">
-			{ Object.values( patterns ).map( ( pattern, index ) =>
+			{ patterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
 						key={ index }
