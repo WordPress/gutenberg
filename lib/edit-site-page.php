@@ -168,7 +168,7 @@ function gutenberg_edit_site_init( $hook ) {
 	$template_ids      = array();
 	$template_part_ids = array();
 	foreach ( $template_getters as $template_getter ) {
-		call_user_func( $template_getter ); // This sets $_wp_current_template_hierarchy
+		call_user_func( $template_getter ); // This sets $_wp_current_template_hierarchy.
 
 		$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
 		if ( isset( $current_template_post ) ) {
