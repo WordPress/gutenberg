@@ -17,7 +17,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { close, page, layout, grid, blockDefault } from '@wordpress/icons';
 
-function EntityRecordState( { record, checked, onChange } ) {
+function EntityRecordState( { record, checked, onChange, closePanel } ) {
 	const { name, kind, title, key } = record;
 	const parentBlockId = useSelect( ( select ) => {
 		// Get entity's blocks.
@@ -40,10 +40,6 @@ function EntityRecordState( { record, checked, onChange } ) {
 		[]
 	);
 
-	// For small sizes panel takes up entire screen, must dismiss panel on selecting blocks.
-	const { closeEntitiesSavedStates: closePanel } = useDispatch(
-		'core/editor'
-	);
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
 		closePanel();
@@ -76,7 +72,12 @@ function EntityRecordState( { record, checked, onChange } ) {
 	);
 }
 
-function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
+function EntityTypeList( {
+	list,
+	unselectedEntities,
+	setUnselectedEntities,
+	closePanel,
+} ) {
 	const firstRecord = list[ 0 ];
 	const entity = useSelect(
 		( select ) =>
@@ -116,6 +117,7 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 						onChange={ ( value ) =>
 							setUnselectedEntities( record, value )
 						}
+						closePanel={ closePanel }
 					/>
 				);
 			} ) }
@@ -202,6 +204,7 @@ export default function EntitiesSavedStates( { isOpen, closePanel } ) {
 					<EntityTypeList
 						key={ list[ 0 ].name }
 						list={ list }
+						closePanel={ dismissPanel }
 						unselectedEntities={ unselectedEntities }
 						setUnselectedEntities={ setUnselectedEntities }
 					/>
