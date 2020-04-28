@@ -4,7 +4,8 @@
 import memize from 'memize';
 import { size, map, without } from 'lodash';
 import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
-
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 /**
  * WordPress dependencies
  */
@@ -14,11 +15,11 @@ import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { SlotFillProvider } from '@wordpress/components';
-
 /**
  * Internal dependencies
  */
 import Layout from './components/layout';
+import ModalScreen from './my-modal';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -125,17 +126,63 @@ class Editor extends Component {
 			meta: [],
 		};
 
+		const MainStack = createStackNavigator();
+		const RootStack = createStackNavigator();
+		const LayoutComponent = () => (
+			<Layout setTitleRef={ this.setTitleRef } />
+		);
+
+		function MainStackScreen() {
+			return (
+				<MainStack.Navigator>
+					<MainStack.Screen
+						name="Root"
+						component={ LayoutComponent }
+						options={ { headerShown: false } }
+					/>
+				</MainStack.Navigator>
+			);
+		}
+
+		function RootStackScreen() {
+			return (
+				<RootStack.Navigator mode="modal">
+					<RootStack.Screen
+						name="Main"
+						component={ MainStackScreen }
+						options={ { headerShown: false } }
+					/>
+					<RootStack.Screen
+						options={ {
+							headerShown: false,
+							height: 100,
+							cardOverlayEnabled: true,
+							transparentCard: true,
+							cardStyle: {
+								backgroundColor: 'transparent',
+								opacity: 1,
+							},
+						} }
+						name="MyModal"
+						component={ ModalScreen }
+					/>
+				</RootStack.Navigator>
+			);
+		}
+
 		return (
 			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
+				<NavigationContainer>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<RootStackScreen />
+					</EditorProvider>
+				</NavigationContainer>
 			</SlotFillProvider>
 		);
 	}
