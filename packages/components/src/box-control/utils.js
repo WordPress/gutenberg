@@ -15,6 +15,7 @@ export const LABELS = {
 	bottom: __( 'Bottom' ),
 	left: __( 'Left' ),
 	right: __( 'Right' ),
+	mixed: __( 'Mixed' ),
 };
 
 export const DEFAULT_VALUES = {

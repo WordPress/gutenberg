@@ -6,9 +6,10 @@ import { UnitControlWrapper } from './styles/box-control-styles';
 
 export default function BoxUnitControl( { label, style, value, ...props } ) {
 	const styles = {
-		marginTop: -2,
-		maxWidth: 70,
+		marginTop: -3,
+		maxWidth: 80,
 		position: 'absolute',
+		width: '100%',
 		zIndex: 1,
 		...style,
 	};
@@ -22,7 +23,6 @@ export default function BoxUnitControl( { label, style, value, ...props } ) {
 				isFloatingLabel
 				label={ label }
 				isResetValueOnUnitChange={ false }
-				size="small"
 				style={ styles }
 				value={ value }
 				{ ...props }

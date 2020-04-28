@@ -16,7 +16,7 @@ import InputControls from './input-controls';
 import Text from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
-import { Root, Header, LayoutContainer } from './styles/box-control-styles';
+import { Root, Header } from './styles/box-control-styles';
 
 const defaultInputProps = {
 	min: 0,
@@ -60,15 +60,13 @@ export default function BoxControl( {
 					/>
 				</Flex.Item>
 			</Header>
-			<LayoutContainer className="component-box-control__input-controls-wrapper">
-				<InputControls
-					{ ...inputProps }
-					onChange={ onChange }
-					isLinked={ isLinked }
-					units={ units }
-					values={ values }
-				/>
-			</LayoutContainer>
+			<InputControls
+				{ ...inputProps }
+				onChange={ onChange }
+				isLinked={ isLinked }
+				units={ units }
+				values={ values }
+			/>
 		</Root>
 	);
 }

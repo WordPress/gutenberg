@@ -4,20 +4,14 @@
 import { noop } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { memo } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import UnitControl from './unit-control';
 import { LABELS, getAllValue, useBoxControlState } from './utils';
 import {
+	LayoutContainer,
 	Layout,
 	LayoutBox,
-	SideIndicatorX,
-	SideIndicatorY,
 } from './styles/box-control-styles';
 import { useRtl } from '../utils/style-mixins';
 
@@ -38,6 +32,9 @@ export default function BoxInputControls( {
 
 	const isRtl = useRtl();
 	const allValue = getAllValue( values );
+	const allPlaceholder = isNaN( parseFloat( allValue ) )
+		? LABELS.mixed
+		: null;
 
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
@@ -76,83 +73,79 @@ export default function BoxInputControls( {
 		handleOnChange( nextValues );
 	};
 
-	return (
-		<Layout className="component-box-control__input-controls">
-			<LayoutBoxUI />
+	/**
+	 * All sides
+	 */
+	if ( isLinked ) {
+		return (
 			<UnitControl
 				{ ...props }
-				disabled={ isLinked }
-				value={ top }
-				dragDirection="s"
-				onChange={ createHandleOnChange( 'top' ) }
-				label={ LABELS.top }
-				style={ {
-					marginTop: -5,
-					left: '50%',
-					transform: 'translateX(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				disabled={ isLinked }
-				value={ left }
-				dragDirection="e"
-				onChange={ createHandleOnChange( 'left' ) }
-				label={ LABELS.left }
-				style={ {
-					position: 'absolute',
-					[ isRtl ? 'right' : 'left' ]: 0,
-					top: '50%',
-					transform: 'translateY(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				disabled={ ! isLinked }
 				value={ allValue }
 				onChange={ createHandleOnChange( 'all' ) }
-				label={ LABELS.all }
-				style={ {
-					left: '50%',
-					top: '50%',
-					transform: 'translate(-50%, -50%)',
-				} }
+				placeholder={ allPlaceholder }
+				style={ { position: 'relative' } }
 			/>
-			<UnitControl
-				{ ...props }
-				disabled={ isLinked }
-				value={ right }
-				dragDirection="w"
-				onChange={ createHandleOnChange( 'right' ) }
-				label={ LABELS.right }
-				style={ {
-					[ isRtl ? 'left' : 'right' ]: 0,
-					top: '50%',
-					transform: 'translateY(-50%)',
-				} }
-			/>
-			<UnitControl
-				{ ...props }
-				disabled={ isLinked }
-				value={ bottom }
-				dragDirection="n"
-				onChange={ createHandleOnChange( 'bottom' ) }
-				label={ LABELS.bottom }
-				style={ {
-					left: '50%',
-					marginTop: -5,
-					bottom: 0,
-					transform: 'translateX(-50%)',
-				} }
-			/>
-		</Layout>
+		);
+	}
+
+	/**
+	 * Individual sides
+	 */
+	return (
+		<LayoutContainer className="component-box-control__input-controls-wrapper">
+			<Layout className="component-box-control__input-controls">
+				<LayoutBox aria-hidden="true" />
+				<UnitControl
+					{ ...props }
+					value={ top }
+					dragDirection="s"
+					onChange={ createHandleOnChange( 'top' ) }
+					label={ LABELS.top }
+					style={ {
+						marginTop: -7,
+						top: 0,
+						left: '50%',
+						transform: 'translateX(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					value={ left }
+					dragDirection="e"
+					onChange={ createHandleOnChange( 'left' ) }
+					label={ LABELS.left }
+					style={ {
+						position: 'absolute',
+						[ isRtl ? 'right' : 'left' ]: 0,
+						top: '50%',
+						transform: 'translateY(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					value={ right }
+					dragDirection="w"
+					onChange={ createHandleOnChange( 'right' ) }
+					label={ LABELS.right }
+					style={ {
+						[ isRtl ? 'left' : 'right' ]: 0,
+						top: '50%',
+						transform: 'translateY(-50%)',
+					} }
+				/>
+				<UnitControl
+					{ ...props }
+					value={ bottom }
+					dragDirection="n"
+					onChange={ createHandleOnChange( 'bottom' ) }
+					label={ LABELS.bottom }
+					style={ {
+						left: '50%',
+						bottom: -2,
+						transform: 'translateX(-50%)',
+					} }
+				/>
+			</Layout>
+		</LayoutContainer>
 	);
 }
-
-const LayoutBoxUI = memo( () => (
-	<>
-		<SideIndicatorX aria-hidden="true" />
-		<SideIndicatorY aria-hidden="true" />
-		<LayoutBox aria-hidden="true" />
-	</>
-) );
