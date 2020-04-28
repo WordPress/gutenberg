@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, difference } from 'lodash';
+import { groupBy, isEqual, difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,7 @@ function createMenuItemAttributesFromBlock( block ) {
 }
 
 export default function useNavigationBlocks( menuId ) {
+	// menuItems is an array of menu item objects.
 	const menuItems = useSelect(
 		( select ) =>
 			select( 'core' ).getMenuItems( { menus: menuId, per_page: -1 } ),
@@ -46,13 +47,7 @@ export default function useNavigationBlocks( menuId ) {
 			return;
 		}
 
-		const itemIndex = {};
-		menuItems.forEach( ( item ) => {
-			if ( ! itemIndex[ item.parent ] ) {
-				itemIndex[ item.parent ] = [];
-			}
-			itemIndex[ item.parent ].push( item );
-		} );
+		const itemsByParentID = groupBy( menuItems, 'parent' );
 
 		menuItemsRef.current = {};
 
@@ -60,9 +55,9 @@ export default function useNavigationBlocks( menuId ) {
 			const innerBlocks = [];
 			for ( const item of items ) {
 				let menuItemInnerBlocks = [];
-				if ( itemIndex[ item.id ] && itemIndex[ item.id ].length > 0 ) {
+				if ( itemsByParentID[ item.id ]?.length ) {
 					menuItemInnerBlocks = createMenuItemBlocks(
-						itemIndex[ item.id ]
+						itemsByParentID[ item.id ]
 					);
 				}
 				const block = createBlockFromMenuItem(
@@ -75,7 +70,8 @@ export default function useNavigationBlocks( menuId ) {
 			return innerBlocks;
 		};
 
-		const innerBlocks = createMenuItemBlocks( itemIndex[ 0 ] );
+		// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+		const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] );
 		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
 	}, [ menuItems ] );
 
@@ -84,13 +80,11 @@ export default function useNavigationBlocks( menuId ) {
 
 		const saveNestedBlocks = ( nestedBlocks, parentId ) => {
 			for ( const block of nestedBlocks ) {
-				if ( block.innerBlocks && block.innerBlocks.length > 0 ) {
+				if ( block.innerBlocks.length ) {
 					saveNestedBlocks( block.innerBlocks, block.clientId );
 				}
 				const menuItem = menuItemsRef.current[ block.clientId ];
-				const parentItemId =
-					menuItemsRef.current[ parentId ] &&
-					menuItemsRef.current[ parentId ].id;
+				const parentItemId = menuItemsRef.current[ parentId ]?.id;
 				if ( ! menuItem ) {
 					saveMenuItem( {
 						...createMenuItemAttributesFromBlock( block ),
