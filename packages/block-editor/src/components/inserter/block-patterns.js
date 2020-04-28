@@ -18,6 +18,8 @@ import { __, sprintf, _x } from '@wordpress/i18n';
 import BlockPreview from '../block-preview';
 import useAsyncList from './use-async-list';
 import InserterPanel from './panel';
+import { searchItems } from './search-items';
+import InserterNoResults from './no-results';
 
 function BlockPattern( { pattern, onClick } ) {
 	const { content } = pattern;
@@ -47,8 +49,12 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatterns( { patterns, onInsert } ) {
-	const currentShownPatterns = useAsyncList( patterns );
+function BlockPatterns( { patterns, onInsert, filterValue } ) {
+	const filteredPatterns = useMemo(
+		() => searchItems( patterns, filterValue ),
+		[ filterValue, patterns ]
+	);
+	const currentShownPatterns = useAsyncList( filteredPatterns );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
@@ -64,9 +70,15 @@ function BlockPatterns( { patterns, onInsert } ) {
 		);
 	}, [] );
 
-	return (
-		<InserterPanel title={ _x( 'All', 'patterns' ) }>
-			{ patterns.map( ( pattern, index ) =>
+	return !! filteredPatterns.length ? (
+		<InserterPanel
+			title={
+				filterValue
+					? _x( 'Search Results', 'patterns' )
+					: _x( 'All', 'patterns' )
+			}
+		>
+			{ filteredPatterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
 						key={ index }
@@ -78,6 +90,8 @@ function BlockPatterns( { patterns, onInsert } ) {
 				)
 			) }
 		</InserterPanel>
+	) : (
+		<InserterNoResults filterValue={ filterValue } />
 	);
 }
 
