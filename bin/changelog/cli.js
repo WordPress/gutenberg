@@ -12,27 +12,37 @@ const chalk = require( 'chalk' );
  */
 const getChangelog = require( './get-changelog' );
 
+/**
+ * @typedef WPChangelogSettings
+ *
+ * @property {string}  owner     Repository owner.
+ * @property {string}  repo      Repository name.
+ * @property {string=} token     Optional personal access token.
+ * @property {string}  milestone Milestone title.
+ */
+
+/**
+ * Optional GitHub token used to authenticate requests.
+ *
+ * @type {string=}
+ */
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+
 const success = chalk.bold.green;
 
 /* eslint-disable no-console */
 
-async function createChangelog( { repository } ) {
+/**
+ * Generates and logs changelog for a milestone.
+ *
+ * @param {Partial<WPChangelogSettings>} settings Changelog settings.
+ */
+async function createChangelog( settings ) {
 	console.log(
 		chalk.bold( '💃 Time to prepare the Gutenberg Changelog 🕺\n\n' )
 	);
 
-	const { token } = await inquirer.prompt( [
-		{
-			type: 'input',
-			name: 'token',
-			message:
-				'Please provide a GitHub personal authentication token. Navigate to ' +
-				success(
-					'https://github.com/settings/tokens/new?scopes=public_repo,admin:org,user'
-				) +
-				' to create one.',
-		},
-	] );
+	/** @type {{milestone:string}} */
 	const { milestone } = await inquirer.prompt( [
 		{
 			type: 'input',
@@ -40,13 +50,17 @@ async function createChangelog( { repository } ) {
 			message:
 				'The milestone name is needed to generate the changelog. ' +
 				'Write it as it appears on the milestones page: ' +
-				success( `https://github.com/${ repository }/milestones` ),
+				success(
+					`https://github.com/${ settings.owner }/${ settings.repo }/milestones`
+				),
 		},
 	] );
 
 	let changelog;
 	try {
-		changelog = await getChangelog( token, repository, milestone );
+		changelog = await getChangelog(
+			/** @type {WPChangelogSettings} */ ( { ...settings, milestone } )
+		);
 	} catch ( error ) {
 		changelog = chalk.yellow( error.stack );
 	}
@@ -57,7 +71,9 @@ async function createChangelog( { repository } ) {
 }
 
 createChangelog( {
-	repository: 'WordPress/gutenberg',
+	owner: 'WordPress',
+	repo: 'gutenberg',
+	token: GITHUB_TOKEN,
 } );
 
 /* eslint-enable no-console */

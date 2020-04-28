@@ -4,19 +4,29 @@
  * External dependencies
  */
 const { groupBy } = require( 'lodash' );
+const Octokit = require( '@octokit/rest' );
 
 /*
  * Internal dependencies
  */
-const { getEntry, getPullRequestType } = require( './get-entry' );
+const { getEntry, getIssueType } = require( './get-entry' );
 const { fetchAllPullRequests } = require( './requests' );
 
-async function getChangelog( token, repository, milestone ) {
-	const pullRequests = await fetchAllPullRequests(
-		token,
-		repository,
-		milestone
-	);
+/** @typedef {import('./cli').WPChangelogSettings} WPChangelogSettings */
+
+/**
+ * Returns a promise resolving to the changelog string for given settings.
+ *
+ * @param {WPChangelogSettings} settings Changelog settings.
+ *
+ * @return {Promise<string>} Promise resolving to changelog.
+ */
+async function getChangelog( settings ) {
+	const octokit = new Octokit( {
+		auth: settings.token,
+	} );
+
+	const pullRequests = await fetchAllPullRequests( octokit, settings );
 	if ( ! pullRequests || ! pullRequests.length ) {
 		throw new Error(
 			"This milestone doesn't have an associated pull request."
@@ -25,13 +35,13 @@ async function getChangelog( token, repository, milestone ) {
 
 	let changelog = '';
 
-	const groupedPullRequests = groupBy( pullRequests, getPullRequestType );
+	const groupedPullRequests = groupBy( pullRequests, getIssueType );
 	for ( const group of Object.keys( groupedPullRequests ) ) {
 		changelog += '### ' + group + '\n\n';
 
 		const groupPullRequests = groupedPullRequests[ group ];
 		for ( const pullRequest of groupPullRequests ) {
-			changelog += ( await getEntry( pullRequest ) ) + '\n';
+			changelog += getEntry( pullRequest ) + '\n';
 		}
 
 		changelog += '\n';

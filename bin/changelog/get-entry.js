@@ -1,35 +1,34 @@
 'use strict';
 
-/*
- * External dependencies
+/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
+
+/**
+ * Returns a type label for a given issue object, or a default if type cannot
+ * be determined.
+ *
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
+ *
+ * @return {string} Type label.
  */
-const { graphql } = require( '@octokit/graphql' );
-
-const getAuthenticatedRequestHeaders = ( token ) => {
-	return {
-		authorization: `token ${ token }`,
-		'user-agent': 'changelog-tool',
-	};
-};
-
-const getGraphqlClient = ( token ) => {
-	return graphql.defaults( {
-		headers: getAuthenticatedRequestHeaders( token ),
-	} );
-};
-
-const getPullRequestType = ( pullRequest ) => {
-	const typeLabel = pullRequest.labels.nodes.find( ( label ) =>
-		label.name.startsWith( '[Type]' )
+function getIssueType( issue ) {
+	const typeLabel = issue.labels.find( ( label ) =>
+		label.name.startsWith( '[Type] ' )
 	);
 
 	return typeLabel ? typeLabel.name.replace( /^\[Type\] /, '' ) : 'Various';
-};
+}
 
-const getEntry = ( pullRequest ) => {
+/**
+ * Returns a formatted changelog entry for a given issue object.
+ *
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
+ *
+ * @return {string} Formatted changelog entry.
+ */
+function getEntry( issue ) {
 	let title;
-	if ( /### Changelog\r\n\r\n> /.test( pullRequest.body ) ) {
-		const bodyParts = pullRequest.body.split( '### Changelog\r\n\r\n> ' );
+	if ( /### Changelog\r\n\r\n> /.test( issue.body ) ) {
+		const bodyParts = issue.body.split( '### Changelog\r\n\r\n> ' );
 		const note = bodyParts[ bodyParts.length - 1 ];
 		title = note
 			// Remove comment prompt
@@ -37,18 +36,17 @@ const getEntry = ( pullRequest ) => {
 			// Remove new lines and whitespace
 			.trim();
 		if ( ! title.length ) {
-			title = `${ pullRequest.title }`;
+			title = `${ issue.title }`;
 		} else {
 			title = `${ title }`;
 		}
 	} else {
-		title = `${ pullRequest.title }`;
+		title = `${ issue.title }`;
 	}
-	return `- ${ title } ([${ pullRequest.number }](${ pullRequest.url }))`;
-};
+	return `- ${ title } ([${ issue.number }](${ issue.url }))`;
+}
 
 module.exports = {
-	getPullRequestType,
-	getGraphqlClient,
+	getIssueType,
 	getEntry,
 };
