@@ -2,14 +2,16 @@
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
+const IgnoreEmitPlugin = require( 'ignore-emit-webpack-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const path = require( 'path' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const path = require( 'path' );
 
 /**
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const postcssConfig = require( '@wordpress/postcss-config' );
 
 /**
  * Internal dependencies
@@ -20,11 +22,6 @@ const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
 const config = {
-	optimization: {
-		// Only concatenate modules in production, when not analyzing bundles.
-		concatenateModules:
-			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
-	},
 	mode,
 	entry: {
 		index: path.resolve( process.cwd(), 'src', 'index.js' ),
@@ -39,25 +36,17 @@ const config = {
 		},
 	},
 	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		splitChunks: {
-			chunks: 'all',
 			cacheGroups: {
-				editor: {
-					name: 'editor',
-					test: /editor\.(sc|sa|c)ss$/,
+				styles: {
+					name: 'style',
+					test: /style\.(sc|sa|c)ss$/,
+					chunks: 'all',
 					enforce: true,
 				},
-				theme: {
-					name: 'theme',
-					test: /theme\.(sc|sa|c)ss$/,
-					enforce: true,
-				},
-				style: {
-					name: 'styles',
-					test: /\.(sc|sa|c)ss$/,
-					enforce: true,
-				},
-
 				default: false,
 			},
 		},
@@ -95,44 +84,50 @@ const config = {
 			},
 			{
 				test: /\.svg$/,
+				exclude: /node_modules/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 			},
 			{
 				test: /\.(sc|sa|c)ss$/,
+				exclude: /node_modules/,
 				use: [
 					{
 						loader: MiniCssExtractPlugin.loader,
 					},
 					{
 						loader: require.resolve( 'css-loader' ),
+						options: {
+							sourceMap: ! isProduction,
+						},
 					},
-					/**
-					 * Configuring PostCSS with Webpack
-					 * https://github.com/postcss/postcss-loader#plugins
-					 */
 					{
 						loader: require.resolve( 'postcss-loader' ),
 						options: {
 							ident: 'postcss',
-							plugins: () =>
-								require.resolve( '@wordpress/postcss-config' ),
+							plugins: postcssConfig.plugins,
 						},
 					},
 					{
 						loader: require.resolve( 'sass-loader' ),
+						options: {
+							sourceMap: ! isProduction,
+						},
 					},
 				],
 			},
 		],
 	},
 	plugins: [
-		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
-		// content as a convenient interactive zoomable treemap.
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
+		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCssExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCssExtractPlugin(),
-		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
-		// when running watch mode.
+		new MiniCssExtractPlugin( { esModule: false, filename: '[name].css' } ),
+		// MiniCssExtractPlugin creates JavaScript assets for CSS that are
+		// obsolete and should be removed.
+		new IgnoreEmitPlugin( [ 'style.js' ] ),
+		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
+		// works when running watch mode.
 		! isProduction &&
 			new LiveReloadPlugin( {
 				port: process.env.WP_LIVE_RELOAD_PORT || 35729,

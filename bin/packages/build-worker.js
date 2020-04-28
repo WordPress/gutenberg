@@ -115,7 +115,7 @@ const BUILD_TASK_BY_EXTENSION = {
 		} );
 
 		const result = await postcss(
-			require( '@wordpress/postcss-config' )
+			require( '@wordpress/postcss-config' ).plugins()
 		).process( builtSass.css, {
 			from: 'src/app.css',
 			to: 'dest/app.css',
