@@ -113,6 +113,7 @@
 		"@wordpress/jest-puppeteer-axe": "file:packages/jest-puppeteer-axe",
 		"@wordpress/library-export-default-webpack-plugin": "file:packages/library-export-default-webpack-plugin",
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
+		"@wordpress/postcss-config": "file:packages/postcss-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",

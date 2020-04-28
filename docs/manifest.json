@@ -1506,6 +1506,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/postcss-config",
+		"slug": "packages-postcss-config",
+		"markdown_source": "../packages/postcss-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",

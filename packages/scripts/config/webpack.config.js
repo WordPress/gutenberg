@@ -4,7 +4,6 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const path = require( 'path' );
-const postcssPresetEnv = require( 'postcss-preset-env' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
 
 /**
@@ -48,16 +47,17 @@ const config = {
 					test: /editor\.(sc|sa|c)ss$/,
 					enforce: true,
 				},
-				style: {
-					name: 'styles',
-					test: /style\.(sc|sa|c)ss$/,
-					enforce: true,
-				},
 				theme: {
 					name: 'theme',
 					test: /theme\.(sc|sa|c)ss$/,
 					enforce: true,
 				},
+				style: {
+					name: 'styles',
+					test: /\.(sc|sa|c)ss$/,
+					enforce: true,
+				},
+
 				default: false,
 			},
 		},
@@ -106,31 +106,20 @@ const config = {
 					{
 						loader: require.resolve( 'css-loader' ),
 					},
-					{
-						loader: require.resolve( 'sass-loader' ),
-					},
+					/**
+					 * Configuring PostCSS with Webpack
+					 * https://github.com/postcss/postcss-loader#plugins
+					 */
 					{
 						loader: require.resolve( 'postcss-loader' ),
 						options: {
 							ident: 'postcss',
-							plugins: () => [
-								postcssPresetEnv( {
-									// Start with a stage.
-									stage: 3,
-									// Override specific features you do (or don't) want.
-									features: {
-										// And, optionally, configure rules/features as needed.
-										'custom-media-queries': {
-											preserve: false,
-										},
-										'custom-properties': {
-											preserve: true,
-										},
-										'nesting-rules': true,
-									},
-								} ),
-							],
+							plugins: () =>
+								require.resolve( '@wordpress/postcss-config' ),
 						},
+					},
+					{
+						loader: require.resolve( 'sass-loader' ),
 					},
 				],
 			},
@@ -140,7 +129,7 @@ const config = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
 		// content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCssExtractPlugin to extract the css thats gets imported into javascript
+		// MiniCssExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCssExtractPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.

@@ -1,5 +1,5 @@
 const path = require( 'path' );
-const postCssConfigPlugins = require( '../bin/packages/post-css-config' );
+const postCssConfigPlugins = require( '@wordpress/postcss-config' );
 
 module.exports = ( { config } ) => {
 	config.module.rules.push(

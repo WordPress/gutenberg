@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/postcss-config",
+	"version": "0.0.1",
+	"description": "PostCSS sharable configuration for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"postcss",
+		"css",
+		"postcss-config"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-config/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/postcss-config"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=10"
+	},
+	"files": [
+		"lib"
+	],
+	"main": "lib/index.js",
+	"dependencies": {
+		"@wordpress/base-styles": "file:../base-styles",
+		"@wordpress/postcss-themes": "file:../postcss-themes",
+		"autoprefixer": "^9.4.5",
+		"postcss-color-function": "^4.0.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
