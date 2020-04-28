@@ -49,8 +49,9 @@ function ToolbarButton( {
 					disabled={ props.isDisabled }
 					data-experimental-toolbar-item
 					{ ...extraProps }
-				/>
-				{ children }
+				>
+					{ children }
+				</Button>
 			</ToolbarButtonContainer>
 		);
 	}

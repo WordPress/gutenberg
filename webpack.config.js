@@ -13,7 +13,9 @@ const { basename, sep } = require( 'path' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const { camelCaseDash } = require( '@wordpress/scripts/utils' );
+const {
+	camelCaseDash,
+} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
 
 /**
  * Internal dependencies
@@ -26,7 +28,7 @@ const {
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(
@@ -188,5 +190,8 @@ module.exports = {
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	],
+	watchOptions: {
+		ignored: '!packages/*/!(src)/**/*',
+	},
 	devtool,
 };

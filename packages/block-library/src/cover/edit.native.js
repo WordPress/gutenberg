@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from 'react-native-gutenberg-bridge';
+import Video from 'react-native-video';
 
 /**
  * WordPress dependencies
@@ -21,15 +27,18 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
+	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
-import { cover as icon } from '@wordpress/icons';
+import { useEffect, useState } from '@wordpress/element';
+import { cover as icon, replace } from '@wordpress/icons';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -41,12 +50,11 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
-import { EditMediaIcon } from './edit-media-icon';
 
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE ];
+const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -62,19 +70,27 @@ const COVER_DEFAULT_HEIGHT = 300;
 const Cover = ( {
 	attributes,
 	getStylesFromColorScheme,
-	hasChildren,
 	isParentSelected,
 	onFocus,
 	overlayColor,
 	setAttributes,
 } ) => {
-	const { backgroundType, dimRatio, focalPoint, minHeight, url } = attributes;
+	const {
+		backgroundType,
+		dimRatio,
+		focalPoint,
+		minHeight,
+		url,
+		id,
+		style,
+	} = attributes;
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const { gradientValue } = __experimentalUseGradient();
 
 	const hasBackground = !! (
 		url ||
+		( style && style.color && style.color.background ) ||
 		attributes.overlayColor ||
 		overlayColor.color ||
 		gradientValue
@@ -92,7 +108,22 @@ const Cover = ( {
 		}
 	}, [ setAttributes ] );
 
+	// sync with local media store
+	useEffect( mediaUploadSync, [] );
+
+	// initialize uploading flag to false, awaiting sync
+	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+
+	// initialize upload failure flag to true if url is local
+	const [ didUploadFail, setDidUploadFail ] = useState(
+		id && getProtocol( url ) === 'file:'
+	);
+
+	// don't show failure if upload is in progress
+	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
+
 	const onSelectMedia = ( media ) => {
+		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
 		// Remove gradient attribute
 		setAttributes( { gradient: undefined, customGradient: undefined } );
@@ -109,26 +140,40 @@ const Cover = ( {
 		setAttributes( { dimRatio: value } );
 	};
 
+	const onMediaPressed = () => {
+		if ( isUploadInProgress ) {
+			requestImageUploadCancelDialog( id );
+		} else if ( shouldShowFailure ) {
+			requestImageFailedRetryDialog( id );
+		}
+	};
+
+	const [ isVideoLoading, setIsVideoLoading ] = useState( true );
+
+	const onVideoLoadStart = () => {
+		setIsVideoLoading( true );
+	};
+
+	const onVideoLoad = () => {
+		setIsVideoLoading( false );
+	};
+
+	const backgroundColor = getStylesFromColorScheme(
+		styles.backgroundSolid,
+		styles.backgroundSolidDark
+	);
+
 	const overlayStyles = [
 		styles.overlay,
-		{
+		url && { opacity: dimRatio / 100 },
+		! gradientValue && {
 			backgroundColor:
-				overlayColor && overlayColor.color
-					? overlayColor.color
-					: styles.overlay.color,
-			// Set opacity to 1 while video / theme color support is not available
-			opacity:
-				url && VIDEO_BACKGROUND_TYPE !== backgroundType
-					? dimRatio / 100
-					: 1,
+				overlayColor?.color ||
+				style?.color?.background ||
+				styles.overlay.color,
 		},
 		// While we don't support theme colors we add a default bg color
-		! overlayColor.color && ! url
-			? getStylesFromColorScheme(
-					styles.backgroundSolid,
-					styles.backgroundSolidDark
-			  )
-			: {},
+		! overlayColor.color && ! url ? backgroundColor : {},
 	];
 
 	const placeholderIconStyle = getStylesFromColorScheme(
@@ -143,7 +188,7 @@ const Cover = ( {
 			<ToolbarGroup>
 				<ToolbarButton
 					title={ __( 'Edit cover media' ) }
-					icon={ EditMediaIcon }
+					icon={ replace }
 					onClick={ open }
 				/>
 			</ToolbarGroup>
@@ -179,43 +224,76 @@ const Cover = ( {
 		</InspectorControls>
 	);
 
-	const containerStyles = [
-		hasChildren && ! isParentSelected && styles.regularMediaPadding,
-		hasChildren && isParentSelected && styles.innerPadding,
-	];
-
-	const background = ( openMediaOptions, getMediaOptions ) => (
+	const renderBackground = ( {
+		open: openMediaOptions,
+		getMediaOptions,
+	} ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
+			onPress={ onMediaPressed }
 			onLongPress={ openMediaOptions }
 			disabled={ ! isParentSelected }
 		>
-			<View style={ styles.background }>
+			<View style={ [ styles.background, backgroundColor ] }>
 				{ getMediaOptions() }
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
-
-				{ /* When the gradient is set as a background the backgroundType is equal to IMAGE_BACKGROUND_TYPE */ }
-				{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-					( gradientValue ? (
-						<LinearGradient
-							gradientValue={ gradientValue }
-							style={ styles.background }
-						/>
-					) : (
-						<ImageWithFocalPoint
-							focalPoint={ focalPoint }
-							url={ url }
-						/>
-					) ) }
+				<MediaUploadProgress
+					mediaId={ id }
+					onUpdateMediaProgress={ () => {
+						setIsUploadInProgress( true );
+					} }
+					onFinishMediaUploadWithSuccess={ ( {
+						mediaServerId,
+						mediaUrl,
+					} ) => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
+						setAttributes( {
+							id: mediaServerId,
+							url: mediaUrl,
+							backgroundType,
+						} );
+					} }
+					onFinishMediaUploadWithFailure={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( true );
+					} }
+					onMediaUploadStateReset={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
+						setAttributes( { id: undefined, url: undefined } );
+					} }
+				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						onLoad={ onVideoLoad }
+						onLoadStart={ onVideoLoadStart }
+						style={ [
+							styles.background,
+							// Hide Video component since it has black background while loading the source
+							{ opacity: isVideoLoading ? 0 : 1 },
+						] }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
 
 	if ( ! hasBackground ) {
 		return (
-			<View style={ containerStyles }>
+			<View>
 				<MediaPlaceholder
-					__experimentalOnlyMediaLibrary
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -229,33 +307,44 @@ const Cover = ( {
 	}
 
 	return (
-		<View style={ containerStyles }>
+		<View style={ styles.backgroundContainer }>
 			{ controls }
-			<View style={ styles.backgroundContainer }>
-				<View
-					pointerEvents="box-none"
-					style={ [
-						styles.content,
-						{ minHeight: CONTAINER_HEIGHT },
-					] }
-				>
-					<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
-				</View>
 
-				{ /* We don't render overlay on top of gradient */ }
-				{ ! gradientValue && (
-					<View pointerEvents="none" style={ overlayStyles } />
-				) }
-
-				<MediaUpload
-					__experimentalOnlyMediaLibrary
-					allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-					onSelect={ onSelectMedia }
-					render={ ( { open, getMediaOptions } ) => {
-						return background( open, getMediaOptions );
-					} }
-				/>
+			<View
+				pointerEvents="box-none"
+				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+			>
+				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>
+
+			<View pointerEvents="none" style={ overlayStyles }>
+				{ gradientValue && (
+					<LinearGradient
+						gradientValue={ gradientValue }
+						style={ styles.background }
+					/>
+				) }
+			</View>
+
+			<MediaUpload
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				onSelect={ onSelectMedia }
+				render={ renderBackground }
+			/>
+
+			{ shouldShowFailure && (
+				<View
+					pointerEvents="none"
+					style={ styles.uploadFailedContainer }
+				>
+					<View style={ styles.uploadFailed }>
+						<Icon
+							icon={ 'warning' }
+							{ ...styles.uploadFailedIcon }
+						/>
+					</View>
+				</View>
+			) }
 		</View>
 	);
 };
@@ -263,15 +352,11 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId, getBlockCount } = select(
-			'core/block-editor'
-		);
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const hasChildren = getBlockCount( clientId );
 
 		return {
-			hasChildren,
 			isParentSelected: selectedBlockClientId === clientId,
 		};
 	} ),

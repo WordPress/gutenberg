@@ -64,7 +64,7 @@ const BaseRangeControl = forwardRef(
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
 			step = 1,
-			value: valueProp = 0,
+			value: valueProp,
 			withInputField = true,
 			...props
 		},
@@ -72,7 +72,9 @@ const BaseRangeControl = forwardRef(
 	) => {
 		const isRTL = useRtl();
 
-		const sliderValue = valueProp || initialPosition;
+		const sliderValue =
+			valueProp !== undefined ? valueProp : initialPosition;
+
 		const [ value, setValue ] = useControlledRangeValue( {
 			min,
 			max,
@@ -95,8 +97,9 @@ const BaseRangeControl = forwardRef(
 		const isThumbFocused = ! disabled && isFocused;
 
 		const isValueReset = value === null;
-		const inputSliderValue = isValueReset ? '' : value;
-		const currentInputValue = isValueReset ? '' : value || currentInput;
+		const currentValue = value !== undefined ? value : currentInput;
+
+		const inputSliderValue = isValueReset ? '' : currentValue;
 
 		const rangeFillValue = isValueReset
 			? floatClamp( max / 2, min, max )
@@ -119,11 +122,19 @@ const BaseRangeControl = forwardRef(
 		const enableTooltip = showTooltipProp !== false && isFinite( value );
 
 		const handleOnChange = ( event ) => {
-			if ( ! event.target.checkValidity() ) {
+			if (
+				event.target.checkValidity &&
+				! event.target.checkValidity()
+			) {
 				return;
 			}
 
 			const nextValue = parseFloat( event.target.value );
+
+			if ( isNaN( nextValue ) ) {
+				handleOnReset();
+				return;
+			}
 
 			setValue( nextValue );
 			onChange( nextValue );
@@ -203,6 +214,7 @@ const BaseRangeControl = forwardRef(
 						/>
 						<RangeRail
 							aria-hidden={ true }
+							disabled={ disabled }
 							marks={ marks }
 							max={ max }
 							min={ min }
@@ -212,6 +224,7 @@ const BaseRangeControl = forwardRef(
 						<Track
 							aria-hidden={ true }
 							className="components-range-control__track"
+							disabled={ disabled }
 							style={ { width: fillValueOffset } }
 						/>
 						<ThumbWrapper style={ offsetStyle }>
@@ -240,20 +253,21 @@ const BaseRangeControl = forwardRef(
 						<InputNumber
 							aria-label={ label }
 							className="components-range-control__number"
+							disabled={ disabled }
 							inputMode="decimal"
 							max={ max }
 							min={ min }
 							onChange={ handleOnChange }
 							step={ step }
 							type="number"
-							value={ currentInputValue }
+							value={ inputSliderValue }
 						/>
 					) }
 					{ allowReset && (
 						<ActionRightWrapper>
 							<Button
 								className="components-range-control__reset"
-								disabled={ value === undefined }
+								disabled={ disabled || value === undefined }
 								isSecondary
 								isSmall
 								onClick={ handleOnReset }

@@ -4,14 +4,6 @@
 	max-width: none;
 }
 
-// Ideally this shouldn't be necessary. There should be no default margins in
-// the editor.
-.editor-styles-wrapper .block-editor-block-list__block.wp-block-column,
-.editor-styles-wrapper .block-editor-block-list__block.wp-block-columns {
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
 // To do: remove horizontal margin override by the editor.
 @include break-small() {
 	.editor-styles-wrapper

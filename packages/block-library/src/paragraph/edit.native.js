@@ -7,7 +7,6 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalUseColors,
 } from '@wordpress/block-editor';
 
 const name = 'core/paragraph';
@@ -17,56 +16,53 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
+	mergedStyle,
 	style,
 } ) {
 	const { align, content, placeholder } = attributes;
 
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
-	const { TextColor } = __experimentalUseColors( [
-		{ name: 'textColor', property: 'color' },
-	] );
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
+	const styles = {
+		...mergedStyle,
+		...style,
+	};
 
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					isCollapsed={ false }
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }
 				/>
 			</BlockControls>
-			<TextColor>
-				<RichText
-					identifier="content"
-					tagName="p"
-					value={ content }
-					deleteEnter={ true }
-					style={ style }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( name );
-						}
+			<RichText
+				identifier="content"
+				tagName="p"
+				value={ content }
+				deleteEnter={ true }
+				style={ styles }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				onSplit={ ( value ) => {
+					if ( ! value ) {
+						return createBlock( name );
+					}
 
-						return createBlock( name, {
-							...attributes,
-							content: value,
-						} );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-					placeholder={ placeholder || __( 'Start writing…' ) }
-					textAlign={ align }
-				/>
-			</TextColor>
+					return createBlock( name, {
+						...attributes,
+						content: value,
+					} );
+				} }
+				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
+				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+				placeholder={ placeholder || __( 'Start writing…' ) }
+				textAlign={ align }
+			/>
 		</>
 	);
 }

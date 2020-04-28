@@ -1,5 +1,5 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 /**
  * Default request to global transformation
@@ -79,8 +79,6 @@ function defaultRequestToHandle( request ) {
  * converting to uppercase, where Lodash will also capitalize letters
  * following numbers.
  *
- * Temporarily duplicated from @wordpress/scripts/utils.
- *
  * @param {string} string Input dash-delimited string.
  *
  * @return {string} Camel-cased string.
@@ -92,6 +90,7 @@ function camelCaseDash( string ) {
 }
 
 module.exports = {
+	camelCaseDash,
 	defaultRequestToExternal,
 	defaultRequestToHandle,
 };

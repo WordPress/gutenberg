@@ -344,12 +344,6 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-### StoryShots
-
-> [StoryShots](https://www.npmjs.com/package/@storybook/addon-storyshots) adds automatic Jest Snapshot Testing for [Storybook](https://storybook.js.org/).
-
-Whenever a new story is added to Storybook, `npm run test-unit` needs to be executed to generate the corresponding snapshots. In the case when the existing story gets updated or removed, please refer to [Working with snapshots](#working-with-snapshots) section.
-
 #### Troubleshooting
 
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
@@ -357,6 +351,11 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 - [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
 
 In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+
+### Debugging Jest unit tests
+
+Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+
 ## Native mobile testing
 
 Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
@@ -372,7 +371,9 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
-## End to end Testing
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
@@ -390,6 +391,12 @@ Sometimes it's useful to observe the browser while running tests. To do so you c
 
 ```bash
 PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+```
+
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+PUPPETEER_HEADLESS=false PUPPETEER_DEVTOOLS=true npm run test-e2e:watch
 ```
 
 If you're using a different setup, you can provide the base URL, username and password like this:
@@ -419,7 +426,7 @@ Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-e
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 

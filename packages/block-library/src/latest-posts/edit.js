@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, invoke, isUndefined, pickBy } from 'lodash';
+import { get, includes, invoke, isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,7 +18,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
-	FormTokenField,
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -105,20 +104,33 @@ class LatestPostsEdit extends Component {
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
 		} = attributes;
-		const suggestions = categoriesList.reduce(
+		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
 				...accumulator,
 				[ category.name ]: category,
 			} ),
 			{}
 		);
-
 		const selectCategories = ( tokens ) => {
+			const hasNoSuggestion = tokens.some(
+				( token ) =>
+					typeof token === 'string' && ! categorySuggestions[ token ]
+			);
+			if ( hasNoSuggestion ) {
+				return;
+			}
 			// Categories that are already will be objects, while new additions will be strings (the name).
 			// allCategories nomalizes the array so that they are all objects.
-			const allCategories = tokens.map( ( token ) =>
-				typeof token === 'string' ? suggestions[ token ] : token
-			);
+			const allCategories = tokens.map( ( token ) => {
+				return typeof token === 'string'
+					? categorySuggestions[ token ]
+					: token;
+			} );
+			// We do nothing if the category is not selected
+			// from suggestions.
+			if ( includes( allCategories, null ) ) {
+				return false;
+			}
 			setAttributes( { categories: allCategories } );
 		};
 
@@ -243,21 +255,11 @@ class LatestPostsEdit extends Component {
 						onNumberOfItemsChange={ ( value ) =>
 							setAttributes( { postsToShow: value } )
 						}
+						categorySuggestions={ categorySuggestions }
+						onCategoryChange={ selectCategories }
+						selectedCategories={ categories }
 					/>
-					{ categoriesList.length > 0 && (
-						<FormTokenField
-							label={ __( 'Categories' ) }
-							value={
-								categories &&
-								categories.map( ( item ) => ( {
-									id: item.id,
-									value: item.name || item.value,
-								} ) )
-							}
-							suggestions={ Object.keys( suggestions ) }
-							onChange={ selectCategories }
-						/>
-					) }
+
 					{ postLayout === 'grid' && (
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -357,20 +359,30 @@ class LatestPostsEdit extends Component {
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
 
-						const postExcerpt =
+						const needsReadMore =
 							excerptLength <
 								excerpt.trim().split( ' ' ).length &&
-							post.excerpt.raw === ''
-								? excerpt
-										.trim()
-										.split( ' ', excerptLength )
-										.join( ' ' ) +
-								  ' ... <a href=' +
-								  post.link +
-								  'target="_blank" rel="noopener noreferrer">' +
-								  __( 'Read more' ) +
-								  '</a>'
-								: excerpt;
+							post.excerpt.raw === '';
+
+						const postExcerpt = needsReadMore ? (
+							<>
+								{ excerpt
+									.trim()
+									.split( ' ', excerptLength )
+									.join( ' ' ) }
+								{ /* translators: excerpt truncation character, default …  */ }
+								{ __( ' … ' ) }
+								<a
+									href={ post.link }
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{ __( 'Read more' ) }
+								</a>
+							</>
+						) : (
+							excerpt
+						);
 
 						return (
 							<li key={ i }>
@@ -416,9 +428,7 @@ class LatestPostsEdit extends Component {
 								{ displayPostContent &&
 									displayPostContentRadio === 'excerpt' && (
 										<div className="wp-block-latest-posts__post-excerpt">
-											<RawHTML key="html">
-												{ postExcerpt }
-											</RawHTML>
+											{ postExcerpt }
 										</div>
 									) }
 								{ displayPostContent &&
@@ -469,8 +479,16 @@ export default withSelect( ( select, props ) => {
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	return {
-		defaultImageWidth: imageDimensions[ featuredImageSizeSlug ].width,
-		defaultImageHeight: imageDimensions[ featuredImageSizeSlug ].height,
+		defaultImageWidth: get(
+			imageDimensions,
+			[ featuredImageSizeSlug, 'width' ],
+			0
+		),
+		defaultImageHeight: get(
+			imageDimensions,
+			[ featuredImageSizeSlug, 'height' ],
+			0
+		),
 		imageSizeOptions,
 		latestPosts: ! Array.isArray( posts )
 			? posts

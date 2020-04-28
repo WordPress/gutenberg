@@ -8,24 +8,59 @@ Ensure that Docker is running, then:
 
 ```sh
 $ cd /path/to/a/wordpress/plugin
-$ npx wp-env start
+$ npm -g i @wordpress/env
+$ wp-env start
 ```
 
 The local environment will be available at http://localhost:8888.
 
-## Instructions
-
-### Installation
+## Prerequisites
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After confirming that Docker is installed, you can install `wp-env` globally like so:
+Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+
+## Installation
+
+### Installation as a global package
+
+After confirming that the prerequisites are installed, you can install `wp-env` globally like so:
 
 ```sh
 $ npm -g i @wordpress/env
 ```
 
 You're now ready to use `wp-env`!
+
+### Installation as a local package
+
+If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally as a dev dependency:
+
+```sh
+$ npm i @wordpress/env --save-dev
+```
+
+Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+
+```json
+"scripts": {
+	"wp-env": "wp-env"
+}
+```
+
+When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
+
+```sh
+$ npm run wp-env start
+```
+
+instead of:
+
+```sh
+$ wp-env start
+```
+
+## Usage
 
 ### Starting the environment
 
@@ -43,7 +78,7 @@ Then, start the local environment:
 $ wp-env start
 ```
 
-Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
+Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated. Default login credentials are username: `admin` password: `password`.
 
 ### Stopping the environment
 
@@ -175,6 +210,40 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
+### `wp-env run [container] [command]` 
+
+```sh
+wp-env run <container> [command..]
+
+Runs an arbitrary command in one of the underlying Docker containers, for
+example it's useful for running wp cli commands.
+
+
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
+```
+
+For example:
+
+```sh
+wp-env run cli wp user list
+⠏ Running `wp user list` in 'cli'.
+
+ID      user_login      display_name    user_email      user_registered roles
+1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
+
+✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
+### `docker logs -f [container_id] >/dev/null` 
+
+```sh
+docker logs -f <container_id> >/dev/null 
+
+Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
@@ -183,7 +252,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 | Field         | Type          | Default                                    | Description                                                                                                               |
 | ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`      | `string|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
 | `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
 | `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
 | `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
@@ -196,8 +265,8 @@ Several types of strings can be passed into the `core`, `plugins`, and `themes` 
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| Relative path     | `.<path>\|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
 | GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 

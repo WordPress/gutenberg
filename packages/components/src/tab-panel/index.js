@@ -78,9 +78,13 @@ class TabPanel extends Component {
 				>
 					{ tabs.map( ( tab ) => (
 						<TabButton
-							className={ classnames( tab.className, {
-								[ activeClass ]: tab.name === selected,
-							} ) }
+							className={ classnames(
+								'components-tab-panel__tabs-item',
+								tab.className,
+								{
+									[ activeClass ]: tab.name === selected,
+								}
+							) }
 							tabId={ instanceId + '-' + tab.name }
 							aria-controls={
 								instanceId + '-' + tab.name + '-view'
@@ -99,7 +103,6 @@ class TabPanel extends Component {
 						role="tabpanel"
 						id={ selectedId + '-view' }
 						className="components-tab-panel__tab-content"
-						tabIndex="0"
 					>
 						{ this.props.children( selectedTab ) }
 					</div>

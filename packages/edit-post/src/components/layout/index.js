@@ -17,7 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalEditorSkeleton as EditorSkeleton,
+	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -28,6 +28,13 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
+import {
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+} from '@wordpress/interface';
+import { useState, useEffect } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,25 +45,31 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
 import OptionsModal from '../options-modal';
-import FullscreenMode from '../fullscreen-mode';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
-import Sidebar from '../sidebar';
 import MetaBoxes from '../meta-boxes';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
+const interfaceLabels = {
+	leftSidebar: __( 'Block Library' ),
+};
+
 function Layout() {
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
+		closeGeneralSidebar,
 		togglePublishSidebar,
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
+		isFullscreenActive,
 		isRichEditingEnabled,
 		editorSidebarOpened,
 		pluginSidebarOpened,
@@ -81,6 +94,9 @@ function Layout() {
 			publishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
@@ -108,9 +124,21 @@ function Layout() {
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Inserter and Sidebars are mutually exclusive
+	useEffect( () => {
+		if ( sidebarIsOpened && ! isHugeViewport ) {
+			setIsInserterOpen( false );
+		}
+	}, [ sidebarIsOpened, isHugeViewport ] );
+	useEffect( () => {
+		if ( isInserterOpen && ! isHugeViewport ) {
+			closeGeneralSidebar();
+		}
+	}, [ isInserterOpen, isHugeViewport ] );
+
 	return (
 		<>
-			<FullscreenMode />
+			<FullscreenMode isActive={ isFullscreenActive } />
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
@@ -118,9 +146,42 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorSkeleton
+				<InterfaceSkeleton
 					className={ className }
-					header={ <Header /> }
+					labels={ interfaceLabels }
+					header={
+						<Header
+							isInserterOpen={ isInserterOpen }
+							onToggleInserter={ () =>
+								setIsInserterOpen( ! isInserterOpen )
+							}
+						/>
+					}
+					leftSidebar={
+						mode === 'visual' &&
+						isInserterOpen && (
+							<div className="edit-post-layout__inserter-panel">
+								<div className="edit-post-layout__inserter-panel-header">
+									<Button
+										icon={ close }
+										onClick={ () =>
+											setIsInserterOpen( false )
+										}
+									/>
+								</div>
+								<div className="edit-post-layout__inserter-panel-content">
+									<Library
+										showInserterHelpPanel
+										onSelect={ () => {
+											if ( isMobileViewport ) {
+												setIsInserterOpen( false );
+											}
+										} }
+									/>
+								</div>
+							</div>
+						)
+					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>
@@ -141,7 +202,7 @@ function Layout() {
 									</div>
 								) }
 								<SettingsSidebar />
-								<Sidebar.Slot />
+								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)
 					}
@@ -172,7 +233,7 @@ function Layout() {
 							</div>
 						)
 					}
-					publish={
+					actions={
 						publishSidebarOpened ? (
 							<PostPublishPanel
 								onClose={ closePublishSidebar }

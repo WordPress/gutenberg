@@ -34,44 +34,43 @@
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;
-	padding-left: $grid-unit-30;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	.table-of-contents {
+		display: none;
+
+		@include break-small() {
+			display: block;
+		}
+	}
 }
 
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: wrap;
-	padding-right: $grid-unit-20;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-20;
+	}
 }
 
 
 /**
  * Buttons in the Toolbar
  */
-
-.edit-post-header__toolbar {
-	.block-editor-inserter__toggle {
-		// Special dimensions for this button.
-		min-width: 32px;
-		height: 32px;
-		margin-right: $grid-unit-10;
-	}
-}
-
-
 .edit-post-header__settings {
-	// Header toggle buttons.
-	.components-button.is-pressed {
-		color: $white;
-		background: $dark-gray-primary;
-	}
-
 	// Adjust button paddings to scale better to mobile.
 	.components-button.editor-post-save-draft,
 	.editor-post-saved-state,
 	.components-button.editor-post-switch-to-draft,
 	.components-button.editor-post-preview,
-	.components-button.editor-post-preview__dropdown,
+	.components-button.block-editor-post-preview__dropdown,
 	.components-button.editor-post-publish-button,
 	.components-button.editor-post-publish-panel__toggle {
 		padding: 0 6px;
@@ -81,5 +80,30 @@
 			padding: 0 12px;
 			margin-right: $grid-unit-15;
 		}
+	}
+}
+
+.edit-post-header-preview__grouping-external {
+	display: flex;
+	position: relative;
+	padding-bottom: 0;
+}
+
+.edit-post-header-preview__button-external {
+	padding-left: $grid-unit-10;
+
+	margin-right: auto;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+
+	svg {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.edit-post-post-preview-dropdown {
+	.components-popover__content {
+		padding-bottom: 0;
 	}
 }

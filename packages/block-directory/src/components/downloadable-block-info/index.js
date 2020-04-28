@@ -19,6 +19,7 @@ function DownloadableBlockInfo( {
 				<div className="block-directory-downloadable-block-info__column">
 					<Icon icon={ chartLine }></Icon>
 					{ sprintf(
+						/* translators: %s: number of active installations. */
 						_n(
 							'%d active installation',
 							'%d active installations',

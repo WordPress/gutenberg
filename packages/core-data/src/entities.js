@@ -22,6 +22,9 @@ export const defaultEntities = [
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
+		getTitle: ( record ) => {
+			return get( record, [ 'title' ], __( 'Site Title' ) );
+		},
 	},
 	{
 		label: __( 'Post Type' ),
@@ -59,6 +62,34 @@ export const defaultEntities = [
 		kind: 'root',
 		baseURL: '/wp/v2/users',
 		plural: 'users',
+	},
+	{
+		name: 'comment',
+		kind: 'root',
+		baseURL: '/wp/v2/comments',
+		plural: 'comments',
+		label: __( 'Comment' ),
+	},
+	{
+		name: 'menu',
+		kind: 'root',
+		baseURL: '/__experimental/menus',
+		plural: 'menus',
+		label: __( 'Menu' ),
+	},
+	{
+		name: 'menuItem',
+		kind: 'root',
+		baseURL: '/__experimental/menu-items',
+		plural: 'menuItems',
+		label: __( 'Menu Item' ),
+	},
+	{
+		name: 'menuLocation',
+		kind: 'root',
+		baseURL: '/__experimental/menu-locations',
+		plural: 'menuLocations',
+		label: __( 'Menu Location' ),
 	},
 ];
 
