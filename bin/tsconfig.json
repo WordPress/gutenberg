@@ -16,10 +16,6 @@
 	"files": [
 		"./api-docs/update-api-docs.js",
 		"./check-latest-npm.js",
-		"./changelog/cli.js",
-		"./changelog/get-changelog.js",
-		"./changelog/get-entry.js",
-		"./changelog/requests.js",
-		"./changelog/get-milestone.js",
+		"./changelog.js",
 	]
 }
