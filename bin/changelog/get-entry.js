@@ -10,8 +10,6 @@ const { graphql } = require( '@octokit/graphql' );
  */
 const { pkg } = require( './config' );
 
-/* eslint no-console: 0 */
-
 const getAuthenticatedRequestHeaders = ( token ) => {
 	return {
 		authorization: `token ${ token }`,

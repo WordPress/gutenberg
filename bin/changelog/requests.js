@@ -6,8 +6,6 @@
 const { REPO } = require( './config' );
 const { getGraphqlClient } = require( './get-entry' );
 
-/* eslint no-console: 0 */
-
 const getMilestoneNumber = async ( token, version ) => {
 	const [ owner, repo ] = REPO.split( '/' );
 	const query = `
