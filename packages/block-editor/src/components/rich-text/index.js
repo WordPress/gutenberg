@@ -39,6 +39,7 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
+import { regexp } from '@wordpress/shortcode';
 
 /**
  * Internal dependencies
@@ -93,9 +94,7 @@ function getAllowedFormats( {
 
 getAllowedFormats.EMPTY_ARRAY = [];
 
-// The given text is considered a shortcode if
-// starts by the [ character and ends by the ] character.
-const isShortcode = ( text ) => new RegExp( '^\\[.*\\]$' ).test( text );
+const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 function RichTextWrapper(
 	{
