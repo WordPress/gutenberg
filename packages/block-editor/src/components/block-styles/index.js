@@ -7,6 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import isShallowEqual from '@wordpress/is-shallow-equal';
+import { memo } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
@@ -74,6 +76,8 @@ function BlockStyles( {
 	onChangeClassName,
 	type,
 	block,
+	blockName,
+	useExample,
 	onSwitch = noop,
 	onHoverClassName = noop,
 } ) {
@@ -143,8 +147,8 @@ function BlockStyles( {
 							<BlockPreview
 								viewportWidth={ 500 }
 								blocks={
-									type.example
-										? getBlockFromExample( block.name, {
+									useExample
+										? getBlockFromExample( blockName, {
 												attributes: {
 													...type.example.attributes,
 													className: styleClassName,
@@ -174,13 +178,19 @@ export default compose( [
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
 		const blockType = getBlockType( block.name );
+		const useExample = !! blockType.example;
 
-		return {
-			block,
+		const props = {
+			useExample,
+			blockName: block.name,
 			className: block.attributes.className || '',
 			styles: getBlockStyles( block.name ),
 			type: blockType,
 		};
+		if ( ! useExample ) {
+			props.block = block;
+		}
+		return props;
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
@@ -194,4 +204,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( BlockStyles );
+] )( memo( BlockStyles, isShallowEqual ) );
