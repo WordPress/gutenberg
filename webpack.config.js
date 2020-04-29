@@ -39,14 +39,10 @@ const gutenbergPackages = Object.keys( dependencies )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
-const analyzingBundles =
-	process.env.WP_BUNDLE_ANALYZER &&
-	process.env.WP_BUNDLE_ANALYZER !== 'false';
-
 module.exports = {
 	optimization: {
 		// Don't concatenate modules when analyzing bundles.
-		concatenateModules: ! analyzingBundles,
+		concatenateModules: ! process.env.WP_BUNDLE_ANALYZER,
 	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
@@ -71,7 +67,9 @@ module.exports = {
 		] ),
 	},
 	plugins: [
-		analyzingBundles && new BundleAnalyzerPlugin(),
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
