@@ -49,13 +49,6 @@ class WP_Block {
 	protected $available_context;
 
 	/**
-	 * Block attribute values.
-	 *
-	 * @var array
-	 */
-	public $attributes = array();
-
-	/**
 	 * List of inner blocks (of this same class)
 	 *
 	 * @var WP_Block[]
@@ -110,10 +103,6 @@ class WP_Block {
 
 		$this->block_type = $registry->get_registered( $this->name );
 
-		if ( ! empty( $block['attrs'] ) ) {
-			$this->attributes = $block['attrs'];
-		}
-
 		$this->available_context = $available_context;
 
 		if ( ! empty( $this->block_type->context ) ) {
@@ -155,6 +144,34 @@ class WP_Block {
 	}
 
 	/**
+	 * Returns a value from an inaccessible property.
+	 *
+	 * This is used to lazily initialize the `attributes` property of a block,
+	 * such that it is only prepared with default attributes at the time that
+	 * the property is accessed. For all other inaccessible properties, a `null`
+	 * value is returned.
+	 *
+	 * @param string $name Property name.
+	 *
+	 * @return array|null Prepared attributes, or null.
+	 */
+	public function __get( $name ) {
+		if ( 'attributes' === $name && ! isset( $this->attributes ) ) {
+			$this->attributes = isset( $this->parsed_block['attrs'] ) ?
+				$this->parsed_block['attrs'] :
+				array();
+
+			if ( ! is_null( $this->block_type ) ) {
+				$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
+			}
+
+			return $this->attributes;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Generates the render output for the block.
 	 *
 	 * @return string Rendered block output.
@@ -173,13 +190,8 @@ class WP_Block {
 		}
 
 		if ( $is_dynamic ) {
-			$attributes = $this->attributes;
-			if ( ! is_null( $this->block_type ) ) {
-				$attributes = $this->block_type->prepare_attributes_for_render( $attributes );
-			}
-
 			$global_post   = $post;
-			$block_content = (string) call_user_func( $this->block_type->render_callback, $attributes, $block_content, $this );
+			$block_content = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content, $this );
 			$post          = $global_post;
 		}
 

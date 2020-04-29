@@ -69,6 +69,60 @@ class WP_Block_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_lazily_assigns_attributes_with_defaults() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'defaulted' => array(
+						'type'    => 'number',
+						'default' => 10,
+					),
+				),
+			)
+		);
+
+		$parsed_block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array(
+				'explicit' => 20,
+			),
+		);
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$this->assertEquals(
+			array(
+				'defaulted' => 10,
+				'explicit'  => 20,
+			),
+			$block->attributes
+		);
+	}
+
+	function test_lazily_assigns_attributes_with_only_defaults() {
+		$this->registry->register(
+			'core/example',
+			array(
+				'attributes' => array(
+					'defaulted' => array(
+						'type'    => 'number',
+						'default' => 10,
+					),
+				),
+			)
+		);
+
+		$parsed_block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array(),
+		);
+		$context      = array();
+		$block        = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$this->assertEquals( array( 'defaulted' => 10 ), $block->attributes );
+	}
+
 	function test_constructor_assigns_context_from_block_type() {
 		$this->registry->register(
 			'core/example',
@@ -172,40 +226,6 @@ class WP_Block_Test extends WP_UnitTestCase {
 			array( 'core/value' => null ),
 			$block->inner_blocks[0]->inner_blocks[0]->context
 		);
-	}
-
-	function test_render_assigns_attributes_with_defaults() {
-		$this->registry->register(
-			'core/example',
-			array(
-				'attributes'      => array(
-					'defaulted' => array(
-						'type'    => 'number',
-						'default' => 10,
-					),
-				),
-				'render_callback' => function( $attributes ) {
-					return json_encode(
-						array(
-							'explicit'  => $attributes['explicit'],
-							'defaulted' => $attributes['defaulted'],
-						)
-					);
-				}
-			)
-		);
-
-		$parsed_block = array(
-			'blockName' => 'core/example',
-			'attrs'     => array(
-				'explicit' => 20,
-			),
-		);
-		$context      = array();
-		$block        = new WP_Block( $parsed_block, $context, $this->registry );
-		$content      = $block->render();
-
-		$this->assertEquals( '{"explicit":20,"defaulted":10}', $content );
 	}
 
 	function test_render_static_block_type_returns_own_content() {
