@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 8.0.0-rc.1 =
+= 8.0.0 =
 
 ### Features
 
@@ -123,7 +123,7 @@
 ### Various
 
 - End-to-end tests:
-  - Add test for template part block creation and insertion. ([21849](https://github.com/WordPress/gutenberg/pull/21849))
+  - Add test for template part block creation and insertion. ([21849](https://github.com/WordPress/gutenberg/pull/21849)) 
   - Add test that template part block customizations are loaded from slug and theme attributes. ([21852](https://github.com/WordPress/gutenberg/pull/21852))
   - Fix tests by removing unnecessary assertions and properly install dependencies in `@wordpress/api-fetch`. ([21780](https://github.com/WordPress/gutenberg/pull/21780))
   - Add end-to-end test for pinned sidebar items. ([21652](https://github.com/WordPress/gutenberg/pull/21652))
@@ -150,6 +150,7 @@
   - Install Composer dependencies as pre-lint step. ([21537](https://github.com/WordPress/gutenberg/pull/21537))
   - Configure Webpack to watch only build files. ([21489](https://github.com/WordPress/gutenberg/pull/21489))
   - Exit with non-zero status on docgen failed parse. ([21690](https://github.com/WordPress/gutenberg/pull/21690))
+
 
 = 7.9.1 =
 
