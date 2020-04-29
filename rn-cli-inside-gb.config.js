@@ -26,6 +26,7 @@ const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat(
 module.exports = {
 	watchFolders: alternateRoots,
 	resolver: {
+		extraNodeModules: wppackages,
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
 		providesModuleNodeModules: [ 'react-native-svg', 'react-native' ],
