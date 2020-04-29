@@ -14,6 +14,7 @@ import Tooltip from './tooltip';
  */
 import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
 import { Animated, Dimensions, Keyboard } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import Preview from './preview';
 
 // Used to hide the picker if there's no enough space in the window
 const PICKER_HEIGHT_OFFSET = 150;
+const TOOLTIP_VISIBLE_KEY = 'LAYOUT_PICKER_TOOLTIP_VISIBLE';
 
 const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
@@ -41,14 +43,16 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
-	const [ tooltip, setTooltipVisible ] = useState( true );
+	const [ tooltip, setTooltipVisible ] = useState( false );
 	const contentOpacity = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
 		if ( shouldShowPicker() && visible && ! pickerVisible ) {
 			setPickerVisible( true );
 		}
+
 		startPickerAnimation( visible );
+		shouldShowTooltip();
 
 		Keyboard.addListener( 'keyboardDidShow', onKeyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', onKeyboardDidHide );
@@ -85,6 +89,17 @@ const __experimentalPageTemplatePicker = ( {
 		return PICKER_HEIGHT_OFFSET < windowHeight / 3;
 	};
 
+	const shouldShowTooltip = async () => {
+		try {
+			const value = await AsyncStorage.getItem( TOOLTIP_VISIBLE_KEY );
+			if ( value !== 'true' ) {
+				setTooltipVisible( true );
+			}
+		} catch ( e ) {
+			setTooltipVisible( false );
+		}
+	};
+
 	const onApply = () => {
 		editPost( {
 			title: title || templatePreview.name,
@@ -96,8 +111,13 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
-	const onTooltipHidden = () => {
-		setTooltipVisible( false );
+	const onTooltipHidden = async () => {
+		try {
+			setTooltipVisible( false );
+			await AsyncStorage.setItem( TOOLTIP_VISIBLE_KEY, 'true' );
+		} catch ( e ) {
+			setTooltipVisible( false );
+		}
 	};
 
 	const startPickerAnimation = ( isVisible ) => {
