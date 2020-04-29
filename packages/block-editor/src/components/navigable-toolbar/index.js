@@ -38,7 +38,7 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	);
 
 	const focusToolbar = useCallback( () => {
-		const tabbables = focus.focusable.find( wrapper.current );
+		const tabbables = focus.tabbable.find( wrapper.current );
 		if ( tabbables.length ) {
 			tabbables[ 0 ].focus();
 		}
