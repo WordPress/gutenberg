@@ -40,15 +40,8 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	const focusToolbar = useCallback( () => {
 		window.requestAnimationFrame( () => {
 			const tabbables = focus.tabbable.find( wrapper.current );
-			// TODO: Oh! Find another way to do this
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
-				window.requestAnimationFrame( () => {
-					tabbables[ 0 ].focus();
-					window.requestAnimationFrame( () => {
-						tabbables[ 0 ].focus();
-					} );
-				} );
 			}
 		} );
 	}, [] );
