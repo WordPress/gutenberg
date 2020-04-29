@@ -41,8 +41,9 @@ const gutenbergPackages = Object.keys( dependencies )
 
 module.exports = {
 	optimization: {
-		// Don't concatenate modules when analyzing bundles.
-		concatenateModules: ! process.env.WP_BUNDLE_ANALYZER,
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
