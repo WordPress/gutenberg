@@ -126,12 +126,7 @@ class WP_Block {
 			}
 			/* phpcs:enable */
 
-			$this->inner_blocks = array_map(
-				function( $inner_block ) use ( $child_context, $registry ) {
-					return new WP_Block( $inner_block, $child_context, $registry );
-				},
-				$block['innerBlocks']
-			);
+			$this->inner_blocks = new WP_Block_List( $block['innerBlocks'], $child_context, $registry );
 		}
 
 		if ( ! empty( $block['innerHTML'] ) ) {

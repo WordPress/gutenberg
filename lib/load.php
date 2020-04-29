@@ -67,6 +67,10 @@ if ( ! class_exists( 'WP_Block' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block.php';
 }
 
+if ( ! class_exists( 'WP_Block_List' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-list.php';
+}
+
 require dirname( __FILE__ ) . '/compat.php';
 
 require dirname( __FILE__ ) . '/blocks.php';
