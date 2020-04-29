@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
+
+/**
  * WordPress dependencies
  */
 import { forwardRef, useContext } from '@wordpress/element';
@@ -8,7 +13,6 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import ToolbarContext from '../toolbar-context';
-import ToolbarItemContainer from './toolbar-item-container';
 
 function ToolbarItem( { children, ...props }, ref ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -27,9 +31,9 @@ function ToolbarItem( { children, ...props }, ref ) {
 	}
 
 	return (
-		<ToolbarItemContainer { ...allProps }>
+		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
 			{ children }
-		</ToolbarItemContainer>
+		</BaseToolbarItem>
 	);
 }
 

@@ -65,7 +65,9 @@ function ToolbarButton( {
 			{ ...props }
 		>
 			{ ( toolbarItemProps ) => (
-				<Button { ...toolbarItemProps }>{ children }</Button>
+				<Button label={ props.title } { ...toolbarItemProps }>
+					{ children }
+				</Button>
 			) }
 		</ToolbarItem>
 	);

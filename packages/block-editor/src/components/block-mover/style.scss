@@ -17,6 +17,7 @@
 	.components-toolbar-group,
 	.components-toolbar {
 		flex-direction: column;
+		flex: 1;
 	}
 
 	.components-toolbar > div {
@@ -28,8 +29,16 @@
 		flex-direction: row;
 	}
 
-	.block-editor-block-mover__control {
+	.block-editor-block-mover__control.has-icon {
 		height: $block-toolbar-height/2;
+		width: $block-toolbar-height;
+		padding: 0 !important;
+
+		// Focys style.
+		&::before {
+			left: $grid-unit-10 !important;
+			right: $grid-unit-10 !important;
+		}
 	}
 
 	// Position the icons correctly.
@@ -57,13 +66,6 @@
 			top: 0;
 			height: calc(100% - #{ $grid-unit-10 });
 		}
-	}
-
-	.components-toolbar-group .block-editor-block-mover__control.has-icon.has-icon,
-	.components-toolbar .block-editor-block-mover__control.has-icon.has-icon {
-		padding-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
-		min-width: $block-toolbar-height;
 	}
 
 	// Mover is horizontal.
