@@ -76,7 +76,7 @@ export const searchBlockItems = (
 				).length > 0
 			);
 		} );
-		// When no patterns matched, fallback to all variations.
+		// When no variations matched, fallback to all variations.
 		if ( isEmpty( matchedVariations ) ) {
 			return item;
 		}
@@ -117,18 +117,14 @@ export const searchItems = ( items, searchTerm, config = {} ) => {
 
 	return items.filter( ( item ) => {
 		const title = getTitle( item );
-		const keywords = getKeywords( item ).join( ' ' );
+		const keywords = getKeywords( item );
 		const category = getCategory( item );
 		const collection = getCollection( item );
-		const variations = getVariations( item ).join( ' ' );
+		const variations = getVariations( item );
 
-		const terms = [
-			title,
-			keywords,
-			category,
-			collection,
-			variations,
-		].join( ' ' );
+		const terms = [ title, keywords, category, collection, variations ]
+			.flat()
+			.join( ' ' );
 
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
