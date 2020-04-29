@@ -44,8 +44,7 @@ describe( 'Gutenberg Editor tests', () => {
 		if ( isAndroid() ) {
 			await headingBlockElement.click();
 		}
-
-		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading );
+		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading, false );
 
 		await editorPage.addNewBlock( paragraphBlockName );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );

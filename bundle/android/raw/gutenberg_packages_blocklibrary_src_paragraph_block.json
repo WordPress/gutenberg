@@ -18,12 +18,6 @@
 		"placeholder": {
 			"type": "string"
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
 		"direction": {
 			"type": "string",
 			"enum": [

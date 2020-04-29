@@ -62,7 +62,7 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 
 			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await swipeUp( driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption );
+			await editorPage.enterCaptionToSelectedImageBlock( testData.imageCaption, true );
 			await editorPage.dismissKeyboard();
 		}
 		await editorPage.addNewBlock( paragraphBlockName );
