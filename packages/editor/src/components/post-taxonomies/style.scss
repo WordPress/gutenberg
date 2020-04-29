@@ -36,3 +36,17 @@
 .editor-post-taxonomies__flat-terms-related-list {
 	column-count: 2;
 }
+.editor-post-taxonomies__flat-terms-related-list-wrapper {
+	position: relative;
+	top: -13px;
+}
+.editor-post-taxonomies__flat-terms-related-list-wrapper > .components-button {
+	font-style: italic;
+}
+.editor-post-taxonomies__flat-terms-related-list .components-button {
+	text-overflow: ellipsis;
+	max-width: 108px;
+	overflow: hidden;
+	white-space: nowrap;
+	display: inline-block;
+}

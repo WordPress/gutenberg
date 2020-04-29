@@ -327,7 +327,7 @@ class FlatTermSelector extends Component {
 			singularName
 		);
 		const tagsButtonDescription = _x(
-			'Choose from the most used tags',
+			'Choose from the most used tags.',
 			'term'
 		);
 
@@ -347,15 +347,14 @@ class FlatTermSelector extends Component {
 						remove: removeTermLabel,
 					} }
 				/>
-				<div>
-					<p>
-						<Button
-							className="is-link"
-							onClick={ () => this.toggleRelatedTerms() }
-						>
-							{ tagsButtonDescription }
-						</Button>
-					</p>
+				<div className="editor-post-taxonomies__flat-terms-related-list-wrapper">
+					<Button
+						className="is-link"
+						onClick={ () => this.toggleRelatedTerms() }
+						aria-expanded={ ! this.state.areRelatedTermsHidden }
+					>
+						{ tagsButtonDescription }
+					</Button>
 					{ this.state.areRelatedTermsHidden === false ? (
 						<ul className="editor-post-taxonomies__flat-terms-related-list">
 							{ this.state.relatedTerms.map( ( term ) => (
