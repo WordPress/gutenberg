@@ -178,6 +178,8 @@ export default function EntitiesSavedStates( { isOpen, closePanel } ) {
 		closePanel( entitiesToSave );
 	};
 
+	// Explicitly define this with no argument passed.  Using `closePanel` on
+	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => closePanel(), [] );
 
 	return isOpen ? (
