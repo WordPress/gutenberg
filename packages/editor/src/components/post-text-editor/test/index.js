@@ -2,24 +2,17 @@
  * External dependencies
  */
 import { create } from 'react-test-renderer';
-import Textarea from 'react-autosize-textarea';
 
 /**
  * Internal dependencies
  */
 import { PostTextEditor } from '../';
 
-// "Downgrade" ReactAutosizeTextarea to a regular textarea. Assumes aligned
-// props interface.
-jest.mock( 'react-autosize-textarea', () => ( props ) => (
-	<textarea { ...props } />
-) );
-
 describe( 'PostTextEditor', () => {
 	it( 'should render via the prop value', () => {
 		const wrapper = create( <PostTextEditor value="Hello World" /> );
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		expect( textarea.props.value ).toBe( 'Hello World' );
 	} );
 
@@ -29,7 +22,7 @@ describe( 'PostTextEditor', () => {
 			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onChange( { target: { value: 'Hello Chicken' } } );
 
 		expect( textarea.props.value ).toBe( 'Hello Chicken' );
@@ -42,7 +35,7 @@ describe( 'PostTextEditor', () => {
 			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onChange( { target: { value: 'Hello Chicken' } } );
 
 		wrapper.update(
@@ -59,7 +52,7 @@ describe( 'PostTextEditor', () => {
 			<PostTextEditor value="Hello World" onChange={ onChange } />
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onChange( { target: { value: '' } } );
 
 		wrapper.update(
@@ -80,7 +73,7 @@ describe( 'PostTextEditor', () => {
 			/>
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onChange( { target: { value: '' } } );
 		textarea.props.onBlur();
 
@@ -97,7 +90,7 @@ describe( 'PostTextEditor', () => {
 			/>
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onBlur();
 
 		expect( onPersist ).not.toHaveBeenCalled();
@@ -116,7 +109,7 @@ describe( 'PostTextEditor', () => {
 			/>
 		);
 
-		const textarea = wrapper.root.findByType( Textarea );
+		const textarea = wrapper.root.findByType( 'textarea' );
 		textarea.props.onChange( { target: { value: '' } } );
 
 		wrapper.update(
