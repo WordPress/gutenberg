@@ -8,7 +8,7 @@ import { redo as redoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 
 export default function UndoButton() {
-	const hasRedo = useSelect( ( select ) => select( 'core' ).hasUndo() );
+	const hasRedo = useSelect( ( select ) => select( 'core' ).hasRedo() );
 	const { redo } = useDispatch( 'core' );
 	return (
 		<Button
