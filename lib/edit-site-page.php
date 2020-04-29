@@ -191,7 +191,6 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['templateId']      = $current_template_post->ID;
 	$settings['templateType']    = 'wp_template';
 	$settings['templateIds']     = array_values( $template_ids );
-	$settings['templateIdsAll']  = $template_ids;
 	$settings['templatePartIds'] = array_values( $template_part_ids );
 	$settings['styles']          = gutenberg_get_editor_styles();
 
