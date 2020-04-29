@@ -29,9 +29,9 @@ const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 			isDismissible={ false }
 			className="block-directory-downloadable-blocks-notice"
 		>
-			<span className="block-directory-downloadable-blocks-notice-content">
+			<div className="block-directory-downloadable-blocks-notice-content">
 				{ copy }
-			</span>
+			</div>
 			<Button
 				isSmall
 				isPrimary
