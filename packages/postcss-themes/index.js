@@ -4,10 +4,40 @@
 const postcss = require( 'postcss' );
 
 module.exports = postcss.plugin( 'postcss-themes', function( options ) {
-	return function( root ) {
+	/**
+	 * Loop over a given theme to create the scoped custom properties.
+	 *
+	 * @param {Object} theme
+	 * @param {string} selector
+	 */
+	function generateThemeRules( theme, selector ) {
+		const rule = postcss.rule( { selector } );
+		Object.keys( theme ).forEach( ( name ) => {
+			rule.append(
+				postcss.decl( {
+					prop: `--color-${ name }`,
+					value: theme[ name ],
+				} )
+			);
+		} );
+
+		return rule;
+	}
+
+	return function( root, result ) {
+		const hasDefaults = Object.keys( options.defaults ).length > 0;
+		const rules = [];
+
+		if ( hasDefaults ) {
+			rules.push( generateThemeRules( options.defaults, ':root' ) );
+		}
+
+		Object.keys( options.themes ).forEach( ( key ) => {
+			const theme = options.themes[ key ];
+			rules.push( generateThemeRules( theme, `body.${ key }` ) );
+		} );
+
 		root.walkRules( ( rule ) => {
-			const themeDecls = {};
-			let hasThemeDecls = false;
 			rule.walkDecls( ( decl ) => {
 				const themeMatch = /(theme\(([^\)]*)\))/g;
 				if ( ! decl.value ) {
@@ -19,55 +49,32 @@ module.exports = postcss.plugin( 'postcss-themes', function( options ) {
 				}
 				let value = decl.value;
 				let parsed;
-				const themeValues = {};
+
 				while ( ( parsed = themeMatch.exec( decl.value ) ) !== null ) {
 					const [ , whole, color ] = parsed;
 					const colorKey = color.trim();
-					const defaultColor = options.defaults[ colorKey ];
-					value = value.replace( whole, defaultColor );
-
-					Object.entries( options.themes ).forEach(
-						( [ key, colors ] ) => {
-							const previousValue = themeValues[ key ]
-								? themeValues[ key ]
-								: decl.value;
-							themeValues[ key ] = previousValue.replace(
-								whole,
-								colors[ colorKey ]
-							);
-						}
-					);
-				}
-
-				hasThemeDecls = true;
-				decl.value = value;
-				Object.keys( options.themes ).forEach( ( key ) => {
-					const themeDecl = decl.clone();
-					themeDecl.value = themeValues[ key ];
-					if ( ! themeDecls[ key ] ) {
-						themeDecls[ key ] = [];
+					if ( !! options.defaults[ colorKey ] ) {
+						value = value.replace(
+							whole,
+							`var(--color-${ colorKey })`
+						);
+					} else {
+						result.warn(
+							'Skipped theme function with unknown color key `' +
+								decl.value +
+								'`',
+							{
+								node: decl,
+								word: decl.value,
+								plugin: 'postcss-themes',
+							}
+						);
 					}
-					themeDecls[ key ].push( themeDecl );
-				} );
+				}
+				decl.value = value;
 			} );
-
-			if ( hasThemeDecls ) {
-				Object.keys( options.themes ).forEach( ( key ) => {
-					const newRule = postcss.rule( {
-						selector: rule.selector
-							.split( ',' )
-							.map(
-								( subselector ) =>
-									'body.' + key + ' ' + subselector.trim()
-							)
-							.join( ', ' ),
-					} );
-					themeDecls[ key ].forEach( ( decl ) =>
-						newRule.append( decl )
-					);
-					rule.parent.insertAfter( rule, newRule );
-				} );
-			}
 		} );
+
+		root.prepend( rules );
 	};
 } );

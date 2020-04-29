@@ -65,4 +65,10 @@ describe( 'postcss-themes', () => {
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );
 	} );
+
+	it( "throws a warning if the value doesn't match a theme color", () => {
+		return run( 'span{ color: theme( fake ) }' ).then( ( result ) => {
+			expect( result.warnings() ).toHaveLength( 1 );
+		} );
+	} );
 } );
