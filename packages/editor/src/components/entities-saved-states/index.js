@@ -64,13 +64,13 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 						onClick={ selectParentBlock }
 						className="entities-saved-states__find-entity"
 					>
-						{ __( 'Select Entity' ) }
+						{ __( 'Select' ) }
 					</Button>
 					<Button
 						onClick={ selectAndDismiss }
 						className="entities-saved-states__find-entity-small"
 					>
-						{ __( 'Select Entity' ) }
+						{ __( 'Select' ) }
 					</Button>
 				</>
 			) : null }
