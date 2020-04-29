@@ -85,6 +85,14 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
 
+jest.mock(
+	'@react-native-community/async-storage',
+	() => () => 'AsyncStorage',
+	{
+		virtual: true,
+	}
+);
+
 // Overwrite some native module mocks from `react-native` jest preset:
 // https://github.com/facebook/react-native/blob/master/jest/setup.js
 // to fix issue "TypeError: Cannot read property 'Commands' of undefined"
