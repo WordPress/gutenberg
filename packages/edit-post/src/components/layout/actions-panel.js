@@ -53,10 +53,10 @@ export default function ActionsPanel( {
 		);
 	} else if ( hasNonPostEntityChanges ) {
 		unmountableContent = (
-			<div className="edit-post-layout__toggle-publish-panel">
+			<div className="edit-post-layout__toggle-entities-saved-states-panel">
 				<Button
 					isSecondary
-					className="edit-post-layout__toggle-publish-panel-button"
+					className="edit-post-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 				>
