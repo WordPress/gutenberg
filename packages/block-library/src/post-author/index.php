@@ -88,7 +88,7 @@ function post_author_build_css_font_sizes( $attributes ) {
 /**
  * Renders the `core/post-author` block on the server.
  *
- * @param  array $attributes Author block attributes.
+ * @param  Object $block The block to render.
  * @return string Returns the rendered author block.
  */
 function render_block_core_post_author( $block ) {
@@ -99,7 +99,7 @@ function render_block_core_post_author( $block ) {
 		return '';
 	}
 
-	$post = gutenberg_get_post_from_context();	
+	$post = gutenberg_get_post_from_context();
 
 	if ( ! $post ) {
 		return '';
@@ -110,8 +110,7 @@ function render_block_core_post_author( $block ) {
 		$attributes['avatarSize']
 	) : null;
 
-	$byline      = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
-
+	$byline     = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
 	$colors     = post_author_build_css_colors( $attributes );
 	$font_sizes = post_author_build_css_font_sizes( $attributes );
 	$classes    = array_merge(
