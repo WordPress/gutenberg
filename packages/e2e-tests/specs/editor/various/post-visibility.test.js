@@ -63,6 +63,7 @@ describe( 'Post visibility', () => {
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );
 
+		await page.waitForSelector( '.editor-post-publish-button' );
 		await page.click( '.editor-post-publish-button' );
 
 		const currentStatus = await page.evaluate( () => {
