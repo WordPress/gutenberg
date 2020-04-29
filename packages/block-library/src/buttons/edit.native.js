@@ -77,6 +77,7 @@ function ButtonsEdit( {
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
+				allowShrinkToolbar
 			/>
 		</AlignmentHookSettingsProvider>
 	);

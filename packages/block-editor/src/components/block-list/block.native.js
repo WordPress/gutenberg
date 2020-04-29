@@ -95,6 +95,7 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
+			allowShrinkToolbar,
 		} = this.props;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
@@ -161,6 +162,7 @@ class BlockListBlock extends Component {
 									isStackedHorizontally={
 										isStackedHorizontally
 									}
+									allowShrinkToolbar={ allowShrinkToolbar }
 								/>
 							) }
 						</View>

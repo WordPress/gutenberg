@@ -56,6 +56,7 @@ export default class Picker extends Component {
 							label={ option.label }
 							separatorType={ 'none' }
 							onPress={ () => this.onCellPress( option.value ) }
+							disabled={ option.disabled }
 						/>
 					) ) }
 					{ ! this.props.hideCancelButton && (
