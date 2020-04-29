@@ -34,7 +34,7 @@ const run = ( input, opts = defaultOptions ) => {
 };
 
 describe( 'postcss-themes', () => {
-	it( 'replaces the default color and generate theme colors', () => {
+	it( 'replaces the default color and generates theme colors', () => {
 		return run( 'a{ color: theme( main ) }' ).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
@@ -50,7 +50,7 @@ describe( 'postcss-themes', () => {
 		} );
 	} );
 
-	it( 'gather several declaration in a unique rule', () => {
+	it( 'gathers several declaration in a unique rule', () => {
 		return run(
 			'a{ color: theme( main ); background: theme(highlight); }'
 		).then( ( result ) => {
@@ -59,7 +59,7 @@ describe( 'postcss-themes', () => {
 		} );
 	} );
 
-	it( 'add the prefix selector to all subselectors', () => {
+	it( 'adds the prefix selector to all subselectors', () => {
 		return run( 'a, span{ color: theme( main ) }' ).then( ( result ) => {
 			expect( result.css ).toMatchSnapshot();
 			expect( result.warnings() ).toHaveLength( 0 );
@@ -70,5 +70,14 @@ describe( 'postcss-themes', () => {
 		return run( 'span{ color: theme( fake ) }' ).then( ( result ) => {
 			expect( result.warnings() ).toHaveLength( 1 );
 		} );
+	} );
+
+	it( 'replaces the function with the darker custom property', () => {
+		return run( 'a{ color: theme( main, shade-10 ) }' ).then(
+			( result ) => {
+				expect( result.css ).toMatchSnapshot();
+				expect( result.warnings() ).toHaveLength( 0 );
+			}
+		);
 	} );
 } );
