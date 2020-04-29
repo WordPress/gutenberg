@@ -111,6 +111,37 @@ const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
 	`;
 };
 
+const dragStyles = ( { isDragging, dragCursor } ) => {
+	let defaultArrowStyles = '';
+	let activeDragCursorStyles = '';
+
+	if ( isDragging ) {
+		defaultArrowStyles = css`
+			cursor: ${dragCursor};
+			user-select: none;
+
+			&::-webkit-outer-spin-button,
+			&::-webkit-inner-spin-button {
+				-webkit-appearance: none !important;
+				margin: 0 !important;
+			}
+		`;
+	}
+
+	if ( isDragging && dragCursor ) {
+		activeDragCursorStyles = css`
+			&:active {
+				cursor: ${dragCursor};
+			}
+		`;
+	}
+
+	return css`
+		${defaultArrowStyles};
+		${activeDragCursorStyles};
+	`;
+};
+
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -127,6 +158,7 @@ export const Input = styled.input`
 		padding-right: 8px;
 		width: 100%;
 
+		${dragStyles};
 		${disabledStyles};
 		${fontSizeStyles};
 		${sizeStyles};

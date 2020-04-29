@@ -2,49 +2,77 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import { useDrag } from 'react-use-gesture';
 
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
+import { useEffect, useRef, forwardRef } from '@wordpress/element';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { useValueState, isValueEmpty } from './utils';
+import { useDragCursor, isValueEmpty } from './utils';
 import { Input } from './styles/input-control-styles';
+import { useInputControlStateReducer } from './state';
 
 function InputField(
 	{
 		disabled,
+		dragDirection = 'n',
+		dragThreshold = 10,
 		id,
-		isPressEnterToChange,
+		isDragEnabled = false,
+		isPressEnterToChange = false,
 		isFloating,
 		isFloatingLabelSet,
+		onDragStart = noop,
+		onDragEnd = noop,
+		onDrag = noop,
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
 		onKeyDown = noop,
 		onUpdateValue,
 		size = 'default',
-		transformValueOnChange = ( value ) => value,
+		stateReducer = ( state ) => state,
 		value: valueProp,
 		...props
 	},
 	ref
 ) {
-	const [ isDirty, setIsDirty ] = useState( false );
-	const [ value, setValue ] = useValueState( valueProp );
+	const {
+		state,
+		change,
+		drag,
+		dragStart,
+		dragEnd,
+		pressUp,
+		pressDown,
+		pressEnter,
+		reset,
+		submit,
+	} = useInputControlStateReducer( stateReducer, {
+		isDragEnabled,
+		value: valueProp,
+		isPressEnterToChange,
+	} );
 
-	const resetValue = () => {
-		setValue( valueProp );
-		setIsDirty( false );
-		onUpdateValue( ! isValueEmpty( valueProp ) );
-	};
+	const { _event, value, isDragging, isDirty } = state;
+
+	const valueRef = useRef( value );
+	const dragCursor = useDragCursor( isDragging, dragDirection );
+
+	useEffect( () => {
+		if ( value !== valueRef.current && ! isDirty ) {
+			onChange( value, { event: _event } );
+			onUpdateValue( ! isValueEmpty( value ) );
+
+			valueRef.current = value;
+		}
+	}, [ value, isDirty ] );
 
 	const handleOnBlur = ( event ) => {
-		const _forceUpdate = true;
-
 		onBlur( event );
 
 		/**
@@ -53,9 +81,9 @@ function InputField(
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			if ( ! isValueEmpty( value ) ) {
-				handleOnChange( event, _forceUpdate );
+				submit( value, event );
 			} else {
-				resetValue();
+				reset( valueProp );
 			}
 		}
 	};
@@ -64,37 +92,73 @@ function InputField(
 		onFocus( event );
 	};
 
-	const handleOnChange = ( event, _forceUpdate ) => {
-		const nextValue = event.target.value;
-
-		if ( ! isPressEnterToChange || _forceUpdate ) {
-			const transformedValue = transformValueOnChange( nextValue );
-			setValue( transformedValue );
-
-			onChange( nextValue, { event } );
-			setIsDirty( false );
-		} else {
-			setValue( nextValue );
-			setIsDirty( true );
-		}
-		onUpdateValue( ! isValueEmpty( nextValue ) );
+	const handleOnChange = ( event ) => {
+		change( event.target.value, event );
 	};
 
 	const handleOnKeyDown = ( event ) => {
-		const _forceUpdate = true;
+		const { keyCode } = event;
 		onKeyDown( event );
 
-		if ( isPressEnterToChange && event.keyCode === ENTER ) {
-			event.preventDefault();
-			handleOnChange( event, _forceUpdate );
+		switch ( keyCode ) {
+			case UP:
+				pressUp( event );
+				break;
+
+			case DOWN:
+				pressDown( event );
+				break;
+
+			case ENTER:
+				pressEnter( event );
+
+				if ( isPressEnterToChange ) {
+					event.preventDefault();
+					submit( event.target.value, event );
+				}
+				break;
 		}
 	};
+
+	const dragGestureProps = useDrag(
+		( dragProps ) => {
+			const { dragging, event } = dragProps;
+
+			if ( ! isDragEnabled ) return;
+			event.stopPropagation();
+
+			/**
+			 * Quick return if no longer dragging.
+			 * This prevents unnecessary value calculations.
+			 */
+			if ( ! dragging ) {
+				onDragEnd( dragProps );
+				dragEnd( dragProps );
+				return;
+			}
+
+			onDrag( dragProps );
+			drag( dragProps );
+
+			if ( ! isDragging ) {
+				onDragStart( dragProps );
+				dragStart( dragProps );
+			}
+		},
+		{
+			threshold: dragThreshold,
+			enabled: isDragEnabled,
+		}
+	);
 
 	return (
 		<Input
 			{ ...props }
+			{ ...dragGestureProps() }
 			className="components-input-control__input"
 			disabled={ disabled }
+			dragCursor={ dragCursor }
+			isDragging={ isDragging }
 			id={ id }
 			isFloating={ isFloating }
 			isFloatingLabel={ isFloatingLabelSet }

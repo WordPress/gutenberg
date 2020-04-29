@@ -1,80 +1,92 @@
 /**
  * External dependencies
  */
-import { clamp, noop } from 'lodash';
+import { clamp } from 'lodash';
 import classNames from 'classnames';
-import { useDrag } from 'react-use-gesture';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Input } from './styles/number-control-styles';
-import {
-	add,
-	getValue,
-	roundClampString,
-	subtract,
-	useDragCursor,
-} from './utils';
+import { add, getValue, roundClamp, subtract } from './utils';
 import { isValueEmpty } from '../input-control/utils';
+import { inputControlActionTypes } from '../input-control/state';
 import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
 	{
 		className,
 		dragDirection = 'n',
-		dragThreshold = 10,
 		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
 		label,
 		max = Infinity,
 		min = -Infinity,
-		onChange = noop,
-		onDrag = noop,
-		onDragEnd = noop,
-		onDragStart = noop,
-		onKeyDown = noop,
 		shiftStep = 10,
+		stateReducer: stateReducerProp = ( state ) => state,
 		step = 1,
-		transformValueOnChange = ( v ) => v,
 		value: valueProp,
 		...props
 	},
 	ref
 ) {
-	const [ isDragging, setIsDragging ] = useState( false );
-	const isRtl = useRtl();
-	const dragCursor = useDragCursor( isDragging, dragDirection );
-
+	const initialValue = getValue( valueProp, min, max );
 	const baseValue = clamp( 0, min, max );
+	const isRtl = useRtl();
 
-	const dragGestureProps = useDrag(
-		( dragProps ) => {
-			const { dragging, delta, event, shiftKey } = dragProps;
+	const classes = classNames( 'components-number-control', className );
 
-			if ( ! isDragEnabled ) return;
+	const stateReducer = ( state, action ) => {
+		const { type, payload } = action;
+		const event = payload?.event;
 
-			/**
-			 * Quick return if no longer dragging.
-			 * This prevents unnecessary value calculations.
-			 */
-			if ( ! dragging ) {
-				onDragEnd( dragProps );
-				setIsDragging( false );
+		const nextState = stateReducerProp( state, action );
+		const currentValue = nextState.value;
 
-				return;
+		/**
+		 * Handles custom UP and DOWN Keyboard events
+		 */
+		if (
+			type === inputControlActionTypes.PRESS_UP ||
+			type === inputControlActionTypes.PRESS_DOWN
+		) {
+			const enableShift = event.shiftKey && isShiftStepEnabled;
+
+			const incrementalValue = enableShift
+				? parseFloat( shiftStep )
+				: parseFloat( step );
+			let nextValue = isValueEmpty( currentValue )
+				? baseValue
+				: currentValue;
+
+			if ( event?.preventDefault ) {
+				event.preventDefault();
 			}
 
-			event.stopPropagation();
-			onDrag( dragProps );
+			if ( action.type === inputControlActionTypes.PRESS_UP ) {
+				nextValue = add( nextValue, incrementalValue );
+			}
 
+			if ( action.type === inputControlActionTypes.PRESS_DOWN ) {
+				nextValue = subtract( nextValue, incrementalValue );
+			}
+
+			nextValue = roundClamp( nextValue, min, max, incrementalValue );
+
+			nextState.value = nextValue;
+		}
+
+		/**
+		 * Handles drag to update events
+		 */
+		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+			const { delta, shiftKey } = payload;
 			const [ x, y ] = delta;
 			const modifier = shiftKey ? shiftStep : 1;
 
@@ -86,14 +98,17 @@ export function NumberControl(
 					directionBaseValue = y;
 					directionModifier = -1;
 					break;
+
 				case 'e':
 					directionBaseValue = x;
 					directionModifier = isRtl ? -1 : 1;
 					break;
+
 				case 's':
 					directionBaseValue = y;
 					directionModifier = 1;
 					break;
+
 				case 'w':
 					directionBaseValue = x;
 					directionModifier = isRtl ? 1 : -1;
@@ -104,102 +119,45 @@ export function NumberControl(
 			let nextValue;
 
 			if ( distance !== 0 ) {
-				nextValue = roundClampString(
-					add( valueProp, distance ),
+				nextValue = roundClamp(
+					add( currentValue, distance ),
 					min,
 					max,
 					modifier
 				);
 
-				handleOnChange( nextValue, { event } );
+				nextState.value = nextValue;
 			}
-
-			if ( ! isDragging ) {
-				onDragStart( dragProps );
-				setIsDragging( true );
-			}
-		},
-		{
-			threshold: dragThreshold,
-			enabled: isDragEnabled,
 		}
-	);
 
-	const handleOnChange = ( next, changeProps ) => {
-		const nextValue = getValue( next );
-
-		onChange( nextValue, changeProps );
-	};
-
-	const handleOnKeyDown = ( event ) => {
-		onKeyDown( event );
-		const { value: currentValue } = event.target;
-
-		const enableShift = event.shiftKey && isShiftStepEnabled;
-
-		const incrementalValue = enableShift
-			? parseFloat( shiftStep )
-			: parseFloat( step );
-		let nextValue = isValueEmpty( currentValue ) ? baseValue : currentValue;
-
-		// Convert to a number to use math
-		nextValue = parseFloat( nextValue );
-
-		switch ( event.keyCode ) {
-			case UP:
-				event.preventDefault();
-
-				nextValue = add( nextValue, incrementalValue );
-				nextValue = roundClampString(
-					nextValue,
-					min,
-					max,
-					incrementalValue
-				);
-
-				handleOnChange( nextValue, { event } );
-
-				break;
-
-			case DOWN:
-				event.preventDefault();
-
-				nextValue = subtract( nextValue, incrementalValue );
-				nextValue = roundClampString(
-					nextValue,
-					min,
-					max,
-					incrementalValue
-				);
-
-				handleOnChange( nextValue, { event } );
-
-				break;
+		/**
+		 * Handles ENTER key press and submit
+		 */
+		if (
+			( type === inputControlActionTypes.CHANGE &&
+				! nextState.isPressEnterToChange ) ||
+			type === inputControlActionTypes.PRESS_ENTER ||
+			type === inputControlActionTypes.SUBMIT
+		) {
+			nextState.value = roundClamp( currentValue, min, max );
 		}
-	};
 
-	const handleTransformValueOnChange = ( value ) => {
-		return transformValueOnChange( getValue( value ) );
+		return nextState;
 	};
-
-	const classes = classNames( 'components-number-control', className );
 
 	return (
 		<Input
 			inputMode="numeric"
 			type="number"
 			{ ...props }
-			{ ...dragGestureProps() }
 			className={ classes }
-			dragCursor={ dragCursor }
+			dragDirection={ dragDirection }
 			hideHTMLArrows={ hideHTMLArrows }
-			isDragging={ isDragging }
+			isDragEnabled={ isDragEnabled }
 			label={ label }
-			onChange={ handleOnChange }
-			onKeyDown={ handleOnKeyDown }
-			transformValueOnChange={ handleTransformValueOnChange }
+			stateReducer={ stateReducer }
 			ref={ ref }
-			value={ valueProp }
+			value={ initialValue }
 		/>
 	);
 }

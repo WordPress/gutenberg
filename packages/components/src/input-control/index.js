@@ -41,6 +41,7 @@ export function InputControl(
 		onFocus = noop,
 		onKeyDown = noop,
 		size = 'default',
+		stateReducer = ( state ) => state,
 		suffix,
 		transformValueOnChange = ( v ) => v,
 		value,
@@ -104,6 +105,7 @@ export function InputControl(
 					ref={ ref }
 					setIsFocused={ setIsFocused }
 					size={ size }
+					stateReducer={ stateReducer }
 					transformValueOnChange={ transformValueOnChange }
 					value={ value }
 				/>

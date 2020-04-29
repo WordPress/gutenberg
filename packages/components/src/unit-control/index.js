@@ -7,12 +7,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ENTER } from '@wordpress/keycodes';
-import { forwardRef } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { inputControlActionTypes } from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import {
@@ -20,7 +20,6 @@ import {
 	DEFAULT_UNIT,
 	getParsedValue,
 	getValidParsedUnit,
-	parseUnit,
 } from './utils';
 
 function UnitControl(
@@ -29,6 +28,7 @@ function UnitControl(
 		className,
 		disabled = false,
 		disableUnits = false,
+		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = false,
 		label,
@@ -36,7 +36,6 @@ function UnitControl(
 		onUnitChange = noop,
 		size = 'default',
 		style,
-		type = 'text',
 		unit: unitProp,
 		units = CSS_UNITS,
 		value: valueProp,
@@ -44,34 +43,16 @@ function UnitControl(
 	},
 	ref
 ) {
-	const [ value, unit ] = getParsedValue( valueProp, unitProp, units );
+	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
+	const [ unit, setUnit ] = useState( initialUnit );
 
 	const handleOnChange = ( next, changeProps ) => {
-		const { event } = changeProps;
-		const isEnterPress = event?.keyCode === ENTER;
+		const [ , parsedUnit ] = getParsedValue( next, units );
+		const baseUnit = parsedUnit || unit;
 
-		const valueToParse = isEnterPress ? event.target.value : next;
-
-		/**
-		 * Extracts the parsed value on any type of change.
-		 */
-		const [ parsedValue ] = getValidParsedUnit(
-			valueToParse,
-			units,
-			value
-		);
-		// Unit parsing is only required for ENTER press onChange.
-		const [ , parsedUnit ] = parseUnit( event.target.value, units );
-
-		const baseUnit = parsedUnit || unit || DEFAULT_UNIT.value;
-
-		const nextValue = `${ parsedValue }${ baseUnit }`;
+		const nextValue = `${ next }${ baseUnit }`;
 
 		onChange( nextValue, changeProps );
-
-		if ( unit !== baseUnit ) {
-			onUnitChange( baseUnit, changeProps );
-		}
 	};
 
 	const handleOnUnitChange = ( next, changeProps ) => {
@@ -79,25 +60,40 @@ function UnitControl(
 
 		let nextValue = `${ value }${ next }`;
 
-		if ( isResetValueOnUnitChange && data.default !== undefined ) {
+		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
 			nextValue = `${ data.default }${ next }`;
 		}
 
 		onChange( nextValue, changeProps );
 		onUnitChange( next, changeProps );
+		setUnit( next );
 	};
 
-	/**
-	 * Validates and transforms content onChange.
-	 * If the next value isn't a valid value, it will reset to the previous
-	 * value from props.
-	 *
-	 * @param {any} next
-	 */
-	const handleTransformValueOnChange = ( next ) => {
-		const [ parsedValue ] = getValidParsedUnit( next, units, value );
+	const stateReducer = ( state, action ) => {
+		const { type, payload } = action;
+		const event = payload?.event;
 
-		return parsedValue;
+		const nextState = { ...state };
+
+		if ( type === inputControlActionTypes.SUBMIT ) {
+			const valueToParse = event?.target?.value;
+
+			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+				valueToParse,
+				units,
+				value
+			);
+
+			const baseUnit = parsedUnit || unit || DEFAULT_UNIT.value;
+
+			nextState.value = parsedValue;
+
+			if ( unit !== baseUnit ) {
+				handleOnUnitChange( baseUnit, { event } );
+			}
+		}
+
+		return nextState;
 	};
 
 	const classes = classnames( 'components-unit-control', className );
@@ -118,18 +114,19 @@ function UnitControl(
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
 				aria-label={ label }
+				type={ isPressEnterToChange ? 'text' : 'number' }
 				{ ...props }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
 				disableUnits={ disableUnits }
+				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
 				onChange={ handleOnChange }
 				ref={ ref }
 				size={ size }
 				suffix={ inputSuffix }
-				transformValueOnChange={ handleTransformValueOnChange }
-				type={ type }
+				stateReducer={ stateReducer }
 				value={ value }
 			/>
 		</Root>
