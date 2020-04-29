@@ -282,7 +282,7 @@ class LatestPostsEdit extends Component {
 						selectedCategories={ categories }
 						onAuthorChange={ ( value ) =>
 							setAttributes( {
-								users: '' !== value ? value : undefined,
+								users: '' !== value ? Number( value ) : undefined,
 							} )
 						}
 						authorList={ authorList }

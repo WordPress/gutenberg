@@ -13,10 +13,7 @@
 			"type": "array"
 		},
 		"users": {
-			"type": "array"
-		},
-		"items": {
-			"type": "array"
+			"type": "number"
 		},
 		"postsToShow": {
 			"type": "number",
