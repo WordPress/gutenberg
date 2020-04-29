@@ -26,7 +26,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
-import { BlockContext } from './block';
+import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
@@ -50,7 +50,7 @@ const BlockComponent = forwardRef(
 			mode,
 			blockTitle,
 			wrapperProps,
-		} = useContext( BlockContext );
+		} = useContext( BlockListBlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
 				if ( ! isSelected ) {
@@ -69,7 +69,7 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-
+		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		// Provide the selected node, or the first and last nodes of a multi-
@@ -196,19 +196,20 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
-		return (
+		const blockWrapper = (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
-				{ ...wrapperProps }
+				{ ...omit( wrapperProps, [ 'data-align' ] ) }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className
+					wrapperProps && wrapperProps.className,
+					! isAligned && 'wp-block'
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -227,6 +228,21 @@ const BlockComponent = forwardRef(
 				{ children }
 			</Animated>
 		);
+
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column.
+		if ( isAligned ) {
+			const alignmentWrapperProps = {
+				'data-align': wrapperProps[ 'data-align' ],
+			};
+			return (
+				<div className="wp-block" { ...alignmentWrapperProps }>
+					{ blockWrapper }
+				</div>
+			);
+		}
+
+		return blockWrapper;
 	}
 );
 

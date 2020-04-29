@@ -50,6 +50,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
   label="Change text alignment"
   popoverProps={
     Object {
+      "isAlternate": true,
       "position": "bottom right",
     }
   }
@@ -121,6 +122,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
   label="Change text alignment"
   popoverProps={
     Object {
+      "isAlternate": true,
       "position": "bottom right",
     }
   }

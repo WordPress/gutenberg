@@ -34,20 +34,19 @@
 			height: 1px;
 		}
 
-		&.is-active {
+		&.is-active svg {
 			// Block UI appearance.
-			border: $border-width solid $dark-gray-primary;
-			border-radius: $radius-block-ui;
 			color: $white;
 			background: $dark-gray-primary;
+			box-shadow: 0 0 0 $border-width $dark-gray-primary;
+			border-radius: $border-width;
 		}
 
 		// Formatting buttons
 		> svg {
-			border-radius: $radius-round-rectangle;
+			border-radius: $radius-block-ui;
 			width: $button-size-small;
 			height: $button-size-small;
-			margin: -1px $grid-unit-10 -1px 0;
 		}
 	}
 

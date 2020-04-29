@@ -63,6 +63,10 @@ if ( ! class_exists( 'WP_Patterns_Registry' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-patterns-registry.php';
 }
 
+if ( ! class_exists( 'WP_Block' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block.php';
+}
+
 require dirname( __FILE__ ) . '/compat.php';
 
 require dirname( __FILE__ ) . '/blocks.php';

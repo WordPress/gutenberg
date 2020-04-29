@@ -491,4 +491,53 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (paste to empty editor)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'Backspace' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (paste mid-block)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should place the caret at the end of last pasted paragraph (replace)', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'first paragraph' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second paragraph' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

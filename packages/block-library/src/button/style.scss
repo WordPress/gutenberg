@@ -1,6 +1,28 @@
 $blocks-button__height: 56px;
 
-.wp-block-button {
+// Prefer the link selector instead of the regular button classname
+// to support the previous markup in addition to the new one.
+.wp-block-button__link {
+	color: $white;
+	background-color: $dark-gray-700;
+	border: none;
+	border-radius: $blocks-button__height / 2;
+	box-shadow: none;
+	cursor: pointer;
+	display: inline-block;
+	font-size: $big-font-size;
+	padding: 12px 24px;
+	text-align: center;
+	text-decoration: none;
+	overflow-wrap: break-word;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&:visited {
+		color: $white;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
@@ -11,36 +33,22 @@ $blocks-button__height: 56px;
 	}
 }
 
-.wp-block-button {
-	border: none;
-	border-radius: $blocks-button__height / 2;
-	box-shadow: none;
-	cursor: pointer;
-	display: inline-block;
-	font-size: $big-font-size;
-	margin: 0;
-	padding: 12px 24px;
-	text-align: center;
-	text-decoration: none;
-	overflow-wrap: break-word;
-
-	&:hover,
-	&:focus,
-	&:active,
-	&:visited {
-		color: var(--wp--color--text, $white);
-	}
-}
-
-.wp-block-button.is-style-squared {
+// the first selector is required for old buttons markup
+.wp-block-button.is-style-squared,
+.wp-block-button__link.wp-block-button.is-style-squared {
 	border-radius: 0;
 }
 
-.wp-block-button.no-border-radius {
+
+// the first selector is required for old buttons markup
+
+.wp-block-button.no-border-radius,
+.wp-block-button__link.wp-block-button.no-border-radius {
 	border-radius: 0 !important;
 }
 
-.wp-block-button.is-style-outline {
+.wp-block-button.is-style-outline .wp-block-button__link,
+.wp-block-button__link.is-style-outline {
 	color: $dark-gray-700;
 	background-color: transparent;
 	border: 2px solid;

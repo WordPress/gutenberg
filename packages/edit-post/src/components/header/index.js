@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
@@ -15,9 +15,9 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header() {
+function Header( { onToggleInserter, isInserterOpen } ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -40,6 +40,10 @@ function Header() {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
@@ -60,7 +64,10 @@ function Header() {
 		<div className="edit-post-header">
 			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
+				<HeaderToolbar
+					onToggleInserter={ onToggleInserter }
+					isInserterOpen={ isInserterOpen }
+				/>
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
@@ -74,10 +81,7 @@ function Header() {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }

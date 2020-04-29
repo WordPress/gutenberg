@@ -15,6 +15,7 @@ function render_block_core_post_title() {
 	if ( ! $post ) {
 		return '';
 	}
+
 	return '<h1>' . get_the_title( $post ) . '</h1>';
 }
 

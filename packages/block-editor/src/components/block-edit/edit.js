@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,10 +13,36 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
+import { useContext, useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import BlockContext from '../block-context';
+
+/**
+ * Default value used for blocks which do not define their own context needs,
+ * used to guarantee that a block's `context` prop will always be an object. It
+ * is assigned as a constant since it is always expected to be an empty object,
+ * and in order to avoid unnecessary React reconciliations of a changing object.
+ *
+ * @type {{}}
+ */
+const DEFAULT_BLOCK_CONTEXT = {};
 
 export const Edit = ( props ) => {
 	const { attributes = {}, name } = props;
 	const blockType = getBlockType( name );
+	const blockContext = useContext( BlockContext );
+
+	// Assign context values using the block type's declared context needs.
+	const context = useMemo(
+		() =>
+			blockType && blockType.context
+				? pick( blockContext, blockType.context )
+				: DEFAULT_BLOCK_CONTEXT,
+		[ blockType, blockContext ]
+	);
 
 	if ( ! blockType ) {
 		return null;
@@ -32,7 +59,7 @@ export const Edit = ( props ) => {
 	);
 
 	if ( lightBlockWrapper ) {
-		return <Component { ...props } />;
+		return <Component { ...props } context={ context } />;
 	}
 
 	// Generate a class name for the block's editable form
@@ -41,7 +68,9 @@ export const Edit = ( props ) => {
 		: null;
 	const className = classnames( generatedClassName, attributes.className );
 
-	return <Component { ...props } className={ className } />;
+	return (
+		<Component { ...props } context={ context } className={ className } />
+	);
 };
 
 export default withFilters( 'editor.BlockEdit' )( Edit );
