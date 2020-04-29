@@ -19,6 +19,7 @@
 	border: 1px solid #e2e4e7;
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
