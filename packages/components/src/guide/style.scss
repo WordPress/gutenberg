@@ -29,6 +29,7 @@
 	&__container {
 		display: flex;
 		flex-direction: column;
+		justify-content: space-between;
 		margin-top: -$header-height;
 		min-height: 100%;
 	}
@@ -49,7 +50,7 @@
 		display: flex;
 		height: 30px;
 		justify-content: center;
-		margin: 0 0 $grid-unit-40 0;
+		margin: 0 0 $grid-unit-30 0;
 		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
@@ -82,6 +83,8 @@
 .components-modal__frame.components-guide {
 	border: none;
 	min-width: 312px;
+	height: 80vh;
+	max-height: 575px;
 
 	@media (max-width: $break-small) {
 		bottom: 5%;
