@@ -102,6 +102,10 @@
 		&.has-text svg {
 			margin: 0;
 		}
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 
 	&.components-guide__back-button {
