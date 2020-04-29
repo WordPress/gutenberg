@@ -33,7 +33,11 @@ class Sandbox extends Component {
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		this.iframe.current.addEventListener( "load", this.trySandboxWithoutRerender, false );
+		this.iframe.current.addEventListener(
+			'load',
+			this.trySandboxWithoutRerender,
+			false
+		);
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -43,7 +47,10 @@ class Sandbox extends Component {
 	}
 
 	componentWillUnmount() {
-		this.iframe.current.removeEventListener( "load", this.trySandboxWithoutRerender );
+		this.iframe.current.removeEventListener(
+			'load',
+			this.trySandboxWithoutRerender
+		);
 	}
 
 	isFrameAccessible() {
