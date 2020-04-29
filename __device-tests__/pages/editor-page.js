@@ -17,7 +17,6 @@ export default class EditorPage {
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
-	latestPostsBlockName = 'Latest Posts';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -383,21 +382,5 @@ export default class EditorPage {
 	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean = true ) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text, clear );
-	}
-
-	// ============================
-	// Latest-Posts Block functions
-	// ============================
-
-	async addNewLatestPostsBlock() {
-		await this.addNewBlock( this.latestPostsBlockName );
-	}
-
-	async getLatestPostsBlockAtPosition( position: number ) {
-		return this.getBlockAtPosition( this.latestPostsBlockName, position );
-	}
-
-	async removeLatestPostsBlockAtPosition( position: number ) {
-		return await this.removeBlockAtPosition( this.latestPostsBlockName, position );
 	}
 }

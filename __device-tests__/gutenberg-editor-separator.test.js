@@ -14,11 +14,11 @@ import {
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
-describe( 'Gutenberg Editor Latest Post Block tests', () => {
+describe( 'Gutenberg Editor Separator Block test', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	const lastPostBlockName = 'Latest Posts';
+	const separatorBlockName = 'Separator';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -40,12 +40,12 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to add a Latests-Posts block', async () => {
-		await editorPage.addNewBlock( lastPostBlockName );
-		const latestPostsBlock = await editorPage.getBlockAtPosition( lastPostBlockName );
+	it( 'should be able to add an separator block', async () => {
+		await editorPage.addNewBlock( separatorBlockName );
+		const separatorBlock = await editorPage.getBlockAtPosition( separatorBlockName );
 
-		expect( latestPostsBlock ).toBeTruthy();
-		await editorPage.removeBlockAtPosition( lastPostBlockName );
+		expect( separatorBlock ).toBeTruthy();
+		await editorPage.removeBlockAtPosition( separatorBlockName );
 	} );
 
 	afterAll( async () => {
