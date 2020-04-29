@@ -101,7 +101,7 @@ describe( 'Multi-entity save flow', () => {
 				await assertMultiSaveEnabled();
 			} );
 
-			it( 'Clicking should open modal with boxes checked by default', async () => {
+			it( 'Clicking should open panel with boxes checked by default', async () => {
 				await page.click( savePostSelector );
 				await assertAllBoxesChecked();
 			} );
@@ -177,7 +177,7 @@ describe( 'Multi-entity save flow', () => {
 			expect( enabledButton ).not.toBeNull();
 		} );
 
-		it( 'Clicking button should open modal with boxes checked', async () => {
+		it( 'Clicking button should open panel with boxes checked', async () => {
 			await page.click( activeSaveSiteSelector );
 			await assertAllBoxesChecked();
 		} );
