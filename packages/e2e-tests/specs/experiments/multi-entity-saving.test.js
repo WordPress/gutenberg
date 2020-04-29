@@ -35,11 +35,11 @@ describe( 'Multi-entity save flow', () => {
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
 	};
 	const assertExistance = async ( selector, shouldBePresent ) => {
-		const button = await page.$( selector );
+		const element = await page.$( selector );
 		if ( shouldBePresent ) {
-			expect( button ).not.toBeNull();
+			expect( element ).not.toBeNull();
 		} else {
-			expect( button ).toBeNull();
+			expect( element ).toBeNull();
 		}
 	};
 	// Setup & Teardown.
