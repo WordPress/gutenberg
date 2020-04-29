@@ -7,10 +7,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import isShallowEqual from '@wordpress/is-shallow-equal';
-import { memo } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useCallback, memo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { _x } from '@wordpress/i18n';
@@ -70,30 +68,49 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 	return list.value;
 }
 
-function BlockStyles( {
-	styles,
-	className,
-	onChangeClassName,
-	type,
-	block,
-	blockName,
-	useExample,
-	onSwitch = noop,
-	onHoverClassName = noop,
-} ) {
+function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const selector = ( select ) => {
+		const { getBlock } = select( 'core/block-editor' );
+		const { getBlockStyles } = select( 'core/blocks' );
+		const block = getBlock( clientId );
+		const blockType = getBlockType( block.name );
+		const useExample = !! blockType.example;
+		return {
+			useExample,
+			blockName: block.name,
+			className: block.attributes.className || '',
+			styles: getBlockStyles( block.name ),
+			type: blockType,
+			block: useExample ? null : block,
+		};
+	};
+
+	const {
+		useExample,
+		blockName,
+		className,
+		styles,
+		type,
+		block,
+	} = useSelect( selector, [ clientId ] );
+
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const onChangeClassName = useCallback(
+		( newClassName ) =>
+			updateBlockAttributes( clientId, { className: newClassName } ),
+		[ updateBlockAttributes, clientId ]
+	);
+
 	if ( ! styles || styles.length === 0 ) {
 		return null;
 	}
 
 	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
-		styles = [
-			{
-				name: 'default',
-				label: _x( 'Default', 'block style' ),
-				isDefault: true,
-			},
-			...styles,
-		];
+		styles.unshift( {
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		} );
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
@@ -172,36 +189,4 @@ function BlockStyles( {
 	);
 }
 
-export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
-		const block = getBlock( clientId );
-		const blockType = getBlockType( block.name );
-		const useExample = !! blockType.example;
-
-		const props = {
-			useExample,
-			blockName: block.name,
-			className: block.attributes.className || '',
-			styles: getBlockStyles( block.name ),
-			type: blockType,
-		};
-		if ( ! useExample ) {
-			props.block = block;
-		}
-		return props;
-	} ),
-	withDispatch( ( dispatch, { clientId } ) => {
-		return {
-			onChangeClassName( newClassName ) {
-				dispatch( 'core/block-editor' ).updateBlockAttributes(
-					clientId,
-					{
-						className: newClassName,
-					}
-				);
-			},
-		};
-	} ),
-] )( memo( BlockStyles, isShallowEqual ) );
+export default memo( BlockStyles );
