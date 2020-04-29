@@ -48,7 +48,6 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
-				// dispatch sidebar to open here:
 				this.props.setCloseEntitiesCallback(
 					() => this.closeEntitiesSavedStates
 				);
@@ -225,7 +224,6 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		// toggleEntitiesSavedStates
 		const { editPost, savePost } = dispatch( 'core/editor' );
 		return {
 			onStatusChange: ( status ) =>
