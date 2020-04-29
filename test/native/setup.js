@@ -5,6 +5,8 @@ import { NativeModules } from 'react-native';
 
 jest.mock( '@wordpress/element', () => {
 	return {
+		__esModule: true,
+		...jest.requireActual( '@wordpress/element' ),
 		render: jest.fn(),
 	};
 } );
