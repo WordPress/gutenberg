@@ -183,7 +183,7 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 	get_front_page_template();
 	get_index_template();
-	$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
+	$current_template_post                             = gutenberg_find_template_post( $_wp_current_template_hierarchy );
 	$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
 	if ( isset( $_wp_current_template_part_ids ) ) {
 		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
