@@ -17,6 +17,7 @@ import { useRtl } from '../utils/style-mixins';
 
 export default function BoxInputControls( {
 	isLinked = true,
+	isInline = false,
 	onChange = noop,
 	values: valuesProp,
 	...props
@@ -89,11 +90,62 @@ export default function BoxInputControls( {
 	}
 
 	/**
+	 * TODO: REMOVE THIS
+	 * Just for testing inline UI
+	 */
+	if ( isInline ) {
+		return (
+			<LayoutContainer className="component-box-control__input-controls-wrapper">
+				<Layout
+					gap={ 1 }
+					align="top"
+					isInline={ isInline }
+					className="component-box-control__input-controls"
+				>
+					<UnitControl
+						{ ...props }
+						value={ top }
+						isInline={ isInline }
+						onChange={ createHandleOnChange( 'top' ) }
+						label={ LABELS.top }
+					/>
+
+					<UnitControl
+						{ ...props }
+						value={ right }
+						isInline={ isInline }
+						onChange={ createHandleOnChange( 'right' ) }
+						label={ LABELS.right }
+					/>
+					<UnitControl
+						{ ...props }
+						value={ bottom }
+						isInline={ isInline }
+						onChange={ createHandleOnChange( 'bottom' ) }
+						label={ LABELS.bottom }
+					/>
+					<UnitControl
+						{ ...props }
+						value={ left }
+						isInline={ isInline }
+						onChange={ createHandleOnChange( 'left' ) }
+						label={ LABELS.left }
+					/>
+				</Layout>
+			</LayoutContainer>
+		);
+	}
+
+	/**
 	 * Individual sides
 	 */
 	return (
 		<LayoutContainer className="component-box-control__input-controls-wrapper">
-			<Layout className="component-box-control__input-controls">
+			<Layout
+				gap={ 1 }
+				align="top"
+				className="component-box-control__input-controls"
+			>
 				<LayoutBox aria-hidden="true" />
 				<UnitControl
 					{ ...props }
@@ -115,7 +167,6 @@ export default function BoxInputControls( {
 					onChange={ createHandleOnChange( 'left' ) }
 					label={ LABELS.left }
 					style={ {
-						position: 'absolute',
 						[ isRtl ? 'right' : 'left' ]: 0,
 						top: '50%',
 						transform: 'translateY(-50%)',

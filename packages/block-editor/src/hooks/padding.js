@@ -47,12 +47,23 @@ export function PaddingEdit( props ) {
 
 	return Platform.select( {
 		web: (
-			<BoxControl
-				values={ style?.padding }
-				onChange={ onChange }
-				label={ __( 'Padding' ) }
-				units={ units }
-			/>
+			<>
+				<BoxControl
+					values={ style?.padding }
+					onChange={ onChange }
+					label={ __( 'Padding' ) }
+					units={ units }
+				/>
+				<br />
+				<br />
+				<BoxControl
+					values={ style?.padding }
+					onChange={ onChange }
+					label={ __( 'Padding' ) }
+					units={ units }
+					isInline
+				/>
+			</>
 		),
 		native: null,
 	} );

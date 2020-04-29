@@ -30,7 +30,7 @@ export const LayoutContainer = styled( Flex )`
 	justify-content: center;
 `;
 
-export const Layout = styled.div`
+export const Layout = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
 	height: 100%;

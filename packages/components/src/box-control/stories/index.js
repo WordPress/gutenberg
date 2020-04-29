@@ -37,6 +37,14 @@ function DemoExample() {
 						values={ values }
 						onChange={ setValues }
 					/>
+					<br />
+					<br />
+					<BoxControl
+						label="Padding"
+						isInline
+						values={ values }
+						onChange={ setValues }
+					/>
 				</Content>
 			</FlexBlock>
 			<FlexBlock>

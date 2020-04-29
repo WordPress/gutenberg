@@ -31,6 +31,7 @@ function useUniqueId( idProp ) {
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
+	isInline = false,
 	onChange = noop,
 	label = __( 'Box Control' ),
 	values,
@@ -64,6 +65,7 @@ export default function BoxControl( {
 				{ ...inputProps }
 				onChange={ onChange }
 				isLinked={ isLinked }
+				isInline={ isInline }
 				units={ units }
 				values={ values }
 			/>
