@@ -42,8 +42,6 @@ function gutenberg_add_template_loader_filters() {
 	foreach ( $template_types as $template_type ) {
 		add_filter( $template_type . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
-
-	add_filter( 'template_include', 'gutenberg_template_include_filter', 20 );
 }
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
@@ -73,28 +71,32 @@ function get_template_hierachy( $template_type ) {
 }
 
 /**
- * Filters into the "{$type}_template" hooks to record the current template hierarchy.
+ * Filters into the "{$type}_template" hooks to redirect them to the Full Site Editing template canvas.
  *
- * The method returns an empty result for every template so that a 'wp_template' post
- * is used instead.
- *
- * @see gutenberg_template_include_filter
+ * Internally, this communicates the block content that needs to be used by the template canvas through a global variable.
  *
  * @param string $template  Path to the template. See locate_template().
  * @param string $type      Sanitized filename without extension.
  * @param array  $templates A list of template candidates, in descending order of priority.
- * @return string Empty string to ensure template file is considered not found.
+ * @return string The path to the Full Site Editing template canvas file.
  */
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
-	global $_wp_current_template_hierarchy;
+	global $_wp_current_template_id, $_wp_current_template_content;
 
-	if ( ! is_array( $_wp_current_template_hierarchy ) ) {
-		$_wp_current_template_hierarchy = $templates;
-	} else {
-		$_wp_current_template_hierarchy = array_merge( $_wp_current_template_hierarchy, $templates );
+	$current_template_post = gutenberg_find_template_post( $templates );
+
+	if ( $current_template_post ) {
+		$_wp_current_template_id      = $current_template_post->ID;
+		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
 	}
 
-	return '';
+	// Add extra hooks for template canvas.
+	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
+	remove_action( 'wp_head', '_wp_render_title_tag', 1 );
+	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 );
+
+	// This file will be included instead of the theme's template file.
+	return gutenberg_dir_path() . 'lib/template-canvas.php';
 }
 
 /**
@@ -175,38 +177,6 @@ function create_auto_draft_for_template_part_block( $block ) {
 	foreach ( $block['innerBlocks'] as $inner_block ) {
 		create_auto_draft_for_template_part_block( $inner_block );
 	}
-}
-
-/**
- * Find the correct 'wp_template' post for the current hierarchy and return the path
- * to the canvas file that will render it.
- *
- * @param string $template_file Original template file. Will be overridden.
- * @return string Path to the canvas file to include.
- */
-function gutenberg_template_include_filter( $template_file ) {
-	global $_wp_current_template_id, $_wp_current_template_content, $_wp_current_template_hierarchy;
-
-	// Bail if no relevant template hierarchy was determined, or if the template file
-	// was overridden another way.
-	if ( ! $_wp_current_template_hierarchy || $template_file ) {
-		return $template_file;
-	}
-
-	$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
-
-	if ( $current_template_post ) {
-		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
-	}
-
-	// Add extra hooks for template canvas.
-	add_action( 'wp_head', 'gutenberg_viewport_meta_tag', 0 );
-	remove_action( 'wp_head', '_wp_render_title_tag', 1 );
-	add_action( 'wp_head', 'gutenberg_render_title_tag', 1 );
-
-	// This file will be included instead of the theme's template file.
-	return gutenberg_dir_path() . 'lib/template-canvas.php';
 }
 
 /**
