@@ -135,7 +135,7 @@
 
 
 @mixin input-style__focus() {
-	border-color: color($theme-color);
+	border-color: $theme-color;
 	box-shadow: 0 0 0 ($border-width-focus - $border-width) $theme-color;
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.

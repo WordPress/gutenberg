@@ -42,7 +42,7 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: color($theme-color);
+		background: $theme-color;
 		color: $white;
 		text-decoration: none;
 		text-shadow: none;
@@ -78,7 +78,7 @@
 			&:focus:enabled {
 				box-shadow:
 					0 0 0 $border-width $white,
-					0 0 0 3px color($theme-color);
+					0 0 0 3px $theme-color;
 			}
 		}
 
@@ -97,7 +97,7 @@
 				$theme-color 72%
 			);
 			/* stylelint-enable */
-			border-color: color($theme-color);
+			border-color: $theme-color;
 		}
 	}
 
