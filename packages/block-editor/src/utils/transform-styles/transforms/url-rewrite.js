@@ -18,6 +18,10 @@ const rewrite = ( rootURL ) => ( node ) => {
 
 	// bases relative URLs with rootURL
 	const basedUrl = new URL( urlValueStr, rootURL );
+
+	// skip host-relative, already normalized URLs (e.g. `/images/image.jpg`, without `..`s)
+	if ( basedUrl.pathname === urlValueStr ) return;
+
 	// wraps URL in the originally used quotes (if used)
 	urlValue.value = urlQuote + basedUrl.toString() + urlQuote;
 };
