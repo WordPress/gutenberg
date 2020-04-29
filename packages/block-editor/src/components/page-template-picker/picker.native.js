@@ -5,6 +5,11 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import Tooltip from './tooltip';
+
+/**
  * External dependencies
  */
 import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
@@ -36,6 +41,7 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
+	const [ tooltip, setTooltipVisible ] = useState( true );
 	const contentOpacity = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
@@ -52,6 +58,12 @@ const __experimentalPageTemplatePicker = ( {
 			Keyboard.removeListener( 'keyboardDidHide', onKeyboardDidHide );
 		};
 	}, [ visible ] );
+
+	useEffect( () => {
+		if ( tooltip && templatePreview ) {
+			setTooltipVisible( false );
+		}
+	}, [ templatePreview ] );
 
 	const onKeyboardDidShow = () => {
 		if ( visible ) {
@@ -84,6 +96,10 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
+	const onTooltipHidden = () => {
+		setTooltipVisible( false );
+	};
+
 	const startPickerAnimation = ( isVisible ) => {
 		Animated.timing( contentOpacity, {
 			toValue: isVisible ? 1 : 0,
@@ -102,6 +118,7 @@ const __experimentalPageTemplatePicker = ( {
 
 	return (
 		<Animated.View style={ [ { opacity: contentOpacity } ] }>
+			{ tooltip && <Tooltip onTooltipHidden={ onTooltipHidden } /> }
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
