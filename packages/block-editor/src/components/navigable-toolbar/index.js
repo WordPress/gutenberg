@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { NavigableMenu, Toolbar } from '@wordpress/components';
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useRef,
+	useLayoutEffect,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
@@ -11,22 +17,20 @@ function useShouldDisplayAccessibleToolbar( ref ) {
 		shouldDisplayAccessibleToolbar,
 		setShouldDisplayAccessibleToolbar,
 	] = useState( false );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const wrapper = ref.current;
-		window.requestAnimationFrame( () => {
-			const focusables = focus.focusable.find( wrapper );
-			const notToolbarItem = focusables.find(
-				( focusable ) =>
-					! ( 'experimentalToolbarItem' in focusable.dataset )
-			);
-			if ( ! notToolbarItem ) {
-				setShouldDisplayAccessibleToolbar( true );
-			}
-		} );
+		const tabbables = focus.tabbable.find( wrapper );
+		const notToolbarItem = tabbables.some(
+			( tabbable ) => ! ( 'experimentalToolbarItem' in tabbable.dataset )
+		);
+		if ( ! notToolbarItem ) {
+			setShouldDisplayAccessibleToolbar( true );
+		}
 	} );
 	return shouldDisplayAccessibleToolbar;
 }
 
+// TODO: Opening Change Alignment Text makes it not be the last child
 function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	const wrapper = useRef();
 	const shouldDisplayAccessibleToolbar = useShouldDisplayAccessibleToolbar(
@@ -34,15 +38,19 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	);
 
 	const focusToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( wrapper.current );
-		if ( tabbables.length ) {
-			tabbables[ 0 ].focus();
-		}
+		window.requestAnimationFrame( () => {
+			const tabbables = focus.tabbable.find( wrapper.current );
+			if ( tabbables.length ) {
+				tabbables[ 0 ].focus();
+			}
+		} );
 	}, [] );
+
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
 		bindGlobal: true,
 		eventName: 'keydown',
 	} );
+
 	useEffect( () => {
 		if ( focusOnMount ) {
 			focusToolbar();
