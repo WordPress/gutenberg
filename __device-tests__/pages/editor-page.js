@@ -83,17 +83,13 @@ export default class EditorPage {
 	}
 
 	async getFirstBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${
-			this.accessibilityIdXPathAttrib
-		}, " Block. Row ")]`;
+		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ 0 ];
 	}
 
 	async getLastBlockVisible() {
-		const firstBlockLocator = `//*[contains(@${
-			this.accessibilityIdXPathAttrib
-		}, " Block. Row ")]`;
+		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 		const elements = await this.driver.elementsByXPath( firstBlockLocator );
 		return elements[ elements.length - 1 ];
 	}
@@ -104,9 +100,7 @@ export default class EditorPage {
 
 	async getTitleElement( options: { autoscroll: boolean } = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
-		const elements = await this.driver.elementsByXPath(
-			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]`
-		);
+		const elements = await this.driver.elementsByXPath( `//*[contains(@${ this.accessibilityIdXPathAttrib }, "Post title.")]` );
 		if ( elements.length === 0 && options.autoscroll ) {
 			await swipeDown( this.driver );
 			return this.getTitleElement( options );
@@ -155,9 +149,7 @@ export default class EditorPage {
 		if ( isAndroid() ) {
 			return await this.driver.hideDeviceKeyboard();
 		}
-		const hideKeyboardToolbarButton = await this.driver.elementByXPath(
-			'//XCUIElementTypeButton[@name="Hide keyboard"]'
-		);
+		const hideKeyboardToolbarButton = await this.driver.elementByXPath( '//XCUIElementTypeButton[@name="Hide keyboard"]' );
 		await hideKeyboardToolbarButton.click();
 	}
 
@@ -220,14 +212,10 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}="${ blockName } Block. Row ${ position }."]`;
+		const parentLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ blockName } Block. Row ${ position }."]`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${
-			this.accessibilityIdXPathAttrib
-		}="Move block up from row ${ position } to row ${ position - 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block up from row ${ position } to row ${ position - 1 }"]`;
 		const moveUpButton = await this.driver.elementByXPath( blockLocator );
 		await moveUpButton.click();
 	}
@@ -238,14 +226,10 @@ export default class EditorPage {
 			throw Error( `No Block at position ${ position }` );
 		}
 
-		const parentLocator = `//*[contains(@${
-			this.accessibilityIdXPathAttrib
-		}, "${ blockName } Block. Row ${ position }.")]`;
+		const parentLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }.")]`;
 		let blockLocator = `${ parentLocator }/following-sibling::*`;
 		blockLocator += isAndroid() ? '' : '//*';
-		blockLocator += `[@${
-			this.accessibilityIdXPathAttrib
-		}="Move block down from row ${ position } to row ${ position + 1 }"]`;
+		blockLocator += `[@${ this.accessibilityIdXPathAttrib }="Move block down from row ${ position } to row ${ position + 1 }"]`;
 		const moveDownButton = await this.driver.elementByXPath( blockLocator );
 		await moveDownButton.click();
 	}
@@ -259,9 +243,7 @@ export default class EditorPage {
 
 		const buttonElementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
 		const removeButtonIdentifier = `Remove block at row ${ position }`;
-		const removeBlockLocator = `${ buttonElementName }[contains(@${
-			this.accessibilityIdXPathAttrib
-		}, "${ removeButtonIdentifier }")]`;
+		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
@@ -287,9 +269,7 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify(
-			accessibilityId
-		) }]//${ textViewElementName }`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
@@ -344,9 +324,7 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify(
-			accessibilityId
-		) }]//${ textViewElementName }`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
@@ -369,24 +347,18 @@ export default class EditorPage {
 
 	async selectEmptyImageBlock( block: wd.PromiseChainWebdriver.Element ) {
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//XCUIElementTypeButton[@name="Image block. Empty"]`;
 		const imageBlockInnerElement = await this.driver.elementByXPath( blockLocator );
 		await imageBlockInnerElement.click();
 	}
 
 	async chooseMediaLibrary() {
-		const mediaLibraryButton = await this.driver.elementByAccessibilityId(
-			'WordPress Media Library'
-		);
+		const mediaLibraryButton = await this.driver.elementByAccessibilityId( 'WordPress Media Library' );
 		await mediaLibraryButton.click();
 	}
 
 	async enterCaptionToSelectedImageBlock( caption: string, clear: boolean = true ) {
-		const imageBlockCaptionField = await this.driver.elementByXPath(
-			'//XCUIElementTypeButton[@name="Image caption. Empty"]'
-		);
+		const imageBlockCaptionField = await this.driver.elementByXPath( '//XCUIElementTypeButton[starts-with(@name, "Image caption.")]' );
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
@@ -403,24 +375,12 @@ export default class EditorPage {
 		}
 
 		const accessibilityId = await block.getAttribute( this.accessibilityIdKey );
-		const blockLocator = `//*[@${
-			this.accessibilityIdXPathAttrib
-		}="${ accessibilityId }"]//${ textViewElementName }`;
+		const blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]//${ textViewElementName }`;
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToHeadingBlock(
-		block: wd.PromiseChainWebdriver.Element,
-		text: string,
-		clear: boolean = true
-	) {
+	async sendTextToHeadingBlock( block: wd.PromiseChainWebdriver.Element, text: string, clear: boolean = true ) {
 		const textViewElement = await this.getTextViewForHeadingBlock( block, true );
 		return await typeString( this.driver, textViewElement, text, clear );
-	}
-
-	async getTextForHeadingBlock( block: wd.PromiseChainWebdriver.Element ) {
-		const textViewElement = await this.getTextViewForHeadingBlock( block, false );
-		const text = await textViewElement.text();
-		return text.toString();
 	}
 }
