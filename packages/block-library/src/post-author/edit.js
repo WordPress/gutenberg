@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { forEach } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -77,11 +78,15 @@ function PostAuthorDisplay( {
 
 	const { align, showAvatar, showBio, byline } = props.attributes;
 
-	const avatarSizes = [
-		{ value: 24, label: __( 'Small' ) },
-		{ value: 48, label: __( 'Medium' ) },
-		{ value: 96, label: __( 'Large' ) },
-	];
+	const avatarSizes = [];
+	if ( authorDetails ) {
+		forEach( authorDetails.avatar_urls, ( url, size ) => {
+			avatarSizes.push( {
+				value: size,
+				label: `${ size } x ${ size }`,
+			} );
+		} );
+	}
 
 	let avatarSize = DEFAULT_AVATAR_SIZE;
 	if ( !! props.attributes.avatarSize ) {
