@@ -188,7 +188,7 @@ function gutenberg_template_include_filter( $template_file ) {
  * Return the correct 'wp_template' post for the current template hierarchy.
  *
  * @param string[] $template_hierarchy The current template hierarchy, ordered by priority.
- * @return WP_Post|null         A template post object, or null if none could be found.
+ * @return WP_Post|null A template post object, or null if none could be found.
  */
 function gutenberg_find_template_post( $template_hierarchy ) {
 	if ( ! $template_hierarchy ) {
