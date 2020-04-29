@@ -38,12 +38,10 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	);
 
 	const focusToolbar = useCallback( () => {
-		window.requestAnimationFrame( () => {
-			const tabbables = focus.tabbable.find( wrapper.current );
-			if ( tabbables.length ) {
-				tabbables[ 0 ].focus();
-			}
-		} );
+		const tabbables = focus.focusable.find( wrapper.current );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
+		}
 	}, [] );
 
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
@@ -55,7 +53,7 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 		if ( focusOnMount ) {
 			focusToolbar();
 		}
-	}, [] );
+	}, [ shouldDisplayAccessibleToolbar ] );
 
 	if ( shouldDisplayAccessibleToolbar ) {
 		return (
