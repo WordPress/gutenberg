@@ -543,10 +543,11 @@ Should there be any situation where you want to provide your own webpack config,
 
 To extend the provided webpack config, or replace subsections within the provided webpack config, you can provide your own `webpack.config.js` file, `require` the provided `webpack.config.js` file, and use the [`spread` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) to import all of or part of the provided configuration.
 
-In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include [`css-loader`](https://github.com/webpack-contrib/css-loader) and [`style-loader`](https://github.com/webpack-contrib/style-loader):
+In the example below, a `webpack.config.js` file is added to the root folder extending the provided webpack config to include custom logic to parse module's source and convert it to a JavaScript object using [`toml`](https://www.npmjs.com/package/toml). It may be useful to import toml or other non-JSON files as JSON, without specific loaders:
 
 ```javascript
-const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+const toml = require( 'toml' );
+const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
   ...defaultConfig,
@@ -555,8 +556,11 @@ module.exports = {
     rules: [
       ...defaultConfig.module.rules,
       {
-        test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ],
+        test: /.toml/,
+        type: 'json',
+        parser: {
+          parse: toml.parse
+        }
       }
     ]
   }
