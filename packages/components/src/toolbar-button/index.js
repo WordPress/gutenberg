@@ -21,6 +21,9 @@ function ToolbarButton( {
 	className,
 	extraProps,
 	children,
+	title,
+	isActive,
+	isDisabled,
 	...props
 } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
@@ -32,7 +35,7 @@ function ToolbarButton( {
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
 					icon={ props.icon }
-					label={ props.title }
+					label={ title }
 					shortcut={ props.shortcut }
 					data-subscript={ props.subscript }
 					onClick={ ( event ) => {
@@ -45,8 +48,8 @@ function ToolbarButton( {
 						'components-toolbar__control',
 						className
 					) }
-					isPressed={ props.isActive }
-					disabled={ props.isDisabled }
+					isPressed={ isActive }
+					disabled={ isDisabled }
 					data-experimental-toolbar-item
 					{ ...extraProps }
 				>
@@ -65,7 +68,12 @@ function ToolbarButton( {
 			{ ...props }
 		>
 			{ ( toolbarItemProps ) => (
-				<Button label={ props.title } { ...toolbarItemProps }>
+				<Button
+					label={ title }
+					isPressed={ isActive }
+					disabled={ isDisabled }
+					{ ...toolbarItemProps }
+				>
 					{ children }
 				</Button>
 			) }

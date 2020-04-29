@@ -29,7 +29,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
-	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
@@ -42,15 +41,13 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 };
 
-const tabThroughBlockMoverControl = async () => {
+const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Move up' );
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
-};
 
-const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 
@@ -71,6 +68,9 @@ const tabThroughBlockToolbar = async () => {
 
 	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'More options' );
+
+	await page.keyboard.press( 'ArrowRight' );
+	await expect( await getActiveLabel() ).toBe( 'Move up' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
