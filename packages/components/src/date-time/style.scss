@@ -77,7 +77,7 @@
 		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
 
 		&:hover {
-			background: color(theme(primary) shade(15%));
+			background: theme(primary, shade-20);
 		}
 
 		&:focus {

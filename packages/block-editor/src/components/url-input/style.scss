@@ -94,7 +94,7 @@ $input-size: 300px;
 
 	&:focus,
 	&.is-selected {
-		background: color(theme(primary) shade(15%));
+		background: theme(primary, shade-20);
 		color: $white;
 		outline: none;
 	}
