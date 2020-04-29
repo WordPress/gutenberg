@@ -1,5 +1,9 @@
 ## Master
 
+### Breaking Changes
+
+-  The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+
 ### Improvements
 
 - `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
