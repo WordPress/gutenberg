@@ -80,21 +80,19 @@ export default function useNavigationBlocks( menuId ) {
 
 		const saveNestedBlocks = ( nestedBlocks, parentId ) => {
 			for ( const block of nestedBlocks ) {
-				if ( block.innerBlocks.length ) {
-					saveNestedBlocks( block.innerBlocks, block.clientId );
-				}
 				const menuItem = menuItemsRef.current[ block.clientId ];
 				const parentItemId = menuItemsRef.current[ parentId ]?.id;
+
 				if ( ! menuItem ) {
 					saveMenuItem( {
 						...createMenuItemAttributesFromBlock( block ),
 						menus: menuId,
 						parent: parentItemId || 0,
 					} );
-					continue;
 				}
 
 				if (
+					menuItem &&
 					! isEqual(
 						block.attributes,
 						createBlockFromMenuItem( menuItem ).attributes
@@ -105,6 +103,10 @@ export default function useNavigationBlocks( menuId ) {
 						...createMenuItemAttributesFromBlock( block ),
 						menus: menuId, // Gotta do this because REST API doesn't like receiving an array here. Maybe a bug in the REST API?
 					} );
+				}
+
+				if ( block.innerBlocks.length ) {
+					saveNestedBlocks( block.innerBlocks, block.clientId );
 				}
 			}
 		};
