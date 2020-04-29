@@ -5,8 +5,8 @@ import {
 	createNewPost,
 	getAllBlockInserterItemTitles,
 	insertBlock,
-	openAllBlockInserterCategories,
 	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Columns', () => {
@@ -16,6 +16,7 @@ describe( 'Columns', () => {
 
 	it( 'restricts all blocks inside the columns block', async () => {
 		await insertBlock( 'Columns' );
+		await closeGlobalBlockInserter();
 		await page.click( '[aria-label="Two columns; equal split"]' );
 		await page.click( '[aria-label="Block navigation"]' );
 		const columnBlockMenuItem = (
@@ -25,7 +26,6 @@ describe( 'Columns', () => {
 		 )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();
-		await openAllBlockInserterCategories();
 		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 0 );
 	} );
 } );

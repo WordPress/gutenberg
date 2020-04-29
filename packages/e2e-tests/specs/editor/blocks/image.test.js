@@ -4,7 +4,7 @@
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -61,6 +62,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
+		await openDocumentSettingsSidebar();
 		await page.click( '[aria-label="Image Size"] button' );
 
 		const regex2 = new RegExp(

@@ -20,10 +20,6 @@ import { compose } from '@wordpress/compose';
  */
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
-
-/**
- * Internal dependencies
- */
 import BlockList from '../block-list';
 import { withBlockEditContext } from '../block-edit/context';
 
@@ -112,8 +108,17 @@ class InnerBlocks extends Component {
 		const {
 			clientId,
 			renderAppender,
+			renderFooterAppender,
+			__experimentalMoverDirection,
+			parentWidth,
+			horizontal,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
 			marginVertical,
 			marginHorizontal,
+			horizontalAlignment,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -125,7 +130,18 @@ class InnerBlocks extends Component {
 						marginHorizontal={ marginHorizontal }
 						rootClientId={ clientId }
 						renderAppender={ renderAppender }
+						renderFooterAppender={ renderFooterAppender }
 						withFooter={ false }
+						__experimentalMoverDirection={
+							__experimentalMoverDirection
+						}
+						parentWidth={ parentWidth }
+						horizontalAlignment={ horizontalAlignment }
+						horizontal={ horizontal }
+						contentResizeMode={ contentResizeMode }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
 					/>
 				) }
 			</>

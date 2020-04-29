@@ -14,13 +14,6 @@ import { combineReducers } from '@wordpress/data';
 import { PREFERENCES_DEFAULTS } from './defaults';
 
 /**
- * The default active general sidebar: The "Document" tab.
- *
- * @type {string}
- */
-export const DEFAULT_ACTIVE_GENERAL_SIDEBAR = 'edit-post/document';
-
-/**
  * Higher-order reducer creator which provides the given initial state for the
  * original reducer.
  *

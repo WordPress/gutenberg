@@ -54,18 +54,34 @@
 		font-size: $default-font-size;
 	}
 
+	// Seperate borders so that border respect border radius
+	.CalendarMonth_table {
+		border-collapse: separate;
+		border-spacing: 2px;
+	}
+
 	.CalendarDay {
 		font-size: $default-font-size;
-		border: 1px solid transparent;
+		border: none;
 		border-radius: $radius-round;
 		text-align: center;
+
+		&:focus {
+			box-shadow: inset 0 0 0 $border-width-focus theme(primary), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
+			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
+		}
 	}
 
 	.CalendarDay__selected {
 		background: theme(primary);
+		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
 
 		&:hover {
 			background: color(theme(primary) shade(15%));
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 $border-width $white;
 		}
 	}
 

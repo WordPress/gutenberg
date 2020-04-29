@@ -1,3 +1,15 @@
+## Master
+
+## 4.5.0 (2020-04-15)
+
+### Enhancements
+
+- `visitAdminPage` will now throw an error (emit a test failure) when there are unexpected errors on hte page.
+
+### New Features
+
+- Added `getPageError` function, returning a promise which resolves to an error message present in the page, if any exists.
+
 ## 4.0.0 (2019-12-19)
 
 ### Breaking Changes

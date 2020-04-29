@@ -17,8 +17,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
-	__experimentalEditorSkeleton as EditorSkeleton,
-	__experimentalFullscreenMode as FullscreenMode,
+	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -29,7 +28,13 @@ import {
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __ } from '@wordpress/i18n';
-import { ComplementaryArea } from '@wordpress/interface';
+import {
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+} from '@wordpress/interface';
+import { useState, useEffect } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -48,11 +53,18 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
 
+const interfaceLabels = {
+	leftSidebar: __( 'Block Library' ),
+};
+
 function Layout() {
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
 		closePublishSidebar,
 		openGeneralSidebar,
+		closeGeneralSidebar,
 		togglePublishSidebar,
 	} = useDispatch( 'core/edit-post' );
 	const {
@@ -112,6 +124,18 @@ function Layout() {
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Inserter and Sidebars are mutually exclusive
+	useEffect( () => {
+		if ( sidebarIsOpened && ! isHugeViewport ) {
+			setIsInserterOpen( false );
+		}
+	}, [ sidebarIsOpened, isHugeViewport ] );
+	useEffect( () => {
+		if ( isInserterOpen && ! isHugeViewport ) {
+			closeGeneralSidebar();
+		}
+	}, [ isInserterOpen, isHugeViewport ] );
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -122,9 +146,42 @@ function Layout() {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<FocusReturnProvider>
-				<EditorSkeleton
+				<InterfaceSkeleton
 					className={ className }
-					header={ <Header /> }
+					labels={ interfaceLabels }
+					header={
+						<Header
+							isInserterOpen={ isInserterOpen }
+							onToggleInserter={ () =>
+								setIsInserterOpen( ! isInserterOpen )
+							}
+						/>
+					}
+					leftSidebar={
+						mode === 'visual' &&
+						isInserterOpen && (
+							<div className="edit-post-layout__inserter-panel">
+								<div className="edit-post-layout__inserter-panel-header">
+									<Button
+										icon={ close }
+										onClick={ () =>
+											setIsInserterOpen( false )
+										}
+									/>
+								</div>
+								<div className="edit-post-layout__inserter-panel-content">
+									<Library
+										showInserterHelpPanel
+										onSelect={ () => {
+											if ( isMobileViewport ) {
+												setIsInserterOpen( false );
+											}
+										} }
+									/>
+								</div>
+							</div>
+						)
+					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>
@@ -176,7 +233,7 @@ function Layout() {
 							</div>
 						)
 					}
-					publish={
+					actions={
 						publishSidebarOpened ? (
 							<PostPublishPanel
 								onClose={ closePublishSidebar }

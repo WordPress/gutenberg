@@ -6,19 +6,6 @@
 .block-editor-block-switcher__no-switcher-icon,
 .block-editor-block-switcher__toggle {
 	position: relative;
-
-	&::after {
-		display: block;
-		content: "";
-		position: absolute;
-		bottom: 1px;
-		right: 0;
-		border-color: transparent;
-		border-style: solid;
-		border-width: 4px;
-		border-right-color: currentColor;
-		border-bottom-color: currentColor;
-	}
 }
 
 
@@ -82,7 +69,6 @@
 	max-width: calc(340px * 2);
 	display: flex;
 	background: $white;
-	box-shadow: $shadow-popover;
 	padding: 0;
 
 	.components-menu-group {

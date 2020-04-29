@@ -79,7 +79,7 @@ _Related_
 _Parameters_
 
 -   _format_ `string`: The format of the string to generate.
--   _args_ `...string`: Arguments to apply to the format.
+-   _args_ `...*`: Arguments to apply to the format.
 
 _Returns_
 

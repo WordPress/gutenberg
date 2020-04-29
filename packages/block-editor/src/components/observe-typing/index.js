@@ -43,6 +43,7 @@ function isKeyDownEligibleForStartTyping( event ) {
 }
 
 function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
+	const typingContainer = useRef();
 	const lastMouseMove = useRef();
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
@@ -130,11 +131,11 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
-		// Ignore typing in a block toolbar
+		// Ignore typing if outside the current DOM container
 		if (
 			isTyping ||
 			! isTextField( target ) ||
-			target.closest( '.block-editor-block-toolbar' )
+			! typingContainer.current.contains( target )
 		) {
 			return;
 		}
@@ -176,6 +177,7 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div
+			ref={ typingContainer }
 			onFocus={ stopTypingOnNonTextField }
 			onKeyPress={ startTypingInTextField }
 			onKeyDown={ over( [

@@ -22,6 +22,9 @@ export const defaultEntities = [
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
+		getTitle: ( record ) => {
+			return get( record, [ 'title' ], __( 'Site Title' ) );
+		},
 	},
 	{
 		label: __( 'Post Type' ),

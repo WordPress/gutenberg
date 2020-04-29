@@ -23,5 +23,11 @@ describe( 'i18n', () => {
 
 			expect( result ).toBe( 'bonjour Riad' );
 		} );
+
+		it( 'replaces named placeholders', () => {
+			const result = sprintf( 'bonjour %(name)s', { name: 'Riad' } );
+
+			expect( result ).toBe( 'bonjour Riad' );
+		} );
 	} );
 } );

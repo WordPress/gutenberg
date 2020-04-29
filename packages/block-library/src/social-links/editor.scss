@@ -29,7 +29,7 @@
 }
 
 // Center flex items. This has an equivalent in style.scss.
-[data-type="core/social-links"][data-align="center"] .wp-block-social-links {
+.wp-block[data-align="center"] > .wp-block-social-links {
 	justify-content: center;
 }
 

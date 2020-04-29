@@ -629,14 +629,11 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Block Pattern Array.
  */
 function gutenberg_load_block_pattern( $name ) {
-	return json_decode(
-		file_get_contents( __DIR__ . '/patterns/' . $name . '.json' ),
-		true
-	);
+	return require( __DIR__ . '/patterns/' . $name . '.php' );
 }
 
 /**
- * Extends block editor settings to include a list of default block patterns.
+ * Extends block editor settings to include a list of default patterns.
  *
  * @param array $settings Default editor settings.
  *
@@ -644,7 +641,7 @@ function gutenberg_load_block_pattern( $name ) {
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
 	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
-		$settings['__experimentalBlockPatterns'] = [];
+		$settings['__experimentalBlockPatterns'] = array();
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(

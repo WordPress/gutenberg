@@ -4,28 +4,26 @@
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
-	BlockList,
-	ObserveTyping,
-	WritingFlow,
-	__experimentalBlockNavigationList,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import useNavigationBlocks from './use-navigation-blocks';
+import MenuEditorShortcuts from './shortcuts';
+import BlockEditorPanel from './block-editor-panel';
+import NavigationStructurePanel from './navigation-structure-panel';
 
 export default function MenuEditor( { menuId, blockEditorSettings } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	return (
 		<div className="edit-navigation-menu-editor">
 			<BlockEditorKeyboardShortcuts.Register />
-			<Button isPrimary onClick={ saveBlocks }>
-				{ __( 'Save' ) }
-			</Button>
+			<MenuEditorShortcuts.Register />
+
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
@@ -33,26 +31,16 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 				settings={ {
 					...blockEditorSettings,
 					templateLock: 'all',
+					hasFixedToolbar: true,
 				} }
 			>
-				<div className="edit-navigation-menu-editor__panel">
-					{ !! blocks.length && (
-						<__experimentalBlockNavigationList
-							blocks={ blocks }
-							selectedBlockClientId={ blocks[ 0 ].clientId }
-							selectBlock={ () => {} }
-							showNestedBlocks
-							showAppender
-						/>
-					) }
-				</div>
-				<div className="edit-navigation-menu-editor__panel">
-					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</div>
+				<BlockEditorKeyboardShortcuts />
+				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
+				<NavigationStructurePanel
+					blocks={ blocks }
+					initialOpen={ isLargeViewport }
+				/>
+				<BlockEditorPanel saveBlocks={ saveBlocks } />
 			</BlockEditorProvider>
 		</div>
 	);

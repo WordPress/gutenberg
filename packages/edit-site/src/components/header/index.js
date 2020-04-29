@@ -6,7 +6,9 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 	Inserter,
+	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 
 /**
@@ -49,6 +51,15 @@ export default function Header() {
 			} ) ),
 		[]
 	);
+
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const {
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = useDispatch( 'core/edit-site' );
+
 	return (
 		<div className="edit-site-header">
 			<FullscreenModeClose />
@@ -73,6 +84,10 @@ export default function Header() {
 				<ToolSelector />
 			</div>
 			<div className="edit-site-header__actions">
+				<PreviewOptions
+					deviceType={ deviceType }
+					setDeviceType={ setPreviewDeviceType }
+				/>
 				<SaveButton />
 				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />
