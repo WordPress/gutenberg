@@ -67,7 +67,7 @@ const Tooltip = ( { onTooltipHidden } ) => {
 	];
 
 	return (
-		<Animated.View>
+		<>
 			<TouchableWithoutFeedback onPress={ onHide }>
 				<View style={ stylesOverlay } />
 			</TouchableWithoutFeedback>
@@ -109,7 +109,7 @@ const Tooltip = ( { onTooltipHidden } ) => {
 					</View>
 				</TouchableWithoutFeedback>
 			</Animated.View>
-		</Animated.View>
+		</>
 	);
 };
 
