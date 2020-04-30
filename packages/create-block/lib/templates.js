@@ -19,6 +19,7 @@ const predefinedBlockTemplates = {
 			title: 'ES5 Example',
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
+			dashicon: 'smiley',
 			wpScripts: false,
 			editorScript: 'file:./index.js',
 			editorStyle: 'file:./editor.css',
@@ -31,6 +32,7 @@ const predefinedBlockTemplates = {
 			title: 'ESNext Example',
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
+			dashicon: 'smiley',
 		},
 	},
 };
@@ -75,7 +77,6 @@ const getBlockTemplate = async ( templateName ) => {
 const getDefaultValues = ( blockTemplate ) => {
 	return {
 		namespace: 'create-block',
-		dashicon: 'smiley',
 		category: 'widgets',
 		author: 'The WordPress Contributors',
 		license: 'GPL-2.0-or-later',
