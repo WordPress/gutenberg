@@ -28,7 +28,6 @@ function useUniqueId( idProp ) {
 
 export function InputControl(
 	{
-		// eslint-disable-next-line camelcase
 		unstable_stateReducer: stateReducer = ( state ) => state,
 		children,
 		className,
