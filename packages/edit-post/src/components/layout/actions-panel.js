@@ -87,7 +87,7 @@ export default function ActionsPanel( {
 				isOpen={ isEntitiesSavedStatesOpen }
 				closePanel={ closeEntitiesSavedStates }
 			/>
-			{ ! isEntitiesSavedStatesOpen && <>{ unmountableContent }</> }
+			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>
 	);
 }
