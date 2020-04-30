@@ -4,6 +4,8 @@
 
 - `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
 
+## 5.1.0 (2020-04-30)
+
 ### Bug Fixes
 
 - The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
