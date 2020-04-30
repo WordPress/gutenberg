@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 
 const wordPressLogo = (
 	<SVG width="28" height="28" viewBox="0 0 128 128" version="1.1">
@@ -18,6 +19,10 @@ function FullscreenModeClose() {
 	}, [] );
 
 	if ( ! isActive ) {
+		return null;
+	}
+
+	if ( applyFilters( 'siteEditor.closeButton.remove', false ) ) {
 		return null;
 	}
 
