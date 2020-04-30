@@ -446,6 +446,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 					} else {
 						$prepared_nav_item['menu-item-position'] = count( $menu_items );
 					}
+					array_push($menu_items,$last_item);
 				} else {
 					$prepared_nav_item['menu-item-position'] = 1;
 				}
@@ -457,7 +458,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 				$menu_item_ids[] = $menu_item->ID;
 				if ( $menu_item->ID !== (int) $menu_item_db_id ) {
 					if ( (int) $prepared_nav_item['menu-item-position'] === (int) $menu_item->menu_order ) {
-						return new WP_Error( 'invalid_menu_order', __( 'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
+						return new WP_Error( 'invalid_menu_order', __( print_r($menu_item).'Invalid menu position.', 'gutenberg' ), array( 'status' => 400 ) );
 					}
 				}
 			}

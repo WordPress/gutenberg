@@ -77,18 +77,22 @@ export default function useNavigationBlocks( menuId ) {
 
 	const saveBlocks = () => {
 		const { clientId, innerBlocks } = blocks[ 0 ];
+		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
 
-		const saveNestedBlocks = ( nestedBlocks, parentId ) => {
+		const saveNestedBlocks = async ( nestedBlocks, parentId = 0 ) => {
 			for ( const block of nestedBlocks ) {
 				const menuItem = menuItemsRef.current[ block.clientId ];
-				const parentItemId = menuItemsRef.current[ parentId ]?.id;
+				let currentItemId = menuItem?.id || 0;
 
 				if ( ! menuItem ) {
-					saveMenuItem( {
+					const savedItem = await saveMenuItem( {
 						...createMenuItemAttributesFromBlock( block ),
 						menus: menuId,
-						parent: parentItemId || 0,
-					} );
+						parent: parentId,
+					} ).then( ( result ) => result );
+					if ( block.innerBlocks.length ) {
+						currentItemId = savedItem.id;
+					}
 				}
 
 				if (
@@ -106,12 +110,12 @@ export default function useNavigationBlocks( menuId ) {
 				}
 
 				if ( block.innerBlocks.length ) {
-					saveNestedBlocks( block.innerBlocks, block.clientId );
+					saveNestedBlocks( block.innerBlocks, currentItemId );
 				}
 			}
 		};
 
-		saveNestedBlocks( innerBlocks, clientId );
+		saveNestedBlocks( innerBlocks, parentItemId );
 
 		const deletedClientIds = difference(
 			Object.keys( menuItemsRef.current ),
