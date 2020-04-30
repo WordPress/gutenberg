@@ -42,12 +42,9 @@ function PostAuthorDisplay( {
 } ) {
 	const ref = useRef();
 
-	const { authors } = useSelect( ( select ) => {
-		const { getAuthors } = select( 'core' );
-		return {
-			authors: getAuthors(),
-		};
-	} );
+	const { authors } = useSelect( ( select ) => ( {
+		authors: select( 'core' ).getAuthors(),
+	} ) );
 
 	const { isSelected, fontSize, setFontSize } = props;
 	const {
