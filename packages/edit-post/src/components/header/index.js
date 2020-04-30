@@ -14,7 +14,6 @@ import {
 /**
  * Internal dependencies
  */
-import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
@@ -32,6 +31,7 @@ function Header( {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
+		isFullscreenActive,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -48,6 +48,9 @@ function Header( {
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
 			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+				'fullscreenMode'
+			),
 			deviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),

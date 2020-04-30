@@ -95,6 +95,15 @@ export default function Header( { openEntitiesSavedStates } ) {
 		} catch ( err ) {}
 	}, [] );
 
+	const { isFullscreenActive } = useSelect(
+		( select ) => ( {
+			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
+				'fullscreenMode'
+			),
+		} ),
+		[]
+	);
+
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
 	}, [] );
