@@ -51,49 +51,28 @@ module.exports = async function(
 		textdomain: namespace,
 	};
 
-	if ( await isCoreTemplate( templateName ) ) {
+	const coreTemplate = await isCoreTemplate( templateName );
 
-		await Promise.all(
-			(await getOutputFiles( templateName )).map( async ( file ) => {
-				const template = await readFile(
-					join(
-						__dirname,
-						`templates/${ templateName }/${ file }.mustache`
-					),
-					'utf8'
-				);
-				// Output files can have names that depend on the slug provided.
-				const outputFilePath = `${ slug }/${ file.replace(
-					/\$slug/g,
-					slug
-				) }`;
-				await makeDir( dirname( outputFilePath ) );
-				writeFile( outputFilePath, render( template, view ) );
-			} )
-		);
+	const templateDirectory = coreTemplate ? join( __dirname, 'templates' ) : join( process.cwd(), "temp", "node_modules" );
 
-	} else {
-
-		await Promise.all(
-			(await getOutputFiles( templateName )).map( async ( file ) => {
-				const template = await readFile(
-					join(
-						process.cwd(),
-						`temp/node_modules/${ templateName }/${ file }.mustache`
-					),
-					'utf8'
-				);
-				// Output files can have names that depend on the slug provided.
-				const outputFilePath = `${ slug }/${ file.replace(
-					/\$slug/g,
-					slug
-				) }`;
-				await makeDir( dirname( outputFilePath ) );
-				writeFile( outputFilePath, render( template, view ) );
-			} )
-		);
-
-	}
+	await Promise.all(
+		(await getOutputFiles( templateName )).map( async ( file ) => {
+			const template = await readFile(
+				join(
+					templateDirectory,
+					`${ templateName }/${ file }.mustache`
+				),
+				'utf8'
+			);
+			// Output files can have names that depend on the slug provided.
+			const outputFilePath = `${ slug }/${ file.replace(
+				/\$slug/g,
+				slug
+			) }`;
+			await makeDir( dirname( outputFilePath ) );
+			writeFile( outputFilePath, render( template, view ) );
+		} )
+	);
 
 	if ( hasWPScriptsEnabled( templateName ) ) {
 		await initWPScripts( view );

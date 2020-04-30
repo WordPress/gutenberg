@@ -4,8 +4,8 @@
 const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 const { command } = require( 'execa' );
-const fs, { existsSync } = require( 'fs' );
-const path, { join } = require( 'path' );
+const { existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync } = require( 'fs' );
+const { join } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const makeDir = require( 'make-dir' );
 
@@ -156,21 +156,6 @@ const downloadExternalTemplate = async templateName => {
 	}
 }
 
-
-const deleteFolderRecursive = function(path) {
-  if (fs.existsSync(path)) {
-    fs.readdirSync(path).forEach((file, index) => {
-      const curPath = Path.join(path, file);
-      if (fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-};
-
 module.exports = {
 	getDefaultValues,
 	getOutputFiles,
@@ -178,5 +163,4 @@ module.exports = {
 	hasWPScriptsEnabled,
 	isCoreTemplate,
 	isExternalTemplate,
-	deleteFolderRecursive,
 };

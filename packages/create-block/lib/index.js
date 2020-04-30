@@ -3,6 +3,7 @@
  */
 const inquirer = require( 'inquirer' );
 const program = require( 'commander' );
+const { join } = require( 'path' );
 const { pickBy, startCase } = require( 'lodash' );
 
 /**
@@ -13,7 +14,7 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const { getDefaultValues, getPrompts, deleteFolderRecursive } = require( './templates' );
+const { getDefaultValues, getPrompts } = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
@@ -74,7 +75,6 @@ program
 					} );
 				}
 
-				deleteFolderRecursive( '/temp' );
 			} catch ( error ) {
 				if ( error instanceof CLIError ) {
 					log.error( error.message );
