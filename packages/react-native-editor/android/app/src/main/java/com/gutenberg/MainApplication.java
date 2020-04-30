@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.devsupport.interfaces.DevOptionHandler;
 import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.horcrux.svg.SvgPackage;
+import org.linusu.RNGetRandomValuesPackage;
 
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
@@ -153,6 +154,7 @@ public class MainApplication extends Application implements ReactApplication {
                         new SvgPackage(),
                         new ReactAztecPackage(),
                         new LinearGradientPackage(),
+                        new RNGetRandomValuesPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 
