@@ -143,6 +143,7 @@ function Layout() {
 		( callbackArg ) => {
 			if ( closeEntitiesCallback ) {
 				closeEntitiesCallback( callbackArg );
+				setCloseEntitiesCallback();
 			}
 			setIsEntitiesSavedStatesOpen( false );
 		},

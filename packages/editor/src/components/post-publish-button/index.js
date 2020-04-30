@@ -80,8 +80,6 @@ export class PostPublishButton extends Component {
 				entitiesSavedStatesCallback();
 			}
 		} );
-		// Clear the callback set for entities saved states.
-		this.props.setCloseEntitiesCallback();
 	}
 
 	render() {
