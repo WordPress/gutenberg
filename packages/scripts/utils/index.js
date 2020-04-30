@@ -5,6 +5,7 @@ const {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,
@@ -22,16 +23,15 @@ const {
 } = require( './env' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { hasPackageProp } = require( './package' );
-const { camelCaseDash } = require( './string' );
 
 module.exports = {
 	buildWordPress,
-	camelCaseDash,
 	fromProjectRoot,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
 	hasArgInCLI,

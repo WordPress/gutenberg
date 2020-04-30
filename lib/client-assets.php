@@ -636,7 +636,7 @@ function gutenberg_load_block_pattern( $name ) {
 }
 
 /**
- * Extends block editor settings to include a list of default block patterns.
+ * Extends block editor settings to include a list of default patterns.
  *
  * @param array $settings Default editor settings.
  *
@@ -644,7 +644,7 @@ function gutenberg_load_block_pattern( $name ) {
  */
 function gutenberg_extend_settings_block_patterns( $settings ) {
 	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
-		$settings['__experimentalBlockPatterns'] = [];
+		$settings['__experimentalBlockPatterns'] = array();
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(

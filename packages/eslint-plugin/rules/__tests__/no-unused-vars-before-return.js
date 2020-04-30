@@ -11,6 +11,9 @@ import rule from '../no-unused-vars-before-return';
 const ruleTester = new RuleTester( {
 	parserOptions: {
 		ecmaVersion: 6,
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 } );
 
@@ -49,6 +52,13 @@ function example() {
 	return number + foo;
 }`,
 			options: [ { excludePattern: '^do' } ],
+		},
+		{
+			code: `
+function MyComponent() {
+	const Foo = getSomeComponent();
+	return <Foo />;
+}`,
 		},
 	],
 	invalid: [
