@@ -24,7 +24,7 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { useControlledState } from '../utils/hooks';
+import { useBoxControlState, isValuesMixed } from './utils';
 
 const defaultInputProps = {
 	min: 0,
@@ -44,12 +44,13 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 } ) {
-	const [ isLinked, setIsLinked ] = useState( true );
+	const [ values, setValues ] = useBoxControlState( valuesProp );
+
 	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
 	const [ isDirty, setIsDirty ] = useState( false );
-	const [ values, setValues ] = useControlledState( valuesProp );
+	const [ isLinked, setIsLinked ] = useState( ! isValuesMixed( values ) );
 
-	const initialValuesRef = useRef( valuesProp );
+	const initialValuesRef = useRef( values );
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
@@ -125,7 +126,7 @@ export default function BoxControl( {
 					/>
 				</Flex.Item>
 			</HeaderControlWrapper>
-			<InputControls { ...inputControlProps } />
+			{ ! isLinked && <InputControls { ...inputControlProps } /> }
 		</Root>
 	);
 }

@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { parseUnit } from '../unit-control/utils';
+import { useControlledState } from '../utils/hooks';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -30,11 +31,8 @@ export const DEFAULT_VALUES = {
  * @param {Object} values Box values.
  * @return {Array<Object, Function>} Hook state and setter.
  */
-export function useBoxControlState( values = {} ) {
-	return {
-		...DEFAULT_VALUES,
-		...values,
-	};
+export function useBoxControlState( values = DEFAULT_VALUES ) {
+	return useControlledState( values );
 }
 
 /**
@@ -74,4 +72,17 @@ export function getAllValue( values = {} ) {
 	const allValue = `${ value }${ unit }`;
 
 	return allValue;
+}
+
+/**
+ * Checks to determine if values are mixed.
+ *
+ * @param {Object} values Box values.
+ * @return {boolean} Whether values are mixed.
+ */
+export function isValuesMixed( values = {} ) {
+	const allValue = getAllValue( values );
+	const isMixed = isNaN( parseFloat( allValue ) );
+
+	return isMixed;
 }

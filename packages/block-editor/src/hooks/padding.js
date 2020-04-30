@@ -54,15 +54,6 @@ export function PaddingEdit( props ) {
 					label={ __( 'Padding' ) }
 					units={ units }
 				/>
-				<br />
-				<br />
-				<BoxControl
-					values={ style?.padding }
-					onChange={ onChange }
-					label={ __( 'Padding' ) }
-					units={ units }
-					isInline
-				/>
 			</>
 		),
 		native: null,

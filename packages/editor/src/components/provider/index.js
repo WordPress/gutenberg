@@ -116,6 +116,7 @@ class EditorProvider extends Component {
 				'__experimentalDisableCustomUnits',
 				'__experimentalDisableCustomLineHeight',
 				'__experimentalDisableDropCap',
+				'__experimentalEnableCustomSpacing',
 				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',

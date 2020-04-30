@@ -6,7 +6,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, getAllValue } from './utils';
+import { LABELS, getAllValue, isValuesMixed } from './utils';
 
 export default function AllInputControl( {
 	onChange = noop,
@@ -15,7 +15,8 @@ export default function AllInputControl( {
 	...props
 } ) {
 	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
+	const isMixed = isValuesMixed( values );
+
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
 
 	const handleOnFocus = ( event ) => {

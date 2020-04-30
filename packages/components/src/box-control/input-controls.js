@@ -7,18 +7,15 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, useBoxControlState } from './utils';
+import { LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 export default function BoxInputControls( {
-	isLinked = true,
 	onChange = noop,
 	onFocus = noop,
-	values: valuesProp,
+	values,
 	...props
 } ) {
-	const values = useBoxControlState( valuesProp );
-
 	const createHandleOnFocus = ( side ) => ( event ) => {
 		onFocus( event, { side } );
 	};
@@ -58,11 +55,6 @@ export default function BoxInputControls( {
 
 		handleOnChange( nextValues );
 	};
-
-	/**
-	 * All sides
-	 */
-	if ( isLinked ) return null;
 
 	return (
 		<LayoutContainer className="component-box-control__input-controls-wrapper">

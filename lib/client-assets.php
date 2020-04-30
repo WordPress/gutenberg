@@ -680,6 +680,20 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
+/**
+ * Extends block editor settings to determine whether to use custom spacing controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_spacing( $settings ) {
+	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
+
 /*
  * Register default patterns if not registered in Core already.
  */
