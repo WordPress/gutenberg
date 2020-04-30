@@ -2,6 +2,7 @@
 
 exports[`Navigation Creating from existing Menus allows a navigation block to be created from existing menus 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
+<<<<<<< HEAD
 <!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"id\\":94} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"type\\":\\"post_type\\",\\"id\\":95} -->
@@ -59,7 +60,6 @@ exports[`Navigation Creating from existing Pages does not display option to crea
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
-
 <!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
 <!-- /wp:navigation -->"
 `;
