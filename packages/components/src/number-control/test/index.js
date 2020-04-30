@@ -8,7 +8,7 @@ import { act, Simulate } from 'react-dom/test-utils';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { UP, DOWN } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -89,6 +89,47 @@ describe( 'NumberControl', () => {
 			const changeValue = spy.mock.calls[ 0 ][ 0 ];
 
 			expect( changeValue ).toBe( '10' );
+		} );
+	} );
+
+	describe( 'Validation', () => {
+		it( 'should clamp value within range on ENTER keypress', () => {
+			act( () => {
+				render(
+					<NumberControl value={ 5 } min={ 0 } max={ 10 } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+			input.value = -100;
+
+			act( () => {
+				Simulate.change( input );
+				Simulate.keyDown( input, { keyCode: ENTER } );
+			} );
+
+			/**
+			 * This is zero because the value has been adjusted to
+			 * respect the min/max range of the input.
+			 */
+			expect( input.value ).toBe( '0' );
+		} );
+
+		it( 'should parse to number value on ENTER keypress', () => {
+			act( () => {
+				render( <NumberControl value={ 5 } />, container );
+			} );
+
+			const input = getInput();
+			input.value = '10 abc';
+
+			act( () => {
+				Simulate.change( input );
+				Simulate.keyDown( input, { keyCode: ENTER } );
+			} );
+
+			expect( input.value ).toBe( '0' );
 		} );
 	} );
 

@@ -31,6 +31,7 @@ export function NumberControl(
 		shiftStep = 10,
 		stateReducer: stateReducerProp = ( state ) => state,
 		step = 1,
+		type: typeProp = 'number',
 		value: valueProp,
 		...props
 	},
@@ -40,6 +41,7 @@ export function NumberControl(
 	const baseValue = clamp( 0, min, max );
 	const isRtl = useRtl();
 
+	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );
 
 	/**
@@ -78,11 +80,11 @@ export function NumberControl(
 				event.preventDefault();
 			}
 
-			if ( action.type === inputControlActionTypes.PRESS_UP ) {
+			if ( type === inputControlActionTypes.PRESS_UP ) {
 				nextValue = add( nextValue, incrementalValue );
 			}
 
-			if ( action.type === inputControlActionTypes.PRESS_DOWN ) {
+			if ( type === inputControlActionTypes.PRESS_DOWN ) {
 				nextValue = subtract( nextValue, incrementalValue );
 			}
 
@@ -154,8 +156,8 @@ export function NumberControl(
 
 	return (
 		<Input
+			autoComplete={ autoComplete }
 			inputMode="numeric"
-			type="number"
 			{ ...props }
 			className={ classes }
 			dragDirection={ dragDirection }
@@ -164,6 +166,7 @@ export function NumberControl(
 			label={ label }
 			stateReducer={ stateReducer }
 			ref={ ref }
+			type={ typeProp }
 			value={ initialValue }
 		/>
 	);

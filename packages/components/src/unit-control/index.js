@@ -42,6 +42,8 @@ function UnitControl(
 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
 	const [ unit, setUnit ] = useState( initialUnit );
 
+	const classes = classnames( 'components-unit-control', className );
+
 	const handleOnChange = ( next, changeProps ) => {
 		/**
 		 * Customizing the onChange callback.
@@ -107,6 +109,7 @@ function UnitControl(
 
 			nextState.value = parsedValue;
 
+			// Update unit if the incoming parsed unit is different.
 			if ( unit !== parsedUnit ) {
 				handleOnUnitChange( parsedUnit, { event } );
 			}
@@ -114,8 +117,6 @@ function UnitControl(
 
 		return nextState;
 	};
-
-	const classes = classnames( 'components-unit-control', className );
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl

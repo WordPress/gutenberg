@@ -18,9 +18,9 @@ const initialInputControlState = {
 
 const actionTypes = {
 	CHANGE: 'CHANGE',
-	DRAG: 'DRAG',
 	DRAG_END: 'DRAG_END',
 	DRAG_START: 'DRAG_START',
+	DRAG: 'DRAG',
 	INVALIDATE: 'INVALIDATE',
 	PRESS_DOWN: 'PRESS_DOWN',
 	PRESS_ENTER: 'PRESS_ENTER',
@@ -32,6 +32,12 @@ const actionTypes = {
 
 export const inputControlActionTypes = actionTypes;
 
+/**
+ * Prepares initialState for the reducer.
+ *
+ * @param {Object} initialState The initial state.
+ * @return {Object} Prepared initialState for the reducer
+ */
 function mergeInitialState( initialState = initialInputControlState ) {
 	const { value } = initialState;
 
@@ -42,6 +48,16 @@ function mergeInitialState( initialState = initialInputControlState ) {
 	};
 }
 
+/**
+ * Creates a reducer that opens the channel for external state subscription
+ * and modification.
+ *
+ * This technique uses the "stateReducer" design pattern:
+ * https://kentcdodds.com/blog/the-state-reducer-pattern/
+ *
+ * @param {Function} stateReducer A custom reducer that can subscribe and modify state.
+ * @return {Function} The reducer.
+ */
 function inputControlStateReducer( stateReducer = initialStateReducer ) {
 	return ( state, action ) => {
 		let nextState = { ...state };
@@ -124,6 +140,17 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
 	};
 }
 
+/**
+ * A custom hook that connects and external stateReducer with an internal
+ * reducer. This hook manages the internal state of InputControl.
+ * However, by connecting an external stateReducer function, other
+ * components can react to actions as well as modify state before it is
+ * applied.
+ *
+ * @param {Function} stateReducer An external state reducer.
+ * @param {Object} initialState The initial state for the reducer.
+ * @return {Object} State, dispatch, and a collection of actions.
+ */
 export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
@@ -134,14 +161,32 @@ export function useInputControlStateReducer(
 	);
 
 	const createChangeEvent = ( type ) => ( nextValue, event ) => {
+		/**
+		 * Persist allows for the (Synthetic) event to be used outside of
+		 * this function call.
+		 * https://reactjs.org/docs/events.html#event-pooling
+		 */
+		if ( event.persist ) {
+			event.persist();
+		}
+
 		dispatch( {
 			type,
-			payload: { value: nextValue, event: { ...event } },
+			payload: { value: nextValue, event },
 		} );
 	};
 
 	const createKeyEvent = ( type ) => ( event ) => {
-		dispatch( { type, payload: { event: { ...event } } } );
+		/**
+		 * Persist allows for the (Synthetic) event to be used outside of
+		 * this function call.
+		 * https://reactjs.org/docs/events.html#event-pooling
+		 */
+		if ( event.persist ) {
+			event.persist();
+		}
+
+		dispatch( { type, payload: { event } } );
 	};
 
 	const createDragEvent = ( type ) => ( dragProps ) => {
@@ -151,11 +196,10 @@ export function useInputControlStateReducer(
 	/**
 	 * Actions for the reducer
 	 */
-
 	const change = createChangeEvent( actionTypes.CHANGE );
-	const submit = createChangeEvent( actionTypes.SUBMIT );
-	const reset = createChangeEvent( actionTypes.RESET );
 	const inValidate = createChangeEvent( actionTypes.INVALIDATE );
+	const reset = createChangeEvent( actionTypes.RESET );
+	const submit = createChangeEvent( actionTypes.SUBMIT );
 	const update = createChangeEvent( actionTypes.UPDATE );
 
 	const dragStart = createDragEvent( actionTypes.DRAG_START );
