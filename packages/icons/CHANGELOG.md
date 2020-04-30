@@ -1,7 +1,5 @@
 ## Master
 
-## 2.0.0 (2020-04-30)
-
 ### Breaking change
 
 -   `star` icon removed as it is duplicative of `star-filled`. ([#21825](https://github.com/WordPress/gutenberg/pull/21825))
