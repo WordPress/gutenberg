@@ -18,13 +18,13 @@ import { useInputControlStateReducer } from './state';
 
 function InputField(
 	{
-		disabled,
+		disabled = false,
 		dragDirection = 'n',
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isFloating,
-		isFloatingLabelSet,
+		isFloating = false,
+		isFloatingLabelSet = false,
 		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
