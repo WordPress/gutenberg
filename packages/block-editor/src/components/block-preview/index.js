@@ -7,7 +7,7 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,4 +48,4 @@ export function BlockPreview( {
 	);
 }
 
-export default BlockPreview;
+export default memo( BlockPreview );
