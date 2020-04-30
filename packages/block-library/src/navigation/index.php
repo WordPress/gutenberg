@@ -213,9 +213,14 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 			$css_classes .= ' ' . $class_name;
 		};
 
+		$item_tag = 'div';
+		if ( isset( $block['attrs']['id'] ) || isset( $block['attrs']['url'] ) ) {
+			$item_tag = 'a';
+		}
+
 		$html .= '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
 			( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
-			'<a class="wp-block-navigation-link__content"';
+			'<' . $item_tag . ' class="wp-block-navigation-link__content"';
 
 		if (
 			isset( $block['attrs']['id'] )
@@ -224,10 +229,12 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 				esc_url( get_permalink( $block['attrs']['id'] ) ) .
 			'"';
 		} else {
-			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
+			if ( $item_tag === 'a' ) {
+				$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
+			}
 		}
 
-		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
+		if ( $item_tag === 'a' && isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
 		// End appending HTML attributes to anchor tag.
@@ -261,7 +268,7 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 
 		$html .= '</span>';
 
-		$html .= '</a>';
+		$html .= '</' . $item_tag . '>';
 		// End anchor tag content.
 
 		// Append submenu icon to top-level item.
