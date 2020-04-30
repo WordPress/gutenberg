@@ -48,6 +48,9 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+				// To set a function on the useState hook, we must set it
+				// with another function (() => myFunction). Passing the
+				// function on its own will cause an error when called.
 				this.props.setCloseEntitiesCallback(
 					() => this.closeEntitiesSavedStates
 				);
