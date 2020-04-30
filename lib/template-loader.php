@@ -50,7 +50,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  *
  * Internally, this filters into the "{$type}_template_hierarchy" hook to record the type-specific template hierarchy.
  *
- * @param string $template_type  A template type.
+ * @param string $template_type A template type.
  * @return string[] A list of template candidates, in descending order of priority.
  */
 function get_template_hierachy( $template_type ) {
