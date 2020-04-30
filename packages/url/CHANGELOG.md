@@ -1,5 +1,7 @@
 ## Master
 
+## 2.14.0 (2020-04-30)
+
 ### Bug fix
 
 - `addQueryArgs` arguments are optional ([#21926](https://github.com/WordPress/gutenberg/pull/21926))
