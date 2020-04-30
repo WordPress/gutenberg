@@ -124,6 +124,12 @@ module.exports = function cli() {
 		},
 		withSpinner( env.run )
 	);
+	yargs.command(
+		'destroy',
+		wpRed( 'destroy the WordPress environment.' ),
+		() => {},
+		withSpinner( env.destroy )
+	);
 	yargs.example(
 		'$0 run cli wp user list',
 		'Runs `wp user list` wp-cli command which lists WordPress users.'
