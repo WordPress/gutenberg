@@ -167,6 +167,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 								blockName={ blockName }
 								useExample={ useExample }
 								styleClassName={ styleClassName }
+								viewportWidth={ 500 }
 							/>
 						</div>
 						<div className="block-editor-block-styles__item-label">
@@ -185,6 +186,7 @@ function BlockStylePreview( {
 	block,
 	blockName,
 	styleClassName,
+	viewportWidth,
 } ) {
 	let factory, deps;
 	if ( useExample ) {
@@ -207,7 +209,12 @@ function BlockStylePreview( {
 
 	const previewBlocks = useMemo( factory, deps );
 
-	return <BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />;
+	return (
+		<BlockPreview
+			viewportWidth={ viewportWidth }
+			blocks={ previewBlocks }
+		/>
+	);
 }
 
 export default BlockStyles;
