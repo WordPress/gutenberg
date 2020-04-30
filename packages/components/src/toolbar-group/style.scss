@@ -104,7 +104,7 @@ div.components-toolbar {
 }
 
 // Single buttons should remain 48px.
-.components-accessible-toolbar .components-toolbar-group > .components-button:first-child:last-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:first-of-type:last-of-type,
 .components-toolbar div:first-child:last-child > .components-button.has-icon {
 	min-width: $block-toolbar-height;
 	padding-left: $grid-unit-15;
