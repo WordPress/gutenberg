@@ -30,6 +30,7 @@ import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.AlignmentRendering;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
@@ -94,7 +95,7 @@ public class ReactAztecText extends AztecText {
     };
 
     public ReactAztecText(ThemedReactContext reactContext) {
-        super(reactContext);
+        super(reactContext, AlignmentRendering.VIEW_LEVEL);
 
         setGutenbergMode(true);
 
@@ -184,6 +185,11 @@ public class ReactAztecText extends AztecText {
     @Override
     public boolean shouldSkipTidying() {
         return isPreTag();
+    }
+
+    @Override
+    public boolean shouldIgnoreWhitespace() {
+        return false;
     }
 
     // VisibleForTesting from {@link TextInputEventsTestCase}.
