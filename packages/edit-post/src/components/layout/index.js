@@ -134,17 +134,16 @@ function Layout() {
 		isEntitiesSavedStatesOpen,
 		setIsEntitiesSavedStatesOpen,
 	] = useState( false );
-	const [
-		closeEntitiesCallback,
-		setCloseEntitiesCallback,
-	] = useState( () => () => {} );
+	const [ closeEntitiesCallback, setCloseEntitiesCallback ] = useState();
 	const openEntitiesSavedStates = useCallback(
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
 		( callbackArg ) => {
-			closeEntitiesCallback( callbackArg );
+			if ( closeEntitiesCallback ) {
+				closeEntitiesCallback( callbackArg );
+			}
 			setIsEntitiesSavedStatesOpen( false );
 		},
 		[ closeEntitiesCallback ]
