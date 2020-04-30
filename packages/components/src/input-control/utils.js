@@ -6,7 +6,6 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useControlledState } from '../utils/hooks';
 import { getRtl } from '../utils/style-mixins';
 
 /**
@@ -72,22 +71,4 @@ export function isValueEmpty( value ) {
 	const isEmptyString = value === '';
 
 	return isNullish || isEmptyString;
-}
-
-/**
- * Custom hook to better handle incoming value and internal state.
- *
- * @param {*} initialValue
- */
-export function useValueState( initialValue ) {
-	/**
-	 * React requires input HTML elements to have a defined value prop
-	 * to be considered "controlled".
-	 *
-	 * For instances were an incoming value may be undefined or null,
-	 * we'll need to transform it to an empty string.
-	 */
-	const value = isValueEmpty( initialValue ) ? '' : initialValue;
-
-	return useControlledState( value );
 }
