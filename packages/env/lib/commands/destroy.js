@@ -28,6 +28,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	const config = await initConfig( { spinner, debug } );
 	const { dockerComposeConfigPath, workDirectoryPath } = config;
 
+	// check installed WordPress.
 	const installed = await fs.readdir( workDirectoryPath );
 	if ( ! installed.length ) {
 		spinner.text = `Not installed WordPress.`;
@@ -47,22 +48,23 @@ module.exports = async function destroy( { spinner, debug } ) {
 
 	spinner.start();
 
-	if ( yesDelete ) {
-		await stop( { spinner, debug } );
-
-		spinner.text = 'Removing WordPress docker containers.';
-
-		await dockerCompose.rm( {
-			config: dockerComposeConfigPath,
-			log: debug,
-		} );
-
-		spinner.text = 'Removing local files.';
-
-		await rimraf( workDirectoryPath );
-
-		spinner.text = 'Removed WordPress environment.';
-	} else {
-		spinner.text = 'Cancelled';
+	if ( ! yesDelete ) {
+		spinner.text = 'Cancelled.';
+		return;
 	}
+
+	await stop( { spinner, debug } );
+
+	spinner.text = 'Removing WordPress docker containers.';
+
+	await dockerCompose.rm( {
+		config: dockerComposeConfigPath,
+		log: debug,
+	} );
+
+	spinner.text = 'Removing local files.';
+
+	await rimraf( workDirectoryPath );
+
+	spinner.text = 'Removed WordPress environment.';
 };
