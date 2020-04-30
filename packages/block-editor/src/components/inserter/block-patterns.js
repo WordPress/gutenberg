@@ -39,6 +39,9 @@ function BlockPattern( { pattern, onClick } ) {
 			aria-label={ pattern.title }
 		>
 			<BlockPreview blocks={ blocks } />
+			<div className="block-editor-inserter__patterns-item-title">
+				{ pattern.title }
+			</div>
 		</div>
 	);
 }
