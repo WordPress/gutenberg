@@ -1,5 +1,7 @@
 ## Master
 
+## 0.12.0 (2020-04-30)
+
 ### New Features
 
 - Add more CLI options: `--namespace`, `--title`, `--short-description` and `--category`. The goal is to make it easier to override default values used for scaffolding ([#21751](https://github.com/WordPress/gutenberg/pull/21751)).

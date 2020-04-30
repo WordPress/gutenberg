@@ -89,9 +89,6 @@ function gutenberg_get_editor_styles() {
  */
 function gutenberg_edit_site_init( $hook ) {
 	global
-		$_wp_current_template_id,
-		$_wp_current_template_name,
-		$_wp_current_template_content,
 		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids,
 		$current_screen;
@@ -171,28 +168,27 @@ function gutenberg_edit_site_init( $hook ) {
 	$template_ids      = array();
 	$template_part_ids = array();
 	foreach ( $template_getters as $template_getter ) {
-		call_user_func( $template_getter );
-		apply_filters( 'template_include', null );
-		if ( isset( $_wp_current_template_id ) ) {
-			$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+		call_user_func( $template_getter ); // This sets $_wp_current_template_hierarchy.
+
+		$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
+		if ( isset( $current_template_post ) ) {
+			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
 		}
 		if ( isset( $_wp_current_template_part_ids ) ) {
 			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
 		}
-		$_wp_current_template_id        = null;
-		$_wp_current_template_name      = null;
-		$_wp_current_template_content   = null;
+
 		$_wp_current_template_hierarchy = null;
 		$_wp_current_template_part_ids  = null;
 	}
 	get_front_page_template();
 	get_index_template();
-	apply_filters( 'template_include', null );
-	$template_ids[ $_wp_current_template_name ] = $_wp_current_template_id;
+	$current_template_post                             = gutenberg_find_template_post( $_wp_current_template_hierarchy );
+	$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
 	if ( isset( $_wp_current_template_part_ids ) ) {
 		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
 	}
-	$settings['templateId']      = $_wp_current_template_id;
+	$settings['templateId']      = $current_template_post->ID;
 	$settings['templateType']    = 'wp_template';
 	$settings['templateIds']     = array_values( $template_ids );
 	$settings['templatePartIds'] = array_values( $template_part_ids );
@@ -210,7 +206,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'/wp/v2/types?context=edit',
 		'/wp/v2/taxonomies?per_page=-1&context=edit',
 		'/wp/v2/themes?status=active',
-		sprintf( '/wp/v2/templates/%s?context=edit', $_wp_current_template_id ),
+		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_post->ID ),
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(

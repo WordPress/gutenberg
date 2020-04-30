@@ -26,7 +26,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
-import { BlockContext } from './block';
+import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
@@ -50,7 +50,7 @@ const BlockComponent = forwardRef(
 			mode,
 			blockTitle,
 			wrapperProps,
-		} = useContext( BlockContext );
+		} = useContext( BlockListBlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
 				if ( ! isSelected ) {

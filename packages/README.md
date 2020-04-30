@@ -183,10 +183,10 @@ Choose the correct version based on `CHANGELOG.md` files, confirm your choices a
 To release a patch for the older major or minor version of packages, run the following command:
 
 ```bash
-npm run publish:legacy
+npm run publish:patch
 ```
 
-This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress.
+This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.
 
 ## TypeScript
 
