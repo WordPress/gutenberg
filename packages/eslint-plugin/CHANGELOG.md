@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
+- Make `@wordpress/i18n-text-domain` rule less strict by default. When `allowedTextDomain` option is not provided it allows now skipping text domain or providing any string ([#21928](https://github.com/WordPress/gutenberg/pull/21928)).
 
 ## 5.0.1 (2020-04-15)
 
