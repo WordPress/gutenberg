@@ -11,7 +11,13 @@ import { Component } from '@wordpress/element';
 
 class Picker extends Component {
 	presentPicker() {
-		const { options, onChange, title, destructiveButtonIndex } = this.props;
+		const {
+			options,
+			onChange,
+			title,
+			destructiveButtonIndex,
+			disabledButtonIndices,
+		} = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
 
@@ -21,6 +27,7 @@ class Picker extends Component {
 				options: fullOptions,
 				cancelButtonIndex: 0,
 				destructiveButtonIndex,
+				disabledButtonIndices,
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {

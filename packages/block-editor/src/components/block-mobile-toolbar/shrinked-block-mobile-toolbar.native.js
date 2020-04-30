@@ -78,6 +78,10 @@ const ShrinkedBlockMobileToolbar = ( {
 		}
 	}
 
+	const disabledButtonIndices = options
+		.map( ( option, index ) => option.disabled && index + 1 )
+		.filter( Boolean );
+
 	return (
 		<>
 			<ToolbarButton
@@ -89,6 +93,7 @@ const ShrinkedBlockMobileToolbar = ( {
 				options={ options }
 				onChange={ onPickerSelect }
 				destructiveButtonIndex={ options.length }
+				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform !== 'ios' }
 			/>
 		</>
