@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
 import {
-	createSlotFill,
 	__experimentalToolbarContext as ToolbarContext,
+	createSlotFill,
 } from '@wordpress/components';
 
 /**
@@ -27,14 +32,15 @@ function BlockFormatControlsSlot( props ) {
 
 function BlockFormatControlsFill( props ) {
 	return (
-		<Fill { ...props }>
-			{ ( fillProps ) => (
-				<ToolbarContext.Provider
-					value={ Object.keys( fillProps ).length ? fillProps : null }
-				>
-					{ props.children }
-				</ToolbarContext.Provider>
-			) }
+		<Fill>
+			{ ( fillProps ) => {
+				const value = ! isEmpty( fillProps ) ? fillProps : null;
+				return (
+					<ToolbarContext.Provider value={ value }>
+						{ props.children }
+					</ToolbarContext.Provider>
+				);
+			} }
 		</Fill>
 	);
 }
