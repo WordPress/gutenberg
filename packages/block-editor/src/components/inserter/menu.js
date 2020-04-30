@@ -17,10 +17,11 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import Tips from './tips';
-import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
-import InserterBlockList from './block-list';
-import BlockPatterns from './block-patterns';
+import InserterSearchForm from './search-form';
+import InserterSearchResults from './search-results';
+import BlocksTab from './blocks-tab';
+import PatternsTab from './patterns-tab';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -36,7 +37,7 @@ function InserterMenu( {
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const {
 		destinationRootClientId,
-		patterns,
+		hasPatterns,
 		getSelectedBlock,
 		getBlockIndex,
 		getBlockSelectionEnd,
@@ -56,7 +57,7 @@ function InserterMenu( {
 			}
 		}
 		return {
-			patterns: getSettings().__experimentalBlockPatterns,
+			hasPatterns: !! getSettings().__experimentalBlockPatterns,
 			destinationRootClientId: destRootClientId,
 			...pick( select( 'core/block-editor' ), [
 				'getSelectedBlock',
@@ -72,8 +73,7 @@ function InserterMenu( {
 		showInsertionPoint,
 		hideInsertionPoint,
 	} = useDispatch( 'core/block-editor' );
-	const hasPatterns =
-		! destinationRootClientId && !! patterns && !! patterns.length;
+	const showPatterns = ! destinationRootClientId && hasPatterns;
 	const onKeyDown = ( event ) => {
 		if (
 			includes(
@@ -141,14 +141,13 @@ function InserterMenu( {
 		<>
 			<div className="block-editor-inserter__block-list">
 				<div className="block-editor-inserter__scrollable">
-					<InserterBlockList
+					<BlocksTab
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertBlocks }
 						onHover={ onHover }
 						__experimentalSelectBlockOnInsert={
 							__experimentalSelectBlockOnInsert
 						}
-						filterValue={ filterValue }
 					/>
 				</div>
 			</div>
@@ -162,12 +161,20 @@ function InserterMenu( {
 
 	const patternsTab = (
 		<div className="block-editor-inserter__scrollable">
-			<BlockPatterns
-				patterns={ patterns }
-				onInsert={ onInsertBlocks }
-				filterValue={ filterValue }
-			/>
+			<PatternsTab onInsert={ onInsertBlocks } />
 		</div>
+	);
+
+	const searchResultsTab = (
+		<InserterSearchResults
+			filterValue={ filterValue }
+			rootClientId={ destinationRootClientId }
+			onInsert={ onInsertBlocks }
+			onHover={ onHover }
+			__experimentalSelectBlockOnInsert={
+				__experimentalSelectBlockOnInsert
+			}
+		/>
 	);
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
@@ -184,7 +191,7 @@ function InserterMenu( {
 		>
 			<div className="block-editor-inserter__main-area">
 				<InserterSearchForm onChange={ setFilterValue } />
-				{ hasPatterns && (
+				{ showPatterns && ! filterValue && (
 					<TabPanel
 						className="block-editor-inserter__tabs"
 						tabs={ [
@@ -208,7 +215,8 @@ function InserterMenu( {
 						} }
 					</TabPanel>
 				) }
-				{ ! hasPatterns && blocksTab }
+				{ ! showPatterns && ! filterValue && blocksTab }
+				{ filterValue && searchResultsTab }
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<div className="block-editor-inserter__preview-container">

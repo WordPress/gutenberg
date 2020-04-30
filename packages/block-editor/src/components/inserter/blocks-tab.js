@@ -9,7 +9,6 @@ import {
 	flow,
 	sortBy,
 	groupBy,
-	isEmpty,
 } from 'lodash';
 
 /**
@@ -19,40 +18,22 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
-import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import __experimentalInserterMenuExtension from '../inserter-menu-extension';
-import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
-import InserterNoResults from './no-results';
-
-// Copied over from the Columns block. It seems like it should become part of public API.
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
+import useInserterBlockItems from './use-inserter-block-items';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 9;
 
-function InserterBlockList( {
+function BlocksTab( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -60,69 +41,35 @@ function InserterBlockList( {
 	filterValue,
 	debouncedSpeak,
 } ) {
-	const {
-		categories,
-		collections,
-		items,
-		rootChildBlocks,
-		fetchReusableBlocks,
-	} = useSelect(
+	const [ items, onSelectItem ] = useInserterBlockItems( {
+		rootClientId,
+		selectBlockOnInsert,
+		onInsert,
+	} );
+	const { categories, collections, rootChildBlocks } = useSelect(
 		( select ) => {
-			const { getInserterItems, getBlockName, getSettings } = select(
-				'core/block-editor'
-			);
+			const { getBlockName } = select( 'core/block-editor' );
 			const {
 				getCategories,
 				getCollections,
 				getChildBlockNames,
 			} = select( 'core/blocks' );
 			const rootBlockName = getBlockName( rootClientId );
-			const { __experimentalFetchReusableBlocks } = getSettings();
 
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
 				rootChildBlocks: getChildBlockNames( rootBlockName ),
-				items: getInserterItems( rootClientId ),
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
 			};
 		},
 		[ rootClientId ]
 	);
 
-	// Fetch resuable blocks on mount
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
-	}, [] );
-
-	const onSelectItem = ( item ) => {
-		const { name, title, initialAttributes, innerBlocks } = item;
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
-
-		onInsert( insertedBlock );
-
-		if ( ! selectBlockOnInsert ) {
-			// translators: %s: the name of the block that has been added
-			const message = sprintf( __( '%s block added' ), title );
-			speak( message );
-		}
-	};
-
-	const filteredItems = useMemo( () => {
-		return searchBlockItems( items, categories, collections, filterValue );
-	}, [ filterValue, items, categories, collections ] );
-
 	const childItems = useMemo( () => {
-		return filter( filteredItems, ( { name } ) =>
+		return filter( items, ( { name } ) =>
 			includes( rootChildBlocks, name )
 		);
-	}, [ filteredItems, rootChildBlocks ] );
+	}, [ items, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
 		return filter( items, ( item ) => item.utility > 0 ).slice(
@@ -132,8 +79,8 @@ function InserterBlockList( {
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
-		return filter( filteredItems, { category: 'reusable' } );
-	}, [ filteredItems ] );
+		return filter( items, { category: 'reusable' } );
+	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
 		const getCategoryIndex = ( item ) => {
@@ -148,14 +95,14 @@ function InserterBlockList( {
 				filter( itemList, ( item ) => item.category !== 'reusable' ),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
-		)( filteredItems );
-	}, [ filteredItems, categories ] );
+		)( items );
+	}, [ items, categories ] );
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection
 		const result = { ...collections };
 		Object.keys( collections ).forEach( ( namespace ) => {
-			result[ namespace ] = filteredItems.filter(
+			result[ namespace ] = items.filter(
 				( item ) => getBlockNamespace( item ) === namespace
 			);
 			if ( result[ namespace ].length === 0 ) {
@@ -164,7 +111,7 @@ function InserterBlockList( {
 		} );
 
 		return result;
-	}, [ filteredItems, collections ] );
+	}, [ items, collections ] );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -185,7 +132,6 @@ function InserterBlockList( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ itemsPerCategory, debouncedSpeak ] );
 
-	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
 
 	return (
@@ -271,35 +217,8 @@ function InserterBlockList( {
 					</a>
 				</InserterPanel>
 			) }
-
-			<__experimentalInserterMenuExtension.Slot
-				fillProps={ {
-					onSelect: onSelectItem,
-					onHover,
-					filterValue,
-					hasItems,
-				} }
-			>
-				{ ( fills ) => {
-					if ( fills.length ) {
-						return (
-							<InserterPanel
-								title={ _x( 'Search Results', 'blocks' ) }
-							>
-								{ fills }
-							</InserterPanel>
-						);
-					}
-					if ( ! hasItems ) {
-						return (
-							<InserterNoResults filterValue={ filterValue } />
-						);
-					}
-					return null;
-				} }
-			</__experimentalInserterMenuExtension.Slot>
 		</div>
 	);
 }
 
-export default compose( withSpokenMessages )( InserterBlockList );
+export default withSpokenMessages( BlocksTab );
