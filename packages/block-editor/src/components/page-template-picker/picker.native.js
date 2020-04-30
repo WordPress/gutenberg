@@ -94,6 +94,7 @@ const __experimentalPageTemplatePicker = ( {
 			const value = await AsyncStorage.getItem( TOOLTIP_VISIBLE_KEY );
 			if ( value !== 'true' ) {
 				setTooltipVisible( true );
+				await AsyncStorage.setItem( TOOLTIP_VISIBLE_KEY, 'true' );
 			}
 		} catch ( e ) {
 			setTooltipVisible( false );
@@ -111,13 +112,8 @@ const __experimentalPageTemplatePicker = ( {
 		setTemplatePreview( undefined );
 	};
 
-	const onTooltipHidden = async () => {
-		try {
-			setTooltipVisible( false );
-			await AsyncStorage.setItem( TOOLTIP_VISIBLE_KEY, 'true' );
-		} catch ( e ) {
-			setTooltipVisible( false );
-		}
+	const onTooltipHidden = () => {
+		setTooltipVisible( false );
 	};
 
 	const startPickerAnimation = ( isVisible ) => {
