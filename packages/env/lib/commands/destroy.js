@@ -5,6 +5,7 @@ const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const inquirer = require( 'inquirer' );
+
 /**
  * Promisified dependencies
  */
@@ -57,6 +58,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 		} );
 
 		spinner.text = 'Removing local files.';
+
 		await rimraf( workDirectoryPath );
 
 		spinner.text = 'Removed WordPress environment.';
