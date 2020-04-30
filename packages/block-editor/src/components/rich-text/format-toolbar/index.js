@@ -10,10 +10,10 @@ import { orderBy } from 'lodash';
 
 import { __ } from '@wordpress/i18n';
 import {
-	ToolbarGroup,
 	__experimentalToolbarItem as ToolbarItem,
-	Slot,
+	ToolbarGroup,
 	DropdownMenu,
+	Slot,
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
