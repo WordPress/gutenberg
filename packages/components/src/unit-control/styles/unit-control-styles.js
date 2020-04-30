@@ -15,7 +15,7 @@ export const Root = styled.div`
 `;
 
 const paddingStyles = ( { disableUnits } ) => {
-	const value = disableUnits ? 3 : 28;
+	const value = disableUnits ? 3 : 24;
 
 	return css`
 		${rtl( { paddingRight: value } )()};
@@ -54,14 +54,14 @@ export const ValueInput = styled( NumberControl )`
 const unitSizeStyles = ( { size } ) => {
 	const sizes = {
 		default: {
-			top: 5,
-			height: 20,
-			minHeight: 20,
+			top: 1,
+			height: 28,
+			minHeight: 28,
 		},
 		small: {
-			top: 4,
-			height: 16,
-			minHeight: 16,
+			top: 1,
+			height: 22,
+			minHeight: 22,
 		},
 	};
 
@@ -75,20 +75,21 @@ const baseUnitLabelStyles = ( props ) => {
 		border-radius: 2px;
 		border: none;
 		box-sizing: border-box;
-		color: ${color( 'darkGray.500' )};
+		color: ${ color( 'darkGray.500' ) };
 		display: block;
 		font-size: 8px;
 		line-height: 1;
 		letter-spacing: -0.5px;
 		outline: none;
-		padding: 2px 2px;
+		padding: 2px 1px;
 		position: absolute;
 		text-align-last: center;
 		text-transform: uppercase;
-		width: 22px;
+		width: 20px;
 
-		${rtl( { right: 4 } )()}
-		${unitSizeStyles( props )}
+		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+		${ rtl( { right: 1 } )() }
+		${ unitSizeStyles( props ) }
 	`;
 };
 

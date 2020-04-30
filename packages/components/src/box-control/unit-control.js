@@ -1,44 +1,43 @@
 /**
  * Internal dependencies
  */
-import BaseUnitControl from '../unit-control';
-import Tooltip from '../tooltip';
-import { UnitControlWrapper } from './styles/box-control-styles';
+import BaseTooltip from '../tooltip';
+import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
 
 export default function BoxUnitControl( {
-	isInline,
+	isFirst,
+	isLast,
+	isOnly,
 	label,
-	style,
 	value,
 	...props
 } ) {
-	const styles = isInline
-		? {}
-		: {
-				marginTop: -3,
-				maxWidth: 80,
-				position: 'absolute',
-				width: '100%',
-				zIndex: 1,
-				...style,
-		  };
-
-	const TooltipComponent = isInline ? Tooltip : 'div';
 	return (
 		<UnitControlWrapper aria-label={ label }>
-			<TooltipComponent text={ label } position="top">
-				<BaseUnitControl
+			<Tooltip text={ label }>
+				<UnitControl
 					className="component-box-control__unit-control"
 					hideHTMLArrows
+					isFirst={ isFirst }
+					isLast={ isLast }
+					isOnly={ isOnly }
 					isPressEnterToChange
 					isFloatingLabel
-					label={ ! isInline ? label : null }
 					isResetValueOnUnitChange={ false }
-					style={ styles }
 					value={ value }
 					{ ...props }
 				/>
-			</TooltipComponent>
+			</Tooltip>
 		</UnitControlWrapper>
+	);
+}
+
+function Tooltip( { children, text } ) {
+	if ( ! text ) return children;
+
+	return (
+		<BaseTooltip text={ text } position="top">
+			{ children }
+		</BaseTooltip>
 	);
 }

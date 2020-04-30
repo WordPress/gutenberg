@@ -6,17 +6,25 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import Button from '../button';
 import { Flex } from '../flex';
+import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
+import BoxControlIcon from './icon';
 import Text from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
-import { Root, Header } from './styles/box-control-styles';
+import {
+	Root,
+	Header,
+	HeaderControlWrapper,
+} from './styles/box-control-styles';
+import { useControlledState } from '../utils/hooks';
 
 const defaultInputProps = {
 	min: 0,
@@ -31,17 +39,52 @@ function useUniqueId( idProp ) {
 export default function BoxControl( {
 	id: idProp,
 	inputProps = defaultInputProps,
-	isInline = false,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	values,
+	values: valuesProp,
 	units,
 } ) {
 	const [ isLinked, setIsLinked ] = useState( true );
+	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
+	const [ isDirty, setIsDirty ] = useState( false );
+	const [ values, setValues ] = useControlledState( valuesProp );
+
+	const initialValuesRef = useRef( valuesProp );
+
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
 
-	const toggleLinked = () => setIsLinked( ! isLinked );
+	const toggleLinked = () => {
+		setIsLinked( ! isLinked );
+		setSide( ! isLinked ? 'all' : 'top' );
+	};
+
+	const handleOnFocus = ( event, { side: nextSide } ) => {
+		setSide( nextSide );
+	};
+
+	const handleOnChange = ( nextValues ) => {
+		onChange( nextValues );
+		setValues( nextValues );
+		setIsDirty( true );
+	};
+
+	const handleOnReset = () => {
+		const initialValues = initialValuesRef.current;
+
+		onChange( initialValues );
+		setValues( initialValues );
+		setIsDirty( false );
+	};
+
+	const inputControlProps = {
+		...inputProps,
+		onChange: handleOnChange,
+		onFocus: handleOnFocus,
+		isLinked,
+		units,
+		values,
+	};
 
 	return (
 		<Root id={ id } role="region" aria-labelledby={ headingId }>
@@ -55,20 +98,34 @@ export default function BoxControl( {
 					</Text>
 				</Flex.Item>
 				<Flex.Item>
+					<Button
+						className="component-box-control__reset-button"
+						isSecondary
+						isSmall
+						onClick={ handleOnReset }
+						disabled={ ! isDirty }
+					>
+						Reset
+					</Button>
+				</Flex.Item>
+			</Header>
+			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
+				<Flex.Item>
+					<BoxControlIcon sides={ [ side ] } />
+				</Flex.Item>
+				{ isLinked && (
+					<Flex.Block>
+						<AllInputControl { ...inputControlProps } />
+					</Flex.Block>
+				) }
+				<Flex.Item>
 					<LinkedButton
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
 				</Flex.Item>
-			</Header>
-			<InputControls
-				{ ...inputProps }
-				onChange={ onChange }
-				isLinked={ isLinked }
-				isInline={ isInline }
-				units={ units }
-				values={ values }
-			/>
+			</HeaderControlWrapper>
+			<InputControls { ...inputControlProps } />
 		</Root>
 	);
 }

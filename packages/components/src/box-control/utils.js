@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,10 +31,10 @@ export const DEFAULT_VALUES = {
  * @return {Array<Object, Function>} Hook state and setter.
  */
 export function useBoxControlState( values = {} ) {
-	return useState( {
+	return {
 		...DEFAULT_VALUES,
 		...values,
-	} );
+	};
 }
 
 /**

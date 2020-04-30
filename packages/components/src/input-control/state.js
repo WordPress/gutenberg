@@ -166,7 +166,7 @@ export function useInputControlStateReducer(
 		 * this function call.
 		 * https://reactjs.org/docs/events.html#event-pooling
 		 */
-		if ( event.persist ) {
+		if ( event && event.persist ) {
 			event.persist();
 		}
 
@@ -182,7 +182,7 @@ export function useInputControlStateReducer(
 		 * this function call.
 		 * https://reactjs.org/docs/events.html#event-pooling
 		 */
-		if ( event.persist ) {
+		if ( event && event.persist ) {
 			event.persist();
 		}
 

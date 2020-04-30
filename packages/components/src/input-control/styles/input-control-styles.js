@@ -17,18 +17,20 @@ const rootFloatLabelStyles = ( { isFloatingLabel } ) => {
 	return css( { paddingTop } );
 };
 
+const rootFocusedStyles = ( { isFocused } ) => {
+	if ( ! isFocused ) return '';
+
+	return css( { zIndex: 1 } );
+};
+
 export const Root = styled.div`
 	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
+
 	${rootFloatLabelStyles};
+	${rootFocusedStyles};
 `;
-
-const containerBorder = ( { isFocused } ) => {
-	const borderRadius = isFocused ? 3 : 2;
-
-	return css( { borderRadius } );
-};
 
 const containerDisabledStyle = ( { disabled } ) => {
 	const backgroundColor = disabled
@@ -41,10 +43,10 @@ const containerDisabledStyle = ( { disabled } ) => {
 export const Container = styled.div`
 	align-items: center;
 	box-sizing: border-box;
+	border-radius: inherit;
 	display: flex;
 	position: relative;
 
-	${containerBorder};
 	${containerDisabledStyle};
 `;
 

@@ -72,7 +72,11 @@ export function InputControl(
 		! hideLabelFromVision && isFloatingLabel && label;
 
 	return (
-		<Root className={ classes } isFloatingLabel={ isFloatingLabelSet }>
+		<Root
+			className={ classes }
+			isFloatingLabel={ isFloatingLabelSet }
+			isFocused={ isFocused }
+		>
 			<Label
 				className="components-input-control__label"
 				hideLabelFromVision={ hideLabelFromVision }
