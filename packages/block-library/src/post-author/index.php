@@ -117,7 +117,7 @@ function render_block_core_post_author( $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		array( 'wp-block-post-author' ),
-		array( $attributes['className'] ) ?? array(),
+		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
 	);
