@@ -63,6 +63,7 @@ const typescriptUtilityTypes = [
 	'unknown',
 	'never',
 	'NodeJS',
+	'AsyncIterableIterator',
 ];
 
 module.exports = {
