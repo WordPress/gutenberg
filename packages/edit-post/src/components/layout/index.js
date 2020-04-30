@@ -130,21 +130,22 @@ function Layout() {
 	}, [ isInserterOpen, isHugeViewport ] );
 
 	// Local state for save panel.
-	const [ isEntitiesSavedStatesOpen, setEntitiesSavedStates ] = useState(
-		false
-	);
+	const [
+		isEntitiesSavedStatesOpen,
+		setIsEntitiesSavedStatesOpen,
+	] = useState( false );
 	const [
 		closeEntitiesCallback,
 		setCloseEntitiesCallback,
 	] = useState( () => () => {} );
 	const openEntitiesSavedStates = useCallback(
-		() => setEntitiesSavedStates( true ),
+		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
 		( callbackArg ) => {
 			closeEntitiesCallback( callbackArg );
-			setEntitiesSavedStates( false );
+			setIsEntitiesSavedStatesOpen( false );
 		},
 		[ closeEntitiesCallback ]
 	);

@@ -73,15 +73,16 @@ function Editor( { settings: _settings } ) {
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
-	const [ isEntitiesSavedStatesOpen, setEntitiesSavedStates ] = useState(
-		false
-	);
+	const [
+		isEntitiesSavedStatesOpen,
+		setIsEntitiesSavedStatesOpen,
+	] = useState( false );
 	const openEntitiesSavedStates = useCallback(
-		() => setEntitiesSavedStates( true ),
+		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
 	);
 	const closeEntitiesSavedStates = useCallback(
-		() => setEntitiesSavedStates( false ),
+		() => setIsEntitiesSavedStatesOpen( false ),
 		[]
 	);
 
