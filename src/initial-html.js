@@ -228,4 +228,8 @@ else:
 <!-- /wp:cover -->
 
 <!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>
+<!-- /wp:pullquote -->
 `;
