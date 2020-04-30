@@ -8,7 +8,7 @@
 /**
  * Class representing a list of block instances.
  */
-class WP_Block_List implements Iterator, ArrayAccess {
+class WP_Block_List implements Iterator, ArrayAccess, Countable {
 
 	/**
 	 * Original array of parsed block data.
@@ -169,6 +169,21 @@ class WP_Block_List implements Iterator, ArrayAccess {
 	 */
 	public function valid() {
 		return null !== key( $this->blocks );
+	}
+
+	/*
+	 * Countable interface methods.
+	 */
+
+	/**
+	 * Returns the count of blocks in the list.
+	 *
+	 * @link https://www.php.net/manual/en/countable.count.php
+	 *
+	 * @return int Block count.
+	 */
+	public function count() {
+		return count( $this->blocks );
 	}
 
 }
