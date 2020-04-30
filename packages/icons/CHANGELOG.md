@@ -4,6 +4,10 @@
 
 -   `star` icon removed as it is duplicative of `star-filled`. ([#21825](https://github.com/WordPress/gutenberg/pull/21825))
 
+### New Feature
+
+-   Include TypeScript type declarations ([#21781](https://github.com/WordPress/gutenberg/pull/21781))
+
 ## 1.3.1 (2020-04-15)
 
 ### Bug Fix

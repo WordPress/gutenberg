@@ -139,11 +139,16 @@ const Services = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				// translators: sample content for "Services" page template
-				text: __( 'Get in Touch' ),
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						// translators: sample content for "Services" page template
+						text: __( 'Get in Touch' ),
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',
