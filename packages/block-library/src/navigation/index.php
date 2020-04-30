@@ -229,12 +229,12 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 				esc_url( get_permalink( $block['attrs']['id'] ) ) .
 			'"';
 		} else {
-			if ( $item_tag === 'a' ) {
+			if ( 'a' === $item_tag ) {
 				$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
 			}
 		}
 
-		if ( $item_tag === 'a' && isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
+		if ( 'a' === $item_tag && isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
 			$html .= ' target="_blank"  ';
 		}
 		// End appending HTML attributes to anchor tag.
