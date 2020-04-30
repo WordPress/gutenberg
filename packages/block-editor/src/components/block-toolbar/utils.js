@@ -178,7 +178,9 @@ export function useToggleBlockHighlight( clientId ) {
 	);
 
 	useEffect( () => {
-		// TODO: Explain
+		// On mount, we make sure to cancel any pending animation frame request
+		// that hasn't been completed yet. Components like NavigableToolbar may
+		// mount and unmount quickly.
 		if ( requestAnimationFrameId ) {
 			cancelAnimationFrame( requestAnimationFrameId );
 		}
