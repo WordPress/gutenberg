@@ -44,11 +44,13 @@ class WP_Block_List implements Iterator, ArrayAccess {
 	 * @param WP_Block_Type_Registry $registry          Optional block type registry.
 	 */
 	public function __construct( $blocks, $available_context = array(), $registry = null ) {
+		if ( is_null( $registry ) ) {
+			$registry = WP_Block_Type_Registry::get_instance();
+		}
+
 		$this->blocks            = $blocks;
 		$this->available_context = $available_context;
-		$this->registry          = is_null( $registry ) ?
-			WP_Block_Type_Registry::get_instance() :
-			$registry;
+		$this->registry          = $registry;
 	}
 
 	/*
