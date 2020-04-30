@@ -12,33 +12,30 @@ import {
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
-function useShouldDisplayAccessibleToolbar( ref ) {
-	const [
-		shouldDisplayAccessibleToolbar,
-		setShouldDisplayAccessibleToolbar,
-	] = useState( false );
+function useIsAccessibleToolbar( ref ) {
+	// By default, it's gonna render NavigableMenu. If all the tabbable elements
+	// inside the toolbar are ToolbarItem components (or derived components like
+	// ToolbarButton), then we can wrap them with the accessible Toolbar
+	// component.
+	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState( false );
 	useLayoutEffect( () => {
-		const wrapper = ref.current;
-		const tabbables = focus.tabbable.find( wrapper );
+		const tabbables = focus.tabbable.find( ref.current );
 		const notToolbarItem = tabbables.some(
 			( tabbable ) => ! ( 'experimentalToolbarItem' in tabbable.dataset )
 		);
 		if ( ! notToolbarItem ) {
-			setShouldDisplayAccessibleToolbar( true );
+			setIsAccessibleToolbar( true );
 		}
 	} );
-	return shouldDisplayAccessibleToolbar;
+	return isAccessibleToolbar;
 }
 
-// TODO: Opening Change Alignment Text makes it not be the last child
-function NavigableToolbar( { children, focusOnMount, ...props } ) {
-	const wrapper = useRef();
-	const shouldDisplayAccessibleToolbar = useShouldDisplayAccessibleToolbar(
-		wrapper
-	);
+function useToolbarFocus( ref, focusOnMount, isAccessibleToolbar ) {
+	// Make sure we don't use modified versions of this prop
+	const [ initialFocusOnMount ] = useState( focusOnMount );
 
 	const focusToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( wrapper.current );
+		const tabbables = focus.tabbable.find( ref.current );
 		if ( tabbables.length ) {
 			tabbables[ 0 ].focus();
 		}
@@ -50,12 +47,19 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	} );
 
 	useEffect( () => {
-		if ( focusOnMount ) {
+		if ( initialFocusOnMount ) {
 			focusToolbar();
 		}
-	}, [ shouldDisplayAccessibleToolbar ] );
+	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
+}
 
-	if ( shouldDisplayAccessibleToolbar ) {
+function NavigableToolbar( { children, focusOnMount, ...props } ) {
+	const wrapper = useRef();
+	const isAccessibleToolbar = useIsAccessibleToolbar( wrapper );
+
+	useToolbarFocus( wrapper, focusOnMount, isAccessibleToolbar );
+
+	if ( isAccessibleToolbar ) {
 		return (
 			<Toolbar
 				__experimentalAccessibilityLabel={ props[ 'aria-label' ] }
