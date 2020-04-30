@@ -130,24 +130,19 @@ function Layout() {
 	}, [ isInserterOpen, isHugeViewport ] );
 
 	// Local state for save panel.
+	// Note 'thruthy' callback implies an open panel.
 	const [
-		isEntitiesSavedStatesOpen,
-		setIsEntitiesSavedStatesOpen,
+		entitiesSavedStatesCallback,
+		setEntitiesSavedStatesCallback,
 	] = useState( false );
-	const [ closeEntitiesCallback, setCloseEntitiesCallback ] = useState();
-	const openEntitiesSavedStates = useCallback(
-		() => setIsEntitiesSavedStatesOpen( true ),
-		[]
-	);
 	const closeEntitiesSavedStates = useCallback(
-		( callbackArg ) => {
-			if ( closeEntitiesCallback ) {
-				closeEntitiesCallback( callbackArg );
-				setCloseEntitiesCallback();
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
 			}
-			setIsEntitiesSavedStatesOpen( false );
+			setEntitiesSavedStatesCallback( false );
 		},
-		[ closeEntitiesCallback ]
+		[ entitiesSavedStatesCallback ]
 	);
 
 	return (
@@ -169,9 +164,8 @@ function Layout() {
 							onToggleInserter={ () =>
 								setIsInserterOpen( ! isInserterOpen )
 							}
-							openEntitiesSavedStates={ openEntitiesSavedStates }
-							setCloseEntitiesCallback={
-								setCloseEntitiesCallback
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
 							}
 						/>
 					}
@@ -253,12 +247,14 @@ function Layout() {
 					}
 					actions={
 						<ActionsPanel
-							openEntitiesSavedStates={ openEntitiesSavedStates }
 							closeEntitiesSavedStates={
 								closeEntitiesSavedStates
 							}
 							isEntitiesSavedStatesOpen={
-								isEntitiesSavedStatesOpen
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
 							}
 						/>
 					}

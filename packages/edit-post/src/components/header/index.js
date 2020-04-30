@@ -20,8 +20,7 @@ import { default as DevicePreview } from '../device-preview';
 function Header( {
 	onToggleInserter,
 	isInserterOpen,
-	openEntitiesSavedStates,
-	setCloseEntitiesCallback,
+	setEntitiesSavedStatesCallback,
 } ) {
 	const {
 		shortcut,
@@ -94,8 +93,9 @@ function Header( {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
-					openEntitiesSavedStates={ openEntitiesSavedStates }
-					setCloseEntitiesCallback={ setCloseEntitiesCallback }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<Button
 					icon={ cog }

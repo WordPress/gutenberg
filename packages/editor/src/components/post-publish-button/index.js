@@ -48,13 +48,13 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+				// Open the save panel by setting its callback as truthy.
 				// To set a function on the useState hook, we must set it
 				// with another function (() => myFunction). Passing the
 				// function on its own will cause an error when called.
-				this.props.setCloseEntitiesCallback(
+				this.props.setEntitiesSavedStatesCallback(
 					() => this.closeEntitiesSavedStates
 				);
-				this.props.openEntitiesSavedStates();
 				return noop;
 			}
 

@@ -5,7 +5,7 @@ import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
+import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -13,7 +13,7 @@ import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 
 export default function ActionsPanel( {
-	openEntitiesSavedStates,
+	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
 } ) {
@@ -37,6 +37,11 @@ export default function ActionsPanel( {
 			).hasNonPostEntityChanges(),
 		};
 	}, [] );
+
+	const openEntitiesSavedStates = useCallback(
+		() => setEntitiesSavedStatesCallback( true ),
+		[]
+	);
 
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
