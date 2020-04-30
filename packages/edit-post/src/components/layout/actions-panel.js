@@ -85,7 +85,7 @@ export default function ActionsPanel( {
 		<>
 			<EntitiesSavedStates
 				isOpen={ isEntitiesSavedStatesOpen }
-				closePanel={ closeEntitiesSavedStates }
+				close={ closeEntitiesSavedStates }
 			/>
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>

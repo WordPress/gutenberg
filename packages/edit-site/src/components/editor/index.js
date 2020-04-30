@@ -124,7 +124,7 @@ function Editor( { settings: _settings } ) {
 													isOpen={
 														isEntitiesSavedStatesOpen
 													}
-													closePanel={
+													close={
 														closeEntitiesSavedStates
 													}
 												/>

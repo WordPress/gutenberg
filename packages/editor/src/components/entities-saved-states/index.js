@@ -15,7 +15,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-import { close, page, layout, grid, blockDefault } from '@wordpress/icons';
+import {
+	close as closeIcon,
+	page,
+	layout,
+	grid,
+	blockDefault,
+} from '@wordpress/icons';
 
 const ENTITY_NAME_ICONS = {
 	site: layout,
@@ -122,7 +128,7 @@ function EntityTypeList( {
 	);
 }
 
-export default function EntitiesSavedStates( { isOpen, closePanel } ) {
+export default function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
@@ -175,19 +181,19 @@ export default function EntitiesSavedStates( { isOpen, closePanel } ) {
 			saveEditedEntityRecord( kind, name, key );
 		} );
 
-		closePanel( entitiesToSave );
+		close( entitiesToSave );
 	};
 
-	// Explicitly define this with no argument passed.  Using `closePanel` on
+	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
-	const dismissPanel = useCallback( () => closePanel(), [ closePanel ] );
+	const dismissPanel = useCallback( () => close(), [ close ] );
 
 	return isOpen ? (
 		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
 					onClick={ dismissPanel }
-					icon={ close }
+					icon={ closeIcon }
 					label={ __( 'Close panel' ) }
 				/>
 			</div>
