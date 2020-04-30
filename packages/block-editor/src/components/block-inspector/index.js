@@ -90,7 +90,7 @@ const AdvancedControls = ( { slotName } ) => {
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
-		return;
+		return null;
 	}
 
 	return (
