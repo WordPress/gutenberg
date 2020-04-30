@@ -7,8 +7,6 @@ const blacklistElements = blacklist( [
 	new RegExp( path.basename( __dirname ) + '/gutenberg/.*' ),
 ] );
 
-const enm = require( './extra-node-modules.config.js' );
-
 const { lstatSync, readdirSync } = require( 'fs' );
 const getDirectoryNames = ( dir ) =>
 	readdirSync( dir ).filter( ( name ) => lstatSync( path.resolve( dir, name ) ).isDirectory() );
@@ -26,9 +24,9 @@ const alternateRoots = [ path.resolve( __dirname, '../node_modules' ) ].concat(
 );
 
 module.exports = {
-	extraNodeModules: Object.assign( enm, wppackages ),
 	watchFolders: alternateRoots,
 	resolver: {
+		extraNodeModules: wppackages,
 		blacklistRE: blacklistElements,
 		sourceExts: [ 'js', 'json', 'scss', 'sass' ],
 		providesModuleNodeModules: [ 'react-native-svg', 'react-native' ],
