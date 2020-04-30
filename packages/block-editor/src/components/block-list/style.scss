@@ -1,7 +1,3 @@
-// .block-editor-block-contextual-toolbar {
-// 	display: block;
-// }
-
 .block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
 	// While block is being dragged, dim the slot dragged from, and hide some UI.
 	&.is-dragging {

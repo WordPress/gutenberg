@@ -8,7 +8,6 @@
 }
 
 .block-editor-block-mover__control.has-icon {
-	height: auto;
 	padding: 0;
 }
 
@@ -17,10 +16,6 @@
 	.components-toolbar-group,
 	.components-toolbar {
 		flex-direction: column;
-		flex: 1;
-	}
-
-	.components-toolbar > div {
 		flex: 1;
 	}
 
