@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flatMap, remove, find, pick, groupBy } from 'lodash';
+import { map, flatMap, remove, find, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -55,12 +55,11 @@ export default function MenuLocationsEditor() {
 
 	const getMenuLocations = async () => {
 		const path = `${ entity.baseURL }`;
-		let apiLocations = await apiFetch( {
+		const apiLocations = await apiFetch( {
 			path,
 			method: 'GET',
 		} );
-		apiLocations = flatMap( apiLocations, ( value ) => value );
-		return apiLocations;
+		return flatMap( apiLocations, ( value ) => value );
 	};
 
 	const setLatestLocations = async () => {
@@ -90,11 +89,10 @@ export default function MenuLocationsEditor() {
 		remove( locationsData[ prevMenuId ], ( oldLocation ) => {
 			return oldLocation === location;
 		} );
-		if ( locationsData[ menu ] ) {
-			locationsData[ menu ].push( location );
-		} else {
-			locationsData[ menu ] = [ location ];
+		if ( ! locationsData[ menu ] ) {
+			locationsData[ menu ] = [];
 		}
+		locationsData[ menu ].push( location );
 		setLocationsData( locationsData );
 	};
 
@@ -104,10 +102,7 @@ export default function MenuLocationsEditor() {
 				const intMenuId = parseInt( menuId );
 				if ( intMenuId ) {
 					await saveMenu( {
-						...pick( find( menus, { id: intMenuId } ), [
-							'id',
-							'name',
-						] ),
+						id: intMenuId,
 						locations: locationsData[ menuId ],
 					} );
 				}
