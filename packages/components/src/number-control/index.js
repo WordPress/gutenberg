@@ -42,6 +42,15 @@ export function NumberControl(
 
 	const classes = classNames( 'components-number-control', className );
 
+	/**
+	 * "Middleware" function that intercepts updates from InputControl.
+	 * This allows us to tap into actions to transform the (next) state for
+	 * InputControl.
+	 *
+	 * @param {Object} state State from InputControl
+	 * @param {Object} action Action triggering state change
+	 * @return {Object} The updated state to apply to InputControl
+	 */
 	const stateReducer = ( state, action ) => {
 		const { type, payload } = action;
 		const event = payload?.event;
@@ -134,8 +143,6 @@ export function NumberControl(
 		 * Handles ENTER key press and submit
 		 */
 		if (
-			( type === inputControlActionTypes.CHANGE &&
-				! nextState.isPressEnterToChange ) ||
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.SUBMIT
 		) {

@@ -88,7 +88,7 @@ describe( 'NumberControl', () => {
 
 			const changeValue = spy.mock.calls[ 0 ][ 0 ];
 
-			expect( changeValue ).toBe( 10 );
+			expect( changeValue ).toBe( '10' );
 		} );
 	} );
 

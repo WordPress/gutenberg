@@ -15,12 +15,7 @@ import { useState, forwardRef } from '@wordpress/element';
 import { inputControlActionTypes } from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import {
-	CSS_UNITS,
-	DEFAULT_UNIT,
-	getParsedValue,
-	getValidParsedUnit,
-} from './utils';
+import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 
 function UnitControl(
 	{
@@ -35,6 +30,7 @@ function UnitControl(
 		onChange = noop,
 		onUnitChange = noop,
 		size = 'default',
+		stateReducer: stateReducerProp = ( state ) => state,
 		style,
 		unit: unitProp,
 		units = CSS_UNITS,
@@ -47,10 +43,17 @@ function UnitControl(
 	const [ unit, setUnit ] = useState( initialUnit );
 
 	const handleOnChange = ( next, changeProps ) => {
-		const [ , parsedUnit ] = getParsedValue( next, units );
-		const baseUnit = parsedUnit || unit;
-
-		const nextValue = `${ next }${ baseUnit }`;
+		/**
+		 * Customizing the onChange callback.
+		 * This allows as to broadcast a combined value+unit to onChange.
+		 */
+		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+			next,
+			units,
+			value,
+			unit
+		);
+		const nextValue = `${ parsedValue }${ parsedUnit }`;
 
 		onChange( nextValue, changeProps );
 	};
@@ -66,30 +69,46 @@ function UnitControl(
 
 		onChange( nextValue, changeProps );
 		onUnitChange( next, changeProps );
+
 		setUnit( next );
 	};
 
+	/**
+	 * "Middleware" function that intercepts updates from InputControl.
+	 * This allows us to tap into actions to transform the (next) state for
+	 * InputControl.
+	 *
+	 * @param {Object} state State from InputControl
+	 * @param {Object} action Action triggering state change
+	 * @return {Object} The updated state to apply to InputControl
+	 */
 	const stateReducer = ( state, action ) => {
 		const { type, payload } = action;
 		const event = payload?.event;
 
-		const nextState = { ...state };
+		const nextState = stateReducerProp( state, action );
 
+		/**
+		 * Customizes the submit interaction.
+		 *
+		 * This occurs when pressing ENTER to fire a change.
+		 * By intercepting the state change, we can parse the incoming
+		 * value to determine if the unit needs to be updated.
+		 */
 		if ( type === inputControlActionTypes.SUBMIT ) {
 			const valueToParse = event?.target?.value;
 
 			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
 				valueToParse,
 				units,
-				value
+				value,
+				unit
 			);
-
-			const baseUnit = parsedUnit || unit || DEFAULT_UNIT.value;
 
 			nextState.value = parsedValue;
 
-			if ( unit !== baseUnit ) {
-				handleOnUnitChange( baseUnit, { event } );
+			if ( unit !== parsedUnit ) {
+				handleOnUnitChange( parsedUnit, { event } );
 			}
 		}
 

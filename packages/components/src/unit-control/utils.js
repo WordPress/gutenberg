@@ -76,16 +76,28 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
  *
  * @param {number|string} next The next value.
  * @param {Array<Object>} units Units to derive from.
- * @param {number|string} fallback The fallback value.
+ * @param {number|string} fallbackValue The fallback value.
+ * @param {string} fallbackUnit The fallback value.
  * @return {Array<number, string>} The extracted number and unit.
  */
-export function getValidParsedUnit( next, units, fallback ) {
+export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
 	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
 	let baseValue = parsedValue;
+	let baseUnit;
 
 	if ( isNaN( parsedValue ) || parsedValue === '' ) {
-		baseValue = fallback;
+		baseValue = fallbackValue;
 	}
 
-	return [ baseValue, parsedUnit ];
+	baseUnit = parsedUnit || fallbackUnit;
+
+	/**
+	 * If no unit is found, attempt to use the first value from the collection
+	 * of units as a default fallback.
+	 */
+	if ( hasUnits( units ) && ! baseUnit ) {
+		baseUnit = units[ 0 ]?.value;
+	}
+
+	return [ baseValue, baseUnit ];
 }

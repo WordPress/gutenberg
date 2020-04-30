@@ -7,24 +7,27 @@ const initialStateReducer = ( state ) => state;
 
 const initialInputControlState = {
 	_event: {},
-	isDragEnabled: false,
+	error: null,
+	initialValue: '',
 	isDirty: false,
+	isDragEnabled: false,
 	isDragging: false,
 	isPressEnterToSubmit: false,
-	initialValue: '',
 	value: '',
 };
 
 const actionTypes = {
 	CHANGE: 'CHANGE',
+	DRAG: 'DRAG',
 	DRAG_END: 'DRAG_END',
 	DRAG_START: 'DRAG_START',
-	DRAG: 'DRAG',
+	INVALIDATE: 'INVALIDATE',
 	PRESS_DOWN: 'PRESS_DOWN',
 	PRESS_ENTER: 'PRESS_ENTER',
 	PRESS_UP: 'PRESS_UP',
 	RESET: 'RESET',
 	SUBMIT: 'SUBMIT',
+	UPDATE: 'UPDATE',
 };
 
 export const inputControlActionTypes = actionTypes;
@@ -63,9 +66,6 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
 				nextState.isDragging = true;
 				break;
 
-			case actionTypes.DRAG:
-				break;
-
 			case actionTypes.DRAG_END:
 				nextState.isDragging = false;
 				break;
@@ -74,10 +74,13 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
 			 * Input events
 			 */
 			case actionTypes.CHANGE:
+				nextState.error = null;
 				nextState.value = payload.value;
+
 				if ( state.isPressEnterToChange ) {
 					nextState.isDirty = true;
 				}
+
 				break;
 
 			case actionTypes.SUBMIT:
@@ -86,8 +89,23 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
 				break;
 
 			case actionTypes.RESET:
-				nextState.value = payload.value || state.initialValue;
+				nextState.error = null;
 				nextState.isDirty = false;
+				nextState.value = payload.value || state.initialValue;
+				break;
+
+			case actionTypes.UPDATE:
+				if ( payload.value !== state.value ) {
+					nextState.value = payload.value;
+					nextState.isDirty = false;
+				}
+				break;
+
+			/**
+			 * Validation
+			 */
+			case actionTypes.INVALIDATE:
+				nextState.error = payload.error;
 				break;
 		}
 
@@ -137,6 +155,8 @@ export function useInputControlStateReducer(
 	const change = createChangeEvent( actionTypes.CHANGE );
 	const submit = createChangeEvent( actionTypes.SUBMIT );
 	const reset = createChangeEvent( actionTypes.RESET );
+	const inValidate = createChangeEvent( actionTypes.INVALIDATE );
+	const update = createChangeEvent( actionTypes.UPDATE );
 
 	const dragStart = createDragEvent( actionTypes.DRAG_START );
 	const drag = createDragEvent( actionTypes.DRAG );
@@ -152,11 +172,13 @@ export function useInputControlStateReducer(
 		drag,
 		dragEnd,
 		dragStart,
+		inValidate,
 		pressDown,
 		pressEnter,
 		pressUp,
 		reset,
 		state,
 		submit,
+		update,
 	};
 }

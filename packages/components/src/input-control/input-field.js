@@ -23,17 +23,18 @@ function InputField(
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isPressEnterToChange = false,
 		isFloating,
 		isFloatingLabelSet,
-		onDragStart = noop,
-		onDragEnd = noop,
-		onDrag = noop,
+		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
+		onDrag = noop,
+		onDragEnd = noop,
+		onDragStart = noop,
 		onFocus = noop,
 		onKeyDown = noop,
 		onUpdateValue,
+		onValidate = noop,
 		size = 'default',
 		stateReducer = ( state ) => state,
 		value: valueProp,
@@ -47,11 +48,13 @@ function InputField(
 		drag,
 		dragStart,
 		dragEnd,
+		invalidate,
 		pressUp,
 		pressDown,
 		pressEnter,
 		reset,
 		submit,
+		update,
 	} = useInputControlStateReducer( stateReducer, {
 		isDragEnabled,
 		value: valueProp,
@@ -60,17 +63,38 @@ function InputField(
 
 	const { _event, value, isDragging, isDirty } = state;
 
+	const initialValueRef = useRef( valueProp );
 	const valueRef = useRef( value );
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
 	useEffect( () => {
+		/**
+		 * Handles syncing incoming value changes with internal state.
+		 * This effectively enables a "controlled" state.
+		 * https://reactjs.org/docs/forms.html#controlled-components
+		 */
+		if (
+			valueProp !== initialValueRef.current &&
+			valueProp !== valueRef.current
+		) {
+			update( valueProp );
+			initialValueRef.current = valueProp;
+			valueRef.current = valueProp;
+
+			// Quick return to avoid firing the onChange callback
+			return;
+		}
+
+		/**
+		 * Fires the onChange callback when internal state value changes.
+		 */
 		if ( value !== valueRef.current && ! isDirty ) {
 			onChange( value, { event: _event } );
 			onUpdateValue( ! isValueEmpty( value ) );
 
 			valueRef.current = value;
 		}
-	}, [ value, isDirty ] );
+	}, [ value, isDirty, valueProp ] );
 
 	const handleOnBlur = ( event ) => {
 		onBlur( event );
@@ -81,7 +105,7 @@ function InputField(
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			if ( ! isValueEmpty( value ) ) {
-				submit( value, event );
+				handleOnSubmit( { target: value }, event );
 			} else {
 				reset( valueProp );
 			}
@@ -93,7 +117,19 @@ function InputField(
 	};
 
 	const handleOnChange = ( event ) => {
-		change( event.target.value, event );
+		const nextValue = event.target.value;
+		change( nextValue, event );
+	};
+
+	const handleOnSubmit = ( event ) => {
+		const nextValue = event.target.value;
+
+		try {
+			onValidate( nextValue, { event } );
+			submit( nextValue, event );
+		} catch ( err ) {
+			invalidate( err, { event } );
+		}
 	};
 
 	const handleOnKeyDown = ( event ) => {
@@ -114,7 +150,7 @@ function InputField(
 
 				if ( isPressEnterToChange ) {
 					event.preventDefault();
-					submit( event.target.value, event );
+					handleOnSubmit( event );
 				}
 				break;
 		}

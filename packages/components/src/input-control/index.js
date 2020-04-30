@@ -39,11 +39,11 @@ export function InputControl(
 		onBlur = noop,
 		onChange = noop,
 		onFocus = noop,
+		onValidate = noop,
 		onKeyDown = noop,
 		size = 'default',
 		stateReducer = ( state ) => state,
 		suffix,
-		transformValueOnChange = ( v ) => v,
 		value,
 		...props
 	},
@@ -102,11 +102,11 @@ export function InputControl(
 					onFocus={ handleOnFocus }
 					onKeyDown={ onKeyDown }
 					onUpdateValue={ setIsFilled }
+					onValidate={ onValidate }
 					ref={ ref }
 					setIsFocused={ setIsFocused }
 					size={ size }
 					stateReducer={ stateReducer }
-					transformValueOnChange={ transformValueOnChange }
 					value={ value }
 				/>
 				{ suffix && (
