@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const arrowLeft = (
+const home = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M9.737 18.011L3.98 12.255l5.734-6.28 1.107 1.012-4.103 4.494h13.3v1.5H6.828l3.97 3.97-1.06 1.06z" />
+		<Path d="M20 20H4v-9.5L12 4l8 6.5V20zM12 5.933l-6.5 5.281V18.5h13v-7.286L12 5.933z" />
 	</SVG>
 );
 
-export default arrowLeft;
+export default home;
