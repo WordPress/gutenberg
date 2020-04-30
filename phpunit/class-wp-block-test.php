@@ -32,6 +32,10 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry = null;
 	}
 
+	function filter_render_block( $content, $parsed_block ) {
+		return 'Original: "' . $content . '", from block "' . $parsed_block['blockName'] . '"';
+	}
+
 	function test_constructor_assigns_properties_from_parsed_block() {
 		$this->registry->register( 'core/example', array() );
 
@@ -263,6 +267,24 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$this->assertSame( 'Hello from core/greeting', $block->render() );
+	}
+
+	function test_render_applies_render_block_filter() {
+		$this->registry->register( 'core/example', array() );
+
+		add_filter( 'render_block', array( $this, 'filter_render_block' ), 10, 2 );
+
+		$parsed_blocks = parse_blocks( '<!-- wp:example -->Static<!-- wp:example -->Inner<!-- /wp:example --><!-- /wp:example -->' );
+		$parsed_block  = $parsed_blocks[0];
+		$context       = array();
+		$block         = new WP_Block( $parsed_block, $context, $this->registry );
+
+		$rendered_content = $block->render();
+
+		remove_filter( 'render_block', array( $this, 'filter_render_block' ) );
+
+		$this->assertSame( 'Original: "StaticOriginal: "Inner", from block "core/example"", from block "core/example"', $rendered_content );
+
 	}
 
 	function test_passes_attributes_to_render_callback() {
