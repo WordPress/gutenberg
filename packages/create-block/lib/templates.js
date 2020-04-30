@@ -3,6 +3,13 @@
  */
 const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
+const { command } = require( 'execa' );
+const fs, { existsSync } = require( 'fs' );
+const path, { join } = require( 'path' );
+const { readFile } = require( 'fs' ).promises;
+const makeDir = require( 'make-dir' );
+
+const log = require( './log' );
 
 const namespace = 'create-block';
 const dashicon = 'smiley';
@@ -65,27 +72,41 @@ const templates = {
 	},
 };
 
-const getTemplate = ( templateName ) => {
-	if ( ! templates[ templateName ] ) {
+const getTemplate = async ( templateName ) => {
+
+	if ( await isCoreTemplate( templateName ) ) {
+		return templates[ templateName ];
+	}
+
+	// throw a CLIError if the the template is neither a core one nor an external one
+	if ( ! await isExternalTemplate( templateName ) && ! await isCoreTemplate( templateName ) ) {
 		throw new CLIError(
-			`Invalid template type name. Allowed values: ${ Object.keys(
+			`Invalid template type name. Either use one of the Core templates: ${ Object.keys(
 				templates
-			).join( ', ' ) }.`
+			).join( ', ' ) }. \n \n or a valid npm package name.`
 		);
 	}
-	return templates[ templateName ];
+
+	await downloadExternalTemplate( templateName );
+
+	const rawPackageInfo = await readFile( join( process.cwd(), 'temp', 'node_modules', templateName, 'template.json' ) );
+	const packageInfo = JSON.parse( rawPackageInfo );
+	return packageInfo;
+
 };
 
-const getDefaultValues = ( templateName ) => {
-	return getTemplate( templateName ).defaultValues;
+const getDefaultValues = async ( templateName ) => {
+	const template = await getTemplate( templateName );
+	return template.defaultValues;
 };
 
-const getOutputFiles = ( templateName ) => {
-	return getTemplate( templateName ).outputFiles;
+const getOutputFiles = async ( templateName ) => {
+	const template = await getTemplate( templateName );
+	return template.outputFiles;
 };
 
-const getPrompts = ( templateName ) => {
-	const defaultValues = getDefaultValues( templateName );
+const getPrompts = async ( templateName ) => {
+	const defaultValues = await getDefaultValues( templateName );
 	return Object.keys( prompts ).map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
@@ -98,9 +119,64 @@ const hasWPScriptsEnabled = ( templateName ) => {
 	return getTemplate( templateName ).wpScriptsEnabled || false;
 };
 
+const isCoreTemplate = async templateName => templates[ templateName ] || false;
+
+const isExternalTemplate = async templateName => {
+	try {
+		await command( `npm view ${ templateName }` );
+		return true;
+	} catch ( error ) {
+		return false;
+	}
+}
+
+const downloadExternalTemplate = async templateName => {
+	try {
+		const cwd = join( process.cwd(), 'temp' );
+
+		if ( existsSync( join( cwd, 'node_modules', templateName ) ) ) {
+			return true;
+		};
+
+		// mkdir temp
+		await makeDir( cwd );
+
+		// npm init
+		await command( 'npm init -y', {cwd} );
+
+		// npm install my-template --save
+		await command( `npm install ${templateName} --save`, {cwd} );
+
+		return true;
+
+	} catch ( error ) {
+		log.error( 'There has been an error:' );
+		log.error( error );
+		return false;
+	}
+}
+
+
+const deleteFolderRecursive = function(path) {
+  if (fs.existsSync(path)) {
+    fs.readdirSync(path).forEach((file, index) => {
+      const curPath = Path.join(path, file);
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
+
 module.exports = {
 	getDefaultValues,
 	getOutputFiles,
 	getPrompts,
 	hasWPScriptsEnabled,
+	isCoreTemplate,
+	isExternalTemplate,
+	deleteFolderRecursive,
 };

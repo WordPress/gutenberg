@@ -12,7 +12,7 @@ const { snakeCase } = require( 'lodash' );
  */
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
-const { hasWPScriptsEnabled, getOutputFiles } = require( './templates' );
+const { hasWPScriptsEnabled, getOutputFiles, isCoreTemplate } = require( './templates' );
 
 module.exports = async function(
 	templateName,
@@ -50,24 +50,50 @@ module.exports = async function(
 		licenseURI,
 		textdomain: namespace,
 	};
-	await Promise.all(
-		getOutputFiles( templateName ).map( async ( file ) => {
-			const template = await readFile(
-				join(
-					__dirname,
-					`templates/${ templateName }/${ file }.mustache`
-				),
-				'utf8'
-			);
-			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ file.replace(
-				/\$slug/g,
-				slug
-			) }`;
-			await makeDir( dirname( outputFilePath ) );
-			writeFile( outputFilePath, render( template, view ) );
-		} )
-	);
+
+	if ( await isCoreTemplate( templateName ) ) {
+
+		await Promise.all(
+			(await getOutputFiles( templateName )).map( async ( file ) => {
+				const template = await readFile(
+					join(
+						__dirname,
+						`templates/${ templateName }/${ file }.mustache`
+					),
+					'utf8'
+				);
+				// Output files can have names that depend on the slug provided.
+				const outputFilePath = `${ slug }/${ file.replace(
+					/\$slug/g,
+					slug
+				) }`;
+				await makeDir( dirname( outputFilePath ) );
+				writeFile( outputFilePath, render( template, view ) );
+			} )
+		);
+
+	} else {
+
+		await Promise.all(
+			(await getOutputFiles( templateName )).map( async ( file ) => {
+				const template = await readFile(
+					join(
+						process.cwd(),
+						`temp/node_modules/${ templateName }/${ file }.mustache`
+					),
+					'utf8'
+				);
+				// Output files can have names that depend on the slug provided.
+				const outputFilePath = `${ slug }/${ file.replace(
+					/\$slug/g,
+					slug
+				) }`;
+				await makeDir( dirname( outputFilePath ) );
+				writeFile( outputFilePath, render( template, view ) );
+			} )
+		);
+
+	}
 
 	if ( hasWPScriptsEnabled( templateName ) ) {
 		await initWPScripts( view );

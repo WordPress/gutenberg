@@ -13,7 +13,7 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const { getDefaultValues, getPrompts } = require( './templates' );
+const { getDefaultValues, getPrompts, deleteFolderRecursive } = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
@@ -45,7 +45,7 @@ program
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const defaultValues = getDefaultValues( template );
+				const defaultValues = await getDefaultValues( template );
 				const optionsValues = pickBy( {
 					category,
 					description: shortDescription,
@@ -62,7 +62,7 @@ program
 					};
 					await scaffold( template, answers );
 				} else {
-					const propmpts = getPrompts( template ).filter(
+					const propmpts = await getPrompts( template ).filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
@@ -73,6 +73,8 @@ program
 						...answers,
 					} );
 				}
+
+				deleteFolderRecursive( '/temp' );
 			} catch ( error ) {
 				if ( error instanceof CLIError ) {
 					log.error( error.message );
