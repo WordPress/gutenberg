@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, memo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
@@ -161,22 +161,12 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						aria-label={ style.label || style.name }
 					>
 						<div className="block-editor-block-styles__item-preview">
-							<BlockPreview
-								viewportWidth={ 500 }
-								blocks={
-									useExample
-										? getBlockFromExample( blockName, {
-												attributes: {
-													...type.example.attributes,
-													className: styleClassName,
-												},
-												innerBlocks:
-													type.example.innerBlocks,
-										  } )
-										: cloneBlock( block, {
-												className: styleClassName,
-										  } )
-								}
+							<BlockPreviewPure
+								type={ type }
+								block={ block }
+								blockName={ blockName }
+								useExample={ useExample }
+								styleClassName={ styleClassName }
 							/>
 						</div>
 						<div className="block-editor-block-styles__item-label">
@@ -189,4 +179,35 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	);
 }
 
-export default memo( BlockStyles );
+function BlockPreviewPure( {
+	useExample,
+	type,
+	block,
+	blockName,
+	styleClassName,
+} ) {
+	let factory, deps;
+	if ( useExample ) {
+		factory = () =>
+			getBlockFromExample( blockName, {
+				attributes: {
+					...type.example.attributes,
+					className: styleClassName,
+				},
+				innerBlocks: type.example.innerBlocks,
+			} );
+		deps = [ useExample, type, blockName, styleClassName ];
+	} else {
+		factory = () =>
+			cloneBlock( block, {
+				className: styleClassName,
+			} );
+		deps = [ block, styleClassName ];
+	}
+
+	const previewBlocks = useMemo( factory, deps );
+
+	return <BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />;
+}
+
+export default BlockStyles;
