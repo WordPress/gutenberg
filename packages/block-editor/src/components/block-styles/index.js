@@ -161,7 +161,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						aria-label={ style.label || style.name }
 					>
 						<div className="block-editor-block-styles__item-preview">
-							<BlockPreviewPure
+							<BlockStylePreview
 								type={ type }
 								block={ block }
 								blockName={ blockName }
@@ -179,7 +179,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	);
 }
 
-function BlockPreviewPure( {
+function BlockStylePreview( {
 	useExample,
 	type,
 	block,
