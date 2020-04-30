@@ -7,6 +7,7 @@ import {
 	Text,
 	TouchableWithoutFeedback,
 	View,
+	Dimensions,
 } from 'react-native';
 
 /**
@@ -21,24 +22,12 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import styles from './style';
 
 const Tooltip = ( { onTooltipHidden } ) => {
-	const [ tooltipPosition, setTooltipPosition ] = useState( null );
 	const [ visible, setVisible ] = useState( true );
-	const tooltipRef = useRef( null );
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
 		startAnimation();
 	}, [ visible ] );
-
-	const onLayout = () => {
-		if ( tooltipRef ) {
-			tooltipRef.current.measure(
-				( _fx, _fy, _width, height, px, py ) => {
-					setTooltipPosition( { height, x: px, y: py } );
-				}
-			);
-		}
-	};
 
 	const onHide = () => {
 		setVisible( false );
@@ -60,10 +49,7 @@ const Tooltip = ( { onTooltipHidden } ) => {
 
 	const stylesOverlay = [
 		styles.overlay,
-		tooltipPosition && {
-			top: -tooltipPosition.y - tooltipPosition.height,
-			height: tooltipPosition.y + tooltipPosition.height,
-		},
+		{ height: Dimensions.get( 'window' ).height },
 	];
 
 	return (
@@ -86,8 +72,6 @@ const Tooltip = ( { onTooltipHidden } ) => {
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
 					<View
-						ref={ tooltipRef }
-						onLayout={ onLayout }
 						style={ [
 							styles.tooltip,
 							{
