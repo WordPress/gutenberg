@@ -114,7 +114,7 @@ class LatestPostsEdit extends Component {
 			order,
 			orderBy,
 			categories,
-			users,
+			author,
 			postsToShow,
 			excerptLength,
 			featuredImageAlign,
@@ -278,12 +278,12 @@ class LatestPostsEdit extends Component {
 						selectedCategories={ categories }
 						onAuthorChange={ ( value ) =>
 							setAttributes( {
-								users:
+								author:
 									'' !== value ? Number( value ) : undefined,
 							} )
 						}
 						authorList={ authorList }
-						selectedAuthorId={ users }
+						selectedAuthorId={ author }
 					/>
 
 					{ postLayout === 'grid' && (
@@ -481,7 +481,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
-		users,
+		author,
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -493,7 +493,7 @@ export default withSelect( ( select, props ) => {
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
-			author: users,
+			author,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,
