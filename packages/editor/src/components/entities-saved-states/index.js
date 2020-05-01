@@ -56,7 +56,7 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 		},
 		[ changesWhenSelected, parentBlockId ]
 	);
-
+	// isSelected requires a dep that changes when 'Select' button is clicked.
 	const [ changesWhenSelected, setChangesWhenSelected ] = useState( true );
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
