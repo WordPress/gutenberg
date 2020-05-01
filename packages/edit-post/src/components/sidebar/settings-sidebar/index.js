@@ -45,7 +45,7 @@ const SettingsSidebar = () => {
 			{ sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
-					<PluginDocumentSettingPanel.Slot />
+					<PluginDocumentSettingPanel.Slot bubblesVirtually />
 					<LastRevision />
 					<PostLink />
 					<PostTaxonomies />

@@ -15,7 +15,7 @@ function PinnedItems( { scope, ...props } ) {
 
 function PinnedItemsSlot( { scope, className, ...props } ) {
 	return (
-		<Slot name={ `PinnedItems/${ scope }` } { ...props }>
+		<Slot name={ `PinnedItems/${ scope }` } bubblesVirtually { ...props }>
 			{ ( fills ) =>
 				! isEmpty( fills ) && (
 					<div

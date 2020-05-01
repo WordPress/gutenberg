@@ -19,7 +19,13 @@ import ComplementaryAreaHeader from '../complementary-area-header';
 import PinnedItems from '../pinned-items';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
-	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
+	return (
+		<Slot
+			name={ `ComplementaryArea/${ scope }` }
+			bubblesVirtually
+			{ ...props }
+		/>
+	);
 }
 
 function ComplementaryAreaFill( { scope, children, className } ) {

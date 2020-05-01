@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import BaseSlot from './slot';
@@ -12,6 +17,13 @@ export function Slot( { bubblesVirtually, ...props } ) {
 	if ( bubblesVirtually ) {
 		return <BubblesVirtuallySlot { ...props } />;
 	}
+
+	deprecated( 'Slots without event bubbling', {
+		hint:
+			"Set the bubblesVirtually prop to true for your slot and make sure it doesn't regress. On future versions, this prop will be enabled by default. Your slot name: " +
+			props.name,
+	} );
+
 	return <BaseSlot { ...props } />;
 }
 

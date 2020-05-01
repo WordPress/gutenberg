@@ -9,7 +9,12 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import {
+	Toolbar,
+	Slot,
+	DropdownMenu,
+	__experimentalUseSlot as useSlot,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
@@ -18,6 +23,10 @@ const POPOVER_PROPS = {
 };
 
 const FormatToolbar = () => {
+	const slot = useSlot( 'RichText.ToolbarControls' );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+	// This still needs to be fixed.
+
 	return (
 		<div className="block-editor-format-toolbar">
 			<Toolbar>
@@ -26,24 +35,18 @@ const FormatToolbar = () => {
 						<Slot
 							name={ `RichText.ToolbarControls.${ format }` }
 							key={ format }
+							bubblesVirtually
 						/>
 					)
 				) }
-				<Slot name="RichText.ToolbarControls">
-					{ ( fills ) =>
-						fills.length !== 0 && (
-							<DropdownMenu
-								icon={ chevronDown }
-								label={ __( 'More rich text controls' ) }
-								controls={ orderBy(
-									fills.map( ( [ { props } ] ) => props ),
-									'title'
-								) }
-								popoverProps={ POPOVER_PROPS }
-							/>
-						)
-					}
-				</Slot>
+				{ hasFills && (
+					<DropdownMenu
+						icon={ chevronDown }
+						label={ __( 'More rich text controls' ) }
+						controls={ [] }
+						popoverProps={ POPOVER_PROPS }
+					/>
+				) }
 			</Toolbar>
 		</div>
 	);

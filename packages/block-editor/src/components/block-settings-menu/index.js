@@ -78,6 +78,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 							<>
 								<MenuGroup>
 									<__experimentalBlockSettingsMenuFirstItem.Slot
+										bubblesVirtually
 										fillProps={ { onClose } }
 									/>
 									{ count === 1 && (

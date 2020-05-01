@@ -20,7 +20,7 @@ describe( 'PluginPostStatusInfo', () => {
 				<PluginPostStatusInfo className="my-plugin-post-status-info">
 					My plugin post status info
 				</PluginPostStatusInfo>
-				<PluginPostStatusInfo.Slot />
+				<PluginPostStatusInfo.Slot bubblesVirtually />
 			</SlotFillProvider>
 		).toJSON();
 

@@ -8,5 +8,7 @@ const { Fill: __experimentalInserterMenuExtension, Slot } = createSlotFill(
 );
 
 __experimentalInserterMenuExtension.Slot = Slot;
+__experimentalInserterMenuExtension.Slot.slotName =
+	'__experimentalInserterMenuExtension';
 
 export default __experimentalInserterMenuExtension;

@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { isEmpty, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createSlotFill, MenuGroup } from '@wordpress/components';
+import {
+	createSlotFill,
+	MenuGroup,
+	__experimentalUseSlot as useSlot,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
@@ -25,13 +29,20 @@ const BlockSettingsMenuControlsSlot = ( { fillProps } ) => {
 			),
 		};
 	}, [] );
+	const slot = useSlot( 'BlockSettingsMenuControls' );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return null;
+	}
 
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup>
-			}
-		</Slot>
+		<MenuGroup>
+			<Slot
+				bubblesVirtually
+				fillProps={ { ...fillProps, selectedBlocks } }
+			/>
+		</MenuGroup>
 	);
 };
 

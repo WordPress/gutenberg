@@ -49,7 +49,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 				/>
 			</Section>
 			<Section title={ __( 'Document panels' ) }>
-				<EnablePluginDocumentSettingPanelOption.Slot />
+				<EnablePluginDocumentSettingPanelOption.Slot bubblesVirtually />
 				{ isViewable && (
 					<EnablePanelOption
 						label={ __( 'Permalink' ) }

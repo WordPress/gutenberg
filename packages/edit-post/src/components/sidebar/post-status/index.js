@@ -32,21 +32,15 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<PluginPostStatusInfo.Slot>
-				{ ( fills ) => (
-					<>
-						<PostVisibility />
-						<PostSchedule />
-						<PostFormat />
-						<PostSticky />
-						<PostPendingStatus />
-						<PostSlug />
-						<PostAuthor />
-						{ fills }
-						<PostTrash />
-					</>
-				) }
-			</PluginPostStatusInfo.Slot>
+			<PostVisibility />
+			<PostSchedule />
+			<PostFormat />
+			<PostSticky />
+			<PostPendingStatus />
+			<PostSlug />
+			<PostAuthor />
+			<PluginPostStatusInfo.Slot bubblesVirtually />
+			<PostTrash />
 		</PanelBody>
 	);
 }

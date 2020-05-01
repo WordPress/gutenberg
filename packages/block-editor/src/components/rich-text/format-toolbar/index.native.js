@@ -11,6 +11,7 @@ const FormatToolbar = () => {
 				<Slot
 					name={ `RichText.ToolbarControls.${ format }` }
 					key={ format }
+					bubblesVirtually
 				/>
 			) ) }
 			<Slot name="RichText.ToolbarControls" />
