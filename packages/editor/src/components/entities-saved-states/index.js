@@ -54,20 +54,16 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 			).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
-		[ changesWhenSelected, parentBlockId ]
+		[ parentBlockId ]
 	);
-	// isSelected requires a dep that changes when 'Select' button is clicked.
-	const [ changesWhenSelected, setChangesWhenSelected ] = useState( true );
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const selectParentBlock = useCallback( () => {
 		selectBlock( parentBlockId );
-		setChangesWhenSelected( ! changesWhenSelected );
 	}, [ parentBlockId ] );
 
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
-		setChangesWhenSelected( ! changesWhenSelected );
 		closePanel();
 	}, [ parentBlockId ] );
 
