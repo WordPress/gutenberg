@@ -58,9 +58,9 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 	);
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const selectParentBlock = useCallback( () => {
-		selectBlock( parentBlockId );
-	}, [ parentBlockId ] );
+	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
+		parentBlockId,
+	] );
 
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
