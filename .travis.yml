@@ -215,13 +215,22 @@ jobs:
       language: android
       jdk: oraclejdk8
       sudo: required
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+          - $HOME/.android/build-cache
+          - /usr/local/android-sdk
       env:
         - TEST_RN_PLATFORM=android
         - TEST_ENV=sauce
         - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
         - ANDROID_API_LEVEL=28
         - ANDROID_BUILD_TOOLS_VERSION=28.0.3
-        - ANDROID_ABI=google_apis/x86_64
+        - ANDROID_ABI=armeabi-v7a
       android:
         components:
           - tools
@@ -238,12 +247,9 @@ jobs:
         - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       install:
         - npm ci
-      before_cache:
-        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       before_script:
         - android list targets
-        - echo no | android create avd --force -n test -t android-$ANDROID_API_LEVEL --abi $ANDROID_ABI -c 100M --package "system-images;android-$ANDROID_API_LEVEL;google_apis;x86_64"
+        - echo no | android create avd --force -n test -t android-$ANDROID_API_LEVEL --abi $ANDROID_ABI -c 100M
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
