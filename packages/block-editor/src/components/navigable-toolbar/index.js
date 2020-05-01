@@ -12,6 +12,16 @@ import {
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
+function useUpdateLayoutEffect( effect, deps ) {
+	const mounted = useRef( false );
+	useLayoutEffect( () => {
+		if ( mounted.current ) {
+			return effect();
+		}
+		mounted.current = true;
+	}, deps );
+}
+
 function hasOnlyToolbarItem( elements ) {
 	const dataProp = 'experimentalToolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
@@ -31,13 +41,19 @@ function useIsAccessibleToolbar( ref ) {
 	// component.
 	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState( false );
 
-	useLayoutEffect( () => {
+	const determineIsAccessibleToolbar = useCallback( () => {
+		const tabbables = focus.tabbable.find( ref.current );
+		setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
+	}, [] );
+
+	useLayoutEffect( determineIsAccessibleToolbar, [] );
+
+	useUpdateLayoutEffect( () => {
 		// Toolbar buttons may be rendered asynchronously, so we use
 		// MutationObserver to check if the toolbar subtree has been modified
-		const observer = new window.MutationObserver( () => {
-			const tabbables = focus.tabbable.find( ref.current );
-			setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
-		} );
+		const observer = new window.MutationObserver(
+			determineIsAccessibleToolbar
+		);
 		observer.observe( ref.current, { childList: true, subtree: true } );
 		return () => observer.disconnect();
 	}, [ isAccessibleToolbar ] );
