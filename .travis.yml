@@ -240,7 +240,7 @@ jobs:
           - extra-android-support
           - android-${ANDROID_API_LEVEL}
           - android-${EMULATOR_API_LEVEL}
-          - sys-img-${ANDROID_ABI}-google_apis-${EMULATOR_API_LEVEL}
+          - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
       before_install:
         - touch $HOME/.android/repositories.cfg
         - yes | sdkmanager "platforms;android-$ANDROID_API_LEVEL"
@@ -252,7 +252,7 @@ jobs:
         - npm ci
       before_script:
         - android list targets
-        - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi google_apis/$ANDROID_ABI -c 100M
+        - echo no | android create avd --force -n test -t android-$EMULATOR_API_LEVEL --abi $ANDROID_ABI -c 100M
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
