@@ -240,7 +240,7 @@ jobs:
           - extra-android-support
           - android-${ANDROID_API_LEVEL}
           - android-${EMULATOR_API_LEVEL}
-          - sys-img-${ANDROID_ABI}-${ANDROID_TARGET}
+          - sys-img-${ANDROID_ABI}-android-${ANDROID_API_LEVEL}
       before_install:
         - touch $HOME/.android/repositories.cfg
         - yes | sdkmanager "platforms;android-$ANDROID_API_LEVEL"
