@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-const doctrine = require( 'doctrine' );
+const parse = require( 'comment-parser' );
 
 /**
  * Internal dependencies.
@@ -21,17 +21,7 @@ module.exports = function( token ) {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
-		jsdoc = doctrine.parse( comments, {
-			unwrap: true,
-			recoverable: true,
-			sloppy: true,
-		} );
-		jsdoc.tags = jsdoc.tags.map( ( tag ) => {
-			if ( tag.type ) {
-				tag.type = getTypeAsString( tag.type );
-			}
-			return tag;
-		} );
+		jsdoc = parse( comments );
 	}
 	return jsdoc;
 };
