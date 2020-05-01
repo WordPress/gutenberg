@@ -20,18 +20,23 @@ function waitForAndAcceptDialog() {
 async function removeReusableBlocks() {
 	await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
+	// When no reusable block is registered, return
+	if ( ( await page.$x( '//td[text()="No blocks found."]' ) ) !== null ) {
+		return;
+	}
+
 	// select all reusable blocks
-	await page.waitForSelector( '#cb-select-all-1' );
 	const checkall = await page.$( '#cb-select-all-1' );
 	await checkall.click();
 
+	// bottom select and bottom apply button are used
+	// because top one is not visible in mobile ui.
+
 	// select "Move to trash" option
-	await page.waitForSelector( '#bulk-action-selector-top' );
-	await page.select( '#bulk-action-selector-top', 'trash' );
+	await page.select( '#bulk-action-selector-bottom', 'trash' );
 
 	// click apply button
-	await page.waitForSelector( '#doaction' );
-	const applyButton = await page.$( '#doaction' );
+	const applyButton = await page.$( '#doaction2' );
 	await applyButton.click();
 }
 
