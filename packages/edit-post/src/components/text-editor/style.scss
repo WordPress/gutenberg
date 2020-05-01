@@ -22,22 +22,24 @@
 			padding: 0;
 		}
 	}
-
-	// Make room for toolbar.
-	padding-top: $block-toolbar-height + $grid-unit-10;
 }
 
 // Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
-	position: absolute;
+	position: sticky;
 	top: 0;
 	left: 0;
 	right: 0;
 	display: flex;
+	background: $white;
 	padding: $grid-unit-05 $grid-unit-15;
 
 	@include break-small() {
 		padding: $grid-unit-15;
+	}
+
+	@include break-large() {
+		padding: $grid-unit-15 $grid-unit-30;
 	}
 
 	h2 {
@@ -67,6 +69,7 @@
 	// This needs specificity to change the title block appearance on the code editor.
 	.editor-post-title__input.editor-post-title__input.editor-post-title__input {
 		font-family: $editor-html-font;
-		font-size: 2em;
+		font-size: 2.5em;
+		font-weight: normal;
 	}
 }
