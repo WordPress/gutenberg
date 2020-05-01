@@ -121,6 +121,7 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 				// Nahh, this doesn't work.. maybe we need to create/ add to editor/ then insert blocks and save?
 				blocks: [ ...editedEntity.blocks ],
 			} );
+			toggleSavingAs();
 			// templatePart.id => new id
 		} catch ( err ) {
 			setHelp( __( 'Error adding template.' ) );
