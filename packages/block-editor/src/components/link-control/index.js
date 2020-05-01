@@ -326,7 +326,7 @@ function LinkControl( {
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	function stopEditing() {
-		isEndingEditWithFocus.current = wrapperNode.current?.contains(
+		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
 			document.activeElement
 		);
 
