@@ -21,6 +21,7 @@ branches:
     - rnmobile/master
     - /rnmobile\/release.*/
     - /wp\/.*/
+    - feat/import-gutenberg-mobile-no-squash
 
 env:
   global:
@@ -208,6 +209,56 @@ jobs:
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+
+    - name: E2E Tests Mobile (Android)
+      os: linux
+      language: android
+      jdk: oraclejdk8
+      sudo: required
+      android:
+        components:
+          - tools
+          - platform-tools
+          - tools
+          - extra-android-m2repository
+        licenses:
+          - 'android-sdk-preview-license-52d11cd2'
+          - 'android-sdk-license-.+'
+          - 'google-gdk-license-.+'
+      env:
+        - TEST_RN_PLATFORM=android
+        - TEST_ENV=sauce
+        - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
+        - ANDROID_API_LEVEL=29
+        - ANDROID_BUILD_TOOLS_VERSION=29.0.6
+        - ANDROID_ABI=armeabi-v7a
+      before_install:
+        - touch $HOME/.android/repositories.cfg
+        - yes | sdkmanager "platforms;android-29"
+        - yes | sdkmanager "build-tools;29.0.6"
+      install:
+        - npm ci
+        - npm run native test:e2e:build-app:android
+        - source bin/sauce-pre-upload.sh
+        - curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./packages/react-native-editor/android/app/build/outputs/apk/debug/app-debug.apk
+        - mkdir -p reports/test-results
+      script:
+        - npm run native device-tests
+
+    - name: E2E Tests Mobile (iOS)
+      os: osx
+      language: objective-c
+      osx_image: xcode11.3
+      env:
+        - TEST_RN_PLATFORM=ios
+        - TEST_ENV=sauce
+      install:
+        - npm ci
+        - test -e packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || SKIP_BUNDLING=true yarn test:e2e:build-app:ios
+        - npm run native test:e2e:bundle:ios
+        - mkdir -p reports/test-results
+      script:
+        - npm run native device-tests
 
     - stage: deploy
       if: (NOT type IN (pull_request)) AND (branch = master)
