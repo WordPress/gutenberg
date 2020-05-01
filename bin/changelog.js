@@ -75,6 +75,22 @@ function getIssueType( issue ) {
 }
 
 /**
+ * Given an issue title, returns the title with normalization transforms
+ * applied.
+ *
+ * @param {string} title Original title.
+ *
+ * @return {string} Normalized title.
+ */
+function getNormalizedTitle( title ) {
+	if ( ! title.endsWith( '.' ) ) {
+		title = title + '.';
+	}
+
+	return title;
+}
+
+/**
  * Returns a formatted changelog entry for a given issue object.
  *
  * @param {IssuesListForRepoResponseItem} issue Issue object.
@@ -82,23 +98,8 @@ function getIssueType( issue ) {
  * @return {string} Formatted changelog entry.
  */
 function getEntry( issue ) {
-	let title;
-	if ( /### Changelog\r\n\r\n> /.test( issue.body ) ) {
-		const bodyParts = issue.body.split( '### Changelog\r\n\r\n> ' );
-		const note = bodyParts[ bodyParts.length - 1 ];
-		title = note
-			// Remove comment prompt
-			.replace( /<!---(.*)--->/gm, '' )
-			// Remove new lines and whitespace
-			.trim();
-		if ( ! title.length ) {
-			title = `${ issue.title }`;
-		} else {
-			title = `${ title }`;
-		}
-	} else {
-		title = `${ issue.title }`;
-	}
+	const title = getNormalizedTitle( issue.title );
+
 	return `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
 }
 
@@ -255,12 +256,20 @@ async function createChangelog( settings ) {
 	console.log( changelog );
 }
 
-createChangelog( {
-	owner: 'WordPress',
-	repo: 'gutenberg',
-	token: GITHUB_TOKEN,
-	milestone:
-		MILESTONE === undefined ? getMilestone( manifest.version ) : MILESTONE,
-} );
+if ( ! module.parent ) {
+	createChangelog( {
+		owner: 'WordPress',
+		repo: 'gutenberg',
+		token: GITHUB_TOKEN,
+		milestone:
+			MILESTONE === undefined
+				? getMilestone( manifest.version )
+				: MILESTONE,
+	} );
+}
+
+/** @type {NodeJS.Module} */ ( module ).exports = {
+	getNormalizedTitle,
+};
 
 /* eslint-enable no-console */
