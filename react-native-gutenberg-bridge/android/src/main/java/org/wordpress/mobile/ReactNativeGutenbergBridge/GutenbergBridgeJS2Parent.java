@@ -4,7 +4,6 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
@@ -15,13 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
-    interface RNMedia {
-        String getUrl();
-        int getId();
-        String getType();
-        String getCaption();
-        WritableMap toMap();
-    }
 
     void responseHtml(String title, String html, boolean changed);
 
