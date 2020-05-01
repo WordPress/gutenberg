@@ -210,7 +210,7 @@ jobs:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
-    - name: E2E Tests Mobile (Android)
+    - name: E2E Mobile tests (Android)
       os: linux
       language: android
       jdk: oraclejdk8
@@ -242,14 +242,14 @@ jobs:
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       before_script:
         - android list targets
-        - echo no | android create avd --force -n test -t android-26 --abi armeabi-v7a -c 100M
+        - echo no | android create avd --force -n test -t android-28 --abi armeabi-v7a -c 100M
         - emulator -avd test -no-audio -no-window &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
       script:
         - npm run native test:e2e:android:local
 
-    - name: E2E Tests Mobile (iOS)
+    - name: E2E Mobile tests (iOS)
       os: osx
       language: objective-c
       osx_image: xcode11.3
@@ -262,11 +262,8 @@ jobs:
         - nvm install
       install:
         - npm ci
-        - test -e packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app || SKIP_BUNDLING=true yarn test:e2e:build-app:ios
-        - npm run native test:e2e:bundle:ios
-        - mkdir -p reports/test-results
       script:
-        - npm run native device-tests
+        - npm run native test:e2e:ios:local
 
     - stage: deploy
       if: (NOT type IN (pull_request)) AND (branch = master)
