@@ -20,6 +20,8 @@ function waitForAndAcceptDialog() {
 async function removeReusableBlocks() {
 	await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
 
+	await page.waitForSelector( '#cb-select-all-1' );
+
 	const checkall = await page.$( '#cb-select-all-1' );
 
 	await checkall.click();
