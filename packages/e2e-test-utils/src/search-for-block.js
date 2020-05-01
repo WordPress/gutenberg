@@ -11,7 +11,7 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  */
 export async function searchForBlock( searchTerm ) {
 	await openGlobalBlockInserter();
-	await page.focus( '.block-editor-inserter__search-input' );
+	await page.focus( '.block-editor-inserter__search' );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
 }
