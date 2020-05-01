@@ -233,7 +233,6 @@ jobs:
         - yes | sdkmanager "platforms;android-28"
         - yes | sdkmanager "build-tools;28.0.3"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-        - source ~/.nvm/nvm.sh
         - nvm install
       install:
         - npm ci
