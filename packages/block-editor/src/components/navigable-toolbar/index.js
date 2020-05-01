@@ -17,11 +17,6 @@ function hasOnlyToolbarItem( elements ) {
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
-function applyOnNextRepaint( callback ) {
-	const id = window.requestAnimationFrame( callback );
-	return () => window.cancelAnimationFrame( id );
-}
-
 function focusFirstTabbableIn( container ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
 	if ( firstTabbable ) {
@@ -36,17 +31,16 @@ function useIsAccessibleToolbar( ref ) {
 	// component.
 	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState( false );
 
-	const determineIsAccessibleToolbar = useCallback( () => {
-		const tabbables = focus.tabbable.find( ref.current );
-		setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
-	}, [] );
-
 	useLayoutEffect( () => {
-		determineIsAccessibleToolbar();
-		// We do an additional check on re-paint because some custom block toolbar
-		// buttons aren't there in the first paint.
-		return applyOnNextRepaint( determineIsAccessibleToolbar );
-	}, [] );
+		// Toolbar buttons may be rendered asynchronously, so we use
+		// MutationObserver to check if the toolbar subtree has been modified
+		const observer = new window.MutationObserver( () => {
+			const tabbables = focus.tabbable.find( ref.current );
+			setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
+		} );
+		observer.observe( ref.current, { childList: true, subtree: true } );
+		return () => observer.disconnect();
+	}, [ isAccessibleToolbar ] );
 
 	return isAccessibleToolbar;
 }
