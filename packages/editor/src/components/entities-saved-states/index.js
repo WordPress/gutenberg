@@ -11,6 +11,7 @@ import {
 	Button,
 	PanelBody,
 	PanelRow,
+	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -66,32 +67,123 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 		closePanel();
 	}, [ parentBlockId ] );
 
+	// Save-As stuff
+	const canSaveAs = name === 'wp_template' || name === 'wp_template_part';
+	const [ savingAs, setSavingAs ] = useState( false );
+	const toggleSavingAs = useCallback( () => setSavingAs( ! savingAs ), [
+		savingAs,
+	] );
+	const [ slug, setSlug ] = useState( '' );
+	const [ theme, setTheme ] = useState( '' );
+	const comboInUse = useSelect(
+		( select ) => {
+			// Find match for entity slug/theme
+			if ( ! ( canSaveAs && slug && theme ) ) {
+				return true;
+			}
+
+			const posts = select( 'core' ).getEntityRecords( 'postType', name, {
+				status: [ 'publish', 'auto-draft' ],
+				slug,
+				theme,
+			} );
+			const foundPosts = posts?.filter(
+				( post ) =>
+					post.slug === slug && post.meta && post.meta.theme === theme
+			);
+			const foundPost =
+				foundPosts?.find( ( post ) => post.status === 'publish' ) ||
+				foundPosts?.find( ( post ) => post.status === 'auto-draft' );
+
+			return !! foundPost?.id;
+		},
+		[ slug, theme ]
+	);
+
 	return (
-		<PanelRow>
-			<CheckboxControl
-				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
-				checked={ checked }
-				onChange={ onChange }
-			/>
-			{ parentBlockId ? (
+		<>
+			<PanelRow>
+				<CheckboxControl
+					label={ <strong>{ title || __( 'Untitled' ) }</strong> }
+					checked={ checked }
+					onChange={ onChange }
+				/>
+				{ parentBlockId ? (
+					<>
+						<Button
+							onClick={ selectParentBlock }
+							className="entities-saved-states__find-entity"
+							disabled={ isSelected }
+						>
+							{ isSelectedText }
+						</Button>
+						<Button
+							onClick={ selectAndDismiss }
+							className="entities-saved-states__find-entity-small"
+							disabled={ isSelected }
+						>
+							{ isSelectedText }
+						</Button>
+					</>
+				) : null }
+			</PanelRow>
+			<PanelRow>
+				{ canSaveAs ? (
+					<Button
+						onClick={ toggleSavingAs }
+						className="entities-saved-states__save-as"
+					>
+						{ __( 'Save as…' ) }
+					</Button>
+				) : null }
+			</PanelRow>
+			{ savingAs && (
 				<>
-					<Button
-						onClick={ selectParentBlock }
-						className="entities-saved-states__find-entity"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-					<Button
-						onClick={ selectAndDismiss }
-						className="entities-saved-states__find-entity-small"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
+					<PanelRow>
+						<TextControl
+							label={ __( 'Slug' ) }
+							placeholder={ __( 'header' ) }
+							value={ slug }
+							onChange={ setSlug }
+							// help={ help }
+							className="wp-block-template-part__placeholder-input"
+						/>
+						<TextControl
+							label={ __( 'Theme' ) }
+							placeholder={ __( 'twentytwenty' ) }
+							value={ theme }
+							onChange={ setTheme }
+							className="wp-block-template-part__placeholder-input"
+						/>
+					</PanelRow>
+					<PanelRow>
+						<Button
+							disabled={ comboInUse }
+							onClick={ toggleSavingAs }
+							isPrimary
+							className="entities-saved-states__save-as"
+						>
+							{ __( 'Save as…' ) }
+						</Button>
+					</PanelRow>
+					<PanelRow>
+						{ slug && theme ? (
+							<>
+								{ comboInUse ? (
+									<h3>{ __( 'Slug/Theme combo in use' ) }</h3>
+								) : (
+									<h3>
+										{ __( 'Slug/Theme combo Available!' ) }
+									</h3>
+								) }
+							</>
+						) : (
+							<h3>{ __( 'Enter a Slug and Theme combo.' ) }</h3>
+						) }
+					</PanelRow>
 				</>
-			) : null }
-		</PanelRow>
+			) }
+		</>
 	);
 }
 
