@@ -128,20 +128,39 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 				) : null }
 			</PanelRow>
 			<PanelRow>
-				{ canSaveAs ? (
+				{ canSaveAs && ! savingAs && (
 					<Button
 						onClick={ toggleSavingAs }
 						className="entities-saved-states__save-as"
 					>
 						{ __( 'Save as…' ) }
 					</Button>
-				) : null }
+				) }
 			</PanelRow>
 			{ savingAs && (
 				<>
 					<PanelRow>
+						{ slug && theme ? (
+							<>
+								{ comboInUse ? (
+									<h3>{ __( 'Slug/Theme combo in use' ) }</h3>
+								) : (
+									<h3>
+										{ __( 'Slug/Theme combo Available!' ) }
+									</h3>
+								) }
+							</>
+						) : (
+							<h3>
+								{ __(
+									'Enter a new Slug and Theme combo to save as new:'
+								) }
+							</h3>
+						) }
+					</PanelRow>
+					<PanelRow>
 						<TextControl
-							label={ __( 'Slug' ) }
+							label={ __( 'New Slug' ) }
 							placeholder={ __( 'header' ) }
 							value={ slug }
 							onChange={ setSlug }
@@ -161,25 +180,16 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 							disabled={ comboInUse }
 							onClick={ toggleSavingAs }
 							isPrimary
-							className="entities-saved-states__save-as"
+							className="entities-saved-states__save-as-button"
 						>
 							{ __( 'Save as…' ) }
 						</Button>
-					</PanelRow>
-					<PanelRow>
-						{ slug && theme ? (
-							<>
-								{ comboInUse ? (
-									<h3>{ __( 'Slug/Theme combo in use' ) }</h3>
-								) : (
-									<h3>
-										{ __( 'Slug/Theme combo Available!' ) }
-									</h3>
-								) }
-							</>
-						) : (
-							<h3>{ __( 'Enter a Slug and Theme combo.' ) }</h3>
-						) }
+						<Button
+							onClick={ toggleSavingAs }
+							className="entities-saved-states__cancel-save-as-button"
+						>
+							{ __( 'Cancel' ) }
+						</Button>
 					</PanelRow>
 				</>
 			) }
