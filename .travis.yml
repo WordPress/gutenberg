@@ -237,17 +237,15 @@ jobs:
         - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       install:
         - npm ci
-        - npm run native test:e2e:build-app:android
-        - source ./packages/react-native-editor/bin/sauce-pre-upload.sh
-        - curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./packages/react-native-editor/android/app/build/outputs/apk/debug/app-debug.apk
-        - mkdir -p reports/test-results
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
         - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-      cache:
-        directories:
-          - $HOME/.gradle/caches/
-          - $HOME/.gradle/wrapper/
+      before_script:
+        - android list targets
+        - echo no | android create avd --force -n test -t android-26 --abi armeabi-v7a -c 100M
+        - emulator -avd test -no-audio -no-window &
+        - android-wait-for-emulator
+        - adb shell input keyevent 82 &
       script:
         - npm run native test:e2e:android:local
 
