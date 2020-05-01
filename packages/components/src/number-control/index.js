@@ -20,7 +20,6 @@ import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
 	{
-		// eslint-disable-next-line camelcase
 		unstable_stateReducer: stateReducer = ( state ) => state,
 		className,
 		dragDirection = 'n',
@@ -54,12 +53,11 @@ export function NumberControl(
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
-	const customStateReducer = ( state, action ) => {
+	const numberControlStateReducer = ( state, action ) => {
 		const { type, payload } = action;
 		const event = payload?.event;
 
-		const nextState = stateReducer( state, action );
-		const currentValue = nextState.value;
+		const currentValue = state.value;
 
 		/**
 		 * Handles custom UP and DOWN Keyboard events
@@ -91,7 +89,7 @@ export function NumberControl(
 
 			nextValue = roundClamp( nextValue, min, max, incrementalValue );
 
-			nextState.value = nextValue;
+			state.value = nextValue;
 		}
 
 		/**
@@ -138,7 +136,7 @@ export function NumberControl(
 					modifier
 				);
 
-				nextState.value = nextValue;
+				state.value = nextValue;
 			}
 		}
 
@@ -149,10 +147,10 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.SUBMIT
 		) {
-			nextState.value = roundClamp( currentValue, min, max );
+			state.value = roundClamp( currentValue, min, max );
 		}
 
-		return nextState;
+		return state;
 	};
 
 	return (
@@ -168,7 +166,10 @@ export function NumberControl(
 			ref={ ref }
 			type={ typeProp }
 			value={ initialValue }
-			unstable_stateReducer={ customStateReducer }
+			unstable_stateReducer={ [
+				numberControlStateReducer,
+				stateReducer,
+			] }
 		/>
 	);
 }

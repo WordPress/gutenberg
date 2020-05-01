@@ -43,15 +43,17 @@ function InputField(
 	ref
 ) {
 	const {
+		// State
 		state,
+		// Actions
 		change,
 		drag,
-		dragStart,
 		dragEnd,
+		dragStart,
 		invalidate,
-		pressUp,
 		pressDown,
 		pressEnter,
+		pressUp,
 		reset,
 		submit,
 		update,

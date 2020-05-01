@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+/**
  * WordPress dependencies
  */
-import { useReducer } from '@wordpress/element';
+import { useMemo, useReducer } from '@wordpress/element';
 
 const initialStateReducer = ( state ) => state;
 
@@ -49,18 +53,37 @@ function mergeInitialState( initialState = initialInputControlState ) {
 }
 
 /**
+ * Combines multiple stateReducers into a single stateReducer, building
+ * the pipeline to control the flow for state and actions.
+ *
+ * @param  {...any} fns State reducers.
+ * @return {Function} The single combined stateReducer.
+ */
+export const combineStateReducers = ( ...fns ) => {
+	const reducers = fns.flat( Infinity );
+
+	return ( ...args ) => {
+		return reducers.reduceRight( ( state, fn ) => {
+			return { ...state, ...fn( ...args ) };
+		}, {} );
+	};
+};
+
+const memoizedCombineStateReducers = memize( combineStateReducers );
+
+/**
  * Creates a reducer that opens the channel for external state subscription
  * and modification.
  *
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param {Function} stateReducer A custom reducer that can subscribe and modify state.
+ * @param {Function} combinedStateReducers A custom reducer that can subscribe and modify state.
  * @return {Function} The reducer.
  */
-function inputControlStateReducer( stateReducer = initialStateReducer ) {
+function inputControlStateReducer( combinedStateReducers ) {
 	return ( state, action ) => {
-		let nextState = { ...state };
+		const nextState = { ...state };
 		const { type, payload } = action;
 
 		switch ( type ) {
@@ -130,13 +153,11 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
 		}
 
 		/**
-		 * This enables consuming components to adjust the state as needed.
-		 * This technique uses the "stateReducer" design pattern:
-		 * https://kentcdodds.com/blog/the-state-reducer-pattern/
+		 * Send the nextState + action to the combinedReducers via
+		 * this "bridge" mechanism. This allows external stateReducers
+		 * to hook into actions, and modify state if needed.
 		 */
-		nextState = stateReducer( nextState, action );
-
-		return nextState;
+		return combinedStateReducers( nextState, action );
 	};
 }
 
@@ -147,6 +168,9 @@ function inputControlStateReducer( stateReducer = initialStateReducer ) {
  * components can react to actions as well as modify state before it is
  * applied.
  *
+ * This technique uses the "stateReducer" design pattern:
+ * https://kentcdodds.com/blog/the-state-reducer-pattern/
+ *
  * @param {Function} stateReducer An external state reducer.
  * @param {Object} initialState The initial state for the reducer.
  * @return {Object} State, dispatch, and a collection of actions.
@@ -155,8 +179,14 @@ export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
 ) {
+	const combinedReducers = memoizedCombineStateReducers( stateReducer );
+	const reducer = useMemo(
+		() => inputControlStateReducer( combinedReducers ),
+		[]
+	);
+
 	const [ state, dispatch ] = useReducer(
-		inputControlStateReducer( stateReducer ),
+		reducer,
 		mergeInitialState( initialState )
 	);
 

@@ -19,7 +19,6 @@ import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 
 function UnitControl(
 	{
-		// eslint-disable-next-line camelcase
 		unstable_stateReducer: stateReducer = ( state ) => state,
 		autoComplete = 'off',
 		className,
@@ -85,11 +84,9 @@ function UnitControl(
 	 * @param {Object} action Action triggering state change
 	 * @return {Object} The updated state to apply to InputControl
 	 */
-	const customStateReducer = ( state, action ) => {
+	const unitControlStateReducer = ( state, action ) => {
 		const { type, payload } = action;
 		const event = payload?.event;
-
-		const nextState = stateReducer( state, action );
 
 		/**
 		 * Customizes the submit interaction.
@@ -108,7 +105,7 @@ function UnitControl(
 				unit
 			);
 
-			nextState.value = parsedValue;
+			state.value = parsedValue;
 
 			// Update unit if the incoming parsed unit is different.
 			if ( unit !== parsedUnit ) {
@@ -116,7 +113,7 @@ function UnitControl(
 			}
 		}
 
-		return nextState;
+		return state;
 	};
 
 	const inputSuffix = ! disableUnits ? (
@@ -148,7 +145,10 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				unstable_stateReducer={ customStateReducer }
+				unstable_stateReducer={ [
+					unitControlStateReducer,
+					stateReducer,
+				] }
 			/>
 		</Root>
 	);
