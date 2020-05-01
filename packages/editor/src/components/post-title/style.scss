@@ -1,5 +1,7 @@
 .editor-post-title {
 	position: relative;
+	// Don't allow larger than 30% title.
+	max-height: 30%;
 
 	.editor-post-title__input {
 		display: block;
@@ -11,10 +13,11 @@
 		@include reduce-motion("transition");
 		padding: #{ $block-padding + 5px } 0;
 		word-break: keep-all;
+		line-height: $default-line-height;
+		max-height: 100%;
 
 		// Inherit the styles set by the theme.
 		font-family: inherit;
-		line-height: inherit;
 		color: inherit;
 
 		// Stack borders on mobile.
