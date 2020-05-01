@@ -86,6 +86,22 @@ const About = {
 						},
 					],
 				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: {
+								// translators: sample content for "About" page template
+								value: `<p>${__(
+									'Technology is best when it brings people together.'
+								)}</p>`,
+								// translators: sample content for "About" page template
+								citation: __('Matt Mullenweg'),
+							},
+						},
+					],
+				},
 			],
 		},
 		{
