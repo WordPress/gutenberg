@@ -160,9 +160,10 @@ function InputField(
 
 	const dragGestureProps = useDrag(
 		( dragProps ) => {
-			const { dragging, event } = dragProps;
+			const { distance, dragging, event } = dragProps;
 
 			if ( ! isDragEnabled ) return;
+			if ( ! distance ) return;
 			event.stopPropagation();
 
 			/**
