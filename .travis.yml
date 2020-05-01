@@ -229,13 +229,16 @@ jobs:
         - TEST_RN_PLATFORM=android
         - TEST_ENV=sauce
         - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
-        - ANDROID_API_LEVEL=29
-        - ANDROID_BUILD_TOOLS_VERSION=29.0.6
+        - ANDROID_API_LEVEL=28
+        - ANDROID_BUILD_TOOLS_VERSION=28.0.3
         - ANDROID_ABI=armeabi-v7a
       before_install:
         - touch $HOME/.android/repositories.cfg
-        - yes | sdkmanager "platforms;android-29"
-        - yes | sdkmanager "build-tools;29.0.6"
+        - yes | sdkmanager "platforms;android-28"
+        - yes | sdkmanager "build-tools;28.0.3"
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
       install:
         - npm ci
         - npm run native test:e2e:build-app:android
