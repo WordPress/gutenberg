@@ -231,7 +231,7 @@ jobs:
         - ANDROID_API_LEVEL=28
         - ANDROID_BUILD_TOOLS_VERSION=28.0.3
         - ANDROID_ABI=armeabi-v7a
-        - EMULATOR_API_LEVEL=22
+        - EMULATOR_API_LEVEL=25
       android:
         components:
           - tools
