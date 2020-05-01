@@ -35,7 +35,10 @@
 	input {
 		@include input-style__neutral();
 	}
+}
 
+.components-datetime,
+.components-datetime__time {
 	// Override inherited conflicting styles to be consistent.
 	select,
 	input[type="number"],
