@@ -31,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { menu } from '@wordpress/icons';
+import { navigation as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -141,7 +141,7 @@ function Navigation( {
 			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
+					icon={ icon }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
