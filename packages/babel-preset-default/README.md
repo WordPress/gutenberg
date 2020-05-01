@@ -14,7 +14,9 @@ npm install @wordpress/babel-preset-default --save-dev
 
 ### Usage
 
-#### Via .babelrc (Recommended)
+There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/default` in the `presets` option in your Babel configuration.
+
+For example, using `.babelrc`:
 
 ```json
 {
@@ -22,18 +24,17 @@ npm install @wordpress/babel-preset-default --save-dev
 }
 ```
 
-#### Via CLI
+#### Extending Configuration
 
-```bash
-babel script.js --presets @wordpress/default
-```
+This preset is an opinionated configuration intended to support the Gutenberg coding guidelines. If you would like to add to or change this configuration, you can do so by expanding your Babel configuration to include plugins or presets which override those included through this preset. It may help to familiarize yourself [the implementation of the configuration](https://github.com/WordPress/gutenberg/blob/master/packages/babel-preset-default/index.js) to see which specific plugins are enabled by default through this preset.
 
-#### Via Node API
+For example, if you'd like to use a new language feature proposal which has not reached the stability requirements of WordPress, you can add those as additional plugins in your Babel configuration:
 
-```js
-require( '@babel/core' ).transform( 'code', {
-  presets: [ '@wordpress/default' ]
-} );
+```json
+{
+  "presets": [ "@wordpress/babel-preset-default" ],
+  "plugins": [ "@babel/plugin-proposal-class-properties" ]
+}
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
