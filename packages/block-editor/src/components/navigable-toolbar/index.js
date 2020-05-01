@@ -56,7 +56,7 @@ function useIsAccessibleToolbar( ref ) {
 		);
 		observer.observe( ref.current, { childList: true, subtree: true } );
 		return () => observer.disconnect();
-	}, [ isAccessibleToolbar, determineIsAccessibleToolbar ] );
+	}, [ isAccessibleToolbar ] );
 
 	return isAccessibleToolbar;
 }
