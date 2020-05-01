@@ -21,6 +21,7 @@ branches:
     - rnmobile/master
     - /rnmobile\/release.*/
     - /wp\/.*/
+    - feat/import-gutenberg-mobile-no-squash
 
 env:
   global:
@@ -95,6 +96,7 @@ install:
 
 jobs:
   include:
+
     - name: Lint
       install:
         - npm ci
@@ -208,6 +210,95 @@ jobs:
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
+
+    - name: E2E Mobile tests (Android)
+      os: linux
+      language: android
+      jdk: oraclejdk8
+      sudo: required
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+          - $HOME/.android/build-cache
+          - /usr/local/android-sdk
+      env:
+        - TEST_RN_PLATFORM=android
+        - TEST_ENV=sauce
+        - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
+        - ANDROID_COMPILE_API=29
+        - ANDROID_API=28
+        - ANDROID_BUILD_TOOLS_VERSION=29.0.6
+        - ANDROID_ABI=x86_64
+        - ANDROID_EMU_FLAVOR=default # or google_apis
+        - ADB_INSTALL_TIMEOUT=8
+      android:
+        components:
+          - tools
+          - platform-tools
+          - tools
+          - extra-android-m2repository
+          - extra-android-support
+          - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+          - android-$ANDROID_API
+          - android-$COMPILE_API
+      before_install:
+        - echo 'count=0' > ~/.android/repositories.cfg
+        - yes | sdkmanager "tools"
+        - yes | sdkmanager "emulator"
+        - yes | sdkmanager "system-images;android-28;default;x86_64"
+        - yes | sdkmanager "system-images;android-$ANDROID_API;$ANDROID_EMU_FLAVOR;$ANDROID_ABI"
+        # Set up KVM on linux for hardware acceleration. Manually here so it only happens for emulator tests, takes ~30s
+        - sudo -E apt-get -yq --no-install-suggests --no-install-recommends install bridge-utils libpulse0 libvirt-bin libxcursor1 qemu-kvm virtinst ubuntu-vm-builder
+        - android list targets
+        - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n Pixel_28 --package "system-images;android-$ANDROID_API;$ANDROID_EMU_FLAVOR;$ANDROID_ABI" -c 10M
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+        - nvm install
+        - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+      install:
+        - npm ci
+      before_script:
+        - emulator -avd Pixel_28 -no-audio -verbose -no-snapshot -no-window -selinux permissive -qemu -m 2048 &
+        - android-wait-for-emulator
+        - adb shell input keyevent 82 &
+      script:
+        - npm run native test:e2e:android:local
+
+    - name: E2E Mobile tests (iOS)
+      os: osx
+      language: objective-c
+      osx_image: xcode11.3
+      env:
+        - TEST_RN_PLATFORM=ios
+        - TEST_ENV=sauce
+      before_install:
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+        - source ~/.nvm/nvm.sh
+        - nvm install
+      install:
+        - npm ci
+      script:
+        - npm run native test:e2e:ios:local
+
+    - stage: deploy
+      if: (NOT type IN (pull_request)) AND (branch = master)
+      name: Deploy Playground
+      env: INSTALL_WORDPRESS=false
+      install:
+        - npm ci
+      before_deploy:
+        - npm run storybook:build
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep_history: true
+        local_dir: playground/dist
+        on:
+          branch: master
 
   allow_failures:
     # nothing is allowed to fail at the moment
