@@ -47,13 +47,27 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
+	const isSelected = useSelect(
+		( select ) => {
+			const selectedBlockId = select(
+				'core/block-editor'
+			).getSelectedBlockClientId();
+			return selectedBlockId === parentBlockId;
+		},
+		[ changesWhenSelected, parentBlockId ]
+	);
+
+	const [ changesWhenSelected, setChangesWhenSelected ] = useState( true );
+
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
+	const selectParentBlock = useCallback( () => {
+		selectBlock( parentBlockId );
+		setChangesWhenSelected( ! changesWhenSelected );
+	}, [ parentBlockId ] );
 
 	const selectAndDismiss = useCallback( () => {
 		selectBlock( parentBlockId );
+		setChangesWhenSelected( ! changesWhenSelected );
 		closePanel();
 	}, [ parentBlockId ] );
 
@@ -69,12 +83,14 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 					<Button
 						onClick={ selectParentBlock }
 						className="entities-saved-states__find-entity"
+						disabled={ isSelected }
 					>
 						{ __( 'Select' ) }
 					</Button>
 					<Button
 						onClick={ selectAndDismiss }
 						className="entities-saved-states__find-entity-small"
+						disabled={ isSelected }
 					>
 						{ __( 'Select' ) }
 					</Button>
