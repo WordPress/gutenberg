@@ -18,7 +18,7 @@ function waitForAndAcceptDialog() {
 }
 
 async function removeReusableBlocks() {
-	await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
+	await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
 	// select all reusable blocks
 	await page.waitForSelector( '#cb-select-all-1' );
