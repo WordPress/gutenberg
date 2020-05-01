@@ -4,7 +4,12 @@
 
 ### Breaking Changes
 
--  The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+- The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+- The new [`@wordpress/no-unsafe-optional-chaining-negation` rule](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unsafe-optional-chaining-negation.md) is now part of the recommended ruleset.
+
+### New Features
+
+- New Rule: [`@wordpress/no-unsafe-optional-chaining-negation`](https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/no-unsafe-optional-chaining-negation.md)
 
 ### Improvements
 

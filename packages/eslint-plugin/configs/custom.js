@@ -4,6 +4,7 @@ module.exports = {
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'@wordpress/no-unguarded-get-range-at': 'error',
+		'@wordpress/no-unsafe-optional-chaining-negation': 'error',
 	},
 	overrides: [
 		{
