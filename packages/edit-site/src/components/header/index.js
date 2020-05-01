@@ -6,7 +6,9 @@ import {
 	BlockNavigationDropdown,
 	ToolSelector,
 	Inserter,
+	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 
 /**
@@ -20,7 +22,7 @@ import SaveButton from '../save-button';
 
 const inserterToggleProps = { isPrimary: true };
 
-export default function Header() {
+export default function Header( { openEntitiesSavedStates } ) {
 	const { settings, setSettings } = useEditorContext();
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
@@ -49,6 +51,15 @@ export default function Header() {
 			} ) ),
 		[]
 	);
+
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const {
+		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+	} = useDispatch( 'core/edit-site' );
+
 	return (
 		<div className="edit-site-header">
 			<FullscreenModeClose />
@@ -73,7 +84,13 @@ export default function Header() {
 				<ToolSelector />
 			</div>
 			<div className="edit-site-header__actions">
-				<SaveButton />
+				<PreviewOptions
+					deviceType={ deviceType }
+					setDeviceType={ setPreviewDeviceType }
+				/>
+				<SaveButton
+					openEntitiesSavedStates={ openEntitiesSavedStates }
+				/>
 				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />
 			</div>

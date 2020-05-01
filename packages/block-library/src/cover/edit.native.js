@@ -2,6 +2,11 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from 'react-native-gutenberg-bridge';
 import Video from 'react-native-video';
 
 /**
@@ -33,6 +38,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { cover as icon, replace } from '@wordpress/icons';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -102,7 +108,22 @@ const Cover = ( {
 		}
 	}, [ setAttributes ] );
 
+	// sync with local media store
+	useEffect( mediaUploadSync, [] );
+
+	// initialize uploading flag to false, awaiting sync
+	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+
+	// initialize upload failure flag to true if url is local
+	const [ didUploadFail, setDidUploadFail ] = useState(
+		id && getProtocol( url ) === 'file:'
+	);
+
+	// don't show failure if upload is in progress
+	const shouldShowFailure = didUploadFail && ! isUploadInProgress;
+
 	const onSelectMedia = ( media ) => {
+		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
 		// Remove gradient attribute
 		setAttributes( { gradient: undefined, customGradient: undefined } );
@@ -117,6 +138,14 @@ const Cover = ( {
 
 	const onOpactiyChange = ( value ) => {
 		setAttributes( { dimRatio: value } );
+	};
+
+	const onMediaPressed = () => {
+		if ( isUploadInProgress ) {
+			requestImageUploadCancelDialog( id );
+		} else if ( shouldShowFailure ) {
+			requestImageFailedRetryDialog( id );
+		}
 	};
 
 	const [ isVideoLoading, setIsVideoLoading ] = useState( true );
@@ -201,6 +230,7 @@ const Cover = ( {
 	} ) => (
 		<TouchableWithoutFeedback
 			accessible={ ! isParentSelected }
+			onPress={ onMediaPressed }
 			onLongPress={ openMediaOptions }
 			disabled={ ! isParentSelected }
 		>
@@ -209,43 +239,53 @@ const Cover = ( {
 				{ isParentSelected && toolbarControls( openMediaOptions ) }
 				<MediaUploadProgress
 					mediaId={ id }
+					onUpdateMediaProgress={ () => {
+						setIsUploadInProgress( true );
+					} }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,
 					} ) => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
 						setAttributes( {
 							id: mediaServerId,
 							url: mediaUrl,
 							backgroundType,
 						} );
 					} }
-					renderContent={ () => (
-						<>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-								<ImageWithFocalPoint
-									focalPoint={ focalPoint }
-									url={ url }
-								/>
-							) }
-							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-								<Video
-									muted
-									disableFocus
-									repeat
-									resizeMode={ 'cover' }
-									source={ { uri: url } }
-									onLoad={ onVideoLoad }
-									onLoadStart={ onVideoLoadStart }
-									style={ [
-										styles.background,
-										// Hide Video component since it has black background while loading the source
-										{ opacity: isVideoLoading ? 0 : 1 },
-									] }
-								/>
-							) }
-						</>
-					) }
+					onFinishMediaUploadWithFailure={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( true );
+					} }
+					onMediaUploadStateReset={ () => {
+						setIsUploadInProgress( false );
+						setDidUploadFail( false );
+						setAttributes( { id: undefined, url: undefined } );
+					} }
 				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<ImageWithFocalPoint
+						focalPoint={ focalPoint }
+						url={ url }
+					/>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<Video
+						muted
+						disableFocus
+						repeat
+						resizeMode={ 'cover' }
+						source={ { uri: url } }
+						onLoad={ onVideoLoad }
+						onLoadStart={ onVideoLoadStart }
+						style={ [
+							styles.background,
+							// Hide Video component since it has black background while loading the source
+							{ opacity: isVideoLoading ? 0 : 1 },
+						] }
+					/>
+				) }
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -254,8 +294,6 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					// eslint-disable-next-line no-undef
-					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -289,12 +327,24 @@ const Cover = ( {
 			</View>
 
 			<MediaUpload
-				// eslint-disable-next-line no-undef
-				__experimentalOnlyMediaLibrary={ ! __DEV__ }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }
 			/>
+
+			{ shouldShowFailure && (
+				<View
+					pointerEvents="none"
+					style={ styles.uploadFailedContainer }
+				>
+					<View style={ styles.uploadFailed }>
+						<Icon
+							icon={ 'warning' }
+							{ ...styles.uploadFailedIcon }
+						/>
+					</View>
+				</View>
+			) }
 		</View>
 	);
 };

@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -163,6 +164,12 @@ function apiFetch( options ) {
  * @param {string} path Query path.
  */
 function useApiFetch( path ) {
+	deprecated( 'useApiFetch', {
+		version: '8.1.0',
+		alternative: 'apiFetch',
+		plugin: 'Gutenberg',
+	} );
+
 	// Indicate the fetching status
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ data, setData ] = useState( null );
