@@ -139,42 +139,36 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 			</PanelRow>
 			{ savingAs && (
 				<>
-					<PanelRow>
-						{ slug && theme ? (
-							<>
-								{ comboInUse ? (
-									<h3>{ __( 'Slug/Theme combo in use' ) }</h3>
-								) : (
-									<h3>
-										{ __( 'Slug/Theme combo Available!' ) }
-									</h3>
-								) }
-							</>
-						) : (
-							<h3>
-								{ __(
-									'Enter a new Slug and Theme combo to save as new:'
-								) }
-							</h3>
-						) }
-					</PanelRow>
-					<PanelRow>
-						<TextControl
-							label={ __( 'New Slug' ) }
-							placeholder={ __( 'header' ) }
-							value={ slug }
-							onChange={ setSlug }
-							// help={ help }
-							className="wp-block-template-part__placeholder-input"
-						/>
-						<TextControl
-							label={ __( 'Theme' ) }
-							placeholder={ __( 'twentytwenty' ) }
-							value={ theme }
-							onChange={ setTheme }
-							className="wp-block-template-part__placeholder-input"
-						/>
-					</PanelRow>
+					<hr />
+					<h3>
+						{ __( 'Enter a new Slug and Theme combo to save as:' ) }
+					</h3>
+
+					<TextControl
+						label={ __( 'New Slug' ) }
+						placeholder={ __( 'header' ) }
+						value={ slug }
+						onChange={ setSlug }
+						// help={ help }
+						className="wp-block-template-part__placeholder-input"
+					/>
+					<TextControl
+						label={ __( 'Theme' ) }
+						placeholder={ __( 'twentytwenty' ) }
+						value={ theme }
+						onChange={ setTheme }
+						className="wp-block-template-part__placeholder-input"
+					/>
+
+					{ slug && theme && (
+						<>
+							{ comboInUse ? (
+								<h3>{ __( 'Slug/Theme combo in use' ) }</h3>
+							) : (
+								<h3>{ __( 'Slug/Theme combo Available!' ) }</h3>
+							) }
+						</>
+					) }
 					<PanelRow>
 						<Button
 							disabled={ comboInUse }
