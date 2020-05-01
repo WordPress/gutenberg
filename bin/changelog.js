@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-/* eslint-disable no-console */
-
 /*
  * External dependencies
  */
@@ -271,5 +269,3 @@ if ( ! module.parent ) {
 /** @type {NodeJS.Module} */ ( module ).exports = {
 	getNormalizedTitle,
 };
-
-/* eslint-enable no-console */
