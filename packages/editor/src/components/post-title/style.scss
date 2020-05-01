@@ -11,10 +11,10 @@
 		@include reduce-motion("transition");
 		padding: #{ $block-padding + 5px } 0;
 		word-break: keep-all;
+		line-height: $default-line-height;
 
 		// Inherit the styles set by the theme.
 		font-family: inherit;
-		line-height: inherit;
 		color: inherit;
 
 		// Stack borders on mobile.
