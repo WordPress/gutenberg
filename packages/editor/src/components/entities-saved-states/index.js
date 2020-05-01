@@ -23,6 +23,7 @@ import {
 	grid,
 	blockDefault,
 } from '@wordpress/icons';
+import { cleanForSlug } from '@wordpress/url';
 
 const ENTITY_NAME_ICONS = {
 	site: layout,
@@ -100,6 +101,32 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 		[ slug, theme ]
 	);
 
+	const editedEntity = useSelect(
+		( select ) => select( 'core' ).getEditedEntityRecord( kind, name, key ),
+		[]
+	);
+
+	// Saving goo.
+	const { saveEntityRecord } = useDispatch( 'core' );
+	const [ help, setHelp ] = useState();
+	const createNew = useCallback( async () => {
+		// Create a new template part.
+		try {
+			const cleanSlug = cleanForSlug( slug );
+			const templatePart = await saveEntityRecord( 'postType', name, {
+				title: cleanSlug,
+				status: 'publish',
+				slug: cleanSlug,
+				meta: { theme },
+				// Nahh, this doesn't work.. maybe we need to create/ add to editor/ then insert blocks and save?
+				blocks: [ ...editedEntity.blocks ],
+			} );
+			// templatePart.id => new id
+		} catch ( err ) {
+			setHelp( __( 'Error adding template.' ) );
+		}
+	}, [ slug, theme, editedEntity ] );
+
 	return (
 		<>
 			<PanelRow>
@@ -149,7 +176,7 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 						placeholder={ __( 'header' ) }
 						value={ slug }
 						onChange={ setSlug }
-						// help={ help }
+						help={ help }
 						className="wp-block-template-part__placeholder-input"
 					/>
 					<TextControl
@@ -172,7 +199,7 @@ function EntityRecordState( { record, checked, onChange, closePanel } ) {
 					<PanelRow>
 						<Button
 							disabled={ comboInUse }
-							onClick={ toggleSavingAs }
+							onClick={ createNew }
 							isPrimary
 							className="entities-saved-states__save-as-button"
 						>
