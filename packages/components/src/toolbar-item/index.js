@@ -32,7 +32,11 @@ function ToolbarItem( { children, ...props }, ref ) {
 
 	return (
 		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
-			{ children }
+			{ ( htmlProps ) =>
+				// Overwriting BaseToolbarItem's onMouseDown since it disables drag
+				// and drop
+				children( { ...htmlProps, onMouseDown: allProps.onMouseDown } )
+			}
 		</BaseToolbarItem>
 	);
 }
