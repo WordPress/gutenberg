@@ -72,8 +72,11 @@ describe( 'Datepicker', () => {
 		// Close the datepicker.
 		await page.click( '.edit-post-post-schedule__toggle' );
 
+		// Open the datepicker.
+		await page.click( '.edit-post-post-schedule__toggle' );
+
 		// Clear the date
-		await page.click( '.edit-post-post-unschedule__button' );
+		await page.click( '.components-datetime__date-reset-button' );
 
 		const publishingDate = await page.$eval(
 			'.edit-post-post-schedule__toggle',
