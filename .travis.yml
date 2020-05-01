@@ -234,6 +234,7 @@ jobs:
         - yes | sdkmanager "build-tools;28.0.3"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
+        - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       install:
         - npm ci
         - npm run native test:e2e:build-app:android
