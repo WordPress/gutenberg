@@ -3,20 +3,25 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	setEntitiesSavedStatesCallback,
+} ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -24,7 +29,6 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
-		isFullscreenActive,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -40,9 +44,10 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
-			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
-				'fullscreenMode'
-			),
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
@@ -61,7 +66,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 
 	return (
 		<div className="edit-post-header">
-			{ isFullscreenActive && <AdminMenuToggle /> }
+			<FullscreenModeClose />
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }
@@ -80,10 +85,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -91,6 +93,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<Button
 					icon={ cog }

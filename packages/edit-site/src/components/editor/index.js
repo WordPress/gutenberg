@@ -6,6 +6,7 @@ import {
 	useContext,
 	useState,
 	useMemo,
+	useCallback,
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -13,14 +14,19 @@ import {
 	DropZoneProvider,
 	Popover,
 	FocusReturnProvider,
+	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
+	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
+import { EntitiesSavedStates } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,6 +53,7 @@ function Editor( { settings: _settings } ) {
 			),
 		[ settings.templateType, settings.templateId ]
 	);
+
 	const context = useMemo( () => ( { settings, setSettings } ), [
 		settings,
 		setSettings,
@@ -59,6 +66,25 @@ function Editor( { settings: _settings } ) {
 			),
 		};
 	}, [] );
+
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const inlineStyles = useResizeCanvas( deviceType );
+
+	const [
+		isEntitiesSavedStatesOpen,
+		setIsEntitiesSavedStatesOpen,
+	] = useState( false );
+	const openEntitiesSavedStates = useCallback(
+		() => setIsEntitiesSavedStatesOpen( true ),
+		[]
+	);
+	const closeEntitiesSavedStates = useCallback(
+		() => setIsEntitiesSavedStatesOpen( false ),
+		[]
+	);
 
 	return template ? (
 		<>
@@ -76,12 +102,50 @@ function Editor( { settings: _settings } ) {
 								<FocusReturnProvider>
 									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
-										header={ <Header /> }
+										header={
+											<Header
+												openEntitiesSavedStates={
+													openEntitiesSavedStates
+												}
+											/>
+										}
 										content={
-											<>
+											<BlockSelectionClearer
+												style={ inlineStyles }
+											>
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
 												<BlockEditor />
+											</BlockSelectionClearer>
+										}
+										actions={
+											<>
+												<EntitiesSavedStates
+													isOpen={
+														isEntitiesSavedStatesOpen
+													}
+													close={
+														closeEntitiesSavedStates
+													}
+												/>
+												{ ! isEntitiesSavedStatesOpen && (
+													<div className="edit-site-editor__toggle-save-panel">
+														<Button
+															isSecondary
+															className="edit-site-editor__toggle-save-panel-button"
+															onClick={
+																openEntitiesSavedStates
+															}
+															aria-expanded={
+																false
+															}
+														>
+															{ __(
+																'Open save panel'
+															) }
+														</Button>
+													</div>
+												) }
 											</>
 										}
 										footer={ <BlockBreadcrumb /> }

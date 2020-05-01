@@ -15,6 +15,7 @@
 	},
 	"files": [
 		"./api-docs/update-api-docs.js",
-		"./check-latest-npm.js"
+		"./check-latest-npm.js",
+		"./changelog.js",
 	]
 }
