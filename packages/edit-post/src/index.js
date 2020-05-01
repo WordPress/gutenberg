@@ -131,7 +131,7 @@ export function initializeEditor(
 				}
 				// Undo unwanted scroll on html element, but only in the visual editor.
 				if (
-					! document.getElementsByClassName( 'is-mode-text' )[ 0 ]
+					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
 				) {
 					window.scrollTo( 0, 0 );
 				}

@@ -22,7 +22,10 @@
 			margin-bottom: -$border-width;
 
 			// Same padding as body.
-			padding: $grid-unit-30;
+			padding: $grid-unit-20;
+			@include break-small() {
+				padding: $grid-unit-30;
+			}
 
 			&:focus {
 				border: $border-width solid $dark-gray-primary;
@@ -52,6 +55,7 @@
 // Exit code editor toolbar.
 .edit-post-text-editor__toolbar {
 	position: sticky;
+	z-index: z-index(".edit-post-text-editor__toolbar");
 	top: 0;
 	left: 0;
 	right: 0;
