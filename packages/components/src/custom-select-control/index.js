@@ -79,6 +79,7 @@ export default function CustomSelectControl( {
 
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
+		'aria-hidden': ! isOpen,
 	} );
 	// We need this here, because the null active descendant is not
 	// fully ARIA compliant.

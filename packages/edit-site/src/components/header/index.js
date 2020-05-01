@@ -9,19 +9,20 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { PinnedItems, AdminMenuToggle } from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
+import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 
 const inserterToggleProps = { isPrimary: true };
 
-export default function Header() {
+export default function Header( { openEntitiesSavedStates } ) {
 	const { settings, setSettings } = useEditorContext();
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
@@ -51,15 +52,6 @@ export default function Header() {
 		[]
 	);
 
-	const { isFullscreenActive } = useSelect(
-		( select ) => ( {
-			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
-				'fullscreenMode'
-			),
-		} ),
-		[]
-	);
-
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
 	}, [] );
@@ -70,7 +62,7 @@ export default function Header() {
 
 	return (
 		<div className="edit-site-header">
-			{ isFullscreenActive && <AdminMenuToggle /> }
+			<FullscreenModeClose />
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
@@ -96,7 +88,9 @@ export default function Header() {
 					deviceType={ deviceType }
 					setDeviceType={ setPreviewDeviceType }
 				/>
-				<SaveButton />
+				<SaveButton
+					openEntitiesSavedStates={ openEntitiesSavedStates }
+				/>
 				<PinnedItems.Slot scope="core/edit-site" />
 				<MoreMenu />
 			</div>

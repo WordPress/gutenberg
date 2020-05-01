@@ -31,7 +31,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { Block } from './block-wrapper';
 
-export const BlockContext = createContext();
+export const BlockListBlockContext = createContext();
 
 function BlockListBlock( {
 	mode,
@@ -94,7 +94,6 @@ function BlockListBlock( {
 		};
 	}
 
-	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
 	const generatedClassName =
 		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
 			? getBlockDefaultClassName( name )
@@ -120,7 +119,6 @@ function BlockListBlock( {
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
-			'is-block-collapsed': isAligned,
 		},
 		className
 	);
@@ -169,7 +167,7 @@ function BlockListBlock( {
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
 	return (
-		<BlockContext.Provider value={ memoizedValue }>
+		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
 				{ isValid && lightBlockWrapper && (
 					<>
@@ -201,7 +199,7 @@ function BlockListBlock( {
 					<BlockCrashWarning />
 				</Block.div>
 			) }
-		</BlockContext.Provider>
+		</BlockListBlockContext.Provider>
 	);
 }
 
@@ -324,14 +322,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect ) {
+		onReplace( blocks, indexToSelect, initialPosition ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
-			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+			replaceBlocks(
+				[ ownProps.clientId ],
+				blocks,
+				indexToSelect,
+				initialPosition
+			);
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );

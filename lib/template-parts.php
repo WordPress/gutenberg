@@ -138,3 +138,42 @@ function gutenberg_render_template_part_list_table_column( $column_name, $post_i
 	echo esc_html( $post->post_name );
 }
 add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_template_part_list_table_column', 10, 2 );
+
+
+/**
+ * Filter for adding a `theme` parameter to `wp_template_part` queries.
+ *
+ * @param array $query_params The query parameters.
+ * @return array Filtered $query_params.
+ */
+function filter_rest_wp_template_part_collection_params( $query_params ) {
+	$query_params += array(
+		'theme' => array(
+			'description' => __( 'The theme slug for the theme that created the template part.', 'gutenberg' ),
+			'type'        => 'string',
+		),
+	);
+	return $query_params;
+}
+apply_filters( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
+
+/**
+ * Filter for supporting the `theme` parameter in `wp_template_part` queries.
+ *
+ * @param array           $args    The query arguments.
+ * @param WP_REST_Request $request The request object.
+ * @return array Filtered $args.
+ */
+function filter_rest_wp_template_part_query( $args, $request ) {
+	if ( $request['theme'] ) {
+		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
+		$meta_query[] = array(
+			'key'   => 'theme',
+			'value' => $request['theme'],
+		);
+
+		$args['meta_query'] = $meta_query;
+	}
+	return $args;
+}
+add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
