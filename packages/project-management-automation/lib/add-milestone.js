@@ -44,9 +44,17 @@ const isDuplicateValidationError = ( error ) =>
  * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
  */
 async function getMilestoneByTitle( octokit, owner, repo, title ) {
+	/** @type {Partial<import('@octokit/rest').IssuesListMilestonesForRepoParams>} */
+	const params = {
+		state: 'all',
+		sort: 'due_on',
+		direction: 'desc',
+	};
+
 	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
 		owner,
 		repo,
+		...params,
 	} );
 
 	/**
