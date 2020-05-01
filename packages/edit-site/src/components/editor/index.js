@@ -35,6 +35,7 @@ import Notices from '../notices';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import BlockEditor from '../block-editor';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 const Context = createContext();
 export function useEditorContext() {
@@ -100,6 +101,7 @@ function Editor( { settings: _settings } ) {
 						>
 							<Context.Provider value={ context }>
 								<FocusReturnProvider>
+									<KeyboardShortcuts.Register />
 									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
 										header={
@@ -116,6 +118,7 @@ function Editor( { settings: _settings } ) {
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
 												<BlockEditor />
+												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
 										actions={
