@@ -88,7 +88,7 @@ const baseUnitLabelStyles = ( props ) => {
 		width: 20px;
 
 		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
-		${ rtl( { right: 1 } )() }
+		${ rtl( { right: 0 } )() }
 		${ unitSizeStyles( props ) }
 	`;
 };

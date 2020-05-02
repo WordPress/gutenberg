@@ -163,6 +163,8 @@ export function NumberControl(
 			hideHTMLArrows={ hideHTMLArrows }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
+			max={ max }
+			min={ min }
 			ref={ ref }
 			type={ typeProp }
 			value={ initialValue }
