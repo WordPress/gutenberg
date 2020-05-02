@@ -6,7 +6,6 @@ import {
 	insertBlock,
 	disablePrePublishChecks,
 	visitAdminPage,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -58,9 +57,8 @@ describe( 'Template Part', () => {
 			await switchToHeaderTemplatePartButton.click();
 
 			// Edit it.
-			await page.click( '*[data-type="core/paragraph"]' );
-			await pressKeyWithModifier( 'primary', 'ArrowRight' );
-			await page.keyboard.type( '123' );
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Header Template Part 123' );
 
 			// Save it, without saving the front page template.
 			await page.click( '.edit-site-save-button__button' );
