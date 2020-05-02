@@ -62,7 +62,13 @@ Rule|Description|Recommended
 [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
 [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
 [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
-[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)| Disallow the usage of unguarded `getRangeAt` calls|✓
+[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)|Disallow the usage of unguarded `getRangeAt` calls|✓
+[i18n-ellipsis](/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)|Disallow using three dots in translatable strings|✓
+[i18n-no-collapsible-whitespace](/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)|Disallow collapsible whitespace in translatable strings|✓
+[i18n-no-placeholders-only](/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)|Prevent using only placeholders in translatable strings|✓
+[i18n-no-variables](/packages/eslint-plugin/docs/rules/i18n-no-variables.md)|Enforce string literals as translation function arguments|✓
+[i18n-text-domain](/packages/eslint-plugin/docs/rules/i18n-text-domain.md)|Enforce passing valid text domains|✓
+[i18n-translator-comments](/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)|Enforce adding translator comments|✓
 
 ### Legacy
 
