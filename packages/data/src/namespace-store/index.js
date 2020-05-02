@@ -233,6 +233,7 @@ function mapResolvers( resolvers, selectors, store ) {
 			return selector;
 		}
 
+		let running = false;
 		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
@@ -245,6 +246,7 @@ function mapResolvers( resolvers, selectors, store ) {
 
 				const { metadata } = store.__unstableOriginalGetState();
 				if (
+					running ||
 					metadataSelectors.hasStartedResolution(
 						metadata,
 						selectorName,
@@ -254,18 +256,22 @@ function mapResolvers( resolvers, selectors, store ) {
 					return;
 				}
 
-				store.dispatch(
-					metadataActions.startResolution( selectorName, args )
-				);
-				await fulfillResolver(
-					store,
-					mappedResolvers,
-					selectorName,
-					...args
-				);
-				store.dispatch(
-					metadataActions.finishResolution( selectorName, args )
-				);
+				running = true;
+				setTimeout( async () => {
+					store.dispatch(
+						metadataActions.startResolution( selectorName, args )
+					);
+					await fulfillResolver(
+						store,
+						mappedResolvers,
+						selectorName,
+						...args
+					);
+					store.dispatch(
+						metadataActions.finishResolution( selectorName, args )
+					);
+					running = false;
+				}, 0 );
 			}
 
 			fulfillSelector( ...args );
