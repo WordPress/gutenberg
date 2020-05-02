@@ -21,7 +21,7 @@ module.exports = function( token ) {
 	let jsdoc;
 	let comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
-		comments = encodeTabsInCode( comments );
+		comments = encodeWhitespacesInCode( comments );
 
 		// babel strips /* and */, but comment-parser requires it.
 		jsdoc = parse( `/*${ comments }\n*/` )[ 0 ];
@@ -77,8 +77,8 @@ module.exports = function( token ) {
 				if ( title === 'example' ) {
 					return {
 						title,
-						description: decodeTabsInCode(
-							`${ name }\n${ description }`
+						description: decodeWhitespacesInCode(
+							`${ name }\n${ description }`.trim()
 						),
 					};
 				}
@@ -95,17 +95,26 @@ module.exports = function( token ) {
 
 const codeRegex = /```.*\n[\s\S]*```/g;
 const CODE_TAB = '__CODE_TAB__';
+const CODE_SPACE = '__CODE_SPACE__';
 
-const encodeTabsInCode = ( comments ) => {
+const encodeWhitespacesInCode = ( comments ) => {
 	return comments.replace( codeRegex, ( m0 ) => {
-		return m0.replace( / \* \t+/g, ( m1 ) => {
-			return m1.replace( /\t/g, CODE_TAB );
+		return m0.replace( /\n \* [ \t]+/g, ( m1 ) => {
+			return (
+				'\n * ' +
+				m1
+					.substring( 4 )
+					.replace( /\t/g, CODE_TAB )
+					.replace( / /g, CODE_SPACE )
+			);
 		} );
 	} );
 };
 
-const decodeTabsInCode = ( description ) => {
+const decodeWhitespacesInCode = ( description ) => {
 	return description.replace( codeRegex, ( m0 ) => {
-		return m0.replace( new RegExp( CODE_TAB, 'g' ), '\t' );
+		return m0
+			.replace( new RegExp( CODE_TAB, 'g' ), '\t' )
+			.replace( new RegExp( CODE_SPACE, 'g' ), ' ' );
 	} );
 };

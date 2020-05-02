@@ -124,5 +124,26 @@ describe( 'JSDoc', () => {
 				},
 			],
 		} );
+
+		// Test spaces in code are preserved.
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
+						value:
+							'*\n * X\n *\n * @example\n *\n * ```\n * const y = (\n *    x === 3\n * );\n * ```\n',
+					},
+				],
+			} )
+		).toEqual( {
+			description: 'X',
+			tags: [
+				{
+					title: 'example',
+					description: '```\nconst y = (\n   x === 3\n);\n```',
+				},
+			],
+		} );
 	} );
 } );
