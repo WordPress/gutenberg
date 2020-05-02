@@ -21,7 +21,60 @@ module.exports = function( token ) {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
-		jsdoc = parse( comments );
+		// babel strips /* and */, but comment-parser requires it.
+		jsdoc = parse( `/*${ comments }\n*/` )[ 0 ];
+
+		delete jsdoc.line;
+		delete jsdoc.source;
+
+		jsdoc.tags = jsdoc.tags.map(
+			( { tag: title, name, type, description } ) => {
+				if ( title === 'deprecated' || title === 'see' ) {
+					return {
+						title,
+						description: `${ name } ${ description }`.trim(),
+					};
+				}
+
+				if ( title === 'since' ) {
+					return {
+						title,
+						version: name,
+						description,
+					};
+				}
+
+				if ( title === 'param' ) {
+					return {
+						title,
+						name,
+						description,
+						type,
+					};
+				}
+
+				if ( title === 'return' ) {
+					return {
+						title,
+						description: `${ name } ${ description }`.trim(),
+						type,
+					};
+				}
+
+				if ( title === 'type' ) {
+					return {
+						title,
+						description: null,
+						type,
+					};
+				}
+
+				return {
+					title,
+					description,
+				};
+			}
+		);
 	}
 	return jsdoc;
 };

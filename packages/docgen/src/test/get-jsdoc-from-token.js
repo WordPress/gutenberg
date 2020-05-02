@@ -10,7 +10,7 @@ describe( 'JSDoc', () => {
 				leadingComments: [
 					{
 						value:
-							'*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
+							'*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
 					},
 				],
 			} )
@@ -23,14 +23,15 @@ describe( 'JSDoc', () => {
 				},
 				{
 					title: 'since',
-					description: 'v2',
+					version: 'v2',
+					description: '',
 				},
 				{
 					title: 'see',
 					description: 'addition',
 				},
 				{
-					title: 'link',
+					title: 'see',
 					description:
 						'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators',
 				},
@@ -95,10 +96,9 @@ describe( 'JSDoc', () => {
 			tags: [
 				{
 					title: 'param',
-					errors: [ 'unexpected token' ],
 					description: 'Callback function.',
 					name: 'callback',
-					type: null,
+					type: '(timestamp:number)=>void',
 				},
 			],
 		} );
