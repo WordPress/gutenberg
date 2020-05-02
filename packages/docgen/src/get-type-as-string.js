@@ -1,47 +1,48 @@
-const maybeAddDefault = function( value, defaultValue ) {
-	if ( defaultValue ) {
-		return `value=${ defaultValue }`;
+const { parse } = require( 'jsdoctypeparser' );
+
+const getType = ( ast, typeString ) => {
+	if ( ast.type === 'NAME' ) {
+		return ast.name;
 	}
-	return value;
+
+	if ( ast.type === 'ANY' ) {
+		return '*';
+	}
+
+	if ( ast.type === 'GENERIC' ) {
+		const types = ast.objects.map( ( o ) => getType( o ) ).join( ', ' );
+		return `${ getType( ast.subject ) }<${ types }>`;
+	}
+
+	if ( ast.type === 'NULLABLE' ) {
+		return `?${ getType( ast.value ) }`;
+	}
+
+	if ( ast.type === 'VARIADIC' ) {
+		return `...${ getType( ast.value ) }`;
+	}
+
+	if ( ast.type === 'UNION' ) {
+		return `${ getType( ast.left ) }|${ getType( ast.right ) }`;
+	}
+
+	if ( ast.type === 'PARENTHESIS' ) {
+		return `(${ getType( ast.value ) })`;
+	}
+
+	return typeString || 'unknown type';
 };
 
-const getType = function( param, defaultValue ) {
-	if ( ! defaultValue ) {
-		defaultValue = param.default;
+module.exports = function( typeString, optional ) {
+	let ast;
+
+	try {
+		ast = parse( typeString );
+	} catch {
+		return 'unknown type';
 	}
 
-	if ( param.type.type ) {
-		return getType( param.type, defaultValue );
-	} else if ( param.expression ) {
-		if ( param.type === 'RestType' ) {
-			return `...${ getType( param.expression, defaultValue ) }`;
-		} else if ( param.type === 'NullableType' ) {
-			return `?${ getType( param.expression, defaultValue ) }`;
-		} else if ( param.type === 'TypeApplication' ) {
-			return `${ getType(
-				param.expression,
-				defaultValue
-			) }<${ param.applications
-				.map( ( application ) => getType( application ) )
-				.join( ',' ) }>`;
-		} else if ( param.type === 'OptionalType' ) {
-			return `[${ getType( param.expression, defaultValue ) }]`;
-		}
-		return getType( param.expression, defaultValue );
-	} else if ( param.elements ) {
-		const types = param.elements.map( ( element ) => getType( element ) );
-		return maybeAddDefault( `(${ types.join( '|' ) })`, defaultValue );
-	} else if ( param.type === 'AllLiteral' ) {
-		return maybeAddDefault( '*', defaultValue );
-	} else if ( param.type === 'NullLiteral' ) {
-		return maybeAddDefault( 'null', defaultValue );
-	} else if ( param.type === 'UndefinedLiteral' ) {
-		return maybeAddDefault( 'undefined', defaultValue );
-	}
+	const type = getType( ast, typeString );
 
-	return maybeAddDefault( param.name, defaultValue );
-};
-
-module.exports = function( param ) {
-	return getType( param );
+	return optional ? `[${ type }]` : type;
 };

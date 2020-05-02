@@ -30,11 +30,14 @@ module.exports = function( token ) {
 		delete jsdoc.source;
 
 		jsdoc.tags = jsdoc.tags.map(
-			( { tag: title, name, type, description } ) => {
+			( { tag: title, name, type, description, optional } ) => {
+				const mergeNameAndDesc = () =>
+					`${ name } ${ description }`.trim();
+
 				if ( title === 'deprecated' || title === 'see' ) {
 					return {
 						title,
-						description: `${ name } ${ description }`.trim(),
+						description: mergeNameAndDesc(),
 					};
 				}
 
@@ -51,15 +54,15 @@ module.exports = function( token ) {
 						title,
 						name,
 						description,
-						type,
+						type: getTypeAsString( type, optional ),
 					};
 				}
 
 				if ( title === 'return' ) {
 					return {
 						title,
-						description: `${ name } ${ description }`.trim(),
-						type,
+						description: mergeNameAndDesc(),
+						type: getTypeAsString( type, optional ),
 					};
 				}
 
@@ -67,14 +70,16 @@ module.exports = function( token ) {
 					return {
 						title,
 						description: null,
-						type,
+						type: getTypeAsString( type, optional ),
 					};
 				}
 
 				if ( title === 'example' ) {
 					return {
 						title,
-						description: decodeTabsInCode( description ),
+						description: decodeTabsInCode(
+							`${ name }\n${ description }`
+						),
 					};
 				}
 
@@ -93,7 +98,7 @@ const CODE_TAB = '__CODE_TAB__';
 
 const encodeTabsInCode = ( comments ) => {
 	return comments.replace( codeRegex, ( m0 ) => {
-		return m0.replace( / \* \t*/g, ( m1 ) => {
+		return m0.replace( / \* \t+/g, ( m1 ) => {
 			return m1.replace( /\t/g, CODE_TAB );
 		} );
 	} );
