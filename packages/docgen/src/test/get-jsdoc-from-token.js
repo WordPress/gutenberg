@@ -102,5 +102,27 @@ describe( 'JSDoc', () => {
 				},
 			],
 		} );
+
+		// Test tabs in code are preserved.
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
+						value:
+							"*\n * Description\n *\n * @example\n *\n * ```js\n * const App = () => {\n * \tlet testTab = '\t';\n * \tconst [ resizeListener, sizes ] = useResizeObserver();\n *\n * \treturn (\n * \t\t<div>\n * \t\t\t{ resizeListener }\n * \t\t\tYour content here\n * \t\t</div>\n * \t);\n * };\n * ```\n *\n",
+					},
+				],
+			} )
+		).toEqual( {
+			description: 'Description',
+			tags: [
+				{
+					title: 'example',
+					description:
+						"```js\nconst App = () => {\n\tlet testTab = '\t';\n\tconst [ resizeListener, sizes ] = useResizeObserver();\n\n\treturn (\n\t\t<div>\n\t\t\t{ resizeListener }\n\t\t\tYour content here\n\t\t</div>\n\t);\n};\n```",
+				},
+			],
+		} );
 	} );
 } );

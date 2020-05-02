@@ -19,8 +19,10 @@ const getTypeAsString = require( './get-type-as-string' );
  */
 module.exports = function( token ) {
 	let jsdoc;
-	const comments = getLeadingComments( token );
+	let comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
+		comments = encodeTabsInCode( comments );
+
 		// babel strips /* and */, but comment-parser requires it.
 		jsdoc = parse( `/*${ comments }\n*/` )[ 0 ];
 
@@ -69,6 +71,13 @@ module.exports = function( token ) {
 					};
 				}
 
+				if ( title === 'example' ) {
+					return {
+						title,
+						description: decodeTabsInCode( description ),
+					};
+				}
+
 				return {
 					title,
 					description,
@@ -77,4 +86,21 @@ module.exports = function( token ) {
 		);
 	}
 	return jsdoc;
+};
+
+const codeRegex = /```.*\n[\s\S]*```/g;
+const CODE_TAB = '__CODE_TAB__';
+
+const encodeTabsInCode = ( comments ) => {
+	return comments.replace( codeRegex, ( m0 ) => {
+		return m0.replace( / \* \t*/g, ( m1 ) => {
+			return m1.replace( /\t/g, CODE_TAB );
+		} );
+	} );
+};
+
+const decodeTabsInCode = ( description ) => {
+	return description.replace( codeRegex, ( m0 ) => {
+		return m0.replace( new RegExp( CODE_TAB, 'g' ), '\t' );
+	} );
 };
