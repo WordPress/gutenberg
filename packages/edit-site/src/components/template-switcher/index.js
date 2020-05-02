@@ -10,10 +10,8 @@ import {
 	MenuGroup,
 	MenuItemsChoice,
 	MenuItem,
-	SVG,
-	Path,
 } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { Icon, home, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,26 +20,15 @@ import AddTemplate from '../add-template';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
 
-const HomeIcon = () => (
-	<SVG
-		width="24"
-		height="24"
-		viewBox="-6 -6 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<Path
-			d="M9.5 4V9.5H6.75V6.25V5.75H6.25H3.75H3.25V6.25V9.5H0.5V4L5 0.625L9.5 4Z"
-			stroke="black"
-		/>
-	</SVG>
-);
 function TemplateLabel( { template, homeId } ) {
 	return (
 		<>
 			{ template.slug }{ ' ' }
 			{ template.id === homeId && (
 				<Tooltip text={ __( 'Home' ) }>
-					<HomeIcon />
+					<div className="edit-site-template-switcher__label-home-icon">
+						<Icon icon={ home } />
+					</div>
 				</Tooltip>
 			) }
 			{ template.status !== 'auto-draft' && (
