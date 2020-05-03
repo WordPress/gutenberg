@@ -78,7 +78,9 @@ module.exports = function( token ) {
 					return {
 						title,
 						description: decodeWhitespacesInCode(
-							`${ name }\n${ description }`.trim()
+							name.match( /```.*/ ) !== null
+								? `${ name }\n${ description }`.trim()
+								: mergeNameAndDesc()
 						),
 					};
 				}

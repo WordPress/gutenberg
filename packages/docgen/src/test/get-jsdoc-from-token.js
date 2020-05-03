@@ -3,6 +3,26 @@
  */
 const getJSDocFromToken = require( '../get-jsdoc-from-token' );
 
+const expectToExtractExample = ( code, description ) => {
+	expect(
+		getJSDocFromToken( {
+			leadingComments: [
+				{
+					value: code,
+				},
+			],
+		} )
+	).toEqual( {
+		description: '',
+		tags: [
+			{
+				title: 'example',
+				description,
+			},
+		],
+	} );
+};
+
 describe( 'Parse JSDoc and extract description and tags', () => {
 	it( 'Normal definition', () => {
 		const code = `
@@ -165,9 +185,7 @@ describe( 'Parse JSDoc and extract description and tags', () => {
 
 	it( 'tabs in code example are preserved', () => {
 		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
-		const comment = `
- *
- * Description
+		const code = `
  *
  * @example
  *
@@ -203,30 +221,12 @@ const App = () => {
 \`\`\`
 `.trim();
 
-		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value: comment,
-					},
-				],
-			} )
-		).toEqual( {
-			description: 'Description',
-			tags: [
-				{
-					title: 'example',
-					description,
-				},
-			],
-		} );
+		expectToExtractExample( code, description );
 	} );
 
 	it( 'spaces in code example are preserved', () => {
 		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
 		const code = `
- *
- * X
  *
  * @example
  *
@@ -245,22 +245,66 @@ const y = (
 \`\`\`
 `.trim();
 
-		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value: code,
-					},
-				],
-			} )
-		).toEqual( {
-			description: 'X',
-			tags: [
-				{
-					title: 'example',
-					description,
-				},
-			],
-		} );
+		expectToExtractExample( code, description );
+	} );
+
+	it( 'no empty line after @example tag: ```js', () => {
+		// Adapted from a11y/src/index.js
+		const code = `
+ *
+ * @example
+ * \`\`\`js
+ * import { speak } from '@wordpress/a11y';
+ * \`\`\`
+`.trim();
+
+		const description = `
+\`\`\`js
+import { speak } from '@wordpress/a11y';
+\`\`\`
+`.trim();
+
+		expectToExtractExample( code, description );
+	} );
+
+	it( 'no empty line after @example tag: ```', () => {
+		// Adapted from a11y/src/index.js
+		const code = `
+ *
+ * @example
+ * \`\`\`
+ * 	ls -a
+ * \`\`\`
+`.trim();
+
+		const description = `
+\`\`\`
+	ls -a
+\`\`\`
+`.trim();
+
+		expectToExtractExample( code, description );
+	} );
+
+	it( 'no empty line after @example tag: normal text', () => {
+		// Adapted from block-serialization-default-parser/src/index.js
+		const code = `
+ *
+ * @example
+ * Input post:
+ * \`\`\`html
+ * <!-- wp:columns {"columns":3} -->
+ * \`\`\`
+ *
+`.trim();
+
+		const description = `
+Input post:
+\`\`\`html
+<!-- wp:columns {"columns":3} -->
+\`\`\`
+`.trim();
+
+		expectToExtractExample( code, description );
 	} );
 } );
