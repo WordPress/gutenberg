@@ -63,6 +63,34 @@ const templates = {
 		],
 		wpScriptsEnabled: true,
 	},
+	esnextEditable: {
+		defaultValues: {
+			namespace,
+			slug: 'esnext-editable',
+			title: 'ESNext Editable Example',
+			description:
+				'Example of editable block – build step required.',
+			dashicon,
+			category,
+			author,
+			license,
+			licenseURI,
+			version,
+		},
+		outputFiles: [
+			'.editorconfig',
+			'.gitignore',
+			'editor.css',
+			'src/edit.js',
+			'src/index.js',
+			'src/save.js',
+			'$slug.php',
+			'style.css',
+			'readme.txt',
+		],
+		wpScriptsEnabled: true,
+
+	}
 };
 
 const getTemplate = ( templateName ) => {
