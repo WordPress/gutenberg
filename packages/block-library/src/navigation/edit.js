@@ -265,7 +265,7 @@ function Navigation( {
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
-								attributes.orientation
+								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
