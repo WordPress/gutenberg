@@ -35,12 +35,12 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @param {WordCountStrategy} type The type of count to be done.
  * @param {WordCountSettings} userSettings Custom settings for the count.
  *
- * @return {void|Object|*} The combined settings object to be used.
+ * @return {WordCountSettings} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
 	const settings = extend( defaultSettings, userSettings );
 
-	settings.shortcodes = settings.l10n.shortcodes || {};
+	settings.shortcodes = settings.l10n?.shortcodes ?? [];
 
 	if ( settings.shortcodes && settings.shortcodes.length ) {
 		settings.shortcodesRegExp = new RegExp(
@@ -49,7 +49,7 @@ function loadSettings( type, userSettings ) {
 		);
 	}
 
-	settings.type = type || settings.l10n.type;
+	settings.type = type || settings.l10n?.type;
 
 	if (
 		settings.type !== 'characters_excluding_spaces' &&
@@ -65,8 +65,8 @@ function loadSettings( type, userSettings ) {
  * Match the regex for the type 'words'
  *
  * @param {string} text     The text being processed
- * @param {string} regex    The regular expression pattern being matched
- * @param {Object} settings Settings object containing regular expressions for each strip function
+ * @param {RegExp|undefined} regex    The regular expression pattern being matched
+ * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
@@ -88,8 +88,8 @@ function matchWords( text, regex, settings ) {
  * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
  *
  * @param {string} text     The text being processed
- * @param {string} regex    The regular expression pattern being matched
- * @param {Object} settings Settings object containing regular expressions for each strip function
+ * @param {RegExp|undefined} regex    The regular expression pattern being matched
+ * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
@@ -111,7 +111,7 @@ function matchCharacters( text, regex, settings ) {
  *
  * @param {string} text The text being processed
  * @param {WordCountStrategy} type	The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
- * @param {Object} userSettings Custom settings object.
+ * @param {WordCountSettings} userSettings Custom settings object.
  *
  * @example
  * ```js
