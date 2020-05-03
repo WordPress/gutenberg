@@ -61,7 +61,7 @@
 
 // Provide every block with a default base margin. This margin provides a consistent spacing
 // between blocks in the editor.
-.editor-styles-wrapper .block-editor-block-list__block {
+.block-editor-block-list__block {
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
 }
