@@ -10,7 +10,7 @@ const getType = ( ast, typeString ) => {
 	}
 
 	if ( ast.type === 'GENERIC' ) {
-		const types = ast.objects.map( ( o ) => getType( o ) ).join( ', ' );
+		const types = ast.objects.map( ( o ) => getType( o ) ).join( ',' );
 		return `${ getType( ast.subject ) }<${ types }>`;
 	}
 

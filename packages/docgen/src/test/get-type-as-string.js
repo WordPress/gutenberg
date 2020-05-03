@@ -16,7 +16,7 @@ describe( 'getType from JSDoc', () => {
 
 	it( 'Applications', () => {
 		const type = getType( 'Record<string, number>' );
-		expect( type ).toBe( 'Record<string, number>' );
+		expect( type ).toBe( 'Record<string,number>' );
 	} );
 
 	it( 'JSDoc style array', () => {
