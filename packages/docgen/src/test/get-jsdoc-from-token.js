@@ -3,14 +3,36 @@
  */
 const getJSDocFromToken = require( '../get-jsdoc-from-token' );
 
-describe( 'JSDoc', () => {
-	it( 'extracts description and tags', () => {
+describe( 'Parse JSDoc and extract description and tags', () => {
+	it( 'Normal definition', () => {
+		const code = `
+ *
+ * A function that adds two parameters.
+ *
+ * @deprecated Use native addition instead.
+ * @since v2
+ *
+ * @see addition
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators
+ *
+ * @param {number} firstParam The first param to add.
+ * @param {number} secondParam The second param to add.
+ *
+ *  @example
+ *
+ * \`\`\`js
+ * const addResult = sum( 1, 3 );
+ * console.log( addResult ); // will yield 4
+ * \`\`\`
+ *
+ * @return {number} The result of adding the two params.
+`.trim();
+
 		expect(
 			getJSDocFromToken( {
 				leadingComments: [
 					{
-						value:
-							'*\n * A function that adds two parameters.\n *\n * @deprecated Use native addition instead.\n * @since v2\n *\n * @see addition\n * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators\n *\n * @param {number} firstParam The first param to add.\n * @param {number} secondParam The second param to add.\n *\n *  @example\n *\n * ```js\n * const addResult = sum( 1, 3 );\n * console.log( addResult ); // will yield 4\n * ```\n *\n * @return {number} The result of adding the two params.\n ',
+						value: code,
 					},
 				],
 			} )
@@ -60,71 +82,6 @@ describe( 'JSDoc', () => {
 			],
 		} );
 
-		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value:
-							'*\n * Constant to document the meaning of life,\n * the universe and everything else.\n *\n * @type {number}\n ',
-					},
-				],
-			} )
-		).toEqual( {
-			description:
-				'Constant to document the meaning of life,\nthe universe and everything else.',
-			tags: [
-				{
-					title: 'type',
-					description: null,
-					type: 'number',
-				},
-			],
-		} );
-
-		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						value:
-							'*\n * Function invoking callback after delay with current timestamp in milliseconds since epoch.\n * @param {(timestamp:number)=>void} callback Callback function.\n ',
-					},
-				],
-			} )
-		).toEqual( {
-			description:
-				'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
-			tags: [
-				{
-					title: 'param',
-					description: 'Callback function.',
-					name: 'callback',
-					type: '(timestamp:number)=>void',
-				},
-			],
-		} );
-
-		// Test tabs in code are preserved.
-		expect(
-			getJSDocFromToken( {
-				leadingComments: [
-					{
-						// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
-						value:
-							"*\n * Description\n *\n * @example\n *\n * ```js\n * const App = () => {\n * \tlet testTab = '\t';\n * \tconst [ resizeListener, sizes ] = useResizeObserver();\n *\n * \treturn (\n * \t\t<div>\n * \t\t\t{ resizeListener }\n * \t\t\tYour content here\n * \t\t</div>\n * \t);\n * };\n * ```\n *\n",
-					},
-				],
-			} )
-		).toEqual( {
-			description: 'Description',
-			tags: [
-				{
-					title: 'example',
-					description:
-						"```js\nconst App = () => {\n\tlet testTab = '\t';\n\tconst [ resizeListener, sizes ] = useResizeObserver();\n\n\treturn (\n\t\t<div>\n\t\t\t{ resizeListener }\n\t\t\tYour content here\n\t\t</div>\n\t);\n};\n```",
-				},
-			],
-		} );
-
 		// Test spaces in code are preserved.
 		expect(
 			getJSDocFromToken( {
@@ -142,6 +99,166 @@ describe( 'JSDoc', () => {
 				{
 					title: 'example',
 					description: '```\nconst y = (\n   x === 3\n);\n```',
+				},
+			],
+		} );
+	} );
+
+	it( 'variable type', () => {
+		const code = `
+ *
+ * Constant to document the meaning of life,
+ * the universe and everything else.
+ *
+ * @type {number}
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description:
+				'Constant to document the meaning of life,\nthe universe and everything else.',
+			tags: [
+				{
+					title: 'type',
+					description: null,
+					type: 'number',
+				},
+			],
+		} );
+	} );
+
+	it( 'function definition', () => {
+		const code = `
+ *
+ * Function invoking callback after delay with current timestamp in milliseconds since epoch.
+ * @param {(timestamp:number)=>void} callback Callback function.
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description:
+				'Function invoking callback after delay with current timestamp in milliseconds since epoch.',
+			tags: [
+				{
+					title: 'param',
+					description: 'Callback function.',
+					name: 'callback',
+					type: '(timestamp:number)=>void',
+				},
+			],
+		} );
+	} );
+
+	it( 'tabs in code example are preserved', () => {
+		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
+		const comment = `
+ *
+ * Description
+ *
+ * @example
+ *
+ * \`\`\`js
+ * const App = () => {
+ * 	let testTab = ' ';
+ * 	const [ resizeListener, sizes ] = useResizeObserver();
+ *
+ * 	return (
+ * 		<div>
+ * 			{ resizeListener }
+ * 			Your content here
+ * 		</div>
+ * 	);
+ * };
+ * \`\`\`
+ *
+`.trim();
+
+		const description = `
+\`\`\`js
+const App = () => {
+	let testTab = ' ';
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+\`\`\`
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: comment,
+					},
+				],
+			} )
+		).toEqual( {
+			description: 'Description',
+			tags: [
+				{
+					title: 'example',
+					description,
+				},
+			],
+		} );
+	} );
+
+	it( 'spaces in code example are preserved', () => {
+		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
+		const code = `
+ *
+ * X
+ *
+ * @example
+ *
+ * \`\`\`
+ * const y = (
+ *    x === 3
+ * );
+ * \`\`\`
+`.trim();
+
+		const description = `
+\`\`\`
+const y = (
+   x === 3
+);
+\`\`\`
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description: 'X',
+			tags: [
+				{
+					title: 'example',
+					description,
 				},
 			],
 		} );
