@@ -29,8 +29,8 @@ const numberOfWords = count( 'Words to count', 'words', {} )
 
 _Parameters_
 
--   _text_ `string`: The text being processed
--   _type_ `string`: The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+-   _text_ `[string]`: The text being processed
+-   _type_ `[WordCountStrategy]`: The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
 -   _userSettings_ `Object`: Custom settings object.
 
 _Returns_

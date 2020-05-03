@@ -18,10 +18,15 @@ import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
 
 /**
+ * A number, or a string containing a number.
+ * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WordCountStrategy
+ */
+
+/**
  * Private function to manage the settings.
  *
- * @param {string} type         The type of count to be done.
- * @param {Object} userSettings Custom settings for the count.
+ * @param {WordCountStrategy} type The type of count to be done.
+ * @param {WordCountSettings} userSettings Custom settings for the count.
  *
  * @return {void|Object|*} The combined settings object to be used.
  */
@@ -97,8 +102,8 @@ function matchCharacters( text, regex, settings ) {
 /**
  * Count some words.
  *
- * @param {string} text         The text being processed
- * @param {string} type         The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {string} text The text being processed
+ * @param {WordCountStrategy} type	The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @param {Object} userSettings Custom settings object.
  *
  * @example
