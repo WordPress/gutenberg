@@ -41,7 +41,12 @@ describe( 'getType from JSDoc', () => {
 
 	it( 'Union', () => {
 		const type = getType( 'null|undefined' );
-		expect( type ).toBe( 'null|undefined' );
+		expect( type ).toBe( '(null|undefined)' );
+	} );
+
+	it( 'Union 2', () => {
+		const type = getType( '(null|undefined)' );
+		expect( type ).toBe( '(null|undefined)' );
 	} );
 
 	it( 'RestType with UnionType', () => {

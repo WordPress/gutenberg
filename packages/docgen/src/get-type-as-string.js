@@ -23,11 +23,14 @@ const getType = ( ast, typeString ) => {
 	}
 
 	if ( ast.type === 'UNION' ) {
-		return `${ getType( ast.left ) }|${ getType( ast.right ) }`;
+		return `(${ getType( ast.left ) }|${ getType( ast.right ) })`;
 	}
 
 	if ( ast.type === 'PARENTHESIS' ) {
-		return `(${ getType( ast.value ) })`;
+		const type = getType( ast.value );
+		return type[ 0 ] === '(' && type[ type.length - 1 ] === ')'
+			? type
+			: `(${ type })`;
 	}
 
 	return typeString || 'unknown type';
