@@ -19,7 +19,14 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
 
 /**
  * A number, or a string containing a number.
+ *
  * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WordCountStrategy
+ */
+
+/**
+ * Lower-level settings for word counting that can be overridden.
+ *
+ * @typedef {import("./defaultSettings").WordCountSettings}  WordCountSettings
  */
 
 /**

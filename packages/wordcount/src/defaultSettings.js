@@ -1,3 +1,32 @@
+/**
+ * @typedef {import("./index").WordCountStrategy} WordCountStrategy
+ */
+
+/**
+ * @typedef {object} WordCountSettingsFields
+ * @property {RegExp} HTMLRegExp
+ * @property {RegExp} HTMLcommentRegExp
+ * @property {RegExp} spaceRegExp
+ * @property {RegExp} HTMLEntityRegExp
+ * @property {RegExp} connectorRegExp
+ * @property {RegExp} removeRegExp
+ * @property {RegExp} astralRegExp
+ * @property {RegExp} wordsRegExp
+ * @property {RegExp} characters_excluding_spacesRegExp
+ * @property {RegExp} characters_including_spacesRegExp
+ * @property {RegExp} shortcodesRegExp
+ * @property {string[]} shortcodes
+ * @property {WordCountStrategy} type
+ * @property {Partial<{type: WordCountStrategy, shortcodes: string[]}>} l10n
+ */
+
+/**
+ * @typedef {Partial<WordCountSettingsFields>} WordCountSettings
+ */
+
+/**
+ * @type {WordCountSettings}
+ */
 export const defaultSettings = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
 	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
