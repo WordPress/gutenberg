@@ -10,4 +10,5 @@ export default function stripTags( settings, text ) {
 	if ( settings.HTMLRegExp ) {
 		return text.replace( settings.HTMLRegExp, '\n' );
 	}
+	return text;
 }

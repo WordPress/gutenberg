@@ -10,4 +10,5 @@ export default function stripSpaces( settings, text ) {
 	if ( settings.spaceRegExp ) {
 		return text.replace( settings.spaceRegExp, ' ' );
 	}
+	return text;
 }
