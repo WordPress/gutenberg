@@ -9,10 +9,17 @@ describe( 'addMilestone', () => {
 			ref: 'refs/heads/not-master',
 		};
 		const octokit = {
+			paginate: {
+				iterator: jest.fn(),
+			},
 			issues: {
 				get: jest.fn(),
 				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn(),
+				listMilestonesForRepo: {
+					endpoint: {
+						merge: jest.fn(),
+					},
+				},
 				update: jest.fn(),
 			},
 			repos: {
@@ -24,7 +31,9 @@ describe( 'addMilestone', () => {
 
 		expect( octokit.issues.get ).not.toHaveBeenCalled();
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
-		expect( octokit.issues.listMilestonesForRepo ).not.toHaveBeenCalled();
+		expect(
+			octokit.issues.listMilestonesForRepo.endpoint.merge
+		).not.toHaveBeenCalled();
 		expect( octokit.issues.update ).not.toHaveBeenCalled();
 		expect( octokit.repos.getContents ).not.toHaveBeenCalled();
 	} );
@@ -41,6 +50,9 @@ describe( 'addMilestone', () => {
 			},
 		};
 		const octokit = {
+			paginate: {
+				iterator: jest.fn(),
+			},
 			issues: {
 				get: jest.fn( () =>
 					Promise.resolve( {
@@ -63,7 +75,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.issues.createMilestone ).not.toHaveBeenCalled();
 		expect( octokit.issues.listMilestonesForRepo ).not.toHaveBeenCalled();
@@ -83,6 +95,29 @@ describe( 'addMilestone', () => {
 			},
 		};
 		const octokit = {
+			paginate: {
+				iterator: jest.fn().mockReturnValue( [
+					Promise.resolve( {
+						data: [
+							{
+								title: 'Gutenberg 6.2',
+								number: 10,
+								due_on: '2019-07-29T00:00:00.000Z',
+							},
+							{
+								title: 'Gutenberg 6.3',
+								number: 11,
+								due_on: '2019-08-12T00:00:00.000Z',
+							},
+							{
+								title: 'Gutenberg 6.4',
+								number: 12,
+								due_on: '2019-08-26T00:00:00.000Z',
+							},
+						],
+					} ),
+				] ),
+			},
 			issues: {
 				get: jest.fn( () =>
 					Promise.resolve( {
@@ -92,15 +127,11 @@ describe( 'addMilestone', () => {
 					} )
 				),
 				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ title: 'Gutenberg 6.2', number: 10 },
-							{ title: 'Gutenberg 6.3', number: 11 },
-							{ title: 'Gutenberg 6.4', number: 12 },
-						],
-					} )
-				),
+				listMilestonesForRepo: {
+					endpoint: {
+						merge: jest.fn(),
+					},
+				},
 				update: jest.fn(),
 			},
 			repos: {
@@ -124,7 +155,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -137,14 +168,10 @@ describe( 'addMilestone', () => {
 			title: 'Gutenberg 6.4',
 			due_on: '2019-08-26T00:00:00.000Z',
 		} );
-		expect( octokit.issues.listMilestonesForRepo ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-		} );
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 			milestone: 12,
 		} );
 	} );
@@ -161,6 +188,29 @@ describe( 'addMilestone', () => {
 			},
 		};
 		const octokit = {
+			paginate: {
+				iterator: jest.fn().mockReturnValue( [
+					Promise.resolve( {
+						data: [
+							{
+								title: 'Gutenberg 6.8',
+								number: 10,
+								due_on: '2019-10-21T00:00:00.000Z',
+							},
+							{
+								title: 'Gutenberg 6.9',
+								number: 11,
+								due_on: '2019-11-04T00:00:00.000Z',
+							},
+							{
+								title: 'Gutenberg 7.0',
+								number: 12,
+								due_on: '2019-11-18T00:00:00.000Z',
+							},
+						],
+					} ),
+				] ),
+			},
 			issues: {
 				get: jest.fn( () =>
 					Promise.resolve( {
@@ -170,15 +220,11 @@ describe( 'addMilestone', () => {
 					} )
 				),
 				createMilestone: jest.fn(),
-				listMilestonesForRepo: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ title: 'Gutenberg 6.8', number: 10 },
-							{ title: 'Gutenberg 6.9', number: 11 },
-							{ title: 'Gutenberg 7.0', number: 12 },
-						],
-					} )
-				),
+				listMilestonesForRepo: {
+					endpoint: {
+						merge: jest.fn(),
+					},
+				},
 				update: jest.fn(),
 			},
 			repos: {
@@ -202,7 +248,7 @@ describe( 'addMilestone', () => {
 		expect( octokit.issues.get ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 		} );
 		expect( octokit.repos.getContents ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -215,14 +261,10 @@ describe( 'addMilestone', () => {
 			title: 'Gutenberg 7.0',
 			due_on: '2019-11-18T00:00:00.000Z',
 		} );
-		expect( octokit.issues.listMilestonesForRepo ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-		} );
 		expect( octokit.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
-			issue_number: '123',
+			issue_number: 123,
 			milestone: 12,
 		} );
 	} );

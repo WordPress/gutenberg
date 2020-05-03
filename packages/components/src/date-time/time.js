@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
+import ButtonGroup from '../button-group';
 
 /**
  * Module Constants
@@ -318,24 +319,24 @@ class TimePicker extends Component {
 							/>
 						</div>
 						{ is12Hour && (
-							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
+							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									isSecondary
-									className="components-datetime__time-am-button"
-									isPressed={ am === 'AM' }
+									isPrimary={ am === 'AM' }
+									isSecondary={ am !== 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
+									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									isSecondary
-									className="components-datetime__time-pm-button"
-									isPressed={ am === 'PM' }
+									isPrimary={ am === 'PM' }
+									isSecondary={ am !== 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
+									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
 								</Button>
-							</div>
+							</ButtonGroup>
 						) }
 					</div>
 				</fieldset>

@@ -18,7 +18,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 	it( 'should switch between visual and HTML modes', async () => {
 		// This block should be in "visual" mode by default.
 		let visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .rich-text'
+			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
 
@@ -52,7 +52,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// This block should be in "visual" mode by default.
 		visualBlock = await page.$$(
-			'.block-editor-block-list__layout .block-editor-block-list__block .rich-text'
+			'.block-editor-block-list__layout .block-editor-block-list__block.rich-text'
 		);
 		expect( visualBlock ).toHaveLength( 1 );
 	} );
@@ -146,7 +146,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 		// The inserter is disabled
 		const disabledInserter = await page.$(
-			'.block-editor-inserter > button:disabled, .block-editor-inserter > button[aria-disabled="true"]'
+			'.edit-post-header-toolbar__inserter-toggle:disabled, .edit-post-header-toolbar__inserter-toggle[aria-disabled="true"]'
 		);
 		expect( disabledInserter ).not.toBeNull();
 	} );

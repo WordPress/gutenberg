@@ -26,13 +26,15 @@ import Editor from './editor';
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {Element} target       DOM node in which editor is rendered.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
+ * @param {Object} postType        Post type of the post to edit.
+ * @param {Object} postId          ID of the post to edit.
+ * @param {Element} target         DOM node in which editor is rendered.
+ * @param {?Object} settings       Editor settings object.
+ * @param {Object} initialEdits    Programmatic edits to apply initially, to be
+ *                                 considered as non-user-initiated (bypass for
+ *                                 unsaved changes prompt).
+ * @param {?string} revisionNotice Message indicating post has been restored
+ *                                 from a revision.
  */
 export function reinitializeEditor(
 	postType,
@@ -60,7 +62,7 @@ export function reinitializeEditor(
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
-			revisionNotice
+			revisionNotice={ revisionNotice }
 			recovery
 		/>,
 		target
@@ -73,13 +75,15 @@ export function reinitializeEditor(
  * The return value of this function is not necessary if we change where we
  * call initializeEditor(). This is due to metaBox timing.
  *
- * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
+ * @param {string}  id             Unique identifier for editor instance.
+ * @param {Object}  postType       Post type of the post to edit.
+ * @param {Object}  postId         ID of the post to edit.
+ * @param {?Object} settings       Editor settings object.
+ * @param {Object}  initialEdits   Programmatic edits to apply initially, to be
+ *                                 considered as non-user-initiated (bypass for
+ *                                 unsaved changes prompt).
+ * @param {?string} revisionNotice Message indicating post has been restored
+ *                                 from a revision.
  */
 export function initializeEditor(
 	id,
@@ -118,14 +122,14 @@ export function initializeEditor(
 	// Without this hack the browser scrolls the mobile toolbar off-screen.
 	// Once supported in Safari we can replace this in favor of preventScroll.
 	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `block-editor-editor-skeleton__body` to enable a fixed top toolbar.
+	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
 	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
 		window.addEventListener( 'scroll', function( event ) {
 			const editorScrollContainer = document.getElementsByClassName(
-				'block-editor-editor-skeleton__body'
+				'interface-interface-skeleton__body'
 			)[ 0 ];
 			if ( event.target === document ) {
 				// Scroll element into view by scrolling the editor container by the same amount

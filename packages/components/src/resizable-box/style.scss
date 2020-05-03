@@ -1,3 +1,6 @@
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
+
 // This is a wrapper of the actual visible handle (pseudo element). It is styled
 // to be much bigger than the visual part so it's easier to click and use.
 .components-resizable-box__handle {
@@ -5,9 +8,7 @@
 	width: $resize-handler-container-size;
 	height: $resize-handler-container-size;
 
-	// Show the resize handle when selected OR
 	// Show the resize handle if set in props
-	.components-resizable-box__container.is-selected &,
 	.components-resizable-box__container.has-show-handle & {
 		display: block;
 	}
@@ -50,6 +51,11 @@
 	.components-resizable-box__handle::after {
 		border-color: $light-gray-600;
 	}
+}
+
+// Elevate the resize handle above the focus style.
+.components-resizable-box__handle {
+	z-index: z-index(".components-resizable-box__handle");
 }
 
 // Show corner handles on top of side handles so they can be used

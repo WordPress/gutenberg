@@ -1,84 +1,114 @@
-@include break-small() {
-	.block-editor-block-contextual-toolbar:not([data-align="wide"]):not([data-align="full"])
-	.block-editor-block-mover:not(.is-horizontal) {
-		display: block;
-		position: absolute;
-		top: $block-toolbar-height;
-		left: - $block-side-ui-width - 10;
-		opacity: 0;
-		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
-
-		&.is-visible {
-			@include edit-post__fade-in-animation;
-		}
-
-		.block-editor-block-mover__control {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-			border: none;
-
-			// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
-			width: $block-side-ui-width;
-			height: $icon-button-size-small;
-
-			svg {
-				width: $block-side-ui-width;
-				height: $icon-button-size-small;
-				padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
-			}
-
-			&[aria-disabled="true"] {
-				cursor: default;
-				pointer-events: none;
-				color: $dark-opacity-300;
-			}
-
-			color: $dark-opacity-300;
-
-			&:focus:not(:disabled) {
-				background-color: transparent;
-			}
-		}
-	}
-}
-
-// Don't add negative vertical margin for wide, fullwide, or mobile.
-// @todo: simplify this selector.
-@include break-small() {
-	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
-		margin-top: 0;
-	}
-}
-
-.block-editor-block-mover__control-drag-handle {
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
-		cursor: grabbing;
-	}
+.block-editor-block-mover {
+	display: inline-flex;
+	flex-direction: row;
 }
 
 .block-editor-block-mover__description {
 	display: none;
 }
 
-.block-editor-block-mover.is-horizontal .block-editor-block-mover__control-drag-handle {
-	display: none;
+.block-editor-block-mover__control.has-icon {
+	padding: 0;
+}
+
+// Show the mover in a single button under the contextual toolbar.
+.block-editor-block-mover {
+	.components-toolbar {
+		flex-direction: column;
+	}
+
+	&.is-horizontal .components-toolbar {
+		flex-direction: row;
+	}
+
+	.block-editor-block-mover__control {
+		height: $block-toolbar-height/2;
+	}
+
+	// Position the icons correctly.
+	.components-toolbar .block-editor-block-mover__control-up {
+		svg {
+			margin-bottom: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			bottom: 0;
+			height: calc(100% - #{ $grid-unit-10 });
+		}
+	}
+
+	.components-toolbar .block-editor-block-mover__control-down {
+		svg {
+			margin-top: -$grid-unit-10;
+		}
+
+		// Focus style.
+		&::before {
+			top: 0;
+			height: calc(100% - #{ $grid-unit-10 });
+		}
+	}
+
+	// Mover is horizontal.
+	&.is-horizontal {
+		.block-editor-block-mover__control.has-icon {
+			height: $block-toolbar-height;
+			width: $block-toolbar-height/2 !important;
+			min-width: $grid-unit-30;
+			padding-left: 0;
+			padding-right: 0;
+
+			// Focus style.
+			&::before {
+				top: $grid-unit-10;
+				bottom: $grid-unit-10;
+				min-width: 0;
+				width: auto;
+				height: auto;
+			}
+		}
+
+		// Position the icons correctly.
+		.block-editor-block-mover__control-up.has-icon {
+			svg {
+				margin-left: 0;
+				margin-right: -$grid-unit-10;
+				margin-bottom: 0;
+			}
+
+			// Focus style.
+			&::before {
+				left: $grid-unit-10;
+				right: 0;
+			}
+		}
+
+		.block-editor-block-mover__control-down.has-icon {
+			svg {
+				margin-left: -$grid-unit-10;
+				margin-right: 0;
+				margin-top: 0;
+			}
+
+			// Focus style.
+			&::before {
+				left: 0;
+				right: $grid-unit-10;
+			}
+		}
+	}
+
+	// Drag and drop is only enabled in contextual toolbars.
+	&:not([draggable="false"]) {
+		cursor: grab;
+
+		.block-editor-block-mover__control {
+			cursor: grab !important;
+
+			&:not(:disabled):not([aria-disabled="true"]):active {
+				cursor: grabbing;
+			}
+		}
+	}
 }

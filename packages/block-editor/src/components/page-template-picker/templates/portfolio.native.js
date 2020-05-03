@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Portfolio = {
 	// translators: title for "Portfolio" page template
 	name: __( 'Portfolio' ),
+	key: 'portfolio',
 	icon: '🎨',
 	content: [
 		{
@@ -174,15 +175,20 @@ const Portfolio = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				url: '',
-				// translators: sample content for "Portfolio" page template
-				text: __( 'Get in touch!' ),
-				linkTarget: '',
-				rel: '',
-				className: 'aligncenter',
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						url: '',
+						// translators: sample content for "Portfolio" page template
+						text: __( 'Get in touch!' ),
+						linkTarget: '',
+						rel: '',
+						className: 'aligncenter',
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',

@@ -70,8 +70,8 @@
 // Hover States
 .components-panel__body > .components-panel__body-title:hover {
 	// Override the default button hover style
-	background: $light-gray-200 !important;
-	border: none !important;
+	background: $light-gray-200;
+	border: none;
 }
 
 .components-panel__body-toggle.components-button {
@@ -82,25 +82,20 @@
 	font-weight: 600;
 	text-align: left;
 	color: $dark-gray-900;
-	@include menu-style__neutral;
+	border: none;
+	box-shadow: none;
 	transition: 0.1s background ease-in-out;
 	@include reduce-motion("transition");
 	height: auto;
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
-	}
-
-	&:hover {
-		// Override the default button hover style
-		background: transparent !important;
-		border: none !important;
-		box-shadow: none !important;
+	&:focus {
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
+		border-radius: 0;
 	}
 
 	.components-panel__arrow {
 		position: absolute;
-		right: $grid-size + 2;
+		right: $grid-unit-20;
 		top: 50%;
 		transform: translateY(-50%);
 		color: $dark-gray-900;

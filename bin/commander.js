@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-
 // Dependencies
 const path = require( 'path' );
 const program = require( 'commander' );
@@ -16,7 +14,7 @@ const SimpleGit = require( 'simple-git/promise' );
 const childProcess = require( 'child_process' );
 const Octokit = require( '@octokit/rest' );
 const os = require( 'os' );
-const uuid = require( 'uuid/v4' );
+const { v4: uuid } = require( 'uuid' );
 
 // Config
 const gitRepoOwner = 'WordPress';
@@ -1136,5 +1134,3 @@ program
 	} );
 
 program.parse( process.argv );
-
-/* eslint-enable no-console */

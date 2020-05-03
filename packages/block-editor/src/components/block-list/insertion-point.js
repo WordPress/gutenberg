@@ -49,7 +49,6 @@ function Indicator( { clientId } ) {
 }
 
 export default function InsertionPoint( {
-	className,
 	isMultiSelecting,
 	hasMultiSelection,
 	selectedBlockClientId,
@@ -72,7 +71,11 @@ export default function InsertionPoint( {
 	} );
 
 	function onMouseMove( event ) {
-		if ( event.target.className !== className ) {
+		if (
+			! event.target.classList.contains(
+				'block-editor-block-list__layout'
+			)
+		) {
 			if ( isInserterShown ) {
 				setIsInserterShown( false );
 			}
@@ -127,12 +130,11 @@ export default function InsertionPoint( {
 		const isReverse = clientY < targetRect.top + targetRect.height / 2;
 		const blockNode = getBlockDOMNode( inserterClientId );
 		const container = isReverse ? containerRef.current : blockNode;
-		const closest = getClosestTabbable( blockNode, true, container );
+		const closest =
+			getClosestTabbable( blockNode, true, container ) || blockNode;
 		const rect = new window.DOMRect( clientX, clientY, 0, 16 );
 
-		if ( closest ) {
-			placeCaretAtVerticalEdge( closest, isReverse, rect, false );
-		}
+		placeCaretAtVerticalEdge( closest, isReverse, rect, false );
 	}
 
 	// Hide the inserter above the selected block and during multi-selection.
@@ -178,7 +180,10 @@ export default function InsertionPoint( {
 								}
 							) }
 						>
-							<Inserter clientId={ inserterClientId } />
+							<Inserter
+								position="bottom center"
+								clientId={ inserterClientId }
+							/>
 						</div>
 					</div>
 				</Popover>

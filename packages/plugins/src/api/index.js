@@ -41,7 +41,8 @@ const plugins = {};
  *                            unique across all registered plugins.
  * @param {WPPlugin} settings The settings for this plugin.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -78,7 +79,8 @@ const plugins = {};
  * } );
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
  * import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
@@ -153,7 +155,8 @@ export function registerPlugin( name, settings ) {
  *
  * @param {string} name Plugin name.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var unregisterPlugin = wp.plugins.unregisterPlugin;
@@ -161,7 +164,8 @@ export function registerPlugin( name, settings ) {
  * unregisterPlugin( 'plugin-name' );
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
  * const { unregisterPlugin } = wp.plugins;

@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide, GuidePage } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { __experimentalCreateInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,13 +33,13 @@ export default function WelcomeGuide() {
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
-			contentLabel={ __( 'Welcome to the Block Editor' ) }
+			contentLabel={ __( 'Welcome to the block editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 		>
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Welcome to the Block Editor' ) }
+					{ __( 'Welcome to the block editor' ) }
 				</h1>
 				<CanvasImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
@@ -63,13 +63,13 @@ export default function WelcomeGuide() {
 
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Get to know the Block Library' ) }
+					{ __( 'Get to know the block library' ) }
 				</h1>
 				<BlockLibraryImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
-					{ __experimentalCreateInterpolateElement(
+					{ createInterpolateElement(
 						__(
-							'All of the blocks available to you live in the Block Library. You’ll find it wherever you see the <InserterIconImage /> icon.'
+							'All of the blocks available to you live in the block library. You’ll find it wherever you see the <InserterIconImage /> icon.'
 						),
 						{
 							InserterIconImage: (
@@ -82,12 +82,12 @@ export default function WelcomeGuide() {
 
 			<GuidePage className="edit-post-welcome-guide__page">
 				<h1 className="edit-post-welcome-guide__heading">
-					{ __( 'Learn how to use the Block Editor' ) }
+					{ __( 'Learn how to use the block editor' ) }
 				</h1>
 				<DocumentationImage className="edit-post-welcome-guide__image" />
 				<p className="edit-post-welcome-guide__text">
 					{ __(
-						'New to the Block Editor? Want to learn more about using it? '
+						'New to the block editor? Want to learn more about using it? '
 					) }
 					<ExternalLink
 						href={ __(

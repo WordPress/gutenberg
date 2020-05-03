@@ -9,7 +9,6 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  */
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +37,6 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
 	popoverProps,
@@ -47,6 +45,7 @@ function DropdownMenu( {
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
+	noIcons,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -106,23 +105,6 @@ function DropdownMenu( {
 					toggleProps
 				);
 
-				let buttonChildren;
-				if (
-					mergedToggleProps.children ||
-					! icon ||
-					hasArrowIndicator
-				) {
-					buttonChildren = [
-						<Fragment key="0">
-							{ mergedToggleProps.children }
-						</Fragment>,
-						<Fragment key="1">
-							{ ( ! icon || hasArrowIndicator ) && (
-								<span className="components-dropdown-menu__indicator" />
-							) }
-						</Fragment>,
-					];
-				}
 				return (
 					<Button
 						{ ...mergedToggleProps }
@@ -144,7 +126,7 @@ function DropdownMenu( {
 						label={ label }
 						showTooltip
 					>
-						{ buttonChildren }
+						{ mergedToggleProps.children }
 					</Button>
 				);
 			} }
@@ -152,7 +134,10 @@ function DropdownMenu( {
 				const mergedMenuProps = mergeProps(
 					{
 						'aria-label': menuLabel || label,
-						className: 'components-dropdown-menu__menu',
+						className: classnames(
+							'components-dropdown-menu__menu',
+							{ 'no-icons': noIcons }
+						),
 					},
 					menuProps
 				);

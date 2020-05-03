@@ -5,6 +5,11 @@ import createSelector from 'rememo';
 import { get, includes, some, flatten, values } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { createRegistrySelector } from '@wordpress/data';
+
+/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -22,14 +27,17 @@ export function getEditorMode( state ) {
  *
  * @return {boolean} Whether the editor sidebar is opened.
  */
-export function isEditorSidebarOpened( state ) {
-	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
-
-	return includes(
-		[ 'edit-post/document', 'edit-post/block' ],
-		activeGeneralSidebar
-	);
-}
+export const isEditorSidebarOpened = createRegistrySelector(
+	( select ) => () => {
+		const activeGeneralSidebar = select(
+			'core/interface'
+		).getActiveComplementaryArea( 'core/edit-post' );
+		return includes(
+			[ 'edit-post/document', 'edit-post/block' ],
+			activeGeneralSidebar
+		);
+	}
+);
 
 /**
  * Returns true if the plugin sidebar is opened.
@@ -37,10 +45,20 @@ export function isEditorSidebarOpened( state ) {
  * @param {Object} state Global application state
  * @return {boolean}     Whether the plugin sidebar is opened.
  */
-export function isPluginSidebarOpened( state ) {
-	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
-	return !! activeGeneralSidebar && ! isEditorSidebarOpened( state );
-}
+export const isPluginSidebarOpened = createRegistrySelector(
+	( select ) => () => {
+		const activeGeneralSidebar = select(
+			'core/interface'
+		).getActiveComplementaryArea( 'core/edit-post' );
+		return (
+			!! activeGeneralSidebar &&
+			! includes(
+				[ 'edit-post/document', 'edit-post/block' ],
+				activeGeneralSidebar
+			)
+		);
+	}
+);
 
 /**
  * Returns the current active general sidebar name, or null if there is no
@@ -56,19 +74,13 @@ export function isPluginSidebarOpened( state ) {
  *
  * @return {?string} Active general sidebar name.
  */
-export function getActiveGeneralSidebarName( state ) {
-	// Dismissal takes precedent.
-	const isDismissed = getPreference(
-		state,
-		'isGeneralSidebarDismissed',
-		false
-	);
-	if ( isDismissed ) {
-		return null;
+export const getActiveGeneralSidebarName = createRegistrySelector(
+	( select ) => () => {
+		return select( 'core/interface' ).getActiveComplementaryArea(
+			'core/edit-post'
+		);
 	}
-
-	return state.activeGeneralSidebar;
-}
+);
 
 /**
  * Returns the preferences (these preferences are persisted locally).
@@ -187,11 +199,14 @@ export function isFeatureActive( state, feature ) {
  *
  * @return {boolean} Whether the plugin item is pinned.
  */
-export function isPluginItemPinned( state, pluginName ) {
-	const pinnedPluginItems = getPreference( state, 'pinnedPluginItems', {} );
-
-	return get( pinnedPluginItems, [ pluginName ], true );
-}
+export const isPluginItemPinned = createRegistrySelector(
+	( select ) => ( pluginName ) => {
+		return select( 'core/interface' ).isItemPinned(
+			'core/edit-post',
+			pluginName
+		);
+	}
+);
 
 /**
  * Returns an array of active meta box locations.
@@ -286,4 +301,15 @@ export function hasMetaBoxes( state ) {
  */
 export function isSavingMetaBoxes( state ) {
 	return state.metaBoxes.isSaving;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function __experimentalGetPreviewDeviceType( state ) {
+	return state.deviceType;
 }

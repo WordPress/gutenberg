@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const About = {
 	// translators: title for "About" page template
 	name: __( 'About' ),
+	key: 'about',
 	icon: '👋',
 	content: [
 		{
@@ -93,11 +94,16 @@ const About = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				// translators: sample content for "About" page template
-				text: __( 'Get in Touch' ),
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						// translators: sample content for "About" page template
+						text: __( 'Get in Touch' ),
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',

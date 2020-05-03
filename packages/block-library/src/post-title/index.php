@@ -15,6 +15,7 @@ function render_block_core_post_title() {
 	if ( ! $post ) {
 		return '';
 	}
+
 	return '<h1>' . get_the_title( $post ) . '</h1>';
 }
 
@@ -22,8 +23,8 @@ function render_block_core_post_title() {
  * Registers the `core/post-title` block on the server.
  */
 function register_block_core_post_title() {
-	register_block_type(
-		'core/post-title',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-title',
 		array(
 			'render_callback' => 'render_block_core_post_title',
 		)

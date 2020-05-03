@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useMemo } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 import { select } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -22,7 +23,7 @@ export default function NavigateToLink( {
 		const effect = async () => {
 			try {
 				const { success, data } = await fetch(
-					`${ url }?_wp-find-template`
+					addQueryArgs( url, { '_wp-find-template': true } )
 				).then( ( res ) => res.json() );
 				if ( success ) {
 					let newTemplateId = data.ID;

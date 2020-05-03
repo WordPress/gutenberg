@@ -34,7 +34,7 @@ export const settings = {
 		className: false,
 		html: false,
 	},
-	transforms,
 	edit,
 	save,
+	transforms,
 };

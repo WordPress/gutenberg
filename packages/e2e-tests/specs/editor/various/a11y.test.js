@@ -23,7 +23,7 @@ describe( 'a11y', () => {
 			':focus',
 			( focusedElement ) => {
 				return focusedElement.classList.contains(
-					'editor-post-publish-button__button'
+					'edit-post-header-toolbar__inserter-toggle'
 				);
 			}
 		);

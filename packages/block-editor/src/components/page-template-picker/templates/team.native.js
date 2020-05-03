@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 const Team = {
 	// translators: title for "Team" page template
 	name: __( 'Team' ),
+	key: 'team',
 	icon: '👥',
 	content: [
 		{
@@ -224,14 +225,19 @@ const Team = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				url: '',
-				// translators: sample content for "Team" page template
-				text: __( 'Get in Touch!' ),
-				borderRadius: 4,
-				className: 'aligncenter',
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						url: '',
+						// translators: sample content for "Team" page template
+						text: __( 'Get in Touch!' ),
+						borderRadius: 4,
+						className: 'aligncenter',
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',

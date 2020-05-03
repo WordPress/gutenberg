@@ -3,9 +3,8 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
-	Inserter,
 	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
@@ -16,25 +15,40 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
+import { Button } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
 
-function HeaderToolbar() {
-	const { hasFixedToolbar, showInserter, isTextModeEnabled } = useSelect(
+function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
+	const {
+		hasFixedToolbar,
+		isInserterEnabled,
+		isInserterVisible,
+		isTextModeEnabled,
+		previewDeviceType,
+	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
-			showInserter:
+			isInserterEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			isInserterVisible: select( 'core/block-editor' ).hasInserterItems(),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
+			previewDeviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const toolbarAriaLabel = hasFixedToolbar
+	const displayBlockToolbar =
+		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
+
+	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
@@ -45,17 +59,26 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<Inserter
-				disabled={ ! showInserter }
-				position="bottom right"
-				showInserterHelpPanel
-			/>
+			{ isInserterVisible && (
+				<Button
+					className="edit-post-header-toolbar__inserter-toggle"
+					isPrimary
+					isPressed={ isInserterOpen }
+					onClick={ onToggleInserter }
+					disabled={ ! isInserterEnabled }
+					icon={ plus }
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
+					) }
+				/>
+			) }
+			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			<ToolSelector />
-			{ ( hasFixedToolbar || ! isLargeViewport ) && (
+			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
 				</div>

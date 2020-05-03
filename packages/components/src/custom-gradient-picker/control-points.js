@@ -16,6 +16,7 @@ import { useInstanceId } from '@wordpress/compose';
 import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
+import VisuallyHidden from '../visually-hidden';
 import {
 	getGradientWithColorAtIndexChanged,
 	getGradientWithControlPointRemoved,
@@ -116,11 +117,11 @@ function ControlPointButton( {
 				} }
 				{ ...additionalProps }
 			/>
-			<div className="screen-reader-text" id={ descriptionId }>
+			<VisuallyHidden id={ descriptionId }>
 				{ __(
 					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
 				) }
-			</div>
+			</VisuallyHidden>
 		</ControlPointKeyboardMove>
 	);
 }
@@ -213,7 +214,11 @@ export default function ControlPoints( {
 								) {
 									return;
 								}
-								onStartControlPointChange();
+								if ( isOpen ) {
+									onStopControlPointChange();
+								} else {
+									onStartControlPointChange();
+								}
 								onToggle();
 							} }
 							onMouseDown={ () => {

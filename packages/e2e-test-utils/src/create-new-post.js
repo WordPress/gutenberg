@@ -32,6 +32,9 @@ export async function createNewPost( {
 	const isWelcomeGuideActive = await page.evaluate( () =>
 		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
 	);
+	const isFullscreenMode = await page.evaluate( () =>
+		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+	);
 
 	if ( showWelcomeGuide !== isWelcomeGuideActive ) {
 		await page.evaluate( () =>
@@ -39,5 +42,13 @@ export async function createNewPost( {
 		);
 
 		await page.reload();
+	}
+
+	if ( isFullscreenMode ) {
+		await page.evaluate( () =>
+			wp.data
+				.dispatch( 'core/edit-post' )
+				.toggleFeature( 'fullscreenMode' )
+		);
 	}
 }

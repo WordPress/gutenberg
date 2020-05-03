@@ -5,10 +5,11 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
-	__experimentalSlotFillConsumer,
+	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -61,32 +62,45 @@ const BlockInspector = ( {
 			<BlockCard blockType={ blockType } />
 			{ hasBlockStyles && (
 				<div>
-					<PanelBody title={ __( 'Styles' ) } initialOpen={ false }>
+					<PanelBody title={ __( 'Styles' ) }>
 						<BlockStyles clientId={ selectedBlockClientId } />
-						<DefaultStylePicker blockName={ blockType.name } />
+						{ hasBlockSupport(
+							blockType.name,
+							'defaultStylePicker',
+							true
+						) && (
+							<DefaultStylePicker blockName={ blockType.name } />
+						) }
 					</PanelBody>
 				</div>
 			) }
 			<InspectorControls.Slot bubblesVirtually />
 			<div>
-				<__experimentalSlotFillConsumer>
-					{ ( { hasFills } ) =>
-						hasFills( InspectorAdvancedControls.slotName ) && (
-							<PanelBody
-								className="block-editor-block-inspector__advanced"
-								title={ __( 'Advanced' ) }
-								initialOpen={ false }
-							>
-								<InspectorAdvancedControls.Slot
-									bubblesVirtually
-								/>
-							</PanelBody>
-						)
-					}
-				</__experimentalSlotFillConsumer>
+				<AdvancedControls
+					slotName={ InspectorAdvancedControls.slotName }
+				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
+	);
+};
+
+const AdvancedControls = ( { slotName } ) => {
+	const slot = useSlot( slotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return null;
+	}
+
+	return (
+		<PanelBody
+			className="block-editor-block-inspector__advanced"
+			title={ __( 'Advanced' ) }
+			initialOpen={ false }
+		>
+			<InspectorAdvancedControls.Slot bubblesVirtually />
+		</PanelBody>
 	);
 };
 

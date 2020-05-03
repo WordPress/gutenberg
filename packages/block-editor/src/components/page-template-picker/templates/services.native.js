@@ -6,7 +6,8 @@ import { __ } from '@wordpress/i18n';
 const Services = {
 	// translators: title for "Services" page template
 	name: __( 'Services' ),
-	icon: '🛠',
+	key: 'services',
+	icon: '🔧',
 	content: [
 		{
 			name: 'core/paragraph',
@@ -115,7 +116,7 @@ const Services = {
 		{
 			name: 'core/spacer',
 			attributes: {
-				height: 40,
+				height: 24,
 			},
 		},
 		{
@@ -138,11 +139,16 @@ const Services = {
 			},
 		},
 		{
-			name: 'core/button',
-			attributes: {
-				// translators: sample content for "Services" page template
-				text: __( 'Get in Touch' ),
-			},
+			name: 'core/buttons',
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						// translators: sample content for "Services" page template
+						text: __( 'Get in Touch' ),
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',

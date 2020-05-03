@@ -1,5 +1,23 @@
 ## Master
 
+## 2.14.0 (2020-04-30)
+
+### Bug fix
+
+- `addQueryArgs` arguments are optional ([#21926](https://github.com/WordPress/gutenberg/pull/21926))
+
+## 2.13.0 (2020-04-15)
+
+### New feature
+
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
+# 2.12.0 (2020-04-01)
+
+### Bug Fixes
+
+- `getQueryString` now correctly considers hash fragments when considering whether to return a query string. Previously, `getQueryString( 'https://example.com/#?foo' )` would wrongly return `'foo'` as its result. A hash fragment is always the last segment of a URL, and the querystring must always precede it ([see reference specification](https://url.spec.whatwg.org/#absolute-url-with-fragment-string)).
+
 ## 2.11.0 (2020-02-10)
 
 ### Bug Fixes

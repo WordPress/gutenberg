@@ -6,7 +6,8 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockSettingsMenuControls, MenuItem } from '@wordpress/components';
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { plugins } from '@wordpress/icons';
 
@@ -37,7 +38,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string} props.label The menu item text.
  * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -60,7 +62,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from wp.i18n;
@@ -72,9 +75,9 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  *
  * const MyPluginBlockSettingsMenuItem = () => (
  *     <PluginBlockSettingsMenuItem
- * 		allowedBlocks=[ 'core/paragraph' ]
+ * 		allowedBlocks={ [ 'core/paragraph' ] }
  * 		icon='dashicon-name'
- * 		label=__( 'Menu item text' )
+ * 		label={ __( 'Menu item text' ) }
  * 		onClick={ doOnClick } />
  * );
  * ```

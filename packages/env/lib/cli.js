@@ -32,6 +32,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 					time[ 1 ] / 1e6
 				).toFixed( 0 ) }ms)`
 			);
+			process.exit( 0 );
 		},
 		( error ) => {
 			if ( error instanceof env.ValidationError ) {
@@ -67,6 +68,11 @@ const withSpinner = ( command ) => ( ...args ) => {
 
 module.exports = function cli() {
 	yargs.usage( wpPrimary( '$0 <command>' ) );
+	yargs.option( 'debug', {
+		type: 'boolean',
+		describe: 'Enable debug output.',
+		default: false,
+	} );
 
 	yargs.command(
 		'start',
@@ -105,7 +111,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers.',
+		"Runs an arbitrary command in one of the underlying Docker containers, for example it's useful for running wp cli commands.",
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',
@@ -117,6 +123,10 @@ module.exports = function cli() {
 			} );
 		},
 		withSpinner( env.run )
+	);
+	yargs.example(
+		'$0 run cli wp user list',
+		'Runs `wp user list` wp-cli command which lists WordPress users.'
 	);
 
 	return yargs;

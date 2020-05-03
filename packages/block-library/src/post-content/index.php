@@ -26,8 +26,8 @@ function render_block_core_post_content() {
  * Registers the `core/post-content` block on the server.
  */
 function register_block_core_post_content() {
-	register_block_type(
-		'core/post-content',
+	register_block_type_from_metadata(
+		__DIR__ . '/post-content',
 		array(
 			'render_callback' => 'render_block_core_post_content',
 		)

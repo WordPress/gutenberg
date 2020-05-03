@@ -12,10 +12,6 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
       label="Pre-publish checks"
     />
-    <WithSelect(WithDispatch(BaseOption))
-      feature="showInserterHelpPanel"
-      label="Inserter help panel"
-    />
   </Section>
   <Section
     title="Document panels"

@@ -1,9 +1,9 @@
 .block-editor-block-inspector {
 	.components-base-control {
-		margin-bottom: #{ $grid-size * 3 };
+		margin-bottom: #{ $grid-unit-30 };
 
 		&:last-child {
-			margin-bottom: $grid-size;
+			margin-bottom: $grid-unit-10;
 		}
 	}
 	.components-panel__body {
@@ -12,7 +12,7 @@
 	}
 
 	.block-editor-block-card {
-		padding: $grid-size-large;
+		padding: $grid-unit-20;
 	}
 }
 

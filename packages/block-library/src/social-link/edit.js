@@ -33,7 +33,6 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
-	// Import icon.
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
 
@@ -41,12 +40,16 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		<Fragment>
 			<InspectorControls>
 				<PanelBody
-					title={ sprintf( __( '%s label' ), socialLinkName ) }
+					title={ sprintf(
+						/* translators: %s: name of the social service. */
+						__( '%s label' ),
+						socialLinkName
+					) }
 					initialOpen={ false }
 				>
 					<PanelRow>
 						<TextControl
-							label={ __( 'Link Label' ) }
+							label={ __( 'Link label' ) }
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
@@ -75,7 +78,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 									onChange={ ( nextURL ) =>
 										setAttributes( { url: nextURL } )
 									}
-									placeholder={ __( 'Enter Address' ) }
+									placeholder={ __( 'Enter address' ) }
 									disableSuggestions={ true }
 								/>
 							</div>

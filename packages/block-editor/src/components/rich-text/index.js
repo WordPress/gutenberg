@@ -39,6 +39,7 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
+import { regexp } from '@wordpress/shortcode';
 
 /**
  * Internal dependencies
@@ -67,7 +68,15 @@ function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-function getAllowedFormats( { allowedFormats, formattingControls } ) {
+function getAllowedFormats( {
+	allowedFormats,
+	formattingControls,
+	disableFormats,
+} ) {
+	if ( disableFormats ) {
+		return getAllowedFormats.EMPTY_ARRAY;
+	}
+
 	if ( ! allowedFormats && ! formattingControls ) {
 		return;
 	}
@@ -82,6 +91,10 @@ function getAllowedFormats( { allowedFormats, formattingControls } ) {
 
 	return formattingControls.map( ( name ) => `core/${ name }` );
 }
+
+getAllowedFormats.EMPTY_ARRAY = [];
+
+const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 function RichTextWrapper(
 	{
@@ -112,6 +125,8 @@ function RichTextWrapper(
 		style,
 		preserveWhiteSpace,
 		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
 		...props
 	},
 	forwardedRef
@@ -141,10 +156,7 @@ function RichTextWrapper(
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const {
-			__experimentalCanUserUseUnfilteredHTML,
-			__experimentalUndo: undo,
-		} = getSettings();
+		const { __experimentalUndo: undo } = getSettings();
 
 		let isSelected;
 
@@ -171,7 +183,6 @@ function RichTextWrapper(
 		}
 
 		return {
-			canUserUseUnfilteredHTML: __experimentalCanUserUseUnfilteredHTML,
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
@@ -186,7 +197,6 @@ function RichTextWrapper(
 	// retreived from the store on merge.
 	// To do: fix this somehow.
 	const {
-		canUserUseUnfilteredHTML,
 		isCaretWithinFormattedText,
 		selectionStart,
 		selectionEnd,
@@ -207,6 +217,7 @@ function RichTextWrapper(
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
 		formattingControls,
+		disableFormats,
 	} );
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
@@ -266,6 +277,7 @@ function RichTextWrapper(
 			const blocks = [];
 			const [ before, after ] = split( record );
 			const hasPastedBlocks = pastedBlocks.length > 0;
+			let lastPastedBlockIndex = -1;
 
 			// Create a block with the content before the caret if there's no pasted
 			// blocks, or if there are pasted blocks and the value is not empty.
@@ -280,10 +292,12 @@ function RichTextWrapper(
 						} )
 					)
 				);
+				lastPastedBlockIndex += 1;
 			}
 
 			if ( hasPastedBlocks ) {
 				blocks.push( ...pastedBlocks );
+				lastPastedBlockIndex += pastedBlocks.length;
 			} else if ( onSplitMiddle ) {
 				blocks.push( onSplitMiddle() );
 			}
@@ -305,9 +319,13 @@ function RichTextWrapper(
 
 			// If there are pasted blocks, set the selection to the last one.
 			// Otherwise, set the selection to the second block.
-			const indexToSelect = hasPastedBlocks ? blocks.length - 1 : 1;
+			const indexToSelect = hasPastedBlocks ? lastPastedBlockIndex : 1;
 
-			onReplace( blocks, indexToSelect );
+			// If there are pasted blocks, move the caret to the end of the selected block
+			// Otherwise, retain the default value.
+			const initialPosition = hasPastedBlocks ? -1 : null;
+
+			onReplace( blocks, indexToSelect, initialPosition );
 		},
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
@@ -334,14 +352,18 @@ function RichTextWrapper(
 
 			if ( multiline ) {
 				if ( shiftKey ) {
-					onChange( insert( value, '\n' ) );
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
 				} else if ( canSplit && isEmptyLine( value ) ) {
 					splitValue( value );
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
 			} else if ( shiftKey || ! canSplit ) {
-				onChange( insert( value, '\n' ) );
+				if ( ! disableLineBreaks ) {
+					onChange( insert( value, '\n' ) );
+				}
 			} else {
 				splitValue( value );
 			}
@@ -381,6 +403,18 @@ function RichTextWrapper(
 
 			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
+			// Force the blocks mode when the user is pasting
+			// on a new line & the content resembles a shortcode.
+			// Otherwise it's going to be detected as inline
+			// and the shortcode won't be replaced.
+			if (
+				mode === 'AUTO' &&
+				isEmpty( value ) &&
+				isShortcode( plainText )
+			) {
+				mode = 'BLOCKS';
+			}
+
 			if (
 				__unstableEmbedURLOnPaste &&
 				isEmpty( value ) &&
@@ -394,7 +428,6 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
-				canUserUseUnfilteredHTML,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -425,7 +458,7 @@ function RichTextWrapper(
 				onChange( insert( value, valueToInsert ) );
 			} else if ( content.length > 0 ) {
 				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
+					onReplace( content, content.length - 1, -1 );
 				} else {
 					splitValue( value, content );
 				}
@@ -437,7 +470,6 @@ function RichTextWrapper(
 			onSplit,
 			splitValue,
 			__unstableEmbedURLOnPaste,
-			canUserUseUnfilteredHTML,
 			multiline,
 		]
 	);
@@ -511,6 +543,7 @@ function RichTextWrapper(
 			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
+			__unstableDisableFormats={ disableFormats }
 			style={ style }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			disabled={ disabled }

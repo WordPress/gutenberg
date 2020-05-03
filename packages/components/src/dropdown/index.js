@@ -78,7 +78,7 @@ class Dropdown extends Component {
 		const {
 			renderContent,
 			renderToggle,
-			position = 'bottom',
+			position = 'bottom right',
 			className,
 			contentClassName,
 			expandOnMobile,
@@ -97,7 +97,6 @@ class Dropdown extends Component {
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
-						className={ contentClassName }
 						position={ position }
 						onClose={ this.close }
 						onFocusOutside={ this.closeIfFocusOutside }
@@ -105,6 +104,11 @@ class Dropdown extends Component {
 						headerTitle={ headerTitle }
 						focusOnMount={ focusOnMount }
 						{ ...popoverProps }
+						className={ classnames(
+							'components-dropdown__content',
+							popoverProps ? popoverProps.className : undefined,
+							contentClassName
+						) }
 					>
 						{ renderContent( args ) }
 					</Popover>

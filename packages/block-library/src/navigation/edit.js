@@ -15,6 +15,7 @@ import {
 	FontSizePicker,
 	withFontSizes,
 	__experimentalUseColors,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
@@ -30,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { menu } from '@wordpress/icons';
+import { navigation as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,16 +57,10 @@ function Navigation( {
 	//
 	// HOOKS
 	//
-	/* eslint-disable @wordpress/no-unused-vars-before-return */
+
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-
-	const {
-		TextColor,
-		BackgroundColor,
-		InspectorControlsColorPanel,
-		ColorPanel,
-	} = __experimentalUseColors(
+	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
 			{ name: 'textColor', property: 'color' },
 			{ name: 'backgroundColor', className: 'has-background' },
@@ -86,7 +81,6 @@ function Navigation( {
 		[ fontSize.size ]
 	);
 
-	/* eslint-enable @wordpress/no-unused-vars-before-return */
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
@@ -135,10 +129,6 @@ function Navigation( {
 
 	const hasPages = hasResolvedPages && pages && pages.length;
 
-	const blockClassNames = classnames( className, {
-		[ `items-justification-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
-	} );
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
@@ -148,10 +138,10 @@ function Navigation( {
 	// then show the Placeholder
 	if ( ! hasExistingNavItems ) {
 		return (
-			<Fragment>
+			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
+					icon={ icon }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -162,7 +152,7 @@ function Navigation( {
 						className="wp-block-navigation-placeholder__buttons"
 					>
 						<Button
-							isSecondary
+							isPrimary
 							className="wp-block-navigation-placeholder__button"
 							onClick={ handleCreateFromExistingPages }
 							disabled={ ! hasPages }
@@ -179,9 +169,15 @@ function Navigation( {
 						</Button>
 					</div>
 				</Placeholder>
-			</Fragment>
+			</Block.div>
 		);
 	}
+
+	const blockClassNames = classnames( className, {
+		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		[ fontSize.class ]: fontSize.class,
+		'is-vertical': attributes.orientation === 'vertical',
+	} );
 
 	// UI State: rendered Block UI
 	return (
@@ -242,7 +238,6 @@ function Navigation( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ InspectorControlsColorPanel }
 			<InspectorControls>
 				<PanelBody title={ __( 'Display settings' ) }>
 					<ToggleControl
@@ -256,8 +251,7 @@ function Navigation( {
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
-					<div
-						ref={ ref }
+					<Block.nav
 						className={ blockClassNames }
 						style={ blockInlineStyles }
 					>
@@ -266,13 +260,25 @@ function Navigation( {
 								<Spinner /> { __( 'Loading Navigation…' ) }{ ' ' }
 							</>
 						) }
-
 						<InnerBlocks
+							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={ 'horizontal' }
+							__experimentalMoverDirection={
+								attributes.orientation
+							}
+							__experimentalTagName="ul"
+							__experimentalAppenderTagName="li"
+							__experimentalPassedProps={ {
+								className: 'wp-block-navigation__container',
+							} }
+							__experimentalCaptureToolbars={ true }
+							// Template lock set to false here so that the Nav
+							// Block on the experimental menus screen does not
+							// inherit templateLock={ 'all' }.
+							templateLock={ false }
 						/>
-					</div>
+					</Block.nav>
 				</BackgroundColor>
 			</TextColor>
 		</Fragment>

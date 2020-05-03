@@ -6,15 +6,27 @@ import {
 	useContext,
 	useState,
 	useMemo,
+	useCallback,
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
 	Popover,
-	navigateRegions,
+	FocusReturnProvider,
+	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
+import {
+	BlockSelectionClearer,
+	BlockBreadcrumb,
+	__unstableEditorStyles as EditorStyles,
+	__experimentalUseResizeCanvas as useResizeCanvas,
+} from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
+import { EntitiesSavedStates } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -30,6 +42,7 @@ export function useEditorContext() {
 }
 
 function Editor( { settings: _settings } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ settings, setSettings ] = useState( _settings );
 	const template = useSelect(
 		( select ) =>
@@ -40,28 +53,111 @@ function Editor( { settings: _settings } ) {
 			),
 		[ settings.templateType, settings.templateId ]
 	);
+
 	const context = useMemo( () => ( { settings, setSettings } ), [
 		settings,
 		setSettings,
 	] );
+
+	const { isFullscreenActive } = useSelect( ( select ) => {
+		return {
+			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
+				'fullscreenMode'
+			),
+		};
+	}, [] );
+
+	const deviceType = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
+	}, [] );
+
+	const inlineStyles = useResizeCanvas( deviceType );
+
+	const [
+		isEntitiesSavedStatesOpen,
+		setIsEntitiesSavedStatesOpen,
+	] = useState( false );
+	const openEntitiesSavedStates = useCallback(
+		() => setIsEntitiesSavedStatesOpen( true ),
+		[]
+	);
+	const closeEntitiesSavedStates = useCallback(
+		() => setIsEntitiesSavedStatesOpen( false ),
+		[]
+	);
+
 	return template ? (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<EntityProvider
-					kind="postType"
-					type={ settings.templateType }
-					id={ settings.templateId }
-				>
-					<Context.Provider value={ context }>
-						<Notices />
-						<Header />
-						<Sidebar />
-						<BlockEditor />
-						<Popover.Slot />
-					</Context.Provider>
-				</EntityProvider>
-			</DropZoneProvider>
-		</SlotFillProvider>
+		<>
+			<EditorStyles styles={ settings.styles } />
+			<FullscreenMode isActive={ isFullscreenActive } />
+			<SlotFillProvider>
+				<DropZoneProvider>
+					<EntityProvider kind="root" type="site">
+						<EntityProvider
+							kind="postType"
+							type={ settings.templateType }
+							id={ settings.templateId }
+						>
+							<Context.Provider value={ context }>
+								<FocusReturnProvider>
+									<InterfaceSkeleton
+										sidebar={ ! isMobile && <Sidebar /> }
+										header={
+											<Header
+												openEntitiesSavedStates={
+													openEntitiesSavedStates
+												}
+											/>
+										}
+										content={
+											<BlockSelectionClearer
+												style={ inlineStyles }
+											>
+												<Notices />
+												<Popover.Slot name="block-toolbar" />
+												<BlockEditor />
+											</BlockSelectionClearer>
+										}
+										actions={
+											<>
+												<EntitiesSavedStates
+													isOpen={
+														isEntitiesSavedStatesOpen
+													}
+													close={
+														closeEntitiesSavedStates
+													}
+												/>
+												{ ! isEntitiesSavedStatesOpen && (
+													<div className="edit-site-editor__toggle-save-panel">
+														<Button
+															isSecondary
+															className="edit-site-editor__toggle-save-panel-button"
+															onClick={
+																openEntitiesSavedStates
+															}
+															aria-expanded={
+																false
+															}
+														>
+															{ __(
+																'Open save panel'
+															) }
+														</Button>
+													</div>
+												) }
+											</>
+										}
+										footer={ <BlockBreadcrumb /> }
+									/>
+									<Popover.Slot />
+								</FocusReturnProvider>
+							</Context.Provider>
+						</EntityProvider>
+					</EntityProvider>
+				</DropZoneProvider>
+			</SlotFillProvider>
+		</>
 	) : null;
 }
-export default navigateRegions( Editor );
+export default Editor;

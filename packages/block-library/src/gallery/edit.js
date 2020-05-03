@@ -20,11 +20,10 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
-	RangeControl,
 	SelectControl,
-	StepperControl,
 	ToggleControl,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
 import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
@@ -40,7 +39,6 @@ import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
-const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -67,12 +65,18 @@ const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
 	native: { separatorType: 'none' },
 } );
 
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+	web: {},
+	native: { type: 'stepper' },
+} );
+
 class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
+		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
@@ -117,6 +121,16 @@ class GalleryEdit extends Component {
 			if ( this.state.selectedImage !== index ) {
 				this.setState( {
 					selectedImage: index,
+				} );
+			}
+		};
+	}
+
+	onDeselectImage( index ) {
+		return () => {
+			if ( this.state.selectedImage === index ) {
+				this.setState( {
+					selectedImage: null,
 				} );
 			}
 		};
@@ -382,26 +396,27 @@ class GalleryEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<ColumnsControl
+							<RangeControl
 								label={ __( 'Columns' ) }
-								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
+								{ ...MOBILE_CONTROL_PROPS }
+								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 								required
 							/>
 						) }
 
 						<ToggleControl
-							label={ __( 'Crop Images' ) }
+							label={ __( 'Crop images' ) }
 							{ ...MOBILE_CONTROL_PROPS }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
-							label={ __( 'Link To' ) }
+							label={ __( 'Link to' ) }
 							{ ...mobileLinkToProps }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
@@ -409,7 +424,7 @@ class GalleryEdit extends Component {
 						/>
 						{ shouldShowSizeOptions && (
 							<SelectControl
-								label={ __( 'Images Size' ) }
+								label={ __( 'Images size' ) }
 								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
@@ -427,6 +442,7 @@ class GalleryEdit extends Component {
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
 					onSelectImage={ this.onSelectImage }
+					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
 				/>

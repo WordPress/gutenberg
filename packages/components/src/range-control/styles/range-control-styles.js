@@ -53,6 +53,13 @@ export const AfterIconWrapper = styled.span`
 	${rtl( { marginLeft: 16 } )}
 `;
 
+const disabledRailBackgroundColor = ( { disabled } ) => {
+	if ( ! disabled ) return '';
+	return css( {
+		backgroundColor: color( 'lightGray.400' ),
+	} );
+};
+
 export const Rail = styled.span`
 	background-color: ${color( 'lightGray.600' )};
 	box-sizing: border-box;
@@ -64,7 +71,16 @@ export const Rail = styled.span`
 	position: absolute;
 	margin-top: 14px;
 	top: 0;
+
+	${disabledRailBackgroundColor};
 `;
+
+const disabledBackgroundColor = ( { disabled } ) => {
+	if ( ! disabled ) return '';
+	return css( {
+		backgroundColor: color( 'lightGray.800' ),
+	} );
+};
 
 export const Track = styled.span`
 	background-color: currentColor;
@@ -76,6 +92,8 @@ export const Track = styled.span`
 	position: absolute;
 	margin-top: 14px;
 	top: 0;
+
+	${disabledBackgroundColor};
 `;
 
 export const MarksWrapper = styled.span`
@@ -101,6 +119,7 @@ export const Mark = styled.span`
 	width: 1px;
 
 	${markFill};
+	${disabledBackgroundColor};
 `;
 
 const markLabelFill = ( { isFilled } ) => {
@@ -229,6 +248,7 @@ export const Tooltip = styled.span`
 	min-width: 32px;
 	opacity: 0;
 	padding: 8px;
+	pointer-events: none;
 	position: absolute;
 	text-align: center;
 	transition: opacity 120ms ease;

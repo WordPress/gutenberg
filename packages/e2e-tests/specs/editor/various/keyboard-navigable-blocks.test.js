@@ -22,6 +22,7 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
@@ -32,16 +33,13 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Block: Paragraph' );
-
-	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
 	await expect(
 		await page.evaluate( () => document.activeElement.innerHTML )
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Document' );
+	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 };
 
 const tabThroughBlockMoverControl = async () => {
@@ -136,7 +134,7 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
+		await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 	} );
 
 	it( 'allows tabbing in navigation mode if no block is selected (reverse)', async () => {
@@ -152,7 +150,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await page.evaluate( () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
 			document
-				.querySelector( '.block-editor-editor-skeleton__sidebar' )
+				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();
 		} );
 

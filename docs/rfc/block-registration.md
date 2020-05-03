@@ -32,7 +32,7 @@ Initial support for server-defined block attributes was merged as part of [#2529
 
 A demonstration for how block registration could be made filterable in PHP was explored in [#5802](https://github.com/WordPress/gutenberg/pull/5802). The purpose here was to explore how plugins could have better control over the registration.
 
-Another exploration in [#5652](https://github.com/WordPress/gutenberg/pull/5652) considered using JSON as a file format to share block type definitions between JavaScript and PHP. 
+Another exploration in [#5652](https://github.com/WordPress/gutenberg/pull/5652) considered using JSON as a file format to share block type definitions between JavaScript and PHP.
 
 ### Conclusions
 
@@ -77,8 +77,8 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".message"
 		}
 	},
-	"styleVariations": [ 
-		{ "name": "default", "label": "Default", "isDefault": true }, 
+	"styleVariations": [
+		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	],
 	"editorScript": "build/editor.js",
@@ -222,7 +222,7 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 * Property: `attributes`
 
 ```json
-{ 
+{
 	"attributes": {
 		"cover": {
 			"type": "string",
@@ -252,9 +252,9 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 * Alias: `styleVariations`
 
 ```json
-{ 
-	"styleVariations": [ 
-		{ "name": "default", "label": "Default", "isDefault": true }, 
+{
+	"styleVariations": [
+		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	]
 }
@@ -326,7 +326,7 @@ The following properties are going to be supported for backward compatibility re
  - `supports` - see the [block supports](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) documentation page for more details.
  - `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
  - `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
- 
+
 **Example**:
 ```js
 wp.blocks.registerBlockType( 'my-block/name', {
@@ -340,7 +340,7 @@ wp.blocks.registerBlockType( 'my-block/name', {
 		html: false
 	}
 } );
-``` 
+```
 
 In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.
 
@@ -365,31 +365,35 @@ That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shap
 
 It's possible to provide an object which takes the following shape:
 - `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
-- `dependencies` (`string[]`) - an array of registered script handles this script depends on.  Default value: `[]`.
+- `dependencies` (`string[]`) - an array of registered script handles this script depends on. Default value: `[]`.
 - `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-The definition is stored inside separate JSON file which ends with `.asset.json` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
+The definition is stored inside separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
 
 ```
 build/
-├─ editor.js
-└─ editor.asset.json
+├─ index.js
+└─ index.asset.php
 ```
 
 In `block.json`:
 ```json
-{ "editorScript": "build/editor.js" }
+{ "editorScript": "build/index.js" }
 ```
 
-In `build/editor.asset.json`:
-```json
-{
-	"handle": "my-plugin-notice-editor",
-	"dependencies": [ "wp-blocks","wp-element", "wp-i18n" ],
-	"version": "3.0.0"
-}
+In `build/index.asset.php`:
+```php
+<?php
+return array(
+	'dependencies' => array(
+		'wp-blocks',
+		'wp-element',
+		'wp-i18n',
+	),
+	'version'      => '3be55b05081a63d8f9d0ecb466c42cfd',
+);
 ```
 
 ## Internationalization
@@ -431,6 +435,28 @@ $metadata = array(
 ```
 
 Implementation should follow the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+
+## Server-side registration
+
+There is also a new API method proposed `register_block_type_from_metadata` that aims to simplify the block type registration on the server from metadata stored in the `block.json` file. This function is going to handle also all necessary work to make internationalization work seamlessly for metadata defined.
+
+This function takes two params:
+- `$path` (`string`) – path to the folder where the `block.json` file is located.
+- `$args` (`array`) –  an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
+  - `$render_callback` (`callable`) – callback used to render blocks of this block type.
+
+It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
+
+**Example:**
+
+```php
+register_block_type_from_metadata(
+	__DIR__ . '/shortcode',
+	array(
+		'render_callback' => 'render_block_core_shortcode',
+	)
+);
+```
 
 ## Backward Compatibility
 

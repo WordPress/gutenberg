@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-import { isUndefined } from 'lodash';
-/**
  * Internal dependencies
  */
 import RangeMark from './mark';
 import { MarksWrapper, Rail } from './styles/range-control-styles';
 
 export default function RangeRail( {
+	disabled = false,
 	marks = false,
 	min = 0,
 	max = 100,
@@ -18,9 +15,10 @@ export default function RangeRail( {
 } ) {
 	return (
 		<>
-			<Rail { ...restProps } />
+			<Rail disabled={ disabled } { ...restProps } />
 			{ marks && (
 				<Marks
+					disabled={ disabled }
 					marks={ marks }
 					min={ min }
 					max={ max }
@@ -32,7 +30,14 @@ export default function RangeRail( {
 	);
 }
 
-function Marks( { marks = false, min = 0, max = 100, step = 1, value = 0 } ) {
+function Marks( {
+	disabled = false,
+	marks = false,
+	min = 0,
+	max = 100,
+	step = 1,
+	value = 0,
+} ) {
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (
@@ -41,7 +46,12 @@ function Marks( { marks = false, min = 0, max = 100, step = 1, value = 0 } ) {
 			className="components-range-control__marks"
 		>
 			{ marksData.map( ( mark ) => (
-				<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
+				<RangeMark
+					{ ...mark }
+					key={ mark.key }
+					aria-hidden="true"
+					disabled={ disabled }
+				/>
 			) ) }
 		</MarksWrapper>
 	);
@@ -64,7 +74,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		  } ) );
 
 	const enhancedMarks = marksArray.map( ( mark, index ) => {
-		const markValue = ! isUndefined( mark.value ) ? mark.value : value;
+		const markValue = mark.value !== undefined ? mark.value : value;
 
 		const key = `mark-${ index }`;
 		const isFilled = markValue * step <= value;
