@@ -1,60 +1,39 @@
 /**
  * External dependencies
  */
-import { map, flatMap, remove, find, groupBy } from 'lodash';
+import { map, flatMap, filter, groupBy } from 'lodash';
+
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import {
-	Button,
-	Panel,
-	PanelBody,
-	SelectControl,
-	Spinner,
-} from '@wordpress/components';
+import { Button, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const MenuSelectControl = ( { onChange, menusList, location } ) => {
-	const [ menuId, setMenuId ] = useState( false );
-
-	useEffect( () => {
-		setMenuId( location.menu );
-	}, [ location.menu ] );
-
-	return (
-		<SelectControl
-			options={ menusList }
-			value={ menuId }
-			onChange={ ( selectedMenuId ) => {
-				onChange( menuId, {
-					location: location.name,
-					menu: parseInt( selectedMenuId ),
-				} );
-				setMenuId( selectedMenuId );
-			} }
-		/>
-	);
-};
+/**
+ * Internal dependencies
+ */
+import MenuSelectControl from './menu-select-control';
 
 export default function MenuLocationsEditor() {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
-
-	const [ menuLocations, setMenuLocations ] = useState( false );
-	const [ locationsData, setLocationsData ] = useState( {} );
 	const { saveMenu } = useDispatch( 'core' );
 
-	const kind = 'root';
-	const name = 'menuLocation';
-	const entities = useSelect( ( select ) =>
-		select( 'core' ).getEntitiesByKind( kind )
-	);
-	const entity = find( entities, { kind, name } );
+	const [ availableLocations, setAvailableLocations ] = useState( null );
 
-	const getMenuLocations = async () => {
-		const path = `${ entity.baseURL }`;
+	// a local state which maps menus to locations
+	// so that we can send one call per menu when
+	// updating locations, otherwise, without this local state
+	// we'd send one call per location
+	const [ menuLocationMap, setMenuLocationMap ] = useState( {} );
+
+	const availableMenus = useSelect( ( select ) =>
+		select( 'core' ).getMenus()
+	);
+
+	const fetchAvailableLocations = async () => {
+		const path = `/__experimental/menu-locations`;
 		const apiLocations = await apiFetch( {
 			path,
 			method: 'GET',
@@ -62,71 +41,107 @@ export default function MenuLocationsEditor() {
 		return flatMap( apiLocations, ( value ) => value );
 	};
 
-	const setLatestLocations = async () => {
-		const latestLocations = await getMenuLocations();
-		setMenuLocations( latestLocations );
+	const initAvailableLocations = async () => {
+		const latestLocations = await fetchAvailableLocations();
+		setAvailableLocations( latestLocations );
 	};
 
+	// we need to fecth the list of locations
+	// because the menu location entity
+	// caches their menu associations
 	useEffect( () => {
-		setLatestLocations();
+		initAvailableLocations();
 	}, [] );
 
+	// as soon as we have the menus we group
+	// all locations by the menuId they are assigned to
 	useEffect( () => {
-		if ( menus && menuLocations ) {
-			const locations = groupBy( menuLocations, 'menu' );
+		if ( availableMenus && availableLocations ) {
+			const locations = groupBy( availableLocations, 'menu' );
 			map( locations, ( location, menuId ) => {
 				locations[ menuId ] = map( location, 'name' );
 			} );
-			setLocationsData( locations );
+			setMenuLocationMap( locations );
 		}
-	}, [ menuLocations ] );
+	}, [ availableLocations ] );
 
-	if ( ! menus || ! menuLocations ) {
+	if ( ! availableMenus || ! availableLocations ) {
 		return <Spinner />;
 	}
 
-	const setLocations = ( prevMenuId, { location, menu } ) => {
-		remove( locationsData[ prevMenuId ], ( oldLocation ) => {
-			return oldLocation === location;
-		} );
-		if ( ! locationsData[ menu ] ) {
-			locationsData[ menu ] = [];
+	const updateMenuLocationMap = ( oldMenuId, { newLocation, newMenuId } ) => {
+		const newMenuLocationMap = menuLocationMap;
+
+		// we need to remove the newLocation from any menu
+		// which is already assigned to it
+		newMenuLocationMap[ oldMenuId ] = filter(
+			menuLocationMap[ oldMenuId ],
+			( oldLocation ) => {
+				return oldLocation !== newLocation;
+			}
+		);
+
+		if ( ! newMenuLocationMap[ newMenuId ] ) {
+			newMenuLocationMap[ newMenuId ] = [];
 		}
-		locationsData[ menu ].push( location );
-		setLocationsData( locationsData );
+
+		newMenuLocationMap[ newMenuId ].push( newLocation );
+		setMenuLocationMap( newMenuLocationMap );
 	};
 
-	const saveLocations = async () => {
-		for ( const menuId in locationsData ) {
-			if ( locationsData.hasOwnProperty( menuId ) ) {
+	const updateLocations = async () => {
+		for ( const menuId in menuLocationMap ) {
+			if ( menuLocationMap.hasOwnProperty( menuId ) ) {
 				const intMenuId = parseInt( menuId );
 				if ( intMenuId ) {
 					await saveMenu( {
 						id: intMenuId,
-						locations: locationsData[ menuId ],
+						locations: menuLocationMap[ menuId ],
 					} );
 				}
 			}
 		}
-		await setLatestLocations();
+		// we need to fetch the locations again after
+		// we've updated their menu associations
+		await initAvailableLocations();
 	};
 
-	const menusList = [
+	const menuSelectControlOptions = [
 		{ value: 0, label: __( '— Select a Menu —' ) },
-		...menus.map( ( menu ) => ( {
-			value: menu.id,
-			label: menu.name,
+		...availableMenus.map( ( { id, name } ) => ( {
+			value: id,
+			label: name,
 		} ) ),
 	];
+
+	if ( availableLocations.length === 0 ) {
+		return (
+			<Panel className="edit-navigation-menu-editor__panel">
+				<PanelBody title={ __( 'Menu locations' ) }>
+					<p>{ __( 'There are no available menu locations' ) }</p>
+				</PanelBody>
+			</Panel>
+		);
+	}
+
+	if ( availableMenus.length === 0 ) {
+		return (
+			<Panel className="edit-navigation-menu-editor__panel">
+				<PanelBody title={ __( 'Menu locations' ) }>
+					<p>{ __( 'There are no available menus' ) }</p>
+				</PanelBody>
+			</Panel>
+		);
+	}
 
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
 			<PanelBody title={ __( 'Menu locations' ) }>
 				<form
-					onSubmit={ ( e ) => {
-						setMenuLocations( false );
-						e.preventDefault();
-						saveLocations();
+					onSubmit={ ( event ) => {
+						event.preventDefault();
+						setAvailableLocations( null );
+						updateLocations();
 					} }
 				>
 					<table>
@@ -137,15 +152,18 @@ export default function MenuLocationsEditor() {
 							</tr>
 						</thead>
 						<tbody>
-							{ menuLocations.map( ( menuLocation ) => (
-								<tr key={ menuLocation.name }>
-									<td>{ menuLocation.description }</td>
+							{ availableLocations.map( ( location ) => (
+								<tr key={ location.name }>
+									<td>{ location.description }</td>
 									<td>
 										<MenuSelectControl
-											menus={ menus }
-											menusList={ menusList }
-											location={ menuLocation }
-											onChange={ setLocations }
+											location={ location }
+											availableMenuIds={
+												menuSelectControlOptions
+											}
+											onSelectMenu={
+												updateMenuLocationMap
+											}
 										/>
 									</td>
 								</tr>
