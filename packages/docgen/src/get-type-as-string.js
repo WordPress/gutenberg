@@ -33,6 +33,10 @@ const getType = ( ast, typeString ) => {
 			: `(${ type })`;
 	}
 
+	if ( ast.type === 'OPTIONAL' ) {
+		return `[${ getType( ast.value ) }]`;
+	}
+
 	return typeString || 'unknown type';
 };
 
