@@ -125,6 +125,8 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$block        = new WP_Block( $parsed_block, $context, $this->registry );
 
 		$this->assertEquals( array( 'defaulted' => 10 ), $block->attributes );
+		// Intentionally call a second time, to ensure property was assigned.
+		$this->assertEquals( array( 'defaulted' => 10 ), $block->attributes );
 	}
 
 	function test_constructor_assigns_context_from_block_type() {

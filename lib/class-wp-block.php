@@ -151,7 +151,7 @@ class WP_Block {
 	 * @return array|null Prepared attributes, or null.
 	 */
 	public function __get( $name ) {
-		if ( 'attributes' === $name && ! isset( $this->attributes ) ) {
+		if ( 'attributes' === $name ) {
 			$this->attributes = isset( $this->parsed_block['attrs'] ) ?
 				$this->parsed_block['attrs'] :
 				array();
