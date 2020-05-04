@@ -1,6 +1,6 @@
 const { parse } = require( 'jsdoctypeparser' );
 
-const getType = ( ast, typeString ) => {
+const getType = ( ast, typeString, noUnionParenthesis ) => {
 	if ( ast.type === 'NAME' ) {
 		return ast.name;
 	}
@@ -23,7 +23,11 @@ const getType = ( ast, typeString ) => {
 	}
 
 	if ( ast.type === 'UNION' ) {
-		return `(${ getType( ast.left ) }|${ getType( ast.right ) })`;
+		const left = getType( ast.left );
+		const right = getType( ast.right, null, true );
+		const type = `${ left }|${ right }`;
+
+		return noUnionParenthesis ? type : `(${ type })`;
 	}
 
 	if ( ast.type === 'PARENTHESIS' ) {

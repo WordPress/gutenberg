@@ -49,6 +49,11 @@ describe( 'getType from JSDoc', () => {
 		expect( type ).toBe( '(null|undefined)' );
 	} );
 
+	it( 'Union 3', () => {
+		const type = getType( 'a|b|c|d' );
+		expect( type ).toBe( '(a|b|c|d)' );
+	} );
+
 	it( 'Optional', () => {
 		const type = getType( 'string=' );
 		expect( type ).toBe( '[string]' );
