@@ -262,6 +262,7 @@ const App = () => {
 	} );
 
 	it( 'tabs in code example are preserved even when the first char after * is a tab', () => {
+		// Adapted from edit-post/src/components/sidebar/plugin-document-setting-panel/index.js
 		const code = `
  *
  * @example
@@ -288,7 +289,7 @@ const MyDocumentSettingTest = () => (
 	} );
 
 	it( 'spaces in code example are preserved', () => {
-		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
+		// Adapted from packages/data/src/components/with-dispatch/index.js
 		const code = `
  *
  * @example
