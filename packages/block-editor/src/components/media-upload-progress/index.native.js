@@ -117,10 +117,16 @@ export class MediaUploadProgress extends React.Component {
 	}
 
 	render() {
-		const { coverUrl, width, height } = this.props;
+		const {
+			coverUrl,
+			width,
+			height,
+			renderContent = () => {},
+		} = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
+		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
 			'Failed to insert media.\nPlease tap for options.'
 		);
@@ -155,7 +161,7 @@ export class MediaUploadProgress extends React.Component {
 							) {
 								finalWidth = width;
 							}
-							return this.props.renderContent( {
+							return renderContent( {
 								isUploadInProgress,
 								isUploadFailed,
 								finalWidth,
@@ -167,7 +173,7 @@ export class MediaUploadProgress extends React.Component {
 					</ImageSize>
 				) }
 				{ ! coverUrl &&
-					this.props.renderContent( {
+					renderContent( {
 						isUploadInProgress,
 						isUploadFailed,
 						retryMessage,

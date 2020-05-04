@@ -31,9 +31,6 @@ const BlockInspector = ( {
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
 } ) => {
-	const slot = useSlot( InspectorAdvancedControls.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
-
 	if ( count > 1 ) {
 		return <MultiSelectionInspector />;
 	}
@@ -79,18 +76,31 @@ const BlockInspector = ( {
 			) }
 			<InspectorControls.Slot bubblesVirtually />
 			<div>
-				{ hasFills && (
-					<PanelBody
-						className="block-editor-block-inspector__advanced"
-						title={ __( 'Advanced' ) }
-						initialOpen={ false }
-					>
-						<InspectorAdvancedControls.Slot bubblesVirtually />
-					</PanelBody>
-				) }
+				<AdvancedControls
+					slotName={ InspectorAdvancedControls.slotName }
+				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
+	);
+};
+
+const AdvancedControls = ( { slotName } ) => {
+	const slot = useSlot( slotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return null;
+	}
+
+	return (
+		<PanelBody
+			className="block-editor-block-inspector__advanced"
+			title={ __( 'Advanced' ) }
+			initialOpen={ false }
+		>
+			<InspectorAdvancedControls.Slot bubblesVirtually />
+		</PanelBody>
 	);
 };
 

@@ -287,12 +287,17 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  *
  * @param {(string|string[])} clientIds     Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to
- *                                          select.
+ * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {number}            initialPosition Index of caret after in the selected block after the operation.
  *
  * @yield {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
+export function* replaceBlocks(
+	clientIds,
+	blocks,
+	indexToSelect,
+	initialPosition
+) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -322,6 +327,7 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 		blocks,
 		time: Date.now(),
 		indexToSelect,
+		initialPosition,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -788,7 +794,7 @@ export function updateBlockListSettings( clientId, settings ) {
 	};
 }
 
-/*
+/**
  * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
@@ -989,4 +995,18 @@ export function* insertAfterBlock( clientId ) {
 		rootClientId
 	);
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
+}
+
+/**
+ * Returns an action object that toggles the highlighted block state.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} isHighlighted The highlight state.
+ */
+export function toggleBlockHighlight( clientId, isHighlighted ) {
+	return {
+		type: 'TOGGLE_BLOCK_HIGHLIGHT',
+		clientId,
+		isHighlighted,
+	};
 }

@@ -317,7 +317,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
           value="00"
         />
       </div>
-      <ButtonGroup
+      <ForwardRef(ButtonGroup)
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
@@ -336,7 +336,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
         >
           PM
         </ForwardRef(Button)>
-      </ButtonGroup>
+      </ForwardRef(ButtonGroup)>
     </div>
   </fieldset>
 </div>
@@ -498,7 +498,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
           value="00"
         />
       </div>
-      <ButtonGroup
+      <ForwardRef(ButtonGroup)
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
@@ -517,7 +517,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
         >
           PM
         </ForwardRef(Button)>
-      </ButtonGroup>
+      </ForwardRef(ButtonGroup)>
     </div>
   </fieldset>
 </div>

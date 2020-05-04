@@ -9,7 +9,7 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'adding blocks', () => {
+describe( 'Block Switcher', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );

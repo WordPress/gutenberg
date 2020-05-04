@@ -133,6 +133,7 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	announceCurrentValue( value ) {
+		/* translators: %s: current cell value. */
 		const announcement = sprintf( __( 'Current value is %s' ), value );
 		AccessibilityInfo.announceForAccessibility( announcement );
 	}
@@ -182,6 +183,7 @@ class BottomSheetRangeCell extends Component {
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
+				activeOpacity={ 1 }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
 				accessibilityLabel={ accessibilityLabel }

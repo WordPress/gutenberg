@@ -1,5 +1,7 @@
 ## Master
 
+## 1.1.0 (2020-04-01)
+
 ### New Feature
 
 -   URLs for ZIP files are now supported as core, plugin, and theme sources.

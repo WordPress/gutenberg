@@ -18,6 +18,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Component, createRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -115,7 +116,6 @@ class VideoEdit extends Component {
 	render() {
 		const { id, caption, controls, poster, src } = this.props.attributes;
 		const {
-			className,
 			instanceId,
 			isSelected,
 			noticeUI,
@@ -137,17 +137,18 @@ class VideoEdit extends Component {
 
 		if ( ! src ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectVideo }
-					onSelectURL={ this.onSelectURL }
-					accept="video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ this.onUploadError }
-				/>
+				<Block.div>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						onSelect={ onSelectVideo }
+						onSelectURL={ this.onSelectURL }
+						accept="video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ this.onUploadError }
+					/>
+				</Block.div>
 			);
 		}
 		const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
@@ -200,6 +201,7 @@ class VideoEdit extends Component {
 								<p id={ videoPosterDescription } hidden>
 									{ this.props.attributes.poster
 										? sprintf(
+												/* translators: %s: poster image URL. */
 												__(
 													'The current poster image url is %s'
 												),
@@ -221,7 +223,7 @@ class VideoEdit extends Component {
 						</MediaUploadCheck>
 					</PanelBody>
 				</InspectorControls>
-				<figure className={ className }>
+				<Block.figure>
 					{ /*
 						Disable the video tag so the user clicking on it won't play the
 						video when the controls are enabled.
@@ -245,7 +247,7 @@ class VideoEdit extends Component {
 							inlineToolbar
 						/>
 					) }
-				</figure>
+				</Block.figure>
 			</>
 		);
 	}

@@ -212,7 +212,6 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
-						tagName="span"
 						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) =>
@@ -228,11 +227,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
@@ -285,6 +279,11 @@ function NavigationLinkEdit( {
 						</Popover>
 					) }
 				</div>
+				{ showSubmenuIcon && (
+					<span className="wp-block-navigation-link__submenu-icon">
+						<ItemSubmenuIcon />
+					</span>
+				) }
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={

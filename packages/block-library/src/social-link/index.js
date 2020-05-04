@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { share as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +21,9 @@ export const settings = {
 	supports: {
 		reusable: false,
 		html: false,
+		lightBlockWrapper: true,
 	},
+	icon,
 	edit,
 	description: __(
 		'Display an icon linking to a social media profile or website.'

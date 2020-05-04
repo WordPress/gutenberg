@@ -31,7 +31,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { Block } from './block-wrapper';
 
-export const BlockContext = createContext();
+export const BlockListBlockContext = createContext();
 
 function BlockListBlock( {
 	mode,
@@ -39,6 +39,7 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	rootClientId,
+	isHighlighted,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -61,7 +62,6 @@ function BlockListBlock( {
 	enableAnimation,
 	isNavigationMode,
 	isMultiSelecting,
-	hasSelectedUI = true,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -87,14 +87,13 @@ function BlockListBlock( {
 		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
-	if ( ! lightBlockWrapper && blockType.getEditWrapperProps ) {
+	if ( blockType.getEditWrapperProps ) {
 		wrapperProps = {
 			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
 		};
 	}
 
-	const isAligned = wrapperProps && wrapperProps[ 'data-align' ];
 	const generatedClassName =
 		lightBlockWrapper && hasBlockSupport( blockType, 'className', true )
 			? getBlockDefaultClassName( name )
@@ -107,11 +106,11 @@ function BlockListBlock( {
 	const wrapperClassName = classnames(
 		generatedClassName,
 		customClassName,
-		'wp-block block-editor-block-list__block',
+		'block-editor-block-list__block',
 		{
-			'has-selected-ui': hasSelectedUI,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
 			'is-selected': isSelected,
+			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': isDragging,
@@ -120,7 +119,6 @@ function BlockListBlock( {
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock,
-			'is-block-collapsed': isAligned,
 		},
 		className
 	);
@@ -143,13 +141,6 @@ function BlockListBlock( {
 			toggleSelection={ toggleSelection }
 		/>
 	);
-
-	// For aligned blocks, provide a wrapper element so the block can be
-	// positioned relative to the block column. This is enabled with the
-	// .is-block-content className.
-	if ( ! lightBlockWrapper && isAligned ) {
-		blockEdit = <div className="is-block-content">{ blockEdit }</div>;
-	}
 
 	if ( mode !== 'visual' ) {
 		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
@@ -176,7 +167,7 @@ function BlockListBlock( {
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
 	return (
-		<BlockContext.Provider value={ memoizedValue }>
+		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
 				{ isValid && lightBlockWrapper && (
 					<>
@@ -208,7 +199,7 @@ function BlockListBlock( {
 					<BlockCrashWarning />
 				</Block.div>
 			) }
-		</BlockContext.Provider>
+		</BlockListBlockContext.Provider>
 	);
 }
 
@@ -228,6 +219,7 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
+			isBlockHighlighted,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -248,6 +240,7 @@ const applyWithSelect = withSelect(
 		const { name, attributes, isValid } = block || {};
 
 		return {
+			isHighlighted: isBlockHighlighted( clientId ),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||
@@ -329,14 +322,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect ) {
+		onReplace( blocks, indexToSelect, initialPosition ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
-			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+			replaceBlocks(
+				[ ownProps.clientId ],
+				blocks,
+				indexToSelect,
+				initialPosition
+			);
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );

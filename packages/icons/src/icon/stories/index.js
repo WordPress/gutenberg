@@ -42,7 +42,7 @@ export const _default = () => {
 
 const LibraryExample = () => {
 	const [ filter, setFilter ] = useState( '' );
-	const filteredIcons = omitBy( availableIcons, ( icon, name ) => {
+	const filteredIcons = omitBy( availableIcons, ( _icon, name ) => {
 		return name.indexOf( filter ) === -1;
 	} );
 	return (

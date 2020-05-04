@@ -29,6 +29,11 @@ import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
+
 export class BlockSwitcher extends Component {
 	constructor() {
 		super( ...arguments );
@@ -99,7 +104,7 @@ export class BlockSwitcher extends Component {
 
 		return (
 			<Dropdown
-				position="bottom right"
+				popoverProps={ POPOVER_PROPS }
 				className="block-editor-block-switcher"
 				contentClassName="block-editor-block-switcher__popover"
 				renderToggle={ ( { onToggle, isOpen } ) => {
@@ -114,6 +119,7 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
+									/* translators: %s: number of blocks. */
 									_n(
 										'Change type of %d block',
 										'Change type of %d blocks',
