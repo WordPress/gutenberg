@@ -208,8 +208,8 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		'postId'   => $post->ID,
 		/*
 		 * The `postType` context is largely unnecessary server-side, since the
-		 * ID is usually sufficient on its own. That being said, since a block
-		 * manifests is expected to be shared between the server and the client,
+		 * ID is usually sufficient on its own. That being said, since a block's
+		 * manifest is expected to be shared between the server and the client,
 		 * it should be included to consistently fulfill the expectation.
 		 */
 		'postType' => $post->post_type,
