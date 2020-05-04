@@ -3,21 +3,21 @@
  */
 
 /**
- * @typedef {object} WordCountSettingsFields
- * @property {RegExp} HTMLRegExp
- * @property {RegExp} HTMLcommentRegExp
- * @property {RegExp} spaceRegExp
- * @property {RegExp} HTMLEntityRegExp
- * @property {RegExp} connectorRegExp
- * @property {RegExp} removeRegExp
- * @property {RegExp} astralRegExp
- * @property {RegExp} wordsRegExp
- * @property {RegExp} characters_excluding_spacesRegExp
- * @property {RegExp} characters_including_spacesRegExp
- * @property {RegExp} shortcodesRegExp
- * @property {string[]} shortcodes
- * @property {WordCountStrategy} type
- * @property {Partial<{type: WordCountStrategy, shortcodes: string[]}>} l10n
+ * @typedef {Object} WordCountSettingsFields
+ * @property {RegExp} HTMLRegExp Regular expression that matches HTML tags
+ * @property {RegExp} HTMLcommentRegExp Regular expression that matches HTML comments
+ * @property {RegExp} spaceRegExp Regular expression that matches spaces in HTML
+ * @property {RegExp} HTMLEntityRegExp Regular expression that matches HTML entities
+ * @property {RegExp} connectorRegExp Regular expression that matches word connectors, like em-dash
+ * @property {RegExp} removeRegExp Regular expression that matches various characters to be removed when counting
+ * @property {RegExp} astralRegExp Regular expression that matches astral UTF-16 code points
+ * @property {RegExp} wordsRegExp Regular expression that matches words
+ * @property {RegExp} characters_excluding_spacesRegExp Regular expression that matches characters excluding spaces
+ * @property {RegExp} characters_including_spacesRegExp Regular expression that matches characters including spaces
+ * @property {RegExp} shortcodesRegExp Regular expression that matches WordPress shortcodes
+ * @property {string[]} shortcodes List of all shortcodes
+ * @property {WordCountStrategy} type Describes what and how are we counting
+ * @property {Partial<{type: WordCountStrategy, shortcodes: string[]}>} l10n Object with human translations
  */
 
 /**
