@@ -19,7 +19,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import styles from './style';
+import styles from './style.scss';
 
 const Tooltip = ( { onTooltipHidden } ) => {
 	const [ visible, setVisible ] = useState( true );
