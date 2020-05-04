@@ -121,12 +121,11 @@ jobs:
         - TEST_ENV=sauce
         - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
         - ANDROID_COMPILE_API=29
+        - ANDROID_API=28
         - ANDROID_BUILD_TOOLS_VERSION=29.0.6
         - ANDROID_ABI=x86_64
         - ANDROID_EMU_FLAVOR=default # or google_apis
         - ADB_INSTALL_TIMEOUT=8
-      matrix:
-        - ANDROID_API=28
       android:
         components:
           - tools
@@ -134,8 +133,6 @@ jobs:
           - tools
           - extra-android-m2repository
           - extra-android-support
-          - build-tools-29.0.0
-          - build-tools-29.0.2
           - build-tools-$ANDROID_BUILD_TOOLS_VERSION
           - android-$ANDROID_API
           - android-$COMPILE_API
