@@ -13,7 +13,6 @@ import { render } from '@wordpress/element';
  */
 import './hooks';
 import './store';
-import './plugins';
 import Editor from './components/editor';
 
 /**
