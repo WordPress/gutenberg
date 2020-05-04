@@ -12,29 +12,27 @@ import MenuSelectControl from './menu-select-control';
 import useMenuLocations from './use-menu-locations';
 
 export default function MenuLocationsEditor() {
-	const availableMenus = useSelect( ( select ) =>
-		select( 'core' ).getMenus()
-	);
+	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
 
 	const [
-		availableLocations,
+		menuLocations,
 		saveMenuLocations,
 		assignMenuToLocation,
 	] = useMenuLocations();
 
-	if ( ! availableMenus || ! availableLocations ) {
+	if ( ! menus || ! menuLocations ) {
 		return <Spinner />;
 	}
 
 	const menuSelectControlOptions = [
 		{ value: 0, label: __( '— Select a Menu —' ) },
-		...availableMenus.map( ( { id, name } ) => ( {
+		...menus.map( ( { id, name } ) => ( {
 			value: id,
 			label: name,
 		} ) ),
 	];
 
-	if ( availableLocations.length === 0 ) {
+	if ( menuLocations.length === 0 ) {
 		return (
 			<Panel className="edit-navigation-menu-editor__panel">
 				<PanelBody title={ __( 'Menu locations' ) }>
@@ -44,7 +42,7 @@ export default function MenuLocationsEditor() {
 		);
 	}
 
-	if ( availableMenus.length === 0 ) {
+	if ( menus.length === 0 ) {
 		return (
 			<Panel className="edit-navigation-menu-editor__panel">
 				<PanelBody title={ __( 'Menu locations' ) }>
@@ -57,7 +55,7 @@ export default function MenuLocationsEditor() {
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
 			<PanelBody title={ __( 'Menu locations' ) }>
-			<form onSubmit={ saveMenuLocations } >
+				<form onSubmit={ saveMenuLocations }>
 					<table>
 						<thead>
 							<tr>
@@ -66,7 +64,7 @@ export default function MenuLocationsEditor() {
 							</tr>
 						</thead>
 						<tbody>
-							{ availableLocations.map( ( location ) => (
+							{ menuLocations.map( ( location ) => (
 								<tr key={ location.name }>
 									<td>{ location.description }</td>
 									<td>

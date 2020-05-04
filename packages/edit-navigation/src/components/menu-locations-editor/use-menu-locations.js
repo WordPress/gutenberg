@@ -11,7 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
 
 export default function useMenuLocations() {
 	const { saveMenu } = useDispatch( 'core' );
-	const [ availableLocations, setAvailableLocations ] = useState( null );
+	const [ menuLocations, setMenuLocations ] = useState( null );
 
 	// a local state which maps menus to locations
 	// so that we can send one call per menu when
@@ -19,7 +19,7 @@ export default function useMenuLocations() {
 	// we'd send one call per location
 	const [ menuLocationMap, setMenuLocationMap ] = useState( {} );
 
-	const fetchAvailableLocations = async () => {
+	const fetchmenuLocations = async () => {
 		const path = '/__experimental/menu-locations';
 		const apiLocations = await apiFetch( {
 			path,
@@ -28,29 +28,29 @@ export default function useMenuLocations() {
 		return flatMap( apiLocations );
 	};
 
-	const initAvailableLocations = async () => {
-		const latestLocations = await fetchAvailableLocations();
-		setAvailableLocations( latestLocations );
+	const initmenuLocations = async () => {
+		const latestLocations = await fetchmenuLocations();
+		setMenuLocations( latestLocations );
 	};
 
 	// we need to fecth the list of locations
 	// because the menu location entity
 	// caches their menu associations
 	useEffect( () => {
-		initAvailableLocations();
+		initmenuLocations();
 	}, [] );
 
 	// as soon as we have the menus we group
 	// all locations by the menuId they are assigned to
 	useEffect( () => {
-		if ( availableLocations ) {
-			const locationsByMenu = groupBy( availableLocations, 'menu' );
+		if ( menuLocations ) {
+			const locationsByMenu = groupBy( menuLocations, 'menu' );
 			forEach( locationsByMenu, ( location, menuId ) => {
 				locationsByMenu[ menuId ] = map( location, 'name' );
 			} );
 			setMenuLocationMap( locationsByMenu );
 		}
-	}, [ availableLocations ] );
+	}, [ menuLocations ] );
 
 	const assignMenuToLocation = ( oldMenuId, { newLocation, newMenuId } ) => {
 		const newMenuLocationMap = {
@@ -79,18 +79,14 @@ export default function useMenuLocations() {
 		}
 		// we need to fetch the locations again after
 		// we've updated their menu associations
-		await initAvailableLocations();
+		await initmenuLocations();
 	};
 
 	const saveMenuLocations = ( event ) => {
 		event.preventDefault();
-		setAvailableLocations( null );
+		setMenuLocations( null );
 		updateLocations();
-	}
+	};
 
-	return [
-		availableLocations,
-		saveMenuLocations,
-		assignMenuToLocation,
-	];
+	return [ menuLocations, saveMenuLocations, assignMenuToLocation ];
 }
