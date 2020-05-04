@@ -15,7 +15,7 @@ import { PinnedItems } from '@wordpress/interface';
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import __experimentalSiteEditorCloseArea from './close-area';
+import MainDashboardButton from './main-dashboard-button';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
@@ -62,7 +62,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<__experimentalSiteEditorCloseArea.Slot />
+			<MainDashboardButton.Slot />
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
