@@ -206,6 +206,7 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
 	$context      = array(
 		'postId'   => $post->ID,
+
 		/*
 		 * The `postType` context is largely unnecessary server-side, since the
 		 * ID is usually sufficient on its own. That being said, since a block's

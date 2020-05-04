@@ -141,7 +141,7 @@ class Block_Context_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'gutenberg/test-context-consumer',
 			array(
-				'context' => array( 'postId', 'postType' ),
+				'context'         => array( 'postId', 'postType' ),
 				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
 					$provided_context[] = $block->context;
 
