@@ -42,6 +42,7 @@
 		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/token-list": "file:../token-list",
+		"@wordpress/shortcode": "file:../shortcode",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
