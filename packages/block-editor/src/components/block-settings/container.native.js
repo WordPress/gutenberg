@@ -35,7 +35,7 @@ function BottomSheetSettings( {
 			<BottomSheetConsumer>
 				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
 					switch ( currentScreen ) {
-						case colorsUtils.subsheets[ 1 ]:
+						case colorsUtils.subsheets.color:
 							return (
 								<ColorSettings
 									defaultSettings={ defaultSettings }
@@ -43,7 +43,7 @@ function BottomSheetSettings( {
 									{ ...extraProps }
 								/>
 							);
-						case colorsUtils.subsheets[ 0 ]:
+						case colorsUtils.subsheets.settings:
 						default:
 							return <InspectorControls.Slot />;
 					}

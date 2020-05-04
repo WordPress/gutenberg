@@ -1,5 +1,8 @@
 export const colorsUtils = {
-	subsheets: [ 'Settings', 'Color' ],
+	subsheets: {
+		settings: 'Settings',
+		color: 'Color',
+	},
 	segments: [ 'Solid', 'Gradient' ],
 	isGradient: ( color ) => color?.includes( 'linear-gradient' ),
 };

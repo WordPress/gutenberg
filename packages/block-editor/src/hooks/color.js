@@ -250,10 +250,7 @@ export function ColorEdit( props ) {
 			clientId={ props.clientId }
 			settings={ [
 				{
-					label:
-						Platform.OS === 'web'
-							? __( 'Text Color' )
-							: __( 'Text' ),
+					label: __( 'Text Color' ),
 					onColorChange: onChangeColor( 'text' ),
 					colorValue: getColorObjectByAttributeValues(
 						colors,
@@ -262,10 +259,7 @@ export function ColorEdit( props ) {
 					).color,
 				},
 				{
-					label:
-						Platform.OS === 'web'
-							? __( 'Background Color' )
-							: __( 'Background' ),
+					label: __( 'Background Color' ),
 					onColorChange: onChangeColor( 'background' ),
 					colorValue: getColorObjectByAttributeValues(
 						colors,
