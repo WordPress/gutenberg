@@ -7,6 +7,10 @@ import { clamp, noop } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { useControlledState } from '../utils/hooks';
 
 /**
  * A float supported clamp function for a specific value.
@@ -29,24 +33,22 @@ export function floatClamp( value, min, max ) {
  * Hook to store a clamped value, derived from props.
  */
 export function useControlledRangeValue( { min, max, value: valueProp } ) {
-	const [ value, setValue ] = useState( floatClamp( valueProp, min, max ) );
-	const valueRef = useRef( value );
+	const [ value, setValue ] = useControlledState(
+		floatClamp( valueProp, min, max )
+	);
 
 	const setClampValue = useCallback(
 		( nextValue ) => {
-			setValue( floatClamp( nextValue, min, max ) );
+			if ( nextValue === null ) {
+				setValue( null );
+			} else {
+				setValue( floatClamp( nextValue, min, max ) );
+			}
 		},
-		[ setValue, min, max ]
+		[ min, max ]
 	);
 
-	useEffect( () => {
-		if ( valueRef.current !== valueProp ) {
-			setClampValue( valueProp );
-			valueRef.current = valueProp;
-		}
-	}, [ valueProp, setValue ] );
-
-	return [ value, setValue ];
+	return [ value, setClampValue ];
 }
 
 /**
