@@ -296,7 +296,7 @@ _Returns_
 <a name="getFontSize" href="#getFontSize">#</a> **getFontSize**
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
-	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
+If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
 
