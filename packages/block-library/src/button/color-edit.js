@@ -7,7 +7,7 @@ import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, Platform } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,6 +22,8 @@ import {
 	ContrastChecker,
 	InspectorControls,
 } from '@wordpress/block-editor';
+
+const isWebPlatform = Platform.OS === 'web';
 
 // The code in this file is copied entirely from the "color" and "style" support flags
 // The flag can't be used at the moment because of the extra wrapper around
@@ -50,7 +52,7 @@ const cleanEmptyObject = ( object ) => {
 		: cleanedNestedObjects;
 };
 
-function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
+function ColorPanel( { settings, clientId, enableContrastChecking = isWebPlatform } ) {
 	const { getComputedStyle, Node } = window;
 
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
@@ -191,7 +193,7 @@ function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
-			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
+			enableContrastChecking={ isWebPlatform && ! gradient && ! style?.color?.gradient }
 			clientId={ props.clientId }
 			settings={ [
 				{

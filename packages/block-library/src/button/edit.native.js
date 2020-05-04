@@ -41,6 +41,8 @@ import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
 import LinkRelIcon from './link-rel';
+import ColorEdit from './color-edit';
+import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -174,6 +176,7 @@ class ButtonEdit extends Component {
 	getBackgroundColor() {
 		const { backgroundColor, attributes, wrapperProps } = this.props;
 		const { gradient, customGradient } = attributes;
+		const colorProps = getColorAndStyleProps( attributes );
 		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
@@ -185,7 +188,7 @@ class ButtonEdit extends Component {
 			);
 		}
 		return (
-			wrapperProps?.style?.backgroundColor ||
+			wrapperProps?.style?.backgroundColor || colorProps.style?.backgroundColor ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
@@ -193,10 +196,11 @@ class ButtonEdit extends Component {
 	}
 
 	getTextColor() {
-		const { textColor, wrapperProps } = this.props;
+		const { textColor, wrapperProps, attributes } = this.props;
+		const colorProps = getColorAndStyleProps( attributes );
 
 		return (
-			wrapperProps?.style?.color ||
+			wrapperProps?.style?.color || colorProps.style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.defaultButton.color
@@ -522,6 +526,7 @@ class ButtonEdit extends Component {
 					/>
 				</BottomSheet>
 
+				<ColorEdit {...this.props} />
 				<InspectorControls>
 					<PanelBody title={ __( 'Border Settings' ) }>
 						<RangeControl
