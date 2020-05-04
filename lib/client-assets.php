@@ -645,7 +645,7 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(
-		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		WP_Patterns_Registry::get_instance()->get_all_registered(),
 		$settings['__experimentalBlockPatterns']
 	);
 
