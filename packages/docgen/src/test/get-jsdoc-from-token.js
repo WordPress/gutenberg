@@ -425,4 +425,39 @@ Find something here.
 			],
 		} );
 	} );
+
+	it( '@typedef and @property', () => {
+		// Adapted from block-editor/src/store/selectors.js
+		const code = `
+ *
+ * @typedef {Object} WPEditorInserterItem
+ * @property {string}   id                Unique identifier for the item.
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description: '',
+			tags: [
+				{
+					title: 'typedef',
+					type: 'Object',
+					name: 'WPEditorInserterItem',
+					description: '',
+				},
+				{
+					title: 'property',
+					name: 'id',
+					type: 'string',
+					description: 'Unique identifier for the item.',
+				},
+			],
+		} );
+	} );
 } );

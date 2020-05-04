@@ -101,6 +101,24 @@ module.exports = function( token ) {
 					};
 				}
 
+				if ( title === 'typedef' ) {
+					return {
+						title,
+						name,
+						type: getTypeAsString( type, optional ),
+						description,
+					};
+				}
+
+				if ( title === 'property' ) {
+					return {
+						title,
+						name,
+						type: getTypeAsString( type, optional ),
+						description,
+					};
+				}
+
 				return {
 					title,
 					description,
