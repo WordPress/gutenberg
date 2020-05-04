@@ -392,4 +392,37 @@ var __ = wp.i18n.__;
 
 		expectToExtractExample( code, description );
 	} );
+
+	it( '@see tag with explanation', () => {
+		const code = `
+ *
+ * @see https://google.com
+ *
+ * Find something here.
+`.trim();
+
+		const description = `
+https://google.com
+
+Find something here.
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description: '',
+			tags: [
+				{
+					title: 'see',
+					description,
+				},
+			],
+		} );
+	} );
 } );

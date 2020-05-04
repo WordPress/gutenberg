@@ -36,10 +36,20 @@ module.exports = function( token ) {
 				const mergeNameAndDesc = () =>
 					`${ name } ${ description }`.trim();
 
-				if ( title === 'deprecated' || title === 'see' ) {
+				if ( title === 'deprecated' ) {
 					return {
 						title,
 						description: mergeNameAndDesc(),
+					};
+				}
+
+				if ( title === 'see' ) {
+					return {
+						title,
+						description:
+							name.match( /https?:\/\// ) !== null
+								? `${ name }\n\n${ description }`.trim()
+								: mergeNameAndDesc(),
 					};
 				}
 
