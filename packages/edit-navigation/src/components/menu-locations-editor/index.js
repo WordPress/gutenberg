@@ -18,9 +18,8 @@ export default function MenuLocationsEditor() {
 
 	const [
 		availableLocations,
-		setAvailableLocations,
-		updateLocations,
-		updateMenuLocationMap,
+		saveMenuLocations,
+		assignMenuToLocation,
 	] = useMenuLocations();
 
 	if ( ! availableMenus || ! availableLocations ) {
@@ -58,13 +57,7 @@ export default function MenuLocationsEditor() {
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
 			<PanelBody title={ __( 'Menu locations' ) }>
-				<form
-					onSubmit={ ( event ) => {
-						event.preventDefault();
-						setAvailableLocations( null );
-						updateLocations();
-					} }
-				>
+			<form onSubmit={ saveMenuLocations } >
 					<table>
 						<thead>
 							<tr>
@@ -83,7 +76,7 @@ export default function MenuLocationsEditor() {
 												menuSelectControlOptions
 											}
 											onSelectMenu={
-												updateMenuLocationMap
+												assignMenuToLocation
 											}
 										/>
 									</td>

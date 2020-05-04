@@ -52,7 +52,7 @@ export default function useMenuLocations() {
 		}
 	}, [ availableLocations ] );
 
-	const updateMenuLocationMap = ( oldMenuId, { newLocation, newMenuId } ) => {
+	const assignMenuToLocation = ( oldMenuId, { newLocation, newMenuId } ) => {
 		const newMenuLocationMap = {
 			...menuLocationMap,
 			[ oldMenuId ]: filter(
@@ -82,10 +82,15 @@ export default function useMenuLocations() {
 		await initAvailableLocations();
 	};
 
+	const saveMenuLocations = ( event ) => {
+		event.preventDefault();
+		setAvailableLocations( null );
+		updateLocations();
+	}
+
 	return [
 		availableLocations,
-		setAvailableLocations,
-		updateLocations,
-		updateMenuLocationMap,
+		saveMenuLocations,
+		assignMenuToLocation,
 	];
 }
