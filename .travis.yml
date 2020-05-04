@@ -138,8 +138,8 @@ jobs:
           - android-$COMPILE_API
       before_install:
         - touch $HOME/.android/repositories.cfg
-        - yes | sdkmanager "emulator"
-        - yes | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
+        - echo y | sdkmanager "emulator"
+        - echo y | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
         - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
