@@ -223,9 +223,6 @@ glob.stream( [
 					{ shell: true }
 				);
 			} catch ( error ) {
-				// Disable reason: Errors should log to console.
-
-				// eslint-disable-next-line no-console
 				console.error( error );
 				process.exit( 1 );
 			}

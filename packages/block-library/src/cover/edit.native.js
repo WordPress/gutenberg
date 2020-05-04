@@ -292,8 +292,6 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					// eslint-disable-next-line no-undef
-					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -327,8 +325,6 @@ const Cover = ( {
 			</View>
 
 			<MediaUpload
-				// eslint-disable-next-line no-undef
-				__experimentalOnlyMediaLibrary={ ! __DEV__ }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }

@@ -75,9 +75,9 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  *
  * const MyPluginBlockSettingsMenuItem = () => (
  *     <PluginBlockSettingsMenuItem
- * 		allowedBlocks=[ 'core/paragraph' ]
+ * 		allowedBlocks={ [ 'core/paragraph' ] }
  * 		icon='dashicon-name'
- * 		label=__( 'Menu item text' )
+ * 		label={ __( 'Menu item text' ) }
  * 		onClick={ doOnClick } />
  * );
  * ```

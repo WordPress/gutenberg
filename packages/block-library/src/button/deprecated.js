@@ -85,6 +85,75 @@ const deprecated = [
 		supports: {
 			align: true,
 			alignWide: false,
+			__experimentalColor: { gradients: true },
+		},
+		attributes: {
+			...blockAttributes,
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'target',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'rel',
+			},
+			placeholder: {
+				type: 'string',
+			},
+			borderRadius: {
+				type: 'number',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			style: {
+				type: 'object',
+			},
+		},
+		save( { attributes } ) {
+			const {
+				borderRadius,
+				linkTarget,
+				rel,
+				text,
+				title,
+				url,
+			} = attributes;
+			const buttonClasses = classnames( 'wp-block-button__link', {
+				'no-border-radius': borderRadius === 0,
+			} );
+			const buttonStyle = {
+				borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+			};
+
+			return (
+				<RichText.Content
+					tagName="a"
+					className={ buttonClasses }
+					href={ url }
+					title={ title }
+					style={ buttonStyle }
+					value={ text }
+					target={ linkTarget }
+					rel={ rel }
+				/>
+			);
+		},
+	},
+	{
+		supports: {
+			align: true,
+			alignWide: false,
 		},
 		attributes: {
 			...blockAttributes,
@@ -125,6 +194,11 @@ const deprecated = [
 				type: 'string',
 			},
 		},
+
+		isEligible: ( attributes ) =>
+			!! attributes.customTextColor ||
+			!! attributes.customBackgroundColor ||
+			!! attributes.customGradient,
 		migrate: migrateCustomColorsAndGradients,
 		save( { attributes } ) {
 			const {
