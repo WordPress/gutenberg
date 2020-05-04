@@ -70,10 +70,9 @@ describe( 'Intermediate Representation', function() {
 			tags: [
 				{
 					description: 'Callback function.',
-					errors: [ 'unexpected token' ],
 					name: 'callback',
 					title: 'param',
-					type: null,
+					type: 'unknown type',
 				},
 			],
 			lineStart: 7,

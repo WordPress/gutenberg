@@ -183,6 +183,34 @@ describe( 'Parse JSDoc and extract description and tags', () => {
 		} );
 	} );
 
+	it( 'handles parse failure', () => {
+		const code = `
+ *
+ * WordPress
+ * @param {A&B} callback It's OK in TypeScript. But it's not in JSDoc.
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description: 'WordPress',
+			tags: [
+				{
+					title: 'param',
+					description: `It's OK in TypeScript. But it's not in JSDoc.`,
+					name: 'callback',
+					type: 'unknown type',
+				},
+			],
+		} );
+	} );
+
 	it( 'handles code block in description', () => {
 		// Adapted from rich-text/src/create.js
 		const code = `
