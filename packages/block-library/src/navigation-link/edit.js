@@ -261,7 +261,12 @@ function NavigationLinkEdit( {
 									id,
 								} = {} ) =>
 									setAttributes( {
-										url: encodeURI( newURL ),
+										url: ( () => {
+											if ( id ) {
+												return undefined;
+											}
+											return encodeURI( newURL );
+										} )(),
 										label: ( () => {
 											const normalizedTitle = newTitle.replace(
 												/http(s?):\/\//gi,
