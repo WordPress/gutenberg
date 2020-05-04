@@ -62,15 +62,18 @@ function loadSettings( type, userSettings ) {
 }
 
 /**
- * Match the regex for the type 'words'
+ * Count the words in text
  *
  * @param {string} text     The text being processed
  * @param {RegExp|undefined} regex    The regular expression pattern being matched
  * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
  *
- * @return {Array|{index: number, input: string}} The matched string.
+ * @return {number} The matched string.
  */
-function matchWords( text, regex, settings ) {
+function countWords( text, regex, settings ) {
+	if ( typeof regex === 'undefined' ) {
+		return 0;
+	}
 	text = flow(
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),
@@ -81,19 +84,22 @@ function matchWords( text, regex, settings ) {
 		stripRemovables.bind( null, settings )
 	)( text );
 	text = text + '\n';
-	return text.match( regex );
+	return text.match( regex )?.length ?? 0;
 }
 
 /**
- * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
+ * Count the characters in text
  *
  * @param {string} text     The text being processed
  * @param {RegExp|undefined} regex    The regular expression pattern being matched
  * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
  *
- * @return {Array|{index: number, input: string}} The matched string.
+ * @return {number} Count of characters.
  */
-function matchCharacters( text, regex, settings ) {
+function countCharacters( text, regex, settings ) {
+	if ( typeof regex === 'undefined' ) {
+		return 0;
+	}
 	text = flow(
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),
@@ -103,7 +109,7 @@ function matchCharacters( text, regex, settings ) {
 		transposeHTMLEntitiesToCountableChars.bind( null, settings )
 	)( text );
 	text = text + '\n';
-	return text.match( regex );
+	return text.match( regex )?.length ?? 0;
 }
 
 /**
@@ -123,18 +129,19 @@ function matchCharacters( text, regex, settings ) {
  */
 
 export function count( text, type, userSettings ) {
-	if ( '' === text ) {
-		return 0;
+	const settings = loadSettings( type, userSettings );
+	let matchRegExp;
+	if ( settings.type === 'words' ) {
+		matchRegExp = settings.wordsRegExp;
+		return countWords( text, matchRegExp, settings );
 	}
-
-	if ( text ) {
-		const settings = loadSettings( type, userSettings );
-		const matchRegExp = settings[ type + 'RegExp' ];
-		const results =
-			'words' === settings.type
-				? matchWords( text, matchRegExp, settings )
-				: matchCharacters( text, matchRegExp, settings );
-
-		return results ? results.length : 0;
+	if ( settings.type === 'characters_including_spaces' ) {
+		matchRegExp = settings.characters_including_spacesRegExp;
+		return countCharacters( text, matchRegExp, settings );
 	}
+	if ( settings.type === 'characters_excluding_spaces' ) {
+		matchRegExp = settings.characters_excluding_spacesRegExp;
+		return countCharacters( text, matchRegExp, settings );
+	}
+	return 0;
 }
