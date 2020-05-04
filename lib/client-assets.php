@@ -688,6 +688,6 @@ if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_insta
 	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
 	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
 	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
-	register_pattern( 'core/hero-and-two-columns', gutenberg_load_block_pattern( 'hero-and-two-columns' ) );
-	register_pattern( 'core/hero-and-two-columns', gutenberg_load_block_pattern( 'hero-right-column' ) );
+	register_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
+	register_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
 }
