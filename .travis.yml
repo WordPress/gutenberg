@@ -137,7 +137,6 @@ jobs:
           - android-$ANDROID_API
           - android-$COMPILE_API
       before_install:
-        - mkdir ~/.android
         - echo 'count=0' > ~/.android/repositories.cfg
         - yes | sdkmanager --licenses >/dev/null
         - yes | sdkmanager "emulator"
