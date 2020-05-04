@@ -19,6 +19,8 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
+import UndoButton from './undo-redo/undo';
+import RedoButton from './undo-redo/redo';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -69,6 +71,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 					showInserterHelpPanel
 					toggleProps={ inserterToggleProps }
 				/>
+				<ToolSelector />
+				<UndoButton />
+				<RedoButton />
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }
@@ -81,7 +86,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 					onAddTemplateId={ addTemplateId }
 				/>
 				<BlockNavigationDropdown />
-				<ToolSelector />
 			</div>
 			<div className="edit-site-header__actions">
 				<PreviewOptions

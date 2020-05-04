@@ -9,8 +9,6 @@ const { Fill: BlockInserterFill, Slot: BlockInserterSlot } = createSlotFill(
 
 const Inserter = BlockInserterFill;
 
-Inserter.Slot = function() {
-	return <BlockInserterSlot bubblesVirtually />;
-};
+Inserter.Slot = BlockInserterSlot;
 
 export default Inserter;
