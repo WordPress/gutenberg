@@ -154,6 +154,15 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 }
 
+function get_navigation_link_url( $attrs ) {
+	if ( isset( $attrs['id'] ) ) {
+		return esc_url( get_permalink( $attrs['id'] ) );
+	} else if ( isset( $attrs['url'] ) ) {
+		return esc_url( $attrs['url'] );
+	}
+	return false;
+}
+
 /**
  * Register the navigation block.
  *
