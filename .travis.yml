@@ -131,13 +131,16 @@ jobs:
         components:
           - tools
           - platform-tools
+          - tools
           - extra-android-m2repository
           - extra-android-support
+          - build-tools-29.0.0
+          - build-tools-29.0.2
+          - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+          - android-$ANDROID_API
+          - android-$COMPILE_API
       before_install:
         - touch $HOME/.android/repositories.cfg
-        - yes | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
-        - yes | sdkmanager "platforms;android-${ANDROID_API}"
-        - yes | sdkmanager "platforms;android-${COMPILE_API}"
         - yes | sdkmanager "emulator"
         - yes | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
@@ -147,7 +150,7 @@ jobs:
         - npm ci
       before_script:
         - android list targets
-        - echo no | android create avd --force -n test -k "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}" -c 100M
+        - echo no | android create avd --force -n test -k "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}" -c 10M
         - emulator -avd test -no-audio -verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
