@@ -18,7 +18,7 @@ import NavigationStructurePanel from './navigation-structure-panel';
 export default function MenuEditor( {
 	menuId,
 	blockEditorSettings,
-	onDelete,
+	onDeleteMenu,
 } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -47,7 +47,7 @@ export default function MenuEditor( {
 				<BlockEditorPanel
 					saveBlocks={ saveBlocks }
 					menuId={ menuId }
-					onDelete={ onDelete }
+					onDeleteMenu={ onDeleteMenu }
 				/>
 			</BlockEditorProvider>
 		</div>

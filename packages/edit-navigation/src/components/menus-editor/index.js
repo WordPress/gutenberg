@@ -19,7 +19,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
 
 	const [ menuId, setMenuId ] = useState( 0 );
-	const [ stateMenus, setStateMenus ] = useState( false );
+	const [ stateMenus, setStateMenus ] = useState( null );
 
 	useEffect( () => {
 		if ( menus?.length ) {
@@ -53,12 +53,14 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
-					onDelete={ ( deletedMenu ) => {
+					onDeleteMenu={ ( deletedMenu ) => {
 						const newStateMenus = filter( stateMenus, ( menu ) => {
-							return menu.id !== deletedMenu.id;
+							return menu.id !== deletedMenu;
 						} );
 						setStateMenus( newStateMenus );
-						setMenuId( newStateMenus[ 0 ].id );
+						if ( newStateMenus.length ) {
+							setMenuId( newStateMenus[ 0 ].id );
+						}
 					} }
 				/>
 			) }

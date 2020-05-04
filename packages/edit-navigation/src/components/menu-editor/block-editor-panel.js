@@ -20,9 +20,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import MenuDelete from '../menu-delete';
+import DeleteMenuButton from '../delete-menu-button';
 
-export default function BlockEditorPanel( { onDelete, menuId, saveBlocks } ) {
+export default function BlockEditorPanel( {
+	onDeleteMenu,
+	menuId,
+	saveBlocks,
+} ) {
 	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
@@ -69,7 +73,10 @@ export default function BlockEditorPanel( { onDelete, menuId, saveBlocks } ) {
 					</ObserveTyping>
 				</WritingFlow>
 				<div className="components-panel__footer-actions">
-					<MenuDelete menuId={ menuId } onDelete={ onDelete } />
+					<DeleteMenuButton
+						menuId={ menuId }
+						onDelete={ onDeleteMenu }
+					/>
 				</div>
 			</PanelBody>
 		</Panel>
