@@ -66,3 +66,9 @@ export { default as ColorSettings } from './mobile/color-settings';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
+
+export {
+	default as GlobalStylesContext,
+	useGlobalStyles,
+	withGlobalStyles,
+} from './mobile/global-styles-context';
