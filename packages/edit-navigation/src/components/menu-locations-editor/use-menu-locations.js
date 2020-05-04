@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flatMap, filter, groupBy } from 'lodash';
+import { map, flatMap, forEach, filter, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -20,12 +20,12 @@ export default function useMenuLocations() {
 	const [ menuLocationMap, setMenuLocationMap ] = useState( {} );
 
 	const fetchAvailableLocations = async () => {
-		const path = `/__experimental/menu-locations`;
+		const path = '/__experimental/menu-locations';
 		const apiLocations = await apiFetch( {
 			path,
 			method: 'GET',
 		} );
-		return flatMap( apiLocations, ( value ) => value );
+		return flatMap( apiLocations );
 	};
 
 	const initAvailableLocations = async () => {
@@ -44,44 +44,37 @@ export default function useMenuLocations() {
 	// all locations by the menuId they are assigned to
 	useEffect( () => {
 		if ( availableLocations ) {
-			const locations = groupBy( availableLocations, 'menu' );
-			map( locations, ( location, menuId ) => {
-				locations[ menuId ] = map( location, 'name' );
+			const locationsByMenu = groupBy( availableLocations, 'menu' );
+			forEach( locationsByMenu, ( location, menuId ) => {
+				locationsByMenu[ menuId ] = map( location, 'name' );
 			} );
-			setMenuLocationMap( locations );
+			setMenuLocationMap( locationsByMenu );
 		}
 	}, [ availableLocations ] );
 
 	const updateMenuLocationMap = ( oldMenuId, { newLocation, newMenuId } ) => {
-		const newMenuLocationMap = menuLocationMap;
-
-		// we need to remove the newLocation from any menu
-		// which is already assigned to it
-		newMenuLocationMap[ oldMenuId ] = filter(
-			menuLocationMap[ oldMenuId ],
-			( oldLocation ) => {
-				return oldLocation !== newLocation;
-			}
-		);
-
-		if ( ! newMenuLocationMap[ newMenuId ] ) {
-			newMenuLocationMap[ newMenuId ] = [];
-		}
-
-		newMenuLocationMap[ newMenuId ].push( newLocation );
+		const newMenuLocationMap = {
+			...menuLocationMap,
+			[ oldMenuId ]: filter(
+				menuLocationMap[ oldMenuId ],
+				( oldLocation ) => oldLocation !== newLocation
+			),
+			[ newMenuId ]: [
+				...( menuLocationMap[ newMenuId ] || [] ),
+				newLocation,
+			],
+		};
 		setMenuLocationMap( newMenuLocationMap );
 	};
 
 	const updateLocations = async () => {
 		for ( const menuId in menuLocationMap ) {
-			if ( menuLocationMap.hasOwnProperty( menuId ) ) {
-				const intMenuId = parseInt( menuId );
-				if ( intMenuId ) {
-					await saveMenu( {
-						id: intMenuId,
-						locations: menuLocationMap[ menuId ],
-					} );
-				}
+			// sometimes menuId is 0 for unassigned locations
+			if ( menuId > 0 ) {
+				await saveMenu( {
+					id: menuId,
+					locations: menuLocationMap[ menuId ],
+				} );
 			}
 		}
 		// we need to fetch the locations again after

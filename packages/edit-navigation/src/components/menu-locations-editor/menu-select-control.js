@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
 
 export default function MenuSelectControl( {
@@ -9,11 +9,7 @@ export default function MenuSelectControl( {
 	availableMenuIds,
 	onSelectMenu,
 } ) {
-	const [ selectedMenuId, setSelectedMenuId ] = useState( undefined );
-
-	useEffect( () => {
-		setSelectedMenuId( location.menu );
-	}, [ location.menu ] );
+	const [ selectedMenuId, setSelectedMenuId ] = useState( location.menu );
 
 	return (
 		<SelectControl
@@ -22,7 +18,7 @@ export default function MenuSelectControl( {
 			onChange={ ( newMenuId ) => {
 				onSelectMenu( selectedMenuId, {
 					newLocation: location.name,
-					newMenuId: parseInt( newMenuId ),
+					newMenuId,
 				} );
 				setSelectedMenuId( newMenuId );
 			} }
