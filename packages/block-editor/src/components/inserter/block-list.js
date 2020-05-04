@@ -283,9 +283,7 @@ function InserterBlockList( {
 				{ ( fills ) => {
 					if ( fills.length ) {
 						return (
-							<InserterPanel
-								title={ _x( 'Search Results', 'blocks' ) }
-							>
+							<InserterPanel title={ __( 'Search Results' ) }>
 								{ fills }
 							</InserterPanel>
 						);

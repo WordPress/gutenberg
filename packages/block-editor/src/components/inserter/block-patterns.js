@@ -77,8 +77,8 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 		<InserterPanel
 			title={
 				filterValue
-					? _x( 'Search Results', 'patterns' )
-					: _x( 'All', 'patterns' )
+					? __( 'Search Results' )
+					: _x( 'All', 'patterns categories' )
 			}
 		>
 			{ filteredPatterns.map( ( pattern, index ) =>
