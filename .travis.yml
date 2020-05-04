@@ -138,8 +138,8 @@ jobs:
           - android-$COMPILE_API
       before_install:
         - touch $HOME/.android/repositories.cfg
-        - echo y | sdkmanager "emulator"
-        - echo y | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
+        - yes | sdkmanager "emulator"
+        - yes | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
         - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
@@ -147,7 +147,8 @@ jobs:
         - npm ci
       before_script:
         - android list targets
-        - echo no | android create avd --force -n test -k "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}" -c 10M
+        - echo no | avdmanager create avd --force -n Pixel_API_29_AOSP -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
+        - printf "\nhw.lcd.height=1334\nhw.lcd.width=750\nhw.lcd.density=320\nskin.name=750x1334" >> /home/travis/.android/avd/Pixel_API_29_AOSP.avd/config.ini
         - emulator -avd test -no-audio -verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
