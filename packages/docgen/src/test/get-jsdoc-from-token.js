@@ -224,6 +224,32 @@ const App = () => {
 		expectToExtractExample( code, description );
 	} );
 
+	it( 'tabs in code example are preserved even when the first char after * is a tab', () => {
+		const code = `
+ *
+ * @example
+ * \`\`\`jsx
+ * const MyDocumentSettingTest = () => (
+ * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+ *			<p>My Document Setting Panel</p>
+ *		</PluginDocumentSettingPanel>
+ *	);
+ * \`\`\`
+`.trim();
+
+		const description = `
+\`\`\`jsx
+const MyDocumentSettingTest = () => (
+		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
+		<p>My Document Setting Panel</p>
+	</PluginDocumentSettingPanel>
+);
+\`\`\`
+`.trim();
+
+		expectToExtractExample( code, description );
+	} );
+
 	it( 'spaces in code example are preserved', () => {
 		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
 		const code = `

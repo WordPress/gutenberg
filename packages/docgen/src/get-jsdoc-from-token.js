@@ -105,7 +105,7 @@ const CODE_SPACE = '__CODE_SPACE__';
 
 const encodeWhitespacesInCode = ( comments ) => {
 	return comments.replace( codeRegex, ( m0 ) => {
-		return m0.replace( /\n \* [ \t]+/g, ( m1 ) => {
+		return m0.replace( /\n \*[ \t][ \t]+/g, ( m1 ) => {
 			return (
 				'\n * ' +
 				m1
