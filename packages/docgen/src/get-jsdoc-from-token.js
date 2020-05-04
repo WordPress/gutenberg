@@ -71,7 +71,7 @@ module.exports = function( token ) {
 				if ( title === 'type' ) {
 					return {
 						title,
-						description: null,
+						description: mergeNameAndDesc(),
 						type: getTypeAsString( type, optional ),
 					};
 				}

@@ -147,7 +147,7 @@ describe( 'Parse JSDoc and extract description and tags', () => {
 			tags: [
 				{
 					title: 'type',
-					description: null,
+					description: '',
 					type: 'number',
 				},
 			],
