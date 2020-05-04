@@ -121,7 +121,7 @@ jobs:
         - TEST_ENV=sauce
         - JEST_JUNIT_OUTPUT="reports/test-results/android-test-results.xml"
         - ANDROID_COMPILE_API=29
-        - ANDROID_BUILD_TOOLS_VERSION=29.0.2
+        - ANDROID_BUILD_TOOLS_VERSION=29.0.6
         - ANDROID_ABI=x86_64
         - ANDROID_EMU_FLAVOR=default # or google_apis
         - ADB_INSTALL_TIMEOUT=8
@@ -133,12 +133,13 @@ jobs:
           - platform-tools
           - extra-android-m2repository
           - extra-android-support
-          - android-${ANDROID_COMPILE_API}
-          - "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
-          - emulator
-          - "platforms;android-${ANDROID_API}"
-          - "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
       before_install:
+        - touch $HOME/.android/repositories.cfg
+        - yes | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+        - yes | sdkmanager "platforms;android-${ANDROID_API}"
+        - yes | sdkmanager "platforms;android-${COMPILE_API}"
+        - yes | sdkmanager "emulator"
+        - yes | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
         - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
