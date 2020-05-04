@@ -185,13 +185,13 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			isSelected,
 			isRTL,
+			wrapperProps,
 		} = this.props;
 		const {
 			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
-			style,
 		} = attributes;
 		const { containerWidth } = this.state;
 
@@ -224,8 +224,7 @@ class MediaTextEdit extends Component {
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
 			backgroundColor:
-				( style && style.color && style.color.background ) ||
-				backgroundColor.color,
+				wrapperProps?.style?.backgroundColor || backgroundColor.color,
 		};
 
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;

@@ -17,9 +17,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.editor-post-preview__button-external' );
-	await editorPage.click( '.editor-post-preview__button-external' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -70,7 +70,12 @@ describe( 'Block context', () => {
 		expect( innerBlockText ).toBe( 'The record ID is: 123' );
 	} );
 
-	test( 'Block context is reflected in the preview', async () => {
+	// Disable reason: Block context PHP implementation is temporarily reverted.
+	// This will be unskipped once the implementation is restored. Skipping was
+	// the most direct option for revert given time constraints.
+
+	/* eslint-disable-next-line jest/no-disabled-tests */
+	test.skip( 'Block context is reflected in the preview', async () => {
 		await insertBlock( 'Test Context Provider' );
 		const editorPage = page;
 		const previewPage = await openPreviewPage( editorPage );

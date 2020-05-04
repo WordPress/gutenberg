@@ -14,6 +14,7 @@ import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { VisuallyHidden } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { pasteHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,6 +34,7 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 
 		this.state = {
 			isSelected: false,
@@ -57,6 +59,57 @@ class PostTitle extends Component {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
 			this.props.onEnterPress();
+		}
+	}
+
+	onPaste( event ) {
+		const { title, onInsertBlockAfter, onUpdate } = this.props;
+		const clipboardData = event.clipboardData;
+
+		let plainText = '';
+		let html = '';
+
+		// IE11 only supports `Text` as an argument for `getData` and will
+		// otherwise throw an invalid argument error, so we try the standard
+		// arguments first, then fallback to `Text` if they fail.
+		try {
+			plainText = clipboardData.getData( 'text/plain' );
+			html = clipboardData.getData( 'text/html' );
+		} catch ( error1 ) {
+			try {
+				html = clipboardData.getData( 'Text' );
+			} catch ( error2 ) {
+				// Some browsers like UC Browser paste plain text by default and
+				// don't support clipboardData at all, so allow default
+				// behaviour.
+				return;
+			}
+		}
+
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', html );
+		window.console.log( 'Received plain text:\n\n', plainText );
+
+		const content = pasteHandler( {
+			HTML: html,
+			plainText,
+		} );
+
+		if ( typeof content !== 'string' && content.length ) {
+			event.preventDefault();
+
+			const [ firstBlock ] = content;
+
+			if (
+				! title &&
+				( firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph' )
+			) {
+				onUpdate( firstBlock.attributes.content );
+				onInsertBlockAfter( content.slice( 1 ) );
+			} else {
+				onInsertBlockAfter( content );
+			}
 		}
 	}
 
@@ -102,6 +155,7 @@ class PostTitle extends Component {
 						onBlur={ this.onUnselect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
+						onPaste={ this.onPaste }
 						/*
 							Only autofocus the title when the post is entirely empty.
 							This should only happen for a new post, which means we
@@ -137,7 +191,7 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { insertDefaultBlock, clearSelectedBlock } = dispatch(
+	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } = dispatch(
 		'core/block-editor'
 	);
 	const { editPost } = dispatch( 'core/editor' );
@@ -145,6 +199,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	return {
 		onEnterPress() {
 			insertDefaultBlock( undefined, undefined, 0 );
+		},
+		onInsertBlockAfter( blocks ) {
+			insertBlocks( blocks, 0 );
 		},
 		onUpdate( title ) {
 			editPost( { title } );

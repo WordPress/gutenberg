@@ -8,17 +8,19 @@ import { ZERO } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import useEditorFeature from '../use-editor-feature';
 import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,
 	STEP,
-	useIsLineHeightControlsDisabled,
 	isLineHeightDefined,
 } from './utils';
 
 export default function LineHeightControl( { value: lineHeight, onChange } ) {
 	// Don't render the controls if disabled by editor settings
-	const isDisabled = useIsLineHeightControlsDisabled();
+	const isDisabled = useEditorFeature(
+		'__experimentalDisableCustomLineHeight'
+	);
 	if ( isDisabled ) {
 		return null;
 	}
