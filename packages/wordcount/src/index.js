@@ -72,13 +72,13 @@ function loadSettings( type, userSettings ) {
  */
 function matchWords( text, regex, settings ) {
 	text = flow(
-		stripTags.bind( this, settings ),
-		stripHTMLComments.bind( this, settings ),
-		stripShortcodes.bind( this, settings ),
-		stripSpaces.bind( this, settings ),
-		stripHTMLEntities.bind( this, settings ),
-		stripConnectors.bind( this, settings ),
-		stripRemovables.bind( this, settings )
+		stripTags.bind( null, settings ),
+		stripHTMLComments.bind( null, settings ),
+		stripShortcodes.bind( null, settings ),
+		stripSpaces.bind( null, settings ),
+		stripHTMLEntities.bind( null, settings ),
+		stripConnectors.bind( null, settings ),
+		stripRemovables.bind( null, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
@@ -95,12 +95,12 @@ function matchWords( text, regex, settings ) {
  */
 function matchCharacters( text, regex, settings ) {
 	text = flow(
-		stripTags.bind( this, settings ),
-		stripHTMLComments.bind( this, settings ),
-		stripShortcodes.bind( this, settings ),
-		stripSpaces.bind( this, settings ),
-		transposeAstralsToCountableChar.bind( this, settings ),
-		transposeHTMLEntitiesToCountableChars.bind( this, settings )
+		stripTags.bind( null, settings ),
+		stripHTMLComments.bind( null, settings ),
+		stripShortcodes.bind( null, settings ),
+		transposeAstralsToCountableChar.bind( null, settings ),
+		stripSpaces.bind( null, settings ),
+		transposeHTMLEntitiesToCountableChars.bind( null, settings )
 	)( text );
 	text = text + '\n';
 	return text.match( regex );
