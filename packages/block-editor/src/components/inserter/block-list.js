@@ -289,9 +289,7 @@ function InserterBlockList( {
 						);
 					}
 					if ( ! hasItems ) {
-						return (
-							<InserterNoResults filterValue={ filterValue } />
-						);
+						return <InserterNoResults />;
 					}
 					return null;
 				} }

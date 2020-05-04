@@ -1,27 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { createInterpolateElement } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Icon, blockDefault } from '@wordpress/icons';
 
-function InserterNoResults( { filterValue } ) {
+function InserterNoResults() {
 	return (
 		<div className="block-editor-inserter__no-results">
 			<Icon
 				className="block-editor-inserter__no-results-icon"
 				icon={ blockDefault }
 			/>
-			<p>
-				{ createInterpolateElement(
-					sprintf(
-						/* translators: %s: search term. */
-						__( 'Sorry no results found on <strong>%s</strong>.' ),
-						filterValue
-					),
-					{ strong: <strong /> }
-				) }
-			</p>
+			<p>{ __( 'No results found.' ) }</p>
 		</div>
 	);
 }

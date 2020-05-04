@@ -55,9 +55,7 @@ const assertNoResultsMessageToBePresent = ( element ) => {
 	const noResultsMessage = element.querySelector(
 		'.block-editor-inserter__no-results'
 	);
-	expect( noResultsMessage.textContent ).toEqual(
-		'Sorry no results found on random.'
-	);
+	expect( noResultsMessage.textContent ).toEqual( 'No results found.' );
 };
 
 const assertNoResultsMessageNotToBePresent = ( element ) => {

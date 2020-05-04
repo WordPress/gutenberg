@@ -94,7 +94,7 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 			) }
 		</InserterPanel>
 	) : (
-		<InserterNoResults filterValue={ filterValue } />
+		<InserterNoResults />
 	);
 }
 
