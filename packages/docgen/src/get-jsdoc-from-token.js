@@ -26,6 +26,8 @@ module.exports = function( token ) {
 		// babel strips /* and */, but comment-parser requires it.
 		jsdoc = parse( `/*${ comments }\n*/` )[ 0 ];
 
+		jsdoc.description = decodeWhitespacesInCode( jsdoc.description );
+
 		delete jsdoc.line;
 		delete jsdoc.source;
 

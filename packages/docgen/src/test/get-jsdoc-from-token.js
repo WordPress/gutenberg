@@ -183,6 +183,43 @@ describe( 'Parse JSDoc and extract description and tags', () => {
 		} );
 	} );
 
+	it( 'handles code block in description', () => {
+		// Adapted from rich-text/src/create.js
+		const code = `
+ *
+ * Blah blah blah
+ *
+ * \`\`\`js
+ * {
+ *   text: string,
+ * }
+ * \`\`\`
+`.trim();
+
+		const description = `
+Blah blah blah
+
+\`\`\`js
+{
+  text: string,
+}
+\`\`\`
+`.trim();
+
+		expect(
+			getJSDocFromToken( {
+				leadingComments: [
+					{
+						value: code,
+					},
+				],
+			} )
+		).toEqual( {
+			description,
+			tags: [],
+		} );
+	} );
+
 	it( 'tabs in code example are preserved', () => {
 		// Adapted from packages/compose/src/hooks/use-resize-observer/index.js
 		const code = `
