@@ -65,7 +65,7 @@ export class ServerSideRender extends Component {
 		const urlAttributes = requestBody ? null : attributes;
 		const path = rendererPath( block, urlAttributes, urlQueryArgs );
 		const method = requestBody ? 'POST' : 'GET';
-		const data = requestBody ? attributes : null;
+		const data = requestBody ? { attributes } : null;
 
 		// Store the latest fetch request so that when we process it, we can
 		// check if it is the current request, to avoid race conditions on slow networks.
