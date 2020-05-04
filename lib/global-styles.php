@@ -153,14 +153,35 @@ function gutenberg_experimental_global_styles_get_core() {
 }
 
 /**
- * Return theme's Global Styles.
+ * Return theme's Global Styles. It also fetches the editor palettes
+ * declared via add_theme_support.
  *
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_theme() {
-	return gutenberg_experimental_global_styles_get_from_file(
+	$global_styles_theme = gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
 	);
+
+	// Take colors from declared theme support.
+	$theme_colors = get_theme_support( 'editor-color-palette' )[ 0 ];
+	foreach( $theme_colors as $color ) {
+		$global_styles_theme['theme']['color'][ $color['slug'] ] = $color['color'];
+	}
+
+	// Take gradients from declared theme support.
+	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[ 0 ];
+	foreach( $theme_gradients as $gradient ) {
+		$global_styles_theme['theme']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+	}
+
+	// Take font-sizes from declared theme support.
+	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[ 0 ];
+	foreach( $theme_font_sizes as $font_size ) {
+		$global_styles_theme['theme']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+	}
+
+	return $global_styles_theme;
 }
 
 /**
