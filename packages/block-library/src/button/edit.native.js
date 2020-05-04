@@ -174,9 +174,8 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes, wrapperProps } = this.props;
+		const { backgroundColor, attributes } = this.props;
 		const { gradient, customGradient } = attributes;
-		const colorProps = getColorAndStyleProps( attributes );
 		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
@@ -188,7 +187,7 @@ class ButtonEdit extends Component {
 			);
 		}
 		return (
-			wrapperProps?.style?.backgroundColor || colorProps.style?.backgroundColor ||
+			getColorAndStyleProps( attributes ).style?.backgroundColor ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
@@ -196,11 +195,9 @@ class ButtonEdit extends Component {
 	}
 
 	getTextColor() {
-		const { textColor, wrapperProps, attributes } = this.props;
-		const colorProps = getColorAndStyleProps( attributes );
-
+		const { textColor, attributes } = this.props;
 		return (
-			wrapperProps?.style?.color || colorProps.style?.color ||
+			getColorAndStyleProps( attributes ).style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.defaultButton.color
@@ -526,7 +523,7 @@ class ButtonEdit extends Component {
 					/>
 				</BottomSheet>
 
-				<ColorEdit {...this.props} />
+				<ColorEdit { ...this.props } />
 				<InspectorControls>
 					<PanelBody title={ __( 'Border Settings' ) }>
 						<RangeControl

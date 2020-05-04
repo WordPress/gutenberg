@@ -52,14 +52,14 @@ const cleanEmptyObject = ( object ) => {
 		: cleanedNestedObjects;
 };
 
-function ColorPanel( { settings, clientId, enableContrastChecking = isWebPlatform } ) {
+function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	const { getComputedStyle, Node } = window;
 
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
+		if ( isWebPlatform && ! enableContrastChecking ) {
 			return;
 		}
 
@@ -92,7 +92,7 @@ function ColorPanel( { settings, clientId, enableContrastChecking = isWebPlatfor
 				initialOpen={ false }
 				settings={ settings }
 			>
-				{ enableContrastChecking && (
+				{ isWebPlatform && enableContrastChecking && (
 					<ContrastChecker
 						backgroundColor={ detectedBackgroundColor }
 						textColor={ detectedColor }
@@ -193,7 +193,9 @@ function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
-			enableContrastChecking={ isWebPlatform && ! gradient && ! style?.color?.gradient }
+			enableContrastChecking={
+				isWebPlatform && ! gradient && ! style?.color?.gradient
+			}
 			clientId={ props.clientId }
 			settings={ [
 				{
