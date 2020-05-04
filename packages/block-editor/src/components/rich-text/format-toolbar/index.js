@@ -1,20 +1,16 @@
 /**
- * External dependencies
- */
-
-import { orderBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-
 import { __ } from '@wordpress/i18n';
 import {
 	Toolbar,
 	Slot,
-	DropdownMenu,
+	Dropdown,
+	Button,
+	NavigableMenu,
 	__experimentalUseSlot as useSlot,
 } from '@wordpress/components';
+import { DOWN } from '@wordpress/keycodes';
 import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
@@ -25,7 +21,6 @@ const POPOVER_PROPS = {
 const FormatToolbar = () => {
 	const slot = useSlot( 'RichText.ToolbarControls' );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
-	// This still needs to be fixed.
 
 	return (
 		<div className="block-editor-format-toolbar">
@@ -40,11 +35,41 @@ const FormatToolbar = () => {
 					)
 				) }
 				{ hasFills && (
-					<DropdownMenu
-						icon={ chevronDown }
-						label={ __( 'More rich text controls' ) }
-						controls={ [] }
+					<Dropdown
 						popoverProps={ POPOVER_PROPS }
+						renderToggle={ ( { isOpen, onToggle } ) => {
+							const openOnArrowDown = ( event ) => {
+								if ( ! isOpen && event.keyCode === DOWN ) {
+									event.preventDefault();
+									event.stopPropagation();
+									onToggle();
+								}
+							};
+
+							return (
+								<Button
+									icon={ chevronDown }
+									onClick={ onToggle }
+									onKeyDown={ openOnArrowDown }
+									aria-haspopup="true"
+									aria-expanded={ isOpen }
+									label={ __( 'More rich text controls' ) }
+									showTooltip
+								/>
+							);
+						} }
+						renderContent={ ( { onClose } ) => (
+							<NavigableMenu
+								aria-label={ __( 'More rich text controls' ) }
+								role="menu"
+							>
+								<Slot
+									name="RichText.ToolbarControls"
+									bubblesVirtually
+									fillProps={ { onClose } }
+								/>
+							</NavigableMenu>
+						) }
 					/>
 				) }
 			</Toolbar>

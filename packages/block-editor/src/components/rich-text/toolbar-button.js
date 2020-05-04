@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Fill, ToolbarButton } from '@wordpress/components';
+import { Fill, ToolbarButton, Button } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
 
 export function RichTextToolbarButton( {
@@ -21,9 +26,31 @@ export function RichTextToolbarButton( {
 		shortcut = displayShortcut[ shortcutType ]( shortcutCharacter );
 	}
 
+	if ( name ) {
+		return (
+			<Fill name={ fillName }>
+				<ToolbarButton { ...props } shortcut={ shortcut } />
+			</Fill>
+		);
+	}
+
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton { ...props } shortcut={ shortcut } />
+			{ ( { onClose } ) => (
+				<Button
+					className="block-editor-rich-text__advanced-toolbar-button"
+					role="menuitem"
+					{ ...omit( props, [ 'title', 'onClick' ] ) }
+					onClick={ ( event ) => {
+						if ( props.onClick ) {
+							props.onClick( event );
+						}
+						onClose();
+					} }
+				>
+					{ props.title }
+				</Button>
+			) }
 		</Fill>
 	);
 }

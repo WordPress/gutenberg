@@ -64,3 +64,9 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 		padding-right: $grid-unit-15;
 	}
 }
+
+
+.block-editor-rich-text__advanced-toolbar-button {
+	display: flex;
+	width: 100%;
+}
