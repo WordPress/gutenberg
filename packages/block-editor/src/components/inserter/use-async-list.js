@@ -13,16 +13,16 @@ import { createQueue } from '@wordpress/priority-queue';
  */
 function getFirstItemsPresentInState( list, state ) {
 	const firstItems = [];
-	let index = 0;
-	let alreadyRendered = false;
-	do {
-		const item = list[ index ];
-		alreadyRendered = state.indexOf( item ) !== -1;
-		if ( alreadyRendered ) {
-			firstItems.push( item );
+
+	for ( let i = 0; i < list.length; i++ ) {
+		const item = list[ i ];
+		if ( ! state.includes( item ) ) {
+			break;
 		}
-		index++;
-	} while ( alreadyRendered || index === list.length );
+
+		firstItems.push( item );
+	}
+
 	return firstItems;
 }
 

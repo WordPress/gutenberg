@@ -122,9 +122,13 @@ export const searchItems = ( items, searchTerm, config = {} ) => {
 		const collection = getCollection( item );
 		const variations = getVariations( item );
 
-		const terms = [ title, keywords, category, collection, variations ]
-			.flat()
-			.join( ' ' );
+		const terms = [
+			title,
+			...keywords,
+			category,
+			collection,
+			...variations,
+		].join( ' ' );
 
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
