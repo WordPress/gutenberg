@@ -307,4 +307,26 @@ Input post:
 
 		expectToExtractExample( code, description );
 	} );
+
+	it( 'no empty line after @example tag: <caption>', () => {
+		// Adapted from edit-post/src/components/block-settings-menu/plugin-block-settings-menu-items.js
+		const code = `
+ *
+ * @example
+ * <caption>ES5</caption>
+ * \`\`\`js
+ * // Using ES5 syntax
+ * var __ = wp.i18n.__;
+ * \`\`\`
+`.trim();
+
+		const description = `
+\`\`\`js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+\`\`\`
+`.trim();
+
+		expectToExtractExample( code, description );
+	} );
 } );

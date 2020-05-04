@@ -75,13 +75,17 @@ module.exports = function( token ) {
 				}
 
 				if ( title === 'example' ) {
+					if ( name.match( /```.*/ ) !== null ) {
+						description = `${ name }\n${ description }`.trim();
+					} else if ( name.match( /<caption>.*/ ) !== null ) {
+						// do nothing
+					} else {
+						description = mergeNameAndDesc();
+					}
+
 					return {
 						title,
-						description: decodeWhitespacesInCode(
-							name.match( /```.*/ ) !== null
-								? `${ name }\n${ description }`.trim()
-								: mergeNameAndDesc()
-						),
+						description: decodeWhitespacesInCode( description ),
 					};
 				}
 
