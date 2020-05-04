@@ -32,7 +32,7 @@ function BlockPattern( { pattern, onClick } ) {
 			onClick={ () => onClick( pattern, blocks ) }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					onClick( blocks );
+					onClick( pattern, blocks );
 				}
 			} }
 			tabIndex={ 0 }
