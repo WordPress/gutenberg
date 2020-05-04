@@ -102,114 +102,6 @@ install:
 
 jobs:
   include:
-    - name: Lint
-      install:
-        - npm ci
-      script:
-        - npm run lint
-
-    - name: Lint ES5 only
-      install:
-        - npm ci
-        - npm run build
-      script:
-        - npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
-
-    - name: Build artifacts
-      install:
-        # A "full" install is executed, since `npm ci` does not always exit
-        # with an error status code if the lock file is inaccurate.
-        #
-        # See: https://github.com/WordPress/gutenberg/issues/16157
-        - npm install
-      script:
-        - npm run check-local-changes
-
-    - name: License compatibility
-      install:
-        - npm ci
-      script:
-        - npm run check-licenses
-
-    - name: JavaScript unit tests
-      env: INSTALL_WORDPRESS=false
-      install:
-        - npm ci
-        # It's not necessary to run the full build, since Jest can interpret
-        # source files with `babel-jest`. Some packages have their own custom
-        # build tasks, however. These must be run.
-        - npx lerna run build
-      script:
-        - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
-
-    - name: JavaScript native mobile tests
-      install:
-        - npm ci
-        # It's not necessary to run the full build, since Jest can interpret
-        # source files with `babel-jest`. Some packages have their own custom
-        # build tasks, however. These must be run.
-        - npx lerna run build
-      script:
-        - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
-
-    - name: PHP unit tests
-      env: INSTALL_COMPOSER=true
-      script:
-        - npm run test-php && npm run test-unit-php-multisite
-
-    - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
-      script:
-        - npm run test-php && npm run test-unit-php-multisite
-
-    - name: E2E tests (Admin) (1/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Admin) (2/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Admin) (3/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Admin) (4/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Author) (1/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Author) (2/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Author) (3/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
-
-    - name: E2E tests (Author) (4/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
-      script:
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
-
     - name: E2E Mobile tests (Android)
       os: linux
       language: android
@@ -249,6 +141,7 @@ jobs:
       before_install:
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
+        - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       install:
         - npm ci
       before_script:
@@ -257,7 +150,6 @@ jobs:
         - emulator -avd test -no-audio -verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
-        - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
       script:
         - npm run native test:e2e:android:local
 
