@@ -192,8 +192,10 @@ function gutenberg_get_post_from_context() {
 function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
 	global $post;
 
-	// If a non-null value is provided, a filter has run at an earlier priority
-	// and has already handled custom rendering and should take precedence.
+	/*
+	 * If a non-null value is provided, a filter has run at an earlier priority
+	 * and has already handled custom rendering and should take precedence.
+	 */
 	if ( null !== $pre_render ) {
 		return $pre_render;
 	}
