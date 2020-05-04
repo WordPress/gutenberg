@@ -149,9 +149,9 @@ jobs:
         - npm ci
       before_script:
         - android list targets
-        - echo no | avdmanager create avd --force -n Pixel_API_29_AOSP -k "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
+        - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n Pixel_API_29_AOSP --package "system-images;android-$API;$EMU_FLAVOR;$ABI" -c 10M
         - printf "\nhw.lcd.height=1334\nhw.lcd.width=750\nhw.lcd.density=320\nskin.name=750x1334" >> /home/travis/.android/avd/Pixel_API_29_AOSP.avd/config.ini
-        - emulator -avd test -no-audio -verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
+        - emulator -avd Pixel_API_29_AOSP -no-audio -verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
       script:
