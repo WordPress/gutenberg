@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * https://reactjs.org/docs/forms.html#controlled-components
  *
  * @param {any} initialState The initial state value.
- * @return {Array<any, Function>} The controlled value and the value setter.
+ * @return {[*, Function]} The controlled value and the value setter.
  */
 export function useControlledState( initialState ) {
 	const [ state, setState ] = useState( initialState );
