@@ -33,6 +33,7 @@ export default function Slot( {
 
 	// fillProps may be an update that interact with the layout, so
 	// we useLayoutEffect
+	// Make sure to memoize your fill Props to avoid infinite loops.
 	useLayoutEffect( () => {
 		if ( slot.fillProps && ! isShallowEqual( slot.fillProps, fillProps ) ) {
 			registry.updateSlot( name, ref, fillProps );

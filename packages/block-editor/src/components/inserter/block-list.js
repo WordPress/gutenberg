@@ -24,7 +24,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -100,22 +100,25 @@ function InserterBlockList( {
 		}
 	}, [] );
 
-	const onSelectItem = ( item ) => {
-		const { name, title, initialAttributes, innerBlocks } = item;
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
+	const onSelectItem = useCallback(
+		( item ) => {
+			const { name, title, initialAttributes, innerBlocks } = item;
+			const insertedBlock = createBlock(
+				name,
+				initialAttributes,
+				createBlocksFromInnerBlocksTemplate( innerBlocks )
+			);
 
-		onInsert( insertedBlock );
+			onInsert( insertedBlock );
 
-		if ( ! selectBlockOnInsert ) {
-			// translators: %s: the name of the block that has been added
-			const message = sprintf( __( '%s block added' ), title );
-			speak( message );
-		}
-	};
+			if ( ! selectBlockOnInsert ) {
+				// translators: %s: the name of the block that has been added
+				const message = sprintf( __( '%s block added' ), title );
+				speak( message );
+			}
+		},
+		[ onInsert, selectBlockOnInsert ]
+	);
 
 	const filteredItems = useMemo( () => {
 		return searchBlockItems( items, categories, collections, filterValue );
@@ -190,7 +193,7 @@ function InserterBlockList( {
 
 	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
-	const slot = { fills: [ 'test' ] }; //useSlot( __experimentalInserterMenuExtension.Slot.slotName );
+	const slot = useSlot( __experimentalInserterMenuExtension.Slot.slotName );
 	const hasInserterExtensionFills = Boolean(
 		slot.fills && slot.fills.length
 	);

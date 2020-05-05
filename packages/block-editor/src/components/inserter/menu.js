@@ -6,7 +6,7 @@ import { includes, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -91,7 +91,7 @@ function InserterMenu( {
 	// Since it's a function only called when the event handlers are called,
 	// it's fine to extract it.
 	// eslint-disable-next-line no-restricted-syntax
-	function getInsertionIndex() {
+	const getInsertionIndex = useCallback( () => {
 		// If the clientId is defined, we insert at the position of the block.
 		if ( clientId ) {
 			return getBlockIndex( clientId, destinationRootClientId );
@@ -105,37 +105,48 @@ function InserterMenu( {
 
 		// Otherwise, we insert at the end of the current rootClientId
 		return getBlockOrder( destinationRootClientId ).length;
-	}
+	}, [ isAppender, clientId, destinationRootClientId ] );
 
-	const onInsertBlocks = ( blocks ) => {
-		const selectedBlock = getSelectedBlock();
-		if (
-			! isAppender &&
-			selectedBlock &&
-			isUnmodifiedDefaultBlock( selectedBlock )
-		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
-		} else {
-			insertBlocks(
-				blocks,
-				getInsertionIndex(),
-				destinationRootClientId,
-				__experimentalSelectBlockOnInsert
-			);
-		}
+	const onInsertBlocks = useCallback(
+		( blocks ) => {
+			const selectedBlock = getSelectedBlock();
+			if (
+				! isAppender &&
+				selectedBlock &&
+				isUnmodifiedDefaultBlock( selectedBlock )
+			) {
+				replaceBlocks( selectedBlock.clientId, blocks );
+			} else {
+				insertBlocks(
+					blocks,
+					getInsertionIndex(),
+					destinationRootClientId,
+					__experimentalSelectBlockOnInsert
+				);
+			}
 
-		onSelect();
-	};
+			onSelect();
+		},
+		[
+			isAppender,
+			getInsertionIndex,
+			destinationRootClientId,
+			__experimentalSelectBlockOnInsert,
+		]
+	);
 
-	const onHover = ( item ) => {
-		setHoveredItem( item );
-		if ( item ) {
-			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
-		} else {
-			hideInsertionPoint();
-		}
-	};
+	const onHover = useCallback(
+		( item ) => {
+			setHoveredItem( item );
+			if ( item ) {
+				const index = getInsertionIndex();
+				showInsertionPoint( destinationRootClientId, index );
+			} else {
+				hideInsertionPoint();
+			}
+		},
+		[ getInsertionIndex, destinationRootClientId ]
+	);
 
 	const blocksTab = (
 		<>
