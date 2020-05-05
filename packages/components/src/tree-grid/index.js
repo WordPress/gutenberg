@@ -40,12 +40,18 @@ function getRowFocusables( rowElement ) {
  */
 export default function TreeGrid( { children, ...props } ) {
 	const onKeyDown = useCallback( ( event ) => {
-		const { keyCode } = event;
+		const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
 
-		if ( ! includes( [ UP, DOWN, LEFT, RIGHT ], keyCode ) ) {
+		const hasModifierKeyPressed = metaKey || ctrlKey || altKey || shiftKey;
+
+		if (
+			hasModifierKeyPressed ||
+			! includes( [ UP, DOWN, LEFT, RIGHT ], keyCode )
+		) {
 			return;
 		}
 
+		// The event will be handled, stop propagation.
 		event.stopPropagation();
 
 		const { activeElement } = document;
