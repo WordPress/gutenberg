@@ -20,7 +20,7 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 
@@ -183,7 +183,7 @@ class AudioEdit extends Component {
 								{ value: '', label: __( 'Browser default' ) },
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
-								{ value: 'none', label: __( 'None' ) },
+								{ value: 'none', label: _x( 'None', 'Preload value' ) },
 							] }
 						/>
 					</PanelBody>

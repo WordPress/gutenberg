@@ -12,7 +12,7 @@ import {
  * WordPress dependencies
  */
 import { withInstanceId, compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
 	withColors,
@@ -332,7 +332,7 @@ class ButtonEdit extends Component {
 					icon={ ! isCompatibleWithSettings && LinkRelIcon }
 					label={ __( 'Link Rel' ) }
 					value={ rel || '' }
-					valuePlaceholder={ __( 'None' ) }
+					valuePlaceholder={ _x( 'None', 'Rel attribute value' ) }
 					onChange={ this.onChangeLinkRel }
 					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"

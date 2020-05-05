@@ -42,7 +42,7 @@ import {
 	BlockAlignmentToolbar,
 	MediaEdit,
 } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -428,7 +428,7 @@ export class ImageEdit extends React.Component {
 						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
-						valuePlaceholder={ __( 'None' ) }
+						valuePlaceholder={ _x( 'None', 'Alt text value placeholder' ) }
 						separatorType={ 'none' }
 						onChangeValue={ this.updateAlt }
 					/>
