@@ -20,6 +20,7 @@
 @import "./media-text/style.scss";
 @import "./navigation/style.scss";
 @import "./paragraph/style.scss";
+@import "./post-author/style.scss";
 @import "./pullquote/style.scss";
 @import "./quote/style.scss";
 @import "./rss/style.scss";
@@ -75,6 +76,11 @@
 		background-color: #9b51e0;
 	}
 
+	.has-white-background-color {
+		background-color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat
 	.has-very-light-gray-background-color {
 		background-color: #eee;
 	}
@@ -83,8 +89,13 @@
 		background-color: #abb8c3;
 	}
 
+	// Deprecated from UI, kept for back-compat
 	.has-very-dark-gray-background-color {
 		background-color: #313131;
+	}
+
+	.has-black-background-color {
+		background-color: #000;
 	}
 
 	// Foreground colors.
@@ -125,6 +136,11 @@
 		color: #9b51e0;
 	}
 
+	.has-white-color {
+		color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat
 	.has-very-light-gray-color {
 		color: #eee;
 	}
@@ -133,8 +149,13 @@
 		color: #abb8c3;
 	}
 
+	// Deprecated from UI, kept for back-compat
 	.has-very-dark-gray-color {
 		color: #313131;
+	}
+
+	.has-black-color {
+		color: #000;
 	}
 
 	// Gradients

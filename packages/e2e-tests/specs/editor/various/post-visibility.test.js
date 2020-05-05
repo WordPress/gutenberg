@@ -63,6 +63,11 @@ describe( 'Post visibility', () => {
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );
 
+		// Wait for the button to be clickable before attempting to click.
+		// This could cause errors when we try to click before changes are registered.
+		await page.waitForSelector(
+			'.editor-post-publish-button[aria-disabled="false"]'
+		);
 		await page.click( '.editor-post-publish-button' );
 
 		const currentStatus = await page.evaluate( () => {
