@@ -14,9 +14,10 @@ export default function SpacingPanelControl( { children, ...props } ) {
 	const isSpacingEnabled = useEditorFeature(
 		'__experimentalEnableCustomSpacing'
 	);
-	// TODO: Renable this guard
+	// TODO: Renable the proper guard
 	// This is temporarily disabled for testing purposes.
-	if ( ! isSpacingEnabled ) return null;
+	if ( !! isSpacingEnabled ) return null;
+	// if ( ! isSpacingEnabled ) return null;
 
 	return (
 		<InspectorControls { ...props }>
