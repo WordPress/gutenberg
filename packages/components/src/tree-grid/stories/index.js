@@ -11,29 +11,32 @@ import { Button } from '../../';
 
 export default { title: 'Components/TreeGrid', component: TreeGrid };
 
-const simpsonsCharacters = [
+const groceries = [
 	{
-		name: 'Homer',
-		children: [
+		name: 'Fruit',
+		types: [
 			{
-				name: 'Lisa',
+				name: 'Apple',
 			},
 			{
-				name: 'Bart',
+				name: 'Orange',
 			},
 			{
-				name: 'Maggie',
+				name: 'Pear',
 			},
 		],
 	},
 	{
-		name: 'Ned',
-		children: [
+		name: 'Vegetable',
+		types: [
 			{
-				name: 'Rod',
+				name: 'Cucumber',
 			},
 			{
-				name: 'Todd',
+				name: 'Parsnip',
+			},
+			{
+				name: 'Pumpkin',
 			},
 		],
 	},
@@ -48,14 +51,14 @@ const Descender = ( { level } ) => {
 	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
 };
 
-const Rows = ( { people, level = 1 } ) => {
-	return people.map( ( person, index ) => {
-		const hasChildren = !! person.children && !! person.children.length;
+const Rows = ( { items, level = 1 } ) => {
+	return items.map( ( item, index ) => {
+		const hasChildren = !! item.types && !! item.types.length;
 		return (
-			<Fragment key={ person.name }>
+			<Fragment key={ item.name }>
 				<TreeGridRow
 					positionInSet={ index + 1 }
-					setSize={ people.length }
+					setSize={ items.length }
 					level={ level }
 				>
 					<TreeGridCell>
@@ -63,7 +66,7 @@ const Rows = ( { people, level = 1 } ) => {
 							<>
 								<Descender level={ level } />
 								<Button isPrimary { ...props }>
-									{ person.name }
+									{ item.name }
 								</Button>
 							</>
 						) }
@@ -71,20 +74,20 @@ const Rows = ( { people, level = 1 } ) => {
 					<TreeGridCell>
 						{ ( props ) => (
 							<Button isSecondary { ...props }>
-								Vote Up
+								Move Up
 							</Button>
 						) }
 					</TreeGridCell>
 					<TreeGridCell>
 						{ ( props ) => (
 							<Button isSecondary { ...props }>
-								Vote Down
+								Move Down
 							</Button>
 						) }
 					</TreeGridCell>
 				</TreeGridRow>
 				{ hasChildren && (
-					<Rows people={ person.children } level={ level + 1 } />
+					<Rows items={ item.types } level={ level + 1 } />
 				) }
 			</Fragment>
 		);
@@ -94,7 +97,7 @@ const Rows = ( { people, level = 1 } ) => {
 export const _default = () => {
 	return (
 		<TreeGrid>
-			<Rows people={ simpsonsCharacters } />
+			<Rows items={ groceries } />
 		</TreeGrid>
 	);
 };
