@@ -293,9 +293,25 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	const wpOrgFields = sourceString.match(
+		/^https?:\/\/downloads\.wordpress\.org\/(plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+	);
+	if ( wpOrgFields ) {
+		return {
+			type: 'zip',
+			url: sourceString,
+			path: path.resolve(
+				workDirectoryPath,
+				encodeURIComponent( wpOrgFields[ 2 ] )
+			),
+			basename: encodeURIComponent( wpOrgFields[ 2 ] ),
+		};
+	}
+
 	const zipFields = sourceString.match(
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
+
 	if ( zipFields ) {
 		return {
 			type: 'zip',
