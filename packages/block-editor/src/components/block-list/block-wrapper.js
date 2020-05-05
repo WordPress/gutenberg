@@ -4,6 +4,7 @@
 import classnames from 'classnames';
 import { first, last, omit } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
+import mergeRefs from 'react-merge-refs';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
-	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
+	( { children, tagName = 'div', __unstableIsHtml, ...props }, ref ) => {
 		const onSelectionStart = useContext( Context );
 		const setBlockNodes = useContext( SetBlockNodes );
 		const {
@@ -32,7 +33,6 @@ const BlockComponent = forwardRef(
 			rootClientId,
 			isSelected,
 			isFirstMultiSelected,
-			isLastMultiSelected,
 			isMultiSelecting,
 			isNavigationMode,
 			isPartOfMultiSelection,
@@ -62,26 +62,18 @@ const BlockComponent = forwardRef(
 		const { removeBlock, insertDefaultBlock } = useDispatch(
 			'core/block-editor'
 		);
-		const fallbackRef = useRef();
+		const wrapper = useRef();
 		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
-		wrapper = wrapper || fallbackRef;
 
-		// Provide the selected node, or the first and last nodes of a multi-
-		// selection, so it can be used to position the contextual block toolbar.
-		// We only provide what is necessary, and remove the nodes again when they
-		// are no longer selected.
+		// Provide the selected node so it can be used to position the contextual block toolbar.
+		// The wrapper changes when the alignment class changes.
 		useEffect( () => {
-			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
-				const node = wrapper.current;
-				setBlockNodes( ( nodes ) => ( {
-					...nodes,
-					[ clientId ]: node,
-				} ) );
-				return () => {
-					setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
-				};
-			}
-		}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
+			setBlockNodes( ( nodes ) => ( {
+				...nodes,
+				[ clientId ]: wrapper.current,
+			} ) );
+			return () => setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+		}, [ isAligned ] );
 
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -198,7 +190,7 @@ const BlockComponent = forwardRef(
 				{ ...omit( wrapperProps, [ 'data-align' ] ) }
 				{ ...props }
 				id={ blockElementId }
-				ref={ wrapper }
+				ref={ mergeRefs( [ ref, wrapper ] ) }
 				className={ classnames(
 					className,
 					props.className,

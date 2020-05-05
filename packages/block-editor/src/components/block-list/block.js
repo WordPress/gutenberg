@@ -44,7 +44,6 @@ function BlockListBlock( {
 	isMultiSelected,
 	isPartOfMultiSelection,
 	isFirstMultiSelected,
-	isLastMultiSelected,
 	isTypingWithinBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
@@ -151,7 +150,6 @@ function BlockListBlock( {
 		rootClientId,
 		isSelected,
 		isFirstMultiSelected,
-		isLastMultiSelected,
 		isMultiSelecting,
 		isNavigationMode,
 		isPartOfMultiSelection,
@@ -210,7 +208,6 @@ const applyWithSelect = withSelect(
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
-			getLastMultiSelectedBlockClientId,
 			isTyping,
 			getBlockMode,
 			isSelectionEnabled,
@@ -246,8 +243,6 @@ const applyWithSelect = withSelect(
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
-			isLastMultiSelected:
-				getLastMultiSelectedBlockClientId() === clientId,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if
