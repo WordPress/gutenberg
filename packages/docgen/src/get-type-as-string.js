@@ -41,6 +41,10 @@ const getType = ( ast, typeString, noUnionParenthesis ) => {
 		return `[${ getType( ast.value ) }]`;
 	}
 
+	if ( ast.type === 'MEMBER' && ast.owner.type === 'IMPORT' ) {
+		return `${ ast.name }`;
+	}
+
 	return typeString || 'unknown type';
 };
 

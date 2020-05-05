@@ -59,6 +59,16 @@ describe( 'getType from JSDoc', () => {
 		expect( type ).toBe( '[string]' );
 	} );
 
+	it( 'Member', () => {
+		const type = getType( `React.FC` );
+		expect( type ).toBe( 'React.FC' );
+	} );
+
+	it( 'Member import', () => {
+		const type = getType( `import('./react').WPComponent` );
+		expect( type ).toBe( 'WPComponent' );
+	} );
+
 	it( 'RestType with UnionType', () => {
 		const type = getType( '...(Object|string)' );
 		expect( type ).toBe( '...(Object|string)' );
