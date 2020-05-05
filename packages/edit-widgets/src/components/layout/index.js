@@ -8,7 +8,10 @@ import {
 	FocusReturnProvider,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
+import {
+	BlockEditorKeyboardShortcuts,
+	Inserter as BlockEditorInserter,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { InterfaceSkeleton } from '@wordpress/interface';
 
@@ -20,6 +23,9 @@ import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import Inserter from '../inserter';
+
+const disabledInserterToggleProps = { isPrimary: true, disabled: true };
 
 function Layout( { blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( null );
@@ -55,6 +61,15 @@ function Layout( { blockEditorSettings } ) {
 											}
 										/>
 									</div>
+									{ selectedArea === null && (
+										<Inserter>
+											<BlockEditorInserter
+												toggleProps={
+													disabledInserterToggleProps
+												}
+											/>
+										</Inserter>
+									) }
 								</>
 							}
 						/>
