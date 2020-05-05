@@ -2,10 +2,7 @@
 
 @import "./components/customizer-edit-widgets-initializer/style.scss";
 @import "./components/header/style.scss";
-@import "./components/layout/style.scss";
 @import "./components/notices/style.scss";
-@import "./components/sidebar/style.scss";
-@import "./components/widget-area/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
@@ -71,3 +68,28 @@ body.gutenberg_page_gutenberg-widgets {
 		opacity: 1;
 	}
 }
+
+.edit-widgets-sidebar {
+	width: $sidebar-width;
+
+	> .components-panel {
+		margin-top: -1px;
+		margin-bottom: -1px;
+		border-left: 0;
+		border-right: 0;
+
+		> .components-panel__header {
+			background: $light-gray-200;
+		}
+	}
+
+	.block-editor-block-inspector__card {
+		margin: 0;
+	}
+}
+
+.blocks-widgets-container .editor-style-wrapper {
+	max-width: $widget-area-width;
+	margin: auto;
+}
+
