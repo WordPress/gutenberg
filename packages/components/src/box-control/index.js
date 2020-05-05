@@ -24,7 +24,8 @@ import {
 	Header,
 	HeaderControlWrapper,
 } from './styles/box-control-styles';
-import { useBoxControlState, isValuesMixed } from './utils';
+import { DEFAULT_VALUES, isValuesMixed } from './utils';
+import { useControlledState } from '../utils/hooks';
 
 const defaultInputProps = {
 	min: 0,
@@ -41,10 +42,10 @@ export default function BoxControl( {
 	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
-	values: valuesProp,
+	values: valuesProp = DEFAULT_VALUES,
 	units,
 } ) {
-	const [ values, setValues ] = useBoxControlState( valuesProp );
+	const [ values, setValues ] = useControlledState( valuesProp );
 
 	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
 	const [ isDirty, setIsDirty ] = useState( false );

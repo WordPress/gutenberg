@@ -7,7 +7,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { parseUnit } from '../unit-control/utils';
-import { useControlledState } from '../utils/hooks';
 
 export const LABELS = {
 	all: __( 'All' ),
@@ -24,16 +23,6 @@ export const DEFAULT_VALUES = {
 	bottom: '0px',
 	left: '0px',
 };
-
-/**
- * Custom hook that merges default values with values prop to use as state.
- *
- * @param {Object} values Box values.
- * @return {Array<Object, Function>} Hook state and setter.
- */
-export function useBoxControlState( values = DEFAULT_VALUES ) {
-	return useControlledState( values );
-}
 
 /**
  * Gets an items with the most occurance within an array
