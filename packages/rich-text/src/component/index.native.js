@@ -80,6 +80,7 @@ export class RichText extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
+		this.handleMention = this.handleMention.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
@@ -98,6 +99,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.showMention = this.showMention.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
@@ -109,7 +111,7 @@ export class RichText extends Component {
 		this.isTouched = false;
 		this.lastAztecEventType = null;
 
-		this.lastHistoryValue = value;
+		this.lastHistoryValue = value;		
 
 		// Internal values that are update synchronously, unlike props.
 		this.value = value;
@@ -303,6 +305,7 @@ export class RichText extends Component {
 
 		this.handleDelete( event );
 		this.handleEnter( event );
+		this.handleMention( event );
 	}
 
 	handleEnter( event ) {
@@ -381,6 +384,31 @@ export class RichText extends Component {
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
+	}
+
+	handleMention( event ) {
+		const { keyCode } = event;
+
+		if ( keyCode !== "@".charCodeAt(0) ) {
+			return;
+		} 
+		this.showMention();
+	}
+
+	showMention() {
+		const record = this.getRecord();
+		addMention()
+		.then( ( mentionUserId ) => {			
+			let stringToInsert = `@${ mentionUserId }`;
+			if ( this.isIOS ) {
+				stringToInsert += ' ';
+			}			
+			this.insertString(
+				record,
+				stringToInsert
+			);
+		} )
+		.catch( () => {} );
 	}
 
 	/**
@@ -859,6 +887,7 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
+					triggerKeyCodes={ [ '@' ] }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -905,20 +934,7 @@ export class RichText extends Component {
 									<ToolbarButton
 										title={ __( 'Insert mention' ) }
 										icon={ <Icon icon={ atSymbol } /> }
-										onClick={ () => {
-											addMention()
-												.then( ( mentionUserId ) => {
-													let stringToInsert = `@${ mentionUserId }`;
-													if ( this.isIOS ) {
-														stringToInsert += ' ';
-													}
-													this.insertString(
-														record,
-														stringToInsert
-													);
-												} )
-												.catch( () => {} );
-										} }
+										onClick={ this.showMention }
 									/>
 								</Toolbar>
 							) }
