@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { last, noop } from 'lodash';
-import { I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -20,10 +19,7 @@ import withRegistryProvider from './with-registry-provider';
 
 class BlockEditorProvider extends Component {
 	componentDidMount() {
-		this.props.updateSettings( {
-			...this.props.settings,
-			isRTL: I18nManager.isRTL,
-		} );
+		this.props.updateSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
 		this.isSyncingOutcomingValue = [];
