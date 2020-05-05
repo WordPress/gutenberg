@@ -193,9 +193,7 @@ function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
-			enableContrastChecking={
-				isWebPlatform && ! gradient && ! style?.color?.gradient
-			}
+			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
 			clientId={ props.clientId }
 			settings={ [
 				{
