@@ -18,6 +18,8 @@ const git = require( '../lib/git' );
  *
  * @param {string} gitWorkingDirectoryPath Git working directory path.
  * @param {string} abortMessage            Abort Message.
+ *
+ * @return {Promise<Object>} WordPress release branch.
  */
 async function runWordPressReleaseBranchSyncStep(
 	gitWorkingDirectoryPath,
@@ -240,7 +242,7 @@ async function runPushGitChangesStep(
  *
  * @param {string} minimumVersionBump Minimum version bump for the packages.
  *
- * @return {Object} Github release object.
+ * @return {Promise<Object>} Github release object.
  */
 async function prepublishPackages( minimumVersionBump ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
@@ -260,7 +262,11 @@ async function prepublishPackages( minimumVersionBump ) {
 		abortMessage
 	);
 
-	await updatePackageChangelogs( minimumVersionBump, abortMessage );
+	await updatePackageChangelogs(
+		gitWorkingDirectoryPath,
+		minimumVersionBump,
+		abortMessage
+	);
 
 	// Push the local changes
 	abortMessage = `Aborting! Make sure to push changes applied to WordPress release branch "${ releaseBranch }" manually.`;

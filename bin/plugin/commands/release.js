@@ -25,7 +25,8 @@ const STABLE_TAG_PLACEHOLDER = 'Stable tag: V.V.V\n';
  * Fetching the SVN repository to the working directory.
  *
  * @param {string} abortMessage Abort message.
- * @return {string} Repository local path.
+ *
+ * @return {Promise<string>} Repository local path.
  */
 async function runSvnRepositoryCheckoutStep( abortMessage ) {
 	// Cloning the repository
@@ -48,7 +49,8 @@ async function runSvnRepositoryCheckoutStep( abortMessage ) {
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage            Abort Message.
- * @return {Object} chosen version and versionLabels.
+ *
+ * @return {Promise<Object>} chosen version and versionLabels.
  */
 async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
@@ -114,7 +116,7 @@ async function runReleaseBranchCreationStep(
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage Abort Message.
  *
- * @return {Object} chosen version and versionLabels.
+ * @return {Promise<Object>} chosen version and versionLabels.
  */
 async function runReleaseBranchCheckoutStep(
 	gitWorkingDirectoryPath,
@@ -186,7 +188,8 @@ async function runReleaseBranchCheckoutStep(
  * @param {string} version                 Version to use.
  * @param {string} changelog               Changelog to use.
  * @param {string} abortMessage            Abort message.
- * @return {string} hash of the version bump commit.
+ *
+ * @return {Promise<string>} hash of the version bump commit.
  */
 async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 	gitWorkingDirectoryPath,
@@ -296,7 +299,8 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
  *
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage            Abort message.
- * @return {string} Plugin ZIP Path
+ *
+ * @return {Promise<string>} Plugin ZIP Path
  */
 async function runPluginZIPCreationStep(
 	gitWorkingDirectoryPath,
@@ -423,7 +427,8 @@ async function runCherrypickBumpCommitIntoMasterStep(
  * @param {string}  changelog     Release changelog.
  * @param {boolean} isPrerelease  is a pre-release.
  * @param {string}  abortMessage  Abort message.
- * @return {Object} Github release object.
+ *
+ * @return {Promise<Object>} Github release object.
  */
 async function runGithubReleaseStep(
 	zipPath,
@@ -631,7 +636,7 @@ async function updateThePluginStableVersion(
  *
  * @param {boolean} isRC Whether it's an RC release or not.
  *
- * @return {Object} Github release object.
+ * @return {Promise<Object>} Github release object.
  */
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
@@ -724,6 +729,7 @@ async function releasePlugin( isRC = true ) {
 
 		await askForConfirmation(
 			'The GitHub release is complete. Proceed with the SVN release? ',
+			true,
 			abortMessage
 		);
 

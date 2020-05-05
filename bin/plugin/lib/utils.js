@@ -7,7 +7,7 @@ const { log, formats } = require( './logger' );
  * Utility to run a child script
  *
  * @param {string} script Script to run.
- * @param {string} cwd    Working directory.
+ * @param {string?} cwd    Working directory.
  */
 function runShellScript( script, cwd ) {
 	childProcess.execSync( script, {

@@ -10,7 +10,8 @@ const config = require( '../config' );
  * Clone the repository and returns the working directory.
  *
  * @param {string} abortMessage Abort message.
- * @return {string} Repository local path.
+ *
+ * @return {Promise<string>} Repository local path.
  */
 async function runGitRepositoryCloneStep( abortMessage ) {
 	// Cloning the repository
@@ -57,7 +58,7 @@ async function runCleanLocalFoldersStep( folders, abortMessage ) {
  *
  * @return {string} Name of the release branch.
  */
-function findReleaseBranchNames( packageJsonPath ) {
+function findReleaseBranchName( packageJsonPath ) {
 	const masterPackageJson = readJSONFile( packageJsonPath );
 	const masterParsedVersion = semver.parse( masterPackageJson.version );
 
@@ -69,5 +70,5 @@ function findReleaseBranchNames( packageJsonPath ) {
 module.exports = {
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
-	findReleaseBranchNames,
+	findReleaseBranchName,
 };
