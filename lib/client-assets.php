@@ -629,10 +629,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Block Pattern Array.
  */
 function gutenberg_load_block_pattern( $name ) {
-	return json_decode(
-		file_get_contents( __DIR__ . '/patterns/' . $name . '.json' ),
-		true
-	);
+	return require( __DIR__ . '/patterns/' . $name . '.php' );
 }
 
 /**

@@ -3,7 +3,7 @@
 exports[`Buttons can jump to the link editor using the keyboard shortcut 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->
-<a class=\\"wp-block-button wp-block-button__link\\" href=\\"https://www.wordpress.org/\\">WordPress</a>
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\" href=\\"https://www.wordpress.org/\\">WordPress</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
@@ -11,7 +11,7 @@ exports[`Buttons can jump to the link editor using the keyboard shortcut 1`] = `
 exports[`Buttons dismisses link editor when escape is pressed 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->
-<a class=\\"wp-block-button wp-block-button__link\\">WordPress</a>
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">WordPress</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
@@ -19,7 +19,7 @@ exports[`Buttons dismisses link editor when escape is pressed 1`] = `
 exports[`Buttons has focus on button content 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->
-<a class=\\"wp-block-button wp-block-button__link\\">Content</a>
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;

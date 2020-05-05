@@ -23,13 +23,15 @@ import {
 } from '@wordpress/block-editor';
 import { Platform } from '@wordpress/element';
 
-function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
-	const { align, content, level, placeholder, style } = attributes;
+function HeadingEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+	onReplace,
+	mergedStyle,
+} ) {
+	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-
-	const styles = {
-		color: style && style.color && style.color.text,
-	};
 
 	return (
 		<>
@@ -88,7 +90,7 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				textAlign={ align }
-				style={ styles }
+				style={ mergedStyle }
 			/>
 		</>
 	);

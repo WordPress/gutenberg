@@ -37,7 +37,10 @@ final class WP_Patterns_Registry {
 			return false;
 		}
 
-		$this->registered_patterns[ $pattern_name ] = $pattern_properties;
+		$this->registered_patterns[ $pattern_name ] = array_merge(
+			$pattern_properties,
+			array( 'name' => $pattern_name )
+		);
 
 		return true;
 	}

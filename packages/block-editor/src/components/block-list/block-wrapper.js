@@ -26,7 +26,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
-import { BlockContext } from './block';
+import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
@@ -50,7 +50,7 @@ const BlockComponent = forwardRef(
 			mode,
 			blockTitle,
 			wrapperProps,
-		} = useContext( BlockContext );
+		} = useContext( BlockListBlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
 				if ( ! isSelected ) {
@@ -230,8 +230,7 @@ const BlockComponent = forwardRef(
 		);
 
 		// For aligned blocks, provide a wrapper element so the block can be
-		// positioned relative to the block column. This is enabled with the
-		// .is-block-content className.
+		// positioned relative to the block column.
 		if ( isAligned ) {
 			const alignmentWrapperProps = {
 				'data-align': wrapperProps[ 'data-align' ],
