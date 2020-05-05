@@ -8,7 +8,7 @@ import { dropRight, get, map, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -78,8 +78,15 @@ function ColumnsEditContainer( {
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
 						min={ 2 }
-						max={ 6 }
+						max={ Math.max( 6, count ) }
 					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This number of columns used is too big. It may cause visual breakage.'
+							) }
+						</Notice>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
