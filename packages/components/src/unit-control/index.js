@@ -19,7 +19,7 @@ import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 
 function UnitControl(
 	{
-		unstable_stateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = ( state ) => state,
 		autoComplete = 'off',
 		className,
 		disabled = false,
@@ -145,7 +145,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				unstable_stateReducer={ [
+				__unstableStateReducer={ [
 					unitControlStateReducer,
 					stateReducer,
 				] }

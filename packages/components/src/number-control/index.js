@@ -20,7 +20,7 @@ import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
 	{
-		unstable_stateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = ( state ) => state,
 		className,
 		dragDirection = 'n',
 		hideHTMLArrows = false,
@@ -168,7 +168,7 @@ export function NumberControl(
 			ref={ ref }
 			type={ typeProp }
 			value={ initialValue }
-			unstable_stateReducer={ [
+			__unstableStateReducer={ [
 				numberControlStateReducer,
 				stateReducer,
 			] }

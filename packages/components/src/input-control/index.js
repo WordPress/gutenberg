@@ -28,7 +28,7 @@ function useUniqueId( idProp ) {
 
 export function InputControl(
 	{
-		unstable_stateReducer: stateReducer = ( state ) => state,
+		__unstableStateReducer: stateReducer = ( state ) => state,
 		children,
 		className,
 		disabled = false,
