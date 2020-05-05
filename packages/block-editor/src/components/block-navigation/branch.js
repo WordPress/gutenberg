@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Children,
-	cloneElement,
-	useContext,
-} from '@wordpress/element';
+import { Children, cloneElement, useContext } from '@wordpress/element';
 import { Fill, Slot } from '@wordpress/components';
 
 /**
