@@ -1,6 +1,4 @@
-/**
- * @typedef {import('./index').WordCountStrategy} WordCountStrategy
- */
+/** @typedef {import('./index').WordCountStrategy} WordCountStrategy */
 
 /**
  * @typedef {Object} WordCountSettingsFields
@@ -21,6 +19,8 @@
  */
 
 /**
+ * Lower-level settings for word counting that can be overridden.
+ *
  * @typedef {Partial<WordCountSettingsFields>} WordCountSettings
  */
 

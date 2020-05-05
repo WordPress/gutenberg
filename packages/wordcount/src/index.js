@@ -17,16 +17,12 @@ import stripShortcodes from './stripShortcodes';
 import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
 
-/**
- * A number, or a string containing a number.
- *
- * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WordCountStrategy
- */
+/** @typedef {import('./defaultSettings').WordCountSettings}  WordCountSettings */
 
 /**
- * Lower-level settings for word counting that can be overridden.
+ * Possible ways of counting.
  *
- * @typedef {import('./defaultSettings').WordCountSettings}  WordCountSettings
+ * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WordCountStrategy
  */
 
 /**
