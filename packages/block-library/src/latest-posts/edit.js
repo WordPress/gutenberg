@@ -109,6 +109,7 @@ class LatestPostsEdit extends Component {
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
+			displayAuthor,
 			postLayout,
 			columns,
 			order,
@@ -195,6 +196,13 @@ class LatestPostsEdit extends Component {
 				</PanelBody>
 
 				<PanelBody title={ __( 'Post meta settings' ) }>
+					<ToggleControl
+						label={ __( 'Display author name' ) }
+						checked={ displayAuthor }
+						onChange={ ( value ) =>
+							setAttributes( { displayAuthor: value } )
+						}
+					/>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
@@ -359,6 +367,7 @@ class LatestPostsEdit extends Component {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
+						'has-author': displayAuthor,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
@@ -437,6 +446,11 @@ class LatestPostsEdit extends Component {
 										__( '(no title)' )
 									) }
 								</a>
+								{ displayAuthor && (
+									<div className="wp-block-latest-posts__post-author">
+										{ `by ${ post.author_info.name }` }
+									</div>
+								) }
 								{ displayPostDate && post.date_gmt && (
 									<time
 										dateTime={ format(

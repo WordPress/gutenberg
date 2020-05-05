@@ -98,6 +98,15 @@ function render_block_core_latest_posts( $attributes ) {
 			$title
 		);
 
+		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
+			$author = get_the_author_meta( 'display_name', $post->post_author );
+			$list_items_markup .= sprintf(
+				'<div class="wp-block-latest-posts__post-author">%1$s %2$s</div>',
+				__( 'Posted by' ),
+				$author
+			);
+		}
+
 		if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
 			$list_items_markup .= sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
@@ -145,6 +154,10 @@ function render_block_core_latest_posts( $attributes ) {
 
 	if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
 		$class .= ' has-dates';
+	}
+
+	if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
+		$class .= ' has-author';
 	}
 
 	if ( isset( $attributes['className'] ) ) {
