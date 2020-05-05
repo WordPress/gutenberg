@@ -1,10 +1,14 @@
 /**
+ * External dependencies
+ */
+import { lowerCase, includes, filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { Tip } from '@wordpress/components';
-import {context} from "@actions/github/lib/github";
 
 const globalTips = [
 	createInterpolateElement(
@@ -76,9 +80,30 @@ const contextualTips = {
 	),
 };
 
+function getTipByContext( tipContext ) {
+	if ( ! tipContext ) {
+		return;
+	}
+
+	const contextualKeys = filter( Object.keys( contextualTips ), ( key ) =>
+		includes( lowerCase( tipContext ), key )
+	);
+
+	if ( ! contextualKeys.length ) {
+		return;
+	}
+
+	return contextualTips[
+		// eslint-disable-next-line no-restricted-syntax
+		contextualKeys[ Math.floor( Math.random() * contextualKeys.length ) ]
+	];
+}
+
 function Tips( { tipContext } ) {
-	if ( contextualTips[ tipContext ] ) {
-		return <Tip>{ contextualTips[ tipContext ] }</Tip>;
+	// Return a contextual tip when it's appropriate.
+	const contextualTip = getTipByContext( tipContext );
+	if ( contextualTip ) {
+		return <Tip>{ contextualTip }</Tip>;
 	}
 
 	const [ randomIndex ] = useState(
