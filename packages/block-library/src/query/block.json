@@ -1,4 +1,12 @@
 {
 	"name": "core/query",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"query": {
+			"type": "object",
+			"default": {
+				"per_page": 3
+			}
+		}
+	}
 }
