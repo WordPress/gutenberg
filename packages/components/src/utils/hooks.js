@@ -18,9 +18,7 @@ export function useControlledState( initialState ) {
 	const stateRef = useRef( initialState );
 
 	useEffect( () => {
-		/**
-		 * Update the internal state if the incoming value changes.
-		 */
+		// Update the internal state if the incoming value changes.
 		if ( initialState !== stateRef.current ) {
 			setState( initialState );
 			stateRef.current = initialState;
