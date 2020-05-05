@@ -159,15 +159,12 @@ function gutenberg_experimental_global_styles_get_core() {
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_theme() {
-	$global_styles_theme = gutenberg_experimental_global_styles_get_from_file(
-		locate_template( 'experimental-theme.json' )
-	);
-
+	$theme_supports = array();
 	// Take colors from declared theme support.
 	$theme_colors = get_theme_support( 'editor-color-palette' )[ 0 ];
 	if ( is_array( $theme_colors ) ) {
 		foreach( $theme_colors as $color ) {
-			$global_styles_theme['theme']['color'][ $color['slug'] ] = $color['color'];
+			$theme_supports['preset']['color'][ $color['slug'] ] = $color['color'];
 		}
 	}
 
@@ -175,7 +172,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[ 0 ];
 	if( is_array( $theme_gradients ) ) {
 		foreach( $theme_gradients as $gradient ) {
-			$global_styles_theme['theme']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_supports['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
 		}
 	}
 
@@ -183,11 +180,30 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[ 0 ];
 	if( is_array( $theme_font_sizes ) ) {
 		foreach( $theme_font_sizes as $font_size ) {
-			$global_styles_theme['theme']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_supports['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
 		}
 	}
 
-	return $global_styles_theme;
+	/*
+	 * We want the presets declared in theme.json
+	 * to take precedence over the ones declared via add_theme_support.
+	 *
+	 * However, at the moment, it's not clear how we're going to declare them
+	 * in theme.json until we resolve issues related to i18n and
+	 * unfold the proper theme.json hierarchy. See:
+	 *
+	 * https://github.com/wp-cli/i18n-command/pull/210
+	 * https://github.com/WordPress/gutenberg/issues/20588
+	 *
+	 * Hence, for simplicity, we take here the existing presets
+	 * from the add_theme_support, if any.
+	 */
+	return array_merge(
+		gutenberg_experimental_global_styles_get_from_file(
+			locate_template( 'experimental-theme.json' )
+		),
+		$theme_supports
+	);
 }
 
 /**
