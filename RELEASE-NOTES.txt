@@ -1,3 +1,7 @@
+1.28.0
+------
+* Add support for changing background and text color in Buttons block
+
 1.27.0
 ------
 * Prefill caption for image blocks when available on the Media library
