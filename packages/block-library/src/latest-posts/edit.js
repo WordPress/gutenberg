@@ -448,7 +448,8 @@ class LatestPostsEdit extends Component {
 								</a>
 								{ displayAuthor && (
 									<div className="wp-block-latest-posts__post-author">
-										{ `by ${ post.author_info.name }` }
+										{ __( 'Posted by' ) }{ ' ' }
+										{ post.author_info.name }
 									</div>
 								) }
 								{ displayPostDate && post.date_gmt && (
