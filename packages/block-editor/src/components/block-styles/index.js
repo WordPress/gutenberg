@@ -85,14 +85,9 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		};
 	};
 
-	const {
-		useExample,
-		blockName,
-		className,
-		styles,
-		type,
-		block,
-	} = useSelect( selector, [ clientId ] );
+	const { styles, type, className, ...rest } = useSelect( selector, [
+		clientId,
+	] );
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const onChangeClassName = useCallback(
@@ -127,67 +122,35 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 	return (
 		<div className="block-editor-block-styles">
-			{ styles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					className,
-					activeStyle,
-					style
-				);
-				return (
-					<div
-						key={ style.name }
-						className={ classnames(
-							'block-editor-block-styles__item',
-							{
-								'is-active': activeStyle === style,
-							}
-						) }
-						onClick={ () => updateClassName( style ) }
-						onKeyDown={ ( event ) => {
-							if (
-								ENTER === event.keyCode ||
-								SPACE === event.keyCode
-							) {
-								event.preventDefault();
-								updateClassName( style );
-							}
-						} }
-						onMouseEnter={ () =>
-							onHoverClassName( styleClassName )
-						}
-						onMouseLeave={ () => onHoverClassName( null ) }
-						role="button"
-						tabIndex="0"
-						aria-label={ style.label || style.name }
-					>
-						<div className="block-editor-block-styles__item-preview">
-							<BlockStylePreview
-								type={ type }
-								block={ block }
-								blockName={ blockName }
-								useExample={ useExample }
-								styleClassName={ styleClassName }
-								viewportWidth={ 500 }
-							/>
-						</div>
-						<div className="block-editor-block-styles__item-label">
-							{ style.label || style.name }
-						</div>
-					</div>
-				);
-			} ) }
+			{ styles.map( ( style ) => (
+				<BlockStyleItem
+					activeStyle={ activeStyle }
+					className={ className }
+					key={ style.name }
+					onHoverClassName={ onHoverClassName }
+					style={ style }
+					type={ type }
+					updateClassName={ updateClassName }
+					{ ...rest }
+				/>
+			) ) }
 		</div>
 	);
 }
 
-function BlockStylePreview( {
-	useExample,
+function BlockStyleItem( {
 	type,
 	block,
 	blockName,
-	styleClassName,
-	viewportWidth,
+	useExample,
+	style,
+	activeStyle,
+	updateClassName,
+	className,
+	onHoverClassName,
 } ) {
+	const styleClassName = replaceActiveStyle( className, activeStyle, style );
+
 	let factory, deps;
 	if ( useExample ) {
 		factory = () =>
@@ -206,14 +169,34 @@ function BlockStylePreview( {
 			} );
 		deps = [ block, styleClassName ];
 	}
-
 	const previewBlocks = useMemo( factory, deps );
 
 	return (
-		<BlockPreview
-			viewportWidth={ viewportWidth }
-			blocks={ previewBlocks }
-		/>
+		<div
+			key={ style.name }
+			className={ classnames( 'block-editor-block-styles__item', {
+				'is-active': activeStyle === style,
+			} ) }
+			onClick={ () => updateClassName( style ) }
+			onKeyDown={ ( event ) => {
+				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+					event.preventDefault();
+					updateClassName( style );
+				}
+			} }
+			onMouseEnter={ () => onHoverClassName( styleClassName ) }
+			onMouseLeave={ () => onHoverClassName( null ) }
+			role="button"
+			tabIndex="0"
+			aria-label={ style.label || style.name }
+		>
+			<div className="block-editor-block-styles__item-preview">
+				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+			</div>
+			<div className="block-editor-block-styles__item-label">
+				{ style.label || style.name }
+			</div>
+		</div>
 	);
 }
 
