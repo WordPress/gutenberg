@@ -119,36 +119,6 @@ const Services = {
 						},
 					],
 				},
-				{
-					name: 'core/column',
-					innerBlocks: [
-						{
-							name: 'core/image',
-							attributes: {
-								url:
-									'https://images.pexels.com/photos/3811082/pexels-photo-3811082.jpeg?cs=srgb&dl=photo-of-women-at-the-meeting-3811082.jpg&fm=jpg',
-								alt: '',
-								caption: '',
-								sizeSlug: 'large',
-								linkDestination: 'none',
-							},
-						},
-						{
-							name: 'core/heading',
-							attributes: {
-								content: 'Determination',
-								level: 2,
-							},
-						},
-						{
-							name: 'core/paragraph',
-							attributes: {
-								// translators: sample content for "Services" page template
-								content: __('A short description of the services you offer.'),
-							},
-						},
-					],
-				},
 			],
 		},
 		{
