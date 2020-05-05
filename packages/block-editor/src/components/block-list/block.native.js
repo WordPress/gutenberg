@@ -95,8 +95,8 @@ class BlockListBlock extends Component {
 
 	render() {
 		const {
-			attributes,
-			blockType,
+			attributes = {},
+			blockType = {},
 			clientId,
 			icon,
 			isSelected,

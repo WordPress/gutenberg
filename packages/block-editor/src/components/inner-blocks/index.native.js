@@ -163,7 +163,7 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
-		const block = getBlock( clientId );
+		const block = getBlock( clientId ) || { innerBlocks: [] };
 		const rootClientId = getBlockRootClientId( clientId );
 
 		return {
