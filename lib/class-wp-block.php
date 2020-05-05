@@ -169,12 +169,14 @@ class WP_Block {
 	/**
 	 * Generates the render output for the block.
 	 *
+	 * @param bool $no_dynamic Optionally set to true to avoid using the block's render_callback.
+	 *
 	 * @return string Rendered block output.
 	 */
-	public function render() {
+	public function render( $no_dynamic = false ) {
 		global $post;
 
-		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
+		$is_dynamic    = ! $no_dynamic && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
 
 		$index = 0;
