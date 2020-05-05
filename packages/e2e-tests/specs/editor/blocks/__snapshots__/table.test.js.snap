@@ -53,3 +53,9 @@ exports[`Table displays a form for choosing the row and column count of the tabl
 <figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->"
 `;
+
+exports[`Table up and down arrow navigation 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td>1</td><td>4</td></tr><tr><td>2</td><td>3</td></tr></tbody></table></figure>
+<!-- /wp:table -->"
+`;
