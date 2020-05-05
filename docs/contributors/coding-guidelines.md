@@ -195,6 +195,18 @@ alert( 'My name is ' + name + '.' );
 alert( `My name is ${ name }.` );
 ```
 
+### Optional Chaining
+
+[Optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) is a new language feature introduced in version 2020 of the ECMAScript specification. While the feature can be very convenient for property access on objects which are potentially null-ish (`null` or `undefined`), there are a number of common pitfalls to be aware of when using optional chaining. These may be issues that linting and/or type-checking can help protect against at some point in the future. In the meantime, you will want to be cautious of the following items:
+
+- When negating (`!`) the result of a value which is evaluated with optional chaining, you should be observant that in the case that optional chaining reaches a point where it cannot proceed, it will produce a [falsy value](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) that will be transformed to `true` when negated. In many cases, this is not an expected result.
+   - Example: `const hasFocus = ! nodeRef.current?.contains( document.activeElement );` will yield `true` if `nodeRef.current` is not assigned.
+   - See related issue: [#21984](https://github.com/WordPress/gutenberg/issues/21984)
+   - See similar ESLint rule: [`no-unsafe-negation`](https://eslint.org/docs/rules/no-unsafe-negation)
+- When assigning a boolean value, observe that optional chaining may produce values which are [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) (`undefined`, `null`), but not strictly `false`. This can become an issue when the value is passed around in a way where it is expected to be a boolean (`true` or `false`). While it's a common occurrence for booleans—since booleans are often used in ways where the logic considers truthiness and falsyness broadly—these issues can also occur for other optional chaining when eagerly assuming a type resulting from the end of the property access chain. [Type-checking](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#typescript) may help in preventing these sorts of errors.
+   - Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
+   - Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
+
 ## JavaScript Documentation using JSDoc
 
 Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
