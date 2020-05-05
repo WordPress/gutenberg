@@ -221,4 +221,6 @@ else:
 <p class="has-text-color has-text-align-center has-large-font-size has-very-light-gray-color">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
+
+<!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
 `;

@@ -48,7 +48,8 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 		await editorPage.sendTextToHeadingBlock(
 			headingBlockElement,
-			testData.heading
+			testData.heading,
+			false
 		);
 
 		await editorPage.addNewParagraphBlock();
@@ -73,7 +74,8 @@ describe( 'Gutenberg Editor tests', () => {
 		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
 		await editorPage.sendTextToHeadingBlock(
 			headingBlockElement,
-			testData.heading
+			testData.heading,
+			false
 		);
 
 		await editorPage.addNewParagraphBlock();

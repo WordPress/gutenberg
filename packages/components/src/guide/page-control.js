@@ -37,8 +37,8 @@ export default function PageControl( {
 								isSelected={ page === currentPage }
 							/>
 						}
-						/* translators: %1$d: current page number %2$d: total number of pages */
 						aria-label={ sprintf(
+							/* translators: 1: current page number 2: total number of pages */
 							__( 'Page %1$d of %2$d' ),
 							page + 1,
 							numberOfPages

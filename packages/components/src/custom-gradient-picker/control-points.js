@@ -214,7 +214,11 @@ export default function ControlPoints( {
 								) {
 									return;
 								}
-								onStartControlPointChange();
+								if ( isOpen ) {
+									onStopControlPointChange();
+								} else {
+									onStartControlPointChange();
+								}
 								onToggle();
 							} }
 							onMouseDown={ () => {

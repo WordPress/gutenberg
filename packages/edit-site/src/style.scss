@@ -1,5 +1,9 @@
+@import "../../interface/src/style.scss";
+
 @import "./components/block-editor/style.scss";
 @import "./components/header/style.scss";
+@import "./components/header/fullscreen-mode-close/style.scss";
+@import "./components/header/more-menu/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/template-switcher/style.scss";
@@ -10,7 +14,6 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.gutenberg_page_gutenberg-edit-site,
 body.toplevel_page_gutenberg-edit-site {
 	@include wp-admin-reset(".edit-site");
 }
@@ -40,6 +43,12 @@ body.toplevel_page_gutenberg-edit-site {
 
 	> .components-navigate-regions {
 		height: 100%;
+	}
+
+	// Todo: Remove this rule when edit site gets support
+	// for opening unpinned sidebar items.
+	.interface-complementary-area__pin-unpin-item.components-button {
+		display: none;
 	}
 }
 

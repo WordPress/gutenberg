@@ -1,6 +1,31 @@
+1.27.0
+------
+* Prefill caption for image blocks when available on the Media library
+* New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
+* [iOS]: Video in video blocks can now be played inline on the editor.
+* [Android] Floating toolbar, previously located above nested blocks, is now placed at the top of the screen
+* [iOS] Floating toolbar, previously located above nested blocks, is now placed at the bottom of the screen
+* Fix the icons in FloatingToolbar on RTL mode
+
+1.26.0
+------
+* [iOS] Disable ripple effect in all BottomSheet's controls.
+* [Android] Disable ripple effect for Slider control
+* New block: Columns
+* New starter page template: Blog
+* Make Starter Page Template picker buttons visible only when the screen height is enough
+* Fix a bug which caused to show URL settings modal randomly when changing the device orientation multiple times during the time Starter Page Template Preview is open
+
 1.25.0
 ------
-* Improve icon on the "Take a Video" media option
+* New block: Cover
+* [Android] Dark Mode
+* [Android] Improve icon on the "Take a Video" media option
+* Removed the dimming effect on unselected blocks
+* [iOS] Add alignment options for heading block
+* Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
+* Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
+* [Android] Show an "Edit" button overlay on selected image blocks
 
 1.24.0
 ------
@@ -8,7 +33,6 @@
 * Fix Quote block's left border not being visible in Dark Mode
 * Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
 * Fix crash when pasting HTML content with embeded images on paragraphs
-* [Android] Dark Mode
 
 1.23.0
 ------

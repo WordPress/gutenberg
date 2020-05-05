@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable jest/no-try-expect */
 /**
  * External dependencies
  */
@@ -221,11 +221,11 @@ describe( 'readConfig', () => {
 
 	it( 'should throw a validaton error if the ports are not numbers', async () => {
 		expect.assertions( 10 );
-		testPortNumberValidation( 'port', 'string' );
-		testPortNumberValidation( 'testsPort', [] );
-		testPortNumberValidation( 'port', {} );
-		testPortNumberValidation( 'testsPort', false );
-		testPortNumberValidation( 'port', null );
+		await testPortNumberValidation( 'port', 'string' );
+		await testPortNumberValidation( 'testsPort', [] );
+		await testPortNumberValidation( 'port', {} );
+		await testPortNumberValidation( 'testsPort', false );
+		await testPortNumberValidation( 'port', null );
 	} );
 
 	it( 'should throw a validaton error if the ports are the same', async () => {
@@ -415,3 +415,4 @@ async function testPortNumberValidation( portName, value ) {
 	}
 	jest.clearAllMocks();
 }
+/* eslint-enable jest/no-try-expect */

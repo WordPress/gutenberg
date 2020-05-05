@@ -19,8 +19,18 @@ $navigation-item-height: 46px;
 	align-items: center;
 }
 
+.wp-block-navigation.is-vertical .block-list-appender {
+	margin: $grid-unit-10;
+}
+
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
+}
+
+// Ensure sub-menus stay open and visible when a nested block is selected.
+.wp-block-navigation__container.is-parent-of-selected-block {
+	visibility: visible;
+	opacity: 1;
 }
 
 /**

@@ -10,11 +10,15 @@ import {
 } from '../helpers/utils';
 
 export default class EditorPage {
+	driver;
+	accessibilityIdKey;
+	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
 	listBlockName = 'List';
 	headingBlockName = 'Heading';
 	imageBlockName = 'Image';
 	galleryBlockName = 'Gallery';
+	latestPostsBlockName = 'Latest Posts';
 	unorderedListButtonName = 'Convert to unordered list';
 	orderedListButtonName = 'Convert to ordered list';
 
@@ -179,10 +183,48 @@ export default class EditorPage {
 		await addButton.click();
 
 		// Click on block of choice
+		const blockButton = await this.findBlockButton( blockName );
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', {
+				element: blockButton,
+				x: 10,
+				y: 10,
+			} );
+		}
+	}
+
+	// Attempts to find the given block button in the block inserter control.
+	async findBlockButton( blockName ) {
+		if ( isAndroid() ) {
+			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
+			while (
+				! ( await this.driver.hasElementByAccessibilityId( blockName ) )
+			) {
+				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+			}
+
+			return await this.driver.elementByAccessibilityId( blockName );
+		}
+
 		const blockButton = await this.driver.elementByAccessibilityId(
 			blockName
 		);
-		await blockButton.click();
+		const size = await this.driver.getWindowSize();
+		const height = size.height - 5;
+
+		while ( ! ( await blockButton.isDisplayed() ) ) {
+			await this.driver.execute( 'mobile: dragFromToForDuration', {
+				fromX: 50,
+				fromY: height,
+				toX: 50,
+				toY: height - 450,
+				duration: 0.5,
+			} );
+		}
+
+		return blockButton;
 	}
 
 	async clickToolBarButton( buttonName ) {
@@ -440,7 +482,7 @@ export default class EditorPage {
 
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
 		const imageBlockCaptionField = await this.driver.elementByXPath(
-			'//XCUIElementTypeButton[@name="Image caption. Empty"]'
+			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
 		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
@@ -514,5 +556,24 @@ export default class EditorPage {
 		);
 		const text = await textViewElement.text();
 		return text.toString();
+	}
+
+	// ============================
+	// Latest-Posts Block functions
+	// ============================
+
+	async addNewLatestPostsBlock() {
+		await this.addNewBlock( this.latestPostsBlockName );
+	}
+
+	async getLatestPostsBlockAtPosition( position ) {
+		return this.getBlockAtPosition( position, this.latestPostsBlockName );
+	}
+
+	async removeLatestPostsBlockAtPosition( position ) {
+		return await this.removeBlockAtPosition(
+			position,
+			this.latestPostsBlockName
+		);
 	}
 }

@@ -26,16 +26,10 @@ function render_block_core_post_comments_form() {
  * Registers the `core/post-comments-form` block on the server.
  */
 function register_block_core_post_comments_form() {
-	$path     = __DIR__ . '/post-comments-form/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_post_comments_form',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/post-comments-form',
+		array(
+			'render_callback' => 'render_block_core_post_comments_form',
 		)
 	);
 }

@@ -43,7 +43,7 @@ const strToKeycode = {
 	'\u0008': 67,
 };
 
-const timer = ( ms ) => new Promise()( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
@@ -167,9 +167,26 @@ const typeString = async ( driver, element, str, clear ) => {
 
 const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		await element.clear();
+		//await element.clear(); This was not working correctly on iOS so need a custom implementation
+		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+};
+
+const clearTextBox = async ( driver, element ) => {
+	await element.click();
+	let originalText = await element.text();
+	let text = originalText;
+	// We are double tapping on the text field and pressing backspace until all content is removed.
+	do {
+		originalText = await element.text();
+		const action = new wd.TouchAction( driver );
+		action.tap( { el: element, count: 2 } );
+		await action.perform();
+		await element.type( '\b' );
+		text = await element.text();
+		// We compare with the original content and not empty because text always return any hint set on the element.
+	} while ( originalText !== text );
 };
 
 const typeStringAndroid = async (

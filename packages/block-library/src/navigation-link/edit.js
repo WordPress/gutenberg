@@ -228,11 +228,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ showSubmenuIcon && (
-						<span className="wp-block-navigation-link__submenu-icon">
-							<ItemSubmenuIcon />
-						</span>
-					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
@@ -285,6 +280,11 @@ function NavigationLinkEdit( {
 						</Popover>
 					) }
 				</div>
+				{ showSubmenuIcon && (
+					<span className="wp-block-navigation-link__submenu-icon">
+						<ItemSubmenuIcon />
+					</span>
+				) }
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
@@ -296,7 +296,12 @@ function NavigationLinkEdit( {
 					__experimentalTagName="ul"
 					__experimentalAppenderTagName="li"
 					__experimentalPassedProps={ {
-						className: 'wp-block-navigation__container',
+						className: classnames(
+							'wp-block-navigation__container',
+							{
+								'is-parent-of-selected-block': isParentOfSelectedBlock,
+							}
+						),
 					} }
 				/>
 			</Block.li>

@@ -77,9 +77,10 @@ async function mockCreatePageResponse( title, slug ) {
 /**
  * Interacts with the LinkControl to perform a search and select a returned suggestion
  *
- * @param {string} url What will be typed in the search input
- * @param {string} label What the resulting label will be in the creating Navigation Link Block after the block is created.
- * @param {string} type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
+ * @param {Object} link link object to be tested
+ * @param {string} link.url What will be typed in the search input
+ * @param {string} link.label What the resulting label will be in the creating Navigation Link Block after the block is created.
+ * @param {string} link.type What kind of suggestion should be clicked, ie. 'url', 'create', or 'entity'
  */
 async function updateActiveNavigationLink( { url, label, type } ) {
 	const typeClasses = {
@@ -311,6 +312,7 @@ describe( 'Navigation', () => {
 				document.activeElement.innerText ===
 					'A really long page name that will not exist'
 		);
+
 		expect( isInLinkRichText ).toBe( true );
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".

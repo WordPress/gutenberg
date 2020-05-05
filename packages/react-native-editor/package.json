@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/react-native-editor",
-  "version": "1.21.0",
+  "version": "1.26.0",
   "description": "Mobile WordPress gutenberg editor.",
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@babel/runtime": "^7.7.7",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
+    "@wordpress/components": "file:../components",
     "@wordpress/data": "file:../data",
     "@wordpress/edit-post": "file:../edit-post",
     "@wordpress/element": "file:../element",
@@ -48,6 +49,7 @@
     "postinstall-prepare": "^1.0.1",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
+    "react-native-get-random-values": "^1.4.0",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",
     "react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37",
@@ -56,7 +58,7 @@
     "react-native-sass-transformer": "^1.1.1",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#c43bdf6b06d361da399b98b8d2e32b578fa188ac",
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948",
     "wd": "^1.11.1"
   },
   "publishConfig": {
@@ -81,8 +83,8 @@
     "install:wpcli": "(test -x bin/wp-cli.phar || curl -Ls https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o bin/wp-cli.phar && chmod +x bin/wp-cli.phar) && bin/wp-cli.phar --info",
     "prewp": "npm run install:wpcli",
     "wp": "php -d memory_limit=512M bin/wp-cli.phar",
-    "makepot:android": "npm run wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.android.js --exclude=test/* --subtract=./gutenberg.pot --ignore-domain gutenberg-android.pot",
-    "makepot:ios": "npm run wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.ios.js --exclude=test/* --subtract=./gutenberg.pot --ignore-domain gutenberg-ios.pot",
+    "makepot:android": "test -f gutenberg.pot && npm run wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.android.js --exclude=test/* --subtract=./gutenberg.pot --ignore-domain gutenberg-android.pot",
+    "makepot:ios": "test -f gutenberg.pot && npm run wp i18n make-pot ./gutenberg/packages --include=*.native.js,*.ios.js --exclude=test/* --subtract=./gutenberg.pot --ignore-domain gutenberg-ios.pot",
     "premakepot:gutenberg": "npm run clean:gutenberg && npm run build:gutenberg",
     "makepot:gutenberg": "npm run wp i18n make-pot ./gutenberg/build --ignore-domain gutenberg.pot",
     "postmakepot:gutenberg": "npm run clean:gutenberg",

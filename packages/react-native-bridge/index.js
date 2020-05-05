@@ -5,6 +5,7 @@ import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
 
 const gutenbergBridgeEvents = new NativeEventEmitter(
 	RNReactNativeGutenbergBridge
@@ -22,8 +23,6 @@ export const userEvents = {
 	editorSessionTemplateApply: 'editor_session_template_apply',
 	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
-
-export const showMediaEditorButton = isIOS;
 
 // Console polyfill from react-native
 
@@ -70,6 +69,12 @@ export function subscribeMediaUpload( callback ) {
 
 export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
+}
+
+export function subscribeAndroidModalClosed( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener( 'notifyModalClosed', callback )
+		: undefined;
 }
 
 export function subscribePreferredColorScheme( callback ) {

@@ -58,7 +58,8 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await imageBlock.click();
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption
+				testData.imageCaption,
+				true
 			);
 			await editorPage.dismissKeyboard();
 			imageBlock = await editorPage.getImageBlockAtPosition( 1 );

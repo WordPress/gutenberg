@@ -13,7 +13,7 @@ import {
  *
  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
  *
- * @param {WPElement}   child     Any renderable child, such as an element,
+ * @param {import('./react').WPElement}   child     Any renderable child, such as an element,
  *                                string, or fragment.
  * @param {HTMLElement} container DOM node into which element should be rendered.
  */
@@ -22,14 +22,14 @@ export { createPortal };
 /**
  * Finds the dom node of a React component.
  *
- * @param {WPComponent} component Component's instance.
+ * @param {import('./react').WPComponent} component Component's instance.
  */
 export { findDOMNode };
 
 /**
  * Renders a given element into the target DOM node.
  *
- * @param {WPElement}   element Element to render.
+ * @param {import('./react').WPElement}   element Element to render.
  * @param {HTMLElement} target  DOM node into which element should be rendered.
  */
 export { render };
