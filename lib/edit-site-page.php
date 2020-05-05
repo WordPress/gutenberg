@@ -145,29 +145,13 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
-	$template_types = array(
-		'index',
-		'404',
-		'archive',
-		'author',
-		'category',
-		'tag',
-		'taxonomy',
-		'date',
-		// Skip 'embed' for now because it is not a regular template type.
-		'home',
-		'front-page',
-		'privacy-policy',
-		'page',
-		'search',
-		'single',
-		'singular',
-		'attachment',
-	);
-
 	$template_ids      = array();
 	$template_part_ids = array();
-	foreach ( $template_types as $template_type ) {
+	foreach ( get_template_types() as $template_type ) {
+		if ( $template_type === 'embed' ) {
+			continue;
+		}
+
 		$template_hierarchy    = get_template_hierachy( $template_type );
 		$current_template_post = gutenberg_find_template_post( $template_hierarchy );
 		if ( isset( $current_template_post ) ) {

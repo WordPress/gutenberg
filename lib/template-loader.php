@@ -6,21 +6,14 @@
  */
 
 /**
- * Adds necessary filters to use 'wp_template' posts instead of theme template files.
+ * Return a list of all overrideable default template types.
+ *
+ * @see get_query_template
+ *
+ * @return string[] List of all overrideable default template types.
  */
-function gutenberg_add_template_loader_filters() {
-	if ( ! post_type_exists( 'wp_template' ) ) {
-		return;
-	}
-
-	/**
-	 * Array of all overrideable default template types.
-	 *
-	 * @see get_query_template
-	 *
-	 * @var array
-	 */
-	$template_types = array(
+function get_template_types() {
+	return array(
 		'index',
 		'404',
 		'archive',
@@ -29,18 +22,31 @@ function gutenberg_add_template_loader_filters() {
 		'tag',
 		'taxonomy',
 		'date',
-		// Skip 'embed' for now because it is not a regular template type.
+		'embed',
 		'home',
-		'frontpage',
-		'privacypolicy',
+		'front-page',
+		'privacy-policy',
 		'page',
 		'search',
 		'single',
 		'singular',
 		'attachment',
 	);
-	foreach ( $template_types as $template_type ) {
-		add_filter( $template_type . '_template', 'gutenberg_override_query_template', 20, 3 );
+}
+
+/**
+ * Adds necessary filters to use 'wp_template' posts instead of theme template files.
+ */
+function gutenberg_add_template_loader_filters() {
+	if ( ! post_type_exists( 'wp_template' ) ) {
+		return;
+	}
+
+	foreach ( get_template_types() as $template_type ) {
+		if ( $template_type === 'embed' ) { // Skip 'embed' for now because it is not a regular template type.
+			continue;
+		}
+		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
 }
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
