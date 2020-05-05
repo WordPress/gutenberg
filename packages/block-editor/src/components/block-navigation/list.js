@@ -6,20 +6,13 @@ import { isNil, map, omitBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Slot, Fill } from '@wordpress/components';
-import {
-	Children,
-	cloneElement,
-	useContext,
-	createContext,
-} from '@wordpress/element';
+import { useContext, createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockNavigationListItem from './list-item';
 import ButtonBlockAppender from '../button-block-appender';
-import { BlockListBlockContext } from '../block-list/block';
+import BlockNavigationBranch from './branch';
 
 export const BlockNavigationContext = createContext( {
 	withBlockNavigationSlots: true,
@@ -89,40 +82,4 @@ export default function BlockNavigationList( {
 
 BlockNavigationList.defaultProps = {
 	selectBlock: () => {},
-};
-
-const BlockNavigationBranch = ( { withSlot, children, ...props } ) => {
-	if ( ! withSlot ) {
-		return <BlockNavigationListItem { ...props } />;
-	}
-
-	return (
-		<li>
-			<BlockNavigationListItemSlot blockId={ props.block.clientId }>
-				{ ( fills ) => {
-					if ( ! fills.length ) {
-						return <BlockNavigationListItem { ...props } />;
-					}
-
-					return Children.map( fills, ( fill ) =>
-						cloneElement( fill, {
-							...props,
-							...fill.props,
-						} )
-					);
-				} }
-			</BlockNavigationListItemSlot>
-			{ children }
-		</li>
-	);
-};
-
-const listItemSlotName = ( blockId ) => `BlockNavigationList-item-${ blockId }`;
-
-export const BlockNavigationListItemSlot = ( { blockId, ...props } ) => (
-	<Slot { ...props } name={ listItemSlotName( blockId ) } />
-);
-export const BlockNavigationListItemFill = ( props ) => {
-	const { clientId } = useContext( BlockListBlockContext );
-	return <Fill { ...props } name={ listItemSlotName( clientId ) } />;
 };

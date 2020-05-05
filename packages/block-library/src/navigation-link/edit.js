@@ -29,8 +29,8 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
-	__experimentalBlockNavigationListItemFill as BlockNavigationListItemFill,
 	__experimentalBlockNavigationListItem as BlockNavigationListItem,
+	__experimentalBlockNavigationListItemFill as BlockNavigationListItemFill,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
