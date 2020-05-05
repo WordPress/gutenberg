@@ -44,7 +44,8 @@ const Descender = ( { level } ) => {
 		return '';
 	}
 	const indentation = '\u00A0'.repeat( ( level - 1 ) * 4 );
-	return indentation + '├ ';
+
+	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
 };
 
 const Rows = ( { people, level = 1 } ) => {
