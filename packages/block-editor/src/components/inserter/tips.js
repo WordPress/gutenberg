@@ -72,7 +72,7 @@ const contextualTips = {
 
 	colors: createInterpolateElement(
 		__(
-			'colors - You can visit the <a>the Customizer</a> to edit your logo and site title.'
+			'colors - You can visit the <a>the Customizer</a> to edit the colors on your site.'
 		),
 		{
 			a: <a href="/customize.php?autofocus[section]=colors" target="_blank"/>
