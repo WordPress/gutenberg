@@ -16,7 +16,7 @@ export default function SpacingPanelControl( { children, ...props } ) {
 	);
 	// TODO: Renable the proper guard
 	// This is temporarily disabled for testing purposes.
-	if ( !! isSpacingEnabled ) return null;
+	if ( isSpacingEnabled ) return null;
 	// if ( ! isSpacingEnabled ) return null;
 
 	return (
