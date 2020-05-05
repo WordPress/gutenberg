@@ -86,6 +86,8 @@
 }
 
 .wp-block-navigation-link__submenu-icon {
+	display: inline-flex;
+	align-items: center;
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	svg {

@@ -296,7 +296,7 @@ function NavigationLinkEdit( {
 					__experimentalAppenderTagName="li"
 					__experimentalPassedProps={ {
 						className: classnames(
-							'wp-block-navigation__container',
+							'wp-block-navigation__container wp-block-subnavigation__container',
 							{
 								'is-parent-of-selected-block': isParentOfSelectedBlock,
 							}
