@@ -2,6 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
+import { flattenDeep } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -60,7 +61,8 @@ function mergeInitialState( initialState = initialInputControlState ) {
  * @return {Function} The single combined stateReducer.
  */
 export const combineStateReducers = ( ...fns ) => {
-	const reducers = fns.flat( Infinity );
+	// Using lodash.flattenDeep until we have an Array.flat polyfill.
+	const reducers = flattenDeep( fns );
 
 	return ( ...args ) => {
 		return reducers.reduceRight( ( state, fn ) => {
