@@ -1,7 +1,7 @@
 /** @typedef {import('./index').WPWordCountStrategy} WPWordCountStrategy */
 
 /**
- * @typedef {Object} WPWordCountSettingsFields
+ * @typedef WPWordCountSettingsFields
  * @property {RegExp} HTMLRegExp Regular expression that matches HTML tags
  * @property {RegExp} HTMLcommentRegExp Regular expression that matches HTML comments
  * @property {RegExp} spaceRegExp Regular expression that matches spaces in HTML
