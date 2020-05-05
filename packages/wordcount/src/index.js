@@ -127,17 +127,17 @@ function countCharacters( text, regex, settings ) {
 export function count( text, type, userSettings ) {
 	const settings = loadSettings( type, userSettings );
 	let matchRegExp;
-	if ( settings.type === 'words' ) {
-		matchRegExp = settings.wordsRegExp;
-		return countWords( text, matchRegExp, settings );
+	switch ( settings.type ) {
+		case 'words':
+			matchRegExp = settings.wordsRegExp;
+			return countWords( text, matchRegExp, settings );
+		case 'characters_including_spaces':
+			matchRegExp = settings.characters_including_spacesRegExp;
+			return countCharacters( text, matchRegExp, settings );
+		case 'characters_excluding_spaces':
+			matchRegExp = settings.characters_excluding_spacesRegExp;
+			return countCharacters( text, matchRegExp, settings );
+		default:
+			return 0;
 	}
-	if ( settings.type === 'characters_including_spaces' ) {
-		matchRegExp = settings.characters_including_spacesRegExp;
-		return countCharacters( text, matchRegExp, settings );
-	}
-	if ( settings.type === 'characters_excluding_spaces' ) {
-		matchRegExp = settings.characters_excluding_spacesRegExp;
-		return countCharacters( text, matchRegExp, settings );
-	}
-	return 0;
 }
