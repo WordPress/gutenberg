@@ -148,11 +148,13 @@ function gutenberg_edit_site_init( $hook ) {
 	$template_ids      = array();
 	$template_part_ids = array();
 	foreach ( get_template_types() as $template_type ) {
-		if ( $template_type === 'embed' ) {
+		// Skip 'embed' for now because it is not a regular template type.
+		// Skip 'index' because it's a fallback that we handle differently.
+		if ( in_array( $template_type, array( 'embed', 'index' ) ) ) {
 			continue;
 		}
 
-		$template_hierarchy    = get_template_hierachy( $template_type );
+		$template_hierarchy    = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
 		$current_template_post = gutenberg_find_template_post( $template_hierarchy );
 		if ( isset( $current_template_post ) ) {
 			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
@@ -164,7 +166,7 @@ function gutenberg_edit_site_init( $hook ) {
 		$_wp_current_template_part_ids = null;
 	}
 
-	$current_template_id = $template_ids['index'] ?? $template_ids['front-page'];
+	$current_template_id = $template_ids['front-page'];
 
 	$settings['templateId']      = $current_template_id;
 	$settings['homeTemplateId']  = $current_template_id;
