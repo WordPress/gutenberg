@@ -102,6 +102,24 @@ describe( 'cpt locking', () => {
 				'The content of your post doesn’t match the template assigned to your post type.'
 			);
 		} );
+
+		it( 'can use the global inserter in inner blocks', async () => {
+			await page.click( 'button[aria-label="Two columns; equal split"]' );
+			await page.click(
+				'.wp-block-column .block-editor-button-block-appender'
+			);
+			await page.type( '.block-editor-inserter__search-input', 'image' );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Enter' );
+			await page.click( '.edit-post-header-toolbar__inserter-toggle' );
+			await page.type(
+				'.block-editor-inserter__search-input',
+				'gallery'
+			);
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'Enter' );
+			expect( await page.$( '.wp-block-gallery' ) ).not.toBeNull();
+		} );
 	} );
 
 	describe( 'template_lock insert', () => {

@@ -25,8 +25,13 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 		isInserterVisible,
 		isTextModeEnabled,
 		previewDeviceType,
-	} = useSelect(
-		( select ) => ( {
+	} = useSelect( ( select ) => {
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+		} = select( 'core/block-editor' );
+		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
@@ -34,15 +39,16 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			isInserterEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
 				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-			isInserterVisible: select( 'core/block-editor' ).hasInserterItems(),
+			isInserterVisible: hasInserterItems(
+				getBlockRootClientId( getBlockSelectionEnd() )
+			),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
-		} ),
-		[]
-	);
+		};
+	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const displayBlockToolbar =
