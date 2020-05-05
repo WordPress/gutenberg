@@ -11,18 +11,26 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { Icon, home, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import AddTemplate from '../add-template';
-import TemplatePreview from './preview';
+import TemplatePreview from './template-preview';
+import ThemePreview from './theme-preview';
 
-function TemplateLabel( { template } ) {
+function TemplateLabel( { template, homeId } ) {
 	return (
 		<>
 			{ template.slug }{ ' ' }
+			{ template.id === homeId && (
+				<Tooltip text={ __( 'Home' ) }>
+					<div className="edit-site-template-switcher__label-home-icon">
+						<Icon icon={ home } />
+					</div>
+				</Tooltip>
+			) }
 			{ template.status !== 'auto-draft' && (
 				<Tooltip text={ __( 'Customized' ) }>
 					<span className="edit-site-template-switcher__label-customized-dot" />
@@ -36,18 +44,29 @@ export default function TemplateSwitcher( {
 	ids,
 	templatePartIds,
 	activeId,
+	homeId,
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
 	onAddTemplateId,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
+	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
+
 	const onHoverTemplate = ( id ) => {
 		setHoveredTemplate( { id, type: 'template' } );
 	};
 	const onHoverTemplatePart = ( id ) => {
 		setHoveredTemplate( { id, type: 'template-part' } );
 	};
+
+	const onMouseEnterTheme = () => {
+		setThemePreviewVisible( () => true );
+	};
+	const onMouseLeaveTheme = () => {
+		setThemePreviewVisible( () => false );
+	};
+
 	const { currentTheme, templates, templateParts } = useSelect(
 		( select ) => {
 			const { getCurrentTheme, getEntityRecord } = select( 'core' );
@@ -61,7 +80,10 @@ export default function TemplateSwitcher( {
 					);
 					return {
 						label: template ? (
-							<TemplateLabel template={ template } />
+							<TemplateLabel
+								template={ template }
+								homeId={ homeId }
+							/>
 						) : (
 							__( 'Loading…' )
 						),
@@ -87,7 +109,7 @@ export default function TemplateSwitcher( {
 				} ),
 			};
 		},
-		[ ids, templatePartIds ]
+		[ ids, templatePartIds, homeId ]
 	);
 	const [ isAddTemplateOpen, setIsAddTemplateOpen ] = useState( false );
 	return (
@@ -136,10 +158,18 @@ export default function TemplateSwitcher( {
 							/>
 						</MenuGroup>
 						<MenuGroup label={ __( 'Current theme' ) }>
-							<MenuItem>{ currentTheme.name }</MenuItem>
+							<MenuItem
+								onMouseEnter={ onMouseEnterTheme }
+								onMouseLeave={ onMouseLeaveTheme }
+							>
+								{ currentTheme.name }
+							</MenuItem>
 						</MenuGroup>
 						{ !! hoveredTemplate?.id && (
 							<TemplatePreview item={ hoveredTemplate } />
+						) }
+						{ themePreviewVisible && (
+							<ThemePreview theme={ currentTheme } />
 						) }
 						<div className="edit-site-template-switcher__footer" />
 					</>

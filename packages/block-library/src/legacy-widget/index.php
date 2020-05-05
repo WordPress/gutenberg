@@ -101,26 +101,9 @@ function render_block_core_legacy_widget( $attributes ) {
  * Register legacy widget block.
  */
 function register_block_core_legacy_widget() {
-	register_block_type(
-		'core/legacy-widget',
+	register_block_type_from_metadata(
+		__DIR__ . '/legacy-widget',
 		array(
-			'attributes'      => array(
-				'widgetClass' => array(
-					'type' => 'string',
-				),
-				'id'          => array(
-					'type' => 'string',
-				),
-				'idBase'      => array(
-					'type' => 'string',
-				),
-				'number'      => array(
-					'type' => 'number',
-				),
-				'instance'    => array(
-					'type' => 'object',
-				),
-			),
 			'render_callback' => 'render_block_core_legacy_widget',
 		)
 	);

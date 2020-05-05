@@ -18,6 +18,8 @@ import { __, sprintf, _x } from '@wordpress/i18n';
 import BlockPreview from '../block-preview';
 import useAsyncList from './use-async-list';
 import InserterPanel from './panel';
+import { searchItems } from './search-items';
+import InserterNoResults from './no-results';
 
 function BlockPattern( { pattern, onClick } ) {
 	const { content } = pattern;
@@ -30,13 +32,16 @@ function BlockPattern( { pattern, onClick } ) {
 			onClick={ () => onClick( pattern, blocks ) }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					onClick( blocks );
+					onClick( pattern, blocks );
 				}
 			} }
 			tabIndex={ 0 }
 			aria-label={ pattern.title }
 		>
 			<BlockPreview blocks={ blocks } />
+			<div className="block-editor-inserter__patterns-item-title">
+				{ pattern.title }
+			</div>
 		</div>
 	);
 }
@@ -47,8 +52,12 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatterns( { patterns, onInsert } ) {
-	const currentShownPatterns = useAsyncList( patterns );
+function BlockPatterns( { patterns, onInsert, filterValue } ) {
+	const filteredPatterns = useMemo(
+		() => searchItems( patterns, filterValue ),
+		[ filterValue, patterns ]
+	);
+	const currentShownPatterns = useAsyncList( filteredPatterns );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
@@ -64,20 +73,28 @@ function BlockPatterns( { patterns, onInsert } ) {
 		);
 	}, [] );
 
-	return (
-		<InserterPanel title={ _x( 'All', 'patterns' ) }>
-			{ patterns.map( ( pattern, index ) =>
+	return !! filteredPatterns.length ? (
+		<InserterPanel
+			title={
+				filterValue
+					? __( 'Search Results' )
+					: _x( 'All', 'patterns categories' )
+			}
+		>
+			{ filteredPatterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
-						key={ index }
+						key={ pattern.name }
 						pattern={ pattern }
 						onClick={ onClickPattern }
 					/>
 				) : (
-					<BlockPatternPlaceholder key={ index } />
+					<BlockPatternPlaceholder key={ pattern.name } />
 				)
 			) }
 		</InserterPanel>
+	) : (
+		<InserterNoResults />
 	);
 }
 

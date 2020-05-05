@@ -48,7 +48,7 @@ function gutenberg_test_register_context_blocks() {
 		'gutenberg/test-context-consumer',
 		array(
 			'context'         => array( 'gutenberg/recordId' ),
-			'render_callback' => function( $block ) {
+			'render_callback' => function( $attributes, $content, $block ) {
 				$record_id = $block->context['gutenberg/recordId'];
 
 				if ( ! is_int( $record_id ) ) {

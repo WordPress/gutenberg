@@ -312,6 +312,7 @@ describe( 'Navigation', () => {
 				document.activeElement.innerText ===
 					'A really long page name that will not exist'
 		);
+
 		expect( isInLinkRichText ).toBe( true );
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
