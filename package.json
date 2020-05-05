@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.26.0",
+  "version": "1.27.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -165,12 +165,12 @@
     "metro-react-native-babel-transformer": "^0.53.0",
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.16",
-    "node-libs-react-native": "^1.0.2",
     "node-sass": "^4.12.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
+    "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",
     "react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37",
     "react-native-modal": "^6.5.0",

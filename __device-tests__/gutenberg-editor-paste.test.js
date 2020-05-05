@@ -31,6 +31,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -50,14 +51,13 @@ describe( 'Gutenberg Editor paste tests', () => {
 	} );
 
 	it( 'copies plain text from one paragraph block and pastes in another', async () => {
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.pastePlainText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 
 		// copy content to clipboard
@@ -66,9 +66,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await tapCopyAboveElement( driver, textViewElement );
 
 		// create another paragraph block
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
-
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement2 = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement2.click();
 		}
@@ -86,8 +85,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 	it( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// create paragraph block with styled text by editing html
 		await editorPage.setHtmlContentAndroid( testData.pasteHtmlText );
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
-
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
@@ -100,9 +98,8 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await tapCopyAboveElement( driver, textViewElement );
 
 		// create another paragraph block
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement2 = await editorPage.getParagraphBlockAtPosition( 2 );
-
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement2 = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement2.click();
 		}
