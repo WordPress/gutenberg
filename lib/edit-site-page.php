@@ -150,7 +150,7 @@ function gutenberg_edit_site_init( $hook ) {
 	foreach ( get_template_types() as $template_type ) {
 		// Skip 'embed' for now because it is not a regular template type.
 		// Skip 'index' because it's a fallback that we handle differently.
-		if ( in_array( $template_type, array( 'embed', 'index' ) ) ) {
+		if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
 			continue;
 		}
 

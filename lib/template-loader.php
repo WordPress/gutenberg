@@ -43,7 +43,7 @@ function gutenberg_add_template_loader_filters() {
 	}
 
 	foreach ( get_template_types() as $template_type ) {
-		if ( $template_type === 'embed' ) { // Skip 'embed' for now because it is not a regular template type.
+		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
@@ -60,12 +60,12 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @return string[] A list of template candidates, in descending order of priority.
  */
 function get_template_hierachy( $template_type ) {
-	if ( ! in_array( $template_type, get_template_types() ) ) {
+	if ( ! in_array( $template_type, get_template_types(), true ) ) {
 		return array();
 	}
 
-	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template
-	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy
+	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template.
+	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy.
 
 	$result                             = array();
 	$template_hierarchy_filter_function = function( $templates ) use ( &$result ) {
@@ -74,7 +74,7 @@ function get_template_hierachy( $template_type ) {
 	};
 
 	add_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20, 1 );
-	call_user_func( $get_template_function ); // This invokes template_hierarchy_filter
+	call_user_func( $get_template_function ); // This invokes template_hierarchy_filter.
 	remove_filter( $template_hierarchy_filter, $template_hierarchy_filter_function, 20 );
 
 	return $result;
