@@ -21,7 +21,10 @@ const NavigatorIcon = (
 	</SVG>
 );
 
-export default function useBlockNavigator( clientId ) {
+export default function useBlockNavigator(
+	clientId,
+	withBlockNavigationSlots
+) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
@@ -41,7 +44,10 @@ export default function useBlockNavigator( clientId ) {
 				setIsNavigationListOpen( false );
 			} }
 		>
-			<BlockNavigationList clientId={ clientId } />
+			<BlockNavigationList
+				clientId={ clientId }
+				withBlockNavigationSlots={ withBlockNavigationSlots }
+			/>
 		</Modal>
 	);
 

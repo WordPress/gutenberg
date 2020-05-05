@@ -9,7 +9,6 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
-	__experimentalBlockNavigationContext as BlockNavigationContext,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
@@ -18,8 +17,6 @@ import {
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-
-const blockNavigationContext = { withBlockNavigationSlots: false };
 
 function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
@@ -80,9 +77,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationContext.Provider value={ blockNavigationContext }>
-				<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
-			</BlockNavigationContext.Provider>
+			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

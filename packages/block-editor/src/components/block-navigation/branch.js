@@ -1,18 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, useContext } from '@wordpress/element';
+import {
+	Children,
+	cloneElement,
+	useContext,
+} from '@wordpress/element';
 import { Fill, Slot } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BlockNavigationListItem from './list-item';
+import { BlockNavigationContext } from './list';
 import { BlockListBlockContext } from '../block-list/block';
 
-const BlockNavigationBranch = ( { withSlot, children, ...props } ) => {
-	if ( ! withSlot ) {
-		return <BlockNavigationListItem { ...props } />;
+const BlockNavigationBranch = ( { children, ...props } ) => {
+	const { withBlockNavigationSlots } = useContext( BlockNavigationContext );
+	if ( ! withBlockNavigationSlots ) {
+		return (
+			<li>
+				<BlockNavigationListItem { ...props } />
+				{ children }
+			</li>
+		);
 	}
 
 	return (

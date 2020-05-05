@@ -6,7 +6,7 @@ import { isNil, map, omitBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useContext, createContext } from '@wordpress/element';
+import { useMemo, createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,10 +15,10 @@ import ButtonBlockAppender from '../button-block-appender';
 import BlockNavigationBranch from './branch';
 
 export const BlockNavigationContext = createContext( {
-	withBlockNavigationSlots: true,
+	withBlockNavigationSlots: false,
 } );
 
-export default function BlockNavigationList( {
+function BlockNavigationList( {
 	blocks,
 	selectedBlockClientId,
 	selectBlock,
@@ -28,7 +28,6 @@ export default function BlockNavigationList( {
 	showNestedBlocks,
 	parentBlockClientId,
 } ) {
-	const { withBlockNavigationSlots } = useContext( BlockNavigationContext );
 	const shouldShowAppender = showAppender && !! parentBlockClientId;
 
 	return (
@@ -42,7 +41,6 @@ export default function BlockNavigationList( {
 				const isSelected = block.clientId === selectedBlockClientId;
 				return (
 					<BlockNavigationBranch
-						withSlot={ withBlockNavigationSlots }
 						block={ block }
 						key={ block.clientId }
 						isSelected={ isSelected }
@@ -83,3 +81,18 @@ export default function BlockNavigationList( {
 BlockNavigationList.defaultProps = {
 	selectBlock: () => {},
 };
+
+export default function BlockNavigationListWrapper( {
+	withBlockNavigationSlots,
+	...props
+} ) {
+	const blockNavigationContext = useMemo(
+		() => ( { withBlockNavigationSlots } ),
+		[ withBlockNavigationSlots ]
+	);
+	return (
+		<BlockNavigationContext.Provider value={ blockNavigationContext }>
+			<BlockNavigationList { ...props } />
+		</BlockNavigationContext.Provider>
+	);
+}
