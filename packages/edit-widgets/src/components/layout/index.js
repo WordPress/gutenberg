@@ -19,6 +19,7 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
 import Notices from '../notices';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 function Layout( { blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( null );
@@ -27,6 +28,7 @@ function Layout( { blockEditorSettings } ) {
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
+			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
@@ -35,6 +37,7 @@ function Layout( { blockEditorSettings } ) {
 							sidebar={ ! isMobile && <Sidebar /> }
 							content={
 								<>
+									<KeyboardShortcuts />
 									<Notices />
 									<Popover.Slot name="block-toolbar" />
 									<div

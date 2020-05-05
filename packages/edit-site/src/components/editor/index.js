@@ -27,6 +27,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -35,6 +36,7 @@ import Notices from '../notices';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import BlockEditor from '../block-editor';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 const Context = createContext();
 export function useEditorContext() {
@@ -100,6 +102,7 @@ function Editor( { settings: _settings } ) {
 						>
 							<Context.Provider value={ context }>
 								<FocusReturnProvider>
+									<KeyboardShortcuts.Register />
 									<InterfaceSkeleton
 										sidebar={ ! isMobile && <Sidebar /> }
 										header={
@@ -116,6 +119,7 @@ function Editor( { settings: _settings } ) {
 												<Notices />
 												<Popover.Slot name="block-toolbar" />
 												<BlockEditor />
+												<KeyboardShortcuts />
 											</BlockSelectionClearer>
 										}
 										actions={
@@ -151,6 +155,7 @@ function Editor( { settings: _settings } ) {
 										footer={ <BlockBreadcrumb /> }
 									/>
 									<Popover.Slot />
+									<PluginArea />
 								</FocusReturnProvider>
 							</Context.Provider>
 						</EntityProvider>

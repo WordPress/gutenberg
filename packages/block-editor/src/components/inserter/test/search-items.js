@@ -10,7 +10,7 @@ import items, {
 	youtubeItem,
 	textEmbedItem,
 } from './fixtures';
-import { normalizeSearchTerm, searchItems } from '../search-items';
+import { normalizeSearchTerm, searchBlockItems } from '../search-items';
 
 describe( 'normalizeSearchTerm', () => {
 	it( 'should return an empty array when no words detected', () => {
@@ -36,45 +36,50 @@ describe( 'normalizeSearchTerm', () => {
 	} );
 } );
 
-describe( 'searchItems', () => {
+describe( 'searchBlockItems', () => {
 	it( 'should return back all items when no terms detected', () => {
-		expect( searchItems( items, categories, collections, ' - ? * ' ) ).toBe(
-			items
-		);
+		expect(
+			searchBlockItems( items, categories, collections, ' - ? * ' )
+		).toBe( items );
 	} );
 
 	it( 'should search items using the title ignoring case', () => {
 		expect(
-			searchItems( items, categories, collections, 'TEXT' )
+			searchBlockItems( items, categories, collections, 'TEXT' )
 		).toEqual( [ textItem, advancedTextItem, textEmbedItem ] );
 	} );
 
 	it( 'should search items using the keywords and partial terms', () => {
 		expect(
-			searchItems( items, categories, collections, 'GOOGL' )
+			searchBlockItems( items, categories, collections, 'GOOGL' )
 		).toEqual( [ youtubeItem ] );
 	} );
 
 	it( 'should search items using the categories', () => {
 		expect(
-			searchItems( items, categories, collections, 'LAYOUT' )
+			searchBlockItems( items, categories, collections, 'LAYOUT' )
 		).toEqual( [ moreItem ] );
 	} );
 
 	it( 'should ignore a leading slash on a search term', () => {
 		expect(
-			searchItems( items, categories, collections, '/GOOGL' )
+			searchBlockItems( items, categories, collections, '/GOOGL' )
 		).toEqual( [ youtubeItem ] );
 	} );
 
 	it( 'should match words using the mix of the title, category and keywords', () => {
 		expect(
-			searchItems( items, categories, collections, 'youtube embed video' )
+			searchBlockItems(
+				items,
+				categories,
+				collections,
+				'youtube embed video'
+			)
 		).toEqual( [ youtubeItem ] );
 	} );
 
 	it( 'should match words using also variations and return all matched variations', () => {
-		const filteredItems = searchItems(
+		const filteredItems = searchBlockItems(
 			items,
 			categories,
 			collections,
@@ -86,7 +91,7 @@ describe( 'searchItems', () => {
 	} );
 
 	it( 'should match words using also variations and filter out unmatched variations', () => {
-		const filteredItems = searchItems(
+		const filteredItems = searchBlockItems(
 			items,
 			categories,
 			collections,
