@@ -24,7 +24,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
 import { Icon, atSymbol } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -77,6 +77,7 @@ export class RichText extends Component {
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -295,7 +296,19 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
+	onKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		this.handleDelete( event );
+		this.handleEnter( event );
+	}
+
 	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
+			return;
+		}
 		const { onEnter } = this.props;
 
 		if ( ! onEnter ) {
@@ -311,7 +324,11 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const { keyCode } = event;
+
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+			return;
+		}
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
@@ -841,8 +858,7 @@ export class RichText extends Component {
 					onChange={ this.onChange }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.handleEnter }
-					onBackspace={ this.handleDelete }
+					onKeyDown={ this.onKeyDown }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
