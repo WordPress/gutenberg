@@ -76,7 +76,11 @@ const contextualTips = {
 	),
 };
 
-function Tips() {
+function Tips( { tipContext } ) {
+	if ( contextualTips[ tipContext ] ) {
+		return <Tip>{ contextualTips[ tipContext ] }</Tip>;
+	}
+
 	const [ randomIndex ] = useState(
 		// Disable Reason: I'm not generating an HTML id.
 		// eslint-disable-next-line no-restricted-syntax
