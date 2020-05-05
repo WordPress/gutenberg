@@ -81,7 +81,12 @@ const BlockComponent = forwardRef(
 					setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
 				};
 			}
-		}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
+		}, [
+			isSelected,
+			isFirstMultiSelected,
+			isLastMultiSelected,
+			isAligned,
+		] );
 
 		// translators: %s: Type of block (i.e. Text, Image etc)
 		const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
