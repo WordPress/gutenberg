@@ -65,7 +65,6 @@ function InputField(
 
 	const { _event, value, isDragging, isDirty } = state;
 
-	const initialValueRef = useRef( valueProp );
 	const valueRef = useRef( value );
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
@@ -75,12 +74,8 @@ function InputField(
 		 * This effectively enables a "controlled" state.
 		 * https://reactjs.org/docs/forms.html#controlled-components
 		 */
-		if (
-			valueProp !== initialValueRef.current &&
-			valueProp !== valueRef.current
-		) {
+		if ( valueProp !== valueRef.current ) {
 			update( valueProp );
-			initialValueRef.current = valueProp;
 			valueRef.current = valueProp;
 
 			// Quick return to avoid firing the onChange callback
