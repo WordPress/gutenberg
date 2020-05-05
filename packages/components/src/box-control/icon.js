@@ -17,13 +17,13 @@ const BASE_ICON_SIZE = 24;
 
 export default function BoxControlIcon( {
 	size = 24,
-	sides = [ 'all' ],
+	side = 'all',
 	...props
 } ) {
-	const top = getSide( sides, 'top' );
-	const right = getSide( sides, 'right' );
-	const bottom = getSide( sides, 'bottom' );
-	const left = getSide( sides, 'left' );
+	const top = getSide( side, 'top' );
+	const right = getSide( side, 'right' );
+	const bottom = getSide( side, 'bottom' );
+	const left = getSide( side, 'left' );
 
 	// Simulates SVG Icon scaling
 	const scale = size / BASE_ICON_SIZE;
@@ -40,11 +40,6 @@ export default function BoxControlIcon( {
 	);
 }
 
-function getSide( sides, value ) {
-	const match = value.toLowerCase();
-
-	return sides.find( ( side ) => {
-		const sideValue = side.toLowerCase();
-		return [ 'all', match ].includes( sideValue );
-	} );
+function getSide( side, value ) {
+	return side === 'all' || side === value;
 }

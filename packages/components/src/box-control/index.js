@@ -47,9 +47,9 @@ export default function BoxControl( {
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp );
 
-	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
 	const [ isDirty, setIsDirty ] = useState( false );
 	const [ isLinked, setIsLinked ] = useState( ! isValuesMixed( values ) );
+	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
 
 	const initialValuesRef = useRef( values );
 
@@ -113,7 +113,7 @@ export default function BoxControl( {
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<Flex.Item>
-					<BoxControlIcon sides={ [ side ] } />
+					<BoxControlIcon side={ side } />
 				</Flex.Item>
 				{ isLinked && (
 					<Flex.Block>
