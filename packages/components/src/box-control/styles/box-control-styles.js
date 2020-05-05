@@ -32,7 +32,6 @@ export const UnitControlWrapper = styled.div`
 `;
 
 export const LayoutContainer = styled( Flex )`
-	height: 100px;
 	justify-content: center;
 	padding-top: 8px;
 `;
