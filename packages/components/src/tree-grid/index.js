@@ -73,11 +73,19 @@ export default function TreeGrid( { children, ...props } ) {
 
 			// Focus is either at the left or right edge of the grid. Do nothing.
 			if ( nextIndex === currentColumnIndex ) {
+				// Prevent key use for anything else. For example, Voiceover
+				// will start reading text on continued use of left/right arrow
+				// keys.
+				event.preventDefault();
 				return;
 			}
 
 			// Focus the next element.
 			focusablesInRow[ nextIndex ].focus();
+
+			// Prevent key use for anything else. This ensures Voiceover
+			// doesn't try to handle key navigation.
+			event.preventDefault();
 		} else if ( includes( [ UP, DOWN ], keyCode ) ) {
 			// Calculate the rowIndex of the next row.
 			const rows = Array.from(
@@ -94,6 +102,10 @@ export default function TreeGrid( { children, ...props } ) {
 
 			// Focus is either at the top or bottom edge of the grid. Do nothing.
 			if ( nextRowIndex === currentRowIndex ) {
+				// Prevent key use for anything else. For example, Voiceover
+				// will start navigating horizontally when reaching the vertical
+				// bounds of a table.
+				event.preventDefault();
 				return;
 			}
 
@@ -104,6 +116,10 @@ export default function TreeGrid( { children, ...props } ) {
 
 			// If for some reason there are no focusables in the next row, do nothing.
 			if ( ! focusablesInNextRow || ! focusablesInNextRow.length ) {
+				// Prevent key use for anything else. For example, Voiceover
+				// will still focus text when using arrow keys, while this
+				// component should limit navigation to focusables.
+				event.preventDefault();
 				return;
 			}
 
@@ -113,6 +129,10 @@ export default function TreeGrid( { children, ...props } ) {
 				focusablesInNextRow.length - 1
 			);
 			focusablesInNextRow[ nextIndex ].focus();
+
+			// Prevent key use for anything else. This ensures Voiceover
+			// doesn't try to handle key navigation.
+			event.preventDefault();
 		}
 	}, [] );
 
