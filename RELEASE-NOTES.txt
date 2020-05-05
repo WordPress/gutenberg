@@ -1,6 +1,7 @@
 1.28.0
 ------
 * New block: Pullquote
+* Add support for changing background and text color in Buttons block
 
 1.27.0
 ------

@@ -12026,6 +12026,13 @@ react-native-animatable@^1.2.4:
   version "1.1.3"
   resolved "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3"
 
+"react-native-hsv-color-picker@git+https://github.com/wordpress-mobile/react-native-hsv-color-picker":
+  version "1.0.1"
+  resolved "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker#163e78cd4d986a28954a626213b40daee15774e8"
+  dependencies:
+    react-native-linear-gradient "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37"
+    tinycolor2 "^1.4.1"
+
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.2.1.tgz#645e2ffbbb49e80844bb4cbbe34a126fda1e6772"
