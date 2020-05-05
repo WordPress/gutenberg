@@ -7,6 +7,7 @@ import { clamp, noop } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
