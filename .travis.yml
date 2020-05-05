@@ -138,7 +138,6 @@ jobs:
           - android-$COMPILE_API
       before_install:
         - echo 'count=0' > ~/.android/repositories.cfg
-        - yes | sdkmanager --licenses >/dev/null
         - yes | sdkmanager "emulator"
         - yes | sdkmanager "system-images;android-${ANDROID_API};${ANDROID_EMU_FLAVOR};${ANDROID_ABI}"
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
