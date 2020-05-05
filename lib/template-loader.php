@@ -60,6 +60,10 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @return string[] A list of template candidates, in descending order of priority.
  */
 function get_template_hierachy( $template_type ) {
+	if ( ! in_array( $template_type, get_template_types() ) ) {
+		return array();
+	}
+
 	$get_template_function     = 'get_' . str_replace( '-', '_', $template_type ) . '_template'; // front-page -> get_front_page_template
 	$template_hierarchy_filter = str_replace( '-', '', $template_type ) . '_template_hierarchy'; // front-page -> frontpage_template_hierarchy
 
