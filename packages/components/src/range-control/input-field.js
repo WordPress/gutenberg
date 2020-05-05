@@ -39,7 +39,7 @@ export default function InputField( {
 		setValue( '' );
 	};
 
-	const handleOnSubmit = ( event ) => {
+	const handleOnCommit = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
 
 		if ( isNaN( nextValue ) ) {
@@ -58,7 +58,7 @@ export default function InputField( {
 
 	const handleOnBlur = ( event ) => {
 		onBlur( event );
-		handleOnSubmit( event );
+		handleOnCommit( event );
 	};
 
 	const handleOnChange = ( event ) => {
@@ -76,7 +76,7 @@ export default function InputField( {
 			return;
 		}
 
-		handleOnSubmit( event );
+		handleOnCommit( event );
 	};
 
 	const handleOnKeyDown = ( event ) => {
@@ -85,7 +85,7 @@ export default function InputField( {
 
 		if ( keyCode === ENTER ) {
 			event.preventDefault();
-			handleOnSubmit( event );
+			handleOnCommit( event );
 		}
 	};
 
