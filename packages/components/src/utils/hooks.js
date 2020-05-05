@@ -24,13 +24,13 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 export function useControlledState( initialState ) {
 	const [ state, setState ] = useState( initialState );
-	const stateRef = useRef( initialState );
+	const lastInitialStateRef = useRef( initialState );
 
 	useEffect( () => {
 		// Update the internal state if the incoming value changes.
-		if ( initialState !== stateRef.current ) {
+		if ( initialState !== lastInitialStateRef.current ) {
 			setState( initialState );
-			stateRef.current = initialState;
+			lastInitialStateRef.current = initialState;
 		}
 	}, [ initialState ] );
 
