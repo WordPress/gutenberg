@@ -17,21 +17,21 @@ import stripShortcodes from './stripShortcodes';
 import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
 
-/** @typedef {import('./defaultSettings').WordCountSettings}  WordCountSettings */
+/** @typedef {import('./defaultSettings').WPWordCountSettings}  WPWordCountSettings */
 
 /**
  * Possible ways of counting.
  *
- * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WordCountStrategy
+ * @typedef {'words'|'characters_excluding_spaces'|'characters_including_spaces'} WPWordCountStrategy
  */
 
 /**
  * Private function to manage the settings.
  *
- * @param {WordCountStrategy} type The type of count to be done.
- * @param {WordCountSettings} userSettings Custom settings for the count.
+ * @param {WPWordCountStrategy} type The type of count to be done.
+ * @param {WPWordCountSettings} userSettings Custom settings for the count.
  *
- * @return {WordCountSettings} The combined settings object to be used.
+ * @return {WPWordCountSettings} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
 	const settings = extend( defaultSettings, userSettings );
@@ -62,7 +62,7 @@ function loadSettings( type, userSettings ) {
  *
  * @param {string} text     The text being processed
  * @param {RegExp|undefined} regex    The regular expression pattern being matched
- * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
+ * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} The matched string.
  */
@@ -88,7 +88,7 @@ function countWords( text, regex, settings ) {
  *
  * @param {string} text     The text being processed
  * @param {RegExp|undefined} regex    The regular expression pattern being matched
- * @param {WordCountSettings} settings Settings object containing regular expressions for each strip function
+ * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} Count of characters.
  */
@@ -112,8 +112,8 @@ function countCharacters( text, regex, settings ) {
  * Count some words.
  *
  * @param {string} text The text being processed
- * @param {WordCountStrategy} type	The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
- * @param {WordCountSettings} userSettings Custom settings object.
+ * @param {WPWordCountStrategy} type	The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {WPWordCountSettings} userSettings Custom settings object.
  *
  * @example
  * ```js

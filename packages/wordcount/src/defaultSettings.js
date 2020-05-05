@@ -1,7 +1,7 @@
-/** @typedef {import('./index').WordCountStrategy} WordCountStrategy */
+/** @typedef {import('./index').WPWordCountStrategy} WPWordCountStrategy */
 
 /**
- * @typedef {Object} WordCountSettingsFields
+ * @typedef {Object} WPWordCountSettingsFields
  * @property {RegExp} HTMLRegExp Regular expression that matches HTML tags
  * @property {RegExp} HTMLcommentRegExp Regular expression that matches HTML comments
  * @property {RegExp} spaceRegExp Regular expression that matches spaces in HTML
@@ -14,18 +14,18 @@
  * @property {RegExp} characters_including_spacesRegExp Regular expression that matches characters including spaces
  * @property {RegExp} shortcodesRegExp Regular expression that matches WordPress shortcodes
  * @property {string[]} shortcodes List of all shortcodes
- * @property {WordCountStrategy} type Describes what and how are we counting
- * @property {Partial<{type: WordCountStrategy, shortcodes: string[]}>} l10n Object with human translations
+ * @property {WPWordCountStrategy} type Describes what and how are we counting
+ * @property {Partial<{type: WPWordCountStrategy, shortcodes: string[]}>} l10n Object with human translations
  */
 
 /**
  * Lower-level settings for word counting that can be overridden.
  *
- * @typedef {Partial<WordCountSettingsFields>} WordCountSettings
+ * @typedef {Partial<WPWordCountSettingsFields>} WPWordCountSettings
  */
 
 /**
- * @type {WordCountSettings}
+ * @type {WPWordCountSettings}
  */
 export const defaultSettings = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
