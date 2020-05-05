@@ -253,7 +253,7 @@ jobs:
         - yes | sdkmanager "system-images;android-$ANDROID_API;$ANDROID_EMU_FLAVOR;$ANDROID_ABI"
         # Set up KVM on linux for hardware acceleration. Manually here so it only happens for emulator tests, takes ~30s
         - sudo -E apt-get -yq --no-install-suggests --no-install-recommends install bridge-utils libpulse0 libvirt-bin libxcursor1 qemu-kvm virtinst ubuntu-vm-builder
-        - android list targets
+        #- android list target
         - echo no | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n Pixel_28 --package "system-images;android-$ANDROID_API;$ANDROID_EMU_FLAVOR;$ANDROID_ABI" -c 10M
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
         - nvm install
