@@ -10,6 +10,15 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  *
  * https://reactjs.org/docs/forms.html#controlled-components
  *
+ * At first, a component using useControlledState receives an initial prop
+ * value, which is used as initial internal state.
+ *
+ * This internal state can be maintained and updated without
+ * relying on new incoming prop values.
+ *
+ * Unlike the basic useState hook, useControlledState's state can
+ * be updated if a new incoming prop value is changed.
+ *
  * @param {any} initialState The initial state value.
  * @return {[*, Function]} The controlled value and the value setter.
  */
