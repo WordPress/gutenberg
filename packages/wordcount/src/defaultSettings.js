@@ -1,5 +1,5 @@
 /**
- * @typedef {import("./index").WordCountStrategy} WordCountStrategy
+ * @typedef {import('./index').WordCountStrategy} WordCountStrategy
  */
 
 /**

@@ -26,7 +26,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
 /**
  * Lower-level settings for word counting that can be overridden.
  *
- * @typedef {import("./defaultSettings").WordCountSettings}  WordCountSettings
+ * @typedef {import('./defaultSettings').WordCountSettings}  WordCountSettings
  */
 
 /**
