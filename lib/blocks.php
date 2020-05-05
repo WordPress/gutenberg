@@ -48,6 +48,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-tags.php'           => 'core/post-tags',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
+				'query.php'               => 'core/query',
 			)
 		);
 	}
