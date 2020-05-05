@@ -111,7 +111,7 @@ export class RichText extends Component {
 		this.isTouched = false;
 		this.lastAztecEventType = null;
 
-		this.lastHistoryValue = value;		
+		this.lastHistoryValue = value;
 
 		// Internal values that are update synchronously, unlike props.
 		this.value = value;
@@ -389,26 +389,23 @@ export class RichText extends Component {
 	handleMention( event ) {
 		const { keyCode } = event;
 
-		if ( keyCode !== "@".charCodeAt(0) ) {
+		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
 			return;
-		} 
+		}
 		this.showMention();
 	}
 
 	showMention() {
 		const record = this.getRecord();
 		addMention()
-		.then( ( mentionUserId ) => {			
-			let stringToInsert = `@${ mentionUserId }`;
-			if ( this.isIOS ) {
-				stringToInsert += ' ';
-			}			
-			this.insertString(
-				record,
-				stringToInsert
-			);
-		} )
-		.catch( () => {} );
+			.then( ( mentionUserId ) => {
+				let stringToInsert = `@${ mentionUserId }`;
+				if ( this.isIOS ) {
+					stringToInsert += ' ';
+				}
+				this.insertString( record, stringToInsert );
+			} )
+			.catch( () => {} );
 	}
 
 	/**
