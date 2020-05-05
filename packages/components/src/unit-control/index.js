@@ -12,7 +12,10 @@ import { useState, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { inputControlActionTypes } from '../input-control/state';
+import {
+	inputControlActionTypes,
+	combineStateReducers,
+} from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
@@ -145,10 +148,10 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				__unstableStateReducer={ [
+				__unstableStateReducer={ combineStateReducers(
 					unitControlStateReducer,
-					stateReducer,
-				] }
+					stateReducer
+				) }
 			/>
 		</Root>
 	);

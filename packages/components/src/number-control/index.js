@@ -15,7 +15,10 @@ import { forwardRef } from '@wordpress/element';
 import { Input } from './styles/number-control-styles';
 import { add, getValue, roundClamp, subtract } from './utils';
 import { isValueEmpty } from '../input-control/utils';
-import { inputControlActionTypes } from '../input-control/state';
+import {
+	inputControlActionTypes,
+	combineStateReducers,
+} from '../input-control/state';
 import { useRtl } from '../utils/style-mixins';
 
 export function NumberControl(
@@ -168,10 +171,10 @@ export function NumberControl(
 			ref={ ref }
 			type={ typeProp }
 			value={ initialValue }
-			__unstableStateReducer={ [
+			__unstableStateReducer={ combineStateReducers(
 				numberControlStateReducer,
-				stateReducer,
-			] }
+				stateReducer
+			) }
 		/>
 	);
 }

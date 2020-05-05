@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import memize from 'memize';
 import { flattenDeep } from 'lodash';
 /**
  * WordPress dependencies
@@ -70,8 +69,6 @@ export const combineStateReducers = ( ...fns ) => {
 		}, {} );
 	};
 };
-
-const memoizedCombineStateReducers = memize( combineStateReducers );
 
 /**
  * Creates a reducer that opens the channel for external state subscription
@@ -181,7 +178,7 @@ export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
 ) {
-	const combinedReducers = memoizedCombineStateReducers( stateReducer );
+	const combinedReducers = combineStateReducers( stateReducer );
 
 	const [ state, dispatch ] = useReducer(
 		inputControlStateReducer( combinedReducers ),
