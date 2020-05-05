@@ -184,7 +184,7 @@ function render_block_core_navigation( $content, $block ) {
 /**
  * Returns the link for the one nav iteem or false
  *
- * @param array $attributes    The Navigation Link block attributes.
+ * @param array $attrs    The Navigation Link block attributes.
  *
  * @return string|bool Returns the determined link or false.
  */
