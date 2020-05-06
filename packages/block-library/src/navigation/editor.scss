@@ -53,21 +53,9 @@ $navigation-item-height: 46px;
 		}
 	}
 
-	.wp-block-subnavigation__container {
-		padding-left: 0;
-		padding-right: 0;
-		> .wp-block-navigation-link {
-			> .wp-block-navigation-link__content {
-				flex-grow: 1;
-			}
-			> .wp-block-navigation-link__submenu-icon {
-				padding-right: $grid-unit-10;
-			}
-		}
-		> .block-list-appender {
-			.block-editor-button-block-appender {
-				margin-left: $grid-unit-10 * 2;
-			}
+	.wp-block-navigation__container {
+		.block-list-appender .block-editor-button-block-appender {
+			margin-left: $grid-unit-10 * 2;
 		}
 	}
 }

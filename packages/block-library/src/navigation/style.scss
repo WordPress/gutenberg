@@ -27,7 +27,7 @@
 .has-child {
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
-		padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+		padding: $grid-unit-10 * 0.75 0;
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -37,6 +37,15 @@
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
+
+		> .wp-block-navigation-link {
+			> .wp-block-navigation-link__content {
+				flex-grow: 1;
+			}
+			> .wp-block-navigation-link__submenu-icon {
+				padding-right: $grid-unit-10;
+			}
+		}
 
 		// Nested submenus sit to the left on large breakpoints
 		@include break-medium {
@@ -86,8 +95,7 @@
 }
 
 .wp-block-navigation-link__submenu-icon {
-	display: inline-flex;
-	align-items: center;
+	height: inherit;
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	svg {
