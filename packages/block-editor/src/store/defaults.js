@@ -38,6 +38,21 @@ export const SETTINGS_DEFAULTS = {
 	alignWide: false,
 	colors: [
 		{
+			name: __( 'Black' ),
+			slug: 'black',
+			color: '#000000',
+		},
+		{
+			name: __( 'Cyan bluish gray' ),
+			slug: 'cyan-bluish-gray',
+			color: '#abb8c3',
+		},
+		{
+			name: __( 'White' ),
+			slug: 'white',
+			color: '#ffffff',
+		},
+		{
 			name: __( 'Pale pink' ),
 			slug: 'pale-pink',
 			color: '#f78da7',
@@ -77,21 +92,6 @@ export const SETTINGS_DEFAULTS = {
 			name: __( 'Vivid purple' ),
 			slug: 'vivid-purple',
 			color: '#9b51e0',
-		},
-		{
-			name: __( 'Very light gray' ),
-			slug: 'very-light-gray',
-			color: '#eeeeee',
-		},
-		{
-			name: __( 'Cyan bluish gray' ),
-			slug: 'cyan-bluish-gray',
-			color: '#abb8c3',
-		},
-		{
-			name: __( 'Very dark gray' ),
-			slug: 'very-dark-gray',
-			color: '#313131',
 		},
 	],
 

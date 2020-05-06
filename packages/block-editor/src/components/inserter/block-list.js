@@ -31,8 +31,9 @@ import { compose } from '@wordpress/compose';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
-import { searchItems } from './search-items';
+import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
+import InserterNoResults from './no-results';
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
@@ -114,7 +115,7 @@ function InserterBlockList( {
 	};
 
 	const filteredItems = useMemo( () => {
-		return searchItems( items, categories, collections, filterValue );
+		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
 
 	const childItems = useMemo( () => {
@@ -282,19 +283,13 @@ function InserterBlockList( {
 				{ ( fills ) => {
 					if ( fills.length ) {
 						return (
-							<InserterPanel
-								title={ _x( 'Search Results', 'blocks' ) }
-							>
+							<InserterPanel title={ __( 'Search Results' ) }>
 								{ fills }
 							</InserterPanel>
 						);
 					}
 					if ( ! hasItems ) {
-						return (
-							<p className="block-editor-inserter__no-results">
-								{ __( 'No blocks found.' ) }
-							</p>
-						);
+						return <InserterNoResults />;
 					}
 					return null;
 				} }

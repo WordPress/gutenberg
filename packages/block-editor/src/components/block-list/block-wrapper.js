@@ -8,13 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useEffect,
-	useLayoutEffect,
-	useContext,
-	forwardRef,
-} from '@wordpress/element';
+import { useRef, useEffect, useContext, forwardRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -76,7 +70,7 @@ const BlockComponent = forwardRef(
 		// selection, so it can be used to position the contextual block toolbar.
 		// We only provide what is necessary, and remove the nodes again when they
 		// are no longer selected.
-		useLayoutEffect( () => {
+		useEffect( () => {
 			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 				const node = wrapper.current;
 				setBlockNodes( ( nodes ) => ( {

@@ -85,6 +85,10 @@ jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
 	virtual: true,
 } );
 
+jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
+	virtual: true,
+} );
+
 jest.mock(
 	'@react-native-community/async-storage',
 	() => () => 'AsyncStorage',

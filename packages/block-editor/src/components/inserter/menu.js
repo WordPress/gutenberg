@@ -73,10 +73,7 @@ function InserterMenu( {
 		hideInsertionPoint,
 	} = useDispatch( 'core/block-editor' );
 	const hasPatterns =
-		! destinationRootClientId &&
-		!! patterns &&
-		!! patterns.length &&
-		! filterValue;
+		! destinationRootClientId && !! patterns && !! patterns.length;
 	const onKeyDown = ( event ) => {
 		if (
 			includes(
@@ -165,7 +162,11 @@ function InserterMenu( {
 
 	const patternsTab = (
 		<div className="block-editor-inserter__scrollable">
-			<BlockPatterns patterns={ patterns } onInsert={ onInsertBlocks } />
+			<BlockPatterns
+				patterns={ patterns }
+				onInsert={ onInsertBlocks }
+				filterValue={ filterValue }
+			/>
 		</div>
 	);
 
