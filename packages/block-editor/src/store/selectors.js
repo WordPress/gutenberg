@@ -16,6 +16,9 @@ import {
 	some,
 	find,
 	filter,
+	lowerCase,
+	uniq,
+	deburr,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1632,4 +1635,54 @@ export function didAutomaticChange( state ) {
  */
 export function isBlockHighlighted( state, clientId ) {
 	return state.highlightedBlock === clientId;
+}
+
+function getArrayIndex( array, random = true ) {
+	// eslint-disable-next-line no-restricted-syntax
+	return random ? Math.floor( Math.random() * array.length ) : 0;
+}
+
+export function __experimentalGetBlockInserterTipByContext(
+	state,
+	searchTerm,
+	random = false
+) {
+	if ( ! searchTerm ) {
+		return;
+	}
+
+	const tips = get( state, [ 'tips', 'blockInserter' ], EMPTY_ARRAY );
+	if ( ! tips.length ) {
+		return;
+	}
+
+	const normalizedSearchTerm = deburr( lowerCase( searchTerm ) ).replace(
+		/^\//,
+		''
+	);
+
+	const foundTips = filter(
+		tips,
+		( { keywords } ) =>
+			filter( keywords, ( keyword ) =>
+				includes( normalizedSearchTerm, keyword )
+			).length
+	);
+
+	if ( ! foundTips.length ) {
+		return;
+	}
+
+	const index = getArrayIndex( foundTips, random );
+	return get( foundTips, [ index, 'description' ] );
+}
+
+export function __experimentalGetBlockTipByType( state, type, random = false ) {
+	const tips = get( state, [ 'tips', type ], EMPTY_ARRAY );
+	if ( ! tips.length ) {
+		return null;
+	}
+
+	const index = getArrayIndex( tips, random );
+	return get( tips, [ index, 'description' ] );
 }
