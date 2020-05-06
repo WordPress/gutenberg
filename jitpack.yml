@@ -1,5 +1,6 @@
 install:
    - export TMPDIR=`dirname $(mktemp)`
+   - export BUILD_GUTENBERG_JS_BUNDLE=1
    - echo "Removing react-native-aztec-old-submodule folder"
    - rm -rf react-native-aztec-old-submodule
    - echo "Changing into the android folder of the Bridge module"

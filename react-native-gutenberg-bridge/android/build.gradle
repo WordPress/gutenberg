@@ -1,11 +1,13 @@
 buildscript {
-    def isJitPack = rootProject.ext.has("jitpack") ? true : System.getenv('JITPACK').asBoolean()
+    def buildGutenbergMobileJSBundle = rootProject.ext.has("buildGutenbergMobileJSBundle")
+            ? rootProject.ext.has("buildGutenbergMobileJSBundle")
+            : System.getenv('BUILD_GUTENBERG_JS_BUNDLE').asBoolean()
 
     repositories {
         jcenter()
         google()
 
-        if (isJitPack) {
+        if (buildGutenbergMobileJSBundle) {
             maven {
                 url "https://plugins.gradle.org/m2/"
             }
@@ -16,7 +18,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
-        if (isJitPack) {
+        if (buildGutenbergMobileJSBundle) {
             classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
         }
     }
@@ -25,10 +27,12 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-def isJitPack = rootProject.ext.has("jitpack") ? true : System.getenv('JITPACK').asBoolean()
+def buildGutenbergMobileJSBundle = rootProject.ext.has("buildGutenbergMobileJSBundle")
+        ? rootProject.ext.has("buildGutenbergMobileJSBundle")
+        : System.getenv('BUILD_GUTENBERG_JS_BUNDLE').asBoolean()
 
-if (isJitPack) {
-    println 'Building in JitPack'
+if (buildGutenbergMobileJSBundle) {
+    println 'Building the Gutenberg Mobile JS bundle'
 
     apply plugin: 'com.moowork.node'
 
@@ -153,7 +157,7 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-if (isJitPack) {
+if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
     def aarFolder = 'src/main/assets'
 
@@ -203,7 +207,7 @@ if (isJitPack) {
         delete '../../node_modules'
     }
 
-    if (isJitPack) {
+    if (buildGutenbergMobileJSBundle) {
         preBuild.dependsOn(cleanupNodeModulesFolder)
         cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
         backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
