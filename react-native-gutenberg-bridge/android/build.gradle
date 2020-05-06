@@ -1,5 +1,5 @@
 buildscript {
-    def isJitPack = System.getenv('JITPACK').asBoolean()
+    def isJitPack = rootProject.ext.has("jitpack") ? true : System.getenv('JITPACK').asBoolean()
 
     repositories {
         jcenter()
@@ -25,7 +25,7 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-def isJitPack = System.getenv('JITPACK').asBoolean()
+def isJitPack = rootProject.ext.has("jitpack") ? true : System.getenv('JITPACK').asBoolean()
 
 if (isJitPack) {
     println 'Building in JitPack'
