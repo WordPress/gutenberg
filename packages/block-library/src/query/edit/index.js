@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -20,16 +20,21 @@ export default function QueryEdit( {
 	attributes: { query },
 	setAttributes,
 } ) {
-	const { posts, blocks } = useSelect(
-		( select ) => ( {
-			// TODO: Import UI for customizing query from sibling files.
-			posts: select( 'core' ).getEntityRecords(
-				'postType',
-				'post',
-				query
-			),
-			blocks: select( 'core/block-editor' ).getBlocks( clientId ),
-		} ),
+	const { posts, isInnerBlockSelected, blocks } = useSelect(
+		( select ) => {
+			const { hasSelectedInnerBlock, getBlocks } = select(
+				'core/block-editor'
+			);
+			return {
+				posts: select( 'core' ).getEntityRecords(
+					'postType',
+					'post',
+					query
+				),
+				isInnerBlockSelected: hasSelectedInnerBlock( clientId ),
+				blocks: getBlocks( clientId ),
+			};
+		},
 		[ query, clientId ]
 	);
 	const blockContexts = useMemo(
@@ -41,6 +46,11 @@ export default function QueryEdit( {
 		[ posts ]
 	);
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
+	useEffect( () => {
+		if ( ! isInnerBlockSelected ) {
+			setActiveBlockContext( null );
+		}
+	}, [ isInnerBlockSelected ] );
 
 	return (
 		<>
@@ -58,8 +68,7 @@ export default function QueryEdit( {
 						key={ blockContext.postId }
 						value={ blockContext }
 					>
-						{ blockContext ===
-						( activeBlockContext || blockContexts[ 0 ] ) ? (
+						{ blockContext === activeBlockContext ? (
 							<InnerBlocks />
 						) : (
 							<BlockPreview
