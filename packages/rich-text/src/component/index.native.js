@@ -37,6 +37,7 @@ import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -392,7 +393,18 @@ export class RichText extends Component {
 		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
 			return;
 		}
-		this.showMention();
+		const record = this.getRecord();
+		const text = getTextContent( record );
+		// Only start the mention UI if the selection is on the start of text or the character before is a space
+		if (
+			text.length === 0 ||
+			record.start === 0 ||
+			text.charAt( record.start - 1 ) === ' '
+		) {
+			this.showMention();
+		} else {
+			this.insertString( record, '@' );
+		}
 	}
 
 	showMention() {
