@@ -32,7 +32,7 @@ const globalTips = [
 
 function Tips( { context } ) {
 	// Return a contextual tip when it's appropriate.
-	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipByContext( context, true );
+	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipsByContext( context, true );
 	if ( contextualTip ) {
 		return <Tip>{ contextualTip }</Tip>;
 	}

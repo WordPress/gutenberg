@@ -18,7 +18,7 @@ import BlockPreview from '../block-preview';
 
 function InserterPreviewPanel( { item } ) {
 	const hoveredItemBlockType = getBlockType( item.name );
-	const { __experimentalGetBlockTipByType } = select( 'core/block-editor' );
+	const { __experimentalGetBlockTipsByType } = select( 'core/block-editor' );
 
 	return (
 		<div className="block-editor-inserter__menu-preview-panel">
@@ -56,7 +56,7 @@ function InserterPreviewPanel( { item } ) {
 			{ ! isReusableBlock( item ) && (
 				<BlockCard
 					blockType={ item }
-					tip={ __experimentalGetBlockTipByType( item.name, true ) }
+					tip={ __experimentalGetBlockTipsByType( item.name, true ) }
 				/>
 			) }
 		</div>

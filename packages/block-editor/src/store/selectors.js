@@ -1642,7 +1642,7 @@ function getArrayIndex( array, random = true ) {
 	return random ? Math.floor( Math.random() * array.length ) : 0;
 }
 
-export function __experimentalGetBlockInserterTipByContext(
+export function __experimentalGetBlockInserterTipsByContext(
 	state,
 	searchTerm,
 	random = false
@@ -1677,7 +1677,7 @@ export function __experimentalGetBlockInserterTipByContext(
 	return get( foundTips, [ index, 'description' ] );
 }
 
-export function __experimentalGetBlockTipByType( state, type, random = false ) {
+export function __experimentalGetBlockTipsByType( state, type, random = false ) {
 	const tips = get( state, [ 'tips', type ], EMPTY_ARRAY );
 	if ( ! tips.length ) {
 		return null;
