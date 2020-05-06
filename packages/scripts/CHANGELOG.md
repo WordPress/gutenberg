@@ -1,4 +1,6 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
 
 ### Enhancements
 - Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.

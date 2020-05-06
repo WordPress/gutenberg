@@ -977,8 +977,9 @@ async function updatePackageChangelogs( minimumVersionBump, abortMessage ) {
 			let changesDetected = false;
 			let versionBump = null;
 			for await ( const line of lines ) {
+				const lineNormalized = line.toLowerCase();
 				// Detect unpublished changes first.
-				if ( line.startsWith( '## Master' ) ) {
+				if ( lineNormalized.startsWith( '## unreleased' ) ) {
 					changesDetected = true;
 					continue;
 				}
@@ -989,27 +990,31 @@ async function updatePackageChangelogs( minimumVersionBump, abortMessage ) {
 				}
 
 				// A previous published version detected. Stop processing.
-				if ( line.startsWith( '## ' ) ) {
+				if ( lineNormalized.startsWith( '## ' ) ) {
 					break;
 				}
 
 				// A major version bump required. Stop processing.
-				if ( line.startsWith( '### Breaking Change' ) ) {
+				if ( lineNormalized.startsWith( '### breaking change' ) ) {
 					versionBump = 'major';
 					break;
 				}
 
 				// A minor version bump required. Proceed to the next line.
 				if (
-					line.startsWith( '### New Feature' ) ||
-					line.startsWith( '### Deprecation' )
+					lineNormalized.startsWith( '### deprecation' ) ||
+					lineNormalized.startsWith( '### enhancement' ) ||
+					lineNormalized.startsWith( '### new feature' )
 				) {
 					versionBump = 'minor';
 					continue;
 				}
 
 				// A version bump required. Found new changelog section.
-				if ( versionBump !== 'minor' && line.startsWith( '### ' ) ) {
+				if (
+					versionBump !== 'minor' &&
+					lineNormalized.startsWith( '### ' )
+				) {
 					versionBump = minimumVersionBump;
 				}
 			}
@@ -1057,8 +1062,8 @@ async function updatePackageChangelogs( minimumVersionBump, abortMessage ) {
 				await fs.promises.writeFile(
 					changelogFile,
 					content.replace(
-						'## Master',
-						`## Master\n\n## ${ nextVersion } (${ publishDate })`
+						'## Unreleased',
+						`## Unreleased\n\n## ${ nextVersion } (${ publishDate })`
 					)
 				);
 				console.log(

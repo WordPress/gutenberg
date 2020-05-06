@@ -1,8 +1,12 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
 ## 3.4.0 (2019-06-12)
 
 ### New Features
 
-- Add the `useMediaQuery` and `useReducedMotion` hooks. 
+- Add the `useMediaQuery` and `useReducedMotion` hooks.
 
 ## 3.0.0 (2018-11-15)
 
