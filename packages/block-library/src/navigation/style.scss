@@ -33,6 +33,7 @@
 		position: absolute;
 		left: 0;
 		top: 100%;
+		width: fit-content;
 		z-index: 1;
 		opacity: 0;
 		transition: opacity 0.1s linear;
@@ -47,8 +48,10 @@
 			}
 		}
 
-		// Nested submenus sit to the left on large breakpoints
 		@include break-medium {
+			left: $grid-unit-30;
+
+			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
 				left: 100%;
 				top: -$border-width;
