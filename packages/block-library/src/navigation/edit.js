@@ -42,6 +42,7 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
 function Navigation( {
+	isSelected,
 	attributes,
 	clientId,
 	fontSize,
@@ -263,6 +264,7 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
+							renderAppender={ isSelected ? InnerBlocks.DefaultAppender : false }
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
 								attributes.orientation || 'horizontal'
