@@ -41,7 +41,7 @@ public protocol GutenbergBridgeDataSource: class {
     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
 
     /// Asks the delegate for a list of theme colors
-    func gutenbergThemeColors() -> [[String : AnyHashable]]?
+    func gutenbergThemeColors() -> [[String : String]]?
 }
 
 public extension GutenbergBridgeDataSource {
