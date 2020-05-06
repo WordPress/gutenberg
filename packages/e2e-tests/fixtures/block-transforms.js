@@ -221,6 +221,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__latest-posts__displayAuthor': {
+		originalBlock: 'Latest Posts',
+		availableTransforms: [ 'Group' ],
+	},
 	'core__latest-posts__displayPostDate': {
 		originalBlock: 'Latest Posts',
 		availableTransforms: [ 'Group' ],

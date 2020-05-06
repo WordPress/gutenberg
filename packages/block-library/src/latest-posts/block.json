@@ -34,11 +34,11 @@
 			"type": "number",
 			"default": 55
 		},
-		"displayPostDate": {
+		"displayAuthor": {
 			"type": "boolean",
 			"default": false
 		},
-		"displayAuthor": {
+		"displayPostDate": {
 			"type": "boolean",
 			"default": false
 		},
