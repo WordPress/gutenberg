@@ -393,10 +393,11 @@ add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_edi
  */
 function gutenberg_template_render_without_post_block_context( $context ) {
 	/*
-	 * Blocks rendered for a template should be treated as if there is no
-	 * current post, since the purpose of a template is in prescribing how
-	 * blocks appear for any post which matches the template. The post is
-	 * assigned only once the template is used in rendering a post.
+	 * When loading a template or template part directly and not through a page
+	 * that resolves it, the top-level post ID and type context get set to that
+	 * of the template part. Templates are just the structure of a site, and
+	 * they should not be available as post context because blocks like Post
+	 * Content would recurse infinitely.
 	 */
 	if ( isset( $context['postType'] ) &&
 			( 'wp_template' === $context['postType'] || 'wp_template_part' === $context['postType'] ) ) {
