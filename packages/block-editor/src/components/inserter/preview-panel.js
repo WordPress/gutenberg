@@ -8,6 +8,7 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +18,8 @@ import BlockPreview from '../block-preview';
 
 function InserterPreviewPanel( { item } ) {
 	const hoveredItemBlockType = getBlockType( item.name );
+	const { __experimentalGetBlockTipByType } = select( 'core/block-editor' );
+
 	return (
 		<div className="block-editor-inserter__menu-preview-panel">
 			<div className="block-editor-inserter__preview">
@@ -50,7 +53,12 @@ function InserterPreviewPanel( { item } ) {
 					</div>
 				) }
 			</div>
-			{ ! isReusableBlock( item ) && <BlockCard blockType={ item } /> }
+			{ ! isReusableBlock( item ) && (
+				<BlockCard
+					blockType={ item }
+					tip={ __experimentalGetBlockTipByType( item.name, true ) }
+				/>
+			) }
 		</div>
 	);
 }
