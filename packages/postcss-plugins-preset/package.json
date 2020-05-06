@@ -1,20 +1,19 @@
 {
-	"name": "@wordpress/postcss-config",
-	"version": "0.0.1",
-	"description": "PostCSS sharable configuration for WordPress development.",
+	"name": "@wordpress/postcss-plugins-preset",
+	"version": "1.0.0-pre",
+	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"postcss",
-		"css",
-		"postcss-config"
+		"css"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-config/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/postcss-plugins-preset/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/postcss-config"
+		"directory": "packages/postcss-plugins-preset"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

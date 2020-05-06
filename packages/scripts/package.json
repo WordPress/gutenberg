@@ -39,7 +39,7 @@
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
-		"@wordpress/postcss-config": "file:../postcss-config",
+		"@wordpress/postcss-plugins-preset": "file:../postcss-plugins-preset",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-jest": "^25.3.0",
 		"babel-loader": "^8.1.0",

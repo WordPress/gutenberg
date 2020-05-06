@@ -1506,9 +1506,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/postcss-config",
-		"slug": "packages-postcss-config",
-		"markdown_source": "../packages/postcss-config/README.md",
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

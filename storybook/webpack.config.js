@@ -6,7 +6,7 @@ const path = require( 'path' );
 /**
  * WordPress dependencies
  */
-const postcssConfig = require( '@wordpress/postcss-config' );
+const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 
 module.exports = ( { config } ) => {
 	config.module.rules.push(
@@ -24,7 +24,7 @@ module.exports = ( { config } ) => {
 					loader: 'postcss-loader',
 					options: {
 						ident: 'postcss',
-						plugins: postcssConfig.plugins,
+						plugins: postcssPlugins,
 					},
 				},
 				'sass-loader',

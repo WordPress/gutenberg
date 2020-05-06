@@ -11,7 +11,7 @@ const path = require( 'path' );
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const postcssConfig = require( '@wordpress/postcss-config' );
+const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 
 /**
  * Internal dependencies
@@ -104,7 +104,7 @@ const config = {
 						loader: require.resolve( 'postcss-loader' ),
 						options: {
 							ident: 'postcss',
-							plugins: postcssConfig.plugins,
+							plugins: postcssPlugins,
 						},
 					},
 					{
