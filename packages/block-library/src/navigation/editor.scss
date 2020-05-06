@@ -37,7 +37,7 @@ $navigation-item-height: 46px;
 // Styles for submenu flyout
 .has-child {
 	// Only show the flyout when the parent menu item is selected.
-	// Specifically, do not show it on hover.
+	// Do not show it on hover.
 	&,
 	&:hover {
 		> .wp-block-navigation__container {
@@ -54,6 +54,7 @@ $navigation-item-height: 46px;
 		}
 	}
 
+	// Adjust the appender margin to match other menu items
 	.wp-block-navigation__container {
 		.block-list-appender .block-editor-button-block-appender {
 			margin-left: $grid-unit-10 * 2;

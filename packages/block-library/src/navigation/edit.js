@@ -264,7 +264,9 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
-							renderAppender={ isSelected ? InnerBlocks.DefaultAppender : false }
+							renderAppender={
+								isSelected ? InnerBlocks.DefaultAppender : false
+							}
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
 								attributes.orientation || 'horizontal'
