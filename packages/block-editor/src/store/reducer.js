@@ -16,6 +16,7 @@ import {
 	identity,
 	difference,
 	omitBy,
+	uniq,
 } from 'lodash';
 
 /**
@@ -23,6 +24,7 @@ import {
  */
 import { combineReducers } from '@wordpress/data';
 import { isReusableBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -1479,6 +1481,29 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+export function tips( state, action ) {
+	const { scope, context, keywords, description } = action;
+
+	switch ( action.type ) {
+		case 'REGISTER_TIP':
+			const tipsByScope = state && state[ scope ] ? state[ scope ] : [];
+
+			return {
+				...state,
+				[ scope ]: [
+					...tipsByScope,
+					{
+						context,
+						keywords: uniq( keywords ),
+						description,
+					},
+				],
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1499,4 +1524,5 @@ export default combineReducers( {
 	isNavigationMode,
 	automaticChangeStatus,
 	highlightedBlock,
+	tips,
 } );
