@@ -94,7 +94,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		};
 	};
 
-	const { styles, block, type, className, ...rest } = useSelect( selector, [
+	const { styles, block, type, className } = useSelect( selector, [
 		clientId,
 	] );
 
@@ -133,7 +133,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						className={ className }
 						isActive={ activeStyle === style }
 						key={ style.name }
-						onHoverClassName={ onHoverClassName }
 						onSelect={ () => {
 							onChangeClassName( styleClassName );
 							onHoverClassName( null );
@@ -143,8 +142,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
 						styleClassName={ styleClassName }
-						type={ type }
-						{ ...rest }
 					/>
 				);
 			} ) }
