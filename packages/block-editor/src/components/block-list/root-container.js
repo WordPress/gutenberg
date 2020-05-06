@@ -91,19 +91,19 @@ function RootContainer( { children, className }, ref ) {
 		>
 			<BlockNodes.Provider value={ blockNodes }>
 				<BlockPopover />
-			</BlockNodes.Provider>
-			<SetBlockNodes.Provider value={ setBlockNodes }>
 				<div
 					ref={ ref }
 					className={ classnames( className, 'is-root-container' ) }
 					onFocus={ onFocus }
 					onDragStart={ onDragStart }
 				>
-					<Context.Provider value={ onSelectionStart }>
-						{ children }
-					</Context.Provider>
+					<SetBlockNodes.Provider value={ setBlockNodes }>
+						<Context.Provider value={ onSelectionStart }>
+							{ children }
+						</Context.Provider>
+					</SetBlockNodes.Provider>
 				</div>
-			</SetBlockNodes.Provider>
+			</BlockNodes.Provider>
 		</InsertionPoint>
 	);
 }
