@@ -33,17 +33,17 @@ const getStyles = (
 	horizontalAlignment
 ) => {
 	if ( isRootList ) {
-		return undefined;
+		return;
 	}
-	const stylesName = `${ isStackedHorizontally }-${ horizontalAlignment }`;
-	if ( stylesMemo[ stylesName ] ) {
-		return stylesMemo[ stylesName ];
+	const styleName = `${ isStackedHorizontally }-${ horizontalAlignment }`;
+	if ( stylesMemo[ styleName ] ) {
+		return stylesMemo[ styleName ];
 	}
 	const computedStyles = [
 		isStackedHorizontally && styles.horizontal,
 		horizontalAlignment && styles[ `is-aligned-${ horizontalAlignment }` ],
 	];
-	stylesMemo[ stylesName ] = computedStyles;
+	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
 };
 
