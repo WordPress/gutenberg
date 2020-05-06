@@ -645,13 +645,7 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(
-		[
-			gutenberg_load_block_pattern( 'text-two-columns' ),
-			gutenberg_load_block_pattern( 'two-buttons' ),
-			gutenberg_load_block_pattern( 'cover-abc' ),
-			gutenberg_load_block_pattern( 'two-images' ),
-			gutenberg_load_block_pattern( 'testimonials' ),
-		],
+		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		$settings['__experimentalBlockPatterns']
 	);
 
