@@ -1,7 +1,3 @@
-/**
- * External dependencies
- */
-import { lowerCase, includes, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +5,7 @@ import { lowerCase, includes, filter } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { Tip } from '@wordpress/components';
+import { select } from '@wordpress/data';
 
 const globalTips = [
 	createInterpolateElement(
@@ -33,75 +30,9 @@ const globalTips = [
 	__( "Change a block's type by pressing the block icon on the toolbar." ),
 ];
 
-const contextualTips = {
-	css: createInterpolateElement(
-		__(
-			'CSS - You can visit the <a>the Customizer</a> to edit the CSS on your site.'
-		),
-		{
-			a: <a href="/customize.php?autofocus[section]=custom_css" target="_blank"/>
-		}
-	),
-
-	theme: createInterpolateElement(
-		__(
-			'theme - You can visit the <a>theme directory</a> to select a different design for your site.'
-		),
-		{
-			a: <a href="/themes.php" target="_blank"/>
-		}
-	),
-
-	plugin: createInterpolateElement(
-		__(
-			'plugin - You can visit the <a>plugin directory</a> to install additional plugins.'
-		),
-		{
-			a: <a href="/plugin-install.php" target="_blank"/>
-		}
-	),
-
-	header: createInterpolateElement(
-		__(
-			'header - You can visit the <a>the Customizer</a> to edit your logo and site title.'
-		),
-		{
-			a: <a href="/customize.php?autofocus[section]=title_tagline" target="_blank"/>
-		}
-	),
-
-	colors: createInterpolateElement(
-		__(
-			'colors - You can visit the <a>the Customizer</a> to edit the colors on your site.'
-		),
-		{
-			a: <a href="/customize.php?autofocus[section]=colors" target="_blank"/>
-		}
-	),
-};
-
-function getTipByContext( tipContext ) {
-	if ( ! tipContext ) {
-		return;
-	}
-
-	const contextualKeys = filter( Object.keys( contextualTips ), ( key ) =>
-		includes( lowerCase( tipContext ), key )
-	);
-
-	if ( ! contextualKeys.length ) {
-		return;
-	}
-
-	return contextualTips[
-		// eslint-disable-next-line no-restricted-syntax
-		contextualKeys[ Math.floor( Math.random() * contextualKeys.length ) ]
-	];
-}
-
-function Tips( { tipContext } ) {
+function Tips( { context } ) {
 	// Return a contextual tip when it's appropriate.
-	const contextualTip = getTipByContext( tipContext );
+	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipByContext( context, true );
 	if ( contextualTip ) {
 		return <Tip>{ contextualTip }</Tip>;
 	}

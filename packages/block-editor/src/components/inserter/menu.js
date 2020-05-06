@@ -154,7 +154,7 @@ function InserterMenu( {
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
-					<Tips tipContext={ filterValue } />
+					<Tips context={ filterValue } />
 				</div>
 			) }
 		</>
