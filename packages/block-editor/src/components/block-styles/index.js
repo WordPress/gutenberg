@@ -68,24 +68,33 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 	return list.value;
 }
 
+const useGenericPreviewBlock = ( block, type ) =>
+	useMemo(
+		() =>
+			type.example
+				? getBlockFromExample( block.name, {
+						attributes: type.example.attributes,
+						innerBlocks: type.example.innerBlocks,
+				  } )
+				: cloneBlock( block ),
+		[ block.name, type ]
+	);
+
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
 		const blockType = getBlockType( block.name );
-		const useExample = !! blockType.example;
 		return {
-			useExample,
-			blockName: block.name,
-			className: block.attributes.className || '',
-			styles: getBlockStyles( block.name ),
+			block,
 			type: blockType,
-			block: useExample ? null : block,
+			styles: getBlockStyles( block.name ),
+			className: block.attributes.className || '',
 		};
 	};
 
-	const { styles, type, className, ...rest } = useSelect( selector, [
+	const { styles, block, type, className, ...rest } = useSelect( selector, [
 		clientId,
 	] );
 
@@ -95,6 +104,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 			updateBlockAttributes( clientId, { className: newClassName } ),
 		[ updateBlockAttributes, clientId ]
 	);
+	const genericPreviewBlock = useGenericPreviewBlock( block, type );
 
 	if ( ! styles || styles.length === 0 ) {
 		return null;
@@ -130,11 +140,14 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 				);
 				return (
 					<BlockStyleItem
+						genericPreviewBlock={ genericPreviewBlock }
 						className={ className }
 						isActive={ activeStyle === style }
 						key={ style.name }
 						onHoverClassName={ onHoverClassName }
 						onSelect={ () => updateClassName( style ) }
+						onBlur={ () => onHoverClassName( null ) }
+						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
 						styleClassName={ styleClassName }
 						type={ type }
@@ -147,35 +160,23 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 }
 
 function BlockStyleItem( {
-	type,
-	block,
-	blockName,
-	useExample,
+	genericPreviewBlock,
 	style,
 	isActive,
+	onBlur,
+	onHover,
 	onSelect,
 	styleClassName,
-	onHoverClassName,
 } ) {
-	let factory, deps;
-	if ( useExample ) {
-		factory = () =>
-			getBlockFromExample( blockName, {
-				attributes: {
-					...type.example.attributes,
-					className: styleClassName,
-				},
-				innerBlocks: type.example.innerBlocks,
-			} );
-		deps = [ useExample, type, blockName, styleClassName ];
-	} else {
-		factory = () =>
-			cloneBlock( block, {
+	const previewBlocks = useMemo( () => {
+		return {
+			...genericPreviewBlock,
+			attributes: {
+				...genericPreviewBlock.attributes,
 				className: styleClassName,
-			} );
-		deps = [ block, styleClassName ];
-	}
-	const previewBlocks = useMemo( factory, deps );
+			},
+		};
+	}, [ genericPreviewBlock, styleClassName ] );
 
 	return (
 		<div
@@ -190,8 +191,8 @@ function BlockStyleItem( {
 					onSelect();
 				}
 			} }
-			onMouseEnter={ () => onHoverClassName( styleClassName ) }
-			onMouseLeave={ () => onHoverClassName( null ) }
+			onMouseEnter={ onHover }
+			onMouseLeave={ onBlur }
 			role="button"
 			tabIndex="0"
 			aria-label={ style.label || style.name }
