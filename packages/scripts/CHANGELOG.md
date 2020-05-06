@@ -10,6 +10,10 @@
 
 ## 9.1.0 (2020-05-14)
 
+### New Features
+
+- Add new capability to `build` and `start` scripts that automates handling CSS, SASS or SCSS files by importing them from JavaScript code ([#21730](https://github.com/WordPress/gutenberg/pull/21730)). You can find more details about CSS assets management in webpack at https://webpack.js.org/guides/asset-management/#loading-css.
+
 ### Enhancements
 
 - Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.
@@ -29,7 +33,6 @@
 - Add support for passing [node CLI options](https://nodejs.org/api/cli.html) to scripts ([#21631](https://github.com/WordPress/gutenberg/pull/21631)).
 - Add debugging support for `test-unit-js` script ([#21631](https://github.com/WordPress/gutenberg/pull/21631)). Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) using the `--inspect-brk` option.
 - Add debugging support for `test-e2e` script ([#21861](https://github.com/WordPress/gutenberg/pull/21861)). Tests can be debugged by using the `--inspect-brk` option and a new `--puppeteer-devtools` option (or `PUPPETEER_DEVTOOLS="true"` environment variable).
-- Add new capability to `build` and `start` scripts that automates handling CSS, SASS or SCSS files by importing them from JavaScript code ([#21730](https://github.com/WordPress/gutenberg/pull/21730)).
 
 ### Bug fix
 
