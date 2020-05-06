@@ -17,7 +17,7 @@ import { trash } from '@wordpress/icons';
  */
 import styles from './style.scss';
 import BlockMover from '../block-mover';
-import ShrinkedBlockMobileToolbar from './shrinked-block-mobile-toolbar';
+import ShrinkBlockMobileToolbar from './shrink-block-mobile-toolbar';
 import { BlockSettingsButton } from '../block-settings';
 
 const BlockMobileToolbar = ( {
@@ -29,7 +29,7 @@ const BlockMobileToolbar = ( {
 } ) => (
 	<View style={ styles.toolbar }>
 		{ allowShrinkToolbar ? (
-			<ShrinkedBlockMobileToolbar
+			<ShrinkBlockMobileToolbar
 				clientIds={ [ clientId ] }
 				isStackedHorizontally={ isStackedHorizontally }
 				onDelete={ onDelete }

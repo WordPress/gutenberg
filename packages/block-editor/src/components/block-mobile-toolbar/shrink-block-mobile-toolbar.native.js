@@ -20,7 +20,7 @@ import {
 	getArrowIcon,
 } from '../block-mover/mover-description';
 
-const ShrinkedBlockMobileToolbar = ( {
+const ShrinkBlockMobileToolbar = ( {
 	onDelete,
 	isStackedHorizontally,
 	openGeneralSidebar,
@@ -82,11 +82,25 @@ const ShrinkedBlockMobileToolbar = ( {
 		.map( ( option, index ) => option.disabled && index + 1 )
 		.filter( Boolean );
 
+	const accessibilityHintIOS = __(
+		'Double tap to open Action Sheet with available options'
+	);
+	const accessibilityHintAndroid = __(
+		'Double tap to open Bottom Sheet with available options'
+	);
+
 	return (
 		<>
 			<ToolbarButton
+				title={ __( 'Open Settings' ) }
 				onClick={ () => this.picker.presentPicker() }
 				icon={ moreVertical }
+				extraProps={ {
+					hint:
+						Platform.OS === 'ios'
+							? accessibilityHintIOS
+							: accessibilityHintAndroid,
+				} }
 			/>
 			<Picker
 				ref={ ( instance ) => ( this.picker = instance ) }
@@ -134,4 +148,4 @@ export default compose(
 		};
 	} ),
 	withInstanceId
-)( ShrinkedBlockMobileToolbar );
+)( ShrinkBlockMobileToolbar );
