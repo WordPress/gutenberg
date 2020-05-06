@@ -17,6 +17,10 @@ import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 
+const stretchStyle = {
+	flex: 1,
+};
+
 export function BlockListItem( {
 	clientId,
 	isReadOnly,
@@ -31,9 +35,8 @@ export function BlockListItem( {
 	onDeleteBlock,
 	shouldShowInnerBlockAppender,
 } ) {
-	const readableContentViewStyle = contentResizeMode === 'stretch' && {
-		flex: 1,
-	};
+	const readableContentViewStyle =
+		contentResizeMode === 'stretch' && stretchStyle;
 
 	return (
 		<ReadableContentView style={ readableContentViewStyle }>
