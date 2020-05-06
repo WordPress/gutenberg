@@ -68,6 +68,67 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 	return list.value;
 }
 
+const usePrecomputedPreviewDetails = ( clientId ) => {
+	const { block, type, hasStyles, styles } = useBlockDetails( clientId );
+	const currentClassName = block.attributes.className || '';
+	const activeStyle = getActiveStyle( styles, currentClassName );
+	const genericPreviewBlock = useGenericPreviewBlock( block, type );
+	const stylesWithPreviewBlocks = useMemo(
+		() =>
+			styles.map( ( style ) => {
+				const styleClassName = replaceActiveStyle(
+					currentClassName,
+					activeStyle,
+					style
+				);
+				return {
+					style,
+					className: styleClassName,
+					previewBlock: {
+						...genericPreviewBlock,
+						attributes: {
+							...genericPreviewBlock.attributes,
+							className: styleClassName,
+						},
+					},
+				};
+			} ),
+		[ styles ]
+	);
+
+	return {
+		activeStyle,
+		hasStyles,
+		stylesWithPreviewBlocks,
+	};
+};
+
+const useBlockDetails = ( clientId ) =>
+	useSelect(
+		( select ) => {
+			const { getBlock } = select( 'core/block-editor' );
+			const { getBlockStyles } = select( 'core/blocks' );
+			const block = getBlock( clientId );
+			const styles = getBlockStyles( block.name ) || [];
+			const type = getBlockType( block.name );
+			const hasStyles = styles && styles.length > 0;
+			if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
+				styles.unshift( {
+					name: 'default',
+					label: _x( 'Default', 'block style' ),
+					isDefault: true,
+				} );
+			}
+			return {
+				block,
+				hasStyles,
+				styles,
+				type,
+			};
+		},
+		[ clientId ]
+	);
+
 const useGenericPreviewBlock = ( block, type ) =>
 	useMemo(
 		() =>
@@ -81,90 +142,51 @@ const useGenericPreviewBlock = ( block, type ) =>
 	);
 
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
-	const selector = ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
-		const block = getBlock( clientId );
-		const blockType = getBlockType( block.name );
-		return {
-			block,
-			type: blockType,
-			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
-		};
-	};
-
-	const { styles, block, type, className } = useSelect( selector, [
-		clientId,
-	] );
-
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	const genericPreviewBlock = useGenericPreviewBlock( block, type );
+	const {
+		activeStyle,
+		hasStyles,
+		stylesWithPreviewBlocks,
+	} = usePrecomputedPreviewDetails( clientId );
 
-	if ( ! styles || styles.length === 0 ) {
+	if ( ! hasStyles ) {
 		return null;
 	}
 
-	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
-		styles.unshift( {
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		} );
-	}
-
-	const activeStyle = getActiveStyle( styles, className );
 	return (
 		<div className="block-editor-block-styles">
-			{ styles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					className,
-					activeStyle,
-					style
-				);
-				return (
+			{ stylesWithPreviewBlocks.map(
+				( { style, className, previewBlock } ) => (
 					<BlockStyleItem
-						genericPreviewBlock={ genericPreviewBlock }
+						key={ style.name }
+						previewBlock={ previewBlock }
 						className={ className }
 						isActive={ activeStyle === style }
-						key={ style.name }
 						onSelect={ () => {
 							updateBlockAttributes( clientId, {
-								className: styleClassName,
+								className,
 							} );
 							onHoverClassName( null );
 							onSwitch();
 						} }
 						onBlur={ () => onHoverClassName( null ) }
-						onHover={ () => onHoverClassName( styleClassName ) }
+						onHover={ () => onHoverClassName( className ) }
 						style={ style }
-						styleClassName={ styleClassName }
 					/>
-				);
-			} ) }
+				)
+			) }
 		</div>
 	);
 }
 
 function BlockStyleItem( {
-	genericPreviewBlock,
+	previewBlock,
 	style,
 	isActive,
 	onBlur,
 	onHover,
 	onSelect,
-	styleClassName,
 } ) {
-	const previewBlocks = useMemo( () => {
-		return {
-			...genericPreviewBlock,
-			attributes: {
-				...genericPreviewBlock.attributes,
-				className: styleClassName,
-			},
-		};
-	}, [ genericPreviewBlock, styleClassName ] );
-
 	return (
 		<div
 			key={ style.name }
@@ -185,7 +207,7 @@ function BlockStyleItem( {
 			aria-label={ style.label || style.name }
 		>
 			<div className="block-editor-block-styles__item-preview">
-				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+				<BlockPreview viewportWidth={ 500 } blocks={ previewBlock } />
 			</div>
 			<div className="block-editor-block-styles__item-label">
 				{ style.label || style.name }
