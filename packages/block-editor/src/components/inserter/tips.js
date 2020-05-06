@@ -30,9 +30,9 @@ const globalTips = [
 	__( "Change a block's type by pressing the block icon on the toolbar." ),
 ];
 
-function Tips( { context } ) {
+function Tips( { filterValue } ) {
 	// Return a contextual tip when it's appropriate.
-	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipsByContext( context, true );
+	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipsByContext( filterValue, true );
 	if ( contextualTip ) {
 		return <Tip>{ contextualTip }</Tip>;
 	}
