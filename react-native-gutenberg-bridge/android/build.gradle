@@ -67,6 +67,10 @@ if (buildGutenbergMobileJSBundle) {
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../")
     }
+
+    yarn_install {
+        args = ['--frozen-lockfile', '--prefer-offline', '--network-concurrency 1']
+    }
 }
 
 // import the `readReactNativeVersion()` function
