@@ -1,3 +1,7 @@
+1.27.1
+------
+* Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+
 1.27.0
 ------
 * Prefill caption for image blocks when available on the Media library
