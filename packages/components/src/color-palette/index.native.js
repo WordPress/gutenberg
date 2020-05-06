@@ -13,7 +13,6 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { useState, useEffect, createRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -39,20 +38,6 @@ function ColorPalette( {
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
 
-	const extendedDefaultColors = [
-		{
-			name: __( 'White' ),
-			slug: 'white',
-			color: '#ffffff',
-		},
-		{
-			name: __( 'Black' ),
-			slug: 'black',
-			color: '#000000',
-		},
-		...defaultSettings.colors,
-	];
-
 	const scrollViewRef = createRef();
 
 	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
@@ -60,7 +45,7 @@ function ColorPalette( {
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
 
-	const defaultColors = map( extendedDefaultColors, 'color' );
+	const defaultColors = map( defaultSettings.colors, 'color' );
 	const defaultGradientColors = map( defaultSettings.gradients, 'gradient' );
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
