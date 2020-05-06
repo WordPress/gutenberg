@@ -122,8 +122,16 @@ describe( 'Performance', () => {
 			);
 		}
 
+		// Wait for all the blocks to be async rendered.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 20000 );
+
 		// Measuring typing performance
 		await insertBlock( 'Paragraph' );
+
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 2000 );
+
 		i = 200;
 		const traceFile = __dirname + '/trace.json';
 		await page.tracing.start( {
@@ -164,6 +172,10 @@ describe( 'Performance', () => {
 				.map( () => createBlock( 'core/paragraph' ) );
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
+
+		// Wait for all the blocks to be async rendered.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 20000 );
 
 		const paragraphs = await page.$$( '.wp-block' );
 

@@ -119,6 +119,20 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
+
+React hook returns an array which items get asynchronously appended from a source array.
+This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+
+_Parameters_
+
+-   _list_ `Array`: Source array.
+-   _config_ `Object`: Configuration of the async list.
+
+_Returns_
+
+-   `Array`: Async array.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.

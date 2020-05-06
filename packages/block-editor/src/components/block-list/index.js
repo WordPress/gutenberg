@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, forwardRef } from '@wordpress/element';
+import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -72,6 +73,7 @@ function BlockList(
 		element: ref,
 		rootClientId,
 	} );
+	const asyncLoadedBlocks = useAsyncList( blockClientIds, { increment: 50 } );
 
 	return (
 		<Container
@@ -83,7 +85,7 @@ function BlockList(
 				__experimentalPassedProps.className
 			) }
 		>
-			{ blockClientIds.map( ( clientId, index ) => {
+			{ asyncLoadedBlocks.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
