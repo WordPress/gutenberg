@@ -12,7 +12,7 @@ import { list } from '@wordpress/icons';
 
 export default function QueryToolbar( { query, setQuery } ) {
 	return (
-		<Toolbar __experimentalAccessibilityLabel={ __( 'Query Toolbar' ) }>
+		<Toolbar>
 			<Dropdown
 				renderToggle={ ( { onToggle } ) => (
 					<ToolbarButton
