@@ -4,7 +4,7 @@
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const IgnoreEmitPlugin = require( 'ignore-emit-webpack-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const path = require( 'path' );
 
 /**
@@ -92,7 +92,7 @@ const config = {
 				exclude: /node_modules/,
 				use: [
 					{
-						loader: MiniCssExtractPlugin.loader,
+						loader: MiniCSSExtractPlugin.loader,
 					},
 					{
 						loader: require.resolve( 'css-loader' ),
@@ -121,10 +121,11 @@ const config = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCssExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCssExtractPlugin( { esModule: false, filename: '[name].css' } ),
-		// MiniCssExtractPlugin creates JavaScript assets for CSS that are
-		// obsolete and should be removed.
+		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
+		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
+		// obsolete and should be removed. Related webpack issue:
+		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/151
 		new IgnoreEmitPlugin( [ 'style.js' ] ),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
