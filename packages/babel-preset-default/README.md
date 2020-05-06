@@ -26,7 +26,7 @@ For example, using `.babelrc`:
 
 #### Extending Configuration
 
-This preset is an opinionated configuration intended to support the Gutenberg coding guidelines. If you would like to add to or change this configuration, you can do so by expanding your Babel configuration to include plugins or presets which override those included through this preset. It may help to familiarize yourself [the implementation of the configuration](https://github.com/WordPress/gutenberg/blob/master/packages/babel-preset-default/index.js) to see which specific plugins are enabled by default through this preset.
+This preset is an opinionated configuration. If you would like to add to or change this configuration, you can do so by expanding your Babel configuration to include plugins or presets which override those included through this preset. It may help to familiarize yourself [the implementation of the configuration](https://github.com/WordPress/gutenberg/blob/master/packages/babel-preset-default/index.js) to see which specific plugins are enabled by default through this preset.
 
 For example, if you'd like to use a new language feature proposal which has not reached the stability requirements of WordPress, you can add those as additional plugins in your Babel configuration:
 
