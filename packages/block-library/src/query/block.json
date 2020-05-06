@@ -2,6 +2,9 @@
 	"name": "core/query",
 	"category": "layout",
 	"attributes": {
+		"id": {
+			"type": "number"
+		},
 		"query": {
 			"type": "object",
 			"default": {

@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo, useState, useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -18,7 +19,7 @@ import Pagination from './pagination';
 
 export default function QueryEdit( {
 	clientId,
-	attributes: { query },
+	attributes: { query, id },
 	setAttributes,
 } ) {
 	const [ page, setPage ] = useState( 1 );
@@ -42,6 +43,14 @@ export default function QueryEdit( {
 		[ query, page, clientId ]
 	);
 
+	const instanceId = useInstanceId( QueryEdit );
+	// We need this for multi-query block pagination.
+	// Query parameters for each block are scoped to their ID.
+	useEffect( () => {
+		if ( ! id ) {
+			setAttributes( { id: instanceId } );
+		}
+	}, [ id, instanceId ] );
 	useEffect( () => {
 		if ( ! isInnerBlockSelected ) {
 			setActiveBlockContext( null );

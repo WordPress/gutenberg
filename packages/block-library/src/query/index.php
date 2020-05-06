@@ -15,15 +15,19 @@
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	// TODO: Use customized query.
-	$posts = get_posts(
+	$page_key = 'query-' . $attributes['id'] . '-page';
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : $_GET[ $page_key ];
+	$posts    = get_posts(
 		array(
 			'post_type'      => 'post',
-			'posts_per_page' => 10,
+			'posts_per_page' => $attributes['query']['per_page'],
+			'offset'         => $attributes['query']['per_page'] * ( $page - 1 ) + $attributes['query']['offset'],
 		)
 	);
 
 	$content = '';
+
+	// Render posts.
 	foreach ( $posts as $post ) {
 		$content .= (
 			new WP_Block(
@@ -38,6 +42,22 @@ function render_block_core_query( $attributes, $content, $block ) {
 			)
 		)->render( true );
 	}
+
+	// Render pagination.
+	// TODO: Make pagination buttons inner blocks of the Query block.
+	if ( 1 !== $page ) {
+		$content .= sprintf(
+			'<div><a href="%s">Previous</a></div>',
+			add_query_arg( $page_key, '2' === $page ? false : $page - 1 )
+		);
+	}
+	if ( $page < $attributes['query']['pages'] ) {
+		$content .= sprintf(
+			'<div><a href="%s">Next</a></div>',
+			add_query_arg( $page_key, $page + 1 )
+		);
+	}
+
 	return $content;
 }
 
