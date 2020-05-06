@@ -16,7 +16,7 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockDraggable from '../block-draggable';
-import { MoveUpButton, MoveDownButton } from './button';
+import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 
 export class BlockMover extends Component {
 	constructor() {
@@ -73,12 +73,12 @@ export class BlockMover extends Component {
 						onDragEnd={ onDraggableEnd }
 					>
 						<ToolbarGroup>
-							<MoveUpButton
+							<BlockMoverUpButton
 								clientIds={ clientIds }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
 							/>
-							<MoveDownButton
+							<BlockMoverDownButton
 								clientIds={ clientIds }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }

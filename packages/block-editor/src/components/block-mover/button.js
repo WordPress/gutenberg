@@ -165,10 +165,10 @@ const BlockMoverButton = forwardRef(
 	}
 );
 
-export const MoveUpButton = forwardRef( ( props, ref ) => {
+export const BlockMoverUpButton = forwardRef( ( props, ref ) => {
 	return <BlockMoverButton direction="up" ref={ ref } { ...props } />;
 } );
 
-export const MoveDownButton = forwardRef( ( props, ref ) => {
+export const BlockMoverDownButton = forwardRef( ( props, ref ) => {
 	return <BlockMoverButton direction="down" ref={ ref } { ...props } />;
 } );
