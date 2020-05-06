@@ -14,29 +14,40 @@ import {
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
+import Pagination from './pagination';
 
 export default function QueryEdit( {
 	clientId,
 	attributes: { query },
 	setAttributes,
 } ) {
-	const { posts, isInnerBlockSelected, blocks } = useSelect(
+	const [ page, setPage ] = useState( 1 );
+	const [ activeBlockContext, setActiveBlockContext ] = useState();
+
+	const { isInnerBlockSelected, posts, blocks } = useSelect(
 		( select ) => {
 			const { hasSelectedInnerBlock, getBlocks } = select(
 				'core/block-editor'
 			);
 			return {
-				posts: select( 'core' ).getEntityRecords(
-					'postType',
-					'post',
-					query
-				),
 				isInnerBlockSelected: hasSelectedInnerBlock( clientId ),
+				posts: select( 'core' ).getEntityRecords( 'postType', 'post', {
+					...query,
+					offset: query.per_page * ( page - 1 ) + query.offset,
+					page,
+				} ),
 				blocks: getBlocks( clientId ),
 			};
 		},
-		[ query, clientId ]
+		[ query, page, clientId ]
 	);
+
+	useEffect( () => {
+		if ( ! isInnerBlockSelected ) {
+			setActiveBlockContext( null );
+		}
+	}, [ isInnerBlockSelected ] );
+
 	const blockContexts = useMemo(
 		() =>
 			posts?.map( ( post ) => ( {
@@ -45,13 +56,6 @@ export default function QueryEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const [ activeBlockContext, setActiveBlockContext ] = useState();
-	useEffect( () => {
-		if ( ! isInnerBlockSelected ) {
-			setActiveBlockContext( null );
-		}
-	}, [ isInnerBlockSelected ] );
-
 	return (
 		<>
 			<BlockControls>
@@ -82,6 +86,13 @@ export default function QueryEdit( {
 					</BlockContextProvider>
 				);
 			} ) }
+			{ query.pages !== 1 && (
+				<Pagination
+					pages={ query.pages }
+					page={ page }
+					setPage={ setPage }
+				/>
+			) }
 		</>
 	);
 }

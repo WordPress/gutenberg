@@ -5,7 +5,9 @@
 		"query": {
 			"type": "object",
 			"default": {
-				"per_page": 3
+				"per_page": 3,
+				"pages": 1,
+				"offset": 0
 			}
 		}
 	}
