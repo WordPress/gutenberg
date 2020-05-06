@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
@@ -99,11 +99,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	] );
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	const onChangeClassName = useCallback(
-		( newClassName ) =>
-			updateBlockAttributes( clientId, { className: newClassName } ),
-		[ updateBlockAttributes, clientId ]
-	);
 	const genericPreviewBlock = useGenericPreviewBlock( block, type );
 
 	if ( ! styles || styles.length === 0 ) {
@@ -134,7 +129,9 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						isActive={ activeStyle === style }
 						key={ style.name }
 						onSelect={ () => {
-							onChangeClassName( styleClassName );
+							updateBlockAttributes( clientId, {
+								className: styleClassName,
+							} );
 							onHoverClassName( null );
 							onSwitch();
 						} }
