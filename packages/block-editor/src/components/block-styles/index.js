@@ -122,18 +122,26 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 	return (
 		<div className="block-editor-block-styles">
-			{ styles.map( ( style ) => (
-				<BlockStyleItem
-					activeStyle={ activeStyle }
-					className={ className }
-					key={ style.name }
-					onHoverClassName={ onHoverClassName }
-					style={ style }
-					type={ type }
-					updateClassName={ updateClassName }
-					{ ...rest }
-				/>
-			) ) }
+			{ styles.map( ( style ) => {
+				const styleClassName = replaceActiveStyle(
+					className,
+					activeStyle,
+					style
+				);
+				return (
+					<BlockStyleItem
+						className={ className }
+						isActive={ activeStyle === style }
+						key={ style.name }
+						onHoverClassName={ onHoverClassName }
+						style={ style }
+						styleClassName={ styleClassName }
+						type={ type }
+						updateClassName={ updateClassName }
+						{ ...rest }
+					/>
+				);
+			} ) }
 		</div>
 	);
 }
@@ -144,13 +152,11 @@ function BlockStyleItem( {
 	blockName,
 	useExample,
 	style,
-	activeStyle,
+	isActive,
 	updateClassName,
-	className,
+	styleClassName,
 	onHoverClassName,
 } ) {
-	const styleClassName = replaceActiveStyle( className, activeStyle, style );
-
 	let factory, deps;
 	if ( useExample ) {
 		factory = () =>
@@ -175,7 +181,7 @@ function BlockStyleItem( {
 		<div
 			key={ style.name }
 			className={ classnames( 'block-editor-block-styles__item', {
-				'is-active': activeStyle === style,
+				'is-active': isActive,
 			} ) }
 			onClick={ () => updateClassName( style ) }
 			onKeyDown={ ( event ) => {
