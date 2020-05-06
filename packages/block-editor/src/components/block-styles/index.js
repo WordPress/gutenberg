@@ -77,7 +77,7 @@ const useGenericPreviewBlock = ( block, type ) =>
 						innerBlocks: type.example.innerBlocks,
 				  } )
 				: cloneBlock( block ),
-		[ block.name, type ]
+		[ block, type ]
 	);
 
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
