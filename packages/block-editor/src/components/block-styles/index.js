@@ -119,17 +119,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
-	function updateClassName( style ) {
-		const updatedClassName = replaceActiveStyle(
-			className,
-			activeStyle,
-			style
-		);
-		onChangeClassName( updatedClassName );
-		onHoverClassName( null );
-		onSwitch();
-	}
-
 	return (
 		<div className="block-editor-block-styles">
 			{ styles.map( ( style ) => {
@@ -145,7 +134,11 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						isActive={ activeStyle === style }
 						key={ style.name }
 						onHoverClassName={ onHoverClassName }
-						onSelect={ () => updateClassName( style ) }
+						onSelect={ () => {
+							onChangeClassName( styleClassName );
+							onHoverClassName( null );
+							onSwitch();
+						} }
 						onBlur={ () => onHoverClassName( null ) }
 						onHover={ () => onHoverClassName( styleClassName ) }
 						style={ style }
