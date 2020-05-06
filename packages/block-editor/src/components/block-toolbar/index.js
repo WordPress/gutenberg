@@ -123,8 +123,14 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			</div>
 			{ shouldShowVisualToolbar && ! isMultiToolbar && (
 				<>
-					<BlockControls.Slot className="block-editor-block-toolbar__slot" />
-					<BlockFormatControls.Slot className="block-editor-block-toolbar__slot" />
+					<BlockControls.Slot
+						bubblesVirtually
+						className="block-editor-block-toolbar__slot"
+					/>
+					<BlockFormatControls.Slot
+						bubblesVirtually
+						className="block-editor-block-toolbar__slot"
+					/>
 				</>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />

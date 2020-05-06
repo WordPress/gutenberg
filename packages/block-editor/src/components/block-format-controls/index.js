@@ -21,13 +21,7 @@ const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
 
 function BlockFormatControlsSlot( props ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	return (
-		<Slot
-			{ ...props }
-			bubblesVirtually
-			fillProps={ accessibleToolbarState }
-		/>
-	);
+	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
 }
 
 function BlockFormatControlsFill( props ) {
