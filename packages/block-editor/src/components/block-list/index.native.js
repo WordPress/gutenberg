@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { identity } from 'lodash';
 import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 
 /**
@@ -24,8 +25,6 @@ import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
 
 const BlockListContext = createContext();
-
-const keyExtractor = ( item ) => item;
 
 const stylesMemo = {};
 const getStyles = (
@@ -216,7 +215,7 @@ export class BlockList extends Component {
 						horizontalAlignment
 					) }
 					data={ blockClientIds }
-					keyExtractor={ keyExtractor }
+					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
