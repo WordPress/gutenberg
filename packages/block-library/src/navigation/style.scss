@@ -58,6 +58,10 @@
 				left: 100%;
 				top: -$border-width;
 			}
+
+			.wp-block-navigation-link__submenu-icon svg {
+				transform: rotate(0);
+			}
 		}
 	}
 	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
@@ -107,8 +111,7 @@
 		fill: currentColor;
 
 		@include break-medium {
-			// reset rotation of submenu indicator icons on nested levels
-			transform: rotate(0);
+			transform: rotate(90deg);
 		}
 	}
 }
