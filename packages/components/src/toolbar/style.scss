@@ -39,6 +39,11 @@
 			left: $grid-unit-10;
 			right: $grid-unit-10;
 			z-index: -1;
+
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
 		}
 
 		svg {
@@ -51,7 +56,11 @@
 
 		// Toggled style.
 		&.is-pressed {
-			color: $white;
+			background: transparent;
+
+			&:hover {
+				background: transparent;
+			}
 
 			&::before {
 				background: $dark-gray-primary;
@@ -83,5 +92,15 @@
 				position: relative;
 			}
 		}
+	}
+}
+
+
+@keyframes components-button__appear-animation {
+	from {
+		transform: scaleY(0);
+	}
+	to {
+		transform: scaleY(1);
 	}
 }

@@ -8,13 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useEffect,
-	useLayoutEffect,
-	useContext,
-	forwardRef,
-} from '@wordpress/element';
+import { useRef, useEffect, useContext, forwardRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -26,7 +20,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
 import { Context, BlockNodes } from './root-container';
-import { BlockContext } from './block';
+import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
@@ -50,7 +44,7 @@ const BlockComponent = forwardRef(
 			mode,
 			blockTitle,
 			wrapperProps,
-		} = useContext( BlockContext );
+		} = useContext( BlockListBlockContext );
 		const { initialPosition } = useSelect(
 			( select ) => {
 				if ( ! isSelected ) {
@@ -69,14 +63,14 @@ const BlockComponent = forwardRef(
 			'core/block-editor'
 		);
 		const fallbackRef = useRef();
-
+		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
 
 		// Provide the selected node, or the first and last nodes of a multi-
 		// selection, so it can be used to position the contextual block toolbar.
 		// We only provide what is necessary, and remove the nodes again when they
 		// are no longer selected.
-		useLayoutEffect( () => {
+		useEffect( () => {
 			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 				const node = wrapper.current;
 				setBlockNodes( ( nodes ) => ( {
@@ -196,19 +190,20 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
-		return (
+		const blockWrapper = (
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
-				{ ...wrapperProps }
+				{ ...omit( wrapperProps, [ 'data-align' ] ) }
 				{ ...props }
 				id={ blockElementId }
 				ref={ wrapper }
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className
+					wrapperProps && wrapperProps.className,
+					! isAligned && 'wp-block'
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -227,6 +222,21 @@ const BlockComponent = forwardRef(
 				{ children }
 			</Animated>
 		);
+
+		// For aligned blocks, provide a wrapper element so the block can be
+		// positioned relative to the block column.
+		if ( isAligned ) {
+			const alignmentWrapperProps = {
+				'data-align': wrapperProps[ 'data-align' ],
+			};
+			return (
+				<div className="wp-block" { ...alignmentWrapperProps }>
+					{ blockWrapper }
+				</div>
+			);
+		}
+
+		return blockWrapper;
 	}
 );
 

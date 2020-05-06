@@ -11,11 +11,13 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	__experimentalLibrary as Library,
+} from '@wordpress/block-editor';
 import {
 	Button,
 	ScrollLock,
@@ -30,6 +32,8 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
+import { useState, useEffect, useCallback } from '@wordpress/element';
+import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,17 +48,20 @@ import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import ActionsPanel from './actions-panel';
+
+const interfaceLabels = {
+	leftSidebar: __( 'Block Library' ),
+};
 
 function Layout() {
+	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const {
-		closePublishSidebar,
-		openGeneralSidebar,
-		togglePublishSidebar,
-	} = useDispatch( 'core/edit-post' );
+	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 	const {
 		mode,
 		isFullscreenActive,
@@ -63,7 +70,6 @@ function Layout() {
 		pluginSidebarOpened,
 		publishSidebarOpened,
 		hasActiveMetaboxes,
-		isSaving,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
@@ -89,7 +95,6 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			previousShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations(
@@ -112,6 +117,34 @@ function Layout() {
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
 
+	// Inserter and Sidebars are mutually exclusive
+	useEffect( () => {
+		if ( sidebarIsOpened && ! isHugeViewport ) {
+			setIsInserterOpen( false );
+		}
+	}, [ sidebarIsOpened, isHugeViewport ] );
+	useEffect( () => {
+		if ( isInserterOpen && ! isHugeViewport ) {
+			closeGeneralSidebar();
+		}
+	}, [ isInserterOpen, isHugeViewport ] );
+
+	// Local state for save panel.
+	// Note 'thruthy' callback implies an open panel.
+	const [
+		entitiesSavedStatesCallback,
+		setEntitiesSavedStatesCallback,
+	] = useState( false );
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -124,7 +157,43 @@ function Layout() {
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
-					header={ <Header /> }
+					labels={ interfaceLabels }
+					header={
+						<Header
+							isInserterOpen={ isInserterOpen }
+							onToggleInserter={ () =>
+								setIsInserterOpen( ! isInserterOpen )
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					}
+					leftSidebar={
+						mode === 'visual' &&
+						isInserterOpen && (
+							<div className="edit-post-layout__inserter-panel">
+								<div className="edit-post-layout__inserter-panel-header">
+									<Button
+										icon={ close }
+										onClick={ () =>
+											setIsInserterOpen( false )
+										}
+									/>
+								</div>
+								<div className="edit-post-layout__inserter-panel-content">
+									<Library
+										showInserterHelpPanel
+										onSelect={ () => {
+											if ( isMobileViewport ) {
+												setIsInserterOpen( false );
+											}
+										} }
+									/>
+								</div>
+							</div>
+						)
+					}
 					sidebar={
 						( ! isMobileViewport || sidebarIsOpened ) && (
 							<>
@@ -177,30 +246,17 @@ function Layout() {
 						)
 					}
 					actions={
-						publishSidebarOpened ? (
-							<PostPublishPanel
-								onClose={ closePublishSidebar }
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								PrePublishExtension={
-									PluginPrePublishPanel.Slot
-								}
-								PostPublishExtension={
-									PluginPostPublishPanel.Slot
-								}
-							/>
-						) : (
-							<div className="edit-post-layout__toggle-publish-panel">
-								<Button
-									isSecondary
-									className="edit-post-layout__toggle-publish-panel-button"
-									onClick={ togglePublishSidebar }
-									aria-expanded={ false }
-								>
-									{ __( 'Open publish panel' ) }
-								</Button>
-							</div>
-						)
+						<ActionsPanel
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
 					}
 					shortcuts={ {
 						previous: previousShortcut,

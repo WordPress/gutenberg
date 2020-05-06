@@ -23,6 +23,7 @@ export const settings = {
 	keywords: [ _x( 'links', 'block keywords' ) ],
 	supports: {
 		align: [ 'left', 'center', 'right' ],
+		lightBlockWrapper: true,
 	},
 	example: {
 		innerBlocks: [

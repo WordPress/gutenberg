@@ -1,5 +1,7 @@
 ## Master
 
+## 2.5.0 (2020-04-01)
+
 ### New Features
 
 - The plugin now supports an optional `combinedOutputFile` option that is useful only when another `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file ([#20844](https://github.com/WordPress/gutenberg/pull/20844)).

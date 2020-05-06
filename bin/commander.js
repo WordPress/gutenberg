@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-
 // Dependencies
 const path = require( 'path' );
 const program = require( 'commander' );
@@ -1136,5 +1134,3 @@ program
 	} );
 
 program.parse( process.argv );
-
-/* eslint-enable no-console */

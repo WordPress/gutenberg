@@ -11,17 +11,16 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
-import { close } from '@wordpress/icons';
 
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
 		<div className="edit-post-text-editor">
 			{ isRichEditingEnabled && (
 				<div className="edit-post-text-editor__toolbar">
-					<h2>{ __( 'Editing Code' ) }</h2>
+					<h2>{ __( 'Editing code' ) }</h2>
 					<Button
+						isTertiary
 						onClick={ onExit }
-						icon={ close }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
 						{ __( 'Exit code editor' ) }

@@ -48,7 +48,6 @@ module.exports = {
 							},
 							{
 								type: 'string',
-								default: 'default',
 							},
 						],
 					},
@@ -68,12 +67,14 @@ module.exports = {
 	},
 	create( context ) {
 		const options = context.options[ 0 ] || {};
-		const { allowedTextDomain = 'default' } = options;
+		const { allowedTextDomain } = options;
 		const allowedTextDomains = Array.isArray( allowedTextDomain )
 			? allowedTextDomain
-			: [ allowedTextDomain ];
+			: [ allowedTextDomain ].filter( ( value ) => value );
 		const canFixTextDomain = allowedTextDomains.length === 1;
-		const allowDefault = allowedTextDomains.includes( 'default' );
+		const allowDefault =
+			allowedTextDomains.length === 0 ||
+			allowedTextDomains.includes( 'default' );
 
 		return {
 			CallExpression( node ) {
@@ -134,7 +135,10 @@ module.exports = {
 					return;
 				}
 
-				if ( ! allowedTextDomains.includes( value ) ) {
+				if (
+					allowedTextDomains.length &&
+					! allowedTextDomains.includes( value )
+				) {
 					const replaceTextDomain = ( fixer ) => {
 						return fixer.replaceTextRange(
 							// account for quotes.

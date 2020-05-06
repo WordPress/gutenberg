@@ -81,10 +81,12 @@ $tree-item-height: 36px;
 		margin-right: 6px;
 	}
 
-	&.is-selected,
-	&.is-selected:focus {
+	&.is-selected svg,
+	&.is-selected:focus svg {
 		color: $white;
 		background: $dark-gray-primary;
+		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		border-radius: $border-width;
 	}
 }
 

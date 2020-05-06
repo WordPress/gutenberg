@@ -15,6 +15,7 @@ import {
 	RichText,
 	__experimentalBlock as Block,
 	getFontSize,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -55,9 +56,21 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	);
 }
 
-function useDropCapMinimumHeight( isDropCap, deps ) {
+function useDropCap( isDropCap, fontSize, styleFontSize ) {
+	const isDisabled = useEditorFeature( '__experimentalDisableDropCap' );
+
 	const [ minimumHeight, setMinimumHeight ] = useState();
+
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+
+	const fontSizeObject = getFontSize( fontSizes, fontSize, styleFontSize );
 	useEffect( () => {
+		if ( isDisabled ) {
+			return;
+		}
+
 		const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
 		if ( isDropCap && element ) {
 			setMinimumHeight(
@@ -66,8 +79,15 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 		} else if ( minimumHeight ) {
 			setMinimumHeight( undefined );
 		}
-	}, [ isDropCap, minimumHeight, setMinimumHeight, ...deps ] );
-	return minimumHeight;
+	}, [
+		isDisabled,
+		isDropCap,
+		minimumHeight,
+		setMinimumHeight,
+		fontSizeObject.size,
+	] );
+
+	return [ ! isDisabled, minimumHeight ];
 }
 
 function ParagraphBlock( {
@@ -85,14 +105,12 @@ function ParagraphBlock( {
 		fontSize,
 		style,
 	} = attributes;
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
 	const ref = useRef();
-	const fontSizeObject = getFontSize( fontSizes, fontSize, style?.fontSize );
-	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
-		fontSizeObject.size,
-	] );
+	const [ isDropCapEnabled, dropCapMinimumHeight ] = useDropCap(
+		dropCap,
+		fontSize,
+		style?.fontSize
+	);
 
 	const styles = {
 		direction,
@@ -116,20 +134,24 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<ToggleControl
-						label={ __( 'Drop cap' ) }
-						checked={ !! dropCap }
-						onChange={ () =>
-							setAttributes( { dropCap: ! dropCap } )
-						}
-						help={
-							dropCap
-								? __( 'Showing large initial letter.' )
-								: __( 'Toggle to show a large initial letter.' )
-						}
-					/>
-				</PanelBody>
+				{ isDropCapEnabled && (
+					<PanelBody title={ __( 'Text settings' ) }>
+						<ToggleControl
+							label={ __( 'Drop cap' ) }
+							checked={ !! dropCap }
+							onChange={ () =>
+								setAttributes( { dropCap: ! dropCap } )
+							}
+							help={
+								dropCap
+									? __( 'Showing large initial letter.' )
+									: __(
+											'Toggle to show a large initial letter.'
+									  )
+							}
+						/>
+					</PanelBody>
+				) }
 			</InspectorControls>
 			<RichText
 				ref={ ref }

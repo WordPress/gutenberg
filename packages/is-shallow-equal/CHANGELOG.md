@@ -1,6 +1,8 @@
 ## Master
 
-### Breaking change
+## 2.0.0 (2020-04-15)
+
+### Breaking Change
 
 - Restructure package moving source files into `lib` directory. Direct imports of
   `@wordpress/is-shallow-equal/arrays` and `@wordpress/is-shallow-equal/objects` were never

@@ -72,6 +72,10 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
+<a name="closeGlobalBlockInserter" href="#closeGlobalBlockInserter">#</a> **closeGlobalBlockInserter**
+
+Undocumented declaration.
+
 <a name="createEmbeddingMatcher" href="#createEmbeddingMatcher">#</a> **createEmbeddingMatcher**
 
 Creates a function to determine if a request is embedding a certain URL.
@@ -283,7 +287,6 @@ result that appears.
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
--   _panelName_ `string`: The inserter panel to open (if it's closed by default).
 
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
@@ -342,10 +345,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
-
-<a name="openAllBlockInserterCategories" href="#openAllBlockInserterCategories">#</a> **openAllBlockInserterCategories**
-
-Opens all block inserter categories.
 
 <a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
 

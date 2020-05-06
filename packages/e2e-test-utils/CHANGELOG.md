@@ -1,5 +1,7 @@
 ## Master
 
+## 4.5.0 (2020-04-15)
+
 ### Enhancements
 
 - `visitAdminPage` will now throw an error (emit a test failure) when there are unexpected errors on hte page.

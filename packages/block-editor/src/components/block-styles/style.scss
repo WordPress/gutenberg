@@ -10,7 +10,7 @@
 	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	padding: $grid-unit-05 * 1.5;
 	display: flex;
 	flex-direction: column;
@@ -42,7 +42,7 @@
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
 	border: $border-width solid rgba($dark-gray-primary, 0.2);
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
 	background: $white;

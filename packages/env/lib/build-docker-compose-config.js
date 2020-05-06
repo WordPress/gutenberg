@@ -109,6 +109,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		services: {
 			mysql: {
 				image: 'mariadb',
+				ports: [ '3306' ],
 				environment: {
 					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 				},

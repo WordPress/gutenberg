@@ -1,0 +1,53 @@
+.footer {
+	border-top-width: $border-width;
+	border-color: $light-gray-400;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: $panel-padding;
+	margin-top: $panel-padding;
+	flex-wrap: wrap;
+}
+
+.footerDark {
+	border-color: $gray-70;
+}
+
+.cancelButton {
+	color: #d63638;
+	font-size: 17px;
+}
+
+.cancelButtonDark {
+	color: #f86368;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
+}
+
+.colorText {
+	font-family: $default-monospace-font;
+	color: $light-primary;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.colorTextDark {
+	color: $dark-primary;
+}
+
+.picker {
+	padding: $panel-padding;
+	border-radius: $panel-padding / 2;
+	height: 200px;
+}
+
+.pickerPointer {
+	height: 16px;
+}
