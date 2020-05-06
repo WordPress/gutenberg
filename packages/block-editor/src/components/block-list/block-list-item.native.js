@@ -6,6 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { ReadableContentView } from '@wordpress/components';
@@ -21,51 +22,57 @@ const stretchStyle = {
 	flex: 1,
 };
 
-export function BlockListItem( {
-	clientId,
-	isReadOnly,
-	shouldShowInsertionPointBefore,
-	shouldShowInsertionPointAfter,
-	marginVertical = styles.defaultBlock.marginTop,
-	marginHorizontal = styles.defaultBlock.marginLeft,
-	isStackedHorizontally,
-	contentResizeMode,
-	contentStyle,
-	onAddBlock,
-	onDeleteBlock,
-	shouldShowInnerBlockAppender,
-} ) {
-	const readableContentViewStyle =
-		contentResizeMode === 'stretch' && stretchStyle;
-
-	return (
-		<ReadableContentView style={ readableContentViewStyle }>
-			<View
-				style={ readableContentViewStyle }
-				pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
-			>
-				{ shouldShowInsertionPointBefore && <BlockInsertionPoint /> }
-				<BlockListBlock
-					key={ clientId }
-					showTitle={ false }
-					clientId={ clientId }
-					marginVertical={ marginVertical }
-					marginHorizontal={ marginHorizontal }
-					rootClientId={ this.props.rootClientId }
-					onCaretVerticalPositionChange={
-						this.onCaretVerticalPositionChange
-					}
-					parentWidth={ this.props.parentWidth }
-					isStackedHorizontally={ isStackedHorizontally }
-					contentStyle={ contentStyle }
-					onAddBlock={ onAddBlock }
-					onDeleteBlock={ onDeleteBlock }
-				/>
-				{ ! shouldShowInnerBlockAppender &&
-					shouldShowInsertionPointAfter && <BlockInsertionPoint /> }
-			</View>
-		</ReadableContentView>
-	);
+export class BlockListItem extends Component {
+	render() {
+		const {
+			clientId,
+			isReadOnly,
+			shouldShowInsertionPointBefore,
+			shouldShowInsertionPointAfter,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
+			isStackedHorizontally,
+			contentResizeMode,
+			contentStyle,
+			onAddBlock,
+			onDeleteBlock,
+			shouldShowInnerBlockAppender,
+		} = this.props;
+		const readableContentViewStyle =
+			contentResizeMode === 'stretch' && stretchStyle;
+		return (
+			<ReadableContentView style={ readableContentViewStyle }>
+				<View
+					style={ readableContentViewStyle }
+					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+				>
+					{ shouldShowInsertionPointBefore && (
+						<BlockInsertionPoint />
+					) }
+					<BlockListBlock
+						key={ clientId }
+						showTitle={ false }
+						clientId={ clientId }
+						marginVertical={ marginVertical }
+						marginHorizontal={ marginHorizontal }
+						rootClientId={ this.props.rootClientId }
+						onCaretVerticalPositionChange={
+							this.onCaretVerticalPositionChange
+						}
+						parentWidth={ this.props.parentWidth }
+						isStackedHorizontally={ isStackedHorizontally }
+						contentStyle={ contentStyle }
+						onAddBlock={ onAddBlock }
+						onDeleteBlock={ onDeleteBlock }
+					/>
+					{ ! shouldShowInnerBlockAppender &&
+						shouldShowInsertionPointAfter && (
+							<BlockInsertionPoint />
+						) }
+				</View>
+			</ReadableContentView>
+		);
+	}
 }
 
 export default compose( [
