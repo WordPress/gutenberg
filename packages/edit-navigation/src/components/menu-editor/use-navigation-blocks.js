@@ -6,6 +6,7 @@ import { groupBy, isEqual, difference } from 'lodash';
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
@@ -26,6 +27,18 @@ function createMenuItemAttributesFromBlock( block ) {
 		title: block.attributes.label,
 		url: block.attributes.url,
 	};
+}
+
+// temp solution until deleteEntityRecords is ready
+async function deleteMenuItem( recordId ) {
+	const path = `${ '/__experimental/menu-items/' +
+		recordId +
+		'?force=true' }`;
+	const deletedRecord = await apiFetch( {
+		path,
+		method: 'DELETE',
+	} );
+	return deletedRecord.previous;
 }
 
 export default function useNavigationBlocks( menuId ) {
@@ -75,12 +88,15 @@ export default function useNavigationBlocks( menuId ) {
 		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
 	}, [ menuItems ] );
 
-	const saveBlocks = () => {
+	const saveBlocks = async () => {
 		const { clientId, innerBlocks } = blocks[ 0 ];
 		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
 
+		const blockClientIds = [];
+
 		const saveNestedBlocks = async ( nestedBlocks, parentId = 0 ) => {
 			for ( const block of nestedBlocks ) {
+				blockClientIds.push( block.clientId );
 				const menuItem = menuItemsRef.current[ block.clientId ];
 				let currentItemId = menuItem?.id || 0;
 
@@ -115,17 +131,17 @@ export default function useNavigationBlocks( menuId ) {
 			}
 		};
 
-		saveNestedBlocks( innerBlocks, parentItemId );
+		await saveNestedBlocks( innerBlocks, parentItemId );
 
 		const deletedClientIds = difference(
 			Object.keys( menuItemsRef.current ),
-			innerBlocks.map( ( block ) => block.clientId )
+			blockClientIds
 		);
 
-		// Disable reason, this code will eventually be implemented.
-		// eslint-disable-next-line no-unused-vars
 		for ( const deletedClientId of deletedClientIds ) {
-			// TODO - delete menu items.
+			const menuItem = menuItemsRef.current[ deletedClientId ];
+
+			deleteMenuItem( menuItem.id );
 		}
 	};
 
