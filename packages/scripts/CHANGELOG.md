@@ -1,5 +1,8 @@
 ## Master
 
+### Enhancements
+- Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.
+
 ## 9.0.0 (2020-04-30)
 
 ### Breaking Changes
