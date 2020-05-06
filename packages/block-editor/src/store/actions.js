@@ -1010,3 +1010,35 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
 		isHighlighted,
 	};
 }
+
+export function __experimentalRegisterTip(
+	scope,
+	context,
+	keywords,
+	description
+) {
+	return {
+		type: 'REGISTER_TIP',
+		scope,
+		context,
+		keywords,
+		description,
+	};
+}
+
+export function __experimentalRegisterBlockInserterTip(
+	context,
+	keywords,
+	description
+) {
+	return __experimentalRegisterTip(
+		'blockInserter',
+		context,
+		keywords,
+		description
+	);
+}
+
+export function __experimentalRegisterBlockTip( type, description ) {
+	return __experimentalRegisterTip( type, null, null, description );
+}
