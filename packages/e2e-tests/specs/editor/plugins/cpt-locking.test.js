@@ -43,9 +43,10 @@ describe( 'cpt locking', () => {
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 		);
 		// Hover the block switcher to show the movers
-		await page.hover(
+		const button = await page.waitForSelector(
 			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
 		);
+		await button.hover();
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(

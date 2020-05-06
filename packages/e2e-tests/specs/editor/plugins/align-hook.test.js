@@ -95,14 +95,15 @@ describe( 'Align Hook Works As Expected', () => {
 				'.components-dropdown-menu__menu button.is-active';
 			// set the specified alignment.
 			await insertBlock( blockName );
-			const element = await page.waitForSelector(
-				CHANGE_ALIGNMENT_BUTTON_SELECTOR
-			);
-			await element.click();
+			await (
+				await page.waitForSelector( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+			 ).click();
 			await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 			// verify the button of the specified alignment is pressed.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await (
+				await page.waitForSelector( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+			 ).click();
 			let pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 1 );
 
@@ -119,11 +120,15 @@ describe( 'Align Hook Works As Expected', () => {
 			);
 
 			// remove the alignment.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await (
+				await page.waitForSelector( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+			 ).click();
 			await ( await page.$x( BUTTON_XPATH ) )[ 0 ].click();
 
 			// verify no alignment button is in pressed state.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await (
+				await page.waitForSelector( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+			 ).click();
 			pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 0 );
 
@@ -139,7 +144,9 @@ describe( 'Align Hook Works As Expected', () => {
 			);
 
 			// verify no alignment button is in pressed state after parsing the block.
-			await page.click( CHANGE_ALIGNMENT_BUTTON_SELECTOR );
+			await (
+				await page.waitForSelector( CHANGE_ALIGNMENT_BUTTON_SELECTOR )
+			 ).click();
 			pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 			expect( pressedButtons ).toHaveLength( 0 );
 		} );

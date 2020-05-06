@@ -127,9 +127,11 @@ describe( 'adding blocks', () => {
 	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
 		// Enter the default block and click the inserter toggle button to the left of it.
 		await page.keyboard.press( 'ArrowDown' );
-		await page.click(
-			'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
-		);
+		await (
+			await page.waitForSelector(
+				'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
+			)
+		 ).click();
 
 		// Expect the inserter search input to be the active element.
 		let activeElementClassList = await page.evaluate(
