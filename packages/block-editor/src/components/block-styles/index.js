@@ -134,10 +134,10 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						isActive={ activeStyle === style }
 						key={ style.name }
 						onHoverClassName={ onHoverClassName }
+						onSelect={ () => updateClassName( style ) }
 						style={ style }
 						styleClassName={ styleClassName }
 						type={ type }
-						updateClassName={ updateClassName }
 						{ ...rest }
 					/>
 				);
@@ -153,7 +153,7 @@ function BlockStyleItem( {
 	useExample,
 	style,
 	isActive,
-	updateClassName,
+	onSelect,
 	styleClassName,
 	onHoverClassName,
 } ) {
@@ -183,11 +183,11 @@ function BlockStyleItem( {
 			className={ classnames( 'block-editor-block-styles__item', {
 				'is-active': isActive,
 			} ) }
-			onClick={ () => updateClassName( style ) }
+			onClick={ () => onSelect() }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
 					event.preventDefault();
-					updateClassName( style );
+					onSelect();
 				}
 			} }
 			onMouseEnter={ () => onHoverClassName( styleClassName ) }
