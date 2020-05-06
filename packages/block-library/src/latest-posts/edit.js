@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -448,8 +448,11 @@ class LatestPostsEdit extends Component {
 								</a>
 								{ displayAuthor && (
 									<div className="wp-block-latest-posts__post-author">
-										{ __( 'Posted by' ) }{ ' ' }
-										{ post.author_info.name }
+										{ sprintf(
+											/* translators: byline. %s: current author. */
+											__( 'by %s' ),
+											post.author_info.name
+										) }
 									</div>
 								) }
 								{ displayPostDate && post.date_gmt && (
