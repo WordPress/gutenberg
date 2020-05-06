@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 export default function addIntroText() {
 	const introText = document.createElement( 'p' );
 
-	introText.id = `a11y-speak-intro-text`;
+	introText.id = 'a11y-speak-intro-text';
 	introText.className = 'a11y-speak-intro-text';
 	introText.textContent = __( 'Notifications' );
 
