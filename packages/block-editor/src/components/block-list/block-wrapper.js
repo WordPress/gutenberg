@@ -68,11 +68,17 @@ const BlockComponent = forwardRef(
 		// Provide the selected node so it can be used to position the contextual block toolbar.
 		// The wrapper changes when the alignment class changes.
 		useEffect( () => {
-			setBlockNodes( ( nodes ) => ( {
-				...nodes,
-				[ clientId ]: wrapper.current,
-			} ) );
-			return () => setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+			const id = window.requestIdleCallback( () => {
+				setBlockNodes( ( nodes ) => ( {
+					...nodes,
+					[ clientId ]: wrapper.current,
+				} ) );
+			} );
+
+			return () => {
+				window.cancelIdleCallback( id );
+				setBlockNodes( ( nodes ) => omit( nodes, clientId ) );
+			};
 		}, [ isAligned ] );
 
 		// translators: %s: Type of block (i.e. Text, Image etc)
