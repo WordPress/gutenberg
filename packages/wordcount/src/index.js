@@ -28,7 +28,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
 /**
  * Private function to manage the settings.
  *
- * @param {WPWordCountStrategy} type The type of count to be done.
+ * @param {WPWordCountStrategy} type         The type of count to be done.
  * @param {WPWordCountSettings} userSettings Custom settings for the count.
  *
  * @return {WPWordCountSettings} The combined settings object to be used.
@@ -60,8 +60,8 @@ function loadSettings( type, userSettings ) {
 /**
  * Count the words in text
  *
- * @param {string} text     The text being processed
- * @param {RegExp|undefined} regex    The regular expression pattern being matched
+ * @param {string}              text     The text being processed
+ * @param {RegExp|undefined}    regex    The regular expression pattern being matched
  * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} The matched string.
@@ -86,8 +86,8 @@ function countWords( text, regex, settings ) {
 /**
  * Count the characters in text
  *
- * @param {string} text     The text being processed
- * @param {RegExp|undefined} regex    The regular expression pattern being matched
+ * @param {string}              text     The text being processed
+ * @param {RegExp|undefined}    regex    The regular expression pattern being matched
  * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} Count of characters.
@@ -111,8 +111,8 @@ function countCharacters( text, regex, settings ) {
 /**
  * Count some words.
  *
- * @param {string} text The text being processed
- * @param {WPWordCountStrategy} type	The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {string}              text         The text being processed
+ * @param {WPWordCountStrategy} type	     The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @param {WPWordCountSettings} userSettings Custom settings object.
  *
  * @example

@@ -1,21 +1,23 @@
 /** @typedef {import('./index').WPWordCountStrategy} WPWordCountStrategy */
 
+/** @typedef {Partial<{type: WPWordCountStrategy, shortcodes: string[]}>} WPWordCountL10n */
+
 /**
  * @typedef WPWordCountSettingsFields
- * @property {RegExp} HTMLRegExp Regular expression that matches HTML tags
- * @property {RegExp} HTMLcommentRegExp Regular expression that matches HTML comments
- * @property {RegExp} spaceRegExp Regular expression that matches spaces in HTML
- * @property {RegExp} HTMLEntityRegExp Regular expression that matches HTML entities
- * @property {RegExp} connectorRegExp Regular expression that matches word connectors, like em-dash
- * @property {RegExp} removeRegExp Regular expression that matches various characters to be removed when counting
- * @property {RegExp} astralRegExp Regular expression that matches astral UTF-16 code points
- * @property {RegExp} wordsRegExp Regular expression that matches words
- * @property {RegExp} characters_excluding_spacesRegExp Regular expression that matches characters excluding spaces
- * @property {RegExp} characters_including_spacesRegExp Regular expression that matches characters including spaces
- * @property {RegExp} shortcodesRegExp Regular expression that matches WordPress shortcodes
- * @property {string[]} shortcodes List of all shortcodes
- * @property {WPWordCountStrategy} type Describes what and how are we counting
- * @property {Partial<{type: WPWordCountStrategy, shortcodes: string[]}>} l10n Object with human translations
+ * @property {RegExp}              HTMLRegExp                        Regular expression that matches HTML tags
+ * @property {RegExp}              HTMLcommentRegExp                 Regular expression that matches HTML comments
+ * @property {RegExp}              spaceRegExp                       Regular expression that matches spaces in HTML
+ * @property {RegExp}              HTMLEntityRegExp                  Regular expression that matches HTML entities
+ * @property {RegExp}              connectorRegExp                   Regular expression that matches word connectors, like em-dash
+ * @property {RegExp}              removeRegExp                      Regular expression that matches various characters to be removed when counting
+ * @property {RegExp}              astralRegExp                      Regular expression that matches astral UTF-16 code points
+ * @property {RegExp}              wordsRegExp                       Regular expression that matches words
+ * @property {RegExp}              characters_excluding_spacesRegExp Regular expression that matches characters excluding spaces
+ * @property {RegExp}              characters_including_spacesRegExp Regular expression that matches characters including spaces
+ * @property {RegExp}              shortcodesRegExp                  Regular expression that matches WordPress shortcodes
+ * @property {string[]}            shortcodes                        List of all shortcodes
+ * @property {WPWordCountStrategy} type                              Describes what and how are we counting
+ * @property {WPWordCountL10n}     l10n                              Object with human translations
  */
 
 /**
