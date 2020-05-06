@@ -41,7 +41,10 @@ function Toolbar(
 			/>
 		);
 	}
-
+	// When the __experimentalAccessibilityLabel prop is not passed, Toolbar will
+	// fallback to ToolbarGroup. This should be deprecated as soon as the new API
+	// gets stable.
+	// See https://github.com/WordPress/gutenberg/pull/20008#issuecomment-624503410
 	return <ToolbarGroup { ...props } className={ className } />;
 }
 
