@@ -91,6 +91,7 @@
 
 // All links
 .wp-block-navigation-link__content {
+	text-decoration: none;
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	.has-text-color & {
@@ -99,6 +100,9 @@
 }
 
 .wp-block-navigation-link__label {
+	font-size: 17px;
+	font-family: $default-font;
+
 	word-break: normal;
 	overflow-wrap: break-word;
 }
