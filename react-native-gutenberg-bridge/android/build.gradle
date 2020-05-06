@@ -136,7 +136,7 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../bundle/";
+        hermesPath = "${projectDir}/../../bundle/android/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
