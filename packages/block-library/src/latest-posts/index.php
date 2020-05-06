@@ -99,11 +99,10 @@ function render_block_core_latest_posts( $attributes ) {
 		);
 
 		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
-			$author = get_the_author_meta( 'display_name', $post->post_author );
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-author">%1$s %2$s</div>',
 				__( 'Posted by' ),
-				$author
+				get_the_author_meta( 'display_name', $post->post_author )
 			);
 		}
 
