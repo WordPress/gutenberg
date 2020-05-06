@@ -72,12 +72,18 @@ export class BlockList extends Component {
 
 	shouldComponentUpdate( nextProps ) {
 		if (
-			JSON.stringify( nextProps.blockClientIds ) ===
-			JSON.stringify( this.props.blockClientIds )
+			JSON.stringify( nextProps.blockClientIds ) !==
+				JSON.stringify( this.props.blockClientIds ) ||
+			nextProps.blockCount !== this.props.blockCount ||
+			nextProps.isReadOnly !== this.props.isReadOnly ||
+			nextProps.shouldShowInsertionPointBefore !==
+				this.props.shouldShowInsertionPointBefore ||
+			nextProps.isBlockInsertionPointVisible !==
+				this.props.isBlockInsertionPointVisible
 		) {
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -103,14 +109,13 @@ export class BlockList extends Component {
 
 	renderDefaultBlockAppender() {
 		const { shouldShowInsertionPointBefore } = this.props;
-		const willShowInsertionPoint = shouldShowInsertionPointBefore(); // call without the client_id argument since this is the appender
 		return (
 			<View style={ styles.defaultAppender }>
 				<ReadableContentView>
 					<BlockListAppender // show the default appender, anormal, when not inserting a block
 						rootClientId={ this.props.rootClientId }
 						renderAppender={ this.props.renderAppender }
-						showSeparator={ willShowInsertionPoint }
+						showSeparator={ shouldShowInsertionPointBefore }
 					/>
 				</ReadableContentView>
 			</View>

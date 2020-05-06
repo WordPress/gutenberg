@@ -30,6 +30,27 @@ class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 	}
+	// wrapperProps are always a new reference and forces update even if value is the same
+	shouldComponentUpdate( nextProps ) {
+		if (
+			nextProps.isValid !== this.props.isValid ||
+			nextProps.isInnerBlockSelected !==
+				this.props.isInnerBlockSelected ||
+			nextProps.isParentSelected !== this.props.isParentSelected ||
+			nextProps.firstToSelectId !== this.props.firstToSelectId ||
+			nextProps.isTouchable !== this.props.isTouchable ||
+			nextProps.order !== this.props.order ||
+			nextProps.isSelected !== this.props.isSelected ||
+			JSON.stringify( nextProps.wrapperProps ) !==
+				JSON.stringify( this.props.wrapperProps ) ||
+			JSON.stringify( nextProps.attributes ) !==
+				JSON.stringify( this.props.attributes )
+		) {
+			return true;
+		}
+
+		return false;
+	}
 
 	onFocus() {
 		const { firstToSelectId, isSelected, onSelect } = this.props;
