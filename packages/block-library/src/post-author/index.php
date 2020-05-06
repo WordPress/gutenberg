@@ -88,13 +88,11 @@ function post_author_build_css_font_sizes( $attributes ) {
 /**
  * Renders the `core/post-author` block on the server.
  *
- * @param  Object $block The block to render.
+ * @param array $attributes Block attributes.
+ *
  * @return string Returns the rendered author block.
  */
-function render_block_core_post_author( $block ) {
-
-	$attributes = $block->attributes;
-
+function render_block_core_post_author( $attributes ) {
 	if ( empty( $attributes ) ) {
 		return '';
 	}
