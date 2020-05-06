@@ -8,7 +8,7 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { map } from 'lodash';
+import { map, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -45,8 +45,10 @@ function ColorPalette( {
 	const [ scale ] = useState( new Animated.Value( 1 ) );
 	const [ opacity ] = useState( new Animated.Value( 1 ) );
 
-	const defaultColors = map( defaultSettings.colors, 'color' );
-	const defaultGradientColors = map( defaultSettings.gradients, 'gradient' );
+	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
+	const defaultGradientColors = uniq(
+		map( defaultSettings.gradients, 'gradient' )
+	);
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
 	useEffect( () => {
