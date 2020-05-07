@@ -1,4 +1,16 @@
 {
 	"name": "core/post-tags",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"beforeText": {
+			"type": "string"
+		},
+		"separator": {
+			"type": "string",
+			"default": " | "
+		},
+		"afterText": {
+			"type": "string"
+		}
+	}
 }

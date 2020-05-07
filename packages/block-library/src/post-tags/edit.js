@@ -4,8 +4,12 @@
 import { useEntityProp, useEntityId } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/block-editor';
 
-function PostTagsDisplay() {
+function PostTagsDisplay( {
+	attributes: { beforeText, separator, afterText },
+	setAttributes,
+} ) {
 	const [ tags ] = useEntityProp( 'postType', 'post', 'tags' );
 	const tagLinks = useSelect(
 		( select ) => {
@@ -28,15 +32,55 @@ function PostTagsDisplay() {
 	);
 	return (
 		tagLinks &&
-		( tagLinks.length === 0
-			? __( 'No tags.' )
-			: tagLinks.reduce( ( prev, curr ) => [ prev, ' | ', curr ] ) )
+		( tagLinks.length === 0 ? (
+			__( 'No tags.' )
+		) : (
+			<>
+				<RichText
+					tagName="span"
+					placeholder={ __( 'Before text.' ) }
+					keepPlaceholderOnFocus
+					value={ beforeText }
+					onChange={ ( newBeforeText ) =>
+						setAttributes( { beforeText: newBeforeText } )
+					}
+				/>{ ' ' }
+				{ tagLinks.reduce( ( prev, curr ) => [
+					prev,
+					<RichText
+						key={ prev + curr }
+						tagName="span"
+						placeholder={ __( ' | ' ) }
+						keepPlaceholderOnFocus
+						value={ separator }
+						onChange={ ( newSeparator ) =>
+							setAttributes( { separator: newSeparator } )
+						}
+					/>,
+					curr,
+				] ) }{ ' ' }
+				<RichText
+					tagName="span"
+					placeholder={ __( 'After text.' ) }
+					keepPlaceholderOnFocus
+					value={ afterText }
+					onChange={ ( newAfterText ) =>
+						setAttributes( { afterText: newAfterText } )
+					}
+				/>
+			</>
+		) )
 	);
 }
 
-export default function PostTagsEdit() {
+export default function PostTagsEdit( { attributes, setAttributes } ) {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
 		return 'Post Tags Placeholder';
 	}
-	return <PostTagsDisplay />;
+	return (
+		<PostTagsDisplay
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+		/>
+	);
 }
