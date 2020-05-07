@@ -693,4 +693,5 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
 	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
   register_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
+	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
 }

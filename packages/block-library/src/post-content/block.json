@@ -1,4 +1,5 @@
 {
 	"name": "core/post-content",
-	"category": "layout"
+	"category": "layout",
+	"context": [ "postId" ]
 }

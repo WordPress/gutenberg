@@ -8,7 +8,8 @@ import { castArray, flow } from 'lodash';
  */
 import { __, _n } from '@wordpress/i18n';
 import {
-	Toolbar,
+	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -66,98 +67,115 @@ export function BlockSettingsMenu( { clientIds } ) {
 				onInsertBefore,
 				onRemove,
 			} ) => (
-				<Toolbar>
-					<DropdownMenu
-						icon={ moreHorizontal }
-						label={ __( 'More options' ) }
-						className="block-editor-block-settings-menu"
-						popoverProps={ POPOVER_PROPS }
-						noIcons
-					>
-						{ ( { onClose } ) => (
-							<>
-								<MenuGroup>
-									<__experimentalBlockSettingsMenuFirstItem.Slot
-										fillProps={ { onClose } }
-									/>
-									{ count === 1 && (
-										<BlockUnknownConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
-									{ count === 1 && (
-										<BlockHTMLConvertButton
-											clientId={ firstBlockClientId }
-										/>
-									) }
-									{ canDuplicate && (
-										<MenuItem
-											onClick={ flow(
-												onClose,
-												onDuplicate
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<DropdownMenu
+								icon={ moreHorizontal }
+								label={ __( 'More options' ) }
+								className="block-editor-block-settings-menu"
+								popoverProps={ POPOVER_PROPS }
+								toggleProps={ toggleProps }
+								noIcons
+							>
+								{ ( { onClose } ) => (
+									<>
+										<MenuGroup>
+											<__experimentalBlockSettingsMenuFirstItem.Slot
+												fillProps={ { onClose } }
+											/>
+											{ count === 1 && (
+												<BlockUnknownConvertButton
+													clientId={
+														firstBlockClientId
+													}
+												/>
 											) }
-											shortcut={ shortcuts.duplicate }
-										>
-											{ __( 'Duplicate' ) }
-										</MenuItem>
-									) }
-									{ canInsertDefaultBlock && (
-										<>
-											<MenuItem
-												onClick={ flow(
-													onClose,
-													onInsertBefore
-												) }
-												shortcut={
-													shortcuts.insertBefore
-												}
-											>
-												{ __( 'Insert Before' ) }
-											</MenuItem>
-											<MenuItem
-												onClick={ flow(
-													onClose,
-													onInsertAfter
-												) }
-												shortcut={
-													shortcuts.insertAfter
-												}
-											>
-												{ __( 'Insert After' ) }
-											</MenuItem>
-										</>
-									) }
-									{ count === 1 && (
-										<BlockModeToggle
-											clientId={ firstBlockClientId }
-											onToggle={ onClose }
+											{ count === 1 && (
+												<BlockHTMLConvertButton
+													clientId={
+														firstBlockClientId
+													}
+												/>
+											) }
+											{ canDuplicate && (
+												<MenuItem
+													onClick={ flow(
+														onClose,
+														onDuplicate
+													) }
+													shortcut={
+														shortcuts.duplicate
+													}
+												>
+													{ __( 'Duplicate' ) }
+												</MenuItem>
+											) }
+											{ canInsertDefaultBlock && (
+												<>
+													<MenuItem
+														onClick={ flow(
+															onClose,
+															onInsertBefore
+														) }
+														shortcut={
+															shortcuts.insertBefore
+														}
+													>
+														{ __(
+															'Insert Before'
+														) }
+													</MenuItem>
+													<MenuItem
+														onClick={ flow(
+															onClose,
+															onInsertAfter
+														) }
+														shortcut={
+															shortcuts.insertAfter
+														}
+													>
+														{ __( 'Insert After' ) }
+													</MenuItem>
+												</>
+											) }
+											{ count === 1 && (
+												<BlockModeToggle
+													clientId={
+														firstBlockClientId
+													}
+													onToggle={ onClose }
+												/>
+											) }
+										</MenuGroup>
+										<BlockSettingsMenuControls.Slot
+											fillProps={ { onClose } }
 										/>
-									) }
-								</MenuGroup>
-								<BlockSettingsMenuControls.Slot
-									fillProps={ { onClose } }
-								/>
-								<MenuGroup>
-									{ ! isLocked && (
-										<MenuItem
-											onClick={ flow(
-												onClose,
-												onRemove
+										<MenuGroup>
+											{ ! isLocked && (
+												<MenuItem
+													onClick={ flow(
+														onClose,
+														onRemove
+													) }
+													shortcut={
+														shortcuts.remove
+													}
+												>
+													{ _n(
+														'Remove Block',
+														'Remove Blocks',
+														count
+													) }
+												</MenuItem>
 											) }
-											shortcut={ shortcuts.remove }
-										>
-											{ _n(
-												'Remove Block',
-												'Remove Blocks',
-												count
-											) }
-										</MenuItem>
-									) }
-								</MenuGroup>
-							</>
+										</MenuGroup>
+									</>
+								) }
+							</DropdownMenu>
 						) }
-					</DropdownMenu>
-				</Toolbar>
+					</ToolbarItem>
+				</ToolbarGroup>
 			) }
 		</BlockActions>
 	);
