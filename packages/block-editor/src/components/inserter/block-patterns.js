@@ -97,7 +97,7 @@ function BlockPatternList( { patterns, shownPatterns, onClickPattern } ) {
 }
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
-	const [ patterns, , onClick ] = usePatternsState( { onInsert } );
+	const [ patterns, , onClick ] = usePatternsState( onInsert );
 	const currentShownPatterns = useAsyncList( patterns );
 
 	const filteredPatterns = useMemo(
@@ -121,7 +121,7 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 }
 
 function BlockPatternsPerCategories( { onInsert } ) {
-	const [ patterns, categories, onClick ] = usePatternsState( { onInsert } );
+	const [ patterns, categories, onClick ] = usePatternsState( onInsert );
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
