@@ -153,10 +153,10 @@ function gutenberg_edit_site_init( $hook ) {
 		}
 
 		$template_hierarchy    = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
-		$current_template_post = gutenberg_find_template_post_and_parts( $template_hierarchy );
-		if ( isset( $current_template_post ) ) {
-			$template_ids[ $current_template_post['template_post']->post_name ] = $current_template_post['template_post']->ID;
-			$template_part_ids = $template_part_ids + $current_template_post['template_part_ids'];
+		$current_template = gutenberg_find_template_post_and_parts( $template_hierarchy );
+		if ( isset( $current_template ) ) {
+			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
+			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
 		}
 	}
 
