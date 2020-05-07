@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
@@ -58,7 +58,7 @@ export function AlignmentToolbar( props ) {
 	}
 
 	return (
-		<Toolbar
+		<ToolbarGroup
 			isCollapsed={ isCollapsed }
 			icon={ setIcon() }
 			label={ label }
