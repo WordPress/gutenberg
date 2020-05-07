@@ -153,6 +153,18 @@ _Returns_
 
 -   `?WPBlockVariation`: The default block variation.
 
+<a name="getDefaultCategory" href="#getDefaultCategory">#</a> **getDefaultCategory**
+
+Returns the default block category.
+
+_Parameters_
+
+-   _state_ `Object`: Blocks state.
+
+_Returns_
+
+-   `(WPBlockTypeCategory|undefined)`: Default block category.
+
 <a name="getFreeformFallbackBlockName" href="#getFreeformFallbackBlockName">#</a> **getFreeformFallbackBlockName**
 
 Returns the name of the block for handling non-block content.

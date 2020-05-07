@@ -27,6 +27,16 @@ import { __ } from '@wordpress/i18n';
  */
 
 /**
+ * Default category, used in absence of any assigned category for block type.
+ *
+ * @type {WPBlockTypeCategory}
+ */
+export const DEFAULT_CATEGORY = {
+	slug: 'uncategorized',
+	title: __( 'Uncategorized' ),
+};
+
+/**
  * Default set of block type categories.
  *
  * @type {WPBlockTypeCategory[]}
@@ -38,6 +48,7 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
+	DEFAULT_CATEGORY,
 ];
 
 /**
@@ -238,6 +249,17 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the default category slug.
+ *
+ * @param {string} state Current state.
+ *
+ * @return {string} Updated state.
+ */
+export function defaultCategory( state = DEFAULT_CATEGORY.slug ) {
+	return state;
+}
+
 export function collections( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_COLLECTION':
@@ -263,5 +285,6 @@ export default combineReducers( {
 	unregisteredFallbackBlockName,
 	groupingBlockName,
 	categories,
+	defaultCategory,
 	collections,
 } );

@@ -233,3 +233,25 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+/**
+ * Appends the "Uncategorized" block category to the default set of block
+ * categories.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see Trac Ticket TBD
+ *
+ * @param array $categories Block categories.
+ *
+ * @return array Block categories with "Uncategorized" block category.
+ */
+function gutenberg_append_default_block_category( $categories ) {
+	$categories[] = array(
+		'slug'  => 'uncategorized',
+		'title' => __( 'Uncategorized' ),
+	);
+
+	return $categories;
+}
+add_filter( 'block_categories', 'gutenberg_append_default_block_category' );

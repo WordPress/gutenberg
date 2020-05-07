@@ -21,6 +21,7 @@ function BlockManager( {
 	setState,
 	blockTypes,
 	categories,
+	defaultCategory,
 	hasBlockSupport,
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
@@ -77,9 +78,14 @@ function BlockManager( {
 					<BlockManagerCategory
 						key={ category.slug }
 						category={ category }
-						blockTypes={ filter( blockTypes, {
-							category: category.slug,
-						} ) }
+						blockTypes={ filter(
+							blockTypes,
+							( blockType ) =>
+								blockType.category ===
+								( category === defaultCategory
+									? undefined
+									: category.slug )
+						) }
 					/>
 				) ) }
 			</div>
@@ -93,6 +99,7 @@ export default compose( [
 		const {
 			getBlockTypes,
 			getCategories,
+			getDefaultCategory,
 			hasBlockSupport,
 			isMatchingSearchTerm,
 		} = select( 'core/blocks' );
@@ -104,6 +111,7 @@ export default compose( [
 		return {
 			blockTypes: getBlockTypes(),
 			categories: getCategories(),
+			defaultCategory: getDefaultCategory(),
 			hasBlockSupport,
 			isMatchingSearchTerm,
 			numberOfHiddenBlocks,

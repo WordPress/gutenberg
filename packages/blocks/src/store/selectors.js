@@ -138,6 +138,17 @@ export function getCategory( state, slug ) {
 }
 
 /**
+ * Returns the default block category.
+ *
+ * @param {Object} state Blocks state.
+ *
+ * @return {WPBlockTypeCategory|undefined} Default block category.
+ */
+export function getDefaultCategory( state ) {
+	return getCategory( state, state.defaultCategory );
+}
+
+/**
  * Returns all the available collections.
  *
  * @param {Object} state Data state.
@@ -287,7 +298,7 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	return (
 		isSearchMatch( blockType.title ) ||
 		some( blockType.keywords, isSearchMatch ) ||
-		isSearchMatch( blockType.category )
+		Boolean( blockType.category && isSearchMatch( blockType.category ) )
 	);
 }
 

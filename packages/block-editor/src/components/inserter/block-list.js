@@ -62,6 +62,7 @@ function InserterBlockList( {
 } ) {
 	const {
 		categories,
+		defaultCategory,
 		collections,
 		items,
 		rootChildBlocks,
@@ -73,6 +74,7 @@ function InserterBlockList( {
 			);
 			const {
 				getCategories,
+				getDefaultCategory,
 				getCollections,
 				getChildBlockNames,
 			} = select( 'core/blocks' );
@@ -81,6 +83,7 @@ function InserterBlockList( {
 
 			return {
 				categories: getCategories(),
+				defaultCategory: getDefaultCategory(),
 				collections: getCollections(),
 				rootChildBlocks: getChildBlockNames( rootBlockName ),
 				items: getInserterItems( rootClientId ),
@@ -209,7 +212,12 @@ function InserterBlockList( {
 
 			{ ! hasChildItems &&
 				map( categories, ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
+					const categoryItems =
+						itemsPerCategory[
+							category === defaultCategory
+								? undefined
+								: category.slug
+						];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
 					}

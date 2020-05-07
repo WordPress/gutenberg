@@ -94,7 +94,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @property {string}             name         Block type's namespaced name.
  * @property {string}             title        Human-readable block type label.
  * @property {string}             description  A detailed block type description.
- * @property {string}             category     Block type category classification,
+ * @property {string}             [category]   Block type category classification,
  *                                             used in search interfaces to arrange
  *                                             block types by category.
  * @property {WPBlockTypeIcon}    [icon]       Block type icon.
@@ -201,10 +201,6 @@ export function registerBlockType( name, settings ) {
 	}
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error( 'The "edit" property must be a valid function.' );
-		return;
-	}
-	if ( ! ( 'category' in settings ) ) {
-		console.error( 'The block "' + name + '" must have a category.' );
 		return;
 	}
 	if (
