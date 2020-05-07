@@ -30,7 +30,7 @@ const INSTALL_URLS = [
 ];
 
 // Example Blocks
-const mockBlock1 = {
+const MOCK_BLOCK1 = {
 	name: 'block-directory-test-block/main-block',
 	title: 'Block Directory Test Block',
 	description: 'This plugin is useful for the block.',
@@ -48,8 +48,8 @@ const mockBlock1 = {
 	humanized_updated: '5 months ago',
 };
 
-const mockBlock2 = {
-	...mockBlock1,
+const MOCK_BLOCK2 = {
+	...MOCK_BLOCK1,
 	name: 'block-directory-test-block/secondary-block',
 	title: 'Block Directory Test Block - Pt Deux',
 	id: 'block-directory-test-secondary-block',
@@ -60,7 +60,7 @@ const block = `( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 
-	registerBlockType( '${ mockBlock1.name }', {
+	registerBlockType( '${ MOCK_BLOCK1.name }', {
 		title: 'Test Block for Block Directory',
 		icon: 'hammer',
 		category: 'common',
@@ -127,7 +127,7 @@ describe( 'adding blocks from block directory', () => {
 				// Mock response for search with the block
 				match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
 				onRequestMatch: createResponse(
-					JSON.stringify( [ mockBlock1, mockBlock2 ] )
+					JSON.stringify( [ MOCK_BLOCK1, MOCK_BLOCK2 ] )
 				),
 			},
 			{
@@ -138,7 +138,7 @@ describe( 'adding blocks from block directory', () => {
 			{
 				// Mock the response for the js asset once it gets injected
 				match: ( request ) =>
-					request.url().includes( mockBlock1.assets[ 0 ] ),
+					request.url().includes( MOCK_BLOCK1.assets[ 0 ] ),
 				onRequestMatch: createResponse(
 					Buffer.from( block, 'utf8' ),
 					'application/javascript; charset=utf-8'
@@ -147,7 +147,7 @@ describe( 'adding blocks from block directory', () => {
 		] );
 
 		// Search for the block via the inserter
-		await searchForBlock( mockBlock1.title );
+		await searchForBlock( MOCK_BLOCK1.title );
 
 		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
 		const addBtn = await page.waitForSelector(
