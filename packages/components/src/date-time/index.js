@@ -161,13 +161,24 @@ export class DateTimePicker extends Component {
 				) }
 
 				{ ! this.state.calendarHelpIsVisible && (
-					<Button
-						className="components-datetime__date-help-button"
-						isLink
-						onClick={ this.onClickDescriptionToggle }
-					>
-						{ __( 'Calendar Help' ) }
-					</Button>
+					<div className="components-datetime__buttons">
+						{ currentDate && (
+							<Button
+								className="components-datetime__date-reset-button"
+								isLink
+								onClick={ () => onChange( null ) }
+							>
+								{ __( 'Reset' ) }
+							</Button>
+						) }
+						<Button
+							className="components-datetime__date-help-button"
+							isLink
+							onClick={ this.onClickDescriptionToggle }
+						>
+							{ __( 'Calendar Help' ) }
+						</Button>
+					</div>
 				) }
 			</div>
 		);
