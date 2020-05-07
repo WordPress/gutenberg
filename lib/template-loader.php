@@ -93,7 +93,7 @@ function get_template_hierachy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_id, $_wp_current_template_content;
 
-	$current_template_post = gutenberg_find_template_post( $templates );
+	$current_template_post = gutenberg_find_template_post_and_parts( $templates );
 
 	if ( $current_template_post ) {
 		$_wp_current_template_id      = $current_template_post['template_post']->ID;
@@ -199,7 +199,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  *  @type int[] A list of template parts IDs for the template.
  * }
  */
-function gutenberg_find_template_post( $template_hierarchy ) {
+function gutenberg_find_template_post_and_parts( $template_hierarchy ) {
 	if ( ! $template_hierarchy ) {
 		return null;
 	}
