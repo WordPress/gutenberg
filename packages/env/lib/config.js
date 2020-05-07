@@ -298,7 +298,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	);
 	if ( wpOrgFields ) {
 		return {
-			type: 'zip',
+			type: 'wporg-' + wpOrgFields[ 1 ],
 			url: sourceString,
 			path: path.resolve(
 				workDirectoryPath,
