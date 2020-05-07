@@ -15,7 +15,7 @@ import ButtonBlockAppender from '../button-block-appender';
 import BlockNavigationBranch from './branch';
 
 export const BlockNavigationContext = createContext( {
-	withBlockNavigationSlots: false,
+	__experimentalWithBlockNavigationSlots: false,
 } );
 
 function BlockNavigationList( {
@@ -83,12 +83,12 @@ BlockNavigationList.defaultProps = {
 };
 
 export default function BlockNavigationListWrapper( {
-	withBlockNavigationSlots,
+	__experimentalWithBlockNavigationSlots,
 	...props
 } ) {
 	const blockNavigationContext = useMemo(
-		() => ( { withBlockNavigationSlots } ),
-		[ withBlockNavigationSlots ]
+		() => ( { __experimentalWithBlockNavigationSlots } ),
+		[ __experimentalWithBlockNavigationSlots ]
 	);
 	return (
 		<BlockNavigationContext.Provider value={ blockNavigationContext }>

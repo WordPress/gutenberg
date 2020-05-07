@@ -21,7 +21,7 @@ function BlockNavigation( {
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
-	withBlockNavigationSlots,
+	__experimentalWithBlockNavigationSlots,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -45,7 +45,9 @@ function BlockNavigation( {
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					withBlockNavigationSlots={ withBlockNavigationSlots }
+					__experimentalWithBlockNavigationSlots={
+						__experimentalWithBlockNavigationSlots
+					}
 					showNestedBlocks
 				/>
 			) }
@@ -54,7 +56,9 @@ function BlockNavigation( {
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					withBlockNavigationSlots={ withBlockNavigationSlots }
+					__experimentalWithBlockNavigationSlots={
+						__experimentalWithBlockNavigationSlots
+					}
 				/>
 			) }
 		</NavigableMenu>

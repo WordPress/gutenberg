@@ -12,8 +12,10 @@ import { BlockNavigationContext } from './list';
 import { BlockListBlockContext } from '../block-list/block';
 
 const BlockNavigationBranch = ( { children, ...props } ) => {
-	const { withBlockNavigationSlots } = useContext( BlockNavigationContext );
-	if ( ! withBlockNavigationSlots ) {
+	const { __experimentalWithBlockNavigationSlots } = useContext(
+		BlockNavigationContext
+	);
+	if ( ! __experimentalWithBlockNavigationSlots ) {
 		return (
 			<li>
 				<BlockNavigationListItem { ...props } />

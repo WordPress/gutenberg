@@ -232,7 +232,7 @@ function Navigation( {
 				<PanelBody title={ __( 'Navigation Structure' ) }>
 					<BlockNavigationList
 						clientId={ clientId }
-						withBlockNavigationSlots
+						__experimentalWithBlockNavigationSlots
 					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>

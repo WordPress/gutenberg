@@ -23,7 +23,7 @@ const NavigatorIcon = (
 
 export default function useBlockNavigator(
 	clientId,
-	withBlockNavigationSlots
+	__experimentalWithBlockNavigationSlots
 ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
@@ -46,7 +46,9 @@ export default function useBlockNavigator(
 		>
 			<BlockNavigationList
 				clientId={ clientId }
-				withBlockNavigationSlots={ withBlockNavigationSlots }
+				__experimentalWithBlockNavigationSlots={
+					__experimentalWithBlockNavigationSlots
+				}
 			/>
 		</Modal>
 	);
