@@ -10,32 +10,19 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
-import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import MainDashboardButton from './main-dashboard-button';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import FullscreenModeClose from './fullscreen-mode-close';
+import { CloseButton } from './main-dashboard-button';
 
 const inserterToggleProps = { isPrimary: true };
-
-const CloseButton = () => {
-	const slot = useSlot( MainDashboardButton.slotName );
-	const hasFills = Boolean( slot.fills && slot.fills.length );
-
-	if ( ! hasFills ) {
-		return <FullscreenModeClose />;
-	}
-
-	return <MainDashboardButton.Slot bubblesVirtually />;
-};
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const { settings, setSettings } = useEditorContext();

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -20,7 +15,7 @@ function FullscreenModeClose( { icon } ) {
 		return null;
 	}
 
-	const buttonIcon = ! isEmpty( icon ) ? icon : wordpress;
+	const buttonIcon = icon || wordpress;
 
 	return (
 		<Button
