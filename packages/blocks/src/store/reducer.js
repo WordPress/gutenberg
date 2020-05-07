@@ -20,7 +20,16 @@ import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Module Constants
+ * @typedef WPBlockTypeCategory
+ *
+ * @property {string} slug  Unique identifier.
+ * @property {string} title Human-readable label.
+ */
+
+/**
+ * Default set of block type categories.
+ *
+ * @type {WPBlockTypeCategory[]}
  */
 export const DEFAULT_CATEGORIES = [
 	{ slug: 'common', title: __( 'Common blocks' ) },
@@ -199,10 +208,10 @@ export const groupingBlockName = createBlockNameSetterReducer(
 /**
  * Reducer managing the categories
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {WPBlockTypeCategory[]} state  Current state.
+ * @param {Object}                action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {WPBlockTypeCategory[]} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
