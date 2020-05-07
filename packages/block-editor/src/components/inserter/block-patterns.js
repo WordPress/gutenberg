@@ -90,7 +90,11 @@ function BlockPatterns( { onInsert, filterValue } ) {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
 				return Infinity;
 			}
-			return indexedCategories[ pattern.categories[ 0 ] ];
+			return Math.min(
+				...pattern.categories.map(
+					( category ) => indexedCategories[ category ]
+				)
+			);
 		};
 		return filteredPatterns.sort( ( a, b ) => {
 			return getPatternIndex( a ) - getPatternIndex( b );

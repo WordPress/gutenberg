@@ -710,10 +710,11 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
  * Register default pattern categories if not registered in Core already.
  */
 if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-	register_block_pattern_category( 'cover', [ 'label' => __( 'Cover' ) ] );
+	register_block_pattern_category( 'text', [ 'label' => __( 'Text' ) ] );
+	register_block_pattern_category( 'hero', [ 'label' => __( 'Hero' ) ] );
 	register_block_pattern_category( 'columns', [ 'label' => __( 'Columns' ) ] );
 	register_block_pattern_category( 'buttons', [ 'label' => __( 'Buttons' ) ] );
-	register_block_pattern_category( 'images', [ 'label' => __( 'Images' ) ] );
+	register_block_pattern_category( 'gallery', [ 'label' => __( 'Gallery' ) ] );
 	register_block_pattern_category( 'features', [ 'label' => __( 'Features' ) ] );
 	register_block_pattern_category( 'testimonials', [ 'label' => __( 'Testimonials' ) ] );
 }
