@@ -377,7 +377,9 @@ export class ImageEdit extends Component {
 							onChangeUrl={ this.onSetHref }
 							linkDestination={ linkDestination }
 							mediaUrl={
-								this.props.image && this.props.image.source_url
+								( this.props.image &&
+									this.props.image.source_url ) ||
+								url
 							}
 							mediaLink={
 								this.props.image && this.props.image.link
