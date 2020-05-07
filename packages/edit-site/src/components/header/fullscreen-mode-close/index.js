@@ -2,9 +2,17 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	Button,
+} from '@wordpress/components';
 import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import MainDashboardButtonIcon from '../main-dashboard-button-icon';
 
 const wordPressLogo = (
 	<SVG width="28" height="28" viewBox="0 0 128 128" version="1.1">
@@ -13,6 +21,8 @@ const wordPressLogo = (
 );
 
 function FullscreenModeClose() {
+	const slot = useSlot( MainDashboardButtonIcon.slotName );
+
 	const isActive = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).isFeatureActive( 'fullscreenMode' );
 	}, [] );
@@ -21,10 +31,18 @@ function FullscreenModeClose() {
 		return null;
 	}
 
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	const icon = hasFills ? (
+		<MainDashboardButtonIcon.Slot bubblesVirtually />
+	) : (
+		wordPressLogo
+	);
+
 	return (
 		<Button
 			className="edit-site-fullscreen-mode-close"
-			icon={ wordPressLogo }
+			icon={ icon }
 			iconSize={ 36 }
 			href="index.php"
 			label={ __( 'Back' ) }

@@ -29,4 +29,5 @@ export function initialize( id, settings ) {
 	render( <Editor settings={ settings } />, document.getElementById( id ) );
 }
 
-export { default as MainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalSiteEditorMainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalSiteEditorMainDashboardButtonIcon } from './components/header/main-dashboard-button-icon';

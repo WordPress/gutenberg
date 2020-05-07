@@ -1,33 +1,14 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import FullscreenModeClose from '../fullscreen-mode-close';
+const name = '__experimentalSiteEditorMainDashboardButton';
 
-const { Fill: MainDashboardButton, Slot } = createSlotFill(
-	'SiteEditorMainDashboardButton'
-);
+const { Fill, Slot } = createSlotFill( name );
 
-MainDashboardButton.Slot = () => (
-	<Slot>
-		{ ( fills ) => {
-			// Return default Close button if no fills are provided, otherwise replace it with available fills.
-			if ( isEmpty( fills ) ) {
-				return <FullscreenModeClose />;
-			}
-
-			return <> { fills } </>;
-		} }
-	</Slot>
-);
+const MainDashboardButton = Fill;
+MainDashboardButton.Slot = Slot;
+MainDashboardButton.slotName = name;
 
 export default MainDashboardButton;
