@@ -122,6 +122,19 @@ _Returns_
 
 -   `?string`: Default block name.
 
+<a name="getDefaultBlockStyle" href="#getDefaultBlockStyle">#</a> **getDefaultBlockStyle**
+
+Returns default block style by block name.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+-   _name_ `string`: Block type name.
+
+_Returns_
+
+-   `?Array`: Block Styles.
+
 <a name="getDefaultBlockVariation" href="#getDefaultBlockVariation">#</a> **getDefaultBlockVariation**
 
 Returns the default block variation for the given block type.

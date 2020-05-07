@@ -76,6 +76,20 @@ export function getBlockStyles( state, name ) {
 }
 
 /**
+ * Returns default block style by block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block type name.
+ *
+ * @return {Array?} Block Styles.
+ */
+export function getDefaultBlockStyle( state, name ) {
+	return getBlockStyles( state, name ).filter(
+		( style ) => style.isDefault
+	)[ 0 ];
+}
+
+/**
  * Returns block variations by block name.
  *
  * @param {Object}                state     Data state.

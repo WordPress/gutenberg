@@ -250,18 +250,26 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
+function getBlocksWithDefaultStylesApplied(
+	blocks,
+	blockEditorSettings,
+	defaultStyleVariations
+) {
 	const preferredStyleVariations = get(
 		blockEditorSettings,
 		[ '__experimentalPreferredStyleVariations', 'value' ],
 		{}
 	);
-	return blocks.map( ( block ) => {
+	const styleVariations = {
+		...defaultStyleVariations,
+		...preferredStyleVariations,
+	};
+	return blocks.map( function( block ) {
 		const blockName = block.name;
 		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
 			return block;
 		}
-		if ( ! preferredStyleVariations[ blockName ] ) {
+		if ( ! styleVariations[ blockName ] ) {
 			return block;
 		}
 		const className = get( block, [ 'attributes', 'className' ] );
@@ -269,7 +277,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			return block;
 		}
 		const { attributes = {} } = block;
-		const blockStyle = preferredStyleVariations[ blockName ];
+		const blockStyle = styleVariations[ blockName ];
 		return {
 			...block,
 			attributes: {
@@ -279,6 +287,18 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 			},
 		};
 	} );
+}
+
+function* computeDefaultStyleVariations( blocks ) {
+	const defaultStyles = {};
+	for ( const block of blocks ) {
+		defaultStyles[ block.name ] = ( yield select(
+			'core/blocks',
+			'getDefaultBlockStyle',
+			block.name
+		) ).name;
+	}
+	return defaultStyles;
 }
 
 /**
@@ -299,9 +319,11 @@ export function* replaceBlocks(
 	initialPosition
 ) {
 	clientIds = castArray( clientIds );
-	blocks = getBlocksWithDefaultStylesApplied(
-		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+	const blocksArray = castArray( blocks );
+	blocks = yield getBlocksWithDefaultStylesApplied(
+		blocksArray,
+		yield select( 'core/block-editor', 'getSettings' ),
+		yield computeDefaultStyleVariations( blocksArray )
 	);
 	const rootClientId = yield select(
 		'core/block-editor',
@@ -470,9 +492,11 @@ export function* insertBlocks(
 	rootClientId,
 	updateSelection = true
 ) {
-	blocks = getBlocksWithDefaultStylesApplied(
-		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+	const blocksArray = castArray( blocks );
+	blocks = yield getBlocksWithDefaultStylesApplied(
+		blocksArray,
+		yield select( 'core/block-editor', 'getSettings' ),
+		yield computeDefaultStyleVariations( blocksArray )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
