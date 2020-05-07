@@ -2,12 +2,3 @@
 .block-editor-block-list__block[data-type="core/paragraph"].has-drop-cap:focus {
 	min-height: auto !important;
 }
-
-@keyframes block-editor-block-list__block-fade-out-animation {
-	from {
-		opacity: 1;
-	}
-	to {
-		opacity: 0;
-	}
-}

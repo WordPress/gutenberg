@@ -18,6 +18,7 @@ export const settings = {
 	icon,
 	supports: {
 		html: false,
+		lightBlockWrapper: true,
 	},
 	edit,
 };

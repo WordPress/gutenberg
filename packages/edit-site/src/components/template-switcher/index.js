@@ -11,7 +11,7 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { Icon, home, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,10 +20,17 @@ import AddTemplate from '../add-template';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
 
-function TemplateLabel( { template } ) {
+function TemplateLabel( { template, homeId } ) {
 	return (
 		<>
 			{ template.slug }{ ' ' }
+			{ template.id === homeId && (
+				<Tooltip text={ __( 'Home' ) }>
+					<div className="edit-site-template-switcher__label-home-icon">
+						<Icon icon={ home } />
+					</div>
+				</Tooltip>
+			) }
 			{ template.status !== 'auto-draft' && (
 				<Tooltip text={ __( 'Customized' ) }>
 					<span className="edit-site-template-switcher__label-customized-dot" />
@@ -37,6 +44,7 @@ export default function TemplateSwitcher( {
 	ids,
 	templatePartIds,
 	activeId,
+	homeId,
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
@@ -72,7 +80,10 @@ export default function TemplateSwitcher( {
 					);
 					return {
 						label: template ? (
-							<TemplateLabel template={ template } />
+							<TemplateLabel
+								template={ template }
+								homeId={ homeId }
+							/>
 						) : (
 							__( 'Loading…' )
 						),
@@ -98,7 +109,7 @@ export default function TemplateSwitcher( {
 				} ),
 			};
 		},
-		[ ids, templatePartIds ]
+		[ ids, templatePartIds, homeId ]
 	);
 	const [ isAddTemplateOpen, setIsAddTemplateOpen ] = useState( false );
 	return (
