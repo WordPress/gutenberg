@@ -1,8 +1,10 @@
 {
-	"core": {
-		"color": {
-			"background": "white",
-			"text": "black"
+	"styles": {
+		"global": {
+			"color": {
+				"background": "white",
+				"text": "black"
+			}
 		}
 	}
 }

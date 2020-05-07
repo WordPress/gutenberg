@@ -223,16 +223,12 @@ function gutenberg_experimental_global_styles_extract_selectors( $block_json ) {
 }
 
 /**
- * Takes a Global Styles tree and returns a CSS rule
- * that contains the corresponding CSS custom properties.
+ * Pulls the CSS selectors to use from the block.json config.
  *
- * @param array $global_styles Global Styles tree.
- * @return string CSS rule.
+ * @return array
  */
-function gutenberg_experimental_global_styles_resolver( $global_styles ) {
-	$css_rules = '';
-
-	$selectors = array( 'core' => ':root' );
+function gutenberg_experimental_global_styles_get_selectors() {
+	$selectors = array( 'global' => ':root' );
 
 	// We need to provide a mechanism for blocks to opt-in into this
 	// that can be used by 3rd party blocks as well.
@@ -242,6 +238,7 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 		'paragraph',
 		'heading',
 	);
+
 	// The block library dir may not exist if working from a fresh clone => bail out early.
 	$block_library_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
 	if ( file_exists( $block_library_dir ) ) {
@@ -258,7 +255,22 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 		}
 	}
 
-	foreach ( $global_styles as $blockname => $subtree ) {
+	return $selectors;
+}
+
+/**
+ * Takes a Global Styles tree and returns a CSS rule
+ * that contains the corresponding CSS custom properties.
+ *
+ * @param array $global_styles Global Styles tree.
+ * @return string CSS rule.
+ */
+function gutenberg_experimental_global_styles_resolver( $global_styles ) {
+	$css_rules = '';
+	$styles    = $global_styles['styles'];
+	$selectors = gutenberg_experimental_global_styles_get_selectors();
+
+	foreach ( $styles as $block_name => $subtree ) {
 		$token    = '--';
 		$prefix   = '--wp' . $token;
 		$css_vars = gutenberg_experimental_global_styles_get_css_vars( $subtree, $prefix, $token );
@@ -266,7 +278,7 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 			return $css_rules;
 		}
 
-		$css_rules .= $selectors[ $blockname ] . " {\n";
+		$css_rules .= $selectors[ $block_name ] . " {\n";
 		foreach ( $css_vars as $var => $value ) {
 			$css_rules .= "\t" . $var . ': ' . $value . ";\n";
 		}
