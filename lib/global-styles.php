@@ -239,6 +239,7 @@ function gutenberg_experimental_global_styles_get_selectors() {
 	$blocks_supported = array(
 		'paragraph',
 		'heading',
+		'group',
 	);
 
 	// The block library dir may not exist if working from a fresh clone => bail out early.
