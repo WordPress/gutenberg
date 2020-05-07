@@ -135,15 +135,15 @@ public class Gutenberg: NSObject {
         return !(url?.isFileURL ?? true)
     }
 
-    public func updateTheme(_ colors: [[String:String]]?, gradients: [[String:String]]?) {
+    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
 
         var themeUpdates = [String : Any]()
 
-        if let colors = colors {
+        if let colors = editorTheme?.colors {
             themeUpdates["colors"] = colors
         }
 
-        if let gradients = gradients {
+        if let gradients = editorTheme?.gradients {
             themeUpdates["gradients"] = gradients
         }
 
