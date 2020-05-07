@@ -3,8 +3,9 @@
  */
 import { useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
-import { documentHasSelection } from '@wordpress/dom';
+import { documentHasTextSelection } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ function CopyHandler( { children } ) {
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
 
 	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const {
 		__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
@@ -36,7 +38,7 @@ function CopyHandler( { children } ) {
 
 		// Always handle multiple selected blocks.
 		// Let native copy behaviour take over in input fields.
-		if ( ! hasMultiSelection() && documentHasSelection() ) {
+		if ( ! hasMultiSelection() && documentHasTextSelection() ) {
 			return;
 		}
 
@@ -46,6 +48,20 @@ function CopyHandler( { children } ) {
 		event.preventDefault();
 
 		if ( event.type === 'copy' || event.type === 'cut' ) {
+			createSuccessNotice(
+				sprintf(
+					// Translators: Number of blocks being copied
+					_n(
+						'Copied %d block to clipboard',
+						'Copied %d blocks to clipboard',
+						selectedBlockClientIds.length
+					),
+					selectedBlockClientIds.length
+				),
+				{
+					type: 'snackbar',
+				}
+			);
 			const blocks = getBlocksByClientId( selectedBlockClientIds );
 			const serialized = serialize( blocks );
 
