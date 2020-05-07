@@ -37,6 +37,7 @@
     "@wordpress/react-native-aztec": "file:../react-native-aztec",
     "@wordpress/react-native-bridge": "file:../react-native-bridge",
     "@wordpress/scripts": "file:../scripts",
+    "appium": "1.17.1",
     "fast-average-color": "^4.3.0",
     "jed": "^1.1.1",
     "jsc-android": "^241213.1.0",
