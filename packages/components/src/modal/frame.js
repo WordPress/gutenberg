@@ -132,6 +132,6 @@ class ModalFrame extends Component {
 
 export default compose( [
 	withFocusReturn,
-	withFocusOutside,
 	withConstrainedTabbing,
+	withFocusOutside,
 ] )( ModalFrame );
