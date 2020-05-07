@@ -96,8 +96,8 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template_post = gutenberg_find_template_post( $templates );
 
 	if ( $current_template_post ) {
-		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
+		$_wp_current_template_id      = $current_template_post['template_post']->ID;
+		$_wp_current_template_content = empty( $current_template_post['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post['template_post']->post_content;
 	}
 
 	// Add hooks for template canvas.
@@ -194,7 +194,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  * Return the correct 'wp_template' post and template part IDs for the current template hierarchy.
  *
  * @param string[] $template_hierarchy The current template hierarchy, ordered by priority.
- * @return array {
+ * @return null|array {
  *  @type WP_Post|null template_post A template post object, or null if none could be found.
  *  @type int[] A list of template parts IDs for the template.
  * }
