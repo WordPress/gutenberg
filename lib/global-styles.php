@@ -200,6 +200,10 @@ function gutenberg_experimental_global_styles_get_theme() {
 		locate_template( 'experimental-theme.json' )
 	);
 
+	if ( ! array_key_exists( 'globals', $theme_styles ) ) {
+		$theme_styles['globals'] = array();
+	}
+
 	$theme_styles['globals'] = array_merge_recursive(
 		$theme_supports,
 		$theme_styles['globals']
@@ -287,11 +291,16 @@ function gutenberg_experimental_global_styles_resolver_styles( $styles ) {
  * Takes a tree and returns a CSS rule
  * that contains the corresponding CSS custom properties.
  *
- * @param array $styles Global Styles tree.
+ * @param array $global_styles Global Styles tree.
  * @return string CSS rule.
  */
-function gutenberg_experimental_global_styles_resolver_globals( $styles ) {
+function gutenberg_experimental_global_styles_resolver_globals( $global_styles ) {
 	$css_rules = '';
+
+	if ( ! is_array( $global_styles ) || ! array_key_exists( 'globals', $global_styles ) ) {
+		return $css_rules;
+	}
+	$styles = $global_styles['globals'];
 
 	$token    = '--';
 	$prefix   = '--wp' . $token;
@@ -334,8 +343,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		gutenberg_experimental_global_styles_get_user()
 	);
 
-	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles['globals'] );
-	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['styles'] );
+	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
+	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['blocks'] );
 	if ( empty( $inline_style ) ) {
 		return;
 	}
