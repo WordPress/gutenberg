@@ -97,7 +97,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 
 	if ( $current_template ) {
 		$_wp_current_template_id      = $current_template['template_post']->ID;
-		$_wp_current_template_content = $current_template['template_post']->post_content ?: __( 'Empty template.', 'gutenberg' );
+		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
 	}
 
 	// Add hooks for template canvas.
