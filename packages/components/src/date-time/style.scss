@@ -20,7 +20,7 @@
 		justify-content: space-between;
 	}
 
-	.components-datetime__date-help-button {
+	.components-datetime__date-help-toggle {
 		display: block;
 		margin-left: auto;
 	}
@@ -108,8 +108,7 @@
 		}
 	}
 
-	&.is-description-visible .DayPicker,
-	&.is-description-visible .components-datetime__date-help-button {
+	&.is-description-visible .DayPicker {
 		visibility: hidden;
 	}
 }

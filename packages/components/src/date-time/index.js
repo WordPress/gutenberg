@@ -149,37 +149,30 @@ export class DateTimePicker extends Component {
 									) }
 								</li>
 							</ul>
-
-							<Button
-								isSmall
-								onClick={ this.onClickDescriptionToggle }
-							>
-								{ __( 'Close' ) }
-							</Button>
 						</div>
 					</>
 				) }
 
-				{ ! this.state.calendarHelpIsVisible && (
-					<div className="components-datetime__buttons">
-						{ currentDate && (
-							<Button
-								className="components-datetime__date-reset-button"
-								isLink
-								onClick={ () => onChange( null ) }
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						) }
+				<div className="components-datetime__buttons">
+					{ ! this.state.calendarHelpIsVisible && currentDate && (
 						<Button
-							className="components-datetime__date-help-button"
+							className="components-datetime__date-reset-button"
 							isLink
-							onClick={ this.onClickDescriptionToggle }
+							onClick={ () => onChange( null ) }
 						>
-							{ __( 'Calendar Help' ) }
+							{ __( 'Reset' ) }
 						</Button>
-					</div>
-				) }
+					) }
+					<Button
+						className="components-datetime__date-help-toggle"
+						isLink
+						onClick={ this.onClickDescriptionToggle }
+					>
+						{ this.state.calendarHelpIsVisible
+							? __( 'Close' )
+							: __( 'Calendar Help' ) }
+					</Button>
+				</div>
 			</div>
 		);
 	}
