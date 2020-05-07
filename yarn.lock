@@ -12088,9 +12088,9 @@ react-native-url-polyfill@^1.1.2:
     buffer "^5.4.3"
     whatwg-url-without-unicode "8.0.0-1"
 
-"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948":
-  version "5.0.1"
-  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948"
+"react-native-video@git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f":
+  version "5.0.2"
+  resolved "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
   dependencies:
     prop-types "^15.5.10"
 

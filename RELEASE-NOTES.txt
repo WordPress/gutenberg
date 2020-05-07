@@ -2,6 +2,9 @@
 ------
 * New block: Pullquote
 * Add support for changing background and text color in Buttons block
+* Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
+* Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+* [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
 
 1.27.0
 ------
