@@ -23,11 +23,13 @@ import InserterNoResults from './no-results';
 
 const usePatternsState = ( onInsert ) => {
 	const { blockPatternCategories, patterns } = useSelect( ( select ) => {
+		const {
+			__experimentalBlockPatterns,
+			__experimentalBlockPatternCategories,
+		} = select( 'core/block-editor' ).getSettings();
 		return {
-			patterns: select( 'core/block-editor' ).getSettings()
-				.__experimentalBlockPatterns,
-			blockPatternCategories: select( 'core/block-editor' ).getSettings()
-				.__experimentalBlockPatternCategories,
+			patterns: __experimentalBlockPatterns,
+			blockPatternCategories: __experimentalBlockPatternCategories,
 		};
 	}, [] );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
@@ -79,9 +81,9 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList( { patterns, showPatterns, onClickPattern } ) {
+function BlockPatternList( { patterns, shownPatterns, onClickPattern } ) {
 	return patterns.map( ( pattern ) => {
-		const isShown = showPatterns.includes( pattern );
+		const isShown = shownPatterns.includes( pattern );
 		return isShown ? (
 			<BlockPattern
 				key={ pattern.name }
@@ -107,7 +109,7 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 		return !! filteredPatterns.length ? (
 			<InserterPanel title={ __( 'Search Results' ) }>
 				<BlockPatternList
-					showPatterns={ currentShownPatterns }
+					shownPatterns={ currentShownPatterns }
 					patterns={ filteredPatterns }
 					onClickPattern={ onClick }
 				/>
@@ -123,13 +125,12 @@ function BlockPatternsPerCategories( { onInsert } ) {
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
-			const indexedCategories = {};
-			categories.forEach( ( category, index ) => {
-				indexedCategories[ category.name ] = index;
-			} );
 			if ( ! pattern.categories || ! pattern.categories.length ) {
 				return Infinity;
 			}
+			const indexedCategories = Object.fromEntries(
+				categories.map( ( { name }, index ) => [ name, index ] )
+			);
 			return Math.min(
 				...pattern.categories.map( ( category ) =>
 					indexedCategories[ category ] !== undefined
@@ -174,7 +175,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 							title={ patternCategory.label }
 						>
 							<BlockPatternList
-								showPatterns={ currentShownPatterns }
+								shownPatterns={ currentShownPatterns }
 								patterns={ categoryPatterns }
 								onClickPattern={ onClick }
 							/>
@@ -186,7 +187,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 			{ !! uncategorizedPatterns.length && (
 				<InserterPanel title={ _x( 'All', 'Uncategorized patterns' ) }>
 					<BlockPatternList
-						showPatterns={ currentShownPatterns }
+						shownPatterns={ currentShownPatterns }
 						patterns={ uncategorizedPatterns }
 						onClickPattern={ onClick }
 					/>
