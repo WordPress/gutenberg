@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -54,7 +50,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ ( deletedMenu ) => {
-						const newStateMenus = filter( stateMenus, ( menu ) => {
+						const newStateMenus = stateMenus.filter( ( menu ) => {
 							return menu.id !== deletedMenu;
 						} );
 						setStateMenus( newStateMenus );
