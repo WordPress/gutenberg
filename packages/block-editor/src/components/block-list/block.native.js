@@ -29,6 +29,11 @@ class BlockListBlock extends Component {
 
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.getBlockWidth = this.getBlockWidth.bind( this );
+
+		this.state = {
+			blockWidth: 0,
+		};
 	}
 
 	onFocus() {
@@ -44,6 +49,15 @@ class BlockListBlock extends Component {
 		if ( blocks[ 0 ] ) {
 			// focus on the first block inserted
 			this.props.onSelect( blocks[ 0 ].clientId );
+		}
+	}
+
+	getBlockWidth( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+
+		if ( blockWidth !== layout.width ) {
+			this.setState( { blockWidth: layout.width } );
 		}
 	}
 
@@ -78,6 +92,7 @@ class BlockListBlock extends Component {
 								contentStyle={ this.props.contentStyle }
 								onDeleteBlock={ this.props.onDeleteBlock }
 							/>
+							<View onLayout={ this.getBlockWidth } />
 						</GlobalStylesContext.Provider>
 					);
 				} }
@@ -112,8 +127,9 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
-			allowShrinkToolbar,
 		} = this.props;
+
+		const { blockWidth } = this.state;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
@@ -179,7 +195,7 @@ class BlockListBlock extends Component {
 									isStackedHorizontally={
 										isStackedHorizontally
 									}
-									allowShrinkToolbar={ allowShrinkToolbar }
+									blockWidth={ blockWidth }
 								/>
 							) }
 						</View>

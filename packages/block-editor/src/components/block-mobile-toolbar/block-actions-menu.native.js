@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreVertical, trash, cog } from '@wordpress/icons';
-import { partial, first, castArray, last } from 'lodash';
+import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -20,9 +20,11 @@ import {
 	getArrowIcon,
 } from '../block-mover/mover-description';
 
-const ShrinkBlockMobileToolbar = ( {
+const BlockActionsMenu = ( {
 	onDelete,
 	isStackedHorizontally,
+	shouldWrapBlockSettings,
+	shouldWrapBlockMover,
 	openGeneralSidebar,
 	onMoveDown,
 	onMoveUp,
@@ -59,12 +61,12 @@ const ShrinkBlockMobileToolbar = ( {
 		disabled: isLast,
 	};
 
-	const options = [
-		backwardButtonOption,
-		forwardButtonOption,
-		settingsOption,
+	const options = compact( [
+		shouldWrapBlockMover && backwardButtonOption,
+		shouldWrapBlockMover && forwardButtonOption,
+		shouldWrapBlockSettings && settingsOption,
 		deleteOption,
-	];
+	] );
 
 	function onPickerSelect( value ) {
 		if ( value === 'deleteOption' ) {
@@ -148,4 +150,4 @@ export default compose(
 		};
 	} ),
 	withInstanceId
-)( ShrinkBlockMobileToolbar );
+)( BlockActionsMenu );
