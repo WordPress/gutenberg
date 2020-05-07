@@ -259,7 +259,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'name'          => array(
-					'description' => __( 'The title for the block type.', 'gutenberg' ),
+					'description' => __( 'Unique name identifying the block type.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
