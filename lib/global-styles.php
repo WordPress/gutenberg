@@ -259,31 +259,49 @@ function gutenberg_experimental_global_styles_get_selectors() {
 }
 
 /**
- * Takes a Global Styles tree and returns a CSS rule
- * that contains the corresponding CSS custom properties.
+ * Takes a tree and returns the CSS rules
+ * with the proper declarations.
  *
- * @param array $global_styles Global Styles tree.
+ * @param array $styles Global Styles tree.
  * @return string CSS rule.
  */
-function gutenberg_experimental_global_styles_resolver( $global_styles ) {
+function gutenberg_experimental_global_styles_resolver_styles( $styles ) {
 	$css_rules = '';
-	$styles    = $global_styles['styles'];
 	$selectors = gutenberg_experimental_global_styles_get_selectors();
 
-	foreach ( $styles as $block_name => $subtree ) {
-		$token    = '--';
-		$prefix   = '--wp' . $token;
-		$css_vars = gutenberg_experimental_global_styles_get_css_vars( $subtree, $prefix, $token );
-		if ( empty( $css_vars ) ) {
-			return $css_rules;
-		}
-
+	foreach ( $styles as $block_name => $block_style ) {
 		$css_rules .= $selectors[ $block_name ] . " {\n";
-		foreach ( $css_vars as $var => $value ) {
-			$css_rules .= "\t" . $var . ': ' . $value . ";\n";
+		foreach ( $block_style as $property => $value ) {
+			$css_rules .= "\t" . $property . ': ' . $value . ";\n";
 		}
 		$css_rules .= "}\n";
 	}
+
+	return $css_rules;
+}
+
+/**
+ * Takes a tree and returns a CSS rule
+ * that contains the corresponding CSS custom properties.
+ *
+ * @param array $styles Global Styles tree.
+ * @return string CSS rule.
+ */
+function gutenberg_experimental_global_styles_resolver_globals( $styles ) {
+	$css_rules = '';
+
+	$token    = '--';
+	$prefix   = '--wp' . $token;
+	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $styles, $prefix, $token );
+	if ( empty( $css_vars ) ) {
+		return $css_rules;
+	}
+
+	$css_rules .= " :root {\n";
+	foreach ( $css_vars as $var => $value ) {
+		$css_rules .= "\t" . $var . ': ' . $value . ";\n";
+	}
+	$css_rules .= "}\n";
 
 	return $css_rules;
 }
@@ -313,7 +331,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		gutenberg_experimental_global_styles_get_user()
 	);
 
-	$inline_style = gutenberg_experimental_global_styles_resolver( $global_styles );
+	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles['globals'] );
+	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['styles'] );
 	if ( empty( $inline_style ) ) {
 		return;
 	}

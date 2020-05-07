@@ -1,10 +1,8 @@
 {
-	"styles": {
-		"global": {
-			"color": {
-				"background": "white",
-				"text": "black"
-			}
+	"globals": {
+		"color": {
+			"background": "white",
+			"text": "black"
 		}
 	}
 }
