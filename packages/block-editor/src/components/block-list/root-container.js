@@ -21,6 +21,7 @@ import BlockPopover from './block-popover';
 
 export const Context = createContext();
 export const BlockNodes = createContext();
+export const SetBlockNodes = createContext();
 
 function selector( select ) {
 	const {
@@ -79,6 +80,8 @@ function RootContainer( { children, className }, ref ) {
 		}
 	}
 
+	const [ blockNodes, setBlockNodes ] = useState( {} );
+
 	return (
 		<InsertionPoint
 			isMultiSelecting={ isMultiSelecting }
@@ -86,7 +89,7 @@ function RootContainer( { children, className }, ref ) {
 			selectedBlockClientId={ selectedBlockClientId }
 			containerRef={ ref }
 		>
-			<BlockNodes.Provider value={ useState( {} ) }>
+			<BlockNodes.Provider value={ blockNodes }>
 				<BlockPopover />
 				<div
 					ref={ ref }
@@ -94,9 +97,11 @@ function RootContainer( { children, className }, ref ) {
 					onFocus={ onFocus }
 					onDragStart={ onDragStart }
 				>
-					<Context.Provider value={ onSelectionStart }>
-						{ children }
-					</Context.Provider>
+					<SetBlockNodes.Provider value={ setBlockNodes }>
+						<Context.Provider value={ onSelectionStart }>
+							{ children }
+						</Context.Provider>
+					</SetBlockNodes.Provider>
 				</div>
 			</BlockNodes.Provider>
 		</InsertionPoint>

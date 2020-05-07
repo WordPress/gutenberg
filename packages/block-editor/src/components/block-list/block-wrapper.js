@@ -19,14 +19,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from './moving-animation';
-import { Context, BlockNodes } from './root-container';
+import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
 		const onSelectionStart = useContext( Context );
-		const [ , setBlockNodes ] = useContext( BlockNodes );
+		const setBlockNodes = useContext( SetBlockNodes );
 		const {
 			clientId,
 			rootClientId,
