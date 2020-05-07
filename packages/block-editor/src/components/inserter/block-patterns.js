@@ -8,9 +8,9 @@ import { map } from 'lodash';
  */
 import { useMemo, useCallback } from '@wordpress/element';
 import { parse, cloneBlock } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -52,12 +52,33 @@ function BlockPatternPlaceholder() {
 	);
 }
 
+function BlockPatternList( { patterns, onClickPattern } ) {
+	const currentShownPatterns = useAsyncList( patterns );
+
+	return patterns.map( ( pattern, index ) =>
+		currentShownPatterns[ index ] === pattern ? (
+			<BlockPattern
+				key={ pattern.name }
+				pattern={ pattern }
+				onClick={ onClickPattern }
+			/>
+		) : (
+			<BlockPatternPlaceholder key={ pattern.name } />
+		)
+	);
+}
+
 function BlockPatterns( { patterns, onInsert, filterValue } ) {
+	const { blockPatternCategories } = useSelect( ( select ) => {
+		return {
+			blockPatternCategories: select( 'core/block-editor' ).getSettings()
+				.__experimentalBlockPatternCategories,
+		};
+	}, [] );
 	const filteredPatterns = useMemo(
 		() => searchItems( patterns, filterValue ),
 		[ filterValue, patterns ]
 	);
-	const currentShownPatterns = useAsyncList( filteredPatterns );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
@@ -73,29 +94,32 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 		);
 	}, [] );
 
-	return !! filteredPatterns.length ? (
+	if ( filterValue ) {
+		return !! filteredPatterns.length ? (
+			<InserterPanel title={ __( 'Search Results' ) }>
+				<BlockPatternList
+					patterns={ filteredPatterns }
+					onClickPattern={ onClickPattern }
+				/>
+			</InserterPanel>
+		) : (
+			<InserterNoResults />
+		);
+	}
+
+	return blockPatternCategories.map( ( patternCategory ) => (
 		<InserterPanel
-			title={
-				filterValue
-					? __( 'Search Results' )
-					: _x( 'All', 'patterns categories' )
-			}
+			key={ patternCategory.name }
+			title={ patternCategory.label }
 		>
-			{ filteredPatterns.map( ( pattern, index ) =>
-				currentShownPatterns[ index ] === pattern ? (
-					<BlockPattern
-						key={ pattern.name }
-						pattern={ pattern }
-						onClick={ onClickPattern }
-					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
-				)
-			) }
+			<BlockPatternList
+				patterns={ patterns.filter( ( pattern ) =>
+					pattern.categories.includes( patternCategory.name )
+				) }
+				onClickPattern={ onClickPattern }
+			/>
 		</InserterPanel>
-	) : (
-		<InserterNoResults />
-	);
+	) );
 }
 
 export default BlockPatterns;

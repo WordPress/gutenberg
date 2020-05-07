@@ -649,6 +649,16 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 		$settings['__experimentalBlockPatterns']
 	);
 
+	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
+		$settings['__experimentalBlockPatternCategories'] = [];
+	}
+
+	$settings['__experimentalBlockPatternCategories'] = array_merge(
+		WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatternCategories']
+	);
+
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
@@ -694,4 +704,16 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
+}
+
+/*
+ * Register default pattern categories if not registered in Core already.
+ */
+if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	register_block_pattern_category( 'cover', [ 'label' => __( 'Cover' ) ] );
+	register_block_pattern_category( 'columns', [ 'label' => __( 'Columns' ) ] );
+	register_block_pattern_category( 'buttons', [ 'label' => __( 'Buttons' ) ] );
+	register_block_pattern_category( 'images', [ 'label' => __( 'Images' ) ] );
+	register_block_pattern_category( 'features', [ 'label' => __( 'Features' ) ] );
+	register_block_pattern_category( 'testimonials', [ 'label' => __( 'Testimonials' ) ] );
 }
