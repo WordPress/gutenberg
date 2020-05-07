@@ -277,7 +277,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'editor_script' => array(
-					'description' => __( 'URL of editor script js file.', 'gutenberg' ),
+					'description' => __( 'Editor script handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
