@@ -21,7 +21,7 @@ branches:
     - rnmobile/master
     - /rnmobile\/release.*/
     - /wp\/.*/
-    - feat/import-gutenberg-mobile-no-squash
+    - rnmobile/monorepo-fix-android-e2e-tests
 
 env:
   global:
