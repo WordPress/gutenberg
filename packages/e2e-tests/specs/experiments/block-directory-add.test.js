@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { enableExperimentalFeatures } from '../../../experimental-features';
+import { enableExperimentalFeatures } from '../../experimental-features';
 
 // Urls to mock
 const SEARCH_URLS = [
