@@ -12,6 +12,7 @@ import {
 	includes,
 	map,
 	some,
+	find,
 } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
@@ -121,6 +122,19 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  */
 export function getCategories( state ) {
 	return state.categories;
+}
+
+/**
+ * Returns a single category by slug. Canonicalizes category by slug, using
+ * internal mapping of legacy category slugs to their updated normal form.
+ *
+ * @param {Object} state Blocks state.
+ * @param {string} slug  Category slug.
+ *
+ * @return {WPBlockTypeCategory|undefined} Block category, if exists.
+ */
+export function getCategory( state, slug ) {
+	return find( getCategories( state ), { slug } );
 }
 
 /**

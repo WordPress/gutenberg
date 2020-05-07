@@ -12,6 +12,7 @@ import {
 	getGroupingBlockName,
 	isMatchingSearchTerm,
 	getCategories,
+	getCategory,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -21,6 +22,21 @@ describe( 'selectors', () => {
 			const state = deepFreeze( { categories } );
 
 			expect( getCategories( state ) ).toEqual( categories );
+		} );
+	} );
+
+	describe( 'getCategory', () => {
+		it( 'returns a single category by slug', () => {
+			const category = { slug: 'text', text: 'Text' };
+			const state = deepFreeze( { categories: [ category ] } );
+
+			expect( getCategory( state, 'text' ) ).toBe( category );
+		} );
+
+		it( 'returns undefined for a category which does not exist', () => {
+			const state = deepFreeze( { categories: [] } );
+
+			expect( getCategory( state, 'nonsense' ) ).toBe( undefined );
 		} );
 	} );
 
