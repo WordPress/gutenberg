@@ -25,6 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
+import TouchableRipple from './ripple.native.js';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -282,7 +283,7 @@ class BottomSheetCell extends Component {
 				: get( platformStyles, 'activeOpacity.opacity' );
 
 		return (
-			<TouchableOpacity
+			<TouchableRipple
 				accessible={
 					accessible !== undefined
 						? accessible
@@ -348,7 +349,7 @@ class BottomSheetCell extends Component {
 					{ children }
 				</View>
 				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
-			</TouchableOpacity>
+			</TouchableRipple>
 		);
 	}
 }
