@@ -213,7 +213,7 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return array
  */
 function gutenberg_experimental_global_styles_extract_selectors( $block_json ) {
-	$selector = $block_json['selector'];
+	$selector = $block_json['__experimentalSelector'];
 	$block_name = $block_json['name'];
 	$block_selectors = array();
 	foreach( $selector as $key => $value ) {
@@ -249,9 +249,9 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 			$block_json_file = $block_library_dir . $block_dir . '/block.json';
 			if ( file_exists( $block_json_file ) ) {
 				$block_json = json_decode( file_get_contents( $block_json_file ), true );
-				if ( array_key_exists( 'selector', $block_json ) && is_string( $block_json['selector'] ) ) {
-					$selectors[ $block_json['name'] ] = $block_json['selector'];
-				} else if ( array_key_exists( 'selector', $block_json) && is_array( $block_json['selector'] ) ) {
+				if ( array_key_exists( '__experimentalSelector', $block_json ) && is_string( $block_json['__experimentalSelector'] ) ) {
+					$selectors[ $block_json['name'] ] = $block_json['__experimentalSelector'];
+				} else if ( array_key_exists( '__experimentalSelector', $block_json) && is_array( $block_json['__experimentalSelector'] ) ) {
 					$selectors = array_merge( $selectors, gutenberg_experimental_global_styles_extract_selectors( $block_json ) );
 				}
 			}

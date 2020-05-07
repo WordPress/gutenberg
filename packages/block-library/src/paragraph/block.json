@@ -1,7 +1,7 @@
 {
 	"name": "core/paragraph",
 	"category": "common",
-	"selector": "p",
+	"__experimentalSelector": "p",
 	"attributes": {
 		"align": {
 			"type": "string"
