@@ -241,8 +241,8 @@ PODS:
     - React
   - RNTAztecView (1.27.0):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.18.0)
-  - WordPress-Aztec-iOS (1.18.0)
+    - WordPress-Aztec-iOS (~> 1.19.0)
+  - WordPress-Aztec-iOS (1.19.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -393,8 +393,8 @@ SPEC CHECKSUMS:
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: 58f944218c32079d76f2542e5b762b8a4dff263b
-  WordPress-Aztec-iOS: fae5d158879dfd6f36c8d0ff0cc111a0b8e36790
+  RNTAztecView: dc2364760fad53f52defde7c01be765e77b9ba19
+  WordPress-Aztec-iOS: fb6ea6409a5228292568f665eb22ea0a0aa7ad7e
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
 PODFILE CHECKSUM: 8fc85c086e46c9bb555a0c4ebda2e57ceae0a8d6
