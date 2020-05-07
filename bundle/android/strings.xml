@@ -76,8 +76,6 @@
     <string name="gutenberg_native_email_me_a_href_mailto_mail_example_com_mail_example_com_a" tools:ignore="UnusedResources">Email me: &lt;a href=\"mailto:mail@example.com\"&gt;mail@example.com&lt;/a&gt;</string>
     <string name="gutenberg_native_excerpt_length_words" tools:ignore="UnusedResources">Excerpt length (words)</string>
     <string name="gutenberg_native_failed_to_insert_media_please_tap_for_options" tools:ignore="UnusedResources">Failed to insert media.\nPlease tap for options.</string>
-    <!-- translators: sample content for "Blog" page template -->
-    <string name="gutenberg_native_follow_our_blog" tools:ignore="UnusedResources">Follow our Blog</string>
     <!-- translators: accessibility text. %s: gallery caption. -->
     <string name="gutenberg_native_gallery_caption_s" tools:ignore="UnusedResources">Gallery caption. %s</string>
     <!-- translators: sample content for "About" page template
@@ -183,8 +181,6 @@ translators: sample content for "Services" page template -->
     <string name="gutenberg_native_start_writing" tools:ignore="UnusedResources">Start writing…</string>
     <!-- translators: sample content for "Services" page template -->
     <string name="gutenberg_native_strategy" tools:ignore="UnusedResources">Strategy</string>
-    <!-- translators: sample content for "Blog" page template -->
-    <string name="gutenberg_native_subscribe" tools:ignore="UnusedResources">Subscribe</string>
     <string name="gutenberg_native_success_message" tools:ignore="UnusedResources">Success Message</string>
     <string name="gutenberg_native_take_a_photo" tools:ignore="UnusedResources">Take a Photo</string>
     <string name="gutenberg_native_take_a_photo_or_video" tools:ignore="UnusedResources">Take a Photo or Video</string>
