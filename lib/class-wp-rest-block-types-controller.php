@@ -170,7 +170,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
-	public  function get_item( $request ) {
+	public function get_item( $request ) {
 		$block_name = $request['namespace'] . '/' . $request['name'];
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
