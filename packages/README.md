@@ -10,7 +10,7 @@ When creating a new package, you need to provide at least the following:
     ```json
     {
     	"name": "@wordpress/package-name",
-    	"version": "1.0.0-pre",
+    	"version": "1.0.0-prerelease",
     	"description": "Package description.",
     	"author": "The WordPress Contributors",
     	"license": "GPL-2.0-or-later",
