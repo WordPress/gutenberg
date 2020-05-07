@@ -3,7 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
-import { documentHasTextSelection } from '@wordpress/dom';
+import { documentHasSelection, documentHasTextSelection } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { _n, sprintf } from '@wordpress/i18n';
 
@@ -37,9 +37,18 @@ function CopyHandler( { children } ) {
 		}
 
 		// Always handle multiple selected blocks.
-		// Let native copy behaviour take over in input fields.
-		if ( ! hasMultiSelection() && documentHasTextSelection() ) {
-			return;
+		if ( ! hasMultiSelection() ) {
+			// If copying, only consider actual text selection as selection.
+			// Otherwise, any focus on an input field is considered.
+			const hasSelection =
+				event.type === 'copy' || event.type === 'cut'
+					? documentHasTextSelection()
+					: documentHasSelection();
+
+			// Let native copy behaviour take over in input fields.
+			if ( hasSelection ) {
+				return;
+			}
 		}
 
 		if ( ! containerRef.current.contains( event.target ) ) {
