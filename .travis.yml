@@ -299,17 +299,6 @@ jobs:
       script:
         - npm run native test:e2e:install-app:android
         - npm run native device-tests:local
-      before_cache:
-        - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-        - rm -r -f node_modules/
-        - curl "${GRAVIS}.clean_gradle_cache.sh" --output ~/.clean_gradle_cache.sh
-        - bash ~/.clean_gradle_cache.sh > /dev/null
-      cache:
-        directories:
-          #- $ANDROID_HOME
-          - $HOME/.npm
-          - $HOME/.gradle/caches/
-          - $HOME/.gradle/wrapper/
 
   allow_failures:
     - name: E2E Mobile tests (Android)
