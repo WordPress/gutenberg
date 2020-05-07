@@ -53,9 +53,6 @@ export class BlockList extends Component {
 
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
-		this.renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind(
-			this
-		);
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind(
 			this
 		);
@@ -67,6 +64,7 @@ export class BlockList extends Component {
 		this.shouldShowInnerBlockAppender = this.shouldShowInnerBlockAppender.bind(
 			this
 		);
+		this.renderEmptyList = this.renderEmptyList.bind( this );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -75,10 +73,10 @@ export class BlockList extends Component {
 				JSON.stringify( this.props.blockClientIds ) ||
 			nextProps.blockCount !== this.props.blockCount ||
 			nextProps.isReadOnly !== this.props.isReadOnly ||
-			nextProps.shouldShowInsertionPointBefore !==
-				this.props.shouldShowInsertionPointBefore ||
 			nextProps.isBlockInsertionPointVisible !==
-				this.props.isBlockInsertionPointVisible
+				this.props.isBlockInsertionPointVisible ||
+			nextProps.renderAppender !== this.props.renderAppender ||
+			nextProps.parentWidth !== this.props.parentWidth
 		) {
 			return true;
 		}
@@ -106,30 +104,22 @@ export class BlockList extends Component {
 		return this.props.isBlockInsertionPointVisible;
 	}
 
-	renderDefaultBlockAppender() {
-		const { shouldShowInsertionPointBefore } = this.props;
-		return (
-			<View style={ styles.defaultAppender }>
-				<ReadableContentView>
-					<BlockListAppender // show the default appender, anormal, when not inserting a block
-						rootClientId={ this.props.rootClientId }
-						renderAppender={ this.props.renderAppender }
-						showSeparator={ shouldShowInsertionPointBefore }
-					/>
-				</ReadableContentView>
-			</View>
-		);
-	}
-
 	shouldShowInnerBlockAppender() {
 		const { blockClientIds, renderAppender } = this.props;
-
 		return renderAppender && blockClientIds.length > 0;
+	}
+
+	renderEmptyList() {
+		return (
+			<EmptyListComponentCompose
+				rootClientId={ this.props.rootClientId }
+				renderAppender={ this.props.renderAppender }
+			/>
+		);
 	}
 
 	render() {
 		const { isRootList } = this.props;
-
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
 		return isRootList ? (
 			<BlockListContext.Provider value={ this.scrollViewRef }>
@@ -160,6 +150,7 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
+			parentWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -205,6 +196,7 @@ export class BlockList extends Component {
 						! isRootList && styles.overflowVisible,
 					] }
 					horizontal={ horizontal }
+					extraData={ parentWidth }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={
 						horizontal && styles.horizontalContentContainer
@@ -222,9 +214,7 @@ export class BlockList extends Component {
 					}
 					title={ title }
 					ListHeaderComponent={ header }
-					ListEmptyComponent={
-						! isReadOnly && this.renderDefaultBlockAppender
-					}
+					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
 				/>
 
@@ -255,17 +245,25 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			rootClientId,
 			isStackedHorizontally,
+			parentWidth,
+			marginVertical,
+			marginHorizontal,
 		} = this.props;
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
+				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }
 				onAddBlock={ onAddBlock }
+				marginVertical={ marginVertical }
+				marginHorizontal={ marginHorizontal }
 				onDeleteBlock={ onDeleteBlock }
-				shouldShowInnerBlockAppender={ this.shouldShowInnerBlockAppender() }
+				shouldShowInnerBlockAppender={
+					this.shouldShowInnerBlockAppender
+				}
 			/>
 		);
 	}
@@ -304,7 +302,6 @@ export default compose( [
 			getBlockCount,
 			getBlockOrder,
 			getSelectedBlockClientId,
-			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
 			getSettings,
 			getBlockHierarchyRootClientId,
@@ -315,16 +312,6 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockClientIds = getBlockOrder( rootClientId );
-		const insertionPoint = getBlockInsertionPoint();
-		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
-		const shouldShowInsertionPointBefore =
-			! isStackedHorizontally &&
-			blockInsertionPointIsVisible &&
-			insertionPoint.rootClientId === rootClientId &&
-			// if list is empty, show the insertion point (via the default appender)
-			( blockClientIds.length === 0 ||
-				// or if the insertion point is right before the denoted block
-				! blockClientIds[ insertionPoint.index ] );
 
 		const isReadOnly = getSettings().readOnly;
 
@@ -340,7 +327,6 @@ export default compose( [
 			blockClientIds,
 			blockCount: getBlockCount( rootClientId ),
 			isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
-			shouldShowInsertionPointBefore,
 			isReadOnly,
 			isRootList: rootClientId === undefined,
 			isFloatingToolbarVisible,
@@ -360,3 +346,53 @@ export default compose( [
 	} ),
 	withPreferredColorScheme,
 ] )( BlockList );
+
+class EmptyListComponent extends Component {
+	render() {
+		const {
+			shouldShowInsertionPoint,
+			rootClientId,
+			renderAppender,
+		} = this.props;
+		return (
+			<View style={ styles.defaultAppender }>
+				<ReadableContentView>
+					<BlockListAppender
+						rootClientId={ rootClientId }
+						renderAppender={ renderAppender }
+						showSeparator={ shouldShowInsertionPoint }
+					/>
+				</ReadableContentView>
+			</View>
+		);
+	}
+}
+
+const EmptyListComponentCompose = compose( [
+	withSelect( ( select, { rootClientId, __experimentalMoverDirection } ) => {
+		const {
+			getBlockOrder,
+			getBlockInsertionPoint,
+			isBlockInsertionPointVisible,
+		} = select( 'core/block-editor' );
+
+		const isStackedHorizontally =
+			__experimentalMoverDirection === 'horizontal';
+
+		const blockClientIds = getBlockOrder( rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const shouldShowInsertionPoint =
+			! isStackedHorizontally &&
+			blockInsertionPointIsVisible &&
+			insertionPoint.rootClientId === rootClientId &&
+			// if list is empty, show the insertion point (via the default appender)
+			( blockClientIds.length === 0 ||
+				// or if the insertion point is right before the denoted block
+				! blockClientIds[ insertionPoint.index ] );
+
+		return {
+			shouldShowInsertionPoint,
+		};
+	} ),
+] )( EmptyListComponent );

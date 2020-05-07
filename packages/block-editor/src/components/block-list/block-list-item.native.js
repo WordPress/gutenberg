@@ -36,7 +36,9 @@ export class BlockListItem extends Component {
 			contentStyle,
 			onAddBlock,
 			onDeleteBlock,
+			rootClientId,
 			shouldShowInnerBlockAppender,
+			parentWidth,
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
@@ -55,17 +57,17 @@ export class BlockListItem extends Component {
 						clientId={ clientId }
 						marginVertical={ marginVertical }
 						marginHorizontal={ marginHorizontal }
-						rootClientId={ this.props.rootClientId }
+						rootClientId={ rootClientId }
 						onCaretVerticalPositionChange={
 							this.onCaretVerticalPositionChange
 						}
-						parentWidth={ this.props.parentWidth }
+						parentWidth={ parentWidth }
 						isStackedHorizontally={ isStackedHorizontally }
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={ onDeleteBlock }
 					/>
-					{ ! shouldShowInnerBlockAppender &&
+					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
 							<BlockInsertionPoint />
 						) }

@@ -3,6 +3,27 @@
  */
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+class InnerFlatList extends Component {
+	shouldComponentUpdate( nextProps ) {
+		if (
+			JSON.stringify( nextProps.data ) !==
+				JSON.stringify( this.props.data ) ||
+			JSON.stringify( nextProps.extraData ) !==
+				JSON.stringify( this.props.extraData )
+		) {
+			return true;
+		}
+		return false;
+	}
+	render() {
+		return <FlatList { ...this.props } />;
+	}
+}
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -55,7 +76,7 @@ export const KeyboardAwareFlatList = ( {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }
 	>
-		<FlatList { ...listProps } />
+		<InnerFlatList { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 

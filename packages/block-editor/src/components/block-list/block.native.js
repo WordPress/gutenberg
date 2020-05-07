@@ -27,7 +27,6 @@ class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 	}
 	// wrapperProps are always a new reference and forces update even if value is the same
@@ -39,8 +38,8 @@ class BlockListBlock extends Component {
 			nextProps.isParentSelected !== this.props.isParentSelected ||
 			nextProps.firstToSelectId !== this.props.firstToSelectId ||
 			nextProps.isTouchable !== this.props.isTouchable ||
-			nextProps.order !== this.props.order ||
 			nextProps.isSelected !== this.props.isSelected ||
+			nextProps.parentWidth !== this.props.parentWidth ||
 			JSON.stringify( nextProps.wrapperProps ) !==
 				JSON.stringify( this.props.wrapperProps ) ||
 			JSON.stringify( nextProps.attributes ) !==
@@ -56,15 +55,6 @@ class BlockListBlock extends Component {
 		const { firstToSelectId, isSelected, onSelect } = this.props;
 		if ( ! isSelected ) {
 			onSelect( firstToSelectId );
-		}
-	}
-
-	insertBlocksAfter( blocks ) {
-		this.props.onInsertBlocks( blocks, this.props.order + 1 );
-
-		if ( blocks[ 0 ] ) {
-			// focus on the first block inserted
-			this.props.onSelect( blocks[ 0 ].clientId );
 		}
 	}
 
@@ -85,7 +75,6 @@ class BlockListBlock extends Component {
 								setAttributes={ this.props.onChange }
 								onFocus={ this.onFocus }
 								onReplace={ this.props.onReplace }
-								insertBlocksAfter={ this.insertBlocksAfter }
 								mergeBlocks={ this.props.mergeBlocks }
 								onCaretVerticalPositionChange={
 									this.props.onCaretVerticalPositionChange

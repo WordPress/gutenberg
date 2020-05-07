@@ -153,8 +153,6 @@ InnerBlocks = compose( [
 	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
 	withSelect( ( select, ownProps ) => {
 		const {
-			isBlockSelected,
-			hasSelectedInnerBlock,
 			getBlock,
 			getBlockListSettings,
 			getBlockRootClientId,
@@ -167,10 +165,6 @@ InnerBlocks = compose( [
 		return {
 			block,
 			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay:
-				block.name !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),
