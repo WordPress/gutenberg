@@ -16,10 +16,7 @@ export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
-export {
-	default as __experimentalBlockNavigationList,
-	BlockNavigationContext as __experimentalBlockNavigationContext,
-} from './block-navigation/list';
+export { default as __experimentalBlockNavigationList } from './block-navigation/list';
 export { BlockNavigationListItemFill as __experimentalBlockNavigationListItemFill } from './block-navigation/branch';
 export { default as __experimentalBlockNavigationListItem } from './block-navigation/list-item';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
