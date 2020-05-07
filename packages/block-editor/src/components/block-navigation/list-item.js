@@ -28,10 +28,10 @@ export default function BlockNavigationListItem( {
 	const blockType = getBlockType( block.name );
 
 	return (
-		<div className="block-editor-block-navigation__item">
+		<div className="block-editor-block-navigation__list-item">
 			<WrapperComponent
 				className={ classnames(
-					'block-editor-block-navigation__item-button',
+					'block-editor-block-navigation__list-item-button',
 					{
 						'is-selected': isSelected,
 					}
