@@ -163,7 +163,6 @@ function InserterMenu( {
 	const patternsTab = (
 		<div className="block-editor-inserter__scrollable">
 			<BlockPatterns
-				patterns={ patterns }
 				onInsert={ onInsertBlocks }
 				filterValue={ filterValue }
 			/>

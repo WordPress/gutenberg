@@ -52,11 +52,10 @@ function BlockPatternPlaceholder() {
 	);
 }
 
-function BlockPatternList( { patterns, onClickPattern } ) {
-	const currentShownPatterns = useAsyncList( patterns );
-
-	return patterns.map( ( pattern, index ) =>
-		currentShownPatterns[ index ] === pattern ? (
+function BlockPatternList( { patterns, showPatterns, onClickPattern } ) {
+	return patterns.map( ( pattern ) => {
+		const isShown = showPatterns.includes( pattern );
+		return isShown ? (
 			<BlockPattern
 				key={ pattern.name }
 				pattern={ pattern }
@@ -64,13 +63,15 @@ function BlockPatternList( { patterns, onClickPattern } ) {
 			/>
 		) : (
 			<BlockPatternPlaceholder key={ pattern.name } />
-		)
-	);
+		);
+	} );
 }
 
-function BlockPatterns( { patterns, onInsert, filterValue } ) {
-	const { blockPatternCategories } = useSelect( ( select ) => {
+function BlockPatterns( { onInsert, filterValue } ) {
+	const { blockPatternCategories, patterns } = useSelect( ( select ) => {
 		return {
+			patterns: select( 'core/block-editor' ).getSettings()
+				.__experimentalBlockPatterns,
 			blockPatternCategories: select( 'core/block-editor' ).getSettings()
 				.__experimentalBlockPatternCategories,
 		};
@@ -79,6 +80,23 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 		() => searchItems( patterns, filterValue ),
 		[ filterValue, patterns ]
 	);
+	// Ordering the patterns per category is important for the async rendering.
+	const orderedPatterns = useMemo( () => {
+		const indexedCategories = {};
+		blockPatternCategories.forEach( ( category, index ) => {
+			indexedCategories[ category.name ] = index;
+		} );
+		const getPatternIndex = ( pattern ) => {
+			if ( ! pattern.categories || ! pattern.categories.length ) {
+				return Infinity;
+			}
+			return indexedCategories[ pattern.categories[ 0 ] ];
+		};
+		return filteredPatterns.sort( ( a, b ) => {
+			return getPatternIndex( a ) - getPatternIndex( b );
+		} );
+	}, [ filterValue, blockPatternCategories ] );
+	const currentShownPatterns = useAsyncList( orderedPatterns );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
@@ -98,6 +116,7 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 		return !! filteredPatterns.length ? (
 			<InserterPanel title={ __( 'Search Results' ) }>
 				<BlockPatternList
+					showPatterns={ currentShownPatterns }
 					patterns={ filteredPatterns }
 					onClickPattern={ onClickPattern }
 				/>
@@ -107,19 +126,25 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 		);
 	}
 
-	return blockPatternCategories.map( ( patternCategory ) => (
-		<InserterPanel
-			key={ patternCategory.name }
-			title={ patternCategory.label }
-		>
-			<BlockPatternList
-				patterns={ patterns.filter( ( pattern ) =>
-					pattern.categories.includes( patternCategory.name )
-				) }
-				onClickPattern={ onClickPattern }
-			/>
-		</InserterPanel>
-	) );
+	return blockPatternCategories.map( ( patternCategory ) => {
+		const categoryPatterns = patterns.filter( ( pattern ) =>
+			pattern.categories.includes( patternCategory.name )
+		);
+		return (
+			!! categoryPatterns.length && (
+				<InserterPanel
+					key={ patternCategory.name }
+					title={ patternCategory.label }
+				>
+					<BlockPatternList
+						showPatterns={ currentShownPatterns }
+						patterns={ categoryPatterns }
+						onClickPattern={ onClickPattern }
+					/>
+				</InserterPanel>
+			)
+		);
+	} );
 }
 
 export default BlockPatterns;
