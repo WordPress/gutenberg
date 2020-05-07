@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Animated, Easing, View, TouchableWithoutFeedback } from 'react-native';
+import {
+	Animated,
+	Easing,
+	View,
+	TouchableWithoutFeedback,
+	Platform,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -50,9 +56,12 @@ const FloatingToolbar = ( {
 		} ).start();
 	}, [ showFloatingToolbar ] );
 
+	const translationRange =
+		( Platform.OS === 'android' ? -1 : 1 ) * TRANSLATION_RANGE;
+
 	const translation = opacity.interpolate( {
 		inputRange: [ 0, 1 ],
-		outputRange: [ TRANSLATION_RANGE, 0 ],
+		outputRange: [ translationRange, 0 ],
 	} );
 
 	const animationStyle = {
