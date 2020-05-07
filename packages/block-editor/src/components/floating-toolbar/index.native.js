@@ -7,7 +7,7 @@ import { Animated, Easing, View, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { ToolbarButton, Toolbar } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -32,7 +32,14 @@ const FloatingToolbar = ( {
 	onNavigateUp,
 	isRTL,
 } ) => {
+	// sustain old selectedClientId for Breacdrumb animation on exit purpose
+	const [ previousSelectedClientId, setPreviousSelectedClientId ] = useState(
+		true
+	);
+
 	useEffect( () => {
+		if ( showFloatingToolbar )
+			setPreviousSelectedClientId( selectedClientId );
 		const easing = Easing.ease;
 		Animated.timing( opacity, {
 			toValue: showFloatingToolbar ? 1 : 0,
@@ -69,7 +76,11 @@ const FloatingToolbar = ( {
 							<View style={ styles.pipe } />
 						</Toolbar>
 					) }
-					<Breadcrumb clientId={ selectedClientId } />
+					<Breadcrumb
+						clientId={
+							previousSelectedClientId || selectedClientId
+						}
+					/>
 				</Animated.View>
 			</TouchableWithoutFeedback>
 		)
