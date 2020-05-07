@@ -383,3 +383,28 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );
+
+/**
+ * Removes post details from block context when rendering a block template.
+ *
+ * @param array $context Default context.
+ *
+ * @return array Filtered context.
+ */
+function gutenberg_template_render_without_post_block_context( $context ) {
+	/*
+	 * When loading a template or template part directly and not through a page
+	 * that resolves it, the top-level post ID and type context get set to that
+	 * of the template part. Templates are just the structure of a site, and
+	 * they should not be available as post context because blocks like Post
+	 * Content would recurse infinitely.
+	 */
+	if ( isset( $context['postType'] ) &&
+			( 'wp_template' === $context['postType'] || 'wp_template_part' === $context['postType'] ) ) {
+		unset( $context['postId'] );
+		unset( $context['postType'] );
+	}
+
+	return $context;
+}
+add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
