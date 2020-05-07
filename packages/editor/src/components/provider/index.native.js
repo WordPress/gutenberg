@@ -99,8 +99,8 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( colors ) => {
-				this.props.updateSettings( { colors } );
+			( theme ) => {
+				this.props.updateSettings( theme );
 			}
 		);
 	}

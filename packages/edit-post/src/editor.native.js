@@ -42,7 +42,8 @@ class Editor extends Component {
 		focusMode,
 		hiddenBlockTypes,
 		blockTypes,
-		colors
+		colors,
+		gradients
 	) {
 		settings = {
 			...settings,
@@ -68,6 +69,10 @@ class Editor extends Component {
 
 		if ( colors !== undefined ) {
 			settings.colors = colors;
+		}
+
+		if ( gradients !== undefined ) {
+			settings.gradients = gradients;
 		}
 
 		return settings;
@@ -104,6 +109,7 @@ class Editor extends Component {
 			post,
 			postType,
 			colors,
+			gradients,
 			...props
 		} = this.props;
 
@@ -113,7 +119,8 @@ class Editor extends Component {
 			focusMode,
 			hiddenBlockTypes,
 			blockTypes,
-			colors
+			colors,
+			gradients
 		);
 
 		const normalizedPost = post || {
