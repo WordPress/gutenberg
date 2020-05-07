@@ -120,6 +120,7 @@
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
 		"@wordpress/scripts": "file:packages/scripts",
+		"appium": "1.17.1",
 		"babel-jest": "24.9.0",
 		"babel-loader": "8.1.0",
 		"babel-plugin-emotion": "10.0.33",
