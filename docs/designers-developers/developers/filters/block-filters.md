@@ -63,7 +63,7 @@ To simplify the process of registering and unregistering block styles, two serve
 
 The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
 
-The properties of the style array must include `name` and `label`: 
+The properties of the style array must include `name` and `label`:
  - `name`: The identifier of the style used to compute a CSS class.
  - `label`: A human-readable label for the style.
 
@@ -231,7 +231,7 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 				props
 			),
 			el(
-				wp.editor.InspectorControls,
+				wp.blockEditor.InspectorControls,
 				{},
 				el(
 					wp.components.PanelBody,
@@ -249,7 +249,7 @@ wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', wit
 ```js
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment } = wp.element;
-const { InspectorControls } = wp.editor;
+const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
 const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
