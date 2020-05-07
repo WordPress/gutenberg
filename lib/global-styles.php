@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping Global Styles.
+ * Bootstraps Global Styles.
  *
  * @package gutenberg
  */
@@ -209,14 +209,14 @@ function gutenberg_experimental_global_styles_get_theme() {
 /**
  * Given a block json, it returns an array of block selectors.
  *
- * @param array $block_json
+ * @param array $block_json The block.json config.
  * @return array
  */
 function gutenberg_experimental_global_styles_extract_selectors( $block_json ) {
-	$selector = $block_json['__experimentalSelector'];
-	$block_name = $block_json['name'];
+	$selector        = $block_json['__experimentalSelector'];
+	$block_name      = $block_json['name'];
 	$block_selectors = array();
-	foreach( $selector as $key => $value ) {
+	foreach ( $selector as $key => $value ) {
 		$block_selectors[ $block_name . '/' . $key ] = $value;
 	}
 	return $block_selectors;
@@ -238,20 +238,20 @@ function gutenberg_experimental_global_styles_resolver( $global_styles ) {
 	// that can be used by 3rd party blocks as well.
 	// This list is an interim approach to avoid the performance cost of
 	// having to detect support by reading all core block's block.json.
-	$blocks_supported = [
+	$blocks_supported = array(
 		'paragraph',
-		'heading'
-	];
+		'heading',
+	);
 	// The block library dir may not exist if working from a fresh clone => bail out early.
 	$block_library_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
 	if ( file_exists( $block_library_dir ) ) {
-		foreach( $blocks_supported as $block_dir ) {
+		foreach ( $blocks_supported as $block_dir ) {
 			$block_json_file = $block_library_dir . $block_dir . '/block.json';
 			if ( file_exists( $block_json_file ) ) {
 				$block_json = json_decode( file_get_contents( $block_json_file ), true );
 				if ( array_key_exists( '__experimentalSelector', $block_json ) && is_string( $block_json['__experimentalSelector'] ) ) {
 					$selectors[ $block_json['name'] ] = $block_json['__experimentalSelector'];
-				} else if ( array_key_exists( '__experimentalSelector', $block_json) && is_array( $block_json['__experimentalSelector'] ) ) {
+				} elseif ( array_key_exists( '__experimentalSelector', $block_json ) && is_array( $block_json['__experimentalSelector'] ) ) {
 					$selectors = array_merge( $selectors, gutenberg_experimental_global_styles_extract_selectors( $block_json ) );
 				}
 			}
