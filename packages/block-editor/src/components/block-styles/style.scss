@@ -49,6 +49,17 @@
 	align-items: center;
 	flex-grow: 1;
 	min-height: 80px;
+	position: relative;
+
+	svg {
+		position: absolute;
+		top: 0;
+		right: 0;
+		border-bottom-left-radius: $radius-block-ui;
+		border-left: $border-width solid $dark-gray-primary;
+		border-bottom: $border-width solid $dark-gray-primary;
+		background: #fff;
+	}
 }
 
 .block-editor-block-styles__item-label {
