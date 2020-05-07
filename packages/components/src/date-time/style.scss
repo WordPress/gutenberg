@@ -37,18 +37,6 @@
 	}
 }
 
-.components-datetime,
-.components-datetime__time {
-	// Override inherited conflicting styles to be consistent.
-	select,
-	input[type="number"],
-	.components-button {
-		height: 30px;
-		margin-top: 0;
-		margin-bottom: 0;
-	}
-}
-
 .components-datetime__date {
 	min-height: 236px;
 	border-top: 1px solid $gray-200;
@@ -173,6 +161,15 @@
 					margin: 0;
 				}
 			}
+		}
+
+		// Override inherited conflicting styles to be consistent.
+		select,
+		input[type="number"],
+		.components-button {
+			height: 30px;
+			margin-top: 0;
+			margin-bottom: 0;
 		}
 	}
 
