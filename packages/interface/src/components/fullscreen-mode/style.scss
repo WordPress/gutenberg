@@ -10,27 +10,20 @@ body.is-fullscreen-mode {
 			display: none;
 		}
 
-		// Layer the sidebar above the editor's top bar and
-		// setup the transition
+		// Setup the transition
 		#adminmenumain {
-			z-index: 1;
-			transform: translateX(-160px);
-			transition: transform 0.12s ease-in-out;
+			position: relative;
+			left: -160px;
+			transition: left 0.12s ease-in-out;
 		}
 
-		// Display the sidebar offscreen, and then transition in when needed.
-		#adminmenumain,
-		#adminmenuback {
-			position: fixed;
-			top: 60px;
-			left: 0;
-			bottom: 0;
+		#adminmenu {
+			margin-top: 60px;
 		}
 
-		// Hides the admin menu
-		// This prevents keyboard navigation from accessing inner links
-		#adminmenuwrap {
-			//display: none;
+		.interface-interface-skeleton__header {
+			margin-left: 60px;
+			transition: margin-left 0.12s ease-in-out;
 		}
 
 		.interface-interface-skeleton__body,
@@ -38,30 +31,38 @@ body.is-fullscreen-mode {
 			transition: margin-left 0.12s ease-in-out;
 		}
 
-		#wpcontent,
-		#wpfooter {
-			margin-left: 0;
+		#adminmenu .wp-submenu li.current a {
+			font-weight: inherit;
+		}
+
+		// Hide the little triangle on the currently
+		// selected menu item.
+		#adminmenu a.wp-has-current-submenu::after,
+		#adminmenu > li.current > a.current::after {
+			display: none;
 		}
 	}
 }
 
 body.is-showing-admin-menu {
+	// Bring the sidebar into view.
 	#adminmenumain {
-		transform: translateX(0);
+		left: 0;
 	}
 
-	// Show the admin menu
-	#adminmenuwrap {
-		display: block;
-	}
-
+	.interface-interface-skeleton__header,
 	.interface-interface-skeleton__body,
 	.interface-interface-skeleton__footer {
 		margin-left: 160px;
 	}
 }
 
+
 body.is-showing-admin-menu.folded {
+	.interface-interface-skeleton__header {
+		margin-left: 60px;
+	}
+
 	.interface-interface-skeleton__body,
 	.interface-interface-skeleton__footer {
 		margin-left: 36px;

@@ -31,6 +31,7 @@ import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
+	AdminMenuToggle,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
@@ -148,6 +149,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
+			{ isFullscreenActive && <AdminMenuToggle /> }
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
