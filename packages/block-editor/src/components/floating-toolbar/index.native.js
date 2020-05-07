@@ -38,14 +38,10 @@ const FloatingToolbar = ( {
 	onNavigateUp,
 	isRTL,
 } ) => {
-	// sustain old selectedClientId for Breacdrumb animation on exit purpose
-	const [ previousSelectedClientId, setPreviousSelectedClientId ] = useState(
-		true
-	);
+	// sustain old selection for proper Breacdrumb rendering when exit animation is ongoing
+	const [ previousSelection, setPreviousSelection ] = useState( {} );
 
 	useEffect( () => {
-		if ( showFloatingToolbar )
-			setPreviousSelectedClientId( selectedClientId );
 		const easing = Easing.ease;
 		Animated.timing( opacity, {
 			toValue: showFloatingToolbar ? 1 : 0,
@@ -55,6 +51,11 @@ const FloatingToolbar = ( {
 			easing,
 		} ).start();
 	}, [ showFloatingToolbar ] );
+
+	useEffect( () => {
+		if ( showFloatingToolbar )
+			setPreviousSelection( { clientId: selectedClientId, parentId } );
+	}, [ selectedClientId ] );
 
 	const translationRange =
 		( Platform.OS === 'android' ? -1 : 1 ) * TRANSLATION_RANGE;
@@ -69,27 +70,38 @@ const FloatingToolbar = ( {
 		transform: [ { translateY: translation } ],
 	};
 
+	const {
+		clientId: previousSelectedClientId,
+		parentId: previousSelectedParentId,
+	} = previousSelection;
+
+	const showPrevious = previousSelectedClientId && ! showFloatingToolbar;
+	const breadcrumbClientId = showPrevious
+		? previousSelectedClientId
+		: selectedClientId;
+	const showNavUpButton =
+		!! parentId || ( showPrevious && !! previousSelectedParentId );
+
 	return (
 		!! opacity && (
 			<TouchableWithoutFeedback accessible={ false }>
 				<Animated.View
 					style={ [ styles.floatingToolbar, animationStyle ] }
 				>
-					{ !! parentId && (
+					{ showNavUpButton && (
 						<Toolbar passedStyle={ styles.toolbar }>
 							<ToolbarButton
 								title={ __( 'Navigate Up' ) }
-								onClick={ () => onNavigateUp( parentId ) }
+								onClick={
+									! showPrevious &&
+									( () => onNavigateUp( parentId ) )
+								}
 								icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 							/>
 							<View style={ styles.pipe } />
 						</Toolbar>
 					) }
-					<Breadcrumb
-						clientId={
-							previousSelectedClientId || selectedClientId
-						}
-					/>
+					<Breadcrumb clientId={ breadcrumbClientId } />
 				</Animated.View>
 			</TouchableWithoutFeedback>
 		)
