@@ -60,10 +60,9 @@ function getChildrenArray( children ) {
  */
 export function concat( ...blockNodes ) {
 	const result = [];
-	for ( let i = 0; i < blockNodes.length; i++ ) {
-		const blockNode = castArray( blockNodes[ i ] );
-		for ( let j = 0; j < blockNode.length; j++ ) {
-			const child = blockNode[ j ];
+	for ( const blockNode of blockNodes ) {
+		const blockNodeAsArray = castArray( blockNode );
+		for ( const child of blockNodeAsArray ) {
 			const canConcatToPreviousString =
 				typeof child === 'string' &&
 				typeof result[ result.length - 1 ] === 'string';
@@ -89,9 +88,9 @@ export function concat( ...blockNodes ) {
  */
 export function fromDOM( domNodes ) {
 	const result = [];
-	for ( let i = 0; i < domNodes.length; i++ ) {
+	for ( const domNode of domNodes ) {
 		try {
-			result.push( node.fromDOM( domNodes[ i ] ) );
+			result.push( node.fromDOM( domNode ) );
 		} catch ( error ) {
 			// Simply ignore if DOM node could not be converted.
 		}

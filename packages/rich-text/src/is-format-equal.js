@@ -41,12 +41,7 @@ export function isFormatEqual( format1, format2 ) {
 		return false;
 	}
 
-	const length = keys1.length;
-
-	// Optimise for speed.
-	for ( let i = 0; i < length; i++ ) {
-		const name = keys1[ i ];
-
+	for ( const name of keys1 ) {
 		if ( attributes1[ name ] !== attributes2[ name ] ) {
 			return false;
 		}

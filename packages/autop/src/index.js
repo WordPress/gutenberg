@@ -95,8 +95,7 @@ function replaceInHtmlTags( haystack, replacePairs ) {
 
 	// Loop through delimiters (elements) only.
 	for ( let i = 1; i < textArr.length; i += 2 ) {
-		for ( let j = 0; j < needles.length; j++ ) {
-			const needle = needles[ j ];
+		for ( const needle of needles ) {
 			if ( -1 !== textArr[ i ].indexOf( needle ) ) {
 				textArr[ i ] = textArr[ i ].replace(
 					new RegExp( needle, 'g' ),

@@ -309,8 +309,7 @@ export function* replaceBlocks(
 		first( clientIds )
 	);
 	// Replace is valid if the new blocks can be inserted in the root block.
-	for ( let index = 0; index < blocks.length; index++ ) {
-		const block = blocks[ index ];
+	for ( const block of blocks ) {
 		const canInsertBlock = yield select(
 			'core/block-editor',
 			'canInsertBlockType',

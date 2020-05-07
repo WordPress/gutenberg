@@ -112,9 +112,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 function filterOptions( search, options = [], maxResults = 10 ) {
 	const filtered = [];
-	for ( let i = 0; i < options.length; i++ ) {
-		const option = options[ i ];
-
+	for ( const option of options ) {
 		// Merge label into keywords
 		let { keywords = [] } = option;
 		if ( 'string' === typeof option.label ) {

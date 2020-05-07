@@ -538,9 +538,7 @@ function renderChildren( children, context, legacyContext = {} ) {
 
 	children = castArray( children );
 
-	for ( let i = 0; i < children.length; i++ ) {
-		const child = children[ i ];
-
+	for ( const child of children ) {
 		result += renderElement( child, context, legacyContext );
 	}
 

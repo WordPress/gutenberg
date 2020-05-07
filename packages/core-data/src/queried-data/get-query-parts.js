@@ -41,8 +41,7 @@ export function getQueryParts( query ) {
 	// Ensure stable key by sorting keys. Also more efficient for iterating.
 	const keys = Object.keys( query ).sort();
 
-	for ( let i = 0; i < keys.length; i++ ) {
-		const key = keys[ i ];
+	for ( const key of keys ) {
 		const value = query[ key ];
 
 		switch ( key ) {

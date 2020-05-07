@@ -147,12 +147,7 @@ export function getClassNames(
 		const aspectRatioClassNames = {
 			'wp-has-aspect-ratio': false,
 		};
-		for (
-			let ratioIndex = 0;
-			ratioIndex < ASPECT_RATIOS.length;
-			ratioIndex++
-		) {
-			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
+		for ( const aspectRatioToRemove of ASPECT_RATIOS ) {
 			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
 		}
 		return classnames( existingClassNames, aspectRatioClassNames );

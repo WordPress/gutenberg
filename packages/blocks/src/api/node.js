@@ -44,8 +44,7 @@ function isNodeOfType( node, type ) {
  */
 export function getNamedNodeMapAsObject( nodeMap ) {
 	const result = {};
-	for ( let i = 0; i < nodeMap.length; i++ ) {
-		const { name, value } = nodeMap[ i ];
+	for ( const { name, value } of nodeMap ) {
 		result[ name ] = value;
 	}
 

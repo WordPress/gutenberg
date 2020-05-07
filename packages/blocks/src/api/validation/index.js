@@ -305,9 +305,7 @@ export function isEquivalentTextTokens(
 	let actualChars = actual.chars;
 	let expectedChars = expected.chars;
 
-	for ( let i = 0; i < TEXT_NORMALIZATIONS.length; i++ ) {
-		const normalize = TEXT_NORMALIZATIONS[ i ];
-
+	for ( const normalize of TEXT_NORMALIZATIONS ) {
 		actualChars = normalize( actualChars );
 		expectedChars = normalize( expectedChars );
 
@@ -420,13 +418,12 @@ export function isEqualTagAttributePairs(
 	// actual attributes, first convert the set of expected attribute values to
 	// an object, for lookup by key.
 	const expectedAttributes = {};
-	for ( let i = 0; i < expected.length; i++ ) {
-		expectedAttributes[ expected[ i ][ 0 ].toLowerCase() ] =
-			expected[ i ][ 1 ];
+	for ( const attributeTuple of expected ) {
+		expectedAttributes[ attributeTuple[ 0 ].toLowerCase() ] =
+			attributeTuple[ 1 ];
 	}
 
-	for ( let i = 0; i < actual.length; i++ ) {
-		const [ name, actualValue ] = actual[ i ];
+	for ( const [ name, actualValue ] of actual ) {
 		const nameLower = name.toLowerCase();
 
 		// As noted above, if missing member in B, assume different

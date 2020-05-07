@@ -331,11 +331,11 @@ export function getMigratedBlock( block, parsedAttributes ) {
 
 	const { originalContent, innerBlocks } = block;
 
-	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
+	for ( const definition of deprecatedDefinitions ) {
 		// A block can opt into a migration even if the block is valid by
 		// defining isEligible on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
-		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
+		const { isEligible = stubFalse } = definition;
 		if ( block.isValid && ! isEligible( parsedAttributes, innerBlocks ) ) {
 			continue;
 		}
@@ -345,7 +345,7 @@ export function getMigratedBlock( block, parsedAttributes ) {
 		// and must be explicitly provided.
 		const deprecatedBlockType = Object.assign(
 			omit( blockType, DEPRECATED_ENTRY_KEYS ),
-			deprecatedDefinitions[ i ]
+			definition
 		);
 
 		let migratedAttributes = getBlockAttributes(

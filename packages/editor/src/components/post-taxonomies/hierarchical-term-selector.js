@@ -305,10 +305,10 @@ class HierarchicalTermSelector extends Component {
 			.filter( ( term ) => term );
 		const getResultCount = ( terms ) => {
 			let count = 0;
-			for ( let i = 0; i < terms.length; i++ ) {
+			for ( const term of terms ) {
 				count++;
-				if ( undefined !== terms[ i ].children ) {
-					count += getResultCount( terms[ i ].children );
+				if ( undefined !== term.children ) {
+					count += getResultCount( term.children );
 				}
 			}
 			return count;

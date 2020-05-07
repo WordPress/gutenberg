@@ -23,11 +23,8 @@ export function html( selector, multilineTag ) {
 
 		if ( multilineTag ) {
 			let value = '';
-			const length = match.children.length;
 
-			for ( let index = 0; index < length; index++ ) {
-				const child = match.children[ index ];
-
+			for ( const child of match.children ) {
 				if ( child.nodeName.toLowerCase() !== multilineTag ) {
 					continue;
 				}

@@ -226,9 +226,7 @@ export function applyValue( future, current ) {
 				}
 
 				if ( futureAttributes ) {
-					for ( let ii = 0; ii < futureAttributes.length; ii++ ) {
-						const { name, value } = futureAttributes[ ii ];
-
+					for ( const { name, value } of futureAttributes ) {
 						if ( currentChild.getAttribute( name ) !== value ) {
 							currentChild.setAttribute( name, value );
 						}

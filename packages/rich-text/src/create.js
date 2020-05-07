@@ -331,11 +331,7 @@ function createFromElement( {
 		return accumulator;
 	}
 
-	const length = element.childNodes.length;
-
-	// Optimise for speed.
-	for ( let index = 0; index < length; index++ ) {
-		const node = element.childNodes[ index ];
+	for ( const node of element.childNodes ) {
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === node.TEXT_NODE ) {
@@ -548,13 +544,9 @@ function getAttributes( { element } ) {
 		return;
 	}
 
-	const length = element.attributes.length;
 	let accumulator;
 
-	// Optimise for speed.
-	for ( let i = 0; i < length; i++ ) {
-		const { name, value } = element.attributes[ i ];
-
+	for ( const { name, value } of element.attributes ) {
 		if ( name.indexOf( 'data-rich-text-' ) === 0 ) {
 			continue;
 		}

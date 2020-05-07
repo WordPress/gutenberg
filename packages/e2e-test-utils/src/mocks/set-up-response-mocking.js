@@ -41,8 +41,7 @@ export async function setUpResponseMocking( mocks ) {
 		interceptionInitialized = true;
 		await page.setRequestInterception( true );
 		page.on( 'request', async ( request ) => {
-			for ( let i = 0; i < requestMocks.length; i++ ) {
-				const mock = requestMocks[ i ];
+			for ( const mock of requestMocks ) {
 				if ( mock.match( request ) ) {
 					await mock.onRequestMatch( request );
 					return;

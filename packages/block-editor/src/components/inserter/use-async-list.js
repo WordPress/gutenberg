@@ -14,8 +14,7 @@ import { createQueue } from '@wordpress/priority-queue';
 function getFirstItemsPresentInState( list, state ) {
 	const firstItems = [];
 
-	for ( let i = 0; i < list.length; i++ ) {
-		const item = list[ i ];
+	for ( const item of list ) {
 		if ( ! state.includes( item ) ) {
 			break;
 		}

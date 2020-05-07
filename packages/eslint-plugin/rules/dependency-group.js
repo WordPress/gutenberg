@@ -118,10 +118,7 @@ module.exports = {
 		function getDependencyBlockCorrection( node, locality ) {
 			const value = getCommentValue( locality );
 
-			let comment;
-			for ( let i = 0; i < comments.length; i++ ) {
-				comment = comments[ i ];
-
+			for ( const comment of comments ) {
 				if ( ! isBefore( comment, node ) ) {
 					// Exhausted options.
 					break;

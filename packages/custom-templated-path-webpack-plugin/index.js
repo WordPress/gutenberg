@@ -43,8 +43,7 @@ class CustomTemplatedPathPlugin {
 				compilation.mainTemplate.hooks.assetPath.tap(
 					'CustomTemplatedPathPlugin',
 					( path, data ) => {
-						for ( let i = 0; i < this.handlers.length; i++ ) {
-							const [ regexp, handler ] = this.handlers[ i ];
+						for ( const [ regexp, handler ] of this.handlers ) {
 							if ( regexp.test( path ) ) {
 								path = path.replace(
 									regexp,
