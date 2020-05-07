@@ -116,7 +116,7 @@ describe( 'adding blocks', () => {
 				)
 		);
 		await page.keyboard.type( 'para' );
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 

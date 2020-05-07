@@ -15,10 +15,12 @@ import { PinnedItems } from '@wordpress/interface';
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import FullscreenModeClose from './fullscreen-mode-close';
+import MainDashboardButton from './main-dashboard-button';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
+import UndoButton from './undo-redo/undo';
+import RedoButton from './undo-redo/redo';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -62,17 +64,21 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<FullscreenModeClose />
+			<MainDashboardButton.Slot />
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
 					showInserterHelpPanel
 					toggleProps={ inserterToggleProps }
 				/>
+				<ToolSelector />
+				<UndoButton />
+				<RedoButton />
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }
 					activeId={ settings.templateId }
+					homeId={ settings.homeTemplateId }
 					isTemplatePart={
 						settings.templateType === 'wp_template_part'
 					}
@@ -81,7 +87,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 					onAddTemplateId={ addTemplateId }
 				/>
 				<BlockNavigationDropdown />
-				<ToolSelector />
 			</div>
 			<div className="edit-site-header__actions">
 				<PreviewOptions

@@ -39,6 +39,7 @@
 		display: none;
 	}
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -72,6 +73,7 @@
 			border-left: $border-width solid $light-gray-500;
 		}
 
+		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
 			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
 			height: $header-height;

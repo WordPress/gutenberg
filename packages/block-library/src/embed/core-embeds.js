@@ -315,7 +315,7 @@ export const others = [
 			icon: embedPhotoIcon,
 			description: __( 'Embed SmugMug content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
 	},
 	{
 		// Deprecated in favour of the core-embed/speaker-deck block.

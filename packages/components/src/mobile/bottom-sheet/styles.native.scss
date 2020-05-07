@@ -122,28 +122,28 @@
 
 .cellLabel {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	margin-right: 12px;
 	flex-shrink: 1;
 }
 
 .cellLabelCentered {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	text-align: center;
 }
 
 .cellLabelLeftAlignNoIcon {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	margin-left: 0;
 }
 
 .cellValue {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	text-align: right;
 	flex: 1;
 }
@@ -169,4 +169,71 @@
 .unsupportedFooterCell {
 	font-size: $text-editor-font-size;
 	color: $gray;
+}
+
+// Color Cell
+
+.colorCircle {
+	width: 2 * $panel-padding;
+	height: 2 * $panel-padding;
+	border-radius: $panel-padding;
+}
+
+// Navigation Header
+
+.bottomSheetHeader {
+	flex-direction: row;
+	align-items: center;
+	padding-right: $panel-padding;
+	padding-left: $panel-padding;
+	min-height: 44px;
+}
+
+.bottomSheetBackButton {
+	flex-direction: row;
+	align-items: center;
+	flex: 1;
+}
+
+.chevronLeftIcon {
+	color: $blue-50;
+	margin-left: -13px;
+	margin-right: -13px;
+}
+
+.chevronLeftIconDark {
+	color: $blue-30;
+}
+
+.bottomSheetHeaderTitle {
+	color: $light-primary;
+	text-align: center;
+	font-weight: 600;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetHeaderTitleDark {
+	color: $dark-primary;
+}
+
+.bottomSheetButtonText {
+	color: $blue-50;
+	font-size: 16px;
+}
+
+.bottomSheetButtonTextDark {
+	color: $blue-30;
+}
+
+.bottomSheetRightSpace {
+	flex: 1;
+}
+
+.arrowLeftIcon {
+	color: $gray-60;
+}
+
+.arrowLeftIconDark {
+	color: $dark-secondary;
 }

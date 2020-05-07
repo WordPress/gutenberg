@@ -645,7 +645,7 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(
-		WP_Patterns_Registry::get_instance()->get_all_registered(),
+		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		$settings['__experimentalBlockPatterns']
 	);
 
@@ -683,12 +683,13 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 /*
  * Register default patterns if not registered in Core already.
  */
-if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
-	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
-	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
-	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
-	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
-	register_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
-	register_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
-	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+	register_block_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
+	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_block_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
+	register_block_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
+	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
 }
