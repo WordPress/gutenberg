@@ -292,11 +292,14 @@ function getBlocksWithDefaultStylesApplied(
 function* computeDefaultStyleVariations( blocks ) {
 	const defaultStyles = {};
 	for ( const block of blocks ) {
-		defaultStyles[ block.name ] = ( yield select(
+		const defaultStyle = yield select(
 			'core/blocks',
 			'getDefaultBlockStyle',
 			block.name
-		) ).name;
+		);
+		if ( defaultStyle ) {
+			defaultStyles[ block.name ] = defaultStyle.name;
+		}
 	}
 	return defaultStyles;
 }
