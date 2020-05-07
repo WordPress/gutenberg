@@ -74,6 +74,36 @@ const block = `( function() {
 	} );
 } )();`;
 
+const MOCK_EMPTY_RESPONSES = [
+	{
+		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		onRequestMatch: createResponse( JSON.stringify( [] ) ),
+	},
+];
+
+const MOCK_BLOCKS_RESPONSES = [
+	{
+		// Mock response for search with the block
+		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		onRequestMatch: createResponse(
+			JSON.stringify( [ MOCK_BLOCK1, MOCK_BLOCK2 ] )
+		),
+	},
+	{
+		// Mock response for install
+		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
+		onRequestMatch: createResponse( JSON.stringify( true ) ),
+	},
+	{
+		// Mock the response for the js asset once it gets injected
+		match: ( request ) => request.url().includes( MOCK_BLOCK1.assets[ 0 ] ),
+		onRequestMatch: createResponse(
+			Buffer.from( block, 'utf8' ),
+			'application/javascript; charset=utf-8'
+		),
+	},
+];
+
 function getResponseObject( obj, contentType ) {
 	return {
 		status: 200,
@@ -102,12 +132,7 @@ describe( 'adding blocks from block directory', () => {
 		const impossibleBlockName = '@#$@@Dsdsdfw2#$@';
 
 		// Return an empty list of plugins
-		await setUpResponseMocking( [
-			{
-				match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
-				onRequestMatch: createResponse( JSON.stringify( [] ) ),
-			},
-		] );
+		await setUpResponseMocking( MOCK_EMPTY_RESPONSES );
 
 		// Search for the block via the inserter
 		await searchForBlock( impossibleBlockName );
@@ -122,29 +147,7 @@ describe( 'adding blocks from block directory', () => {
 
 	it( 'Should be able to add (the first) block.', async () => {
 		// Setup our mocks
-		await setUpResponseMocking( [
-			{
-				// Mock response for search with the block
-				match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
-				onRequestMatch: createResponse(
-					JSON.stringify( [ MOCK_BLOCK1, MOCK_BLOCK2 ] )
-				),
-			},
-			{
-				// Mock response for install
-				match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-				onRequestMatch: createResponse( JSON.stringify( true ) ),
-			},
-			{
-				// Mock the response for the js asset once it gets injected
-				match: ( request ) =>
-					request.url().includes( MOCK_BLOCK1.assets[ 0 ] ),
-				onRequestMatch: createResponse(
-					Buffer.from( block, 'utf8' ),
-					'application/javascript; charset=utf-8'
-				),
-			},
-		] );
+		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
 		// Search for the block via the inserter
 		await searchForBlock( MOCK_BLOCK1.title );
