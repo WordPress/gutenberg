@@ -8,10 +8,6 @@ import { Tip } from '@wordpress/components';
  */
 import BlockIcon from '../block-icon';
 
-// const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipsByContext( context, true );
-
-// console.log( { __experimentalGetBlockTipsByType } );
-
 function BlockCard( { blockType, tip } ) {
 	return (
 		<>
