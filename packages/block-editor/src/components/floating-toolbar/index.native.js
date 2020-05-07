@@ -20,7 +20,7 @@ import NavigateUpSVG from './nav-up-icon';
 import Breadcrumb from '../block-list/breadcrumb.native';
 
 const EASE_IN_DURATION = 300;
-const EASE_OUT_DURATION = 50;
+const EASE_OUT_DURATION = 100;
 const TRANSLATION_RANGE = 8;
 
 const opacity = new Animated.Value( 0 );
