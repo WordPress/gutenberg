@@ -66,8 +66,13 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
-        if let colors = dataSource.gutenbergThemeColors() {
-            initialProps["colors"] = dataSource.gutenbergThemeColors()
+        let editorTheme = dataSource.gutenbergEditorTheme()
+        if let colors = editorTheme?.colors {
+            initialProps["colors"] = colors
+        }
+
+        if let gradients = editorTheme?.gradients {
+            initialProps["gradients"] = gradients
         }
 
         return initialProps
@@ -130,9 +135,19 @@ public class Gutenberg: NSObject {
         return !(url?.isFileURL ?? true)
     }
 
-    public func updateTheme(_ colors:[[String:AnyHashable]]?) {
-        guard let colors = colors else { return }
-        bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body: colors)
+    public func updateTheme(_ colors: [[String:String]]?, gradients: [[String:String]]?) {
+
+        var themeUpdates = [String : Any]()
+
+        if let colors = colors {
+            themeUpdates["colors"] = colors
+        }
+
+        if let gradients = gradients {
+            themeUpdates["gradients"] = gradients
+        }
+
+        bridgeModule.sendEventIfNeeded(name: EventName.updateTheme, body:themeUpdates)
     }
 }
 
