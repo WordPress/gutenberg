@@ -6,7 +6,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
 
-export function PostSchedule( { date, modified, onUpdateDate } ) {
+export function PostSchedule( { date, onUpdateDate } ) {
 	const onChange = ( newDate ) => {
 		onUpdateDate( newDate );
 		document.activeElement.blur();
@@ -26,7 +26,7 @@ export function PostSchedule( { date, modified, onUpdateDate } ) {
 	return (
 		<DateTimePicker
 			key="date-time-picker"
-			currentDate={ date || modified }
+			currentDate={ date }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 		/>
@@ -37,9 +37,6 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
-			modified: select( 'core/editor' ).getEditedPostAttribute(
-				'modified'
-			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
