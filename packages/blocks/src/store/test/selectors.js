@@ -11,9 +11,19 @@ import {
 	getDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
+	getCategories,
 } from '../selectors';
 
 describe( 'selectors', () => {
+	describe( 'getCategories', () => {
+		it( 'returns categories state', () => {
+			const categories = [ { slug: 'text', text: 'Text' } ];
+			const state = deepFreeze( { categories } );
+
+			expect( getCategories( state ) ).toEqual( categories );
+		} );
+	} );
+
 	describe( 'getChildBlockNames', () => {
 		it( 'should return an empty array if state is empty', () => {
 			const state = {};
