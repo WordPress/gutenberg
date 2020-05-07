@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flatMap, forEach, filter, groupBy } from 'lodash';
+import { map, mapValues, flatMap, without, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -19,45 +19,38 @@ export default function useMenuLocations() {
 	// we'd send one call per location
 	const [ menuLocationMap, setMenuLocationMap ] = useState( {} );
 
-	const fetchmenuLocations = async () => {
+	const initMenuLocations = async () => {
 		const path = '/__experimental/menu-locations';
 		const apiLocations = await apiFetch( {
 			path,
 			method: 'GET',
 		} );
-		return flatMap( apiLocations );
+		setMenuLocations( flatMap( apiLocations ) );
 	};
 
-	const initmenuLocations = async () => {
-		const latestLocations = await fetchmenuLocations();
-		setMenuLocations( latestLocations );
-	};
-
-	// we need to fecth the list of locations
+	// we need to fetch the list of locations
 	// because the menu location entity
 	// caches their menu associations
 	useEffect( () => {
-		initmenuLocations();
+		initMenuLocations();
 	}, [] );
 
 	// as soon as we have the menus we group
 	// all locations by the menuId they are assigned to
 	useEffect( () => {
 		if ( menuLocations ) {
-			const locationsByMenu = groupBy( menuLocations, 'menu' );
-			forEach( locationsByMenu, ( location, menuId ) => {
-				locationsByMenu[ menuId ] = map( location, 'name' );
-			} );
+			const locationsByMenu = mapValues(
+				groupBy( menuLocations, 'menu' ),
+				( locations ) => map( locations, 'name' )
+			);
 			setMenuLocationMap( locationsByMenu );
 		}
 	}, [ menuLocations ] );
 
-	const assignMenuToLocation = ( oldMenuId, { newLocation, newMenuId } ) => {
+	const assignMenuToLocation = ( newLocation, newMenuId ) => {
 		const newMenuLocationMap = {
-			...menuLocationMap,
-			[ oldMenuId ]: filter(
-				menuLocationMap[ oldMenuId ],
-				( oldLocation ) => oldLocation !== newLocation
+			...mapValues( menuLocationMap, ( locationNames ) =>
+				without( locationNames, newLocation )
 			),
 			[ newMenuId ]: [
 				...( menuLocationMap[ newMenuId ] || [] ),
@@ -77,14 +70,9 @@ export default function useMenuLocations() {
 				} );
 			}
 		}
-		// we need to fetch the locations again after
-		// we've updated their menu associations
-		await initmenuLocations();
 	};
 
-	const saveMenuLocations = ( event ) => {
-		event.preventDefault();
-		setMenuLocations( null );
+	const saveMenuLocations = () => {
 		updateLocations();
 	};
 

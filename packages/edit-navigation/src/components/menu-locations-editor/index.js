@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { Button, Panel, PanelBody, Spinner } from '@wordpress/components';
+import {
+	SelectControl,
+	Button,
+	Panel,
+	PanelBody,
+	Spinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import MenuSelectControl from './menu-select-control';
 import useMenuLocations from './use-menu-locations';
 
 export default function MenuLocationsEditor() {
@@ -55,7 +60,12 @@ export default function MenuLocationsEditor() {
 	return (
 		<Panel className="edit-navigation-menu-editor__panel">
 			<PanelBody title={ __( 'Menu locations' ) }>
-				<form onSubmit={ saveMenuLocations }>
+				<form
+					onSubmit={ ( event ) => {
+						event.preventDefault();
+						saveMenuLocations();
+					} }
+				>
 					<table>
 						<thead>
 							<tr>
@@ -68,14 +78,16 @@ export default function MenuLocationsEditor() {
 								<tr key={ location.name }>
 									<td>{ location.description }</td>
 									<td>
-										<MenuSelectControl
-											location={ location }
-											availableMenuIds={
-												menuSelectControlOptions
-											}
-											onSelectMenu={
-												assignMenuToLocation
-											}
+										<SelectControl
+											options={ menuSelectControlOptions }
+											value={ location.menu }
+											onChange={ ( newMenuId ) => {
+												location.menu = newMenuId;
+												assignMenuToLocation(
+													location.name,
+													newMenuId
+												);
+											} }
 										/>
 									</td>
 								</tr>
