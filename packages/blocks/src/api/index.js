@@ -26,7 +26,12 @@ export {
 	getSaveContent,
 } from './serializer';
 export { isValidBlockContent } from './validation';
-export { getCategories, setCategories, updateCategory } from './categories';
+export {
+	getCategory,
+	getCategories,
+	setCategories,
+	updateCategory,
+} from './categories';
 export {
 	registerBlockType,
 	registerBlockCollection,

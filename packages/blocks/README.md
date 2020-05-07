@@ -356,6 +356,18 @@ _Returns_
 
 -   `Array<WPBlockTypeCategory>`: Block categories.
 
+<a name="getCategory" href="#getCategory">#</a> **getCategory**
+
+Returns a single category by slug.
+
+_Parameters_
+
+-   _slug_ `string`: Category slug.
+
+_Returns_
+
+-   `(WPBlockTypeCategory|undefined)`: Block category, if exists.
+
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
 Returns an array with the child blocks of a given block.
