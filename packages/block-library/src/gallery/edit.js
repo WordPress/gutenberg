@@ -90,7 +90,6 @@ class GalleryEdit extends Component {
 		this.onFocusGalleryCaption = this.onFocusGalleryCaption.bind( this );
 		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
 		this.updateImagesSize = this.updateImagesSize.bind( this );
-		this.getValue = this.getValue.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -345,10 +344,6 @@ class GalleryEdit extends Component {
 		}
 	}
 
-	getValue() {
-		return this.props.attributes.images;
-	}
-
 	render() {
 		const { attributes, className, isSelected, noticeUI } = this.props;
 		const {
@@ -377,7 +372,6 @@ class GalleryEdit extends Component {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
 				value={ images }
-				getValue={ this.getValue }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }

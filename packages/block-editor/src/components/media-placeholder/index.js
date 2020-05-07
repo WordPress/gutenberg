@@ -65,7 +65,6 @@ export class MediaPlaceholder extends Component {
 		this.onFilesUpload = this.onFilesUpload.bind( this );
 		this.openURLInput = this.openURLInput.bind( this );
 		this.closeURLInput = this.closeURLInput.bind( this );
-		this.defaultGetValue = this.defaultGetValue.bind( this );
 	}
 
 	onlyAllowsImages() {
@@ -109,10 +108,6 @@ export class MediaPlaceholder extends Component {
 		this.onFilesUpload( event.target.files );
 	}
 
-	defaultGetValue() {
-		return this.props.value || [];
-	}
-
 	onFilesUpload( files ) {
 		const {
 			addToGallery,
@@ -121,7 +116,6 @@ export class MediaPlaceholder extends Component {
 			multiple,
 			onError,
 			onSelect,
-			getValue = this.defaultGetValue,
 		} = this.props;
 		let setMedia;
 		if ( multiple ) {
@@ -141,19 +135,22 @@ export class MediaPlaceholder extends Component {
 				setMedia = ( newMedia ) => {
 					// Remove any images this upload group is responsible for (lastMediaPassed).
 					// Their replacements are contained in newMedia.
-					const filteredMedia = getValue().filter( ( item ) => {
-						// If Item has id, only remove it if lastMediaPassed has an item with that id.
-						if ( item.id ) {
-							return ! lastMediaPassed.some(
-								// Be sure to convert to number for comparison.
-								( { id } ) => Number( id ) === Number( item.id )
+					const filteredMedia = ( this.props.value || [] ).filter(
+						( item ) => {
+							// If Item has id, only remove it if lastMediaPassed has an item with that id.
+							if ( item.id ) {
+								return ! lastMediaPassed.some(
+									// Be sure to convert to number for comparison.
+									( { id } ) =>
+										Number( id ) === Number( item.id )
+								);
+							}
+							// Compare transient images via .includes since gallery may append extra info onto the url.
+							return ! lastMediaPassed.some( ( { urlSlug } ) =>
+								item.url.includes( urlSlug )
 							);
 						}
-						// Compare transient images via .includes since gallery may append extra info onto the url.
-						return ! lastMediaPassed.some( ( { urlSlug } ) =>
-							item.url.includes( urlSlug )
-						);
-					} );
+					);
 					// Return the filtered media array along with newMedia.
 					onSelect( filteredMedia.concat( newMedia ) );
 					// Reset lastMediaPassed and set it with ids and urls from newMedia.
