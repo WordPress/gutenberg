@@ -6,61 +6,49 @@ import { Keyboard, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 import BlockMover from '../block-mover';
-import ShrinkBlockMobileToolbar from './shrink-block-mobile-toolbar';
+import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
 
 const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
-	order,
 	isStackedHorizontally,
-	allowShrinkToolbar,
-} ) => (
-	<View style={ styles.toolbar }>
-		{ allowShrinkToolbar ? (
-			<ShrinkBlockMobileToolbar
-				clientIds={ [ clientId ] }
-				isStackedHorizontally={ isStackedHorizontally }
-				onDelete={ onDelete }
-			/>
-		) : (
-			<>
+	blockWidth,
+} ) => {
+	const shouldWrapBlockMover = blockWidth <= 110;
+	const shouldWrapBlockSettings = blockWidth < 150;
+
+	return (
+		<View style={ styles.toolbar }>
+			{ ! shouldWrapBlockMover && (
 				<BlockMover
 					clientIds={ [ clientId ] }
 					isStackedHorizontally={ isStackedHorizontally }
 				/>
+			) }
 
-				<View style={ styles.spacer } />
+			<View style={ styles.spacer } />
 
-				<BlockSettingsButton.Slot />
+			{ ! shouldWrapBlockSettings && <BlockSettingsButton.Slot /> }
 
-				<ToolbarButton
-					title={ sprintf(
-						/* translators: accessibility text. %s: current block position (number). */
-						__( 'Remove block at row %s' ),
-						order + 1
-					) }
-					onClick={ onDelete }
-					icon={ trash }
-					extraProps={ {
-						hint: __( 'Double tap to remove the block' ),
-					} }
-				/>
-			</>
-		) }
-	</View>
-);
+			<BlockActionsMenu
+				clientIds={ [ clientId ] }
+				shouldWrapBlockMover={ shouldWrapBlockMover }
+				shouldWrapBlockSettings={ shouldWrapBlockSettings }
+				isStackedHorizontally={ isStackedHorizontally }
+				onDelete={ onDelete }
+			/>
+		</View>
+	);
+};
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {

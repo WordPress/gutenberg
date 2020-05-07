@@ -119,7 +119,6 @@ class InnerBlocks extends Component {
 			marginVertical,
 			marginHorizontal,
 			horizontalAlignment,
-			allowShrinkToolbar,
 		} = this.props;
 		const { templateInProcess } = this.state;
 
@@ -143,7 +142,6 @@ class InnerBlocks extends Component {
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={ onDeleteBlock }
-						allowShrinkToolbar={ allowShrinkToolbar }
 					/>
 				) }
 			</>
