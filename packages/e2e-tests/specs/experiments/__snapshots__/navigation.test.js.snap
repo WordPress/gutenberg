@@ -20,6 +20,6 @@ exports[`Navigation allows a navigation menu to be created using existing pages 
 
 exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1} /-->
+<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
 <!-- /wp:navigation -->"
 `;
