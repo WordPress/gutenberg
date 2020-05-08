@@ -14,7 +14,6 @@ import { ReadableContentView } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 
@@ -29,16 +28,9 @@ export class BlockListItem extends Component {
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
-			marginVertical = styles.defaultBlock.marginTop,
-			marginHorizontal = styles.defaultBlock.marginLeft,
-			isStackedHorizontally,
 			contentResizeMode,
-			contentStyle,
-			onAddBlock,
-			onDeleteBlock,
-			rootClientId,
 			shouldShowInnerBlockAppender,
-			parentWidth,
+			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
@@ -55,17 +47,7 @@ export class BlockListItem extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
-						marginVertical={ marginVertical }
-						marginHorizontal={ marginHorizontal }
-						rootClientId={ rootClientId }
-						onCaretVerticalPositionChange={
-							this.onCaretVerticalPositionChange
-						}
-						parentWidth={ parentWidth }
-						isStackedHorizontally={ isStackedHorizontally }
-						contentStyle={ contentStyle }
-						onAddBlock={ onAddBlock }
-						onDeleteBlock={ onDeleteBlock }
+						{ ...restProps }
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (

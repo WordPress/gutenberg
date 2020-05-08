@@ -246,8 +246,8 @@ export class BlockList extends Component {
 			rootClientId,
 			isStackedHorizontally,
 			parentWidth,
-			marginVertical,
-			marginHorizontal,
+			marginVertical = styles.defaultBlock.marginTop,
+			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 		return (
 			<BlockListItem
@@ -263,6 +263,9 @@ export class BlockList extends Component {
 				onDeleteBlock={ onDeleteBlock }
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
+				}
+				onCaretVerticalPositionChange={
+					this.onCaretVerticalPositionChange
 				}
 			/>
 		);
