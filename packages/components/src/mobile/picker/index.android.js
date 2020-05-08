@@ -9,13 +9,15 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BottomSheet from '../bottom-sheet';
+import styles from './styles.scss';
 
-export default class Picker extends Component {
+class Picker extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onClose = this.onClose.bind( this );
@@ -40,6 +42,12 @@ export default class Picker extends Component {
 	}
 
 	render() {
+		const { getStylesFromColorScheme } = this.props;
+		const separatorStyle = getStylesFromColorScheme(
+			styles.separator,
+			styles.separatorDark
+		);
+
 		return (
 			<BottomSheet
 				isVisible={ this.state.isVisible }
@@ -49,15 +57,22 @@ export default class Picker extends Component {
 			>
 				<View>
 					{ this.props.options.map( ( option, index ) => (
-						<BottomSheet.Cell
-							icon={ option.icon }
-							key={ index }
-							leftAlign={ this.props.leftAlign }
-							label={ option.label }
-							separatorType={ 'none' }
-							onPress={ () => this.onCellPress( option.value ) }
-							disabled={ option.disabled }
-						/>
+						<>
+							{ option.separated && (
+								<View style={ separatorStyle } />
+							) }
+							<BottomSheet.Cell
+								icon={ option.icon }
+								key={ index }
+								leftAlign={ this.props.leftAlign }
+								label={ option.label }
+								separatorType={ 'none' }
+								onPress={ () =>
+									this.onCellPress( option.value )
+								}
+								disabled={ option.disabled }
+							/>
+						</>
 					) ) }
 					{ ! this.props.hideCancelButton && (
 						<BottomSheet.Cell
@@ -71,3 +86,5 @@ export default class Picker extends Component {
 		);
 	}
 }
+
+export default withPreferredColorScheme( Picker );
