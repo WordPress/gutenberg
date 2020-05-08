@@ -89,7 +89,6 @@ function gutenberg_get_editor_styles() {
  */
 function gutenberg_edit_site_init( $hook ) {
 	global
-		$_wp_current_template_hierarchy,
 		$_wp_current_template_part_ids,
 		$current_screen;
 
@@ -146,31 +145,17 @@ function gutenberg_edit_site_init( $hook ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
 
-	// Get all templates by triggering `./template-loader.php`'s logic.
-	$template_getters  = array(
-		'get_embed_template',
-		'get_404_template',
-		'get_search_template',
-		'get_home_template',
-		'get_privacy_policy_template',
-		'get_post_type_archive_template',
-		'get_taxonomy_template',
-		'get_attachment_template',
-		'get_single_template',
-		'get_page_template',
-		'get_singular_template',
-		'get_category_template',
-		'get_tag_template',
-		'get_author_template',
-		'get_date_template',
-		'get_archive_template',
-	);
 	$template_ids      = array();
 	$template_part_ids = array();
-	foreach ( $template_getters as $template_getter ) {
-		call_user_func( $template_getter ); // This sets $_wp_current_template_hierarchy.
+	foreach ( get_template_types() as $template_type ) {
+		// Skip 'embed' for now because it is not a regular template type.
+		// Skip 'index' because it's a fallback that we handle differently.
+		if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
+			continue;
+		}
 
-		$current_template_post = gutenberg_find_template_post( $_wp_current_template_hierarchy );
+		$template_hierarchy    = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
+		$current_template_post = gutenberg_find_template_post( $template_hierarchy );
 		if ( isset( $current_template_post ) ) {
 			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
 		}
@@ -178,17 +163,13 @@ function gutenberg_edit_site_init( $hook ) {
 			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
 		}
 
-		$_wp_current_template_hierarchy = null;
-		$_wp_current_template_part_ids  = null;
+		$_wp_current_template_part_ids = null;
 	}
-	get_front_page_template();
-	get_index_template();
-	$current_template_post                             = gutenberg_find_template_post( $_wp_current_template_hierarchy );
-	$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
-	if ( isset( $_wp_current_template_part_ids ) ) {
-		$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
-	}
-	$settings['templateId']      = $current_template_post->ID;
+
+	$current_template_id = $template_ids['front-page'];
+
+	$settings['templateId']      = $current_template_id;
+	$settings['homeTemplateId']  = $current_template_id;
 	$settings['templateType']    = 'wp_template';
 	$settings['templateIds']     = array_values( $template_ids );
 	$settings['templatePartIds'] = array_values( $template_part_ids );
@@ -206,7 +187,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'/wp/v2/types?context=edit',
 		'/wp/v2/taxonomies?per_page=-1&context=edit',
 		'/wp/v2/themes?status=active',
-		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_post->ID ),
+		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 	$preload_data  = array_reduce(
