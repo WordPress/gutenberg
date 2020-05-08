@@ -122,27 +122,28 @@
 }
 
 // Default / Light styles
-.wp-block-navigation-link,
-.is-style-light .wp-block-navigation-link {
+.wp-block-navigation .wp-block-navigation-link,
+.wp-block-navigation.is-style-light .wp-block-navigation-link {
 	&:not(.has-text-color) .wp-block-navigation-link__content {
 		color: $light-style-sub-menu-text-color;
 	}
 }
-.is-style-light:not(.has-background) .wp-block-navigation__container {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__container,
+.wp-block-navigation.is-style-light:not(.has-background) .wp-block-navigation__container {
 	background-color: $light-style-sub-menu-background-color;
 }
 
 // Dark styles.
-.is-style-dark .wp-block-navigation-link {
+.wp-block-navigation.is-style-dark .wp-block-navigation-link {
 	&:not(.has-text-color) .wp-block-navigation-link__content {
 		color: $dark-style-sub-menu-text-color;
 	}
 }
-.is-style-dark:not(.has-background) .wp-block-navigation__container {
+.wp-block-navigation.is-style-dark:not(.has-background) .wp-block-navigation__container {
 	background-color: $dark-style-sub-menu-background-color;
 }
 
-// Jutification.
+// Justification.
 .items-justified-left > ul {
 	justify-content: flex-start;
 }
