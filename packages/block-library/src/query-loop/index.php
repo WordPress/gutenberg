@@ -50,7 +50,8 @@ function register_block_core_query_loop() {
 	register_block_type_from_metadata(
 		__DIR__ . '/query-loop',
 		array(
-			'render_callback' => 'render_block_core_query_loop',
+			'render_callback'   => 'render_block_core_query_loop',
+			'skip_inner_blocks' => true,
 		)
 	);
 }

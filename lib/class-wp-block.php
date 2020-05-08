@@ -179,11 +179,13 @@ class WP_Block {
 		$is_dynamic    = ! $no_dynamic && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
 
-		$index = 0;
-		foreach ( $this->inner_content as $chunk ) {
-			$block_content .= is_string( $chunk ) ?
-				$chunk :
-				$this->inner_blocks[ $index++ ]->render();
+		if ( $no_dynamic || empty( $this->block_type->skip_inner_blocks ) ) {
+			$index = 0;
+			foreach ( $this->inner_content as $chunk ) {
+				$block_content .= is_string( $chunk ) ?
+					$chunk :
+					$this->inner_blocks[ $index++ ]->render();
+			}
 		}
 
 		if ( $is_dynamic ) {
