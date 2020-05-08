@@ -69,7 +69,7 @@ program
 					);
 					const answers = await inquirer.prompt( filteredPrompts );
 
-					await scaffold( answers.template, {
+					await scaffold( template, {
 						...defaultValues,
 						...optionsValues,
 						...answers,
