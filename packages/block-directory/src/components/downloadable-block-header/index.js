@@ -48,6 +48,7 @@ export function DownloadableBlockHeader( {
 			<Button
 				isSecondary
 				isBusy={ isLoading }
+				disabled={ isLoading }
 				onClick={ ( event ) => {
 					event.preventDefault();
 					if ( ! isLoading ) {
