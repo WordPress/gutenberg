@@ -18,7 +18,7 @@ interface EnterDeleter {
 class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) : TextWatcher {
 
     private val aztecTextRef: WeakReference<AztecText?> = WeakReference(aztecText)
-    private lateinit var textBefore : SpannableStringBuilder
+    private lateinit var textBefore: SpannableStringBuilder
     private var start: Int = -1
     private var selStart: Int = 0
     private var selEnd: Int = 0
@@ -46,7 +46,12 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
                 if (newTextCopy[this.start] == Constants.NEWLINE) {
                     done = false
                     aztecText.editableText.setSpan(EnterPressedUnderway(), 0, 0, Spanned.SPAN_USER)
-                    aztecKeyListener.onEnterKey(newTextCopy.replace(this.start, this.start+1, ""), true, selStart, selEnd)
+                    aztecKeyListener.onEnterKey(
+                            newTextCopy.replace(this.start, this.start + 1, ""),
+                            true,
+                            selStart,
+                            selEnd
+                    )
                 }
             }
         }
