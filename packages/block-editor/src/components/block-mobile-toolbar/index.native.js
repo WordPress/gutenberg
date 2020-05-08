@@ -17,18 +17,22 @@ import BlockMover from '../block-mover';
 import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
 
+const BREAKPOINTS = {
+	wrapSettings: 65,
+	wrapMover: 150,
+};
 const BlockMobileToolbar = ( {
 	clientId,
 	onDelete,
 	isStackedHorizontally,
 	blockWidth,
 } ) => {
-	const shouldWrapBlockSettings = blockWidth < 65;
-	const shouldWrapBlockMover = blockWidth <= 150;
+	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
+	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
 
 	return (
 		<View style={ styles.toolbar }>
-			{ ! shouldWrapBlockMover && (
+			{ ! wrapBlockMover && (
 				<BlockMover
 					clientIds={ [ clientId ] }
 					isStackedHorizontally={ isStackedHorizontally }
@@ -37,12 +41,12 @@ const BlockMobileToolbar = ( {
 
 			<View style={ styles.spacer } />
 
-			{ ! shouldWrapBlockSettings && <BlockSettingsButton.Slot /> }
+			{ ! wrapBlockSettings && <BlockSettingsButton.Slot /> }
 
 			<BlockActionsMenu
 				clientIds={ [ clientId ] }
-				shouldWrapBlockMover={ shouldWrapBlockMover }
-				shouldWrapBlockSettings={ shouldWrapBlockSettings }
+				wrapBlockMover={ wrapBlockMover }
+				wrapBlockSettings={ wrapBlockSettings }
 				isStackedHorizontally={ isStackedHorizontally }
 				onDelete={ onDelete }
 			/>
