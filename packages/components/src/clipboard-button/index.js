@@ -57,7 +57,7 @@ export default function ClipboardButton( {
 			clipboard.current.destroy();
 			clearTimeout( timeoutId );
 		};
-	}, [] );
+	}, [ onCopy, onFinishCopy, text ] );
 
 	const classes = classnames( 'components-clipboard-button', className );
 
