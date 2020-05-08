@@ -50,20 +50,17 @@ module.exports = async function(
 		licenseURI,
 		textdomain: namespace,
 	};
+	const outputFiles = await getOutputFiles( templateName );
 	await Promise.all(
-		getOutputFiles( templateName ).map( async ( file ) => {
+		outputFiles.map( async ( file ) => {
 			const template = await readFile(
-				join(
-					__dirname,
-					`templates/${ templateName }/${ file }.mustache`
-				),
+				join( __dirname, `templates/${ templateName }/${ file }` ),
 				'utf8'
 			);
 			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ file.replace(
-				/\$slug/g,
-				slug
-			) }`;
+			const outputFilePath = `${ slug }/${ file
+				.replace( /\$slug/g, slug )
+				.replace( '.mustache', '' ) }`;
 			await makeDir( dirname( outputFilePath ) );
 			writeFile( outputFilePath, render( template, view ) );
 		} )
