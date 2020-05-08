@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -19,41 +19,11 @@ import {
 	INSTALL_ERROR_NOTICE_ID,
 } from '../../store/constants';
 
-/**
- * Returns either installAndDownload or download function.
- *
- * @param {Object} item The block item.
- * @param {Object} errorNotices An object with errors. Ie: "my-block/block : block-download-error"
- * @param {Function} installAndDownload The function that installs and downloads the block.
- * @param {Function} download The function that downloads the block.
- *
- * @return {Function} Function to continue install process.
- */
-const getNoticeCallback = (
-	item,
-	errorNotices,
-	installAndDownload,
-	download
-) => {
-	// We don't want to try installing again, the API will throw an install error
-	if (
-		errorNotices[ item.id ] &&
-		errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
-	) {
-		return download;
-	}
-
-	return installAndDownload;
-};
-
 export function DownloadableBlocksList( {
 	items,
 	onHover = noop,
 	children,
-	isLoading,
-	errorNotices,
-	installAndDownload,
-	download,
+	install,
 } ) {
 	if ( ! items.length ) {
 		return null;
@@ -67,20 +37,13 @@ export function DownloadableBlocksList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
 			{ items.map( ( item ) => {
-				const callBack = getNoticeCallback(
-					item,
-					errorNotices,
-					installAndDownload,
-					download
-				);
-
 				return (
 					<DownloadableBlockListItem
 						key={ item.id }
 						className={ getBlockMenuDefaultClassName( item.id ) }
 						icons={ item.icons }
 						onClick={ () => {
-							callBack( item );
+							install( item );
 							onHover( null );
 						} }
 						onFocus={ () => onHover( item ) }
@@ -88,7 +51,6 @@ export function DownloadableBlocksList( {
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
 						item={ item }
-						isLoading={ isLoading }
 					/>
 				);
 			} ) }
@@ -99,20 +61,7 @@ export function DownloadableBlocksList( {
 }
 
 export default compose(
-	withSelect( ( select ) => {
-		const { getErrorNotices, isInstalling } = select(
-			'core/block-directory'
-		);
-
-		const errorNotices = getErrorNotices();
-		const isLoading = isInstalling();
-
-		return {
-			errorNotices,
-			isLoading,
-		};
-	} ),
-	withDispatch( ( dispatch, props ) => {
+	withDispatch( ( dispatch, props, { select } ) => {
 		const {
 			downloadBlock,
 			installBlock,
@@ -121,8 +70,9 @@ export default compose(
 			setIsInstalling,
 		} = dispatch( 'core/block-directory' );
 		const { onSelect } = props;
+		const errorNotices = select( 'core/block-directory' ).getErrorNotices();
 
-		const download = ( item ) => {
+		const downloadAssets = ( item ) => {
 			clearErrorNotice( item.id );
 			setIsInstalling( true );
 
@@ -139,7 +89,16 @@ export default compose(
 			downloadBlock( item, onDownloadSuccess, onDownloadError );
 		};
 
-		const install = ( item, onSuccess ) => {
+		const installPlugin = ( item, onSuccess ) => {
+			if (
+				errorNotices[ item.id ] &&
+				errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
+			) {
+				// Install has already run & the error was in downloading the assets, so we
+				// can skip the install step to prevent re-downloading the plugin.
+				return onSuccess();
+			}
+
 			clearErrorNotice( item.id );
 			setIsInstalling( true );
 
@@ -152,14 +111,13 @@ export default compose(
 		};
 
 		return {
-			installAndDownload( item ) {
+			install( item ) {
 				const onSuccess = () => {
-					download( item );
+					downloadAssets( item );
 				};
 
-				install( item, onSuccess );
+				installPlugin( item, onSuccess );
 			},
-			download,
 		};
 	} )
 )( DownloadableBlocksList );
