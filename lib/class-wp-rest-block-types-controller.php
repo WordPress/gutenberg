@@ -2,7 +2,7 @@
 /**
  * REST API: WP_REST_Block_Types_Controller class
  *
- * @since      5.4.0
+ * @since      5.5.0
  * @subpackage REST_API
  * @package    WordPress
  */
