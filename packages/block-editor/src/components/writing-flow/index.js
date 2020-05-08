@@ -537,13 +537,6 @@ export default function WritingFlow( { children } ) {
 			// Moving from block multi-selection to single block selection
 			moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				container.current,
-				true
-			);
 		} else if (
 			isHorizontal &&
 			getSelection().isCollapsed &&
