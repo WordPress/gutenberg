@@ -160,8 +160,8 @@ describe( 'adding blocks from block directory', () => {
 		// Add the block
 		await addBtn.click();
 
-		// To be honest, not sure why this is necessary, but the getEditedPostContent returns empty without querying wp.data first.
-		await getAllBlocks();
+		// Delay to let block script load
+		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();
