@@ -34,7 +34,10 @@ const BlockActionsMenu = ( {
 
 	const {
 		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
-		actionTitle: { backward: backwardButtonTitle, forward: forwardButtonTitle },
+		actionTitle: {
+			backward: backwardButtonTitle,
+			forward: forwardButtonTitle,
+		},
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	const deleteOption = {
