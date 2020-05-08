@@ -14,12 +14,13 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Query' ),
+	title: __( 'Query Loop' ),
+	parent: [ 'core/query' ],
 	supports: {
+		inserter: false,
+		reusable: false,
 		html: false,
 	},
 	edit,
 	save,
 };
-
-export { useQueryContext } from './edit';

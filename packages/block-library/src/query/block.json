@@ -13,5 +13,9 @@
 				"offset": 0
 			}
 		}
+	},
+	"providesContext": {
+		"id": "id",
+		"query": "query"
 	}
 }

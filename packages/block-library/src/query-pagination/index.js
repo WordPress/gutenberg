@@ -8,18 +8,17 @@ import { __ } from '@wordpress/i18n';
  */
 import metadata from './block.json';
 import edit from './edit';
-import save from './save';
 
 const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Query' ),
+	title: __( 'Query Pagination' ),
+	parent: [ 'core/query' ],
 	supports: {
+		inserter: false,
+		reusable: false,
 		html: false,
 	},
 	edit,
-	save,
 };
-
-export { useQueryContext } from './edit';
