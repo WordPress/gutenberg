@@ -303,7 +303,10 @@ class BottomSheetCell extends Component {
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
 				<View
-					style={ cellContainerStyles }
+					style={ [
+						cellContainerStyles,
+						disabled && styles.disabled,
+					] }
 					pointerEvents={ containerPointerEvents }
 				>
 					<View style={ rowContainerStyles }>
