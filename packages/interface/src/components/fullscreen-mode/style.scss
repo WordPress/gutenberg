@@ -6,7 +6,10 @@ body.is-fullscreen-mode {
 		height: calc(100% + #{ $admin-bar-height });
 
 		// Hide the top adminbar toolbar.
-		#wpadminbar {
+		#wpadminbar,
+		// The sidebar background div is strange and seems entirely useless. Plus it
+		// has some strange rendering bugs in Safari with regards to transitions.
+		#adminmenuback {
 			display: none;
 		}
 
@@ -14,15 +17,27 @@ body.is-fullscreen-mode {
 		#adminmenumain {
 			position: relative;
 			left: -160px;
-			transition: left 0.12s ease-in-out;
+			transition: all 0.12s ease-in-out;
+
+			.wp-submenu {
+				display: none;
+			}
 		}
 
 		#adminmenu {
 			margin-top: 60px;
 		}
 
+		// This ensure's the sidebar's background color is always using
+		// all vertical space.
+		#adminmenuwrap {
+			min-height: 100vh;
+		}
+
 		.interface-interface-skeleton__header {
+			// Make room for the admin-menu-toggle button
 			margin-left: 60px;
+
 			transition: margin-left 0.12s ease-in-out;
 		}
 
@@ -48,8 +63,13 @@ body.is-showing-admin-menu {
 	// Bring the sidebar into view.
 	#adminmenumain {
 		left: 0;
+
+		.wp-submenu {
+			display: block;
+		}
 	}
 
+	// Make room for the sidebar by moving the skeleton elements over
 	.interface-interface-skeleton__header,
 	.interface-interface-skeleton__body,
 	.interface-interface-skeleton__footer {
@@ -58,6 +78,7 @@ body.is-showing-admin-menu {
 }
 
 
+// The sidebar menu can be collapsed to show only icons.
 body.is-showing-admin-menu.folded {
 	.interface-interface-skeleton__header {
 		margin-left: 60px;
