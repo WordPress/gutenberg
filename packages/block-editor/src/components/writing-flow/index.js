@@ -478,6 +478,7 @@ export default function WritingFlow( { children } ) {
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
 			if ( isKeyboardEvent.primary( event ) ) {
+				console.log( 'the entirely selected just got executed.' );
 				entirelySelected.current = isEntirelySelected( target );
 			}
 
@@ -547,11 +548,12 @@ export default function WritingFlow( { children } ) {
 			);
 
 			if ( closestTabbable ) {
-				placeCaretAtVerticalEdge(
+				console.log( 'vertical edge selection' );
+				/*				placeCaretAtVerticalEdge(
 					closestTabbable,
 					isReverse,
 					verticalRect.current
-				);
+				);*/
 				event.preventDefault();
 			}
 		} else if (
