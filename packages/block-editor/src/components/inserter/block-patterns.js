@@ -81,7 +81,6 @@ function BlockPatterns( { patterns, onInsert, filterValue } ) {
 					: _x( 'All', 'patterns categories' )
 			}
 		>
-			Test gutenberg zoom
 			{ filteredPatterns.map( ( pattern, index ) =>
 				currentShownPatterns[ index ] === pattern ? (
 					<BlockPattern
