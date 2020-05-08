@@ -1,0 +1,44 @@
+/**
+ * External dependencies
+ */
+import { View as BaseToolbarItem } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef, useContext } from '@wordpress/element';
+import warning from '@wordpress/warning';
+
+/**
+ * Internal dependencies
+ */
+import ToolbarContext from '../toolbar-context';
+
+function ToolbarItem( { children, ...props }, ref ) {
+	const accessibleToolbarState = useContext( ToolbarContext );
+
+	if ( typeof children !== 'function' ) {
+		warning(
+			'`ToolbarItem` is a generic headless component that accepts only function children props'
+		);
+		return null;
+	}
+
+	const allProps = { ...props, ref, 'data-experimental-toolbar-item': true };
+
+	if ( ! accessibleToolbarState ) {
+		return children( allProps );
+	}
+
+	return (
+		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
+			{ ( htmlProps ) =>
+				// Overwriting BaseToolbarItem's onMouseDown since it disables drag
+				// and drop
+				children( { ...htmlProps, onMouseDown: allProps.onMouseDown } )
+			}
+		</BaseToolbarItem>
+	);
+}
+
+export default forwardRef( ToolbarItem );
