@@ -4,7 +4,7 @@
 const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 const { command } = require( 'execa' );
-const { existsSync, readdirSync, lstatSync, unlinkSync, rmdirSync } = require( 'fs' );
+const { existsSync  } = require( 'fs' );
 const { join } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const makeDir = require( 'make-dir' );
@@ -150,7 +150,7 @@ const downloadExternalTemplate = async templateName => {
 		return true;
 
 	} catch ( error ) {
-		log.error( 'There has been an error:' );
+		log.error( 'There has been an error while trying to download the package from NPM:' );
 		log.error( error );
 		return false;
 	}
