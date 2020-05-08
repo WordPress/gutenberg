@@ -3,7 +3,6 @@
  */
 import {
 	Platform,
-	TouchableHighlight,
 	TouchableOpacity,
 	TouchableNativeFeedback,
 	View,
@@ -26,13 +25,13 @@ const TouchableRipple = ( {
 	style,
 	onPress,
 	disabled: disabledProp,
-	children: rippleChildren,
+	children,
+	activeOpacity,
+	getStylesFromColorScheme,
 	accessible,
 	accessibilityLabel,
 	accessibilityRole,
 	accessibilityHint,
-	activeOpacity,
-	getStylesFromColorScheme,
 } ) => {
 	const borderless = false;
 
@@ -40,30 +39,10 @@ const TouchableRipple = ( {
 		Platform.OS === 'android' &&
 		Platform.Version >= ANDROID_VERSION_LOLLIPOP;
 
-	const useTouchableOpacity = Platform.OS === 'ios';
-
 	const disabled = disabledProp || ! onPress;
 	const rippleColor = getStylesFromColorScheme(
 		rippleStyles.ripple,
 		rippleStyles.rippleDark
-	);
-
-	const TouchableComponentWrapper = ( {
-		component: TouchableComponent,
-		children,
-		...rest
-	} ) => (
-		<TouchableComponent
-			accessible={ accessible }
-			accessibilityLabel={ accessibilityLabel }
-			accessibilityRole={ accessibilityRole }
-			accessibilityHint={ accessibilityHint }
-			disabled={ disabled }
-			onPress={ onPress }
-			{ ...rest }
-		>
-			{ children }
-		</TouchableComponent>
 	);
 
 	if ( isTouchableNativeSupported ) {
@@ -75,8 +54,13 @@ const TouchableRipple = ( {
 			borderless;
 
 		return (
-			<TouchableComponentWrapper
-				component={ TouchableNativeFeedback }
+			<TouchableNativeFeedback
+				accessible={ accessible }
+				accessibilityLabel={ accessibilityLabel }
+				accessibilityRole={ accessibilityRole }
+				accessibilityHint={ accessibilityHint }
+				onPress={ onPress }
+				disabled={ disabled }
 				useForeground={ useForeground }
 				background={ TouchableNativeFeedback.Ripple(
 					rippleColor,
@@ -84,24 +68,25 @@ const TouchableRipple = ( {
 				) }
 			>
 				<View style={ [ borderless && rippleStyles.overflow, style ] }>
-					{ rippleChildren }
+					{ children }
 				</View>
-			</TouchableComponentWrapper>
+			</TouchableNativeFeedback>
 		);
 	}
 
-	return useTouchableOpacity ? (
-		<TouchableComponentWrapper
-			component={ TouchableOpacity }
+	return (
+		<TouchableOpacity
+			accessible={ accessible }
+			accessibilityLabel={ accessibilityLabel }
+			accessibilityRole={ accessibilityRole }
+			accessibilityHint={ accessibilityHint }
+			onPress={ onPress }
+			disabled={ disabled }
 			activeOpacity={ activeOpacity }
 			style={ style }
-		/>
-	) : (
-		<TouchableComponentWrapper
-			component={ TouchableHighlight }
-			style={ [ borderless && rippleStyles.overflow, style ] }
-			underlayColor={ rippleColor }
-		/>
+		>
+			{ children }
+		</TouchableOpacity>
 	);
 };
 
