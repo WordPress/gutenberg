@@ -114,7 +114,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 			if ( $namespace ) {
 				$pieces          = explode( '/', $obj->name );
-				$block_namespace = array_shift( $pieces );
+				$block_namespace = $pieces[0];
 				if ( $namespace !== $block_namespace ) {
 					continue;
 				}
