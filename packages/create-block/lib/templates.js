@@ -74,12 +74,13 @@ const templates = {
 
 const getTemplate = async ( templateName ) => {
 
-	if ( await isCoreTemplate( templateName ) ) {
+	const isCoreTemplate = await checkIsCoreTemplate( templateName );
+	if ( isCoreTemplate ) {
 		return templates[ templateName ];
 	}
 
 	// throw a CLIError if the the template is neither a core one nor an external one
-	if ( ! await isExternalTemplate( templateName ) && ! await isCoreTemplate( templateName ) ) {
+	if ( ! await checkIsExternalTemplate( templateName ) && ! isCoreTemplate ) {
 		throw new CLIError(
 			`Invalid template type name. Either use one of the Core templates: ${ Object.keys(
 				templates
@@ -119,9 +120,9 @@ const hasWPScriptsEnabled = ( templateName ) => {
 	return getTemplate( templateName ).wpScriptsEnabled || false;
 };
 
-const isCoreTemplate = async templateName => templates[ templateName ] || false;
+const checkIsCoreTemplate = async templateName => templates[ templateName ] || false;
 
-const isExternalTemplate = async templateName => {
+const checkIsExternalTemplate = async templateName => {
 	try {
 		await command( `npm view ${ templateName }` );
 		return true;
@@ -161,6 +162,6 @@ module.exports = {
 	getOutputFiles,
 	getPrompts,
 	hasWPScriptsEnabled,
-	isCoreTemplate,
-	isExternalTemplate,
+	checkIsCoreTemplate,
+	checkIsExternalTemplate,
 };
