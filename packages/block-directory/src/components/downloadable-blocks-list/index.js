@@ -59,13 +59,14 @@ function DownloadableBlocksList( {
 }
 
 export default compose(
-	withDispatch( ( dispatch, props ) => {
+	withDispatch( ( dispatch, props, { select } ) => {
 		const { installBlock, downloadBlock } = dispatch(
 			'core/block-directory'
 		);
 		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
 		const { removeBlocks } = dispatch( 'core/block-editor' );
-		const { onSelect } = props;
+		const { canInsertBlockType } = select( 'core/block-editor' );
+		const { onSelect, rootClientId } = props;
 
 		return {
 			downloadAndInstallBlock: ( item ) => {
@@ -89,6 +90,17 @@ export default compose(
 				};
 
 				const onSuccess = () => {
+					if ( ! canInsertBlockType( item.name, rootClientId ) ) {
+						createErrorNotice(
+							__( 'You can’t add that block here.' ),
+							{
+								id: INSTALL_ERROR_NOTICE_ID,
+							}
+						);
+						return;
+					}
+
+					// Insert block.
 					const createdBlock = onSelect( item );
 
 					const onInstallBlockError = () => {

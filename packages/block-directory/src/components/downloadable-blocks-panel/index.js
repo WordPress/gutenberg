@@ -20,6 +20,7 @@ function DownloadableBlocksPanel( {
 	isLoading,
 	isWaiting,
 	debouncedSpeak,
+	rootClientId,
 } ) {
 	if ( ! hasPermission ) {
 		debouncedSpeak(
@@ -76,6 +77,7 @@ function DownloadableBlocksPanel( {
 				items={ downloadableItems }
 				onSelect={ onSelect }
 				onHover={ onHover }
+				rootClientId={ rootClientId }
 			/>
 		</Fragment>
 	);

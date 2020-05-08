@@ -278,6 +278,7 @@ function InserterBlockList( {
 					onHover,
 					filterValue,
 					hasItems,
+					rootClientId,
 				} }
 			>
 				{ ( fills ) => {

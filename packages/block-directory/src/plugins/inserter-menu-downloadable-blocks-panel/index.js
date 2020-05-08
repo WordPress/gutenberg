@@ -21,7 +21,13 @@ function InserterMenuDownloadableBlocksPanel() {
 
 	return (
 		<__experimentalInserterMenuExtension>
-			{ ( { onSelect, onHover, filterValue, hasItems } ) => {
+			{ ( {
+				onSelect,
+				onHover,
+				filterValue,
+				hasItems,
+				rootClientId,
+			} ) => {
 				if ( hasItems || ! filterValue ) {
 					return null;
 				}
@@ -36,6 +42,7 @@ function InserterMenuDownloadableBlocksPanel() {
 						onHover={ onHover }
 						filterValue={ debouncedFilterValue }
 						isWaiting={ filterValue !== debouncedFilterValue }
+						rootClientId={ rootClientId }
 					/>
 				);
 			} }
