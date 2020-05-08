@@ -195,10 +195,10 @@ PODS:
     - React
   - react-native-slider (2.0.7):
     - React
-  - react-native-video (5.0.1):
+  - react-native-video (5.0.2):
     - React
-    - react-native-video/Video (= 5.0.1)
-  - react-native-video/Video (5.0.1):
+    - react-native-video/Video (= 5.0.2)
+  - react-native-video/Video (5.0.2):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -241,8 +241,8 @@ PODS:
     - React
   - RNTAztecView (1.27.1):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.18.0)
-  - WordPress-Aztec-iOS (1.18.0)
+    - WordPress-Aztec-iOS (~> 1.19.0)
+  - WordPress-Aztec-iOS (1.19.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -380,7 +380,7 @@ SPEC CHECKSUMS:
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
-  react-native-video: 331eaf96cb034fedcc27f4f6ada3ac3cf6c0a78a
+  react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -393,8 +393,8 @@ SPEC CHECKSUMS:
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: 4b7dc7d72fad7778f03c70441450dc311eea7d2b
-  WordPress-Aztec-iOS: fae5d158879dfd6f36c8d0ff0cc111a0b8e36790
+  RNTAztecView: dc2364760fad53f52defde7c01be765e77b9ba19
+  WordPress-Aztec-iOS: fb6ea6409a5228292568f665eb22ea0a0aa7ad7e
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
 PODFILE CHECKSUM: 8fc85c086e46c9bb555a0c4ebda2e57ceae0a8d6
