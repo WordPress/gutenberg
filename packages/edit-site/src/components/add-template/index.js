@@ -30,7 +30,7 @@ export default function AddTemplate( {
 	);
 	const { saveEntityRecord } = useDispatch( 'core' );
 
-	const [ slug, _setSlug ] = useState();
+	const [ slug, _setSlug ] = useState( '' );
 	const [ help, setHelp ] = useState();
 	const setSlug = useCallback(
 		( nextSlug ) => {
