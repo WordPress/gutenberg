@@ -53,7 +53,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 						'type'        => 'string',
 					),
 					'namespace' => array(
-						'description' => __( 'Block namsspace', 'gutenberg' ),
+						'description' => __( 'Block namespace', 'gutenberg' ),
 						'type'        => 'string',
 					),
 				),
