@@ -1,7 +1,8 @@
 buildscript {
     def buildGutenbergMobileJSBundle =
             System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
-            ? false : rootProject.ext.buildGutenbergMobileJSBundle
+            ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                    && rootProject.ext.buildGutenbergMobileJSBundle)
 
     repositories {
         jcenter()
@@ -29,7 +30,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 def buildGutenbergMobileJSBundle =
         System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
-                ? false : rootProject.ext.buildGutenbergMobileJSBundle
+        ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                && rootProject.ext.buildGutenbergMobileJSBundle)
 
 if (buildGutenbergMobileJSBundle) {
     println 'Building the Gutenberg Mobile JS bundle'
