@@ -33,8 +33,7 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url:
-									'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-3471423.jpg',
+								url: 'https://cldup.com/niJL8UbTZH-3000x3000.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'full',
@@ -64,8 +63,7 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url:
-									'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-1595385.jpeg',
+								url: 'https://cldup.com/NTV4PW_Xtw-3000x3000.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'full',
@@ -95,8 +93,7 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url:
-									'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-68562.jpg?w=1024',
+								url: 'https://cldup.com/CL1KK71EsH-1200x1200.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'large',
