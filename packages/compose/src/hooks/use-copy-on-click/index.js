@@ -8,6 +8,17 @@ import Clipboard from 'clipboard';
  */
 import { useRef, useEffect, useState } from '@wordpress/element';
 
+/**
+ * Copies the text to the clipboard when the element is clicked.
+ *
+ * @param {Object}          ref     Reference with the element.
+ * @param {string|Function} text    The text to copy.
+ * @param {number}          timeout Optional timeout to reset the returned
+ *                                  state. 4 seconds by default.
+ *
+ * @return {boolean} Whether or not the text has been copied. Resets after the
+ *                   timeout.
+ */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	const clipboard = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
