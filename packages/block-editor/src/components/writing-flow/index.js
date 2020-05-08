@@ -15,7 +15,6 @@ import {
 	isTextField,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
 	isEntirelySelected,
 } from '@wordpress/dom';
 import {
@@ -478,7 +477,6 @@ export default function WritingFlow( { children } ) {
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
 			if ( isKeyboardEvent.primary( event ) ) {
-				console.log( 'the entirely selected just got executed.' );
 				entirelySelected.current = isEntirelySelected( target );
 			}
 
@@ -546,16 +544,6 @@ export default function WritingFlow( { children } ) {
 				container.current,
 				true
 			);
-
-			if ( closestTabbable ) {
-				console.log( 'vertical edge selection' );
-				/*				placeCaretAtVerticalEdge(
-					closestTabbable,
-					isReverse,
-					verticalRect.current
-				);*/
-				event.preventDefault();
-			}
 		} else if (
 			isHorizontal &&
 			getSelection().isCollapsed &&
