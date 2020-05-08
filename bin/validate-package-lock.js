@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
+// This script validates `package-lock.json` to avoid the introduction of an
+// erroneous `"resolved": false` value. It appears to be related to an upstream
+// unresolved issue with NPM. If the upstream issue is resolved, this script
+// should no longer be necessary.
+//
+// See: https://github.com/npm/cli/issues/1138
+
 /**
  * External dependencies
  */
