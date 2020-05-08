@@ -3,7 +3,6 @@
  */
 const inquirer = require( 'inquirer' );
 const program = require( 'commander' );
-const { join } = require( 'path' );
 const { pickBy, startCase } = require( 'lodash' );
 
 /**
@@ -63,11 +62,12 @@ program
 					};
 					await scaffold( template, answers );
 				} else {
-					const propmpts = await getPrompts( template ).filter(
+					const propmpts = await getPrompts( template );
+					const filteredPrompts = propmpts.filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
-					const answers = await inquirer.prompt( propmpts );
+					const answers = await inquirer.prompt( filteredPrompts );
 					await scaffold( template, {
 						...defaultValues,
 						...optionsValues,
