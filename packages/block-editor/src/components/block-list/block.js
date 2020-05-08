@@ -240,7 +240,7 @@ const applyWithSelect = withSelect(
 		// is not correct.
 		const { name, attributes, isValid } = block || {};
 
-		// Do not add new properties here, use `useDispatch` instead to avoid
+		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
 		return {
 			isMultiSelected: isBlockMultiSelected( clientId ),
