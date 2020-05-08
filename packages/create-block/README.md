@@ -38,7 +38,7 @@ $ npm init @wordpress/block [options] [slug]
 Options:
 ```
 -V, --version                output the version number
--t, --template <name>        template type name, allowed values: "es5", "esnext" (default: "esnext")
+-t, --template <name>        template name: "es5", "esnext" or the name of an external npm package  (default: "esnext")
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block
 --short-description <value>  short description for the block
@@ -65,9 +65,9 @@ More examples:
 
 When you scaffold a block, you must provide at least a `slug` name, the `namespace` which usually corresponds to either the `theme` or `plugin` name, and the `category`. In most cases, we recommended pairing blocks with plugins rather than themes, because only using plugin ensures that all blocks still work when your theme changes.
 
-## Available Commands
+## Available Commands [ESNext template]
 
-Inside that bootstrapped directory _(it doesn't apply to `es5` template)_, you can run several commands:
+When bootstraped with the `esnext` templateyou can run several commands inside the directory:
 
 ```bash
 $ npm start
@@ -98,6 +98,53 @@ Lints JavaScript files. [Learn more](/packages/scripts#lint-js).
 $ npm run packages-update
 ```
 Updates WordPress packages to the latest version. [Learn more](/packages/scripts#packages-update).
+
+## External Templates
+Since version 0.12.0 it is possible to use external templates hosted on NPM. These templates need to contain `.mustache` files that will be used in the scaffolding and one `template.json` for the metadata. 
+
+### Availabe Variables: 
+- `namespace`
+- `slug`
+- `title`
+- `textdomain`
+- `description`
+- `category`
+- `dashicon`
+- `license`
+- `licenseURI`
+- `namespaceSnakeCase`
+- `slugSnakeCase`
+
+### `template.json`
+```json
+{
+    "defaultValues": {
+        "namespace": "create-block",
+        "slug": "esnext-example",
+        "title": "ESNext Example",
+        "description":
+            "Example block written with ESNext standard and JSX support – build step required.",
+        "dashicon": "smiley",
+        "category": "widgets",
+        "author": "The WordPress Contributors",
+        "license": "GPL-2.0-or-later",
+        "licenseURI": "https://www.gnu.org/licenses/gpl-2.0.html",
+        "version": "0.1.0"
+    },
+    "outputFiles": [
+        ".editorconfig",
+        ".gitignore",
+        "editor.css",
+        "src/edit.js",
+        "src/index.js",
+        "src/save.js",
+        "$slug.php",
+        "style.css",
+        "readme.txt"
+    ],
+    "wpScriptsEnabled": true
+}
+```
 
 ## WP-CLI
 
