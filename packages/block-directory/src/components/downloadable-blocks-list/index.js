@@ -93,7 +93,6 @@ export function DownloadableBlocksList( {
 					>
 						<DownloadableBlockNotice
 							onClick={ callBack }
-							errorNotices={ errorNotices }
 							block={ item }
 						/>
 					</DownloadableBlockListItem>

@@ -1,15 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Notice, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Button, Notice } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { DOWNLOAD_ERROR_NOTICE_ID } from '../../store/constants';
 
-const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
+export const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 	if ( ! errorNotices[ block.id ] ) {
 		return null;
 	}
@@ -45,4 +46,8 @@ const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 	);
 };
 
-export default DownloadableBlockNotice;
+export default withSelect( ( select ) => {
+	return {
+		errorNotices: select( 'core/block-directory' ).getErrorNotices(),
+	};
+} )( DownloadableBlockNotice );

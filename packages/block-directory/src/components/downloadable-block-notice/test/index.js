@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import DownloadableBlockNotice from '../index';
+import { DownloadableBlockNotice } from '../index';
 import { plugin } from './fixtures';
 
 import { INSTALL_ERROR_NOTICE_ID } from '../../../store/constants';
