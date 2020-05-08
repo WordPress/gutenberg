@@ -25,9 +25,10 @@
 
 // Styles for submenu flyout
 .has-child {
+	$navigation-vertical-padding: $grid-unit-10 * 0.75;
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
-		padding: $grid-unit-10 * 0.75 0;
+		padding: $navigation-vertical-padding 0;
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
@@ -56,7 +57,7 @@
 			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
 				left: 100%;
-				top: -$border-width;
+				top: -$border-width - $navigation-vertical-padding;
 			}
 
 			.wp-block-navigation-link__submenu-icon svg {
