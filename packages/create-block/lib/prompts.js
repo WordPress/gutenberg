@@ -28,8 +28,8 @@ const template = {
 		}
 
 		return true;
-	}
-}
+	},
+};
 
 const namespace = {
 	type: 'input',

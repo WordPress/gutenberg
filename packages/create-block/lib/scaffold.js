@@ -12,7 +12,11 @@ const { snakeCase } = require( 'lodash' );
  */
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
-const { hasWPScriptsEnabled, getOutputFiles, checkIsCoreTemplate } = require( './templates' );
+const {
+	hasWPScriptsEnabled,
+	getOutputFiles,
+	checkIsCoreTemplate,
+} = require( './templates' );
 
 module.exports = async function(
 	templateName,
@@ -53,10 +57,12 @@ module.exports = async function(
 
 	const coreTemplate = await checkIsCoreTemplate( templateName );
 
-	const templateDirectory = coreTemplate ? join( __dirname, 'templates' ) : join( process.cwd(), "temp", "node_modules" );
+	const templateDirectory = coreTemplate
+		? join( __dirname, 'templates' )
+		: join( process.cwd(), 'temp', 'node_modules' );
 
 	await Promise.all(
-		(await getOutputFiles( templateName )).map( async ( file ) => {
+		( await getOutputFiles( templateName ) ).map( async ( file ) => {
 			const template = await readFile(
 				join(
 					templateDirectory,

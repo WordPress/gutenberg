@@ -4,7 +4,7 @@
 const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 const { command } = require( 'execa' );
-const { existsSync  } = require( 'fs' );
+const { existsSync } = require( 'fs' );
 const { join } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const makeDir = require( 'make-dir' );
@@ -73,14 +73,16 @@ const templates = {
 };
 
 const getTemplate = async ( templateName ) => {
-
 	const isCoreTemplate = await checkIsCoreTemplate( templateName );
 	if ( isCoreTemplate ) {
 		return templates[ templateName ];
 	}
 
 	// throw a CLIError if the the template is neither a core one nor an external one
-	if ( ! await checkIsExternalTemplate( templateName ) && ! isCoreTemplate ) {
+	if (
+		! ( await checkIsExternalTemplate( templateName ) ) &&
+		! isCoreTemplate
+	) {
 		throw new CLIError(
 			`Invalid template type name. Either use one of the Core templates: ${ Object.keys(
 				templates
@@ -90,10 +92,17 @@ const getTemplate = async ( templateName ) => {
 
 	await downloadExternalTemplate( templateName );
 
-	const rawPackageInfo = await readFile( join( process.cwd(), 'temp', 'node_modules', templateName, 'template.json' ) );
+	const rawPackageInfo = await readFile(
+		join(
+			process.cwd(),
+			'temp',
+			'node_modules',
+			templateName,
+			'template.json'
+		)
+	);
 	const packageInfo = JSON.parse( rawPackageInfo );
 	return packageInfo;
-
 };
 
 const getDefaultValues = async ( templateName ) => {
@@ -120,42 +129,44 @@ const hasWPScriptsEnabled = ( templateName ) => {
 	return getTemplate( templateName ).wpScriptsEnabled || false;
 };
 
-const checkIsCoreTemplate = async templateName => templates[ templateName ] || false;
+const checkIsCoreTemplate = async ( templateName ) =>
+	templates[ templateName ] || false;
 
-const checkIsExternalTemplate = async templateName => {
+const checkIsExternalTemplate = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
 		return true;
 	} catch ( error ) {
 		return false;
 	}
-}
+};
 
-const downloadExternalTemplate = async templateName => {
+const downloadExternalTemplate = async ( templateName ) => {
 	try {
 		const cwd = join( process.cwd(), 'temp' );
 
 		if ( existsSync( join( cwd, 'node_modules', templateName ) ) ) {
 			return true;
-		};
+		}
 
 		// mkdir temp
 		await makeDir( cwd );
 
 		// npm init
-		await command( 'npm init -y', {cwd} );
+		await command( 'npm init -y', { cwd } );
 
 		// npm install my-template --save
-		await command( `npm install ${templateName} --save`, {cwd} );
+		await command( `npm install ${ templateName } --save`, { cwd } );
 
 		return true;
-
 	} catch ( error ) {
-		log.error( 'There has been an error while trying to download the package from NPM:' );
+		log.error(
+			'There has been an error while trying to download the package from NPM:'
+		);
 		log.error( error );
 		return false;
 	}
-}
+};
 
 module.exports = {
 	getDefaultValues,

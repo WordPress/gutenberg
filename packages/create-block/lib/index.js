@@ -75,7 +75,6 @@ program
 						...answers,
 					} );
 				}
-
 			} catch ( error ) {
 				if ( error instanceof CLIError ) {
 					log.error( error.message );
