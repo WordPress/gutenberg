@@ -104,8 +104,8 @@ function getArrowIcon( isStackedHorizontally ) {
 	];
 
 	return {
-		prev: applyRTLSetup( true, args ),
-		next: applyRTLSetup( false, args ),
+		backward: applyRTLSetup( true, args ),
+		forward: applyRTLSetup( false, args ),
 	};
 }
 
@@ -120,8 +120,8 @@ function getMoverActionTitle( isStackedHorizontally ) {
 	const actionTitleNext = applyRTLSetup( false, args );
 
 	return {
-		prev: sprintf( actionTitlePrev, firstBlockTitle ),
-		next: sprintf( actionTitleNext, lastBlockTitle ),
+		backward: sprintf( actionTitlePrev, firstBlockTitle ),
+		forward: sprintf( actionTitleNext, lastBlockTitle ),
 	};
 }
 
@@ -148,7 +148,7 @@ function getMoverButtonTitle( isStackedHorizontally, firstIndex ) {
 	const buttonTitleNext = applyRTLSetup( false, args );
 
 	return {
-		prev: sprintf( buttonTitlePrev, ...getIndexes( true ) ),
-		next: sprintf( buttonTitleNext, ...getIndexes( false ) ),
+		backward: sprintf( buttonTitlePrev, ...getIndexes( true ) ),
+		forward: sprintf( buttonTitleNext, ...getIndexes( false ) ),
 	};
 }

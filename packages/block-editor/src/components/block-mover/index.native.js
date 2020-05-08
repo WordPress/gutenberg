@@ -32,8 +32,8 @@ const BlockMover = ( {
 			firstBlockTitle,
 			lastBlockTitle,
 		},
-		icon: { prev: prevIcon, next: nextIcon },
-		title: { prev: prevTitle, next: nextTitle },
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		title: { backward: backwardButtonTitle, forward: forwardButtonTitle },
 	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
@@ -43,18 +43,18 @@ const BlockMover = ( {
 	return (
 		<>
 			<ToolbarButton
-				title={ ! isFirst ? prevTitle : firstBlockTitle }
+				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon={ prevIcon }
+				icon={ backwardButtonIcon }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
 
 			<ToolbarButton
-				title={ ! isLast ? nextTitle : lastBlockTitle }
+				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon={ nextIcon }
+				icon={ forwardButtonIcon }
 				extraProps={ {
 					hint: forwardButtonHint,
 				} }

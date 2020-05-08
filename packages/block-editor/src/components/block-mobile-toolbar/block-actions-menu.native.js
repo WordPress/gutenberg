@@ -33,8 +33,8 @@ const BlockActionsMenu = ( {
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
 
 	const {
-		icon: { prev: prevIcon, next: nextIcon },
-		actionTitle: { prev: prevActionTitle, next: nextActionTitle },
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		actionTitle: { backward: backwardButtonTitle, forward: forwardButtonTitle },
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	const deleteOption = {
@@ -55,17 +55,17 @@ const BlockActionsMenu = ( {
 
 	const backwardButtonOption = {
 		id: 'backwardButtonOption',
-		label: prevActionTitle,
+		label: backwardButtonTitle,
 		value: 'backwardButtonOption',
-		icon: prevIcon,
+		icon: backwardButtonIcon,
 		disabled: isFirst,
 	};
 
 	const forwardButtonOption = {
 		id: 'forwardButtonOption',
-		label: nextActionTitle,
+		label: forwardButtonTitle,
 		value: 'forwardButtonOption',
-		icon: nextIcon,
+		icon: forwardButtonIcon,
 		disabled: isLast,
 	};
 
