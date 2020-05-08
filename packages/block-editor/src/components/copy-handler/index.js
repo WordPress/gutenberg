@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
 import { documentHasSelection, documentHasTextSelection } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,6 +11,29 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
+
+function useFlashBlock() {
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
+	const timeouts = useRef( [] );
+	const flashBlock = useCallback(
+		( clientId ) => {
+			toggleBlockHighlight( clientId, true );
+			const timeout = setTimeout( () => {
+				toggleBlockHighlight( clientId, false );
+			}, 1000 );
+			timeouts.current.push( timeout );
+		},
+		[ toggleBlockHighlight ]
+	);
+	useEffect( () => {
+		return () => {
+			timeouts.current.forEach( ( timeout ) => {
+				clearTimeout( timeout );
+			} );
+		};
+	}, [] );
+	return flashBlock;
+}
 
 function CopyHandler( { children } ) {
 	const containerRef = useRef();
@@ -29,6 +52,8 @@ function CopyHandler( { children } ) {
 
 	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
+
+	const flashBlock = useFlashBlock();
 
 	const {
 		__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
@@ -66,6 +91,7 @@ function CopyHandler( { children } ) {
 			if ( selectedBlockClientIds.length === 1 ) {
 				const clientId = selectedBlockClientIds[ 0 ];
 				const { title } = getBlockType( getBlockName( clientId ) );
+				flashBlock( clientId );
 				notice = sprintf(
 					// Translators: Name of the block being copied, e.g. "Paragraph"
 					__( 'Copied block "%s" to clipboard.' ),
