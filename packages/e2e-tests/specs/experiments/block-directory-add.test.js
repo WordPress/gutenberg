@@ -6,8 +6,8 @@ import {
 	searchForBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
+	createJSONResponse,
 } from '@wordpress/e2e-test-utils';
-
 /**
  * Internal dependencies
  */
@@ -76,7 +76,7 @@ const block = `( function() {
 const MOCK_EMPTY_RESPONSES = [
 	{
 		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
-		onRequestMatch: createResponse( JSON.stringify( [] ) ),
+		onRequestMatch: createJSONResponse( [] ),
 	},
 ];
 
@@ -84,14 +84,12 @@ const MOCK_BLOCKS_RESPONSES = [
 	{
 		// Mock response for search with the block
 		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
-		onRequestMatch: createResponse(
-			JSON.stringify( [ MOCK_BLOCK1, MOCK_BLOCK2 ] )
-		),
+		onRequestMatch: createJSONResponse( [ MOCK_BLOCK1, MOCK_BLOCK2 ] ),
 	},
 	{
 		// Mock response for install
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-		onRequestMatch: createResponse( JSON.stringify( true ) ),
+		onRequestMatch: createJSONResponse( true ),
 	},
 	{
 		// Mock the response for the js asset once it gets injected
@@ -111,7 +109,7 @@ function getResponseObject( obj, contentType ) {
 	};
 }
 
-function createResponse( mockResponse, contentType = undefined ) {
+function createResponse( mockResponse, contentType ) {
 	return async ( request ) =>
 		request.respond( getResponseObject( mockResponse, contentType ) );
 }
