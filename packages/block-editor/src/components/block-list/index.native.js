@@ -232,7 +232,6 @@ export class BlockList extends Component {
 			contentStyle,
 			onAddBlock,
 			onDeleteBlock,
-			allowShrinkToolbar,
 		} = this.props;
 
 		const readableContentViewStyle = contentResizeMode === 'stretch' && {
@@ -263,7 +262,6 @@ export class BlockList extends Component {
 						contentStyle={ contentStyle }
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={ onDeleteBlock }
-						allowShrinkToolbar={ allowShrinkToolbar }
 					/>
 					{ ! this.shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter( clientId ) && (

@@ -23,8 +23,8 @@ const BlockMobileToolbar = ( {
 	isStackedHorizontally,
 	blockWidth,
 } ) => {
-	const shouldWrapBlockMover = blockWidth <= 104;
-	const shouldWrapBlockSettings = blockWidth < 150;
+	const shouldWrapBlockSettings = blockWidth < 65;
+	const shouldWrapBlockMover = blockWidth <= 150;
 
 	return (
 		<View style={ styles.toolbar }>
