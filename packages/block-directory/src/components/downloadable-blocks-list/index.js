@@ -97,6 +97,7 @@ export default compose(
 								id: INSTALL_ERROR_NOTICE_ID,
 							}
 						);
+						unregisterBlockType( item.name );
 						return;
 					}
 
