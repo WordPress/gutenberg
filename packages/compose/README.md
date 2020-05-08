@@ -119,6 +119,10 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
+
+Undocumented declaration.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
