@@ -8,7 +8,7 @@ import { dropRight, get, map, times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -78,8 +78,15 @@ function ColumnsEditContainer( {
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
 						min={ 2 }
-						max={ 6 }
+						max={ Math.max( 6, count ) }
 					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
@@ -89,6 +96,7 @@ function ColumnsEditContainer( {
 				__experimentalPassedProps={ {
 					className: classes,
 				} }
+				renderAppender={ false }
 			/>
 		</>
 	);
