@@ -33,7 +33,8 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url: 'https://cldup.com/niJL8UbTZH-3000x3000.jpeg',
+								url:
+									'https://cldup.com/niJL8UbTZH-3000x3000.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'full',
@@ -44,7 +45,7 @@ const Services = {
 							name: 'core/heading',
 							attributes: {
 								// translators: sample content for "Services" page template
-								content: __('Inspiration'),
+								content: __( 'Inspiration' ),
 								level: 2,
 							},
 						},
@@ -52,7 +53,9 @@ const Services = {
 							name: 'core/paragraph',
 							attributes: {
 								// translators: sample content for "Services" page template
-								content: __('A short description of the services you offer.'),
+								content: __(
+									'A short description of the services you offer.'
+								),
 							},
 						},
 					],
@@ -63,7 +66,8 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url: 'https://cldup.com/NTV4PW_Xtw-3000x3000.jpeg',
+								url:
+									'https://cldup.com/NTV4PW_Xtw-3000x3000.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'full',
@@ -74,7 +78,7 @@ const Services = {
 							name: 'core/heading',
 							attributes: {
 								// translators: sample content for "Services" page template
-								content: __('Strategy'),
+								content: __( 'Strategy' ),
 								level: 2,
 							},
 						},
@@ -82,7 +86,9 @@ const Services = {
 							name: 'core/paragraph',
 							attributes: {
 								// translators: sample content for "Services" page template
-								content: __('A short description of the services you offer.'),
+								content: __(
+									'A short description of the services you offer.'
+								),
 							},
 						},
 					],
@@ -93,7 +99,8 @@ const Services = {
 						{
 							name: 'core/image',
 							attributes: {
-								url: 'https://cldup.com/CL1KK71EsH-1200x1200.jpeg',
+								url:
+									'https://cldup.com/CL1KK71EsH-1200x1200.jpeg',
 								alt: '',
 								caption: '',
 								sizeSlug: 'large',
@@ -111,7 +118,9 @@ const Services = {
 							name: 'core/paragraph',
 							attributes: {
 								// translators: sample content for "Services" page template
-								content: __('A short description of the services you offer.'),
+								content: __(
+									'A short description of the services you offer.'
+								),
 							},
 						},
 					],

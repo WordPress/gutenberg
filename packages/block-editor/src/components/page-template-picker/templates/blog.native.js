@@ -20,7 +20,7 @@ const Blog = {
 					name: 'core/heading',
 					attributes: {
 						// translators: sample content for "Blog" page template
-						content: __('Welcome to our new blog'),
+						content: __( 'Welcome to our new blog' ),
 						level: 1,
 					},
 				},

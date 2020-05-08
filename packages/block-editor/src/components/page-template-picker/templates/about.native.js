@@ -45,11 +45,11 @@ const About = {
 							name: 'core/quote',
 							attributes: {
 								// translators: sample content for "About" page template
-								value: `<p>${__(
+								value: `<p>${ __(
 									'The way to get started is to quit talking and begin doing.'
-								)}</p>`,
+								) }</p>`,
 								// translators: sample content for "About" page template
-								citation: __('Walt Disney'),
+								citation: __( 'Walt Disney' ),
 							},
 						},
 					],
@@ -61,11 +61,11 @@ const About = {
 							name: 'core/quote',
 							attributes: {
 								// translators: sample content for "About" page template
-								value: `<p>${__(
+								value: `<p>${ __(
 									'It is our choices, Harry, that show what we truly are, far more than our abilities.'
-								)}</p>`,
+								) }</p>`,
 								// translators: sample content for "About" page template
-								citation: __('J.K. Rowling'),
+								citation: __( 'J.K. Rowling' ),
 							},
 						},
 					],
@@ -77,11 +77,11 @@ const About = {
 							name: 'core/quote',
 							attributes: {
 								// translators: sample content for "About" page template
-								value: `<p>${__(
+								value: `<p>${ __(
 									'Don’t cry because it’s over, smile because it happened.'
-								)}</p>`,
+								) }</p>`,
 								// translators: sample content for "About" page template
-								citation: __('Dr. Seuss'),
+								citation: __( 'Dr. Seuss' ),
 							},
 						},
 					],
