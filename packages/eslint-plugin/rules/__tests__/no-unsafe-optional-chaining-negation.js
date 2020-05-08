@@ -23,10 +23,17 @@ ruleTester.run( 'no-unsafe-optional-chaining-negation', rule, {
 		{
 			code: `foo?.bar`,
 		},
+		{
+			code: `!! foo?.bar`,
+		},
 	],
 	invalid: [
 		{
 			code: `! foo.bar?.baz`,
+			errors: [ { messageId: 'unsafeNegation' } ],
+		},
+		{
+			code: `!!! foo.bar?.baz`,
 			errors: [ { messageId: 'unsafeNegation' } ],
 		},
 	],
