@@ -1,10 +1,10 @@
-.wp-block[data-align="center"] .wp-block-button {
+.wp-block[data-align="center"] > .wp-block-button {
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-.wp-block[data-align="right"] .wp-block-button {
+.wp-block[data-align="right"] > .wp-block-button {
 	/*!rtl:ignore*/
 	text-align: right;
 }
