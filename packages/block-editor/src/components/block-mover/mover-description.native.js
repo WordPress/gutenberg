@@ -41,57 +41,25 @@ const verticalMover = {
 const AVAILABLE_KEYS = [ 'description', 'icon', 'title', 'actionTitle' ];
 const DEFAULT_KEYS = [ 'description', 'icon', 'title' ];
 
+const SETUP_GETTER = {
+	description: getMoverDescription,
+	icon: getArrowIcon,
+	title: getMoverButtonTitle,
+	actionTitle: getMoverActionTitle,
+};
+
 export function getMoversSetup(
 	isStackedHorizontally,
-	firstIndex,
-	keys = DEFAULT_KEYS
+	{ firstIndex, keys = DEFAULT_KEYS }
 ) {
 	return keys.reduce( ( setup, key ) => {
 		if ( AVAILABLE_KEYS.includes( key ) ) {
 			Object.assign( setup, {
-				[ key ]: getKeySetup( key, isStackedHorizontally, firstIndex ),
+				[ key ]: getSetup( key, isStackedHorizontally, firstIndex ),
 			} );
 		}
 		return setup;
 	}, {} );
-}
-
-function getKeySetup( key, isStackedHorizontally, firstIndex ) {
-	switch ( key ) {
-		case 'description':
-			return getMoverDescription( isStackedHorizontally );
-
-		case 'icon':
-			return {
-				prev: getArrowIcon( true, isStackedHorizontally ),
-				next: getArrowIcon( false, isStackedHorizontally ),
-			};
-
-		case 'title':
-			return parseInt( firstIndex ) >= 0
-				? {
-						prev: getMoverButtonTitle(
-							true,
-							firstIndex,
-							isStackedHorizontally
-						),
-						next: getMoverButtonTitle(
-							false,
-							firstIndex,
-							isStackedHorizontally
-						),
-				  }
-				: {};
-
-		case 'actionTitle':
-			return {
-				prev: getMoverActionTitle( true, isStackedHorizontally ),
-				next: getMoverActionTitle( false, isStackedHorizontally ),
-			};
-
-		default:
-			return {};
-	}
 }
 
 function switchButtonPropIfRTL(
@@ -111,60 +79,76 @@ function switchButtonPropIfRTL(
 	return isBackwardButton ? backwardButtonProp : forwardButtonProp;
 }
 
+function getSetup() {
+	const [ key, ...args ] = arguments;
+	return SETUP_GETTER[ key ].apply( null, [ ...args ] );
+}
+
+function applyRTLSetup( isBackwardButton, args ) {
+	return switchButtonPropIfRTL.apply( null, [ isBackwardButton, ...args ] );
+}
+
 function getMoverDescription( isStackedHorizontally ) {
 	return isStackedHorizontally ? horizontalMover : verticalMover;
 }
 
-function getArrowIcon( isBackwardButton, isStackedHorizontally ) {
+function getArrowIcon( isStackedHorizontally ) {
 	const { forwardButtonIcon, backwardButtonIcon } = getMoverDescription(
 		isStackedHorizontally
 	);
 
-	const arrowIcon = switchButtonPropIfRTL(
-		isBackwardButton,
+	const args = [
 		forwardButtonIcon,
 		backwardButtonIcon,
-		isStackedHorizontally
-	);
+		isStackedHorizontally,
+	];
 
-	return arrowIcon;
+	return {
+		prev: applyRTLSetup( true, args ),
+		next: applyRTLSetup( false, args ),
+	};
 }
 
-function getMoverActionTitle( isBackwardButton, isStackedHorizontally ) {
+function getMoverActionTitle( isStackedHorizontally ) {
 	const { firstBlockTitle, lastBlockTitle } = getMoverDescription(
 		isStackedHorizontally
 	);
 
-	const actionTitle = switchButtonPropIfRTL(
-		isBackwardButton,
-		lastBlockTitle,
-		firstBlockTitle,
-		isStackedHorizontally
-	);
+	const args = [ lastBlockTitle, firstBlockTitle, isStackedHorizontally ];
 
-	return sprintf( actionTitle, firstBlockTitle );
+	const actionTitlePrev = applyRTLSetup( true, args );
+	const actionTitleNext = applyRTLSetup( false, args );
+
+	return {
+		prev: sprintf( actionTitlePrev, firstBlockTitle ),
+		next: sprintf( actionTitleNext, lastBlockTitle ),
+	};
 }
 
-function getMoverButtonTitle(
-	isBackwardButton,
-	firstIndex,
-	isStackedHorizontally
-) {
-	const fromIndex = firstIndex + 1; // current position based on index
-	// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
-	const direction = isBackwardButton ? -1 : 1;
-	const toIndex = fromIndex + direction; // position after move
+function getMoverButtonTitle( isStackedHorizontally, firstIndex ) {
+	const getIndexes = ( isBackwardButton ) => {
+		const fromIndex = firstIndex + 1; // current position based on index
+		// for backwardButton decrease index (move left/up) for forwardButton increase index (move right/down)
+		const direction = isBackwardButton ? -1 : 1;
+		const toIndex = fromIndex + direction; // position after move
+		return [ fromIndex, toIndex ];
+	};
 
 	const { backwardButtonTitle, forwardButtonTitle } = getMoverDescription(
 		isStackedHorizontally
 	);
 
-	const buttonTitle = switchButtonPropIfRTL(
-		isBackwardButton,
-		forwardButtonTitle,
+	const args = [
 		backwardButtonTitle,
-		isStackedHorizontally
-	);
+		forwardButtonTitle,
+		isStackedHorizontally,
+	];
 
-	return sprintf( buttonTitle, fromIndex, toIndex );
+	const buttonTitlePrev = applyRTLSetup( true, args );
+	const buttonTitleNext = applyRTLSetup( false, args );
+
+	return {
+		prev: sprintf( buttonTitlePrev, ...getIndexes( true ) ),
+		next: sprintf( buttonTitleNext, ...getIndexes( false ) ),
+	};
 }

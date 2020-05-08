@@ -30,13 +30,12 @@ const BlockActionsMenu = ( {
 	isLast,
 	blockTitle,
 } ) => {
+	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
+
 	const {
 		icon: { prev: prevIcon, next: nextIcon },
 		actionTitle: { prev: prevActionTitle, next: nextActionTitle },
-	} = getMoversSetup( isStackedHorizontally, null, [
-		'icon',
-		'actionTitle',
-	] );
+	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
 	const deleteOption = {
 		id: 'deleteOption',

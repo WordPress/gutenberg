@@ -34,7 +34,7 @@ const BlockMover = ( {
 		},
 		icon: { prev: prevIcon, next: nextIcon },
 		title: { prev: prevTitle, next: nextTitle },
-	} = getMoversSetup( isStackedHorizontally, firstIndex );
+	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
