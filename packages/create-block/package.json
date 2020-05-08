@@ -38,6 +38,7 @@
 		"lodash": "^4.17.15",
 		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
+		"uuid": "^8.0.0",
 		"write-pkg": "^4.0.0"
 	},
 	"publishConfig": {

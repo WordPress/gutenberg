@@ -15,7 +15,7 @@ const { code, info, success } = require( './log' );
 const {
 	hasWPScriptsEnabled,
 	getOutputFiles,
-	checkIsCoreTemplate,
+	isCoreTemplate,
 } = require( './templates' );
 
 module.exports = async function(
@@ -55,9 +55,7 @@ module.exports = async function(
 		textdomain: namespace,
 	};
 
-	const coreTemplate = await checkIsCoreTemplate( templateName );
-
-	const templateDirectory = coreTemplate
+	const templateDirectory = isCoreTemplate( templateName )
 		? join( __dirname, 'templates' )
 		: join( process.cwd(), 'temp', 'node_modules' );
 

@@ -8,6 +8,8 @@ const { existsSync } = require( 'fs' );
 const { join } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const makeDir = require( 'make-dir' );
+const os = require( 'os' );
+const { v4: uuid } = require( 'uuid' );
 
 const log = require( './log' );
 
@@ -19,7 +21,7 @@ const license = 'GPL-2.0-or-later';
 const licenseURI = 'https://www.gnu.org/licenses/gpl-2.0.html';
 const version = '0.1.0';
 
-const templates = {
+const coreTemplates = {
 	es5: {
 		defaultValues: {
 			namespace,
@@ -72,36 +74,24 @@ const templates = {
 	},
 };
 
+const tempFolder = join( os.tmpdir(), uuid() );
+
 const getTemplate = async ( templateName ) => {
-	const isCoreTemplate = await checkIsCoreTemplate( templateName );
-	if ( isCoreTemplate ) {
-		return templates[ templateName ];
+	if ( coreTemplates[ templateName ] ) {
+		return coreTemplates[ templateName ];
 	}
 
 	// throw a CLIError if the the template is neither a core one nor an external one
-	if (
-		! ( await checkIsExternalTemplate( templateName ) ) &&
-		! isCoreTemplate
-	) {
+	if ( ! ( await isExternalTemplate( templateName ) ) ) {
 		throw new CLIError(
 			`Invalid template type name. Either use one of the Core templates: ${ Object.keys(
-				templates
+				coreTemplates
 			).join( ', ' ) }. \n \n or a valid npm package name.`
 		);
 	}
 
-	await downloadExternalTemplate( templateName );
+	const packageInfo = await downloadExternalTemplate( templateName );
 
-	const rawPackageInfo = await readFile(
-		join(
-			process.cwd(),
-			'temp',
-			'node_modules',
-			templateName,
-			'template.json'
-		)
-	);
-	const packageInfo = JSON.parse( rawPackageInfo );
 	return packageInfo;
 };
 
@@ -129,10 +119,10 @@ const hasWPScriptsEnabled = ( templateName ) => {
 	return getTemplate( templateName ).wpScriptsEnabled || false;
 };
 
-const checkIsCoreTemplate = async ( templateName ) =>
-	templates[ templateName ] || false;
+const isCoreTemplate = ( templateName ) =>
+	coreTemplates[ templateName ] || false;
 
-const checkIsExternalTemplate = async ( templateName ) => {
+const isExternalTemplate = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
 		return true;
@@ -143,22 +133,28 @@ const checkIsExternalTemplate = async ( templateName ) => {
 
 const downloadExternalTemplate = async ( templateName ) => {
 	try {
-		const cwd = join( process.cwd(), 'temp' );
+		const cwd = tempFolder;
 
 		if ( existsSync( join( cwd, 'node_modules', templateName ) ) ) {
 			return true;
 		}
 
-		// mkdir temp
 		await makeDir( cwd );
-
-		// npm init
 		await command( 'npm init -y', { cwd } );
-
-		// npm install my-template --save
 		await command( `npm install ${ templateName } --save`, { cwd } );
 
-		return true;
+		const rawPackageInfo = await readFile(
+			join(
+				process.cwd(),
+				'temp',
+				'node_modules',
+				templateName,
+				'template.json'
+			)
+		);
+		const packageInfo = JSON.parse( rawPackageInfo );
+
+		return packageInfo;
 	} catch ( error ) {
 		log.error(
 			'There has been an error while trying to download the package from NPM:'
@@ -173,6 +169,6 @@ module.exports = {
 	getOutputFiles,
 	getPrompts,
 	hasWPScriptsEnabled,
-	checkIsCoreTemplate,
-	checkIsExternalTemplate,
+	isCoreTemplate,
+	isExternalTemplate,
 };
