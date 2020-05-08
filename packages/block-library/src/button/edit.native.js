@@ -18,7 +18,7 @@ import {
 	withColors,
 	InspectorControls,
 	BlockControls,
-	SETTINGS_DEFAULTS,
+	__experimentalUseGradient,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -174,16 +174,12 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes } = this.props;
+		const { backgroundColor, attributes, gradientValue } = this.props;
 		const { gradient, customGradient } = attributes;
-		const defaultGradients = SETTINGS_DEFAULTS.gradients;
 
 		if ( customGradient || gradient ) {
 			return (
-				customGradient ||
-				defaultGradients.find(
-					( defaultGradient ) => defaultGradient.slug === gradient
-				).gradient
+				customGradient || gradientValue
 			);
 		}
 		return (
@@ -548,6 +544,7 @@ export default compose( [
 	withInstanceId,
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
+		const { gradientValue } = __experimentalUseGradient();
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const {
 			getSelectedBlockClientId,
@@ -560,6 +557,7 @@ export default compose( [
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
+			gradientValue,
 			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,
