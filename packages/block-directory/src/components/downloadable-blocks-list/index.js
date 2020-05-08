@@ -14,7 +14,6 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
-import DownloadableBlockNotice from '../downloadable-block-notice';
 import {
 	DOWNLOAD_ERROR_NOTICE_ID,
 	INSTALL_ERROR_NOTICE_ID,
@@ -90,12 +89,7 @@ export function DownloadableBlocksList( {
 						onBlur={ () => onHover( null ) }
 						item={ item }
 						isLoading={ isLoading }
-					>
-						<DownloadableBlockNotice
-							onClick={ callBack }
-							block={ item }
-						/>
-					</DownloadableBlockListItem>
+					/>
 				);
 			} ) }
 			{ children }
