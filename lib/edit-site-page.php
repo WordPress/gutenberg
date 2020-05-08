@@ -88,9 +88,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global
-		$_wp_current_template_part_ids,
-		$current_screen;
+	global $current_screen;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -154,16 +152,12 @@ function gutenberg_edit_site_init( $hook ) {
 			continue;
 		}
 
-		$template_hierarchy    = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
-		$current_template_post = gutenberg_find_template_post( $template_hierarchy );
-		if ( isset( $current_template_post ) ) {
-			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
+		$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
+		$current_template   = gutenberg_find_template_post_and_parts( $template_hierarchy );
+		if ( isset( $current_template ) ) {
+			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
+			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
 		}
-		if ( isset( $_wp_current_template_part_ids ) ) {
-			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
-		}
-
-		$_wp_current_template_part_ids = null;
 	}
 
 	$current_template_id = $template_ids['front-page'];
