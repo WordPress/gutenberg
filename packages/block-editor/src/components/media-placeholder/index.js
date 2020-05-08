@@ -123,7 +123,7 @@ export class MediaPlaceholder extends Component {
 				// To allow changes to a gallery to be made while uploads are in progress
 				// (including trigging multiple upload groups and removing already in place images),
 				// we must be able to add newMedia based on the current value of the Gallery
-				// whenever the setMedia function runs (given by getValue).
+				// whenever the setMedia function runs (not destructuring 'value' from props).
 				// Additionally, since the setMedia function runs multiple times per upload group
 				// and is passed newMedia containing every item in its group each time, we must
 				// also filter out whatever this upload group had previously returned to the
