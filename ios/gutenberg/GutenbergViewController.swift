@@ -216,6 +216,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {
         return ExampleAttachmentDelegate()
     }
+
+    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+        return nil
+    }
 }
 
 //MARK: - Navigation bar
