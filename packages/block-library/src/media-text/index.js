@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { mediaAndText as icon } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ export const settings = {
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,
-		__experimentalColor: { gradients: true },
+		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	example: {
 		attributes: {

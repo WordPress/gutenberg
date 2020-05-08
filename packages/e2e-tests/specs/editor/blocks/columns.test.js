@@ -26,6 +26,6 @@ describe( 'Columns', () => {
 		 )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();
-		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 0 );
+		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 1 );
 	} );
 } );

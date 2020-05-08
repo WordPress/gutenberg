@@ -16,7 +16,7 @@ function Header() {
 	return (
 		<div className="edit-widgets-header">
 			<NavigableMenu>
-				<Inserter.Slot />
+				<Inserter.Slot className="edit-widgets-inserter" />
 				<UndoButton />
 				<RedoButton />
 			</NavigableMenu>
