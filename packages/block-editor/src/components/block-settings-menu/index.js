@@ -105,7 +105,9 @@ export function BlockSettingsMenu( { clientIds } ) {
 												/>
 											) }
 											<ClipboardButton
-												text={ serialize( blocks ) }
+												text={ () =>
+													serialize( blocks )
+												}
 												role="menuitem"
 												className="components-menu-item__button"
 												onCopy={ () => {
