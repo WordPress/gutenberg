@@ -68,7 +68,8 @@ program
 							! Object.keys( optionsValues ).includes( name )
 					);
 					const answers = await inquirer.prompt( filteredPrompts );
-					await scaffold( template, {
+
+					await scaffold( answers.template, {
 						...defaultValues,
 						...optionsValues,
 						...answers,

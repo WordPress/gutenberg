@@ -17,6 +17,20 @@ const slug = {
 	},
 };
 
+const template = {
+	type: 'input',
+	name: 'template',
+	message:
+		'The template used to scaffold the block (es5 | esnext | name of a npm repository)',
+	validate( input ) {
+		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+			return 'Invalid block template name specified. Template can contain only lowercase alphanumeric characters or dashes, and start with a letter.';
+		}
+
+		return true;
+	}
+}
+
 const namespace = {
 	type: 'input',
 	name: 'namespace',
@@ -109,6 +123,7 @@ const version = {
 
 module.exports = {
 	slug,
+	template,
 	namespace,
 	title,
 	description,
