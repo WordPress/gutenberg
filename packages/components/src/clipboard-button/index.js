@@ -27,7 +27,7 @@ class ClipboardButton extends Component {
 		const { getText, onCopy } = this;
 		const container = this.containerRef.current;
 
-		this.clipboard = new Clipboard( container.firstChild, {
+		this.clipboard = new Clipboard( container, {
 			text: getText,
 			container,
 		} );
@@ -95,11 +95,14 @@ class ClipboardButton extends Component {
 		};
 
 		return (
-			<span ref={ this.containerRef } onCopy={ focusOnCopyEventTarget }>
-				<Button { ...buttonProps } className={ classes }>
-					{ children }
-				</Button>
-			</span>
+			<Button
+				{ ...buttonProps }
+				className={ classes }
+				ref={ this.containerRef }
+				onCopy={ focusOnCopyEventTarget }
+			>
+				{ children }
+			</Button>
 		);
 	}
 }
