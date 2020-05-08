@@ -15,10 +15,7 @@ import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	getMoverActionTitle,
-	getArrowIcon,
-} from '../block-mover/mover-description';
+import { getMoversSetup } from '../block-mover/mover-description';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -31,6 +28,14 @@ const BlockActionsMenu = ( {
 	isFirst,
 	isLast,
 } ) => {
+	const {
+		icon: { prev: prevIcon, next: nextIcon },
+		actionTitle: { prev: prevActionTitle, next: nextActionTitle },
+	} = getMoversSetup( isStackedHorizontally, null, [
+		'icon',
+		'actionTitle',
+	] );
+
 	const deleteOption = {
 		id: 'deleteOption',
 		label: __( 'Remove Block' ),
@@ -47,17 +52,17 @@ const BlockActionsMenu = ( {
 
 	const backwardButtonOption = {
 		id: 'backwardButtonOption',
-		label: getMoverActionTitle( true, isStackedHorizontally ),
+		label: prevActionTitle,
 		value: 'backwardButtonOption',
-		icon: getArrowIcon( true, isStackedHorizontally ),
+		icon: prevIcon,
 		disabled: isFirst,
 	};
 
 	const forwardButtonOption = {
 		id: 'forwardButtonOption',
-		label: getMoverActionTitle( false, isStackedHorizontally ),
+		label: nextActionTitle,
 		value: 'forwardButtonOption',
-		icon: getArrowIcon( false, isStackedHorizontally ),
+		icon: nextIcon,
 		disabled: isLast,
 	};
 
