@@ -1,20 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter, removeFilter } from '@wordpress/hooks';
 
 const FilteredComponent = ( {
-	filterName,
 	as: Component,
+	hookName,
 	namespace,
 	priority,
 	...props
 } ) => {
 	const instanceId = useInstanceId( FilteredComponent );
 
-	// Rules of React hooks require unusual handling of the default value.
+	// Rules of React hooks enforce unusual handling of the default value.
 	namespace = namespace || instanceId;
 
 	useEffect( () => {
@@ -26,12 +26,12 @@ const FilteredComponent = ( {
 				return <Component { ...originalProps } { ...props } />;
 			}
 		);
-		addFilter( filterName, namespace, callback, priority );
+		addFilter( hookName, namespace, callback, priority );
 
 		return () => {
-			removeFilter( filterName, namespace );
+			removeFilter( hookName, namespace );
 		};
-	}, [ filterName ] );
+	}, [ Component, hookName, namespace, priority ] );
 
 	return null;
 };
