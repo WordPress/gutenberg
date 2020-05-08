@@ -104,14 +104,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		}
 
 		foreach ( $block_types as $slug => $obj ) {
-			$ret = $this->check_read_permission();
-
-			if ( ! $ret ) {
-				continue;
-			}
-
 			$block_type = $this->prepare_item_for_response( $obj, $request );
-
 			if ( $namespace ) {
 				$pieces          = explode( '/', $obj->name );
 				$block_namespace = $pieces[0];
@@ -119,7 +112,6 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					continue;
 				}
 			}
-
 			$data[ $obj->name ] = $this->prepare_response_for_collection( $block_type );
 		}
 
@@ -134,17 +126,14 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		$block_name = $request['namespace'] . '/' . $request['name'];
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-
-		if ( empty( $block_type ) ) {
-			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
 		$check = $this->check_read_permission();
-
 		if ( ! $check ) {
 			return new WP_Error( 'rest_cannot_read_block_type', __( 'Cannot view block type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+		$block_name = $request['namespace'] . '/' . $request['name'];
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		if ( empty( $block_type ) ) {
+			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		return true;
@@ -173,11 +162,9 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		$block_name = $request['namespace'] . '/' . $request['name'];
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-
 		if ( empty( $block_type ) ) {
 			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
-
 		$data = $this->prepare_item_for_response( $block_type, $request );
 
 		return rest_ensure_response( $data );
@@ -186,7 +173,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a block type object for serialization.
 	 *
-	 * @param stdClass        $block_type block type data.
+	 * @param WP_Block_Type   $block_type block type data.
 	 * @param WP_REST_Request $request    Full details about the request.
 	 *
 	 * @return WP_REST_Response block type data.
