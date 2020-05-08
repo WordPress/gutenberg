@@ -81,10 +81,10 @@ export function getBlockStyles( state, name ) {
  * @param {Object} state Data state.
  * @param {string} name  Block type name.
  *
- * @return {Array?} Block Styles.
+ * @return {Object?} Block Styles.
  */
 export function getDefaultBlockStyle( state, name ) {
-	return getBlockStyles( state, name ).filter(
+	return getBlockStyles( state, name )?.filter(
 		( style ) => style.isDefault
 	)[ 0 ];
 }

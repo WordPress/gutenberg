@@ -133,7 +133,7 @@ _Parameters_
 
 _Returns_
 
--   `?Array`: Block Styles.
+-   `?Object`: Block Styles.
 
 <a name="getDefaultBlockVariation" href="#getDefaultBlockVariation">#</a> **getDefaultBlockVariation**
 
