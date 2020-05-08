@@ -178,9 +178,7 @@ class ButtonEdit extends Component {
 		const { gradient, customGradient } = attributes;
 
 		if ( customGradient || gradient ) {
-			return (
-				customGradient || gradientValue
-			);
+			return customGradient || gradientValue;
 		}
 		return (
 			getColorAndStyleProps( attributes ).style?.backgroundColor ||
