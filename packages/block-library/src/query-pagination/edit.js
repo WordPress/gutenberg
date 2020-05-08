@@ -47,6 +47,6 @@ export default function QueryPaginationEdit( {
 			{ next }
 		</ButtonGroup>
 	) : (
-		'No pages to paginate.'
+		__( 'No pages to paginate.' )
 	);
 }

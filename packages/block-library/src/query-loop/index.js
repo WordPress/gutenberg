@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { loop } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,6 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Query Loop' ),
+	icon: loop,
 	parent: [ 'core/query' ],
 	supports: {
 		inserter: false,
