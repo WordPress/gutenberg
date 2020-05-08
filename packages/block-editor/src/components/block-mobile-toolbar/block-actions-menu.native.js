@@ -7,10 +7,11 @@ import { Platform } from 'react-native';
  * WordPress dependencies
  */
 import { ToolbarButton, Picker } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { moreVertical, trash, cog } from '@wordpress/icons';
+import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
 import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * Internal dependencies
@@ -30,12 +31,15 @@ const BlockActionsMenu = ( {
 	onMoveUp,
 	isFirst,
 	isLast,
+	blockTitle,
 } ) => {
 	const deleteOption = {
 		id: 'deleteOption',
-		label: __( 'Remove Block' ),
+		// translators: %s: block title e.g: "Paragraph".
+		label: sprintf( __( 'Remove %s' ), blockTitle ),
 		value: 'deleteOption',
 		icon: trash,
+		separated: true,
 	};
 
 	const settingsOption = {
@@ -96,7 +100,7 @@ const BlockActionsMenu = ( {
 			<ToolbarButton
 				title={ __( 'Open Settings' ) }
 				onClick={ () => this.picker.presentPicker() }
-				icon={ moreVertical }
+				icon={ moreHorizontalMobile }
 				extraProps={ {
 					hint:
 						Platform.OS === 'ios'
@@ -118,10 +122,16 @@ const BlockActionsMenu = ( {
 
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlockIndex, getBlockRootClientId, getBlockOrder } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockIndex,
+			getBlockRootClientId,
+			getBlockOrder,
+			getBlockName,
+		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
+		const blockName = getBlockName( normalizedClientIds );
+		const blockType = getBlockType( blockName );
+		const blockTitle = blockType.title;
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
@@ -135,6 +145,7 @@ export default compose(
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
+			blockTitle,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
