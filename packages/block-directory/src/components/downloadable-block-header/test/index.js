@@ -12,7 +12,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import DownloadableBlockHeader from '../index';
+import { DownloadableBlockHeader } from '../index';
 import { pluginWithImg, pluginWithIcon } from './fixtures';
 
 const getContainer = (

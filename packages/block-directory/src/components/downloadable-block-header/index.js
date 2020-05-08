@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,7 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
 
-function DownloadableBlockHeader( {
+export function DownloadableBlockHeader( {
 	icon,
 	title,
 	rating,
@@ -60,4 +61,8 @@ function DownloadableBlockHeader( {
 	);
 }
 
-export default DownloadableBlockHeader;
+export default withSelect( ( select ) => {
+	return {
+		isLoading: select( 'core/block-directory' ).isInstalling(),
+	};
+} )( DownloadableBlockHeader );
