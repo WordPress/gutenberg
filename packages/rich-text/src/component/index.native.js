@@ -896,7 +896,7 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ __DEV__ ? [ '@' ] : []}
+					triggerKeyCodes={ [ '@' ] }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -938,7 +938,7 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{ __DEV__ && isMentionsSupported( capabilities ) && (
+							{ isMentionsSupported( capabilities ) && (
 								<Toolbar>
 									<ToolbarButton
 										title={ __( 'Insert mention' ) }
