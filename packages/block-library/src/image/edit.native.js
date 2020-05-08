@@ -428,7 +428,10 @@ export class ImageEdit extends React.Component {
 						icon={ textColor }
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
-						valuePlaceholder={ _x( 'None', 'Alt text value placeholder' ) }
+						valuePlaceholder={ _x(
+							'None',
+							'Alt text value placeholder'
+						) }
 						separatorType={ 'none' }
 						onChangeValue={ this.updateAlt }
 					/>
