@@ -884,7 +884,7 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{ isMentionsSupported( capabilities ) && (
+							{ __DEV__ && isMentionsSupported( capabilities ) && (
 								<Toolbar>
 									<ToolbarButton
 										title={ __( 'Insert mention' ) }
