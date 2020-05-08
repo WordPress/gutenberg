@@ -6,7 +6,6 @@ import {
 	searchForBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
-	getAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 /**
