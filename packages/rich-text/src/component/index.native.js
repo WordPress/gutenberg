@@ -896,7 +896,7 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ [ '@' ] }
+					triggerKeyCodes={ __DEV__ ? [ '@' ] : []}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
