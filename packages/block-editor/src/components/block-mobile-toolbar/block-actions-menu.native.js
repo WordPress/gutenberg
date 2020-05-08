@@ -24,8 +24,8 @@ import {
 const BlockActionsMenu = ( {
 	onDelete,
 	isStackedHorizontally,
-	shouldWrapBlockSettings,
-	shouldWrapBlockMover,
+	wrapBlockSettings,
+	wrapBlockMover,
 	openGeneralSidebar,
 	onMoveDown,
 	onMoveUp,
@@ -66,9 +66,9 @@ const BlockActionsMenu = ( {
 	};
 
 	const options = compact( [
-		shouldWrapBlockMover && backwardButtonOption,
-		shouldWrapBlockMover && forwardButtonOption,
-		shouldWrapBlockSettings && settingsOption,
+		wrapBlockMover && backwardButtonOption,
+		wrapBlockMover && forwardButtonOption,
+		wrapBlockSettings && settingsOption,
 		deleteOption,
 	] );
 
