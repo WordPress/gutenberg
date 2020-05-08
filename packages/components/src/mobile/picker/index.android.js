@@ -9,7 +9,7 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,7 +17,16 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import BottomSheet from '../bottom-sheet';
 import styles from './styles.scss';
 
-class Picker extends Component {
+function Separator() {
+	const separatorStyle = usePreferredColorSchemeStyle(
+		styles.separator,
+		styles.separatorDark
+	);
+
+	return <View style={ separatorStyle } />;
+}
+
+export default class Picker extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onClose = this.onClose.bind( this );
@@ -42,12 +51,6 @@ class Picker extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme } = this.props;
-		const separatorStyle = getStylesFromColorScheme(
-			styles.separator,
-			styles.separatorDark
-		);
-
 		return (
 			<BottomSheet
 				isVisible={ this.state.isVisible }
@@ -58,9 +61,7 @@ class Picker extends Component {
 				<View>
 					{ this.props.options.map( ( option, index ) => (
 						<>
-							{ option.separated && (
-								<View style={ separatorStyle } />
-							) }
+							{ option.separated && <Separator /> }
 							<BottomSheet.Cell
 								icon={ option.icon }
 								key={ index }
@@ -86,5 +87,3 @@ class Picker extends Component {
 		);
 	}
 }
-
-export default withPreferredColorScheme( Picker );
