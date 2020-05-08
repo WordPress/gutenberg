@@ -15,11 +15,19 @@
 class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 	/**
+	 * Instance of WP_Block_Type_Registry.
+	 *
+	 * @var WP_Block_Type_Registry
+	 */
+	protected $block_type_registry;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = 'block-types';
+		$this->namespace           = '__experimental';
+		$this->rest_base           = 'block-types';
+		$this->block_type_registry = WP_Block_Type_Registry::get_instance();
 	}
 
 	/**
@@ -94,7 +102,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$data        = array();
-		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+		$block_types = $this->block_type_registry->get_all_registered();
 
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
@@ -130,10 +138,10 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		if ( ! $check ) {
 			return new WP_Error( 'rest_cannot_read_block_type', __( 'Cannot view block type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
-		$block_name = $request['namespace'] . '/' . $request['name'];
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( empty( $block_type ) ) {
-			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
+		$block_name = sprintf( '%s/%s', $request['namespace'], $request['name'] );
+		$block_type = $this->get_block( $block_name );
+		if ( is_wp_error( $block_type ) ) {
+			return $block_type;
 		}
 
 		return true;
@@ -153,6 +161,21 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Get the block, if the name is valid.
+	 *
+	 * @param string $name Block name
+	 * @return WP_Block_Type|WP_Error Block type object if name is valid, WP_Error otherwise.
+	 */
+	protected function get_block( $name ) {
+		$block_type = $this->block_type_registry->get_registered( $name );
+		if ( empty( $block_type ) ) {
+			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		return $block_type;
+	}
+
+	/**
 	 * Retrieves a specific block type.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -160,10 +183,10 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		$block_name = $request['namespace'] . '/' . $request['name'];
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( empty( $block_type ) ) {
-			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
+		$block_name = sprintf( '%s/%s', $request['namespace'], $request['name'] );
+		$block_type = $this->get_block( $block_name );
+		if ( is_wp_error( $block_type ) ) {
+			return $block_type;
 		}
 		$data = $this->prepare_item_for_response( $block_type, $request );
 
