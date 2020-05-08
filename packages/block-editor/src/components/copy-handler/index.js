@@ -5,7 +5,7 @@ import { useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
 import { documentHasSelection, documentHasTextSelection } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,11 +16,16 @@ function CopyHandler( { children } ) {
 	const containerRef = useRef();
 
 	const {
+		getBlockName,
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
+	const { getBlockType } = useSelect(
+		( select ) => select( 'core/blocks' ),
+		[]
+	);
 
 	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
@@ -57,20 +62,25 @@ function CopyHandler( { children } ) {
 		event.preventDefault();
 
 		if ( event.type === 'copy' || event.type === 'cut' ) {
-			createSuccessNotice(
-				sprintf(
+			let notice;
+			if ( selectedBlockClientIds.length === 1 ) {
+				const clientId = selectedBlockClientIds[ 0 ];
+				const { title } = getBlockType( getBlockName( clientId ) );
+				notice = sprintf(
+					// Translators: Name of the block being copied, e.g. "Paragraph"
+					__( 'Copied block "%s" to clipboard.' ),
+					title
+				);
+			} else {
+				notice = sprintf(
 					// Translators: Number of blocks being copied
-					_n(
-						'Copied %d block to clipboard',
-						'Copied %d blocks to clipboard',
-						selectedBlockClientIds.length
-					),
+					__( 'Copied %d blocks to clipboard.' ),
 					selectedBlockClientIds.length
-				),
-				{
-					type: 'snackbar',
-				}
-			);
+				);
+			}
+			createSuccessNotice( notice, {
+				type: 'snackbar',
+			} );
 			const blocks = getBlocksByClientId( selectedBlockClientIds );
 			const serialized = serialize( blocks );
 
