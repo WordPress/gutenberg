@@ -136,7 +136,17 @@ const downloadExternalTemplate = async ( templateName ) => {
 		const cwd = tempFolder;
 
 		if ( existsSync( join( cwd, 'node_modules', templateName ) ) ) {
-			return true;
+			const rawPackageInfo = await readFile(
+				join(
+					tempFolder,
+					'node_modules',
+					templateName,
+					'template.json'
+				)
+			);
+			const packageInfo = JSON.parse( rawPackageInfo );
+
+			return packageInfo;
 		}
 
 		await makeDir( cwd );
@@ -144,13 +154,7 @@ const downloadExternalTemplate = async ( templateName ) => {
 		await command( `npm install ${ templateName } --save`, { cwd } );
 
 		const rawPackageInfo = await readFile(
-			join(
-				process.cwd(),
-				'temp',
-				'node_modules',
-				templateName,
-				'template.json'
-			)
+			join( tempFolder, 'node_modules', templateName, 'template.json' )
 		);
 		const packageInfo = JSON.parse( rawPackageInfo );
 
@@ -171,4 +175,5 @@ module.exports = {
 	hasWPScriptsEnabled,
 	isCoreTemplate,
 	isExternalTemplate,
+	tempFolder,
 };

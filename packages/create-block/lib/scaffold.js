@@ -16,6 +16,7 @@ const {
 	hasWPScriptsEnabled,
 	getOutputFiles,
 	isCoreTemplate,
+	tempFolder,
 } = require( './templates' );
 
 module.exports = async function(
@@ -57,26 +58,19 @@ module.exports = async function(
 
 	const templateDirectory = isCoreTemplate( templateName )
 		? join( __dirname, 'templates' )
-		: join( process.cwd(), 'temp', 'node_modules' );
+		: join( tempFolder, 'node_modules' );
 
-	await Promise.all(
-		( await getOutputFiles( templateName ) ).map( async ( file ) => {
-			const template = await readFile(
-				join(
-					templateDirectory,
-					`${ templateName }/${ file }.mustache`
-				),
-				'utf8'
-			);
-			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ file.replace(
-				/\$slug/g,
-				slug
-			) }`;
-			await makeDir( dirname( outputFilePath ) );
-			writeFile( outputFilePath, render( template, view ) );
-		} )
-	);
+	const outputFiles = await getOutputFiles( templateName );
+	outputFiles.map( async ( file ) => {
+		const template = await readFile(
+			join( templateDirectory, `${ templateName }/${ file }.mustache` ),
+			'utf8'
+		);
+		// Output files can have names that depend on the slug provided.
+		const outputFilePath = `${ slug }/${ file.replace( /\$slug/g, slug ) }`;
+		await makeDir( dirname( outputFilePath ) );
+		writeFile( outputFilePath, render( template, view ) );
+	} );
 
 	if ( hasWPScriptsEnabled( templateName ) ) {
 		await initWPScripts( view );
