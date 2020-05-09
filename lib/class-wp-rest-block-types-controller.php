@@ -19,15 +19,15 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 *
 	 * @var WP_Block_Type_Registry
 	 */
-	protected $block_type_registry;
+	protected $registry;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace           = '__experimental';
-		$this->rest_base           = 'block-types';
-		$this->block_type_registry = WP_Block_Type_Registry::get_instance();
+		$this->namespace = '__experimental';
+		$this->rest_base = 'block-types';
+		$this->registry  = WP_Block_Type_Registry::get_instance();
 	}
 
 	/**
@@ -102,7 +102,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$data        = array();
-		$block_types = $this->block_type_registry->get_all_registered();
+		$block_types = $this->registry->get_all_registered();
 
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
@@ -167,7 +167,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Block_Type|WP_Error Block type object if name is valid, WP_Error otherwise.
 	 */
 	protected function get_block( $name ) {
-		$block_type = $this->block_type_registry->get_registered( $name );
+		$block_type = $this->registry->get_registered( $name );
 		if ( empty( $block_type ) ) {
 			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -230,16 +230,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		$response = rest_ensure_response( $data );
 
-		$response->add_links(
-			array(
-				'collection'              => array(
-					'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
-				),
-				'https://api.w.org/items' => array(
-					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $block_type->name ) ),
-				),
-			)
-		);
+		$response->add_links( $this->prepare_links( $block_type ) );
 
 		/**
 		 * Filters a block type returned from the REST API.
@@ -251,6 +242,25 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		 * @param WP_REST_Request  $request    Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_block_type', $response, $block_type, $request );
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @param WP_Block_Type   $block_type block type data.
+	 * @return array Links for the given block type.
+	 */
+	protected function prepare_links( $block_type ) {
+		$links = array(
+			'collection'              => array(
+				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
+			),
+			'about' => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $block_type->name ) ),
+			),
+		);
+
+		return $links;
 	}
 
 	/**
@@ -277,6 +287,15 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				'attributes'    => array(
 					'description' => __( 'Block attributes.', 'gutenberg' ),
 					'type'        => 'object',
+					'properties'           => array(
+						'layout' => array(
+							'description' => __( 'Block layout.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit' ),
+							'readonly'    => true,
+						),
+					),
+					'additionalProperties' => true,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
