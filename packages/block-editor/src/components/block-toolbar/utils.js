@@ -8,7 +8,12 @@ import { noop } from 'lodash';
 import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
-const { clearTimeout, requestAnimationFrame, setTimeout } = window;
+const {
+	clearTimeout,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+	setTimeout,
+} = window;
 const DEBOUNCE_TIMEOUT = 250;
 
 /**
@@ -153,6 +158,8 @@ export function useShowMoversGestures( {
 	};
 }
 
+let requestAnimationFrameId;
+
 /**
  * Hook that toggles the highlight (outline) state of a block
  *
@@ -171,10 +178,16 @@ export function useToggleBlockHighlight( clientId ) {
 	);
 
 	useEffect( () => {
+		// On mount, we make sure to cancel any pending animation frame request
+		// that hasn't been completed yet. Components like NavigableToolbar may
+		// mount and unmount quickly.
+		if ( requestAnimationFrameId ) {
+			cancelAnimationFrame( requestAnimationFrameId );
+		}
 		return () => {
 			// Sequences state change to enable editor updates (e.g. cursor
 			// position) to render correctly.
-			requestAnimationFrame( () => {
+			requestAnimationFrameId = requestAnimationFrame( () => {
 				updateBlockHighlight( false );
 			} );
 		};

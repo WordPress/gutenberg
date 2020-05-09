@@ -15,14 +15,16 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
 
 	const [ menuId, setMenuId ] = useState( 0 );
+	const [ stateMenus, setStateMenus ] = useState( null );
 
 	useEffect( () => {
 		if ( menus?.length ) {
+			setStateMenus( menus );
 			setMenuId( menus[ 0 ].id );
 		}
 	}, [ menus ] );
 
-	if ( ! menus ) {
+	if ( ! stateMenus ) {
 		return <Spinner />;
 	}
 
@@ -33,7 +35,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					<SelectControl
 						className="edit-navigation-menus-editor__menu-select-control"
 						label={ __( 'Select navigation to edit:' ) }
-						options={ menus.map( ( menu ) => ( {
+						options={ stateMenus.map( ( menu ) => ( {
 							value: menu.id,
 							label: menu.name,
 						} ) ) }
@@ -47,6 +49,15 @@ export default function MenusEditor( { blockEditorSettings } ) {
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
+					onDeleteMenu={ ( deletedMenu ) => {
+						const newStateMenus = stateMenus.filter( ( menu ) => {
+							return menu.id !== deletedMenu;
+						} );
+						setStateMenus( newStateMenus );
+						if ( newStateMenus.length ) {
+							setMenuId( newStateMenus[ 0 ].id );
+						}
+					} }
 				/>
 			) }
 		</>

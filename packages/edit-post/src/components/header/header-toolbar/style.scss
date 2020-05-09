@@ -67,6 +67,7 @@
 		display: none;
 	}
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -100,6 +101,7 @@
 			border-left: $border-width solid $light-gray-500;
 		}
 
+		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
 			$top-toolbar-padding: ( $header-height - $grid-unit-60 ) / 2;
 			height: $header-height;
@@ -108,7 +110,7 @@
 	}
 }
 
-.edit-post-header-toolbar > .edit-post-header-toolbar__inserter-toggle {
+.edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.
 	min-width: 32px;

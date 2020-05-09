@@ -6,22 +6,101 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Modal, Button } from '@wordpress/components';
+import {
+	CheckboxControl,
+	Button,
+	PanelBody,
+	PanelRow,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
+import {
+	close as closeIcon,
+	page,
+	layout,
+	grid,
+	blockDefault,
+} from '@wordpress/icons';
 
-function EntityRecordState( { record, checked, onChange } ) {
+const ENTITY_NAME_ICONS = {
+	site: layout,
+	page,
+	post: grid,
+	wp_template: grid,
+};
+
+function EntityRecordState( { record, checked, onChange, closePanel } ) {
+	const { name, kind, title, key } = record;
+	const parentBlockId = useSelect( ( select ) => {
+		// Get entity's blocks.
+		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
+			kind,
+			name,
+			key
+		);
+		// Get parents of the entity's first block.
+		const parents = select( 'core/block-editor' ).getBlockParents(
+			blocks[ 0 ]?.clientId
+		);
+		// Return closest parent block's clientId.
+		return parents[ parents.length - 1 ];
+	}, [] );
+
+	const isSelected = useSelect(
+		( select ) => {
+			const selectedBlockId = select(
+				'core/block-editor'
+			).getSelectedBlockClientId();
+			return selectedBlockId === parentBlockId;
+		},
+		[ parentBlockId ]
+	);
+	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
+		parentBlockId,
+	] );
+	const selectAndDismiss = useCallback( () => {
+		selectBlock( parentBlockId );
+		closePanel();
+	}, [ parentBlockId ] );
+
 	return (
-		<CheckboxControl
-			label={ <strong>{ record.title || __( 'Untitled' ) }</strong> }
-			checked={ checked }
-			onChange={ onChange }
-		/>
+		<PanelRow>
+			<CheckboxControl
+				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
+				checked={ checked }
+				onChange={ onChange }
+			/>
+			{ parentBlockId ? (
+				<>
+					<Button
+						onClick={ selectParentBlock }
+						className="entities-saved-states__find-entity"
+						disabled={ isSelected }
+					>
+						{ isSelectedText }
+					</Button>
+					<Button
+						onClick={ selectAndDismiss }
+						className="entities-saved-states__find-entity-small"
+						disabled={ isSelected }
+					>
+						{ isSelectedText }
+					</Button>
+				</>
+			) : null }
+		</PanelRow>
 	);
 }
 
-function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
+function EntityTypeList( {
+	list,
+	unselectedEntities,
+	setUnselectedEntities,
+	closePanel,
+} ) {
 	const firstRecord = list[ 0 ];
 	const entity = useSelect(
 		( select ) =>
@@ -29,9 +108,12 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 		[ firstRecord.kind, firstRecord.name ]
 	);
 
+	// Set icon based on type of entity.
+	const { name } = firstRecord;
+	const icon = ENTITY_NAME_ICONS[ name ] || blockDefault;
+
 	return (
-		<div className="editor-entities-saved-states__entity-type-list">
-			<h2>{ entity.label }</h2>
+		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordState
@@ -49,18 +131,22 @@ function EntityTypeList( { list, unselectedEntities, setUnselectedEntities } ) {
 						onChange={ ( value ) =>
 							setUnselectedEntities( record, value )
 						}
+						closePanel={ closePanel }
 					/>
 				);
 			} ) }
-		</div>
+		</PanelBody>
 	);
 }
 
-export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
-	const dirtyEntityRecords = useSelect(
-		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
-		[]
-	);
+export default function EntitiesSavedStates( { isOpen, close } ) {
+	const { dirtyEntityRecords } = useSelect( ( select ) => {
+		return {
+			dirtyEntityRecords: select(
+				'core'
+			).__experimentalGetDirtyEntityRecords(),
+		};
+	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
 	// To group entities by type.
@@ -106,40 +192,51 @@ export default function EntitiesSavedStates( { isOpen, onRequestClose } ) {
 			saveEditedEntityRecord( kind, name, key );
 		} );
 
-		onRequestClose( entitiesToSave );
+		close( entitiesToSave );
 	};
 
-	return (
-		isOpen && (
-			<Modal
-				title={ __( 'What do you want to save?' ) }
-				onRequestClose={ () => onRequestClose() }
-				contentLabel={ __( 'Select items to save.' ) }
-			>
-				{ partitionedSavables.map( ( list ) => {
-					return (
-						<EntityTypeList
-							key={ list[ 0 ].name }
-							list={ list }
-							unselectedEntities={ unselectedEntities }
-							setUnselectedEntities={ setUnselectedEntities }
-						/>
-					);
-				} ) }
+	// Explicitly define this with no argument passed.  Using `close` on
+	// its own will use the event object in place of the expected saved entities.
+	const dismissPanel = useCallback( () => close(), [ close ] );
 
+	return isOpen ? (
+		<div className="entities-saved-states__panel">
+			<div className="entities-saved-states__panel-header">
 				<Button
-					isPrimary
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
-					}
-					onClick={ saveCheckedEntities }
-					className="editor-entities-saved-states__save-button"
-				>
-					{ __( 'Save' ) }
-				</Button>
-			</Modal>
-		)
-	);
+					onClick={ dismissPanel }
+					icon={ closeIcon }
+					label={ __( 'Close panel' ) }
+				/>
+			</div>
+
+			<div className="entities-saved-states__text-prompt">
+				<h2>
+					{ __( 'Please review the following changes to save:' ) }
+				</h2>
+			</div>
+
+			{ partitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						closePanel={ dismissPanel }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
+
+			<Button
+				isPrimary
+				disabled={
+					dirtyEntityRecords.length - unselectedEntities.length === 0
+				}
+				onClick={ saveCheckedEntities }
+				className="editor-entities-saved-states__save-button"
+			>
+				{ __( 'Save selected items' ) }
+			</Button>
+		</div>
+	) : null;
 }

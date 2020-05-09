@@ -8,7 +8,14 @@
 /**
  * Class representing a parsed instance of a block.
  */
-class WP_Block implements ArrayAccess {
+class WP_Block {
+
+	/**
+	 * Original parsed array representation of block.
+	 *
+	 * @var array
+	 */
+	public $parsed_block;
 
 	/**
 	 * Name of block.
@@ -40,13 +47,6 @@ class WP_Block implements ArrayAccess {
 	 * @access protected
 	 */
 	protected $available_context;
-
-	/**
-	 * Block attribute values.
-	 *
-	 * @var array
-	 */
-	public $attributes = array();
 
 	/**
 	 * List of inner blocks (of this same class)
@@ -94,21 +94,14 @@ class WP_Block implements ArrayAccess {
 	 * @param WP_Block_Type_Registry $registry          Optional block type registry.
 	 */
 	public function __construct( $block, $available_context = array(), $registry = null ) {
-		$this->name = $block['blockName'];
+		$this->parsed_block = $block;
+		$this->name         = $block['blockName'];
 
 		if ( is_null( $registry ) ) {
 			$registry = WP_Block_Type_Registry::get_instance();
 		}
 
 		$this->block_type = $registry->get_registered( $this->name );
-
-		if ( ! empty( $block['attrs'] ) ) {
-			$this->attributes = $block['attrs'];
-		}
-
-		if ( ! is_null( $this->block_type ) ) {
-			$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
-		}
 
 		$this->available_context = $available_context;
 
@@ -133,12 +126,7 @@ class WP_Block implements ArrayAccess {
 			}
 			/* phpcs:enable */
 
-			$this->inner_blocks = array_map(
-				function( $inner_block ) use ( $child_context, $registry ) {
-					return new WP_Block( $inner_block, $child_context, $registry );
-				},
-				$block['innerBlocks']
-			);
+			$this->inner_blocks = new WP_Block_List( $block['innerBlocks'], $child_context, $registry );
 		}
 
 		if ( ! empty( $block['innerHTML'] ) ) {
@@ -148,6 +136,34 @@ class WP_Block implements ArrayAccess {
 		if ( ! empty( $block['innerContent'] ) ) {
 			$this->inner_content = $block['innerContent'];
 		}
+	}
+
+	/**
+	 * Returns a value from an inaccessible property.
+	 *
+	 * This is used to lazily initialize the `attributes` property of a block,
+	 * such that it is only prepared with default attributes at the time that
+	 * the property is accessed. For all other inaccessible properties, a `null`
+	 * value is returned.
+	 *
+	 * @param string $name Property name.
+	 *
+	 * @return array|null Prepared attributes, or null.
+	 */
+	public function __get( $name ) {
+		if ( 'attributes' === $name ) {
+			$this->attributes = isset( $this->parsed_block['attrs'] ) ?
+				$this->parsed_block['attrs'] :
+				array();
+
+			if ( ! is_null( $this->block_type ) ) {
+				$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
+			}
+
+			return $this->attributes;
+		}
+
+		return null;
 	}
 
 	/**
@@ -170,71 +186,12 @@ class WP_Block implements ArrayAccess {
 
 		if ( $is_dynamic ) {
 			$global_post   = $post;
-			$block_content = (string) call_user_func( $this->block_type->render_callback, $this, $block_content );
+			$block_content = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content, $this );
 			$post          = $global_post;
 		}
 
-		return $block_content;
-	}
-
-	/**
-	 * Returns true if an attribute exists by the specified attribute name, or
-	 * false otherwise.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetexists.php
-	 *
-	 * @param string $attribute_name Name of attribute to check.
-	 *
-	 * @return bool Whether attribute exists.
-	 */
-	public function offsetExists( $attribute_name ) {
-		return isset( $this->attributes[ $attribute_name ] );
-	}
-
-	/**
-	 * Returns the value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetget.php
-	 *
-	 * @param string $attribute_name Name of attribute value to retrieve.
-	 *
-	 * @return mixed|null Attribute value if exists, or null.
-	 */
-	public function offsetGet( $attribute_name ) {
-		// This may cause an "Undefined index" notice if the attribute name does
-		// not exist. This is expected, since the purpose of this implementation
-		// is to align exactly to the expectations of operating on an array.
-		return $this->attributes[ $attribute_name ];
-	}
-
-	/**
-	 * Assign an attribute value by the specified attribute name.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to set.
-	 * @param mixed  $value          Attribute value.
-	 */
-	public function offsetSet( $attribute_name, $value ) {
-		if ( is_null( $attribute_name ) ) {
-			// This is not technically a valid use-case for attributes. Since
-			// this implementation is expected to align to expectations of
-			// operating on an array, it is still supported.
-			$this->attributes[] = $value;
-		} else {
-			$this->attributes[ $attribute_name ] = $value;
-		}
-	}
-
-	/**
-	 * Unset an attribute.
-	 *
-	 * @link https://www.php.net/manual/en/arrayaccess.offsetunset.php
-	 *
-	 * @param string $attribute_name Name of attribute value to unset.
-	 */
-	public function offsetUnset( $attribute_name ) {
-		unset( $this->attributes[ $attribute_name ] );
+		/** This filter is documented in src/wp-includes/blocks.php */
+		return apply_filters( 'render_block', $block_content, $this->parsed_block );
 	}
 
 }
