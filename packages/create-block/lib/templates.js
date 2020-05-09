@@ -115,8 +115,9 @@ const getPrompts = async ( templateName ) => {
 	} );
 };
 
-const hasWPScriptsEnabled = ( templateName ) => {
-	return getTemplate( templateName ).wpScriptsEnabled || false;
+const hasWPScriptsEnabled = async ( templateName ) => {
+	const template = await getTemplate( templateName );
+	return template.wpScriptsEnabled || false;
 };
 
 const isCoreTemplate = ( templateName ) =>
