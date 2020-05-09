@@ -111,8 +111,12 @@ dependencies {
     implementation "com.facebook.react:react-native:$reactNativeVersion"
 }
 
-// Returns react-native version from root package.json
+// Returns react-native version based on environment
 def reactNativeVersion() {
+  if(rootProject.ext.buildGutenbergFromSource) {
+    return '+'
+  }
+
   def packageFile = new File("$projectDir/../../package.json")
   def packageContent = new groovy.json.JsonSlurper().parseText(packageFile.text)
   return packageContent['dependencies']['react-native']
