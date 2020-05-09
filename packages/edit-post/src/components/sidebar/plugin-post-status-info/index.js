@@ -17,7 +17,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * @param {Object} props Component properties.
  * @param {string} [props.className] An optional class name added to the row.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -34,7 +35,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * const { __ } = wp.i18n;

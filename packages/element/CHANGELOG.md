@@ -1,5 +1,23 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
+## Unreleased
+
+### New Feature
+
+-   Include TypeScript type declarations ([#21781](https://github.com/WordPress/gutenberg/pull/21781))
+
+## 2.13.1 (2020-04-15)
+
+### Bug Fix
+
+-   Hide TypeScript type declarations ([#21613](https://github.com/WordPress/gutenberg/pull/21613))
+    after they were found to conflict with DefinitelyTyped provided declarations.
+
+## 2.13.0 (2020-04-15)
+
+### New Features
+
+-   Include TypeScript type declarations ([#21248](https://github.com/WordPress/gutenberg/pull/21248))
 -   Graduated `__experimentalCreateInterpolateElement` function to stable api: `createInterpolateElement` (see [20699](https://github.com/WordPress/gutenberg/pull/20699))
 
 ## 2.10.0 (2019-12-19)

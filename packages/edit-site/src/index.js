@@ -28,3 +28,6 @@ export function initialize( id, settings ) {
 	}
 	render( <Editor settings={ settings } />, document.getElementById( id ) );
 }
+
+export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+export { default as __experimentalFullscrenModeClose } from './components/header/fullscreen-mode-close';

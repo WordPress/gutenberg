@@ -2,7 +2,7 @@
 
 Gutenberg is a Node.js-based project, built primarily in JavaScript.
 
-The first step is to install the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of Node. The easiest way (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install` in the Gutenberg directory.
+The first step is to install the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of Node, along with the latest version of [NPM](https://www.npmjs.com/). The easiest way (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by installing and running [nvm]. Once `nvm` is installed, you can install the correct version of Node by running `nvm install --latest-npm` in the Gutenberg directory.
 
 Once you have Node installed, run these scripts from within your local Gutenberg repository:
 
@@ -56,9 +56,13 @@ See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenbe
 
 ## On A Remote Server
 
-Open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`. You can now upload the entire repository to your `wp-content/plugins` directory on your web server and activate the plugin from the WordPress admin.
+You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
-You can also type `npm run package-plugin` which will run the two commands above and create a zip file automatically for you which you can use to install Gutenberg through the WordPress admin.
+To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`.
+
+After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
+
+Another way to upload after building is to run `npm run package-plugin` to create a plugin zip file — this requires `bash` and `php` to run. The script creates `gutenberg.zip` that you can use to install Gutenberg through the WordPress admin.
 
 [npm]: https://www.npmjs.com/
 [nvm]: https://github.com/creationix/nvm

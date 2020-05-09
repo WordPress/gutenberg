@@ -11,6 +11,10 @@
 		}
 	}
 
+	> .edit-post-header-toolbar__inserter-toggle {
+		display: inline-flex;
+	}
+
 	// Hide table of contents and block navigation on mobile.
 	.block-editor-block-navigation {
 		display: none;
@@ -35,6 +39,7 @@
 		display: none;
 	}
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
@@ -68,10 +73,20 @@
 			border-left: $border-width solid $light-gray-500;
 		}
 
+		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
 			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
 			height: $header-height;
 			padding: $top-toolbar-padding 0;
 		}
 	}
+}
+
+.edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle {
+	margin-right: $grid-unit-10;
+	// Special dimensions for this button.
+	min-width: 32px;
+	width: 32px;
+	height: 32px;
+	padding: 0;
 }

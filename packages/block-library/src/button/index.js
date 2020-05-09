@@ -34,6 +34,7 @@ export const settings = {
 		align: true,
 		alignWide: false,
 		reusable: false,
+		lightBlockWrapper: true,
 	},
 	parent: [ 'core/buttons' ],
 	styles: [

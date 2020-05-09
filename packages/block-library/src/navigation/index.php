@@ -197,15 +197,23 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 		$font_sizes['css_classes']
 	);
 	$classes[]       = 'wp-block-navigation-link';
-	$css_classes     = trim( implode( ' ', $classes ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
 		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
 		: '';
 
 	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
+		$css_classes = trim( implode( ' ', $classes ) );
 		$has_submenu = count( (array) $block['innerBlocks'] ) > 0;
+		$is_active   = ! empty( $block['attrs']['id'] ) && ( get_the_ID() === $block['attrs']['id'] );
 
-		$html .= '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) . '"' . $style_attribute . '>' .
+		$class_name = ! empty( $block['attrs']['className'] ) ? implode( ' ', (array) $block['attrs']['className'] ) : false;
+
+		if ( false !== $class_name ) {
+			$css_classes .= ' ' . $class_name;
+		};
+
+		$html .= '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
+			( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
 			'<a class="wp-block-navigation-link__content"';
 
 		// Start appending HTML attributes to anchor tag.
@@ -247,6 +255,9 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 
 		$html .= '</span>';
 
+		$html .= '</a>';
+		// End anchor tag content.
+
 		// Append submenu icon to top-level item.
 		// it shows the icon as default, when 'showSubmenuIcon' is not set,
 		// or when it's set and also not False.
@@ -260,11 +271,8 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
 
-		$html .= '</a>';
-		// End anchor tag content.
-
 		if ( $has_submenu ) {
-			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes, false );
+			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes );
 		}
 
 		$html .= '</li>';
@@ -284,6 +292,9 @@ function register_block_core_navigation() {
 		'core/navigation',
 		array(
 			'attributes' => array(
+				'orientation'           => array(
+					'type' => 'string',
+				),
 				'className'             => array(
 					'type' => 'string',
 				),

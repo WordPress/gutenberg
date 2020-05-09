@@ -13,6 +13,7 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
+		subscribeAndroidModalClosed: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
@@ -81,6 +82,10 @@ if ( ! global.window.matchMedia ) {
 }
 
 jest.mock( 'react-native-linear-gradient', () => () => 'LinearGradient', {
+	virtual: true,
+} );
+
+jest.mock( 'react-native-hsv-color-picker', () => () => 'HsvColorPicker', {
 	virtual: true,
 } );
 

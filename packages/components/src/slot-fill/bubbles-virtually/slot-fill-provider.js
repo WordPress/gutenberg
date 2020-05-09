@@ -13,23 +13,25 @@ function useSlotRegistry() {
 	const [ fills, setFills ] = useState( {} );
 
 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
-		setSlots( ( prevSlots ) => ( {
-			...prevSlots,
-			[ name ]: {
-				...prevSlots[ name ],
-				ref: ref || prevSlots[ name ].ref,
-				fillProps: fillProps || prevSlots[ name ].fillProps || {},
-			},
-		} ) );
+		setSlots( ( prevSlots ) => {
+			const currentSlot = prevSlots[ name ] || {};
+			return {
+				...prevSlots,
+				[ name ]: {
+					...currentSlot,
+					ref: ref || currentSlot.ref,
+					fillProps: fillProps || currentSlot.fillProps || {},
+				},
+			};
+		} );
 	}, [] );
 
 	const unregisterSlot = useCallback( ( name, ref ) => {
 		setSlots( ( prevSlots ) => {
-			// eslint-disable-next-line no-unused-vars
 			const { [ name ]: slot, ...nextSlots } = prevSlots;
 			// Make sure we're not unregistering a slot registered by another element
 			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
-			if ( slot.ref === ref ) {
+			if ( slot?.ref === ref ) {
 				return nextSlots;
 			}
 			return prevSlots;

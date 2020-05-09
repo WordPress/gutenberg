@@ -1,3 +1,7 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
 ## 1.0.5 (2019-01-03)
 
 ## 1.0.4 (2018-12-12)

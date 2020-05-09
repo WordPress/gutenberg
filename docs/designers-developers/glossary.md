@@ -19,8 +19,8 @@
 <dt>Block name</dt>
 <dd>A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. <code>core/image</code></dd>
 
-<dt>Block patterns</dt>
-<dd>Block patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
+<dt>Patterns</dt>
+<dd>Patterns are predefined layouts of blocks that can be inserted as starter content that are meant to be changed by the user every time. Once inserted, they exist as a local save and are not global.</dd>
 
 <dt>Block type</dt>
 <dd>In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.</dd>
@@ -59,7 +59,7 @@
 <dd>A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block.</dd>
 
 <dt>Template</dt>
-<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the templates documentation for more information. See <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.</dd>
+<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the <a href="../../developers/block-api/block-templates/">templates documentation</a> for more information.</dd>
 
 <dt>Template part</dt>
 <dd>Template parts are equivalent – in blocks – of theme template parts. They are generally defined by a theme first. They carry some semantic meaning (could be swapped between themes such as a header) and can only be inserted in the site editor context (within “templates”). They are primarily site structure and are never to be mixed with the post content editor. </dd>

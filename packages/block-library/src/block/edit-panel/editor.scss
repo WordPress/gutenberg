@@ -48,11 +48,9 @@
 }
 
 .is-navigate-mode .is-selected .reusable-block-edit-panel {
-	border-color: $blue-medium-focus;
-	border-style: solid;
-	border-bottom: 0;
+	box-shadow: 0 0 0 $border-width $blue-medium-focus;
 
 	.is-dark-theme & {
-		border-color: $blue-medium-focus;
+		box-shadow: 0 0 0 $border-width $blue-medium-focus;
 	}
 }

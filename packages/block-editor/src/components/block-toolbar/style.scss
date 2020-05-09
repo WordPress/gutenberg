@@ -19,6 +19,7 @@
 	}
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
@@ -37,6 +38,7 @@
 	}
 
 	> :last-child,
+	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
 		border-right: none;
 	}
@@ -44,130 +46,11 @@
 
 .block-editor-block-toolbar,
 .block-editor-format-toolbar {
-	// Toolbar buttons.
-	.components-button {
-		position: relative;
-
-		// Give all buttons extra padding to fit text.
-		padding-left: $grid-unit-20;
-		padding-right: $grid-unit-20;
-
-		// Don't show the focus inherited by the Button component.
-		&:focus:enabled {
-			box-shadow: none;
-			outline: none;
-		}
-
-		// Focus and toggle pseudo elements.
-		&::before {
-			content: "";
-			position: absolute;
-			display: block;
-			border-radius: $radius-block-ui;
-			height: 32px;
-			min-width: 32px;
-
-			// Position the focus rectangle.
-			left: $grid-unit-10;
-			right: $grid-unit-10;
-		}
-
-		svg {
-			position: relative;
-
-			// Center the icon inside.
-			margin-left: auto;
-			margin-right: auto;
-		}
-
-		// Toggled style.
-		&.is-pressed {
-			color: $white;
-
-			&::before {
-				background: $dark-gray-primary;
-			}
-		}
-
-		// Focus style.
-		&:focus::before {
-			@include block-toolbar-button-style__focus();
-		}
-
-		// Ensure the icon buttons remain square.
-		&.has-icon {
-			// Reduce the default padding when a button only has an icon.
-			padding-left: $grid-unit-10;
-			padding-right: $grid-unit-10;
-
-			min-width: $block-toolbar-height;
-			justify-content: center;
-		}
-
-		// @todo: We should extract the tabs styles to the tabs component itself
-		&.components-tab-button {
-			font-weight: 500;
-
-			span {
-				display: inline-block;
-				padding-left: 0;
-				padding-right: 0;
-				position: relative;
-			}
-		}
-	}
-
-	// Size multiple sequential buttons to be optically balanced.
-	// Icons are 36px, as set by a 24px icon and 12px padding.
-	.components-toolbar div > .components-button.has-icon {
-		min-width: $block-toolbar-height - $grid-unit-15;
-		padding-left: $grid-unit-15 / 2; // 6px.
-		padding-right: $grid-unit-15 / 2;
-
-		svg {
-			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
-		}
-
-		&::before {
-			left: 2px;
-			right: 2px;
-		}
-	}
-
-	// First button in a group.
-	.components-toolbar div:first-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
-		padding-left: $grid-unit-15 - $border-width;
-		padding-right: $grid-unit-15 / 2;
-
-		&::before {
-			left: $grid-unit-10;
-			right: 2px;
-		}
-	}
-
-	// Last button in a group.
-	.components-toolbar div:last-child .components-button {
-		min-width: $block-toolbar-height - $grid-unit-15 / 2;
-		padding-left: $grid-unit-15 / 2;
-		padding-right: $grid-unit-15 - $border-width;
-
-		&::before {
-			left: 2px;
-			right: $grid-unit-10;
-		}
-	}
-
-	// Single buttons should remain 48px.
-	.components-toolbar div:first-child:last-child > .components-button {
-		min-width: $block-toolbar-height;
-		padding-left: $grid-unit-15;
-		padding-right: $grid-unit-15;
-
-		&::before {
-			left: $grid-unit-10;
-			right: $grid-unit-10;
-		}
+	// Override Toolbar buttons size.
+	.components-toolbar-group,
+	.components-toolbar {
+		display: flex;
+		flex-wrap: nowrap;
 	}
 }
 
@@ -202,8 +85,17 @@
 			top: -1px;
 			transform: translateX(-48px);
 			user-select: none;
-			z-index: -1; // This makes it slide out from underneath the toolbar.
 		}
+	}
+
+	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
+	.block-editor-block-toolbar__block-switcher-wrapper {
+		background: $white;
+		border-left: $border-width solid;
+		border-radius: 0 0 $radius-block-ui $radius-block-ui;
+		position: relative;
+		z-index: 1;
+		margin-left: -$border-width;
 	}
 
 	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {

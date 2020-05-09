@@ -2,6 +2,11 @@
 
 For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 8.3.0
+
+- The PHP function `gutenberg_get_post_from_context` has been removed. Use [Block Context](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) instead.
+- The old Block Pattern APIs `register_pattern`/`unregister_pattern` have been removed. Use the [new functions](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-patterns.md#register_block_pattern) instead. 
+
 ## 5.5.0
 
 - The PHP function `gutenberg_init` has been removed.
@@ -241,11 +246,11 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://github.com/WordPress/gutenberg/blob/v3.0.0/editor/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](https://github.com/WordPress/gutenberg/blob/v2.8.0/components/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 

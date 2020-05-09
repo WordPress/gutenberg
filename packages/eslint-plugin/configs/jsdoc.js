@@ -17,6 +17,7 @@ const temporaryWordPressInternalTypes = [
 	'WPBlockSerializationOptions',
 	'WPBlock',
 	'WPBlockPattern',
+	'WPBlockType',
 	'WPBlockTypeIcon',
 	'WPBlockTypeIconRender',
 	'WPBlockTypeIconDescriptor',
@@ -47,6 +48,7 @@ const typescriptUtilityTypes = [
 	'IterableIterator',
 	'NonNullable',
 	'Omit',
+	'Parameters',
 	'Partial',
 	'Pick',
 	'PromiseLike',
@@ -58,6 +60,10 @@ const typescriptUtilityTypes = [
 	'Required',
 	'ReturnType',
 	'ThisType',
+	'unknown',
+	'never',
+	'NodeJS',
+	'AsyncIterableIterator',
 ];
 
 module.exports = {
@@ -75,7 +81,7 @@ module.exports = {
 	},
 	rules: {
 		'jsdoc/no-undefined-types': [
-			'warn',
+			'error',
 			{
 				definedTypes: [
 					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
@@ -88,11 +94,33 @@ module.exports = {
 					...temporaryWordPressInternalTypes,
 					...temporaryExternalTypes,
 					'void',
+					'JSX',
 				],
 			},
 		],
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
+		'jsdoc/check-access': 'error',
+		'jsdoc/check-alignment': 'error',
+		'jsdoc/check-param-names': 'error',
+		'jsdoc/check-property-names': 'error',
+		'jsdoc/check-tag-names': 'error',
+		'jsdoc/check-types': 'error',
+		'jsdoc/check-values': 'off',
+		'jsdoc/empty-tags': 'error',
+		'jsdoc/implements-on-classes': 'error',
+		'jsdoc/newline-after-description': 'error',
+		'jsdoc/require-param': 'error',
+		'jsdoc/require-param-name': 'error',
+		'jsdoc/require-param-type': 'error',
+		'jsdoc/require-property': 'error',
+		'jsdoc/require-property-description': 'error',
+		'jsdoc/require-property-name': 'error',
+		'jsdoc/require-property-type': 'error',
+		'jsdoc/require-returns-check': 'error',
+		'jsdoc/require-returns-description': 'error',
+		'jsdoc/require-returns-type': 'error',
+		'jsdoc/valid-types': 'error',
 	},
 };

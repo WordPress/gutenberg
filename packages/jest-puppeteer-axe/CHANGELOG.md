@@ -1,3 +1,11 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## New Features
+
+- The `axe-puppeteer` dependency has been updated from requiring `^1.0.0` to requiring `^1.1.0`.
+
 ## 1.1.0 (2019-05-21)
 
 ### New Feature

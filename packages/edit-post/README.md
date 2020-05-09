@@ -81,9 +81,9 @@ const doOnClick = ( ) => {
 
 const MyPluginBlockSettingsMenuItem = () => (
     <PluginBlockSettingsMenuItem
-		allowedBlocks=[ 'core/paragraph' ]
+		allowedBlocks={ [ 'core/paragraph' ] }
 		icon='dashicon-name'
-		label=__( 'Menu item text' )
+		label={ __( 'Menu item text' ) }
 		onClick={ doOnClick } />
 );
 ```
@@ -437,10 +437,6 @@ _Parameters_
 -   _props.title_ `string`: Title displayed at the top of the sidebar.
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
-
-_Returns_
-
--   `WPComponent`: Plugin sidebar component.
 
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 

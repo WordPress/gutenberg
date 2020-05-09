@@ -4,6 +4,12 @@
 }
 
 .outline {
+	// Border Width has to be spread since width is thicker
+	// on Android when border radius is decreased to 0
+	border-left-width: $border-width;
+	border-right-width: $border-width;
+	border-top-width: $border-width;
+	border-bottom-width: $border-width;
 	position: absolute;
 	left: -($block-spacing + $border-width);
 	right: -($block-spacing + $border-width);
@@ -19,17 +25,13 @@
 	bottom: 0;
 }
 
-.button {
-	border-width: $border-width;
+.defaultButton {
 	border-radius: $border-width * 4;
 	padding: $block-spacing;
-	max-width: 580px;
-	min-width: 108px;
-	margin: $panel-padding;
-}
-
-.fallbackButton {
+	border-width: $border-width;
+	margin: 2 * $panel-padding;
 	background-color: $button-fallback-bg;
+	color: $white;
 }
 
 .clearLinkButton {
@@ -38,4 +40,11 @@
 
 .placeholderTextColor {
 	color: rgba($color: $white, $alpha: 0.43);
+}
+
+.placeholder {
+	font-family: $default-regular-font;
+	min-height: 22px;
+	font-size: 16px;
+	display: none;
 }

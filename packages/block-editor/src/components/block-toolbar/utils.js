@@ -1,9 +1,20 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+/**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
+const {
+	clearTimeout,
+	requestAnimationFrame,
+	cancelAnimationFrame,
+	setTimeout,
+} = window;
+const DEBOUNCE_TIMEOUT = 250;
 
 /**
  * Hook that creates a showMover state, as well as debounced show/hide callbacks
@@ -11,10 +22,16 @@ const { clearTimeout, setTimeout } = window;
 export function useDebouncedShowMovers( {
 	ref,
 	isFocused,
-	debounceTimeout = 500,
+	debounceTimeout = DEBOUNCE_TIMEOUT,
+	onChange = noop,
 } ) {
 	const [ showMovers, setShowMovers ] = useState( false );
 	const timeoutRef = useRef();
+
+	const handleOnChange = ( nextIsFocused ) => {
+		setShowMovers( nextIsFocused );
+		onChange( nextIsFocused );
+	};
 
 	const getIsHovered = () => {
 		return ref?.current && ref.current.matches( ':hover' );
@@ -26,40 +43,41 @@ export function useDebouncedShowMovers( {
 		return ! isFocused && ! isHovered;
 	};
 
-	const debouncedShowMovers = useCallback(
-		( event ) => {
-			if ( event ) {
-				event.stopPropagation();
+	const clearTimeoutRef = () => {
+		const timeout = timeoutRef.current;
+
+		if ( timeout && clearTimeout ) {
+			clearTimeout( timeout );
+		}
+	};
+
+	const debouncedShowMovers = ( event ) => {
+		if ( event ) {
+			event.stopPropagation();
+		}
+
+		clearTimeoutRef();
+
+		if ( ! showMovers ) {
+			handleOnChange( true );
+		}
+	};
+
+	const debouncedHideMovers = ( event ) => {
+		if ( event ) {
+			event.stopPropagation();
+		}
+
+		clearTimeoutRef();
+
+		timeoutRef.current = setTimeout( () => {
+			if ( shouldHideMovers() ) {
+				handleOnChange( false );
 			}
+		}, debounceTimeout );
+	};
 
-			const timeout = timeoutRef.current;
-
-			if ( timeout && clearTimeout ) {
-				clearTimeout( timeout );
-			}
-			if ( ! showMovers ) {
-				setShowMovers( true );
-			}
-		},
-		[ showMovers ]
-	);
-
-	const debouncedHideMovers = useCallback(
-		( event ) => {
-			if ( event ) {
-				event.stopPropagation();
-			}
-
-			timeoutRef.current = setTimeout( () => {
-				if ( shouldHideMovers() ) {
-					setShowMovers( false );
-				}
-			}, debounceTimeout );
-		},
-		[ isFocused ]
-	);
-
-	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
+	useEffect( () => () => clearTimeoutRef(), [] );
 
 	return {
 		showMovers,
@@ -72,13 +90,17 @@ export function useDebouncedShowMovers( {
  * Hook that provides a showMovers state and gesture events for DOM elements
  * that interact with the showMovers state.
  */
-export function useShowMoversGestures( { ref, debounceTimeout = 500 } ) {
+export function useShowMoversGestures( {
+	ref,
+	debounceTimeout = DEBOUNCE_TIMEOUT,
+	onChange = noop,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const {
 		showMovers,
 		debouncedShowMovers,
 		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused } );
+	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
 
 	const registerRef = useRef( false );
 
@@ -134,4 +156,42 @@ export function useShowMoversGestures( { ref, debounceTimeout = 500 } ) {
 			onMouseLeave: debouncedHideMovers,
 		},
 	};
+}
+
+let requestAnimationFrameId;
+
+/**
+ * Hook that toggles the highlight (outline) state of a block
+ *
+ * @param {string} clientId The block's clientId
+ *
+ * @return {Function} Callback function to toggle highlight state.
+ */
+export function useToggleBlockHighlight( clientId ) {
+	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
+
+	const updateBlockHighlight = useCallback(
+		( isFocused ) => {
+			toggleBlockHighlight( clientId, isFocused );
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		// On mount, we make sure to cancel any pending animation frame request
+		// that hasn't been completed yet. Components like NavigableToolbar may
+		// mount and unmount quickly.
+		if ( requestAnimationFrameId ) {
+			cancelAnimationFrame( requestAnimationFrameId );
+		}
+		return () => {
+			// Sequences state change to enable editor updates (e.g. cursor
+			// position) to render correctly.
+			requestAnimationFrameId = requestAnimationFrame( () => {
+				updateBlockHighlight( false );
+			} );
+		};
+	}, [] );
+
+	return updateBlockHighlight;
 }
