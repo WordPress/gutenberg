@@ -767,6 +767,7 @@ export class RichText extends Component {
 			parentBlockStyles,
 			withoutInteractiveFormatting,
 			capabilities,
+			disableEditingMenu=false,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -896,7 +897,7 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ [ '@' ] }
+					triggerKeyCodes={ disableEditingMenu === false && isMentionsSupported( capabilities ) ? [ '@' ] : [] }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -918,7 +919,7 @@ export class RichText extends Component {
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					disableEditingMenu={ this.props.disableEditingMenu }
+					disableEditingMenu={ disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
