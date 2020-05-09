@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+import { cog, moreHorizontal } from '@wordpress/icons';
 import { PinnedItems } from '@wordpress/interface';
 
 /**
@@ -29,6 +30,7 @@ function Header( {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
+		showIconLabel,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -45,6 +47,9 @@ function Header( {
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
 			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			showIconLabel: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 			deviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
@@ -55,6 +60,8 @@ function Header( {
 		'core/edit-post'
 	);
 
+	const isLargeViewport = useViewportMatch( 'large' );
+
 	const toggleGeneralSidebar = isEditorSidebarOpened
 		? closeGeneralSidebar
 		: () =>
@@ -63,6 +70,44 @@ function Header( {
 						? 'edit-post/block'
 						: 'edit-post/document'
 				);
+
+	const headerSettings = (
+		<div className="edit-post-header__settings">
+			{ ! isPublishSidebarOpened && (
+				// This button isn't completely hidden by the publish sidebar.
+				// We can't hide the whole toolbar when the publish sidebar is open because
+				// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+				// We track that DOM node to return focus to the PostPublishButtonOrToggle
+				// when the publish sidebar has been closed.
+				<PostSavedState
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+			) }
+			<DevicePreview />
+			<PostPreviewButton
+				forceIsAutosaveable={ hasActiveMetaboxes }
+				forcePreviewLink={ isSaving ? null : undefined }
+			/>
+			<PostPublishButtonOrToggle
+				forceIsDirty={ hasActiveMetaboxes }
+				forceIsSaving={ isSaving }
+				setEntitiesSavedStatesCallback={
+					setEntitiesSavedStatesCallback
+				}
+			/>
+			<Button
+				icon={ cog }
+				label={ __( 'Settings' ) }
+				onClick={ toggleGeneralSidebar }
+				isPressed={ isEditorSidebarOpened }
+				aria-expanded={ isEditorSidebarOpened }
+				shortcut={ shortcut }
+			/>
+			<PinnedItems.Slot scope="core/edit-post" />
+			<MoreMenu showIconLabel={ showIconLabel } />
+		</div>
+	);
 
 	return (
 		<div className="edit-post-header">
@@ -73,41 +118,23 @@ function Header( {
 					isInserterOpen={ isInserterOpen }
 				/>
 			</div>
-			<div className="edit-post-header__settings">
-				{ ! isPublishSidebarOpened && (
-					// This button isn't completely hidden by the publish sidebar.
-					// We can't hide the whole toolbar when the publish sidebar is open because
-					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-					// We track that DOM node to return focus to the PostPublishButtonOrToggle
-					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
-					/>
-				) }
-				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
+			{ isLargeViewport && headerSettings }
+			{ ! isLargeViewport && (
+				<Dropdown
+					className="my-container-class-name"
+					contentClassName="my-popover-content-classname"
+					position="bottom right"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<Button
+							aria-expanded={ isOpen }
+							icon={ moreHorizontal }
+							isSecondary
+							onClick={ onToggle }
+						/>
+					) }
+					renderContent={ () => headerSettings }
 				/>
-				<PostPublishButtonOrToggle
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-				/>
-				<Button
-					icon={ cog }
-					label={ __( 'Settings' ) }
-					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcut }
-				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
-			</div>
+			) }
 		</div>
 	);
 }
