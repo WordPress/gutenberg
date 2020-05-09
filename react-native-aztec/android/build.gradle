@@ -84,12 +84,12 @@ repositories {
 
     maven { url "https://jitpack.io" }
 
-    if (!rootProject.ext.buildGutenbergFromSource) {
+  if (!rootProject.ext.buildGutenbergFromSource) {
          // if not building from source (where the node_modules dir is used), use a remote RN maven repo
          def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
          println "Will use the RN maven repo at ${reactNativeRepo}"
          maven { url reactNativeRepo }
-     }
+   }
 }
 
 dependencies {
@@ -109,13 +109,14 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
-    if (rootProject.ext.buildGutenbergFromSource) {
-        implementation "com.facebook.react:react-native:+" // From node_modules.
-    } else {
+    def reactNativeVersion = reactNativeVersion()
+    logger.quiet("Using react-native version: $reactNativeVersion")
+    implementation "com.facebook.react:react-native:$reactNativeVersion"
+}
 
-        // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
-        //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        def rnVersion = '0.61.5'
-        implementation "com.facebook.react:react-native:${rnVersion}" // From Maven repo
-    }
+// Returns react-native version from root package.json
+def reactNativeVersion() {
+  def packageFile = new File("$projectDir/../../package.json")
+  def packageContent = new groovy.json.JsonSlurper().parseText(packageFile.text)
+  return packageContent['dependencies']['react-native']
 }
