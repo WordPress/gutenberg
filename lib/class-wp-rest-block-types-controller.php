@@ -163,7 +163,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Get the block, if the name is valid.
 	 *
-	 * @param string $name Block name
+	 * @param string $name Block name.
 	 * @return WP_Block_Type|WP_Error Block type object if name is valid, WP_Error otherwise.
 	 */
 	protected function get_block( $name ) {
@@ -247,15 +247,15 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares links for the request.
 	 *
-	 * @param WP_Block_Type   $block_type block type data.
+	 * @param WP_Block_Type $block_type block type data.
 	 * @return array Links for the given block type.
 	 */
 	protected function prepare_links( $block_type ) {
 		$links = array(
-			'collection'              => array(
+			'collection' => array(
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
-			'about' => array(
+			'about'      => array(
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $block_type->name ) ),
 			),
 		);
@@ -285,8 +285,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'attributes'    => array(
-					'description' => __( 'Block attributes.', 'gutenberg' ),
-					'type'        => 'object',
+					'description'          => __( 'Block attributes.', 'gutenberg' ),
+					'type'                 => 'object',
 					'properties'           => array(
 						'layout' => array(
 							'description' => __( 'Block layout.', 'gutenberg' ),
@@ -296,8 +296,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 						),
 					),
 					'additionalProperties' => true,
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
+					'context'              => array( 'embed', 'view', 'edit' ),
+					'readonly'             => true,
 				),
 				'is_dynamic'    => array(
 					'description' => __( 'Is the block dynamically rendered.', 'gutenberg' ),
