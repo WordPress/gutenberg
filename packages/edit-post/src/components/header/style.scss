@@ -55,8 +55,21 @@
 	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
-	.my-popover-content-classname {
-		display: block;
+	.my-popover-content-classname & {
+		min-width: 150px;
+		.editor-post-saved-state {
+			margin-bottom: 1rem;
+		}
+		button {
+			width: 100%;
+		}
+		.is-primary {
+			justify-content: center;
+		}
+		.components-button .label {
+			flex-basis: auto;
+			padding-right: 7px;
+		}
 	}
 
 	@include break-small() {
@@ -82,6 +95,9 @@
 			margin-bottom: 1rem;
 			text-align: left;
 			width: 100%;
+			&:last-child {
+				margin-bottom: 0;
+			}
 		}
 	}
 }
