@@ -73,7 +73,8 @@ module.exports = async function(
 		writeFile( outputFilePath, render( template, view ) );
 	} );
 
-	if ( hasWPScriptsEnabled( templateName ) ) {
+	const wpScriptsEnabled = await hasWPScriptsEnabled( templateName );
+	if ( wpScriptsEnabled ) {
 		await initWPScripts( view );
 	}
 
@@ -83,7 +84,7 @@ module.exports = async function(
 	success(
 		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
 	);
-	if ( hasWPScriptsEnabled( templateName ) ) {
+	if ( wpScriptsEnabled ) {
 		info( '' );
 		info( 'Inside that directory, you can run several commands:' );
 		info( '' );
