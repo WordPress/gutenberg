@@ -210,7 +210,7 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
-### `wp-env run [container] [command]` 
+### `wp-env run [container] [command]`
 
 ```sh
 wp-env run <container> [command..]
@@ -236,10 +236,10 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
-### `docker logs -f [container_id] >/dev/null` 
+### `docker logs -f [container_id] >/dev/null`
 
 ```sh
-docker logs -f <container_id> >/dev/null 
+docker logs -f <container_id> >/dev/null
 
 Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
 ```
@@ -250,23 +250,24 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports five fields:
 
-| Field         | Type          | Default                                    | Description                                                                                                               |
-| ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
-| `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `integer`      | `8889`                                   | The port number to use for the tests instance.                                                                            |
-| `"config"`    | `Object`      | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+| Field         | Type           | Default                                     | Description                                                                                                               |
+| ------------- | -------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`      | `string\|null` | `null`                                      | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"plugins"`   | `string[]`     | `[]`                                        | A list of plugins to install and activate in the environment.                                                             |
+| `"themes"`    | `string[]`     | `[]`                                        | A list of themes to install in the environment. The first theme in the list will be activated.                            |
+| `"port"`      | `integer`      | `8888`                                      | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`                                      | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`       | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"`  | Mapping of wp-config.php constants to their desired values.                                                               |
+| `"mappings"`  | `Object`       | `"{ "wp-content/themes: "path/to/themes }"` | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
-Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
+Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields. _Note that the `mappings` config only accepts relative and absolute sources as values._
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
 | GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
@@ -323,6 +324,20 @@ This is useful for integration testing: that is, testing how old versions of Wor
 }
 ```
 
+#### Override wp-content directories
+
+This is useful if you need to specify wp-content directories directly:
+
+````json
+{
+	"plugins": [ "." ],
+	"themes": [ "WordPress/theme-experiments" ],
+	"mappings": {
+		"wp-content/uploads": "./path/to/local/uploads",
+		"wp-content/themes": "./path/to/local/themes",
+	}
+}
+
 #### Custom Port Numbers
 
 You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
@@ -333,6 +348,6 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 	"port": 4013,
 	"testsPort": 4012
 }
-```
+````
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

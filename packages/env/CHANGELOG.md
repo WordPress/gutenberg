@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   You may now mount local directories other than single plugin or theme sources to WordPress. For example, you can specify `"wp-content/themes": "./path/to/some/themes"` to directly set the wp-content theme directory.
+
 ## 1.1.0 (2020-04-01)
 
 ### New Feature
