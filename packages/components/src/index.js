@@ -108,7 +108,6 @@ export {
 } from './slot-fill';
 
 // Higher-Order Components
-export { default as useFilters } from './higher-order/use-filters';
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';

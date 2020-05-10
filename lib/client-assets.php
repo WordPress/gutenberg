@@ -693,3 +693,19 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
 }
+
+/**
+ * Extends block editor settings to include UI labels to be shown for elements.
+ *
+ * Currently experimental.
+ *
+ * @param  array $settings Default editor settings.
+ * @return array           Modified editor settings.
+ */
+function gutenberg_extend_settings_ui_labels( $settings ) {
+	$settings['__experimentalLabels'] = array(
+		'document' => __( 'Document', 'gutenberg' ),
+	);
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_ui_labels' );

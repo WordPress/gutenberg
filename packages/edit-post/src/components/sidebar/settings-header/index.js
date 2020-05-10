@@ -1,21 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { Button, useFilters } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 
 const SettingsHeader = ( {
 	openDocumentSettings,
 	openBlockSettings,
 	sidebarName,
 } ) => {
-	const blockLabel = __( 'Block' );
-	const documentLabel = useFilters(
-		'edit-post.sidebar.settings-header.document-label',
+	const documentLabel = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
 		// translators: ARIA label for the Document sidebar tab, not selected.
-		__( 'Document' )
-	);
+		return settings?.__experimentalLabels?.document ?? __( 'Document' );
+	} );
 
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
@@ -24,6 +23,7 @@ const SettingsHeader = ( {
 			: // translators: ARIA label for the Document sidebar tab, not selected.
 			  [ documentLabel, '' ];
 
+	const blockLabel = __( 'Block' );
 	const [ blockAriaLabel, blockActiveClass ] =
 		sidebarName === 'edit-post/block'
 			? // translators: ARIA label for the Settings Sidebar tab, selected.
