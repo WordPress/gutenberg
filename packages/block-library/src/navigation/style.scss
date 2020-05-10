@@ -25,24 +25,43 @@
 
 // Styles for submenu flyout
 .has-child {
+	$navigation-vertical-padding: $grid-unit-10 * 0.75;
 	.wp-block-navigation__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
-		padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+		padding: $navigation-vertical-padding 0;
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
 		left: 0;
 		top: 100%;
+		width: fit-content;
 		z-index: 1;
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
 
-		// Nested submenus sit to the left on large breakpoints
+		> .wp-block-navigation-link {
+			font-size: 15px;
+
+			> .wp-block-navigation-link__content {
+				flex-grow: 1;
+			}
+			> .wp-block-navigation-link__submenu-icon {
+				padding-right: $grid-unit-10;
+			}
+		}
+
 		@include break-medium {
+			left: $grid-unit-30;
+
+			// Nested submenus sit to the left on large breakpoints
 			.wp-block-navigation__container {
 				left: 100%;
-				top: -$border-width;
+				top: -$border-width - $navigation-vertical-padding;
+			}
+
+			.wp-block-navigation-link__submenu-icon svg {
+				transform: rotate(0);
 			}
 		}
 	}
@@ -73,6 +92,7 @@
 
 // All links
 .wp-block-navigation-link__content {
+	text-decoration: none;
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	.has-text-color & {
@@ -81,19 +101,22 @@
 }
 
 .wp-block-navigation-link__label {
+	font-size: 17px;
+	font-family: $default-font;
+
 	word-break: normal;
 	overflow-wrap: break-word;
 }
 
 .wp-block-navigation-link__submenu-icon {
+	height: inherit;
 	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
 
 	svg {
 		fill: currentColor;
 
 		@include break-medium {
-			// reset rotation of submenu indicator icons on nested levels
-			transform: rotate(0);
+			transform: rotate(90deg);
 		}
 	}
 }

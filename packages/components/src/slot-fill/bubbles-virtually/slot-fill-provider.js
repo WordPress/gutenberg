@@ -13,14 +13,17 @@ function useSlotRegistry() {
 	const [ fills, setFills ] = useState( {} );
 
 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
-		setSlots( ( prevSlots ) => ( {
-			...prevSlots,
-			[ name ]: {
-				...prevSlots[ name ],
-				ref: ref || prevSlots[ name ].ref,
-				fillProps: fillProps || prevSlots[ name ].fillProps || {},
-			},
-		} ) );
+		setSlots( ( prevSlots ) => {
+			const currentSlot = prevSlots[ name ] || {};
+			return {
+				...prevSlots,
+				[ name ]: {
+					...currentSlot,
+					ref: ref || currentSlot.ref,
+					fillProps: fillProps || currentSlot.fillProps || {},
+				},
+			};
+		} );
 	}, [] );
 
 	const unregisterSlot = useCallback( ( name, ref ) => {

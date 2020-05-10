@@ -9,6 +9,8 @@ import { link } from './link';
 import { strikethrough } from './strikethrough';
 import { underline } from './underline';
 import { textColor } from './text-color';
+import { subscript } from './subscript';
+import { superscript } from './superscript';
 
 export default [
 	bold,
@@ -19,4 +21,6 @@ export default [
 	strikethrough,
 	underline,
 	textColor,
+	subscript,
+	superscript,
 ];

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.4.1",
+	"version": "9.5.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,7 +53,7 @@
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
-		"reakit": "^1.0.0-rc.0",
+		"reakit": "^1.0.0-rc.2",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^7.0.2"
