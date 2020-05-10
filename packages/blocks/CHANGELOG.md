@@ -1,4 +1,6 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
 
 ## 6.13.0 (2020-04-01)
 

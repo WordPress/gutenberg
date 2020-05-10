@@ -1,4 +1,12 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 3.12.0 (2020-04-30)
+
+### Bug Fix
+
+- Relax type of `sprintf` arguments type ([#21919](https://github.com/WordPress/gutenberg/pull/21919))
 
 ## 3.11.0 (2020-04-15)
 

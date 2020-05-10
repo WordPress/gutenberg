@@ -63,14 +63,14 @@ registerBlockType( 'my-plugin/record-title', {
 
 ### PHP
 
-A block's context values are available from the `context` property of the `$block` argument passed to the `render_callback` function.
+A block's context values are available from the `context` property of the `$block` argument passed as the third argument to the `render_callback` function.
 
 `record-title/index.php`
 
 ```php
-register_block_type( 'my-plugin/record-title', [
-	'render_callback' => function( $block ) {
+register_block_type( 'my-plugin/record-title', array(
+	'render_callback' => function( $attributes, $content, $block ) {
 		return 'The current record ID is: ' . $block->context['my-plugin/recordId'];
 	},
-] );
+) );
 ```

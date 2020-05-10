@@ -4,7 +4,7 @@
 	border-radius: $radius-block-ui;
 	flex-shrink: 0;
 
-	.components-toolbar-group:last-child {
+	& > .components-toolbar-group:last-child {
 		border-right: none;
 	}
 }
