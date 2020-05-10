@@ -4,7 +4,7 @@
 import { common as commonEmbeds, others as otherEmbeds } from './core-embeds';
 import { embedContentIcon } from './icons';
 import { getEmbedBlockSettings } from './settings';
-import transforms, { _mergeTransforms } from './transforms';
+import transforms from './transforms';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,24 @@ export const settings = getEmbedBlockSettings( {
 	transforms,
 } );
 
-export const common = commonEmbeds.map( _mergeTransforms );
+export const common = commonEmbeds.map( ( embedDefinition ) => {
+	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
+	return {
+		...embedDefinition,
+		settings: {
+			...embedSettings,
+			transforms,
+		},
+	};
+} );
 
-export const others = otherEmbeds.map( _mergeTransforms );
+export const others = otherEmbeds.map( ( embedDefinition ) => {
+	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
+	return {
+		...embedDefinition,
+		settings: {
+			...embedSettings,
+			transforms,
+		},
+	};
+} );

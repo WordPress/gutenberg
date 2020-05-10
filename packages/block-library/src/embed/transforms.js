@@ -1,18 +1,8 @@
 /**
- * External dependencies
- */
-import { concat } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { getEmbedBlockSettings } from './settings';
 
 /**
  * Default transforms for generic embeds.
@@ -43,32 +33,6 @@ const transforms = {
 			},
 		},
 	],
-};
-
-/**
- * Merge default transforms with the embed (common/other) specific transforms.
- *
- * @param  {Object} embedDefinition Embed definition.
- * @return {Object}                 Updated Embed definition with all the transforms together.
- */
-export const _mergeTransforms = ( embedDefinition ) => {
-	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
-	return {
-		...embedDefinition,
-		settings: {
-			...embedSettings,
-			transforms: {
-				from: concat(
-					transforms?.from ?? [],
-					embedSettings?.transforms?.from ?? []
-				).filter( Boolean ),
-				to: concat(
-					transforms?.to ?? [],
-					embedSettings?.transforms?.to ?? []
-				).filter( Boolean ),
-			},
-		},
-	};
 };
 
 export default transforms;
