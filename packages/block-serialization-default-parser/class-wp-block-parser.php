@@ -5,6 +5,10 @@
  * @package WordPress
  */
 
+// Load classes we will need.
+require __DIR__ . '/class-wp-block-parser-block.php';
+require __DIR__ . '/class-wp-block-parser-frame.php';
+
 /**
  * Class WP_Block_Parser
  *
