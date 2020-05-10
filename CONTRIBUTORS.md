@@ -146,3 +146,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @anthonyledesma | @paranoia1906 |
 | @richtabor | @richtabor |
 | @mikehaydon | @intelliwolf |
+| @siddhantdante | @siddhantd |
