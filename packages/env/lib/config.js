@@ -6,6 +6,7 @@ const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const os = require( 'os' );
 const crypto = require( 'crypto' );
+const { reduce } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -38,6 +39,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, Source>} mappings    Mapping of WordPress directories to local directories which should be mounted.
  * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
@@ -128,6 +130,7 @@ module.exports = {
 				port: 8888,
 				testsPort: 8889,
 				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
+				mappings: {},
 			},
 			config,
 			overrideConfig
@@ -185,6 +188,12 @@ module.exports = {
 			);
 		}
 
+		if ( typeof config.mappings !== 'object' ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "mappings" must be an object.'
+			);
+		}
+
 		const workDirectoryPath = path.resolve(
 			getHomeDirectory(),
 			md5( configPath )
@@ -217,6 +226,25 @@ module.exports = {
 				} )
 			),
 			config: config.config,
+			mappings: reduce(
+				config.mappings,
+				( result, localDir, wpDir ) => {
+					const source = parseSourceString( localDir, {
+						workDirectoryPath,
+					} );
+					if ( ! source ) {
+						return result;
+					}
+					if ( source.type !== 'local' ) {
+						throw new ValidationError(
+							`The mapping for "${ wpDir }" must be a local source.`
+						);
+					}
+					result[ wpDir ] = source;
+					return result;
+				},
+				{}
+			),
 		};
 	},
 };
