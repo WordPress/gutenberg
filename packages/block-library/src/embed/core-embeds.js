@@ -162,19 +162,17 @@ export const others = [
 			title: 'Crowdsignal',
 			icon: embedContentIcon,
 			keywords: [ 'polldaddy', __( 'survey' ) ],
-			transforms: {
-				from: [
-					{
-						type: 'block',
-						blocks: [ 'core-embed/polldaddy' ],
-						transform: ( content ) => {
-							return createBlock( 'core-embed/crowdsignal', {
-								content,
-							} );
-						},
+			transform: [
+				{
+					type: 'block',
+					blocks: [ 'core-embed/polldaddy' ],
+					transform: ( content ) => {
+						return createBlock( 'core-embed/crowdsignal', {
+							content,
+						} );
 					},
-				],
-			},
+				},
+			],
 			description: __(
 				'Embed Crowdsignal (formerly Polldaddy) content.'
 			),
@@ -336,19 +334,17 @@ export const others = [
 		settings: {
 			title: 'Speaker Deck',
 			icon: embedContentIcon,
-			transforms: {
-				from: [
-					{
-						type: 'block',
-						blocks: [ 'core-embed/speaker' ],
-						transform: ( content ) => {
-							return createBlock( 'core-embed/speaker-deck', {
-								content,
-							} );
-						},
+			transform: [
+				{
+					type: 'block',
+					blocks: [ 'core-embed/speaker' ],
+					transform: ( content ) => {
+						return createBlock( 'core-embed/speaker-deck', {
+							content,
+						} );
 					},
-				],
-			},
+				},
+			],
 			description: __( 'Embed Speaker Deck content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
