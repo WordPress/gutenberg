@@ -1,4 +1,7 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ]
+	"plugins": [ ".", "./packages/e2e-tests/plugins" ],
+	"mappings": {
+		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins"
+	}
 }
