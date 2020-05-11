@@ -40,6 +40,10 @@ function ImageSize( { src, dirtynessTrigger, children } ) {
 		};
 
 		image.src = src;
+
+		return () => {
+			image.onload = undefined;
+		};
 	}, [ src, dirtynessTrigger ] );
 
 	return <div ref={ ref }>{ children( state ) }</div>;
