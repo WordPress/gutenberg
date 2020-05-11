@@ -42,12 +42,15 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
 function Navigation( {
+	selectedBlockHasDescendants,
 	attributes,
 	clientId,
 	fontSize,
 	hasExistingNavItems,
 	hasResolvedPages,
+	isImmediateParentOfSelectedBlock,
 	isRequestingPages,
+	isSelected,
 	pages,
 	setAttributes,
 	setFontSize,
@@ -263,6 +266,13 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
+							renderAppender={
+								( isImmediateParentOfSelectedBlock &&
+									! selectedBlockHasDescendants ) ||
+								isSelected
+									? InnerBlocks.DefaultAppender
+									: false
+							}
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
 								attributes.orientation || 'horizontal'
@@ -289,6 +299,11 @@ export default compose( [
 	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const {
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
 
 		const filterDefaultPages = {
 			parent: 0,
@@ -302,7 +317,18 @@ export default compose( [
 			[ 'postType', 'page', filterDefaultPages ],
 		];
 
+		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			false
+		);
+		const selectedBlockId = getSelectedBlockClientId();
+		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+			selectedBlockId,
+		] )?.length;
+
 		return {
+			isImmediateParentOfSelectedBlock,
+			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
 			pages: select( 'core' ).getEntityRecords(
 				'postType',
