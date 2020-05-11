@@ -119,6 +119,10 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useGlobalEvent" href="#useGlobalEvent">#</a> **useGlobalEvent**
+
+Undocumented declaration.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
