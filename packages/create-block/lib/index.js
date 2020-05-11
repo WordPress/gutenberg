@@ -55,7 +55,7 @@ program
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const blockTemplate = getBlockTemplate( templateName );
+				const blockTemplate = await getBlockTemplate( templateName );
 				const defaultValues = getDefaultValues( blockTemplate );
 				const optionsValues = pickBy( {
 					category,

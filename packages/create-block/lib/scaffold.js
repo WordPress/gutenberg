@@ -12,7 +12,7 @@ const { dirname } = require( 'path' );
  */
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
-const { hasWPScriptsEnabled, getOutputTemplates } = require( './templates' );
+const { hasWPScriptsEnabled } = require( './templates' );
 
 module.exports = async function(
 	blockTemplate,
@@ -35,6 +35,7 @@ module.exports = async function(
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
+	const { outputTemplates } = blockTemplate;
 	const view = {
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
@@ -50,7 +51,6 @@ module.exports = async function(
 		licenseURI,
 		textdomain: namespace,
 	};
-	const outputTemplates = await getOutputTemplates( blockTemplate );
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			// Output files can have names that depend on the slug provided.
