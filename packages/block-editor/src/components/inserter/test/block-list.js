@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import InserterBlockList from '../block-list';
+import { InserterBlockList } from '../block-list';
 import items, { categories, collections } from './fixtures';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
@@ -26,9 +26,12 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	};
 } );
 
+const speak = jest.fn();
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
-	return render( <InserterBlockList { ...propOverrides } /> ).container;
+	return render(
+		<InserterBlockList debouncedSpeak={ speak } { ...propOverrides } />
+	).container;
 };
 
 const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
@@ -58,6 +61,8 @@ const assertNoResultsMessageNotToBePresent = ( element ) => {
 
 describe( 'InserterMenu', () => {
 	beforeEach( () => {
+		speak.mockClear();
+
 		useSelect.mockImplementation( () => ( {
 			categories,
 			collections,
@@ -183,15 +188,52 @@ describe( 'InserterMenu', () => {
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
+		expect( matchingCategories[ 2 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
 
 		const blocks = element.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
+		// There are five buttons present for 3 total distinct results. The
+		// additional two account for the collection results (repeated).
 		expect( blocks ).toHaveLength( 5 );
+		expect( speak ).toHaveBeenCalledWith( '3 results found.' );
+
+		// Default block results.
 		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
 		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
+
+		// Collection results.
+		expect( blocks[ 3 ].textContent ).toBe( 'Text' );
+		expect( blocks[ 4 ].textContent ).toBe( 'Advanced Text' );
+
+		assertNoResultsMessageNotToBePresent( element );
+	} );
+
+	it( 'should allow searching for reusable blocks by title', () => {
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			filterValue: 'my reusable',
+		} );
+
+		const matchingCategories = element.querySelectorAll(
+			'.block-editor-inserter__panel-title'
+		);
+
+		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Reusable' );
+
+		const blocks = element.querySelectorAll(
+			'.block-editor-block-types-list__item-title'
+		);
+
+		// There are two buttons present for 1 total distinct result. The
+		// additional one accounts for the collection result (repeated).
+		expect( blocks ).toHaveLength( 2 );
+		expect( speak ).toHaveBeenCalledWith( '1 result found.' );
+		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 1 ].textContent ).toBe( 'My reusable block' );
 
 		assertNoResultsMessageNotToBePresent( element );
 	} );
