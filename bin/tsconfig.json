@@ -17,5 +17,6 @@
 		"./api-docs/update-api-docs.js",
 		"./check-latest-npm.js",
 		"./changelog.js",
+		"./validate-package-lock.js",
 	]
 }
