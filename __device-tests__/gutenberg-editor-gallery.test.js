@@ -6,11 +6,7 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-} from './helpers/utils';
+import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
@@ -18,6 +14,7 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const galleryBlockName = 'Gallery';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -40,11 +37,11 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 	} );
 
 	it( 'should be able to add a gallery block', async () => {
-		await editorPage.addNewGalleryBlock();
-		const galleryBlock = await editorPage.getGalleryBlockAtPosition( 1 );
+		await editorPage.addNewBlock( galleryBlockName );
+		const galleryBlock = await editorPage.getBlockAtPosition( galleryBlockName );
 
 		expect( galleryBlock ).toBeTruthy();
-		await editorPage.removeGalleryBlockAtPosition( 1 );
+		await editorPage.removeBlockAtPosition( galleryBlockName );
 	} );
 
 	afterAll( async () => {
