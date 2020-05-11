@@ -82,10 +82,9 @@ export default function MenuLocationsEditor() {
 											options={ menuSelectControlOptions }
 											value={ location.menu }
 											onChange={ ( newMenuId ) => {
-												location.menu = newMenuId;
 												assignMenuToLocation(
 													location.name,
-													newMenuId
+													parseInt( newMenuId )
 												);
 											} }
 										/>
