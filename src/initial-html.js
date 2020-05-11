@@ -27,7 +27,7 @@ Hello World
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><b>Hello</b> World!</p>
+<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:nextpage -->
@@ -217,10 +217,6 @@ else:
 <h2 class="has-text-align-left">Dig in deeper</h2>
 <!-- /wp:heading -->
 
-<!-- wp:list -->
-<ul><li><a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview">Gutenberg Editor Technical Overview</a></li><li><a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/">Gutenberg Design Principles</a></li><li><a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a></li><li><a href="https://wordpress.tv/?s=gutenberg">WordPress.tv Talks about Gutenberg</a></li><li><a href="https://wordpress.org/gutenberg/handbook/reference/faq/">FAQs</a></li></ul>
-<!-- /wp:list -->
-
 <!-- wp:spacer -->
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->
@@ -230,4 +226,10 @@ else:
 <p class="has-text-color has-text-align-center has-large-font-size has-very-light-gray-color">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
+
+<!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>
+<!-- /wp:pullquote -->
 `;

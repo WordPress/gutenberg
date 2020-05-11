@@ -1,6 +1,5 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -18,6 +17,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         String getUrl();
         int getId();
         String getType();
+        String getCaption();
         WritableMap toMap();
     }
 
