@@ -48,16 +48,14 @@ const hasWebpackConfig = () =>
 
 /**
  * Converts CLI arguments to the format which webpack understands.
- * It allows to optionally pass some additional webpack CLI arguments.
  *
  * @see https://webpack.js.org/api/cli/#usage-with-config-file
  *
- * @param {?Array} additionalArgs The list of additional CLI arguments.
- *
  * @return {Array} The list of CLI arguments to pass to webpack CLI.
  */
-const getWebpackArgs = ( additionalArgs = [] ) => {
-	let webpackArgs = getArgsFromCLI();
+const getWebpackArgs = () => {
+	// Gets all args from CLI without those prefixed with `--webpack`.
+	let webpackArgs = getArgsFromCLI( [ '--webpack' ] );
 
 	const hasWebpackOutputOption =
 		hasArgInCLI( '-o' ) || hasArgInCLI( '--output' );
@@ -98,8 +96,6 @@ const getWebpackArgs = ( additionalArgs = [] ) => {
 	if ( ! hasWebpackConfig() ) {
 		webpackArgs.push( '--config', fromConfigRoot( 'webpack.config.js' ) );
 	}
-
-	webpackArgs.push( ...additionalArgs );
 
 	return webpackArgs;
 };
