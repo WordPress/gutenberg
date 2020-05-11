@@ -23,12 +23,13 @@ export function BlockAlignmentMatrixToolbar( props ) {
 
 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
 	const className = 'block-editor-block-alignment-matrix-toolbar';
+	const popoverClassName = `${ className }__popover`;
 
 	return (
 		<Dropdown
 			position="bottom right"
 			className={ className }
-			popoverProps={ { className } }
+			popoverProps={ { className: popoverClassName } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
