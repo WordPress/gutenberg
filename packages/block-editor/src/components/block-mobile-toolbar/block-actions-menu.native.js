@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
-
+import { Platform, findNodeHandle, View } from 'react-native';
+import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { ToolbarButton, Picker } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, getDefaultBlockName } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
-import { partial, first, castArray, last, compact } from 'lodash';
+import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -20,6 +20,7 @@ import {
 	getMoverActionTitle,
 	getArrowIcon,
 } from '../block-mover/mover-description';
+import styles from './style.scss';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -32,7 +33,10 @@ const BlockActionsMenu = ( {
 	isFirst,
 	isLast,
 	blockTitle,
+	isDefaultBlock,
 } ) => {
+	const actionsMenuRef = useRef( null );
+
 	const deleteOption = {
 		id: 'deleteOption',
 		// translators: %s: block title e.g: "Paragraph".
@@ -44,7 +48,8 @@ const BlockActionsMenu = ( {
 
 	const settingsOption = {
 		id: 'settingsOption',
-		label: __( 'Block Settings' ),
+		// translators: %s: block title e.g: "Paragraph".
+		label: sprintf( __( '%s Settings' ), blockTitle ),
 		value: 'settingsOption',
 		icon: cog,
 	};
@@ -96,8 +101,9 @@ const BlockActionsMenu = ( {
 	);
 
 	return (
-		<>
+		<View ref={ actionsMenuRef } style={ styles.wrapper }>
 			<ToolbarButton
+				isDisabled={ isDefaultBlock }
 				title={ __( 'Open Settings' ) }
 				onClick={ () => this.picker.presentPicker() }
 				icon={ moreHorizontalMobile }
@@ -115,8 +121,13 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform !== 'ios' }
+				anchor={
+					actionsMenuRef.current
+						? findNodeHandle( actionsMenuRef.current )
+						: undefined
+				}
 			/>
-		</>
+		</View>
 	);
 };
 
@@ -146,6 +157,8 @@ export default compose(
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
 			blockTitle,
+			isDefaultBlock:
+				firstIndex === 0 && blockName === getDefaultBlockName(),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
