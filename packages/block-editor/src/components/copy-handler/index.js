@@ -35,25 +35,68 @@ function useFlashBlock() {
 	return flashBlock;
 }
 
+function useNotifyCopy() {
+	const { getBlockName } = useSelect(
+		( select ) => select( 'core/block-editor' ),
+		[]
+	);
+	const { getBlockType } = useSelect(
+		( select ) => select( 'core/blocks' ),
+		[]
+	);
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
+
+	return useCallback( ( eventType, selectedBlockClientIds ) => {
+		let notice = '';
+		if ( selectedBlockClientIds.length === 1 ) {
+			const clientId = selectedBlockClientIds[ 0 ];
+			const { title } = getBlockType( getBlockName( clientId ) );
+			notice =
+				eventType === 'copy'
+					? sprintf(
+							// Translators: Name of the block being copied, e.g. "Paragraph"
+							__( 'Copied block "%s" to clipboard.' ),
+							title
+					  )
+					: sprintf(
+							// Translators: Name of the block being cut, e.g. "Paragraph"
+							__( 'Cut block "%s" to clipboard.' ),
+							title
+					  );
+		} else {
+			notice =
+				eventType === 'copy'
+					? sprintf(
+							// Translators: Number of blocks being copied
+							__( 'Copied %d blocks to clipboard.' ),
+							selectedBlockClientIds.length
+					  )
+					: sprintf(
+							// Translators: Number of blocks being cut
+							__( 'Cut %d blocks to clipboard.' ),
+							selectedBlockClientIds.length
+					  );
+		}
+		createSuccessNotice( notice, {
+			type: 'snackbar',
+		} );
+	}, [] );
+}
+
 function CopyHandler( { children } ) {
 	const containerRef = useRef();
 
 	const {
-		getBlockName,
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
-	const { getBlockType } = useSelect(
-		( select ) => select( 'core/blocks' ),
-		[]
-	);
 
 	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const flashBlock = useFlashBlock();
+	const notifyCopy = useNotifyCopy();
 
 	const {
 		__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
@@ -87,26 +130,10 @@ function CopyHandler( { children } ) {
 		event.preventDefault();
 
 		if ( event.type === 'copy' || event.type === 'cut' ) {
-			let notice;
 			if ( selectedBlockClientIds.length === 1 ) {
-				const clientId = selectedBlockClientIds[ 0 ];
-				const { title } = getBlockType( getBlockName( clientId ) );
-				flashBlock( clientId );
-				notice = sprintf(
-					// Translators: Name of the block being copied, e.g. "Paragraph"
-					__( 'Copied block "%s" to clipboard.' ),
-					title
-				);
-			} else {
-				notice = sprintf(
-					// Translators: Number of blocks being copied
-					__( 'Copied %d blocks to clipboard.' ),
-					selectedBlockClientIds.length
-				);
+				flashBlock( selectedBlockClientIds[ 0 ] );
 			}
-			createSuccessNotice( notice, {
-				type: 'snackbar',
-			} );
+			notifyCopy( event.type, selectedBlockClientIds );
 			const blocks = getBlocksByClientId( selectedBlockClientIds );
 			const serialized = serialize( blocks );
 
