@@ -8,11 +8,12 @@ import { noop } from 'lodash';
  */
 import {
 	getBlockMenuDefaultClassName,
+	getBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -65,7 +66,9 @@ export default compose(
 		);
 		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
 		const { removeBlocks } = dispatch( 'core/block-editor' );
-		const { canInsertBlockType } = select( 'core/block-editor' );
+		const { canInsertBlockType, getBlockName } = select(
+			'core/block-editor'
+		);
 		const { onSelect, rootClientId } = props;
 
 		return {
@@ -90,13 +93,29 @@ export default compose(
 				};
 
 				const onSuccess = () => {
+					const parent = rootClientId
+						? getBlockType( getBlockName( rootClientId ) )
+						: false;
 					if ( ! canInsertBlockType( item.name, rootClientId ) ) {
-						createErrorNotice(
-							__( 'You can’t add that block here.' ),
-							{
-								id: INSTALL_ERROR_NOTICE_ID,
-							}
-						);
+						const message = ! parent
+							? sprintf(
+									/* translators: %1$s: block to be added. */
+									__(
+										'We can’t insert a %1$s block into this post. Select another block.'
+									),
+									item.title
+							  )
+							: sprintf(
+									/* translators: %1$s: block to be added. %2$s: parent block. */
+									__(
+										'We can’t insert a %1$s block into the %2$s. Select another block.'
+									),
+									item.title,
+									parent.title
+							  );
+						createErrorNotice( message, {
+							id: INSTALL_ERROR_NOTICE_ID,
+						} );
 						unregisterBlockType( item.name );
 						return;
 					}
