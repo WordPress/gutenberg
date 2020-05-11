@@ -135,6 +135,10 @@ function InserterBlockList( {
 		return filter( filteredItems, { category: 'reusable' } );
 	}, [ filteredItems ] );
 
+	const uncategorizedItems = useMemo( () => {
+		return filter( filteredItems, ( item ) => ! item.category );
+	}, [ filteredItems ] );
+
 	const itemsPerCategory = useMemo( () => {
 		const getCategoryIndex = ( item ) => {
 			return findIndex(
@@ -145,7 +149,10 @@ function InserterBlockList( {
 
 		return flow(
 			( itemList ) =>
-				filter( itemList, ( item ) => item.category !== 'reusable' ),
+				filter(
+					itemList,
+					( item ) => item.category && item.category !== 'reusable'
+				),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -227,6 +234,19 @@ function InserterBlockList( {
 						</InserterPanel>
 					);
 				} ) }
+
+			{ ! hasChildItems && uncategorizedItems.length && (
+				<InserterPanel
+					className="block-editor-inserter__uncategorized-blocks-panel"
+					title={ __( 'Uncategorized' ) }
+				>
+					<BlockTypesList
+						items={ uncategorizedItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+					/>
+				</InserterPanel>
+			) }
 
 			{ ! hasChildItems &&
 				map( collections, ( collection, namespace ) => {
