@@ -5,19 +5,23 @@ import TestUtils, { act } from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import InserterBlockList from '../block-list';
-import useSelect from '../../../../../data/src/components/use-select';
 import items, { categories, collections } from './fixtures';
 
-jest.mock( '../../../../../data/src/components/use-select', () => {
-	// This allows us to tweaak the returned value on each test
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
 	const mock = jest.fn();
 	return mock;
 } );
 
-jest.mock( '../../../../../data/src/components/use-dispatch', () => {
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	return {
 		useDispatch: () => ( {} ),
 	};
