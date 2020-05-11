@@ -6,7 +6,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { GlobalStylesContext } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -34,6 +34,8 @@ class BlockListBlock extends Component {
 		this.state = {
 			blockWidth: 0,
 		};
+
+		this.blockMobileToolbar = createRef();
 	}
 
 	onFocus() {
@@ -187,7 +189,10 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ styles.neutralToolbar }>
+						<View
+							style={ styles.neutralToolbar }
+							ref={ this.blockMobileToolbar }
+						>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
@@ -196,6 +201,9 @@ class BlockListBlock extends Component {
 										isStackedHorizontally
 									}
 									blockWidth={ blockWidth }
+									blockMobileToolbarRef={
+										this.blockMobileToolbar.current
+									}
 								/>
 							) }
 						</View>

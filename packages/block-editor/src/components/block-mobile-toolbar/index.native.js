@@ -26,6 +26,7 @@ const BlockMobileToolbar = ( {
 	onDelete,
 	isStackedHorizontally,
 	blockWidth,
+	blockMobileToolbarRef,
 } ) => {
 	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
 	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
@@ -41,10 +42,12 @@ const BlockMobileToolbar = ( {
 
 			<View style={ styles.spacer } />
 
-			<BlockSettingsButton.Slot>
-				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
-				{ ( fills = [ null ] ) => fills[ 0 ] }
-			</BlockSettingsButton.Slot>
+			{ ! wrapBlockSettings && (
+				<BlockSettingsButton.Slot>
+					{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+					{ ( fills = [ null ] ) => fills[ 0 ] }
+				</BlockSettingsButton.Slot>
+			) }
 
 			<BlockActionsMenu
 				clientIds={ [ clientId ] }
@@ -52,6 +55,7 @@ const BlockMobileToolbar = ( {
 				wrapBlockSettings={ wrapBlockSettings }
 				isStackedHorizontally={ isStackedHorizontally }
 				onDelete={ onDelete }
+				blockMobileToolbarRef={ blockMobileToolbarRef }
 			/>
 		</View>
 	);

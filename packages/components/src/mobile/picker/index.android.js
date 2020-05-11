@@ -72,6 +72,7 @@ export default class Picker extends Component {
 									this.onCellPress( option.value )
 								}
 								disabled={ option.disabled }
+								style={ option.disabled && styles.disabled }
 							/>
 						</>
 					) ) }
