@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   The `.wp-env.json` coniguration file now accepts "mu-plugins" sources.
+
 ## 1.1.0 (2020-04-01)
 
 ### New Feature
