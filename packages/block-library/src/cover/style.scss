@@ -10,6 +10,8 @@
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
+	padding: $grid-unit-20;
+
 	&.has-parallax {
 		background-attachment: fixed;
 
@@ -155,10 +157,6 @@
 			width: auto;
 		}
 	}
-}
-
-.wp-block-cover {
-	padding: $grid-unit-20;
 }
 
 .wp-block-cover__video-background {
