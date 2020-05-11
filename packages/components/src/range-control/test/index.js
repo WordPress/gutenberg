@@ -305,11 +305,13 @@ describe( 'RangeControl', () => {
 
 	describe( 'reset', () => {
 		it( 'should reset to a custom fallback value, defined by a parent component', () => {
+			const spy = jest.fn();
 			const { container } = render(
 				<RangeControl
 					initialPosition={ 50 }
 					value={ 10 }
 					allowReset={ true }
+					onChange={ spy }
 					resetFallbackValue={ 33 }
 				/>
 			);
@@ -322,9 +324,11 @@ describe( 'RangeControl', () => {
 
 			expect( rangeInput.value ).toBe( '33' );
 			expect( numberInput.value ).toBe( '33' );
+			expect( spy ).toHaveBeenCalledWith( 33 );
 		} );
 
 		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
+			const spy = jest.fn();
 			const { container } = render(
 				<RangeControl
 					initialPosition={ undefined }
@@ -332,6 +336,7 @@ describe( 'RangeControl', () => {
 					min={ 0 }
 					max={ 100 }
 					allowReset={ true }
+					onChange={ spy }
 					resetFallbackValue={ undefined }
 				/>
 			);
@@ -344,6 +349,7 @@ describe( 'RangeControl', () => {
 
 			expect( rangeInput.value ).toBe( '50' );
 			expect( numberInput.value ).toBe( '' );
+			expect( spy ).toHaveBeenCalledWith( undefined );
 		} );
 	} );
 } );

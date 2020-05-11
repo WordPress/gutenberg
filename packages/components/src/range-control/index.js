@@ -136,13 +136,29 @@ const BaseRangeControl = forwardRef(
 
 		const handleOnReset = () => {
 			let resetValue = parseFloat( resetFallbackValue );
+			let onChangeResetValue = resetValue;
 
 			if ( isNaN( resetValue ) ) {
 				resetValue = null;
+				onChangeResetValue = undefined;
 			}
 
 			setValue( resetValue );
-			onChange( undefined );
+
+			/**
+			 * Previously, this callback would always receive undefined as
+			 * an argument. This behavior is unexpected, specifically
+			 * when resetFallbackValue is defined.
+			 *
+			 * The value of undefined is not ideal. Passing it through
+			 * to internal <input /> elements would change it from a
+			 * controlled component to an uncontrolled component.
+			 *
+			 * For now, to minimize unexpected regressions, we're going to
+			 * preserve the undefined callback argument, except when a
+			 * resetFallbackValue is defined.
+			 */
+			onChange( onChangeResetValue );
 		};
 
 		const handleShowTooltip = () => setShowTooltip( true );
