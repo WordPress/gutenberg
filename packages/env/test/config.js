@@ -120,6 +120,54 @@ describe( 'readConfig', () => {
 		}
 	} );
 
+	it( 'should accept mu-plugins as a source type', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					'mu-plugins': [ './relative' ],
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			muPluginsSources: [
+				{
+					type: 'local',
+					path: expect.stringMatching( /^\/.*relative$/ ),
+					basename: 'relative',
+				},
+			],
+		} );
+	} );
+
+	it( 'should throw a validation error if a mu-plugins source is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( { 'mu-plugins': [ 'test', 123 ] } )
+			)
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain( 'must be an array of strings' );
+		}
+	} );
+
+	it( 'should throw a validation error if mu-plugins is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { 'mu-plugins': false } ) )
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain( 'must be an array of strings' );
+		}
+	} );
+
 	it( 'should parse local sources', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve(

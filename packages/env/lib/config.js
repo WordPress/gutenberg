@@ -35,6 +35,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {Source|null} coreSource              The WordPress installation to load in the environment.
  * @property {Source[]}    pluginSources           Plugins to load in the environment.
  * @property {Source[]}    themeSources            Themes to load in the environment.
+ * @property {Source[]}    muPluginsSources        Themes to load in the environment.
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
@@ -125,6 +126,7 @@ module.exports = {
 				core: null,
 				plugins: [],
 				themes: [],
+				'mu-plugins': [],
 				port: 8888,
 				testsPort: 8889,
 				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
@@ -143,23 +145,9 @@ module.exports = {
 			);
 		}
 
-		if (
-			! Array.isArray( config.plugins ) ||
-			config.plugins.some( ( plugin ) => typeof plugin !== 'string' )
-		) {
-			throw new ValidationError(
-				'Invalid .wp-env.json: "plugins" must be an array of strings.'
-			);
-		}
-
-		if (
-			! Array.isArray( config.themes ) ||
-			config.themes.some( ( theme ) => typeof theme !== 'string' )
-		) {
-			throw new ValidationError(
-				'Invalid .wp-env.json: "themes" must be an array of strings.'
-			);
-		}
+		validateSources( config.plugins, 'plugins' );
+		validateSources( config.themes, 'themes' );
+		validateSources( config[ 'mu-plugins' ], 'mu-plugins' );
 
 		if ( ! Number.isInteger( config.port ) ) {
 			throw new ValidationError(
@@ -190,6 +178,11 @@ module.exports = {
 			md5( configPath )
 		);
 
+		const parseSourceStrings = ( sources ) =>
+			sources.map( ( sourceString ) =>
+				parseSourceString( sourceString, { workDirectoryPath } )
+			);
+
 		return {
 			name: path.basename( configDirectoryPath ),
 			configDirectoryPath,
@@ -206,20 +199,31 @@ module.exports = {
 				} ),
 				{ workDirectoryPath }
 			),
-			pluginSources: config.plugins.map( ( sourceString ) =>
-				parseSourceString( sourceString, {
-					workDirectoryPath,
-				} )
-			),
-			themeSources: config.themes.map( ( sourceString ) =>
-				parseSourceString( sourceString, {
-					workDirectoryPath,
-				} )
-			),
+			pluginSources: parseSourceStrings( config.plugins ),
+			themeSources: parseSourceStrings( config.themes ),
+			muPluginsSources: parseSourceStrings( config[ 'mu-plugins' ] ),
 			config: config.config,
 		};
 	},
 };
+
+/**
+ * Throws an error if the passed source value is invalid.
+ *
+ * @param {string[]} sources    An array of sources from the config object.
+ * @param {string}   sourceType The type of source. Used to inform the
+ *                              user which config property should be fixed.
+ */
+function validateSources( sources, sourceType ) {
+	if (
+		! Array.isArray( sources ) ||
+		sources.some( ( source ) => typeof source !== 'string' )
+	) {
+		throw new ValidationError(
+			`Invalid .wp-env.json: "${ sourceType }" must be an array of strings.`
+		);
+	}
+}
 
 /**
  * Parses a source string into a source object.
