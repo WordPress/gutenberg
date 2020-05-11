@@ -2,25 +2,23 @@
  * External dependencies
  */
 import { isNil, map, omitBy } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
-import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { useMemo, createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import ButtonBlockAppender from '../button-block-appender';
+import BlockNavigationBranch from './branch';
 
-export default function BlockNavigationList( {
+export const BlockNavigationContext = createContext( {
+	__experimentalWithBlockNavigationSlots: false,
+} );
+
+function BlockNavigationList( {
 	blocks,
 	selectedBlockClientId,
 	selectBlock,
@@ -40,30 +38,14 @@ export default function BlockNavigationList( {
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul className="block-editor-block-navigation__list" role="list">
 			{ map( omitBy( blocks, isNil ), ( block ) => {
-				const blockType = getBlockType( block.name );
 				const isSelected = block.clientId === selectedBlockClientId;
-
 				return (
-					<li key={ block.clientId }>
-						<div className="block-editor-block-navigation__item">
-							<Button
-								className={ classnames(
-									'block-editor-block-navigation__item-button',
-									{
-										'is-selected': isSelected,
-									}
-								) }
-								onClick={ () => selectBlock( block.clientId ) }
-							>
-								<BlockIcon icon={ blockType.icon } showColors />
-								{ getBlockLabel( blockType, block.attributes ) }
-								{ isSelected && (
-									<VisuallyHidden as="span">
-										{ __( '(selected block)' ) }
-									</VisuallyHidden>
-								) }
-							</Button>
-						</div>
+					<BlockNavigationBranch
+						block={ block }
+						key={ block.clientId }
+						isSelected={ isSelected }
+						onClick={ () => selectBlock( block.clientId ) }
+					>
 						{ showNestedBlocks &&
 							!! block.innerBlocks &&
 							!! block.innerBlocks.length && (
@@ -78,7 +60,7 @@ export default function BlockNavigationList( {
 									showNestedBlocks
 								/>
 							) }
-					</li>
+					</BlockNavigationBranch>
 				);
 			} ) }
 			{ shouldShowAppender && (
@@ -93,5 +75,24 @@ export default function BlockNavigationList( {
 			) }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
+	);
+}
+
+BlockNavigationList.defaultProps = {
+	selectBlock: () => {},
+};
+
+export default function BlockNavigationListWrapper( {
+	__experimentalWithBlockNavigationSlots,
+	...props
+} ) {
+	const blockNavigationContext = useMemo(
+		() => ( { __experimentalWithBlockNavigationSlots } ),
+		[ __experimentalWithBlockNavigationSlots ]
+	);
+	return (
+		<BlockNavigationContext.Provider value={ blockNavigationContext }>
+			<BlockNavigationList { ...props } />
+		</BlockNavigationContext.Provider>
 	);
 }
