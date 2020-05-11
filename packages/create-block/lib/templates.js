@@ -2,6 +2,8 @@
  * External dependencies
  */
 const glob = require( 'fast-glob' );
+const { readFile } = require( 'fs' ).promises;
+const { fromPairs } = require( 'lodash' );
 const { join } = require( 'path' );
 
 /**
@@ -10,7 +12,7 @@ const { join } = require( 'path' );
 const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 
-const templates = {
+const predefinedBlockTemplates = {
 	es5: {
 		defaultValues: {
 			slug: 'es5-example',
@@ -32,18 +34,18 @@ const templates = {
 	},
 };
 
-const getTemplate = ( templateName ) => {
-	if ( ! templates[ templateName ] ) {
+const getBlockTemplate = ( templateName ) => {
+	if ( ! predefinedBlockTemplates[ templateName ] ) {
 		throw new CLIError(
-			`Invalid template type name. Allowed values: ${ Object.keys(
-				templates
+			`Invalid block template type name. Allowed values: ${ Object.keys(
+				predefinedBlockTemplates
 			).join( ', ' ) }.`
 		);
 	}
-	return templates[ templateName ];
+	return predefinedBlockTemplates[ templateName ];
 };
 
-const getDefaultValues = ( templateName ) => {
+const getDefaultValues = ( blockTemplate ) => {
 	return {
 		namespace: 'create-block',
 		dashicon: 'smiley',
@@ -52,21 +54,35 @@ const getDefaultValues = ( templateName ) => {
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
-		...getTemplate( templateName ).defaultValues,
+		...blockTemplate.defaultValues,
 	};
 };
 
-const getOutputFiles = async ( templateName ) => {
-	const templatesPath = getTemplate( templateName ).templatesPath;
-
-	return await glob( '**/*.mustache', {
-		cwd: join( __dirname, templatesPath ),
+const getOutputTemplates = async ( blockTemplate ) => {
+	const outputTemplatesPath = join( __dirname, blockTemplate.templatesPath );
+	const outputTemplatesFiles = await glob( '**/*.mustache', {
+		cwd: outputTemplatesPath,
 		dot: true,
 	} );
+	return fromPairs(
+		await Promise.all(
+			outputTemplatesFiles.map( async ( outputTemplateFile ) => {
+				const outputFile = outputTemplateFile.replace(
+					'.mustache',
+					''
+				);
+				const outputTemplate = await readFile(
+					join( outputTemplatesPath, outputTemplateFile ),
+					'utf8'
+				);
+				return [ outputFile, outputTemplate ];
+			} )
+		)
+	);
 };
 
-const getPrompts = ( templateName ) => {
-	const defaultValues = getDefaultValues( templateName );
+const getPrompts = ( blockTemplate ) => {
+	const defaultValues = getDefaultValues( blockTemplate );
 	return Object.keys( prompts ).map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
@@ -75,13 +91,14 @@ const getPrompts = ( templateName ) => {
 	} );
 };
 
-const hasWPScriptsEnabled = ( templateName ) => {
-	return ! ( getTemplate( templateName ).wpScripts === false );
+const hasWPScriptsEnabled = ( blockTemplate ) => {
+	return ! ( blockTemplate.wpScripts === false );
 };
 
 module.exports = {
+	getBlockTemplate,
 	getDefaultValues,
-	getOutputFiles,
+	getOutputTemplates,
 	getPrompts,
 	hasWPScriptsEnabled,
 };
