@@ -32,7 +32,7 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
- * Load editor styles (this is copied form edit-form-blocks.php).
+ * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
  * @return array Editor Styles Setting.
