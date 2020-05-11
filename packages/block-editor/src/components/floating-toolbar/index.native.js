@@ -42,13 +42,13 @@ const FloatingToolbar = ( {
 	const [ previousSelection, setPreviousSelection ] = useState( {} );
 
 	useEffect( () => {
-		const easing = Easing.ease;
 		Animated.timing( opacity, {
 			toValue: showFloatingToolbar ? 1 : 0,
 			duration: showFloatingToolbar
 				? EASE_IN_DURATION
 				: EASE_OUT_DURATION,
-			easing,
+			easing: Easing.ease,
+			useNativeDriver: true,
 		} ).start();
 	}, [ showFloatingToolbar ] );
 
