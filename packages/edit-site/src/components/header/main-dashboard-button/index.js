@@ -1,33 +1,33 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	createSlotFill,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import FullscreenModeClose from '../fullscreen-mode-close';
 
-const { Fill: MainDashboardButton, Slot } = createSlotFill(
-	'SiteEditorMainDashboardButton'
-);
+const name = '__experimentalSiteEditorMainDashboardButton';
 
-MainDashboardButton.Slot = () => (
-	<Slot>
-		{ ( fills ) => {
-			// Return default Close button if no fills are provided, otherwise replace it with available fills.
-			if ( isEmpty( fills ) ) {
-				return <FullscreenModeClose />;
-			}
+const { Fill, Slot } = createSlotFill( name );
 
-			return <> { fills } </>;
-		} }
-	</Slot>
-);
+const MainDashboardButton = Fill;
+MainDashboardButton.Slot = Slot;
+MainDashboardButton.slotName = name;
+
+export const CloseButton = () => {
+	const slot = useSlot( MainDashboardButton.slotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return <FullscreenModeClose />;
+	}
+
+	return <MainDashboardButton.Slot bubblesVirtually />;
+};
 
 export default MainDashboardButton;

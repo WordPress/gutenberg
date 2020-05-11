@@ -93,11 +93,11 @@ function get_template_hierachy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_id, $_wp_current_template_content;
 
-	$current_template_post = gutenberg_find_template_post( $templates );
+	$current_template = gutenberg_find_template_post_and_parts( $templates );
 
-	if ( $current_template_post ) {
-		$_wp_current_template_id      = $current_template_post->ID;
-		$_wp_current_template_content = empty( $current_template_post->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template_post->post_content;
+	if ( $current_template ) {
+		$_wp_current_template_id      = $current_template['template_post']->ID;
+		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
 	}
 
 	// Add hooks for template canvas.
@@ -119,86 +119,87 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  * @access private
  *
  * @param array $block The root block to start traversing from.
+ * @return int[] A list of template parts IDs for the given block.
  */
 function create_auto_draft_for_template_part_block( $block ) {
-	global $_wp_current_template_part_ids;
+	if ( 'core/template-part' !== $block['blockName'] ) {
+		return array();
+	}
 
-	if ( 'core/template-part' === $block['blockName'] ) {
-		if ( isset( $block['attrs']['postId'] ) ) {
-			// Template part is customized.
-			$template_part_id = $block['attrs']['postId'];
+	if ( isset( $block['attrs']['postId'] ) ) {
+		// Template part is customized.
+		$template_part_id = $block['attrs']['postId'];
+	} else {
+		// A published post might already exist if this template part
+		// was customized elsewhere or if it's part of a customized
+		// template. We also check if an auto-draft was already created
+		// because preloading can make this run twice, so, different code
+		// paths can end up with different posts for the same template part.
+		// E.g. The server could send back post ID 1 to the client, preload,
+		// and create another auto-draft. So, if the client tries to resolve the
+		// post ID from the slug and theme, it won't match with what the server sent.
+		$template_part_query = new WP_Query(
+			array(
+				'post_type'      => 'wp_template_part',
+				'post_status'    => array( 'publish', 'auto-draft' ),
+				'name'           => $block['attrs']['slug'],
+				'meta_key'       => 'theme',
+				'meta_value'     => $block['attrs']['theme'],
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+			)
+		);
+		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+		if ( $template_part_post ) {
+			$template_part_id = $template_part_post->ID;
 		} else {
-			// A published post might already exist if this template part
-			// was customized elsewhere or if it's part of a customized
-			// template. We also check if an auto-draft was already created
-			// because preloading can make this run twice, so, different code
-			// paths can end up with different posts for the same template part.
-			// E.g. The server could send back post ID 1 to the client, preload,
-			// and create another auto-draft. So, if the client tries to resolve the
-			// post ID from the slug and theme, it won't match with what the server sent.
-			$template_part_query = new WP_Query(
-				array(
-					'post_type'      => 'wp_template_part',
-					'post_status'    => array( 'publish', 'auto-draft' ),
-					'name'           => $block['attrs']['slug'],
-					'meta_key'       => 'theme',
-					'meta_value'     => $block['attrs']['theme'],
-					'posts_per_page' => 1,
-					'no_found_rows'  => true,
-				)
-			);
-			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-			if ( $template_part_post ) {
-				$template_part_id = $template_part_post->ID;
-			} else {
-				// Template part is not customized, get it from a file and make an auto-draft for it.
-				$template_part_file_path =
-				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
-				if ( ! file_exists( $template_part_file_path ) ) {
-					if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-						$template_part_file_path =
-							dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
-						if ( ! file_exists( $template_part_file_path ) ) {
-							return;
-						}
-					} else {
+			// Template part is not customized, get it from a file and make an auto-draft for it.
+			$template_part_file_path =
+			get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+			if ( ! file_exists( $template_part_file_path ) ) {
+				if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+					$template_part_file_path =
+						dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
+					if ( ! file_exists( $template_part_file_path ) ) {
 						return;
 					}
+				} else {
+					return;
 				}
-				$template_part_id = wp_insert_post(
-					array(
-						'post_content' => file_get_contents( $template_part_file_path ),
-						'post_title'   => $block['attrs']['slug'],
-						'post_status'  => 'auto-draft',
-						'post_type'    => 'wp_template_part',
-						'post_name'    => $block['attrs']['slug'],
-						'meta_input'   => array(
-							'theme' => $block['attrs']['theme'],
-						),
-					)
-				);
 			}
-		}
-
-		if ( isset( $_wp_current_template_part_ids ) ) {
-			$_wp_current_template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
-		} else {
-			$_wp_current_template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
+			$template_part_id = wp_insert_post(
+				array(
+					'post_content' => file_get_contents( $template_part_file_path ),
+					'post_title'   => $block['attrs']['slug'],
+					'post_status'  => 'auto-draft',
+					'post_type'    => 'wp_template_part',
+					'post_name'    => $block['attrs']['slug'],
+					'meta_input'   => array(
+						'theme' => $block['attrs']['theme'],
+					),
+				)
+			);
 		}
 	}
+
+	$template_part_ids = array( $block['attrs']['slug'] => $template_part_id );
 
 	foreach ( $block['innerBlocks'] as $inner_block ) {
-		create_auto_draft_for_template_part_block( $inner_block );
+		$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $inner_block ) );
 	}
+	return $template_part_ids;
 }
 
 /**
- * Return the correct 'wp_template' post for the current template hierarchy.
+ * Return the correct 'wp_template' post and template part IDs for the current template hierarchy.
  *
  * @param string[] $template_hierarchy The current template hierarchy, ordered by priority.
- * @return WP_Post|null A template post object, or null if none could be found.
+ * @return null|array {
+ *  @type WP_Post|null template_post A template post object, or null if none could be found.
+ *  @type int[] A list of template parts IDs for the template.
+ * }
  */
-function gutenberg_find_template_post( $template_hierarchy ) {
+function gutenberg_find_template_post_and_parts( $template_hierarchy ) {
 	if ( ! $template_hierarchy ) {
 		return null;
 	}
@@ -287,12 +288,16 @@ function gutenberg_find_template_post( $template_hierarchy ) {
 	}
 
 	if ( $current_template_post ) {
+		$template_part_ids = array();
 		if ( is_admin() ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
-				create_auto_draft_for_template_part_block( $block );
+				$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $block ) );
 			}
 		}
-		return $current_template_post;
+		return array(
+			'template_post'     => $current_template_post,
+			'template_part_ids' => $template_part_ids,
+		);
 	}
 	return null;
 }
@@ -383,3 +388,28 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );
+
+/**
+ * Removes post details from block context when rendering a block template.
+ *
+ * @param array $context Default context.
+ *
+ * @return array Filtered context.
+ */
+function gutenberg_template_render_without_post_block_context( $context ) {
+	/*
+	 * When loading a template or template part directly and not through a page
+	 * that resolves it, the top-level post ID and type context get set to that
+	 * of the template part. Templates are just the structure of a site, and
+	 * they should not be available as post context because blocks like Post
+	 * Content would recurse infinitely.
+	 */
+	if ( isset( $context['postType'] ) &&
+			( 'wp_template' === $context['postType'] || 'wp_template_part' === $context['postType'] ) ) {
+		unset( $context['postId'] );
+		unset( $context['postType'] );
+	}
+
+	return $context;
+}
+add_filter( 'render_block_context', 'gutenberg_template_render_without_post_block_context' );
