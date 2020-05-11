@@ -111,6 +111,7 @@ class BottomSheetCell extends Component {
 			customActionButton,
 			type,
 			step,
+			borderless,
 			...valueProps
 		} = this.props;
 
@@ -301,6 +302,7 @@ class BottomSheetCell extends Component {
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				style={ [ styles.clipToBounds, style ] }
+				borderless={ borderless }
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
 				<View

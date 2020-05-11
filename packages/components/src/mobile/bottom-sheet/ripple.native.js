@@ -32,9 +32,8 @@ const TouchableRipple = ( {
 	accessibilityLabel,
 	accessibilityRole,
 	accessibilityHint,
+	borderless = false,
 } ) => {
-	const borderless = false;
-
 	const isTouchableNativeSupported =
 		Platform.OS === 'android' &&
 		Platform.Version >= ANDROID_VERSION_LOLLIPOP;
