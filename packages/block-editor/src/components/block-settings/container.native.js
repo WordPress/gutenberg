@@ -55,9 +55,8 @@ export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getSettings } = select( 'core/block-editor' );
-		const settings = getSettings();
 		return {
-			settings,
+			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
