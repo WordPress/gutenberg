@@ -10,16 +10,13 @@ import { DownloadableBlocksList } from '../index';
 import DownloadableBlockListItem from '../../downloadable-block-list-item';
 import { items, plugin } from './fixtures';
 
-import { DOWNLOAD_ERROR_NOTICE_ID } from '../../../store/constants';
-
 const getContainer = ( {
 	blocks,
 	selectMock = jest.fn(),
 	hoverMock = jest.fn(),
 	isLoading = false,
 	errorNotices = {},
-	installAndDownload = jest.fn(),
-	download = jest.fn(),
+	install = jest.fn(),
 } ) => {
 	return shallow(
 		<DownloadableBlocksList
@@ -28,8 +25,7 @@ const getContainer = ( {
 			onHover={ hoverMock }
 			errorNotices={ errorNotices }
 			isLoading={ isLoading }
-			installAndDownload={ installAndDownload }
-			download={ download }
+			install={ install }
 		/>
 	);
 };
@@ -50,43 +46,20 @@ describe( 'DownloadableBlocksList', () => {
 		} );
 	} );
 	describe( 'Behaviour', () => {
-		it( 'should try to install and download the block plugin', () => {
-			const installAndDownload = jest.fn();
-			const download = jest.fn();
+		it( 'should try to install the block plugin', () => {
+			const install = jest.fn();
 			const errorNotices = {};
 
 			const wrapper = getContainer( {
 				blocks: [ plugin ],
-				installAndDownload,
-				download,
+				install,
 				errorNotices,
 			} );
 			const listItems = wrapper.find( DownloadableBlockListItem );
 
 			listItems.get( 0 ).props.onClick();
 
-			expect( installAndDownload ).toHaveBeenCalledTimes( 1 );
-			expect( download ).toHaveBeenCalledTimes( 0 );
-		} );
-		it( 'should try to only download the block plugin to the page', () => {
-			const installAndDownload = jest.fn();
-			const download = jest.fn();
-			const errorNotices = {
-				[ plugin.id ]: DOWNLOAD_ERROR_NOTICE_ID,
-			};
-
-			const wrapper = getContainer( {
-				blocks: [ plugin ],
-				installAndDownload,
-				download,
-				errorNotices,
-			} );
-			const listItems = wrapper.find( DownloadableBlockListItem );
-
-			listItems.get( 0 ).props.onClick();
-
-			expect( installAndDownload ).toHaveBeenCalledTimes( 0 );
-			expect( download ).toHaveBeenCalledTimes( 1 );
+			expect( install ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
