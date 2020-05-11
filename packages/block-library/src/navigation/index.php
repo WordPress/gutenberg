@@ -157,6 +157,11 @@ function render_block_core_navigation( $content, $block ) {
 		return '';
 	}
 
+	$orientation_class_name = 'is-horizontal';
+	if ( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) {
+		$orientation_class_name = 'is-vertical';
+	}
+
 	$colors          = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
@@ -164,6 +169,7 @@ function render_block_core_navigation( $content, $block ) {
 		$font_sizes['css_classes'],
 		array( 'wp-block-navigation' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
+		array( $orientation_class_name ),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
 	);
