@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import TestUtils, { act } from 'react-dom/test-utils';
-import ReactDOM from 'react-dom';
+import { render, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -27,21 +26,9 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	};
 } );
 
-const getWrapperForProps = ( propOverrides ) => {
-	let wrapper;
-	act( () => {
-		wrapper = TestUtils.renderIntoDocument(
-			<InserterBlockList { ...propOverrides } />
-		);
-	} );
-
-	return wrapper;
-};
 
 const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
-	const wrapper = getWrapperForProps( propOverrides );
-	// eslint-disable-next-line react/no-find-dom-node
-	return ReactDOM.findDOMNode( wrapper );
+	return render( <InserterBlockList { ...propOverrides } /> ).container;
 };
 
 const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
@@ -50,7 +37,7 @@ const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
 		'.components-panel__body.is-opened button.components-panel__body-toggle'
 	);
 	activeTabs.forEach( ( tab ) => {
-		TestUtils.Simulate.click( tab );
+		fireEvent.click( tab );
 	} );
 	return element;
 };
