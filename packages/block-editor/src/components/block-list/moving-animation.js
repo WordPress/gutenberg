@@ -82,7 +82,6 @@ function useMovingAnimation(
 			if ( adjustScrolling && scrollContainer.current && previous ) {
 				// if the animation is disabled and the scroll needs to be adjusted,
 				// just move directly to the final scroll position
-				ref.current.style.transform = 'none';
 				const destination = getAbsolutePosition( ref.current );
 				scrollContainer.current.scrollTop =
 					scrollContainer.current.scrollTop -
@@ -92,7 +91,6 @@ function useMovingAnimation(
 
 			return;
 		}
-		ref.current.style.transform = 'none';
 		const destination = getAbsolutePosition( ref.current );
 		const newTransform = {
 			x: previous ? previous.left - destination.left : 0,
@@ -141,7 +139,10 @@ function useMovingAnimation(
 	return prefersReducedMotion
 		? {}
 		: {
-				transformOrigin: 'center',
+				transformOrigin: interpolate(
+					[ animationProps.x, animationProps.y ],
+					( x, y ) => ( x === 0 && y === 0 ? undefined : 'center' )
+				),
 				transform: interpolate(
 					[ animationProps.x, animationProps.y ],
 					( x, y ) =>
