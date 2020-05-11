@@ -1,7 +1,6 @@
 .components-button {
 	display: inline-flex;
 	text-decoration: none;
-	font-size: $default-font-size;
 	margin: 0;
 	border: 0;
 	cursor: pointer;
@@ -12,10 +11,15 @@
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px 12px;
 	overflow: hidden;
 	border-radius: $radius-block-ui;
 	color: $dark-gray-primary;
+
+	// Inside a placeholder, these properties need higher than usual specificity.
+	.components-placeholder & {
+		font-size: $default-font-size;
+		padding: 6px 12px;
+	}
 
 	&[aria-expanded="true"],
 	&:hover {
