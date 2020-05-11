@@ -13,19 +13,32 @@
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
+	.components-toolbar-group,
 	.components-toolbar {
 		flex-direction: column;
+		flex: 1;
 	}
 
+	&.is-horizontal .components-toolbar-group,
 	&.is-horizontal .components-toolbar {
 		flex-direction: row;
 	}
 
 	.block-editor-block-mover-button {
 		height: $block-toolbar-height/2;
+		width: $block-toolbar-height;
+		padding: 0 !important;
+
+		// Focus style.
+		// Overrides .components-toolbar-group styles
+		&::before {
+			left: $grid-unit-10 !important;
+			right: $grid-unit-10 !important;
+		}
 	}
 
 	// Position the icons correctly.
+	.components-toolbar-group .block-editor-block-mover-button.is-up-button,
 	.components-toolbar .block-editor-block-mover-button.is-up-button {
 		svg {
 			margin-bottom: -$grid-unit-10;
@@ -38,6 +51,7 @@
 		}
 	}
 
+	.components-toolbar-group .block-editor-block-mover-button.is-down-button,
 	.components-toolbar .block-editor-block-mover-button.is-down-button {
 		svg {
 			margin-top: -$grid-unit-10;
@@ -54,8 +68,9 @@
 	&.is-horizontal {
 		.block-editor-block-mover-button.has-icon {
 			height: $block-toolbar-height;
+			// Overrides .components-toolbar-group styles
 			width: $block-toolbar-height/2 !important;
-			min-width: $grid-unit-30;
+			min-width: $grid-unit-30 !important;
 			padding-left: 0;
 			padding-right: 0;
 
@@ -78,9 +93,10 @@
 			}
 
 			// Focus style.
+			// Overrides .components-toolbar-group styles
 			&::before {
-				left: $grid-unit-10;
-				right: 0;
+				left: $grid-unit-10 !important;
+				right: 0 !important;
 			}
 		}
 
@@ -92,9 +108,10 @@
 			}
 
 			// Focus style.
+			// Overrides .components-toolbar-group styles
 			&::before {
-				left: 0;
-				right: $grid-unit-10;
+				left: 0 !important;
+				right: $grid-unit-10 !important;
 			}
 		}
 	}

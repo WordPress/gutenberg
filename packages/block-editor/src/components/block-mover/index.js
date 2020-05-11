@@ -7,7 +7,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
+} from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
@@ -73,16 +76,28 @@ export class BlockMover extends Component {
 						onDragEnd={ onDraggableEnd }
 					>
 						<ToolbarGroup>
-							<BlockMoverUpButton
-								clientIds={ clientIds }
+							<ToolbarItem
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
-							/>
-							<BlockMoverDownButton
-								clientIds={ clientIds }
+							>
+								{ ( itemProps ) => (
+									<BlockMoverUpButton
+										clientIds={ clientIds }
+										{ ...itemProps }
+									/>
+								) }
+							</ToolbarItem>
+							<ToolbarItem
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
-							/>
+							>
+								{ ( itemProps ) => (
+									<BlockMoverDownButton
+										clientIds={ clientIds }
+										{ ...itemProps }
+									/>
+								) }
+							</ToolbarItem>
 						</ToolbarGroup>
 					</div>
 				) }
