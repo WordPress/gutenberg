@@ -67,6 +67,13 @@ module.exports = async function start( { spinner, debug } ) {
 				.join( '\n' );
 	};
 
+	const getDownloader = ( source ) =>
+		downloadSource( source, {
+			onProgress: getProgressSetter( source.basename ),
+			spinner,
+			debug: config.debug,
+		} );
+
 	await Promise.all( [
 		// Preemptively start the database while we wait for sources to download.
 		dockerCompose.upOne( 'mysql', {
@@ -88,21 +95,9 @@ module.exports = async function start( { spinner, debug } ) {
 			}
 		} )(),
 
-		...config.pluginSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
-
-		...config.themeSources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-				debug: config.debug,
-			} )
-		),
+		...config.pluginSources.map( getDownloader ),
+		...config.pluginSources.map( getDownloader ),
+		...config.muPluginsSources.map( getDownloader ),
 	] );
 
 	spinner.text = 'Starting WordPress.';
