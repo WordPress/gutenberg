@@ -43,7 +43,7 @@ const TouchableRipple = ( {
 	const rippleColor = getStylesFromColorScheme(
 		rippleStyles.ripple,
 		rippleStyles.rippleDark
-	);
+	).backgroundColor;
 
 	if ( isTouchableNativeSupported ) {
 		// A workaround for ripple on Android P is to use useForeground + overflow: 'hidden'
