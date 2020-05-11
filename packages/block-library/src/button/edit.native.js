@@ -24,6 +24,7 @@ import {
 	TextControl,
 	ToggleControl,
 	PanelBody,
+	PanelActions,
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
@@ -319,9 +320,6 @@ class ButtonEdit extends Component {
 					autoFocus={
 						! isCompatibleWithSettings && Platform.OS === 'ios'
 					}
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
 					keyboardType="url"
 				/>
 				<ToggleControl
@@ -329,9 +327,6 @@ class ButtonEdit extends Component {
 					label={ __( 'Open in new tab' ) }
 					checked={ linkTarget === '_blank' }
 					onChange={ this.onChangeOpenInNewTab }
-					separatorType={
-						isCompatibleWithSettings ? 'fullWidth' : 'leftMargin'
-					}
 				/>
 				<TextControl
 					icon={ ! isCompatibleWithSettings && LinkRelIcon }
@@ -342,9 +337,6 @@ class ButtonEdit extends Component {
 					onSubmit={ this.dismissSheet }
 					autoCapitalize="none"
 					autoCorrect={ false }
-					separatorType={
-						isCompatibleWithSettings ? 'none' : 'fullWidth'
-					}
 					keyboardType="url"
 				/>
 			</>
@@ -435,6 +427,13 @@ class ButtonEdit extends Component {
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
 
+		const actions = [
+			{
+				label: __( 'Remove link' ),
+				onPress: this.onClearSettings,
+			},
+		];
+
 		return (
 			<View onLayout={ this.onLayout }>
 				{ this.getPlaceholderWidth( placeholderText ) }
@@ -508,13 +507,10 @@ class ButtonEdit extends Component {
 					onClose={ this.onHideLinkSettings }
 					hideHeader
 				>
-					{ this.getLinkSettings( url, rel, linkTarget ) }
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ this.onClearSettings }
-					/>
+					<PanelBody style={ styles.linkSettingsPanel }>
+						{ this.getLinkSettings( url, rel, linkTarget ) }
+					</PanelBody>
+					<PanelActions actions={ actions } />
 				</BottomSheet>
 
 				<ColorEdit { ...this.props } />
@@ -526,7 +522,6 @@ class ButtonEdit extends Component {
 							maximumValue={ MAX_BORDER_RADIUS_VALUE }
 							value={ borderRadiusValue }
 							onChange={ this.onChangeBorderRadius }
-							separatorType="none"
 						/>
 					</PanelBody>
 					<PanelBody title={ __( 'Link Settings' ) }>
