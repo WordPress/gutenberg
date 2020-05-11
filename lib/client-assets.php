@@ -681,7 +681,7 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
 /*
- * Register default patterns if not registered in Core already.
+ * Register default patterns if not registered in Core already. Test
  */
 if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
 	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
