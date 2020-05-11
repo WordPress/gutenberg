@@ -25,7 +25,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 		...( fs.existsSync( path.resolve( source.path, 'gutenberg.php' ) )
 			? [
 					`${ source.path }/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins`,
-					`${ source.path }/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins`,
 			  ]
 			: [] ),
 	] );
@@ -35,12 +34,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
+	const muPluginsMounts = config.muPluginsSources.map(
+		( source ) =>
+			`${ source.path }:/var/www/html/wp-content/mu-plugins/${ source.basename }`
+	);
+
 	const developmentMounts = [
 		`${
 			config.coreSource ? config.coreSource.path : 'wordpress'
 		}:/var/www/html`,
 		...pluginMounts,
 		...themeMounts,
+		...muPluginsMounts,
 	];
 
 	let testsMounts;
@@ -85,12 +90,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 			...pluginMounts,
 			...themeMounts,
+			...muPluginsMounts,
 		];
 	} else {
 		testsMounts = [
 			'tests-wordpress:/var/www/html',
 			...pluginMounts,
 			...themeMounts,
+			...muPluginsMounts,
 		];
 	}
 

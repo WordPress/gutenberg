@@ -1,4 +1,5 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ]
+	"plugins": [ "." ],
+	"mu-plugins": [ "./packages/e2e-tests/mu-plugins" ]
 }
