@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, findNodeHandle, View } from 'react-native';
+import { Platform, findNodeHandle } from 'react-native';
 import { partial, first, castArray, last, compact } from 'lodash';
 /**
  * WordPress dependencies
@@ -12,7 +12,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -20,7 +19,6 @@ import {
 	getMoverActionTitle,
 	getArrowIcon,
 } from '../block-mover/mover-description';
-import styles from './style.scss';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -34,9 +32,8 @@ const BlockActionsMenu = ( {
 	isLast,
 	blockTitle,
 	isDefaultBlock,
+	blockMobileToolbarRef,
 } ) => {
-	const actionsMenuRef = useRef( null );
-
 	const deleteOption = {
 		id: 'deleteOption',
 		// translators: %s: block title e.g: "Paragraph".
@@ -101,7 +98,7 @@ const BlockActionsMenu = ( {
 	);
 
 	return (
-		<View ref={ actionsMenuRef } style={ styles.wrapper }>
+		<>
 			<ToolbarButton
 				isDisabled={ isDefaultBlock }
 				title={ __( 'Open Settings' ) }
@@ -122,12 +119,12 @@ const BlockActionsMenu = ( {
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform !== 'ios' }
 				anchor={
-					actionsMenuRef.current
-						? findNodeHandle( actionsMenuRef.current )
+					blockMobileToolbarRef
+						? findNodeHandle( blockMobileToolbarRef )
 						: undefined
 				}
 			/>
-		</View>
+		</>
 	);
 };
 
