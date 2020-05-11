@@ -33,11 +33,12 @@ function ColorSettings( {
 	onHardwareButtonPress,
 	defaultSettings,
 } ) {
-	const { segments, subsheets, isGradient } = colorsUtils;
-	const selectedSegmentIndex = isGradient( colorValue ) ? 1 : 0;
-
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
+
+	const { segments, subsheets, isGradient } = colorsUtils;
+	const selectedSegmentIndex = isGradient( currentValue ) ? 1 : 0;
+
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
 	);
