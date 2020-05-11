@@ -222,7 +222,12 @@ describe( 'readConfig', () => {
 	it( 'should parse mappings into sources', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve(
-				JSON.stringify( { mappings: { test: './relative' } } )
+				JSON.stringify( {
+					mappings: {
+						test: './relative',
+						test2: 'WordPress/gutenberg#master',
+					},
+				} )
 			)
 		);
 		const { mappings } = await readConfig( '.wp-env.json' );
@@ -231,6 +236,11 @@ describe( 'readConfig', () => {
 				type: 'local',
 				path: expect.stringMatching( /^\/.*relative$/ ),
 				basename: 'relative',
+			},
+			test2: {
+				type: 'git',
+				path: expect.stringMatching( /^\/.*gutenberg$/ ),
+				basename: 'gutenberg',
 			},
 		} );
 	} );
@@ -250,25 +260,6 @@ describe( 'readConfig', () => {
 		}
 	} );
 
-	it( 'should throw a validaton error if there is a non-local mapping source', async () => {
-		readFile.mockImplementation( () =>
-			Promise.resolve(
-				JSON.stringify( {
-					mappings: { test: 'WordPress/gutenberg#master' },
-				} )
-			)
-		);
-		expect.assertions( 2 );
-		try {
-			await readConfig( '.wp-env.json' );
-		} catch ( error ) {
-			expect( error ).toBeInstanceOf( ValidationError );
-			expect( error.message ).toContain(
-				'The mapping for "test" must be a local source.'
-			);
-		}
-	} );
-
 	it( 'excludes undefined sources', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve(
@@ -278,7 +269,7 @@ describe( 'readConfig', () => {
 			)
 		);
 		const { mappings } = await readConfig( '.wp-env.json' );
-		expect( mappings ).toMatchObject( {
+		expect( mappings ).toEqual( {
 			test1: {
 				type: 'local',
 				path: expect.stringMatching( /^\/.*relative$/ ),

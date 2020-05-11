@@ -235,11 +235,6 @@ module.exports = {
 					if ( ! source ) {
 						return result;
 					}
-					if ( source.type !== 'local' ) {
-						throw new ValidationError(
-							`The mapping for "${ wpDir }" must be a local source.`
-						);
-					}
 					result[ wpDir ] = source;
 					return result;
 				},
