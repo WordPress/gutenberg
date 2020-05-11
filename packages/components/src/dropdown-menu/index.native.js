@@ -163,8 +163,6 @@ function DropdownMenu( {
 												leftAlign={ true }
 												isSelected={ control.isActive }
 												separatorType={
-													indexOfControl ===
-														controlSet.length - 1 ||
 													Platform.OS === 'android'
 														? 'none'
 														: 'leftMargin'
