@@ -15,12 +15,12 @@ import { PinnedItems } from '@wordpress/interface';
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
-import MainDashboardButton from './main-dashboard-button';
 import MoreMenu from './more-menu';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
+import { CloseButton } from './main-dashboard-button';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -64,7 +64,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<MainDashboardButton.Slot />
+			<CloseButton />
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"

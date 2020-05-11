@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray, first, last, partial } from 'lodash';
+import { castArray, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -121,9 +121,14 @@ const BlockMoverButton = forwardRef(
 		);
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
-		const onClick = isDisabled
-			? null
-			: partial( moverFunction, clientIds, rootClientId );
+
+		const onClick = ( event ) => {
+			moverFunction( clientIds, rootClientId );
+			if ( props.onClick ) {
+				props.onClick( event );
+			}
+		};
+
 		const descriptionId = `block-editor-block-mover-button__description-${ instanceId }`;
 
 		return (
@@ -141,9 +146,9 @@ const BlockMoverButton = forwardRef(
 						isRTL
 					) }
 					aria-describedby={ descriptionId }
-					onClick={ onClick }
-					aria-disabled={ isDisabled }
 					{ ...props }
+					onClick={ isDisabled ? null : onClick }
+					aria-disabled={ isDisabled }
 				/>
 				<span
 					id={ descriptionId }
