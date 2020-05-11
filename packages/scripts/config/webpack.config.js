@@ -19,6 +19,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
 const config = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+	},
 	mode,
 	entry: {
 		index: path.resolve( process.cwd(), 'src', 'index.js' ),
@@ -70,8 +75,8 @@ const config = {
 		],
 	},
 	plugins: [
-		// WP_BUNDLE_ANALYZER global variable enables utility that represents bundle content
-		// as convenient interactive zoomable treemap.
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.

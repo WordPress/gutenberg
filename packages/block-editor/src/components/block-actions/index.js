@@ -21,6 +21,7 @@ function BlockActions( {
 	onInsertBefore,
 	onRemove,
 	onUngroup,
+	blocks,
 } ) {
 	return children( {
 		canDuplicate,
@@ -32,6 +33,7 @@ function BlockActions( {
 		onInsertBefore,
 		onRemove,
 		onUngroup,
+		blocks,
 	} );
 }
 

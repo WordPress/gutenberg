@@ -41,7 +41,10 @@ const BlockMobileToolbar = ( {
 
 			<View style={ styles.spacer } />
 
-			{ ! wrapBlockSettings && <BlockSettingsButton.Slot /> }
+			<BlockSettingsButton.Slot>
+				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+				{ ( fills = [ null ] ) => fills[ 0 ] }
+			</BlockSettingsButton.Slot>
 
 			<BlockActionsMenu
 				clientIds={ [ clientId ] }
