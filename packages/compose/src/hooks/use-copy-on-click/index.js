@@ -24,10 +24,6 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
-		if ( ! clipboard.current ) {
-			return;
-		}
-
 		let timeoutId;
 
 		// Clipboard listens to click events.

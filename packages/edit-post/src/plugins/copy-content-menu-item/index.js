@@ -4,7 +4,7 @@
 import { MenuItem } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useCopyOnClick, compose } from '@wordpress/compose';
+import { useCopyOnClick, compose, ifCondition } from '@wordpress/compose';
 import { useRef, useEffect } from '@wordpress/element';
 
 function CopyContentMenuItem( { createNotice, editedPostContent } ) {
@@ -23,11 +23,9 @@ function CopyContentMenuItem( { createNotice, editedPostContent } ) {
 	}, [ hasCopied ] );
 
 	return (
-		editedPostContent.length > 0 && (
-			<MenuItem ref={ ref }>
-				{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
-			</MenuItem>
-		)
+		<MenuItem ref={ ref }>
+			{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
+		</MenuItem>
 	);
 }
 
@@ -43,5 +41,6 @@ export default compose(
 		return {
 			createNotice,
 		};
-	} )
+	} ),
+	ifCondition( ( { editedPostContent } ) => editedPostContent.length > 0 )
 )( CopyContentMenuItem );
