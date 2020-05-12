@@ -510,6 +510,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"w.org") and @target="_blank"]'
+		);
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Regression Test: This verifies that the UI is updated according to
@@ -545,6 +550,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"wordpress.org") and not(@target)]'
+		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
