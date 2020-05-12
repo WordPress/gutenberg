@@ -421,11 +421,9 @@ function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 		return $settings;
 	}
 
-	$current_template_id = $settings['templateId'];
-
 	// Create template part auto-drafts for the edited post.
-	$post = isset( $current_template_id )
-		? get_post( $current_template_id ) // It's a template.
+	$post = isset( $settings['templateId'] )
+		? get_post( $settings['templateId'] ) // It's a template.
 		: get_post(); // It's a post.
 	foreach ( parse_blocks( $post->post_content ) as $block ) {
 		create_auto_draft_for_template_part_block( $block );
