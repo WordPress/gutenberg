@@ -195,7 +195,7 @@ function create_auto_draft_for_template_part_block( $block ) {
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
- * @param string   $template_type The current template type.
+ * @param string   $template_type      The current template type.
  * @param string[] $template_hierarchy (optional) The current template hierarchy, ordered by priority.
  * @return null|array {
  *  @type WP_Post|null template_post A template post object, or null if none could be found.
