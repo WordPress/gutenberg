@@ -38,7 +38,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 					)
 				)
 			)
-		)->render( true );
+		)->render( array( 'dynamic' => false ) );
 	}
 	return $content;
 }
