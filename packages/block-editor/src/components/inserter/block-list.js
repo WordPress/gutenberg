@@ -282,11 +282,7 @@ function InserterBlockList( {
 			>
 				{ ( fills ) => {
 					if ( fills.length ) {
-						return (
-							<InserterPanel title={ __( 'Search Results' ) }>
-								{ fills }
-							</InserterPanel>
-						);
+						return fills;
 					}
 					if ( ! hasItems ) {
 						return <InserterNoResults />;
