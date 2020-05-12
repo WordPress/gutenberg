@@ -127,7 +127,7 @@ async function updatePackageChangelogs(
 				}
 
 				// A major version bump required. Stop processing.
-				if ( lineNormalized.startsWith( '### Breaking Change' ) ) {
+				if ( lineNormalized.startsWith( '### breaking change' ) ) {
 					versionBump = 'major';
 					break;
 				}
