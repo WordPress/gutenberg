@@ -20,6 +20,11 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"(build|build-module)/store/index.js",
+		"(build|build-module)/plugins/index.js"
+	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
