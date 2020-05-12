@@ -5,7 +5,7 @@ import { flattenDeep } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useReducer } from '@wordpress/element';
+import { useMemo, useReducer } from '@wordpress/element';
 
 const initialStateReducer = ( state ) => state;
 
@@ -179,9 +179,13 @@ export function useInputControlStateReducer(
 	initialState = initialInputControlState
 ) {
 	const combinedReducers = combineStateReducers( stateReducer );
+	const reducer = useMemo(
+		() => inputControlStateReducer( combinedReducers ),
+		[]
+	);
 
 	const [ state, dispatch ] = useReducer(
-		inputControlStateReducer( combinedReducers ),
+		reducer,
 		mergeInitialState( initialState )
 	);
 
