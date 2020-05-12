@@ -117,6 +117,7 @@ function RichTextWrapper(
 		onRemove,
 		onMerge,
 		onSplit,
+		onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		// To do: find a better way to implicitly inherit props.
@@ -360,11 +361,17 @@ function RichTextWrapper(
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( shiftKey || ! canSplit ) {
+			} else if ( shiftKey ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( value, '\n' ) );
 				}
-			} else {
+			} else if ( onSplitAtEnd && ! canSplit ) {
+				const { text, start, end } = value;
+
+				if ( start === end && end === text.length ) {
+					onSplitAtEnd();
+				}
+			} else if ( canSplit ) {
 				splitValue( value );
 			}
 		},
