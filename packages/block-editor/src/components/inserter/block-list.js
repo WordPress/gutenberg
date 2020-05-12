@@ -174,7 +174,7 @@ export function InserterBlockList( {
 			filteredItems.length
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ filteredItems.length, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
