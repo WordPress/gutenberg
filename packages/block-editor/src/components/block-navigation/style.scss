@@ -22,14 +22,41 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation-leaf {
-	display: flex;
+	display: grid;
+	height: $button-size;
+	width: 100%;
+	grid-template-columns: auto 1fr $button-size;
+	grid-template-rows: ($button-size / 2) ($button-size / 2);
+	grid-template-areas:
+		"connectors block-content up-mover"
+		"connectors block-content down-mover";
+
 	// Use position relative for row animation.
 	position: relative;
 
-	.block-editor-block-navigation-block__contents-cell,
-	.block-editor-block-navigation-appender__cell {
-		flex-grow: 1;
+	.block-editor-block-navigation-connectors {
+		grid-area: connectors;
 	}
+
+	.block-editor-block-navigation-block__contents-cell {
+		grid-area: block-content;
+	}
+
+	.block-editor-block-navigation-block__mover-cell:first-child {
+		grid-area: up-mover;
+	}
+
+	.block-editor-block-navigation-block__mover-cell:last-child {
+		grid-area: down-mover;
+	}
+
+	.block-editor-block-navigation-appender__cell {
+		grid-column-start: 2;
+		grid-column-end: 4;
+		grid-row-start: 1;
+		grid-row-end: 3;
+	}
+
 
 	.block-editor-block-navigation-block-content-wrapper {
 		display: flex;
@@ -72,7 +99,7 @@ $tree-item-height: 36px;
 
 	.block-editor-block-mover-button {
 		width: $button-size;
-		height: $button-size;
+		height: $button-size / 2;
 	}
 
 	.block-editor-button-block-appender {
