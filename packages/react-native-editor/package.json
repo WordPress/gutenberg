@@ -124,7 +124,7 @@
     "clean:aztec": "cd ../react-native-aztec && npm run clean && cd example && npm run clean",
     "clean:gutenberg": "cd gutenberg && npm run clean:packages && rm -rf build && rm -rf node_modules",
     "clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
-    "clean:install": "npm run clean; npm run",
+    "clean:install": "npm run clean; npm install",
     "clean:jest": "jest --clearCache --config ../../test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
     "clean:metro": "rm -rf $TMPDIR/metro-cache-*;",
     "clean:pot": "rm -f gutenberg*.pot",
