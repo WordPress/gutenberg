@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { serialize, pasteHandler } from '@wordpress/blocks';
 import { documentHasSelection, documentHasTextSelection } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,29 +11,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/get-paste-event-data';
-
-function useFlashBlock() {
-	const { toggleBlockHighlight } = useDispatch( 'core/block-editor' );
-	const timeouts = useRef( [] );
-	const flashBlock = useCallback(
-		( clientId ) => {
-			toggleBlockHighlight( clientId, true );
-			const timeout = setTimeout( () => {
-				toggleBlockHighlight( clientId, false );
-			}, 150 );
-			timeouts.current.push( timeout );
-		},
-		[ toggleBlockHighlight ]
-	);
-	useEffect( () => {
-		return () => {
-			timeouts.current.forEach( ( timeout ) => {
-				clearTimeout( timeout );
-			} );
-		};
-	}, [] );
-	return flashBlock;
-}
 
 function useNotifyCopy() {
 	const { getBlockName } = useSelect(
@@ -93,9 +70,10 @@ function CopyHandler( { children } ) {
 		getSettings,
 	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
 
-	const { removeBlocks, replaceBlocks } = useDispatch( 'core/block-editor' );
+	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
+		'core/block-editor'
+	);
 
-	const flashBlock = useFlashBlock();
 	const notifyCopy = useNotifyCopy();
 
 	const {
