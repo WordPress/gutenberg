@@ -40,7 +40,7 @@ async function runSvnRepositoryCheckoutStep( abortMessage ) {
 	let svnWorkingDirectoryPath;
 	await runStep( 'Fetching the SVN repository', abortMessage, async () => {
 		log( '>> Fetching the SVN repository' );
-		svnWorkingDirectoryPath = svn.checkout( config.svnRepositoryUrl );
+		svnWorkingDirectoryPath = svn.checkout( config.svnRepositoryURL );
 		log(
 			'>> The SVN repository has been successfully fetched in the following temporary folder: ' +
 				formats.success( svnWorkingDirectoryPath )
@@ -246,7 +246,7 @@ async function runBumpPluginVersionUpdateChangelogAndCommitStep(
 				readmeFileContent.indexOf( '== Changelog ==' )
 			) +
 			'== Changelog ==\n\n' +
-			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesUrl }v${ version }">release page</a>.` +
+			`To read the changelog for ${ config.name } ${ version }, please navigate to the <a href="${ config.wpRepositoryReleasesURL }v${ version }">release page</a>.` +
 			'\n';
 		fs.writeFileSync( readmePath, newReadmeContent );
 
@@ -584,7 +584,7 @@ async function runSvnTagStep( version, abortMessage ) {
 			abortMessage
 		);
 		svn.tagTrunk(
-			config.svnRepositoryUrl,
+			config.svnRepositoryURL,
 			version,
 			'Tagging version ' + version
 		);

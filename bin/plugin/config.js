@@ -8,10 +8,10 @@ const config = {
 	githubRepositoryName: 'gutenberg',
 	pluginEntryPoint: 'gutenberg.php',
 	buildZipCommand: '/bin/bash bin/build-plugin-zip.sh',
-	wpRepositoryReleasesUrl:
+	wpRepositoryReleasesURL:
 		'https://github.com/WordPress/gutenberg/releases/tag/',
-	gitRepositoryUrl: 'https://github.com/' + gitRepoOwner + '/gutenberg.git',
-	svnRepositoryUrl: 'https://plugins.svn.wordpress.org/gutenberg',
+	gitRepositoryURL: 'https://github.com/' + gitRepoOwner + '/gutenberg.git',
+	svnRepositoryURL: 'https://plugins.svn.wordpress.org/gutenberg',
 };
 
 module.exports = config;

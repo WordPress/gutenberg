@@ -25,7 +25,7 @@ async function runGitRepositoryCloneStep( abortMessage ) {
 	let gitWorkingDirectoryPath;
 	await runStep( 'Cloning the Git repository', abortMessage, async () => {
 		log( '>> Cloning the Git repository' );
-		gitWorkingDirectoryPath = await git.clone( config.gitRepositoryUrl );
+		gitWorkingDirectoryPath = await git.clone( config.gitRepositoryURL );
 		log(
 			'>> The Git repository has been successfully cloned in the following temporary folder: ' +
 				formats.success( gitWorkingDirectoryPath )
