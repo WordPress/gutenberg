@@ -16,6 +16,13 @@ import { Icon, create } from '@wordpress/icons';
  */
 import Inserter from '../inserter';
 
+function AddTooltipForIconButton( { hasTooltip, tooltipLabel, button } ) {
+	if ( hasTooltip ) {
+		return <Tooltip text={ tooltipLabel }> { button } </Tooltip>;
+	}
+	return button;
+}
+
 function ButtonBlockAppender(
 	{
 		rootClientId,
@@ -52,30 +59,35 @@ function ButtonBlockAppender(
 					);
 				}
 				const isToggleButton = ! hasSingleBlockType;
-				return (
-					<Tooltip text={ label }>
-						<Button
-							ref={ ref }
-							onFocus={ onFocus }
-							tabIndex={ tabIndex }
-							className={ classnames(
-								className,
-								'block-editor-button-block-appender'
-							) }
-							onClick={ onToggle }
-							aria-haspopup={
-								isToggleButton ? 'true' : undefined
-							}
-							aria-expanded={
-								isToggleButton ? isOpen : undefined
-							}
-							disabled={ disabled }
-							label={ label }
-						>
+
+				const inserterButton = (
+					<Button
+						ref={ ref }
+						onFocus={ onFocus }
+						tabIndex={ tabIndex }
+						className={ classnames(
+							className,
+							'block-editor-button-block-appender'
+						) }
+						onClick={ onToggle }
+						aria-haspopup={ isToggleButton ? 'true' : undefined }
+						aria-expanded={ isToggleButton ? isOpen : undefined }
+						disabled={ disabled }
+						label={ label }
+					>
+						{ ! hasSingleBlockType && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-							<Icon icon={ create } />
-						</Button>
-					</Tooltip>
+						) }
+						<Icon icon={ create } />
+						{ hasSingleBlockType && <span>{ label } </span> }
+					</Button>
+				);
+				return (
+					<AddTooltipForIconButton
+						hasTooltip={ ! hasSingleBlockType }
+						tooltipLabel={ label }
+						button={ inserterButton }
+					/>
 				);
 			} }
 			isAppender
