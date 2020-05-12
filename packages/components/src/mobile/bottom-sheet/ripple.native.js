@@ -28,11 +28,8 @@ const TouchableRipple = ( {
 	children,
 	activeOpacity,
 	getStylesFromColorScheme,
-	accessible,
-	accessibilityLabel,
-	accessibilityRole,
-	accessibilityHint,
 	borderless = false,
+	...touchableProps
 } ) => {
 	const isTouchableNativeSupported =
 		Platform.OS === 'android' &&
@@ -54,10 +51,7 @@ const TouchableRipple = ( {
 
 		return (
 			<TouchableNativeFeedback
-				accessible={ accessible }
-				accessibilityLabel={ accessibilityLabel }
-				accessibilityRole={ accessibilityRole }
-				accessibilityHint={ accessibilityHint }
+				{ ...touchableProps }
 				onPress={ onPress }
 				disabled={ disabled }
 				useForeground={ useForeground }
@@ -75,10 +69,7 @@ const TouchableRipple = ( {
 
 	return (
 		<TouchableOpacity
-			accessible={ accessible }
-			accessibilityLabel={ accessibilityLabel }
-			accessibilityRole={ accessibilityRole }
-			accessibilityHint={ accessibilityHint }
+			{ ...touchableProps }
 			onPress={ onPress }
 			disabled={ disabled }
 			activeOpacity={ activeOpacity }
