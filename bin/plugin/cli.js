@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-/*
+/**
  * External dependencies
  */
 const program = require( 'commander' );
 
-/*
+/**
  * Internal dependencies
  */
 const { releaseRC, releaseStable } = require( './commands/release' );

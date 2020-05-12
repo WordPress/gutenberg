@@ -1,8 +1,15 @@
+/**
+ * External dependencies
+ */
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const readline = require( 'readline' );
+
+/**
+ * Internal dependencies
+ */
 const { log, formats } = require( '../lib/logger' );
 const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const {

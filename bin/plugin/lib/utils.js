@@ -1,4 +1,4 @@
-/*
+/**
  * External dependencies
  */
 const inquirer = require( 'inquirer' );

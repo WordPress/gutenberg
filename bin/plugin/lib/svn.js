@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 const path = require( 'path' );
 const os = require( 'os' );
 const { v4: uuid } = require( 'uuid' );

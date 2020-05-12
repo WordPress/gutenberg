@@ -1,7 +1,14 @@
+/**
+ * External dependencies
+ */
 const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const Octokit = require( '@octokit/rest' );
+
+/**
+ * Internal dependencies
+ */
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
