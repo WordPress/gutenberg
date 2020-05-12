@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.0.0",
+	"version": "8.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -184,6 +184,7 @@
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
+		"analyze-bundles": "cross-env WP_BUNDLE_ANALYZER=1 npm run build",
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
@@ -205,12 +206,13 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format-js": "wp-scripts format-js",
-		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
+		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"prelint-php": "npm run wp-env run composer install -- --no-interaction",
 		"lint-php": "npm run wp-env run composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
+		"lint-lockfile": "node ./bin/validate-package-lock.js",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint:md-js": "wp-scripts lint-md-js",
@@ -254,6 +256,7 @@
 	},
 	"lint-staged": {
 		"package-lock.json": [
+			"npm run lint-lockfile",
 			"node ./bin/check-latest-npm.js"
 		],
 		"packages/*/package.json": [

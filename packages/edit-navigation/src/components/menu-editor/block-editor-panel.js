@@ -17,7 +17,16 @@ import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function BlockEditorPanel( { saveBlocks } ) {
+/**
+ * Internal dependencies
+ */
+import DeleteMenuButton from '../delete-menu-button';
+
+export default function BlockEditorPanel( {
+	onDeleteMenu,
+	menuId,
+	saveBlocks,
+} ) {
 	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
@@ -39,15 +48,13 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 	);
 
 	return (
-		<Panel
-			className="edit-navigation-menu-editor__block-editor-panel"
-			header={
-				<Button isPrimary onClick={ saveBlocks }>
-					{ __( 'Save navigation' ) }
-				</Button>
-			}
-		>
+		<Panel className="edit-navigation-menu-editor__block-editor-panel">
 			<PanelBody title={ __( 'Navigation menu' ) }>
+				<div className="components-panel__header-actions">
+					<Button isPrimary onClick={ saveBlocks }>
+						{ __( 'Save navigation' ) }
+					</Button>
+				</div>
 				<NavigableToolbar
 					className={ classnames(
 						'edit-navigation-menu-editor__block-editor-toolbar',
@@ -65,6 +72,12 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 						<BlockList />
 					</ObserveTyping>
 				</WritingFlow>
+				<div className="components-panel__footer-actions">
+					<DeleteMenuButton
+						menuId={ menuId }
+						onDelete={ onDeleteMenu }
+					/>
+				</div>
 			</PanelBody>
 		</Panel>
 	);
