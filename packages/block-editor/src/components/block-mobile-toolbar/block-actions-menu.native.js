@@ -31,7 +31,7 @@ const BlockActionsMenu = ( {
 	isFirst,
 	isLast,
 	blockTitle,
-	isDefaultBlock,
+	isEmptyDefaultBlock,
 	blockMobileToolbarRef,
 } ) => {
 	const deleteOption = {
@@ -41,6 +41,7 @@ const BlockActionsMenu = ( {
 		value: 'deleteOption',
 		icon: trash,
 		separated: true,
+		disabled: isEmptyDefaultBlock,
 	};
 
 	const settingsOption = {
@@ -100,8 +101,7 @@ const BlockActionsMenu = ( {
 	return (
 		<>
 			<ToolbarButton
-				isDisabled={ isDefaultBlock }
-				title={ __( 'Open Settings' ) }
+				title={ __( 'Open Block Actions Menu' ) }
 				onClick={ () => this.picker.presentPicker() }
 				icon={ moreHorizontalMobile }
 				extraProps={ {
@@ -135,27 +135,35 @@ export default compose(
 			getBlockRootClientId,
 			getBlockOrder,
 			getBlockName,
+			getBlock,
 		} = select( 'core/block-editor' );
 		const normalizedClientIds = castArray( clientIds );
+		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
 		const blockType = getBlockType( blockName );
 		const blockTitle = blockType.title;
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
+
 		const firstIndex = getBlockIndex( firstClientId, rootClientId );
 		const lastIndex = getBlockIndex(
 			last( normalizedClientIds ),
 			rootClientId
 		);
 
+		const isDefaultBlock = blockName === getDefaultBlockName();
+		const isEmptyContent = block.attributes.content === '';
+		const isExactlyOneBlock = blockOrder.length === 1;
+		const isEmptyDefaultBlock =
+			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
+
 		return {
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
 			blockTitle,
-			isDefaultBlock:
-				firstIndex === 0 && blockName === getDefaultBlockName(),
+			isEmptyDefaultBlock,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
