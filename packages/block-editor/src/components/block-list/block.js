@@ -17,7 +17,12 @@ import {
 	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useSelect } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useSelect,
+	useDispatch,
+} from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
@@ -74,6 +79,8 @@ function BlockListBlock( {
 			isHighlighted: isBlockHighlighted( clientId ),
 		};
 	}, [] );
+	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const onRemove = () => removeBlock( clientId );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -137,6 +144,7 @@ function BlockListBlock( {
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ isLocked ? undefined : onReplace }
+			onRemove={ isLocked ? undefined : onRemove }
 			mergeBlocks={ isLocked ? undefined : onMerge }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
