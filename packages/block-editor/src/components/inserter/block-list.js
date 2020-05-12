@@ -234,7 +234,7 @@ function InserterBlockList( {
 					);
 				} ) }
 
-			{ ! hasChildItems && uncategorizedItems.length && (
+			{ ! hasChildItems && !! uncategorizedItems.length && (
 				<InserterPanel
 					className="block-editor-inserter__uncategorized-blocks-panel"
 					title={ __( 'Uncategorized' ) }
