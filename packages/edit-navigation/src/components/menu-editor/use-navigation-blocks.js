@@ -89,7 +89,7 @@ export default function useNavigationBlocks( menuId ) {
 						...createMenuItemAttributesFromBlock( block ),
 						menus: menuId,
 						parent: parentId,
-					} ).then( ( result ) => result );
+					} );
 					if ( block.innerBlocks.length ) {
 						currentItemId = savedItem.id;
 					}
@@ -106,6 +106,7 @@ export default function useNavigationBlocks( menuId ) {
 						...menuItem,
 						...createMenuItemAttributesFromBlock( block ),
 						menus: menuId, // Gotta do this because REST API doesn't like receiving an array here. Maybe a bug in the REST API?
+						parent: parentId,
 					} );
 				}
 
