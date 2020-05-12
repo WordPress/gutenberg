@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
-// Dependencies
+/*
+ * External dependencies
+ */
 const program = require( 'commander' );
+
+/*
+ * Internal dependencies
+ */
 const { releaseRC, releaseStable } = require( './commands/release' );
 const { prepublishNpmStablePackages } = require( './commands/packages' );
 
