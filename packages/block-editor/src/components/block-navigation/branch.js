@@ -1,59 +1,100 @@
 /**
+ * External dependencies
+ */
+import { map, compact } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Children, cloneElement, useContext } from '@wordpress/element';
-import { Fill, Slot } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockNavigationListItem from './list-item';
-import { BlockNavigationContext } from './list';
-import { BlockListBlockContext } from '../block-list/block';
+import BlockNavigationBlock from './block';
+import BlockNavigationAppender from './appender';
 
-const BlockNavigationBranch = ( { children, ...props } ) => {
-	const { __experimentalWithBlockNavigationSlots } = useContext(
-		BlockNavigationContext
-	);
-	if ( ! __experimentalWithBlockNavigationSlots ) {
-		return (
-			<li>
-				<BlockNavigationListItem { ...props } />
-				{ children }
-			</li>
-		);
-	}
+export default function BlockNavigationBranch( props ) {
+	const {
+		blocks,
+		selectBlock,
+		selectedBlockClientId,
+		showAppender,
+		showBlockMovers,
+		showNestedBlocks,
+		parentBlockClientId,
+		level = 1,
+		terminatedLevels = [],
+		path = [],
+	} = props;
+
+	const isTreeRoot = ! parentBlockClientId;
+	const filteredBlocks = compact( blocks );
+	// Add +1 to the rowCount to take the block appender into account.
+	const rowCount = showAppender
+		? filteredBlocks.length + 1
+		: filteredBlocks.length;
+	const hasAppender =
+		showAppender && filteredBlocks.length > 0 && ! isTreeRoot;
+	const appenderPosition = rowCount;
 
 	return (
-		<li>
-			<BlockNavigationListItemSlot blockId={ props.block.clientId }>
-				{ ( fills ) => {
-					if ( ! fills.length ) {
-						return <BlockNavigationListItem { ...props } />;
-					}
+		<>
+			{ map( filteredBlocks, ( block, index ) => {
+				const { clientId, innerBlocks } = block;
+				const hasNestedBlocks =
+					showNestedBlocks && !! innerBlocks && !! innerBlocks.length;
+				const position = index + 1;
+				const isLastRowAtLevel = rowCount === position;
+				const updatedTerminatedLevels = isLastRowAtLevel
+					? [ ...terminatedLevels, level ]
+					: terminatedLevels;
+				const updatedPath = [ ...path, position ];
 
-					return Children.map( fills, ( fill ) =>
-						cloneElement( fill, {
-							...props,
-							...fill.props,
-						} )
-					);
-				} }
-			</BlockNavigationListItemSlot>
-			{ children }
-		</li>
+				return (
+					<Fragment key={ clientId }>
+						<BlockNavigationBlock
+							block={ block }
+							onClick={ () => selectBlock( clientId ) }
+							isSelected={ selectedBlockClientId === clientId }
+							level={ level }
+							position={ position }
+							rowCount={ rowCount }
+							showBlockMovers={ showBlockMovers }
+							terminatedLevels={ terminatedLevels }
+							path={ updatedPath }
+						/>
+						{ hasNestedBlocks && (
+							<BlockNavigationBranch
+								blocks={ innerBlocks }
+								selectedBlockClientId={ selectedBlockClientId }
+								selectBlock={ selectBlock }
+								showAppender={ showAppender }
+								showBlockMovers={ showBlockMovers }
+								showNestedBlocks={ showNestedBlocks }
+								parentBlockClientId={ clientId }
+								level={ level + 1 }
+								terminatedLevels={ updatedTerminatedLevels }
+								path={ updatedPath }
+							/>
+						) }
+					</Fragment>
+				);
+			} ) }
+			{ hasAppender && (
+				<BlockNavigationAppender
+					parentBlockClientId={ parentBlockClientId }
+					position={ rowCount }
+					rowCount={ appenderPosition }
+					level={ level }
+					terminatedLevels={ terminatedLevels }
+					path={ [ ...path, appenderPosition ] }
+				/>
+			) }
+		</>
 	);
-};
+}
 
-export default BlockNavigationBranch;
-
-const listItemSlotName = ( blockId ) => `BlockNavigationList-item-${ blockId }`;
-
-export const BlockNavigationListItemSlot = ( { blockId, ...props } ) => (
-	<Slot { ...props } name={ listItemSlotName( blockId ) } />
-);
-
-export const BlockNavigationListItemFill = ( props ) => {
-	const { clientId } = useContext( BlockListBlockContext );
-	return <Fill { ...props } name={ listItemSlotName( clientId ) } />;
+BlockNavigationBranch.defaultProps = {
+	selectBlock: () => {},
 };
