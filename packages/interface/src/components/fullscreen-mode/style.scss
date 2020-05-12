@@ -4,6 +4,7 @@ body.is-fullscreen-mode {
 		// Because this uses negative margins, we have to compensate for the height.
 		margin-top: -$admin-bar-height;
 		height: calc(100% + #{ $admin-bar-height });
+		overflow: hidden;
 
 		// Hide the top adminbar toolbar.
 		#wpadminbar,
@@ -60,6 +61,7 @@ body.is-fullscreen-mode {
 }
 
 body.is-showing-admin-menu {
+	overflow: auto;
 	// Bring the sidebar into view.
 	#adminmenumain {
 		left: 0;
