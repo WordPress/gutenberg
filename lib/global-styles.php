@@ -213,54 +213,25 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
- * Given a block json, it returns an array of block selectors.
- *
- * @param array $block_json The block.json config.
- * @return array
- */
-function gutenberg_experimental_global_styles_extract_selectors( $block_json ) {
-	$selector        = $block_json['__experimentalSelector'];
-	$block_name      = $block_json['name'];
-	$block_selectors = array();
-	foreach ( $selector as $key => $value ) {
-		$block_selectors[ $block_name . '/' . $key ] = $value;
-	}
-	return $block_selectors;
-}
-
-/**
- * Pulls the CSS selectors to use from the block.json config.
+ * Maintains a list of the CSS selectors available to use.
+ * This should be taken from the block / pattern registry.
  *
  * @return array
  */
 function gutenberg_experimental_global_styles_get_selectors() {
-	$selectors = array( 'global' => ':root' );
-
-	// We need to provide a mechanism for blocks to opt-in into this
-	// that can be used by 3rd party blocks as well.
-	// This list is an interim approach to avoid the performance cost of
-	// having to detect support by reading all core block's block.json.
-	$blocks_supported = array(
-		'paragraph',
-		'heading',
-		'group',
+	$selectors = array(
+		'global'                        => ':root',
+		'core/paragraph'                => 'p',
+		'core/heading/h1'               => 'h1',
+		'core/heading/h2'               => 'h2',
+		'core/heading/h3'               => 'h3',
+		'core/heading/h4'               => 'h4',
+		'core/heading/h5'               => 'h5',
+		'core/heading/h6'               => 'h6',
+		'core/numbered-features/number' => '.wp-block-column:first-child p',
+		'core/numbered-features/title'  => '.wp-block-column:nth-child(2) p:first-child',
+		'core/numbered-features/desc'   => '.wp-block-column:nth-child(2) p',
 	);
-
-	// The block library dir may not exist if working from a fresh clone => bail out early.
-	$block_library_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
-	if ( file_exists( $block_library_dir ) ) {
-		foreach ( $blocks_supported as $block_dir ) {
-			$block_json_file = $block_library_dir . $block_dir . '/block.json';
-			if ( file_exists( $block_json_file ) ) {
-				$block_json = json_decode( file_get_contents( $block_json_file ), true );
-				if ( array_key_exists( '__experimentalSelector', $block_json ) && is_string( $block_json['__experimentalSelector'] ) ) {
-					$selectors[ $block_json['name'] ] = $block_json['__experimentalSelector'];
-				} elseif ( array_key_exists( '__experimentalSelector', $block_json ) && is_array( $block_json['__experimentalSelector'] ) ) {
-					$selectors = array_merge( $selectors, gutenberg_experimental_global_styles_extract_selectors( $block_json ) );
-				}
-			}
-		}
-	}
 
 	return $selectors;
 }
@@ -345,6 +316,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 
 	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
 	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['blocks'] );
+	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['patterns'] );
 	if ( empty( $inline_style ) ) {
 		return;
 	}

@@ -1,7 +1,6 @@
 {
 	"name": "core/paragraph",
 	"category": "common",
-	"__experimentalSelector": "p",
 	"attributes": {
 		"align": {
 			"type": "string"

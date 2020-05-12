@@ -1,7 +1,6 @@
 {
 	"name": "core/group",
 	"category": "layout",
-	"__experimentalSelector": ".wp-block-group",
 	"attributes": {
 		"tagName": {
 			"type": "string",
