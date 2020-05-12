@@ -453,12 +453,6 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
-
 		await waitForAutoFocus();
 		const isInURLInput = await page.evaluate(
 			() => !! document.activeElement.closest( '.block-editor-url-input' )
@@ -536,11 +530,6 @@ describe( 'Links', () => {
 
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
 		await waitForAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
