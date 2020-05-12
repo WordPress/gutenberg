@@ -17,7 +17,12 @@ import {
 	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useSelect, useDispatch } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useSelect,
+	useDispatch,
+} from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
