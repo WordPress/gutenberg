@@ -285,7 +285,7 @@ jobs:
 
         # Create an Android emulator
         - echo no | avdmanager create avd --force --name test -k "system-images;android-$ANDROID_API;$ANDROID_EMU_FLAVOR;$ANDROID_ABI" -c 10M
-        - printf "\nhw.lcd.height=1480\nhw.lcd.width=720\nhw.lcd.density=240\nskin.name=720x1480" >> /home/travis/.android/avd/test.avd/config.ini
+        - printf "\nhw.lcd.height=2960\nhw.lcd.width=1080\nhw.lcd.density=480\nskin.name=1080x2960" >> /home/travis/.android/avd/test.avd/config.ini
         - |
           EMU_PARAMS="-verbose -no-snapshot -no-window -camera-back none -camera-front none -selinux permissive -qemu -m 2048"
           EMU_COMMAND="emulator"
