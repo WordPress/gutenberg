@@ -9,9 +9,7 @@ const { v4: uuid } = require( 'uuid' );
 async function clone( repositoryUrl ) {
 	const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
 	const simpleGit = SimpleGit();
-	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath, [
-		'--depth=1',
-	] );
+	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath );
 	return gitWorkingDirectoryPath;
 }
 
