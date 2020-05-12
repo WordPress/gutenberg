@@ -109,6 +109,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			)
 		);
 
+		// Check if the plugin is already installed but deactivated
 		$installed_plugins = get_plugins( '/' . $api->slug );
 
 		if ( empty( $installed_plugins ) ) {
