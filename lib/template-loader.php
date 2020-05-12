@@ -234,6 +234,10 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	$current_template_post = $template_query->have_posts() ? $template_query->next_post() : null;
 
+	// TODO: We could consider moving the following logic to a hook like `posts_results` that is run
+	// after query results have been fetched. That might allow us to absorb filtering logic
+	// (as e.g. found in `filter_rest_wp_template_query`) into the generic querying logic.
+
 	// Build map of template slugs to their priority in the current hierarchy.
 	$slug_priorities = array_flip( $slugs );
 

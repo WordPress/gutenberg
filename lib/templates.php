@@ -192,6 +192,10 @@ function filter_rest_wp_template_query( $args, $request ) {
 				continue;
 			}
 
+			// TODO: gutenberg_find_template_post_and_parts() internally performs a query.
+			// This means that there's room for optimization, and we might be able to
+			// generalize the logic found here into something that runs upon every `wp_template`
+			// query (not just those coming from the REST API).
 			$current_template = gutenberg_find_template_post_and_parts( $template_type );
 			if ( isset( $current_template ) ) {
 				$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
