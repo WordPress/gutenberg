@@ -67,12 +67,7 @@ export class RootComponent extends React.Component {
 	}
 
 	render() {
-		const { initialHtmlModeEnabled } = this.props;
-		let initialData = this.props.initialData;
-		let initialTitle = this.props.initialTitle;
-		let postType = this.props.postType;
-		const colors = this.props.colors;
-		const gradients = this.props.gradients;
+		let { initialData, initialTitle, postType } = this.props;
 
 		if ( initialData === undefined && __DEV__ ) {
 			initialData = initialHtml;
@@ -87,11 +82,11 @@ export class RootComponent extends React.Component {
 		return (
 			<Editor
 				initialHtml={ initialData }
-				initialHtmlModeEnabled={ initialHtmlModeEnabled }
+				initialHtmlModeEnabled={ this.props.initialHtmlModeEnabled }
 				initialTitle={ initialTitle }
 				postType={ postType }
-				colors={ colors }
-				gradients={ gradients }
+				colors={ this.props.colors }
+				gradients={ this.props.gradients }
 			/>
 		);
 	}
