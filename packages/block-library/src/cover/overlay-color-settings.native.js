@@ -38,7 +38,6 @@ function OverlayColorSettings( { attributes, setAttributes } ) {
 
 	const setOverlayAttribute = ( attributeName, value ) => {
 		setAttributes( {
-			...attributes,
 			// clear all related attributes (only one should be set)
 			overlayColor: undefined,
 			customOverlayColor: undefined,
