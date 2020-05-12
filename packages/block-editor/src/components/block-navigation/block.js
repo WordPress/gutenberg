@@ -61,8 +61,12 @@ export default function BlockNavigationBlock( {
 			terminatedLevels={ terminatedLevels }
 		>
 			<TreeGridCell
-				className="block-editor-block-navigation-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 3 }
+				className={ classnames(
+					'block-editor-block-navigation-block__contents-cell',
+					{
+						'has-movers': hasRenderedMovers,
+					}
+				) }
 			>
 				{ ( props ) => (
 					<BlockNavigationBlockContents
