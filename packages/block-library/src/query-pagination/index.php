@@ -22,7 +22,7 @@ function render_block_core_query_pagination( $attributes, $content, $block ) {
 	if ( 1 !== $page ) {
 		$content .= sprintf(
 			'<div><a href="%s">%s</a></div>',
-			add_query_arg( $page_key, '2' === $page ? false : $page - 1 ),
+			esc_url( add_query_arg( $page_key, '2' === $page ? false : $page - 1 ) ),
 			__( 'Previous', 'gutenberg' )
 		);
 	}
