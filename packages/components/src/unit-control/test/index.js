@@ -281,12 +281,12 @@ describe( 'UnitControl', () => {
 
 			expect( state ).toBe( '50pt' );
 		} );
+	} );
+	describe( 'Unit Parser', () => {
+		let state = '10px';
+		const setState = ( nextState ) => ( state = nextState );
 
 		it( 'should parse unit from input', () => {
-			let state = '10px';
-
-			const setState = ( nextState ) => ( state = nextState );
-
 			act( () => {
 				render(
 					<UnitControl value={ state } onChange={ setState } />,
@@ -301,24 +301,76 @@ describe( 'UnitControl', () => {
 			} );
 
 			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse PX unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
 
 			act( () => {
 				Simulate.change( input, { target: { value: '61   PX' } } );
 			} );
 
 			expect( state ).toBe( '61px' );
+		} );
+
+		it( 'should parse EM unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, { target: { value: '55 em' } } );
+			} );
+
+			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse % unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
 
 			act( () => {
 				Simulate.change( input, { target: { value: '-10  %' } } );
 			} );
 
 			expect( state ).toBe( '-10%' );
+		} );
 
+		it( 'should parse REM unit from input', () => {
 			act( () => {
-				Simulate.change( input, { target: { value: '15.25 REm ' } } );
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
 			} );
 
-			expect( state ).toBe( '15.25rem' );
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, {
+					target: { value: '123       rEm  ' },
+				} );
+			} );
+
+			expect( state ).toBe( '123rem' );
 		} );
 	} );
 } );
