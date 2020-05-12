@@ -102,7 +102,7 @@ function InputField(
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			if ( ! isValueEmpty( value ) ) {
-				handleOnSubmit( { target: value }, event );
+				handleOnSubmit( { target: { value } }, event );
 			} else {
 				reset( valueProp );
 			}
