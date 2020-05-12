@@ -81,7 +81,7 @@ jasmine.getEnv().addReporter( {
 				'--bit-rate',
 				'1M',
 				'--size',
-				'1440x2560',
+				'720x1280',
 				`/sdcard/${ fileName }`,
 			] );
 
