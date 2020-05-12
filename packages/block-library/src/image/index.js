@@ -61,6 +61,11 @@ export const settings = {
 			return alt + ( caption ? '. ' + caption : '' );
 		}
 	},
+	getEditWrapperProps( attributes ) {
+		return {
+			'data-align': attributes.align,
+		};
+	},
 	transforms,
 	edit,
 	save,

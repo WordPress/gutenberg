@@ -31,6 +31,7 @@ export const settings = {
 	deprecated,
 	supports: {
 		align: true,
+		lightBlockWrapper: true,
 	},
 	edit,
 	save,

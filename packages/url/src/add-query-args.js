@@ -10,7 +10,7 @@ import { parse, stringify } from 'qs';
  *
  * @param {string} [url='']  URL to which arguments should be appended. If omitted,
  *                           only the resulting querystring is returned.
- * @param {Object} args      Query arguments to apply to URL.
+ * @param {Object} [args]    Query arguments to apply to URL.
  *
  * @example
  * ```js

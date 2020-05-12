@@ -202,7 +202,6 @@ const Cover = ( {
 					label={ __( 'Minimum height in pixels' ) }
 					minimumValue={ COVER_MIN_HEIGHT }
 					maximumValue={ COVER_MAX_HEIGHT }
-					separatorType={ 'none' }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
 					style={ styles.rangeCellContainer }
@@ -214,7 +213,6 @@ const Cover = ( {
 						label={ __( 'Background Opacity' ) }
 						minimumValue={ 0 }
 						maximumValue={ 100 }
-						separatorType={ 'none' }
 						value={ dimRatio }
 						onChange={ onOpactiyChange }
 						style={ styles.rangeCellContainer }
@@ -294,8 +292,6 @@ const Cover = ( {
 		return (
 			<View>
 				<MediaPlaceholder
-					// eslint-disable-next-line no-undef
-					__experimentalOnlyMediaLibrary={ ! __DEV__ }
 					icon={ placeholderIcon }
 					labels={ {
 						title: __( 'Cover' ),
@@ -329,8 +325,6 @@ const Cover = ( {
 			</View>
 
 			<MediaUpload
-				// eslint-disable-next-line no-undef
-				__experimentalOnlyMediaLibrary={ ! __DEV__ }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onSelect={ onSelectMedia }
 				render={ renderBackground }

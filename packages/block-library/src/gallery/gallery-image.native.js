@@ -180,6 +180,7 @@ class GalleryImage extends Component {
 			'aria-label': ariaLabel,
 			isCropped,
 			getStylesFromColorScheme,
+			isRTL,
 		} = this.props;
 
 		const { isUploadInProgress, captionSelected } = this.state;
@@ -244,7 +245,9 @@ class GalleryImage extends Component {
 									<View style={ style.moverButtonContainer }>
 										<Button
 											style={ buttonStyle }
-											icon={ arrowLeft }
+											icon={
+												isRTL ? arrowRight : arrowLeft
+											}
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isFirstItem
@@ -260,7 +263,9 @@ class GalleryImage extends Component {
 										<View style={ separatorStyle }></View>
 										<Button
 											style={ buttonStyle }
-											icon={ arrowRight }
+											icon={
+												isRTL ? arrowLeft : arrowRight
+											}
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
 												isLastItem

@@ -1,8 +1,26 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### Enhancements
+
+- Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.
+
+### Deprecations
+
+- `env` script was marked as deprecated. We recommend using `@wordpress/env` package instead that lets you easily set up a local WordPress environment for building and testing plugins and themes.
+
+## 9.0.0 (2020-04-30)
 
 ### Breaking Changes
 
 - The bundled `puppeteer` (`^2.0.0`) dependency has been replaced with `puppeteer-core` in version `3.0.0`. Puppeteer uses Chromium v81 instead of Chromium v79. See the [full list of changes](https://github.com/puppeteer/puppeteer/releases/tag/v3.0.0). It also allowed preventing Chromium installation together with `@wordpress/scripts`. It happens now on-demand when running `test-e2e` script, and it re-triggers only when a new version is required.
+
+### New Features
+
+- Add support for passing [node CLI options](https://nodejs.org/api/cli.html) to scripts ([#21631](https://github.com/WordPress/gutenberg/pull/21631)).
+- Add debugging support for `test-unit-js` script ([#21631](https://github.com/WordPress/gutenberg/pull/21631)). Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) using the `--inspect-brk` option.
+- Add debugging support for `test-e2e` script ([#21861](https://github.com/WordPress/gutenberg/pull/21861)). Tests can be debugged by using the `--inspect-brk` option and a new `--puppeteer-devtools` option (or `PUPPETEER_DEVTOOLS="true"` environment variable).
 
 ### Bug fix
 

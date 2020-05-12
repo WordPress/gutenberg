@@ -47,15 +47,19 @@ function gutenberg_test_register_context_blocks() {
 	register_block_type(
 		'gutenberg/test-context-consumer',
 		array(
-			'context'         => array( 'gutenberg/recordId' ),
-			'render_callback' => function( $block ) {
-				$record_id = $block->context['gutenberg/recordId'];
+			'context'         => array(
+				'gutenberg/recordId',
+				'postId',
+				'postType',
+			),
+			'render_callback' => function( $attributes, $content, $block ) {
+				$ordered_context = array(
+					$block->context['gutenberg/recordId'],
+					$block->context['postId'],
+					$block->context['postType'],
+				);
 
-				if ( ! is_int( $record_id ) ) {
-					throw new Exception( 'Expected numeric recordId' );
-				}
-
-				return 'The record ID is: ' . filter_var( $record_id, FILTER_VALIDATE_INT );
+				return implode( ',', $ordered_context );
 			},
 		)
 	);

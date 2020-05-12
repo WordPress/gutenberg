@@ -84,6 +84,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-templates.md",
@@ -966,6 +972,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "RovingTabIndex",
+		"slug": "roving-tab-index",
+		"markdown_source": "../packages/components/src/roving-tab-index/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Sandbox",
 		"slug": "sandbox",
 		"markdown_source": "../packages/components/src/sandbox/README.md",
@@ -1047,6 +1059,12 @@
 		"title": "Tooltip",
 		"slug": "tooltip",
 		"markdown_source": "../packages/components/src/tooltip/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
 		"parent": "components"
 	},
 	{
