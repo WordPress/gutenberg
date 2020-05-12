@@ -32,7 +32,7 @@ export default class EditorPage {
 			this.accessibilityIdKey = 'contentDescription';
 		}
 
-		driver.setImplicitWaitTimeout( 5000 );
+		driver.setImplicitWaitTimeout( 10000 );
 	}
 
 	async getBlockList() {
