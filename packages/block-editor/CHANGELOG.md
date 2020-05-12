@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   The block controll value for `InnerBlocks` has been changed from `__experimentalBlocks` to `value` and is now considered a stable API.
+-   The block control value for `InnerBlocks` has been changed from `__experimentalBlocks` to `value` and is now considered a stable API.
 
 ## 3.7.0 (2020-02-10)
 
