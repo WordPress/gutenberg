@@ -67,22 +67,6 @@ export class BlockList extends Component {
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 	}
 
-	shouldComponentUpdate( nextProps ) {
-		if (
-			JSON.stringify( nextProps.blockClientIds ) !==
-				JSON.stringify( this.props.blockClientIds ) ||
-			nextProps.blockCount !== this.props.blockCount ||
-			nextProps.isReadOnly !== this.props.isReadOnly ||
-			nextProps.isBlockInsertionPointVisible !==
-				this.props.isBlockInsertionPointVisible ||
-			nextProps.renderAppender !== this.props.renderAppender ||
-			nextProps.parentWidth !== this.props.parentWidth
-		) {
-			return true;
-		}
-		return false;
-	}
-
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}

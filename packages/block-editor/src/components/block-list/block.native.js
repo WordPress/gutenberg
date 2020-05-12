@@ -26,29 +26,7 @@ import BlockMobileToolbar from '../block-mobile-toolbar';
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.onFocus = this.onFocus.bind( this );
-	}
-	// wrapperProps are always a new reference and forces update even if value is the same
-	shouldComponentUpdate( nextProps ) {
-		if (
-			nextProps.isValid !== this.props.isValid ||
-			nextProps.isInnerBlockSelected !==
-				this.props.isInnerBlockSelected ||
-			nextProps.isParentSelected !== this.props.isParentSelected ||
-			nextProps.firstToSelectId !== this.props.firstToSelectId ||
-			nextProps.isTouchable !== this.props.isTouchable ||
-			nextProps.isSelected !== this.props.isSelected ||
-			nextProps.parentWidth !== this.props.parentWidth ||
-			JSON.stringify( nextProps.wrapperProps ) !==
-				JSON.stringify( this.props.wrapperProps ) ||
-			JSON.stringify( nextProps.attributes ) !==
-				JSON.stringify( this.props.attributes )
-		) {
-			return true;
-		}
-
-		return false;
 	}
 
 	onFocus() {
@@ -198,6 +176,22 @@ class BlockListBlock extends Component {
 	}
 }
 
+// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference
+const wrapperPropsCache = new WeakMap();
+const emptyObj = {};
+function getWrapperProps( value, getWrapperPropsFunction ) {
+	if ( ! getWrapperPropsFunction ) {
+		return emptyObj;
+	}
+	const cachedValue = wrapperPropsCache.get( value );
+	if ( ! cachedValue ) {
+		const wrapperProps = getWrapperPropsFunction( value );
+		wrapperPropsCache.set( value, wrapperProps );
+		return wrapperProps;
+	}
+	return cachedValue;
+}
+
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
@@ -262,9 +256,10 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
-			wrapperProps: blockType.getEditWrapperProps
-				? blockType.getEditWrapperProps( attributes ) || {}
-				: {},
+			wrapperProps: getWrapperProps(
+				attributes,
+				blockType.getEditWrapperProps
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

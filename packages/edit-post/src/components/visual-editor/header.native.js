@@ -17,7 +17,12 @@ import { ReadableContentView } from '@wordpress/components';
 import styles from './style.scss';
 
 const Header = React.memo(
-	( { editTitle, setTitleRef, title, getStylesFromColorScheme } ) => {
+	function EditorHeader( {
+		editTitle,
+		setTitleRef,
+		title,
+		getStylesFromColorScheme,
+	} ) {
 		const blockHolderFocusedStyle = getStylesFromColorScheme(
 			styles.blockHolderFocused,
 			styles.blockHolderFocusedDark
@@ -35,7 +40,8 @@ const Header = React.memo(
 				/>
 			</ReadableContentView>
 		);
-	}
+	},
+	( prevProps, nextProps ) => prevProps.title === nextProps.title
 );
 
 export default compose( [

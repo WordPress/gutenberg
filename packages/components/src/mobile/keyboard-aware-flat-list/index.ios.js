@@ -1,29 +1,15 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { FlatList } from 'react-native';
+import { isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 
-class InnerFlatList extends Component {
-	shouldComponentUpdate( nextProps ) {
-		if (
-			JSON.stringify( nextProps.data ) !==
-				JSON.stringify( this.props.data ) ||
-			JSON.stringify( nextProps.extraData ) !==
-				JSON.stringify( this.props.extraData )
-		) {
-			return true;
-		}
-		return false;
-	}
-	render() {
-		return <FlatList { ...this.props } />;
-	}
-}
+const List = React.memo( FlatList, isEqual );
 
 export const KeyboardAwareFlatList = ( {
 	extraScrollHeight,
@@ -76,7 +62,7 @@ export const KeyboardAwareFlatList = ( {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }
 	>
-		<InnerFlatList { ...listProps } />
+		<List { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 
