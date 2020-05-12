@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	Animated,
-	Easing,
-	View,
-	TouchableWithoutFeedback,
-	Platform,
-} from 'react-native';
+import { Animated, Easing, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -84,26 +78,22 @@ const FloatingToolbar = ( {
 
 	return (
 		!! opacity && (
-			<TouchableWithoutFeedback accessible={ false }>
-				<Animated.View
-					style={ [ styles.floatingToolbar, animationStyle ] }
-				>
-					{ showNavUpButton && (
-						<Toolbar passedStyle={ styles.toolbar }>
-							<ToolbarButton
-								title={ __( 'Navigate Up' ) }
-								onClick={
-									! showPrevious &&
-									( () => onNavigateUp( parentId ) )
-								}
-								icon={ <NavigateUpSVG isRTL={ isRTL } /> }
-							/>
-							<View style={ styles.pipe } />
-						</Toolbar>
-					) }
-					<Breadcrumb clientId={ breadcrumbClientId } />
-				</Animated.View>
-			</TouchableWithoutFeedback>
+			<Animated.View style={ [ styles.floatingToolbar, animationStyle ] }>
+				{ showNavUpButton && (
+					<Toolbar passedStyle={ styles.toolbar }>
+						<ToolbarButton
+							title={ __( 'Navigate Up' ) }
+							onClick={
+								! showPrevious &&
+								( () => onNavigateUp( parentId ) )
+							}
+							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
+						/>
+						<View style={ styles.pipe } />
+					</Toolbar>
+				) }
+				<Breadcrumb clientId={ breadcrumbClientId } />
+			</Animated.View>
 		)
 	);
 };
