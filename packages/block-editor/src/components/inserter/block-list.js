@@ -4,7 +4,6 @@
 import {
 	map,
 	includes,
-	filter,
 	findIndex,
 	flow,
 	sortBy,
@@ -119,24 +118,25 @@ function InserterBlockList( {
 	}, [ filterValue, items, categories, collections ] );
 
 	const childItems = useMemo( () => {
-		return filter( filteredItems, ( { name } ) =>
+		return filteredItems.filter( ( { name } ) =>
 			includes( rootChildBlocks, name )
 		);
 	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
-		return filter( items, ( item ) => item.utility > 0 ).slice(
-			0,
-			MAX_SUGGESTED_ITEMS
-		);
+		return items
+			.filter( ( item ) => item.utility > 0 )
+			.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
-		return filter( filteredItems, { category: 'reusable' } );
+		return filteredItems.filter(
+			( { category } ) => category === 'reusable'
+		);
 	}, [ filteredItems ] );
 
 	const uncategorizedItems = useMemo( () => {
-		return filter( filteredItems, ( item ) => ! item.category );
+		return filteredItems.filter( ( item ) => ! item.category );
 	}, [ filteredItems ] );
 
 	const itemsPerCategory = useMemo( () => {
@@ -149,8 +149,7 @@ function InserterBlockList( {
 
 		return flow(
 			( itemList ) =>
-				filter(
-					itemList,
+				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
