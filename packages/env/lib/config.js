@@ -6,7 +6,6 @@ const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const os = require( 'os' );
 const crypto = require( 'crypto' );
-const { reduce } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -194,6 +193,14 @@ module.exports = {
 			);
 		}
 
+		for ( const [ wpDir, localDir ] of Object.entries( config.mappings ) ) {
+			if ( ! localDir || typeof localDir !== 'string' ) {
+				throw new ValidationError(
+					`Invalid .wp-env.json: "mapping.${ wpDir }" should be a string.`
+				);
+			}
+		}
+
 		const workDirectoryPath = path.resolve(
 			getHomeDirectory(),
 			md5( configPath )
@@ -226,15 +233,11 @@ module.exports = {
 				} )
 			),
 			config: config.config,
-			mappings: reduce(
-				config.mappings,
-				( result, localDir, wpDir ) => {
+			mappings: Object.entries( config.mappings ).reduce(
+				( result, [ wpDir, localDir ] ) => {
 					const source = parseSourceString( localDir, {
 						workDirectoryPath,
 					} );
-					if ( ! source ) {
-						return result;
-					}
 					result[ wpDir ] = source;
 					return result;
 				},

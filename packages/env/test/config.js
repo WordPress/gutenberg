@@ -260,22 +260,23 @@ describe( 'readConfig', () => {
 		}
 	} );
 
-	it( 'excludes undefined sources', async () => {
+	it( 'throws an error if a mapping is badly formatted', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve(
 				JSON.stringify( {
-					mappings: { test1: './relative', test2: null },
+					mappings: { test: null },
 				} )
 			)
 		);
-		const { mappings } = await readConfig( '.wp-env.json' );
-		expect( mappings ).toEqual( {
-			test1: {
-				type: 'local',
-				path: expect.stringMatching( /^\/.*relative$/ ),
-				basename: 'relative',
-			},
-		} );
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "mapping.test" should be a string.'
+			);
+		}
 	} );
 
 	it( 'throws an error if mappings is not an object', async () => {

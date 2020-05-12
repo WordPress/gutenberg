@@ -4,7 +4,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { map } = require( 'lodash' );
 
 /**
  * @typedef {import('./config').Config} Config
@@ -19,9 +18,8 @@ const { map } = require( 'lodash' );
  */
 module.exports = function buildDockerComposeConfig( config ) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
-	const directoryMounts = map(
-		config.mappings,
-		( source, wpDir ) => `${ source.path }:/var/www/html/${ wpDir }`
+	const directoryMounts = Object.entries( config.mappings ).map(
+		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
 	);
 
 	const pluginMounts = config.pluginSources.map(
