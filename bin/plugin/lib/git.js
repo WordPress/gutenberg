@@ -1,3 +1,6 @@
+/*
+ * External dependencies
+ */
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git/promise' );
 const os = require( 'os' );
