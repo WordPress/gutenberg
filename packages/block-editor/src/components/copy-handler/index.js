@@ -20,7 +20,7 @@ function useFlashBlock() {
 			toggleBlockHighlight( clientId, true );
 			const timeout = setTimeout( () => {
 				toggleBlockHighlight( clientId, false );
-			}, 1000 );
+			}, 150 );
 			timeouts.current.push( timeout );
 		},
 		[ toggleBlockHighlight ]
@@ -55,12 +55,12 @@ function useNotifyCopy() {
 				eventType === 'copy'
 					? sprintf(
 							// Translators: Name of the block being copied, e.g. "Paragraph"
-							__( 'Copied block "%s" to clipboard.' ),
+							__( 'Copied "%s" to clipboard.' ),
 							title
 					  )
 					: sprintf(
 							// Translators: Name of the block being cut, e.g. "Paragraph"
-							__( 'Cut block "%s" to clipboard.' ),
+							__( 'Moved "%s" to clipboard.' ),
 							title
 					  );
 		} else {
@@ -73,7 +73,7 @@ function useNotifyCopy() {
 					  )
 					: sprintf(
 							// Translators: Number of blocks being cut
-							__( 'Cut %d blocks to clipboard.' ),
+							__( 'Moved %d blocks to clipboard.' ),
 							selectedBlockClientIds.length
 					  );
 		}
