@@ -157,7 +157,7 @@ function render_block_core_navigation( $content, $block ) {
 		return '';
 	}
 
-	$orientation_class_name = 'is-horizontal';
+	$orientation_class_name = '';
 	if ( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) {
 		$orientation_class_name = 'is-vertical';
 	}
