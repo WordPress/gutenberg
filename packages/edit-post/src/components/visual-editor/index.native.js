@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { BlockList } from '@wordpress/block-editor';
 
 /**
@@ -8,12 +9,23 @@ import { BlockList } from '@wordpress/block-editor';
  */
 import Header from './header';
 
-export default function VisualEditor( { safeAreaBottomInset, setTitleRef } ) {
-	return (
-		<BlockList
-			header={ <Header setTitleRef={ setTitleRef } /> }
-			safeAreaBottomInset={ safeAreaBottomInset }
-			autoScroll={ true }
-		/>
-	);
+export default class VisualEditor extends Component {
+	constructor( props ) {
+		super( props );
+		this.renderHeader = this.renderHeader.bind( this );
+	}
+	renderHeader() {
+		const { setTitleRef } = this.props;
+		return <Header setTitleRef={ setTitleRef } />;
+	}
+	render() {
+		const { safeAreaBottomInset } = this.props;
+		return (
+			<BlockList
+				header={ this.renderHeader }
+				safeAreaBottomInset={ safeAreaBottomInset }
+				autoScroll={ true }
+			/>
+		);
+	}
 }
