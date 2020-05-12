@@ -60,6 +60,10 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await paragraphBlockElement.click();
 
 		await editorPage.addNewParagraphBlock();
+
+		// wait for accessibility ids to update
+		await driver.sleep( 1000 );
+
 		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
 			3
 		);

@@ -345,7 +345,7 @@ export default class EditorPage {
 			block
 		);
 		await typeString( this.driver, textViewElement, text, clear );
-		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
+		await this.driver.sleep( 3000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
 	async sendTextToParagraphBlockAtPosition( position, text, clear ) {

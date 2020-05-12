@@ -266,7 +266,7 @@ DEPENDENCIES:
   - React-jsi (from `../../../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
@@ -326,7 +326,7 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
   react-native-get-random-values:
-    :path: "../node_modules/react-native-get-random-values"
+    :path: "../../../node_modules/react-native-get-random-values"
   react-native-keyboard-aware-scroll-view:
     :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
   react-native-safe-area:
@@ -386,7 +386,7 @@ SPEC CHECKSUMS:
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
-  react-native-video: a1aeeb872d4408ff2f1a2a780a49ff44bdeb9172
+  react-native-video: 331eaf96cb034fedcc27f4f6ada3ac3cf6c0a78a
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72

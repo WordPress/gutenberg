@@ -1,0 +1,31 @@
+on: push
+
+jobs:
+  test:
+    runs-on: macos-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: Restore npm cache
+      uses: actions/cache@master
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+
+    - uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 28
+        profile: pixel_xl
+        script: |
+          npm ci
+          npm run native test:e2e:android:local
+
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: android-screen-recordings
+        path: packages/react-native-editor/android-screen-recordings
