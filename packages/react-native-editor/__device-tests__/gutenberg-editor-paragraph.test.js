@@ -9,11 +9,10 @@ import {
 	clickBeginningOfElement,
 	stopDriver,
 	isAndroid,
-	swipeUp,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
@@ -73,8 +72,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await clickMiddleOfElement( driver, textViewElement );
 		await editorPage.sendTextToParagraphBlock(
 			paragraphBlockElement,
-			'\n',
-			false
+			'\n'
 		);
 		expect(
 			( await editorPage.hasParagraphBlockAtPosition( 1 ) ) &&
@@ -158,7 +156,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		);
 
 		for ( let i = 3; i > 0; i-- ) {
-			await swipeUp( driver );
 			await editorPage.removeParagraphBlockAtPosition( i );
 		}
 	} );

@@ -4,13 +4,13 @@
 import EditorPage from './pages/editor-page';
 import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
-describe( 'Gutenberg Editor Latest Post Block tests', () => {
+describe( 'Gutenberg Editor Spacer Block test', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	const lastPostBlockName = 'Latest Posts';
+	const spacerBlockName = 'Spacer';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -32,14 +32,14 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to add a Latests-Posts block', async () => {
-		await editorPage.addNewLatestPostsBlock();
-		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition(
-			1
+	it( 'should be able to add an separator block', async () => {
+		await editorPage.addNewBlock( spacerBlockName );
+		const separatorBlock = await editorPage.getBlockAtPosition(
+			spacerBlockName
 		);
 
-		expect( latestPostsBlock ).toBeTruthy();
-		await editorPage.removeBlockAtPosition( lastPostBlockName );
+		expect( separatorBlock ).toBeTruthy();
+		await editorPage.removeBlockAtPosition( spacerBlockName );
 	} );
 
 	afterAll( async () => {

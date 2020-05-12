@@ -3,14 +3,11 @@
  */
 import 'react-native-get-random-values'; // This library works as a polyfill for the global crypto.getRandomValues which is needed by `uuid` version 7.0.0
 import { AppRegistry, I18nManager } from 'react-native';
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { setLocaleData } from '@wordpress/i18n';
 
 /**
@@ -20,6 +17,7 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+import correctTextFontWeight from './text-font-weight-correct';
 
 const gutenbergSetup = () => {
 	const wpData = require( '@wordpress/data' );
@@ -57,6 +55,7 @@ export class RootComponent extends Component {
 		super( props );
 		setupLocale( props.locale, props.translations );
 		setupApiFetch();
+		correctTextFontWeight();
 		require( '@wordpress/edit-post' ).initializeEditor();
 
 		const isHermes = () => global.HermesInternal !== null;
