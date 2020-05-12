@@ -324,25 +324,24 @@ This is useful for integration testing: that is, testing how old versions of Wor
 }
 ```
 
-#### Add mu-plugins
+#### Add mu-plugins and other mapped directories
 
-You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory.
+You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated, despite being the "first" mapped theme.
 
 ```json
 {
 	"plugins": [ "." ],
-	"themes": [ "WordPress/theme-experiments" ],
 	"mappings": {
 		"wp-content/mu-plugins": "./path/to/local/mu-plugins",
 		"wp-content/themes": "./path/to/local/themes",
-		"wp-content/themes/specific-theme": "./path/to/local/theme"
+		"wp-content/themes/specific-theme": "./path/to/local/theme-1"
 	}
 }
 ```
 
-#### Avoid activating plugins on the instance
+#### Avoid activating plugins or themes on the instance
 
-Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time.
+Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time. The same applies for a theme which should not be activated.
 
 ```json
 {
