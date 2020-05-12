@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockNavigationDropdown, Inserter } from '@wordpress/block-editor';
+import { PinnedItems } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ function Header() {
 			</h1>
 			<div className="edit-widgets-header__actions">
 				<SaveButton />
+				<PinnedItems.Slot scope="core/edit-widgets" />
 			</div>
 		</div>
 	);
