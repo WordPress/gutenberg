@@ -121,7 +121,13 @@ _Returns_
 
 <a name="useGlobalEvent" href="#useGlobalEvent">#</a> **useGlobalEvent**
 
-Undocumented declaration.
+Adds a listener to the containing window.
+
+_Parameters_
+
+-   _ref_ `Object`: A reference with a node that is contained by the window.
+-   _args_ `Array`: `addEventListener` arguments.
+-   _dependencies_ `Array`: Hook dependencies.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 

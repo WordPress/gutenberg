@@ -51,7 +51,7 @@ export default function ImageSize( { src, dirtynessTrigger, children } ) {
 		};
 	}, [ src, dirtynessTrigger ] );
 
-	useGlobalEvent( ref, 'resize', calculateSize, [] );
+	useGlobalEvent( ref, [ 'resize', calculateSize ], [] );
 
 	return <div ref={ ref }>{ children( state ) }</div>;
 }
