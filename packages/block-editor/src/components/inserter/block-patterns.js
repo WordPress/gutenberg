@@ -22,14 +22,14 @@ import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
 
 const usePatternsState = ( onInsert ) => {
-	const { blockPatternCategories, patterns } = useSelect( ( select ) => {
+	const { patternCategories, patterns } = useSelect( ( select ) => {
 		const {
 			__experimentalBlockPatterns,
 			__experimentalBlockPatternCategories,
 		} = select( 'core/block-editor' ).getSettings();
 		return {
 			patterns: __experimentalBlockPatterns,
-			blockPatternCategories: __experimentalBlockPatternCategories,
+			patternCategories: __experimentalBlockPatternCategories,
 		};
 	}, [] );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
@@ -47,7 +47,7 @@ const usePatternsState = ( onInsert ) => {
 		);
 	}, [] );
 
-	return [ patterns, blockPatternCategories, onClickPattern ];
+	return [ patterns, patternCategories, onClickPattern ];
 };
 
 function BlockPattern( { pattern, onClick } ) {
