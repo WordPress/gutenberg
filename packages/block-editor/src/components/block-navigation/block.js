@@ -18,7 +18,6 @@ import {
 	BlockMoverUpButton,
 	BlockMoverDownButton,
 } from '../block-mover/button';
-import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 
 export default function BlockNavigationBlock( {
@@ -59,28 +58,22 @@ export default function BlockNavigationBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
+			terminatedLevels={ terminatedLevels }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
 				colSpan={ hasRenderedMovers ? undefined : 3 }
 			>
 				{ ( props ) => (
-					<div className="block-editor-block-navigation-block__contents-container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
-						<BlockNavigationBlockContents
-							block={ block }
-							onClick={ onClick }
-							isSelected={ isSelected }
-							position={ position }
-							siblingCount={ siblingCount }
-							level={ level }
-							{ ...props }
-						/>
-					</div>
+					<BlockNavigationBlockContents
+						block={ block }
+						onClick={ onClick }
+						isSelected={ isSelected }
+						position={ position }
+						siblingCount={ siblingCount }
+						level={ level }
+						{ ...props }
+					/>
 				) }
 			</TreeGridCell>
 			{ hasRenderedMovers && (

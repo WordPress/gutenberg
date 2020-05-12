@@ -14,6 +14,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import useMovingAnimation from '../use-moving-animation';
+import Connectors from './connectors';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
@@ -25,6 +26,7 @@ export default function BlockNavigationLeaf( {
 	children,
 	className,
 	path,
+	terminatedLevels,
 	...props
 } ) {
 	const wrapper = useRef( null );
@@ -52,6 +54,11 @@ export default function BlockNavigationLeaf( {
 			setSize={ rowCount }
 			{ ...props }
 		>
+			<Connectors
+				level={ level }
+				isLastRow={ position === rowCount }
+				terminatedLevels={ terminatedLevels }
+			/>
 			{ children }
 		</AnimatedTreeGridRow>
 	);

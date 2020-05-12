@@ -22,8 +22,14 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation-leaf {
+	display: flex;
 	// Use position relative for row animation.
 	position: relative;
+
+	.block-editor-block-navigation-block__contents-cell,
+	.block-editor-block-navigation-appender__cell {
+		flex-grow: 1;
+	}
 
 	.block-editor-block-navigation-block-content-wrapper {
 		display: flex;
@@ -40,10 +46,6 @@ $tree-item-height: 36px;
 		opacity: 1;
 		@include edit-post__fade-in-animation;
 	}
-
-	// .block-editor-block-navigation__list-item {
-	// 	position: relative;
-	// }
 
 	.block-editor-block-icon {
 		margin-right: 6px;
@@ -101,17 +103,14 @@ $tree-item-height: 36px;
 	display: none;
 }
 
-.block-editor-block-navigation-block__contents-cell,
-.block-editor-block-navigation-appender__cell {
-	.block-editor-block-navigation-block__contents-container,
-	.block-editor-block-navigation-appender__container {
-		display: flex;
-	}
+.block-editor-block-navigation-connectors {
+	display: flex;
+	flex-shrink: 1;
 
-	.block-editor-block-navigator-descender-line {
+	.block-editor-block-navigation-connectors__line {
 		position: relative;
-		flex-shrink: 0;
 		width: ( $button-size / 2 ) + 6px;
+		height: 100%;
 
 		&:first-child {
 			width: ( $button-size / 2 );
@@ -139,7 +138,14 @@ $tree-item-height: 36px;
 
 		// Make the last vertical line half-height.
 		&.has-item.is-last-row {
-			height: $grid-unit-20;
+			&::before {
+				// Subtract border width to line things up.
+				bottom: calc(50% - 2px);
+			}
+
+			&::after {
+				top: 50%;
+			}
 		}
 
 		// Draw a horizontal line using border-bottom.
@@ -147,7 +153,7 @@ $tree-item-height: 36px;
 			content: "";
 			display: block;
 			position: absolute;
-			top: $grid-unit-20;
+			top: 50%;
 			left: 100%;
 			width: 5px;
 			border-bottom: 2px solid $light-gray-900;

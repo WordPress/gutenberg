@@ -10,7 +10,6 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import BlockNavigationLeaf from './leaf';
 import ButtonBlockAppender from '../button-block-appender';
-import DescenderLines from './descender-lines';
 
 export default function BlockNavigationAppender( {
 	parentBlockClientId,
@@ -36,18 +35,14 @@ export default function BlockNavigationAppender( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
+			terminatedLevels={ terminatedLevels }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-appender__cell"
 				colSpan="3"
 			>
 				{ ( props ) => (
-					<div className="block-editor-block-navigation-appender__container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
+					<>
 						<ButtonBlockAppender
 							rootClientId={ parentBlockClientId }
 							__experimentalSelectBlockOnInsert={ false }
@@ -60,7 +55,7 @@ export default function BlockNavigationAppender( {
 						>
 							{ appenderPositionDescription }
 						</div>
-					</div>
+					</>
 				) }
 			</TreeGridCell>
 		</BlockNavigationLeaf>
