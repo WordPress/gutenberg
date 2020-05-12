@@ -12,9 +12,13 @@ import Tooltip from './tooltip';
 /**
  * External dependencies
  */
-import { logUserEvent, userEvents } from 'react-native-gutenberg-bridge';
+import {
+	logUserEvent,
+	userEvents,
+	getStarterPageTemplatesTooltipShown,
+	setStarterPageTemplatesTooltipShown,
+} from 'react-native-gutenberg-bridge';
 import { Animated, Dimensions, Keyboard } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 
 /**
  * Internal dependencies
@@ -26,7 +30,6 @@ import Preview from './preview';
 
 // Used to hide the picker if there's no enough space in the window
 const PICKER_HEIGHT_OFFSET = 150;
-const TOOLTIP_VISIBLE_KEY = 'LAYOUT_PICKER_TOOLTIP_VISIBLE';
 
 const __experimentalPageTemplatePicker = ( {
 	templates = getDefaultTemplates(),
@@ -89,16 +92,13 @@ const __experimentalPageTemplatePicker = ( {
 		return PICKER_HEIGHT_OFFSET < windowHeight / 3;
 	};
 
-	const shouldShowTooltip = async () => {
-		try {
-			const value = await AsyncStorage.getItem( TOOLTIP_VISIBLE_KEY );
-			if ( value !== 'true' ) {
+	const shouldShowTooltip = () => {
+		getStarterPageTemplatesTooltipShown( ( tooltipShown ) => {
+			if ( ! tooltipShown ) {
 				setTooltipVisible( true );
-				await AsyncStorage.setItem( TOOLTIP_VISIBLE_KEY, 'true' );
+				setStarterPageTemplatesTooltipShown( true );
 			}
-		} catch ( e ) {
-			setTooltipVisible( false );
-		}
+		} );
 	};
 
 	const onApply = () => {
