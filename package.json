@@ -61,6 +61,9 @@
 		"@wordpress/plugins": "file:packages/plugins",
 		"@wordpress/primitives": "file:packages/primitives",
 		"@wordpress/priority-queue": "file:packages/priority-queue",
+		"@wordpress/react-native-aztec": "file:packages/react-native-aztec",
+		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
+		"@wordpress/react-native-editor": "file:packages/react-native-editor",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/rich-text": "file:packages/rich-text",
 		"@wordpress/server-side-render": "file:packages/server-side-render",
@@ -300,5 +303,8 @@
 			"                                                `---'"
 		],
 		"welcome-build-command": "npm run dev"
+	},
+	"resolutions": {
+		"metro-config": "0.58.0"
 	}
 }

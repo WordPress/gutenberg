@@ -54,7 +54,9 @@ const correctTextFontWeight = ( args ) => {
 	const baseText = textRender.call( this, args );
 	const { style } = baseText.props;
 
-	const flatStyle = Array.isArray( style ) ? Object.assign( {}, ...style ) : style;
+	const flatStyle = Array.isArray( style )
+		? Object.assign( {}, ...style )
+		: style;
 	const shouldCorrectFontWeight = flatStyle && flatStyle.fontWeight;
 
 	return shouldCorrectFontWeight
