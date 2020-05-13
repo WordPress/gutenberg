@@ -6,12 +6,17 @@ import { Panel, PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function NavigationStructurePanel( { blocks, initialOpen } ) {
+export default function NavigationStructurePanel( {
+	menuId,
+	blocks,
+	initialOpen,
+} ) {
 	const selectedBlockClientIds = useSelect(
 		( select ) => select( 'core/block-editor' ).getSelectedBlockClientIds(),
 		[]
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const showNavigationStructure = !! menuId && !! blocks.length;
 
 	return (
 		<Panel className="edit-navigation-menu-editor__navigation-structure-panel">
@@ -19,7 +24,7 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 				title={ __( 'Navigation structure' ) }
 				initialOpen={ initialOpen }
 			>
-				{ !! blocks.length && (
+				{ showNavigationStructure && (
 					<__experimentalBlockNavigationTree
 						blocks={ blocks }
 						selectedBlockClientId={ selectedBlockClientIds[ 0 ] }

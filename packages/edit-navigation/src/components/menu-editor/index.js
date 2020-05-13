@@ -42,6 +42,7 @@ export default function MenuEditor( {
 				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
 				<NavigationStructurePanel
 					blocks={ blocks }
+					menuId={ menuId }
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorPanel
