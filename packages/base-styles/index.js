@@ -5,6 +5,7 @@ exports.adminColorSchemes = {
 		toggle: '#11a0d2',
 		button: '#007cba',
 		outlines: '#007cba',
+		sidebar: '#23282d',
 	},
 	themes: {
 		'admin-color-light': {
@@ -13,6 +14,7 @@ exports.adminColorSchemes = {
 			toggle: '#11a0d2',
 			button: '#0085ba',
 			outlines: '#007cba',
+			sidebar: '#e5e5e5',
 		},
 		'admin-color-blue': {
 			primary: '#82b4cb',
@@ -20,6 +22,7 @@ exports.adminColorSchemes = {
 			toggle: '#82b4cb',
 			button: '#d9ab59',
 			outlines: '#417e9B',
+			sidebar: '#52accc',
 		},
 		'admin-color-coffee': {
 			primary: '#c2a68c',
@@ -27,6 +30,7 @@ exports.adminColorSchemes = {
 			toggle: '#c2a68c',
 			button: '#c2a68c',
 			outlines: '#59524c',
+			sidebar: '#59524c',
 		},
 		'admin-color-ectoplasm': {
 			primary: '#a7b656',
@@ -34,6 +38,7 @@ exports.adminColorSchemes = {
 			toggle: '#a7b656',
 			button: '#a7b656',
 			outlines: '#523f6d',
+			sidebar: '#523f6d',
 		},
 		'admin-color-midnight': {
 			primary: '#e14d43',
@@ -41,6 +46,7 @@ exports.adminColorSchemes = {
 			toggle: '#77a6b9',
 			button: '#e14d43',
 			outlines: '#497b8d',
+			sidebar: '#363b3f',
 		},
 		'admin-color-ocean': {
 			primary: '#a3b9a2',
@@ -48,6 +54,7 @@ exports.adminColorSchemes = {
 			toggle: '#a3b9a2',
 			button: '#a3b9a2',
 			outlines: '#5e7d5e',
+			sidebar: '#738e96',
 		},
 		'admin-color-sunrise': {
 			primary: '#d1864a',
@@ -55,6 +62,7 @@ exports.adminColorSchemes = {
 			toggle: '#c8b03c',
 			button: '#d1864a',
 			outlines: '#837425',
+			sidebar: '#cf4944',
 		},
 	},
 };
