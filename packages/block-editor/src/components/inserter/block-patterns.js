@@ -22,7 +22,7 @@ import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
 
 function BlockPattern( { pattern, onClick } ) {
-	const { content } = pattern;
+	const { content, viewportWidth } = pattern;
 	const blocks = useMemo( () => parse( content ), [ content ] );
 
 	return (
@@ -38,7 +38,7 @@ function BlockPattern( { pattern, onClick } ) {
 			tabIndex={ 0 }
 			aria-label={ pattern.title }
 		>
-			<BlockPreview blocks={ blocks } />
+			<BlockPreview blocks={ blocks } viewportWidth={ viewportWidth } />
 			<div className="block-editor-inserter__patterns-item-title">
 				{ pattern.title }
 			</div>
