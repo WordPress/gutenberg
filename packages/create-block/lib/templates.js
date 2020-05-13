@@ -42,7 +42,7 @@ const getOutputTemplates = async ( name ) => {
 		await Promise.all(
 			outputTemplatesFiles.map( async ( outputTemplateFile ) => {
 				const outputFile = outputTemplateFile.replace(
-					'.mustache',
+					/\.mustache$/,
 					''
 				);
 				const outputTemplate = await readFile(
@@ -93,7 +93,7 @@ const getPrompts = ( blockTemplate ) => {
 };
 
 const hasWPScriptsEnabled = ( blockTemplate ) => {
-	return ! ( blockTemplate.wpScripts === false );
+	return blockTemplate.wpScripts !== false;
 };
 
 module.exports = {
