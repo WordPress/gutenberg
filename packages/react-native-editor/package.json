@@ -47,8 +47,6 @@
     "metro-react-native-babel-preset": "0.57.0",
     "metro-react-native-babel-transformer": "0.56.0",
     "node-fetch": "^2.3.0",
-    "patch-package": "^6.2.0",
-    "postinstall-prepare": "^1.0.1",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-get-random-values": "^1.4.0",
@@ -61,8 +59,7 @@
     "react-native-sass-transformer": "^1.1.1",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f",
-    "wd": "^1.11.1"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
   },
   "publishConfig": {
     "access": "public"
