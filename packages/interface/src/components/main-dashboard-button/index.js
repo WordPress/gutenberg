@@ -6,12 +6,7 @@ import {
 	createSlotFill,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import FullscreenModeClose from '../fullscreen-mode-close';
-
-const name = '__experimentalSiteEditorMainDashboardButton';
+const name = '__experimentalMainDashboardButton';
 
 const { Fill, Slot } = createSlotFill( name );
 
@@ -19,12 +14,12 @@ const MainDashboardButton = Fill;
 MainDashboardButton.Slot = Slot;
 MainDashboardButton.slotName = name;
 
-export const CloseButton = () => {
+export const CloseButtonSlot = ( { children } ) => {
 	const slot = useSlot( MainDashboardButton.slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
-		return <FullscreenModeClose />;
+		return children;
 	}
 
 	return <MainDashboardButton.Slot bubblesVirtually />;

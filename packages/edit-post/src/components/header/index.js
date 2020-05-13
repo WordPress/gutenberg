@@ -6,7 +6,10 @@ import { Button } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import {
+	PinnedItems,
+	__experimentalCloseButtonSlot as CloseButtonSlot,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -66,7 +69,9 @@ function Header( {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<CloseButtonSlot>
+				<FullscreenModeClose />
+			</CloseButtonSlot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }
