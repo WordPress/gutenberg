@@ -92,13 +92,13 @@ function UnitControl(
 		const event = payload?.event;
 
 		/**
-		 * Customizes the submit interaction.
+		 * Customizes the commit interaction.
 		 *
 		 * This occurs when pressing ENTER to fire a change.
 		 * By intercepting the state change, we can parse the incoming
 		 * value to determine if the unit needs to be updated.
 		 */
-		if ( type === inputControlActionTypes.SUBMIT ) {
+		if ( type === inputControlActionTypes.COMMIT ) {
 			const valueToParse = event?.target?.value;
 
 			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
