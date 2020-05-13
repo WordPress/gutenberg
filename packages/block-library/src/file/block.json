@@ -1,6 +1,6 @@
 {
 	"name": "core/file",
-	"category": "text",
+	"category": "media",
 	"attributes": {
 		"id": {
 			"type": "number"

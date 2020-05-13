@@ -1,6 +1,6 @@
 {
 	"name": "core/html",
-	"category": "text",
+	"category": "widgets",
 	"attributes": {
 		"content": {
 			"type": "string",

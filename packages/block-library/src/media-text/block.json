@@ -1,6 +1,6 @@
 {
 	"name": "core/media-text",
-	"category": "design",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string",
