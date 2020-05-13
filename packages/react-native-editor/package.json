@@ -36,7 +36,6 @@
     "@wordpress/i18n": "file:../i18n",
     "@wordpress/react-native-aztec": "file:../react-native-aztec",
     "@wordpress/react-native-bridge": "file:../react-native-bridge",
-    "@wordpress/scripts": "file:../scripts",
     "fast-average-color": "^4.3.0",
     "jed": "^1.1.1",
     "jsc-android": "^241213.1.0",
@@ -45,8 +44,6 @@
     "metro-react-native-babel-transformer": "0.56.0",
     "node-fetch": "^2.3.0",
     "node-libs-react-native": "^1.0.2",
-    "patch-package": "^6.2.0",
-    "postinstall-prepare": "^1.0.1",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-get-random-values": "^1.4.0",
@@ -58,8 +55,7 @@
     "react-native-sass-transformer": "^1.1.1",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948",
-    "wd": "^1.11.1"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948"
   },
   "publishConfig": {
     "access": "public"
@@ -71,7 +67,6 @@
     "patch-metro-no-file-watch": "cp ../../node_modules/metro/src/node-haste/DependencyGraph.js ./ && cp DependencyGraph.js.patched ../../node_modules/metro/src/node-haste/DependencyGraph.js",
     "un-patch-metro-no-file-watch": "mv ./DependencyGraph.js ../../node_modules/metro/src/node-haste/DependencyGraph.js",
     "prebundle": "npm run i18n-cache:force",
-    "prepare": "patch-package",
     "prebundle:android": "npm run patch-metro-no-file-watch",
     "postbundle:android": "npm run un-patch-metro-no-file-watch",
     "bundle": "npm run bundle:android && npm run bundle:ios && npm run genstrings",
