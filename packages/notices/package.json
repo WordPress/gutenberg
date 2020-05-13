@@ -20,9 +20,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"(build|build-module)/store/index.js"
-	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/a11y": "file:../a11y",
