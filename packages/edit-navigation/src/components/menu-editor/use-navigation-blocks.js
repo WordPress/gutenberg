@@ -9,6 +9,7 @@ import { groupBy, isEqual, difference } from 'lodash';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
 	return createBlock(
@@ -37,7 +38,7 @@ export default function useNavigationBlocks( menuId ) {
 	);
 
 	const { saveMenuItem } = useDispatch( 'core' );
-
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const [ blocks, setBlocks ] = useState( [] );
 
 	const menuItemsRef = useRef( {} );
@@ -53,6 +54,9 @@ export default function useNavigationBlocks( menuId ) {
 
 		const createMenuItemBlocks = ( items ) => {
 			const innerBlocks = [];
+			if ( ! items ) {
+				return;
+			}
 			for ( const item of items ) {
 				let menuItemInnerBlocks = [];
 				if ( itemsByParentID[ item.id ]?.length ) {
@@ -128,6 +132,10 @@ export default function useNavigationBlocks( menuId ) {
 		for ( const deletedClientId of deletedClientIds ) {
 			// TODO - delete menu items.
 		}
+
+		createSuccessNotice( __( 'Navigation saved.' ), {
+			type: 'snackbar',
+		} );
 	};
 
 	return [ blocks, setBlocks, saveBlocks ];
