@@ -243,6 +243,64 @@ function gutenberg_experimental_global_styles_enqueue_assets_editor() {
 }
 
 /**
+ * Converts the block implicit attributes into CSS declarations.
+ *
+ * @return string
+ */
+function gutenberg_experimental_global_styles_output_implicit_attributes( $block_attributes ) {
+	$declaration = '';
+	foreach ( $block_attributes as $att ) {
+		$declaration .= $att . ': var(--wp-' . $att . ');';
+	}
+	return $declaration;
+}
+
+/**
+ * Returns the CSS with the block style hooks
+ *
+ * @return string
+ */
+function gutenberg_experimental_global_styles_block_style_hooks() {
+	// This data should come from the block.json.
+	// We'd need the ability to have many selectors per block
+	// like for heading (core/heading/h1, core/heading/h2, etc)
+	// but potentially for other blocks that have complex layouts
+	// (ex: for gallery we may want to target the wrapper element
+	// and the individual images).
+	//
+	// Having access to this via the block registry
+	// requires block server registration.
+	$block_data = array(
+		'core/paragraph'  => array(
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+			'selector' => 'p',
+		),
+		'core/heading'    => array(
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+			'selector' => 'h1, h2, h3, h4, h5, h6',
+		),
+		'core/columns'    => array(
+			'supports' => array( 'color' ),
+			'selector' => '.wp-block-columns',
+		),
+		'core/group'      => array(
+			'supports' => array( 'color' ),
+			'selector' => '.wp-block-group',
+		),
+		'core/media-text' => array(
+			'supports' => array( 'color' ),
+			'selector' => '.wp-block-media-text',
+		),
+	);
+
+	$block_style_hooks = '';
+	foreach ( $block_data as $block ) {
+		$block_style_hooks .= '' . $block['selector'] . '{' . gutenberg_experimental_global_styles_output_implicit_attributes( $block['supports'] ) . '}';
+	}
+	return $block_style_hooks;
+}
+
+/**
  * Fetches the Global Styles for each level (core, theme, user)
  * and enqueues the resulting CSS custom properties.
  */
@@ -261,10 +319,14 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	if ( empty( $inline_style ) ) {
 		return;
 	}
-
 	wp_register_style( 'global-styles', false, array(), true, true );
 	wp_add_inline_style( 'global-styles', $inline_style );
 	wp_enqueue_style( 'global-styles' );
+
+	$block_style_hooks = gutenberg_experimental_global_styles_block_style_hooks();
+	wp_register_style( 'global-styles-block-style-hooks', false, array(), true, true );
+	wp_add_inline_style( 'global-styles-block-style-hooks', $block_style_hooks );
+	wp_enqueue_style( 'global-styles-block-style-hooks' );
 }
 
 /**
