@@ -4,7 +4,6 @@
 import {
 	map,
 	includes,
-	filter,
 	findIndex,
 	flow,
 	sortBy,
@@ -119,20 +118,25 @@ export function InserterBlockList( {
 	}, [ filterValue, items, categories, collections ] );
 
 	const childItems = useMemo( () => {
-		return filter( filteredItems, ( { name } ) =>
+		return filteredItems.filter( ( { name } ) =>
 			includes( rootChildBlocks, name )
 		);
 	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
-		return filter( items, ( item ) => item.utility > 0 ).slice(
-			0,
-			MAX_SUGGESTED_ITEMS
-		);
+		return items
+			.filter( ( item ) => item.utility > 0 )
+			.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
-		return filter( filteredItems, { category: 'reusable' } );
+		return filteredItems.filter(
+			( { category } ) => category === 'reusable'
+		);
+	}, [ filteredItems ] );
+
+	const uncategorizedItems = useMemo( () => {
+		return filteredItems.filter( ( item ) => ! item.category );
 	}, [ filteredItems ] );
 
 	const itemsPerCategory = useMemo( () => {
@@ -145,7 +149,9 @@ export function InserterBlockList( {
 
 		return flow(
 			( itemList ) =>
-				filter( itemList, ( item ) => item.category !== 'reusable' ),
+				itemList.filter(
+					( item ) => item.category && item.category !== 'reusable'
+				),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -218,6 +224,19 @@ export function InserterBlockList( {
 						</InserterPanel>
 					);
 				} ) }
+
+			{ ! hasChildItems && !! uncategorizedItems.length && (
+				<InserterPanel
+					className="block-editor-inserter__uncategorized-blocks-panel"
+					title={ __( 'Uncategorized' ) }
+				>
+					<BlockTypesList
+						items={ uncategorizedItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+					/>
+				</InserterPanel>
+			) }
 
 			{ ! hasChildItems &&
 				map( collections, ( collection, namespace ) => {
