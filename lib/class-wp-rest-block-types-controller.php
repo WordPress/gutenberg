@@ -205,9 +205,6 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
-		if ( in_array( 'name', $fields, true ) ) {
-			$data['name'] = $block_type->name;
-		}
 
 		if ( in_array( 'attributes', $fields, true ) ) {
 			$data['attributes'] = $block_type->get_attributes();
@@ -217,10 +214,17 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			$data['is_dynamic'] = $block_type->is_dynamic();
 		}
 
-		$extra_fields = array( 'editor_script', 'script', 'editor_style', 'style' );
-		foreach ( $extra_fields as $extra_field ) {
-			if ( in_array( $extra_field, $fields, true ) ) {
-				$data[ $extra_field ] = (string) $block_type->$extra_field;
+		$schema       = $this->get_item_schema();
+		$extra_fields = array(
+			'name'         => 'name',
+			'editorScript' => 'editor_script',
+			'script'       => 'script',
+			'editorStyle'  => 'editor_style',
+			'style'        => 'style'
+		);
+		foreach ( $extra_fields as $key => $extra_field ) {
+			if ( in_array( $key, $fields, true ) ) {
+				$data[ $key ] = rest_sanitize_value_from_schema( $block_type->$extra_field, $schema['properties'][ $key ] );
 			}
 		}
 
@@ -305,7 +309,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'editor_script' => array(
+				'editorScript' => array(
 					'description' => __( 'Editor script handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
@@ -317,7 +321,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'editor_style'  => array(
+				'editorStyle'  => array(
 					'description' => __( 'URL of editor style css file.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
