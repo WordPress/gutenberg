@@ -90,9 +90,7 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: (
-						<DocumentationImage />
-					),
+					image: <DocumentationImage />,
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">

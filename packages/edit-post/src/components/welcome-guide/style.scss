@@ -7,16 +7,16 @@
 		background: #1386bf;
 		height: 240px;
 
-		&__01alt {
+		&__prm-r {
 			display: none;
 		}
 
 		@media (prefers-reduced-motion: reduce) {
-			&__01alt {
+			&__prm-r {
 				display: block;
 			}
 
-			&__01 {
+			&__prm-np {
 				display: none;
 			}
 		}
