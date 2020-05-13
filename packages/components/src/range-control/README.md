@@ -245,6 +245,14 @@ const MyRangeControl() {
 - Required: No
 - Platform: Web
 
+#### resetFallbackValue
+
+The value to revert to if the Reset button is clicked (enabled by `allowReset`)
+
+- Type: `Number`
+- Required: No
+- Platform: Web
+
 #### showTooltip
 
 Forcing the Tooltip UI to show or hide.

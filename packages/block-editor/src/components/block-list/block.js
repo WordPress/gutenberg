@@ -17,7 +17,12 @@ import {
 	getBlockDefaultClassName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, withSelect, useSelect } from '@wordpress/data';
+import {
+	withDispatch,
+	withSelect,
+	useSelect,
+	useDispatch,
+} from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
@@ -39,7 +44,6 @@ function BlockListBlock( {
 	isLocked,
 	clientId,
 	rootClientId,
-	isHighlighted,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -66,11 +70,17 @@ function BlockListBlock( {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDraggingBlocks } = useSelect( ( select ) => {
+	const { isDragging, isHighlighted } = useSelect( ( select ) => {
+		const { isDraggingBlocks, isBlockHighlighted } = select(
+			'core/block-editor'
+		);
 		return {
-			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
+			isDragging: isDraggingBlocks(),
+			isHighlighted: isBlockHighlighted( clientId ),
 		};
 	}, [] );
+	const { removeBlock } = useDispatch( 'core/block-editor' );
+	const onRemove = () => removeBlock( clientId );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
@@ -83,8 +93,6 @@ function BlockListBlock( {
 		false
 	);
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
-	const isDragging =
-		isDraggingBlocks && ( isSelected || isPartOfMultiSelection );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
@@ -113,7 +121,8 @@ function BlockListBlock( {
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging': isDragging,
+			'is-dragging':
+				isDragging && ( isSelected || isPartOfMultiSelection ),
 			'is-typing': isTypingWithinBlock,
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
@@ -135,6 +144,7 @@ function BlockListBlock( {
 			setAttributes={ setAttributes }
 			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
 			onReplace={ isLocked ? undefined : onReplace }
+			onRemove={ isLocked ? undefined : onRemove }
 			mergeBlocks={ isLocked ? undefined : onMerge }
 			clientId={ clientId }
 			isSelectionEnabled={ isSelectionEnabled }
@@ -219,7 +229,6 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
-			isBlockHighlighted,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -239,8 +248,9 @@ const applyWithSelect = withSelect(
 		// is not correct.
 		const { name, attributes, isValid } = block || {};
 
+		// Do not add new properties here, use `useSelect` instead to avoid
+		// leaking new props to the public API (editor.BlockListBlock filter).
 		return {
-			isHighlighted: isBlockHighlighted( clientId ),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||
@@ -287,6 +297,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		__unstableMarkLastChangeAsPersistent,
 	} = dispatch( 'core/block-editor' );
 
+	// Do not add new properties here, use `useDispatch` instead to avoid
+	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
 			const { clientId } = ownProps;

@@ -10,24 +10,26 @@ const Blog = {
 	icon: '📰',
 	content: [
 		{
-			name: 'core/image',
+			name: 'core/cover',
 			attributes: {
 				url:
 					'https://mgblayoutexamples.files.wordpress.com/2020/02/people-woman-coffee-meeting.jpg',
 			},
+			innerBlocks: [
+				{
+					name: 'core/heading',
+					attributes: {
+						// translators: sample content for "Blog" page template
+						content: __( 'Welcome to our new blog' ),
+						level: 1,
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',
 			attributes: {
 				height: 24,
-			},
-		},
-		{
-			name: 'core/heading',
-			attributes: {
-				// translators: sample content for "Blog" page template
-				content: __( 'Latest Blog Posts' ),
-				level: 2,
 			},
 		},
 		{

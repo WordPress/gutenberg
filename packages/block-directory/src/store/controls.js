@@ -146,15 +146,6 @@ const controls = {
 						loadStyle( asset );
 					}
 				} );
-			} else {
-				loadScript(
-					assets.editor_script,
-					() => {
-						return resolve( 0 );
-					},
-					reject
-				);
-				loadStyle( assets.style );
 			}
 		} );
 	},

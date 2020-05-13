@@ -32,7 +32,7 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
- * Load editor styles (this is copied form edit-form-blocks.php).
+ * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
  * @return array Editor Styles Setting.
@@ -152,8 +152,7 @@ function gutenberg_edit_site_init( $hook ) {
 			continue;
 		}
 
-		$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
-		$current_template   = gutenberg_find_template_post_and_parts( $template_hierarchy );
+		$current_template = gutenberg_find_template_post_and_parts( $template_type );
 		if ( isset( $current_template ) ) {
 			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
 			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];

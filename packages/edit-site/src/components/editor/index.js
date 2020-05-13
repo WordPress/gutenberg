@@ -114,6 +114,7 @@ function Editor( { settings: _settings } ) {
 										}
 										content={
 											<BlockSelectionClearer
+												className="edit-site-visual-editor"
 												style={ inlineStyles }
 											>
 												<Notices />
