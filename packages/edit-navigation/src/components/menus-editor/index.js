@@ -34,21 +34,28 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		return <Spinner />;
 	}
 
+	const hasMenus = hasLoadedMenus && !! menus?.length;
+
 	return (
 		<>
 			<Card className="edit-navigation-menus-editor__menu-selection-card">
 				<CardBody>
-					<SelectControl
-						className="edit-navigation-menus-editor__menu-select-control"
-						label={ __( 'Select navigation to edit:' ) }
-						options={ stateMenus?.map( ( menu ) => ( {
-							value: menu.id,
-							label: menu.name,
-						} ) ) }
-						onChange={ ( selectedMenuId ) =>
-							setMenuId( selectedMenuId )
-						}
-					/>
+					{ ! hasMenus && (
+						<p>{ __( 'Create your first menu below.' ) }</p>
+					) }
+					{ hasMenus && (
+						<SelectControl
+							className="edit-navigation-menus-editor__menu-select-control"
+							label={ __( 'Select navigation to edit:' ) }
+							options={ stateMenus?.map( ( menu ) => ( {
+								value: menu.id,
+								label: menu.name,
+							} ) ) }
+							onChange={ ( selectedMenuId ) =>
+								setMenuId( selectedMenuId )
+							}
+						/>
+					) }
 				</CardBody>
 			</Card>
 			{ hasLoadedMenus && (
