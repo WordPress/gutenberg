@@ -1,3 +1,4 @@
+name: Android React Native E2E Tests
 on: push
 
 jobs:
