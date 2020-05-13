@@ -1,6 +1,6 @@
 # Media replace flow
 
-A component that implements a replace flow for various media. It is used to allow various blocks that use media to have a toolbar button for replacing it. I offers several options, such as:
+A component that implements a replacement flow for various media objects. It is used to allow various blocks that use media to have a toolbar button for replacing it. I offers several options, such as:
 
 - replace from Media Library
 - replace using an URL
@@ -8,65 +8,65 @@ A component that implements a replace flow for various media. It is used to allo
 
 This component should be used as a child of a `<BlockControls>` component.
 
-#### Props
+## Props
 
-##### mediaURL
+### mediaURL
 
 The URL of the media.
 
 - Type: `string`
 - Required: Yes
 
-##### mediaId
+### mediaId
 
 The Id of the attachment post type for the current media.
 
 - Type: `Int`
 - Required: No
 
-##### allowedTypes
+### allowedTypes
 
 A list of media types allowed to replace the current media.
 
 - Type: `Array`
 - Required: Yes
 
-##### accept
+### accept
 
 Comma delimited list of MIME types accepted for upload.
 
 - Type: `string`
 - Required: Yes
 
-##### onSelect
+### onSelect
 
 Callback used when media is replaced from the Media Library or when a new media is uploaded. It is called with one argument `media` which is an object with all the media details.
 
 - Type: `func`
 - Required: Yes
 
-##### onSelectURL
+### onSelectURL
 
 Callback used when media is replaced with an URL. It is called with one argument `newURL` which is a `string` containing the new URL.
 
 - Type: `func`
 - Required: Yes
 
-##### name
+### name
 
 The label of the replace button.
 
 - Type: `string`
 - Required: No
 
-##### createNotice
+### createNotice
 
 Creates a media replace notice.
 
 - Type: `func`
 - Required: No
 
-##### remvovedNotice
+### remvovedNotice
 
 Removes a media replace notice.
 
