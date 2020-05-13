@@ -56,7 +56,7 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<EditorImage className="edit-post-welcome-guide__image" />
+						<EditorImage />
 					),
 					content: (
 						<>
