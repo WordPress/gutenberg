@@ -173,6 +173,19 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'should canonicalize legacy block category.', () => {
+			const blockType = {
+					save: noop,
+					category: 'common',
+					title: 'block title',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-9',
+					blockType
+				);
+			expect( block.category ).toBe( 'text' );
+		} );
+
 		it( 'should unset category of blocks with non registered category.', () => {
 			const blockType = {
 					save: noop,

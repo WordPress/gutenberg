@@ -15,17 +15,6 @@ export function getCategories() {
 }
 
 /**
- * Returns a single category by slug.
- *
- * @param {string} slug Category slug.
- *
- * @return {WPBlockCategory|undefined} Block category, if exists.
- */
-export function getCategory( slug ) {
-	return select( 'core/blocks' ).getCategory( slug );
-}
-
-/**
  * Sets the block categories.
  *
  * @param {WPBlockCategory[]} categories Block categories.

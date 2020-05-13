@@ -12,24 +12,11 @@ import {
 	includes,
 	map,
 	some,
-	find,
 } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
 /** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
-
-/**
- * Mapping of legacy category slugs to their latest normal values, used to
- * accommodate updates of the default set of block categories.
- *
- * @type {Map<string,string>}
- */
-const LEGACY_CATEGORY_MAPPING = new Map( [
-	[ 'common', 'text' ],
-	[ 'formatting', 'text' ],
-	[ 'layout', 'design' ],
-] );
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -134,24 +121,6 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  */
 export function getCategories( state ) {
 	return state.categories;
-}
-
-/**
- * Returns a single category by slug. Canonicalizes category by slug, using
- * internal mapping of legacy category slugs to their updated normal form.
- *
- * @param {Object} state Blocks state.
- * @param {string} slug  Category slug.
- *
- * @return {WPBlockCategory|undefined} Block category, if exists.
- */
-export function getCategory( state, slug ) {
-	if ( LEGACY_CATEGORY_MAPPING.has( slug ) ) {
-		return getCategory( state, LEGACY_CATEGORY_MAPPING.get( slug ) );
-	}
-
-	const categories = getCategories( state );
-	return find( categories, { slug } );
 }
 
 /**

@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, omit, pick, isFunction, isPlainObject } from 'lodash';
+import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,6 +113,18 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *                                             then no preview is shown.
  */
 
+/**
+ * Mapping of legacy category slugs to their latest normal values, used to
+ * accommodate updates of the default set of block categories.
+ *
+ * @type {Record<string,string>}
+ */
+const LEGACY_CATEGORY_MAPPING = {
+	common: 'text',
+	formatting: 'text',
+	layout: 'design',
+};
+
 export let serverSideBlockDefinitions = {};
 
 /**
@@ -204,8 +216,17 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	const category = select( 'core/blocks' ).getCategory( settings.category );
-	if ( ! category ) {
+	// Canonicalize legacy categories to equivalent fallback.
+	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
+	}
+
+	if (
+		'category' in settings &&
+		! some( select( 'core/blocks' ).getCategories(), {
+			slug: settings.category,
+		} )
+	) {
 		console.warn(
 			'The block "' +
 				name +
@@ -215,11 +236,6 @@ export function registerBlockType( name, settings ) {
 		);
 		delete settings.category;
 	}
-
-	// `getCategory` handles canonicalization of a category, which may yield a
-	// different slug from the provided settings. Ensure that the settings value
-	// references the normalized value.
-	settings.category = category?.slug;
 
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		console.error( 'The block "' + name + '" must have a title.' );

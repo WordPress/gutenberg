@@ -85,20 +85,6 @@ _Returns_
 
 -   `Array<WPBlockCategory>`: Categories list.
 
-<a name="getCategory" href="#getCategory">#</a> **getCategory**
-
-Returns a single category by slug. Canonicalizes category by slug, using
-internal mapping of legacy category slugs to their updated normal form.
-
-_Parameters_
-
--   _state_ `Object`: Blocks state.
--   _slug_ `string`: Category slug.
-
-_Returns_
-
--   `(WPBlockCategory|undefined)`: Block category, if exists.
-
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
 Returns an array with the child blocks of a given block.

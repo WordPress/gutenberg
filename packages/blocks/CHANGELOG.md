@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
-- Added a new function `getCategory` to retrieve a single category object by slug.
-
 ## 6.13.0 (2020-04-01)
 
 ### New Feature
