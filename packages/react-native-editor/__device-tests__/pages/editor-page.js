@@ -38,7 +38,7 @@ export default class EditorPage {
 		if ( isAndroid() ) {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
-			//this.accessibilityIdSuffix = ', ';
+			this.accessibilityIdSuffix = ', ';
 		}
 	}
 
