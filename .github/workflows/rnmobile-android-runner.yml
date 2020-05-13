@@ -17,13 +17,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-npm-
 
+    - run: npm ci
+
+    - name: Restore Gradle cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+
     - uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 28
         profile: pixel_xl
-        script: |
-          npm ci
-          npm run native test:e2e:android:local
+        script: npm run native test:e2e:android:local
 
     - uses: actions/upload-artifact@v2
       if: always()
