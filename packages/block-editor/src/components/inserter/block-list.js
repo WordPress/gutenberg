@@ -52,7 +52,7 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 9;
 
-function InserterBlockList( {
+export function InserterBlockList( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -168,22 +168,13 @@ function InserterBlockList( {
 
 	// Announce search results on change
 	useEffect( () => {
-		const resultCount = Object.keys( itemsPerCategory ).reduce(
-			( accumulator, currentCategorySlug ) => {
-				return (
-					accumulator + itemsPerCategory[ currentCategorySlug ].length
-				);
-			},
-			0
-		);
-
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
+			_n( '%d result found.', '%d results found.', filteredItems.length ),
+			filteredItems.length
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ itemsPerCategory, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
