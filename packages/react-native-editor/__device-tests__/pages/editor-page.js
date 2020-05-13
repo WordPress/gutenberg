@@ -212,14 +212,14 @@ export default class EditorPage {
 			blockName
 		);
 		const size = await this.driver.getWindowSize();
-		const height = size.height - 5;
+		const height = size.height - 100;
 
 		while ( ! ( await blockButton.isDisplayed() ) ) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
 				fromX: 50,
 				fromY: height,
 				toX: 50,
-				toY: height - 450,
+				toY: height - 50,
 				duration: 0.5,
 			} );
 		}
