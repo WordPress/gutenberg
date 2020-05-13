@@ -40,6 +40,7 @@ const gutenbergPackages = Object.keys( dependencies )
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
+	// TODO: Remove when upgrading to webpack v5.
 	node: false,
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
