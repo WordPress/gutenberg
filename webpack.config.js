@@ -41,6 +41,7 @@ const gutenbergPackages = Object.keys( dependencies )
 
 module.exports = {
 	// TODO: Remove when upgrading to webpack v5.
+	// @see https://github.com/WordPress/gutenberg/issues/21647.
 	node: false,
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
