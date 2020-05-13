@@ -25,6 +25,7 @@ function Example() {
 		disabled: boolean( 'disabled', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		label: text( 'label', 'Value' ),
 		placeholder: text( 'placeholder', 'Placeholder' ),
 		size: select(
