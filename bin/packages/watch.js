@@ -52,7 +52,6 @@ getPackages().forEach( ( p ) => {
 
 				const filePath = path.resolve( srcDir, filename );
 				if ( event === 'update' && exists( filePath ) ) {
-					// eslint-disable-next-line no-console
 					console.log(
 						chalk.green( '->' ),
 						`${ event }: ${ filename }`
@@ -95,5 +94,4 @@ setInterval( () => {
 	}
 }, 100 );
 
-// eslint-disable-next-line no-console
 console.log( chalk.red( '->' ), chalk.cyan( 'Watching for changes...' ) );

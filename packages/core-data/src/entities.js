@@ -90,6 +90,7 @@ export const defaultEntities = [
 		baseURL: '/__experimental/menu-locations',
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
+		key: 'name',
 	},
 ];
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-const espree = require( 'espree' );
+const babel = require( '@babel/core' );
 const { flatten } = require( 'lodash' );
 
 /**
@@ -9,16 +9,9 @@ const { flatten } = require( 'lodash' );
  */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
-const getAST = ( source ) =>
-	espree.parse( source, {
-		attachComment: true,
-		loc: true,
-		ecmaVersion: 2018,
-		ecmaFeatures: {
-			jsx: true,
-		},
-		sourceType: 'module',
-	} );
+const getAST = ( source ) => {
+	return babel.parse( source || '' ).program;
+};
 
 const getExportTokens = ( ast ) =>
 	ast.body.filter( ( node ) =>

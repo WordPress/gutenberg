@@ -14,6 +14,7 @@ export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
@@ -37,6 +38,7 @@ export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as UnsupportedFooterControl } from './unsupported-footer-control';
+export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
 
 // Higher-Order Components
@@ -51,6 +53,7 @@ export * from './text';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
+export { BottomSheetConsumer } from './mobile/bottom-sheet/bottom-sheet-context';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
@@ -60,3 +63,13 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as LinearGradient } from './mobile/linear-gradient';
+export { default as ColorSettings } from './mobile/color-settings';
+
+// Utils
+export { colorsUtils } from './mobile/color-settings/utils';
+
+export {
+	default as GlobalStylesContext,
+	useGlobalStyles,
+	withGlobalStyles,
+} from './mobile/global-styles-context';

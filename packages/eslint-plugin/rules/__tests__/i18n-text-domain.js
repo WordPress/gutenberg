@@ -17,6 +17,12 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'i18n-text-domain', rule, {
 	valid: [
 		{
+			code: `_x( 'Hello World' )`,
+		},
+		{
+			code: `_x( 'Hello World', 'random' )`,
+		},
+		{
 			code: `__( 'Hello World' )`,
 			options: [ { allowedTextDomain: 'default' } ],
 		},

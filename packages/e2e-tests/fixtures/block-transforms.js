@@ -97,7 +97,7 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	core__embed: {
 		originalBlock: 'Embed',
-		availableTransforms: [ 'Group' ],
+		availableTransforms: [ 'Group', 'Paragraph' ],
 	},
 	'core__file__new-window': {
 		originalBlock: 'File',

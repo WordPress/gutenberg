@@ -98,6 +98,12 @@ jobs:
     - name: Lint
       install:
         - npm ci
+        # eslint-plugin-import/no-extraneous-dependencies relies on modules to
+        # be "installed", which in practice requires that packages be built,
+        # presumably so that pkg.main can be resolved.
+        #
+        # See: https://github.com/benmosher/eslint-plugin-import/blob/92caa35/resolvers/node/index.js
+        - node ./bin/packages/build.js
       script:
         - npm run lint
 
