@@ -119,16 +119,6 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
-<a name="useGlobalEvent" href="#useGlobalEvent">#</a> **useGlobalEvent**
-
-Adds a listener to the containing window.
-
-_Parameters_
-
--   _ref_ `Object`: A reference with a node that is contained by the window.
--   _args_ `Array`: `addEventListener` arguments.
--   _dependencies_ `Array`: Hook dependencies.
-
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.

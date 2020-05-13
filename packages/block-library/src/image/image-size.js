@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useGlobalEvent } from '@wordpress/compose';
 import { useRef, useState, useEffect } from '@wordpress/element';
 
 /**
@@ -11,7 +10,6 @@ import { calculatePreferedImageSize } from './utils';
 
 export default function ImageSize( { src, dirtynessTrigger, children } ) {
 	const ref = useRef();
-	const image = useRef();
 	const [ state, setState ] = useState( {
 		imageWidth: null,
 		imageHeight: null,
@@ -21,37 +19,35 @@ export default function ImageSize( { src, dirtynessTrigger, children } ) {
 		imageHeightWithinContainer: null,
 	} );
 
-	function calculateSize() {
-		const { width, height } = calculatePreferedImageSize(
-			image.current,
-			ref.current
-		);
-
-		setState( {
-			imageWidth: image.current.width,
-			imageHeight: image.current.height,
-			containerWidth: ref.current.clientWidth,
-			containerHeight: ref.current.clientHeight,
-			imageWidthWithinContainer: width,
-			imageHeightWithinContainer: height,
-		} );
-	}
-
 	useEffect( () => {
-		if ( ! image.current ) {
-			const { defaultView } = ref.current.ownerDocument;
-			image.current = new defaultView.Image();
+		const { defaultView } = ref.current.ownerDocument;
+		const image = new defaultView.Image();
+
+		function calculateSize() {
+			const { width, height } = calculatePreferedImageSize(
+				image,
+				ref.current
+			);
+
+			setState( {
+				imageWidth: image.width,
+				imageHeight: image.height,
+				containerWidth: ref.current.clientWidth,
+				containerHeight: ref.current.clientHeight,
+				imageWidthWithinContainer: width,
+				imageHeightWithinContainer: height,
+			} );
 		}
 
-		image.current.onload = calculateSize;
-		image.current.src = src;
+		defaultView.addEventListener( 'resize', calculateSize );
+		image.addEventListener( 'load', calculateSize );
+		image.src = src;
 
 		return () => {
-			image.current.onload = undefined;
+			defaultView.removeEventListener( 'resize', calculateSize );
+			image.removeEventListener( 'load', calculateSize );
 		};
 	}, [ src, dirtynessTrigger ] );
-
-	useGlobalEvent( ref, [ 'resize', calculateSize ], [] );
 
 	return <div ref={ ref }>{ children( state ) }</div>;
 }
