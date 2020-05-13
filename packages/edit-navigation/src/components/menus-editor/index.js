@@ -3,7 +3,13 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import { Card, CardBody, Spinner, SelectControl } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardBody,
+	Spinner,
+	SelectControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -39,22 +45,27 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	return (
 		<>
 			<Card className="edit-navigation-menus-editor__menu-selection-card">
-				<CardBody>
+				<CardBody className="edit-navigation-menus-editor__menu-selection-card-body">
 					{ ! hasMenus && (
 						<p>{ __( 'Create your first menu below.' ) }</p>
 					) }
 					{ hasMenus && (
-						<SelectControl
-							className="edit-navigation-menus-editor__menu-select-control"
-							label={ __( 'Select navigation to edit:' ) }
-							options={ stateMenus?.map( ( menu ) => ( {
-								value: menu.id,
-								label: menu.name,
-							} ) ) }
-							onChange={ ( selectedMenuId ) =>
-								setMenuId( selectedMenuId )
-							}
-						/>
+						<>
+							<SelectControl
+								className="edit-navigation-menus-editor__menu-select-control"
+								label={ __( 'Select navigation to edit:' ) }
+								options={ stateMenus?.map( ( menu ) => ( {
+									value: menu.id,
+									label: menu.name,
+								} ) ) }
+								onChange={ ( selectedMenuId ) =>
+									setMenuId( selectedMenuId )
+								}
+							/>
+							<Button isLink onClick={ () => setMenuId() }>
+								{ __( 'Create a new menu' ) }
+							</Button>
+						</>
 					) }
 				</CardBody>
 			</Card>

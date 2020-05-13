@@ -2,7 +2,13 @@
 	margin-bottom: 10px;
 }
 
+.edit-navigation-menus-editor__menu-selection-card-body {
+	display: flex;
+}
+
 .edit-navigation-menus-editor__menu-select-control {
+	flex: 1;
+
 	@include break-small {
 		.components-base-control__field {
 			display: flex;
