@@ -38,9 +38,7 @@ export default function WelcomeGuide() {
 			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 			pages={ [
 				{
-					image: (
-						<CanvasImage />
-					),
+					image: <CanvasImage />,
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
@@ -55,9 +53,7 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: (
-						<EditorImage />
-					),
+					image: <EditorImage />,
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
@@ -73,7 +69,7 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<BlockLibraryImage className="edit-post-welcome-guide__image" />
+						<BlockLibraryImage />
 					),
 					content: (
 						<>
