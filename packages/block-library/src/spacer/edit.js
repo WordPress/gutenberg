@@ -71,7 +71,6 @@ const SpacerEdit = ( {
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
 						value={ height }
 						onChange={ updateHeight }
-						step={ 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
