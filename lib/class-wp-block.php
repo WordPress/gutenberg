@@ -169,8 +169,11 @@ class WP_Block {
 	/**
 	 * Generates the render output for the block.
 	 *
-	 * @param array $options         Optional options object.
-	 *        bool  $options.dynamic Optionally set to false to avoid using the block's render_callback.
+	 * @param array $options {
+	 *   Optional options object.
+	 *
+	 *   @type bool $dynamic Defaults to 'true'. Optionally set to false to avoid using the block's render_callback.
+	 * }
 	 *
 	 * @return string Rendered block output.
 	 */

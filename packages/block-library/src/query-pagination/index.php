@@ -15,8 +15,8 @@
  * @return string Returns the pagination for the query.
  */
 function render_block_core_query_pagination( $attributes, $content, $block ) {
-	$page_key = 'query-' . $block->context['id'] . '-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : $_GET[ $page_key ];
+	$page_key = 'query-' . $block->context['queryId'] . '-page';
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
 	$content = '';
 	if ( 1 !== $page ) {

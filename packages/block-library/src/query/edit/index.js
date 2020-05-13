@@ -13,17 +13,17 @@ import QueryProvider from './query-provider';
 
 const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
 export default function QueryEdit( {
-	attributes: { id, query },
+	attributes: { queryId, query },
 	setAttributes,
 } ) {
 	const instanceId = useInstanceId( QueryEdit );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
-		if ( ! id ) {
-			setAttributes( { id: instanceId } );
+		if ( ! queryId ) {
+			setAttributes( { queryId: instanceId } );
 		}
-	}, [ id, instanceId ] );
+	}, [ queryId, instanceId ] );
 	return (
 		<>
 			<BlockControls>

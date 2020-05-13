@@ -15,8 +15,8 @@
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_query_loop( $attributes, $content, $block ) {
-	$page_key = 'query-' . $block->context['id'] . '-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : $_GET[ $page_key ];
+	$page_key = 'query-' . $block->context['queryId'] . '-page';
+	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 	$posts    = get_posts(
 		array(
 			'post_type'      => 'post',
