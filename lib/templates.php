@@ -183,7 +183,7 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
 function filter_rest_wp_template_query( $args, $request ) {
 	if ( $request['resolved'] ) {
 		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
-		$template_types = $request['slug'] ? array( $request['slug'] ) : get_template_types();
+		$template_types = $request['slug'] ? $request['slug'] : get_template_types();
 
 		foreach ( $template_types as $template_type ) {
 			// Skip 'embed' for now because it is not a regular template type.
