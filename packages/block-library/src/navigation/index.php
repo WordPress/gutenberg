@@ -157,11 +157,6 @@ function render_block_core_navigation( $content, $block ) {
 		return '';
 	}
 
-	$orientation_class_name = '';
-	if ( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) {
-		$orientation_class_name = 'is-vertical';
-	}
-
 	$colors          = block_core_navigation_build_css_colors( $attributes );
 	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
 	$classes         = array_merge(
