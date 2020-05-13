@@ -28,6 +28,7 @@ export default function NavigateToLink( { url, activeId, onActiveIdChange } ) {
 							'postType',
 							'wp_template',
 							{
+								resolved: true,
 								slug: data.post_name,
 							}
 						)[ 0 ].id;
