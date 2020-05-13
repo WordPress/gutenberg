@@ -40,7 +40,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		return <Spinner />;
 	}
 
-	const hasMenus = hasLoadedMenus && !! menus?.length;
+	const hasMenus = hasLoadedMenus && !! stateMenus?.length;
 
 	return (
 		<>
