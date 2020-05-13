@@ -537,18 +537,6 @@ export default function WritingFlow( { children } ) {
 			// Moving from block multi-selection to single block selection
 			moveSelection( isReverse );
 			event.preventDefault();
-		} else if (
-			isHorizontal &&
-			getSelection().isCollapsed &&
-			isHorizontalEdge( target, isReverseDir )
-		) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverseDir,
-				container.current
-			);
-			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
-			event.preventDefault();
 		}
 	}
 
