@@ -16,12 +16,13 @@ const initialInputControlState = {
 	isDirty: false,
 	isDragEnabled: false,
 	isDragging: false,
-	isPressEnterToSubmit: false,
+	isPressEnterToChange: false,
 	value: '',
 };
 
 const actionTypes = {
 	CHANGE: 'CHANGE',
+	COMMIT: 'COMMIT',
 	DRAG_END: 'DRAG_END',
 	DRAG_START: 'DRAG_START',
 	DRAG: 'DRAG',
@@ -30,7 +31,6 @@ const actionTypes = {
 	PRESS_ENTER: 'PRESS_ENTER',
 	PRESS_UP: 'PRESS_UP',
 	RESET: 'RESET',
-	SUBMIT: 'SUBMIT',
 	UPDATE: 'UPDATE',
 };
 
@@ -121,7 +121,7 @@ function inputControlStateReducer( combinedStateReducers ) {
 
 				break;
 
-			case actionTypes.SUBMIT:
+			case actionTypes.COMMIT:
 				nextState.value = payload.value;
 				nextState.isDirty = false;
 				break;
@@ -228,7 +228,7 @@ export function useInputControlStateReducer(
 	const change = createChangeEvent( actionTypes.CHANGE );
 	const inValidate = createChangeEvent( actionTypes.INVALIDATE );
 	const reset = createChangeEvent( actionTypes.RESET );
-	const submit = createChangeEvent( actionTypes.SUBMIT );
+	const commit = createChangeEvent( actionTypes.COMMIT );
 	const update = createChangeEvent( actionTypes.UPDATE );
 
 	const dragStart = createDragEvent( actionTypes.DRAG_START );
@@ -241,6 +241,7 @@ export function useInputControlStateReducer(
 
 	return {
 		change,
+		commit,
 		dispatch,
 		drag,
 		dragEnd,
@@ -251,7 +252,6 @@ export function useInputControlStateReducer(
 		pressUp,
 		reset,
 		state,
-		submit,
 		update,
 	};
 }

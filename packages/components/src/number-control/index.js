@@ -19,7 +19,7 @@ import {
 	inputControlActionTypes,
 	combineStateReducers,
 } from '../input-control/state';
-import { useRtl } from '../utils/style-mixins';
+import { useRTL } from '../utils/style-mixins';
 
 export function NumberControl(
 	{
@@ -42,7 +42,7 @@ export function NumberControl(
 ) {
 	const initialValue = getValue( valueProp, min, max );
 	const baseValue = clamp( 0, min, max );
-	const isRtl = useRtl();
+	const isRtl = useRTL();
 
 	const autoComplete = typeProp === 'number' ? 'off' : null;
 	const classes = classNames( 'components-number-control', className );

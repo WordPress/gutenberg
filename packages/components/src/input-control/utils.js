@@ -6,7 +6,7 @@ import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getRtl } from '../utils/style-mixins';
+import { getRTL } from '../utils/style-mixins';
 
 /**
  * Gets a CSS cursor value based on a drag direction.
@@ -15,7 +15,7 @@ import { getRtl } from '../utils/style-mixins';
  * @return {string} The CSS cursor value.
  */
 export function getDragCursor( dragDirection ) {
-	const isRtl = getRtl();
+	const isRtl = getRTL();
 	let dragCursor = 'n-resize';
 
 	switch ( dragDirection ) {

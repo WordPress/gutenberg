@@ -47,6 +47,7 @@ function InputField(
 		state,
 		// Actions
 		change,
+		commit,
 		drag,
 		dragEnd,
 		dragStart,
@@ -55,7 +56,6 @@ function InputField(
 		pressEnter,
 		pressUp,
 		reset,
-		submit,
 		update,
 	} = useInputControlStateReducer( stateReducer, {
 		isDragEnabled,
@@ -97,12 +97,12 @@ function InputField(
 		onBlur( event );
 
 		/**
-		 * If isPressEnterToChange is set, this submits the value to
+		 * If isPressEnterToChange is set, this commits the value to
 		 * the onChange callback.
 		 */
 		if ( isPressEnterToChange && isDirty ) {
 			if ( ! isValueEmpty( value ) ) {
-				handleOnSubmit( { target: { value } }, event );
+				handleOnCommit( { target: { value } }, event );
 			} else {
 				reset( valueProp );
 			}
@@ -118,12 +118,12 @@ function InputField(
 		change( nextValue, event );
 	};
 
-	const handleOnSubmit = ( event ) => {
+	const handleOnCommit = ( event ) => {
 		const nextValue = event.target.value;
 
 		try {
 			onValidate( nextValue, { event } );
-			submit( nextValue, event );
+			commit( nextValue, event );
 		} catch ( err ) {
 			invalidate( err, { event } );
 		}
@@ -147,7 +147,7 @@ function InputField(
 
 				if ( isPressEnterToChange ) {
 					event.preventDefault();
-					handleOnSubmit( event );
+					handleOnCommit( event );
 				}
 				break;
 		}
