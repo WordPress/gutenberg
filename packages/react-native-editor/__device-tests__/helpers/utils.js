@@ -2,6 +2,7 @@
  * External dependencies
  */
 import childProcess from 'child_process';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import wd from 'wd';
 import crypto from 'crypto';
 import path from 'path';

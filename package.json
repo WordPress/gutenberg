@@ -187,6 +187,7 @@
 		"stylelint-config-wordpress": "13.1.0",
 		"typescript": "3.8.3",
 		"uuid": "7.0.2",
+		"wd": "1.12.1",
 		"webpack": "4.42.0",
 		"worker-farm": "1.7.0"
 	},
@@ -199,7 +200,7 @@
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build": "npm run build:packages && wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
-		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
+		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
 		"predev": "npm run check-engines",
