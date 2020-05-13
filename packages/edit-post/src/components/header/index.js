@@ -8,7 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
 import {
 	PinnedItems,
-	__experimentalCloseButtonSlot as CloseButtonSlot,
+	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
 
 /**
@@ -69,9 +69,9 @@ function Header( {
 
 	return (
 		<div className="edit-post-header">
-			<CloseButtonSlot>
+			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
-			</CloseButtonSlot>
+			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }

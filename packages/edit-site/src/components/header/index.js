@@ -11,7 +11,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	PinnedItems,
-	__experimentalCloseButtonSlot as CloseButtonSlot,
+	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
 
 /**
@@ -67,9 +67,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<CloseButtonSlot>
+			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
-			</CloseButtonSlot>
+			</MainDashboardButton.Slot>
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"

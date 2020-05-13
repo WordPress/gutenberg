@@ -6,23 +6,23 @@ import {
 	createSlotFill,
 } from '@wordpress/components';
 
-const name = '__experimentalMainDashboardButton';
+const slotName = '__experimentalMainDashboardButton';
 
-const { Fill, Slot } = createSlotFill( name );
+const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
 
 const MainDashboardButton = Fill;
-MainDashboardButton.Slot = Slot;
-MainDashboardButton.slotName = name;
 
-export const CloseButtonSlot = ( { children } ) => {
-	const slot = useSlot( MainDashboardButton.slotName );
+const Slot = ( { children } ) => {
+	const slot = useSlot( slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
 	if ( ! hasFills ) {
 		return children;
 	}
 
-	return <MainDashboardButton.Slot bubblesVirtually />;
+	return <MainDashboardButtonSlot bubblesVirtually />;
 };
+
+MainDashboardButton.Slot = Slot;
 
 export default MainDashboardButton;
