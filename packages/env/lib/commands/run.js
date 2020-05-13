@@ -7,6 +7,7 @@ const dockerCompose = require( 'docker-compose' );
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
+const getDockerPath = require( '../get-docker-path' );
 
 /**
  * Runs an arbitrary command on the given Docker container.
@@ -17,17 +18,36 @@ const initConfig = require( '../init-config' );
  * @param {Object}  options.spinner   A CLI spinner which indicates progress.
  * @param {boolean} options.debug     True if debug mode is enabled.
  */
-module.exports = async function run( { container, command, spinner, debug } ) {
+module.exports = async function run( {
+	container,
+	command,
+	cwd,
+	spinner,
+	debug,
+} ) {
 	const config = await initConfig( { spinner, debug } );
 
-	command = command.join( ' ' );
+	command = Array.isArray( command ) ? command.join( ' ' ) : command;
 
 	spinner.text = `Running \`${ command }\` in '${ container }'.`;
 
+	const commandOptions = [ '--rm' ];
+	if ( cwd ) {
+		// If a cwd for the command was passed, turn it into an internal absolute
+		// path. As given, it is relative to the local filesystem, not docker.
+		const internalPath = getDockerPath( config, cwd );
+		if ( ! internalPath ) {
+			throw new Error(
+				'Could not convert the given work directory into an internal Docker path.'
+			);
+		}
+		commandOptions.push( [ '-w', internalPath ] );
+	}
+
 	const result = await dockerCompose.run( container, command, {
 		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
 		log: config.debug,
+		commandOptions,
 	} );
 
 	if ( result.out ) {

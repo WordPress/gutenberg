@@ -213,27 +213,62 @@ Positionals:
 ### `wp-env run [container] [command]`
 
 ```sh
-wp-env run <container> [command..]
+wp-env run <container> <command> [cwd]
 
-Runs an arbitrary command in one of the underlying Docker containers, for
-example it's useful for running wp cli commands.
-
+Runs an arbitrary command in one of the underlying Docker containers. For
+example, it is useful for running wp cli commands and phpunit.
 
 Positionals:
   container  The container to run the command on.            [string] [required]
-  command    The command to run.                           [array] [default: []]
+  command    The command to run. Wrap it in quotation marks if there are
+             multiple words or options to pass into the Docker service.
+                                                             [string] [required]
+  cwd        An optional local path to a mapped directory in which to run the
+             command. This is useful if you want to run a command within a
+             Docker service relative to one of your mapped sources.     [string]
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+  --debug    Enable debug output.                     [boolean] [default: false]
 ```
 
 For example:
 
 ```sh
-wp-env run cli wp user list
+# Get the users in the WordPress instance
+wp-env run cli "wp user list"
 ⠏ Running `wp user list` in 'cli'.
 
 ID      user_login      display_name    user_email      user_registered roles
 1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
 
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
+```sh
+# Run phpunit
+wp-env run phpunit phpunit ./
+
+⠏ Running `phpunit` in 'phpunit'.
+
+Installing...
+Running as single site... To run multisite, use -c tests/phpunit/multisite.xml
+Not running ajax tests. To execute these, use --group ajax.
+Not running ms-files tests. To execute these, use --group ms-files.
+Not running external-http tests. To execute these, use --group external-http.
+PHPUnit 7.5.20 by Sebastian Bergmann and contributors.
+
+...............................................................  63 / 101 ( 62%)
+......................................                          101 / 101 (100%)
+
+Time: 4.44 seconds, Memory: 40.50 MB
+
+OK (101 tests, 1801 assertions)
+
+
+
+✔ Ran `phpunit` in 'phpunit'. (in 5s 670ms)
 ```
 
 ### `docker logs -f [container_id] >/dev/null`
@@ -363,5 +398,32 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 	"testsPort": 4012
 }
 ```
+
+## Phpunit
+
+You can run phpunit in the Docker environment with the WordPress phpunit test functions with these instructions. Note that all of the files we mention here should be included in one of the sources which is mapped into the WordPress instance. This setup depends on WP PHPUnit. [Find more information about that here](https://github.com/wp-phpunit/docs).
+
+1. Use composer to install WP PHPUnit: `wp-env run composer "composer require wp-phpunit/wp-phpunit --dev"`.
+2. Specify a `phpunit.dist.xml` within one of your mapped sources. For example, if your main source is a plugin in cwd (`"plugins": [ "." ]`), you could put `phpunit.dist.xml` in the top-level directory. [Here is an example of a `phpunit.dist.xml` file.](https://github.com/WordPress/gutenberg/blob/master/phpunit.xml.dist)
+3. Make sure `phpunit.dist.xml` points to a local `bootstrap.php` file. This should require composer dependencies and also attempt to load the WordPress test functions. Below is the minimal PHP to make it work:
+
+```php
+<?php
+
+// See https://github.com/WordPress/gutenberg/blob/master/phpunit/bootstrap.php
+// for more information.
+
+// 1. Require composer dependencies.
+require_once dirname( dirname( __FILE__ ) ) . '/vendor/autoload.php';
+
+// 2. Require the WP_PHPUNIT library, which provides WP test helpers.
+$_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
+require_once $_tests_dir . '/includes/functions.php';
+
+// 3. Start the WP testing environment.
+require $_tests_dir . '/includes/bootstrap.php';
+```
+
+4. Call `wp-env run phpunit phpunit $path_to_config_dir`. For example, `$path_to_config_dir` can be `./` if you placed the phpunit config file in the current working directory. Looking at the peices, this command simply runs the `phpunit` command on the `phpunit` service in the specified directory. The directory should be specified relative to cwd of the wp-env command. Under the hood, wp-env locates the mapped version of that path inside the Docker container.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
