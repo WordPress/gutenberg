@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { apiFetch } from '@wordpress/data-controls';
 import { getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { apiFetch, loadAssets } from './controls';
+import { loadAssets } from './controls';
 
 /**
  * Returns an action object used in signalling that the downloadable blocks
