@@ -1,7 +1,7 @@
 /**
  * Returns true if application is requesting for downloadable blocks.
  *
- * @param {Object} state       Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {Array} Downloadable blocks
  */

@@ -9,9 +9,11 @@ import { getBlockTypes } from '@wordpress/blocks';
 import { apiFetch, loadAssets } from './controls';
 
 /**
- * Returns an action object used in signalling that the downloadable blocks have been requested and is loading.
+ * Returns an action object used in signalling that the downloadable blocks
+ * have been requested and is loading.
  *
  * @param {string} filterValue Search string.
+ *
  * @return {Object} Action object.
  */
 export function fetchDownloadableBlocks( filterValue ) {
@@ -19,10 +21,11 @@ export function fetchDownloadableBlocks( filterValue ) {
 }
 
 /**
- * Returns an action object used in signalling that the downloadable blocks have been updated.
+ * Returns an action object used in signalling that the downloadable blocks
+ * have been updated.
  *
- * @param {Array} downloadableBlocks Downloadable blocks.
- * @param {string} filterValue Search string.
+ * @param {Array}  downloadableBlocks Downloadable blocks.
+ * @param {string} filterValue        Search string.
  *
  * @return {Object} Action object.
  */
@@ -35,9 +38,10 @@ export function receiveDownloadableBlocks( downloadableBlocks, filterValue ) {
 }
 
 /**
- * Returns an action object used in signalling that the user does not have permission to install blocks.
+ * Returns an action object used in signalling that the user does not have
+ * permission to install blocks.
  *
- @param {boolean} hasPermission User has permission to install blocks.
+ * @param {boolean} hasPermission User has permission to install blocks.
  *
  * @return {Object} Action object.
  */
@@ -48,9 +52,10 @@ export function setInstallBlocksPermission( hasPermission ) {
 /**
  * Action triggered to download block assets.
  *
- * @param {Object} item The selected block item
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
+ * @param {Object}   item      The selected block item
+ * @param {Function} onSuccess The callback function when the action has
+ *                             succeeded.
+ * @param {Function} onError   The callback function when the action has failed.
  */
 export function* downloadBlock( item, onSuccess, onError ) {
 	try {
@@ -73,10 +78,10 @@ export function* downloadBlock( item, onSuccess, onError ) {
 /**
  * Action triggered to install a block plugin.
  *
- * @param {string} item The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
- *
+ * @param {string}   item      The block item returned by search.
+ * @param {Function} onSuccess The callback function when the action has
+ *                             succeeded.
+ * @param {Function} onError   The callback function when the action has failed.
  */
 export function* installBlock( { id, name }, onSuccess, onError ) {
 	try {
@@ -100,10 +105,10 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 /**
  * Action triggered to uninstall a block plugin.
  *
- * @param {string} item The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has succeeded.
- * @param {Function} onError The callback function when the action has failed.
- *
+ * @param {string} item        The block item returned by search.
+ * @param {Function} onSuccess The callback function when the action has
+ *                             succeeded.
+ * @param {Function} onError   The callback function when the action has failed.
  */
 export function* uninstallBlock( { id, name }, onSuccess, onError ) {
 	try {
@@ -127,7 +132,7 @@ export function* uninstallBlock( { id, name }, onSuccess, onError ) {
 /**
  * Returns an action object used to add a newly installed block type.
  *
- * @param {string} item The block item with the block id and name.
+ * @param {Object} item The block item with the block id and name.
  *
  * @return {Object} Action object.
  */
@@ -141,7 +146,7 @@ export function addInstalledBlockType( item ) {
 /**
  * Returns an action object used to remove a newly installed block type.
  *
- * @param {string} item The block item with the block id and name.
+ * @param {Object} item The block item with the block id and name.
  *
  * @return {Object} Action object.
  */
@@ -155,8 +160,9 @@ export function removeInstalledBlockType( item ) {
 /**
  * Returns an action object used to indicate install in progress
  *
- * @param {boolean} isInstalling Boolean value that tells state whether installation is occurring
+ * @param {boolean} isInstalling
  *
+ * @return {Object} Action object.
  */
 export function setIsInstalling( isInstalling ) {
 	return {
@@ -168,9 +174,11 @@ export function setIsInstalling( isInstalling ) {
 /**
  * Sets an error notice string to be displayed to the user
  *
- * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} noticeId The ID of the message used to determine which notice to show.
+ * @param {string} blockId  The ID of the block plugin. eg: my-block
+ * @param {string} noticeId The ID of the message used to determine which
+ *                          notice to show.
  *
+ * @return {Object} Action object.
  */
 export function setErrorNotice( blockId, noticeId ) {
 	return {
@@ -185,6 +193,7 @@ export function setErrorNotice( blockId, noticeId ) {
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
  *
+ * @return {Object} Action object.
  */
 export function clearErrorNotice( blockId ) {
 	return {
