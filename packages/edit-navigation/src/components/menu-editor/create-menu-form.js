@@ -1,27 +1,14 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
 import { Button, TextControl } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function CreateMenuForm() {
 	const [ menuName, setMenuName ] = useState( '' );
-	const createMenu = useCallback( () => {
-		const path = '/__experimental/menus';
-		return apiFetch( {
-			path,
-			method: 'POST',
-			data: {
-				// A value of 0 indicates that a new menu should be created.
-				menu_id: 0,
-				menu_data: {
-					name: menuName,
-				},
-			},
-		} );
-	}, [ menuName ] );
+	const { saveMenu } = useDispatch( 'core' );
 
 	return (
 		<>
@@ -31,7 +18,7 @@ export default function CreateMenuForm() {
 				onChange={ setMenuName }
 				placeholder={ __( 'Main Navigation' ) }
 			/>
-			<Button isPrimary onClick={ createMenu }>
+			<Button isPrimary onClick={ () => saveMenu( { name: menuName } ) }>
 				{ __( 'Create menu' ) }
 			</Button>
 		</>
