@@ -9,6 +9,16 @@ import { act, Simulate } from 'react-dom/test-utils';
  */
 import AlignmentMatrixControl from '../';
 
+const __windowFocus = window.focus;
+
+beforeAll( () => {
+	window.focus = jest.fn();
+} );
+
+afterAll( () => {
+	window.focus = __windowFocus;
+} );
+
 let container = null;
 
 beforeEach( () => {
