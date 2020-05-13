@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { noop, isEmpty } from 'lodash';
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * Internal dependencies
  */
 import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
-import { CSS_UNITS } from './utils';
+import { CSS_UNITS, hasUnits } from './utils';
 
 /**
  * Renders a `select` if there are multiple units.
@@ -23,7 +23,7 @@ export default function UnitSelectControl( {
 	value = 'px',
 	...props
 } ) {
-	if ( isEmpty( options ) || options.length === 1 || options === false ) {
+	if ( ! hasUnits( options ) ) {
 		return <UnitLabel size={ size }>{ value }</UnitLabel>;
 	}
 
@@ -34,7 +34,7 @@ export default function UnitSelectControl( {
 		onChange( unitValue, { event, data } );
 	};
 
-	const classes = classnames( 'component-unit-control__select', className );
+	const classes = classnames( 'components-unit-control__select', className );
 
 	return (
 		<UnitSelect
