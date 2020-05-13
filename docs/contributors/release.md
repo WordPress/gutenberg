@@ -27,13 +27,13 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
 
 ```bash
-./bin/commander.js rc
+./bin/plugin/cli.js rc
 ```
 
 To release a stable version, run:
 
 ```bash
-./bin/commander.js stable
+./bin/plugin/cli.js stable
 ```
 
 It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
@@ -233,7 +233,7 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
+For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/plugin/cli npm-stable` command:
 
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 

@@ -1,21 +1,21 @@
 /**
  * External dependencies
  */
-const { dirname, join } = require( 'path' );
-const makeDir = require( 'make-dir' );
-const { readFile, writeFile } = require( 'fs' ).promises;
-const { render } = require( 'mustache' );
+const { writeFile } = require( 'fs' ).promises;
 const { snakeCase } = require( 'lodash' );
+const makeDir = require( 'make-dir' );
+const { render } = require( 'mustache' );
+const { dirname } = require( 'path' );
 
 /**
  * Internal dependencies
  */
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
-const { hasWPScriptsEnabled, getOutputFiles } = require( './templates' );
+const { hasWPScriptsEnabled } = require( './templates' );
 
 module.exports = async function(
-	templateName,
+	blockTemplate,
 	{
 		namespace,
 		slug,
@@ -35,6 +35,7 @@ module.exports = async function(
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
+	const { outputTemplates } = blockTemplate;
 	const view = {
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
@@ -51,25 +52,21 @@ module.exports = async function(
 		textdomain: namespace,
 	};
 	await Promise.all(
-		getOutputFiles( templateName ).map( async ( file ) => {
-			const template = await readFile(
-				join(
-					__dirname,
-					`templates/${ templateName }/${ file }.mustache`
-				),
-				'utf8'
-			);
+		Object.keys( outputTemplates ).map( async ( outputFile ) => {
 			// Output files can have names that depend on the slug provided.
-			const outputFilePath = `${ slug }/${ file.replace(
+			const outputFilePath = `${ slug }/${ outputFile.replace(
 				/\$slug/g,
 				slug
 			) }`;
 			await makeDir( dirname( outputFilePath ) );
-			writeFile( outputFilePath, render( template, view ) );
+			writeFile(
+				outputFilePath,
+				render( outputTemplates[ outputFile ], view )
+			);
 		} )
 	);
 
-	if ( hasWPScriptsEnabled( templateName ) ) {
+	if ( hasWPScriptsEnabled( blockTemplate ) ) {
 		await initWPScripts( view );
 	}
 
@@ -77,7 +74,7 @@ module.exports = async function(
 	success(
 		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
 	);
-	if ( hasWPScriptsEnabled( templateName ) ) {
+	if ( hasWPScriptsEnabled( blockTemplate ) ) {
 		info( '' );
 		info( 'Inside that directory, you can run several commands:' );
 		info( '' );

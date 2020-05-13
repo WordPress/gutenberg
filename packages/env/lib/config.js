@@ -38,6 +38,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, Source>} mappings    Mapping of WordPress directories to local directories which should be mounted.
  * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
@@ -128,6 +129,7 @@ module.exports = {
 				port: 8888,
 				testsPort: 8889,
 				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
+				mappings: {},
 			},
 			config,
 			overrideConfig
@@ -185,6 +187,20 @@ module.exports = {
 			);
 		}
 
+		if ( typeof config.mappings !== 'object' ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "mappings" must be an object.'
+			);
+		}
+
+		for ( const [ wpDir, localDir ] of Object.entries( config.mappings ) ) {
+			if ( ! localDir || typeof localDir !== 'string' ) {
+				throw new ValidationError(
+					`Invalid .wp-env.json: "mapping.${ wpDir }" should be a string.`
+				);
+			}
+		}
+
 		const workDirectoryPath = path.resolve(
 			getHomeDirectory(),
 			md5( configPath )
@@ -217,6 +233,16 @@ module.exports = {
 				} )
 			),
 			config: config.config,
+			mappings: Object.entries( config.mappings ).reduce(
+				( result, [ wpDir, localDir ] ) => {
+					const source = parseSourceString( localDir, {
+						workDirectoryPath,
+					} );
+					result[ wpDir ] = source;
+					return result;
+				},
+				{}
+			),
 		};
 	},
 };

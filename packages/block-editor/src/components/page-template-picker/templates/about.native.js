@@ -36,37 +36,57 @@ const About = {
 			},
 		},
 		{
-			name: 'core/quote',
-			attributes: {
-				// translators: sample content for "About" page template
-				value: `<p>${ __(
-					'The way to get started is to quit talking and begin doing.'
-				) }</p>`,
-				// translators: sample content for "About" page template
-				citation: __( 'Walt Disney' ),
-			},
-		},
-		{
-			name: 'core/quote',
-			attributes: {
-				// translators: sample content for "About" page template
-				value: `<p>${ __(
-					'It is our choices, Harry, that show what we truly are, far more than our abilities.'
-				) }</p>`,
-				// translators: sample content for "About" page template
-				citation: __( 'J.K. Rowling' ),
-			},
-		},
-		{
-			name: 'core/quote',
-			attributes: {
-				// translators: sample content for "About" page template
-				value: `<p>${ __(
-					'Don’t cry because it’s over, smile because it happened.'
-				) }</p>`,
-				// translators: sample content for "About" page template
-				citation: __( 'Dr. Seuss' ),
-			},
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: {
+								// translators: sample content for "About" page template
+								value: `<p>${ __(
+									'The way to get started is to quit talking and begin doing.'
+								) }</p>`,
+								// translators: sample content for "About" page template
+								citation: __( 'Walt Disney' ),
+							},
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: {
+								// translators: sample content for "About" page template
+								value: `<p>${ __(
+									'It is our choices, Harry, that show what we truly are, far more than our abilities.'
+								) }</p>`,
+								// translators: sample content for "About" page template
+								citation: __( 'J.K. Rowling' ),
+							},
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/quote',
+							attributes: {
+								// translators: sample content for "About" page template
+								value: `<p>${ __(
+									'Don’t cry because it’s over, smile because it happened.'
+								) }</p>`,
+								// translators: sample content for "About" page template
+								citation: __( 'Dr. Seuss' ),
+							},
+						},
+					],
+				},
+			],
 		},
 		{
 			name: 'core/spacer',
