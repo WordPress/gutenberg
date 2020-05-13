@@ -194,10 +194,10 @@ function filter_rest_wp_template_query( $args, $request ) {
 
 			$current_template = gutenberg_find_template_post_and_parts( $template_type );
 			if ( isset( $current_template ) ) {
-				$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
+				$template_ids[] = $current_template['template_post']->ID;
 			}
 		}
-		$args['post__in'] = array_values( $template_ids );
+		$args['post__in'] = $template_ids;
 	}
 
 	return $args;
