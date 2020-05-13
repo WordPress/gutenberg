@@ -283,11 +283,17 @@ function gutenberg_experimental_global_styles_get_block_data() {
  * Takes a tree and returns the CSS rules
  * with the proper declarations.
  *
- * @param array $styles Global Styles tree.
+ * @param array $global_styles Global Styles tree.
  * @return string CSS rule.
  */
-function gutenberg_experimental_global_styles_resolver_styles( $styles ) {
-	$css_rules  = '';
+function gutenberg_experimental_global_styles_resolver_styles( $global_styles ) {
+	$css_rules = '';
+
+	if ( ! is_array( $global_styles ) || ! array_key_exists( 'blocks', $global_styles ) ) {
+		return $css_rules;
+	}
+	$styles = $global_styles['blocks'];
+
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
 
 	foreach ( $styles as $block_name => $block_style ) {
@@ -365,7 +371,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	);
 
 	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
-	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['blocks'] );
+	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles );
 	if ( empty( $inline_style ) ) {
 		return;
 	}
