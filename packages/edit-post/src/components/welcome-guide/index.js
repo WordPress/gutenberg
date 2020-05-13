@@ -39,7 +39,7 @@ export default function WelcomeGuide() {
 			pages={ [
 				{
 					image: (
-						<CanvasImage className="edit-post-welcome-guide__image" />
+						<CanvasImage />
 					),
 					content: (
 						<>
