@@ -530,7 +530,7 @@ The `build` and `start` commands use [webpack](https://webpack.js.org/) behind t
 * [Loaders](https://webpack.js.org/loaders/):
   * [`babel-loader`](https://webpack.js.org/loaders/babel-loader/) allows transpiling JavaScript files using Babel and webpack.
   * [`@svgr/webpack`](https://www.npmjs.com/package/@svgr/webpack) and [`url-loader`](https://webpack.js.org/loaders/url-loader/) makes it possible to handle SVG files in JavaScript code.
-  * [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack processing CSS, SASS or SCSS files referenced in JavaScript files and extract into CSS files with [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/).
+  * [`css-loader`](https://webpack.js.org/loaders/css-loader/) chained with [`postcss-loader`](https://webpack.js.org/loaders/postcss-loader/) and [sass-loader](https://webpack.js.org/loaders/sass-loader/) let webpack process CSS, SASS or SCSS files referenced in JavaScript files.
 * [Plugins](https://webpack.js.org/configuration/plugins) (among others):
   * [`MiniCssExtractPlugin`](https://webpack.js.org/plugins/mini-css-extract-plugin/) extracts CSS into separate files. It creates a CSS file per JavaScript entry point which contains CSS.
   * [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md) is used with the default configuration to ensure that WordPress provided scripts are not included in the built bundle.
@@ -561,8 +561,8 @@ import './index.scss';
 import './style.css';
 ```
 
-When you run the build using the default command `wp-scripts build` (also applies to `start`) in addition to JavaScript file `index.js` generated in the `dist` folder, you should see two more files:
-1. `index.css` – in general, the majority of JavaScript code written for the block, it's going to be rendered in the block editor. Therefore all imported files are bundled into one chunk named after the entry point that defaults to `index.js`, and thus the file created becomes `index.css`.
+When you run the build using the default command `wp-scripts build` (also applies to `start`) in addition to the JavaScript file `index.js` generated in the `build` folder, you should see two more files:
+1. `index.css` – all imported CSS files are bundled into one chunk named after the entry point, which defaults to `index.js`, and thus the file created becomes `index.css`. This is for styles used only in the editor.
 2. `style.css` – imported `style.css` file(s) (applies to SASS and SCSS extensions) get bundled into one `style.css` file that is meant to be used both on the front-end and in the editor.
 
 You can also have multiple entry points as described in the docs for the script:
@@ -572,7 +572,7 @@ wp-scripts start entry-one.js entry-two.js --output-path=custom
 
 If you do so, then CSS files generated will follow the names of the entry points: `entry-one.css` and `entry-two.css`.
 
-You can have only one entry point and name it differently if you will. The chances that you would call an entry point `style.js` is close to zero, but possible and therefore, it needs to be discouraged.
+You can have only one entry point and name it differently if you will. Avoid using `style` for an entry point name, this will break your build process.
 
 #### Using SVG
 
