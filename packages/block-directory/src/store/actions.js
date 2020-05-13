@@ -11,10 +11,11 @@ import { apiFetch, loadAssets } from './controls';
 /**
  * Returns an action object used in signalling that the downloadable blocks have been requested and is loading.
  *
+ * @param {string} filterValue Search string.
  * @return {Object} Action object.
  */
-export function fetchDownloadableBlocks() {
-	return { type: 'FETCH_DOWNLOADABLE_BLOCKS' };
+export function fetchDownloadableBlocks( filterValue ) {
+	return { type: 'FETCH_DOWNLOADABLE_BLOCKS', filterValue };
 }
 
 /**
