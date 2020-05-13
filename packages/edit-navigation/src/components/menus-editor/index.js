@@ -62,6 +62,8 @@ export default function MenusEditor( { blockEditorSettings } ) {
 						setStateMenus( newStateMenus );
 						if ( newStateMenus.length ) {
 							setMenuId( newStateMenus[ 0 ].id );
+						} else {
+							setMenuId();
 						}
 					} }
 				/>
