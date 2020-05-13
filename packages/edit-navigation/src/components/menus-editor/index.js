@@ -12,10 +12,16 @@ import { __ } from '@wordpress/i18n';
 import MenuEditor from '../menu-editor';
 
 export default function MenusEditor( { blockEditorSettings } ) {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
+	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
+		const { getMenus, hasFinishedResolution } = select( 'core' );
+		return {
+			menus: getMenus(),
+			hasLoadedMenus: hasFinishedResolution( 'getMenus' ),
+		};
+	}, [] );
 
-	const [ menuId, setMenuId ] = useState( 0 );
-	const [ stateMenus, setStateMenus ] = useState( null );
+	const [ menuId, setMenuId ] = useState();
+	const [ stateMenus, setStateMenus ] = useState();
 
 	useEffect( () => {
 		if ( menus?.length ) {
@@ -24,7 +30,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		}
 	}, [ menus ] );
 
-	if ( ! stateMenus ) {
+	if ( ! hasLoadedMenus ) {
 		return <Spinner />;
 	}
 
@@ -35,7 +41,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					<SelectControl
 						className="edit-navigation-menus-editor__menu-select-control"
 						label={ __( 'Select navigation to edit:' ) }
-						options={ stateMenus.map( ( menu ) => ( {
+						options={ stateMenus?.map( ( menu ) => ( {
 							value: menu.id,
 							label: menu.name,
 						} ) ) }
@@ -45,7 +51,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					/>
 				</CardBody>
 			</Card>
-			{ !! menuId && (
+			{ hasLoadedMenus && (
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
