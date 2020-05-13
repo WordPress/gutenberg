@@ -15,10 +15,7 @@ import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import {
-	getMoverActionTitle,
-	getArrowIcon,
-} from '../block-mover/mover-description';
+import { getMoversSetup } from '../block-mover/mover-description';
 
 const BlockActionsMenu = ( {
 	onDelete,
@@ -34,6 +31,16 @@ const BlockActionsMenu = ( {
 	isEmptyDefaultBlock,
 	blockMobileToolbarRef,
 } ) => {
+	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
+
+	const {
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		actionTitle: {
+			backward: backwardButtonTitle,
+			forward: forwardButtonTitle,
+		},
+	} = getMoversSetup( isStackedHorizontally, moversOptions );
+
 	const deleteOption = {
 		id: 'deleteOption',
 		// translators: %s: block title e.g: "Paragraph".
@@ -54,17 +61,17 @@ const BlockActionsMenu = ( {
 
 	const backwardButtonOption = {
 		id: 'backwardButtonOption',
-		label: getMoverActionTitle( true, isStackedHorizontally ),
+		label: backwardButtonTitle,
 		value: 'backwardButtonOption',
-		icon: getArrowIcon( true, isStackedHorizontally ),
+		icon: backwardButtonIcon,
 		disabled: isFirst,
 	};
 
 	const forwardButtonOption = {
 		id: 'forwardButtonOption',
-		label: getMoverActionTitle( false, isStackedHorizontally ),
+		label: forwardButtonTitle,
 		value: 'forwardButtonOption',
-		icon: getArrowIcon( false, isStackedHorizontally ),
+		icon: forwardButtonIcon,
 		disabled: isLast,
 	};
 

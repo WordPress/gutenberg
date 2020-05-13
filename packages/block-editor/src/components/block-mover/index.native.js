@@ -13,11 +13,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	getMoverDescription,
-	getArrowIcon,
-	getMoverButtonTitle,
-} from './mover-description';
+import { getMoversSetup } from './mover-description';
 
 const BlockMover = ( {
 	isFirst,
@@ -30,11 +26,15 @@ const BlockMover = ( {
 	isStackedHorizontally,
 } ) => {
 	const {
-		backwardButtonHint,
-		forwardButtonHint,
-		firstBlockTitle,
-		lastBlockTitle,
-	} = getMoverDescription( isStackedHorizontally );
+		description: {
+			backwardButtonHint,
+			forwardButtonHint,
+			firstBlockTitle,
+			lastBlockTitle,
+		},
+		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+		title: { backward: backwardButtonTitle, forward: forwardButtonTitle },
+	} = getMoversSetup( isStackedHorizontally, { firstIndex } );
 
 	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
 		return null;
@@ -43,34 +43,18 @@ const BlockMover = ( {
 	return (
 		<>
 			<ToolbarButton
-				title={
-					! isFirst
-						? getMoverButtonTitle(
-								true,
-								firstIndex,
-								isStackedHorizontally
-						  )
-						: firstBlockTitle
-				}
+				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				icon={ getArrowIcon( true, isStackedHorizontally ) }
+				icon={ backwardButtonIcon }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
 
 			<ToolbarButton
-				title={
-					! isLast
-						? getMoverButtonTitle(
-								false,
-								firstIndex,
-								isStackedHorizontally
-						  )
-						: lastBlockTitle
-				}
+				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				icon={ getArrowIcon( false, isStackedHorizontally ) }
+				icon={ forwardButtonIcon }
 				extraProps={ {
 					hint: forwardButtonHint,
 				} }
