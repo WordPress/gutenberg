@@ -12,12 +12,7 @@ import { __ } from '@wordpress/i18n';
  */
 const { fetch } = window;
 
-export default function NavigateToLink( {
-	url,
-	templateIds,
-	activeId,
-	onActiveIdChange,
-} ) {
+export default function NavigateToLink( { url, activeId, onActiveIdChange } ) {
 	const [ templateId, setTemplateId ] = useState();
 	useEffect( () => {
 		const effect = async () => {
@@ -28,14 +23,15 @@ export default function NavigateToLink( {
 				if ( success ) {
 					let newTemplateId = data.ID;
 					if ( newTemplateId === null ) {
-						const { getEntityRecord } = select( 'core' );
-						newTemplateId = templateIds
-							.map( ( id ) =>
-								getEntityRecord( 'postType', 'wp_template', id )
-							)
-							.find(
-								( template ) => template.slug === data.post_name
-							).id;
+						const { getEntityRecords } = select( 'core' );
+						newTemplateId = getEntityRecords(
+							'postType',
+							'wp_template',
+							{
+								resolved: true,
+								slug: data.post_name,
+							}
+						)[ 0 ].id;
 					}
 					setTemplateId( newTemplateId );
 				} else {
@@ -46,7 +42,7 @@ export default function NavigateToLink( {
 			}
 		};
 		effect();
-	}, [ url, templateIds ] );
+	}, [ url ] );
 	const onClick = useMemo( () => {
 		if ( ! templateId || templateId === activeId ) {
 			return null;

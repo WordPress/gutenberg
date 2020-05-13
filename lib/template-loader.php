@@ -93,7 +93,7 @@ function get_template_hierachy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_id, $_wp_current_template_content;
 
-	$current_template = gutenberg_find_template_post_and_parts( basename( $template, '.php' ), $templates );
+	$current_template = gutenberg_find_template_post_and_parts( $type, $templates );
 
 	if ( $current_template ) {
 		$_wp_current_template_id      = $current_template['template_post']->ID;
