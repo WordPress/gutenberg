@@ -46,7 +46,7 @@ class WP_Block {
 	 * @var array
 	 * @access protected
 	 */
-	protected $available_context;
+	public $available_context;
 
 	/**
 	 * List of inner blocks (of this same class)
