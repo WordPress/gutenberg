@@ -109,7 +109,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			)
 		);
 
-		// Check if the plugin is already installed but deactivated
+		// Check if the plugin is already installed.
 		$installed_plugins = get_plugins( '/' . $api->slug );
 
 		if ( empty( $installed_plugins ) ) {
@@ -257,8 +257,6 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result = array();
 
 		foreach ( $response['plugins'] as $plugin ) {
-			$installed_plugins = get_plugins( '/' . $plugin['slug'] );
-
 			$result[] = self::parse_block_metadata( $plugin );
 		}
 
