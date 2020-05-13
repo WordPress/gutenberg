@@ -1,4 +1,4 @@
-.interface-admin-menu-toggle.has-icon {
+#editor .interface-admin-menu-toggle.has-icon {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
@@ -10,9 +10,8 @@
 		border: none;
 		border-radius: 0;
 		width: $header-height;
-		background: #23282e; // WP-admin gray.
+		background: theme(sidebar);
 		transition: all 0.12s ease-in-out;
-
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -20,29 +19,20 @@
 		z-index: 10000;
 
 		svg {
-			padding: 6px;
 			pointer-events: none;
-			border-radius: 2px;
 			width: 38px;
 			height: 38px;
-			fill: $white;
-		}
-
-		&:hover {
-			svg {
-				fill: rgba($white, 0.8);
-			}
-		}
-
-		&:active {
-			color: $white;
+			padding: 4px;
+			fill: theme(sidebarText);
 		}
 
 		&:focus {
 			box-shadow: none;
+			outline: none;
 
 			svg {
-				box-shadow: 0 0 0 1.5px color($theme-color);
+				box-shadow: 0 0 0 1px $white, 0 0 0 4px theme(primary);
+				border-radius: 2px;
 			}
 		}
 
