@@ -218,22 +218,65 @@ function gutenberg_experimental_global_styles_get_theme() {
  *
  * @return array
  */
-function gutenberg_experimental_global_styles_get_selectors() {
-	$selectors = array(
-		'global'                        => ':root',
-		'core/paragraph'                => 'p',
-		'core/heading/h1'               => 'h1',
-		'core/heading/h2'               => 'h2',
-		'core/heading/h3'               => 'h3',
-		'core/heading/h4'               => 'h4',
-		'core/heading/h5'               => 'h5',
-		'core/heading/h6'               => 'h6',
-		'core/numbered-features/number' => '.wp-block-column:first-child p',
-		'core/numbered-features/title'  => '.wp-block-column:nth-child(2) p:first-child',
-		'core/numbered-features/desc'   => '.wp-block-column:nth-child(2) p',
+function gutenberg_experimental_global_styles_get_block_data() {
+	// TODO: this data should be taken from the block.json.
+	//
+	// We need the ability to have many selectors per block
+	// like for heading (core/heading/h1, core/heading/h2, etc)
+	// but also for other blocks that have complex layouts
+	// (ex: for gallery we may want to target the wrapper element
+	// and the individual images).
+	//
+	// Having access to this via the block registry
+	// requires block server registration.
+	$block_data = array(
+		'global'          => array(
+			'selector' => ':root',
+			'supports' => array(),
+		),
+		'core/paragraph'  => array(
+			'selector' => 'p',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h1' => array(
+			'selector' => 'h1',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h2' => array(
+			'selector' => 'h2',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h3' => array(
+			'selector' => 'h3',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h4' => array(
+			'selector' => 'h4',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h5' => array(
+			'selector' => 'h5',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/heading/h6' => array(
+			'selector' => 'h6',
+			'supports' => array( 'line-height', 'font-size', 'color' ),
+		),
+		'core/columns'    => array(
+			'selector' => '.wp-block-columns',
+			'supports' => array( 'color' ),
+		),
+		'core/group'      => array(
+			'selector' => '.wp-block-group',
+			'supports' => array( 'color' ),
+		),
+		'core/media-text' => array(
+			'selector' => '.wp-block-media-text',
+			'supports' => array( 'color' ),
+		),
 	);
 
-	return $selectors;
+	return $block_data;
 }
 
 /**
@@ -244,15 +287,22 @@ function gutenberg_experimental_global_styles_get_selectors() {
  * @return string CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $styles ) {
-	$css_rules = '';
-	$selectors = gutenberg_experimental_global_styles_get_selectors();
+	$css_rules  = '';
+	$block_data = gutenberg_experimental_global_styles_get_block_data();
 
 	foreach ( $styles as $block_name => $block_style ) {
-		$css_rules .= $selectors[ $block_name ] . " {\n";
+		$css_declarations = '';
 		foreach ( $block_style as $property => $value ) {
-			$css_rules .= "\t" . $property . ': ' . $value . ";\n";
+			// Only convert to CSS the style attributes the block has declared support for.
+			if ( in_array( $property, $block_data[ $block_name ]['supports'], true ) ) {
+				$css_declarations .= "\t" . $property . ': ' . $value . ";\n";
+			}
 		}
-		$css_rules .= "}\n";
+		if ( '' !== $css_declarations ) {
+			$css_rules .= $block_data[ $block_name ]['selector'] . " {\n";
+			$css_rules .= $css_declarations;
+			$css_rules .= "}\n";
+		}
 	}
 
 	return $css_rules;
@@ -316,7 +366,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 
 	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
 	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['blocks'] );
-	$inline_style .= gutenberg_experimental_global_styles_resolver_styles( $global_styles['patterns'] );
 	if ( empty( $inline_style ) ) {
 		return;
 	}
