@@ -46,26 +46,32 @@ export default class Picker extends Component {
 	}
 
 	onCellPress( value ) {
-		this.props.onChange( value );
+		const { onChange } = this.props;
+		onChange( value );
 		this.onClose();
 	}
 
 	render() {
+		const { options, leftAlign, hideCancelButton } = this.props;
+		const { isVisible } = this.state;
+
 		return (
 			<BottomSheet
-				isVisible={ this.state.isVisible }
+				isVisible={ isVisible }
 				onClose={ this.onClose }
 				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
 				<View>
-					{ this.props.options.map( ( option, index ) => (
+					{ options.map( ( option, index ) => (
 						<>
-							{ option.separated && <Separator /> }
+							{ options.length > 1 && option.separated && (
+								<Separator />
+							) }
 							<BottomSheet.Cell
 								icon={ option.icon }
 								key={ index }
-								leftAlign={ this.props.leftAlign }
+								leftAlign={ leftAlign }
 								label={ option.label }
 								separatorType={ 'none' }
 								onPress={ () =>
@@ -76,7 +82,7 @@ export default class Picker extends Component {
 							/>
 						</>
 					) ) }
-					{ ! this.props.hideCancelButton && (
+					{ ! hideCancelButton && (
 						<BottomSheet.Cell
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }
