@@ -68,9 +68,7 @@ export default function WelcomeGuide() {
 					),
 				},
 				{
-					image: (
-						<BlockLibraryImage />
-					),
+					image: <BlockLibraryImage />,
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
@@ -93,7 +91,7 @@ export default function WelcomeGuide() {
 				},
 				{
 					image: (
-						<DocumentationImage className="edit-post-welcome-guide__image" />
+						<DocumentationImage />
 					),
 					content: (
 						<>
