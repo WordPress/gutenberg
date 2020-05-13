@@ -6,6 +6,20 @@
 	&__image {
 		background: #1386bf;
 		height: 240px;
+
+		&__01alt {
+			display: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			&__01alt {
+				display: block;
+			}
+
+			&__01 {
+				display: none;
+			}
+		}
 	}
 
 	&__heading {
