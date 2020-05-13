@@ -1,7 +1,7 @@
-## Get involved in triage
+### Get involved in triage
 To keep the issue list healthy, it needs to be triaged regularly. Triage is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need. Anyone can help triage, although you’ll need to be a member of the triage team for the Gutenberg repository to modify an issue’s labels or edit its title.
 
-## Join the triage team
+### Join the triage team
 The triage team is an open group of people with a particular role of making sure triage is done consistently across the Gutenberg repo. There are various types of triage which happen:
 
 * Regular self triage sessions done by members on their own time.
@@ -16,7 +16,7 @@ These are the expectations of being a triage team member:
 
 If you would like to join this team, simply ask in #core-editor [Slack](https://make.wordpress.org/chat/) at any time. 
 
-## Getting started
+### Getting started
 To start simply choose from one of these filtered lists of issues below. Note: You can find these filters by selecting the “Sort” option from the [overall Issues page](https://github.com/wordpress/gutenberg/issues).
 
 * All Gutenberg issues [without an assigned label](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+no%3Alabel+sort%3Aupdated-asc). Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
@@ -52,7 +52,14 @@ Generally speaking, the following labels are very useful for triaging issues and
 * Needs Testing - when old bugs seem like they are no longer relevant.
 * [Type] Help Request - when someone is asking for general help with setup/implementation. 
 
-## Design specific triage
+### Release specific triage
+Here are some guidelines to follow when doing triage specifically around the time of a release. This is important to differentiate compared to general triage so problematic, release blocking bugs are properly identified and solutions are found.
+
+* If a bug is introduced in a release candidate (RC) and it's going to break many workflows, add it to the RC milestone and flag in the #core-editor channel in WordPress.org slack.
+* If a bug was introduced in the most recent version, and a next RC hasn’t yet happened, ideally the developers can push to fix it prior to RC! The amount of push for a fix should scale proportional to the potential of breakage. In this case, add to the RC milestone and, if deemed urgent, ping in the #core-editor channel in WordPress.org slack. 
+* If a bug wasn’t introduced in the most recent version, do not add a milestone. Instead, use labels like “[Priority] High” if it’s a pressing issue, and if needed you can call attention to it in the weekly core meetings. 
+
+### Design specific triage
 Along with the general triage flows listed previously, there are some specific additions to the flows for more design-centric triage for design minded folks participating in triage. 
 
 * PR testing and reviews: this should be your first stop for daily self triage. 
