@@ -1,4 +1,4 @@
-name: iOS React Native E2E Tests
+name: React Native E2E Tests (iOS)
 on: push
 
 jobs:
