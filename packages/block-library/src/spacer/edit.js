@@ -70,7 +70,6 @@ const SpacerEdit = ( {
 						label={ __( 'Height in pixels' ) }
 						min={ MIN_SPACER_HEIGHT }
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						separatorType={ 'none' }
 						value={ height }
 						onChange={ updateHeight }
 						step={ Platform.OS === 'web' ? 10 : 1 }

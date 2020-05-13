@@ -33,6 +33,7 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
+	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -49,6 +50,8 @@ import {
 	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
 } from './shared';
 
 /**
@@ -233,6 +236,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		contentPosition,
 		id,
 		backgroundType,
 		dimRatio,
@@ -293,6 +297,13 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
+				<BlockAlignmentMatrixToolbar
+					label={ __( 'Change content position' ) }
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( { contentPosition: nextPosition } )
+					}
+				/>
 				{ hasBackground && (
 					<MediaReplaceFlow
 						mediaId={ id }
@@ -439,14 +450,22 @@ function CoverEdit( {
 		);
 	}
 
-	const classes = classnames( className, dimRatioToClass( dimRatio ), {
-		'is-dark-theme': isDark,
-		'has-background-dim': dimRatio !== 0,
-		'has-parallax': hasParallax,
-		[ overlayColor.class ]: overlayColor.class,
-		'has-background-gradient': gradientValue,
-		[ gradientClass ]: ! url && gradientClass,
-	} );
+	const classes = classnames(
+		className,
+		dimRatioToClass( dimRatio ),
+		{
+			'is-dark-theme': isDark,
+			'has-background-dim': dimRatio !== 0,
+			'has-parallax': hasParallax,
+			[ overlayColor.class ]: overlayColor.class,
+			'has-background-gradient': gradientValue,
+			[ gradientClass ]: ! url && gradientClass,
+			'has-custom-content-position': ! isContentPositionCenter(
+				contentPosition
+			),
+		},
+		getPositionClassName( contentPosition )
+	);
 
 	return (
 		<>

@@ -1212,6 +1212,8 @@ export function initialPosition( state, action ) {
 		return action.initialPosition;
 	} else if ( action.type === 'REMOVE_BLOCKS' ) {
 		return state;
+	} else if ( action.type === 'START_TYPING' ) {
+		return state;
 	}
 
 	// Reset the state by default (for any action not handled).

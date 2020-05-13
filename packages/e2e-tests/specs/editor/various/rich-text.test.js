@@ -256,6 +256,9 @@ describe( 'RichText', () => {
 	it( 'should handle Home and End keys', async () => {
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for rich text editor to load.
+		await page.waitForSelector( '.block-editor-rich-text__editable' );
+
 		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '12' );
 		await pressKeyWithModifier( 'primary', 'b' );

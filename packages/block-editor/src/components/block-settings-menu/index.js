@@ -13,9 +13,12 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	ClipboardButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreHorizontal } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -56,6 +59,8 @@ export function BlockSettingsMenu( { clientIds } ) {
 		};
 	}, [] );
 
+	const [ hasCopied, setHasCopied ] = useState();
+
 	return (
 		<BlockActions clientIds={ clientIds }>
 			{ ( {
@@ -66,6 +71,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 				onInsertAfter,
 				onInsertBefore,
 				onRemove,
+				blocks,
 			} ) => (
 				<ToolbarGroup>
 					<ToolbarItem>
@@ -98,6 +104,23 @@ export function BlockSettingsMenu( { clientIds } ) {
 													}
 												/>
 											) }
+											<ClipboardButton
+												text={ () =>
+													serialize( blocks )
+												}
+												role="menuitem"
+												className="components-menu-item__button"
+												onCopy={ () => {
+													setHasCopied( true );
+												} }
+												onFinishCopy={ () =>
+													setHasCopied( false )
+												}
+											>
+												{ hasCopied
+													? __( 'Copied!' )
+													: __( 'Copy' ) }
+											</ClipboardButton>
 											{ canDuplicate && (
 												<MenuItem
 													onClick={ flow(

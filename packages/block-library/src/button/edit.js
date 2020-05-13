@@ -71,6 +71,9 @@ function URLPicker( {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
+
+		// prevents default behaviour for event
+		return false;
 	};
 	const linkControl = isURLPickerOpen && (
 		<Popover
