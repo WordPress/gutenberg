@@ -8,7 +8,7 @@ use \WP_REST_Response;
 class DeleteOperation extends Operation {
 
 	public function doValidate() {
-		return $this->controller->delete_item_validate( $this->input['id'], $this->input );
+		return $this->controller->delete_item_validate( $this->input );
 	}
 
 	/**
