@@ -23,7 +23,11 @@ export default function CreateMenuForm( { onCancel } ) {
 				{ __( 'Create menu' ) }
 			</Button>
 			{ onCancel && (
-				<Button isLink onClick={ onCancel }>
+				<Button
+					className="edit-navigation-menu-editor__cancel-create-menu-button"
+					isSecondary
+					onClick={ onCancel }
+				>
 					{ __( 'Cancel' ) }
 				</Button>
 			) }
