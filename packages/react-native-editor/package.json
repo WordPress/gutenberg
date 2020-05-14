@@ -115,7 +115,7 @@
     "test:e2e:build-app:android": "npm run test:e2e:bundle:android && cd android && ./gradlew clean && ./gradlew assembleDebug",
     "test:e2e:install-app:android": "cd android && ./gradlew installDebug",
     "test:e2e:bundle:ios": "mkdir -p ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app && react-native bundle --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle --assets-dest=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app",
-    "test:e2e:build-app:ios": "npm run ios -- --configuration Release --no-packager --simulator 'iPhone 11 (13.4)'",
+    "test:e2e:build-app:ios": "npm run test:e2e:bundle:ios && npm run ios -- --configuration Release --no-packager --simulator 'iPhone 11 (13.4)'",
     "build:gutenberg": "cd gutenberg && npm ci && npm run build",
     "clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run cache clean; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman; npm run clean:node; npm run clean:pot",
     "clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
