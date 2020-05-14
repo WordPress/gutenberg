@@ -148,8 +148,12 @@ const useDynamicMenuItemPlaceholders = (
 				const [ clientIdToProcess, idx ] = getNextProcessableClientId();
 				if ( ! clientIdToProcess ) {
 					if ( processing.queue.length ) {
-						// @TODO: WHAT NOW?
-						alert( 'We are doomed!' );
+						// Rudimentary assertion - suggestions welcome!
+						// eslint-disable-next-line no-console
+						console.error(
+							'getNextProcessableClientId() did not return anything even though the processing queue is not empty'
+						);
+						return;
 					}
 					break;
 				}
@@ -220,6 +224,7 @@ const useDynamicMenuItemPlaceholders = (
 };
 
 const useSaveBlocks = ( menuId, blocks, menuItemsRef ) => {
+	const { receiveEntityRecords } = useDispatch( 'core' );
 	const prepareRequestItem = ( block, parentId ) => {
 		const menuItem = omit(
 			menuItemsRef.current[ block.clientId ] || {},
@@ -275,6 +280,13 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef ) => {
 		// 	undefined,
 		// 	true
 		// );
+		receiveEntityRecords(
+			'root',
+			'menuItem',
+			Object.values( saved ),
+			{},
+			false
+		);
 	};
 
 	return saveBlocks;
