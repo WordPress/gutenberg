@@ -1,20 +1,13 @@
 /**
  * External dependencies
  */
-
-import {
-	groupBy,
-	omitBy,
-	isNil,
-	keyBy,
-	omit,
-} from 'lodash';
+import { groupBy, omitBy, isNil, keyBy, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
@@ -49,13 +42,24 @@ export default function useNavigationBlocks( menuId ) {
 		[ menuId ]
 	);
 
-	const { receiveEntityRecords, saveMenuItem } = useDispatch( 'core' );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
+	const [ blocks, setBlocks, menuItemsRef ] = useNavigationBlocksModel(
+		menuItems
+	);
 
+	const [ onFinished ] = useDynamicMenuItemPlaceholders(
+		menuId,
+		blocks,
+		menuItemsRef
+	);
+
+	const saveBlocks = useSaveBlocks( menuId, blocks, menuItemsRef );
+
+	return [ blocks, setBlocks, () => onFinished( saveBlocks ) ];
+}
+
+const useNavigationBlocksModel = ( menuItems ) => {
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
-
-	usePlaceholderMenuItems( menuId, blocks, menuItemsRef );
 
 	useEffect( () => {
 		if ( ! menuItems ) {
@@ -63,9 +67,7 @@ export default function useNavigationBlocks( menuId ) {
 		}
 
 		const itemsByParentID = groupBy( menuItems, 'parent' );
-
 		menuItemsRef.current = {};
-
 		const createMenuItemBlocks = ( items ) => {
 			const innerBlocks = [];
 			if ( ! items ) {
@@ -94,66 +96,20 @@ export default function useNavigationBlocks( menuId ) {
 		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
 	}, [ menuItems ] );
 
-	const prepareRequestItem = ( block, parentId ) => {
-		const menuItem = omit(
-			menuItemsRef.current[ block.clientId ] || {},
-			'_links'
-		);
+	return [ blocks, setBlocks, menuItemsRef ];
+};
 
-		return {
-			...menuItem,
-			...createMenuItemAttributesFromBlock( block ),
-			clientId: block.clientId,
-			menus: menuId,
-			parent: parentId,
-			menu_order: 0,
-		};
-	};
-
-	const prepareRequestData = ( nestedBlocks, parentId = 0 ) =>
-		nestedBlocks.map( ( block ) => {
-			const data = prepareRequestItem( block, parentId );
-			return {
-				...data,
-				children: prepareRequestData( block.innerBlocks, data.id ),
-			};
-		} );
-
-	const saveBlocks = async () => {
-		const { clientId, innerBlocks } = blocks[ 0 ];
-		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
-		const requestData = prepareRequestData( innerBlocks, parentItemId );
-
-		const saved = await apiFetch( {
-			path: `/__experimental/menu-items/save-hierarchy?menus=${ menuId }`,
-			method: 'PUT',
-			data: { tree: requestData },
-		} );
-
-		const kind = 'root';
-		const name = 'menuItem';
-		// receiveEntityRecords(
-		// 	kind,
-		// 	name,
-		// 	saved,
-		// 	// {
-		// 	// 	...item.data,
-		// 	// 	title: { rendered: 'experimental' },
-		// 	// },
-		// 	undefined,
-		// 	true
-		// );
-	};
-
-	return [ blocks, setBlocks, saveBlocks ];
-}
-
-const usePlaceholderMenuItems = ( menuId, currentBlocks, menuItemsRef ) => {
+const useDynamicMenuItemPlaceholders = (
+	menuId,
+	currentBlocks,
+	menuItemsRef
+) => {
 	const blocks = useDebouncedValue( currentBlocks, 800 );
 	const blocksByIdRef = useRef( {} );
 	const processingRef = useRef( {
 		queue: [],
 		running: false,
+		notify: [],
 	} );
 
 	useEffect(
@@ -202,14 +158,22 @@ const usePlaceholderMenuItems = ( menuId, currentBlocks, menuItemsRef ) => {
 			}
 		} finally {
 			processing.running = false;
+			notify();
+		}
+	}
+
+	function notify() {
+		const listeners = processingRef.current.notify;
+		for ( let i = listeners.length - 1; i >= 0; i-- ) {
+			listeners[ i ]();
+			listeners.splice( i, 1 );
 		}
 	}
 
 	function getNextProcessableClientId() {
 		const queue = processingRef.current.queue;
 		// While loop makes it possible to safely mutate the list
-		let i = queue.length;
-		while ( i-- >= 0 ) {
+		for ( let i = queue.length - 1; i >= 0; i-- ) {
 			const clientId = queue[ i ];
 
 			// Blocks was removed before we got to process it
@@ -226,11 +190,7 @@ const usePlaceholderMenuItems = ( menuId, currentBlocks, menuItemsRef ) => {
 
 			return [ clientId, i ];
 		}
-
-		createSuccessNotice( __( 'Navigation saved.' ), {
-			type: 'snackbar',
-		} );
-	};
+	}
 
 	async function createPlaceholderMenuItem( clientId ) {
 		const block = blocksByIdRef.current[ clientId ];
@@ -247,6 +207,77 @@ const usePlaceholderMenuItems = ( menuId, currentBlocks, menuItemsRef ) => {
 		menuItemsRef.current[ clientId ] = createdItem;
 		return createdItem;
 	}
+
+	const onFinished = function( callback ) {
+		if ( ! processingRef.current.running ) {
+			callback();
+			return;
+		}
+		processingRef.current.notify.push( callback );
+	};
+
+	return [ onFinished ];
+};
+
+const useSaveBlocks = ( menuId, blocks, menuItemsRef ) => {
+	const prepareRequestItem = ( block, parentId ) => {
+		const menuItem = omit(
+			menuItemsRef.current[ block.clientId ] || {},
+			'_links'
+		);
+
+		return {
+			...menuItem,
+			...createMenuItemAttributesFromBlock( block ),
+			clientId: block.clientId,
+			menus: menuId,
+			parent: parentId,
+			menu_order: 0,
+		};
+	};
+
+	const prepareRequestData = ( nestedBlocks, parentId = 0 ) =>
+		nestedBlocks.map( ( block ) => {
+			const data = prepareRequestItem( block, parentId );
+			return {
+				...data,
+				children: prepareRequestData( block.innerBlocks, data.id ),
+			};
+		} );
+
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
+
+	const saveBlocks = async () => {
+		const { clientId, innerBlocks } = blocks[ 0 ];
+		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
+		const requestData = prepareRequestData( innerBlocks, parentItemId );
+
+		const saved = await apiFetch( {
+			path: `/__experimental/menu-items/save-hierarchy?menus=${ menuId }`,
+			method: 'PUT',
+			data: { tree: requestData },
+		} );
+
+		createSuccessNotice( __( 'Navigation saved.' ), {
+			type: 'snackbar',
+		} );
+
+		const kind = 'root';
+		const name = 'menuItem';
+		// receiveEntityRecords(
+		// 	kind,
+		// 	name,
+		// 	saved,
+		// 	// {
+		// 	// 	...item.data,
+		// 	// 	title: { rendered: 'experimental' },
+		// 	// },
+		// 	undefined,
+		// 	true
+		// );
+	};
+
+	return saveBlocks;
 };
 
 const useDebouncedValue = ( value, timeout ) => {
