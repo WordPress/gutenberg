@@ -155,18 +155,18 @@ function gutenberg_experimental_global_styles_get_core() {
 }
 
 /**
- * Return theme's Global Styles. It also fetches the editor palettes
- * declared via add_theme_support.
+ * Returns the registered theme presets, if any.
  *
- * @return array Global Styles tree.
+ * @return array
  */
-function gutenberg_experimental_global_styles_get_theme() {
-	$theme_supports = array();
+function gutenberg_experimental_global_styles_get_theme_presets() {
+	$theme_presets = gutenberg_experimental_global_styles_normalize_shape( array() );
+
 	// Take colors from declared theme support.
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
 		foreach ( $theme_colors as $color ) {
-			$theme_supports['preset']['color'][ $color['slug'] ] = $color['color'];
+			$theme_presets['preset']['color'][ $color['slug'] ] = $color['color'];
 		}
 	}
 
@@ -174,7 +174,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
 	if ( is_array( $theme_gradients ) ) {
 		foreach ( $theme_gradients as $gradient ) {
-			$theme_supports['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_presets['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
 		}
 	}
 
@@ -182,9 +182,21 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
 	if ( is_array( $theme_font_sizes ) ) {
 		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_supports['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_presets['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
 		}
 	}
+
+	return $theme_presets;
+}
+
+/**
+ * Return theme's Global Styles. It also fetches the editor palettes
+ * declared via add_theme_support.
+ *
+ * @return array Global Styles tree.
+ */
+function gutenberg_experimental_global_styles_get_theme() {
+	$theme_presets = gutenberg_experimental_global_styles_get_theme_presets();
 
 	/*
 	 * We want the presets declared in theme.json
@@ -205,7 +217,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	);
 
 	$theme_config['styles']['globals'] = array_merge_recursive(
-		$theme_supports,
+		$theme_presets,
 		$theme_config['styles']['globals']
 	);
 
