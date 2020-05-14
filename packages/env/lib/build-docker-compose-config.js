@@ -133,7 +133,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				user: cliUser,
 			},
 			'tests-cli': {
-				depends_on: [ 'wordpress' ],
+				depends_on: [ 'tests-wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
 				user: cliUser,
@@ -144,7 +144,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			phpunit: {
 				image: 'wordpressdevelop/phpunit',
-				depends_on: [ 'wordpress' ],
+				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,
 					'phpunit-uploads:/var/www/html/wp-content/uploads',
