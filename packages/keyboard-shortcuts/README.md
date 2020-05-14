@@ -1,6 +1,6 @@
 # Keyboard Shortcuts
 
-Keyboard shortcuts is a generic package that allow registering and modifying shortcuts.
+Keyboard shortcuts is a generic package that allows registering and modifying shortcuts.
 
 ## Installation
 
