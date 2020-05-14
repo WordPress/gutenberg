@@ -6,7 +6,13 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, Panel, PanelBody, TextControl } from '@wordpress/components';
+import {
+	Button,
+	Panel,
+	PanelBody,
+	TextControl,
+	withFocusReturn,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -16,7 +22,7 @@ const noticeId = 'edit-navigation-create-menu-error';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export default function CreateMenuForm( { onCancel, menus } ) {
+export function CreateMenuForm( { onCancel, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { isCreatingMenu } = useSelect( ( select ) => {
 		const { getIsResolving } = select( 'core' );
@@ -96,3 +102,5 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 		</Panel>
 	);
 }
+
+export default withFocusReturn( CreateMenuForm );
