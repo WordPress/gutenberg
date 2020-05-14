@@ -63,6 +63,11 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 			<PanelBody title={ __( 'Create navigation menu' ) }>
 				<form onSubmit={ onCreateMenu }>
 					<TextControl
+						// Disable reason - autoFocus is legitimate in this usage,
+						// The first focusable on the form should be focused,
+						// which is this element.
+						// eslint-disable-next-line jsx-a11y/no-autofocus
+						autoFocus
 						label={ __( 'Menu name' ) }
 						value={ menuName }
 						onChange={ setMenuName }
