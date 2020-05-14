@@ -196,20 +196,25 @@ function gutenberg_experimental_global_styles_get_theme() {
 	 * https://github.com/WordPress/gutenberg/issues/20588
 	 *
 	 */
-	$theme_styles = gutenberg_experimental_global_styles_get_from_file(
+	$theme_config = gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
 	);
 
-	if ( ! array_key_exists( 'globals', $theme_styles ) ) {
-		$theme_styles['globals'] = array();
+	$theme_styles = array();
+	if ( array_key_exists( 'styles', $theme_config ) ) {
+		$theme_styles = $theme_config['styles'];
 	}
 
-	$theme_styles['globals'] = array_merge_recursive(
+	if ( ! array_key_exists( 'globals', $theme_styles ) ) {
+		$theme_config['styles']['globals'] = array();
+	}
+
+	$theme_config['styles']['globals'] = array_merge_recursive(
 		$theme_supports,
-		$theme_styles['globals']
+		$theme_config['styles']['globals']
 	);
 
-	return $theme_styles;
+	return $theme_config;
 }
 
 /**
