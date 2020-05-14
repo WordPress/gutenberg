@@ -49,7 +49,10 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					{ ! hasMenus && (
 						<p>{ __( 'Create your first menu below.' ) }</p>
 					) }
-					{ hasMenus && (
+					{ hasMenus && ! menuId && (
+						<p>{ __( 'Create a new menu below.' ) }</p>
+					) }
+					{ hasMenus && !! menuId && (
 						<>
 							<SelectControl
 								className="edit-navigation-menus-editor__menu-select-control"
@@ -84,6 +87,13 @@ export default function MenusEditor( { blockEditorSettings } ) {
 							setMenuId();
 						}
 					} }
+					onCancelMenuCreation={
+						// User can only cancel out of menu creation if there
+						// are other menus to fall back to showing.
+						hasMenus
+							? () => setMenuId( stateMenus[ 0 ] )
+							: undefined
+					}
 				/>
 			) }
 		</>

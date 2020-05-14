@@ -19,6 +19,7 @@ export default function MenuEditor( {
 	menuId,
 	blockEditorSettings,
 	onDeleteMenu,
+	onCancelMenuCreation,
 } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -49,6 +50,7 @@ export default function MenuEditor( {
 					saveBlocks={ saveBlocks }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
+					onCancelMenuCreation={ onCancelMenuCreation }
 				/>
 			</BlockEditorProvider>
 		</div>

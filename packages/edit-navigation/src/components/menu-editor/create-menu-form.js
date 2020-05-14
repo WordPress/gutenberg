@@ -6,7 +6,7 @@ import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-export default function CreateMenuForm() {
+export default function CreateMenuForm( { onCancel } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { saveMenu } = useDispatch( 'core' );
 	const createMenu = () => saveMenu( { name: menuName } );
@@ -22,6 +22,11 @@ export default function CreateMenuForm() {
 			<Button type="submit" isPrimary onClick={ createMenu }>
 				{ __( 'Create menu' ) }
 			</Button>
+			{ onCancel && (
+				<Button isLink onClick={ onCancel }>
+					{ __( 'Cancel' ) }
+				</Button>
+			) }
 		</form>
 	);
 }
