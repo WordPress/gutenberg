@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
 	SelectControl,
 	Button,
@@ -16,9 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useMenuLocations from './use-menu-locations';
 
-export default function MenuLocationsEditor() {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
-
+export default function MenuLocationsEditor( { menus } ) {
 	const [
 		menuLocations,
 		saveMenuLocations,

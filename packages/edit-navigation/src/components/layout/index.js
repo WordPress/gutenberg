@@ -15,8 +15,11 @@ import { __ } from '@wordpress/i18n';
  */
 import MenusEditor from '../menus-editor';
 import MenuLocationsEditor from '../menu-locations-editor';
+import useMenus from './use-menus.js';
 
 export default function Layout( { blockEditorSettings } ) {
+	const [ menus, setMenus, currentMenu, setCurrentMenu ] = useMenus();
+
 	return (
 		<>
 			<SlotFillProvider>
@@ -43,10 +46,14 @@ export default function Layout( { blockEditorSettings } ) {
 											blockEditorSettings={
 												blockEditorSettings
 											}
+											menus={ menus }
+											setMenus={ setMenus }
+											currentMenu={ currentMenu }
+											setCurrentMenu={ setCurrentMenu }
 										/>
 									) }
 									{ tab.name === 'menu-locations' && (
-										<MenuLocationsEditor />
+										<MenuLocationsEditor menus={ menus } />
 									) }
 								</>
 							) }

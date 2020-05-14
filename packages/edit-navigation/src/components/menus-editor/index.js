@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
 import { Card, CardBody, Spinner, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -11,20 +9,14 @@ import { __ } from '@wordpress/i18n';
  */
 import MenuEditor from '../menu-editor';
 
-export default function MenusEditor( { blockEditorSettings } ) {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus() );
-
-	const [ menuId, setMenuId ] = useState( 0 );
-	const [ stateMenus, setStateMenus ] = useState( null );
-
-	useEffect( () => {
-		if ( menus?.length ) {
-			setStateMenus( menus );
-			setMenuId( menus[ 0 ].id );
-		}
-	}, [ menus ] );
-
-	if ( ! stateMenus ) {
+export default function MenusEditor( {
+	blockEditorSettings,
+	menus,
+	setMenus,
+	currentMenu,
+	setCurrentMenu,
+} ) {
+	if ( ! menus ) {
 		return <Spinner />;
 	}
 
@@ -35,27 +27,27 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					<SelectControl
 						className="edit-navigation-menus-editor__menu-select-control"
 						label={ __( 'Select navigation to edit:' ) }
-						options={ stateMenus.map( ( menu ) => ( {
+						options={ menus.map( ( menu ) => ( {
 							value: menu.id,
 							label: menu.name,
 						} ) ) }
 						onChange={ ( selectedMenuId ) =>
-							setMenuId( selectedMenuId )
+							setCurrentMenu( selectedMenuId )
 						}
 					/>
 				</CardBody>
 			</Card>
-			{ !! menuId && (
+			{ !! currentMenu && (
 				<MenuEditor
-					menuId={ menuId }
+					menuId={ currentMenu }
 					blockEditorSettings={ blockEditorSettings }
 					onDeleteMenu={ ( deletedMenu ) => {
-						const newStateMenus = stateMenus.filter( ( menu ) => {
+						const newStateMenus = menus.filter( ( menu ) => {
 							return menu.id !== deletedMenu;
 						} );
-						setStateMenus( newStateMenus );
+						setMenus( newStateMenus );
 						if ( newStateMenus.length ) {
-							setMenuId( newStateMenus[ 0 ].id );
+							setCurrentMenu( newStateMenus[ 0 ].id );
 						}
 					} }
 				/>
