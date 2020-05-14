@@ -1,6 +1,5 @@
 .wp-block-cover-image,
 .wp-block-cover {
-
 	&.components-placeholder h2 {
 		color: inherit;
 	}
@@ -23,13 +22,14 @@
 	.wp-block-cover__placeholder-background-options {
 		width: 100%;
 	}
+}
 
-	// Apply max-width to floated items that have no intrinsic width.
-	[data-align="left"] &,
-	[data-align="right"] & {
-		max-width: $content-width / 2;
-		width: 100%;
-	}
+[data-align="left"] > .wp-block-cover,
+[data-align="right"] > .wp-block-cover,
+[data-align="left"] > .wp-block-cover-image,
+[data-align="right"] > .wp-block-cover-image {
+	max-width: $content-width / 2;
+	width: 100%;
 }
 
 .block-library-cover__reset-button {

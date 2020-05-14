@@ -30,13 +30,13 @@ import {
 	AfterIconWrapper,
 	BeforeIconWrapper,
 	InputRange,
-	InputNumber,
 	Root,
 	Track,
 	ThumbWrapper,
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
+import InputField from './input-field';
 import { useRtl } from '../utils/rtl';
 
 const BaseRangeControl = forwardRef(
@@ -61,6 +61,7 @@ const BaseRangeControl = forwardRef(
 			onFocus = noop,
 			onMouseMove = noop,
 			onMouseLeave = noop,
+			resetFallbackValue,
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
 			step = 1,
@@ -122,13 +123,6 @@ const BaseRangeControl = forwardRef(
 		const enableTooltip = showTooltipProp !== false && isFinite( value );
 
 		const handleOnChange = ( event ) => {
-			if (
-				event.target.checkValidity &&
-				! event.target.checkValidity()
-			) {
-				return;
-			}
-
 			const nextValue = parseFloat( event.target.value );
 
 			if ( isNaN( nextValue ) ) {
@@ -141,8 +135,30 @@ const BaseRangeControl = forwardRef(
 		};
 
 		const handleOnReset = () => {
-			setValue( null );
-			onChange( undefined );
+			let resetValue = parseFloat( resetFallbackValue );
+			let onChangeResetValue = resetValue;
+
+			if ( isNaN( resetValue ) ) {
+				resetValue = null;
+				onChangeResetValue = undefined;
+			}
+
+			setValue( resetValue );
+
+			/**
+			 * Previously, this callback would always receive undefined as
+			 * an argument. This behavior is unexpected, specifically
+			 * when resetFallbackValue is defined.
+			 *
+			 * The value of undefined is not ideal. Passing it through
+			 * to internal <input /> elements would change it from a
+			 * controlled component to an uncontrolled component.
+			 *
+			 * For now, to minimize unexpected regressions, we're going to
+			 * preserve the undefined callback argument, except when a
+			 * resetFallbackValue is defined.
+			 */
+			onChange( onChangeResetValue );
 		};
 
 		const handleShowTooltip = () => setShowTooltip( true );
@@ -250,16 +266,14 @@ const BaseRangeControl = forwardRef(
 						</AfterIconWrapper>
 					) }
 					{ withInputField && (
-						<InputNumber
-							aria-label={ label }
-							className="components-range-control__number"
+						<InputField
 							disabled={ disabled }
-							inputMode="decimal"
+							label={ label }
 							max={ max }
 							min={ min }
 							onChange={ handleOnChange }
+							onReset={ handleOnReset }
 							step={ step }
-							type="number"
 							value={ inputSliderValue }
 						/>
 					) }

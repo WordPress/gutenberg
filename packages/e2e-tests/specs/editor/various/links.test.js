@@ -453,12 +453,6 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
-
 		await waitForAutoFocus();
 		const isInURLInput = await page.evaluate(
 			() => !! document.activeElement.closest( '.block-editor-url-input' )
@@ -516,6 +510,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"w.org") and @target="_blank"]'
+		);
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Regression Test: This verifies that the UI is updated according to
@@ -531,11 +530,6 @@ describe( 'Links', () => {
 
 		// Edit link.
 		await pressKeyWithModifier( 'primary', 'k' );
-		await page.waitForSelector(
-			':focus.block-editor-link-control__search-item-title'
-		);
-		await page.keyboard.press( 'Tab' ); // Shift focus to "Edit" button
-		await page.keyboard.press( 'Enter' ); // Click "Edit" button
 		await waitForAutoFocus();
 		await pressKeyWithModifier( 'primary', 'a' );
 		await page.keyboard.type( 'wordpress.org' );
@@ -556,6 +550,11 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Tab' );
 		// Uncheck the checkbox.
 		await page.keyboard.press( 'Space' );
+
+		// Wait for Gutenberg to finish the job.
+		await page.waitForXPath(
+			'//a[contains(@href,"wordpress.org") and not(@target)]'
+		);
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

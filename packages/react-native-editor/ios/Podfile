@@ -39,8 +39,9 @@ target 'gutenberg' do
   pod 'Folly', :podspec => '../../../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'RNTAztecView', :path => '../../react-native-aztec/RNTAztecView.podspec'
   #Use for testing non official versions of Aztec
-  #pod 'WordPress-Aztec-iOS', :git => '../../https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => 'edf1c9ae758b946e76bb9de6efc9135d2c2a4b43'
+  #pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => '29dff741f4b19435d75f21179e27766337de8e9d'
   pod 'Gutenberg', :path => '../../react-native-bridge/Gutenberg.podspec'
+
 
   target 'gutenbergTests' do
     inherit! :search_paths

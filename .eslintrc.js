@@ -131,6 +131,7 @@ module.exports = {
 			],
 			rules: {
 				'import/no-extraneous-dependencies': 'error',
+				'import/no-unresolved': 'error',
 			},
 		},
 		{
@@ -170,6 +171,12 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
+			},
+		},
+		{
+			files: [ 'bin/**/*.js' ],
+			rules: {
+				'no-console': 'off',
 			},
 		},
 	],

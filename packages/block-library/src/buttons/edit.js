@@ -4,6 +4,7 @@
 import {
 	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
 	InnerBlocks,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 /**
@@ -19,9 +20,9 @@ const alignmentHooksSetting = {
 	isEmbedButton: true,
 };
 
-function ButtonsEdit( { className } ) {
+function ButtonsEdit() {
 	return (
-		<div className={ className }>
+		<Block.div>
 			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
@@ -29,7 +30,7 @@ function ButtonsEdit( { className } ) {
 					__experimentalMoverDirection="horizontal"
 				/>
 			</AlignmentHookSettingsProvider>
-		</div>
+		</Block.div>
 	);
 }
 

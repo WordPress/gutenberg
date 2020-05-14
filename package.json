@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "7.9.1",
+	"version": "8.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -120,7 +120,7 @@
 		"@wordpress/prettier-config": "file:packages/prettier-config",
 		"@wordpress/project-management-automation": "file:packages/project-management-automation",
 		"@wordpress/scripts": "file:packages/scripts",
-		"appium": "1.17.0",
+		"appium": "1.17.1",
 		"babel-jest": "24.9.0",
 		"babel-loader": "8.1.0",
 		"babel-plugin-emotion": "10.0.33",
@@ -149,7 +149,7 @@
 		"husky": "3.0.5",
 		"inquirer": "7.1.0",
 		"is-equal-shallow": "0.1.3",
-		"jest": "24.9.0",
+		"jest": "25.3.0",
 		"jest-emotion": "10.0.32",
 		"jest-junit": "10.0.0",
 		"jest-serializer-enzyme": "1.0.0",
@@ -193,6 +193,7 @@
 		"worker-farm": "1.7.0"
 	},
 	"scripts": {
+		"analyze-bundles": "cross-env WP_BUNDLE_ANALYZER=1 npm run build",
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
 		"clean:package-types": "tsc --build --clean",
@@ -200,6 +201,7 @@
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build": "npm run build:packages && wp-scripts build",
+		"changelog": "./bin/changelog.js",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
@@ -213,33 +215,33 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format-js": "wp-scripts format-js",
-		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
+		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
 		"prelint-php": "npm run wp-env run composer install -- --no-interaction",
 		"lint-php": "npm run wp-env run composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
+		"lint-lockfile": "node ./bin/validate-package-lock.js",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
 		"lint:md-js": "wp-scripts lint-md-js",
 		"lint:md-docs": "wp-scripts lint-md-docs",
 		"native": "npm run --prefix packages/react-native-editor",
 		"react-native": "react-native --root packages/react-native-editor",
-		"bundle:android": "cd packages/react-native-editor && npm run bundle:android",
-		"android": "npm run react-native run-android",
-		"ios": "npm run native ios",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag next",
-		"publish:legacy": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag legacy",
+		"publish:patch": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag patch",
 		"publish:prod": "npm run clean:package-types && npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
+		"test-e2e:debug": "wp-scripts --inspect-brk test-e2e --config packages/e2e-tests/jest.config.js --puppeteer-devtools",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
+		"test-unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "wp-scripts env test-php",
@@ -265,6 +267,7 @@
 	},
 	"lint-staged": {
 		"package-lock.json": [
+			"npm run lint-lockfile",
 			"node ./bin/check-latest-npm.js"
 		],
 		"packages/*/package.json": [
@@ -298,5 +301,8 @@
 			"                                                `---'"
 		],
 		"welcome-build-command": "npm run dev"
+	},
+	"resolutions": {
+		"metro-config": "0.58.0"
 	}
 }

@@ -159,16 +159,10 @@ function render_block_core_latest_posts( $attributes ) {
  * Registers the `core/latest-posts` block on server.
  */
 function register_block_core_latest_posts() {
-	$path     = __DIR__ . '/latest-posts/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_latest_posts',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/latest-posts',
+		array(
+			'render_callback' => 'render_block_core_latest_posts',
 		)
 	);
 }

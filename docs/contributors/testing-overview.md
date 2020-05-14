@@ -351,6 +351,11 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 - [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
 
 In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+
+### Debugging Jest unit tests
+
+Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+
 ## Native mobile testing
 
 Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
@@ -382,16 +387,28 @@ or interactively
 npm run test-e2e:watch
 ```
 
-Sometimes it's useful to observe the browser while running tests. To do so you can use these environment variables:
+Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+npm run test-e2e:watch -- --puppeteer-interactive
+```
+
+You can control the speed of execution with `--puppeteer-slowmo`:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+```
+
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
-WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
+npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
 
 If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:

@@ -15,6 +15,11 @@
 		}
 	}
 
+	.components-datetime__buttons {
+		display: flex;
+		justify-content: space-between;
+	}
+
 	.components-datetime__date-help-button {
 		display: block;
 		margin-left: auto;

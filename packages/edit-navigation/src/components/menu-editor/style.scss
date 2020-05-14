@@ -19,6 +19,7 @@
 	border: 1px solid #e2e4e7;
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
@@ -65,4 +66,21 @@
 
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
 	-ms-grid-row-align: start;
+}
+
+.components-panel__header-actions {
+	margin-top: $grid-unit-20;
+	padding-bottom: $grid-unit-20;
+	margin-bottom: $grid-unit-60;
+	width: 100%;
+	text-align: right;
+	border-bottom: 1px solid $light-gray-300;
+}
+
+.components-panel__footer-actions {
+	margin-top: $grid-unit-60;
+	padding-top: $grid-unit-20;
+	width: 100%;
+	text-align: left;
+	border-top: 1px solid $light-gray-300;
 }

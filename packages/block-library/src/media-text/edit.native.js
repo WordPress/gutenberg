@@ -184,13 +184,14 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
+			isRTL,
+			wrapperProps,
 		} = this.props;
 		const {
 			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
 			verticalAlignment,
-			style,
 		} = attributes;
 		const { containerWidth } = this.state;
 
@@ -223,8 +224,7 @@ class MediaTextEdit extends Component {
 				: {} ),
 			...( isSelected && styles[ 'is-selected' ] ),
 			backgroundColor:
-				( style && style.color && style.color.background ) ||
-				backgroundColor.color,
+				wrapperProps?.style?.backgroundColor || backgroundColor.color,
 		};
 
 		const innerBlockWidth = shouldStack ? 100 : 100 - temporaryMediaWidth;
@@ -242,13 +242,13 @@ class MediaTextEdit extends Component {
 
 		const toolbarControls = [
 			{
-				icon: pullLeft,
+				icon: isRTL ? pullRight : pullLeft,
 				title: __( 'Show media on left' ),
 				isActive: mediaPosition === 'left',
 				onClick: () => setAttributes( { mediaPosition: 'left' } ),
 			},
 			{
-				icon: pullRight,
+				icon: isRTL ? pullLeft : pullRight,
 				title: __( 'Show media on right' ),
 				isActive: mediaPosition === 'right',
 				onClick: () => setAttributes( { mediaPosition: 'right' } ),
@@ -302,6 +302,7 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlockRootClientId,
 			getBlockParents,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const parents = getBlockParents( clientId, true );
@@ -317,6 +318,7 @@ export default compose(
 			isSelected: selectedBlockClientId === clientId,
 			isParentSelected,
 			isAncestorSelected,
+			isRTL: getSettings().isRTL,
 		};
 	} )
 )( MediaTextEdit );

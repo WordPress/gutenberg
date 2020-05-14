@@ -1,11 +1,28 @@
+1.28.0
+------
+* [***] New block: Pullquote
+* [**] Add support for changing background and text color in Buttons block
+* [*] Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
+* [**] Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+* [**] [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
+* [**] Update page templates to use recently added blocks
+
+1.27.1
+------
+* Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+
 1.27.0
 ------
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
-* [iOS]: Video in video blocks can now be played inline on the editor.
+* Fix bug where whitespaces at start of text blocks were being removed
+* Add support for upload options in Cover block
 * [Android] Floating toolbar, previously located above nested blocks, is now placed at the top of the screen
 * [iOS] Floating toolbar, previously located above nested blocks, is now placed at the bottom of the screen
 * Fix the icons in FloatingToolbar on RTL mode
+* [Android] Add alignment options for heading block
+* Fix Quote block so it visually reflects selected alignment
+* Fix bug where buttons in page templates were not rendering correctly on web
 
 1.26.0
 ------

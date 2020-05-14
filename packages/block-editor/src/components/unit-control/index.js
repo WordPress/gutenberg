@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
 
 const { __defaultUnits } = BaseUnitControl;
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
-	const settings = useCustomUnitsSettings();
+	const settings = useEditorFeature( '__experimentalDisableCustomUnits' );
 	const isDisabled = !! settings;
 
 	// Adjust units based on add_theme_support( 'experimental-custom-units' );
@@ -33,18 +37,6 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 
 // Hoisting statics from the BaseUnitControl
 UnitControl.__defaultUnits = __defaultUnits;
-
-/**
- * Hook that retrieves the 'experimental-custom-units' setting from add_theme_support()
- */
-function useCustomUnitsSettings() {
-	const settings = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return getSettings().__experimentalDisableCustomUnits;
-	}, [] );
-
-	return settings;
-}
 
 /**
  * Filters available units based on values defined by settings.
