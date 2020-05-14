@@ -1145,10 +1145,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $result;
 		}
 
-		$response = new WP_REST_Response();
-		$response->set_data( $this->get_menu_items( $navigation_id, true ) );
-
-		return $response;
+		return $this->get_items($request);
 	}
 
 	protected function get_nav_menu_item_cached( $id, $menu_id ) {
