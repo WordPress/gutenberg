@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, omitBy, isNil, keyBy, omit } from 'lodash';
+import { groupBy, omitBy, sortBy, isNil, keyBy, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -74,7 +74,8 @@ const useNavigationBlocksModel = ( menuItems ) => {
 				return;
 			}
 
-			for ( const item of items ) {
+			const sortedItems = sortBy( items, 'menu_order' );
+			for ( const item of sortedItems ) {
 				let menuItemInnerBlocks = [];
 				if ( itemsByParentID[ item.id ]?.length ) {
 					menuItemInnerBlocks = createMenuItemBlocks(
@@ -99,7 +100,9 @@ const useNavigationBlocksModel = ( menuItems ) => {
 	return [ blocks, setBlocks, menuItemsRef ];
 };
 
-// Creation and synchronization logic for creating menu items on the fly
+// Creation and synchronization logic for creating menu items on the fly.
+// This effects creates so many functions on each re-render - it would be great to
+// refactor it it and minimize that.
 const useDynamicMenuItemPlaceholders = (
 	menuId,
 	currentBlocks,
