@@ -358,7 +358,6 @@ function gutenberg_experimental_global_styles_resolver_presets( $block_selector,
 		return $css_rule;
 	}
 
-	error_log( 'declarations ' . print_r( $css_declarations, true ) );
 	$css_rule .= $block_selector . " {\n";
 	foreach ( $css_declarations as $property => $value ) {
 		$css_rule .= "\t" . $property . ': ' . $value . ";\n";
