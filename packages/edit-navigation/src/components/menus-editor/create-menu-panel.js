@@ -18,22 +18,14 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export default function CreateMenuForm( { onCancel, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const { hasStartedCreatingMenu, hasFinishedCreatingMenu } = useSelect(
-		( select ) => {
-			const { hasStartedResolution, hasFinishedResolution } = select(
-				'core'
-			);
-			return {
-				hasStartedCreatingMenu: hasStartedResolution( 'saveMenu' ),
-				hasCreatedMenu: hasFinishedResolution( 'saveMenu' ),
-			};
-		},
-		[]
-	);
+	const { isCreatingMenu } = useSelect( ( select ) => {
+		const { getIsResolving } = select( 'core' );
+		return {
+			isCreatingMenu: getIsResolving( 'saveMenu' ),
+		};
+	}, [] );
 	const { saveMenu } = useDispatch( 'core' );
 	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
-
-	const isSavingMenu = hasStartedCreatingMenu && ! hasFinishedCreatingMenu;
 
 	const onCreateMenu = useCallback(
 		( event ) => {
@@ -78,7 +70,7 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 					/>
 					<Button
 						type="submit"
-						isBusy={ isSavingMenu }
+						isBusy={ isCreatingMenu }
 						onClick={ onCreateMenu }
 						aria-disabled={ menuName.length === 0 }
 						isPrimary
