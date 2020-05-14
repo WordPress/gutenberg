@@ -377,6 +377,34 @@ function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
 	}
 
 	if (
+		! array_key_exists( 'preset', $tree['styles']['globals'] ) ||
+		! is_array( $tree['styles']['globals']['preset'] )
+	) {
+		$tree['styles']['globals']['preset'] = array();
+	}
+
+	if (
+		! array_key_exists( 'color', $tree['styles']['globals']['preset'] ) ||
+		! is_array( $tree['styles']['globals']['preset']['color'] )
+	) {
+		$tree['styles']['globals']['preset']['color'] = array();
+	}
+
+	if (
+		! array_key_exists( 'font-size', $tree['styles']['globals']['preset'] ) ||
+		! is_array( $tree['styles']['globals']['preset']['font-size'] )
+	) {
+		$tree['styles']['globals']['preset']['font-size'] = array();
+	}
+
+	if (
+		! array_key_exists( 'gradient', $tree['styles']['globals']['preset'] ) ||
+		! is_array( $tree['styles']['globals']['preset']['gradient'] )
+	) {
+		$tree['styles']['globals']['preset']['gradient'] = array();
+	}
+
+	if (
 		! array_key_exists( 'blocks', $tree['styles'] ) ||
 		! is_array( $tree['styles']['blocks'] )
 	) {
