@@ -38,8 +38,7 @@ export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
 	const menuItems = useSelect(
-		( select ) =>
-			select( 'core' ).getMenuItems( query ),
+		( select ) => select( 'core' ).getMenuItems( query ),
 		[ menuId ]
 	);
 
@@ -259,7 +258,7 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 		const requestData = prepareRequestData( innerBlocks, parentItemId );
 
 		const saved = await apiFetch( {
-			path: `/__experimental/menu-items/save-hierarchy?menus=${ menuId }`,
+			path: `/__experimental/menu-items/batch?menus=${ menuId }`,
 			method: 'PUT',
 			data: { tree: requestData },
 		} );
