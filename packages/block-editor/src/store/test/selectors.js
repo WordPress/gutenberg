@@ -333,6 +333,78 @@ describe( 'selectors', () => {
 				},
 			] );
 		} );
+		it( 'only returns a new value if the cache key of a direct child changes', () => {
+			const cacheRef = {};
+			const state = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			const oldBlocks = getBlocks( state );
+
+			const newStateSameCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: cacheRef,
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Makes sure blocks are referentially equal if the cache key stays the same.
+			const newBlocks = getBlocks( newStateSameCache );
+			expect( oldBlocks ).toBe( newBlocks );
+
+			const newStateNewCache = {
+				blocks: {
+					byClientId: {
+						23: { clientId: 23, name: 'core/heading' },
+					},
+					attributes: {
+						23: {},
+					},
+					order: {
+						'': [ 23 ],
+					},
+					parents: {
+						23: '',
+					},
+					cache: {
+						23: {},
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			// Blocks are referentially different if the cache key changes.
+			const newBlocksNewCache = getBlocks( newStateNewCache );
+			expect( oldBlocks ).not.toBe( newBlocksNewCache );
+		} );
 	} );
 
 	describe( 'getBlockParents', () => {

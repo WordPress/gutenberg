@@ -217,12 +217,11 @@ export const getBlocks = createSelector(
 			getBlock( state, clientId )
 		);
 	},
-	( state, rootClientId ) => [
-		...map(
+	( state, rootClientId ) =>
+		map(
 			state.blocks.order[ rootClientId || '' ],
 			( id ) => state.blocks.cache[ id ]
-		),
-	]
+		)
 );
 
 /**
