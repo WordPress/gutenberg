@@ -165,21 +165,21 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
 		foreach ( $theme_colors as $color ) {
-			$theme_presets['styles']['globals']['preset']['color'][ $color['slug'] ] = $color['color'];
+			$theme_presets['global']['presets']['color'][ $color['slug'] ] = $color['color'];
 		}
 	}
 
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
 	if ( is_array( $theme_gradients ) ) {
 		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['styles']['globals']['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_presets['global']['presets']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
 		}
 	}
 
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
 	if ( is_array( $theme_font_sizes ) ) {
 		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['styles']['globals']['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_presets['global']['presets']['font-size'][ $font_size['slug'] ] = $font_size['size'];
 		}
 	}
 
@@ -352,17 +352,19 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
 	$accumulator = gutenberg_experimental_global_styles_normalize_shape( array() );
 
 	foreach ( $trees as $tree ) {
-		foreach ( array_keys( $accumulator['styles']['globals']['preset'] ) as $property ) {
-			if ( ! empty( $tree['styles']['globals']['preset'][ $property ] ) ) {
-				$accumulator['styles']['globals']['preset'][ $property ] = $tree['styles']['globals']['preset'][ $property ];
+		foreach ( array_keys( $accumulator ) as $block_name ) {
+			foreach ( array_keys( $accumulator['global']['presets'] ) as $property ) {
+				if ( ! empty( $tree[ $block_name ]['presets'][ $property ] ) ) {
+					$accumulator[ $block_name ]['presets'][ $property ] = $tree[ $block_name ]['presets'][ $property ];
+				}
 			}
 		}
 	}
 
 	foreach ( $trees as $tree ) {
-		foreach ( array_keys( $accumulator['styles']['blocks'] ) as $block_name ) {
-			if ( ! empty( $tree['styles']['blocks'][ $block_name ] ) ) {
-				$accumulator['styles']['blocks'][ $block_name ] = $tree['styles']['blocks'][ $block_name ];
+		foreach ( array_keys( $accumulator ) as $block_name ) {
+			if ( ! empty( $tree[ $block_name ]['styles'] ) ) {
+				$accumulator[ $block_name ]['styles'] = $tree[ $block_name ]['styles'];
 			}
 		}
 	}
@@ -379,23 +381,20 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
  * @return array
  */
 function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
-	$normalized_tree = array(
-		'styles' => array(
-			'globals' => array(
-				'preset' => array(
-					'color'     => array(),
-					'font-size' => array(),
-					'gradient'  => array(),
-				),
-			),
-			'blocks'  => array(),
+	$block_shape = array(
+		'styles'   => array(),
+		'features' => array(),
+		'presets'  => array(
+			'color'     => array(),
+			'font-size' => array(),
+			'gradient'  => array(),
 		),
 	);
 
-	// Add the supported blocks, which we don't know prior which they are.
-	$block_data = gutenberg_experimental_global_styles_get_block_data();
+	$normalized_tree = array( 'global' => array( $block_shape ) );
+	$block_data      = gutenberg_experimental_global_styles_get_block_data();
 	foreach ( array_keys( $block_data ) as $block_name ) {
-		$normalized_tree['styles']['blocks'][ $block_name ] = array();
+		$normalized_tree[ $block_name ] = $block_shape;
 	}
 
 	$tree = array_merge_recursive(
