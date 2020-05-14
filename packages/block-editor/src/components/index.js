@@ -8,6 +8,7 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
 export { default as BlockControls } from './block-controls';
