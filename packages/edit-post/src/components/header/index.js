@@ -29,6 +29,7 @@ function Header( {
 		isPublishSidebarOpened,
 		isSaving,
 		getBlockSelectionStart,
+		isSingleBlockMode,
 	} = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -48,6 +49,9 @@ function Header( {
 			deviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
+			isSingleBlockMode: select( 'core/edit-post' ).isFeatureActive(
+				'singleBlockMode'
+			),
 		} ),
 		[]
 	);
@@ -63,6 +67,17 @@ function Header( {
 						? 'edit-post/block'
 						: 'edit-post/document'
 				);
+
+	if ( isSingleBlockMode ) {
+		return (
+			<div className="edit-post-header__toolbar">
+				<HeaderToolbar
+					onToggleInserter={ onToggleInserter }
+					isInserterOpen={ isInserterOpen }
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<div className="edit-post-header">

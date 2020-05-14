@@ -25,6 +25,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 		isInserterVisible,
 		isTextModeEnabled,
 		previewDeviceType,
+		isSingleBlockMode,
 	} = useSelect(
 		( select ) => ( {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -40,6 +41,9 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			previewDeviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
+			isSingleBlockMode: select( 'core/edit-post' ).isFeatureActive(
+				'singleBlockMode'
+			),
 		} ),
 		[]
 	);
@@ -53,6 +57,19 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
+
+	if ( isSingleBlockMode ) {
+		return (
+			<NavigableToolbar
+				className="edit-post-header-toolbar"
+				aria-label={ toolbarAriaLabel }
+			>
+				<div className="edit-post-header-toolbar__block-toolbar edit-post-header-toolbar__block-toolbar_single-block-mode">
+					<BlockToolbar hideDragHandle />
+				</div>
+			</NavigableToolbar>
+		);
+	}
 
 	return (
 		<NavigableToolbar

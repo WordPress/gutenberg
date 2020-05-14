@@ -82,6 +82,11 @@
 	}
 }
 
+// Block toolbar when fixed to the top of the screen.
+.edit-post-header-toolbar__block-toolbar_single-block-mode {
+	top: 0 !important;
+}
+
 .edit-post-header-toolbar .edit-post-header-toolbar__inserter-toggle {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.

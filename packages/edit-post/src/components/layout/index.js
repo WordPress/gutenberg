@@ -50,6 +50,7 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import SingleBlockModeLayout from './single-block-mode';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
@@ -74,6 +75,7 @@ function Layout() {
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		isSingleBlockMode,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -103,6 +105,9 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			isSingleBlockMode: select( 'core/edit-post' ).isFeatureActive(
+				'singleBlockMode'
+			),
 		};
 	}, [] );
 	const sidebarIsOpened =
@@ -144,6 +149,10 @@ function Layout() {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	if ( isSingleBlockMode ) {
+		return <SingleBlockModeLayout />;
+	}
 
 	return (
 		<>
