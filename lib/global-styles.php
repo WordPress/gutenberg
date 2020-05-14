@@ -71,8 +71,8 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_user() {
-	$config = array();
-	$user_cpt      = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
+	$config   = array();
+	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
 	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
 		if ( is_array( $decoded_data ) ) {
@@ -80,27 +80,7 @@ function gutenberg_experimental_global_styles_get_user() {
 		}
 	}
 
-	// Normalize to expected shape.
-	if (
-		! array_key_exists( 'styles', $config ) ||
-		! is_array( $config['styles'] )
-	) {
-		$config['styles'] = array();
-	}
-	if (
-		! array_key_exists( 'globals', $config['styles'] ) ||
-		! is_array( $config['styles']['globals'] )
-	) {
-		$config['styles']['globals'] = array();
-	}
-	if (
-		! array_key_exists( 'blocks', $config['styles'] ) ||
-		! is_array( $config['styles']['blocks'] )
-	) {
-		$config['styles']['blocks'] = array();
-	}
-
-	return $config;
+	return gutenberg_experimental_global_styles_normalize_shape( $config );
 }
 
 /**
@@ -171,29 +151,7 @@ function gutenberg_experimental_global_styles_get_core() {
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
 
-	// Normalize the core config to the expected shape.
-	if (
-		! array_key_exists( 'styles', $config ) ||
-		! is_array( $config['styles'] )
-	) {
-		$config['styles'] = array();
-	}
-
-	if (
-		! array_key_exists( 'globals', $config['styles'] ) ||
-		! is_array( $config['styles']['globals'] )
-	) {
-		$config['styles']['globals'] = array();
-	}
-
-	if (
-		! array_key_exists( 'blocks', $config['styles'] ) ||
-		! is_array( $config['styles']['blocks'] )
-	) {
-		$config['styles']['blocks'] = array();
-	}
-
-	return $config;
+	return gutenberg_experimental_global_styles_normalize_shape( $config );
 }
 
 /**
@@ -240,19 +198,11 @@ function gutenberg_experimental_global_styles_get_theme() {
 	 * https://github.com/WordPress/gutenberg/issues/20588
 	 *
 	 */
-	$theme_config = gutenberg_experimental_global_styles_get_from_file(
-		locate_template( 'experimental-theme.json' )
+	$theme_config = gutenberg_experimental_global_styles_normalize_shape(
+		gutenberg_experimental_global_styles_get_from_file(
+			locate_template( 'experimental-theme.json' )
+		)
 	);
-
-	// Normalize theme config to expected shape.
-	$theme_styles = array();
-	if ( array_key_exists( 'styles', $theme_config ) ) {
-		$theme_styles = $theme_config['styles'];
-	}
-
-	if ( ! array_key_exists( 'globals', $theme_styles ) ) {
-		$theme_config['styles']['globals'] = array();
-	}
 
 	$theme_config['styles']['globals'] = array_merge_recursive(
 		$theme_supports,
@@ -389,6 +339,39 @@ function gutenberg_experimental_global_styles_resolver_globals( $global_styles )
 	$css_rules .= "}\n";
 
 	return $css_rules;
+}
+
+/**
+ * Given a global styles tree, returns a normalized tree
+ * that conforms to the expected shape.
+ *
+ * @param array $tree Input tree to normalize.
+ *
+ * @return array
+ */
+function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
+	if (
+		! array_key_exists( 'styles', $tree ) ||
+		! is_array( $tree['styles'] )
+	) {
+		$tree['styles'] = array();
+	}
+
+	if (
+		! array_key_exists( 'globals', $tree['styles'] ) ||
+		! is_array( $tree['styles']['globals'] )
+	) {
+		$tree['styles']['globals'] = array();
+	}
+
+	if (
+		! array_key_exists( 'blocks', $tree['styles'] ) ||
+		! is_array( $tree['styles']['blocks'] )
+	) {
+		$tree['styles']['blocks'] = array();
+	}
+
+	return $tree;
 }
 
 /**
