@@ -163,21 +163,53 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
+boolean isBundleUpToDate() {
+    return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
+}
+
 if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
-    def aarFolder = 'src/main/assets'
+    def jsRootDir = '../..'
+
+    task bundleUpToDateCheck {
+        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
+Only if they are is the isBundleUpToDate flag set to true. That flag is used by other tasks.")
+        inputs.files("$jsRootDir/package.json",
+                     "$jsRootDir/yarn.lock")
+        inputs.dir("$jsRootDir/patches")
+        outputs.file("$assetsFolder/index.android.bundle")
+
+        // set flag to true before task tries to run
+        project.ext.isBundleUpToDate = true
+        doLast {
+            // If this task runs, either the inputs or outputs have changed, so the bundle is out of date.
+            project.ext.isBundleUpToDate = false
+        }
+    }
+
+    yarn_install.dependsOn bundleUpToDateCheck
+    yarn_install.onlyIf { !isBundleUpToDate() }
 
     task buildJSBundle(type: YarnTask) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         args = ['bundle:android']
     }
 
-    task ensureAssetsDirectory { 
+    task ensureAssetsDirectory {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         doLast {
             mkdir assetsFolder
         }
     }
 
     task backupHermesDebugAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-debug.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -188,6 +220,9 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     task backupHermesReleaseAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-release.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -198,6 +233,9 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     task copyJSBundle(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'App.js'
         def origWithPath = "../../bundle/android/${origFileName}"
         def target = 'index.android.bundle'
@@ -210,15 +248,16 @@ if (buildGutenbergMobileJSBundle) {
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         delete '../../node_modules'
     }
 
-    if (buildGutenbergMobileJSBundle) {
-        preBuild.dependsOn(cleanupNodeModulesFolder)
-        cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
-        backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
-        backupHermesReleaseAAR.dependsOn(copyJSBundle)
-        copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
-    }
+    preBuild.dependsOn(cleanupNodeModulesFolder)
+    cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+    backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
+    backupHermesReleaseAAR.dependsOn(copyJSBundle)
+    copyJSBundle.dependsOn(buildJSBundle)
+    buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
 }
