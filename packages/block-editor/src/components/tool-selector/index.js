@@ -12,6 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 const editIcon = (
 	<SVG
@@ -34,7 +35,7 @@ const selectIcon = (
 	</SVG>
 );
 
-function ToolSelector() {
+function ToolSelector( props, ref ) {
 	const isNavigationTool = useSelect(
 		( select ) => select( 'core/block-editor' ).isNavigationMode(),
 		[]
@@ -53,6 +54,8 @@ function ToolSelector() {
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					{ ...props }
+					ref={ ref }
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
@@ -99,4 +102,4 @@ function ToolSelector() {
 	);
 }
 
-export default ToolSelector;
+export default forwardRef( ToolSelector );
