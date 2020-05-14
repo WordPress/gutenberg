@@ -119,14 +119,24 @@ module.exports = function cli() {
 			} );
 			args.positional( 'command', {
 				type: 'string',
-				describe: 'The command to run.',
+				describe:
+					'The command to run. Wrap it in quotation marks if there are multiple words or options to pass into the Docker service.',
+			} );
+			args.positional( 'cwd', {
+				type: 'string',
+				describe:
+					'An optional local path to a mapped directory in which to run the command. This is useful if you want to run a command within a Docker service relative to one of your mapped sources.',
 			} );
 		},
 		withSpinner( env.run )
 	);
 	yargs.example(
-		'$0 run cli wp user list',
+		'$0 run cli "wp user list"',
 		'Runs `wp user list` wp-cli command which lists WordPress users.'
+	);
+	yargs.example(
+		'$0 run phpunit phpunit ./',
+		'Runs the phpunit command in the phpunit service. "./" points at the local directory containing the phpunit config file, which in this case is the current working directory.'
 	);
 
 	return yargs;

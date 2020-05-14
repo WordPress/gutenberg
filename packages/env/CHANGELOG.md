@@ -4,7 +4,13 @@
 
 ### New Feature
 
+-   Add cwd option to `wp-env run` command to support running commands in Docker relative to a mapped source.
+-   A new service is now available for running phpunit commands.
 -   You may now mount local directories to any location within the WordPress install. For example, you may specify `"wp-content/mu-plugins": "./path/to/mu-plugins"` to add mu-plugins.
+
+### Breaking Changes
+
+-   You must now wrap multi-word commands for `wp-env run` in quotation marks for them to be passed to docker. Before: `wp-env run cli wp user list`. After: `wp-env run cli "wp user list"`.
 
 ## 1.1.0 (2020-04-01)
 
