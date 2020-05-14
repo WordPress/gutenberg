@@ -197,28 +197,19 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
  */
 function gutenberg_experimental_global_styles_get_theme() {
 	$theme_presets = gutenberg_experimental_global_styles_get_theme_presets();
-
-	/*
-	 * We want the presets declared in theme.json
-	 * to take precedence over the ones declared via add_theme_support.
-	 *
-	 * However, at the moment, it's not clear how we're going to declare them
-	 * in theme.json until we resolve issues related to i18n and
-	 * unfold the proper theme.json hierarchy. See:
-	 *
-	 * https://github.com/wp-cli/i18n-command/pull/210
-	 * https://github.com/WordPress/gutenberg/issues/20588
-	 *
-	 */
-	$theme_config = gutenberg_experimental_global_styles_normalize_shape(
+	$theme_config  = gutenberg_experimental_global_styles_normalize_shape(
 		gutenberg_experimental_global_styles_get_from_file(
 			locate_template( 'experimental-theme.json' )
 		)
 	);
 
-	$theme_config['styles']['globals'] = array_merge_recursive(
+	/*
+	 * We want the presets declared in theme.json
+	 * to take precedence over the ones declared via add_theme_support.
+	 */
+	$theme_config = array_merge(
 		$theme_presets,
-		$theme_config['styles']['globals']
+		$theme_config
 	);
 
 	return $theme_config;
@@ -354,6 +345,33 @@ function gutenberg_experimental_global_styles_resolver_globals( $global_styles )
 }
 
 /**
+ * Function that incorporates into the source tree
+ * the modifications given as updates. We use the source
+ * instead of creating a new array to keep memory usage down.
+ *
+ * @param array $source Source tree to be updated.
+ * @param array $updates Modifications to incorporate.
+ *
+ * @return void
+ */
+function gutenberg_experimental_global_styles_merge_trees( $source, $updates ) {
+	foreach ( array( 'color', 'font-size', 'gradient' ) as $property ) {
+		$source['styles']['globals']['preset'][ $property ] = array_merge(
+			$source['styles']['globals']['preset'][ $property ],
+			$updates['styles']['globals']['preset'][ $property ]
+		);
+	}
+
+	$block_data = gutenberg_experimental_global_styles_get_block_data();
+	foreach ( $block_data as $block_name ) {
+		$source['styles']['blocks'][ $block_name ] = array_merge(
+			$source['styles']['blocks'][ $block_name ],
+			$updates['styles']['blocks'][ $block_name ]
+		);
+	}
+}
+
+/**
  * Given a global styles tree, returns a normalized tree
  * that conforms to the expected shape.
  *
@@ -425,12 +443,12 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
 	$gs_user   = gutenberg_experimental_global_styles_get_user();
 
-	$gs_merged['styles']['globals'] = array_merge(
+	$gs_merged['styles']['globals'] = array_merge_recursive(
 		$gs_core['styles']['globals'],
 		$gs_theme['styles']['globals'],
 		$gs_user['styles']['globals']
 	);
-	$gs_merged['styles']['blocks']  = array_merge(
+	$gs_merged['styles']['blocks']  = array_merge_recursive(
 		$gs_core['styles']['blocks'],
 		$gs_theme['styles']['blocks'],
 		$gs_user['styles']['blocks']
