@@ -53,6 +53,9 @@ export default function useNavigationBlocks( menuId ) {
 
 		const createMenuItemBlocks = ( items ) => {
 			const innerBlocks = [];
+			if ( ! items ) {
+				return;
+			}
 			for ( const item of items ) {
 				let menuItemInnerBlocks = [];
 				if ( itemsByParentID[ item.id ]?.length ) {
