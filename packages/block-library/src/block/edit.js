@@ -88,9 +88,12 @@ export default function ReusableBlockEdit( {
 	// Start in preview mode when we're working with an existing reusable block.
 	const [ isEditing, setIsEditing ] = useState( isTemporary ?? false );
 
-	// Local state so changes can be made to the reusable block without having to save them.
-	const [ localTitle, setLocalTitle ] = useState( title );
-	const [ localBlocks, setLocalBlocks ] = useState( blocks ?? [] );
+	// Local state used while editing so changes can be made to the reusable
+	// block without having to save them.
+	const [ localTitle, setLocalTitle ] = useState( isEditing ? title : null );
+	const [ localBlocks, setLocalBlocks ] = useState(
+		isEditing ? blocks : null
+	);
 
 	useEffect( () => {
 		if ( ! reusableBlock ) {
@@ -98,24 +101,30 @@ export default function ReusableBlockEdit( {
 		}
 	}, [] );
 
-	// If the reusable block was changed by saving another instance of the same
-	// reusable block in the editor, and if this instance is not currently being
-	// edited, update the local state of this instance to match.
-	useEffect( () => {
-		if ( ! isEditing && ! isSaving ) {
-			setLocalTitle( title );
-		}
-	}, [ title, isEditing, isSaving ] );
+	function startEditing() {
+		// Copy saved reusable block data into local state.
+		setLocalBlocks( blocks ?? [] );
+		setLocalTitle( title );
 
-	useEffect( () => {
-		if ( ! isEditing && ! isSaving ) {
-			setLocalBlocks( blocks );
-		}
-	}, [ blocks, isEditing, isSaving ] );
+		setIsEditing( true );
+	}
 
-	function save() {
+	function cancelEditing() {
+		// Clear local state.
+		setLocalBlocks( null );
+		setLocalTitle( null );
+
+		setIsEditing( false );
+	}
+
+	function saveAndStopEditing() {
 		onChange( { title: localTitle, content: serialize( localBlocks ) } );
 		onSave();
+
+		// Clear local state.
+		setLocalBlocks( null );
+		setLocalTitle( null );
+
 		setIsEditing( false );
 	}
 
@@ -134,12 +143,22 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
+	function handleModifyBlocks( modifedBlocks ) {
+		// We shouldn't change local state when the blocks are loading
+		// from the saved reusable block.
+		if ( isEditing ) {
+			setLocalBlocks( modifedBlocks );
+		}
+	}
+
 	let content = (
 		<BlockEditorProvider
 			settings={ settings }
-			value={ localBlocks }
-			onChange={ setLocalBlocks }
-			onInput={ setLocalBlocks }
+			// If editing, use local state; otherwise, load the blocks from the
+			// saved reusable block.
+			value={ isEditing ? localBlocks : blocks }
+			onChange={ handleModifyBlocks }
+			onInput={ handleModifyBlocks }
 		>
 			<WritingFlow>
 				<BlockList />
@@ -168,17 +187,17 @@ export default function ReusableBlockEdit( {
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
-						title={ localTitle ?? title }
+						title={ isEditing ? localTitle : title }
 						isSaving={ isSaving && ! ( isTemporary ?? false ) }
 						isEditDisabled={ ! canUpdateBlock }
-						onEdit={ () => {
-							setIsEditing( true );
+						onEdit={ startEditing }
+						onChangeTitle={ ( updatedTitle ) => {
+							if ( isEditing ) {
+								setLocalTitle( updatedTitle );
+							}
 						} }
-						onChangeTitle={ setLocalTitle }
-						onSave={ save }
-						onCancel={ () => {
-							setIsEditing( false );
-						} }
+						onSave={ saveAndStopEditing }
+						onCancel={ cancelEditing }
 					/>
 				) }
 				{ content }
