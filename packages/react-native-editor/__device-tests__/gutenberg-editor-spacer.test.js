@@ -4,7 +4,7 @@
 import EditorPage from './pages/editor-page';
 import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor Spacer Block test', () => {
 	let driver;
