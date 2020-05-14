@@ -14,6 +14,7 @@
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 	protected $cached_menu_items = [];
+	public $validate_order_and_hierarchy = true;
 
 	/**
 	 * Constructor.
@@ -498,7 +499,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		// If menu id is set, valid the value of menu item position and parent id.
-		if ( ! $this->ignore_position_collision && ! empty( $prepared_nav_item['menu-id'] ) ) {
+		if ( $this->validate_order_and_hierarchy && ! empty( $prepared_nav_item['menu-id'] ) ) {
 			// Check if nav menu is valid.
 			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
 				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );
@@ -1121,8 +1122,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	}
 
 	public function process_batch( $request ) {
-		require_once __DIR__ . "/class-wp-rest-menu-items-batch-processor.php";
-		$processor = new WP_REST_Menu_Items_Batch_Processor( $this, $request );
+		require_once __DIR__ . "/menu-items-batch-processing/class-batch-processor.php";
+		$processor = new WP_REST_Menu_Items_Batch_Operation\Batch_Processor( $this, $request );
 
 		$navigation_id = $request['menus'];
 		$result = $processor->process( $navigation_id, $request['tree'] );
