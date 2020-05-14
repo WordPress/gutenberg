@@ -104,33 +104,6 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 }
 
 /**
- * Action triggered to uninstall a block plugin.
- *
- * @param {string} item        The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has
- *                             succeeded.
- * @param {Function} onError   The callback function when the action has failed.
- */
-export function* uninstallBlock( { id, name }, onSuccess, onError ) {
-	try {
-		const response = yield apiFetch( {
-			path: '__experimental/block-directory/uninstall',
-			data: {
-				slug: id,
-			},
-			method: 'DELETE',
-		} );
-		if ( response.success === false ) {
-			throw new Error( response.errorMessage );
-		}
-		yield removeInstalledBlockType( { id, name } );
-		onSuccess();
-	} catch ( error ) {
-		onError( error );
-	}
-}
-
-/**
  * Returns an action object used to add a newly installed block type.
  *
  * @param {Object} item The block item with the block id and name.
@@ -140,20 +113,6 @@ export function* uninstallBlock( { id, name }, onSuccess, onError ) {
 export function addInstalledBlockType( item ) {
 	return {
 		type: 'ADD_INSTALLED_BLOCK_TYPE',
-		item,
-	};
-}
-
-/**
- * Returns an action object used to remove a newly installed block type.
- *
- * @param {Object} item The block item with the block id and name.
- *
- * @return {Object} Action object.
- */
-export function removeInstalledBlockType( item ) {
-	return {
-		type: 'REMOVE_INSTALLED_BLOCK_TYPE',
 		item,
 	};
 }
