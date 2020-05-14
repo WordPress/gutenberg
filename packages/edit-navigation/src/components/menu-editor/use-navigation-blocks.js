@@ -99,6 +99,7 @@ const useNavigationBlocksModel = ( menuItems ) => {
 	return [ blocks, setBlocks, menuItemsRef ];
 };
 
+// Creation and synchronization logic for creating menu items on the fly
 const useDynamicMenuItemPlaceholders = (
 	menuId,
 	currentBlocks,
@@ -106,6 +107,9 @@ const useDynamicMenuItemPlaceholders = (
 ) => {
 	const blocks = useDebouncedValue( currentBlocks, 800 );
 	const blocksByIdRef = useRef( {} );
+	// This is used to ensure we will only process one menu item at a time and won't save
+	// the entire menu before all menu items are created. We could increase the concurrency
+	// quite easily too.
 	const processingRef = useRef( {
 		queue: [],
 		running: false,
