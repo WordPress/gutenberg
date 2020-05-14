@@ -102,11 +102,14 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 		if ( isset( $_GET['_wp-find-template'] ) ) {
 			wp_send_json_success( $current_template['template_post'] );
 		}
-	} elseif ( 'index' === $type ) {
-		if ( isset( $_GET['_wp-find-template'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+	} else {
+		if ( 'index' === $type ) {
+			if ( isset( $_GET['_wp-find-template'] ) ) {
+				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+			}
+		} else {
+			return false; // So that the template loader keeps looking for templates.
 		}
-		return false; // So that the template loader keeps looking for templates.
 	}
 
 	// Add hooks for template canvas.
