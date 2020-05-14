@@ -34,22 +34,17 @@ class Batch_Processor {
 			return $validated_operations;
 		}
 
-		// Transactions may or may not be supported in the current environment.
-		// Ideally we would know and only use them if they are. For the purpose of this prototype,
-		// let's simplify that dilemma by just ignoring the result of those queries.
-		$this->wpdb->query( 'START TRANSACTION' );
-		$this->wpdb->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ' );
-
 		$result = $this->batch_persist( $validated_operations );
 
 		if ( is_wp_error( $result ) ) {
-			// @TODO: how to refresh the caches yet again?
-			$this->wpdb->query( 'ROLLBACK' );
+			// We're in a broken state now, some operations succeeded and some other failed.
+			// This is okay for the experimental version 1.
+			// In the future let's wrap this in a transaction if WP tables are based on InnoDB
+			// and do something smart on rollback - e.g. try to restore the original state, or
+			// refresh all the caches that were affected in the process.
 
 			return $result;
 		}
-
-		$this->wpdb->query( 'COMMIT' );
 
 		return $result;
 	}
