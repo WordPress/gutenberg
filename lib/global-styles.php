@@ -19,16 +19,16 @@ function gutenberg_experimental_global_styles_has_theme_support() {
  * whose keys are the CSS custom properties
  * and its values the CSS custom properties' values.
  *
- * @param array  $global_styles Global Styles object to process.
+ * @param array  $styles Global Styles object to process.
  * @param string $prefix Prefix to prepend to each variable.
  * @param string $token Token to use between levels.
  *
  * @return array The flattened tree.
  */
-function gutenberg_experimental_global_styles_get_css_vars( $global_styles, $prefix = '', $token = '--' ) {
+function gutenberg_experimental_global_styles_get_css_vars( $styles, $prefix = '', $token = '--' ) {
 	$result = array();
-	foreach ( $global_styles as $key => $value ) {
-		$new_key = $prefix . str_replace( '/', '-', $key );
+	foreach ( $styles as $property => $value ) {
+		$new_key = $prefix . str_replace( '/', '-', $property );
 
 		if ( is_array( $value ) ) {
 			$new_prefix = $new_key . $token;
@@ -274,71 +274,98 @@ function gutenberg_experimental_global_styles_get_block_data() {
 }
 
 /**
- * Takes a tree and returns the CSS rules
- * with the proper declarations.
+ * Takes a global styles tree and generates
+ * the corresponding stylesheet.
  *
- * @param array $global_styles Global Styles tree.
- * @return string A list of CSS rules.
+ * @param array $tree Global Styles tree.
+ *
+ * @return string
  */
-function gutenberg_experimental_global_styles_resolver_block_styles( $global_styles ) {
-	$css_rules = '';
-	$styles    = $global_styles['styles']['blocks'];
-
+function gutenberg_experimental_global_styles_resolver( $tree ) {
+	$stylesheet = '';
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
-
-	foreach ( $styles as $block_name => $block_style ) {
+	foreach ( array_keys( $tree ) as $block_name ) {
 		if (
 			! array_key_exists( $block_name, $block_data ) ||
 			! array_key_exists( 'selector', $block_data[ $block_name ] ) ||
 			! array_key_exists( 'supports', $block_data[ $block_name ] )
 		) {
-			// Do not process blocks that haven't declared support,
+			// Skip blocks that haven't declared support,
 			// so we don't know to process.
 			continue;
 		}
 
-		$css_declarations = '';
-		foreach ( $block_style as $property => $value ) {
-			// Only convert to CSS the style attributes the block has declared support for.
-			if ( in_array( $property, $block_data[ $block_name ]['supports'], true ) ) {
-				$css_declarations .= "\t" . $property . ': ' . $value . ";\n";
-			}
-		}
-		if ( '' !== $css_declarations ) {
-			$css_rules .= $block_data[ $block_name ]['selector'] . " {\n";
-			$css_rules .= $css_declarations;
-			$css_rules .= "}\n";
+		$token         = '--';
+		$prefix        = '--wp--preset' . $token;
+		$css_variables = gutenberg_experimental_global_styles_get_css_vars( $tree[ $block_name ]['presets'], $prefix, $token );
+
+		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
+			$block_data[ $block_name ]['selector'],
+			$block_data[ $block_name ]['supports'],
+			array_merge( $tree[ $block_name ]['styles'], $css_variables )
+		);
+	}
+	return $stylesheet;
+}
+
+/**
+ * Takes a tree and returns the CSS rule
+ * with the proper declarations.
+ *
+ * @param string $block_selector CSS selector for the block.
+ * @param array  $block_supports A list of properties supported by the block.
+ * @param array  $block_styles The list of properties/values to be converted to CSS.
+ *
+ * @return string The corresponding CSS rule.
+ */
+function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
+	$css_rule         = '';
+	$css_declarations = '';
+	foreach ( $block_styles as $property => $value ) {
+		// Only convert to CSS:
+		//
+		// 1) The style attributes the block has declared support for.
+		// 2) Any CSS custom property attached to the node.
+		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
+			$css_declarations .= "\t" . $property . ': ' . $value . ";\n";
 		}
 	}
+	if ( '' !== $css_declarations ) {
+		$css_rule .= $block_selector . " {\n";
+		$css_rule .= $css_declarations;
+		$css_rule .= "}\n";
+	}
 
-	return $css_rules;
+	return $css_rule;
 }
 
 /**
  * Takes a tree and returns a CSS rule
  * that contains the corresponding CSS custom properties.
  *
- * @param array $global_styles Global Styles tree.
- * @return string A list of CSS rules.
+ * @param string $block_selector CSS selector for the block.
+ * @param array  $presets Presets to convert to CSS variables.
+ *
+ * @return string The corresponding CSS rule.
  */
-function gutenberg_experimental_global_styles_resolver_globals( $global_styles ) {
-	$css_rules = '';
-	$styles    = $global_styles['styles']['globals'];
-
+function gutenberg_experimental_global_styles_resolver_presets( $block_selector, $presets ) {
+	$css_rule = '';
 	$token    = '--';
-	$prefix   = '--wp' . $token;
-	$css_vars = gutenberg_experimental_global_styles_get_css_vars( $styles, $prefix, $token );
-	if ( empty( $css_vars ) ) {
-		return $css_rules;
+	$prefix   = '--wp--presets' . $token;
+
+	$css_declarations = gutenberg_experimental_global_styles_get_css_vars( $presets, $prefix, $token );
+	if ( empty( $css_declarations ) ) {
+		return $css_rule;
 	}
 
-	$css_rules .= " :root {\n";
-	foreach ( $css_vars as $var => $value ) {
-		$css_rules .= "\t" . $var . ': ' . $value . ";\n";
+	error_log( 'declarations ' . print_r( $css_declarations, true ) );
+	$css_rule .= $block_selector . " {\n";
+	foreach ( $css_declarations as $property => $value ) {
+		$css_rule .= "\t" . $property . ': ' . $value . ";\n";
 	}
-	$css_rules .= "}\n";
+	$css_rule .= "}\n";
 
-	return $css_rules;
+	return $css_rule;
 }
 
 /**
@@ -418,8 +445,7 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 
 	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
 
-	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $gs_merged );
-	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $gs_merged );
+	$stylesheet  = gutenberg_experimental_global_styles_resolver( $gs_merged );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
