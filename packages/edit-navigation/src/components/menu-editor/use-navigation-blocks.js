@@ -225,37 +225,11 @@ const useDynamicMenuItemPlaceholders = (
 
 const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 	const { receiveEntityRecords } = useDispatch( 'core' );
-	const prepareRequestItem = ( block, parentId ) => {
-		const menuItem = omit(
-			menuItemsRef.current[ block.clientId ] || {},
-			'_links'
-		);
-
-		return {
-			...menuItem,
-			...createMenuItemAttributesFromBlock( block ),
-			clientId: block.clientId,
-			menus: menuId,
-			parent: parentId,
-			menu_order: 0,
-		};
-	};
-
-	const prepareRequestData = ( nestedBlocks, parentId = 0 ) =>
-		nestedBlocks.map( ( block ) => {
-			const data = prepareRequestItem( block, parentId );
-			return {
-				...data,
-				children: prepareRequestData( block.innerBlocks, data.id ),
-			};
-		} );
 
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const saveBlocks = async () => {
-		const { clientId, innerBlocks } = blocks[ 0 ];
-		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
-		const requestData = prepareRequestData( innerBlocks, parentItemId );
+		const requestData = prepareRequestData( blocks[ 0 ].innerBlocks );
 
 		const saved = await apiFetch( {
 			path: `/__experimental/menu-items/batch?menus=${ menuId }`,
@@ -287,6 +261,26 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 			query,
 			false
 		);
+	};
+
+	const prepareRequestData = ( nestedBlocks ) =>
+		nestedBlocks.map( ( block ) => ( {
+			...prepareRequestItem( block ),
+			children: prepareRequestData( block.innerBlocks ),
+		} ) );
+
+	const prepareRequestItem = ( block ) => {
+		const menuItem = omit(
+			menuItemsRef.current[ block.clientId ] || {},
+			'_links'
+		);
+
+		return {
+			...menuItem,
+			...createMenuItemAttributesFromBlock( block ),
+			clientId: block.clientId,
+			menus: menuId,
+		};
 	};
 
 	return saveBlocks;
