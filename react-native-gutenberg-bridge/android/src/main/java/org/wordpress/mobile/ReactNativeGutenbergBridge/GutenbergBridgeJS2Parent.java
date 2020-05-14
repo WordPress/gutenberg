@@ -1,5 +1,9 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -19,6 +23,13 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         String getType();
         String getCaption();
         WritableMap toMap();
+    }
+
+    interface RNEditorTheme {
+        @Nullable
+        ReadableArray getColors();
+        @Nullable
+        ReadableArray getGradients();
     }
 
     void responseHtml(String title, String html, boolean changed);

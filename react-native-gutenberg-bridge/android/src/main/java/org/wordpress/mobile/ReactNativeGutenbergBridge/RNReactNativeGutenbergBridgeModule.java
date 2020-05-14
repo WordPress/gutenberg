@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
@@ -19,6 +20,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNEditorTheme;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
@@ -40,6 +42,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_TOGGLE_HTML_MODE = "toggleHTMLMode";
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
+    private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -49,6 +52,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID = "mediaServerId";
+    private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
+    private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
 
@@ -124,6 +129,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putBoolean(MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK, isDarkMode);
         emitToJS(EVENT_NAME_PREFERRED_COLOR_SCHEME, writableMap);
+    }
+
+    public void setUpdateTheme(RNEditorTheme editorTheme) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, editorTheme.getColors());
+        writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, editorTheme.getGradients());
+
+        emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
     }
 
     @ReactMethod

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
+import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.Fragment;
 
@@ -24,9 +25,14 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableNativeMap;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -41,6 +47,7 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNEditorTheme;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
@@ -97,6 +104,8 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
+    private static final String PROP_NAME_COLORS = "colors";
+    private static final String PROP_NAME_GRADIENTS = "gradients";
 
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
@@ -393,9 +402,71 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
+        RNEditorTheme editorTheme = getGutenbergEditorTheme();
+        if (editorTheme != null && editorTheme.getColors() != null) {
+            initialProps.putSerializable(PROP_NAME_COLORS, Arguments.toList(editorTheme.getColors()));
+        }
+
+        if (editorTheme != null && editorTheme.getGradients() != null) {
+            initialProps.putSerializable(PROP_NAME_GRADIENTS, Arguments.toList(editorTheme.getGradients()));
+        }
+
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
+    }
+
+    @Nullable
+    private RNEditorTheme getGutenbergEditorTheme() {
+        return new RNEditorTheme() {
+            @Override public ReadableArray getColors() {
+                WritableNativeMap accent = new WritableNativeMap();
+                accent.putString("name", "Accent Color");
+                accent.putString("slug", "accent");
+                accent.putString("color", "#cd2653");
+
+                WritableNativeMap primary = new WritableNativeMap();
+                primary.putString("name", "Primary");
+                primary.putString("slug", "primary");
+                primary.putString("color", "#000000");
+
+                WritableNativeMap secondary = new WritableNativeMap();
+                secondary.putString("name", "Secondary");
+                secondary.putString("slug", "secondary");
+                secondary.putString("color", "#6d6d6d");
+
+                WritableNativeMap subtle = new WritableNativeMap();
+                subtle.putString("name", "Subtle Background");
+                subtle.putString("slug", "subtle-background");
+                subtle.putString("color", "#dcd7ca");
+
+                WritableNativeMap background = new WritableNativeMap();
+                background.putString("name", "Background Color");
+                background.putString("slug", "background");
+                background.putString("color", "#f5efe0");
+
+                WritableNativeArray colors = new WritableNativeArray();
+                colors.pushMap(accent);
+                colors.pushMap(primary);
+                colors.pushMap(secondary);
+                colors.pushMap(subtle);
+                colors.pushMap(background);
+
+                return colors;
+            }
+
+            @Override public ReadableArray getGradients() {
+                WritableNativeMap gradient = new WritableNativeMap();
+                gradient.putString("name", "Blue to Purple");
+                gradient.putString("slug", "blue-to-purple");
+                gradient.putString("gradient", "linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)");
+
+                WritableNativeArray gradients = new WritableNativeArray();
+                gradients.pushMap(gradient);
+
+                return gradients;
+            }
+        };
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
