@@ -159,11 +159,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
+      env: WP_ENV_TESTS_PORT=8887 # TODO: Remove tests port when scripts/env is replaced with wp-env.
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: LOCAL_PHP=5.6-fpm
+      env: LOCAL_PHP=5.6-fpm WP_ENV_TESTS_PORT=8887 # TODO: Remove tests port when scripts/env is replaced with wp-env.
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
