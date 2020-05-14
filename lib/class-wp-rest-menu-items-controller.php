@@ -29,11 +29,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		parent::register_routes();
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/save-hierarchy',
+			'/' . $this->rest_base . '/batch',
 			array(
 				array(
-					'methods' => WP_REST_Server::EDITABLE,
-					'callback' => array( $this, 'update_hierarchy' ),
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'process_batch' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
@@ -1135,7 +1135,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $menu_id;
 	}
 
-	public function update_hierarchy( $request ) {
+	public function process_batch( $request ) {
 		require_once __DIR__ . "/class-wp-rest-menu-items-batch-processor.php";
 		$processor = new WP_REST_Menu_Items_Batch_Processor( $this, $request );
 
