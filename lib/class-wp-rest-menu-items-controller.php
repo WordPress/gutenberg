@@ -289,7 +289,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$menu_item = $this->delete_item_validate( $request );
 		$previous = $this->prepare_item_for_response( $menu_item, $request );
 
-		$result = $this->delete_item_persist( $request['id'] );
+		$result = $this->delete_item_persist( $request );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
@@ -324,8 +324,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $menu_item;
 	}
 
-	public function delete_item_persist( $id ) {
-		$result = wp_delete_post( $id, true );
+	public function delete_item_persist( $request ) {
+		$result = wp_delete_post( $request['id'], true );
 
 		if ( ! $result ) {
 			return new WP_Error( 'rest_cannot_delete', __( 'The post cannot be deleted.', 'gutenberg' ), array( 'status' => 500 ) );
