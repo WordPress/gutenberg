@@ -4,8 +4,6 @@ InputControl components let users enter and edit text. This is an experimental c
 
 ## Usage
 
-Render a user interface to input the name of an additional css class.
-
 ```js
 import { __experimentalInputControl as InputControl } from '@wordpress/components';
 import { useState } from '@wordpress/compose';
