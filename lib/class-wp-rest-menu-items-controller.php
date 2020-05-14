@@ -13,8 +13,6 @@
  */
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
-	public $validate_order_and_hierarchy = true;
-
 	protected $cached_menu_items = [];
 
 	/**
@@ -207,7 +205,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
 		}
-		$nav_menu_item = $this->update_item_persist( $prepared_nav_item, $request, $request );
+		$nav_menu_item = $this->update_item_persist( $prepared_nav_item, $request );
 		$this->update_item_notify( $nav_menu_item, $request );
 
 		$response = $this->prepare_item_for_response( $nav_menu_item, $request );
@@ -215,13 +213,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return rest_ensure_response( $response );
 	}
 
-	public function update_item_validate( $input ) {
-		$valid_check = $this->get_nav_menu_item( $input['id'] );
+	public function update_item_validate( $request ) {
+		$valid_check = $this->get_nav_menu_item( $request['id'] );
 		if ( is_wp_error( $valid_check ) ) {
 			return $valid_check;
 		}
 
-		$prepared_nav_item = $this->prepare_item_for_database( $input );
+		$prepared_nav_item = $this->prepare_item_for_database( $request );
 
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
@@ -231,7 +229,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $prepared_nav_item;
 	}
 
-	public function update_item_persist( $prepared_nav_item, $input, $request ) {
+	public function update_item_persist( $prepared_nav_item, $request ) {
 		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'], $prepared_nav_item );
 
 		if ( is_wp_error( $nav_menu_item_id ) ) {
@@ -256,8 +254,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$schema = $this->get_item_schema();
 
-		if ( ! empty( $schema['properties']['meta'] ) && isset( $input['meta'] ) ) {
-			$meta_update = $this->meta->update_value( $input['meta'], $nav_menu_item->ID );
+		if ( ! empty( $schema['properties']['meta'] ) && isset( $request['meta'] ) ) {
+			$meta_update = $this->meta->update_value( $request['meta'], $nav_menu_item->ID );
 
 			if ( is_wp_error( $meta_update ) ) {
 				return $meta_update;
@@ -309,13 +307,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $response;
 	}
 
-	public function delete_item_validate( $input ) {
-		$menu_item = $this->get_nav_menu_item_cached( $input['id'], $input['menus'] );
+	public function delete_item_validate( $request ) {
+		$menu_item = $this->get_nav_menu_item_cached( $request['id'], $request['menus'] );
 		if ( is_wp_error( $menu_item ) ) {
 			return $menu_item;
 		}
 
-		$force = isset( $input['force'] ) ? (bool) $input['force'] : false;
+		$force = isset( $request['force'] ) ? (bool) $request['force'] : false;
 
 		// We don't support trashing for menu items.
 		if ( ! $force ) {
@@ -486,7 +484,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		// If menu id is set, valid the value of menu item position and parent id.
-		if ( $this->validate_order_and_hierarchy && ! empty( $prepared_nav_item['menu-id'] ) ) {
+		if ( $request->get_param( 'validate_order_and_hierarchy' ) !== false && ! empty( $prepared_nav_item['menu-id'] ) ) {
 			// Check if nav menu is valid.
 			if ( ! is_nav_menu( $prepared_nav_item['menu-id'] ) ) {
 				return new WP_Error( 'invalid_menu_id', __( 'Invalid menu ID.', 'gutenberg' ), array( 'status' => 400 ) );

@@ -110,12 +110,14 @@ class WP_REST_Menu_Items_Batch_Processor {
 	protected function batch_validate( $batch ) {
 		// We infer the menu order and parent id from the received input tree so there's no need
 		// to validate them in the controller
-		$this->controller->validate_order_and_hierarchy = false;
 		foreach ( $batch as $k => list( $type, $input ) ) {
+			$request = new WP_REST_Request();
+			$request->set_default_params($input);
+			$request->set_param( 'validate_order_and_hierarchy', false );
 			if ( $type === static::UPDATE ) {
-				$result = $this->controller->update_item_validate( $input );
+				$result = $this->controller->update_item_validate( $request );
 			} elseif ( $type === static::DELETE ) {
-				$result = $this->controller->delete_item_validate( $input );
+				$result = $this->controller->delete_item_validate( $request );
 			}
 			if ( is_wp_error( $result ) ) {
 				return $result;
@@ -129,8 +131,10 @@ class WP_REST_Menu_Items_Batch_Processor {
 	protected function batch_persist( $validated_operations ) {
 		foreach ( $validated_operations as $operation ) {
 			list( $type, $input, $prepared_nav_item ) = $operation;
+			$request = new WP_REST_Request();
+			$request->set_default_params($input);
 			if ( $type === static::UPDATE ) {
-				$result = $this->controller->update_item_persist( $prepared_nav_item, $input, $this->request );
+				$result = $this->controller->update_item_persist( $prepared_nav_item, $request );
 			} elseif ( $type === static::DELETE ) {
 				$result = $this->controller->delete_item_persist( $input['id'] );
 			}
@@ -140,9 +144,9 @@ class WP_REST_Menu_Items_Batch_Processor {
 			}
 
 			if ( $type === static::UPDATE ) {
-				$this->controller->update_item_notify( $result, $this->request );
+				$this->controller->update_item_notify( $result, $request );
 			} elseif ( $type === static::DELETE ) {
-				$this->controller->delete_item_notify( $result, new WP_REST_Response(), $this->request );
+				$this->controller->delete_item_notify( $result, new WP_REST_Response(), $request );
 			}
 		}
 	}
