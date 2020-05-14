@@ -33,6 +33,9 @@ class WP_REST_Menu_Items_Batch_Processor {
 	 */
 	public function process( $raw_input ) {
 		$batch = $this->compute_batch( $raw_input );
+		if ( is_wp_error( $batch ) ) {
+			return $batch;
+		}
 
 		$validated_batch = $this->batch_validate( $batch );
 		if ( is_wp_error( $validated_batch ) ) {
@@ -85,10 +88,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 				} else {
 					// Inserts are slow so we don't allow them here. Instead they are handled "on the fly"
 					// by use-navigation-blocks.js so that this code may deal exclusively with the updates.
-					return new WP_Error(
-						"Attempted to insert a new menu item using batch processing - it is unsupported. " .
-						"Batch processing can only delete and update existing items."
-					);
+					return new WP_Error( 'insert_unsupported', __( 'Cannot insert new items using batch processing.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 
 				if ( $children ) {
@@ -120,6 +120,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 				$result = $this->controller->delete_item_validate( $request );
 			}
 			if ( is_wp_error( $result ) ) {
+				$result->add_data( $input, 'input' );
 				return $result;
 			}
 			$batch[ $k ][] = $result;
@@ -140,6 +141,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 			}
 
 			if ( is_wp_error( $result ) ) {
+				$result->add_data( $input, 'input' );
 				return $result;
 			}
 

@@ -1120,6 +1120,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$result = $processor->process( $request['tree'] );
 		if ( is_wp_error( $result ) ) {
+			// Provide information to the client about the specific input that caused the problem
+			$current_data = $result->get_error_data() ?: [];
+			$current_data['input'] = $result->get_error_data( 'input' );
+			$result->add_data( $current_data );
+
 			return $result;
 		}
 
