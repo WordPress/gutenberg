@@ -14,7 +14,7 @@ import {
 	withFocusReturn,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 const noticeId = 'edit-navigation-create-menu-error';
@@ -24,14 +24,26 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export function CreateMenuForm( { onCancel, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const { isCreatingMenu } = useSelect( ( select ) => {
-		const { getIsResolving } = select( 'core' );
+	const { isCreatingMenu, hasCreatedMenu } = useSelect( ( select ) => {
+		const { getIsResolving, hasFinishedResolution } = select( 'core' );
 		return {
 			isCreatingMenu: getIsResolving( 'saveMenu' ),
+			hasCreatedMenu: hasFinishedResolution( 'saveMenu' ),
 		};
 	}, [] );
 	const { saveMenu } = useDispatch( 'core' );
-	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
+	const { createInfoNotice, createErrorNotice, removeNotice } = useDispatch(
+		'core/notices'
+	);
+
+	useEffect( () => {
+		if ( hasCreatedMenu ) {
+			createInfoNotice( __( 'Menu created' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		}
+	}, [ hasCreatedMenu ] );
 
 	const onCreateMenu = useCallback(
 		( event ) => {
