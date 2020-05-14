@@ -372,62 +372,37 @@ function gutenberg_experimental_global_styles_merge_trees( $source, $updates ) {
 }
 
 /**
- * Given a global styles tree, returns a normalized tree
- * that conforms to the expected shape.
+ * Given a global styles tree, it normalizes it
+ * to the expected shape.
  *
- * @param array $tree Input tree to normalize.
+ * @param array $tree Source tree to normalize.
  *
  * @return array
  */
 function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
-	if (
-		! array_key_exists( 'styles', $tree ) ||
-		! is_array( $tree['styles'] )
-	) {
-		$tree['styles'] = array();
+	$normalized_tree = array(
+		'styles' => array(
+			'globals' => array(
+				'preset' => array(
+					'color'     => array(),
+					'font-size' => array(),
+					'gradient'  => array(),
+				),
+			),
+			'blocks'  => array(),
+		),
+	);
+
+	// Add the supported blocks, which we don't know prior which they are.
+	$block_data = gutenberg_experimental_global_styles_get_block_data();
+	foreach ( array_keys( $block_data ) as $block_name ) {
+		$normalized_tree['styles']['blocks'][ $block_name ] = array();
 	}
 
-	if (
-		! array_key_exists( 'globals', $tree['styles'] ) ||
-		! is_array( $tree['styles']['globals'] )
-	) {
-		$tree['styles']['globals'] = array();
-	}
-
-	if (
-		! array_key_exists( 'preset', $tree['styles']['globals'] ) ||
-		! is_array( $tree['styles']['globals']['preset'] )
-	) {
-		$tree['styles']['globals']['preset'] = array();
-	}
-
-	if (
-		! array_key_exists( 'color', $tree['styles']['globals']['preset'] ) ||
-		! is_array( $tree['styles']['globals']['preset']['color'] )
-	) {
-		$tree['styles']['globals']['preset']['color'] = array();
-	}
-
-	if (
-		! array_key_exists( 'font-size', $tree['styles']['globals']['preset'] ) ||
-		! is_array( $tree['styles']['globals']['preset']['font-size'] )
-	) {
-		$tree['styles']['globals']['preset']['font-size'] = array();
-	}
-
-	if (
-		! array_key_exists( 'gradient', $tree['styles']['globals']['preset'] ) ||
-		! is_array( $tree['styles']['globals']['preset']['gradient'] )
-	) {
-		$tree['styles']['globals']['preset']['gradient'] = array();
-	}
-
-	if (
-		! array_key_exists( 'blocks', $tree['styles'] ) ||
-		! is_array( $tree['styles']['blocks'] )
-	) {
-		$tree['styles']['blocks'] = array();
-	}
+	$tree = array_merge_recursive(
+		$normalized_tree,
+		$tree
+	);
 
 	return $tree;
 }
