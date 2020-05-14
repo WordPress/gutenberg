@@ -207,7 +207,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	 * We want the presets declared in theme.json
 	 * to take precedence over the ones declared via add_theme_support.
 	 */
-	$theme_config = array_merge(
+	$theme_config = gutenberg_experimental_global_styles_merge_trees(
 		$theme_presets,
 		$theme_config
 	);
@@ -418,16 +418,8 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
 	$gs_user   = gutenberg_experimental_global_styles_get_user();
 
-	$gs_merged['styles']['globals'] = array_merge_recursive(
-		$gs_core['styles']['globals'],
-		$gs_theme['styles']['globals'],
-		$gs_user['styles']['globals']
-	);
-	$gs_merged['styles']['blocks']  = array_merge_recursive(
-		$gs_core['styles']['blocks'],
-		$gs_theme['styles']['blocks'],
-		$gs_user['styles']['blocks']
-	);
+	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme );
+	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_merged, $gs_user );
 
 	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $gs_merged );
 	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $gs_merged );
@@ -485,7 +477,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 
-	$global_styles = array_merge(
+	$global_styles = gutenberg_experimental_global_styles_merge_trees(
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme()
 	);
