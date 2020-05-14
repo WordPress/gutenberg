@@ -12,7 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import styles from './style.scss';
 
 function ResizableBox( props ) {
-	const { size, isSelected, getStylesFromColorScheme } = props;
+	const { size, showHandle, getStylesFromColorScheme } = props;
 	const { height } = size;
 	const defaultStyle = getStylesFromColorScheme(
 		styles.staticSpacer,
@@ -22,7 +22,7 @@ function ResizableBox( props ) {
 		<View
 			style={ [
 				defaultStyle,
-				isSelected && styles.selectedSpacer,
+				showHandle && styles.selectedSpacer,
 				{ height },
 			] }
 		></View>

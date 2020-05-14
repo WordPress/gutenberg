@@ -11,7 +11,7 @@ import path from 'path';
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { iosServer, iosLocal, android8 } from './caps';
+import { iosServer, iosLocal, android } from './caps';
 import AppiumLocal from './appium-local';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'underscore';
@@ -78,7 +78,7 @@ const setupDriver = async () => {
 
 	let desiredCaps;
 	if ( isAndroid() ) {
-		desiredCaps = _.clone( android8 );
+		desiredCaps = _.clone( android );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {

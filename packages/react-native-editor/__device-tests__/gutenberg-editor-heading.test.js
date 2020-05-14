@@ -10,7 +10,7 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
 describe( 'Gutenberg Editor tests', () => {
 	let driver;
@@ -48,8 +48,7 @@ describe( 'Gutenberg Editor tests', () => {
 		}
 		await editorPage.sendTextToHeadingBlock(
 			headingBlockElement,
-			testData.heading,
-			false
+			testData.heading
 		);
 
 		await editorPage.addNewParagraphBlock();
@@ -74,8 +73,7 @@ describe( 'Gutenberg Editor tests', () => {
 		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
 		await editorPage.sendTextToHeadingBlock(
 			headingBlockElement,
-			testData.heading,
-			false
+			testData.heading
 		);
 
 		await editorPage.addNewParagraphBlock();

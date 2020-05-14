@@ -31,8 +31,9 @@ import { compose } from '@wordpress/compose';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
-import { searchItems } from './search-items';
+import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
+import InserterNoResults from './no-results';
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
@@ -51,7 +52,7 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 9;
 
-function InserterBlockList( {
+export function InserterBlockList( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -114,7 +115,7 @@ function InserterBlockList( {
 	};
 
 	const filteredItems = useMemo( () => {
-		return searchItems( items, categories, collections, filterValue );
+		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
 
 	const childItems = useMemo( () => {
@@ -167,22 +168,13 @@ function InserterBlockList( {
 
 	// Announce search results on change
 	useEffect( () => {
-		const resultCount = Object.keys( itemsPerCategory ).reduce(
-			( accumulator, currentCategorySlug ) => {
-				return (
-					accumulator + itemsPerCategory[ currentCategorySlug ].length
-				);
-			},
-			0
-		);
-
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
+			_n( '%d result found.', '%d results found.', filteredItems.length ),
+			filteredItems.length
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ itemsPerCategory, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
@@ -284,11 +276,7 @@ function InserterBlockList( {
 						return fills;
 					}
 					if ( ! hasItems ) {
-						return (
-							<p className="block-editor-inserter__no-results">
-								{ __( 'No blocks found.' ) }
-							</p>
-						);
+						return <InserterNoResults />;
 					}
 					return null;
 				} }

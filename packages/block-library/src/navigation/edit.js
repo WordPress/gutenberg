@@ -31,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { menu } from '@wordpress/icons';
+import { navigation as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -82,7 +82,8 @@ function Navigation( {
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
-		clientId
+		clientId,
+		true
 	);
 
 	// Builds navigation links from default Pages.
@@ -141,7 +142,7 @@ function Navigation( {
 			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
+					icon={ icon }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -229,7 +230,10 @@ function Navigation( {
 			{ navigatorModal }
 			<InspectorControls>
 				<PanelBody title={ __( 'Navigation Structure' ) }>
-					<BlockNavigationList clientId={ clientId } />
+					<BlockNavigationList
+						clientId={ clientId }
+						__experimentalWithBlockNavigationSlots
+					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
@@ -265,7 +269,7 @@ function Navigation( {
 							allowedBlocks={ [ 'core/navigation-link' ] }
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
-								attributes.orientation
+								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"

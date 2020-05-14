@@ -46,6 +46,7 @@ export default function VerseEdit( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ) }
 				onMerge={ mergeBlocks }
+				textAlign={ textAlign }
 			/>
 		</>
 	);

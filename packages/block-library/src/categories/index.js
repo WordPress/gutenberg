@@ -1,21 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { category as icon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
 
-export const name = 'core/categories';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Categories' ),
 	description: __( 'Display a list of all categories.' ),
 	icon,
-	category: 'widgets',
 	supports: {
 		align: true,
 		html: false,

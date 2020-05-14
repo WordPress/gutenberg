@@ -170,9 +170,13 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__no-results {
-	font-style: italic;
-	padding: 24px;
+	padding: $grid-unit-40;
+	margin-top: $grid-unit-40 * 2;
 	text-align: center;
+}
+
+.block-editor-inserter__no-results-icon {
+	fill: $light-gray-800;
 }
 
 .block-editor-inserter__child-blocks {
@@ -261,4 +265,10 @@ $block-inserter-tabs-height: 44px;
 	&.is-placeholder {
 		min-height: 100px;
 	}
+}
+
+.block-editor-inserter__patterns-item-title {
+	padding: $grid-unit-05;
+	font-size: 12px;
+	text-align: center;
 }

@@ -123,7 +123,9 @@ _Flags_:
 - `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
 - `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
-### `env`
+### `env` (deprecated)
+
+> _This script is no longer maintained and it’s going to be removed in one of the future releases. We recommend using [`@wordpress/env`](/packages/env/README.md) package instead that lets you easily set up a local WordPress environment for building and testing plugins and themes._
 
 `env` is a family of scripts for setting up a local Docker-based development environment that plugin contributors can work in.
 
@@ -162,14 +164,14 @@ In the `wp-env` config block, each entry can be configured like so:
 #### Available Sub-Scripts
 
 - `install`: Automatically downloads, builds, and installs a copy of WordPress to work with. This will be installed in the `wordpress` folder inside your project. You should add `wordpress` to your `.gitignore` file.
-- `connect`: For contributors that have a WordPress respository already, they can define the `WP_DEVELOP_DIR` environment variable with the path to their repository, then run this command to add your plugin to it.
+- `connect`: For contributors that have a WordPress repository already, they can define the `WP_DEVELOP_DIR` environment variable with the path to their repository, then run this command to add your plugin to it.
 - `start`: Starts the Docker containers.
 - `stop`: Stops the Docker containers.
 - `update`: For contributors that used `npm run env install` to setup WordPress, running this command will update it to the latest checkout.
 - `reinstall`: Resets the database and re-configures WordPress again.
 - `cli`: Runs WP-CLI commands against the WordPress install.
 - `lint-php`: Run PHPCS linting on your plugin. You will need to have `composer.json` configured to install PHPCS, with a `lint` script that runs your linting. You will also need to have an appropriately configured `phpcs.xml.dist` file.
-- `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
+- `test-php`: Runs your plugin’s PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
 ### `format-js`
@@ -385,7 +387,8 @@ _Example:_
 {
 	"scripts": {
 		"test:e2e": "wp-scripts test-e2e",
-		"test:e2e:help": "wp-scripts test-e2e --help"
+		"test:e2e:help": "wp-scripts test-e2e --help",
+		"test:e2e:debug": "wp-scripts --inspect-brk test-e2e --puppeteer-devtools"
 	}
 }
 ```
@@ -397,6 +400,7 @@ This is how you execute those scripts using the presented setup:
 * `npm run test-e2e -- --puppeteer-interactive` - runs all e2e tests interactively.
 * `npm run test-e2e FILE_NAME -- --puppeteer-interactive ` - runs one test file interactively.
 * `npm run test-e2e:watch -- --puppeteer-interactive` - runs all tests interactively and watch for changes.
+* `npm run test-e2e:debug` - runs all tests interactively and enables [debugging tests](#debugging-e2e-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
@@ -425,7 +429,8 @@ _Example:_
 	"scripts": {
 		"test:unit": "wp-scripts test-unit-js",
 		"test:unit:help": "wp-scripts test-unit-js --help",
-		"test:unit:watch": "wp-scripts test-unit-js --watch"
+		"test:unit:watch": "wp-scripts test-unit-js --watch",
+		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache"
 	}
 }
 ```
@@ -435,6 +440,7 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
+* `npm run test:unit:debug` - runs all unit tests in [debug mode](#debugging-tests).
 
 Jest will look for test files with any of the following popular naming conventions:
 
@@ -445,6 +451,58 @@ Jest will look for test files with any of the following popular naming conventio
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+## Passing Node.js options
+
+`wp-scripts` supports the full array of [Node.js CLI options](https://nodejs.org/api/cli.html). They can be passed after the `wp-scripts` command and before the script name.
+
+```sh
+wp-scripts [NODE_OPTIONS] script
+```
+
+### Debugging tests
+
+One common use-case for passing Node.js options is debugging your tests.
+
+Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
+
+Follow the instructions for debugging Node.js with your favorite supported browser or IDE. When the instructions say to use `node --inspect script.js` or `node --inspect-brk script.js`, simply use `wp-scripts --inspect script` or `wp-scripts --inspect-brk script` instead.
+
+Google Chrome and Visual Studio Code are used as examples below.
+
+#### Debugging in Google Chrome
+
+Place `debugger;` statements in any test and run `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` (or `npm run test:unit:debug` from above).
+
+Then open `about:inspect` in Google Chrome and select `inspect` on your process.
+
+A breakpoint will be set at the first line of the script (this is done to give you time to open the developer tools and to prevent Jest from executing before you have time to do so). Click the resume button in the upper right panel of the dev tools to continue execution. When Jest executes the test that contains the debugger statement, execution will pause and you can examine the current scope and call stack.
+
+#### Debugging in Visual Studio Code
+
+Debugging npm scripts is supported out of the box for Visual Studio Code as of [version 1.23](https://code.visualstudio.com/blogs/2018/07/12/introducing-logpoints-and-auto-attach#_npm-scripts-and-debugging) and can be used to debug Jest unit tests.
+
+Make sure `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
+
+When debugging, set a breakpoint in your tests by clicking on a line in the editor’s left margin by the line numbers.
+
+Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the npm scripts. To start the tests, click the debug icon next to `test:unit:debug`.
+
+The tests will start running, and execution will pause on your selected line so you can inspect the current scope and call stack within the editor.
+
+See [Debugging in Visual Studio Code](https://code.visualstudio.com/Docs/editor/debugging) for more details on using the Visual Studio Code debugger.
+
+#### Debugging e2e tests
+
+Since e2e tests run both in the node context _and_ the (usually headless) browser context, not all lines of code can have breakpoints set within the inspector client—only the node context is debugged in the inspector client.
+
+The code executed in the node context includes all of the test files _excluding_ code within `page.evaluate` functions. The `page.evaluate` functions and the rest of your app code is executed within the browser context.
+
+Test code (node context) can be debugged normally using the instructions above.
+
+To also debug the browser context, run `wp-scripts --inspect-brk test-e2e --puppeteer-devtools`. The `--puppeteer-devtools` option (or the `PUPPETEER_DEVTOOLS="true"` environment variable when used with `PUPPETEER_HEADLESS="false"`) will disable headless mode and launch the browser with the devtools already open. Breakpoints can then be set in the browser context using these devtools.
+
+For more e2e debugging tips check out the [Puppeteer debugging docs](https://developers.google.com/web/tools/puppeteer/debugging).
 
 ## Advanced Usage
 
@@ -497,4 +555,5 @@ module.exports = {
 ```
 
 If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

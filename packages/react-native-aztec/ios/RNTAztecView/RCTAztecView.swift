@@ -136,6 +136,7 @@ class RCTAztecView: Aztec.TextView {
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
+        storage.htmlConverter.shouldCollapseSpaces = false
         shouldNotifyOfNonUserChanges = false
         disableLinkTapRecognizer()
         preBackgroundColor = .clear

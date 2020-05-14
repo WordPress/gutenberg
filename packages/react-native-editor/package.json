@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/react-native-editor",
-  "version": "1.26.0",
+  "version": "1.27.1",
   "description": "Mobile WordPress gutenberg editor.",
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
@@ -27,8 +27,12 @@
     "npm": ">=6.9"
   },
   "dependencies": {
-    "@babel/runtime": "^7.7.7",
+    "@babel/runtime": "^7.9.2",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#5ad284d92b8d886e366445bf215be741ed53ddc6",
+    "@wordpress/api-fetch": "file:../api-fetch",
+    "@wordpress/block-editor": "file:../block-editor",
+    "@wordpress/block-library": "file:../block-library",
+    "@wordpress/blocks": "file:../blocks",
     "@wordpress/components": "file:../components",
     "@wordpress/data": "file:../data",
     "@wordpress/edit-post": "file:../edit-post",
@@ -43,11 +47,11 @@
     "metro-react-native-babel-preset": "0.57.0",
     "metro-react-native-babel-transformer": "0.56.0",
     "node-fetch": "^2.3.0",
-    "node-libs-react-native": "^1.0.2",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
     "react-native-get-random-values": "^1.4.0",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
+    "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",
     "react-native-linear-gradient": "git+https://github.com/wordpress-mobile/react-native-linear-gradient.git#52bf43077171cff8714ce3e0155f3ebb7f55bc37",
     "react-native-modal": "^6.5.0",
@@ -55,7 +59,7 @@
     "react-native-sass-transformer": "^1.1.1",
     "react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
     "react-native-url-polyfill": "^1.1.2",
-    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#6cdaddd9c81ebe2da5b28412d389cc105e156948"
+    "react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
   },
   "publishConfig": {
     "access": "public"
@@ -112,14 +116,14 @@
     "test:e2e:install-app:android": "cd android && ./gradlew installDebug",
     "test:e2e:bundle:ios": "react-native bundle --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle --assets-dest=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app",
     "test:e2e:build-app:ios": "npm run ios --configuration Release --no-packager",
-    "build:gutenberg": "cd gutenberg && npm install && npm run build",
+    "build:gutenberg": "cd gutenberg && npm ci && npm run build",
     "clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run cache clean; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman; npm run clean:node; npm run clean:pot",
     "clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
     "clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",
     "clean:aztec": "cd ../react-native-aztec && npm run clean && cd example && npm run clean",
     "clean:gutenberg": "cd gutenberg && npm run clean:packages && rm -rf build && rm -rf node_modules",
     "clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
-    "clean:install": "npm run clean; npm run",
+    "clean:install": "npm run clean; npm install",
     "clean:jest": "jest --clearCache --config ../../test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
     "clean:metro": "rm -rf $TMPDIR/metro-cache-*;",
     "clean:pot": "rm -f gutenberg*.pot",

@@ -93,6 +93,10 @@ _Returns_
 
 -   `WPElement`: Block Breadcrumb.
 
+<a name="BlockColorsStyleSelector" href="#BlockColorsStyleSelector">#</a> **BlockColorsStyleSelector**
+
+Undocumented declaration.
+
 <a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
 
 Component which merges passed value with current consumed block context.

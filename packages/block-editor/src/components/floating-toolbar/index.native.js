@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, I18nManager } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,7 @@ const FloatingToolbar = ( {
 	parentId,
 	showFloatingToolbar,
 	onNavigateUp,
+	isRTL,
 } ) =>
 	!! showFloatingToolbar && (
 		<TouchableWithoutFeedback accessible={ false }>
@@ -32,9 +33,7 @@ const FloatingToolbar = ( {
 						<ToolbarButton
 							title={ __( 'Navigate Up' ) }
 							onClick={ () => onNavigateUp( parentId ) }
-							icon={
-								<NavigateUpSVG isRTL={ I18nManager.isRTL } />
-							}
+							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
 						/>
 						<View style={ styles.pipe } />
 					</Toolbar>
@@ -51,6 +50,7 @@ export default compose( [
 			getBlockHierarchyRootClientId,
 			getBlockRootClientId,
 			getBlockCount,
+			getSettings,
 		} = select( 'core/block-editor' );
 
 		const selectedClientId = getSelectedBlockClientId();
@@ -63,6 +63,7 @@ export default compose( [
 			selectedClientId,
 			showFloatingToolbar: !! getBlockCount( rootBlockId ),
 			parentId: getBlockRootClientId( selectedClientId ),
+			isRTL: getSettings().isRTL,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

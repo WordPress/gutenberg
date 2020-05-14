@@ -1,11 +1,14 @@
 buildscript {
-    def isJitPack = System.getenv('JITPACK').asBoolean()
+    def buildGutenbergMobileJSBundle =
+            System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
+                    ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                    && rootProject.ext.buildGutenbergMobileJSBundle)
 
     repositories {
         jcenter()
         google()
 
-        if (isJitPack) {
+        if (buildGutenbergMobileJSBundle) {
             maven {
                 url "https://plugins.gradle.org/m2/"
             }
@@ -16,7 +19,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
-        if (isJitPack) {
+        if (buildGutenbergMobileJSBundle) {
             classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
         }
     }
@@ -25,10 +28,13 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-def isJitPack = System.getenv('JITPACK').asBoolean()
+def buildGutenbergMobileJSBundle =
+        System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
+                ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                && rootProject.ext.buildGutenbergMobileJSBundle)
 
-if (isJitPack) {
-    println 'Building in JitPack'
+if (buildGutenbergMobileJSBundle) {
+    println 'Building the Gutenberg Mobile JS bundle'
 
     apply plugin: 'com.moowork.node'
 
@@ -62,6 +68,10 @@ if (isJitPack) {
 
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../")
+    }
+
+    yarn_install {
+        args = ['--prefer-offline', '--network-concurrency 1']
     }
 }
 
@@ -155,7 +165,7 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-if (isJitPack) {
+if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
     def aarFolder = 'src/main/assets'
 
@@ -163,7 +173,7 @@ if (isJitPack) {
         args = ['bundle:android']
     }
 
-    task ensureAssetsDirectory { 
+    task ensureAssetsDirectory {
         doLast {
             mkdir assetsFolder
         }
@@ -205,7 +215,7 @@ if (isJitPack) {
         delete '../../react-native-editor/node_modules'
     }
 
-    if (isJitPack) {
+    if (buildGutenbergMobileJSBundle) {
         preBuild.dependsOn(cleanupNodeModulesFolder)
         cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
         backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)

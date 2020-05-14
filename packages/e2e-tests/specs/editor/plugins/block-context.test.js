@@ -17,9 +17,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.editor-post-preview__button-external' );
-	await editorPage.click( '.editor-post-preview__button-external' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -80,7 +80,7 @@ describe( 'Block context', () => {
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 0' );
+		expect( content ).toMatch( /^0,\d+,post$/ );
 
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
@@ -99,7 +99,7 @@ describe( 'Block context', () => {
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 123' );
+		expect( content ).toMatch( /^123,\d+,post$/ );
 
 		// Clean up
 		await editorPage.bringToFront();

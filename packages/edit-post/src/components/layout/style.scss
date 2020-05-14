@@ -31,7 +31,7 @@
 	overflow: auto;
 
 	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel-break-medium");
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
@@ -67,7 +67,8 @@
 
 
 .edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toogle-sidebar-panel {
+.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-entities-saved-states-panel {
 	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;

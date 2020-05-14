@@ -286,7 +286,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$block->rating_count        = $plugin['num_ratings'];
 		$block->active_installs     = $plugin['active_installs'];
 		$block->author_block_rating = $plugin['author_block_rating'] / 20;
-		$block->author_block_count  = $plugin['author_block_count'];
+		$block->author_block_count  = (int) $plugin['author_block_count'];
 
 		// Plugin's author, not author in block.json.
 		$block->author = wp_strip_all_tags( $plugin['author'] );

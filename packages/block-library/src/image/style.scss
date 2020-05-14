@@ -16,17 +16,11 @@
 		width: 100%;
 	}
 
-	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
 	.alignleft,
 	.alignright,
 	.aligncenter,
 	&.is-resized {
 		display: table;
-
-		// The figure is born with left and right margin.
-		// We remove this by default, and then customize it for left, right, and center.
-		margin-left: 0;
-		margin-right: 0;
 
 		> figcaption {
 			display: table-caption;
@@ -38,6 +32,7 @@
 		/*rtl:ignore*/
 		float: left;
 		/*rtl:ignore*/
+		margin-left: 0;
 		margin-right: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;
@@ -47,6 +42,7 @@
 		/*rtl:ignore*/
 		float: right;
 		/*rtl:ignore*/
+		margin-right: 0;
 		margin-left: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;

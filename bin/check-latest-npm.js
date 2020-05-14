@@ -111,9 +111,6 @@ Run ${ yellow(
 		}
 	} )
 	.catch( ( error ) => {
-		// Disable reason: A failure should log to the terminal.
-
-		// eslint-disable-next-line no-console
 		console.error(
 			'Latest NPM check failed!\n\n' + error.toString() + '\n'
 		);

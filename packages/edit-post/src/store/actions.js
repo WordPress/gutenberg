@@ -273,8 +273,6 @@ export function metaBoxUpdatesSuccess() {
 
 /**
  * Returns an action object used to toggle the width of the editing canvas.
- * It's marked as experimental because, potentially, we'll need this
- * in several pages including edit-site.
  *
  * @param {string} deviceType
  *
