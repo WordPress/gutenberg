@@ -32,12 +32,7 @@ import {
 	__experimentalBlockNavigationEditor as BlockNavigationEditor,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import {
-	Fragment,
-	useState,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 

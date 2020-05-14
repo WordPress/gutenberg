@@ -13,7 +13,6 @@ export default function BlockNavigationEditor( { value, onChange } ) {
 	return (
 		<BlockNavigationBlockFill>
 			<RichText
-				className="wp-block-navigation-link__label"
 				value={ value }
 				onChange={ onChange }
 				placeholder={ __( 'Navigation item' ) }
