@@ -164,7 +164,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
 		foreach ( $theme_colors as $color ) {
-			$theme_supports['color'][ $color['slug'] ] = $color['color'];
+			$theme_supports['preset']['color'][ $color['slug'] ] = $color['color'];
 		}
 	}
 
@@ -172,7 +172,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
 	if ( is_array( $theme_gradients ) ) {
 		foreach ( $theme_gradients as $gradient ) {
-			$theme_supports['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_supports['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
 		}
 	}
 
@@ -180,7 +180,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
 	if ( is_array( $theme_font_sizes ) ) {
 		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_supports['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_supports['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
 		}
 	}
 
