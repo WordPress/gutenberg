@@ -1,21 +1,14 @@
 <?php
 
-namespace WP_REST_Menu_Items_Batch_Operation;
-
-use \WP_Error;
-use \WP_REST_Menu_Items_Controller;
-
-require_once __DIR__ . '/class-operation.php';
-require_once __DIR__ . '/class-delete-operation.php';
-require_once __DIR__ . '/class-update-operation.php';
-require_once __DIR__ . '/class-unsupported-operation.php';
-
 /**
  * Class that processes a batch of menu item updates and deletes.
  *
  * @see WP_REST_Posts_Controller
  */
-class Batch_Processor {
+class WP_REST_Menu_Items_Batch_Processor {
+
+	const UPDATE = 'update';
+	const DELETE = 'delete';
 
 	private $navigation_id;
 	private $controller;
@@ -41,14 +34,14 @@ class Batch_Processor {
 	public function process( $raw_input ) {
 		$batch = $this->compute_batch( $raw_input );
 
-		$error = $this->batch_validate( $batch );
-		if ( is_wp_error( $error ) ) {
-			return $error;
+		$validated_batch = $this->batch_validate( $batch );
+		if ( is_wp_error( $validated_batch ) ) {
+			return $validated_batch;
 		}
 
 		do_action( 'menu_items_batch_processing_start', $this->navigation_id );
 
-		$result = $this->batch_persist( $batch );
+		$result = $this->batch_persist( $validated_batch );
 
 		if ( is_wp_error( $result ) ) {
 			// We're in a broken state now, some operations succeeded and some other failed.
@@ -82,17 +75,19 @@ class Batch_Processor {
 				unset( $raw_menu_item['children'] );
 				// Let's infer the menu order and parent id from the input tree
 				$raw_menu_item['menu_order'] = $n + 1;
-				$raw_menu_item['parent'] = $parent_operation ? $parent_operation->input['id'] : 0;
+				$raw_menu_item['parent'] = $parent_operation ? $parent_operation[1]['id'] : 0;
 
 				if ( ! empty( $raw_menu_item['id'] ) ) {
 					$updated_ids[] = $raw_menu_item['id'];
-					$operation = new UpdateOperation( $this->controller, $raw_menu_item, $parent_operation );
+					$operation = [ static::UPDATE, $raw_menu_item ];
 					$operations[] = $operation;
 				} else {
 					// Inserts are slow so we don't allow them here. Instead they are handled "on the fly"
 					// by use-navigation-blocks.js so that this code may deal exclusively with the updates.
-					$operation = new UnsupportedOperation( $this->controller, $raw_menu_item, $parent_operation );
-					$operations[] = $operation;
+					return new WP_Error(
+						"Attempted to insert a new menu item using batch processing - it is unsupported. " .
+						"Batch processing can only delete and update existing items."
+					);
 				}
 
 				if ( $children ) {
@@ -104,10 +99,7 @@ class Batch_Processor {
 		// Delete any orphaned items
 		foreach ( $current_menu_items as $item ) {
 			if ( ! in_array( $item->ID, $updated_ids ) ) {
-				$operations[] = new DeleteOperation(
-					$this->controller,
-					[ 'menus' => $this->navigation_id, 'force' => true, 'id' => $item->ID ]
-				);
+				$operations[] = [ static::DELETE, [ 'menus' => $this->navigation_id, 'force' => true, 'id' => $item->ID ] ];
 			}
 		}
 
@@ -118,21 +110,39 @@ class Batch_Processor {
 		// We infer the menu order and parent id from the received input tree so there's no need
 		// to validate them in the controller
 		$this->controller->validate_order_and_hierarchy = false;
-		foreach ( $batch as $operation ) {
-			$result = $operation->validate();
+		foreach ( $batch as $k => list( $type, $input ) ) {
+			if ( $type === static::UPDATE ) {
+				$result = $this->controller->update_item_validate( $input );
+			} elseif ( $type === static::DELETE ) {
+				$result = $this->controller->delete_item_validate( $input );
+			}
 			if ( is_wp_error( $result ) ) {
 				return $result;
 			}
+			$batch[ $k ][] = $result;
 		}
+
+		return $batch;
 	}
 
 	protected function batch_persist( $validated_operations ) {
 		foreach ( $validated_operations as $operation ) {
-			$result = $operation->persist( $this->request );
+			list( $type, $input, $prepared_nav_item ) = $operation;
+			if ( $type === static::UPDATE ) {
+				$result = $this->controller->update_item_persist( $prepared_nav_item, $input, $this->request );
+			} elseif ( $type === static::DELETE ) {
+				$result = $this->controller->delete_item_persist( $input['id'] );
+			}
+
 			if ( is_wp_error( $result ) ) {
 				return $result;
 			}
-			$operation->notify( $this->request );
+
+			if ( $type === static::UPDATE ) {
+				$this->controller->update_item_notify( $result, $this->request );
+			} elseif ( $type === static::DELETE ) {
+				$this->controller->delete_item_notify( $result, new WP_REST_Response(), $this->request );
+			}
 		}
 	}
 
