@@ -80,7 +80,7 @@ function gutenberg_experimental_global_styles_get_user() {
 		}
 	}
 
-	return gutenberg_experimental_global_styles_normalize_shape( $config );
+	return gutenberg_experimental_global_styles_normalize_schema( $config );
 }
 
 /**
@@ -151,7 +151,7 @@ function gutenberg_experimental_global_styles_get_core() {
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
 
-	return gutenberg_experimental_global_styles_normalize_shape( $config );
+	return gutenberg_experimental_global_styles_normalize_schema( $config );
 }
 
 /**
@@ -160,7 +160,7 @@ function gutenberg_experimental_global_styles_get_core() {
  * @return array
  */
 function gutenberg_experimental_global_styles_get_theme_presets() {
-	$theme_presets = gutenberg_experimental_global_styles_normalize_shape( array() );
+	$theme_presets = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
@@ -194,7 +194,7 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
  */
 function gutenberg_experimental_global_styles_get_theme() {
 	$theme_presets = gutenberg_experimental_global_styles_get_theme_presets();
-	$theme_config  = gutenberg_experimental_global_styles_normalize_shape(
+	$theme_config  = gutenberg_experimental_global_styles_normalize_schema(
 		gutenberg_experimental_global_styles_get_from_file(
 			locate_template( 'experimental-theme.json' )
 		)
@@ -375,7 +375,7 @@ function gutenberg_experimental_global_styles_resolver_presets( $block_selector,
  * @return array The merge result.
  */
 function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
-	$accumulator = gutenberg_experimental_global_styles_normalize_shape( array() );
+	$accumulator = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( $trees as $tree ) {
 		foreach ( array_keys( $accumulator ) as $block_name ) {
@@ -399,15 +399,14 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
 }
 
 /**
- * Given a global styles tree, it normalizes it
- * to the expected shape.
+ * Given a tree, it normalizes it to the expected schema.
  *
  * @param array $tree Source tree to normalize.
  *
- * @return array
+ * @return array Normalized tree.
  */
-function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
-	$block_shape = array(
+function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
+	$block_schema = array(
 		'styles'   => array(),
 		'features' => array(),
 		'presets'  => array(
@@ -417,10 +416,10 @@ function gutenberg_experimental_global_styles_normalize_shape( $tree ) {
 		),
 	);
 
-	$normalized_tree = array( 'global' => array( $block_shape ) );
+	$normalized_tree = array( 'global' => array( $block_schema ) );
 	$block_data      = gutenberg_experimental_global_styles_get_block_data();
 	foreach ( array_keys( $block_data ) as $block_name ) {
-		$normalized_tree[ $block_name ] = $block_shape;
+		$normalized_tree[ $block_name ] = $block_schema;
 	}
 
 	$tree = array_merge_recursive(
@@ -444,7 +443,7 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 
 	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
 
-	$stylesheet  = gutenberg_experimental_global_styles_resolver( $gs_merged );
+	$stylesheet = gutenberg_experimental_global_styles_resolver( $gs_merged );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
