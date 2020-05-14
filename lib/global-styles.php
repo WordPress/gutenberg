@@ -354,10 +354,7 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
 	foreach ( $trees as $tree ) {
 		foreach ( array_keys( $accumulator['styles']['globals']['preset'] ) as $property ) {
 			if ( ! empty( $tree['styles']['globals']['preset'][ $property ] ) ) {
-				$accumulator['styles']['globals']['preset'][ $property ] = array_merge(
-					$accumulator['styles']['globals']['preset'][ $property ],
-					$tree['styles']['globals']['preset'][ $property ]
-				);
+				$accumulator['styles']['globals']['preset'][ $property ] = $tree['styles']['globals']['preset'][ $property ];
 			}
 		}
 	}
@@ -365,10 +362,7 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
 	foreach ( $trees as $tree ) {
 		foreach ( array_keys( $accumulator['styles']['blocks'] ) as $block_name ) {
 			if ( ! empty( $tree['styles']['blocks'][ $block_name ] ) ) {
-				$accumulator['styles']['blocks'][ $block_name ] = array_merge(
-					$accumulator['styles']['blocks'][ $block_name ],
-					$tree['styles']['blocks'][ $block_name ]
-				);
+				$accumulator['styles']['blocks'][ $block_name ] = $tree['styles']['blocks'][ $block_name ];
 			}
 		}
 	}
