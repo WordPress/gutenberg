@@ -291,6 +291,16 @@ function gutenberg_experimental_global_styles_resolver_block_styles( $global_sty
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
 
 	foreach ( $styles as $block_name => $block_style ) {
+		if (
+			! array_key_exists( $block_name, $block_data ) ||
+			! array_key_exists( 'selector', $block_data[ $block_name ] ) ||
+			! array_key_exists( 'supports', $block_data[ $block_name ] )
+		) {
+			// Do not process blocks that haven't declared support,
+			// so we don't know to process.
+			continue;
+		}
+
 		$css_declarations = '';
 		foreach ( $block_style as $property => $value ) {
 			// Only convert to CSS the style attributes the block has declared support for.
