@@ -185,7 +185,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 			} ) }
 
 			{ !! uncategorizedPatterns.length && (
-				<InserterPanel title={ _x( 'All', 'Uncategorized patterns' ) }>
+				<InserterPanel title={ _x( 'Uncategorized' ) }>
 					<BlockPatternList
 						shownPatterns={ currentShownPatterns }
 						patterns={ uncategorizedPatterns }
