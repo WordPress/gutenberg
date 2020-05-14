@@ -213,22 +213,18 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
- * Maintains a list of the CSS selectors available to use.
- * This should be taken from the block / pattern registry.
+ * Retrieves the block data (selector/supports).
  *
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	// TODO: this data should be taken from the block.json.
+	// TODO: this data should be taken from the block registry.
 	//
 	// We need the ability to have many selectors per block
-	// like for heading (core/heading/h1, core/heading/h2, etc)
-	// but also for other blocks that have complex layouts
-	// (ex: for gallery we may want to target the wrapper element
+	// to account for block variations (heading block: h1, ..., h6)
+	// as well as complex blocks that don't match an HTML element
+	// (ex:gallery block, for which we may want to target the wrapper element
 	// and the individual images).
-	//
-	// Having access to this via the block registry
-	// requires block server registration.
 	$block_data = array(
 		'global'          => array(
 			'selector' => ':root',
