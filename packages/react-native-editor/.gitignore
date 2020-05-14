@@ -27,6 +27,7 @@ bundle/
 *.ap_
 .gradle/
 android/app/src/main/assets/
+android/app/src/main/res/raw/
 
 # iOS builds
 *.app.zip
@@ -105,6 +106,8 @@ buck-out/
 
 # e2e output log
 appium-out.log
+ios-screen-recordings/
+android-screen-recordings/
 
 bin/wp-cli.phar
 
