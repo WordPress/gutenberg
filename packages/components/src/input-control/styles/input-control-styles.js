@@ -195,9 +195,13 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	const position = isFloatingLabel ? 'absolute' : null;
 	const pointerEvents = isFloating ? null : 'none';
 
-	const marginTop = isFloating ? 0 : 1;
+	const isSmall = size === 'small';
+
+	const offsetTop = isSmall ? 1 : 2;
+	const offset = isSmall ? '-3px' : '-5px';
+
+	const marginTop = isFloating ? 0 : offsetTop;
 	const marginLeft = isFloatingLabel ? 8 : 0;
-	const offset = size === 'small' ? '-3px' : '-5px';
 
 	let transform = isFloating
 		? `translate( 0, calc(-100% + ${ offset }) ) scale( 0.75 )`
