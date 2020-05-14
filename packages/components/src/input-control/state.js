@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { flattenDeep } from 'lodash';
-/**
  * WordPress dependencies
  */
 import { useReducer } from '@wordpress/element';
@@ -56,15 +52,12 @@ function mergeInitialState( initialState = initialInputControlState ) {
  * Combines multiple stateReducers into a single stateReducer, building
  * the pipeline to control the flow for state and actions.
  *
- * @param  {...any} fns State reducers.
+ * @param  {...Function} fns State reducers.
  * @return {Function} The single combined stateReducer.
  */
-export const combineStateReducers = ( ...fns ) => {
-	// Using lodash.flattenDeep until we have an Array.flat polyfill.
-	const reducers = flattenDeep( fns );
-
+export const composeStateReducers = ( ...fns ) => {
 	return ( ...args ) => {
-		return reducers.reduceRight( ( state, fn ) => {
+		return fns.reduceRight( ( state, fn ) => {
 			return { ...state, ...fn( ...args ) };
 		}, {} );
 	};
@@ -178,7 +171,7 @@ export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
 ) {
-	const combinedReducers = combineStateReducers( stateReducer );
+	const combinedReducers = composeStateReducers( stateReducer );
 
 	const [ state, dispatch ] = useReducer(
 		inputControlStateReducer( combinedReducers ),

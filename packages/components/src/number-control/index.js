@@ -17,7 +17,7 @@ import { add, getValue, roundClamp, subtract } from './utils';
 import { isValueEmpty } from '../input-control/utils';
 import {
 	inputControlActionTypes,
-	combineStateReducers,
+	composeStateReducers,
 } from '../input-control/state';
 import { useRTL } from '../utils/style-mixins';
 
@@ -171,7 +171,7 @@ export function NumberControl(
 			ref={ ref }
 			type={ typeProp }
 			value={ initialValue }
-			__unstableStateReducer={ combineStateReducers(
+			__unstableStateReducer={ composeStateReducers(
 				numberControlStateReducer,
 				stateReducer
 			) }

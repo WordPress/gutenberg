@@ -14,7 +14,7 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import {
 	inputControlActionTypes,
-	combineStateReducers,
+	composeStateReducers,
 } from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
@@ -148,7 +148,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				__unstableStateReducer={ combineStateReducers(
+				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
 				) }
