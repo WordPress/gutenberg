@@ -11,7 +11,7 @@ function Backdrop( {
 	disabled = false,
 	isFloating = false,
 	isFloatingLabel = false,
-	isFocused,
+	isFocused = false,
 	label,
 	size = 'default',
 } ) {
