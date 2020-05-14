@@ -132,6 +132,7 @@ module.exports = {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
 					WP_TESTS_DOMAIN: 'example.org',
+					WP_PHP_BINARY: 'php',
 				},
 				mappings: {},
 			},
