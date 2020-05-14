@@ -141,10 +141,10 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 
 function ResizableCover( {
 	className,
-	children,
 	onResizeStart,
 	onResize,
 	onResizeStop,
+	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 
@@ -154,24 +154,23 @@ function ResizableCover( {
 				'is-resizing': isResizing,
 			} ) }
 			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ ( event, direction, elt ) => {
+			onResizeStart={ ( _event, _direction, elt ) => {
 				onResizeStart( elt.clientHeight );
 				onResize( elt.clientHeight );
 			} }
-			onResize={ ( event, direction, elt ) => {
+			onResize={ ( _event, _direction, elt ) => {
 				onResize( elt.clientHeight );
 				if ( ! isResizing ) {
 					setIsResizing( true );
 				}
 			} }
-			onResizeStop={ ( event, direction, elt ) => {
+			onResizeStop={ ( _event, _direction, elt ) => {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
 			minHeight={ COVER_MIN_HEIGHT }
-		>
-			{ children }
-		</ResizableBox>
+			{ ...props }
+		/>
 	);
 }
 
@@ -471,12 +470,8 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<ResizableCover
-				className={ classnames(
-					'block-library-cover__resize-container',
-					{
-						'is-selected': isSelected,
-					}
-				) }
+				showHandle={ isSelected }
+				className="block-library-cover__resize-container"
 				onResizeStart={ () => {
 					setAttributes( { minHeightUnit: 'px' } );
 					toggleSelection( false );
