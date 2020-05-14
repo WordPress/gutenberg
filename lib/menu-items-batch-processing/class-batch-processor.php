@@ -34,6 +34,8 @@ class Batch_Processor {
 			return $validated_operations;
 		}
 
+		do_action( 'menu_items_batch_processing_start', $navigation_id );
+
 		$result = $this->batch_persist( $validated_operations );
 
 		if ( is_wp_error( $result ) ) {
@@ -42,9 +44,12 @@ class Batch_Processor {
 			// In the future let's wrap this in a transaction if WP tables are based on InnoDB
 			// and do something smart on rollback - e.g. try to restore the original state, or
 			// refresh all the caches that were affected in the process.
+			do_action( 'menu_items_batch_processing_failure', $navigation_id );
 
 			return $result;
 		}
+
+		do_action( 'menu_items_batch_processing_success', $navigation_id );
 
 		return $result;
 	}
