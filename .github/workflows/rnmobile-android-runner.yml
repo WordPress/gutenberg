@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Restore npm cache
-      uses: actions/cache@master
+      uses: actions/cache@v1
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}

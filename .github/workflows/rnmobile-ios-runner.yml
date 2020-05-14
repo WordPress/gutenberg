@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Restore npm cache
-      uses: actions/cache@master
+      uses: actions/cache@v1
       with:
         path: ~/.npm
         key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
@@ -38,7 +38,7 @@ jobs:
         key: ${{ runner.os }}-ios-build-${{ hashFiles('ios-checksums.txt') }}
     
     - name: Restore pods cache
-      uses: actions/cache@master
+      uses: actions/cache@v1
       with:
         path: |
           packages/react-native-editor/ios/Pods
