@@ -113,54 +113,17 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$prepared_nav_item = $this->create_item_validate( $request['id'], $request );
-		if ( is_wp_error( $prepared_nav_item ) ) {
-			return $prepared_nav_item;
-		}
-
-		$nav_menu_item = $this->create_item_persist( $prepared_nav_item, $request, $request );
-		if ( is_wp_error( $nav_menu_item ) ) {
-			return $nav_menu_item;
-		}
-
-		$request->set_param( 'context', 'edit' );
-
-		/**
-		 * Fires after a single nav menu item is completely created or updated via the REST API.
-		 *
-		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
-		 *
-		 * @param object          $nav_menu_item Inserted or updated nav item object.
-		 * @param WP_REST_Request $request       Request object.
-		 * @param bool            $creating      True when creating a post, false when updating.
-		 */
-		do_action( "rest_after_insert_{$this->post_type}", $nav_menu_item, $request, true );
-
-		$response = $this->prepare_item_for_response( $nav_menu_item, $request );
-		$response = rest_ensure_response( $response );
-
-		$response->set_status( 201 );
-		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $nav_menu_item->ID ) ) );
-
-		return $response;
-	}
-
-	public function create_item_validate( $id, $input ) {
-		if ( ! empty( $id ) ) {
+		if ( ! empty( $request['id'] ) ) {
 			return new WP_Error( 'rest_post_exists', __( 'Cannot create existing post.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
-		$prepared_nav_item = $this->do_prepare_item_for_database( $id, $input );
+		$prepared_nav_item = $this->prepare_item_for_database( $request );
 
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
 		}
 		$prepared_nav_item = (array) $prepared_nav_item;
 
-		return $prepared_nav_item;
-	}
-
-	public function create_item_persist( $prepared_nav_item, $input, $request ) {
 		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'], $prepared_nav_item );
 		if ( is_wp_error( $nav_menu_item_id ) ) {
 			if ( 'db_insert_error' === $nav_menu_item_id->get_error_code() ) {
@@ -172,7 +135,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $nav_menu_item_id;
 		}
 
-		$nav_menu_item = $this->get_nav_menu_item( $nav_menu_item_id, $prepared_nav_item['menu-id'] );
+		$nav_menu_item = $this->get_nav_menu_item( $nav_menu_item_id );
 		if ( is_wp_error( $nav_menu_item ) ) {
 			$nav_menu_item->add_data( array( 'status' => 404 ) );
 
@@ -193,8 +156,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		$schema = $this->get_item_schema();
 
-		if ( ! empty( $schema['properties']['meta'] ) && isset( $input['meta'] ) ) {
-			$meta_update = $this->meta->update_value( $input['meta'], $nav_menu_item_id );
+		if ( ! empty( $schema['properties']['meta'] ) && isset( $request['meta'] ) ) {
+			$meta_update = $this->meta->update_value( $request['meta'], $nav_menu_item_id );
 
 			if ( is_wp_error( $meta_update ) ) {
 				return $meta_update;
@@ -208,7 +171,26 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $fields_update;
 		}
 
-		return $nav_menu_item;
+		$request->set_param( 'context', 'edit' );
+
+		/**
+		 * Fires after a single nav menu item is completely created or updated via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
+		 *
+		 * @param object          $nav_menu_item Inserted or updated nav item object.
+		 * @param WP_REST_Request $request       Request object.
+		 * @param bool            $creating      True when creating a post, false when updating.
+		 */
+		do_action( "rest_after_insert_{$this->post_type}", $nav_menu_item, $request, true );
+
+		$response = $this->prepare_item_for_response( $nav_menu_item, $request );
+		$response = rest_ensure_response( $response );
+
+		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $nav_menu_item_id ) ) );
+
+		return $response;
 	}
 
 	/**
