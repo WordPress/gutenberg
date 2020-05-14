@@ -5,7 +5,7 @@ namespace WP_REST_Menu_Items_Batch_Operation;
 class UpdateOperation extends Operation {
 
 	public function doValidate() {
-		return $this->controller->update_item_validate( $this->input['id'], $this->input );
+		return $this->controller->update_item_validate(  $this->input );
 	}
 
 	public function doPersist( $request ) {

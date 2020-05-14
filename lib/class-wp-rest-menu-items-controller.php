@@ -202,7 +202,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function update_item( $request ) {
-		$prepared_nav_item = $this->update_item_validate( $request['id'], $request );
+		$prepared_nav_item = $this->update_item_validate( $request );
 		if ( is_wp_error( $prepared_nav_item ) ) {
 			return $prepared_nav_item;
 		}
@@ -214,8 +214,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return rest_ensure_response( $response );
 	}
 
-	public function update_item_validate( $id, $input ) {
-		$valid_check = $this->get_nav_menu_item( $id );
+	public function update_item_validate( $input ) {
+		$valid_check = $this->get_nav_menu_item( $input['id'] );
 		if ( is_wp_error( $valid_check ) ) {
 			return $valid_check;
 		}
@@ -287,7 +287,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return true|WP_Error True on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
-		$menu_item = $this->delete_item_validate( $request['id'], $request );
+		$menu_item = $this->delete_item_validate( $request );
 		$previous = $this->prepare_item_for_response( $menu_item, $request );
 
 		$result = $this->delete_item_persist( $request['id'] );
@@ -308,8 +308,8 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $response;
 	}
 
-	public function delete_item_validate( $id, $input ) {
-		$menu_item = $this->get_nav_menu_item_cached( $id, $input['menus'] );
+	public function delete_item_validate( $input ) {
+		$menu_item = $this->get_nav_menu_item_cached( $input['id'], $input['menus'] );
 		if ( is_wp_error( $menu_item ) ) {
 			return $menu_item;
 		}
