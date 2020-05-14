@@ -4,7 +4,13 @@ on: push
 jobs:
   test:
     runs-on: macos-latest
-    
+    strategy:
+      matrix:
+        native-test-name: [
+          gutenberg-editor-heading,
+          gutenberg-editor-image,
+        ]
+
     steps:
     - uses: actions/checkout@v2
 
@@ -53,7 +59,7 @@ jobs:
       run: test -e packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || SKIP_BUNDLING=true npm run native test:e2e:build-app:ios
 
     - name: Run iOS Device Tests
-      run: TEST_RN_PLATFORM=ios npm run native device-tests:local
+      run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
 
     - name: Prepare build cache
       run: rm packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle

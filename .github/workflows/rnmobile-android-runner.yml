@@ -4,6 +4,12 @@ on: push
 jobs:
   test:
     runs-on: macos-latest
+    strategy:
+      matrix:
+        native-test-name: [
+          gutenberg-editor-heading,
+          gutenberg-editor-image,
+        ]
 
     steps:
     - name: checkout
@@ -30,7 +36,7 @@ jobs:
       with:
         api-level: 28
         profile: pixel_xl
-        script: npm run native test:e2e:android:local
+        script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
     - uses: actions/upload-artifact@v2
       if: always()
