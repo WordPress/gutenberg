@@ -356,21 +356,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return stdClass|WP_Error
 	 */
 	protected function prepare_item_for_database( $request ) {
-		$prepared_nav_item = $this->do_prepare_item_for_database( $request['id'], $request );
-
-		/**
-		 * Filters a post before it is inserted via the REST API.
-		 *
-		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
-		 *
-		 * @param stdClass        $prepared_post An object representing a single post prepared
-		 *                                       for inserting or updating the database.
-		 * @param WP_REST_Request $request       Request object.
-		 */
-		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
-	}
-
-	protected function do_prepare_item_for_database( $menu_item_db_id, $input ) {
+		$menu_item_db_id = $request['id'];
 		$menu_item_obj   = $this->get_nav_menu_item( $menu_item_db_id );
 		// Need to persist the menu item data. See https://core.trac.wordpress.org/ticket/28138 .
 		if ( ! is_wp_error( $menu_item_obj ) ) {
@@ -433,29 +419,29 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$schema = $this->get_item_schema();
 
 		foreach ( $mapping as $original => $api_request ) {
-			if ( ! empty( $schema['properties'][ $api_request ] ) && isset( $input[ $api_request ] ) ) {
-				$check = rest_validate_value_from_schema( $input[ $api_request ], $schema['properties'][ $api_request ] );
+			if ( ! empty( $schema['properties'][ $api_request ] ) && isset( $request[ $api_request ] ) ) {
+				$check = rest_validate_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
 				if ( is_wp_error( $check ) ) {
 					$check->add_data( array( 'status' => 400 ) );
 					return $check;
 				}
-				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $input[ $api_request ], $schema['properties'][ $api_request ] );
+				$prepared_nav_item[ $original ] = rest_sanitize_value_from_schema( $request[ $api_request ], $schema['properties'][ $api_request ] );
 			}
 		}
 
 		$taxonomy = get_taxonomy( 'nav_menu' );
 		$base     = ! empty( $taxonomy->rest_base ) ? $taxonomy->rest_base : $taxonomy->name;
 		// If menus submitted, cast to int.
-		if ( isset( $input[ $base ] ) && ! empty( $input[ $base ] ) ) {
-			$prepared_nav_item['menu-id'] = absint( $input[ $base ] );
+		if ( isset( $request[ $base ] ) && ! empty( $request[ $base ] ) ) {
+			$prepared_nav_item['menu-id'] = absint( $request[ $base ] );
 		}
 
 		// Nav menu title.
-		if ( ! empty( $schema['properties']['title'] ) && isset( $input['title'] ) ) {
-			if ( is_string( $input['title'] ) ) {
-				$prepared_nav_item['menu-item-title'] = $input['title'];
-			} elseif ( ! empty( $input['title']['raw'] ) ) {
-				$prepared_nav_item['menu-item-title'] = $input['title']['raw'];
+		if ( ! empty( $schema['properties']['title'] ) && isset( $request['title'] ) ) {
+			if ( is_string( $request['title'] ) ) {
+				$prepared_nav_item['menu-item-title'] = $request['title'];
+			} elseif ( ! empty( $request['title']['raw'] ) ) {
+				$prepared_nav_item['menu-item-title'] = $request['title']['raw'];
 			}
 		}
 
@@ -587,7 +573,17 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		$prepared_nav_item = (object) $prepared_nav_item;
-		return $prepared_nav_item;
+
+		/**
+		 * Filters a post before it is inserted via the REST API.
+		 *
+		 * The dynamic portion of the hook name, `$this->post_type`, refers to the post type slug.
+		 *
+		 * @param stdClass        $prepared_post An object representing a single post prepared
+		 *                                       for inserting or updating the database.
+		 * @param WP_REST_Request $request       Request object.
+		 */
+		return apply_filters( "rest_pre_insert_{$this->post_type}", $prepared_nav_item, $request );
 	}
 
 	/**
