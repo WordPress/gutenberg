@@ -30,7 +30,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 		$this->wpdb->query( 'START TRANSACTION' );
 		$this->wpdb->query( 'SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ' );
 
-		$result = $this->bulk_persist( $navigation_id, $validated_operations );
+		$result = $this->bulk_persist( $validated_operations );
 
 		if ( is_wp_error( $result ) ) {
 			$this->wpdb->query( 'ROLLBACK' );
@@ -102,12 +102,13 @@ class WP_REST_Menu_Items_Batch_Processor {
 		return $operations;
 	}
 
-	protected function bulk_persist( $navigation_id, $validated_operations ) {
+	protected function bulk_persist( $validated_operations ) {
 		foreach ( $validated_operations as $operation ) {
 			$result = $operation->persist( $this->request );
 			if ( is_wp_error( $result ) ) {
 				return $result;
 			}
+			$operation->notify( $this->request );
 		}
 	}
 
@@ -167,20 +168,8 @@ abstract class Operation {
 	}
 
 	abstract protected function doPersist( $request );
-}
 
-class InsertOperation extends Operation {
-
-	public function doValidate() {
-		// We could also just make the code from create_item_validate live in this class,
-		// but it needs to call some protected methods.
-		return $this->controller->create_item_validate( $this->input['id'] ?? null, $this->input );
-	}
-
-	public function doPersist( $request ) {
-		return $this->controller->create_item_persist( $this->prepared_item, $this->input, $request );
-	}
-
+	abstract public function notify( $request );
 }
 
 class UnsupportedOperation extends Operation {
@@ -190,6 +179,10 @@ class UnsupportedOperation extends Operation {
 	}
 
 	public function doPersist( $request ) {
+		return new WP_Error( "Not implemented" );
+	}
+
+	public function notify( $request ) {
 		return new WP_Error( "Not implemented" );
 	}
 
@@ -203,6 +196,10 @@ class UpdateOperation extends Operation {
 
 	public function doPersist( $request ) {
 		return $this->controller->update_item_persist( $this->prepared_item, $this->input, $request );
+	}
+
+	public function notify( $request ) {
+		return $this->controller->update_item_notify( $this->result, $request );
 	}
 
 }
@@ -219,6 +216,12 @@ class DeleteOperation extends Operation {
 	 */
 	public function doPersist( $request ) {
 		$this->controller->delete_item_persist( $this->input['id'] );
+	}
+
+	public function notify( $request ) {
+		$response = new WP_REST_Response();
+
+		return $this->controller->delete_item_notify( $this->result, $response, $request );
 	}
 
 }

@@ -206,11 +206,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			return $prepared_nav_item;
 		}
 		$nav_menu_item = $this->update_item_persist( $prepared_nav_item, $request, $request );
-
-		$request->set_param( 'context', 'edit' );
-
-		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
-		do_action( "rest_after_insert_{$this->post_type}", $nav_menu_item, $request, false );
+		$this->update_item_notify( $nav_menu_item, $request );
 
 		$response = $this->prepare_item_for_response( $nav_menu_item, $request );
 
@@ -274,6 +270,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 
 		return $nav_menu_item;
+	}
+
+	public function update_item_notify( $nav_menu_item, $request ) {
+		$request->set_param( 'context', 'edit' );
+
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php */
+		do_action( "rest_after_insert_{$this->post_type}", $nav_menu_item, $request, false );
 	}
 
 	/**
