@@ -1123,10 +1123,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 	public function process_batch( $request ) {
 		require_once __DIR__ . "/menu-items-batch-processing/class-batch-processor.php";
-		$processor = new WP_REST_Menu_Items_Batch_Operation\Batch_Processor( $this, $request );
-
 		$navigation_id = $request['menus'];
-		$result = $processor->process( $navigation_id, $request['tree'] );
+		$processor = new WP_REST_Menu_Items_Batch_Operation\Batch_Processor( $navigation_id, $this, $request );
+
+		$result = $processor->process( $request['tree'] );
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
