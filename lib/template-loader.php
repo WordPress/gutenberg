@@ -98,6 +98,15 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	if ( $current_template ) {
 		$_wp_current_template_id      = $current_template['template_post']->ID;
 		$_wp_current_template_content = empty( $current_template['template_post']->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['template_post']->post_content;
+
+		if ( isset( $_GET['_wp-find-template'] ) ) {
+			wp_send_json_success( $current_template['template_post'] );
+		}
+	} elseif ( 'index' === $type ) {
+		if ( isset( $_GET['_wp-find-template'] ) ) {
+			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
+		}
+		return false; // So that the template loader keeps looking for templates.
 	}
 
 	// Add hooks for template canvas.
@@ -269,32 +278,39 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	// If there is, use it instead.
 	if ( isset( $higher_priority_block_template_path ) ) {
 		$post_name             = basename( $higher_priority_block_template_path, '.html' );
+		$file_contents         = file_get_contents( $higher_priority_block_template_path );
 		$current_template_post = array(
-			'post_content' => file_get_contents( $higher_priority_block_template_path ),
+			'post_content' => $file_contents,
 			'post_title'   => $post_name,
 			'post_status'  => 'auto-draft',
 			'post_type'    => 'wp_template',
 			'post_name'    => $post_name,
 		);
-		if ( is_admin() ) {
-			// Only create auto-draft of block template for editing
-			// in admin screens, similarly to how we do it for new
-			// posts in the editor.
-			$current_template_post = get_post(
-				wp_insert_post( $current_template_post )
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+			$template_query        = new WP_Query(
+				array(
+					'post_type'      => 'wp_template',
+					'post_status'    => 'auto-draft',
+					'name'           => $post_name,
+					'posts_per_page' => 1,
+					'no_found_rows'  => true,
+				)
 			);
+			$current_template_post = $template_query->have_posts() ? $template_query->next_post() : null;
+
+			// Only create auto-draft of block template for editing
+			// in admin screens, when necessary, because the underlying
+			// file has changed.
+			if ( ! $current_template_post || $current_template_post->post_content !== $file_contents ) {
+				$current_template_post->post_content = $file_contents;
+				$current_template_post = get_post(
+					wp_insert_post( $current_template_post )
+				);
+			}
 		} else {
 			$current_template_post = new WP_Post(
 				(object) $current_template_post
 			);
-		}
-	}
-
-	if ( isset( $_GET['_wp-find-template'] ) ) {
-		if ( $current_template_post ) {
-			wp_send_json_success( $current_template_post );
-		} else {
-			wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
 		}
 	}
 
