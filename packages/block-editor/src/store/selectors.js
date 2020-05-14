@@ -137,6 +137,16 @@ export function getBlockAttributes( state, clientId ) {
  * is not the block's registration settings, which must be retrieved from the
  * blocks module registration store.
  *
+ * getBlock recurses through its inner blocks until all its children blocks have
+ * been retrieved. Note that getBlock will not return the child inner blocks of
+ * an inner block controller. This is because an inner block controller syncs
+ * itself with its own entity, and should therefore not be included with the
+ * blocks of a different entity. For example, say you call `getBlocks( TP )` to
+ * get the blocks of a template part. If another template part is a child of TP,
+ * then the nested template part's child blocks will not be returned. This way,
+ * the template block itself is considered part of the parent, but the children
+ * are not.
+ *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
  *
@@ -152,7 +162,9 @@ export const getBlock = createSelector(
 		return {
 			...block,
 			attributes: getBlockAttributes( state, clientId ),
-			innerBlocks: getBlocks( state, clientId ),
+			innerBlocks: areInnerBlocksControlled( state, clientId )
+				? EMPTY_ARRAY
+				: getBlocks( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
@@ -185,10 +197,14 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 
 /**
  * Returns all block objects for the current post being edited as an array in
- * the order they appear in the post.
+ * the order they appear in the post. Note that this will exclude child blocks
+ * of nested inner block controllers.
  *
  * Note: It's important to memoize this selector to avoid return a new instance
- * on each call
+ * on each call. We use the block cache state for each top-level block of the
+ * given clientID. This way, the selector only refreshes on changes to blocks
+ * associated with the given entity, and does not refresh when changes are made
+ * to blocks which are part of different inner block controllers.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional root client ID of block list.
@@ -201,10 +217,11 @@ export const getBlocks = createSelector(
 			getBlock( state, clientId )
 		);
 	},
-	( state ) => [
-		state.blocks.byClientId,
-		state.blocks.order,
-		state.blocks.attributes,
+	( state, rootClientId ) => [
+		...map(
+			state.blocks.order[ rootClientId || '' ],
+			( id ) => state.blocks.cache[ id ]
+		),
 	]
 );
 
@@ -1632,4 +1649,16 @@ export function didAutomaticChange( state ) {
  */
 export function isBlockHighlighted( state, clientId ) {
 	return state.highlightedBlock === clientId;
+}
+
+/**
+ * Checks if a given block has controlled inner blocks.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} True if the block has controlled inner blocks.
+ */
+export function areInnerBlocksControlled( state, clientId ) {
+	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }

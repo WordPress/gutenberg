@@ -282,7 +282,7 @@ _Returns_
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
-result that appears.
+result that appears. It then waits briefly for the block list to update.
 
 _Parameters_
 
