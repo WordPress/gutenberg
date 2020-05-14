@@ -21,11 +21,11 @@ describe( 'Columns', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const columnBlockMenuItem = (
 			await page.$x(
-				'//button[contains(concat(" ", @class, " "), " block-editor-block-navigation__item-button ")][text()="Column"]'
+				'//button[contains(concat(" ", @class, " "), " block-editor-block-navigation__list-item-button ")][text()="Column"]'
 			)
 		 )[ 0 ];
 		await columnBlockMenuItem.click();
 		await openGlobalBlockInserter();
-		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 0 );
+		expect( await getAllBlockInserterItemTitles() ).toHaveLength( 1 );
 	} );
 } );

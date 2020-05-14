@@ -191,7 +191,7 @@ class BottomSheetCell extends Component {
 				case 'none':
 					return undefined;
 				case undefined:
-					if ( showValue && icon !== undefined ) {
+					if ( showValue && icon ) {
 						return leftMarginStyle;
 					}
 					return defaultSeparatorStyle;

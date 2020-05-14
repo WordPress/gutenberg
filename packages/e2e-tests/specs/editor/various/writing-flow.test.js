@@ -80,25 +80,7 @@ describe( 'Writing Flow', () => {
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		activeBlockName = await getActiveBlockName();
-		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
-			() => document.activeElement.textContent
-		);
-		expect( activeElementText ).toBe( '1st col' );
-
-		// Arrow up from first text field in nested context focuses column and
-		// columns wrappers before escaping out.
-		let activeElementBlockType;
-		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
-		);
-		expect( activeElementBlockType ).toBe( 'core/column' );
-		activeBlockName = await getActiveBlockName();
-		expect( activeBlockName ).toBe( 'core/column' );
-		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
+		const activeElementBlockType = await page.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
 		);
 		expect( activeElementBlockType ).toBe( 'core/columns' );

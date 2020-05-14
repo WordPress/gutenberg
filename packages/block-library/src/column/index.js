@@ -21,7 +21,6 @@ export const settings = {
 	icon,
 	description: __( 'A single column within a columns block.' ),
 	supports: {
-		inserter: false,
 		reusable: false,
 		html: false,
 		lightBlockWrapper: true,

@@ -53,10 +53,34 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 
 ##### Writing the Release Post and Changelog
 
-1. Open the [list of closed pull requests](https://github.com/WordPress/gutenberg/pulls?utf8=✓&q=is%3Apr+is%3Aclosed+sort%3Acreated-desc+) and filter by the current milestone.
-2. Read through each PR  to determine if it needs to be included in the blog post and/or changelog.
-3. Choose a few features to highlight in the release post; record an animation of them in use.
-4. Save the draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
+To generate a changelog for a release, use the changelog generator tool:
+
+```
+node bin/changelog.js
+```
+
+By default, this will search for and organize all pull requests associated with the milestone for the current version of the project. Notably, this assumes a release candidate version has already been tagged and published.
+
+To override the default behavior, you can pass one or both of the following values as environment variables:
+
+- `MILESTONE`: Provide the title of the milestone for which the changelog should be generated. This should exactly match the title as shown on [the milestones page](https://github.com/WordPress/gutenberg/milestones).
+  - Example: `MILESTONE="Gutenberg 8.1" npm run changelog`
+- `GITHUB_TOKEN`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
+  - Example: `GITHUB_TOKEN=... npm run changelog`
+
+The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
+
+Guidelines for proof-reading include:
+
+- Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience are those who use the plugin or are keeping up with ongoing development.
+- Create new groupings as applicable, and move pull requests between.
+- When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry.
+- If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
+- Remove mobile app pull request entries.
+
+Once you have cleaned up the changelog, choose a few features to highlight in the release post and record an animation of them in use.
+
+Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
 ##### Creating the Release Branch
 

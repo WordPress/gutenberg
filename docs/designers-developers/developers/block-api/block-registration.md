@@ -196,9 +196,6 @@ Similarly to how the block's style variations can be declared, a block type can 
 
 By default, all variations will show up in the Inserter in addition to the regular block type item. However, setting the `isDefault` flag for any of the variations listed will override the regular block type in the Inserter.
 
-{% codetabs %}
-{% ES5 %}
-
 ```js
 variations: [
     {
@@ -223,35 +220,6 @@ variations: [
 	},
 ],
 ```
-
-{% ESNext %}
-
-```js
-variations: [
-    {
-		name: 'wordpress',
-		isDefault: true,
-		title: __( 'WordPress' ),
-		description: __( 'Code is poetry!' ),
-		icon: WordPressIcon,
-		attributes: { service: 'wordpress' },
-	},
-	{
-		name: 'google',
-		title: __( 'Google' ),
-		icon: GoogleIcon,
-		attributes: { service: 'google' },
-	},
-	{
-		name: 'twitter',
-		title: __( 'Twitter' ),
-		icon: TwitterIcon,
-		attributes: { service: 'twitter' },
-	},
-],
-```
-
-{% end %}
 
 An object describing a variation defined for the block type can contain the following fields:
 
@@ -264,6 +232,20 @@ An object describing a variation defined for the block type can contain the foll
 - `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
 - `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
 - `scope` (optional, type `String[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`.
+
+It's also possible to override the default block style variation using the `className` attribute when defining block variations.
+
+```js
+variations: [
+	{
+		name: 'blue',
+		title: __( 'Blue Quote' ),
+		isDefault: true,
+		attributes: { className: 'is-style-blue-quote' },
+		icon: 'format-quote',
+	},
+],
+```
 
 #### transforms (optional)
 

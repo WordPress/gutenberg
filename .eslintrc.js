@@ -172,5 +172,11 @@ module.exports = {
 				'jest/expect-expect': 'off',
 			},
 		},
+		{
+			files: [ 'bin/**/*.js' ],
+			rules: {
+				'no-console': 'off',
+			},
+		},
 	],
 };

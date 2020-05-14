@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,7 +45,7 @@ export const settings = {
 		className: false,
 		__unstablePasteTextInline: true,
 		lightBlockWrapper: true,
-		__experimentalColor: true,
+		__experimentalColor: Platform.OS === 'web',
 		__experimentalLineHeight: true,
 		__experimentalFontSize: true,
 	},

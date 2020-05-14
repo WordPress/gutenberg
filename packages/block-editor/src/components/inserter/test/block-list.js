@@ -55,7 +55,7 @@ const assertNoResultsMessageToBePresent = ( element ) => {
 	const noResultsMessage = element.querySelector(
 		'.block-editor-inserter__no-results'
 	);
-	expect( noResultsMessage.textContent ).toEqual( 'No blocks found.' );
+	expect( noResultsMessage.textContent ).toEqual( 'No results found.' );
 };
 
 const assertNoResultsMessageNotToBePresent = ( element ) => {
@@ -81,7 +81,9 @@ describe( 'InserterMenu', () => {
 			collections,
 			items: noItems,
 		} ) );
-		const element = initializeMenuDefaultStateAndReturnElement();
+		const element = initializeMenuDefaultStateAndReturnElement( {
+			filterValue: 'random',
+		} );
 		const visibleBlocks = element.querySelector(
 			'.block-editor-block-types-list__item'
 		);

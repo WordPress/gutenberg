@@ -7,6 +7,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { GlobalStylesContext } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -48,23 +49,39 @@ class BlockListBlock extends Component {
 
 	getBlockForType() {
 		return (
-			<BlockEdit
-				name={ this.props.name }
-				isSelected={ this.props.isSelected }
-				attributes={ this.props.attributes }
-				setAttributes={ this.props.onChange }
-				onFocus={ this.onFocus }
-				onReplace={ this.props.onReplace }
-				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.props.mergeBlocks }
-				onCaretVerticalPositionChange={
-					this.props.onCaretVerticalPositionChange
-				}
-				clientId={ this.props.clientId }
-				parentWidth={ this.props.parentWidth }
-				contentStyle={ this.props.contentStyle }
-				onDeleteBlock={ this.props.onDeleteBlock }
-			/>
+			<GlobalStylesContext.Consumer>
+				{ ( globalStyle ) => {
+					const mergedStyle = {
+						...globalStyle,
+						...this.props.wrapperProps.style,
+					};
+					return (
+						<GlobalStylesContext.Provider value={ mergedStyle }>
+							<BlockEdit
+								name={ this.props.name }
+								isSelected={ this.props.isSelected }
+								attributes={ this.props.attributes }
+								setAttributes={ this.props.onChange }
+								onFocus={ this.onFocus }
+								onReplace={ this.props.onReplace }
+								insertBlocksAfter={ this.insertBlocksAfter }
+								mergeBlocks={ this.props.mergeBlocks }
+								onCaretVerticalPositionChange={
+									this.props.onCaretVerticalPositionChange
+								}
+								// Block level styles
+								wrapperProps={ this.props.wrapperProps }
+								// inherited styles merged with block level styles
+								mergedStyle={ mergedStyle }
+								clientId={ this.props.clientId }
+								parentWidth={ this.props.parentWidth }
+								contentStyle={ this.props.contentStyle }
+								onDeleteBlock={ this.props.onDeleteBlock }
+							/>
+						</GlobalStylesContext.Provider>
+					);
+				} }
+			</GlobalStylesContext.Consumer>
 		);
 	}
 
@@ -252,6 +269,9 @@ export default compose( [
 			isAncestorSelected,
 			isTouchable,
 			isDimmed,
+			wrapperProps: blockType.getEditWrapperProps
+				? blockType.getEditWrapperProps( attributes ) || {}
+				: {},
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

@@ -20,10 +20,6 @@
 		min-width: 20px;
 	}
 
-	&.has-link .wp-block-navigation-link__label {
-		text-decoration: underline;
-	}
-
 	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
