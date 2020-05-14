@@ -25,8 +25,6 @@ export default class EditorPage {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
-
-		driver.setImplicitWaitTimeout( 5000 );
 	}
 
 	async getBlockList() {
