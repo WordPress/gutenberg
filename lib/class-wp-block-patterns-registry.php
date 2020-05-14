@@ -164,7 +164,7 @@ class WP_Patterns_Registry {
  * @return boolean True if the pattern was registered with success and false otherwise.
  */
 function register_pattern( $pattern_name, $pattern_properties ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 8.3.0', 'register_block_pattern()' );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 8.1.0', 'register_block_pattern()' );
 	return register_block_pattern( $pattern_name, $pattern_properties );
 }
 
