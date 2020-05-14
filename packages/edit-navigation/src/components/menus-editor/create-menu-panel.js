@@ -11,27 +11,23 @@ import { useDispatch } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
+const noticeId = 'edit-navigation-create-menu-error';
+
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
 export default function CreateMenuForm( { onCancel, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const [ validationError, setValidationError ] = useState( '' );
 	const { saveMenu } = useDispatch( 'core' );
-
-	const onChangeMenuName = ( menuNameValue ) => {
-		// Clear validation errors when typing.
-		if ( validationError !== '' ) {
-			setValidationError( '' );
-		}
-
-		setMenuName( menuNameValue );
-	};
+	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
 
 	const onCreateMenu = useCallback(
 		( event ) => {
 			// Prevent form submission.
 			event.preventDefault();
+
+			// Remove existing notices.
+			removeNotice( noticeId );
 
 			if ( menuName.length === 0 ) {
 				// Button is aria-disabled, do nothing.
@@ -40,15 +36,14 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 
 			// Validate the menu name doesn't match an existing menu.
 			if ( some( menus, menuNameMatches( menuName ) ) ) {
-				setValidationError(
-					sprintf(
-						// translators: %s: the name of a menu.
-						__(
-							'The menu name %s conflicts with another menu name. Please try another.'
-						),
-						menuName
-					)
+				const message = sprintf(
+					// translators: %s: the name of a menu.
+					__(
+						'The menu name %s conflicts with another menu name. Please try another.'
+					),
+					menuName
 				);
+				createErrorNotice( message, { id: noticeId } );
 				return;
 			}
 
@@ -64,7 +59,7 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 					<TextControl
 						label={ __( 'Menu name' ) }
 						value={ menuName }
-						onChange={ onChangeMenuName }
+						onChange={ setMenuName }
 						placeholder={ __( 'Main Navigation' ) }
 					/>
 					<Button
