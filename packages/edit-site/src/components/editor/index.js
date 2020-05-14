@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
 import {
+	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
@@ -100,65 +101,71 @@ function Editor( { settings: _settings } ) {
 							type={ settings.templateType }
 							id={ settings.templateId }
 						>
-							<Context.Provider value={ context }>
-								<FocusReturnProvider>
-									<KeyboardShortcuts.Register />
-									<InterfaceSkeleton
-										sidebar={ ! isMobile && <Sidebar /> }
-										header={
-											<Header
-												openEntitiesSavedStates={
-													openEntitiesSavedStates
-												}
-											/>
-										}
-										content={
-											<BlockSelectionClearer
-												className="edit-site-visual-editor"
-												style={ inlineStyles }
-											>
-												<Notices />
-												<Popover.Slot name="block-toolbar" />
-												<BlockEditor />
-												<KeyboardShortcuts />
-											</BlockSelectionClearer>
-										}
-										actions={
-											<>
-												<EntitiesSavedStates
-													isOpen={
-														isEntitiesSavedStatesOpen
-													}
-													close={
-														closeEntitiesSavedStates
+							<BlockContextProvider
+								value={ settings.page.context }
+							>
+								<Context.Provider value={ context }>
+									<FocusReturnProvider>
+										<KeyboardShortcuts.Register />
+										<InterfaceSkeleton
+											sidebar={
+												! isMobile && <Sidebar />
+											}
+											header={
+												<Header
+													openEntitiesSavedStates={
+														openEntitiesSavedStates
 													}
 												/>
-												{ ! isEntitiesSavedStatesOpen && (
-													<div className="edit-site-editor__toggle-save-panel">
-														<Button
-															isSecondary
-															className="edit-site-editor__toggle-save-panel-button"
-															onClick={
-																openEntitiesSavedStates
-															}
-															aria-expanded={
-																false
-															}
-														>
-															{ __(
-																'Open save panel'
-															) }
-														</Button>
-													</div>
-												) }
-											</>
-										}
-										footer={ <BlockBreadcrumb /> }
-									/>
-									<Popover.Slot />
-									<PluginArea />
-								</FocusReturnProvider>
-							</Context.Provider>
+											}
+											content={
+												<BlockSelectionClearer
+													className="edit-site-visual-editor"
+													style={ inlineStyles }
+												>
+													<Notices />
+													<Popover.Slot name="block-toolbar" />
+													<BlockEditor />
+													<KeyboardShortcuts />
+												</BlockSelectionClearer>
+											}
+											actions={
+												<>
+													<EntitiesSavedStates
+														isOpen={
+															isEntitiesSavedStatesOpen
+														}
+														close={
+															closeEntitiesSavedStates
+														}
+													/>
+													{ ! isEntitiesSavedStatesOpen && (
+														<div className="edit-site-editor__toggle-save-panel">
+															<Button
+																isSecondary
+																className="edit-site-editor__toggle-save-panel-button"
+																onClick={
+																	openEntitiesSavedStates
+																}
+																aria-expanded={
+																	false
+																}
+															>
+																{ __(
+																	'Open save panel'
+																) }
+															</Button>
+														</div>
+													) }
+												</>
+											}
+											footer={ <BlockBreadcrumb /> }
+										/>
+										<Popover.Slot />
+										<PluginArea />
+									</FocusReturnProvider>
+								</Context.Provider>
+							</BlockContextProvider>
 						</EntityProvider>
 					</EntityProvider>
 				</DropZoneProvider>
