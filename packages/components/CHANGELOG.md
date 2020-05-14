@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.6.0 (2020-05-14)
+
 ### Bug Fix
 
 - Fix and issue that would cause the `Popover` component to throw an error under certain
