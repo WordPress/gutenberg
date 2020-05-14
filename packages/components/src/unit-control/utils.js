@@ -57,7 +57,7 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
 
-	let unit = unitMatch !== 'undefined' ? unitMatch : '';
+	let unit = unitMatch !== undefined ? unitMatch : '';
 	unit = unit.toLowerCase();
 
 	if ( hasUnits( units ) ) {
