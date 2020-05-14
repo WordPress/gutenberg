@@ -220,11 +220,9 @@ function gutenberg_experimental_global_styles_get_theme() {
 function gutenberg_experimental_global_styles_get_block_data() {
 	// TODO: this data should be taken from the block registry.
 	//
-	// We need the ability to have many selectors per block
-	// to account for block variations (heading block: h1, ..., h6)
-	// as well as complex blocks that don't match an HTML element
-	// (ex:gallery block, for which we may want to target the wrapper element
-	// and the individual images).
+	// At the moment this array replicates the current capabilities
+	// declared by blocks via __experimentalLineHeight,
+	// __experimentalColor, and __experimentalFontSize.
 	$block_data = array(
 		'global'          => array(
 			'selector' => ':root',
