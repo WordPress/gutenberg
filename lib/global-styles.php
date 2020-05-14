@@ -417,6 +417,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme()
 	);
+
 	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	// Add the styles for the editor via the settings
