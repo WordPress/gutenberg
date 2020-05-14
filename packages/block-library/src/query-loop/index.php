@@ -30,12 +30,9 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		$content .= (
 			new WP_Block(
 				$block->parsed_block,
-				array_merge(
-					$block->available_context ? $block->available_context : array(),
-					array(
-						'postType' => $post->post_type,
-						'postId'   => $post->ID,
-					)
+				array(
+					'postType' => $post->post_type,
+					'postId'   => $post->ID,
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
