@@ -517,6 +517,7 @@ function CoverEdit( {
 					/>
 				) }
 				<InnerBlocks
+					__experimentalTagName="div"
 					__experimentalPassedProps={ {
 						className: 'wp-block-cover__inner-container',
 					} }
