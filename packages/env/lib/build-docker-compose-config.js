@@ -143,7 +143,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
 			phpunit: {
-				image: 'wordpressdevelop/phpunit',
+				image: 'wordpressdevelop/phpunit:${LOCAL_PHP-latest}',
 				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,
