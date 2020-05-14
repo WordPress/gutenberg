@@ -1,8 +1,12 @@
 {
-	"globals": {
-		"color": {
-			"background": "white",
-			"text": "black"
+	"styles": {
+		"globals": {
+			"preset": {
+				"color": {
+					"background": "white",
+					"text": "black"
+				}
+			}
 		}
 	}
 }
