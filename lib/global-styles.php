@@ -71,16 +71,36 @@ function gutenberg_experimental_global_styles_get_from_file( $global_styles_path
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_user() {
-	$global_styles = array();
+	$config = array();
 	$user_cpt      = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
 	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
 		if ( is_array( $decoded_data ) ) {
-			$global_styles = $decoded_data;
+			$config = $decoded_data;
 		}
 	}
 
-	return $global_styles;
+	// Normalize to expected shape.
+	if (
+		! array_key_exists( 'styles', $config ) ||
+		! is_array( $config['styles'] )
+	) {
+		$config['styles'] = array();
+	}
+	if (
+		! array_key_exists( 'globals', $config['styles'] ) ||
+		! is_array( $config['styles']['globals'] )
+	) {
+		$config['styles']['globals'] = array();
+	}
+	if (
+		! array_key_exists( 'blocks', $config['styles'] ) ||
+		! is_array( $config['styles']['blocks'] )
+	) {
+		$config['styles']['blocks'] = array();
+	}
+
+	return $config;
 }
 
 /**
@@ -147,9 +167,33 @@ function gutenberg_experimental_global_styles_get_user_cpt_id() {
  * @return array Global Styles tree.
  */
 function gutenberg_experimental_global_styles_get_core() {
-	return gutenberg_experimental_global_styles_get_from_file(
+	$config = gutenberg_experimental_global_styles_get_from_file(
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
+
+	// Normalize the core config to the expected shape.
+	if (
+		! array_key_exists( 'styles', $config ) ||
+		! is_array( $config['styles'] )
+	) {
+		$config['styles'] = array();
+	}
+
+	if (
+		! array_key_exists( 'globals', $config['styles'] ) ||
+		! is_array( $config['styles']['globals'] )
+	) {
+		$config['styles']['globals'] = array();
+	}
+
+	if (
+		! array_key_exists( 'blocks', $config['styles'] ) ||
+		! is_array( $config['styles']['blocks'] )
+	) {
+		$config['styles']['blocks'] = array();
+	}
+
+	return $config;
 }
 
 /**
@@ -200,6 +244,7 @@ function gutenberg_experimental_global_styles_get_theme() {
 		locate_template( 'experimental-theme.json' )
 	);
 
+	// Normalize theme config to expected shape.
 	$theme_styles = array();
 	if ( array_key_exists( 'styles', $theme_config ) ) {
 		$theme_styles = $theme_config['styles'];
@@ -287,11 +332,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
  */
 function gutenberg_experimental_global_styles_resolver_block_styles( $global_styles ) {
 	$css_rules = '';
-
-	if ( ! is_array( $global_styles ) || ! array_key_exists( 'blocks', $global_styles ) ) {
-		return $css_rules;
-	}
-	$styles = $global_styles['blocks'];
+	$styles    = $global_styles['styles']['blocks'];
 
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
 
@@ -332,11 +373,7 @@ function gutenberg_experimental_global_styles_resolver_block_styles( $global_sty
  */
 function gutenberg_experimental_global_styles_resolver_globals( $global_styles ) {
 	$css_rules = '';
-
-	if ( ! is_array( $global_styles ) || ! array_key_exists( 'globals', $global_styles ) ) {
-		return $css_rules;
-	}
-	$styles = $global_styles['globals'];
+	$styles    = $global_styles['styles']['globals'];
 
 	$token    = '--';
 	$prefix   = '--wp' . $token;
@@ -360,14 +397,24 @@ function gutenberg_experimental_global_styles_resolver_globals( $global_styles )
  * @return string
  */
 function gutenberg_experimental_global_styles_get_stylesheet() {
-	$global_styles = array_merge(
-		gutenberg_experimental_global_styles_get_core(),
-		gutenberg_experimental_global_styles_get_theme(),
-		gutenberg_experimental_global_styles_get_user()
+	$gs_merged = array();
+	$gs_core   = gutenberg_experimental_global_styles_get_core();
+	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
+	$gs_user   = gutenberg_experimental_global_styles_get_user();
+
+	$gs_merged['styles']['globals'] = array_merge(
+		$gs_core['styles']['globals'],
+		$gs_theme['styles']['globals'],
+		$gs_user['styles']['globals']
+	);
+	$gs_merged['styles']['blocks']  = array_merge(
+		$gs_core['styles']['blocks'],
+		$gs_theme['styles']['blocks'],
+		$gs_user['styles']['blocks']
 	);
 
-	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
-	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $global_styles );
+	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $gs_merged );
+	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $gs_merged );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
