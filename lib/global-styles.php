@@ -346,13 +346,23 @@ function gutenberg_experimental_global_styles_resolver_globals( $global_styles )
 }
 
 /**
- * Fetches the Global Styles for each level (core, theme, user)
- * and enqueues the resulting CSS custom properties for the editor.
+ * Returns the merged styles from core, theme, and user preferences.
+ *
+ * @return string
  */
-function gutenberg_experimental_global_styles_enqueue_assets_editor() {
-	if ( gutenberg_experimental_global_styles_is_site_editor() ) {
-		gutenberg_experimental_global_styles_enqueue_assets();
+function gutenberg_experimental_global_styles_get_stylesheet() {
+	$global_styles = array_merge(
+		gutenberg_experimental_global_styles_get_core(),
+		gutenberg_experimental_global_styles_get_theme(),
+		gutenberg_experimental_global_styles_get_user()
+	);
+
+	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
+	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $global_styles );
+	if ( empty( $stylesheet ) ) {
+		return;
 	}
+	return $stylesheet;
 }
 
 /**
@@ -364,20 +374,10 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$global_styles = array_merge(
-		gutenberg_experimental_global_styles_get_core(),
-		gutenberg_experimental_global_styles_get_theme(),
-		gutenberg_experimental_global_styles_get_user()
-	);
-
-	$inline_style  = gutenberg_experimental_global_styles_resolver_globals( $global_styles );
-	$inline_style .= gutenberg_experimental_global_styles_resolver_block_styles( $global_styles );
-	if ( empty( $inline_style ) ) {
-		return;
-	}
+	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet();
 
 	wp_register_style( 'global-styles', false, array(), true, true );
-	wp_add_inline_style( 'global-styles', $inline_style );
+	wp_add_inline_style( 'global-styles', $stylesheet );
 	wp_enqueue_style( 'global-styles' );
 }
 
@@ -417,8 +417,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_experimental_global_styles_get_core(),
 		gutenberg_experimental_global_styles_get_theme()
 	);
-
 	$settings['__experimentalGlobalStylesBase'] = $global_styles;
+
+	// Add the styles for the editor via the settings
+	// so they get processed as if they were added by add_editor_styles:
+	// they will get the editor wrapper class.
+	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
 
 	return $settings;
 }
@@ -459,7 +463,5 @@ function gutenberg_experimental_global_styles_register_cpt() {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
 	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
-	// enqueue_block_assets is not fired in edit-site, so we use separate back/front hooks instead.
 	add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
-	add_action( 'admin_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets_editor' );
 }
