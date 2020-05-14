@@ -13,8 +13,9 @@
  */
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
-	protected $cached_menu_items = [];
 	public $validate_order_and_hierarchy = true;
+
+	protected $cached_menu_items = [];
 
 	/**
 	 * Constructor.
