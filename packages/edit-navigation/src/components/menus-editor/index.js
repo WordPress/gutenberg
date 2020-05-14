@@ -85,7 +85,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 						// User can only cancel out of menu creation if there
 						// are other menus to fall back to showing.
 						hasMenus
-							? () => setMenuId( stateMenus[ 0 ] )
+							? () => setMenuId( stateMenus[ 0 ].id )
 							: undefined
 					}
 				/>
