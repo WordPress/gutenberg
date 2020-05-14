@@ -26,6 +26,7 @@ export const settings = {
 	supports: {
 		align: true,
 		html: false,
+		lightBlockWrapper: true,
 	},
 	example: {
 		attributes: {

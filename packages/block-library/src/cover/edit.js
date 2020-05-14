@@ -30,6 +30,7 @@ import {
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
+	__experimentalBlock as Block,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -227,7 +228,6 @@ function CoverEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
-	className,
 	noticeUI,
 	overlayColor,
 	setOverlayColor,
@@ -418,39 +418,39 @@ function CoverEdit( {
 		return (
 			<>
 				{ controls }
-				<MediaPlaceholder
-					icon={ placeholderIcon }
-					className={ className }
-					labels={ {
-						title: label,
-						instructions: __(
-							'Upload an image or video file, or pick one from your media library.'
-						),
-					} }
-					onSelect={ onSelectMedia }
-					accept="image/*,video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					notices={ noticeUI }
-					onError={ ( message ) => {
-						removeAllNotices();
-						createErrorNotice( message );
-					} }
-				>
-					<div className="wp-block-cover__placeholder-background-options">
-						<ColorPalette
-							disableCustomColors={ true }
-							value={ overlayColor.color }
-							onChange={ setOverlayColor }
-							clearable={ false }
-						/>
-					</div>
-				</MediaPlaceholder>
+				<Block.div className="is-placeholder">
+					<MediaPlaceholder
+						icon={ placeholderIcon }
+						labels={ {
+							title: label,
+							instructions: __(
+								'Upload an image or video file, or pick one from your media library.'
+							),
+						} }
+						onSelect={ onSelectMedia }
+						accept="image/*,video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						notices={ noticeUI }
+						onError={ ( message ) => {
+							removeAllNotices();
+							createErrorNotice( message );
+						} }
+					>
+						<div className="wp-block-cover__placeholder-background-options">
+							<ColorPalette
+								disableCustomColors={ true }
+								value={ overlayColor.color }
+								onChange={ setOverlayColor }
+								clearable={ false }
+							/>
+						</div>
+					</MediaPlaceholder>
+				</Block.div>
 			</>
 		);
 	}
 
 	const classes = classnames(
-		className,
 		dimRatioToClass( dimRatio ),
 		{
 			'is-dark-theme': isDark,
@@ -469,58 +469,61 @@ function CoverEdit( {
 	return (
 		<>
 			{ controls }
-			<ResizableCover
-				showHandle={ isSelected }
-				className="block-library-cover__resize-container"
-				onResizeStart={ () => {
-					setAttributes( { minHeightUnit: 'px' } );
-					toggleSelection( false );
-				} }
-				onResize={ setTemporaryMinHeight }
-				onResizeStop={ ( newMinHeight ) => {
-					toggleSelection( true );
-					setAttributes( { minHeight: newMinHeight } );
-					setTemporaryMinHeight( null );
-				} }
-			>
-				<div data-url={ url } style={ style } className={ classes }>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ isDarkElement }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ url && gradientValue && dimRatio !== 0 && (
-						<span
-							aria-hidden="true"
-							className={ classnames(
-								'wp-block-cover__gradient-background',
-								gradientClass
-							) }
-							style={ { background: gradientValue } }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ isDarkElement }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
-					</div>
-				</div>
-			</ResizableCover>
+			<Block.div className={ classes } data-url={ url } style={ style }>
+				<ResizableCover
+					className="block-library-cover__resize-container"
+					onResizeStart={ () => {
+						setAttributes( { minHeightUnit: 'px' } );
+						toggleSelection( false );
+					} }
+					onResize={ setTemporaryMinHeight }
+					onResizeStop={ ( newMinHeight ) => {
+						toggleSelection( true );
+						setAttributes( { minHeight: newMinHeight } );
+						setTemporaryMinHeight( null );
+					} }
+					showHandle={ isSelected }
+				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					// Used only to programmatically check if the image is dark or not
+					<img
+						ref={ isDarkElement }
+						aria-hidden
+						alt=""
+						style={ {
+							display: 'none',
+						} }
+						src={ url }
+					/>
+				) }
+				{ url && gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__gradient-background',
+							gradientClass
+						) }
+						style={ { background: gradientValue } }
+					/>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<video
+						ref={ isDarkElement }
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+					/>
+				) }
+				<InnerBlocks
+					__experimentalTagName="div"
+					__experimentalPassedProps={ {
+						className: 'wp-block-cover__inner-container',
+					} }
+					template={ INNER_BLOCKS_TEMPLATE }
+				/>
+			</Block.div>
 		</>
 	);
 }
