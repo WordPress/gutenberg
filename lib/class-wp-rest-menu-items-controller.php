@@ -318,9 +318,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// We don't support trashing for menu items.
 		if ( ! $force ) {
 			/* translators: %s: force=true */
-			return new WP_Error( 'rest_trash_not_supported',
-				sprintf( __( "Menu items do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ),
-				array( 'status' => 501 ) );
+			return new WP_Error( 'rest_trash_not_supported', sprintf( __( "Menu items do not support trashing. Set '%s' to delete.", 'gutenberg' ), 'force=true' ), array( 'status' => 501 ) );
 		}
 
 		return $menu_item;
