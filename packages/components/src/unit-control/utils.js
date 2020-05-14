@@ -50,7 +50,7 @@ export function hasUnits( units ) {
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function parseUnit( initialValue, units = CSS_UNITS ) {
-	const value = String( initialValue );
+	const value = String( initialValue ).trim();
 
 	let num = parseFloat( value, 10 );
 	num = isNaN( num ) ? '' : num;
