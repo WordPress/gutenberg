@@ -36,9 +36,10 @@ function createMenuItemAttributesFromBlock( block ) {
 
 export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
+	const query = { menus: menuId, per_page: -1 };
 	const menuItems = useSelect(
 		( select ) =>
-			select( 'core' ).getMenuItems( { menus: menuId, per_page: -1 } ),
+			select( 'core' ).getMenuItems( query ),
 		[ menuId ]
 	);
 
@@ -52,7 +53,7 @@ export default function useNavigationBlocks( menuId ) {
 		menuItemsRef
 	);
 
-	const saveBlocks = useSaveBlocks( menuId, blocks, menuItemsRef );
+	const saveBlocks = useSaveBlocks( menuId, blocks, menuItemsRef, query );
 
 	return [ blocks, setBlocks, () => onFinished( saveBlocks ) ];
 }
@@ -223,7 +224,7 @@ const useDynamicMenuItemPlaceholders = (
 	return [ onFinished ];
 };
 
-const useSaveBlocks = ( menuId, blocks, menuItemsRef ) => {
+const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 	const { receiveEntityRecords } = useDispatch( 'core' );
 	const prepareRequestItem = ( block, parentId ) => {
 		const menuItem = omit(
@@ -284,7 +285,7 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef ) => {
 			'root',
 			'menuItem',
 			Object.values( saved ),
-			{},
+			query,
 			false
 		);
 	};
