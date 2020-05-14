@@ -34,20 +34,25 @@ function PostAuthorEdit( {
 } ) {
 	const { postType, postId } = context;
 
-	const { authorId, authorDetails, authors } = useSelect( ( select ) => {
-		const { getEditedEntityRecord, getUser, getAuthors } = select( 'core' );
-		const _authorId = getEditedEntityRecord(
-			'postType',
-			postType,
-			postId
-		)?.author;
+	const { authorId, authorDetails, authors } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getUser, getAuthors } = select(
+				'core'
+			);
+			const _authorId = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			)?.author;
 
-		return {
-			authorId: _authorId,
-			authorDetails: _authorId ? getUser( _authorId ) : null,
-			authors: getAuthors(),
-		};
-	} );
+			return {
+				authorId: _authorId,
+				authorDetails: _authorId ? getUser( _authorId ) : null,
+				authors: getAuthors(),
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const { editEntityRecord } = useDispatch( 'core' );
 
