@@ -86,7 +86,7 @@ const config = {
 			} ),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
-		process.env.WP_NO_EXTERNALS &&
+		! process.env.WP_NO_EXTERNALS &&
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	stats: {
