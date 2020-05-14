@@ -351,18 +351,16 @@ function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
 
 	foreach ( $trees as $tree ) {
 		foreach ( array_keys( $accumulator ) as $block_name ) {
+			// Merge styles.
+			if ( ! empty( $tree[ $block_name ]['styles'] ) ) {
+				$accumulator[ $block_name ]['styles'] = $tree[ $block_name ]['styles'];
+			}
+
+			// Merge presets.
 			foreach ( array_keys( $accumulator['global']['presets'] ) as $property ) {
 				if ( ! empty( $tree[ $block_name ]['presets'][ $property ] ) ) {
 					$accumulator[ $block_name ]['presets'][ $property ] = $tree[ $block_name ]['presets'][ $property ];
 				}
-			}
-		}
-	}
-
-	foreach ( $trees as $tree ) {
-		foreach ( array_keys( $accumulator ) as $block_name ) {
-			if ( ! empty( $tree[ $block_name ]['styles'] ) ) {
-				$accumulator[ $block_name ]['styles'] = $tree[ $block_name ]['styles'];
 			}
 		}
 	}
