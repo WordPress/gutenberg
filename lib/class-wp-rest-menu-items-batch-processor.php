@@ -136,7 +136,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 			if ( $type === static::UPDATE ) {
 				$result = $this->controller->update_item_persist( $prepared_nav_item, $request );
 			} elseif ( $type === static::DELETE ) {
-				$result = $this->controller->delete_item_persist( $input['id'] );
+				$result = $this->controller->delete_item_persist( $request );
 			}
 
 			if ( is_wp_error( $result ) ) {
