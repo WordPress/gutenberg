@@ -162,27 +162,24 @@ function gutenberg_experimental_global_styles_get_core() {
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = gutenberg_experimental_global_styles_normalize_shape( array() );
 
-	// Take colors from declared theme support.
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
 		foreach ( $theme_colors as $color ) {
-			$theme_presets['preset']['color'][ $color['slug'] ] = $color['color'];
+			$theme_presets['styles']['globals']['preset']['color'][ $color['slug'] ] = $color['color'];
 		}
 	}
 
-	// Take gradients from declared theme support.
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
 	if ( is_array( $theme_gradients ) ) {
 		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_presets['styles']['globals']['preset']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
 		}
 	}
 
-	// Take font-sizes from declared theme support.
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
 	if ( is_array( $theme_font_sizes ) ) {
 		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_presets['styles']['globals']['preset']['font-size'][ $font_size['slug'] ] = $font_size['size'];
 		}
 	}
 
@@ -345,30 +342,38 @@ function gutenberg_experimental_global_styles_resolver_globals( $global_styles )
 }
 
 /**
- * Function that incorporates into the source tree
- * the modifications given as updates. We use the source
- * instead of creating a new array to keep memory usage down.
+ * Function that merges the given trees.
  *
- * @param array $source Source tree to be updated.
- * @param array $updates Modifications to incorporate.
+ * @param array ...$trees Trees to be merged.
  *
- * @return void
+ * @return array The merge result.
  */
-function gutenberg_experimental_global_styles_merge_trees( $source, $updates ) {
-	foreach ( array( 'color', 'font-size', 'gradient' ) as $property ) {
-		$source['styles']['globals']['preset'][ $property ] = array_merge(
-			$source['styles']['globals']['preset'][ $property ],
-			$updates['styles']['globals']['preset'][ $property ]
-		);
+function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
+	$accumulator = gutenberg_experimental_global_styles_normalize_shape( array() );
+
+	foreach ( $trees as $tree ) {
+		foreach ( array_keys( $accumulator['styles']['globals']['preset'] ) as $property ) {
+			if ( ! empty( $tree['styles']['globals']['preset'][ $property ] ) ) {
+				$accumulator['styles']['globals']['preset'][ $property ] = array_merge(
+					$accumulator['styles']['globals']['preset'][ $property ],
+					$tree['styles']['globals']['preset'][ $property ]
+				);
+			}
+		}
 	}
 
-	$block_data = gutenberg_experimental_global_styles_get_block_data();
-	foreach ( $block_data as $block_name ) {
-		$source['styles']['blocks'][ $block_name ] = array_merge(
-			$source['styles']['blocks'][ $block_name ],
-			$updates['styles']['blocks'][ $block_name ]
-		);
+	foreach ( $trees as $tree ) {
+		foreach ( array_keys( $accumulator['styles']['blocks'] ) as $block_name ) {
+			if ( ! empty( $tree['styles']['blocks'][ $block_name ] ) ) {
+				$accumulator['styles']['blocks'][ $block_name ] = array_merge(
+					$accumulator['styles']['blocks'][ $block_name ],
+					$tree['styles']['blocks'][ $block_name ]
+				);
+			}
+		}
 	}
+
+	return $accumulator;
 }
 
 /**
@@ -418,8 +423,7 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
 	$gs_theme  = gutenberg_experimental_global_styles_get_theme();
 	$gs_user   = gutenberg_experimental_global_styles_get_user();
 
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme );
-	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_merged, $gs_user );
+	$gs_merged = gutenberg_experimental_global_styles_merge_trees( $gs_core, $gs_theme, $gs_user );
 
 	$stylesheet  = gutenberg_experimental_global_styles_resolver_globals( $gs_merged );
 	$stylesheet .= gutenberg_experimental_global_styles_resolver_block_styles( $gs_merged );
