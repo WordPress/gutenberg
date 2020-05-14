@@ -20,12 +20,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import CreateMenuForm from './create-menu-form';
 import DeleteMenuButton from '../delete-menu-button';
 
 export default function BlockEditorPanel( {
 	onDeleteMenu,
-	onCancelMenuCreation,
 	menuId,
 	saveBlocks,
 } ) {
@@ -54,9 +52,6 @@ export default function BlockEditorPanel( {
 	return (
 		<Panel className="edit-navigation-menu-editor__block-editor-panel">
 			<PanelBody title={ __( 'Navigation menu' ) }>
-				{ ! hasMenu && (
-					<CreateMenuForm onCancel={ onCancelMenuCreation } />
-				) }
 				{ hasMenu && (
 					<>
 						<div className="components-panel__header-actions">
