@@ -36,11 +36,11 @@ function PostAuthorEdit( {
 
 	const { authorId, authorDetails, authors } = useSelect( ( select ) => {
 		const { getEditedEntityRecord, getUser, getAuthors } = select( 'core' );
-		const { author: _authorId } = getEditedEntityRecord(
+		const _authorId = getEditedEntityRecord(
 			'postType',
 			postType,
 			postId
-		);
+		)?.author;
 
 		return {
 			authorId: _authorId,
