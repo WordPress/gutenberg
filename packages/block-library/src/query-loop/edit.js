@@ -25,6 +25,7 @@ export default function QueryLoopEdit( { clientId, context: { query } } ) {
 				...query,
 				offset: query.per_page * ( page - 1 ) + query.offset,
 				page,
+				categories: query.categoryIds,
 			} ),
 			blocks: select( 'core/block-editor' ).getBlocks( clientId ),
 		} ),

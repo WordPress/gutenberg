@@ -22,6 +22,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 			'post_type'      => 'post',
 			'posts_per_page' => $block->context['query']['per_page'],
 			'offset'         => $block->context['query']['per_page'] * ( $page - 1 ) + $block->context['query']['offset'],
+			'category__in'   => $block->context['query']['categoryIds'],
 		)
 	);
 
