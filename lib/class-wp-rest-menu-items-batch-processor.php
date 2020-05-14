@@ -67,7 +67,8 @@ class WP_REST_Menu_Items_Batch_Processor {
 			[ null, $input_tree ],
 		];
 		$updated_ids = [];
-		// Compute all the necessary Updates
+
+		// Compute all necessary Updates
 		while ( ! empty( $stack ) ) {
 			list( $parent_operation, $raw_menu_items ) = array_pop( $stack );
 			foreach ( $raw_menu_items as $n => $raw_menu_item ) {
