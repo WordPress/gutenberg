@@ -216,15 +216,16 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
-			'name'         => 'name',
-			'editorScript' => 'editor_script',
-			'script'       => 'script',
-			'editorStyle'  => 'editor_style',
-			'style'        => 'style'
+			'name',
+			'editor_script',
+			'script',
+			'editor_style',
+			'style',
 		);
-		foreach ( $extra_fields as $key => $extra_field ) {
-			if ( in_array( $key, $fields, true ) ) {
-				$data[ $key ] = rest_sanitize_value_from_schema( $block_type->$extra_field, $schema['properties'][ $key ] );
+		foreach ( $extra_fields as $extra_field ) {
+			if ( in_array( $extra_field, $fields, true ) ) {
+				$field                = ( isset( $block_type->$extra_field ) ) ? $block_type->$extra_field : false;
+				$data[ $extra_field ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $extra_field ] );
 			}
 		}
 
@@ -255,14 +256,23 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return array Links for the given block type.
 	 */
 	protected function prepare_links( $block_type ) {
-		$links = array(
+		$pieces    = explode( '/', $block_type->name );
+		$namespace = $pieces[0];
+		$links     = array(
 			'collection' => array(
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
 			'about'      => array(
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $block_type->name ) ),
 			),
+			'namespace'  => array(
+				'href' => add_query_arg( 'namespace', $namespace, rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ) ),
+			),
 		);
+
+		if ( $block_type->is_dynamic() ) {
+			$links['render']['href'] = add_query_arg( 'context', 'edit', rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'block-renderer', $block_type->name ) ) );
+		}
 
 		return $links;
 	}
@@ -309,7 +319,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'editorScript' => array(
+				'editor_script' => array(
 					'description' => __( 'Editor script handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
@@ -321,7 +331,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'editorStyle'  => array(
+				'editor_style'  => array(
 					'description' => __( 'URL of editor style css file.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
