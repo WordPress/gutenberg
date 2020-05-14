@@ -98,8 +98,8 @@ function BlockListBlock( {
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
 		wrapperProps = {
-			...wrapperProps,
 			...blockType.getEditWrapperProps( attributes ),
+			...wrapperProps,
 		};
 	}
 
