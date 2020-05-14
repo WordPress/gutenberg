@@ -299,12 +299,12 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 					'no_found_rows'  => true,
 				)
 			);
-			$current_template_post = $template_query->have_posts() ? $template_query->next_post() : null;
+			$current_template_post = $template_query->have_posts() ? $template_query->next_post() : $current_template_post;
 
 			// Only create auto-draft of block template for editing
 			// in admin screens, when necessary, because the underlying
 			// file has changed.
-			if ( ! $current_template_post || $current_template_post->post_content !== $file_contents ) {
+			if ( ! $current_template_post->ID || $current_template_post->post_content !== $file_contents ) {
 				$current_template_post->post_content = $file_contents;
 				$current_template_post = get_post(
 					wp_insert_post( $current_template_post )
