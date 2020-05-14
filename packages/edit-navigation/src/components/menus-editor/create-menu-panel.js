@@ -7,7 +7,7 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { Button, Panel, PanelBody, TextControl } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -18,8 +18,22 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export default function CreateMenuForm( { onCancel, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
+	const { hasStartedCreatingMenu, hasFinishedCreatingMenu } = useSelect(
+		( select ) => {
+			const { hasStartedResolution, hasFinishedResolution } = select(
+				'core'
+			);
+			return {
+				hasStartedCreatingMenu: hasStartedResolution( 'saveMenu' ),
+				hasCreatedMenu: hasFinishedResolution( 'saveMenu' ),
+			};
+		},
+		[]
+	);
 	const { saveMenu } = useDispatch( 'core' );
 	const { createErrorNotice, removeNotice } = useDispatch( 'core/notices' );
+
+	const isSavingMenu = hasStartedCreatingMenu && ! hasFinishedCreatingMenu;
 
 	const onCreateMenu = useCallback(
 		( event ) => {
@@ -64,9 +78,10 @@ export default function CreateMenuForm( { onCancel, menus } ) {
 					/>
 					<Button
 						type="submit"
-						isPrimary
+						isBusy={ isSavingMenu }
 						onClick={ onCreateMenu }
 						aria-disabled={ menuName.length === 0 }
+						isPrimary
 					>
 						{ __( 'Create menu' ) }
 					</Button>
