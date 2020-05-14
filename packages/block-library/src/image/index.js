@@ -3,6 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,6 +15,16 @@ import save from './save';
 import transforms from './transforms';
 
 const { name } = metadata;
+
+// Register Tip.
+const { __experimentalRegisterBlockTip } = dispatch( 'core/block-editor' );
+const tips = [
+	__( 'Add alternative text to your images to make them more accessible.' ),
+	__( 'Use a Cover block to add text on top of your image.' ),
+	__( 'To place two images side by side, convert them to a Gallery.' ),
+];
+
+tips.forEach( ( desc ) => __experimentalRegisterBlockTip( name, desc ) );
 
 export { metadata, name };
 

@@ -1,9 +1,11 @@
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { Tip } from '@wordpress/components';
+import { select } from '@wordpress/data';
 
 const globalTips = [
 	createInterpolateElement(
@@ -28,7 +30,13 @@ const globalTips = [
 	__( "Change a block's type by pressing the block icon on the toolbar." ),
 ];
 
-function Tips() {
+function Tips( { filterValue } ) {
+	// Return a contextual tip when it's appropriate.
+	const contextualTip = select( 'core/block-editor' ).__experimentalGetBlockInserterTipsByContext( filterValue, true );
+	if ( contextualTip ) {
+		return <Tip>{ contextualTip }</Tip>;
+	}
+
 	const [ randomIndex ] = useState(
 		// Disable Reason: I'm not generating an HTML id.
 		// eslint-disable-next-line no-restricted-syntax

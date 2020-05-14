@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
-import { size, map, without } from 'lodash';
+import { size, map, without, each } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
+import inserterContextualTips from './utils/tips';
 
 class Editor extends Component {
 	constructor() {
@@ -36,6 +37,9 @@ class Editor extends Component {
 		this.getEditorSettings = memize( this.getEditorSettings, {
 			maxSize: 1,
 		} );
+
+		// Register Block Inserter Tips.
+		each( inserterContextualTips, this.props.registerBlockInserterTip );
 	}
 
 	getEditorSettings(
@@ -167,8 +171,16 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { updatePreferredStyleVariations } = dispatch( 'core/edit-post' );
+		const { __experimentalRegisterBlockInserterTip } = dispatch(
+			'core/block-editor'
+		);
+
+		const registerBlockInserterTip = ( args ) =>
+			__experimentalRegisterBlockInserterTip( ...args );
+
 		return {
 			updatePreferredStyleVariations,
+			registerBlockInserterTip,
 		};
 	} ),
 ] )( Editor );
