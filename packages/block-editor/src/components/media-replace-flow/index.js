@@ -122,7 +122,7 @@ const MediaReplaceFlow = ( {
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
-					<NavigableMenu>
+					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
 							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
