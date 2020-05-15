@@ -24,7 +24,7 @@ program
 			'it is used as the block slug used for its identification, the output ' +
 			'location for scaffolded files, and the name of the WordPress plugin.' +
 			'The rest of the configuration is set to all default values unless ' +
-			'overriden with some of the options listed below.'
+			'overridden with some of the options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
