@@ -4,11 +4,11 @@
 import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { blockDirection } = attributes;
+	const { orientation } = attributes;
 	return (
 		<div
 			className={
-				blockDirection === 'vertical' ? 'is-direction-vertical' : ''
+				orientation === 'vertical' ? 'is-direction-vertical' : ''
 			}
 		>
 			<InnerBlocks.Content />

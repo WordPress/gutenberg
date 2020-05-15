@@ -24,26 +24,26 @@ const alignmentHooksSetting = {
 };
 
 function ButtonsEdit( { attributes, setAttributes } ) {
-	const { blockDirection } = attributes;
+	const { orientation } = attributes;
 
 	return (
 		<Block.div
 			className={ `${
-				blockDirection === 'vertical' ? 'is-direction-vertical' : ''
+				orientation === 'vertical' ? 'is-direction-vertical' : ''
 			}` }
 		>
 			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }
 					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection={ blockDirection }
+					__experimentalMoverDirection={ orientation }
 				/>
 			</AlignmentHookSettingsProvider>
 			<InspectorControls>
 				<PanelBody title={ __( 'Buttons Settings' ) }>
 					<RadioControl
 						label={ __( 'Direction' ) }
-						selected={ blockDirection }
+						selected={ orientation }
 						options={ [
 							{ label: __( 'Horizontal' ), value: 'horizontal' },
 							{
@@ -53,7 +53,7 @@ function ButtonsEdit( { attributes, setAttributes } ) {
 						] }
 						onChange={ ( value ) =>
 							setAttributes( {
-								blockDirection: value,
+								orientation: value,
 							} )
 						}
 					/>

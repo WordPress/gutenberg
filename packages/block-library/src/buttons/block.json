@@ -7,7 +7,7 @@
 		"lightBlockWrapper": true
 	},
 	"attributes": {
-		"blockDirection": {
+		"orientation": {
 			"type": "string",
 			"default": "horizontal"
 		}
