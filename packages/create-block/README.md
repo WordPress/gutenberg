@@ -102,7 +102,7 @@ Updates WordPress packages to the latest version. [Learn more](/packages/scripts
 ## External Templates
 Since version 0.12.0 it is possible to use external templates hosted on NPM. These templates need to contain `.mustache` files that will be used in the scaffolding and one `template.json` for the metadata. 
 
-### Availabe Variables: 
+### Available Variables: 
 - `namespace`
 - `slug`
 - `title`
