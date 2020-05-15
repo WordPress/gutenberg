@@ -217,7 +217,7 @@ function EditorProvider( {
 		} );
 	}
 
-	if ( ! isReady ) {
+	if ( ! isReady && ! recovery ) {
 		return null;
 	}
 
