@@ -16,6 +16,7 @@ import {
 } from '@wordpress/data';
 import {
 	PinnedItems,
+	AdminMenuToggle,
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
 
@@ -29,7 +30,6 @@ import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import FullscreenModeClose from './fullscreen-mode-close';
 
 /**
  * Browser dependencies
@@ -95,15 +95,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 		} catch ( err ) {}
 	}, [] );
 
-	const { isFullscreenActive } = useSelect(
-		( select ) => ( {
-			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
-				'fullscreenMode'
-			),
-		} ),
-		[]
-	);
-
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
 	}, [] );
@@ -115,7 +106,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 	return (
 		<div className="edit-site-header">
 			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
+				<AdminMenuToggle />
 			</MainDashboardButton.Slot>
 			<div className="edit-site-header__toolbar">
 				<Inserter
