@@ -47,7 +47,7 @@ function ButtonsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Buttons Settings' ) }>
 					<RadioControl
-						label={ __( 'Direction' ) }
+						label={ __( 'Orientation' ) }
 						selected={ orientation }
 						options={ [
 							{ label: __( 'Horizontal' ), value: 'horizontal' },
