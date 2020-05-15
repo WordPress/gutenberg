@@ -67,7 +67,7 @@ When you scaffold a block, you must provide at least a `slug` name, the `namespa
 
 ## Available Commands [ESNext template]
 
-When bootstraped with the `esnext` templateyou can run several commands inside the directory:
+When bootstraped with the `esnext` template, you can run several commands inside the directory:
 
 ```bash
 $ npm start
