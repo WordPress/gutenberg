@@ -1,23 +1,48 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { NoticeList, SnackbarList } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { SnackbarList } from '@wordpress/components';
 
-export default function Notices() {
+export default function EditNavigationNotices() {
+	const { removeNotice } = useDispatch( 'core/notices' );
 	const notices = useSelect(
-		( select ) =>
-			select( 'core/notices' )
-				.getNotices()
-				.filter( ( notice ) => notice.type === 'snackbar' ),
+		( select ) => select( 'core/notices' ).getNotices(),
 		[]
 	);
-	const { removeNotice } = useDispatch( 'core/notices' );
+	const dismissibleNotices = filter( notices, {
+		isDismissible: true,
+		type: 'default',
+	} );
+	const nonDismissibleNotices = filter( notices, {
+		isDismissible: false,
+		type: 'default',
+	} );
+	const snackbarNotices = filter( notices, {
+		type: 'snackbar',
+	} );
+
 	return (
-		<SnackbarList
-			className="edit-navigation-notices"
-			notices={ notices }
-			onRemove={ removeNotice }
-		/>
+		<>
+			<NoticeList
+				notices={ nonDismissibleNotices }
+				className="edit-navigation-notices__notice-list"
+			/>
+			<NoticeList
+				notices={ dismissibleNotices }
+				className="edit-navigation-notices__notice-list"
+				onRemove={ removeNotice }
+			/>
+			<SnackbarList
+				notices={ snackbarNotices }
+				className="edit-navigation-notices__snackbar-list"
+				onRemove={ removeNotice }
+			/>
+		</>
 	);
 }
