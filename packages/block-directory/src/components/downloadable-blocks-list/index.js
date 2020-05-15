@@ -7,8 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,10 +16,12 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 
 export function DownloadableBlocksList( {
 	items,
-	onHover = noop,
 	children,
-	install,
+	onHover = noop,
+	onSelect,
 } ) {
+	const { installBlockType } = useDispatch( 'core/block-directory' );
+
 	if ( ! items.length ) {
 		return null;
 	}
@@ -39,7 +40,9 @@ export function DownloadableBlocksList( {
 						className={ getBlockMenuDefaultClassName( item.id ) }
 						icons={ item.icons }
 						onClick={ () => {
-							install( item );
+							installBlockType( item ).then( () => {
+								onSelect( item );
+							} );
 							onHover( null );
 						} }
 						onFocus={ () => onHover( item ) }
@@ -56,15 +59,4 @@ export function DownloadableBlocksList( {
 	);
 }
 
-export default compose(
-	withDispatch( ( dispatch, { onSelect } ) => {
-		const { installBlockType } = dispatch( 'core/block-directory' );
-		return {
-			downloadAndInstallBlock: ( item ) => {
-				installBlockType( item ).then( () => {
-					onSelect( item );
-				} );
-			},
-		};
-	} )
-)( DownloadableBlocksList );
+export default DownloadableBlocksList;
