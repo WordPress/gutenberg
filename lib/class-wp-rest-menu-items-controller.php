@@ -13,7 +13,12 @@
  */
 class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
-	protected $cached_menu_items = [];
+	/**
+	 * List of cached menu items, used to avoid re-fetching during batch processing.
+	 *
+	 * @var array
+	 */
+	protected $cached_menu_items = array();
 
 	/**
 	 * Constructor.
@@ -25,6 +30,11 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$this->namespace = '__experimental';
 	}
 
+	/**
+	 * Adds /batch endpoint
+	 *
+	 * @see WP_REST_Posts_Controller
+	 */
 	public function register_routes() {
 		parent::register_routes();
 		register_rest_route(
@@ -213,6 +223,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return rest_ensure_response( $response );
 	}
 
+	/**
+	 * Validates an update to a single nav menu item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return object|WP_Error Result of prepare_item_for_database if validation succeeded, WP_Error otherwise.
+	 */
 	public function update_item_validate( $request ) {
 		$valid_check = $this->get_nav_menu_item( $request['id'] );
 		if ( is_wp_error( $valid_check ) ) {
@@ -229,6 +246,14 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $prepared_nav_item;
 	}
 
+	/**
+	 * Updates an a single nav menu item once it's been validated.
+	 *
+	 * @param object          $prepared_nav_item Validated navigation item to persist.
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return object|WP_Error Post object if update succeeded, WP_Error otherwise.
+	 */
 	public function update_item_persist( $prepared_nav_item, $request ) {
 		$nav_menu_item_id = wp_update_nav_menu_item( $prepared_nav_item['menu-id'], $prepared_nav_item['menu-item-db-id'], $prepared_nav_item );
 
@@ -272,6 +297,12 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $nav_menu_item;
 	}
 
+	/**
+	 * Runs rest_after_insert_ action
+	 *
+	 * @param object          $nav_menu_item Stored menu item.
+	 * @param WP_REST_Request $request Full details about the request.
+	 */
 	public function update_item_notify( $nav_menu_item, $request ) {
 		$request->set_param( 'context', 'edit' );
 
@@ -287,7 +318,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function delete_item( $request ) {
 		$menu_item = $this->delete_item_validate( $request );
-		$previous = $this->prepare_item_for_response( $menu_item, $request );
+		$previous  = $this->prepare_item_for_response( $menu_item, $request );
 
 		$result = $this->delete_item_persist( $request );
 		if ( is_wp_error( $result ) ) {
@@ -302,11 +333,18 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			)
 		);
 
-		$this->delete_item_notify($menu_item, $response, $request);
+		$this->delete_item_notify( $menu_item, $response, $request );
 
 		return $response;
 	}
 
+	/**
+	 * Validates a delete of a single nav menu item.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return object|WP_Error Menu item to be deleted if validation succeeded, WP_Error otherwise.
+	 */
 	public function delete_item_validate( $request ) {
 		$menu_item = $this->get_nav_menu_item_cached( $request['id'], $request['menus'] );
 		if ( is_wp_error( $menu_item ) ) {
@@ -324,6 +362,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $menu_item;
 	}
 
+	/**
+	 * Delete a single nav menu item once it was validated.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return void|WP_Error Nothing on success, WP_Error on failure.
+	 */
 	public function delete_item_persist( $request ) {
 		$result = wp_delete_post( $request['id'], true );
 
@@ -332,6 +377,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		}
 	}
 
+	/**
+	 * Runs rest_delete_ action after deleting a menu item
+	 *
+	 * @param Object           $menu_item  The deleted or trashed menu item.
+	 * @param WP_REST_Response $response The response data.
+	 * @param WP_REST_Request  $request Full details about the request.
+	 */
 	public function delete_item_notify( $menu_item, $response, $request ) {
 		/**
 		 * Fires immediately after a single menu item is deleted or trashed via the REST API.
@@ -1113,26 +1165,40 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		return $menu_id;
 	}
 
+	/**
+	 * Processes a batch of update and delete operations.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True on success, or WP_Error object on failure.
+	 */
 	public function process_batch( $request ) {
-		require_once __DIR__ . "/class-wp-rest-menu-items-batch-processor.php";
+		require_once __DIR__ . '/class-wp-rest-menu-items-batch-processor.php';
 		$navigation_id = $request['menus'];
-		$processor = new WP_REST_Menu_Items_Batch_Processor( $navigation_id, $this, $request );
+		$processor     = new WP_REST_Menu_Items_Batch_Processor( $navigation_id, $this, $request );
 
 		$result = $processor->process( $request['tree'] );
 		if ( is_wp_error( $result ) ) {
-			// Provide information to the client about the specific input that caused the problem
-			$current_data = $result->get_error_data() ?: [];
+			// Provide information to the client about the specific input that caused the problem.
+			$current_data          = $result->get_error_data() ? $result->get_error_data() : array();
 			$current_data['input'] = $result->get_error_data( 'input' );
 			$result->add_data( $current_data );
 
 			return $result;
 		}
 
-		return $this->get_items($request);
+		return $this->get_items( $request );
 	}
 
+	/**
+	 * Returns a menu item without querying the database on subsequent calls.
+	 *
+	 * @param int $id ID of the menu item.
+	 * @param int $menu_id ID of the menu the menu item belongs to.
+	 *
+	 * @return object
+	 */
 	protected function get_nav_menu_item_cached( $id, $menu_id ) {
-		return $this->get_menu_items($menu_id)[$id];
+		return $this->get_menu_items( $menu_id )[ $id ];
 	}
 
 	/**
@@ -1140,15 +1206,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * endpoint reuses most of the regular endpoints logic, it would hit the database even more.
 	 * This caching logic makes it possible to avoid most of those round trips.
 	 *
-	 * @param $menu_id
-	 * @param $refresh
+	 * @param int  $menu_id ID of the menu to retrieve menu items from.
+	 * @param bool $refresh Should the cache be refreshed.
 	 *
-	 * @return mixed
+	 * @return object[] A list of menu items related to the specified menu
 	 */
 	public function get_menu_items( $menu_id, $refresh = false ) {
 		if ( empty( $this->cached_menu_items[ $menu_id ] ) || $refresh ) {
-			$items = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'publish,draft' ) );
-			$items_by_id = [];
+			$items       = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'publish,draft' ) );
+			$items_by_id = array();
 			foreach ( $items as $item ) {
 				$items_by_id[ $item->ID ] = $item;
 			}
