@@ -14,10 +14,6 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
-import {
-	DOWNLOAD_ERROR_NOTICE_ID,
-	INSTALL_ERROR_NOTICE_ID,
-} from '../../store/constants';
 
 export function DownloadableBlocksList( {
 	items,
@@ -61,62 +57,11 @@ export function DownloadableBlocksList( {
 }
 
 export default compose(
-	withDispatch( ( dispatch, props, { select } ) => {
-		const {
-			downloadBlock,
-			installBlock,
-			setErrorNotice,
-			clearErrorNotice,
-			setIsInstalling,
-		} = dispatch( 'core/block-directory' );
-		const { onSelect } = props;
-		const errorNotices = select( 'core/block-directory' ).getErrorNotices();
-
-		const downloadAssets = ( item ) => {
-			clearErrorNotice( item.id );
-			setIsInstalling( true );
-
-			const onDownloadError = () => {
-				setErrorNotice( item.id, DOWNLOAD_ERROR_NOTICE_ID );
-				setIsInstalling( false );
-			};
-
-			const onDownloadSuccess = () => {
-				onSelect( item );
-				setIsInstalling( false );
-			};
-
-			downloadBlock( item, onDownloadSuccess, onDownloadError );
-		};
-
-		const installPlugin = ( item, onSuccess ) => {
-			if (
-				errorNotices[ item.id ] &&
-				errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
-			) {
-				// Install has already run & the error was in downloading the assets, so we
-				// can skip the install step to prevent re-downloading the plugin.
-				return onSuccess();
-			}
-
-			clearErrorNotice( item.id );
-			setIsInstalling( true );
-
-			const onInstallBlockError = () => {
-				setErrorNotice( item.id, INSTALL_ERROR_NOTICE_ID );
-				setIsInstalling( false );
-			};
-
-			installBlock( item, onSuccess, onInstallBlockError );
-		};
-
+	withDispatch( ( dispatch ) => {
+		const { installBlockType } = dispatch( 'core/block-directory' );
 		return {
-			install( item ) {
-				const onSuccess = () => {
-					downloadAssets( item );
-				};
-
-				installPlugin( item, onSuccess );
+			downloadAndInstallBlock: ( item ) => {
+				installBlockType( item );
 			},
 		};
 	} )
