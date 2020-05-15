@@ -22,18 +22,23 @@
 	align-items: center;
 	align-content: space-between;
 
-	.components-button.has-icon {
-		position: absolute;
-		right: $grid-unit-10;
+	.components-button {
+		width: 100%;
+		justify-content: center;
 	}
 }
 
-.editor-post-publish-panel__header-publish-button {
-	display: flex;
-	justify-content: flex-end;
+.editor-post-publish-panel__header-publish-button,
+.editor-post-publish-panel__header-cancel-button {
 	flex-grow: 1;
-	text-align: right;
-	flex-wrap: nowrap;
+}
+
+.editor-post-publish-panel__header-publish-button {
+	padding-right: 4px;
+}
+
+.editor-post-publish-panel__header-cancel-button {
+	padding-left: 4px;
 }
 
 .editor-post-publish-panel__header-published {
