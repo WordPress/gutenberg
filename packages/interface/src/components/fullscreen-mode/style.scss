@@ -21,7 +21,8 @@ body.is-fullscreen-mode {
 			transition: all 0.12s ease-in-out;
 
 			.wp-submenu {
-				display: none;
+				opacity: 0;
+				pointer-events: none;
 			}
 		}
 
@@ -67,7 +68,8 @@ body.is-showing-admin-menu {
 		left: 0;
 
 		.wp-submenu {
-			display: block;
+			opacity: 1;
+			pointer-events: auto;
 		}
 	}
 
