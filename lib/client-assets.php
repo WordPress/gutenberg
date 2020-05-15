@@ -650,7 +650,7 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	);
 
 	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
-		$settings['__experimentalBlockPatternCategories'] = [];
+		$settings['__experimentalBlockPatternCategories'] = array();
 	}
 
 	$settings['__experimentalBlockPatternCategories'] = array_merge(
@@ -709,11 +709,11 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
  * Register default pattern categories if not registered in Core already.
  */
 if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-	register_block_pattern_category( 'text', [ 'label' => __( 'Text', 'gutenberg' ) ] );
-	register_block_pattern_category( 'hero', [ 'label' => __( 'Hero', 'gutenberg' ) ] );
-	register_block_pattern_category( 'columns', [ 'label' => __( 'Columns', 'gutenberg' ) ] );
-	register_block_pattern_category( 'buttons', [ 'label' => __( 'Buttons', 'gutenberg' ) ] );
-	register_block_pattern_category( 'gallery', [ 'label' => __( 'Gallery', 'gutenberg' ) ] );
-	register_block_pattern_category( 'features', [ 'label' => __( 'Features', 'gutenberg' ) ] );
-	register_block_pattern_category( 'testimonials', [ 'label' => __( 'Testimonials', 'gutenberg' ) ] );
+	register_block_pattern_category( 'text', array( 'label' => __( 'Text', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => __( 'Hero', 'gutenberg' ) ) );
+	register_block_pattern_category( 'columns', array( 'label' => __( 'Columns', 'gutenberg' ) ) );
+	register_block_pattern_category( 'buttons', array( 'label' => __( 'Buttons', 'gutenberg' ) ) );
+	register_block_pattern_category( 'gallery', array( 'label' => __( 'Gallery', 'gutenberg' ) ) );
+	register_block_pattern_category( 'features', array( 'label' => __( 'Features', 'gutenberg' ) ) );
+	register_block_pattern_category( 'testimonials', array( 'label' => __( 'Testimonials', 'gutenberg' ) ) );
 }
