@@ -16,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 import Notices from '../notices';
 import MenusEditor from '../menus-editor';
 import MenuLocationsEditor from '../menu-locations-editor';
-import Notices from '../notices';
 
 export default function Layout( { blockEditorSettings } ) {
 	return (
