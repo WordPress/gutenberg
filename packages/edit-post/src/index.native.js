@@ -20,14 +20,12 @@ let blocksRegistered = false;
 /**
  * Initializes the Editor and returns a componentProvider
  * that can be registered with `AppRegistry.registerComponent`
+ *
+ * @param {string}  id           Unique identifier for editor instance.
+ * @param {Object}  postType     Post type of the post to edit.
+ * @param {Object}  postId       ID of the post to edit (unused right now)
  */
-export function initializeEditor( {
-	id,
-	initialHtml,
-	initialTitle,
-	initialHtmlModeEnabled,
-	postType,
-} ) {
+export function initializeEditor( id, postType, postId ) {
 	if ( blocksRegistered ) {
 		return;
 	}
@@ -36,13 +34,5 @@ export function initializeEditor( {
 	registerCoreBlocks();
 	blocksRegistered = true;
 
-	render(
-		<Editor
-			initialHtml={ initialHtml }
-			initialHtmlModeEnabled={ initialHtmlModeEnabled }
-			initialTitle={ initialTitle }
-			postType={ postType }
-		/>,
-		id
-	);
+	render( <Editor postId={ postId } postType={ postType } />, id );
 }

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { AppRegistry } from 'react-native';
-import { isEmpty, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,26 +17,12 @@ import { cloneElement } from './react';
 const render = ( element, id ) =>
 	AppRegistry.registerComponent( id, () => ( propsFromParent ) => {
 		const parentProps = omit( propsFromParent || {}, [ 'rootTag' ] );
-		let filteredProps;
 
 		doAction( 'native.pre-render', parentProps );
 
-		// If we have not received props from the parent app, we're in the demo app
-		if ( isEmpty( parentProps ) ) {
-			filteredProps = applyFilters(
-				'native.block_editor_props_default',
-				element.props
-			);
-		} else {
-			filteredProps = applyFilters(
-				'native.block_editor_props_from_parent',
-				parentProps
-			);
-		}
-
-		filteredProps = applyFilters(
+		const filteredProps = applyFilters(
 			'native.block_editor_props',
-			filteredProps
+			parentProps
 		);
 
 		doAction( 'native.render', filteredProps );

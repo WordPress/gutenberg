@@ -37,13 +37,7 @@ const gutenbergSetup = () => {
 	setupInitHooks();
 
 	const initializeEditor = require( '@wordpress/edit-post' ).initializeEditor;
-	initializeEditor( {
-		id: 'gutenberg',
-		initialHtml,
-		initialHtmlModeEnabled: false,
-		initialTitle: 'Welcome to Gutenberg!',
-		postType: 'post',
-	} );
+	initializeEditor( 'gutenberg', 'post', 1 );
 };
 
 const setupInitHooks = () => {
@@ -58,20 +52,27 @@ const setupInitHooks = () => {
 	);
 
 	// Map native props to Editor props
+	// TODO: normalize props in the bridge (So we don't have to map initialData to initialHtml)
 	wpHooks.addFilter(
-		'native.block_editor_props_from_parent',
+		'native.block_editor_props',
 		'core/react-native-editor',
-		( {
-			initialData,
-			initialTitle,
-			initialHtmlModeEnabled,
-			postType,
-		} ) => ( {
-			initialHtml: initialData,
-			initialHtmlModeEnabled,
-			initialTitle,
-			postType,
-		} ),
+		( { initialData, initialTitle, initialHtmlModeEnabled, postType } ) => {
+			const isDemo = initialData === undefined && __DEV__;
+			if ( isDemo ) {
+				return {
+					initialHtml,
+					initialHtmlModeEnabled: false,
+					initialTitle: 'Welcome to Gutenberg!',
+					postType: 'post',
+				};
+			}
+			return {
+				initialHtml: initialData,
+				initialHtmlModeEnabled,
+				initialTitle,
+				postType,
+			};
+		},
 		5
 	);
 };
