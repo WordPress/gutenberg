@@ -10,12 +10,13 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor tests for List block', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const listBlockName = 'List';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -38,9 +39,10 @@ describe( 'Gutenberg Editor tests for List block', () => {
 	} );
 
 	it( 'should be able to add a new List block', async () => {
-		await editorPage.addNewListBlock();
-		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
-
+		await editorPage.addNewBlock( listBlockName );
+		const listBlockElement = await editorPage.getBlockAtPosition(
+			listBlockName
+		);
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {
 			await listBlockElement.click();
@@ -63,6 +65,21 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		await editorPage.verifyHtmlContent( testData.listHtml );
+	} );
+
+	it( 'should update format to ordered list, using toolbar button', async () => {
+		const listBlockElement = await editorPage.getBlockAtPosition(
+			listBlockName
+		);
+
+		// Click List block to force EditText focus
+		await listBlockElement.click();
+
+		// Send a click on the order list format button
+		await editorPage.clickOrderedListToolBarButton();
+
+		// switch to html and verify html
+		await editorPage.verifyHtmlContent( testData.listHtmlOrdered );
 	} );
 
 	afterAll( async () => {

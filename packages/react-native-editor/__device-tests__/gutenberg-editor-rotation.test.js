@@ -11,12 +11,13 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -39,15 +40,15 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
-		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
-			1
+		await editorPage.addNewBlock( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition(
+			paragraphBlockName
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock(
+		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);
@@ -58,22 +59,24 @@ describe( 'Gutenberg Editor tests', () => {
 			await driver.hideDeviceKeyboard();
 		}
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 
 		if ( isAndroid() ) {
 			await driver.hideDeviceKeyboard();
 		}
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
+		paragraphBlockElement = await editorPage.getBlockAtPosition(
+			paragraphBlockName,
 			2
 		);
 		while ( ! paragraphBlockElement ) {
 			await driver.hideDeviceKeyboard();
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
+			paragraphBlockElement = await editorPage.getBlockAtPosition(
+				paragraphBlockName,
 				2
 			);
 		}
-		await editorPage.sendTextToParagraphBlock(
+		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			testData.mediumText
 		);

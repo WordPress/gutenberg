@@ -33,9 +33,9 @@ describe( 'Gutenberg Editor Latest Post Block tests', () => {
 	} );
 
 	it( 'should be able to add a Latests-Posts block', async () => {
-		await editorPage.addNewLatestPostsBlock();
-		const latestPostsBlock = await editorPage.getLatestPostsBlockAtPosition(
-			1
+		await editorPage.addNewBlock( lastPostBlockName );
+		const latestPostsBlock = await editorPage.getBlockAtPosition(
+			lastPostBlockName
 		);
 
 		expect( latestPostsBlock ).toBeTruthy();

@@ -1,7 +1,7 @@
 const ios = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.3',
+	platformVersion: '13.4',
 	deviceName: 'iPhone 11',
 	os: 'iOS',
 	deviceOrientation: 'portrait',

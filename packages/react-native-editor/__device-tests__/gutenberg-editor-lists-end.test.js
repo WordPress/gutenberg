@@ -10,12 +10,13 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor tests for List block (end)', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const listBlockName = 'List';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -38,8 +39,10 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 	} );
 
 	it( 'should be able to end a List block', async () => {
-		await editorPage.addNewListBlock();
-		const listBlockElement = await editorPage.getListBlockAtPosition( 1 );
+		await editorPage.addNewBlock( listBlockName );
+		const listBlockElement = await editorPage.getBlockAtPosition(
+			listBlockName
+		);
 
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {

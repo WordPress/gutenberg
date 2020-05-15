@@ -12,12 +12,14 @@ import {
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
+jest.setTimeout( 1000000 );
 
 describe( 'Gutenberg Editor Image Block tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const imageBlockName = 'Image';
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -40,8 +42,8 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 	} );
 
 	it( 'should be able to add an image block', async () => {
-		await editorPage.addNewImageBlock();
-		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
+		await editorPage.addNewBlock( imageBlockName );
+		let imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
 
 		// Can only add image from media library on iOS
 		if ( ! isAndroid() ) {
@@ -54,52 +56,28 @@ describe( 'Gutenberg Editor Image Block tests', () => {
 			await editorPage.dismissKeyboard();
 			// end workaround
 
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-			await imageBlock.click();
+			imageBlock = await editorPage.getBlockAtPosition( imageBlock );
 			await swipeUp( driver, imageBlock );
 			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption
-			);
-			await editorPage.dismissKeyboard();
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-			await imageBlock.click();
-		}
-		await editorPage.removeImageBlockAtPosition( 1 );
-	} );
-
-	it( 'should be able to add an image block with multiple paragraph blocks', async () => {
-		await editorPage.addNewImageBlock();
-		let imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-
-		// Can only add image from media library on iOS
-		if ( ! isAndroid() ) {
-			await editorPage.selectEmptyImageBlock( imageBlock );
-			await editorPage.chooseMediaLibrary();
-
-			imageBlock = await editorPage.getImageBlockAtPosition( 1 );
-			await imageBlock.click();
-			await swipeUp( driver, imageBlock );
-			await editorPage.enterCaptionToSelectedImageBlock(
-				testData.imageCaption
+				testData.imageCaption,
+				true
 			);
 			await editorPage.dismissKeyboard();
 		}
-
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition(
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+			paragraphBlockName,
 			2
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlockAtPosition(
-			2,
-			testData.longText
-		);
+
+		await editorPage.sendTextToParagraphBlock( 2, testData.shortText );
 
 		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {
-			await editorPage.verifyHtmlContent( testData.imageCompletehtml );
+			await editorPage.verifyHtmlContent( testData.imageShorteHtml );
 		}
 	} );
 
