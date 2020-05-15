@@ -972,6 +972,15 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="flashBlock" href="#flashBlock">#</a> **flashBlock**
+
+Yields action objects used in signalling that the block corresponding to the
+given clientId should appear to "flash" by rhythmically highlighting it.
+
+_Parameters_
+
+-   _clientId_ `string`: Target block client ID.
+
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
 Returns an action object hiding the insertion point.

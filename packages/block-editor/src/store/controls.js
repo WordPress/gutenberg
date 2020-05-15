@@ -27,6 +27,11 @@ const controls = {
 			return registry.select( storeName )[ selectorName ]( ...args );
 		}
 	),
+	SLEEP( { duration } ) {
+		return new Promise( ( resolve ) => {
+			setTimeout( resolve, duration );
+		} );
+	},
 };
 
 export default controls;
