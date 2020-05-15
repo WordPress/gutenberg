@@ -81,6 +81,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 								onChange={ ( selectedMenuId ) =>
 									setMenuId( selectedMenuId )
 								}
+								value={ menuId }
 							/>
 							<Button
 								isLink
