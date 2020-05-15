@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -28,9 +33,9 @@ function ButtonsEdit( { attributes, setAttributes } ) {
 
 	return (
 		<Block.div
-			className={ `${
-				orientation === 'vertical' ? 'is-direction-vertical' : ''
-			}` }
+			className={ classnames( {
+				'is-vertical': orientation === 'vertical',
+			} ) }
 		>
 			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
 				<InnerBlocks
