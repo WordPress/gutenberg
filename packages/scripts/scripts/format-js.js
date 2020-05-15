@@ -72,9 +72,11 @@ if ( ! checkResult.success ) {
 // needed for config, otherwise pass in args to default config in packages
 // See: https://prettier.io/docs/en/configuration.html
 let configArgs = [];
-// TODO: once setup, use @wordpress/prettier-config
 if ( ! hasPrettierConfig() ) {
-	configArgs = [ '--config', fromConfigRoot( '.prettierrc.js' ) ];
+	configArgs = [
+		'--config',
+		require.resolve( '@wordpress/prettier-config' ),
+	];
 }
 
 // If `--ignore-path` is not explicitly specified, use the project's or global .eslintignore
@@ -101,7 +103,7 @@ if ( fileArgs.length === 0 ) {
 }
 
 // Converts `foo/bar` directory to `foo/bar/**/*.js`
-const globArgs = dirGlob( fileArgs, { extensions: [ 'js' ] } );
+const globArgs = dirGlob( fileArgs, { extensions: [ 'js', 'jsx' ] } );
 
 const result = spawn(
 	resolveBin( 'prettier' ),

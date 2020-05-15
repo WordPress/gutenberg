@@ -367,9 +367,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               xmlns="http://www.w3.org/2000/svg"
             >
               <svg
-                aria-hidden="true"
+                aria-hidden={true}
                 fill="#000000"
-                focusable="false"
+                focusable={false}
                 height={24}
                 role="img"
                 viewBox="0 0 24 24"

@@ -78,7 +78,7 @@ class Dropdown extends Component {
 		const {
 			renderContent,
 			renderToggle,
-			position = 'bottom',
+			position = 'bottom right',
 			className,
 			contentClassName,
 			expandOnMobile,
@@ -103,6 +103,7 @@ class Dropdown extends Component {
 						expandOnMobile={ expandOnMobile }
 						headerTitle={ headerTitle }
 						focusOnMount={ focusOnMount }
+						isAlternate
 						{ ...popoverProps }
 						className={ classnames(
 							'components-dropdown__content',

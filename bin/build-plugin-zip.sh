@@ -99,7 +99,7 @@ done
 
 # Run the build.
 status "Installing dependencies... 📦"
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
+npm install
 status "Generating build... 👷‍♀️"
 npm run build
 

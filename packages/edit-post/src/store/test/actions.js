@@ -5,37 +5,16 @@ import {
 	toggleEditorPanelEnabled,
 	toggleEditorPanelOpened,
 	removeEditorPanel,
-	openGeneralSidebar,
-	closeGeneralSidebar,
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
 	openModal,
 	closeModal,
 	toggleFeature,
-	togglePinnedPluginItem,
 	requestMetaBoxUpdates,
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'openGeneralSidebar', () => {
-		it( 'should return OPEN_GENERAL_SIDEBAR action', () => {
-			const name = 'plugin/my-name';
-			expect( openGeneralSidebar( name ) ).toEqual( {
-				type: 'OPEN_GENERAL_SIDEBAR',
-				name,
-			} );
-		} );
-	} );
-
-	describe( 'closeGeneralSidebar', () => {
-		it( 'should return CLOSE_GENERAL_SIDEBAR action', () => {
-			expect( closeGeneralSidebar() ).toEqual( {
-				type: 'CLOSE_GENERAL_SIDEBAR',
-			} );
-		} );
-	} );
-
 	describe( 'openPublishSidebar', () => {
 		it( 'should return an OPEN_PUBLISH_SIDEBAR action', () => {
 			expect( openPublishSidebar() ).toEqual( {
@@ -111,17 +90,6 @@ describe( 'actions', () => {
 			expect( toggleFeature( feature ) ).toEqual( {
 				type: 'TOGGLE_FEATURE',
 				feature,
-			} );
-		} );
-	} );
-
-	describe( 'togglePinnedPluginItem', () => {
-		it( 'should return TOGGLE_PINNED_PLUGIN_ITEM action', () => {
-			const pluginName = 'foo/bar';
-
-			expect( togglePinnedPluginItem( pluginName ) ).toEqual( {
-				type: 'TOGGLE_PINNED_PLUGIN_ITEM',
-				pluginName,
 			} );
 		} );
 	} );

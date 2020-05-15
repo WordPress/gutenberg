@@ -4,6 +4,7 @@
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/components';
+import { Icon, search } from '@wordpress/icons';
 
 function InserterSearchForm( { onChange } ) {
 	const instanceId = useInstanceId( InserterSearchForm );
@@ -13,7 +14,7 @@ function InserterSearchForm( { onChange } ) {
 	// Popover's focusOnMount.
 	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
-		<>
+		<div className="block-editor-inserter__search">
 			<VisuallyHidden
 				as="label"
 				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
@@ -21,14 +22,19 @@ function InserterSearchForm( { onChange } ) {
 				{ __( 'Search for a block' ) }
 			</VisuallyHidden>
 			<input
+				className="block-editor-inserter__search-input"
 				id={ `block-editor-inserter__search-${ instanceId }` }
 				type="search"
 				placeholder={ __( 'Search for a block' ) }
-				className="block-editor-inserter__search"
 				autoFocus
 				onChange={ ( event ) => onChange( event.target.value ) }
+				autoComplete="off"
 			/>
-		</>
+			<Icon
+				className="block-editor-inserter__search-icon"
+				icon={ search }
+			/>
+		</div>
 	);
 	/* eslint-enable jsx-a11y/no-autofocus */
 }

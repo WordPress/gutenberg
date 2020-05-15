@@ -11,9 +11,7 @@ describe('Babel preset default', function () {
   }
 
   function _foo() {
-    _foo = _wrapAsyncGenerator(
-    /*#__PURE__*/
-    _regeneratorRuntime.mark(function _callee() {
+    _foo = _wrapAsyncGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
       return _regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -35,11 +33,7 @@ describe('Babel preset default', function () {
     return _foo.apply(this, arguments);
   }
 
-  test('support for async generator functions',
-  /*#__PURE__*/
-  _asyncToGenerator(
-  /*#__PURE__*/
-  _regeneratorRuntime.mark(function _callee2() {
+  test('support for async generator functions', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
     var generator;
     return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
@@ -52,13 +46,12 @@ describe('Babel preset default', function () {
 
           case 4:
             _context2.t1 = _context2.sent;
-            _context2.t2 = {
+            (0, _context2.t0)(_context2.t1).toEqual({
               done: false,
               value: 2
-            };
-            (0, _context2.t0)(_context2.t1).toEqual(_context2.t2);
+            });
 
-          case 7:
+          case 6:
           case \\"end\\":
             return _context2.stop();
         }

@@ -40,6 +40,7 @@ import { isEmptyLine } from '../is-empty';
 import withFormatTypes from './with-format-types';
 import { BoundaryStyle } from './boundary-style';
 import { InlineWarning } from './inline-warning';
+import { insert } from '../insert';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -257,6 +258,7 @@ class RichText extends Component {
 			formatTypes,
 			onPaste,
 			__unstableIsSelected: isSelected,
+			__unstableDisableFormats,
 		} = this.props;
 		const { activeFormats = [] } = this.state;
 
@@ -298,6 +300,11 @@ class RichText extends Component {
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', html );
 		window.console.log( 'Received plain text:\n\n', plainText );
+
+		if ( __unstableDisableFormats ) {
+			this.onChange( insert( this.record, plainText ) );
+			return;
+		}
 
 		const record = this.record;
 		const transformed = formatTypes.reduce(

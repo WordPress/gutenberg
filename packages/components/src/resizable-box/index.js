@@ -4,7 +4,7 @@
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 
-function ResizableBox( { className, showHandle = false, ...props } ) {
+function ResizableBox( { className, showHandle = true, ...props } ) {
 	// Removes the inline styles in the drag handles.
 	const handleStylesOverrides = {
 		width: null,

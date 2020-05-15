@@ -105,9 +105,9 @@ export class MediaUpload extends React.Component {
 			.filter( ( source ) => {
 				return __experimentalOnlyMediaLibrary
 					? source.mediaLibrary
-					: allowedTypes.filter( ( allowedType ) =>
+					: allowedTypes.some( ( allowedType ) =>
 							source.types.includes( allowedType )
-					  ).length > 0;
+					  );
 			} )
 			.map( ( source ) => {
 				return {

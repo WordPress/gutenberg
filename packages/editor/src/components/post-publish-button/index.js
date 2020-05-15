@@ -3,7 +3,6 @@
  */
 import { noop, get, some } from 'lodash';
 import classnames from 'classnames';
-import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -17,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import EntitiesSavedStates from '../entities-saved-states';
 import PublishButtonLabel from './label';
 
 export class PostPublishButton extends Component {
@@ -33,12 +31,6 @@ export class PostPublishButton extends Component {
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
-		this.createIgnoredForSave = memoize(
-			( postType, postId ) => [
-				{ kind: 'postType', name: postType, key: postId },
-			],
-			{ maxSize: 1 }
-		);
 	}
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
@@ -56,6 +48,13 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+				// Open the save panel by setting its callback.
+				// To set a function on the useState hook, we must set it
+				// with another function (() => myFunction). Passing the
+				// function on its own will cause an error when called.
+				this.props.setEntitiesSavedStatesCallback(
+					() => this.closeEntitiesSavedStates
+				);
 				return noop;
 			}
 
@@ -102,10 +101,7 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
-			postType,
-			postId,
 		} = this.props;
-		const { entitiesSavedStatesCallback } = this.state;
 
 		const isButtonDisabled =
 			isSaving ||
@@ -179,14 +175,6 @@ export class PostPublishButton extends Component {
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
-				<EntitiesSavedStates
-					isOpen={ Boolean( entitiesSavedStatesCallback ) }
-					onRequestClose={ this.closeEntitiesSavedStates }
-					ignoredForSave={ this.createIgnoredForSave(
-						postType,
-						postId
-					) }
-				/>
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }

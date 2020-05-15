@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.14.5",
+	"version": "2.18.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
 		"build-style/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -54,7 +54,7 @@
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
 		"lodash": "^4.17.15",
-		"memize": "^1.0.5",
+		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^2.1.0",
 		"tinycolor2": "^1.4.1"

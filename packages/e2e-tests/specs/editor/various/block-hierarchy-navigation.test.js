@@ -7,12 +7,13 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
 	await page.waitForSelector(
-		'.block-editor-block-navigation__item-button.is-selected'
+		'.block-editor-block-navigation-leaf.is-selected'
 	);
 }
 
@@ -37,12 +38,13 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Columns')]"
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Columns')]"
 			)
 		 )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
+		await openDocumentSettingsSidebar();
 		await page.focus(
 			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
 		);
@@ -55,7 +57,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Block navigation"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
-				"//button[contains(@class,'block-editor-block-navigation__item') and contains(text(), 'Column')]"
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Column')]"
 			)
 		 )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
@@ -73,6 +75,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
 		await insertBlock( 'Columns' );
+		await openDocumentSettingsSidebar();
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
@@ -91,14 +94,14 @@ describe( 'Navigating the block hierarchy', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'Tab', 5 );
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
-		await pressKeyTimes( 'Tab', 4 );
+		await pressKeyTimes( 'ArrowDown', 4 );
 		await page.keyboard.press( 'Enter' );
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
@@ -118,7 +121,7 @@ describe( 'Navigating the block hierarchy', () => {
 
 		await insertBlock( 'Paragraph' );
 
-		// Add content so there is a block in the hierachy.
+		// Add content so there is a block in the hierarchy.
 		await page.keyboard.type( textString );
 
 		// Create an image block too.
@@ -134,5 +137,43 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should select the wrapper div for a group ', async () => {
+		// Insert a group block
+		await insertBlock( 'Group' );
+
+		// Insert some random blocks.
+		// The last block shouldn't be a textual block.
+		await page.click( '.block-list-appender .block-editor-inserter' );
+		const paragraphMenuItem = (
+			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
+		 )[ 0 ];
+		await paragraphMenuItem.click();
+		await page.keyboard.type( 'just a paragraph' );
+		await insertBlock( 'Separator' );
+
+		// Check the Group block content
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Unselect the blocks
+		await page.click( '.editor-post-title' );
+
+		// Try selecting the group block using the block navigation
+		await page.click( '[aria-label="Block navigation"]' );
+		const groupMenuItem = (
+			await page.$x(
+				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Group')]"
+			)
+		 )[ 0 ];
+		await groupMenuItem.click();
+
+		// The group block's wrapper should be selected.
+		const isGroupBlockSelected = await page.evaluate(
+			() =>
+				document.activeElement.getAttribute( 'data-type' ) ===
+				'core/group'
+		);
+		expect( isGroupBlockSelected ).toBe( true );
 	} );
 } );

@@ -2,6 +2,7 @@
 build
 build-module
 build-style
+build-types
 node_modules
 gutenberg.zip
 
@@ -14,6 +15,7 @@ yarn.lock
 
 playground/dist
 .cache
+*.tsbuildinfo
 
 # Report generated from jest-junit
 test/native/junit.xml

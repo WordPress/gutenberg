@@ -180,7 +180,7 @@ _Related_
 
 _Parameters_
 
--   _child_ `WPElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ (unknown type): Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="createRef" href="#createRef">#</a> **createRef**
@@ -199,7 +199,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `WPComponent`: Component's instance.
+-   _component_ (unknown type): Component's instance.
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
 
@@ -289,13 +289,11 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `Object`: 
--   _props.children_ `string`: HTML to render.
--   _props.props_ `Object`: Any additonal props to be set on the containing div.
+-   _props_ `RawHTMLProps`: Children should be a string of HTML. Other props will be passed through to div wrapper.
 
 _Returns_
 
--   `WPComponent`: Dangerously-rendering component.
+-   `JSX.Element`: Dangerously-rendering component.
 
 <a name="render" href="#render">#</a> **render**
 
@@ -303,7 +301,7 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to render.
+-   _element_ (unknown type): Element to render.
 -   _target_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString**
@@ -312,9 +310,9 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to serialize.
--   _context_ `?Object`: Context object.
--   _legacyContext_ `?Object`: Legacy context object.
+-   _element_ (unknown type): Element to serialize.
+-   _context_ `[Object]`: Context object.
+-   _legacyContext_ `[Object]`: Legacy context object.
 
 _Returns_
 

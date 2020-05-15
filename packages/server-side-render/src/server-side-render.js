@@ -131,8 +131,8 @@ ServerSideRender.defaultProps = {
 		</Placeholder>
 	),
 	ErrorResponsePlaceholder: ( { response, className } ) => {
-		// translators: %s: error message describing the problem
 		const errorMessage = sprintf(
+			// translators: %s: error message describing the problem
 			__( 'Error loading block: %s' ),
 			response.errorMsg
 		);

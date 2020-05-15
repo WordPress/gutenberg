@@ -3,9 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -13,11 +17,14 @@ import { cog } from '@wordpress/icons';
 import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
-import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header() {
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	setEntitiesSavedStatesCallback,
+} ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -40,6 +47,10 @@ function Header() {
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
+			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+			deviceType: select(
+				'core/edit-post'
+			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
@@ -58,9 +69,14 @@ function Header() {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar />
+				<HeaderToolbar
+					onToggleInserter={ onToggleInserter }
+					isInserterOpen={ isInserterOpen }
+				/>
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
@@ -74,10 +90,7 @@ function Header() {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -85,6 +98,9 @@ function Header() {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<Button
 					icon={ cog }
@@ -94,7 +110,7 @@ function Header() {
 					aria-expanded={ isEditorSidebarOpened }
 					shortcut={ shortcut }
 				/>
-				<PinnedPlugins.Slot />
+				<PinnedItems.Slot scope="core/edit-post" />
 				<MoreMenu />
 			</div>
 		</div>

@@ -10,9 +10,10 @@ import {
 import { useState } from '@wordpress/element';
 import {
 	BlockEditorKeyboardShortcuts,
-	__experimentalEditorSkeleton as EditorSkeleton,
+	Inserter as BlockEditorInserter,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { InterfaceSkeleton } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -21,6 +22,10 @@ import Header from '../header';
 import Sidebar from '../sidebar';
 import WidgetAreas from '../widget-areas';
 import Notices from '../notices';
+import KeyboardShortcuts from '../keyboard-shortcuts';
+import Inserter from '../inserter';
+
+const disabledInserterToggleProps = { isPrimary: true, disabled: true };
 
 function Layout( { blockEditorSettings } ) {
 	const [ selectedArea, setSelectedArea ] = useState( null );
@@ -29,14 +34,16 @@ function Layout( { blockEditorSettings } ) {
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
+			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
-						<EditorSkeleton
+						<InterfaceSkeleton
 							header={ <Header /> }
 							sidebar={ ! isMobile && <Sidebar /> }
 							content={
 								<>
+									<KeyboardShortcuts />
 									<Notices />
 									<Popover.Slot name="block-toolbar" />
 									<div
@@ -54,6 +61,15 @@ function Layout( { blockEditorSettings } ) {
 											}
 										/>
 									</div>
+									{ selectedArea === null && (
+										<Inserter>
+											<BlockEditorInserter
+												toggleProps={
+													disabledInserterToggleProps
+												}
+											/>
+										</Inserter>
+									) }
 								</>
 							}
 						/>

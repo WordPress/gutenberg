@@ -18,8 +18,8 @@ export default function HeadingLevelIcon( { level, isPressed = false } ) {
 
 	return (
 		<SVG
-			width="20"
-			height="20"
+			width="24"
+			height="24"
 			viewBox="0 0 20 20"
 			xmlns="http://www.w3.org/2000/svg"
 			isPressed={ isPressed }

@@ -9,12 +9,13 @@ import {
 	I18nManager,
 	AccessibilityInfo,
 } from 'react-native';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { check } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
@@ -24,6 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
+import TouchableRipple from './ripple.native.js';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -87,6 +89,7 @@ class BottomSheetCell extends Component {
 			accessibilityHint,
 			accessibilityRole,
 			disabled = false,
+			activeOpacity,
 			onPress,
 			label,
 			value,
@@ -98,14 +101,17 @@ class BottomSheetCell extends Component {
 			cellContainerStyle = {},
 			cellRowContainerStyle = {},
 			onChangeValue,
+			onSubmit,
 			children,
 			editable = true,
+			isSelected = false,
 			separatorType,
 			style = {},
 			getStylesFromColorScheme,
 			customActionButton,
 			type,
 			step,
+			borderless,
 			...valueProps
 		} = this.props;
 
@@ -127,7 +133,7 @@ class BottomSheetCell extends Component {
 			? cellLabelLeftAlignNoIconStyle
 			: cellLabelCenteredStyle;
 		const defaultLabelStyle =
-			showValue || icon !== undefined || customActionButton
+			showValue || customActionButton || icon
 				? cellLabelStyle
 				: defaultMissingIconAndValue;
 
@@ -187,7 +193,7 @@ class BottomSheetCell extends Component {
 				case 'none':
 					return undefined;
 				case undefined:
-					if ( showValue && icon !== undefined ) {
+					if ( showValue && icon ) {
 						return leftMarginStyle;
 					}
 					return defaultSeparatorStyle;
@@ -226,6 +232,7 @@ class BottomSheetCell extends Component {
 					}
 					onFocus={ startEditing }
 					onBlur={ finishEditing }
+					onSubmitEditing={ onSubmit }
 					keyboardType={ this.typeToKeyboardType( type, step ) }
 					{ ...valueProps }
 				/>
@@ -271,8 +278,13 @@ class BottomSheetCell extends Component {
 			this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 		const { title, handler } = customActionButton || {};
 
+		const opacity =
+			activeOpacity !== undefined
+				? activeOpacity
+				: get( platformStyles, 'activeOpacity.opacity' );
+
 		return (
-			<TouchableOpacity
+			<TouchableRipple
 				accessible={
 					accessible !== undefined
 						? accessible
@@ -287,8 +299,10 @@ class BottomSheetCell extends Component {
 						: accessibilityHint
 				}
 				disabled={ disabled }
+				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				style={ [ styles.clipToBounds, style ] }
+				borderless={ borderless }
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
 				<View
@@ -303,6 +317,7 @@ class BottomSheetCell extends Component {
 										icon={ icon }
 										size={ 24 }
 										color={ iconStyle.color }
+										isPressed={ false }
 									/>
 									<View
 										style={
@@ -326,11 +341,17 @@ class BottomSheetCell extends Component {
 							</TouchableOpacity>
 						) }
 					</View>
+					{ isSelected && (
+						<Icon
+							icon={ check }
+							fill={ platformStyles.isSelected.color }
+						/>
+					) }
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
 				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
-			</TouchableOpacity>
+			</TouchableRipple>
 		);
 	}
 }

@@ -36,46 +36,27 @@
 	height: 0;
 }
 
-// The base width of blocks
-.edit-post-visual-editor .block-editor-block-list__block {
-	margin-left: auto;
-	margin-right: auto;
-}
+// Ideally this wrapper div is not needed but if we waant to match the positionning of blocks
+// .block-editor-block-list__layout and block-editor-block-list__block
+// We need to have two DOM elements.
+.edit-post-visual-editor__post-title-wrapper {
+	// This padding is needed to match the block root container padding
+	padding-left: $block-padding;
+	padding-right: $block-padding;
 
-
-// The base width of the title should match that of blocks even if it isn't a block.
-// @todo: This duplicates CSS from line 49 in block-list/style.scss, and should be
-// removed when the Title field becomes an actual block.
-.editor-post-title {
-	// Beyond the mobile breakpoint, compensate for side UI.
 	@include break-small() {
-		padding-left: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-		padding-right: $block-padding + $block-side-ui-width + $block-padding + $border-width * 2;
-	}
-}
-
-.edit-post-visual-editor .editor-post-title__block {
-	// Center.
-	margin-left: auto;
-	margin-right: auto;
-
-	// Apply default block margin below the post title.
-	// This ensures the first block on the page is in a good position.
-	// This rule can be retired once the title becomes an actual block.
-	margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
-
-	// Stack borders.
-	> div {
-		margin-left: 0;
-		margin-right: 0;
+		padding-left: $block-side-ui-width;
+		padding-right: $block-side-ui-width;
 	}
 
-	// Stretch to mimic outline padding on desktop.
-	// Note that we can't target the textarea as it can't be stretched.
-	@include break-small() {
-		> div {
-			margin-left: -$block-padding - $block-side-ui-clearance;
-			margin-right: -$block-padding - $block-side-ui-clearance;
-		}
+	.editor-post-title {
+		// Center.
+		margin-left: auto;
+		margin-right: auto;
+
+		// Apply default block margin below the post title.
+		// This ensures the first block on the page is in a good position.
+		// This rule can be retired once the title becomes an actual block.
+		margin-bottom: ($block-padding * 2) + $block-spacing; // This matches 2em in the vanilla style.
 	}
 }

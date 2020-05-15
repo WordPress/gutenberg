@@ -1,53 +1,91 @@
-$navigation-menu-height: $grid-unit-10 * 7;
-$navigation-sub-menu-height: $grid-unit-10 * 5;
-$navigation-sub-menu-width: $grid-unit-10 * 25;
-
-/*
-* Reset the default list styles
-*/
-
-.wp-block-navigation > ul {
-	display: block;
+.wp-block-navigation__container {
+	// Reset the default list styles
 	list-style: none;
 	margin: 0;
 	padding-left: 0;
 
-	@include break-small {
-		display: flex;
-		flex-wrap: wrap;
-	}
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
 
-	// Submenu
-	ul {
-		list-style: none;
-		padding-left: 0;
-		margin-top: 0;
-		margin-left: 0;
+	// Vertical layout
 
-		li {
-			margin: 0;
-		}
+	.is-vertical & {
+		display: block;
 	}
 }
 
-/*
-* Styles for submenu flyout
-*/
+.wp-block-navigation-link {
+	display: flex;
+	align-items: center;
+	position: relative;
+	margin: 0;
+	padding: $grid-unit-10;
 
-.wp-block-navigation > ul {
-	li {
+	.wp-block-navigation__container:empty {
+		display: none;
+	}
+}
+
+// Styles for submenu flyout
+.has-child {
+	$navigation-vertical-padding: $grid-unit-10 * 0.75;
+	.wp-block-navigation__container {
+		border: $border-width solid rgba(0, 0, 0, 0.15);
+		padding: $navigation-vertical-padding 0;
+		background-color: inherit;
+		color: inherit;
+		position: absolute;
+		left: 0;
+		top: 100%;
+		width: fit-content;
 		z-index: 1;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		visibility: hidden;
 
-		&:hover,
-		&:focus-within {
-			cursor: pointer;
+		> .wp-block-navigation-link {
+			font-size: 15px;
+
+			> .wp-block-navigation-link__content {
+				flex-grow: 1;
+			}
+			> .wp-block-navigation-link__submenu-icon {
+				padding-right: $grid-unit-10;
+			}
 		}
 
-		// Submenu Display
-		&:hover > ul,
-		&:focus-within > ul,
-		& ul:hover,
-		& ul:focus {
+		@include break-medium {
+			left: $grid-unit-30;
+
+			// Nested submenus sit to the left on large breakpoints
+			.wp-block-navigation__container {
+				left: calc(100% + #{$grid-unit-10});
+				top: -$border-width - $navigation-vertical-padding;
+
+				// Prevent the menu from disappearing when the mouse is over the gap
+				&::before {
+					content: "";
+					position: absolute;
+					right: 100%;
+					height: 100%;
+					display: block;
+					width: $grid-unit-10;
+					background: transparent;
+				}
+			}
+
+			.wp-block-navigation-link__submenu-icon svg {
+				transform: rotate(0);
+			}
+		}
+	}
+	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
+	// We will need to replace focus-within with a JS solution for IE keyboard support.
+	&:hover {
+		cursor: pointer;
+
+		> .wp-block-navigation__container {
 			visibility: visible;
 			opacity: 1;
 			display: flex;
@@ -55,213 +93,79 @@ $navigation-sub-menu-width: $grid-unit-10 * 25;
 		}
 	}
 
-	& > li ul {
-		position: absolute;
-		left: 0;
-		top: 100%;
-		min-width: $navigation-sub-menu-width;
-		max-width: $navigation-sub-menu-width;
-		opacity: 0;
-		transition: opacity 0.1s linear;
-		visibility: hidden;
+	&:focus-within {
+		cursor: pointer;
+
+		> .wp-block-navigation__container {
+			visibility: visible;
+			opacity: 1;
+			display: flex;
+			flex-direction: column;
+		}
 	}
 }
 
-/*
-* Styles shared between editor and frontend
-*/
+// All links
+.wp-block-navigation-link__content {
+	text-decoration: none;
+	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+
+	.has-text-color & {
+		color: inherit;
+	}
+}
+
+.wp-block-navigation-link__label {
+	font-size: 17px;
+	font-family: $default-font;
+
+	word-break: normal;
+	overflow-wrap: break-word;
+}
+
+.wp-block-navigation-link__submenu-icon {
+	height: inherit;
+	padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
+
+	svg {
+		fill: currentColor;
+
+		@include break-medium {
+			transform: rotate(90deg);
+		}
+	}
+}
+
+// Default / Light styles
 .wp-block-navigation,
-.wp-block-navigation .block-editor-block-list__layout {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.wp-block-navigation {
-
-	// set a width on the editor submenus
-	.block-editor-block-list__layout .block-editor-block-list__layout {
-		width: $navigation-sub-menu-width;
+.wp-block-navigation.is-style-light {
+	.wp-block-navigation-link:not(.has-text-color) {
+		color: $light-style-sub-menu-text-color;
 	}
-
-	&,
-	> .wp-block-navigation__container {
-		align-items: center;
-		width: 100%;
-
-		> .wp-block-navigation-link {
-			display: flex;
-			margin-top: 0;
-			margin-bottom: 0;
-		}
-	}
-
-	// Main menu
-	.wp-block-navigation-link {
-		position: relative;
-		margin: 0;
-		min-height: $navigation-menu-height;
-		display: flex;
-		line-height: 1.4;
-
-		// Sub menus
-		.wp-block,
-		.wp-block-navigation-link {
-			min-height: auto; // reset the min-height and rely on padding
-			padding: 0;
-		}
-
-		// Sub menus (editor canvas)
-		.wp-block .wp-block-navigation-link {
-			margin: 0;
-		}
-
-		&.has-child > .wp-block-navigation__container {
-			// Box model
-			display: flex;
-			border: $border-width solid rgba(0, 0, 0, 0.15);
-
-			// Position (first level)
-			position: absolute;
-			z-index: 1;
-			top: 100%;
-			left: 0; // just under the main menu item.
-
-			// Position (nested levels)
-			.block-editor-inner-blocks,
-			.wp-block-navigation__container {
-				left: 100%;
-				top: - $border-width;
-			}
-		}
-
-		// Inherit colors from menu
-		.wp-block-navigation__container {
-			background-color: inherit;
-			color: inherit;
-		}
-
-		// All links
-		.wp-block-navigation-link__content {
-			display: flex;
-			align-items: center;
-			width: max-content;
-			padding: $grid-unit-10 * 0.75 $grid-unit-10 * 2;
-		}
-
-		// Submenu links only
-		.wp-block-navigation-link {
-
-			&:first-child:not(:only-child) .wp-block-navigation-link__content {
-				padding-top: $grid-unit-10;
-			}
-
-			&:last-child .wp-block-navigation-link__content {
-				padding-bottom: $grid-unit-10;
-			}
-		}
-
-		&.has-child .wp-block-navigation-link__content {
-			min-width: 100%;
-			padding-right: $grid-unit-10 * 4;
-			position: relative;
-		}
-
-		.wp-block-navigation-link__submenu-icon {
-			position: absolute;
-			right: $grid-unit-10 * 2;
-
-			svg {
-				fill: currentColor;
-			}
-		}
-
-		// reset rotation of submenu indicator icons on nested levels
-		.wp-block-navigation-link svg {
-			transform: rotate(0);
-		}
-
-		&.has-text-color .wp-block-navigation-link__content {
-			color: inherit;
-		}
+	&:not(.has-background) .wp-block-navigation__container {
+		background-color: $light-style-sub-menu-background-color;
 	}
 }
 
-// Styles
-.wp-block-navigation {
-
-	// Default / Light styles
-	.wp-block-navigation-link,
-	&.is-style-light .wp-block-navigation-link {
-		//  No text color
-		&:not(.has-text-color) > .wp-block-navigation__container {
-			color: $light-style-sub-menu-text-color;
-		}
-
-		// No background color
-		&:not(.has-background) > .wp-block-navigation__container {
-			background-color: $light-style-sub-menu-background-color;
-		}
+// Dark styles.
+.wp-block-navigation.is-style-dark {
+	.wp-block-navigation-link:not(.has-text-color) {
+		color: $dark-style-sub-menu-text-color;
 	}
-
-	// Dark styles.
-	&.is-style-dark .wp-block-navigation-link {
-		// No text color
-		&:not(.has-text-color) > .wp-block-navigation__container {
-			color: $dark-style-sub-menu-text-color;
-		}
-
-		// No background color
-		&:not(.has-background) > .wp-block-navigation__container {
-			background-color: $dark-style-sub-menu-background-color;
-		}
+	&:not(.has-background) .wp-block-navigation__container {
+		background-color: $dark-style-sub-menu-background-color;
 	}
 }
 
-/*
-* Non-shared styles & overrides
-*/
-
-.wp-block-navigation {
-
-	.wp-block-navigation-link.has-child > .wp-block-navigation__container {
-		display: flex;
-		flex-direction: column;
-		padding: 0;
-	}
+// Justification.
+.items-justified-left > ul {
+	justify-content: flex-start;
 }
 
-/*
-* TODO: organize/untangle styles below this line
-*/
+.items-justified-center > ul {
+	justify-content: center;
+}
 
-.wp-block-navigation {
-
-	& > ul {
-		& > li {
-			& > a {
-				display: flex;
-				align-items: center;
-			}
-
-			&:first-of-type > a {
-				padding-left: 0;
-			}
-
-			&:last-of-type > a {
-				padding-right: 0;
-			}
-		}
-	}
-
-	&.items-justified-left > ul {
-		justify-content: flex-start;
-	}
-
-	&.items-justified-center > ul {
-		justify-content: center;
-	}
-
-	&.items-justified-right > ul {
-		justify-content: flex-end;
-	}
+.items-justified-right > ul {
+	justify-content: flex-end;
 }

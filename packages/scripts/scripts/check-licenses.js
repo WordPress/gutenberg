@@ -3,7 +3,6 @@
  */
 const spawn = require( 'cross-spawn' );
 const { existsSync, readFileSync } = require( 'fs' );
-const { sep } = require( 'path' );
 const chalk = require( 'chalk' );
 
 /**
@@ -21,6 +20,7 @@ const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
  */
 
 const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
+const WARNING = chalk.reset.inverse.bold.yellow( ' WARNING ' );
 
 const prod = hasArgInCLI( '--prod' ) || hasArgInCLI( '--production' );
 const dev = hasArgInCLI( '--dev' ) || hasArgInCLI( '--development' );
@@ -170,36 +170,59 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	);
 };
 
-/**
- * Returns true if the given module path is not to be ignored for consideration
- * in license validation, or false otherwise.
- *
- * @param {string} moduleName Module path.
- *
- * @return {boolean} Whether module path is not to be ignored.
- */
-const isNotIgnoredModule = ( moduleName ) =>
-	! ignored.some( ( ignoredItem ) =>
-		// `moduleName` is a file path to the module directory. Assume CLI arg
-		// is passed as basename of package (directory(s) after node_modules).
-		// Prefix with sep to avoid false-positives on prefixing variations.
-		moduleName.endsWith( sep + ignoredItem )
-	);
-
 // Use `npm ls` to grab a list of all the packages.
-const child = spawn.sync( 'npm', [
-	'ls',
-	'--parseable',
-	...( prod ? [ '--prod' ] : [] ),
-	...( dev ? [ '--dev' ] : [] ),
-] );
+const child = spawn.sync(
+	'npm',
+	[
+		'ls',
+		'--json',
+		'--long',
+		...( prod ? [ '--prod' ] : [] ),
+		...( dev ? [ '--dev' ] : [] ),
+	],
+	{ maxBuffer: 1024 * 1024 * 100 } // output size for prod is ~21 MB and dev is ~76 MB
+);
 
-const modules = child.stdout
-	.toString()
-	.split( '\n' )
-	.filter( isNotIgnoredModule );
+const result = JSON.parse( child.stdout.toString() );
 
-modules.forEach( ( path ) => {
+const topLevelDeps = result.dependencies;
+
+function traverseDepTree( deps ) {
+	for ( const key in deps ) {
+		const dep = deps[ key ];
+
+		if ( ignored.includes( dep.name ) ) {
+			return;
+		}
+
+		if ( ! dep.hasOwnProperty( 'path' ) ) {
+			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
+				process.stdout.write(
+					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
+				);
+			} else {
+				process.exitCode = 1;
+				process.stdout.write(
+					`${ ERROR } Unable to locate path for ${ dep.name }@${ dep.version }. `
+				);
+			}
+		} else if ( dep.missing ) {
+			process.stdout.write(
+				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
+			);
+		} else {
+			checkDepLicense( dep.path );
+		}
+
+		if ( dep.hasOwnProperty( 'dependencies' ) ) {
+			traverseDepTree( dep.dependencies );
+		} else {
+			return;
+		}
+	}
+}
+
+function checkDepLicense( path ) {
 	if ( ! path ) {
 		return;
 	}
@@ -287,4 +310,6 @@ modules.forEach( ( path ) => {
 			`${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n`
 		);
 	}
-} );
+}
+
+traverseDepTree( topLevelDeps );

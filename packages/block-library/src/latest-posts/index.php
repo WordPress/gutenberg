@@ -33,7 +33,7 @@ function block_core_latest_posts_get_excerpt_length() {
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $block_core_latest_posts_excerpt_length;
+	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
 		'posts_per_page'   => $attributes['postsToShow'],
@@ -55,6 +55,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$list_items_markup = '';
 
 	foreach ( $recent_posts as $post ) {
+
 		$list_items_markup .= '<li>';
 
 		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
@@ -108,21 +109,9 @@ function render_block_core_latest_posts( $attributes ) {
 			$trimmed_excerpt = get_the_excerpt( $post );
 
 			$list_items_markup .= sprintf(
-				'<div class="wp-block-latest-posts__post-excerpt">%1$s',
+				'<div class="wp-block-latest-posts__post-excerpt">%1$s</div>',
 				$trimmed_excerpt
 			);
-
-			if ( strpos( $trimmed_excerpt, ' &hellip; ' ) !== false ) {
-				$list_items_markup .= sprintf(
-					'<a href="%1$s">%2$s</a></div>',
-					esc_url( get_permalink( $post ) ),
-					__( 'Read more' )
-				);
-			} else {
-				$list_items_markup .= sprintf(
-					'</div>'
-				);
-			}
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
@@ -170,17 +159,42 @@ function render_block_core_latest_posts( $attributes ) {
  * Registers the `core/latest-posts` block on server.
  */
 function register_block_core_latest_posts() {
-	$path     = __DIR__ . '/latest-posts/block.json';
-	$metadata = json_decode( file_get_contents( $path ), true );
-
-	register_block_type(
-		$metadata['name'],
-		array_merge(
-			$metadata,
-			array(
-				'render_callback' => 'render_block_core_latest_posts',
-			)
+	register_block_type_from_metadata(
+		__DIR__ . '/latest-posts',
+		array(
+			'render_callback' => 'render_block_core_latest_posts',
 		)
 	);
 }
 add_action( 'init', 'register_block_core_latest_posts' );
+
+/**
+ * Handles outdated versions of the `core/latest-posts` block by converting
+ * attribute `categories` from a numeric string to an array with key `id`.
+ *
+ * This is done to accommodate the changes introduced in #20781 that sought to
+ * add support for multiple categories to the block. However, given that this
+ * block is dynamic, the usual provisions for block migration are insufficient,
+ * as they only act when a block is loaded in the editor.
+ *
+ * TODO: Remove when and if the bottom client-side deprecation for this block
+ * is removed.
+ *
+ * @param array $block A single parsed block object.
+ *
+ * @return array The migrated block object.
+ */
+function block_core_latest_posts_migrate_categories( $block ) {
+	if (
+		'core/latest-posts' === $block['blockName'] &&
+		! empty( $block['attrs']['categories'] ) &&
+		is_string( $block['attrs']['categories'] )
+	) {
+		$block['attrs']['categories'] = array(
+			array( 'id' => absint( $block['attrs']['categories'] ) ),
+		);
+	}
+
+	return $block;
+}
+add_filter( 'render_block_data', 'block_core_latest_posts_migrate_categories' );

@@ -72,6 +72,10 @@ _Parameters_
 
 -   _buttonLabel_ `string`: The label to search the button for.
 
+<a name="closeGlobalBlockInserter" href="#closeGlobalBlockInserter">#</a> **closeGlobalBlockInserter**
+
+Undocumented declaration.
+
 <a name="createEmbeddingMatcher" href="#createEmbeddingMatcher">#</a> **createEmbeddingMatcher**
 
 Creates a function to determine if a request is embedding a certain URL.
@@ -252,6 +256,21 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
+<a name="getPageError" href="#getPageError">#</a> **getPageError**
+
+Returns a promise resolving to one of either a string or null. A string will
+be resolved if an error message is present in the contents of the page. If no
+error is present, a null value will be resolved instead. This requires the
+environment be configured to display errors.
+
+_Related_
+
+-   <http://php.net/manual/en/function.error-reporting.php>
+
+_Returns_
+
+-   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
+
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
 Returns a boolean indicating if the current selected block has a block switcher or not.
@@ -263,12 +282,11 @@ _Returns_
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
-result that appears.
+result that appears. It then waits briefly for the block list to update.
 
 _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
--   _panelName_ `string`: The inserter panel to open (if it's closed by default).
 
 <a name="installPlugin" href="#installPlugin">#</a> **installPlugin**
 
@@ -327,10 +345,6 @@ _Parameters_
 _Returns_
 
 -   `Promise`: Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
-
-<a name="openAllBlockInserterCategories" href="#openAllBlockInserterCategories">#</a> **openAllBlockInserterCategories**
-
-Opens all block inserter categories.
 
 <a name="openDocumentSettingsSidebar" href="#openDocumentSettingsSidebar">#</a> **openDocumentSettingsSidebar**
 

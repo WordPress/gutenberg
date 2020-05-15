@@ -1,11 +1,5 @@
-.editor-post-title__block {
+.editor-post-title {
 	position: relative;
-	padding: 5px 0;
-	font-size: $editor-font-size;
-
-	@include break-small() {
-		padding: 5px $block-side-ui-clearance;
-	}
 
 	.editor-post-title__input {
 		display: block;
@@ -13,13 +7,15 @@
 		margin: 0;
 		box-shadow: none;
 		background: transparent;
-		font-family: $editor-font;
-		line-height: $default-line-height;
-		color: $dark-gray-900;
 		transition: border 0.1s ease-out, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
-		padding: #{ $block-padding + 5px } $block-padding;
+		padding: #{ $block-padding + 5px } 0;
 		word-break: keep-all;
+
+		// Inherit the styles set by the theme.
+		font-family: inherit;
+		line-height: inherit;
+		color: inherit;
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;
@@ -36,7 +32,7 @@
 
 		// Match h1 heading.
 		font-size: 2.44em;
-		font-weight: 600;
+		font-weight: bold;
 
 		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {
@@ -66,26 +62,5 @@
 		&:focus {
 			opacity: 1;
 		}
-	}
-}
-
-.editor-post-title .editor-post-permalink {
-	font-size: $default-font-size;
-	color: $dark-gray-900;
-	height: auto;
-	position: relative;
-	top: -2px;
-	width: 100%;
-
-	@include break-mobile() {
-		position: absolute;
-		top: -$button-size + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
-		right: 0;
-		flex-wrap: nowrap;
-		width: auto;
-	}
-	@include break-small() {
-		left: $block-side-ui-clearance;
-		right: $block-side-ui-clearance;
 	}
 }

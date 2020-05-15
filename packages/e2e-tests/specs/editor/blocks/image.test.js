@@ -4,7 +4,7 @@
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -31,7 +32,9 @@ async function upload( selector ) {
 	const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
 	fs.copyFileSync( testImagePath, tmpFileName );
 	await inputElement.uploadFile( tmpFileName );
-	await page.waitForSelector( '.wp-block-image img[src^="http"]' );
+	await page.waitForSelector(
+		`.wp-block-image img[src$="${ filename }.png"]`
+	);
 	return filename;
 }
 
@@ -59,6 +62,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
+		await openDocumentSettingsSidebar();
 		await page.click( '[aria-label="Image Size"] button' );
 
 		const regex2 = new RegExp(
@@ -80,5 +84,18 @@ describe( 'Image', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
+	} );
+
+	it( 'should place caret at end of caption after merging empty paragraph', async () => {
+		await insertBlock( 'Image' );
+		await upload( '.wp-block-image input[type="file"]' );
+		await page.keyboard.type( '1' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '2' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( '12' );
 	} );
 } );

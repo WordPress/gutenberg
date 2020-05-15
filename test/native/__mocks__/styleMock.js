@@ -90,4 +90,7 @@ module.exports = {
 	blockBorder: {
 		width: 1,
 	},
+	defaultBlock: {
+		marginTop: 16,
+	},
 };

@@ -1,7 +1,11 @@
 /**
  * Group: All Alignment Settings
  */
-.wp-block[data-type="core/group"] {
+
+.wp-block-group {
+	// Zero out the baseline margin that is set for every block in the editor.
+	margin-top: 0;
+	margin-bottom: 0;
 
 	// Ensure not rendering outside the element
 	// as -1px causes overflow-x scrollbars
@@ -48,7 +52,7 @@
 /**
  * Group: Full Width Alignment
  */
-.wp-block[data-type="core/group"][data-align="full"] {
+.wp-block[data-align="full"] .wp-block-group {
 
 	// First tier of InnerBlocks must act like the container of the standard canvas
 	> div > .wp-block-group > .wp-block-group__inner-container > .block-editor-inner-blocks {

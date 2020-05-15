@@ -4,18 +4,22 @@ Patterns are predefined block layouts, ready to insert and tweak.
 
 **Note** Patterns are still under heavy development and the APIs are subject to change.
 
-#### register_pattern
+## Patterns Registration
 
-The editor comes with a list of built-in patterns. Theme and plugin authors can register addition custom patterns using the `register_pattern` function.
+### register_block_pattern
 
-The `register_pattern` function receives the name of the pattern as the first argument and an array describing properties of the pattern as the second argument.
+The editor comes with a list of built-in patterns. Theme and plugin authors can register addition custom patterns using the `register_block_pattern` function.
 
-The properties of the style array must include `name` and `label`: 
- - `title`: A human-readable title for the pattern.
- - `content`: Raw HTML content for the pattern.
+The `register_block_pattern` function receives the name of the pattern as the first argument and an array describing properties of the pattern as the second argument.
+
+The properties of the pattern include:
+ - `title` (required): A human-readable title for the pattern.
+ - `content` (required): Raw HTML content for the pattern.
+ - `categories`: A list of pattern categories used to group patterns. Patterns can be shown on multiple categories.
+ - `keywords`: Aliases or keywords that help users discover it while searching.
 
 ```php
-register_pattern(
+register_block_pattern(
     'my-plugin/my-awesome-pattern',
     array(
 		'title'   => __( 'Two buttons', 'my-plugin' ),
@@ -24,14 +28,44 @@ register_pattern(
 );
 ```
 
-#### unregister_pattern
+### unregister_block_pattern
 
-`unregister_pattern` allows unregistering a pattern previously registered on the server using `register_pattern`.
+`unregister_block_pattern` allows unregistering a pattern previously registered on the server using `register_block_pattern`.
 
 The function's argument is the registered name of the pattern.
 
 The following code sample unregisters the style named 'my-plugin/my-awesome-pattern':
 
 ```php
-unregister_pattern( 'my-plugin/my-awesome-pattern' );
+unregister_block_pattern( 'my-plugin/my-awesome-pattern' );
+```
+
+## Pattern Categories
+
+Patterns can be grouped using categories. The block editor comes with bundled categories you can use on your custom patterns. You can also register your own pattern categories.
+
+### register_block_pattern_category
+
+The `register_block_pattern_category` function receives the name of the category as the first argument and an array describing properties of the category as the second argument.
+
+The properties of the pattern categories include:
+ - `label` (required): A human-readable label for the pattern category.
+
+```php
+register_block_pattern_category(
+	'hero',
+	array( 'label' => __( 'Hero', 'my-plugin' ) )
+);
+```
+
+### unregister_block_pattern_category
+
+`unregister_block_pattern_category` allows unregistering a pattern category.
+
+The function's argument is the name of the pattern category to unregister.
+
+The following code sample unregisters the category named 'hero':
+
+```php
+unregister_block_pattern_category( 'hero' );
 ```

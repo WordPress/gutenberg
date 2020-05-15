@@ -1,0 +1,20 @@
+.interface-pinned-items {
+	display: none;
+
+	@include break-small() {
+		display: flex;
+	}
+
+	.components-button {
+		margin-left: 4px;
+
+		&.is-pressed {
+			margin-left: 5px;
+		}
+
+		svg {
+			max-width: 24px;
+			max-height: 24px;
+		}
+	}
+}

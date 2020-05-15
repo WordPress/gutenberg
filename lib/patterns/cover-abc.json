@@ -1,5 +1,0 @@
-{
-	"__file": "wp_block",
-	"title": "Cover",
-	"content": "<!-- wp:cover {\"minHeight\":470,\"gradient\":\"pale-ocean\",\"align\":\"wide\"} -->\n<div class=\"wp-block-cover alignwide has-background-dim has-pale-ocean-gradient-background\" style=\"min-height:470px\"><div class=\"wp-block-cover__inner-container\"><!-- wp:paragraph {\"align\":\"center\",\"placeholder\":\"Write title…\",\"customTextColor\":\"#114050\",\"customFontSize\":220} -->\n<p style=\"color:#114050;font-size:220px\" class=\"has-text-color has-text-align-center\">abc!</p>\n<!-- /wp:paragraph --></div></div>\n<!-- /wp:cover -->"
-  }

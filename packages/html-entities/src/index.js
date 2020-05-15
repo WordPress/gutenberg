@@ -1,3 +1,4 @@
+/** @type {HTMLTextAreaElement} */
 let _decodeTextArea;
 
 /**
@@ -36,5 +37,23 @@ export function decodeEntities( html ) {
 	_decodeTextArea.innerHTML = html;
 	const decoded = _decodeTextArea.textContent;
 	_decodeTextArea.innerHTML = '';
-	return decoded;
+
+	/**
+	 * Cast to string, HTMLTextAreaElement should always have `string` textContent.
+	 *
+	 * > The `textContent` property of the `Node` interface represents the text content of the
+	 * > node and its descendants.
+	 * >
+	 * > Value: A string or `null`
+	 * >
+	 * > * If the node is a `document` or a Doctype, `textContent` returns `null`.
+	 * > * If the node is a CDATA section, comment, processing instruction, or text node,
+	 * >   textContent returns the text inside the node, i.e., the `Node.nodeValue`.
+	 * > * For other node types, `textContent returns the concatenation of the textContent of
+	 * >   every child node, excluding comments and processing instructions. (This is an empty
+	 * >   string if the node has no children.)
+	 *
+	 * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
+	 */
+	return /** @type {string} */ ( decoded );
 }

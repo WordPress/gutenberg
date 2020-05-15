@@ -1,4 +1,20 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.14.0 (2020-04-30)
+
+### Bug fix
+
+- `addQueryArgs` arguments are optional ([#21926](https://github.com/WordPress/gutenberg/pull/21926))
+
+## 2.13.0 (2020-04-15)
+
+### New feature
+
+- Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
+
+# 2.12.0 (2020-04-01)
 
 ### Bug Fixes
 

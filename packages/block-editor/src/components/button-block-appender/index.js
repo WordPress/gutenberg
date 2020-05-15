@@ -7,21 +7,28 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
-import { Icon, plus } from '@wordpress/icons';
+import { Icon, create } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
 
-function ButtonBlockAppender( {
-	rootClientId,
-	className,
-	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
-} ) {
+function ButtonBlockAppender(
+	{
+		rootClientId,
+		className,
+		__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+		onFocus,
+		tabIndex,
+	},
+	ref
+) {
 	return (
 		<Inserter
+			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			renderToggle={ ( {
@@ -33,8 +40,8 @@ function ButtonBlockAppender( {
 			} ) => {
 				let label;
 				if ( hasSingleBlockType ) {
-					// translators: %s: the name of the block when there is only one
 					label = sprintf(
+						// translators: %s: the name of the block when there is only one
 						_x( 'Add %s', 'directly add the only allowed block' ),
 						blockTitle
 					);
@@ -48,6 +55,9 @@ function ButtonBlockAppender( {
 				return (
 					<Tooltip text={ label }>
 						<Button
+							ref={ ref }
+							onFocus={ onFocus }
+							tabIndex={ tabIndex }
 							className={ classnames(
 								className,
 								'block-editor-button-block-appender'
@@ -63,7 +73,7 @@ function ButtonBlockAppender( {
 							label={ label }
 						>
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-							<Icon icon={ plus } />
+							<Icon icon={ create } />
 						</Button>
 					</Tooltip>
 				);
@@ -76,4 +86,4 @@ function ButtonBlockAppender( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md
  */
-export default ButtonBlockAppender;
+export default forwardRef( ButtonBlockAppender );

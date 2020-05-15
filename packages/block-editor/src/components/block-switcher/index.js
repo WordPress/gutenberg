@@ -7,7 +7,12 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Dropdown, Button, Toolbar, MenuGroup } from '@wordpress/components';
+import {
+	Dropdown,
+	ToolbarButton,
+	ToolbarGroup,
+	MenuGroup,
+} from '@wordpress/components';
 import {
 	getBlockType,
 	getPossibleBlockTransformations,
@@ -28,6 +33,11 @@ import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
+
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
 
 export class BlockSwitcher extends Component {
 	constructor() {
@@ -86,20 +96,20 @@ export class BlockSwitcher extends Component {
 
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
 			return (
-				<Toolbar>
-					<Button
+				<ToolbarGroup>
+					<ToolbarButton
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
 						label={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
-				</Toolbar>
+				</ToolbarGroup>
 			);
 		}
 
 		return (
 			<Dropdown
-				position="bottom right"
+				popoverProps={ POPOVER_PROPS }
 				className="block-editor-block-switcher"
 				contentClassName="block-editor-block-switcher__popover"
 				renderToggle={ ( { onToggle, isOpen } ) => {
@@ -114,6 +124,7 @@ export class BlockSwitcher extends Component {
 						1 === blocks.length
 							? __( 'Change block type or style' )
 							: sprintf(
+									/* translators: %s: number of blocks. */
 									_n(
 										'Change type of %d block',
 										'Change type of %d blocks',
@@ -123,8 +134,8 @@ export class BlockSwitcher extends Component {
 							  );
 
 					return (
-						<Toolbar>
-							<Button
+						<ToolbarGroup>
+							<ToolbarButton
 								className="block-editor-block-switcher__toggle"
 								onClick={ onToggle }
 								aria-haspopup="true"
@@ -134,7 +145,7 @@ export class BlockSwitcher extends Component {
 								showTooltip
 								icon={ <BlockIcon icon={ icon } showColors /> }
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					);
 				} }
 				renderContent={ ( { onClose } ) => (
@@ -187,7 +198,6 @@ export class BlockSwitcher extends Component {
 									{ __( 'Preview' ) }
 								</div>
 								<BlockPreview
-									autoHeight
 									viewportWidth={ 500 }
 									blocks={
 										hoveredBlockType.example

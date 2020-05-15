@@ -8,18 +8,6 @@
 	fill: $white;
 }
 
-.innerPadding {
-	padding: $block-selected-to-content;
-}
-
-.regularMediaPadding {
-	padding: $block-edge-to-content;
-}
-
-.denseMediaPadding {
-	padding: $block-media-container-to-content;
-}
-
 .backgroundContainer {
 	overflow: hidden;
 	width: 100%;
@@ -29,6 +17,7 @@
 .content {
 	justify-content: center;
 	width: 100%;
+	padding: $block-edge-to-content;
 	z-index: 3;
 }
 
@@ -56,4 +45,29 @@
 
 .backgroundSolidDark {
 	background-color: $background-dark-secondary;
+}
+
+.uploadFailedContainer {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 8px;
+	justify-content: flex-start;
+	align-items: flex-end;
+	z-index: 3;
+}
+
+.uploadFailed {
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+	justify-content: center;
+	align-items: center;
+	background-color: #fff;
+}
+
+.uploadFailedIcon {
+	fill: $red-40;
+	width: 100%;
+	height: 100%;
 }

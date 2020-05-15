@@ -16,6 +16,8 @@ $editor-line-height: 1.8;
 $big-font-size: 18px;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
 $border-width: 1px;
+$border-width-focus: 1.5px;
+$border-width-tab: 4px;
 
 /**
  * Grid System.
@@ -36,6 +38,7 @@ $grid-unit-60: 6 * $grid-unit;		// 48px
  * Dimensions.
  */
 
+$icon-size: 24px;
 $button-size: 36px;
 $button-size-small: 24px;
 $panel-padding: 16px;
@@ -49,6 +52,8 @@ $admin-sidebar-width-collapsed: 36px;
 $modal-min-width: 360px;
 $spinner-size: 18px;
 $mobile-header-toolbar-height: 44px;
+$mobile-floating-toolbar-height: 44px;
+$mobile-floating-toolbar-margin: 8px;
 
 
 /**
@@ -75,7 +80,7 @@ $block-toolbar-height: $grid-unit-60;
 $mobile-block-toolbar-height: 44px;
 $block-padding: 14px; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
 $block-spacing: 4px; // Vertical space between blocks.
-$block-side-ui-width: 28px; // Width of the movers/drag handle UI.
+$block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
 $block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance; // Total space left and right of the block footprint.
 $block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
@@ -83,18 +88,13 @@ $block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // paddin
 $dimmed-opacity: 1;
 
 $block-edge-to-content: 16px;
+$solid-border-space: 12px;
+$dashed-border-space: 6px;
 $block-selected-margin: 3px;
 $block-selected-border-width: 1px;
 $block-selected-padding: 0;
 $block-selected-child-margin: 5px;
-$block-selected-child-border-width: 1px;
-$block-selected-child-padding: 0;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
-$block-selected-child-to-content: $block-selected-to-content - $block-selected-child-margin - $block-selected-child-border-width;
-$block-custom-appender-to-content: $block-selected-margin - $block-selected-border-width;
-$block-media-container-to-content: $block-selected-child-margin + $block-selected-border-width;
-$block-selected-vertical-margin-descendant: 2 * $block-selected-to-content;
-$block-selected-vertical-margin-child: $block-edge-to-content;
 
 
 /**

@@ -14,7 +14,10 @@ export default function FinishButton( { className, onClick, children } ) {
 	// Focus the button on mount if nothing else is focused. This prevents a
 	// focus loss when the 'Next' button is swapped out.
 	useLayoutEffect( () => {
-		if ( document.activeElement === document.body ) {
+		if (
+			! document.activeElement ||
+			document.activeElement === document.body
+		) {
 			button.current.focus();
 		}
 	}, [ button ] );

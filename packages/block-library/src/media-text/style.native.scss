@@ -1,3 +1,5 @@
+$media-to-text: 12px;
+
 .wp-block-media-text {
 	display: flex;
 	align-items: flex-start;
@@ -26,6 +28,10 @@
 
 .is-vertically-aligned-bottom {
 	align-items: flex-end;
+}
+
+.is-selected {
+	padding-bottom: 8;
 }
 
 .content {
@@ -104,27 +110,35 @@
 	color: $gray-dark;
 }
 
-.innerPadding {
-	padding: $block-selected-to-content;
+// Inner blocks STACK
+.innerBlockStackMediaLeft {
+	margin-top: $media-to-text;
 }
 
-.innerPaddingMediaOnLeft {
-	padding-right: $block-selected-to-content;
+.innerBlockStackMediaRight {
+	margin-bottom: $media-to-text;
 }
 
-.innerPaddingMediaOnRight {
-	padding-left: $block-selected-to-content;
+// Inner blocks
+.innerBlock {
+	padding-right: $media-to-text;
+	padding-left: $media-to-text;
 }
 
-.paddingHorizontalNone {
-	padding-left: 0;
-	padding-right: 0;
+// Media STACK
+.mediaStackLeft {
+	margin-bottom: $media-to-text;
 }
 
-.regularMediaPadding {
-	padding: $block-edge-to-content;
+.mediaStackRight {
+	margin-top: $media-to-text;
 }
 
-.denseMediaPadding {
-	padding: $block-media-container-to-content;
+// Media
+.mediaLeft {
+	padding-right: $media-to-text;
+}
+
+.mediaRight {
+	padding-left: $media-to-text;
 }

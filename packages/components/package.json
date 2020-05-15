@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "9.2.4",
+	"version": "9.6.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,7 @@
 		"build-style/**"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.8.3",
+		"@babel/runtime": "^7.9.2",
 		"@emotion/core": "^10.0.22",
 		"@emotion/css": "^10.0.22",
 		"@emotion/native": "^10.0.22",
@@ -48,15 +48,15 @@
 		"downshift": "^4.0.5",
 		"gradient-parser": "^0.1.5",
 		"lodash": "^4.17.15",
-		"memize": "^1.0.5",
+		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"re-resizable": "^6.0.0",
 		"react-dates": "^17.1.1",
 		"react-spring": "^8.0.20",
-		"reakit": "^1.0.0-beta.12",
+		"reakit": "^1.0.2",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^3.3.2"
+		"uuid": "^7.0.2"
 	},
 	"publishConfig": {
 		"access": "public"

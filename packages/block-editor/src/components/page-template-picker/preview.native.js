@@ -5,12 +5,14 @@ import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
 import { ModalHeaderBar } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * External dependencies
  */
-import { Modal, View, SafeAreaView } from 'react-native';
+import { Modal, Platform, View, SafeAreaView } from 'react-native';
+import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -50,6 +52,30 @@ const Preview = ( props ) => {
 		styles.previewContainer,
 		styles.previewContainerDark
 	);
+	const previewContentStyle = usePreferredColorSchemeStyle(
+		styles.previewContent,
+		styles.previewContentDark
+	);
+	const androidModalClosedSubscription = useRef();
+
+	useEffect( () => {
+		if ( Platform.OS === 'android' ) {
+			androidModalClosedSubscription.current = subscribeAndroidModalClosed(
+				() => {
+					onDismiss();
+				}
+			);
+		}
+
+		return () => {
+			if (
+				androidModalClosedSubscription &&
+				androidModalClosedSubscription.current
+			) {
+				androidModalClosedSubscription.current.remove();
+			}
+		};
+	}, [] );
 
 	if ( template === undefined ) {
 		return null;
@@ -79,7 +105,9 @@ const Preview = ( props ) => {
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<BlockPreview blocks={ template.blocks } />
+				<View style={ previewContentStyle }>
+					<BlockPreview blocks={ template.blocks } />
+				</View>
 			</SafeAreaView>
 		</Modal>
 	);

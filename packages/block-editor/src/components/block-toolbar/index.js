@@ -26,7 +26,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		isValid,
 		mode,
 		moverDirection,
-		hasMovers = true,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -40,7 +39,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 
-		const { __experimentalMoverDirection, __experimentalUIParts = {} } =
+		const { __experimentalMoverDirection } =
 			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
@@ -57,7 +56,6 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					? getBlockMode( selectedBlockClientIds[ 0 ] )
 					: null,
 			moverDirection: __experimentalMoverDirection,
-			hasMovers: __experimentalUIParts.hasMovers,
 		};
 	}, [] );
 
@@ -74,8 +72,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
-	const shouldShowMovers =
-		displayHeaderToolbar || ( showMovers && hasMovers );
+	const shouldShowMovers = displayHeaderToolbar || showMovers;
 
 	if ( blockClientIds.length === 0 ) {
 		return null;

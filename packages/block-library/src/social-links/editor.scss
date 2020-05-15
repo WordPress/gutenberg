@@ -4,21 +4,18 @@
 		display: inline-block;
 		margin-left: $grid-unit-10;
 	}
-
-	.block-editor-block-list__layout {
-		display: flex;
-		justify-content: flex-start;
-	}
 }
 
 // Reduce the paddings, margins, and UI of inner-blocks.
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
-[data-type="core/social-links"] {
-	.wp-block-social-links > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
+.editor-styles-wrapper .wp-block-social-link {
+	margin: 0;
+	margin-right: 8px;
+}
+
+.editor-styles-wrapper .wp-block-social-links {
+	padding: 0;
 }
 
 // Polish the Appender.
@@ -29,7 +26,7 @@
 }
 
 // Center flex items. This has an equivalent in style.scss.
-[data-type="core/social-links"][data-align="center"] .wp-block-social-links {
+.wp-block[data-align="center"] > .wp-block-social-links {
 	justify-content: center;
 }
 

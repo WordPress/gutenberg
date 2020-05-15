@@ -2,7 +2,7 @@
 
 This is a [GitHub Action](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) which contains various automation to assist with managing the Gutenberg GitHub repository:
 
-- `add-first-time-contributor-label`: Adds the 'First Time Contributor' label to PRs opened by contributors that have not yet made a commit.
+- `first-time-contributor`: Adds the 'First Time Contributor' label to PRs merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if neccessary for props credit.
 - `add-milestone`: Assigns the correct milestone to PRs once merged.
 - `assign-fixed-issues`: Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
 

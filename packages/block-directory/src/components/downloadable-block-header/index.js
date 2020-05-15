@@ -20,10 +20,13 @@ function DownloadableBlockHeader( {
 	return (
 		<div className="block-directory-downloadable-block-header__row">
 			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
-				// translators: %s: Name of the plugin e.g: "Akismet".
 				<img
 					src={ icon }
-					alt={ sprintf( __( '%s block icon' ), title ) }
+					alt={ sprintf(
+						// translators: %s: Name of the plugin e.g: "Akismet".
+						__( '%s block icon' ),
+						title
+					) }
 				/>
 			) : (
 				<span>
@@ -41,7 +44,7 @@ function DownloadableBlockHeader( {
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 			</div>
 			<Button
-				isDefault
+				isSecondary
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();

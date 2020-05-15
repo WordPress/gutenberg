@@ -2,18 +2,6 @@
 	flex: 1 1 auto;
 }
 
-.fullSolidBordered {
-	border-width: $block-selected-border-width;
-	border-radius: 4px;
-	border-style: solid;
-}
-
-.dashedBordered {
-	border-width: $block-selected-child-border-width;
-	border-radius: 2px;
-	border-style: dashed;
-}
-
 .solidBorderColor {
 	border-color: $blue-wordpress;
 }
@@ -34,74 +22,11 @@
 	opacity: $dimmed-opacity;
 }
 
-.horizontalSpaceNone {
-	padding-left: 0;
-	padding-right: 0;
-	margin-left: 0;
-	margin-right: 0;
-}
-
-.marginHorizontalNone {
-	margin-left: 0;
-	margin-right: 0;
-}
-
-.marginVerticalDescendant {
-	margin-bottom: $block-selected-vertical-margin-descendant;
-}
-
-.marginVerticalChild {
-	margin-bottom: $block-selected-vertical-margin-child;
-}
-
-.marginVerticalNone {
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
 .blockTitle {
 	background-color: $gray;
 	padding-left: 8px;
 	padding-top: 4px;
 	padding-bottom: 4px;
-}
-
-.neutral {
-	margin: 0;
-	border: 0;
-	padding: 0;
-}
-
-.full {
-	margin: $block-edge-to-content;
-	border: 0;
-	padding: 0;
-}
-
-.selectedLeaf {
-	margin: $block-selected-margin;
-	padding-left: $block-selected-to-content;
-	padding-right: $block-selected-to-content;
-	padding-top: $block-selected-to-content;
-}
-
-.selectedParent {
-	margin: $block-selected-margin;
-	padding: 0;
-}
-
-.childOfSelected {
-	margin: $block-selected-child-margin;
-	padding: 0;
-}
-
-.childOfSelectedLeaf {
-	margin: $block-selected-child-margin;
-	padding: $block-selected-child-to-content;
-}
-
-.descendantOfSelectedLeaf {
-	margin: $block-selected-child-to-content;
 }
 
 .aztec_container {
@@ -116,24 +41,29 @@
 	min-height: 50px;
 }
 
-.toolbar {
-	border-left-width: 0;
-	margin-right: auto;
-	padding-left: 2px;
-	height: 44px;
-}
-
-.pipe {
-	margin-top: auto;
-	margin-bottom: auto;
-	margin-left: 2px;
-	height: 28px;
-	width: 1px;
-	background-color: #e9eff3;
-	opacity: 0.4;
-}
-
 .neutralToolbar {
 	margin-left: -$block-edge-to-content;
 	margin-right: -$block-edge-to-content;
+}
+
+.solidBorder {
+	position: absolute;
+	top: -$solid-border-space;
+	bottom: 0;
+	left: -$solid-border-space;
+	right: -$solid-border-space;
+	border-width: $block-selected-border-width;
+	border-radius: 4px;
+	border-style: solid;
+}
+
+.dashedBorder {
+	position: absolute;
+	top: -$dashed-border-space;
+	bottom: -$dashed-border-space;
+	left: -$dashed-border-space;
+	right: -$dashed-border-space;
+	border-width: $block-selected-border-width;
+	border-radius: 2px;
+	border-style: dashed;
 }

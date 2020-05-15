@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	receiveUserQuery,
+	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveThemeSupports,
@@ -23,6 +24,7 @@ import {
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch, resolveSelect } from './controls';
+import { ifNotResolved } from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -62,6 +64,22 @@ export function* getEntityRecord( kind, name, key = '' ) {
 }
 
 /**
+ * Requests an entity's record from the REST API.
+ */
+export const getRawEntityRecord = ifNotResolved(
+	getEntityRecord,
+	'getEntityRecord'
+);
+
+/**
+ * Requests an entity's record from the REST API.
+ */
+export const getEditedEntityRecord = ifNotResolved(
+	getRawEntityRecord,
+	'getRawEntityRecord'
+);
+
+/**
  * Requests the entity's records from the REST API.
  *
  * @param {string}  kind   Entity kind.
@@ -90,6 +108,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the current theme.
+ */
+export function* getCurrentTheme() {
+	const activeThemes = yield apiFetch( {
+		path: '/wp/v2/themes?status=active',
+	} );
+	yield receiveCurrentTheme( activeThemes[ 0 ] );
+}
 
 /**
  * Requests theme supports data from the index.
