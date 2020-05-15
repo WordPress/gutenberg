@@ -1,18 +1,17 @@
-#!/usr/bin/env node
-'use strict';
-
 /*
  * External dependencies
  */
 const { groupBy } = require( 'lodash' );
-const chalk = require( 'chalk' );
 const Octokit = require( '@octokit/rest' );
 
 /*
  * Internal dependencies
  */
+const { getNextMajorVersion } = require( '../lib/version' );
+const { log, formats } = require( '../lib/logger' );
+const config = require( '../config' );
 // @ts-ignore
-const manifest = require( '../package.json' );
+const manifest = require( '../../../package.json' );
 
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
@@ -28,20 +27,6 @@ const manifest = require( '../package.json' );
  */
 
 /**
- * Optional GitHub token used to authenticate requests.
- *
- * @type {string=}
- */
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-
-/**
- * Optional explicit milestone title to use for generating changelog.
- *
- * @type {string=}
- */
-const MILESTONE = process.env.MILESTONE;
-
-/**
  * Given a SemVer-formatted version string, returns an assumed milestone title
  * associated with that version.
  *
@@ -53,6 +38,7 @@ const MILESTONE = process.env.MILESTONE;
  */
 function getMilestone( version ) {
 	const [ major, minor ] = version.split( '.' );
+
 	return `Gutenberg ${ major }.${ minor }`;
 }
 
@@ -238,9 +224,9 @@ async function getChangelog( settings ) {
  * @param {WPChangelogSettings} settings Changelog settings.
  */
 async function createChangelog( settings ) {
-	console.log(
-		chalk.bold(
-			`💃Preparing changelog for milestone: "${ settings.milestone }"\n\n`
+	log(
+		formats.title(
+			`\n💃Preparing changelog for milestone: "${ settings.milestone }"\n\n`
 		)
 	);
 
@@ -248,24 +234,25 @@ async function createChangelog( settings ) {
 	try {
 		changelog = await getChangelog( settings );
 	} catch ( error ) {
-		changelog = chalk.yellow( error.stack );
+		changelog = formats.error( error.stack );
 	}
 
-	console.log( changelog );
+	log( changelog );
 }
 
-if ( ! module.parent ) {
-	createChangelog( {
-		owner: 'WordPress',
-		repo: 'gutenberg',
-		token: GITHUB_TOKEN,
+async function getReleaseChangelog( options ) {
+	await createChangelog( {
+		owner: config.githubRepositoryOwner,
+		repo: config.githubRepositoryName,
+		token: options.token,
 		milestone:
-			MILESTONE === undefined
-				? getMilestone( manifest.version )
-				: MILESTONE,
+			options.milestone === undefined
+				? getMilestone( getNextMajorVersion( manifest.version ) )
+				: options.milestone,
 	} );
 }
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
 	getNormalizedTitle,
+	getReleaseChangelog,
 };

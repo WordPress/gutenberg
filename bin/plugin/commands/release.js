@@ -18,6 +18,7 @@ const {
 } = require( '../lib/utils' );
 const git = require( '../lib/git' );
 const svn = require( '../lib/svn' );
+const { getNextMajorVersion } = require( '../lib/version' );
 const config = require( '../config' );
 const {
 	runGitRepositoryCloneStep,
@@ -67,31 +68,16 @@ async function runReleaseBranchCreationStep(
 	await runStep( 'Creating the release branch', abortMessage, async () => {
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageJson = readJSONFile( packageJsonPath );
-		const parsedVersion = semver.parse( packageJson.version );
+		const nextMajor = getNextMajorVersion( packageJson.version );
+		const parsedMajorVersion = semver.parse( nextMajor );
 
-		// Follow the WordPress version guidelines to compute the version to be used
-		// By default, increase the "minor" number but if we reach 9, bump to the next major.
-		if ( parsedVersion.minor === 9 ) {
-			version = parsedVersion.major + 1 + '.0.0-rc.1';
-			releaseBranch = 'release/' + ( parsedVersion.major + 1 ) + '.0';
-			versionLabel = parsedVersion.major + 1 + '.0.0 RC1';
-		} else {
-			version =
-				parsedVersion.major +
-				'.' +
-				( parsedVersion.minor + 1 ) +
-				'.0-rc.1';
-			releaseBranch =
-				'release/' +
-				parsedVersion.major +
-				'.' +
-				( parsedVersion.minor + 1 );
-			versionLabel =
-				parsedVersion.major +
-				'.' +
-				( parsedVersion.minor + 1 ) +
-				'.0 RC1';
-		}
+		version = nextMajor + '-rc.1';
+		releaseBranch =
+			'release/' +
+			parsedMajorVersion.major +
+			'.' +
+			parsedMajorVersion.minor;
+		versionLabel = nextMajor + ' RC1';
 
 		await askForConfirmation(
 			'The Plugin version to be used is ' +
