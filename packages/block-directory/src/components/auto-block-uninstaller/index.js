@@ -17,7 +17,7 @@ const UNINSTALL_ERROR_NOTICE_ID = 'block-uninstall-error';
 export class AutoBlockUninstaller extends Component {
 	componentDidUpdate( prevProps ) {
 		// If the document is being saved, delete unused blocks
-		if ( this.props.isSavingPost && ! prevProps.isSavingPost ) {
+		if ( this.props.shouldRemoveBlocks && ! prevProps.shouldRemoveBlocks ) {
 			this.props.blocksToUninstall.forEach( ( blockType ) => {
 				this.props.uninstallBlock( blockType, noop, () => {
 					this.props.createWarningNotice(
@@ -40,7 +40,9 @@ export class AutoBlockUninstaller extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getInstalledBlockTypes } = select( 'core/block-directory' );
-		const { isSavingPost } = select( 'core/editor' );
+		const { isCurrentPostPublished, isSavingPost } = select(
+			'core/editor'
+		);
 		const { getBlocks } = select( 'core/block-editor' );
 
 		const downloadableBlocksToUninstall = differenceBy(
@@ -50,8 +52,8 @@ export default compose( [
 		);
 
 		return {
-			isSavingPost: isSavingPost(),
 			blocksToUninstall: downloadableBlocksToUninstall,
+			shouldRemoveBlocks: ! isCurrentPostPublished() && isSavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
