@@ -89,6 +89,31 @@ function Editor( { settings: _settings } ) {
 		[]
 	);
 
+	const blockContext = useMemo( () => {
+		if ( ! settings.page.context.queryContext )
+			return settings.page.context;
+
+		return {
+			...settings.page.context,
+			queryContext: [
+				settings.page.context.queryContext,
+				( newQueryContext ) =>
+					setSettings( ( prevSettings ) => ( {
+						...prevSettings,
+						page: {
+							...prevSettings.page,
+							context: {
+								...prevSettings.page.context,
+								queryContext: {
+									...prevSettings.page.context.queryContext,
+									...newQueryContext,
+								},
+							},
+						},
+					} ) ),
+			],
+		};
+	}, [ settings.page.context ] );
 	return template ? (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -101,9 +126,7 @@ function Editor( { settings: _settings } ) {
 							type={ settings.templateType }
 							id={ settings.templateId }
 						>
-							<BlockContextProvider
-								value={ settings.page.context }
-							>
+							<BlockContextProvider value={ blockContext }>
 								<Context.Provider value={ context }>
 									<FocusReturnProvider>
 										<KeyboardShortcuts.Register />

@@ -118,6 +118,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 				<UndoButton />
 				<RedoButton />
 				<PageSwitcher
+					showOnFront={ settings.showOnFront }
 					activePage={ settings.page }
 					onActivePageChange={ setActivePage }
 				/>

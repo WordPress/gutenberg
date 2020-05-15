@@ -54,9 +54,9 @@ export default function QueryToolbar( { query, setQuery } ) {
 							label={ __( 'Posts per Page' ) }
 							min={ 1 }
 							allowReset
-							value={ query.per_page }
+							value={ query.perPage }
 							onChange={ ( value ) =>
-								setQuery( { per_page: value ?? -1 } )
+								setQuery( { perPage: value ?? -1 } )
 							}
 						/>
 						<RangeControl

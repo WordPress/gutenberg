@@ -18,30 +18,52 @@ function getPathFromLink( link ) {
 	if ( queryString ) value += `?${ queryString }`;
 	return value;
 }
-export default function PageSwitcher( { activePage, onActivePageChange } ) {
-	const { pages = [], categories = [] } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( 'core' );
-		return {
-			pages: getEntityRecords( 'postType', 'page' )?.map( ( _page ) => {
-				const path = getPathFromLink( _page.link );
-				return {
-					label: _page.title.rendered,
-					value: path,
-					context: { postType: 'page', postId: _page.id },
-				};
-			} ),
-			categories: getEntityRecords( 'taxonomy', 'category' )?.map(
-				( category ) => {
-					const path = getPathFromLink( category.link );
-					return {
-						label: category.name,
-						value: path,
-						context: { query: { categoryId: category.id } },
-					};
-				}
-			),
-		};
-	}, [] );
+export default function PageSwitcher( {
+	showOnFront,
+	activePage,
+	onActivePageChange,
+} ) {
+	const { pages = [], categories = [], posts = [] } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( 'core' );
+			return {
+				pages: getEntityRecords( 'postType', 'page' )?.map(
+					( _page ) => {
+						const path = getPathFromLink( _page.link );
+						return {
+							label: _page.title.rendered,
+							value: path,
+							context: { postType: 'page', postId: _page.id },
+						};
+					}
+				),
+				categories: getEntityRecords( 'taxonomy', 'category' )?.map(
+					( category ) => {
+						const path = getPathFromLink( category.link );
+						return {
+							label: category.name,
+							value: path,
+							context: {
+								query: { categoryIds: [ category.id ] },
+								queryContext: { page: 1 },
+							},
+						};
+					}
+				),
+				posts: [
+					{
+						label: __( 'All Posts' ),
+						value: '/',
+						context: {
+							query: { categoryIds: [] },
+							queryContext: { page: 1 },
+						},
+					},
+				],
+			};
+		},
+		[]
+	);
 	const onPageSelect = ( newPath ) => {
 		const { value: path, context } = [ ...pages, ...categories ].find(
 			( choice ) => choice.value === newPath
@@ -53,7 +75,7 @@ export default function PageSwitcher( { activePage, onActivePageChange } ) {
 			icon={ null }
 			label={ __( 'Switch Page' ) }
 			toggleProps={ {
-				children: [ ...pages, ...categories ].find(
+				children: [ ...pages, ...categories, ...posts ].find(
 					( choice ) => choice.value === activePage.path
 				)?.label,
 			} }
@@ -63,7 +85,12 @@ export default function PageSwitcher( { activePage, onActivePageChange } ) {
 					<MenuGroup label={ __( 'Pages' ) }>
 						<MenuItemsChoice
 							choices={ pages }
-							value={ activePage.path }
+							value={
+								activePage.path !== '/' ||
+								showOnFront === 'page'
+									? activePage.path
+									: undefined
+							}
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>
@@ -71,6 +98,18 @@ export default function PageSwitcher( { activePage, onActivePageChange } ) {
 						<MenuItemsChoice
 							choices={ categories }
 							value={ activePage.path }
+							onSelect={ onPageSelect }
+						/>
+					</MenuGroup>
+					<MenuGroup label={ __( 'Posts' ) }>
+						<MenuItemsChoice
+							choices={ posts }
+							value={
+								activePage.path !== '/' ||
+								showOnFront === 'posts'
+									? activePage.path
+									: undefined
+							}
 							onSelect={ onPageSelect }
 						/>
 					</MenuGroup>

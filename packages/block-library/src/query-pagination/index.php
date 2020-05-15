@@ -15,7 +15,7 @@
  * @return string Returns the pagination for the query.
  */
 function render_block_core_query_pagination( $attributes, $content, $block ) {
-	$page_key = 'query-' . $block->context['queryId'] . '-page';
+	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
 	$content = '';
@@ -26,7 +26,7 @@ function render_block_core_query_pagination( $attributes, $content, $block ) {
 			__( 'Previous', 'gutenberg' )
 		);
 	}
-	if ( $page < $block->context['query']['pages'] ) {
+	if ( $page < ( isset( $block->context['query']['pages'] ) ? $block->context['query']['pages'] : 1 ) ) {
 		$content .= sprintf(
 			'<div><a href="%s">%s</a></div>',
 			esc_url( add_query_arg( $page_key, $page + 1 ) ),
