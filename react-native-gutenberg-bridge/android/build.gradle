@@ -91,6 +91,7 @@ project.ext.buildGutenbergFromSource = false
 
 def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
+def buildAssetsFolder = 'build/assets'
 
 android {
     compileSdkVersion 28
@@ -108,6 +109,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += buildAssetsFolder
+        }
     }
 }
 
@@ -168,7 +175,7 @@ boolean isBundleUpToDate() {
 }
 
 if (buildGutenbergMobileJSBundle) {
-    def assetsFolder = 'src/main/assets'
+    def bundleName = 'index.android.bundle'
     def jsRootDir = '../..'
 
     task bundleUpToDateCheck {
@@ -211,13 +218,24 @@ Only if they are is the isBundleUpToDate flag set to true. That flag is used by 
         }
         inputs.files(inputFiles())
 
-        outputs.file("$assetsFolder/index.android.bundle")
+        outputs.file("$buildAssetsFolder/$bundleName")
+
+        // Having this task create this file as an output because changes to
+        // the actual bundle (or even deleting the bundle file) was not triggering
+        // this task to rerun (and flip the isBundleUpToDate flag to false). Now that
+        // this second indicator file is here, which gets deleted if the project is cleaned,
+        // this task knows that it is out of date. Note that if there are changes to the
+        // bundle file though, that alone will not trigger this task to run again, so you'll
+        // need to use --rerun-tasks in that case.
+        def upToDateIndicatorFile = "$buildAssetsFolder/up-to-date-bundle-indicator"
+        outputs.file(upToDateIndicatorFile)
 
         // set flag to true before task tries to run
         project.ext.isBundleUpToDate = true
         doLast {
             // If this task runs, either the inputs or outputs have changed, so the bundle is out of date.
             project.ext.isBundleUpToDate = false
+            file(upToDateIndicatorFile).createNewFile()
         }
     }
 
@@ -229,15 +247,6 @@ Only if they are is the isBundleUpToDate flag set to true. That flag is used by 
         onlyIf { !isBundleUpToDate() }
 
         args = ['bundle:android']
-    }
-
-    task ensureAssetsDirectory {
-        dependsOn bundleUpToDateCheck
-        onlyIf { !isBundleUpToDate() }
-
-        doLast {
-            mkdir assetsFolder
-        }
     }
 
     task backupHermesDebugAAR(type: Copy) {
@@ -272,10 +281,9 @@ Only if they are is the isBundleUpToDate flag set to true. That flag is used by 
 
         def origFileName = 'App.js'
         def origWithPath = "../../bundle/android/${origFileName}"
-        def target = 'index.android.bundle'
         from origWithPath
-        into assetsFolder
-        rename origFileName, target
+        into buildAssetsFolder
+        rename origFileName, bundleName
         doLast {
             println "Done copying the Android JS bundle to assets folder"
         }
@@ -293,5 +301,5 @@ Only if they are is the isBundleUpToDate flag set to true. That flag is used by 
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
-    buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
+    buildJSBundle.dependsOn(yarn_install)
 }
