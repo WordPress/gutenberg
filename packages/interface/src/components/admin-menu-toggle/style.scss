@@ -31,7 +31,7 @@
 			outline: none;
 
 			svg {
-				box-shadow: 0 0 0 1px $white, 0 0 0 4px theme(primary);
+				box-shadow: 0 0 0 $border-width-focus theme(sidebarText);
 				border-radius: 2px;
 			}
 		}
