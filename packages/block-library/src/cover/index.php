@@ -8,12 +8,13 @@
 /**
  * Supports `playsinline` attribute server side for `core/cover`.
  *
- * @param array $attributes The block attributes.
+ * @param array  $attributes The block attributes.
+ * @param string $content HTML content of the block.
  *
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_cover( $attributes, $content ) {
-	if ( isset( $attributes['backgroundType'] ) && $attributes['backgroundType'] === 'video' ) {
+	if ( isset( $attributes['backgroundType'] ) && 'video' === $attributes['backgroundType'] ) {
 		return str_replace( 'autoplay muted', 'autoplay muted playsinline', $content );
 	}
 
