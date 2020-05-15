@@ -174,9 +174,43 @@ if (buildGutenbergMobileJSBundle) {
     task bundleUpToDateCheck {
         description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
 Only if they are is the isBundleUpToDate flag set to true. That flag is used by other tasks.")
-        inputs.files("$jsRootDir/package.json",
-                     "$jsRootDir/yarn.lock")
-        inputs.dir("$jsRootDir/patches")
+
+        def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name == 'package.json' }
+        def inputFiles = {
+            def jsFiles = []
+            def dirs = []
+            file(jsRootDir).eachDir { dir ->
+                if (dir.name != 'node_modules'
+                        && dir.name != 'bundle'
+                        && dir.name != 'gutenberg'
+                        && !dir.name.startsWith('symlinked')) {
+                    dirs << dir
+                }
+            }
+            file("$jsRootDir/gutenberg").eachDir { dir ->
+                if (dir.name != 'node_modules') {
+                    dirs << dir
+                }
+            }
+
+            dirs.forEach { dir ->
+                file(dir).eachFileRecurse {
+                    if (isRelevantFile(it)) {
+                        jsFiles << it
+                    }
+                }
+            }
+
+            def jsRootDirFiles = file(jsRootDir).listFiles().findAll {
+                isRelevantFile(it)
+            }
+            def gutenbergRootDirFiles = file("$jsRootDir/gutenberg").listFiles().findAll {
+                isRelevantFile(it)
+            }
+            return jsFiles + jsRootDirFiles + gutenbergRootDirFiles
+        }
+        inputs.files(inputFiles())
+
         outputs.file("$assetsFolder/index.android.bundle")
 
         // set flag to true before task tries to run
