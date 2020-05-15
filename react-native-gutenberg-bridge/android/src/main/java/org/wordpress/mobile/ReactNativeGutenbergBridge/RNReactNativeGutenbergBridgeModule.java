@@ -133,8 +133,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void setUpdateTheme(RNEditorTheme editorTheme) {
         WritableMap writableMap = new WritableNativeMap();
-        writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, editorTheme.getColors());
-        writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, editorTheme.getGradients());
+        writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.makeNativeArray(editorTheme.getColors()));
+        writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.makeNativeArray(editorTheme.getGradients()));
 
         emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
     }

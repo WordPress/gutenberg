@@ -27,9 +27,9 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface RNEditorTheme {
         @Nullable
-        ReadableArray getColors();
+        ArrayList<Object> getColors();
         @Nullable
-        ReadableArray getGradients();
+        ArrayList<Object> getGradients();
     }
 
     void responseHtml(String title, String html, boolean changed);

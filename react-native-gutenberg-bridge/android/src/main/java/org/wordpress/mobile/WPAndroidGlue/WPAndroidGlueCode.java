@@ -29,8 +29,6 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
@@ -365,13 +363,14 @@ public class WPAndroidGlueCode {
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
         onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations, colorBackground, isDarkMode);
+        , localeString, translations, colorBackground, isDarkMode, null);
     }
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              String postType, boolean isNewPost, String localeString, Bundle translations,
-                             int colorBackground, boolean isDarkMode) {
+                             int colorBackground, boolean isDarkMode, @Nullable
+                             RNEditorTheme editorTheme) {
         mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
@@ -402,71 +401,17 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
-        RNEditorTheme editorTheme = getGutenbergEditorTheme();
         if (editorTheme != null && editorTheme.getColors() != null) {
-            initialProps.putSerializable(PROP_NAME_COLORS, Arguments.toList(editorTheme.getColors()));
+            initialProps.putSerializable(PROP_NAME_COLORS, editorTheme.getColors());
         }
 
         if (editorTheme != null && editorTheme.getGradients() != null) {
-            initialProps.putSerializable(PROP_NAME_GRADIENTS, Arguments.toList(editorTheme.getGradients()));
+            initialProps.putSerializable(PROP_NAME_GRADIENTS, editorTheme.getGradients());
         }
 
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
-    }
-
-    @Nullable
-    private RNEditorTheme getGutenbergEditorTheme() {
-        return new RNEditorTheme() {
-            @Override public ReadableArray getColors() {
-                WritableNativeMap accent = new WritableNativeMap();
-                accent.putString("name", "Accent Color");
-                accent.putString("slug", "accent");
-                accent.putString("color", "#cd2653");
-
-                WritableNativeMap primary = new WritableNativeMap();
-                primary.putString("name", "Primary");
-                primary.putString("slug", "primary");
-                primary.putString("color", "#000000");
-
-                WritableNativeMap secondary = new WritableNativeMap();
-                secondary.putString("name", "Secondary");
-                secondary.putString("slug", "secondary");
-                secondary.putString("color", "#6d6d6d");
-
-                WritableNativeMap subtle = new WritableNativeMap();
-                subtle.putString("name", "Subtle Background");
-                subtle.putString("slug", "subtle-background");
-                subtle.putString("color", "#dcd7ca");
-
-                WritableNativeMap background = new WritableNativeMap();
-                background.putString("name", "Background Color");
-                background.putString("slug", "background");
-                background.putString("color", "#f5efe0");
-
-                WritableNativeArray colors = new WritableNativeArray();
-                colors.pushMap(accent);
-                colors.pushMap(primary);
-                colors.pushMap(secondary);
-                colors.pushMap(subtle);
-                colors.pushMap(background);
-
-                return colors;
-            }
-
-            @Override public ReadableArray getGradients() {
-                WritableNativeMap gradient = new WritableNativeMap();
-                gradient.putString("name", "Blue to Purple");
-                gradient.putString("slug", "blue-to-purple");
-                gradient.putString("gradient", "linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)");
-
-                WritableNativeArray gradients = new WritableNativeArray();
-                gradients.pushMap(gradient);
-
-                return gradients;
-            }
-        };
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
