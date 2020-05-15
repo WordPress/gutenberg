@@ -49,10 +49,8 @@ const gutenbergSetup = () => {
 const setupInitHooks = () => {
 	const wpHooks = require( '@wordpress/hooks' );
 
-	wpHooks.doAction( 'native.setup-init-hooks' );
-
 	wpHooks.addAction(
-		'native.render',
+		'native.pre-render',
 		'core/react-native-editor',
 		( props ) => {
 			setupLocale( props.locale, props.translations );
@@ -61,7 +59,7 @@ const setupInitHooks = () => {
 
 	// Map native props to Editor props
 	wpHooks.addFilter(
-		'native.block_editor_props',
+		'native.block_editor_props_from_parent',
 		'core/react-native-editor',
 		( {
 			initialData,
@@ -73,7 +71,8 @@ const setupInitHooks = () => {
 			initialHtmlModeEnabled,
 			initialTitle,
 			postType,
-		} )
+		} ),
+		5
 	);
 };
 

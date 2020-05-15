@@ -15,22 +15,31 @@ import { applyFilters, doAction } from '@wordpress/hooks';
 import { cloneElement } from './react';
 
 const render = ( element, id ) =>
-	AppRegistry.registerComponent( id, () => ( propsFromNative ) => {
-		const nativeProps = omit( propsFromNative || {}, [ 'rootTag' ] );
+	AppRegistry.registerComponent( id, () => ( propsFromParent ) => {
+		const parentProps = omit( propsFromParent || {}, [ 'rootTag' ] );
+		let filteredProps;
 
-		doAction( 'native.render', nativeProps );
+		doAction( 'native.pre-render', parentProps );
 
-		// if we have not received props from a parent native app
-		// just render the element as it is
-		if ( isEmpty( nativeProps ) ) {
-			return element;
+		// If we have not received props from the parent app, we're in the demo app
+		if ( isEmpty( parentProps ) ) {
+			filteredProps = applyFilters(
+				'native.block_editor_props_default',
+				element.props
+			);
+		} else {
+			filteredProps = applyFilters(
+				'native.block_editor_props_from_parent',
+				parentProps
+			);
 		}
 
-		// Otherwise overwrite the existing props using a filter hook
-		const filteredProps = applyFilters(
+		filteredProps = applyFilters(
 			'native.block_editor_props',
-			nativeProps
+			filteredProps
 		);
+
+		doAction( 'native.render', filteredProps );
 
 		return cloneElement( element, filteredProps );
 	} );
