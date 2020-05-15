@@ -8,6 +8,10 @@
 - New `--webpack-bundle-analyzer` flag added to `build` and `start` scripts. It enables visualization for the size of webpack output files with an interactive zoomable treemap ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
 - New `--webpack--devtool` flag added to `start` script. It controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
 
+### Breaking Changes
+
+- The default babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled babel configuration; if a project provides its own, this change doesn't affect it. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
+
 ## 9.1.0 (2020-05-14)
 
 ### Enhancements
@@ -17,12 +21,6 @@
 ### Deprecations
 
 - `env` script was marked as deprecated. We recommend using `@wordpress/env` package instead that lets you easily set up a local WordPress environment for building and testing plugins and themes.
-
-## 10.0.0 (xxxx-xx-xx)
-
-### Breaking Changes
-
-- Revert the activation of shippedProposals in the default babel config, which enables stage-3 syntax. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
 
 ## 9.0.0 (2020-04-30)
 
