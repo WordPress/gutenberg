@@ -113,22 +113,22 @@ export function setIsInstalling( isInstalling ) {
 /**
  * Sets an error notice string to be displayed to the user
  *
- * @param {string} blockId  The ID of the block plugin. eg: my-block
- * @param {string} noticeId The ID of the message used to determine which
- *                          notice to show.
+ * @param {string} blockId The ID of the block plugin. eg: my-block
+ * @param {string} notice  The ID of the message used to determine which
+ *                         notice to show.
  *
  * @return {Object} Action object.
  */
-export function setErrorNotice( blockId, noticeId ) {
+export function setErrorNotice( blockId, notice ) {
 	return {
-		type: 'SET_ERROR_NOTICE_ID',
+		type: 'SET_ERROR_NOTICE',
 		blockId,
-		noticeId,
+		notice,
 	};
 }
 
 /**
- * Sets the error noticeId to empty for specific block
+ * Sets the error notice to empty for specific block
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
  *
@@ -136,8 +136,8 @@ export function setErrorNotice( blockId, noticeId ) {
  */
 export function clearErrorNotice( blockId ) {
 	return {
-		type: 'SET_ERROR_NOTICE_ID',
+		type: 'SET_ERROR_NOTICE',
 		blockId,
-		noticeId: '',
+		notice: false,
 	};
 }
