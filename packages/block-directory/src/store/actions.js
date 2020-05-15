@@ -114,8 +114,7 @@ export function setIsInstalling( isInstalling ) {
  * Sets an error notice string to be displayed to the user
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
- * @param {string} notice  The ID of the message used to determine which
- *                         notice to show.
+ * @param {string} notice  The message shown in the notice.
  *
  * @return {Object} Action object.
  */
