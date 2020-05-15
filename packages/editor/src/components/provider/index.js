@@ -113,6 +113,7 @@ class EditorProvider extends Component {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
 				'__experimentalDisableCustomUnits',
 				'__experimentalDisableCustomLineHeight',
 				'__experimentalDisableDropCap',

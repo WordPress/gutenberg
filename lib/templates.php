@@ -155,3 +155,51 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 	echo esc_html( $post->post_name );
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+
+/**
+ * Filter for adding a `resolved` parameter to `wp_template` queries.
+ *
+ * @param array $query_params The query parameters.
+ * @return array Filtered $query_params.
+ */
+function filter_rest_wp_template_collection_params( $query_params ) {
+	$query_params += array(
+		'resolved' => array(
+			'description' => __( 'Whether to filter for resolved templates', 'gutenberg' ),
+			'type'        => 'boolean',
+		),
+	);
+	return $query_params;
+}
+apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_collection_params', 99, 1 );
+
+/**
+ * Filter for supporting the `resolved` parameter in `wp_template` queries.
+ *
+ * @param array           $args    The query arguments.
+ * @param WP_REST_Request $request The request object.
+ * @return array Filtered $args.
+ */
+function filter_rest_wp_template_query( $args, $request ) {
+	if ( $request['resolved'] ) {
+		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
+		$template_types = $request['slug'] ? $request['slug'] : get_template_types();
+
+		foreach ( $template_types as $template_type ) {
+			// Skip 'embed' for now because it is not a regular template type.
+			// Skip 'index' because it's a fallback that we handle differently.
+			if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
+				continue;
+			}
+
+			$current_template = gutenberg_find_template_post_and_parts( $template_type );
+			if ( isset( $current_template ) ) {
+				$template_ids[] = $current_template['template_post']->ID;
+			}
+		}
+		$args['post__in'] = $template_ids;
+	}
+
+	return $args;
+}
+add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
