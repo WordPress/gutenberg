@@ -31,7 +31,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	// check installed WordPress.
 	const installed = await fs.readdir( workDirectoryPath );
 	if ( ! installed.length ) {
-		spinner.text = `Not installed WordPress.`;
+		spinner.text = `Could not find any files to remove.`;
 		return;
 	}
 
