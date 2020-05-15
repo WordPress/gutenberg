@@ -22,9 +22,9 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-buttons is-direction-vertical\">\n\t\n\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-buttons is-vertical\">\n\t\n\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-buttons is-direction-vertical\">\n\t",
+            "\n<div class=\"wp-block-buttons is-vertical\">\n\t",
             null,
             "\n\n\t",
             null,

@@ -5,7 +5,7 @@
         "isValid": true,
         "attributes": {
             "orientation": "horizontal",
-            "className": "is-direction-vertical"
+            "className": "is-vertical"
         },
         "innerBlocks": [
             {
@@ -29,6 +29,6 @@
                 "originalContent": "<a class=\"wp-block-button wp-block-button__link\">My button 2</a>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-buttons is-direction-vertical\">\n\t\n\n\t\n</div>"
+        "originalContent": "<div class=\"wp-block-buttons is-vertical\">\n\t\n\n\t\n</div>"
     }
 ]
