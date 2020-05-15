@@ -5,11 +5,6 @@ import { I18nManager } from 'react-native';
 import 'react-native-get-random-values'; // This library works as a polyfill for the global crypto.getRandomValues which is needed by `uuid` version 7.0.0
 
 /**
- * WordPress dependencies
- */
-import { setLocaleData } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import './globals';
@@ -17,7 +12,7 @@ import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
 
-const reactNativeSetup  = () => {
+const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
 	// eslint-disable-next-line no-console
 	console.disableYellowBox = true;
@@ -47,7 +42,7 @@ const gutenbergSetup = () => {
 		initialHtml,
 		initialHtmlModeEnabled: false,
 		initialTitle: 'Welcome to Gutenberg!',
-		postType: 'post'
+		postType: 'post',
 	} );
 };
 
@@ -56,22 +51,30 @@ const setupInitHooks = () => {
 
 	wpHooks.doAction( 'native.setup-init-hooks' );
 
-	wpHooks.addAction( 'native.render', 'core/react-native-editor', ( props ) => {
-		setupLocale( props.locale, props.translations );
-	} );
+	wpHooks.addAction(
+		'native.render',
+		'core/react-native-editor',
+		( props ) => {
+			setupLocale( props.locale, props.translations );
+		}
+	);
 
 	// Map native props to Editor props
-	wpHooks.addFilter(  'native.block_editor_props', 'core/react-native-editor', ( {
-		initialData,
-		initialTitle,
-		initialHtmlModeEnabled,
-		postType,
-	} ) => ( {
-		initialHtml: initialData,
-		initialHtmlModeEnabled,
-		initialTitle,
-		postType,
-	} ) );
+	wpHooks.addFilter(
+		'native.block_editor_props',
+		'core/react-native-editor',
+		( {
+			initialData,
+			initialTitle,
+			initialHtmlModeEnabled,
+			postType,
+		} ) => ( {
+			initialHtml: initialData,
+			initialHtmlModeEnabled,
+			initialTitle,
+			postType,
+		} )
+	);
 };
 
 const setupLocale = ( locale, extraTranslations ) => {
