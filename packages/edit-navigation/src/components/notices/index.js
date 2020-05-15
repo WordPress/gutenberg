@@ -31,16 +31,16 @@ export default function EditNavigationNotices() {
 		<>
 			<NoticeList
 				notices={ nonDismissibleNotices }
-				className="components-editor-notices__pinned"
+				className="edit-navigation-notices__notice-list"
 			/>
 			<NoticeList
 				notices={ dismissibleNotices }
-				className="components-editor-notices__dismissible"
+				className="edit-navigation-notices__notice-list"
 				onRemove={ removeNotice }
 			/>
 			<SnackbarList
 				notices={ snackbarNotices }
-				className="components-editor-notices__snackbar"
+				className="edit-navigation-notices__snackbar-list"
 				onRemove={ removeNotice }
 			/>
 		</>

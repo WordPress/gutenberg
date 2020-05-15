@@ -1,4 +1,18 @@
-.components-snackbar-list.edit-navigation-notices {
+.edit-navigation-notices__snackbar-list {
 	position: fixed;
 	bottom: 20px;
+}
+
+.edit-navigation-notices__notice-list {
+	margin-left: -20px;
+
+	// Notices have some unusual margin and padding by default, reset that.
+	.components-notice {
+		margin: 0;
+		padding-right: 12px;
+
+		.components-button {
+			align-self: initial;
+		}
+	}
 }
