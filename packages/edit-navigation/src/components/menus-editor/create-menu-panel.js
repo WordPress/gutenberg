@@ -14,7 +14,7 @@ import {
 	withFocusReturn,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 const noticeId = 'edit-navigation-create-menu-error';
@@ -24,26 +24,14 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const { isCreatingMenu, hasCreatedMenu } = useSelect( ( select ) => {
-		const { getIsResolving, hasFinishedResolution } = select( 'core' );
-		return {
-			isCreatingMenu: getIsResolving( 'saveMenu' ),
-			hasCreatedMenu: hasFinishedResolution( 'saveMenu' ),
-		};
-	}, [] );
+	const isCreatingMenu = useSelect(
+		( select ) => select( 'core' ).getIsResolving( 'saveMenu' ),
+		[]
+	);
 	const { saveMenu } = useDispatch( 'core' );
 	const { createInfoNotice, createErrorNotice, removeNotice } = useDispatch(
 		'core/notices'
 	);
-
-	useEffect( () => {
-		if ( hasCreatedMenu ) {
-			createInfoNotice( __( 'Menu created' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		}
-	}, [ hasCreatedMenu ] );
 
 	const createMenu = useCallback(
 		async ( event ) => {
@@ -70,9 +58,21 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 				createErrorNotice( message, { id: noticeId } );
 				return;
 			}
-
-			const menu = await saveMenu( { name: menuName } );
-			onCreateMenu( menu.id );
+			try {
+				const menu = await saveMenu( { name: menuName } );
+				createInfoNotice( __( 'Menu created' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				onCreateMenu( menu.id );
+			} catch ( error ) {
+				const message = sprintf(
+					// translators: %s: an error message.
+					__( 'Error creating menu: %s' ),
+					error.message
+				);
+				createErrorNotice( message, { id: noticeId } );
+			}
 		},
 		[ menuName, menus ]
 	);
