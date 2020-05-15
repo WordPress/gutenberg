@@ -486,46 +486,27 @@ export function* saveEntityRecord(
 				recordId
 			);
 
-			if (
-				currentEdits &&
-				currentEdits.toDelete &&
-				currentEdits.toDelete === true
-			) {
-				let deletePath = path;
-				if ( entity.forceDelete === true ) {
-					deletePath = deletePath + '?force=true';
-				}
+			yield receiveEntityRecords(
+				kind,
+				name,
+				{ ...persistedEntity, ...data },
+				undefined,
+				true
+			);
 
-				updatedRecord = yield apiFetch( {
-					path: deletePath,
-					method: 'DELETE',
-				} );
+			updatedRecord = yield apiFetch( {
+				path,
+				method: recordId ? 'PUT' : 'POST',
+				data,
+			} );
 
-				updatedRecord = updatedRecord.previous;
-				yield removeItems( kind, name, updatedRecord );
-			} else {
-				yield receiveEntityRecords(
-					kind,
-					name,
-					{ ...persistedEntity, ...data },
-					undefined,
-					true
-				);
-
-				updatedRecord = yield apiFetch( {
-					path,
-					method: recordId ? 'PUT' : 'POST',
-					data,
-				} );
-
-				yield receiveEntityRecords(
-					kind,
-					name,
-					updatedRecord,
-					undefined,
-					true
-				);
-			}
+			yield receiveEntityRecords(
+				kind,
+				name,
+				updatedRecord,
+				undefined,
+				true
+			);
 		}
 	} catch ( _error ) {
 		error = _error;
