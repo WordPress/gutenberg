@@ -189,6 +189,7 @@ class ButtonEdit extends Component {
 		}
 		return (
 			getColorAndStyleProps( attributes ).style?.backgroundColor ||
+			getColorAndStyleProps( attributes ).style?.background ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
