@@ -102,7 +102,7 @@ export function CreateMenuForm( { onCancel, menus } ) {
 					</Button>
 					{ onCancel && (
 						<Button
-							className="edit-navigation-menu-editor__cancel-create-menu-button"
+							className="edit-navigation-menus-editor__cancel-create-menu-button"
 							isSecondary
 							onClick={ onCancel }
 						>

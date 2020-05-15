@@ -29,6 +29,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 
 	const [ menuId, setMenuId ] = useState();
 	const [ stateMenus, setStateMenus ] = useState();
+	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
 
 	useEffect( () => {
 		if ( menus?.length ) {
@@ -42,23 +43,17 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	}
 
 	const hasMenus = hasLoadedMenus && !! stateMenus?.length;
-	const isCreatingFirstMenu = ! hasMenus;
-	const isCreatingAdditionalMenu = hasMenus && ! menuId;
-	const isCreatingMenu = isCreatingFirstMenu || isCreatingAdditionalMenu;
-	const hasSelectedMenu = hasMenus && !! menuId;
 
 	return (
 		<>
 			<Card className="edit-navigation-menus-editor__menu-selection-card">
 				<CardBody className="edit-navigation-menus-editor__menu-selection-card-body">
-					{ isCreatingMenu && (
+					{ ! hasMenus && (
 						<p className="edit-navigation-menus-editor__menu-selection-card-instructional-text">
-							{ isCreatingFirstMenu
-								? __( 'Create your first menu below.' )
-								: __( 'Create a new menu below.' ) }
+							{ __( 'Create your first menu below.' ) }
 						</p>
 					) }
-					{ hasSelectedMenu && (
+					{ hasMenus && (
 						<>
 							<SelectControl
 								className="edit-navigation-menus-editor__menu-select-control"
@@ -71,26 +66,29 @@ export default function MenusEditor( { blockEditorSettings } ) {
 									setMenuId( selectedMenuId )
 								}
 							/>
-							<Button isLink onClick={ () => setMenuId() }>
+							<Button
+								isLink
+								onClick={ () => setShowCreateMenuPanel( true ) }
+							>
 								{ __( 'Create a new menu' ) }
 							</Button>
 						</>
 					) }
 				</CardBody>
 			</Card>
-			{ isCreatingMenu && (
+			{ ( ! hasMenus || showCreateMenuPanel ) && (
 				<CreateMenuPanel
 					menus={ stateMenus }
 					onCancel={
 						// User can only cancel out of menu creation if there
 						// are other menus to fall back to showing.
 						hasMenus
-							? () => setMenuId( stateMenus[ 0 ].id )
+							? () => setShowCreateMenuPanel( false )
 							: undefined
 					}
 				/>
 			) }
-			{ hasSelectedMenu && (
+			{ hasMenus && (
 				<MenuEditor
 					menuId={ menuId }
 					blockEditorSettings={ blockEditorSettings }
