@@ -86,6 +86,10 @@ export default function MenusEditor( { blockEditorSettings } ) {
 							? () => setShowCreateMenuPanel( false )
 							: undefined
 					}
+					onCreateMenu={ ( newMenuId ) => {
+						setMenuId( newMenuId );
+						setShowCreateMenuPanel( false );
+					} }
 				/>
 			) }
 			{ hasMenus && (

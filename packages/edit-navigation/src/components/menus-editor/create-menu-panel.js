@@ -22,7 +22,7 @@ const noticeId = 'edit-navigation-create-menu-error';
 const menuNameMatches = ( menuName ) => ( menu ) =>
 	menu.name.toLowerCase() === menuName.toLowerCase();
 
-export function CreateMenuForm( { onCancel, menus } ) {
+export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const { isCreatingMenu, hasCreatedMenu } = useSelect( ( select ) => {
 		const { getIsResolving, hasFinishedResolution } = select( 'core' );
@@ -45,8 +45,8 @@ export function CreateMenuForm( { onCancel, menus } ) {
 		}
 	}, [ hasCreatedMenu ] );
 
-	const onCreateMenu = useCallback(
-		( event ) => {
+	const createMenu = useCallback(
+		async ( event ) => {
 			// Prevent form submission.
 			event.preventDefault();
 
@@ -71,7 +71,8 @@ export function CreateMenuForm( { onCancel, menus } ) {
 				return;
 			}
 
-			saveMenu( { name: menuName } );
+			const menu = await saveMenu( { name: menuName } );
+			onCreateMenu( menu.id );
 		},
 		[ menuName, menus ]
 	);
@@ -79,7 +80,7 @@ export function CreateMenuForm( { onCancel, menus } ) {
 	return (
 		<Panel className="edit-navigation-menus-editor__create-menu-panel">
 			<PanelBody title={ __( 'Create navigation menu' ) }>
-				<form onSubmit={ onCreateMenu }>
+				<form onSubmit={ createMenu }>
 					<TextControl
 						// Disable reason - autoFocus is legitimate in this usage,
 						// The first focusable on the form should be focused,
@@ -94,7 +95,7 @@ export function CreateMenuForm( { onCancel, menus } ) {
 					<Button
 						type="submit"
 						isBusy={ isCreatingMenu }
-						onClick={ onCreateMenu }
+						onClick={ createMenu }
 						aria-disabled={ menuName.length === 0 }
 						isPrimary
 					>
