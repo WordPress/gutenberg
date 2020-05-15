@@ -1,52 +1,56 @@
 /**
- * External dependencies
- */
-import { forEach } from 'lodash';
-/**
- * Loads JavaScript
+ * Loads a JavaScript file.
  *
- * @param {Array}    asset   The url for the JavaScript.
- * @param {Function} onLoad  Callback function on success.
- * @param {Function} onError Callback function on failure.
+ * @param {string} asset The url for this file.
+ *
+ * @return {Promise} Promise which will resolve when the asset is loaded.
  */
-const loadScript = ( asset, onLoad, onError ) => {
+export const loadScript = ( asset ) => {
 	if ( ! asset ) {
-		return;
+		return Promise.reject( new Error( 'No script found.' ) );
 	}
-	const existing = document.querySelector( `script[src="${ asset.src }"]` );
-	if ( existing ) {
-		existing.parentNode.removeChild( existing );
-	}
-	const script = document.createElement( 'script' );
-	script.src = typeof asset === 'string' ? asset : asset.src;
-	script.onload = onLoad;
-	script.onerror = onError;
-	document.body.appendChild( script );
+	return new Promise( ( resolve, reject ) => {
+		const existing = document.querySelector( `script[src="${ asset }"]` );
+		if ( existing ) {
+			existing.parentNode.removeChild( existing );
+		}
+		const script = document.createElement( 'script' );
+		script.src = asset;
+		script.onload = () => resolve( true );
+		script.onerror = () => reject( new Error( 'Error loading script.' ) );
+		document.body.appendChild( script );
+	} );
 };
 
 /**
- * Loads CSS file.
+ * Loads a CSS file.
  *
- * @param {*} asset the url for the CSS file.
+ * @param {string} asset The url for this file.
+ *
+ * @return {Promise} Promise which will resolve when the asset is added.
  */
-const loadStyle = ( asset ) => {
+export const loadStyle = ( asset ) => {
 	if ( ! asset ) {
-		return;
+		return Promise.reject( new Error( 'No style found.' ) );
 	}
-	const link = document.createElement( 'link' );
-	link.rel = 'stylesheet';
-	link.href = typeof asset === 'string' ? asset : asset.src;
-	document.body.appendChild( link );
+	return new Promise( ( resolve, reject ) => {
+		const link = document.createElement( 'link' );
+		link.rel = 'stylesheet';
+		link.href = asset;
+		link.onload = () => resolve( true );
+		link.onerror = () => reject( new Error( 'Error loading script.' ) );
+		document.body.appendChild( link );
+	} );
 };
 
 /**
  * Load the asset files for a block
  *
- * @param {Array} assets A collection of URL for the assets.
+ * @param {Array} assets A collection of URLs for the assets.
  *
  * @return {Object} Control descriptor.
  */
-export function* loadAssets( assets ) {
+export function loadAssets( assets ) {
 	return {
 		type: 'LOAD_ASSETS',
 		assets,
@@ -55,29 +59,13 @@ export function* loadAssets( assets ) {
 
 const controls = {
 	LOAD_ASSETS( { assets } ) {
-		return new Promise( ( resolve, reject ) => {
-			if ( Array.isArray( assets ) ) {
-				let scriptsCount = 0;
+		const scripts = assets.map( ( asset ) =>
+			asset.match( /\.js$/ ) !== null
+				? loadScript( asset )
+				: loadStyle( asset )
+		);
 
-				forEach( assets, ( asset ) => {
-					if ( asset.match( /\.js$/ ) !== null ) {
-						scriptsCount++;
-						loadScript(
-							asset,
-							() => {
-								scriptsCount--;
-								if ( scriptsCount === 0 ) {
-									return resolve( scriptsCount );
-								}
-							},
-							reject
-						);
-					} else {
-						loadStyle( asset );
-					}
-				} );
-			}
-		} );
+		return Promise.all( scripts );
 	},
 };
 
