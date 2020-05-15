@@ -32,6 +32,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 	AdminMenuToggle,
+	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
@@ -149,7 +150,9 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			{ isFullscreenActive && <AdminMenuToggle /> }
+			<MainDashboardButton.Slot>
+				{ isFullscreenActive && <AdminMenuToggle /> }
+			</MainDashboardButton.Slot>
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
