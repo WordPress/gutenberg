@@ -16,7 +16,7 @@ import { PluginPrePublishPanel } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
-import DownloadableBlockCompactListItem from '../../components/downloadable-block-compact-list-item';
+import DownloadableBlockCompactList from '../../components/downloadable-block-compact-list';
 
 const PrePublishPanel = ( { usedNewBlocks } ) => {
 	if ( ! usedNewBlocks.length ) {
@@ -27,13 +27,13 @@ const PrePublishPanel = ( { usedNewBlocks } ) => {
 		<PluginPrePublishPanel
 			title={ sprintf(
 				// translators: %d: number of blocks (number).
-				_n( 'Added: %d block', 'Added: %d blocks' ),
+				_n( 'Added: %d blocks', 'Added: %d block' ),
 				usedNewBlocks.length
 			) }
 			initialOpen={ true }
 		>
 			<p>{ __( 'The following blocks has been added to your site:' ) }</p>
-			<DownloadableBlockCompactListItem items={ usedNewBlocks } />
+			<DownloadableBlockCompactList items={ usedNewBlocks } />
 		</PluginPrePublishPanel>
 	);
 };
