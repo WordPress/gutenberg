@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -49,7 +49,7 @@ export default function useNestedSettingsUpdate(
 		[ clientId ]
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks,
 			templateLock:
