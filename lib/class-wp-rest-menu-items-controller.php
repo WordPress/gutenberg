@@ -321,7 +321,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( is_wp_error( $menu_item ) ) {
 			return $menu_item;
 		}
-		$previous  = $this->prepare_item_for_response( $menu_item, $request );
+		$previous = $this->prepare_item_for_response( $menu_item, $request );
 
 		$result = $this->delete_item_persist( $request );
 		if ( is_wp_error( $result ) ) {
@@ -1175,7 +1175,6 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return true|WP_Error True on success, or WP_Error object on failure.
 	 */
 	public function process_batch( $request ) {
-		require_once __DIR__ . '/class-wp-rest-menu-items-batch-processor.php';
 		$navigation_id = $request['menus'];
 		$processor     = new WP_REST_Menu_Items_Batch_Processor( $navigation_id, $this, $request );
 
