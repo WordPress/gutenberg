@@ -21,6 +21,7 @@ describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -43,13 +44,13 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to add blocks , rotate device and continue adding blocks', async () => {
-		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.addNewBlock( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
 
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
 		await toggleOrientation( driver );
 		// On Android the keyboard hides the add block button, let's hide it after rotation
@@ -57,18 +58,18 @@ describe( 'Gutenberg Editor tests', () => {
 			await driver.hideDeviceKeyboard();
 		}
 
-		await editorPage.addNewParagraphBlock();
+		await editorPage.addNewBlock( paragraphBlockName );
 
 		if ( isAndroid() ) {
 			await driver.hideDeviceKeyboard();
 		}
 
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		while ( ! paragraphBlockElement ) {
 			await driver.hideDeviceKeyboard();
-			paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+			paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		}
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 		await toggleOrientation( driver );
 
 		await editorPage.verifyHtmlContent( testData.deviceRotationHtml );

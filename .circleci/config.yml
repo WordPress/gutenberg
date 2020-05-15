@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@3.4.2
+
 commands:
   yarn-install:
     steps:
@@ -60,6 +63,11 @@ jobs:
       - store_test_results:
           path: ./reports/test-results
   android-device-checks:
+    parameters:
+      post-to-slack:
+        description: Post to Slack when tests fail. SLACK_WEBHOOK ENV variable must be set.
+        type: boolean
+        default: false
     docker:
     - image: circleci/android:api-29-node
     steps:
@@ -89,7 +97,20 @@ jobs:
             JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
       - store_test_results:
           path: ./reports/test-results
+      - when:
+          condition: << parameters.post-to-slack >>
+          steps:
+            - slack/status:
+                fail_only: true
+                include_job_number_field: false
+                include_project_field: false
+                failure_message: ':red_circle: Scheduled tests failed on Android device!'
   ios-device-checks:
+    parameters:
+      post-to-slack:
+        description: Post to Slack when tests fail. SLACK_WEBHOOK ENV variable must be set.
+        type: boolean
+        default: false
     macos:
       xcode: "11.2.1"
     steps:
@@ -156,6 +177,14 @@ jobs:
         key: ios-build-cache-{{ checksum "ios-checksums.txt" }}
         paths:
           - ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+    - when:
+          condition: << parameters.post-to-slack >>
+          steps:
+            - slack/status:
+                fail_only: true
+                include_job_number_field: false
+                include_project_field: false
+                failure_message: ':red_circle: Scheduled tests failed on iOS device!'
 
 workflows:
   gutenberg-mobile:
@@ -175,3 +204,18 @@ workflows:
           name: Test iOS on Device
       - android-device-checks:
           name: Test Android on Device
+
+  ui-tests-full-scheduled:
+    jobs:
+      - ios-device-checks:
+          name: Test iOS on Device - Scheduled
+          post-to-slack: true
+      - android-device-checks:
+          name: Test Android on Device - Scheduled
+          post-to-slack: true
+    triggers:
+      - schedule:
+          cron: '1 1,13 * * *'
+          filters:
+            branches:
+              only: develop

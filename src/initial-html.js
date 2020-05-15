@@ -27,7 +27,7 @@ Hello World
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><b>Hello</b> World!</p>
+<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:nextpage -->
@@ -228,4 +228,8 @@ else:
 <!-- /wp:cover -->
 
 <!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>One of the hardest things to do in technology is disrupt yourself.</p><cite>Matt Mullenweg</cite></blockquote></figure>
+<!-- /wp:pullquote -->
 `;

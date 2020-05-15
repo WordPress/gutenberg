@@ -6,12 +6,7 @@
  * Internal dependencies
  */
 import EditorPage from './pages/editor-page';
-import {
-	setupDriver,
-	isLocalEnvironment,
-	stopDriver,
-	isAndroid,
-} from './helpers/utils';
+import { setupDriver, isLocalEnvironment, stopDriver, isAndroid } from './helpers/utils';
 import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
@@ -20,6 +15,8 @@ describe( 'Gutenberg Editor tests', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const paragraphBlockName = 'Paragraph';
+	const headingBlockName = 'Heading';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -42,29 +39,28 @@ describe( 'Gutenberg Editor tests', () => {
 	} );
 
 	it( 'should be able to create a post with heading and paragraph blocks', async () => {
-		await editorPage.addNewHeadingBlock();
-		let headingBlockElement = await editorPage.getHeadingBlockAtPosition( 1 );
-
+		await editorPage.addNewBlock( headingBlockName );
+		let headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName );
 		if ( isAndroid() ) {
 			await headingBlockElement.click();
 		}
 		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading, false );
 
-		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.addNewBlock( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		await editorPage.addNewParagraphBlock();
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 3 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.addNewBlock( paragraphBlockName );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 3 );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 
-		await editorPage.addNewHeadingBlock();
-		headingBlockElement = await editorPage.getHeadingBlockAtPosition( 4 );
-		await editorPage.sendTextToHeadingBlock( headingBlockElement, testData.heading, false );
+		await editorPage.addNewBlock( headingBlockName );
+		headingBlockElement = await editorPage.getBlockAtPosition( headingBlockName, 4 );
+		await editorPage.typeTextToParagraphBlock( headingBlockElement, testData.heading );
 
-		await editorPage.addNewParagraphBlock();
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 5 );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
+		await editorPage.addNewBlock( paragraphBlockName );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 5 );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.mediumText );
 	} );
 
 	afterAll( async () => {

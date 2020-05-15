@@ -12,8 +12,8 @@ import {
 	clickMiddleOfElement,
 	clickBeginningOfElement,
 	stopDriver,
-	isAndroid,
 	swipeUp,
+	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
@@ -23,6 +23,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
+	const paragraphBlockName = 'Paragraph';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -45,26 +46,28 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	} );
 
 	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
-		await editorPage.removeParagraphBlockAtPosition( 1 );
+
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+		await editorPage.removeBlockAtPosition( paragraphBlockName );
 	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		const textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n', false );
-		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\n', false );
+		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -73,51 +76,54 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( text1 ).not.toBe( '' );
 		expect( testData.shortText ).toMatch( new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` ) );
 
-		await editorPage.removeParagraphBlockAtPosition( 2 );
-		await editorPage.removeParagraphBlockAtPosition( 1 );
+		await editorPage.removeBlockAtPosition( paragraphBlockName, 2 );
+		await editorPage.removeBlockAtPosition( paragraphBlockName );
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
-		await editorPage.addNewParagraphBlock();
-		let paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.addNewBlock( paragraphBlockName );
+		let paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, testData.shortText );
+
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, testData.shortText );
 		let textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickMiddleOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\n' );
-		expect( await editorPage.hasParagraphBlockAtPosition( 1 ) && await editorPage.hasParagraphBlockAtPosition( 2 ) )
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\n' );
+		expect( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) && await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
 			.toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
-		paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 2 );
+		paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
+
 		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickBeginningOfElement( driver, textViewElement );
-		await editorPage.sendTextToParagraphBlock( paragraphBlockElement, '\u0008' );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\u0008' );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
 
-		expect( await editorPage.hasParagraphBlockAtPosition( 2 ) ).toBe( false );
-		await editorPage.removeParagraphBlockAtPosition( 1 );
+		expect( await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) ).toBe( false );
+		await editorPage.removeBlockAtPosition( paragraphBlockName );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewParagraphBlock();
-		const paragraphBlockElement = await editorPage.getParagraphBlockAtPosition( 1 );
+		await editorPage.addNewBlock( paragraphBlockName );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName );
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
 		}
-		await editorPage.sendTextToParagraphBlockAtPosition( 1, testData.longText );
+
+		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
 			await swipeUp( driver );
-			await editorPage.removeParagraphBlockAtPosition( i );
+			await editorPage.removeBlockAtPosition( paragraphBlockName, i );
 		}
 	} );
 

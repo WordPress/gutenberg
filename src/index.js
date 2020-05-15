@@ -22,6 +22,7 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+import correctTextFontWeight from './text-font-weight-correct';
 import setupJetpackEditor from './jetpack-editor-setup';
 
 const gutenbergSetup = () => {
@@ -56,6 +57,7 @@ export class RootComponent extends React.Component {
 		super( props );
 		setupLocale( props.locale, props.translations );
 		setupApiFetch();
+		correctTextFontWeight();
 		setupJetpackEditor( props.jetpackState || { blogId: 1, isJetpackActive: true } );
 		require( '@wordpress/edit-post' ).initializeEditor();
 

@@ -18,6 +18,6 @@ Pod::Spec.new do |s|
   s.xcconfig         = {'OTHER_LDFLAGS' => '-lxml2',
                         'HEADER_SEARCH_PATHS' => '/usr/include/libxml2'}
   s.dependency         'React-Core'
-  s.dependency         'WordPress-Aztec-iOS', '~> 1.18.0'
+  s.dependency         'WordPress-Aztec-iOS', '~> 1.19.0'
 
 end
