@@ -6,7 +6,7 @@ const makeDir = require( 'make-dir' );
 const { readFile, writeFile } = require( 'fs' ).promises;
 const { render } = require( 'mustache' );
 const { snakeCase } = require( 'lodash' );
-const raimraf = require( 'rimraf' ).sync;
+const rimraf = require( 'rimraf' ).sync;
 
 /**
  * Internal dependencies
@@ -78,7 +78,7 @@ module.exports = async function(
 		await initWPScripts( view );
 	}
 
-	raimraf( tempFolder );
+	rimraf( tempFolder );
 
 	info( '' );
 	success(

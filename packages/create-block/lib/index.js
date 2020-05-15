@@ -62,8 +62,8 @@ program
 					};
 					await scaffold( template, answers );
 				} else {
-					const propmpts = await getPrompts( template );
-					const filteredPrompts = propmpts.filter(
+					const prompts = await getPrompts( template );
+					const filteredPrompts = prompts.filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
