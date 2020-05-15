@@ -20,7 +20,7 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
         if (buildGutenbergMobileJSBundle) {
-            classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+            classpath "com.moowork.gradle:gradle-node-plugin:1.3.1"
         }
     }
 }
@@ -40,13 +40,13 @@ if (buildGutenbergMobileJSBundle) {
 
     node {
         // Version of node to use.
-        version = '12.13.1'
+        version = '12.16.1'
 
         // Version of npm to use.
-        npmVersion = '6.3.0'
+        npmVersion = '6.14.2'
 
         // Version of Yarn to use.
-        yarnVersion = '1.10.1'
+        yarnVersion = '1.22.4'
 
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
