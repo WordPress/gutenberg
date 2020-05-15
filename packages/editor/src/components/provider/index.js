@@ -2,14 +2,12 @@
  * External dependencies
  */
 import { map, pick, defaultTo } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
 import {
@@ -58,32 +56,72 @@ const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	} ) );
 };
 
-class EditorProvider extends Component {
-	constructor( props ) {
-		super( ...arguments );
+function EditorProvider( {
+	recovery,
+	settings,
+	post,
+	initialEdits,
+	children,
+} ) {
+	const {
+		canUserUseUnfilteredHTML,
+		isReady,
+		blocks,
+		selectionStart,
+		selectionEnd,
+		reusableBlocks,
+		hasUploadPermissions,
+		isPostTitleSelected,
+	} = useSelect( ( select ) => {
+		const {
+			canUserUseUnfilteredHTML: _canUserUseUnfilteredHTML,
+			__unstableIsEditorReady: isEditorReady,
+			isPostTitleSelected: _isPostTitleSelected,
+			getEditorBlocks,
+			getEditorSelectionStart,
+			getEditorSelectionEnd,
+			__experimentalGetReusableBlocks,
+		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 
-		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
-			maxSize: 1,
-		} );
+		return {
+			canUserUseUnfilteredHTML: _canUserUseUnfilteredHTML(),
+			isReady: isEditorReady(),
+			blocks: getEditorBlocks(),
+			selectionStart: getEditorSelectionStart(),
+			selectionEnd: getEditorSelectionEnd(),
+			reusableBlocks: __experimentalGetReusableBlocks(),
+			hasUploadPermissions: defaultTo(
+				canUser( 'create', 'media' ),
+				true
+			),
+			// This selector is only defined on mobile.
+			isPostTitleSelected: _isPostTitleSelected && _isPostTitleSelected(),
+		};
+	} );
 
-		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
-			maxSize: 1,
-		} );
+	const {
+		setupEditor,
+		updatePostLock,
+		resetEditorBlocks,
+		updateEditorSettings,
+		__experimentalFetchReusableBlocks,
+		__experimentalTearDownEditor: tearDownEditor,
+		undo,
+	} = useDispatch( 'core/editor' );
+	const { createWarningNotice } = useDispatch( 'core/notices' );
 
-		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( props.recovery ) {
+	useEffect( () => {
+		// In case of recovery, state should already have been initialized.
+		if ( recovery ) {
 			return;
 		}
 
-		props.updatePostLock( props.settings.postLock );
-		props.setupEditor(
-			props.post,
-			props.initialEdits,
-			props.settings.template
-		);
+		updatePostLock( settings.postLock );
+		setupEditor( post, initialEdits, settings.template );
 
-		if ( props.settings.autosave ) {
-			props.createWarningNotice(
+		if ( settings.autosave ) {
+			createWarningNotice(
 				__(
 					'There is an autosave of this post that is more recent than the version below.'
 				),
@@ -92,24 +130,22 @@ class EditorProvider extends Component {
 					actions: [
 						{
 							label: __( 'View the autosave' ),
-							url: props.settings.autosave.editLink,
+							url: settings.autosave.editLink,
 						},
 					],
 				}
 			);
 		}
-	}
+	}, [] );
 
-	getBlockEditorSettings(
-		settings,
-		reusableBlocks,
-		__experimentalFetchReusableBlocks,
-		hasUploadPermissions,
-		canUserUseUnfilteredHTML,
-		undo,
-		shouldInsertAtTheTop
-	) {
-		return {
+	useEffect( () => tearDownEditor, [] );
+
+	useEffect( () => {
+		updateEditorSettings( settings );
+	}, [ settings ] );
+
+	const editorSettings = useMemo(
+		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
@@ -153,153 +189,66 @@ class EditorProvider extends Component {
 			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-		};
-	}
-
-	getDefaultBlockContext( postId, postType ) {
-		return { postId, postType };
-	}
-
-	componentDidMount() {
-		this.props.updateEditorSettings( this.props.settings );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.settings !== prevProps.settings ) {
-			this.props.updateEditorSettings( this.props.settings );
-		}
-	}
-
-	componentWillUnmount() {
-		this.props.tearDownEditor();
-	}
-
-	render() {
-		const {
-			canUserUseUnfilteredHTML,
-			children,
-			post,
-			blocks,
-			resetEditorBlocks,
-			selectionStart,
-			selectionEnd,
-			isReady,
+			__experimentalShouldInsertAtTheTop: isPostTitleSelected,
+		} ),
+		[
 			settings,
 			reusableBlocks,
-			resetEditorBlocksWithoutUndoLevel,
+			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
+			canUserUseUnfilteredHTML,
+			undo,
 			isPostTitleSelected,
-			__experimentalFetchReusableBlocks,
-			undo,
-		} = this.props;
+		]
+	);
 
-		if ( ! isReady ) {
-			return null;
-		}
+	const defaultBlockContext = useMemo(
+		() => ( {
+			postId: post.id,
+			postType: post.type,
+		} ),
+		[ post.id, post.type ]
+	);
 
-		const editorSettings = this.getBlockEditorSettings(
-			settings,
-			reusableBlocks,
-			__experimentalFetchReusableBlocks,
-			hasUploadPermissions,
-			canUserUseUnfilteredHTML,
-			undo,
-			isPostTitleSelected
-		);
-
-		const defaultBlockContext = this.getDefaultBlockContext(
-			post.id,
-			post.type
-		);
-
-		return (
-			<>
-				<EditorStyles styles={ settings.styles } />
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						<BlockContextProvider value={ defaultBlockContext }>
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ resetEditorBlocksWithoutUndoLevel }
-								onChange={ resetEditorBlocks }
-								selectionStart={ selectionStart }
-								selectionEnd={ selectionEnd }
-								settings={ editorSettings }
-								useSubRegistry={ false }
-							>
-								{ children }
-								<ReusableBlocksButtons />
-								<ConvertToGroupButtons />
-							</BlockEditorProvider>
-						</BlockContextProvider>
-					</EntityProvider>
-				</EntityProvider>
-			</>
-		);
+	function resetEditorBlocksWithoutUndoLevel( nextBlocks, options ) {
+		resetEditorBlocks( nextBlocks, {
+			...options,
+			__unstableShouldCreateUndoLevel: false,
+		} );
 	}
+
+	if ( ! isReady ) {
+		return null;
+	}
+
+	return (
+		<>
+			<EditorStyles styles={ settings.styles } />
+			<EntityProvider kind="root" type="site">
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
+					<BlockContextProvider value={ defaultBlockContext }>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ resetEditorBlocksWithoutUndoLevel }
+							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
+							settings={ editorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							<ReusableBlocksButtons />
+							<ConvertToGroupButtons />
+						</BlockEditorProvider>
+					</BlockContextProvider>
+				</EntityProvider>
+			</EntityProvider>
+		</>
+	);
 }
 
-export default compose( [
-	withRegistryProvider,
-	withSelect( ( select ) => {
-		const {
-			canUserUseUnfilteredHTML,
-			__unstableIsEditorReady: isEditorReady,
-			getEditorBlocks,
-			getEditorSelectionStart,
-			getEditorSelectionEnd,
-			__experimentalGetReusableBlocks,
-			isPostTitleSelected,
-		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
-
-		return {
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
-			selectionStart: getEditorSelectionStart(),
-			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: __experimentalGetReusableBlocks(),
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-			// This selector is only defined on mobile.
-			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			setupEditor,
-			updatePostLock,
-			resetEditorBlocks,
-			updateEditorSettings,
-			__experimentalFetchReusableBlocks,
-			__experimentalTearDownEditor,
-			undo,
-		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
-
-		return {
-			setupEditor,
-			updatePostLock,
-			createWarningNotice,
-			resetEditorBlocks,
-			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
-				resetEditorBlocks( blocks, {
-					...options,
-					__unstableShouldCreateUndoLevel: false,
-				} );
-			},
-			tearDownEditor: __experimentalTearDownEditor,
-			__experimentalFetchReusableBlocks,
-			undo,
-		};
-	} ),
-] )( EditorProvider );
+export default withRegistryProvider( EditorProvider );
