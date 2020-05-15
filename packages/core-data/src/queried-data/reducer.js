@@ -75,9 +75,9 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
  * @return {Object} Next state.
  */
 function items( state = {}, action ) {
-	const key = action.key || DEFAULT_ENTITY_KEY;
 	switch ( action.type ) {
 		case 'RECEIVE_ITEMS':
+			const key = action.key || DEFAULT_ENTITY_KEY;
 			return {
 				...state,
 				...action.items.reduce( ( accumulator, value ) => {
