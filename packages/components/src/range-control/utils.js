@@ -35,7 +35,7 @@ export function floatClamp( value, min, max ) {
  */
 export function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, setValue ] = useControlledState(
-		floatClamp( valueProp, min, max )
+		valueProp || valueProp === 0 ? floatClamp( valueProp, min, max ) : null
 	);
 
 	const setClampValue = useCallback(
