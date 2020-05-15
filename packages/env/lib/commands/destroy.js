@@ -25,7 +25,8 @@ const stop = require( './stop' );
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
 module.exports = async function destroy( { spinner, debug } ) {
-	const config = await initConfig( { spinner, debug } );
+	const configPath = path.resolve( '.wp-env.json' );
+	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig( configPath );
 	const { dockerComposeConfigPath, workDirectoryPath } = config;
 
 	// check installed WordPress.
