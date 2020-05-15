@@ -84,9 +84,9 @@ const getTemplate = async ( templateName ) => {
 	// throw a CLIError if the the template is neither a core one nor an external one
 	if ( ! ( await isExternalTemplate( templateName ) ) ) {
 		throw new CLIError(
-			`Invalid template type name. Either use one of the Core templates: ${ Object.keys(
+			`Invalid template type name. Provide either a valid npm package name, or use one of the Core templates: ${ Object.keys(
 				coreTemplates
-			).join( ', ' ) }. \n \n or a valid npm package name.`
+			).join( ', ' ) }.`
 		);
 	}
 
