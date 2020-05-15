@@ -703,9 +703,17 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
  * @return array           Modified editor settings.
  */
 function gutenberg_extend_settings_ui_labels( $settings ) {
+	$post_type        = get_post_type();
+	$post_type_object = get_post_type_object( $post_type );
+
+	$document_label = in_array( $post_type, array( 'post', 'page' ), true ) ?
+		__( 'Document', 'gutenberg' ) :
+		$post_type_object->labels->singular_name;
+
 	$settings['__experimentalLabels'] = array(
-		'document' => __( 'Document', 'gutenberg' ),
+		'document' => $document_label,
 	);
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_ui_labels' );
