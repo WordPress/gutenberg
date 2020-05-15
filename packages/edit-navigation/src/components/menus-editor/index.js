@@ -44,21 +44,27 @@ export default function MenusEditor( { blockEditorSettings } ) {
 	useEffect( () => {
 		if ( menus?.length ) {
 			setStateMenus( menus );
-			setMenuId( menus[ 0 ].id );
+
+			// Only set menuId if it's currently unset.
+			if ( ! menuId ) {
+				setMenuId( menus[ 0 ].id );
+			}
 		}
-	}, [ menus ] );
+	}, [ menus, menuId ] );
 
 	if ( ! hasCompletedFirstLoad ) {
 		return <Spinner />;
 	}
 
-	const hasMenus = hasLoadedMenus && !! stateMenus?.length;
+	const hasMenus = !! stateMenus?.length;
+	const isCreateMenuPanelVisible =
+		hasCompletedFirstLoad && ( ! hasMenus || showCreateMenuPanel );
 
 	return (
 		<>
 			<Card className="edit-navigation-menus-editor__menu-selection-card">
 				<CardBody className="edit-navigation-menus-editor__menu-selection-card-body">
-					{ ! hasMenus && (
+					{ hasCompletedFirstLoad && ! hasMenus && (
 						<p className="edit-navigation-menus-editor__menu-selection-card-instructional-text">
 							{ __( 'Create your first menu below.' ) }
 						</p>
@@ -86,7 +92,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 					) }
 				</CardBody>
 			</Card>
-			{ ( ! hasMenus || showCreateMenuPanel ) && (
+			{ isCreateMenuPanelVisible && (
 				<CreateMenuPanel
 					menus={ stateMenus }
 					onCancel={
