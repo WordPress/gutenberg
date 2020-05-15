@@ -318,6 +318,9 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function delete_item( $request ) {
 		$menu_item = $this->delete_item_validate( $request );
+		if ( is_wp_error( $menu_item ) ) {
+			return $menu_item;
+		}
 		$previous  = $this->prepare_item_for_response( $menu_item, $request );
 
 		$result = $this->delete_item_persist( $request );
@@ -1198,7 +1201,12 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 * @return object
 	 */
 	protected function get_nav_menu_item_cached( $id, $menu_id ) {
-		return $this->get_menu_items( $menu_id )[ $id ];
+		$items = $this->get_menu_items( $menu_id );
+		if ( ! empty( $items[ $id ] ) ) {
+			return $items[ $id ];
+		}
+
+		return $this->get_nav_menu_item( $id );
 	}
 
 	/**
@@ -1213,12 +1221,18 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	 */
 	public function get_menu_items( $menu_id, $refresh = false ) {
 		if ( empty( $this->cached_menu_items[ $menu_id ] ) || $refresh ) {
-			$items       = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'publish,draft' ) );
 			$items_by_id = array();
-			foreach ( $items as $item ) {
-				$items_by_id[ $item->ID ] = $item;
+			$items       = wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'publish,draft' ) );
+			if ( $items ) {
+				foreach ( $items as $item ) {
+					$items_by_id[ $item->ID ] = $item;
+				}
 			}
 			$this->cached_menu_items[ $menu_id ] = $items_by_id;
+		}
+
+		if ( empty( $this->cached_menu_items[ $menu_id ] ) ) {
+			return null;
 		}
 
 		return $this->cached_menu_items[ $menu_id ];
