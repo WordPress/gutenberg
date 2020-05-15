@@ -630,6 +630,12 @@
 		"parent": null
 	},
 	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AnglePickerControl",
 		"slug": "angle-picker-control",
 		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
@@ -972,6 +978,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "RovingTabIndex",
+		"slug": "roving-tab-index",
+		"markdown_source": "../packages/components/src/roving-tab-index/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Sandbox",
 		"slug": "sandbox",
 		"markdown_source": "../packages/components/src/sandbox/README.md",
@@ -1053,6 +1065,12 @@
 		"title": "Tooltip",
 		"slug": "tooltip",
 		"markdown_source": "../packages/components/src/tooltip/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
 		"parent": "components"
 	},
 	{

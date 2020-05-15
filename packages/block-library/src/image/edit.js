@@ -622,6 +622,7 @@ export class ImageEdit extends Component {
 											width,
 											height,
 										} }
+										showHandle={ isSelected }
 										minWidth={ minWidth }
 										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }

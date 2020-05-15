@@ -6,7 +6,10 @@ import { Button } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -17,7 +20,11 @@ import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	setEntitiesSavedStatesCallback,
+} ) {
 	const {
 		shortcut,
 		hasActiveMetaboxes,
@@ -62,7 +69,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }
@@ -89,6 +98,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<Button
 					icon={ cog }

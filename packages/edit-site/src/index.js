@@ -28,3 +28,5 @@ export function initialize( id, settings ) {
 	}
 	render( <Editor settings={ settings } />, document.getElementById( id ) );
 }
+
+export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';

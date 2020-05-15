@@ -20,7 +20,11 @@ function createId( object ) {
  * Provides a unique instance ID.
  *
  * @param {Object} object Object reference to create an id for.
+ * @param {string} prefix Prefix for the unique id.
  */
-export default function useInstanceId( object ) {
-	return useMemo( () => createId( object ), [ object ] );
+export default function useInstanceId( object, prefix ) {
+	return useMemo( () => {
+		const id = createId( object );
+		return prefix ? `${ prefix }-${ id }` : id;
+	}, [ object ] );
 }

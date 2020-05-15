@@ -1,5 +1,13 @@
-.wp-block-cover-image,
 .wp-block-cover {
+	position: relative;
+
+	// Override default cover styles
+	// because we're not ready yet to show the cover block.
+	&.is-placeholder {
+		min-height: auto !important;
+		padding: 0 !important;
+	}
+
 	&.components-placeholder h2 {
 		color: inherit;
 	}
@@ -12,9 +20,6 @@
 	.wp-block-cover__inner-container {
 		// Avoid text align inherit from cover image align.
 		text-align: left;
-	}
-
-	.wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
 	}
@@ -25,15 +30,21 @@
 }
 
 [data-align="left"] > .wp-block-cover,
-[data-align="right"] > .wp-block-cover,
-[data-align="left"] > .wp-block-cover-image,
-[data-align="right"] > .wp-block-cover-image {
+[data-align="right"] > .wp-block-cover {
 	max-width: $content-width / 2;
 	width: 100%;
 }
 
 .block-library-cover__reset-button {
 	margin-left: auto;
+}
+
+.block-library-cover__resize-container {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }
 
 .block-library-cover__resize-container:not(.is-resizing) {

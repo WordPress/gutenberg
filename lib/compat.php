@@ -169,9 +169,67 @@ function gutenberg_get_post_from_context() {
 	if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 		return null;
 	}
+
+	_deprecated_function( __FUNCTION__, '8.1.0' );
+
 	if ( ! in_the_loop() ) {
 		rewind_posts();
 		the_post();
 	}
 	return get_post();
 }
+
+/**
+ * Shim that hooks into `pre_render_block` so as to override `render_block` with
+ * a function that assigns block context.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49927
+ *
+ * @param string|null $pre_render   The pre-rendered content. Defaults to null.
+ * @param array       $parsed_block The parsed block being rendered.
+ *
+ * @return string String of rendered HTML.
+ */
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
+	global $post;
+
+	/*
+	 * If a non-null value is provided, a filter has run at an earlier priority
+	 * and has already handled custom rendering and should take precedence.
+	 */
+	if ( null !== $pre_render ) {
+		return $pre_render;
+	}
+
+	$source_block = $parsed_block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
+
+	$context = array(
+		'postId'   => $post->ID,
+
+		/*
+		 * The `postType` context is largely unnecessary server-side, since the
+		 * ID is usually sufficient on its own. That being said, since a block's
+		 * manifest is expected to be shared between the server and the client,
+		 * it should be included to consistently fulfill the expectation.
+		 */
+		'postType' => $post->post_type,
+	);
+
+	/**
+	 * Filters the default context provided to a rendered block.
+	 *
+	 * @param array $context      Default context.
+	 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
+	 */
+	$context = apply_filters( 'render_block_context', $context, $parsed_block );
+
+	$block = new WP_Block( $parsed_block, $context );
+
+	return $block->render();
+}
+add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );

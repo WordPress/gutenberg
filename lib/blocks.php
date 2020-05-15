@@ -17,32 +17,43 @@ function gutenberg_reregister_core_block_types() {
 	}
 
 	$block_names = array(
-		'archives.php'            => 'core/archives',
-		'block.php'               => 'core/block',
-		'calendar.php'            => 'core/calendar',
-		'categories.php'          => 'core/categories',
-		'latest-comments.php'     => 'core/latest-comments',
-		'latest-posts.php'        => 'core/latest-posts',
-		'legacy-widget.php'       => 'core/legacy-widget',
-		'navigation.php'          => 'core/navigation',
-		'rss.php'                 => 'core/rss',
-		'shortcode.php'           => 'core/shortcode',
-		'search.php'              => 'core/search',
-		'social-link.php'         => 'core/social-link',
-		'tag-cloud.php'           => 'core/tag-cloud',
-		'site-title.php'          => 'core/site-title',
-		'template-part.php'       => 'core/template-part',
-		'post-title.php'          => 'core/post-title',
-		'post-content.php'        => 'core/post-content',
-		'post-author.php'         => 'core/post-author',
-		'post-comments.php'       => 'core/post-comments',
-		'post-comments-count.php' => 'core/post-comments-count',
-		'post-comments-form.php'  => 'core/post-comments-form',
-		'post-date.php'           => 'core/post-date',
-		'post-excerpt.php'        => 'core/post-excerpt',
-		'post-featured-image.php' => 'core/post-featured-image',
-		'post-tags.php'           => 'core/post-tags',
+		'archives.php'        => 'core/archives',
+		'block.php'           => 'core/block',
+		'calendar.php'        => 'core/calendar',
+		'categories.php'      => 'core/categories',
+		'latest-comments.php' => 'core/latest-comments',
+		'latest-posts.php'    => 'core/latest-posts',
+		'legacy-widget.php'   => 'core/legacy-widget',
+		'navigation.php'      => 'core/navigation',
+		'rss.php'             => 'core/rss',
+		'shortcode.php'       => 'core/shortcode',
+		'search.php'          => 'core/search',
+		'social-link.php'     => 'core/social-link',
+		'tag-cloud.php'       => 'core/tag-cloud',
 	);
+
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+		$block_names = array_merge(
+			$block_names,
+			array(
+				'post-title.php'          => 'core/post-title',
+				'post-content.php'        => 'core/post-content',
+				'post-author.php'         => 'core/post-author',
+				'post-comments.php'       => 'core/post-comments',
+				'post-comments-count.php' => 'core/post-comments-count',
+				'post-comments-form.php'  => 'core/post-comments-form',
+				'post-date.php'           => 'core/post-date',
+				'post-excerpt.php'        => 'core/post-excerpt',
+				'post-featured-image.php' => 'core/post-featured-image',
+				'post-tags.php'           => 'core/post-tags',
+				'site-title.php'          => 'core/site-title',
+				'template-part.php'       => 'core/template-part',
+				'query.php'               => 'core/query',
+				'query-loop.php'          => 'core/query-loop',
+				'query-pagination.php'    => 'core/query-pagination',
+			)
+		);
+	}
 
 	$registry = WP_Block_Type_Registry::get_instance();
 
