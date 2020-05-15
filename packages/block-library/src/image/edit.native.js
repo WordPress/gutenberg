@@ -429,7 +429,6 @@ export class ImageEdit extends React.Component {
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
-						separatorType={ 'none' }
 						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>

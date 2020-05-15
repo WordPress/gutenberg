@@ -19,6 +19,7 @@
 	}
 
 	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
 		// IE11 has thick paddings without this.
@@ -37,6 +38,7 @@
 	}
 
 	> :last-child,
+	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
 		border-right: none;
 	}

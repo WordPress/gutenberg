@@ -93,10 +93,18 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * @param {Element} target           Currently focused text field.
  * @param {boolean} isReverse        True if considering as the first field.
  * @param {Element} containerElement Element containing all blocks.
+ * @param {boolean} onlyVertical     Wether to only consider tabbable elements
+ *                                   that are visually above or under the
+ *                                   target.
  *
  * @return {?Element} Optimal tab target, if one exists.
  */
-export function getClosestTabbable( target, isReverse, containerElement ) {
+export function getClosestTabbable(
+	target,
+	isReverse,
+	containerElement,
+	onlyVertical
+) {
 	// Since the current focus target is not guaranteed to be a text field,
 	// find all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );
@@ -112,10 +120,27 @@ export function getClosestTabbable( target, isReverse, containerElement ) {
 		focusableNodes.indexOf( target ) + 1
 	);
 
+	let targetRect;
+
+	if ( onlyVertical ) {
+		targetRect = target.getBoundingClientRect();
+	}
+
 	function isTabCandidate( node, i, array ) {
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
 			return false;
+		}
+
+		if ( onlyVertical ) {
+			const nodeRect = node.getBoundingClientRect();
+
+			if (
+				nodeRect.left >= targetRect.right ||
+				nodeRect.right <= targetRect.left
+			) {
+				return false;
+			}
 		}
 
 		// Prefer text fields...
@@ -517,7 +542,8 @@ export default function WritingFlow( { children } ) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
-				container.current
+				container.current,
+				true
 			);
 
 			if ( closestTabbable ) {

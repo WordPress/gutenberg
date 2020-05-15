@@ -38,7 +38,7 @@ $ npm init @wordpress/block [options] [slug]
 Options:
 ```
 -V, --version                output the version number
--t, --template <name>        template type name, allowed values: "es5", "esnext" (default: "esnext")
+-t, --template <name>        block template type name, allowed values: "es5", "esnext" (default: "esnext")
 --namespace <value>          internal namespace for the block name
 --title <value>              display title for the block
 --short-description <value>  short description for the block

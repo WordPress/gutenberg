@@ -173,23 +173,7 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks without category', () => {
-			const blockType = {
-					settingName: 'settingValue',
-					save: noop,
-					title: 'block title',
-				},
-				block = registerBlockType(
-					'my-plugin/fancy-block-8',
-					blockType
-				);
-			expect( console ).toHaveErroredWith(
-				'The block "my-plugin/fancy-block-8" must have a category.'
-			);
-			expect( block ).toBeUndefined();
-		} );
-
-		it( 'should reject blocks with non registered category.', () => {
+		it( 'should unset category of blocks with non registered category.', () => {
 			const blockType = {
 					save: noop,
 					category: 'custom-category-slug',
@@ -199,10 +183,11 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-9',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
-				'The block "my-plugin/fancy-block-9" must have a registered category.'
+			expect( console ).toHaveWarnedWith(
+				'The block "my-plugin/fancy-block-9" is registered with an invalid category "custom-category-slug".'
 			);
-			expect( block ).toBeUndefined();
+			expect( block ).not.toBeUndefined();
+			expect( block.category ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without title', () => {
