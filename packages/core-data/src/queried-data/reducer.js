@@ -40,13 +40,10 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
-	const size =
-		itemIds.length > nextItemIds.length
-			? nextItemIds.length
-			: Math.max(
-					itemIds.length,
-					nextItemIdsStartIndex + nextItemIds.length
-			  );
+	const size = Math.max(
+		itemIds.length,
+		nextItemIdsStartIndex + nextItemIds.length
+	);
 
 	// Preallocate array since size is known.
 	const mergedItemIds = new Array( size );
