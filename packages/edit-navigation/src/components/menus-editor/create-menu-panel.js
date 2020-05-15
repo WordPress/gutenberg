@@ -13,7 +13,7 @@ import {
 	TextControl,
 	withFocusReturn,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -24,10 +24,7 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 
 export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
-	const isCreatingMenu = useSelect(
-		( select ) => select( 'core' ).getIsResolving( 'saveMenu' ),
-		[]
-	);
+	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
 	const { saveMenu } = useDispatch( 'core' );
 	const { createInfoNotice, createErrorNotice, removeNotice } = useDispatch(
 		'core/notices'
@@ -37,6 +34,7 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 		async ( event ) => {
 			// Prevent form submission.
 			event.preventDefault();
+			setIsCreatingMenu( true );
 
 			// Remove existing notices.
 			removeNotice( noticeId );
@@ -64,6 +62,7 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
+				setIsCreatingMenu( false );
 				onCreateMenu( menu.id );
 			} catch ( error ) {
 				const message = sprintf(
@@ -72,6 +71,7 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 					error.message
 				);
 				createErrorNotice( message, { id: noticeId } );
+				setIsCreatingMenu( false );
 			}
 		},
 		[ menuName, menus ]
