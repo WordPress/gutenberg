@@ -99,7 +99,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 	 *
 	 * @return array|WP_Error List of operations on success, WP_Error carrying the data about specific input that caused the problem on failure.
 	 */
-	protected function compute_batch( $input_tree ) {
+	public function compute_batch( $input_tree ) {
 		$current_menu_items = $this->controller->get_menu_items( $this->navigation_id );
 		$operations         = array();
 
@@ -158,7 +158,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 	 *
 	 * @return array|WP_Error List of validated operations enriched with the database-ready arrays on success, WP_Error carrying the data about specific input that caused the problem on failure.
 	 */
-	protected function validate_batch( $batch ) {
+	public function validate_batch( $batch ) {
 		// We infer the menu order and parent id from the received input tree so there's no need
 		// to validate them in the controller.
 		foreach ( $batch as $k => list( $type, $input ) ) {
@@ -187,7 +187,7 @@ class WP_REST_Menu_Items_Batch_Processor {
 	 *
 	 * @return void|WP_Error Nothing on success, WP_Error carrying the data about specific input that caused the problem on failure.
 	 */
-	protected function persist_batch( $validated_operations ) {
+	public function persist_batch( $validated_operations ) {
 		foreach ( $validated_operations as $operation ) {
 			list( $type, $input, $prepared_nav_item ) = $operation;
 			$request                                  = new WP_REST_Request();

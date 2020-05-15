@@ -98,6 +98,8 @@ class REST_Nav_Menu_Items_Controller_Test extends WP_Test_REST_Post_Type_Control
 		$this->assertCount( 2, $routes['/__experimental/menu-items'] );
 		$this->assertArrayHasKey( '/__experimental/menu-items/(?P<id>[\d]+)', $routes );
 		$this->assertCount( 3, $routes['/__experimental/menu-items/(?P<id>[\d]+)'] );
+		$this->assertArrayHasKey( '/__experimental/menu-items/batch', $routes );
+		$this->assertCount( 1, $routes['/__experimental/menu-items/batch'] );
 	}
 
 	/**

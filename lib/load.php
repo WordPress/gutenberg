@@ -45,6 +45,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menu_Items_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-items-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Menu_Items_Batch_Processor' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-items-batch-processor.php';
+	}
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-locations-controller.php';
 	}
