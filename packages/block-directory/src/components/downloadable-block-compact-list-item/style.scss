@@ -1,0 +1,14 @@
+.block-directory-downloadable-block-compact-list-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.block-directory-downloadable-block-compact-list-item:last-child {
+	margin-bottom: 0;
+}
+
+.block-directory-downloadable-block-compact-list-item__title {
+	margin-left: 8px;
+}
