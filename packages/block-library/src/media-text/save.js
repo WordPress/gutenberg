@@ -7,7 +7,7 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,8 +18,6 @@ const DEFAULT_MEDIA_WIDTH = 50;
 
 export default function save( { attributes } ) {
 	const {
-		backgroundColor,
-		customBackgroundColor,
 		isStackedOnMobile,
 		mediaAlt,
 		mediaPosition,
@@ -66,14 +64,8 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const backgroundClass = getColorClassName(
-		'background-color',
-		backgroundColor
-	);
 	const className = classnames( {
 		'has-media-on-the-right': 'right' === mediaPosition,
-		'has-background': backgroundClass || customBackgroundColor,
-		[ backgroundClass ]: backgroundClass,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill': imageFill,
@@ -90,7 +82,6 @@ export default function save( { attributes } ) {
 				: `${ mediaWidth }% auto`;
 	}
 	const style = {
-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
 		gridTemplateColumns,
 	};
 	return (

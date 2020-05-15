@@ -1,6 +1,48 @@
+1.28.0
+------
+* [***] New block: Pullquote
+* [**] Add support for changing background and text color in Buttons block
+* [*] Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
+* [**] Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+* [**] [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
+* [**] Update page templates to use recently added blocks
+
+1.27.1
+------
+* Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+
+1.27.0
+------
+* Prefill caption for image blocks when available on the Media library
+* New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
+* Fix bug where whitespaces at start of text blocks were being removed
+* Add support for upload options in Cover block
+* [Android] Floating toolbar, previously located above nested blocks, is now placed at the top of the screen
+* [iOS] Floating toolbar, previously located above nested blocks, is now placed at the bottom of the screen
+* Fix the icons in FloatingToolbar on RTL mode
+* [Android] Add alignment options for heading block
+* Fix Quote block so it visually reflects selected alignment
+* Fix bug where buttons in page templates were not rendering correctly on web
+
+1.26.0
+------
+* [iOS] Disable ripple effect in all BottomSheet's controls.
+* [Android] Disable ripple effect for Slider control
+* New block: Columns
+* New starter page template: Blog
+* Make Starter Page Template picker buttons visible only when the screen height is enough
+* Fix a bug which caused to show URL settings modal randomly when changing the device orientation multiple times during the time Starter Page Template Preview is open
+
 1.25.0
 ------
-* Improve icon on the "Take a Video" media option
+* New block: Cover
+* [Android] Dark Mode
+* [Android] Improve icon on the "Take a Video" media option
+* Removed the dimming effect on unselected blocks
+* [iOS] Add alignment options for heading block
+* Implemented dropdown toolbar for alignment toolbar in Heading, Paragraph, Image, MediaText blocks
+* Block Editor: When editing link settings, tapping the keyboard return button now closes the settings panel as well as closing the keyboard.
+* [Android] Show an "Edit" button overlay on selected image blocks
 
 1.24.0
 ------
@@ -8,7 +50,6 @@
 * Fix Quote block's left border not being visible in Dark Mode
 * Added Starter Page Templates: when you create a new page, we now show you a few templates to get started more quickly.
 * Fix crash when pasting HTML content with embeded images on paragraphs
-* [Android] Dark Mode
 
 1.23.0
 ------

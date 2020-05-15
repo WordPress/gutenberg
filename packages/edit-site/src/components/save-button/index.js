@@ -7,18 +7,17 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { EntitiesSavedStates } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
 
-export default function SaveButton() {
+export default function SaveButton( { openEntitiesSavedStates } ) {
 	const { settings } = useEditorContext();
 	const [ , setStatus ] = useEntityProp(
 		'postType',
@@ -52,21 +51,18 @@ export default function SaveButton() {
 	} );
 	const disabled = ! isDirty || isSaving;
 
-	const [ isOpen, setIsOpen ] = useState( false );
-	const open = useCallback( setIsOpen.bind( null, true ), [] );
-	const close = useCallback( setIsOpen.bind( null, false ), [] );
 	return (
 		<>
 			<Button
 				isPrimary
+				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
 				disabled={ disabled }
 				isBusy={ isSaving }
-				onClick={ disabled ? undefined : open }
+				onClick={ disabled ? undefined : openEntitiesSavedStates }
 			>
 				{ __( 'Update Design' ) }
 			</Button>
-			<EntitiesSavedStates isOpen={ isOpen } onRequestClose={ close } />
 		</>
 	);
 }

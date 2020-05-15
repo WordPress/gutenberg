@@ -126,3 +126,57 @@ export const withoutGroup = () => {
 	);
 };
 /* eslint-enable no-restricted-syntax */
+
+export const toolbars = () => {
+	return (
+		<div>
+			<div style={ { padding: '20px' } }>
+				<h2>Icon-only Toolbar</h2>
+				<Toolbar>
+					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton
+						icon={ formatItalic }
+						title="Italic"
+						isActive
+					/>
+					<ToolbarButton icon={ link } title="Link" />
+				</Toolbar>
+			</div>
+
+			<div style={ { padding: '20px' } }>
+				<h2>Text-only Toolbar</h2>
+				<Toolbar>
+					<ToolbarButton>Bold Format</ToolbarButton>
+					<ToolbarButton isActive>Italic Format</ToolbarButton>
+					<ToolbarButton>Link Format</ToolbarButton>
+				</Toolbar>
+			</div>
+
+			<div style={ { padding: '20px' } }>
+				<h2>Text and Icon Toolbar</h2>
+				<Toolbar>
+					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton isActive>Bold Format</ToolbarButton>
+					<ToolbarButton icon={ formatItalic } title="Italic" />
+					<ToolbarButton>Italic Format</ToolbarButton>
+					<ToolbarButton icon={ link } title="Link" />
+					<ToolbarButton>Link Format</ToolbarButton>
+				</Toolbar>
+			</div>
+
+			<div style={ { padding: '20px' } }>
+				<h2>Single Icon Button Toolbar</h2>
+				<Toolbar>
+					<ToolbarButton icon={ formatBold } title="Bold" />
+				</Toolbar>
+			</div>
+
+			<div style={ { padding: '20px' } }>
+				<h2>Single Text Button toolbar</h2>
+				<Toolbar>
+					<ToolbarButton>Bold Toolbar</ToolbarButton>
+				</Toolbar>
+			</div>
+		</div>
+	);
+};

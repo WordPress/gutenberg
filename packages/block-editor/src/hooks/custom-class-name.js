@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, difference, omit } from 'lodash';
+import { difference, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -32,12 +32,13 @@ import { InspectorAdvancedControls } from '../components';
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
-		// Use Lodash's assign to gracefully handle if attributes are undefined
-		settings.attributes = assign( settings.attributes, {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
 			className: {
 				type: 'string',
 			},
-		} );
+		};
 	}
 
 	return settings;
@@ -65,6 +66,7 @@ export const withInspectorControl = createHigherOrderComponent(
 						<BlockEdit { ...props } />
 						<InspectorAdvancedControls>
 							<TextControl
+								autoComplete="off"
 								label={ __( 'Additional CSS class(es)' ) }
 								value={ props.attributes.className || '' }
 								onChange={ ( nextValue ) => {

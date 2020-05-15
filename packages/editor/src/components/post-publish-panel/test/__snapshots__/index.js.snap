@@ -13,7 +13,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
       Published
     </div>
     <ForwardRef(Button)
-      aria-expanded={true}
       icon={
         <SVG
           viewBox="0 0 24 24"
@@ -57,7 +56,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
       Scheduled
     </div>
     <ForwardRef(Button)
-      aria-expanded={true}
       icon={
         <SVG
           viewBox="0 0 24 24"
@@ -104,7 +102,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       />
     </div>
     <ForwardRef(Button)
-      aria-expanded={true}
       icon={
         <SVG
           viewBox="0 0 24 24"
@@ -149,7 +146,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       />
     </div>
     <ForwardRef(Button)
-      aria-expanded={true}
       icon={
         <SVG
           viewBox="0 0 24 24"
@@ -194,7 +190,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       />
     </div>
     <ForwardRef(Button)
-      aria-expanded={true}
       icon={
         <SVG
           viewBox="0 0 24 24"

@@ -161,6 +161,7 @@ dependencies {
     implementation project(':@react-native-community_slider')
     implementation project(':react-native-video')
     implementation project(':react-native-svg')
+    implementation project(':react-native-get-random-values')
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation "com.facebook.react:react-native:+"  // From node_modules

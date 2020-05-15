@@ -9,9 +9,6 @@
 	width: 100%;
 
 	overflow: hidden;
-	&.is-ready {
-		overflow: visible;
-	}
 }
 
 .block-editor-block-preview__content {
@@ -35,17 +32,22 @@
 	overflow: visible;
 	min-height: auto;
 
-	.block-editor-block-preview__container &.is-centered {
-		.block-editor-block-list__layout,
-		.block-editor-block-list__block {
-			padding: 0;
-		}
-	}
-
 	.block-editor-block-list__insertion-point,
 	.block-editor-block-drop-zone,
 	.reusable-block-indicator,
 	.block-list-appender {
 		display: none;
 	}
+
+	// Reset default editor padding
+	.block-editor-block-list__layout.is-root-container {
+		padding-left: 0;
+		padding-right: 0;
+
+		> .wp-block[data-align="full"] {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
 }
+

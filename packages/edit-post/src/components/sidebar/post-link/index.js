@@ -94,9 +94,9 @@ function PostLink( {
 					</p>
 				</div>
 			) }
-			<p className="edit-post-post-link__preview-label">
+			<h3 className="edit-post-post-link__preview-label">
 				{ postTypeLabel || __( 'View post' ) }
-			</p>
+			</h3>
 			<div className="edit-post-post-link__preview-link-container">
 				<ExternalLink
 					className="edit-post-post-link__link"

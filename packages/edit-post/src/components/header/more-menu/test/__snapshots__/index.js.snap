@@ -99,8 +99,8 @@ exports[`MoreMenu should match snapshot 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <svg
-                    aria-hidden="true"
-                    focusable="false"
+                    aria-hidden={true}
+                    focusable={false}
                     height={24}
                     role="img"
                     viewBox="0 0 24 24"

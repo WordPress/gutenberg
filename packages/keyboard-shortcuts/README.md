@@ -1,4 +1,4 @@
-# Keycodes
+# Keyboard Shortcuts
 
 Keyboard shortcuts is a generic package that allow registering andd modifying shortcuts.
 

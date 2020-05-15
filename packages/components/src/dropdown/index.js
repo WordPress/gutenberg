@@ -78,7 +78,7 @@ class Dropdown extends Component {
 		const {
 			renderContent,
 			renderToggle,
-			position = 'bottom',
+			position = 'bottom right',
 			className,
 			contentClassName,
 			expandOnMobile,

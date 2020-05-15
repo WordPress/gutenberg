@@ -22,9 +22,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
           value="1"
         />
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="components-checkbox-control__checked"
-          focusable="false"
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"
@@ -80,9 +80,9 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
           value="1"
         />
         <svg
-          aria-hidden="true"
+          aria-hidden={true}
           className="components-checkbox-control__checked"
-          focusable="false"
+          focusable={false}
           height={24}
           role="img"
           viewBox="0 0 24 24"

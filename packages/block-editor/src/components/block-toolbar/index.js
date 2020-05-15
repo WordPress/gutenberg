@@ -16,16 +16,16 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
-import { useShowMoversGestures } from './utils';
+import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
 
 export default function BlockToolbar( { hideDragHandle } ) {
 	const {
 		blockClientIds,
+		blockClientId,
 		hasFixedToolbar,
 		isValid,
 		mode,
 		moverDirection,
-		hasMovers = true,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockMode,
@@ -36,15 +36,15 @@ export default function BlockToolbar( { hideDragHandle } ) {
 			getSettings,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const blockRootClientId = getBlockRootClientId(
-			selectedBlockClientIds[ 0 ]
-		);
+		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 
-		const { __experimentalMoverDirection, __experimentalUIParts = {} } =
+		const { __experimentalMoverDirection } =
 			getBlockListSettings( blockRootClientId ) || {};
 
 		return {
 			blockClientIds: selectedBlockClientIds,
+			blockClientId: selectedBlockClientId,
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			rootClientId: blockRootClientId,
 			isValid:
@@ -56,22 +56,23 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					? getBlockMode( selectedBlockClientIds[ 0 ] )
 					: null,
 			moverDirection: __experimentalMoverDirection,
-			hasMovers: __experimentalUIParts.hasMovers,
 		};
 	}, [] );
 
+	const toggleBlockHighlight = useToggleBlockHighlight( blockClientId );
 	const nodeRef = useRef();
 
-	const {
-		showMovers,
-		gestures: showMoversGestures,
-	} = useShowMoversGestures( { ref: nodeRef } );
+	const { showMovers, gestures: showMoversGestures } = useShowMoversGestures(
+		{
+			ref: nodeRef,
+			onChange: toggleBlockHighlight,
+		}
+	);
 
 	const displayHeaderToolbar =
 		useViewportMatch( 'medium', '<' ) || hasFixedToolbar;
 
-	const shouldShowMovers =
-		displayHeaderToolbar || ( showMovers && hasMovers );
+	const shouldShowMovers = displayHeaderToolbar || showMovers;
 
 	if ( blockClientIds.length === 0 ) {
 		return null;

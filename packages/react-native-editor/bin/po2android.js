@@ -46,6 +46,23 @@ function escapeResourceXML( unsafeXMLValue ) {
 }
 
 /**
+ * Android specifics replacements.
+ *
+ * @param {string} XMLValue input to apply replacements.
+ * @return {string} valid string passing Android linter rules.
+ */
+function androidReplacements( XMLValue ) {
+	return XMLValue.replace( /(-|\.\.\.)/gm, function( character ) {
+		switch ( character ) {
+			case '-':
+				return '–'; // Android lint rule: TypographyDashes.
+			case '...':
+				return '…'; // Android lint rule: TypographyEllipsis
+		}
+	} );
+}
+
+/**
  * Generate a unique string identifier to use as the `name` property in our xml.
  * Try using the string first by stripping any non-alphanumeric characters and cropping it
  * Then try hashing the string and appending it to the the sanatized string
@@ -97,9 +114,11 @@ function po2Android( poInput ) {
 				return result;
 			}
 			const uniqueName = getUniqueName( translation.msgid );
-			const escapedValue = escapeResourceXML( translation.msgid );
-			const escapedValuePlural = escapeResourceXML(
-				translation.msgid_plural || ''
+			const escapedValue = androidReplacements(
+				escapeResourceXML( translation.msgid )
+			);
+			const escapedValuePlural = androidReplacements(
+				escapeResourceXML( translation.msgid_plural || '' )
 			);
 			const comment = translation.comments.extracted || '';
 			let localizedEntry = '';

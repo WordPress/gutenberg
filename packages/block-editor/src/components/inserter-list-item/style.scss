@@ -2,7 +2,7 @@
 	display: block;
 	width: 33.33%;
 	padding: 0;
-	margin: 0 0 12px;
+	margin: 0;
 }
 
 .components-button.block-editor-block-types-list__item {
@@ -11,13 +11,13 @@
 	width: 100%;
 	font-size: $default-font-size;
 	color: $dark-gray-700;
-	padding: 0 4px;
+	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -25,23 +25,30 @@
 	height: auto;
 
 	&:disabled {
-		@include block-style__disabled();
+		opacity: 0.6;
+		cursor: default;
 	}
 
 	&:not(:disabled) {
 		&:hover {
-			@include block-style__hover();
+			border-color: $theme-color;
+			color: $theme-color !important;
 		}
 
 		&.is-active {
-			@include block-style__is-active();
+			color: $white;
+			background: $dark-gray-primary;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
 		}
 	}
 }
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	color: $dark-gray-primary;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -59,4 +66,5 @@
 
 .block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
+	font-size: 12px;
 }

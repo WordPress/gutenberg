@@ -7,7 +7,7 @@ module.exports = {
 	globals: {
 		__DEV__: true,
 	},
-	plugins: [ 'react', 'react-native', 'jest' ],
+	plugins: [ 'react', 'jest' ],
 	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
 	settings: {
 		react: {

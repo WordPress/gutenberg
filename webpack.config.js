@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
@@ -13,7 +14,9 @@ const { basename, sep } = require( 'path' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const { camelCaseDash } = require( '@wordpress/scripts/utils' );
+const {
+	camelCaseDash,
+} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
 
 /**
  * Internal dependencies
@@ -26,7 +29,7 @@ const {
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons' ];
+const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
 
 const gutenbergPackages = Object.keys( dependencies )
 	.filter(
@@ -38,6 +41,11 @@ const gutenbergPackages = Object.keys( dependencies )
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
@@ -61,6 +69,9 @@ module.exports = {
 		] ),
 	},
 	plugins: [
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
@@ -188,6 +199,9 @@ module.exports = {
 			},
 		] ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	],
+	].filter( Boolean ),
+	watchOptions: {
+		ignored: '!packages/*/!(src)/**/*',
+	},
 	devtool,
 };

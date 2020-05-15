@@ -21,13 +21,12 @@ branches:
     - rnmobile/master
     - /rnmobile\/release.*/
     - /wp\/.*/
+    - feat/import-gutenberg-mobile-no-squash
 
 env:
   global:
-    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     - WP_DEVELOP_DIR: ./wordpress
     - LOCAL_SCRIPT_DEBUG: false
-    - INSTALL_COMPOSER: false
     - INSTALL_WORDPRESS: true
 
 # Make sure NodeGit gets the correct C libs.
@@ -90,10 +89,6 @@ install:
       npm run env cli plugin activate gutenberg
     fi
   - |
-    if [[ "$INSTALL_COMPOSER" = "true" ]]; then
-      npm run env docker-run -- php composer install
-    fi
-  - |
     if [[ "$E2E_ROLE" = "author" ]]; then
       npm run env cli -- user create author author@example.com --role=author --user_pass=authpass
       npm run env cli -- post update 1 --post_author=2
@@ -104,6 +99,12 @@ jobs:
     - name: Lint
       install:
         - npm ci
+        # eslint-plugin-import/no-extraneous-dependencies relies on modules to
+        # be "installed", which in practice requires that packages be built,
+        # presumably so that pkg.main can be resolved.
+        #
+        # See: https://github.com/benmosher/eslint-plugin-import/blob/92caa35/resolvers/node/index.js
+        - node ./bin/packages/build.js
       script:
         - npm run lint
 
@@ -113,6 +114,13 @@ jobs:
         - npm run build
       script:
         - npx eslint --parser-options=ecmaVersion:5 --no-eslintrc --no-ignore ./build/**/*.js
+
+    - name: Typecheck
+      install:
+        - npm ci
+      script:
+        - npm run build:package-types
+
 
     - name: Build artifacts
       install:
@@ -152,79 +160,61 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: INSTALL_COMPOSER=true
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: INSTALL_COMPOSER=true LOCAL_PHP=5.6-fpm
+      env: LOCAL_PHP=5.6-fpm
       script:
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (2/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (3/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin) (4/4)
-      env: FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (1/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (2/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (3/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author) (4/4)
-      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=
+      env: E2E_ROLE=author FORCE_REDUCED_MOTION=true
       script:
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
-
-    - stage: deploy
-      if: (NOT type IN (pull_request)) AND (branch = master)
-      name: Deploy Playground
-      env: INSTALL_WORDPRESS=false
-      install:
-        - npm ci
-      before_deploy:
-        - npm run storybook:build
-      deploy:
-        provider: pages
-        skip_cleanup: true
-        github_token: $GITHUB_TOKEN
-        keep_history: true
-        local_dir: playground/dist
-        on:
-          branch: master
 
   allow_failures:
     # nothing is allowed to fail at the moment

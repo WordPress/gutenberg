@@ -2,11 +2,13 @@ public struct MediaInfo {
     public let id: Int32?
     public let url: String?
     public let type: String?
+    public let caption: String?
 
-    public init(id: Int32?, url: String?, type: String?) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
+        self.caption = caption
     }
 }
 

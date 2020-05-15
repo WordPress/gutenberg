@@ -11,6 +11,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
+import { Platform } from '@wordpress/element';
 
 const MIN_SPACER_HEIGHT = 20;
 const MAX_SPACER_HEIGHT = 500;
@@ -52,7 +53,6 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				isSelected={ isSelected }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -62,6 +62,7 @@ const SpacerEdit = ( {
 					);
 					updateHeight( spacerHeight );
 				} }
+				showHandle={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
@@ -69,10 +70,9 @@ const SpacerEdit = ( {
 						label={ __( 'Height in pixels' ) }
 						min={ MIN_SPACER_HEIGHT }
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						separatorType={ 'none' }
 						value={ height }
 						onChange={ updateHeight }
-						step={ 10 }
+						step={ Platform.OS === 'web' ? 10 : 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>

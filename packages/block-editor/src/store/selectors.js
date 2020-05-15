@@ -1621,3 +1621,15 @@ export function isNavigationMode( state ) {
 export function didAutomaticChange( state ) {
 	return !! state.automaticChangeStatus;
 }
+
+/**
+ * Returns true if the current highlighted block matches the block clientId.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {boolean} Whether the block is currently highlighted.
+ */
+export function isBlockHighlighted( state, clientId ) {
+	return state.highlightedBlock === clientId;
+}

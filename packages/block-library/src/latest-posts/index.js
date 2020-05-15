@@ -7,6 +7,7 @@ import { postList as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 
@@ -22,5 +23,7 @@ export const settings = {
 		align: true,
 		html: false,
 	},
+	example: {},
 	edit,
+	deprecated,
 };

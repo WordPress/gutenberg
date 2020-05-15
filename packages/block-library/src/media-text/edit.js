@@ -15,8 +15,6 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	InspectorControls,
-	PanelColorSettings,
-	withColors,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
@@ -183,10 +181,8 @@ class MediaTextEdit extends Component {
 		const {
 			attributes,
 			className,
-			backgroundColor,
 			isSelected,
 			setAttributes,
-			setBackgroundColor,
 			image,
 		} = this.props;
 		const {
@@ -210,8 +206,6 @@ class MediaTextEdit extends Component {
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
-			'has-background': backgroundColor.class || backgroundColor.color,
-			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 			'is-image-fill': imageFill,
@@ -224,15 +218,7 @@ class MediaTextEdit extends Component {
 		const style = {
 			gridTemplateColumns,
 			msGridColumns: gridTemplateColumns,
-			backgroundColor: backgroundColor.color,
 		};
-		const colorSettings = [
-			{
-				value: backgroundColor.color,
-				onChange: setBackgroundColor,
-				label: __( 'Background color' ),
-			},
-		];
 		const toolbarControls = [
 			{
 				icon: pullLeft,
@@ -311,11 +297,6 @@ class MediaTextEdit extends Component {
 			<>
 				<InspectorControls>
 					{ mediaTextGeneralSettings }
-					<PanelColorSettings
-						title={ __( 'Color settings' ) }
-						initialOpen={ false }
-						colorSettings={ colorSettings }
-					/>
 				</InspectorControls>
 				<BlockControls>
 					<ToolbarGroup controls={ toolbarControls } />
@@ -352,7 +333,6 @@ class MediaTextEdit extends Component {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const {

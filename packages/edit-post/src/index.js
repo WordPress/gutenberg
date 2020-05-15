@@ -113,14 +113,14 @@ export function initializeEditor(
 	// Without this hack the browser scrolls the mobile toolbar off-screen.
 	// Once supported in Safari we can replace this in favor of preventScroll.
 	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `block-editor-editor-skeleton__body` to enable a fixed top toolbar.
+	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
 	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
 		window.addEventListener( 'scroll', function( event ) {
 			const editorScrollContainer = document.getElementsByClassName(
-				'block-editor-editor-skeleton__body'
+				'interface-interface-skeleton__body'
 			)[ 0 ];
 			if ( event.target === document ) {
 				// Scroll element into view by scrolling the editor container by the same amount

@@ -17,6 +17,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -114,7 +115,7 @@ class AudioEdit extends Component {
 			preload,
 			src,
 		} = this.props.attributes;
-		const { setAttributes, isSelected, className, noticeUI } = this.props;
+		const { setAttributes, isSelected, noticeUI } = this.props;
 		const onSelectAudio = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
@@ -128,17 +129,18 @@ class AudioEdit extends Component {
 		};
 		if ( ! src ) {
 			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					className={ className }
-					onSelect={ onSelectAudio }
-					onSelectURL={ this.onSelectURL }
-					accept="audio/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ this.props.attributes }
-					notices={ noticeUI }
-					onError={ this.onUploadError }
-				/>
+				<Block.div>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						onSelect={ onSelectAudio }
+						onSelectURL={ this.onSelectURL }
+						accept="audio/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ this.props.attributes }
+						notices={ noticeUI }
+						onError={ this.onUploadError }
+					/>
+				</Block.div>
 			);
 		}
 
@@ -170,15 +172,15 @@ class AudioEdit extends Component {
 						/>
 						<SelectControl
 							label={ __( 'Preload' ) }
-							value={ undefined !== preload ? preload : 'none' }
+							value={ preload || '' }
 							// `undefined` is required for the preload attribute to be unset.
 							onChange={ ( value ) =>
 								setAttributes( {
-									preload:
-										'none' !== value ? value : undefined,
+									preload: value || undefined,
 								} )
 							}
 							options={ [
+								{ value: '', label: __( 'Browser default' ) },
 								{ value: 'auto', label: __( 'Auto' ) },
 								{ value: 'metadata', label: __( 'Metadata' ) },
 								{ value: 'none', label: __( 'None' ) },
@@ -186,7 +188,7 @@ class AudioEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<figure className={ className }>
+				<Block.figure>
 					{ /*
 						Disable the audio tag so the user clicking on it won't play the
 						file or change the position slider when the controls are enabled.
@@ -205,7 +207,7 @@ class AudioEdit extends Component {
 							inlineToolbar
 						/>
 					) }
-				</figure>
+				</Block.figure>
 			</>
 		);
 	}

@@ -79,16 +79,16 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             case .image:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image"),
-                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image")])
+                              MediaInfo(id: 3, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
                 } else {
-                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image")])
+                    callback([MediaInfo(id: 1, url: "https://cldup.com/cXyG__fTLN.jpg", type: "image", caption: "Mountain")])
                 }
             case .video:
                 if(allowMultipleSelection) {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video"),
                               MediaInfo(id: 4, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
                 } else {
-                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video")])
+                    callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
             default:
                 break

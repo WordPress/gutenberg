@@ -2,15 +2,17 @@
  * External dependencies
  */
 import childProcess from 'child_process';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import wd from 'wd';
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs';
 
 /**
  * Internal dependencies
  */
 import serverConfigs from './serverConfigs';
-import { iosServer, iosLocal, android8 } from './caps';
+import { iosServer, iosLocal, android } from './caps';
 import AppiumLocal from './appium-local';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import _ from 'underscore';
@@ -35,6 +37,8 @@ const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
 let appiumProcess;
+let iOSScreenRecordingProcess;
+let androidScreenRecordingProcess;
 
 // Used to map unicode and special values to keycodes on Android
 // Docs for keycode values: https://developer.android.com/reference/android/view/KeyEvent.html
@@ -43,7 +47,7 @@ const strToKeycode = {
 	'\u0008': 67,
 };
 
-const timer = ( ms ) => new Promise()( ( res ) => setTimeout( res, ms ) );
+const timer = ( ms ) => new Promise( ( res ) => setTimeout( res, ms ) );
 
 const isAndroid = () => {
 	return rnPlatform.toLowerCase() === 'android';
@@ -52,6 +56,90 @@ const isAndroid = () => {
 const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
+
+const IOS_RECORDINGS_DIR = './ios-screen-recordings';
+const ANDROID_RECORDINGS_DIR = './android-screen-recordings';
+
+const getScreenRecordingFileNameBase = ( testPath, id ) => {
+	const suiteName = path.basename( testPath, '.test.js' );
+	return `${ suiteName }.${ id }`;
+};
+
+jasmine.getEnv().addReporter( {
+	specStarted: ( { testPath, id } ) => {
+		const fileName =
+			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
+
+		if ( isAndroid() ) {
+			if ( ! fs.existsSync( ANDROID_RECORDINGS_DIR ) ) {
+				fs.mkdirSync( ANDROID_RECORDINGS_DIR );
+			}
+
+			androidScreenRecordingProcess = childProcess.spawn( 'adb', [
+				'shell',
+				'screenrecord',
+				'--verbose',
+				'--bit-rate',
+				'1M',
+				'--size',
+				'720x1280',
+				`/sdcard/${ fileName }`,
+			] );
+
+			return;
+		}
+
+		if ( ! fs.existsSync( IOS_RECORDINGS_DIR ) ) {
+			fs.mkdirSync( IOS_RECORDINGS_DIR );
+		}
+
+		iOSScreenRecordingProcess = childProcess.spawn(
+			'xcrun',
+			[
+				'simctl',
+				'io',
+				'booted',
+				'recordVideo',
+				'--mask=black',
+				'--force',
+				fileName,
+			],
+			{
+				cwd: IOS_RECORDINGS_DIR,
+			}
+		);
+	},
+	specDone: ( { testPath, id, status } ) => {
+		const fileNameBase = getScreenRecordingFileNameBase( testPath, id );
+
+		if ( isAndroid() ) {
+			androidScreenRecordingProcess.kill( 'SIGINT' );
+			// wait for kill
+			childProcess.execSync( 'sleep 20' );
+
+			childProcess.execSync(
+				`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
+			);
+
+			const oldPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
+			const newPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;
+
+			if ( fs.existsSync( oldPath ) ) {
+				fs.renameSync( oldPath, newPath );
+			}
+			return;
+		}
+
+		iOSScreenRecordingProcess.kill( 'SIGINT' );
+
+		const oldPath = `${ IOS_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
+		const newPath = `${ IOS_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;
+
+		if ( fs.existsSync( oldPath ) ) {
+			fs.renameSync( oldPath, newPath );
+		}
+	},
+} );
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
@@ -77,7 +165,7 @@ const setupDriver = async () => {
 
 	let desiredCaps;
 	if ( isAndroid() ) {
-		desiredCaps = _.clone( android8 );
+		desiredCaps = _.clone( android );
 		if ( isLocalEnvironment() ) {
 			desiredCaps.app = path.resolve( localAndroidAppPath );
 			try {
@@ -119,8 +207,8 @@ const setupDriver = async () => {
 	// eslint-disable-next-line no-console
 	console.log( status );
 
-	await driver.setImplicitWaitTimeout( 2000 );
-	await timer( 3000 );
+	await driver.setImplicitWaitTimeout( 5000 );
+	await timer( 5000 );
 
 	await driver.setOrientation( 'PORTRAIT' );
 	return driver;
@@ -167,9 +255,26 @@ const typeString = async ( driver, element, str, clear ) => {
 
 const typeStringIos = async ( driver, element, str, clear ) => {
 	if ( clear ) {
-		await element.clear();
+		//await element.clear(); This was not working correctly on iOS so need a custom implementation
+		await clearTextBox( driver, element );
 	}
 	await element.type( str );
+};
+
+const clearTextBox = async ( driver, element ) => {
+	await element.click();
+	let originalText = await element.text();
+	let text = originalText;
+	// We are double tapping on the text field and pressing backspace until all content is removed.
+	do {
+		originalText = await element.text();
+		const action = new wd.TouchAction( driver );
+		action.tap( { el: element, count: 2 } );
+		await action.perform();
+		await element.type( '\b' );
+		text = await element.text();
+		// We compare with the original content and not empty because text always return any hint set on the element.
+	} while ( originalText !== text );
 };
 
 const typeStringAndroid = async (

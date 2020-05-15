@@ -90,11 +90,13 @@ const makeCancelable = ( promise ) => {
  *                                    providing a custom `settings` prop.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Custom settings values associated with a link.
  *
  * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
  */
+/* eslint-enable */
 
 /**
  * Custom settings values associated with a link.
@@ -105,12 +107,14 @@ const makeCancelable = ( promise ) => {
  * @property {string} title Human-readable label to show in user interface.
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Properties associated with a link control value, composed as a union of the
  * default properties and any custom settings values.
  *
  * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
  */
+/* eslint-enable */
 
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
@@ -322,9 +326,9 @@ function LinkControl( {
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	function stopEditing() {
-		isEndingEditWithFocus.current =
-			!! wrapperNode.current &&
-			wrapperNode.current.contains( document.activeElement );
+		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
+			document.activeElement
+		);
 
 		setIsEditingLink( false );
 	}
@@ -440,7 +444,11 @@ function LinkControl( {
 		const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
 		const labelText = isInitialSuggestions
 			? __( 'Recently updated' )
-			: sprintf( __( 'Search results for "%s"' ), inputValue );
+			: sprintf(
+					/* translators: %s: search term. */
+					__( 'Search results for "%s"' ),
+					inputValue
+			  );
 
 		// VisuallyHidden rightly doesn't accept custom classNames
 		// so we conditionally render it as a wrapper to visually hide the label

@@ -19,13 +19,24 @@ import styles from './style.scss';
 import BlockMover from '../block-mover';
 import { BlockSettingsButton } from '../block-settings';
 
-const BlockMobileToolbar = ( { clientId, onDelete, order } ) => (
+const BlockMobileToolbar = ( {
+	clientId,
+	onDelete,
+	order,
+	isStackedHorizontally,
+} ) => (
 	<View style={ styles.toolbar }>
-		<BlockMover clientIds={ [ clientId ] } />
+		<BlockMover
+			clientIds={ [ clientId ] }
+			isStackedHorizontally={ isStackedHorizontally }
+		/>
 
 		<View style={ styles.spacer } />
 
-		<BlockSettingsButton.Slot />
+		<BlockSettingsButton.Slot>
+			{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+			{ ( fills = [ null ] ) => fills[ 0 ] }
+		</BlockSettingsButton.Slot>
 
 		<ToolbarButton
 			title={ sprintf(
@@ -48,13 +59,15 @@ export default compose(
 			order: getBlockIndex( clientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId } ) => {
+	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
 		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
-			onDelete: () => {
-				Keyboard.dismiss();
-				removeBlock( clientId, rootClientId );
-			},
+			onDelete:
+				onDelete ||
+				( () => {
+					Keyboard.dismiss();
+					removeBlock( clientId, rootClientId );
+				} ),
 		};
 	} )
 )( BlockMobileToolbar );

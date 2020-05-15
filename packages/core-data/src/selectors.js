@@ -179,7 +179,7 @@ export const getRawEntityRecord = createSelector(
  * @param {string}  name   Entity name.
  * @param {?Object} query  Optional terms query.
  *
- * @return {Array} Records.
+ * @return {?Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
 	const queriedState = get( state.entities.data, [
@@ -447,6 +447,17 @@ export function hasUndo( state ) {
  */
 export function hasRedo( state ) {
 	return Boolean( getRedoEdit( state ) );
+}
+
+/**
+ * Return the current theme.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object}      The current theme.
+ */
+export function getCurrentTheme( state ) {
+	return state.themes[ state.currentTheme ];
 }
 
 /**

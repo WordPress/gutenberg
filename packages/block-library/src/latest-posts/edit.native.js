@@ -14,7 +14,7 @@ import { coreBlocks } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 import { postList as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
-import { fetchRequest } from '@wordpress/react-native-bridge';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Icon,
 	PanelBody,
@@ -52,23 +52,13 @@ class LatestPostsEdit extends Component {
 
 	componentDidMount() {
 		this.isStillMounted = true;
-		this.fetchRequest = fetchRequest( '/wp/v2/categories' )
+		this.fetchRequest = apiFetch( { path: '/wp/v2/categories' } )
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
-					let parsedCategoriesList = categoriesList;
-
-					// TODO: remove this check after `fetchRequest` types are made consist across platforms
-					// (see: https://github.com/wordpress-mobile/gutenberg-mobile/issues/1961)
-					if ( typeof categoriesList === 'string' ) {
-						parsedCategoriesList = JSON.parse( categoriesList );
-					}
-
-					if ( isEmpty( parsedCategoriesList ) ) {
-						parsedCategoriesList = [];
-					}
-
 					this.setState( {
-						categoriesList: parsedCategoriesList,
+						categoriesList: isEmpty( categoriesList )
+							? []
+							: categoriesList,
 					} );
 				}
 			} )
@@ -150,18 +140,12 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Show post content' ) }
 						checked={ displayPostContent }
 						onChange={ this.onSetDisplayPostContent }
-						separatorType={
-							displayPostContent ? 'fullWidth' : 'none'
-						}
 					/>
 					{ displayPostContent && (
 						<ToggleControl
 							label={ __( 'Only show excerpt' ) }
 							checked={ displayExcerptPostContent }
 							onChange={ this.onSetDisplayPostContentRadio }
-							separatorType={
-								displayExcerptPostContent ? 'fullWidth' : 'none'
-							}
 						/>
 					) }
 					{ displayPostContent && displayExcerptPostContent && (
@@ -171,7 +155,6 @@ class LatestPostsEdit extends Component {
 							onChange={ this.onSetExcerptLength }
 							min={ MIN_EXCERPT_LENGTH }
 							max={ MAX_EXCERPT_LENGTH }
-							separatorType="none"
 						/>
 					) }
 				</PanelBody>
@@ -181,10 +164,8 @@ class LatestPostsEdit extends Component {
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ this.onSetDisplayPostDate }
-						separatorType="none"
 					/>
 				</PanelBody>
-
 				<PanelBody title={ __( 'Sorting and filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
@@ -195,7 +176,10 @@ class LatestPostsEdit extends Component {
 						}
 						onOrderChange={ this.onSetOrder }
 						onOrderByChange={ this.onSetOrderBy }
-						onCategoryChange={ this.onSetCategories }
+						onCategoryChange={
+							// eslint-disable-next-line no-undef
+							__DEV__ ? this.onSetCategories : undefined
+						}
 						onNumberOfItemsChange={ this.onSetPostsToShow }
 					/>
 				</PanelBody>

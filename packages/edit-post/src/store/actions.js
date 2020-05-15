@@ -4,28 +4,37 @@
 import { castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data-controls';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name Sidebar name to be opened.
+ * @param {?string} name Sidebar name to be opened.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function openGeneralSidebar( name ) {
-	return {
-		type: 'OPEN_GENERAL_SIDEBAR',
-		name,
-	};
+export function* openGeneralSidebar( name ) {
+	yield dispatch(
+		'core/interface',
+		'enableComplementaryArea',
+		'core/edit-post',
+		name
+	);
 }
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function closeGeneralSidebar() {
-	return {
-		type: 'CLOSE_GENERAL_SIDEBAR',
-	};
+export function* closeGeneralSidebar() {
+	yield dispatch(
+		'core/interface',
+		'disableComplementaryArea',
+		'core/edit-post'
+	);
 }
 
 /**
@@ -264,8 +273,6 @@ export function metaBoxUpdatesSuccess() {
 
 /**
  * Returns an action object used to toggle the width of the editing canvas.
- * It's marked as experimental because, potentially, we'll need this
- * in several pages including edit-site.
  *
  * @param {string} deviceType
  *

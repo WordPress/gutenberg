@@ -65,6 +65,10 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
+JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://reactjs.org/docs/introducing-jsx.html). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/master/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration. 
+
+While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
+
 ### Imports
 
 In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) to enable us to create modular code with clear separations between code of a specific feature, code shared across distinct WordPress features, and third-party dependencies.
@@ -195,6 +199,22 @@ alert( 'My name is ' + name + '.' );
 alert( `My name is ${ name }.` );
 ```
 
+### Optional Chaining
+
+[Optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) is a new language feature introduced in version 2020 of the ECMAScript specification. While the feature can be very convenient for property access on objects which are potentially null-ish (`null` or `undefined`), there are a number of common pitfalls to be aware of when using optional chaining. These may be issues that linting and/or type-checking can help protect against at some point in the future. In the meantime, you will want to be cautious of the following items:
+
+- When negating (`!`) the result of a value which is evaluated with optional chaining, you should be observant that in the case that optional chaining reaches a point where it cannot proceed, it will produce a [falsy value](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) that will be transformed to `true` when negated. In many cases, this is not an expected result.
+   - Example: `const hasFocus = ! nodeRef.current?.contains( document.activeElement );` will yield `true` if `nodeRef.current` is not assigned.
+   - See related issue: [#21984](https://github.com/WordPress/gutenberg/issues/21984)
+   - See similar ESLint rule: [`no-unsafe-negation`](https://eslint.org/docs/rules/no-unsafe-negation)
+- When assigning a boolean value, observe that optional chaining may produce values which are [falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy) (`undefined`, `null`), but not strictly `false`. This can become an issue when the value is passed around in a way where it is expected to be a boolean (`true` or `false`). While it's a common occurrence for booleans—since booleans are often used in ways where the logic considers truthiness and falsyness broadly—these issues can also occur for other optional chaining when eagerly assuming a type resulting from the end of the property access chain. [Type-checking](https://github.com/WordPress/gutenberg/blob/master/packages/README.md#typescript) may help in preventing these sorts of errors.
+   - Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
+   - Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
+
+### `@wordpress/element` (React) Components
+
+It is preferred to implement all components as [function components](https://reactjs.org/docs/components-and-props.html), using [hooks](https://reactjs.org/docs/hooks-reference.html) to manage component state and lifecycle. With the exception of [error boundaries](https://reactjs.org/docs/error-boundaries.html), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
+
 ## JavaScript Documentation using JSDoc
 
 Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/master/packages/docgen).
@@ -216,7 +236,7 @@ Custom types should be named as succinctly as possible, while still retaining cl
 /**
  * A block selection object.
  *
- * @typedef {Object} WPBlockSelection
+ * @typedef WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
  * @property {string} attributeKey A block attribute key.
@@ -224,6 +244,8 @@ Custom types should be named as succinctly as possible, while still retaining cl
  *                                 text value.
  */
 ```
+
+Note that there is no `{Object}` between `@typedef` and the type name. As `@property`s below tells us that it is a type for objects, it is recommend to not use `{Object}` when you want to define types for your objects.
 
 Custom types can also be used to describe a set of predefined options. While the [type union](https://jsdoc.app/tags-type.html) can be used with literal values as an inline type, it can be difficult to align tags while still respecting a maximum line length of 80 characters. Using a custom type to define a union type can afford the opportunity to describe the purpose of these options, and helps to avoid these line length issues.
 
@@ -269,23 +291,25 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](http://definitelytyped.org/) community-maintained types definitions, if one exists.
 
-### Record Types
+### Generic Types
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
 ```js
-// Incorrect:
+// Bad:
 
 /** @type {Object} */
 /** @type {Function} */
 /** @type {Promise} */
 
-// Correct:
+// Good:
 
-/** @type {Object<string,number>} */
+/** @type {Record<string,number>} */ /* or */ /** @type {{[setting:string]:any}} */
 /** @type {(key:string)=>boolean} */
 /** @type {Promise<string>} */
 ```
+
+When an object is used as a dictionary, you can define its type in 2 ways: indexable interface (`{[setting:string]:any}`) or `Record`. When the name of the key for an object provides hints for developers what to do like `setting`, use indexable interface. If not, use `Record`.
 
 The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
 
@@ -312,7 +336,7 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
- * @type {Object<WPBreakpoint,number>}
+ * @type {Record<WPBreakpoint,number>}
  */
 const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
@@ -409,7 +433,7 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
  *
- * @return {Object<string,WPDataSelector>} Object containing the store's
+ * @return {Record<string,WPDataSelector>} Object containing the store's
  *                                         selectors.
  */
 ````

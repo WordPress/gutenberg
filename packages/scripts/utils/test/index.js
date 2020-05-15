@@ -121,6 +121,32 @@ describe( 'utils', () => {
 			expect( console ).toHaveLogged();
 		} );
 
+		test( 'should pass inspect args to node', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+
+			expect( () =>
+				spawnScript( scriptName, [], [ '--inspect-brk' ] )
+			).toThrow( 'Exit code: 0.' );
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ '--inspect-brk', expect.stringContaining( scriptName ) ],
+				{ stdio: 'inherit' }
+			);
+		} );
+
+		test( 'should pass script args to the script', () => {
+			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
+
+			expect( () =>
+				spawnScript( scriptName, [ '--runInBand' ] )
+			).toThrow( 'Exit code: 0.' );
+			expect( crossSpawnMock ).toHaveBeenCalledWith(
+				'node',
+				[ expect.stringContaining( scriptName ), '--runInBand' ],
+				{ stdio: 'inherit' }
+			);
+		} );
+
 		test( 'should finish successfully when the script properly executed', () => {
 			crossSpawnMock.mockReturnValueOnce( { status: 0 } );
 

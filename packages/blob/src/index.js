@@ -4,7 +4,7 @@
 const { createObjectURL, revokeObjectURL } = window.URL;
 
 /**
- * @type {{[key: string]: File|undefined}}
+ * @type {Record<string, File|undefined>}
  */
 const cache = {};
 

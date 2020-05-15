@@ -6,6 +6,7 @@ $navigation-item-height: 46px;
 .editor-styles-wrapper .wp-block-navigation ol {
 	margin-bottom: 0;
 	margin-left: 0;
+	padding-left: 0;
 }
 
 .editor-styles-wrapper .wp-block-navigation .block-editor-block-list__block {
@@ -19,8 +20,46 @@ $navigation-item-height: 46px;
 	align-items: center;
 }
 
+.wp-block-navigation.is-vertical .block-list-appender {
+	margin: $grid-unit-10;
+}
+
 .wp-block-navigation__inserter-content {
 	padding: $grid-unit-20;
+}
+
+// Ensure sub-menus stay open and visible when a nested block is selected.
+.wp-block-navigation__container.is-parent-of-selected-block {
+	visibility: visible;
+	opacity: 1;
+}
+
+// Styles for submenu flyout
+.has-child {
+	// Only show the flyout when the parent menu item is selected.
+	// Do not show it on hover.
+	&,
+	&:hover {
+		> .wp-block-navigation__container {
+			opacity: 0;
+			visibility: hidden;
+		}
+	}
+
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation__container {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+
+	// Adjust the appender margin to match other menu items
+	.wp-block-navigation__container {
+		.block-list-appender .block-editor-button-block-appender {
+			margin-left: $grid-unit-10 * 2;
+		}
+	}
 }
 
 /**

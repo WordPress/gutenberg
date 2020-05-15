@@ -404,7 +404,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			} elseif ( 'post_type' === $prepared_nav_item['menu-item-type'] ) {
 				$original = get_post( absint( $prepared_nav_item['menu-item-object-id'] ) );
 				if ( empty( $original ) ) {
-					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post  ID.', 'gutenberg' ), array( 'status' => 400 ) );
+					return new WP_Error( 'rest_post_invalid_id', __( 'Invalid post ID.', 'gutenberg' ), array( 'status' => 400 ) );
 				}
 				$prepared_nav_item['menu-item-object'] = get_post_type( $original );
 			}
@@ -422,10 +422,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		// Check if menu item is type custom, then title and url are required.
 		if ( 'custom' === $prepared_nav_item['menu-item-type'] ) {
 			if ( '' === $prepared_nav_item['menu-item-title'] ) {
-				return new WP_Error( 'rest_title_required', __( 'Title require if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_title_required', __( 'Title required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 			if ( empty( $prepared_nav_item['menu-item-url'] ) ) {
-				return new WP_Error( 'rest_url_required', __( 'URL require if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_url_required', __( 'URL required if menu item of type custom.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -440,12 +440,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
 			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
 				if ( $menu_items ) {
-					$last_item = array_pop( $menu_items );
+					$last_item = $menu_items[ count( $menu_items ) - 1 ];
 					if ( $last_item && isset( $last_item->menu_order ) ) {
 						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
 					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items );
+						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
 					}
+					array_push( $menu_items, $last_item );
 				} else {
 					$prepared_nav_item['menu-item-position'] = 1;
 				}
@@ -840,7 +841,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['menu_order'] = array(
-			'description' => __( 'The DB ID of the nav_menu_item that is this item\'s menu parent, if any . 0 otherwise . ', 'gutenberg' ),
+			'description' => __( 'The DB ID of the nav_menu_item that is this item\'s menu parent, if any, otherwise 0.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
 			'minimum'     => 0,
@@ -853,7 +854,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['object_id'] = array(
-			'description' => __( 'The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories .', 'gutenberg' ),
+			'description' => __( 'The DB ID of the original object this menu item represents, e . g . ID for posts and term_id for categories.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'integer',
 			'minimum'     => 0,
@@ -899,7 +900,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['_invalid'] = array(
-			'description' => __( 'Whether the menu item represents an object that no longer exists .', 'gutenberg' ),
+			'description' => __( 'Whether the menu item represents an object that no longer exists.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'boolean',
 			'readonly'    => true,

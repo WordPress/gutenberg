@@ -9,8 +9,6 @@ import {
 	TouchableWithoutFeedback,
 	Dimensions,
 } from 'react-native';
-import { isEmpty, get, find, map } from 'lodash';
-
 /**
  * WordPress dependencies
  */
@@ -20,8 +18,12 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	showMediaEditorButton,
 } from '@wordpress/react-native-bridge';
+import { isEmpty, get, find, map } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	CycleSelectControl,
 	Icon,
@@ -295,6 +297,7 @@ export class ImageEdit extends React.Component {
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
+			caption: media.caption,
 		};
 
 		let additionalAttributes;
@@ -390,7 +393,6 @@ export class ImageEdit extends React.Component {
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ this.updateAlignment }
-					isCollapsed={ false }
 				/>
 			</BlockControls>
 		);
@@ -430,7 +432,6 @@ export class ImageEdit extends React.Component {
 						label={ __( 'Alt Text' ) }
 						value={ alt || '' }
 						valuePlaceholder={ __( 'None' ) }
-						separatorType={ 'none' }
 						onChangeValue={ this.updateAlt }
 					/>
 				</PanelBody>
@@ -607,8 +608,7 @@ export class ImageEdit extends React.Component {
 											! isUploadInProgress &&
 											! isUploadFailed &&
 											finalWidth &&
-											finalHeight &&
-											showMediaEditorButton && (
+											finalHeight && (
 												<MediaEdit
 													allowedTypes={ [
 														MEDIA_TYPE_IMAGE,

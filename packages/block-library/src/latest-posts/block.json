@@ -10,7 +10,10 @@
 			"type": "string"
 		},
 		"categories": {
-			"type": "array"
+			"type": "array",
+			"items": {
+				"type": "object"
+			}
 		},
 		"postsToShow": {
 			"type": "number",

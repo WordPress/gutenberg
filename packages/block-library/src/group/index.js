@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,8 +30,12 @@ export const settings = {
 	],
 	example: {
 		attributes: {
-			customBackgroundColor: '#ffffff',
-			customTextColor: '#000000',
+			style: {
+				color: {
+					text: '#000000',
+					background: '#ffffff',
+				},
+			},
 		},
 		innerBlocks: [
 			{
@@ -88,6 +93,7 @@ export const settings = {
 		anchor: true,
 		html: false,
 		lightBlockWrapper: true,
+		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	transforms: {
 		from: [

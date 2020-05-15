@@ -10,6 +10,8 @@ import {
 	ScrollView,
 	Keyboard,
 	StatusBar,
+	TouchableHighlight,
+	LayoutAnimation,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -17,6 +19,7 @@ import SafeArea from 'react-native-safe-area';
 /**
  * WordPress dependencies
  */
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -30,16 +33,32 @@ import CyclePickerCell from './cycle-picker-cell';
 import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
-import UnsupportedFooterCell from './unsupported-footer-cell';
-
+import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
+import { BottomSheetProvider } from './bottom-sheet-context';
+
+const ANIMATION_DURATION = 300;
 
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.onScroll = this.onScroll.bind( this );
+		this.isScrolling = this.isScrolling.bind( this );
+		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
+		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
+			this
+		);
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
+		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
+			this
+		);
+		this.onHardwareButtonPress = this.onHardwareButtonPress.bind( this );
+		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
+			this
+		);
+		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
@@ -48,6 +67,13 @@ class BottomSheet extends Component {
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
+			scrollEnabled: true,
+			isScrolling: false,
+			onCloseBottomSheet: null,
+			onHardwareButtonPress: null,
+			isMaxHeightSet: true,
+			currentScreen: '',
+			extraProps: {},
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -69,6 +95,14 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
+		if ( Platform.OS === 'android' ) {
+			this.androidModalClosedSubscription = subscribeAndroidModalClosed(
+				() => {
+					this.props.onClose();
+				}
+			);
+		}
+
 		this.keyboardWillShowListener = Keyboard.addListener(
 			'keyboardWillShow',
 			this.keyboardWillShow
@@ -87,6 +121,9 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		if ( this.androidModalClosedSubscription ) {
+			this.androidModalClosedSubscription.remove();
+		}
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -98,6 +135,14 @@ class BottomSheet extends Component {
 		);
 		this.keyboardWillShowListener.remove();
 		this.keyboardDidHideListener.remove();
+	}
+
+	componentDidUpdate( prevProps ) {
+		const { isVisible } = this.props;
+
+		if ( ! prevProps.isVisible && isVisible ) {
+			this.setState( { currentScreen: '' } );
+		}
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -117,7 +162,7 @@ class BottomSheet extends Component {
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
-		// `maxHeight` when modal is opened alon with a keyboard
+		// `maxHeight` when modal is opened along with a keyboard
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( Dimensions.get( 'window' ).height -
@@ -159,10 +204,65 @@ class BottomSheet extends Component {
 	onScroll( { nativeEvent } ) {
 		if ( this.isCloseToTop( nativeEvent ) ) {
 			this.setState( { bounces: false } );
-		}
-		if ( this.isCloseToBottom( nativeEvent ) ) {
+		} else if ( this.isCloseToBottom( nativeEvent ) ) {
 			this.setState( { bounces: true } );
 		}
+	}
+
+	onShouldEnableScroll( value ) {
+		this.setState( { scrollEnabled: value } );
+	}
+
+	onShouldSetBottomSheetMaxHeight( value ) {
+		this.setState( { isMaxHeightSet: value } );
+	}
+
+	isScrolling( value ) {
+		this.setState( { isScrolling: value } );
+	}
+
+	onHandleClosingBottomSheet( action ) {
+		this.setState( { onCloseBottomSheet: action } );
+	}
+
+	onHandleHardwareButtonPress( action ) {
+		this.setState( { onHardwareButtonPress: action } );
+	}
+
+	onCloseBottomSheet() {
+		const { onClose } = this.props;
+		const { onCloseBottomSheet } = this.state;
+		if ( onCloseBottomSheet ) {
+			onCloseBottomSheet();
+		}
+		onClose();
+	}
+
+	onHardwareButtonPress() {
+		const { onClose } = this.props;
+		const { onHardwareButtonPress } = this.state;
+		if ( onHardwareButtonPress ) {
+			return onHardwareButtonPress();
+		}
+		return onClose();
+	}
+
+	onReplaceSubsheet( destination, extraProps, callback ) {
+		LayoutAnimation.configureNext(
+			LayoutAnimation.create(
+				ANIMATION_DURATION,
+				LayoutAnimation.Types.easeInEaseOut,
+				LayoutAnimation.Properties.opacity
+			)
+		);
+
+		this.setState(
+			{
+				currentScreen: destination,
+				extraProps: extraProps || {},
+			},
+			callback
+		);
 	}
 
 	render() {
@@ -175,12 +275,20 @@ class BottomSheet extends Component {
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
-			onClose,
 			onDismiss,
 			children,
 			...rest
 		} = this.props;
-		const { maxHeight, bounces, safeAreaBottomInset } = this.state;
+		const {
+			maxHeight,
+			bounces,
+			safeAreaBottomInset,
+			isScrolling,
+			scrollEnabled,
+			isMaxHeightSet,
+			extraProps,
+			currentScreen,
+		} = this.state;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -221,25 +329,27 @@ class BottomSheet extends Component {
 				isVisible={ isVisible }
 				style={ styles.bottomModal }
 				animationInTiming={ 600 }
-				animationOutTiming={ 250 }
+				animationOutTiming={ 300 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
 				backdropOpacity={ 0.2 }
-				onBackdropPress={ onClose }
-				onBackButtonPress={ onClose }
-				onSwipe={ onClose }
+				onBackdropPress={ this.onCloseBottomSheet }
+				onBackButtonPress={ this.onHardwareButtonPress }
+				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
 					Platform.OS === 'android' ? onDismiss : undefined
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
+					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponder
 				}
 				onMoveShouldSetResponderCapture={
+					scrollEnabled &&
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
-				onAccessibilityEscape={ onClose }
+				onAccessibilityEscape={ this.onCloseBottomSheet }
 				{ ...rest }
 			>
 				<KeyboardAvoidingView
@@ -257,15 +367,38 @@ class BottomSheet extends Component {
 						disableScrollViewPanResponder
 						bounces={ bounces }
 						onScroll={ this.onScroll }
+						onScrollBeginDrag={ () => this.isScrolling( true ) }
+						onScrollEndDrag={ () => this.isScrolling( false ) }
 						scrollEventThrottle={ 16 }
-						style={ { maxHeight } }
+						style={ isMaxHeightSet ? { maxHeight } : {} }
 						contentContainerStyle={ [
 							styles.content,
 							hideHeader && styles.emptyHeader,
 							contentStyle,
 						] }
+						scrollEnabled={ scrollEnabled }
+						automaticallyAdjustContentInsets={ false }
 					>
-						{ children }
+						<BottomSheetProvider
+							value={ {
+								shouldEnableBottomSheetScroll: this
+									.onShouldEnableScroll,
+								shouldDisableBottomSheetMaxHeight: this
+									.onShouldSetBottomSheetMaxHeight,
+								isBottomSheetContentScrolling: isScrolling,
+								onCloseBottomSheet: this
+									.onHandleClosingBottomSheet,
+								onHardwareButtonPress: this
+									.onHandleHardwareButtonPress,
+								onReplaceSubsheet: this.onReplaceSubsheet,
+								extraProps,
+								currentScreen,
+							} }
+						>
+							<TouchableHighlight accessible={ false }>
+								<>{ children }</>
+							</TouchableHighlight>
+						</BottomSheetProvider>
 						<View style={ { height: safeAreaBottomInset } } />
 					</ScrollView>
 				</KeyboardAvoidingView>
@@ -290,6 +423,6 @@ ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
-ThemedBottomSheet.UnsupportedFooterCell = UnsupportedFooterCell;
+ThemedBottomSheet.ColorCell = ColorCell;
 
 export default ThemedBottomSheet;

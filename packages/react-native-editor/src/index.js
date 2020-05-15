@@ -2,6 +2,12 @@
  * External dependencies
  */
 import { I18nManager } from 'react-native';
+import 'react-native-get-random-values'; // This library works as a polyfill for the global crypto.getRandomValues which is needed by `uuid` version 7.0.0
+
+/**
+ * WordPress dependencies
+ */
+import { setLocaleData } from '@wordpress/i18n';
 
 /**
  * Internal dependencies

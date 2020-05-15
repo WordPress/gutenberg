@@ -245,14 +245,17 @@ class FlatTermSelector extends Component {
 			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
 		);
 		const termAddedLabel = sprintf(
+			/* translators: %s: term name. */
 			_x( '%s added', 'term' ),
 			singularName
 		);
 		const termRemovedLabel = sprintf(
+			/* translators: %s: term name. */
 			_x( '%s removed', 'term' ),
 			singularName
 		);
 		const removeTermLabel = sprintf(
+			/* translators: %s: term name. */
 			_x( 'Remove %s', 'term' ),
 			singularName
 		);

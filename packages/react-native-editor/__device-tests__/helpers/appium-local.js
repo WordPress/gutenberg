@@ -5,7 +5,7 @@ import childProcess from 'child_process';
 
 // Spawns an appium process
 export const start = ( localAppiumPort ) =>
-	new Promise()( ( resolve, reject ) => {
+	new Promise( ( resolve, reject ) => {
 		const appium = childProcess.spawn( 'appium', [
 			'--port',
 			localAppiumPort.toString(),

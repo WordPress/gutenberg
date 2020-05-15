@@ -53,7 +53,10 @@ function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
 	);
 }
 
-function BlockNavigationDropdown( { isDisabled } ) {
+function BlockNavigationDropdown( {
+	isDisabled,
+	__experimentalWithBlockNavigationSlots,
+} ) {
 	const hasBlocks = useSelect(
 		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
 		[]
@@ -71,7 +74,12 @@ function BlockNavigationDropdown( { isDisabled } ) {
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<BlockNavigation onSelect={ onClose } />
+				<BlockNavigation
+					onSelect={ onClose }
+					__experimentalWithBlockNavigationSlots={
+						__experimentalWithBlockNavigationSlots
+					}
+				/>
 			) }
 		/>
 	);

@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (7.7.1):
+  - Gutenberg (8.1.0-rc.1):
     - React (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
@@ -189,16 +189,18 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
+  - react-native-get-random-values (1.4.0):
+    - React
   - react-native-keyboard-aware-scroll-view (0.8.8):
     - React
   - react-native-safe-area (0.5.1):
     - React
   - react-native-slider (2.0.7):
     - React
-  - react-native-video (5.0.1):
+  - react-native-video (5.0.2):
     - React
-    - react-native-video/Video (= 5.0.1)
-  - react-native-video/Video (5.0.1):
+    - react-native-video/Video (= 5.0.2)
+  - react-native-video/Video (5.0.2):
     - React
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
@@ -241,8 +243,8 @@ PODS:
     - React
   - RNTAztecView (0.1.11):
     - React-Core
-    - WordPress-Aztec-iOS (= 1.16.0)
-  - WordPress-Aztec-iOS (1.16.0)
+    - WordPress-Aztec-iOS (~> 1.19.0)
+  - WordPress-Aztec-iOS (1.19.1)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -264,6 +266,7 @@ DEPENDENCIES:
   - React-jsi (from `../../../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
@@ -322,6 +325,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-get-random-values:
+    :path: "../../../node_modules/react-native-get-random-values"
   react-native-keyboard-aware-scroll-view:
     :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
   react-native-safe-area:
@@ -367,7 +372,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: 947a15dae17e75ac0b022ac51b5cb5d8b58f6409
+  Gutenberg: 1afccb2a2f6b2966016dae142fa48db859410c6b
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -377,10 +382,11 @@ SPEC CHECKSUMS:
   React-jsi: cb2cd74d7ccf4cffb071a46833613edc79cdf8f7
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
+  react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
   react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
   react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
   react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
-  react-native-video: a1aeeb872d4408ff2f1a2a780a49ff44bdeb9172
+  react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -393,10 +399,10 @@ SPEC CHECKSUMS:
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: 4e64576a03d9e578ad6ee091811a74b33ddbe35b
-  WordPress-Aztec-iOS: 64a2989d25befb5ce086fac440315f696026ffd5
+  RNTAztecView: b8caab8aea3cc3628d751f8025555642e1b7ea9e
+  WordPress-Aztec-iOS: 25a9cbe204a22dd6d540d66d90b8a889421e0b42
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 6f29befa4340201780fd76791bfdf5e85ce42be8
+PODFILE CHECKSUM: aac0fd05ad076bb61d290e7c36d06c9cb30154c8
 
 COCOAPODS: 1.8.4

@@ -10,6 +10,7 @@ import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
 import {
@@ -33,7 +34,6 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		'wp-social-link__is-incomplete': ! url,
 	} );
 
-	// Import icon.
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
 
@@ -41,7 +41,11 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 		<Fragment>
 			<InspectorControls>
 				<PanelBody
-					title={ sprintf( __( '%s label' ), socialLinkName ) }
+					title={ sprintf(
+						/* translators: %s: name of the social service. */
+						__( '%s label' ),
+						socialLinkName
+					) }
 					initialOpen={ false }
 				>
 					<PanelRow>
@@ -58,36 +62,38 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<Button className={ classes } onClick={ () => setPopover( true ) }>
-				<IconComponent />
-				{ isSelected && showURLPopover && (
-					<URLPopover onClose={ () => setPopover( false ) }>
-						<form
-							className="block-editor-url-popover__link-editor"
-							onSubmit={ ( event ) => {
-								event.preventDefault();
-								setPopover( false );
-							} }
-						>
-							<div className="block-editor-url-input">
-								<URLInput
-									value={ url }
-									onChange={ ( nextURL ) =>
-										setAttributes( { url: nextURL } )
-									}
-									placeholder={ __( 'Enter address' ) }
-									disableSuggestions={ true }
+			<Block.li className={ classes }>
+				<Button onClick={ () => setPopover( true ) }>
+					<IconComponent />
+					{ isSelected && showURLPopover && (
+						<URLPopover onClose={ () => setPopover( false ) }>
+							<form
+								className="block-editor-url-popover__link-editor"
+								onSubmit={ ( event ) => {
+									event.preventDefault();
+									setPopover( false );
+								} }
+							>
+								<div className="block-editor-url-input">
+									<URLInput
+										value={ url }
+										onChange={ ( nextURL ) =>
+											setAttributes( { url: nextURL } )
+										}
+										placeholder={ __( 'Enter address' ) }
+										disableSuggestions={ true }
+									/>
+								</div>
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
 								/>
-							</div>
-							<Button
-								icon={ keyboardReturn }
-								label={ __( 'Apply' ) }
-								type="submit"
-							/>
-						</form>
-					</URLPopover>
-				) }
-			</Button>
+							</form>
+						</URLPopover>
+					) }
+				</Button>
+			</Block.li>
 		</Fragment>
 	);
 };

@@ -5,7 +5,7 @@ The Gutenberg Project is not only building a better editor for WordPress, but al
 
 ## UI Components
 
-The [WordPress Components package](/docs/components/) contains a set of UI components you can use in your project. See the [WordPress Storybook site](https://wordpress.github.io/gutenberg/) for an interactive guide to the available components and settings.
+The [WordPress Components package](/packages/components/README.md) contains a set of UI components you can use in your project. See the [WordPress Storybook site](https://wordpress.github.io/gutenberg/) for an interactive guide to the available components and settings.
 
 Here is a quick example, how to use components in your project.
 
@@ -26,6 +26,8 @@ function MyApp() {
    );
 }
 ```
+
+Many components include CSS to add style, you will need to include for the components to appear correctly. The component stylesheet can be found in `node_modules/@wordpress/components/build-style/style.css`, you can link directly or copy and include it in your project.
 
 ## Development Scripts
 

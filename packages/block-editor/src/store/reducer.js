@@ -1092,7 +1092,11 @@ function selection( state = {}, action ) {
 				return state;
 			}
 
-			return { clientId: blockToSelect.clientId };
+			const newState = { clientId: blockToSelect.clientId };
+			if ( typeof action.initialPosition === 'number' ) {
+				newState.initialPosition = action.initialPosition;
+			}
+			return newState;
 		}
 	}
 
@@ -1189,9 +1193,9 @@ export function isSelectionEnabled( state = true, action ) {
 /**
  * Reducer returning the intial block selection.
  *
- * Currently this in only used to restore the selection after block deletion.
- * This reducer should eventually be removed in favour of setting selection
- * directly.
+ * Currently this in only used to restore the selection after block deletion and
+ * pasting new content.This reducer should eventually be removed in favour of setting
+ * selection directly.
  *
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
@@ -1199,9 +1203,16 @@ export function isSelectionEnabled( state = true, action ) {
  * @return {?number} Initial position: -1 or undefined.
  */
 export function initialPosition( state, action ) {
-	if ( action.type === 'SELECT_BLOCK' ) {
+	if (
+		action.type === 'REPLACE_BLOCKS' &&
+		typeof action.initialPosition === 'number'
+	) {
+		return action.initialPosition;
+	} else if ( action.type === 'SELECT_BLOCK' ) {
 		return action.initialPosition;
 	} else if ( action.type === 'REMOVE_BLOCKS' ) {
+		return state;
+	} else if ( action.type === 'START_TYPING' ) {
 		return state;
 	}
 
@@ -1448,6 +1459,28 @@ export function automaticChangeStatus( state, action ) {
 	// Reset the state by default (for any action not handled).
 }
 
+/**
+ * Reducer returning current highlighted block.
+ *
+ * @param {boolean} state  Current highlighted block.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function highlightedBlock( state, action ) {
+	const { clientId, isHighlighted } = action;
+
+	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
+		if ( isHighlighted ) {
+			return clientId;
+		} else if ( state === clientId ) {
+			return null;
+		}
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1467,4 +1500,5 @@ export default combineReducers( {
 	lastBlockAttributesChange,
 	isNavigationMode,
 	automaticChangeStatus,
+	highlightedBlock,
 } );

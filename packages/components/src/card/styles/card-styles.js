@@ -109,13 +109,13 @@ export function bodySize() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 28px;
+				padding: 24px 32px;
 			}
 			&-medium {
-				padding: 20px;
+				padding: 16px 24px;
 			}
 			&-small {
-				padding: 12px;
+				padding: 16px;
 			}
 			&-extraSmall {
 				padding: 8px;
@@ -128,16 +128,16 @@ export function headerFooterSizes() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 20px 28px;
+				padding: 24px 32px;
 			}
 			&-medium {
-				padding: 12px 20px;
+				padding: 16px 24px;
 			}
 			&-small {
-				padding: 8px 12px;
+				padding: 16px;
 			}
 			&-extraSmall {
-				padding: 4px 8px;
+				padding: 8px;
 			}
 		}
 	`;

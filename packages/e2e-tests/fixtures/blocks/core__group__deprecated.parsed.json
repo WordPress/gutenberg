@@ -2,8 +2,8 @@
     {
         "blockName": "core/group",
         "attrs": {
-            "backgroundColor": "lighter-blue",
-            "align": "full"
+            "align": "full",
+            "backgroundColor": "lighter-blue"
         },
         "innerBlocks": [
             {

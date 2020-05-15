@@ -14,7 +14,7 @@ Find the section below based on what you are looking to contribute:
 
 - **Documentation?** See the [documentation section](/docs/contributors/document.md)
 
-- **Triage Support?** See the [triaging issues section](/docs/contributors/repository-management/#triaging-issues)
+- **Triage Support?** See the [triaging issues section](/docs/contributors/triage.md)
 
 - **Internationalization?** See the [localizing and translating section](/docs/contributors/localizing.md)
 

@@ -470,6 +470,20 @@ export function isTextField( element ) {
 }
 
 /**
+ * Check whether the given element is an input field of type number
+ * and has a valueAsNumber
+ *
+ * @param {HTMLElement} element The HTML element.
+ *
+ * @return {boolean} True if the element is input and holds a number.
+ */
+export function isNumberInput( element ) {
+	const { nodeName, type, valueAsNumber } = element;
+
+	return nodeName === 'INPUT' && type === 'number' && !! valueAsNumber;
+}
+
+/**
  * Check wether the current document has a selection.
  * This checks both for focus in an input field and general text selection.
  *
@@ -477,6 +491,10 @@ export function isTextField( element ) {
  */
 export function documentHasSelection() {
 	if ( isTextField( document.activeElement ) ) {
+		return true;
+	}
+
+	if ( isNumberInput( document.activeElement ) ) {
 		return true;
 	}
 

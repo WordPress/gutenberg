@@ -40,6 +40,7 @@ export const LinkControlSearchCreate = ( {
 				<span className="block-editor-link-control__search-item-title">
 					{ createInterpolateElement(
 						sprintf(
+							/* translators: %s: search term. */
 							__( 'New page: <mark>%s</mark>' ),
 							searchTerm
 						),

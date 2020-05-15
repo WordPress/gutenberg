@@ -3,17 +3,21 @@
 	display: flex;
 	height: $header-height;
 	justify-content: space-between;
-	padding: $grid-unit-10;
 	box-sizing: border-box;
 }
 
-.edit-site-header__toolbar,
-.edit-site-header__actions {
+.edit-site-header__toolbar {
 	display: flex;
+	flex-grow: 1;
+	padding-left: $grid-unit-10;
 
 	& > * {
 		margin-left: 5px;
 	}
+}
+.edit-site-header__actions {
+	display: flex;
+	margin-right: 8px;
 }
 
 .edit-site-header__actions-more-menu {

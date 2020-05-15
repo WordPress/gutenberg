@@ -10,12 +10,10 @@ import {
 } from '../helpers/utils';
 
 export default class EditorPage {
+	driver;
+	accessibilityIdKey;
+	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
-	listBlockName = 'List';
-	headingBlockName = 'Heading';
-	imageBlockName = 'Image';
-	galleryBlockName = 'Gallery';
-	unorderedListButtonName = 'Convert to unordered list';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver ) {
@@ -27,8 +25,6 @@ export default class EditorPage {
 			this.accessibilityIdXPathAttrib = 'content-desc';
 			this.accessibilityIdKey = 'contentDescription';
 		}
-
-		driver.setImplicitWaitTimeout( 5000 );
 	}
 
 	async getBlockList() {
@@ -39,8 +35,8 @@ export default class EditorPage {
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering
 	async getBlockAtPosition(
-		position,
 		blockName,
+		position = 1,
 		options = { autoscroll: false }
 	) {
 		const blockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockName } Block. Row ${ position }")]`;
@@ -80,7 +76,11 @@ export default class EditorPage {
 				// scroll down
 				await swipeUp( this.driver );
 			}
-			return this.getBlockAtPosition( position, blockName, options );
+			return await this.getBlockAtPosition(
+				blockName,
+				position,
+				options
+			);
 		}
 		return lastElementFound;
 	}
@@ -97,10 +97,10 @@ export default class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
-	async hasBlockAtPosition( position, blockName = '' ) {
+	async hasBlockAtPosition( position = 1, blockName = '' ) {
 		return (
 			undefined !==
-			( await this.getBlockAtPosition( position, blockName ) )
+			( await this.getBlockAtPosition( blockName, position ) )
 		);
 	}
 
@@ -179,10 +179,48 @@ export default class EditorPage {
 		await addButton.click();
 
 		// Click on block of choice
+		const blockButton = await this.findBlockButton( blockName );
+		if ( isAndroid() ) {
+			await blockButton.click();
+		} else {
+			await this.driver.execute( 'mobile: tap', {
+				element: blockButton,
+				x: 10,
+				y: 10,
+			} );
+		}
+	}
+
+	// Attempts to find the given block button in the block inserter control.
+	async findBlockButton( blockName ) {
+		if ( isAndroid() ) {
+			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
+			while (
+				! ( await this.driver.hasElementByAccessibilityId( blockName ) )
+			) {
+				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+			}
+
+			return await this.driver.elementByAccessibilityId( blockName );
+		}
+
 		const blockButton = await this.driver.elementByAccessibilityId(
 			blockName
 		);
-		await blockButton.click();
+		const size = await this.driver.getWindowSize();
+		const height = size.height - 5;
+
+		while ( ! ( await blockButton.isDisplayed() ) ) {
+			await this.driver.execute( 'mobile: dragFromToForDuration', {
+				fromX: 50,
+				fromY: height,
+				toX: 50,
+				toY: height - 450,
+				duration: 0.5,
+			} );
+		}
+
+		return blockButton;
 	}
 
 	async clickToolBarButton( buttonName ) {
@@ -230,7 +268,7 @@ export default class EditorPage {
 
 	// position of the block to remove
 	// Block will no longer be present if this succeeds
-	async removeBlockAtPosition( position, blockName = '' ) {
+	async removeBlockAtPosition( blockName = '', position = 1 ) {
 		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
 			throw Error( `No Block at position ${ position }` );
 		}
@@ -242,7 +280,7 @@ export default class EditorPage {
 		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( position, blockName );
+			const block = await this.getBlockAtPosition( blockName, position );
 			let checkList = await this.driver.elementsByXPath(
 				removeBlockLocator
 			);
@@ -264,25 +302,6 @@ export default class EditorPage {
 	// Paragraph Block functions
 	// =========================
 
-	async addNewParagraphBlock() {
-		await this.addNewBlock( this.paragraphBlockName );
-	}
-
-	async getParagraphBlockAtPosition(
-		position,
-		options = { autoscroll: false }
-	) {
-		return this.getBlockAtPosition(
-			position,
-			this.paragraphBlockName,
-			options
-		);
-	}
-
-	async hasParagraphBlockAtPosition( position ) {
-		return this.hasBlockAtPosition( position, this.paragraphBlockName );
-	}
-
 	async getTextViewForParagraphBlock( block ) {
 		let textViewElementName = 'XCUIElementTypeTextView';
 		if ( isAndroid() ) {
@@ -298,7 +317,7 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	async sendTextToParagraphBlock( block, text, clear ) {
+	async typeTextToParagraphBlock( block, text, clear ) {
 		const textViewElement = await this.getTextViewForParagraphBlock(
 			block
 		);
@@ -306,22 +325,23 @@ export default class EditorPage {
 		await this.driver.sleep( 1000 ); // Give time for the block to rerender (such as for accessibility)
 	}
 
-	async sendTextToParagraphBlockAtPosition( position, text, clear ) {
+	async sendTextToParagraphBlock( position, text, clear ) {
 		const paragraphs = text.split( '\n' );
 		for ( let i = 0; i < paragraphs.length; i++ ) {
 			// Select block first
-			const block = await this.getParagraphBlockAtPosition(
+			const block = await this.getBlockAtPosition(
+				this.paragraphBlockName,
 				position + i
 			);
 			await block.click();
 
-			await this.sendTextToParagraphBlock(
+			await this.typeTextToParagraphBlock(
 				block,
 				paragraphs[ i ],
 				clear
 			);
 			if ( i !== paragraphs.length - 1 ) {
-				await this.sendTextToParagraphBlock( block, '\n', false );
+				await this.typeTextToParagraphBlock( block, '\n', false );
 			}
 		}
 	}
@@ -334,16 +354,18 @@ export default class EditorPage {
 		return text.toString();
 	}
 
-	async removeParagraphBlockAtPosition( position ) {
-		await this.removeBlockAtPosition( position, this.paragraphBlockName );
-	}
-
 	async getTextForParagraphBlockAtPosition( position ) {
 		// Select block first
-		let block = await this.getParagraphBlockAtPosition( position );
+		let block = await this.getBlockAtPosition(
+			this.paragraphBlockName,
+			position
+		);
 		await block.click();
 
-		block = await this.getParagraphBlockAtPosition( position );
+		block = await this.getBlockAtPosition(
+			this.paragraphBlockName,
+			position
+		);
 		const text = await this.getTextForParagraphBlock( block );
 		return text.toString();
 	}
@@ -351,18 +373,6 @@ export default class EditorPage {
 	// =========================
 	// List Block functions
 	// =========================
-
-	async addNewListBlock() {
-		await this.addNewBlock( this.listBlockName );
-	}
-
-	async getListBlockAtPosition( position ) {
-		return this.getBlockAtPosition( position, this.listBlockName );
-	}
-
-	async hasListBlockAtPosition( position ) {
-		return await this.hasBlockAtPosition( position, this.listBlockName );
-	}
 
 	async getTextViewForListBlock( block ) {
 		let textViewElementName = 'XCUIElementTypeTextView';
@@ -388,22 +398,6 @@ export default class EditorPage {
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
-	async getTextForListBlock( block ) {
-		const textViewElement = await this.getTextViewForListBlock( block );
-		const text = await textViewElement.text();
-		return text.toString();
-	}
-
-	async removeListBlockAtPosition( position ) {
-		return await this.removeBlockAtPosition( position, this.listBlockName );
-	}
-
-	async getTextForListBlockAtPosition( position ) {
-		const block = await this.getListBlockAtPosition( position );
-		const text = await this.getTextForListBlock( block );
-		return text.toString();
-	}
-
 	async clickOrderedListToolBarButton() {
 		await this.clickToolBarButton( this.orderedListButtonName );
 	}
@@ -411,14 +405,6 @@ export default class EditorPage {
 	// =========================
 	// Image Block functions
 	// =========================
-
-	async addNewImageBlock() {
-		await this.addNewBlock( this.imageBlockName );
-	}
-
-	async getImageBlockAtPosition( position ) {
-		return this.getBlockAtPosition( position, this.imageBlockName );
-	}
 
 	async selectEmptyImageBlock( block ) {
 		const accessibilityId = await block.getAttribute(
@@ -440,48 +426,15 @@ export default class EditorPage {
 
 	async enterCaptionToSelectedImageBlock( caption, clear = true ) {
 		const imageBlockCaptionField = await this.driver.elementByXPath(
-			'//XCUIElementTypeButton[@name="Image caption. Empty"]'
+			'//XCUIElementTypeButton[starts-with(@name, "Image caption.")]'
 		);
 		await imageBlockCaptionField.click();
 		await typeString( this.driver, imageBlockCaptionField, caption, clear );
 	}
 
-	async removeImageBlockAtPosition( position ) {
-		return await this.removeBlockAtPosition(
-			position,
-			this.imageBlockName
-		);
-	}
-
-	// =========================
-	// Gallery Block functions
-	// =========================
-
-	async addNewGalleryBlock() {
-		await this.addNewBlock( this.galleryBlockName );
-	}
-
-	async getGalleryBlockAtPosition( position ) {
-		return this.getBlockAtPosition( position, this.galleryBlockName );
-	}
-
-	async removeGalleryBlockAtPosition( position ) {
-		return await this.removeBlockAtPosition(
-			position,
-			this.galleryBlockName
-		);
-	}
-
 	// =========================
 	// Heading Block functions
 	// =========================
-	async addNewHeadingBlock() {
-		await this.addNewBlock( this.headingBlockName );
-	}
-
-	async getHeadingBlockAtPosition( position ) {
-		return this.getBlockAtPosition( position, this.headingBlockName );
-	}
 
 	// Inner element changes on iOS if Heading Block is empty
 	async getTextViewForHeadingBlock( block, empty ) {
@@ -505,14 +458,5 @@ export default class EditorPage {
 			true
 		);
 		return await typeString( this.driver, textViewElement, text, clear );
-	}
-
-	async getTextForHeadingBlock( block ) {
-		const textViewElement = await this.getTextViewForHeadingBlock(
-			block,
-			false
-		);
-		const text = await textViewElement.text();
-		return text.toString();
 	}
 }

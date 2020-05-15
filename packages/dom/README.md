@@ -118,6 +118,19 @@ _Returns_
 
 -   `boolean`: True if at the horizontal edge, false if not.
 
+<a name="isNumberInput" href="#isNumberInput">#</a> **isNumberInput**
+
+Check whether the given element is an input field of type number
+and has a valueAsNumber
+
+_Parameters_
+
+-   _element_ `HTMLElement`: The HTML element.
+
+_Returns_
+
+-   `boolean`: True if the element is input and holds a number.
+
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
 Check whether the given element is a text field, where text field is defined
