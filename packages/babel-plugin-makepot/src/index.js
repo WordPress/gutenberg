@@ -132,6 +132,11 @@ function getExtractedComment( path, _originalNodeLine ) {
 
 	let comment;
 	forEach( node.leadingComments, ( commentNode ) => {
+		let line = 0;
+		if ( commentNode && commentNode.loc && commentNode.loc.end ) {
+			line = commentNode.loc.end.line;
+		}
+
 		const { line } = commentNode.loc.end;
 		if ( line < _originalNodeLine - 1 || line > _originalNodeLine ) {
 			return;
