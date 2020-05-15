@@ -18,6 +18,13 @@ const manifest = require( '../../../package.json' );
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
 
 /**
+ * @typedef WPChangelogCommandOptions
+ *
+ * @property {string=} milestone Optional Milestone title.
+ * @property {string=} token     Optional personal access token.
+ */
+
+/**
  * @typedef WPChangelogSettings
  *
  * @property {string}  owner     Repository owner.
@@ -240,6 +247,11 @@ async function createChangelog( settings ) {
 	log( changelog );
 }
 
+/**
+ * Command that generates the release changelog.
+ *
+ * @param {WPChangelogCommandOptions} options
+ */
 async function getReleaseChangelog( options ) {
 	await createChangelog( {
 		owner: config.githubRepositoryOwner,

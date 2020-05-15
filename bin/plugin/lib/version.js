@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// @ts-ignore
 const semver = require( 'semver' );
 
 /**
