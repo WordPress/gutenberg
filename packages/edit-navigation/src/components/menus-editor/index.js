@@ -27,6 +27,16 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		};
 	}, [] );
 
+	const [ hasCompletedFirstLoad, setHasCompletedFirstLoad ] = useState(
+		false
+	);
+
+	useEffect( () => {
+		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
+			setHasCompletedFirstLoad( true );
+		}
+	}, [ hasCompletedFirstLoad, hasLoadedMenus ] );
+
 	const [ menuId, setMenuId ] = useState();
 	const [ stateMenus, setStateMenus ] = useState();
 	const [ showCreateMenuPanel, setShowCreateMenuPanel ] = useState( false );
@@ -38,7 +48,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		}
 	}, [ menus ] );
 
-	if ( ! hasLoadedMenus ) {
+	if ( ! hasCompletedFirstLoad ) {
 		return <Spinner />;
 	}
 
