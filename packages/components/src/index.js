@@ -79,8 +79,8 @@ export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export {
-	default as __experimentalRovingTabIndex,
-	RovingTabIndexItem as __experimentalRovingTabIndexItem,
+	default as __unstableRovingTabIndex,
+	RovingTabIndexItem as __unstableRovingTabIndexItem,
 } from './roving-tab-index';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
