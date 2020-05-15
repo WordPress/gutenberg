@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { apiFetch } from '@wordpress/data-controls';
-import { getBlockTypes } from '@wordpress/blocks';
+import { apiFetch, select } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -51,41 +50,16 @@ export function setInstallBlocksPermission( hasPermission ) {
 }
 
 /**
- * Action triggered to download block assets.
- *
- * @param {Object}   item      The selected block item
- * @param {Function} onSuccess The callback function when the action has
- *                             succeeded.
- * @param {Function} onError   The callback function when the action has failed.
- */
-export function* downloadBlock( item, onSuccess, onError ) {
-	try {
-		if ( ! item.assets.length ) {
-			throw new Error( 'Block has no assets' );
-		}
-
-		yield loadAssets( item.assets );
-		const registeredBlocks = getBlockTypes();
-		if ( registeredBlocks.length ) {
-			onSuccess( item );
-		} else {
-			throw new Error( 'Unable to get block types' );
-		}
-	} catch ( error ) {
-		yield onError( error );
-	}
-}
-
-/**
  * Action triggered to install a block plugin.
  *
- * @param {string}   item      The block item returned by search.
- * @param {Function} onSuccess The callback function when the action has
- *                             succeeded.
- * @param {Function} onError   The callback function when the action has failed.
+ * @param {Object} item The block item returned by search.
  */
-export function* installBlock( { id, name }, onSuccess, onError ) {
+export function* installBlockType( { id, name, assets } ) {
+	yield clearErrorNotice( id );
 	try {
+		if ( ! Array.isArray( assets ) || ! assets.length ) {
+			throw new Error( 'Block has no assets' );
+		}
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
@@ -93,13 +67,18 @@ export function* installBlock( { id, name }, onSuccess, onError ) {
 			},
 			method: 'POST',
 		} );
-		if ( response.success === false ) {
+		if ( response.success !== true ) {
 			throw new Error( response.errorMessage );
 		}
 		yield addInstalledBlockType( { id, name } );
-		onSuccess();
+
+		yield loadAssets( assets );
+		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
+		if ( ! registeredBlocks.length ) {
+			throw new Error( 'Unable to get block types' );
+		}
 	} catch ( error ) {
-		onError( error );
+		yield setErrorNotice( id, error.message );
 	}
 }
 
