@@ -94,10 +94,6 @@ function post_author_build_css_font_sizes( $attributes ) {
  * @return string Returns the rendered author block.
  */
 function render_block_core_post_author( $attributes, $content, $block ) {
-	if ( empty( $attributes ) ) {
-		return '';
-	}
-
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
