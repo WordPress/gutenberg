@@ -4,6 +4,7 @@
 const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
+const path = require( 'path' );
 const inquirer = require( 'inquirer' );
 
 /**
@@ -14,8 +15,8 @@ const rimraf = util.promisify( require( 'rimraf' ) );
 /**
  * Internal dependencies
  */
-const initConfig = require( '../init-config' );
 const stop = require( './stop' );
+const { readConfig } = require( '../../lib/config' );
 
 /**
  * Destroy the development server.
@@ -26,8 +27,9 @@ const stop = require( './stop' );
  */
 module.exports = async function destroy( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig( configPath );
-	const { dockerComposeConfigPath, workDirectoryPath } = config;
+	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
+		configPath
+	);
 
 	// check installed WordPress.
 	const installed = await fs.readdir( workDirectoryPath );
@@ -49,7 +51,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 
 	spinner.start();
 
-	if ( ! yesDelete ) {
+	if ( !yesDelete ) {
 		spinner.text = 'Cancelled.';
 		return;
 	}
