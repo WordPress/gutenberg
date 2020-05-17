@@ -25,7 +25,7 @@
 		order: 1;
 
 		// Restore default order for all other browsers
-		@supports (position: sticky) {
+		@supports ( position: sticky ) {
 			order: initial;
 		}
 	}
@@ -57,18 +57,48 @@
 
 	.my-popover-content-classname & {
 		min-width: 150px;
+
 		.editor-post-saved-state {
 			margin-bottom: 1rem;
+			padding-left: 0;
+			svg {
+				margin-left: 4px;
+				margin-right: 0;
+			}
 		}
+
 		button {
 			width: 100%;
 		}
+
 		.is-primary {
 			justify-content: center;
 		}
-		.components-button .label {
-			flex-basis: auto;
-			padding-right: 7px;
+
+		.is-tertiary {
+			display: flex;
+			justify-content: center;
+			margin-bottom: 1rem;
+			&.is-tertiary {
+				margin-right: 0;
+			}
+		}
+
+		.components-button {
+			.label {
+				flex-basis: auto;
+				padding-right: 7px;
+			}
+
+			&.has-icon {
+				justify-content: left;
+				padding-left: 0;
+			}
+		}
+
+		.edit-post-more-menu {
+			display: block;
+			width: 100%;
 		}
 	}
 
@@ -101,7 +131,6 @@
 		}
 	}
 }
-
 
 /**
  * Buttons in the Toolbar
