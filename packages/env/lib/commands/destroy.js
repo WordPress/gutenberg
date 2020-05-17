@@ -51,7 +51,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 
 	spinner.start();
 
-	if ( !yesDelete ) {
+	if ( ! yesDelete ) {
 		spinner.text = 'Cancelled.';
 		return;
 	}
