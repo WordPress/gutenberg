@@ -65,6 +65,9 @@ import * as socialLink from './social-link';
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
+import * as query from './query';
+import * as queryLoop from './query-loop';
+import * as queryPagination from './query-pagination';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
@@ -197,6 +200,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						? [
 								siteTitle,
 								templatePart,
+								query,
+								queryLoop,
+								queryPagination,
 								postTitle,
 								postContent,
 								postAuthor,

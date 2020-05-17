@@ -5,6 +5,9 @@
  * @package Gutenberg
  */
 
+// Require composer dependencies.
+require_once dirname( dirname( __FILE__ ) ) . '/vendor/autoload.php';
+
 // If we're running in WP's build directory, ensure that WP knows that, too.
 if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
 	define( 'WP_RUN_CORE_TESTS', true );
@@ -13,6 +16,11 @@ if ( 'build' === getenv( 'LOCAL_DIR' ) ) {
 // Determine the tests directory (from a WP dev checkout).
 // Try the WP_TESTS_DIR environment variable first.
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
+
+// Next, try the WP_PHPUNIT composer package.
+if ( ! $_tests_dir ) {
+	$_tests_dir = getenv( 'WP_PHPUNIT__DIR' );
+}
 
 // See if we're installed inside an existing WP dev instance.
 if ( ! $_tests_dir ) {

@@ -1,0 +1,5 @@
+{
+	"name": "core/query-pagination",
+	"category": "layout",
+	"context": [ "queryId", "query" ]
+}

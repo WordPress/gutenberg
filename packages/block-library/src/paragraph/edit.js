@@ -94,6 +94,7 @@ function ParagraphBlock( {
 	attributes,
 	mergeBlocks,
 	onReplace,
+	onRemove,
 	setAttributes,
 } ) {
 	const {
@@ -178,7 +179,7 @@ function ParagraphBlock( {
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
-				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+				onRemove={ onRemove }
 				aria-label={
 					content
 						? __( 'Paragraph block' )

@@ -24,8 +24,16 @@ _Returns_
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
-Check wether the current document has a selection.
-This checks both for focus in an input field and general text selection.
+Check whether the current document has a selection. This checks for both
+focus in an input field and general text selection.
+
+_Returns_
+
+-   `boolean`: True if there is selection, false if not.
+
+<a name="documentHasTextSelection" href="#documentHasTextSelection">#</a> **documentHasTextSelection**
+
+Check whether the current document has selected text.
 
 _Returns_
 

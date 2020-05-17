@@ -1,4 +1,4 @@
-/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
  * External dependencies
@@ -203,20 +203,20 @@ export function registerBlockType( name, settings ) {
 		console.error( 'The "edit" property must be a valid function.' );
 		return;
 	}
-	if ( ! ( 'category' in settings ) ) {
-		console.error( 'The block "' + name + '" must have a category.' );
-		return;
-	}
 	if (
 		'category' in settings &&
 		! some( select( 'core/blocks' ).getCategories(), {
 			slug: settings.category,
 		} )
 	) {
-		console.error(
-			'The block "' + name + '" must have a registered category.'
+		console.warn(
+			'The block "' +
+				name +
+				'" is registered with an invalid category "' +
+				settings.category +
+				'".'
 		);
-		return;
+		delete settings.category;
 	}
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		console.error( 'The block "' + name + '" must have a title.' );

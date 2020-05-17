@@ -6,6 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
+import '@wordpress/notices';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
