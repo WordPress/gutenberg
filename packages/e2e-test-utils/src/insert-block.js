@@ -5,7 +5,7 @@ import { searchForBlock } from './search-for-block';
 
 /**
  * Opens the inserter, searches for the given term, then selects the first
- * result that appears.
+ * result that appears. It then waits briefly for the block list to update.
  *
  * @param {string} searchTerm The text to search the inserter for.
  */

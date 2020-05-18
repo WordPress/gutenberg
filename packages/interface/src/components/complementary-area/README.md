@@ -25,7 +25,7 @@ Label of the button that allows to close the complementary area.
 - Required: No
 - Default: "Close plugin"
 
-### complementaryAreaIdentifier
+### identifier
 
 Identifier of the complementary area. The string is saved on the store and allows to identify which of the sidebars is active.
 
@@ -57,7 +57,7 @@ The icon to render.
 
 ### name
 
-Name of the complementary area. The name of the complementarity area is concatenated with the name of the plugin to form the identifier of the complementary area. The name of the plugin is extracted from the plugin context where the sidebar is rendered. If there is no plugin context available or there is a need to specify a custom identifier, please use the `complementaryAreaIdentifier` property instead.
+Name of the complementary area. The name of the complementarity area is concatenated with the name of the plugin to form the identifier of the complementary area. The name of the plugin is extracted from the plugin context where the sidebar is rendered. If there is no plugin context available or there is a need to specify a custom identifier, please use the `identifier` property instead.
 
 - Type: `String`
 - Required: No

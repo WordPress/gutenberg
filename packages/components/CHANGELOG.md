@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 9.6.0 (2020-05-14)
+
+### Bug Fix
+
+- Fix and issue that would cause the `Popover` component to throw an error under certain
+  circumstances ([#22264](https://github.com/WordPress/gutenberg/pull/22264)).
+
 ## 9.2.0 (2020-02-10)
 
 ### Enhancements
