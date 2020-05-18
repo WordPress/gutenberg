@@ -226,7 +226,9 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		} );
 
-		it( 'should only dirty the parent entity when editing the parent', async () => {
+		// Todo: Solve issue affecting test
+		// eslint-disable-next-line jest/no-disabled-tests
+		it.skip( 'should only dirty the parent entity when editing the parent', async () => {
 			await page.click( '.block-editor-button-block-appender' );
 			await page.waitForSelector( '.block-editor-inserter__menu' );
 			await page.click( 'button.editor-block-list-item-paragraph' );
