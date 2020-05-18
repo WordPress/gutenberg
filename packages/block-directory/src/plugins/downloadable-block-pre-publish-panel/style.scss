@@ -1,3 +1,10 @@
 .downloadable-block-pre-publish-panel__copy {
 	margin-top: 0;
 }
+
+.downloadable-block-pre-publish-panel__subcopy {
+	margin-top: $grid-unit-30;
+	margin-bottom: 0;
+	color: $dark-gray-400;
+	font-style: italic;
+}
