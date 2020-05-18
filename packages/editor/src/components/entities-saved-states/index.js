@@ -109,7 +109,7 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 				<strong>{ __( 'Are you ready to save?' ) }</strong>
 				<p>
 					{ __(
-						'Changes may exist in more than one savable entity.'
+						'Changes were made to this template, its content, and the contents of the page.'
 					) }
 				</p>
 				<p>
