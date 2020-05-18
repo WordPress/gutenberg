@@ -705,3 +705,16 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
 	register_block_pattern( 'core/pricing-table', gutenberg_load_block_pattern( 'pricing-table' ) );
 }
+
+/*
+ * Register default pattern categories if not registered in Core already.
+ */
+if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => _x( 'Hero', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'features', array( 'label' => _x( 'Features', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'testimonials', array( 'label' => _x( 'Testimonials', 'Block pattern category', 'gutenberg' ) ) );
+}
