@@ -58,12 +58,7 @@
 
 	.entities-saved-states__text-prompt {
 		border-bottom: $border-width solid $light-gray-500;
-
-		h2 {
-			padding: $grid-unit-20;
-			padding-bottom: $grid-unit-15;
-			margin: 0;
-			font-size: $big-font-size;
-		}
+		padding: $grid-unit-20;
+		padding-bottom: $grid-unit-05;
 	}
 }

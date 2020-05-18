@@ -100,9 +100,12 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
-				<h2>
-					{ __( 'Please review the following changes to save:' ) }
-				</h2>
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<p>
+					{ __(
+						'Changes may exist in more than one savable entity.'
+					) }
+				</p>
 			</div>
 
 			{ partitionedSavables.map( ( list ) => {
