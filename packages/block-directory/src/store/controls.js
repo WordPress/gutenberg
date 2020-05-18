@@ -38,7 +38,7 @@ export const loadStyle = ( asset ) => {
 		link.rel = 'stylesheet';
 		link.href = asset;
 		link.onload = () => resolve( true );
-		link.onerror = () => reject( new Error( 'Error loading script.' ) );
+		link.onerror = () => reject( new Error( 'Error loading style.' ) );
 		document.body.appendChild( link );
 	} );
 };
