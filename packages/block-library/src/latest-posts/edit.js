@@ -498,10 +498,7 @@ export default withSelect( ( select, props ) => {
 
 	let authors = [];
 	if ( posts ) {
-		const postAuthors = posts.reduce( ( accumulator, post ) => {
-			accumulator.push( post.author );
-			return accumulator;
-		}, [] );
+		const postAuthors = posts.map( ( post ) => post.author );
 		const authorsQuery = {
 			include: postAuthors.join( ',' ),
 		};
