@@ -95,8 +95,6 @@ translators: sample content for "Services" page template -->
     <string name="gutenberg_native_j_k_rowling" tools:ignore="UnusedResources">J.K. Rowling</string>
     <!-- translators: sample content for "Team" page template -->
     <string name="gutenberg_native_juan_p_rez" tools:ignore="UnusedResources">Juan Pérez</string>
-    <!-- translators: sample content for "Blog" page template -->
-    <string name="gutenberg_native_latest_blog_posts" tools:ignore="UnusedResources">Latest Blog Posts</string>
     <!-- translators: sample content for "About" page template -->
     <string name="gutenberg_native_let_s_build_something_together" tools:ignore="UnusedResources">Let’s build something together</string>
     <!-- translators: sample content for "Services" page template -->
@@ -207,6 +205,8 @@ translators: sample content for "Services" page template -->
     <string name="gutenberg_native_we_are_working_hard_to_add_more_blocks_with_each_release_in_the_m" tools:ignore="UnusedResources">We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.</string>
     <!-- translators: sample content for "Services" page template -->
     <string name="gutenberg_native_we_offer_a_range_of_services_to_help_you_achieve_the_results_you" tools:ignore="UnusedResources">We offer a range of services to help you achieve the results you\'re after. Not sure what you need, or what it costs? We can explain what services are right for you and tell you more about our fees. Get in touch below.</string>
+    <!-- translators: sample content for "Blog" page template -->
+    <string name="gutenberg_native_welcome_to_our_new_blog" tools:ignore="UnusedResources">Welcome to our new blog</string>
     <!-- translators: sample content for "About" page template -->
     <string name="gutenberg_native_what_people_say" tools:ignore="UnusedResources">What People Say</string>
     <string name="gutenberg_native_wordpress_media_library" tools:ignore="UnusedResources">WordPress Media Library</string>
