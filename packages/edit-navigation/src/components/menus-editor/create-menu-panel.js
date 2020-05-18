@@ -13,9 +13,10 @@ import {
 	TextControl,
 	withFocusReturn,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+const { DOMParser } = window;
 
 const noticeId = 'edit-navigation-create-menu-error';
 
@@ -25,10 +26,28 @@ const menuNameMatches = ( menuName ) => ( menu ) =>
 export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 	const [ menuName, setMenuName ] = useState( '' );
 	const [ isCreatingMenu, setIsCreatingMenu ] = useState( false );
+	const menuSaveError = useSelect( ( select ) =>
+		select( 'core' ).getLastEntitySaveError( 'root', 'menu' )
+	);
 	const { saveMenu } = useDispatch( 'core' );
 	const { createInfoNotice, createErrorNotice, removeNotice } = useDispatch(
 		'core/notices'
 	);
+
+	// Handle REST API Error messages.
+	useEffect( () => {
+		if ( menuSaveError ) {
+			// Error messages from the REST API often contain HTML.
+			// createErrorNotice does not support HTML in error text, so first
+			// strip HTML out using DOMParser.
+			const document = new DOMParser().parseFromString(
+				menuSaveError.message,
+				'text/html'
+			);
+			const errorText = document.body.textContent || '';
+			createErrorNotice( errorText, { id: noticeId } );
+		}
+	}, [ menuSaveError ] );
 
 	const createMenu = useCallback(
 		async ( event ) => {
@@ -55,24 +74,19 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 				createErrorNotice( message, { id: noticeId } );
 				return;
 			}
-			try {
-				setIsCreatingMenu( true );
-				const menu = await saveMenu( { name: menuName } );
+
+			setIsCreatingMenu( true );
+
+			const menu = await saveMenu( { name: menuName } );
+			if ( menu ) {
 				createInfoNotice( __( 'Menu created' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
 				onCreateMenu( menu.id );
-			} catch ( error ) {
-				const message = sprintf(
-					// translators: %s: an error message.
-					__( 'Error creating menu: %s' ),
-					error.message
-				);
-				createErrorNotice( message, { id: noticeId } );
-			} finally {
-				setIsCreatingMenu( false );
 			}
+
+			setIsCreatingMenu( false );
 		},
 		[ menuName, menus ]
 	);
