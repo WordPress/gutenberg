@@ -81,6 +81,10 @@ function CopyHandler( { children } ) {
 	} = getSettings();
 
 	const handler = ( event ) => {
+		if ( ! containerRef.current.contains( event.target ) ) {
+			return;
+		}
+
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 
 		if ( selectedBlockClientIds.length === 0 ) {
@@ -102,9 +106,6 @@ function CopyHandler( { children } ) {
 			}
 		}
 
-		if ( ! containerRef.current.contains( event.target ) ) {
-			return;
-		}
 		event.preventDefault();
 
 		if ( event.type === 'copy' || event.type === 'cut' ) {
