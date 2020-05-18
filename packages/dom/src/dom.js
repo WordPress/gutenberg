@@ -484,24 +484,28 @@ export function isNumberInput( element ) {
 }
 
 /**
- * Check wether the current document has a selection.
- * This checks both for focus in an input field and general text selection.
+ * Check whether the current document has selected text.
+ *
+ * @return {boolean} True if there is selection, false if not.
+ */
+export function documentHasTextSelection() {
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	return range && ! range.collapsed;
+}
+
+/**
+ * Check whether the current document has a selection. This checks for both
+ * focus in an input field and general text selection.
  *
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection() {
-	if ( isTextField( document.activeElement ) ) {
-		return true;
-	}
-
-	if ( isNumberInput( document.activeElement ) ) {
-		return true;
-	}
-
-	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-	return range && ! range.collapsed;
+	return (
+		isTextField( document.activeElement ) ||
+		isNumberInput( document.activeElement ) ||
+		documentHasTextSelection()
+	);
 }
 
 /**

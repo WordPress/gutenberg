@@ -99,10 +99,6 @@ export default function AlignmentMatrixControl( {
 								key={ cell }
 								value={ cell }
 								onFocus={ () => handleOnChange( cell ) }
-								onClick={ () =>
-									// VoiceOver doesn't focus elements on click
-									composite.move( cellId )
-								}
 							/>
 						);
 					} ) }

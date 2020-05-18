@@ -45,3 +45,25 @@ export function hasInstallBlocksPermission( state ) {
 export function getInstalledBlockTypes( state ) {
 	return state.blockManagement.installedBlockTypes;
 }
+
+/**
+ * Returns true if application is calling install endpoint.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether its currently installing
+ */
+export function isInstalling( state ) {
+	return state.blockManagement.isInstalling;
+}
+
+/**
+ * Returns the error notices
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Object with error notices.
+ */
+export function getErrorNotices( state ) {
+	return state.errorNotices.notices;
+}

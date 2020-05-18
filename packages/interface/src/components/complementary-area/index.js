@@ -36,7 +36,7 @@ function ComplementaryArea( {
 	children,
 	className,
 	closeLabel = __( 'Close plugin' ),
-	complementaryAreaIdentifier,
+	identifier,
 	header,
 	headerClassName,
 	icon,
@@ -53,13 +53,11 @@ function ComplementaryArea( {
 				'core/interface'
 			);
 			return {
-				isActive:
-					getActiveComplementaryArea( scope ) ===
-					complementaryAreaIdentifier,
-				isPinned: isItemPinned( scope, complementaryAreaIdentifier ),
+				isActive: getActiveComplementaryArea( scope ) === identifier,
+				isPinned: isItemPinned( scope, identifier ),
 			};
 		},
-		[ complementaryAreaIdentifier, scope ]
+		[ identifier, scope ]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		'core/interface'
@@ -75,10 +73,7 @@ function ComplementaryArea( {
 						onClick={ () =>
 							isActive
 								? disableComplementaryArea( scope )
-								: enableComplementaryArea(
-										scope,
-										complementaryAreaIdentifier
-								  )
+								: enableComplementaryArea( scope, identifier )
 						}
 						isPressed={ isActive }
 						aria-expanded={ isActive }
@@ -117,7 +112,7 @@ function ComplementaryArea( {
 										onClick={ () =>
 											( isPinned ? unpinItem : pinItem )(
 												scope,
-												complementaryAreaIdentifier
+												identifier
 											)
 										}
 										isPressed={ isPinned }
@@ -137,9 +132,8 @@ function ComplementaryArea( {
 const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
 	return {
 		icon: ownProps.icon || context.icon,
-		complementaryAreaIdentifier:
-			ownProps.complementaryAreaIdentifier ||
-			`${ context.name }/${ ownProps.name }`,
+		identifier:
+			ownProps.identifier || `${ context.name }/${ ownProps.name }`,
 	};
 } )( ComplementaryArea );
 

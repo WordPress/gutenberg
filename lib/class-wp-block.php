@@ -7,6 +7,8 @@
 
 /**
  * Class representing a parsed instance of a block.
+ *
+ * @property array $attributes
  */
 class WP_Block {
 
