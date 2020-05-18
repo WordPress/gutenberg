@@ -709,8 +709,8 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
  * Register default pattern categories if not registered in Core already.
  */
 if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-	register_block_pattern_category( 'text', array( 'label' => __( 'Text', 'gutenberg' ) ) );
-	register_block_pattern_category( 'hero', array( 'label' => __( 'Hero', 'gutenberg' ) ) );
+	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => _x( 'Hero', 'Block pattern category', 'gutenberg' ) ) );
 	register_block_pattern_category( 'columns', array( 'label' => __( 'Columns', 'gutenberg' ) ) );
 	register_block_pattern_category( 'buttons', array( 'label' => __( 'Buttons', 'gutenberg' ) ) );
 	register_block_pattern_category( 'gallery', array( 'label' => __( 'Gallery', 'gutenberg' ) ) );
