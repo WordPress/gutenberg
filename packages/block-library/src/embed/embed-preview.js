@@ -7,7 +7,6 @@ import { getPhotoHtml } from './util';
 /**
  * External dependencies
  */
-import { parse } from 'url';
 import { includes } from 'lodash';
 import classnames from 'classnames/dedupe';
 
@@ -69,13 +68,13 @@ class EmbedPreview extends Component {
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = parse( url ).host.split( '.' );
+		const parsedHost = new URL( url ).host.split( '.' );
 		const parsedHostBaseUrl = parsedHost
 			.splice( parsedHost.length - 2, parsedHost.length - 1 )
 			.join( '.' );
 		const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
-		// translators: %s: host providing embed content e.g: www.youtube.com
 		const iframeTitle = sprintf(
+			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
 			parsedHostBaseUrl
 		);
@@ -126,8 +125,8 @@ class EmbedPreview extends Component {
 							<a href={ url }>{ url }</a>
 						</p>
 						<p className="components-placeholder__error">
-							{ /* translators: %s: host providing embed content e.g: www.youtube.com */
-							sprintf(
+							{ sprintf(
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),

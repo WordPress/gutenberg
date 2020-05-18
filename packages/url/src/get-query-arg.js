@@ -3,9 +3,11 @@
  */
 import { parse } from 'qs';
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef {{[key: string]: QueryArgParsed}} QueryArgObject
  */
+/* eslint-enable */
 
 /**
  * @typedef {string|string[]|QueryArgObject} QueryArgParsed

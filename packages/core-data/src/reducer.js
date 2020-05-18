@@ -103,6 +103,43 @@ export function taxonomies( state = [], action ) {
 }
 
 /**
+ * Reducer managing the current theme.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function currentTheme( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_THEME':
+			return action.currentTheme.stylesheet;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing installed themes.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function themes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_CURRENT_THEME':
+			return {
+				...state,
+				[ action.currentTheme.stylesheet ]: action.currentTheme,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.
@@ -502,8 +539,10 @@ export function autosaves( state = {}, action ) {
 export default combineReducers( {
 	terms,
 	users,
+	currentTheme,
 	currentUser,
 	taxonomies,
+	themes,
 	themeSupports,
 	entities,
 	undo,

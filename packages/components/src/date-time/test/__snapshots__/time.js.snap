@@ -317,12 +317,12 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
           value="00"
         />
       </div>
-      <div
+      <ForwardRef(ButtonGroup)
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
-          isPressed={false}
+          isPrimary={false}
           isSecondary={true}
           onClick={[Function]}
         >
@@ -330,13 +330,13 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
         </ForwardRef(Button)>
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
-          isPressed={true}
-          isSecondary={true}
+          isPrimary={true}
+          isSecondary={false}
           onClick={[Function]}
         >
           PM
         </ForwardRef(Button)>
-      </div>
+      </ForwardRef(ButtonGroup)>
     </div>
   </fieldset>
 </div>
@@ -498,12 +498,12 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
           value="00"
         />
       </div>
-      <div
+      <ForwardRef(ButtonGroup)
         className="components-datetime__time-field components-datetime__time-field-am-pm"
       >
         <ForwardRef(Button)
           className="components-datetime__time-am-button"
-          isPressed={false}
+          isPrimary={false}
           isSecondary={true}
           onClick={[Function]}
         >
@@ -511,13 +511,13 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
         </ForwardRef(Button)>
         <ForwardRef(Button)
           className="components-datetime__time-pm-button"
-          isPressed={true}
-          isSecondary={true}
+          isPrimary={true}
+          isSecondary={false}
           onClick={[Function]}
         >
           PM
         </ForwardRef(Button)>
-      </div>
+      </ForwardRef(ButtonGroup)>
     </div>
   </fieldset>
 </div>

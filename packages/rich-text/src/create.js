@@ -16,12 +16,6 @@ import {
 	ZWNBSP,
 } from './special-characters';
 
-/**
- * Browser dependencies
- */
-
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
-
 function createEmptyValue() {
 	return {
 		formats: [],
@@ -160,6 +154,8 @@ export function create( {
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {
+		// It does not matter which document this is, we're just using it to
+		// parse.
 		element = createElement( document, html );
 	}
 
@@ -208,7 +204,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
 		// Range indicates that the current node has selection.
-	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === startContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 		// Range indicates that the current node is selected.
 	} else if (
@@ -231,7 +227,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
 		// Range indicates that the current node has selection.
-	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
+	} else if ( node === endContainer && node.nodeType === node.TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 		// Range indicates that the current node is selected.
 	} else if (
@@ -342,7 +338,7 @@ function createFromElement( {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
 			let filter = removePadding;
 
 			if ( ! preserveWhiteSpace ) {
@@ -361,7 +357,7 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeType !== ELEMENT_NODE ) {
+		if ( node.nodeType !== node.ELEMENT_NODE ) {
 			continue;
 		}
 

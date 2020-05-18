@@ -65,8 +65,8 @@
 	/*!rtl:end:ignore*/
 }
 
-.wp-block-media-text > figure > img,
-.wp-block-media-text > figure > video {
+.wp-block-media-text__media img,
+.wp-block-media-text__media video {
 	max-width: unset;
 	width: 100%;
 	vertical-align: middle;

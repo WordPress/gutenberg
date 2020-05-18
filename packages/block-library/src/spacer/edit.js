@@ -6,24 +6,29 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
+import { Platform } from '@wordpress/element';
+
+const MIN_SPACER_HEIGHT = 20;
+const MAX_SPACER_HEIGHT = 500;
 
 const SpacerEdit = ( {
 	attributes,
 	isSelected,
 	setAttributes,
-	instanceId,
 	onResizeStart,
 	onResizeStop,
 } ) => {
 	const { height } = attributes;
-	const id = `block-spacer-height-input-${ instanceId }`;
-	const [ inputHeightValue, setInputHeightValue ] = useState( height );
+	const updateHeight = ( value ) => {
+		setAttributes( {
+			height: value,
+		} );
+	};
 
 	return (
 		<>
@@ -37,7 +42,7 @@ const SpacerEdit = ( {
 				size={ {
 					height,
 				} }
-				minHeight="20"
+				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
 					top: false,
 					right: false,
@@ -51,42 +56,24 @@ const SpacerEdit = ( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
-					const spacerHeight = parseInt( height + delta.height, 10 );
-					setAttributes( {
-						height: spacerHeight,
-					} );
-					setInputHeightValue( spacerHeight );
+					const spacerHeight = Math.min(
+						parseInt( height + delta.height, 10 ),
+						MAX_SPACER_HEIGHT
+					);
+					updateHeight( spacerHeight );
 				} }
+				showHandle={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
-					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
-						<input
-							type="number"
-							id={ id }
-							onChange={ ( event ) => {
-								let spacerHeight = parseInt(
-									event.target.value,
-									10
-								);
-								setInputHeightValue( spacerHeight );
-								if ( isNaN( spacerHeight ) ) {
-									// Set spacer height to default size and input box to empty string
-									setInputHeightValue( '' );
-									spacerHeight = 100;
-								} else if ( spacerHeight < 20 ) {
-									// Set spacer height to minimum size
-									spacerHeight = 20;
-								}
-								setAttributes( {
-									height: spacerHeight,
-								} );
-							} }
-							value={ inputHeightValue }
-							min="20"
-							step="10"
-						/>
-					</BaseControl>
+					<RangeControl
+						label={ __( 'Height in pixels' ) }
+						min={ MIN_SPACER_HEIGHT }
+						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+						value={ height }
+						onChange={ updateHeight }
+						step={ Platform.OS === 'web' ? 10 : 1 }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>

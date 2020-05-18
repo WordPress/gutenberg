@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,13 +33,21 @@ export const settings = {
 			content: __(
 				'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
 			),
-			customFontSize: 28,
+			style: {
+				typography: {
+					fontSize: 28,
+				},
+			},
 			dropCap: true,
 		},
 	},
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,
+		lightBlockWrapper: true,
+		__experimentalColor: Platform.OS === 'web',
+		__experimentalLineHeight: true,
+		__experimentalFontSize: true,
 	},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
@@ -54,12 +63,6 @@ export const settings = {
 				( attributes.content || '' ) +
 				( attributesToMerge.content || '' ),
 		};
-	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
-			return { 'data-align': width };
-		}
 	},
 	edit,
 	save,

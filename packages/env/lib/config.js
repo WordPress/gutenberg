@@ -28,15 +28,18 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * A wp-env config object.
  *
  * @typedef Config
- * @property {string} name Name of the environment.
- * @property {string} configDirectoryPath Path to the .wp-env.json file.
- * @property {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @property {string} dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {Source|null} coreSource The WordPress installation to load in the environment.
- * @property {Source[]} pluginSources Plugins to load in the environment.
- * @property {Source[]} themeSources Themes to load in the environment.
- * @property {number} port The port on which to start the development WordPress environment.
- * @property {number} testsPort The port on which to start the testing WordPress environment.
+ * @property {string}      name                    Name of the environment.
+ * @property {string}      configDirectoryPath     Path to the .wp-env.json file.
+ * @property {string}      workDirectoryPath       Path to the work directory located in ~/.wp-env.
+ * @property {string}      dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {Source|null} coreSource              The WordPress installation to load in the environment.
+ * @property {Source[]}    pluginSources           Plugins to load in the environment.
+ * @property {Source[]}    themeSources            Themes to load in the environment.
+ * @property {number}      port                    The port on which to start the development WordPress environment.
+ * @property {number}      testsPort               The port on which to start the testing WordPress environment.
+ * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, Source>} mappings    Mapping of WordPress directories to local directories which should be mounted.
+ * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
 /**
@@ -61,6 +64,7 @@ module.exports = {
 		const configDirectoryPath = path.dirname( configPath );
 
 		let config = null;
+		let overrideConfig = {};
 
 		try {
 			config = JSON.parse( await fs.readFile( configPath, 'utf8' ) );
@@ -74,6 +78,30 @@ module.exports = {
 			} else {
 				throw new ValidationError(
 					`Could not read .wp-env.json: ${ error.message }`
+				);
+			}
+		}
+
+		try {
+			overrideConfig = JSON.parse(
+				await fs.readFile(
+					configPath.replace(
+						/\.wp-env\.json$/,
+						'.wp-env.override.json'
+					),
+					'utf8'
+				)
+			);
+		} catch ( error ) {
+			if ( error.code === 'ENOENT' ) {
+				// Config override file does not exist. Do nothing - it's optional.
+			} else if ( error instanceof SyntaxError ) {
+				throw new ValidationError(
+					`Invalid .wp-env.override.json: ${ error.message }`
+				);
+			} else {
+				throw new ValidationError(
+					`Could not read .wp-env.override.json: ${ error.message }`
 				);
 			}
 		}
@@ -100,9 +128,21 @@ module.exports = {
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
+				config: {
+					WP_DEBUG: true,
+					SCRIPT_DEBUG: true,
+					WP_TESTS_DOMAIN: 'example.org',
+					WP_PHP_BINARY: 'php',
+				},
+				mappings: {},
 			},
-			config
+			config,
+			overrideConfig
 		);
+
+		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
+		config.testsPort =
+			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
 
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(
@@ -146,9 +186,28 @@ module.exports = {
 			);
 		}
 
+		if ( typeof config.config !== 'object' ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "config" must be an object.'
+			);
+		}
+
+		if ( typeof config.mappings !== 'object' ) {
+			throw new ValidationError(
+				'Invalid .wp-env.json: "mappings" must be an object.'
+			);
+		}
+
+		for ( const [ wpDir, localDir ] of Object.entries( config.mappings ) ) {
+			if ( ! localDir || typeof localDir !== 'string' ) {
+				throw new ValidationError(
+					`Invalid .wp-env.json: "mapping.${ wpDir }" should be a string.`
+				);
+			}
+		}
+
 		const workDirectoryPath = path.resolve(
-			os.homedir(),
-			'.wp-env',
+			getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -165,7 +224,8 @@ module.exports = {
 			coreSource: includeTestsPath(
 				parseSourceString( config.core, {
 					workDirectoryPath,
-				} )
+				} ),
+				{ workDirectoryPath }
 			),
 			pluginSources: config.plugins.map( ( sourceString ) =>
 				parseSourceString( sourceString, {
@@ -176,6 +236,17 @@ module.exports = {
 				parseSourceString( sourceString, {
 					workDirectoryPath,
 				} )
+			),
+			config: config.config,
+			mappings: Object.entries( config.mappings ).reduce(
+				( result, [ wpDir, localDir ] ) => {
+					const source = parseSourceString( localDir, {
+						workDirectoryPath,
+					} );
+					result[ wpDir ] = source;
+					return result;
+				},
+				{}
 			),
 		};
 	},
@@ -217,6 +288,21 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
+	const zipFields = sourceString.match(
+		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
+	);
+	if ( zipFields ) {
+		return {
+			type: 'zip',
+			url: sourceString,
+			path: path.resolve(
+				workDirectoryPath,
+				encodeURIComponent( zipFields[ 1 ] )
+			),
+			basename: encodeURIComponent( zipFields[ 1 ] ),
+		};
+	}
+
 	const gitHubFields = sourceString.match( /^([^\/]+)\/([^#]+)(?:#(.+))?$/ );
 	if ( gitHubFields ) {
 		return {
@@ -238,9 +324,11 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  * property set correctly. Only the 'core' source requires a testsPath.
  *
  * @param {Source|null} source A source object.
+ * @param {Object} options
+ * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
  * @return {Source|null} A source object.
  */
-function includeTestsPath( source ) {
+function includeTestsPath( source, { workDirectoryPath } ) {
 	if ( source === null ) {
 		return null;
 	}
@@ -248,11 +336,63 @@ function includeTestsPath( source ) {
 	return {
 		...source,
 		testsPath: path.resolve(
-			source.path,
-			'..',
+			workDirectoryPath,
 			'tests-' + path.basename( source.path )
 		),
 	};
+}
+
+/**
+ * Parses an environment variable which should be a number.
+ *
+ * Throws an error if the variable cannot be parsed to a number.
+ * Returns null if the environment variable has not been specified.
+ *
+ * @param {string} varName The environment variable to check (e.g. WP_ENV_PORT).
+ * @return {null|number} The number. Null if it does not exist.
+ */
+function getNumberFromEnvVariable( varName ) {
+	// Allow use of the default if it does not exist.
+	if ( ! process.env[ varName ] ) {
+		return null;
+	}
+
+	const maybeNumber = parseInt( process.env[ varName ] );
+
+	// Throw an error if it is not parseable as a number.
+	if ( isNaN( maybeNumber ) ) {
+		throw new ValidationError(
+			`Invalid environment variable: ${ varName } must be a number.`
+		);
+	}
+
+	return maybeNumber;
+}
+
+/**
+ * Gets the `wp-env` home directory in which generated files are created.
+ *
+ * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
+ * WP_ENV_HOME environment variable.
+ *
+ * @return {string} The absolute path to the `wp-env` home directory.
+ */
+function getHomeDirectory() {
+	// Allow user to override download location.
+	if ( process.env.WP_ENV_HOME ) {
+		return path.resolve( process.env.WP_ENV_HOME );
+	}
+
+	/**
+	 * Installing docker with Snap Packages on Linux is common, but does not
+	 * support hidden directories. Therefore we use a public directory on Linux.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325
+	 */
+	return path.resolve(
+		os.homedir(),
+		os.platform() === 'linux' ? 'wp-env' : '.wp-env'
+	);
 }
 
 /**

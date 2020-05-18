@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { URL } from 'url';
-
-/**
  * Internal dependencies
  */
 import { createURL } from './create-url';

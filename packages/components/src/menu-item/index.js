@@ -44,8 +44,6 @@ export function MenuItem( {
 	if ( icon && ! isString( icon ) ) {
 		icon = cloneElement( icon, {
 			className: 'components-menu-items__item-icon',
-			height: 20,
-			width: 20,
 		} );
 	}
 

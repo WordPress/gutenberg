@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BlockAlignmentToolbar should match snapshot 1`] = `
-<Toolbar
+<ToolbarGroup
   controls={
     Array [
       Object {
         "icon": <SVG
-          viewBox="-2 -2 24 24"
+          viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
-            d="M3 5h14V3H3v2zm9 8V7H3v6h9zm2-4h3V7h-3v2zm0 4h3v-2h-3v2zM3 17h14v-2H3v2z"
+            d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
           />
         </SVG>,
         "isActive": true,
@@ -20,11 +20,11 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
       },
       Object {
         "icon": <SVG
-          viewBox="-2 -2 24 24"
+          viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
-            d="M3 5h14V3H3v2zm12 8V7H5v6h10zM3 17h14v-2H3v2z"
+            d="M5 15h14V9H5v6zm0 4.8h14v-1.5H5v1.5zM5 4.2v1.5h14V4.2H5z"
           />
         </SVG>,
         "isActive": false,
@@ -34,11 +34,11 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
       },
       Object {
         "icon": <SVG
-          viewBox="-2 -2 24 24"
+          viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
           <Path
-            d="M3 5h14V3H3v2zm0 4h3V7H3v2zm14 4V7H8v6h9zM3 13h3v-2H3v2zm0 4h14v-2H3v2z"
+            d="M6 15h14V9H6v6zm6-10.8v1.5h8V4.2h-8zm0 15.6h8v-1.5h-8v1.5z"
           />
         </SVG>,
         "isActive": false,
@@ -50,11 +50,11 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
   }
   icon={
     <SVG
-      viewBox="-2 -2 24 24"
+      viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
     >
       <Path
-        d="M3 5h14V3H3v2zm9 8V7H3v6h9zm2-4h3V7h-3v2zm0 4h3v-2h-3v2zM3 17h14v-2H3v2z"
+        d="M4 9v6h14V9H4zm8-4.8H4v1.5h8V4.2zM4 19.8h8v-1.5H4v1.5z"
       />
     </SVG>
   }

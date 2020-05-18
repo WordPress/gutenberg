@@ -42,7 +42,7 @@ function gutenberg_url( $path ) {
  *
  * @since 4.1.0
  *
- * @param WP_Scripts       $scripts   WP_Scripts instance (passed by reference).
+ * @param WP_Scripts       $scripts   WP_Scripts instance.
  * @param string           $handle    Name of the script. Should be unique.
  * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
  * @param array            $deps      Optional. An array of registered script handles this script depends on. Default empty array.
@@ -53,7 +53,7 @@ function gutenberg_url( $path ) {
  * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
  *                                    Default 'false'.
  */
-function gutenberg_override_script( &$scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
+function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
 	$script = $scripts->query( $handle, 'registered' );
 	if ( $script ) {
 		/*
@@ -174,7 +174,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
  *
  * @since 4.1.0
  *
- * @param WP_Styles        $styles WP_Styles instance (passed by reference).
+ * @param WP_Styles        $styles WP_Styles instance.
  * @param string           $handle Name of the stylesheet. Should be unique.
  * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
  * @param array            $deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
@@ -186,7 +186,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
  *                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
  *                                 '(orientation: portrait)' and '(max-width: 640px)'.
  */
-function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
+function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
 	$style = $styles->query( $handle, 'registered' );
 	if ( $style ) {
 		$styles->remove( $handle );
@@ -203,39 +203,37 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  *
  * @since 0.1.0
  *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_register_vendor_scripts( &$scripts ) {
+function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
-	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-
-	// TODO: Overrides for react, react-dom and lodash are necessary
-	// until WordPress 5.3 is released.
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * once the plugin is updated to support WordPress 5.4.0 and newer.
+	 *
+	 * See: `gutenberg_add_url_polyfill`
+	 */
 	gutenberg_register_vendor_script(
 		$scripts,
-		'react',
-		'https://unpkg.com/react@16.9.0/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' ),
-		'16.9.0',
-		true
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react-dom',
-		'https://unpkg.com/react-dom@16.9.0/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' ),
-		'16.9.0',
-		true
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'lodash',
-		'https://unpkg.com/lodash@4.17.15/lodash' . $suffix . '.js',
+		'wp-polyfill-url',
+		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
 		array(),
-		'4.17.15',
-		true
+		'3.6.4'
+	);
+
+	/*
+	 * This script registration and the corresponding function should be removed
+	 * removed once the plugin is updated to support WordPress 5.4.0 and newer.
+	 *
+	 * See: `gutenberg_add_dom_rect_polyfill`
+	 */
+	gutenberg_register_vendor_script(
+		$scripts,
+		'wp-polyfill-dom-rect',
+		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
+		array(),
+		'3.42.0'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -246,9 +244,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  *
  * @since 4.5.0
  *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_register_packages_scripts( &$scripts ) {
+function gutenberg_register_packages_scripts( $scripts ) {
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
 		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
@@ -298,9 +296,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  *
  * @since 6.7.0
 
- * @param WP_Styles $styles WP_Styles instance (passed by reference).
+ * @param WP_Styles $styles WP_Styles instance.
  */
-function gutenberg_register_packages_styles( &$styles ) {
+function gutenberg_register_packages_styles( $styles ) {
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
@@ -400,6 +398,15 @@ function gutenberg_register_packages_styles( &$styles ) {
 
 	gutenberg_override_style(
 		$styles,
+		'wp-edit-navigation',
+		gutenberg_url( 'build/edit-navigation/style.css' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
+		filemtime( gutenberg_dir_path() . 'build/edit-navigation/style.css' )
+	);
+	$styles->add_data( 'wp-edit-navigation', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
 		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
@@ -434,19 +441,6 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * @since 0.1.0
  */
 function gutenberg_enqueue_block_editor_assets() {
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf(
-			'wp.apiFetch.nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );' .
-			'wp.apiFetch.use( wp.apiFetch.nonceMiddleware );' .
-			'wp.apiFetch.nonceEndpoint = "%s";' .
-			'wp.apiFetch.use( wp.apiFetch.mediaUploadMiddleware );',
-			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' ),
-			admin_url( 'admin-ajax.php?action=gutenberg_rest_nonce' )
-		),
-		'after'
-	);
-
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
 
@@ -494,7 +488,7 @@ function gutenberg_vendor_script_filename( $handle, $src ) {
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
  *
- * @param WP_Scripts       $scripts   WP_Scripts instance (passed by reference).
+ * @param WP_Scripts       $scripts   WP_Scripts instance.
  * @param string           $handle    Name of the script.
  * @param string           $src       Full URL of the external script.
  * @param array            $deps      Optional. An array of registered script handles this
@@ -508,7 +502,7 @@ function gutenberg_vendor_script_filename( $handle, $src ) {
  *
  * @since 0.1.0
  */
-function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
+function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
 	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
 		return;
 	}
@@ -628,73 +622,98 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Extends block editor preload paths to preload additional data. Note that any
- * additions here should be complemented with a corresponding core ticket to
- * reconcile the change upstream for future removal from Gutenberg.
+ * Load a block pattern by name.
  *
- * @param array   $preload_paths Array of paths to preload.
- * @param WP_Post $post          Post being edited.
+ * @param string $name Block Pattern File name.
  *
- * @return array Filtered array of paths to preload.
+ * @return array Block Pattern Array.
  */
-function gutenberg_extend_block_editor_preload_paths( $preload_paths, $post ) {
-	/*
-	 * Preload any autosaves for the post. (see https://github.com/WordPress/gutenberg/pull/7945)
-	 *
-	 * Trac ticket: https://core.trac.wordpress.org/ticket/46974
-	 *
-	 * At the time of writing, the change is not committed or released
-	 * in core. This path should be removed from Gutenberg when the code is
-	 * released in core, and the corresponding release version becomes
-	 * the minimum supported version.
-	 */
-	$post_type_object = get_post_type_object( $post->post_type );
-
-	if ( isset( $post_type_object ) ) {
-		$rest_base      = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-		$autosaves_path = sprintf( '/wp/v2/%s/%d/autosaves?context=edit', $rest_base, $post->ID );
-
-		if ( ! in_array( $autosaves_path, $preload_paths, true ) ) {
-			$preload_paths[] = $autosaves_path;
-		}
-	}
-
-	/*
-	 * Used in considering user permissions for creating and updating blocks,
-	 * as condition for displaying relevant actions in the interface.
-	 *
-	 * Trac ticket: https://core.trac.wordpress.org/ticket/46429
-	 *
-	 * This is present in WordPress 5.2 and should be removed from Gutenberg
-	 * once WordPress 5.2 is the minimum supported version.
-	 */
-	$blocks_path = array( '/wp/v2/blocks', 'OPTIONS' );
-
-	if ( ! in_array( $blocks_path, $preload_paths, true ) ) {
-		$preload_paths[] = $blocks_path;
-	}
-
-	return $preload_paths;
+function gutenberg_load_block_pattern( $name ) {
+	return require( __DIR__ . '/patterns/' . $name . '.php' );
 }
-add_filter( 'block_editor_preload_paths', 'gutenberg_extend_block_editor_preload_paths', 10, 2 );
 
 /**
- * Extends block editor settings to include a list of image dimensions per size.
+ * Extends block editor settings to include a list of default patterns.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_extend_settings_image_dimensions( $settings ) {
-	$image_dimensions = array();
-	$all_sizes        = wp_get_registered_image_subsizes();
-	foreach ( $settings['imageSizes'] as $size ) {
-		$key = $size['slug'];
-		if ( isset( $all_sizes[ $key ] ) ) {
-			$image_dimensions[ $key ] = $all_sizes[ $key ];
-		}
+function gutenberg_extend_settings_block_patterns( $settings ) {
+	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
+		$settings['__experimentalBlockPatterns'] = array();
 	}
-	$settings['imageDimensions'] = $image_dimensions;
+
+	$settings['__experimentalBlockPatterns'] = array_merge(
+		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatterns']
+	);
+
+	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
+		$settings['__experimentalBlockPatternCategories'] = array();
+	}
+
+	$settings['__experimentalBlockPatternCategories'] = array_merge(
+		WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatternCategories']
+	);
+
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
+
+/**
+ * Extends block editor settings to determine whether to use custom line height controls.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_line_height( $settings ) {
+	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
+
+/**
+ * Extends block editor settings to determine whether to use custom unit controls.
+ * Currently experimental.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_settings_custom_units( $settings ) {
+	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
+
+/*
+ * Register default patterns if not registered in Core already.
+ */
+
+if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+	register_block_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
+	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_block_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
+	register_block_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
+	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
+	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
+}
+
+/*
+ * Register default pattern categories if not registered in Core already.
+ */
+if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	register_block_pattern_category( 'text', array( 'label' => __( 'Text', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => __( 'Hero', 'gutenberg' ) ) );
+	register_block_pattern_category( 'columns', array( 'label' => __( 'Columns', 'gutenberg' ) ) );
+	register_block_pattern_category( 'buttons', array( 'label' => __( 'Buttons', 'gutenberg' ) ) );
+	register_block_pattern_category( 'gallery', array( 'label' => __( 'Gallery', 'gutenberg' ) ) );
+	register_block_pattern_category( 'features', array( 'label' => __( 'Features', 'gutenberg' ) ) );
+	register_block_pattern_category( 'testimonials', array( 'label' => __( 'Testimonials', 'gutenberg' ) ) );
+}

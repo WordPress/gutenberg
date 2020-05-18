@@ -58,8 +58,8 @@ export function getBlockMoverDescription(
 	}
 
 	if ( isFirst && isLast ) {
-		// translators: %s: Type of block (i.e. Text, Image etc)
 		return sprintf(
+			// translators: %s: Type of block (i.e. Text, Image etc)
 			__( 'Block %s is the only block, and cannot be moved' ),
 			type
 		);

@@ -8,13 +8,13 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Animate, Dashicon, Button } from '@wordpress/components';
+import { Animate, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 import { withViewportMatch } from '@wordpress/viewport';
-import { Icon, check } from '@wordpress/icons';
+import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -79,7 +79,7 @@ export class PostSavedState extends Component {
 								animateClassName
 							) }
 						>
-							<Dashicon icon="cloud" />
+							<Icon icon={ cloud } />
 							{ isAutosaving
 								? __( 'Autosaving' )
 								: __( 'Saving' ) }
@@ -125,7 +125,7 @@ export class PostSavedState extends Component {
 					label={ label }
 					onClick={ () => onSave() }
 					shortcut={ displayShortcut.primary( 's' ) }
-					icon="cloud-upload"
+					icon={ cloudUpload }
 				/>
 			);
 		}

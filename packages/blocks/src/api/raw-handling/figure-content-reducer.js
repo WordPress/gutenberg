@@ -88,7 +88,11 @@ export default function( node, doc, schema ) {
 	// there is no text content.
 	// Otherwise, if directly at the root, wrap in a figure element.
 	if ( wrapper ) {
-		if (
+		// In jsdom-jscore, 'node.classList' can be undefined.
+		// In this case, default to extract as it offers a better UI experience on mobile.
+		if ( ! node.classList ) {
+			wrapFigureContent( nodeToInsert, wrapper );
+		} else if (
 			node.classList.contains( 'alignright' ) ||
 			node.classList.contains( 'alignleft' ) ||
 			node.classList.contains( 'aligncenter' ) ||

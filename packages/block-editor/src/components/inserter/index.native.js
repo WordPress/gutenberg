@@ -2,16 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Dropdown,
-	ToolbarButton,
-	Dashicon,
-	Picker,
-} from '@wordpress/components';
+import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import {
+	Icon,
+	plusCircleFilled,
+	insertAfter,
+	insertBefore,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +25,11 @@ const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
 		title={ __( 'Add block' ) }
 		icon={
-			<Dashicon icon="plus-alt" style={ style } color={ style.color } />
+			<Icon
+				icon={ plusCircleFilled }
+				style={ style }
+				color={ style.color }
+			/>
 		}
 		onClick={ onToggle }
 		extraProps={ {
@@ -51,31 +56,31 @@ export class Inserter extends Component {
 		const addBeforeOption = {
 			value: 'before',
 			label: __( 'Add Block Before' ),
-			icon: 'insert-before',
+			icon: insertBefore,
 		};
 
 		const replaceCurrentOption = {
 			value: 'replace',
 			label: __( 'Replace Current Block' ),
-			icon: 'plus-alt',
+			icon: plusCircleFilled,
 		};
 
 		const addAfterOption = {
 			value: 'after',
 			label: __( 'Add Block After' ),
-			icon: 'insert-after',
+			icon: insertAfter,
 		};
 
 		const addToBeginningOption = {
 			value: 'before',
 			label: __( 'Add To Beginning' ),
-			icon: 'insert-before',
+			icon: insertBefore,
 		};
 
 		const addToEndOption = {
 			value: 'after',
 			label: __( 'Add To End' ),
-			icon: 'insert-after',
+			icon: insertAfter,
 		};
 
 		const { isAnyBlockSelected, isSelectedBlockReplaceable } = this.props;

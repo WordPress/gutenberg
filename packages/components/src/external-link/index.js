@@ -9,11 +9,11 @@ import { compact, uniq } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
+import { external, Icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
 import VisuallyHidden from '../visually-hidden';
 
 export function ExternalLink(
@@ -39,8 +39,8 @@ export function ExternalLink(
 				{ /* translators: accessibility text */
 				__( '(opens in a new tab)' ) }
 			</VisuallyHidden>
-			<Dashicon
-				icon="external"
+			<Icon
+				icon={ external }
 				className="components-external-link__icon"
 			/>
 		</a>

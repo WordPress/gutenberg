@@ -1,26 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BlockSwitcher should render disabled block switcher with multi block of different types when no transforms 1`] = `
-<Toolbar>
-  <ForwardRef(Button)
+<ToolbarGroup>
+  <ToolbarButton
     className="block-editor-block-switcher__no-switcher-icon"
     disabled={true}
     icon={
       <BlockIcon
-        icon="layout"
+        icon={
+          <SVG
+            viewBox="-2 -2 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <Path
+              d="M2 2h5v11H2V2zm6 0h5v5H8V2zm6 0h4v16h-4V2zM8 8h5v5H8V8zm-6 6h11v4H2v-4z"
+            />
+          </SVG>
+        }
         showColors={true}
       />
     }
     label="Block icon"
   />
-</Toolbar>
+</ToolbarGroup>
 `;
 
 exports[`BlockSwitcher should render enabled block switcher with multi block when transforms exist 1`] = `
 <Dropdown
   className="block-editor-block-switcher"
   contentClassName="block-editor-block-switcher__popover"
-  position="bottom right"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
   renderContent={[Function]}
   renderToggle={[Function]}
 />
@@ -30,7 +44,12 @@ exports[`BlockSwitcher should render switcher with blocks 1`] = `
 <Dropdown
   className="block-editor-block-switcher"
   contentClassName="block-editor-block-switcher__popover"
-  position="bottom right"
+  popoverProps={
+    Object {
+      "isAlternate": true,
+      "position": "bottom right",
+    }
+  }
   renderContent={[Function]}
   renderToggle={[Function]}
 />

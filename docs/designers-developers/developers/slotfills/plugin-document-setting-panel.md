@@ -3,15 +3,17 @@
 This SlotFill allows registering a UI to edit Document settings.
 
 ## Available Props
+
 * __name__ `string`: A string identifying the panel.
 * __className__ `string`: An optional class name added to the sidebar body.
 * __title__ `string`: Title displayed at the top of the sidebar.
 * __icon__ `(string|Element)`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
 
 ## Example
+
 ```js
-const { registerPlugin } = wp.plugins;
-const { PluginDocumentSettingPanel } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 const PluginDocumentSettingPanelDemo = () => (
 	<PluginDocumentSettingPanel
@@ -22,5 +24,9 @@ const PluginDocumentSettingPanelDemo = () => (
 		Custom Panel Contents
 	</PluginDocumentSettingPanel>
 );
-registerPlugin( 'plugin-document-setting-panel-demo', { render: PluginDocumentSettingPanelDemo, icon: 'palmtree' } );
+
+registerPlugin( 'plugin-document-setting-panel-demo', {
+	render: PluginDocumentSettingPanelDemo,
+	icon: 'palmtree',
+} );
 ```

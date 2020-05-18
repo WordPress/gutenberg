@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,6 +34,10 @@ export const settings = {
 		className: false,
 		anchor: true,
 		__unstablePasteTextInline: true,
+		lightBlockWrapper: true,
+		__experimentalColor: Platform.OS === 'web',
+		__experimentalLineHeight: true,
+		__experimentalFontSize: true,
 	},
 	example: {
 		attributes: {

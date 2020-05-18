@@ -1,9 +1,7 @@
 {
-	"global": {
-		"color": {
-			"primary": "#52accc",
-			"background": "white",
-			"text": "black"
-		}
+	"color": {
+		"primary": "#52accc",
+		"background": "white",
+		"text": "black"
 	}
 }

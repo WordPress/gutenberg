@@ -3,6 +3,7 @@
  */
 const { createHash } = require( 'crypto' );
 const json2php = require( 'json2php' );
+const path = require( 'path' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
@@ -18,6 +19,8 @@ class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
 			{
+				combineAssets: false,
+				combinedOutputFile: null,
 				injectPolyfill: false,
 				outputFormat: 'php',
 				useDefaults: true,
@@ -102,7 +105,13 @@ class DependencyExtractionWebpackPlugin {
 		const { filename: outputFilename } = output;
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
-			const { injectPolyfill, outputFormat } = this.options;
+			const {
+				combineAssets,
+				combinedOutputFile,
+				injectPolyfill,
+				outputFormat,
+			} = this.options;
+			const combinedAssetsData = {};
 
 			// Process each entry point independently.
 			for ( const [
@@ -130,36 +139,61 @@ class DependencyExtractionWebpackPlugin {
 
 				const runtimeChunk = entrypoint.getRuntimeChunk();
 
-				// Get a stable, stringified representation of the WordPress script asset.
-				const assetString = this.stringify( {
+				const assetData = {
+					// Get a sorted array so we can produce a stable, stringified representation.
 					dependencies: Array.from(
 						entrypointExternalizedWpDeps
 					).sort(),
 					version: runtimeChunk.hash,
-				} );
+				};
+
+				const assetString = this.stringify( assetData );
 
 				// Determine a filename for the asset file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const assetFilename = compilation
-					.getPath( outputFilename, {
-						chunk: runtimeChunk,
-						filename,
-						query,
-						basename: basename( filename ),
-						contentHash: createHash( 'md4' )
-							.update( assetString )
-							.digest( 'hex' ),
-					} )
-					.replace(
-						/\.js$/i,
-						'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-					);
+				const buildFilename = compilation.getPath( outputFilename, {
+					chunk: runtimeChunk,
+					filename,
+					query,
+					basename: basename( filename ),
+					contentHash: createHash( 'md4' )
+						.update( assetString )
+						.digest( 'hex' ),
+				} );
+
+				if ( combineAssets ) {
+					combinedAssetsData[ buildFilename ] = assetData;
+					continue;
+				}
+
+				const assetFilename = buildFilename.replace(
+					/\.js$/i,
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
 
 				// Add source and file into compilation for webpack to output.
 				compilation.assets[ assetFilename ] = new RawSource(
 					assetString
 				);
 				runtimeChunk.files.push( assetFilename );
+			}
+
+			if ( combineAssets ) {
+				const outputFolder = compiler.options.output.path;
+				const assetsFilePath = path.resolve(
+					outputFolder,
+					combinedOutputFile ||
+						'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+				);
+				const assetsFilename = path.relative(
+					outputFolder,
+					assetsFilePath
+				);
+
+				// Add source into compilation for webpack to output.
+				compilation.assets[ assetsFilename ] = new RawSource(
+					this.stringify( combinedAssetsData )
+				);
 			}
 		} );
 	}

@@ -6,13 +6,10 @@ import { difference } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import PluginBlockSettingsMenuGroup from './plugin-block-settings-menu-group';
+import { plugins } from '@wordpress/icons';
 
 const isEverySelectedBlockAllowed = ( selected, allowed ) =>
 	difference( selected, allowed ).length === 0;
@@ -41,7 +38,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string} props.label The menu item text.
  * @param {Function} props.onClick Callback function to be executed when the user click the menu item.
  *
- * @example <caption>ES5</caption>
+ * @example
+ * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -64,7 +62,8 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
+ * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from wp.i18n;
@@ -76,9 +75,9 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  *
  * const MyPluginBlockSettingsMenuItem = () => (
  *     <PluginBlockSettingsMenuItem
- * 		allowedBlocks=[ 'core/paragraph' ]
+ * 		allowedBlocks={ [ 'core/paragraph' ] }
  * 		icon='dashicon-name'
- * 		label=__( 'Menu item text' )
+ * 		label={ __( 'Menu item text' ) }
  * 		onClick={ doOnClick } />
  * );
  * ```
@@ -93,7 +92,7 @@ const PluginBlockSettingsMenuItem = ( {
 	small,
 	role,
 } ) => (
-	<PluginBlockSettingsMenuGroup>
+	<BlockSettingsMenuControls>
 		{ ( { selectedBlocks, onClose } ) => {
 			if ( ! shouldRenderItem( selectedBlocks, allowedBlocks ) ) {
 				return null;
@@ -101,7 +100,7 @@ const PluginBlockSettingsMenuItem = ( {
 			return (
 				<MenuItem
 					onClick={ compose( onClick, onClose ) }
-					icon={ icon || 'admin-plugins' }
+					icon={ icon || plugins }
 					label={ small ? label : undefined }
 					role={ role }
 				>
@@ -109,7 +108,7 @@ const PluginBlockSettingsMenuItem = ( {
 				</MenuItem>
 			);
 		} }
-	</PluginBlockSettingsMenuGroup>
+	</BlockSettingsMenuControls>
 );
 
 export default PluginBlockSettingsMenuItem;

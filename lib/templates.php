@@ -86,6 +86,26 @@ function gutenberg_grant_template_caps( array $allcaps ) {
 add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 /**
+ * Filters `wp_template` posts slug resolution to bypass deduplication logic as
+ * template slugs should be unique.
+ *
+ * @param string $slug          The resolved slug (post_name).
+ * @param int    $post_ID       Post ID.
+ * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
+ * @param string $post_type     Post type.
+ * @param int    $post_parent   Post parent ID.
+ * @param int    $original_slug The desired slug (post_name).
+ * @return string The original, desired slug.
+ */
+function gutenberg_filter_wp_template_wp_unique_post_slug( $slug, $post_ID, $post_status, $post_type, $post_parent, $original_slug ) {
+	if ( 'wp_template' === $post_type ) {
+		return $original_slug;
+	}
+	return $slug;
+}
+add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_slug', 10, 6 );
+
+/**
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
@@ -135,3 +155,51 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 	echo esc_html( $post->post_name );
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+
+/**
+ * Filter for adding a `resolved` parameter to `wp_template` queries.
+ *
+ * @param array $query_params The query parameters.
+ * @return array Filtered $query_params.
+ */
+function filter_rest_wp_template_collection_params( $query_params ) {
+	$query_params += array(
+		'resolved' => array(
+			'description' => __( 'Whether to filter for resolved templates', 'gutenberg' ),
+			'type'        => 'boolean',
+		),
+	);
+	return $query_params;
+}
+apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_collection_params', 99, 1 );
+
+/**
+ * Filter for supporting the `resolved` parameter in `wp_template` queries.
+ *
+ * @param array           $args    The query arguments.
+ * @param WP_REST_Request $request The request object.
+ * @return array Filtered $args.
+ */
+function filter_rest_wp_template_query( $args, $request ) {
+	if ( $request['resolved'] ) {
+		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
+		$template_types = $request['slug'] ? $request['slug'] : get_template_types();
+
+		foreach ( $template_types as $template_type ) {
+			// Skip 'embed' for now because it is not a regular template type.
+			// Skip 'index' because it's a fallback that we handle differently.
+			if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
+				continue;
+			}
+
+			$current_template = gutenberg_find_template_post_and_parts( $template_type );
+			if ( isset( $current_template ) ) {
+				$template_ids[] = $current_template['template_post']->ID;
+			}
+		}
+		$args['post__in'] = $template_ids;
+	}
+
+	return $args;
+}
+add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );

@@ -1,84 +1,89 @@
 /**
+ * External dependencies
+ */
+const glob = require( 'fast-glob' );
+const { readFile } = require( 'fs' ).promises;
+const { fromPairs } = require( 'lodash' );
+const { join } = require( 'path' );
+
+/**
  * Internal dependencies
  */
-const CliError = require( './cli-error' );
+const CLIError = require( './cli-error' );
 const prompts = require( './prompts' );
 
-const namespace = 'create-block';
-const dashicon = 'smiley';
-const category = 'widgets';
-const author = 'The WordPress Contributors';
-const license = 'GPL-2.0-or-later';
-const version = '0.1.0';
-
-const templates = {
+const predefinedBlockTemplates = {
 	es5: {
 		defaultValues: {
-			namespace,
 			slug: 'es5-example',
 			title: 'ES5 Example',
 			description:
 				'Example block written with ES5 standard and no JSX – no build step required.',
-			dashicon,
-			category,
-			author,
-			license,
-			version,
 		},
-		outputFiles: [
-			'.editorconfig',
-			'editor.css',
-			'index.js',
-			'$slug.php',
-			'style.css',
-		],
+		wpScripts: false,
 	},
 	esnext: {
 		defaultValues: {
-			namespace,
 			slug: 'esnext-example',
 			title: 'ESNext Example',
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
-			dashicon,
-			category,
-			author,
-			license,
-			version,
 		},
-		outputFiles: [
-			'.editorconfig',
-			'.gitignore',
-			'editor.css',
-			'src/index.js',
-			'$slug.php',
-			'style.css',
-		],
-		wpScriptsEnabled: true,
 	},
 };
 
-const getTemplate = ( templateName ) => {
-	if ( ! templates[ templateName ] ) {
-		throw new CliError(
-			`Invalid template type name. Allowed values: ${ Object.keys(
-				templates
+const getOutputTemplates = async ( name ) => {
+	const outputTemplatesPath = join( __dirname, 'templates', name );
+	const outputTemplatesFiles = await glob( '**/*.mustache', {
+		cwd: outputTemplatesPath,
+		dot: true,
+	} );
+	return fromPairs(
+		await Promise.all(
+			outputTemplatesFiles.map( async ( outputTemplateFile ) => {
+				const outputFile = outputTemplateFile.replace(
+					/\.mustache$/,
+					''
+				);
+				const outputTemplate = await readFile(
+					join( outputTemplatesPath, outputTemplateFile ),
+					'utf8'
+				);
+				return [ outputFile, outputTemplate ];
+			} )
+		)
+	);
+};
+
+const getBlockTemplate = async ( templateName ) => {
+	if ( ! predefinedBlockTemplates[ templateName ] ) {
+		throw new CLIError(
+			`Invalid block template type name. Allowed values: ${ Object.keys(
+				predefinedBlockTemplates
 			).join( ', ' ) }.`
 		);
 	}
-	return templates[ templateName ];
+	return {
+		...predefinedBlockTemplates[ templateName ],
+		outputTemplates: await getOutputTemplates( templateName ),
+	};
 };
 
-const getDefaultValues = ( templateName ) => {
-	return getTemplate( templateName ).defaultValues;
+const getDefaultValues = ( blockTemplate ) => {
+	return {
+		namespace: 'create-block',
+		dashicon: 'smiley',
+		category: 'widgets',
+		author: 'The WordPress Contributors',
+		license: 'GPL-2.0-or-later',
+		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
+		version: '0.1.0',
+		...blockTemplate.defaultValues,
+	};
 };
 
-const getOutputFiles = ( templateName ) => {
-	return getTemplate( templateName ).outputFiles;
-};
-
-const getPrompts = ( templateName ) => {
-	const defaultValues = getDefaultValues( templateName );
+const getPrompts = ( blockTemplate ) => {
+	const defaultValues = getDefaultValues( blockTemplate );
 	return Object.keys( prompts ).map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
@@ -87,13 +92,13 @@ const getPrompts = ( templateName ) => {
 	} );
 };
 
-const hasWPScriptsEnabled = ( templateName ) => {
-	return getTemplate( templateName ).wpScriptsEnabled || false;
+const hasWPScriptsEnabled = ( blockTemplate ) => {
+	return blockTemplate.wpScripts !== false;
 };
 
 module.exports = {
+	getBlockTemplate,
 	getDefaultValues,
-	getOutputFiles,
 	getPrompts,
 	hasWPScriptsEnabled,
 };

@@ -1,15 +1,16 @@
-/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
  * External dependencies
  */
-import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
+import { get, isFunction, isPlainObject, omit, pick, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -70,7 +71,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @property {string}   name                   The unique and machine-readable name.
  * @property {string}   title                  A human-readable variation title.
- * @property {string}   description            A detailed variation description.
+ * @property {string}   [description]          A detailed variation description.
  * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
  * @property {boolean}  [isDefault]            Indicates whether the current variation is
  *                                             the default one. Defaults to `false`.
@@ -112,18 +113,6 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *                                             then no preview is shown.
  */
 
-/**
- * Default values to assign for omitted optional block type settings.
- *
- * @type {Object}
- */
-export const DEFAULT_BLOCK_TYPE_SETTINGS = {
-	icon: 'block-default',
-	attributes: {},
-	keywords: [],
-	save: () => null,
-};
-
 export let serverSideBlockDefinitions = {};
 
 /**
@@ -153,7 +142,10 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
-		...DEFAULT_BLOCK_TYPE_SETTINGS,
+		icon: blockDefault,
+		attributes: {},
+		keywords: [],
+		save: () => null,
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -211,20 +203,20 @@ export function registerBlockType( name, settings ) {
 		console.error( 'The "edit" property must be a valid function.' );
 		return;
 	}
-	if ( ! ( 'category' in settings ) ) {
-		console.error( 'The block "' + name + '" must have a category.' );
-		return;
-	}
 	if (
 		'category' in settings &&
 		! some( select( 'core/blocks' ).getCategories(), {
 			slug: settings.category,
 		} )
 	) {
-		console.error(
-			'The block "' + name + '" must have a registered category.'
+		console.warn(
+			'The block "' +
+				name +
+				'" is registered with an invalid category "' +
+				settings.category +
+				'".'
 		);
-		return;
+		delete settings.category;
 	}
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		console.error( 'The block "' + name + '" must have a title.' );

@@ -241,8 +241,13 @@ describe( 'Embedding content', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
-		// Wait for the request to fail and present an error.
-		await page.waitForSelector( '.components-placeholder__error' );
+		// Wait for the request to fail and present an error. Since placeholder
+		// has styles applied which depend on resize observer, wait for the
+		// expected size class to settle before clicking, since otherwise a race
+		// condition could occur on the placeholder layout vs. click intent.
+		await page.waitForSelector(
+			'.components-placeholder.is-large .components-placeholder__error'
+		);
 
 		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -269,8 +274,13 @@ describe( 'Embedding content', () => {
 		);
 		await page.keyboard.press( 'Enter' );
 
-		// Wait for the request to fail and present an error.
-		await page.waitForSelector( '.components-placeholder__error' );
+		// Wait for the request to fail and present an error. Since placeholder
+		// has styles applied which depend on resize observer, wait for the
+		// expected size class to settle before clicking, since otherwise a race
+		// condition could occur on the placeholder layout vs. click intent.
+		await page.waitForSelector(
+			'.components-placeholder.is-large .components-placeholder__error'
+		);
 
 		// Set up a different mock to make sure that try again actually does make the request again.
 		await setUpResponseMocking( [
@@ -297,7 +307,7 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 		const postUrl = await page.$eval(
-			'[id^=inspector-text-control-]',
+			'.editor-post-publish-panel [id^=inspector-text-control-]',
 			( el ) => el.value
 		);
 

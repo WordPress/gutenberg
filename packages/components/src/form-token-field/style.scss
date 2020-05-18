@@ -3,8 +3,8 @@
 	flex-wrap: wrap;
 	align-items: flex-start;
 	width: 100%;
-	margin: 0 0 $grid-size 0;
-	padding: $grid-size-small;
+	margin: 0 0 $grid-unit-10 0;
+	padding: $grid-unit-05;
 	background-color: $white;
 	border: $border-width solid $light-gray-700;
 	color: $dark-gray-700;
@@ -47,7 +47,7 @@
 
 .components-form-token-field__label {
 	display: inline-block;
-	margin-bottom: $grid-size-small;
+	margin-bottom: $grid-unit-05;
 }
 
 .components-form-token-field__help {
@@ -169,7 +169,7 @@
 	@include reduce-motion("transition");
 	list-style: none;
 	border-top: $border-width solid $dark-gray-300;
-	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
+	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
 	padding-top: 3px;
 }
 

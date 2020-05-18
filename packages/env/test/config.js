@@ -1,8 +1,9 @@
-'use strict';
+/* eslint-disable jest/no-try-expect */
 /**
  * External dependencies
  */
 const { readFile } = require( 'fs' ).promises;
+const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -218,13 +219,100 @@ describe( 'readConfig', () => {
 		}
 	} );
 
+	it( 'should parse mappings into sources', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: {
+						test: './relative',
+						test2: 'WordPress/gutenberg#master',
+					},
+				} )
+			)
+		);
+		const { mappings } = await readConfig( '.wp-env.json' );
+		expect( mappings ).toMatchObject( {
+			test: {
+				type: 'local',
+				path: expect.stringMatching( /^\/.*relative$/ ),
+				basename: 'relative',
+			},
+			test2: {
+				type: 'git',
+				path: expect.stringMatching( /^\/.*gutenberg$/ ),
+				basename: 'gutenberg',
+			},
+		} );
+	} );
+
+	it( 'should throw a validaton error if there is an invalid mapping', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { mappings: { test: 'false' } } ) )
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid or unrecognized source'
+			);
+		}
+	} );
+
+	it( 'throws an error if a mapping is badly formatted', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: { test: null },
+				} )
+			)
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "mapping.test" should be a string.'
+			);
+		}
+	} );
+
+	it( 'throws an error if mappings is not an object', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: 'not object',
+				} )
+			)
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "mappings" must be an object.'
+			);
+		}
+	} );
+
+	it( 'should return an empty mappings object if none are passed', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { mappings: {} } ) )
+		);
+		const { mappings } = await readConfig( '.wp-env.json' );
+		expect( mappings ).toEqual( {} );
+	} );
+
 	it( 'should throw a validaton error if the ports are not numbers', async () => {
 		expect.assertions( 10 );
-		testPortNumberValidation( 'port', 'string' );
-		testPortNumberValidation( 'testsPort', [] );
-		testPortNumberValidation( 'port', {} );
-		testPortNumberValidation( 'testsPort', false );
-		testPortNumberValidation( 'port', null );
+		await testPortNumberValidation( 'port', 'string' );
+		await testPortNumberValidation( 'testsPort', [] );
+		await testPortNumberValidation( 'port', {} );
+		await testPortNumberValidation( 'testsPort', false );
+		await testPortNumberValidation( 'port', null );
 	} );
 
 	it( 'should throw a validaton error if the ports are the same', async () => {
@@ -257,6 +345,141 @@ describe( 'readConfig', () => {
 			testsPort: 8889,
 		} );
 	} );
+
+	it( 'should throw an error if the port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		process.env.WP_ENV_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_PORT = oldPort;
+	} );
+
+	it( 'should throw an error if the tests port number environment variable is invalid', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_TESTS_PORT = 'hello';
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid environment variable: WP_ENV_TESTS_PORT must be a number.'
+			);
+		}
+		process.env.WP_ENV_TESTS_PORT = oldPort;
+	} );
+
+	it( 'should use port environment values rather than config values if both are defined', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					port: 1000,
+					testsPort: 2000,
+				} )
+			)
+		);
+		const oldPort = process.env.WP_ENV_PORT;
+		const oldTestsPort = process.env.WP_ENV_TESTS_PORT;
+		process.env.WP_ENV_PORT = 4000;
+		process.env.WP_ENV_TESTS_PORT = 3000;
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 4000,
+			testsPort: 3000,
+		} );
+
+		process.env.WP_ENV_PORT = oldPort;
+		process.env.WP_ENV_TESTS_PORT = oldTestsPort;
+	} );
+
+	it( 'should use 8888 and 8889 as the default port and testsPort values if nothing else is specified', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			port: 8888,
+			testsPort: 8889,
+		} );
+	} );
+
+	it( 'should use the WP_ENV_HOME environment variable only if specified', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldEnvHome = process.env.WP_ENV_HOME;
+
+		expect.assertions( 2 );
+
+		process.env.WP_ENV_HOME = 'here/is/a/path';
+		const configWith = await readConfig( '.wp-env.json' );
+		expect(
+			configWith.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( true );
+
+		process.env.WP_ENV_HOME = undefined;
+		const configWithout = await readConfig( '.wp-env.json' );
+		expect(
+			configWithout.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( false );
+
+		process.env.WP_ENV_HOME = oldEnvHome;
+	} );
+
+	it( 'should use the WP_ENV_HOME environment variable on Linux', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldEnvHome = process.env.WP_ENV_HOME;
+		const oldOsPlatform = os.platform;
+		os.platform = () => 'linux';
+
+		expect.assertions( 2 );
+
+		process.env.WP_ENV_HOME = 'here/is/a/path';
+		const configWith = await readConfig( '.wp-env.json' );
+		expect(
+			configWith.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( true );
+
+		process.env.WP_ENV_HOME = undefined;
+		const configWithout = await readConfig( '.wp-env.json' );
+		expect(
+			configWithout.workDirectoryPath.includes( 'here/is/a/path' )
+		).toBe( false );
+
+		process.env.WP_ENV_HOME = oldEnvHome;
+		os.platform = oldOsPlatform;
+	} );
+
+	it( 'should use a non-private folder on Linux', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( {} ) )
+		);
+		const oldOsPlatform = os.platform;
+		os.platform = () => 'linux';
+
+		expect.assertions( 2 );
+
+		const config = await readConfig( '.wp-env.json' );
+		expect( config.workDirectoryPath.includes( '.wp-env' ) ).toBe( false );
+		expect( config.workDirectoryPath.includes( 'wp-env' ) ).toBe( true );
+
+		os.platform = oldOsPlatform;
+	} );
 } );
 
 /**
@@ -279,3 +502,4 @@ async function testPortNumberValidation( portName, value ) {
 	}
 	jest.clearAllMocks();
 }
+/* eslint-enable jest/no-try-expect */

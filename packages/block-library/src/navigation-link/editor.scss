@@ -3,11 +3,11 @@
 .wp-block-navigation-link__container {
 	border-radius: 0;
 	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $icon-button-size;
-	min-height: $icon-button-size;
+	line-height: $button-size;
+	min-height: $button-size;
 }
 
-/*
+/**
  * Adjust Navigation Item.
  */
 .wp-block-navigation-link {
@@ -20,31 +20,14 @@
 		min-width: 20px;
 	}
 
-	&.has-link .wp-block-navigation-link__label {
-		text-decoration: underline;
-	}
-
-	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
+	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
 		display: inline-block;
 	}
 
 	.block-list-appender {
-		margin: $grid-size * 2;
-		margin-left: $grid-size * 1.25;
-		margin-top: $grid-size * 1.25;
-	}
-}
-
-[data-type="core/navigation-link"] {
-	.block-editor-block-toolbar {
-		left: $block-padding;
-	}
-
-	// Hide the draggable mover until functionality for positioning it on drag correctly is added: https://github.com/WordPress/gutenberg/issues/19703
-	.block-editor-block-toolbar .components-toolbar.block-editor-block-mover {
-		.components-button.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
+		margin: $grid-unit-10 * 2;
+		margin-left: $grid-unit-10 * 1.25;
+		margin-top: $grid-unit-10 * 1.25;
 	}
 }
 
@@ -54,7 +37,7 @@
 
 // Separator
 .wp-block-navigation-link__separator {
-	margin: $grid-size 0 $grid-size;
+	margin: $grid-unit-10 0 $grid-unit-10;
 	border-top: $border-width solid $light-gray-500;
 }
 
@@ -65,7 +48,7 @@
 }
 
 .wp-block-navigation-link__dropdown-content .components-popover__content {
-	padding: $grid-size 0;
+	padding: $grid-unit-10 0;
 }
 
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {

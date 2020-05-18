@@ -9,7 +9,6 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { MenuItem, withSpokenMessages } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
 
 export function BlockInspectorButton( {
 	onClick = noop,
@@ -58,7 +57,6 @@ export function BlockInspectorButton( {
 					onClick();
 				}
 			} }
-			icon={ cog }
 			shortcut={ shortcut }
 		>
 			{ ! small && label }

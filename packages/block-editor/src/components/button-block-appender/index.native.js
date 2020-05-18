@@ -7,7 +7,8 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { Button, Dashicon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Icon, plusCircleFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
+	isFloating = false,
+	onAddBlock,
 } ) {
 	const appenderStyle = {
 		...styles.appender,
@@ -29,7 +32,9 @@ function ButtonBlockAppender( {
 	};
 	const addBlockButtonStyle = getStylesFromColorScheme(
 		styles.addBlockButton,
-		styles.addBlockButtonDark
+		isFloating
+			? styles.floatingAddBlockButtonDark
+			: styles.addBlockButtonDark
 	);
 
 	return (
@@ -38,14 +43,19 @@ function ButtonBlockAppender( {
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 					<Button
-						onClick={ onToggle }
+						onClick={ onAddBlock || onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
 						fixedRatio={ false }
 					>
-						<View style={ appenderStyle }>
-							<Dashicon
-								icon="plus-alt"
+						<View
+							style={ [
+								appenderStyle,
+								isFloating && styles.floatingAppender,
+							] }
+						>
+							<Icon
+								icon={ plusCircleFilled }
 								style={ addBlockButtonStyle }
 								color={ addBlockButtonStyle.color }
 								size={ addBlockButtonStyle.size }

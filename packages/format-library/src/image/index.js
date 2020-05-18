@@ -45,6 +45,7 @@ export const image = {
 			this.onKeyDown = this.onKeyDown.bind( this );
 			this.openModal = this.openModal.bind( this );
 			this.closeModal = this.closeModal.bind( this );
+			this.anchorRef = null;
 			this.state = {
 				modal: false,
 			};
@@ -95,6 +96,22 @@ export const image = {
 			this.setState( { modal: false } );
 		}
 
+		componentDidMount() {
+			this.anchorRef = getRange();
+		}
+
+		componentDidUpdate( prevProps ) {
+			// When the popover is open or when the selected image changes,
+			// update the anchorRef.
+			if (
+				( ! prevProps.isObjectActive && this.props.isObjectActive ) ||
+				prevProps.activeObjectAttributes.url !==
+					this.props.activeObjectAttributes.url
+			) {
+				this.anchorRef = getRange();
+			}
+		}
+
 		render() {
 			const {
 				value,
@@ -112,7 +129,7 @@ export const image = {
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
 							>
-								<Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" />
+								<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
 							</SVG>
 						}
 						title={ title }
@@ -151,7 +168,7 @@ export const image = {
 						<Popover
 							position="bottom center"
 							focusOnMount={ false }
-							anchorRef={ getRange() }
+							anchorRef={ this.anchorRef }
 						>
 							{
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar

@@ -72,15 +72,33 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Context",
+		"slug": "block-context",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-context.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Deprecated Blocks",
 		"slug": "block-deprecation",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-deprecation.md",
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Templates",
 		"slug": "block-templates",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-templates.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Patterns (Experimental)",
+		"slug": "block-patterns",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-patterns.md",
 		"parent": "block-api"
 	},
 	{
@@ -234,6 +252,24 @@
 		"parent": "backward-compatibility"
 	},
 	{
+		"title": "Gutenberg as a Development Platform",
+		"slug": "platform",
+		"markdown_source": "../docs/designers-developers/developers/platform/README.md",
+		"parent": "developers"
+	},
+	{
+		"title": "Building a custom block editor",
+		"slug": "custom-block-editor",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/README.md",
+		"parent": "platform"
+	},
+	{
+		"title": "Tutorial: building a custom block editor",
+		"slug": "tutorial",
+		"markdown_source": "../docs/designers-developers/developers/platform/custom-block-editor/tutorial.md",
+		"parent": "custom-block-editor"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "../docs/designers-developers/designers/README.md",
@@ -246,9 +282,9 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Patterns",
-		"slug": "design-patterns",
-		"markdown_source": "../docs/designers-developers/designers/design-patterns.md",
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/designers-developers/designers/user-interface.md",
 		"parent": "designers"
 	},
 	{
@@ -358,6 +394,12 @@
 		"slug": "copy-guide",
 		"markdown_source": "../docs/contributors/copy-guide.md",
 		"parent": "document"
+	},
+	{
+		"title": "Triage",
+		"slug": "triage",
+		"markdown_source": "../docs/contributors/triage.md",
+		"parent": "contributors"
 	},
 	{
 		"title": "Localizing Gutenberg Plugin",
@@ -586,6 +628,12 @@
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
 		"parent": null
+	},
+	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
 	},
 	{
 		"title": "AnglePickerControl",
@@ -870,6 +918,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NumberControl",
+		"slug": "number-control",
+		"markdown_source": "../packages/components/src/number-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Panel",
 		"slug": "panel",
 		"markdown_source": "../packages/components/src/panel/README.md",
@@ -897,6 +951,12 @@
 		"title": "RadioControl",
 		"slug": "radio-control",
 		"markdown_source": "../packages/components/src/radio-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "RadioGroup",
+		"slug": "radio-group",
+		"markdown_source": "../packages/components/src/radio-group/README.md",
 		"parent": "components"
 	},
 	{
@@ -1002,9 +1062,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "UnitControl",
+		"slug": "unit-control",
+		"markdown_source": "../packages/components/src/unit-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1266,6 +1338,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-navigation",
+		"slug": "packages-edit-navigation",
+		"markdown_source": "../packages/edit-navigation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1341,6 +1419,12 @@
 		"title": "@wordpress/icons",
 		"slug": "packages-icons",
 		"markdown_source": "../packages/icons/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/interface",
+		"slug": "packages-interface",
+		"markdown_source": "../packages/interface/README.md",
 		"parent": "packages"
 	},
 	{
@@ -1425,6 +1509,12 @@
 		"title": "@wordpress/postcss-themes",
 		"slug": "packages-postcss-themes",
 		"markdown_source": "../packages/postcss-themes/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/prettier-config",
+		"slug": "packages-prettier-config",
+		"markdown_source": "../packages/prettier-config/README.md",
 		"parent": "packages"
 	},
 	{

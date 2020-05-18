@@ -41,7 +41,7 @@ export const settings = {
 			label: _x( 'Default', 'block style' ),
 			isDefault: true,
 		},
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
 	],
 	supports: {
 		align: [ 'left', 'right', 'wide', 'full' ],

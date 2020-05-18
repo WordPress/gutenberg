@@ -1,27 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
+import { Polygon, Path, SVG } from '@wordpress/components';
 
 export const leftArrow = (
 	<SVG
-		width="18"
-		height="18"
-		viewBox="0 0 18 18"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<Path d="M4.5 9l5.6-5.7 1.4 1.5L7.3 9l4.2 4.2-1.4 1.5L4.5 9z" />
+		<Polygon points="14.5,8 10.6,12 14.5,16 13.5,17 8.4,12 13.5,7 " />
 	</SVG>
 );
 
 export const rightArrow = (
 	<SVG
-		width="18"
-		height="18"
-		viewBox="0 0 18 18"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<Path d="M13.5 9L7.9 3.3 6.5 4.8 10.7 9l-4.2 4.2 1.4 1.5L13.5 9z" />
+		<Polygon points="9.5,16 13.4,12 9.5,8 10.5,7 15.6,12 10.5,17 " />
 	</SVG>
 );
 

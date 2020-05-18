@@ -54,7 +54,7 @@ In most cases, a block’s setup state is only shown once and then further custo
 
 ### Block Identification
 
-A block should have a straightforward, short name so users can easily find it in the Block Library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Library.
+A block should have a straightforward, short name so users can easily find it in the block library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the block library.
 
 When referring to a block in documentation or UI, use title case for the block title and lowercase for the "block" descriptor. For example:
 
@@ -64,11 +64,11 @@ When referring to a block in documentation or UI, use title case for the block t
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
-![A screenshot of the Block Library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-do.png)
+![A screenshot of the block library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-do.png)
 **Do:**
 Use concise block names.
 
-![A screenshot of the Block Library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-dont.png)
+![A screenshot of the block library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-dont.png)
 **Don't:**
 Avoid long, multi-line block names.
 
@@ -76,7 +76,7 @@ Avoid long, multi-line block names.
 
 Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
 
-You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration/). 
+You can add a description by using the description attribute in the [registerBlockType function](/docs/designers-developers/developers/block-api/block-registration.md). 
 
 Stick to a single imperative sentence with an action + subject format. Examples:
 

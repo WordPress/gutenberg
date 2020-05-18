@@ -5,6 +5,7 @@ module.exports = {
 		require.resolve( './custom.js' ),
 		require.resolve( './react.js' ),
 		require.resolve( './esnext.js' ),
+		require.resolve( './i18n.js' ),
 	],
 	env: {
 		node: true,

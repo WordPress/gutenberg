@@ -33,9 +33,11 @@ function GroupEdit( { hasInnerBlocks, isSelected, getStylesFromColorScheme } ) {
 	}
 
 	return (
-		<InnerBlocks
-			renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
-		/>
+		<View style={ isSelected && hasInnerBlocks && styles.innerBlocks }>
+			<InnerBlocks
+				renderAppender={ isSelected && InnerBlocks.ButtonBlockAppender }
+			/>
+		</View>
 	);
 }
 

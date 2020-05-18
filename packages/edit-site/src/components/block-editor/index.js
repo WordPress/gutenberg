@@ -4,11 +4,11 @@
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { uploadMedia } from '@wordpress/media-utils';
-import { useEntityProp } from '@wordpress/core-data';
-import { parse, serialize } from '@wordpress/blocks';
+import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
 	ObserveTyping,
@@ -19,9 +19,12 @@ import {
 /**
  * Internal dependencies
  */
+import { useEditorContext } from '../editor';
+import NavigateToLink from '../navigate-to-link';
 import Sidebar from '../sidebar';
 
-export default function BlockEditor( { settings: _settings } ) {
+export default function BlockEditor() {
+	const { settings: _settings, setSettings } = useEditorContext();
 	const canUserCreateMedia = useSelect( ( select ) => {
 		const _canUserCreateMedia = select( 'core' ).canUser(
 			'create',
@@ -44,38 +47,44 @@ export default function BlockEditor( { settings: _settings } ) {
 			},
 		};
 	}, [ canUserCreateMedia, _settings ] );
-	const [ content, _setContent ] = useEntityProp(
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
-		'wp_template',
-		'content'
+		settings.templateType
 	);
-	const initialBlocks = useMemo( () => {
-		if ( typeof content !== 'function' ) {
-			const parsedContent = parse( content );
-			return parsedContent.length ? parsedContent : undefined;
-		}
-	}, [] );
-	const [ blocks = initialBlocks, setBlocks ] = useEntityProp(
-		'postType',
-		'wp_template',
-		'blocks'
+	const setActiveTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+				templateType: 'wp_template',
+			} ) ),
+		[]
 	);
-	const setContent = useCallback( ( nextBlocks ) => {
-		setBlocks( nextBlocks );
-		_setContent( serialize( nextBlocks ) );
-	}, [] );
 	return (
 		<BlockEditorProvider
 			settings={ settings }
 			value={ blocks }
-			onInput={ setBlocks }
-			onChange={ setContent }
+			onInput={ onInput }
+			onChange={ onChange }
+			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<__experimentalLinkControl.ViewerFill>
+				{ useCallback(
+					( fillProps ) => (
+						<NavigateToLink
+							{ ...fillProps }
+							activeId={ settings.templateId }
+							onActiveIdChange={ setActiveTemplateId }
+						/>
+					),
+					[ settings.templateId, setActiveTemplateId ]
+				) }
+			</__experimentalLinkControl.ViewerFill>
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
+			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>
 						<BlockList

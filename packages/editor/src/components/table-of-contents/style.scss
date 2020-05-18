@@ -8,7 +8,7 @@
 
 .table-of-contents__popover {
 	.components-popover__content {
-		padding: $grid-size-large;
+		padding: $grid-unit-20;
 
 		@include break-small {
 			max-height: calc(100vh - 120px);
@@ -21,9 +21,15 @@
 	}
 }
 
-.table-of-contents__wrapper:focus {
-	@include square-style__focus();
-	outline-offset: $grid-size;
+.table-of-contents__wrapper:focus::before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-shadow: inset 0 0 0 $border-width-focus $theme-color;
 }
 
 .table-of-contents__counts {
@@ -38,7 +44,7 @@
 	flex-direction: column;
 	font-size: $default-font-size;
 	color: $dark-gray-300;
-	padding-right: $grid-size;
+	padding-right: $grid-unit-10;
 	margin-bottom: 0;
 
 	&:last-child {

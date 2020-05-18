@@ -18,6 +18,10 @@ describe( 'block mover', () => {
 		// Select a block so the block mover is rendered.
 		await page.focus( '.block-editor-block-list__block' );
 
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
+
 		const blockMover = await page.$$( '.block-editor-block-mover' );
 		// There should be a block mover.
 		expect( blockMover ).toHaveLength( 1 );
@@ -30,6 +34,10 @@ describe( 'block mover', () => {
 
 		// Select a block so the block mover has the possibility of being rendered.
 		await page.focus( '.block-editor-block-list__block' );
+
+		// Move the mouse to show the block toolbar
+		await page.mouse.move( 0, 0 );
+		await page.mouse.move( 10, 10 );
 
 		// Ensure no block mover exists when only one block exists on the page.
 		const blockMover = await page.$$( '.block-editor-block-mover' );

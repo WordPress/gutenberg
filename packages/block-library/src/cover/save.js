@@ -20,12 +20,15 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 	backgroundImageStyles,
 	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
 } from './shared';
 
 export default function save( { attributes } ) {
 	const {
 		backgroundType,
 		gradient,
+		contentPosition,
 		customGradient,
 		customOverlayColor,
 		dimRatio,
@@ -33,13 +36,17 @@ export default function save( { attributes } ) {
 		hasParallax,
 		overlayColor,
 		url,
-		minHeight,
+		minHeight: minHeightProp,
+		minHeightUnit,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
 		overlayColor
 	);
 	const gradientClass = __experimentalGetGradientClass( gradient );
+	const minHeight = minHeightUnit
+		? `${ minHeightProp }${ minHeightUnit }`
+		: minHeightProp;
 
 	const style =
 		backgroundType === IMAGE_BACKGROUND_TYPE
@@ -64,9 +71,13 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
-			'has-background-gradient': customGradient,
+			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
-		}
+			'has-custom-content-position': ! isContentPositionCenter(
+				contentPosition
+			),
+		},
+		getPositionClassName( contentPosition )
 	);
 
 	return (
@@ -91,6 +102,7 @@ export default function save( { attributes } ) {
 					autoPlay
 					muted
 					loop
+					playsInline
 					src={ url }
 				/>
 			) }

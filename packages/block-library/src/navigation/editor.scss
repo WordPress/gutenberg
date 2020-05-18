@@ -1,71 +1,65 @@
 $navigation-height: 60px;
 $navigation-item-height: 46px;
 
-// Reduce the paddings, margins, and UI of inner-blocks.
-// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
-// When that happens, leverage that instead of the following overrides.
-[data-type="core/navigation"] {
+// Undo default editor styles.
+.editor-styles-wrapper .wp-block-navigation ul,
+.editor-styles-wrapper .wp-block-navigation ol {
+	margin-bottom: 0;
+	margin-left: 0;
+	padding-left: 0;
+}
 
-	.wp-block-navigation .block-editor-inner-blocks {
-		flex: 1; // expand to fill available space required for justification
-	}
+.editor-styles-wrapper .wp-block-navigation .block-editor-block-list__block {
+	margin: 0;
+}
 
-	// 1. Reset margins on immediate innerblocks container.
-	.wp-block-navigation .block-editor-inner-blocks > .block-editor-block-list__layout {
-		margin-left: 0;
-		margin-right: 0;
-	}
+// Polish the Appender.
+.wp-block-navigation .block-list-appender {
+	margin: 0;
+	display: flex;
+	align-items: center;
+}
 
-	.wp-block-navigation.items-justification-left .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: flex-start;
-	}
-
-	.wp-block-navigation.items-justification-center .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: center;
-	}
-
-	.wp-block-navigation.items-justification-right .block-editor-inner-blocks > .block-editor-block-list__layout {
-		justify-content: flex-end;
-	}
-
-	.wp-block-navigation .block-editor-block-list__block::before {
-		left: 0;
-		right: 0;
-	}
-
-	// Remove the dashed outlines for child blocks.
-	&.is-selected .wp-block-navigation .block-editor-block-list__block::before,
-	&.has-child-selected .wp-block-navigation .block-editor-block-list__block::before {
-		border-color: transparent !important; // !important used to keep the selector from growing any more complex.
-	}
-
-	// Hide the sibling inserter.
-	.wp-block-navigation .block-editor-block-list__insertion-point {
-		display: none;
-	}
-
-	// Polish the Appender.
-	.wp-block-navigation .block-list-appender {
-		width: 28px;
-		height: 28px;
-
-		.block-editor-button-block-appender {
-			padding: $grid-size;
-			padding-bottom: $grid-size-small;
-			padding-top: $grid-size-small;
-			outline: none;
-			background: none;
-		}
-	}
-
-	// Set a min width when the item is focused and empty in order to show the caret.
-	.wp-block-navigation .wp-block-navigation-link.is-selected .block-editor-rich-text__editable:focus {
-		min-width: 20px;
-	}
+.wp-block-navigation.is-vertical .block-list-appender {
+	margin: $grid-unit-10;
 }
 
 .wp-block-navigation__inserter-content {
-	padding: $grid-size-large;
+	padding: $grid-unit-20;
+}
+
+// Ensure sub-menus stay open and visible when a nested block is selected.
+.wp-block-navigation__container.is-parent-of-selected-block {
+	visibility: visible;
+	opacity: 1;
+}
+
+// Styles for submenu flyout
+.has-child {
+	// Only show the flyout when the parent menu item is selected.
+	// Do not show it on hover.
+	&,
+	&:hover {
+		> .wp-block-navigation__container {
+			opacity: 0;
+			visibility: hidden;
+		}
+	}
+
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation__container {
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+
+	// Adjust the appender margin to match other menu items
+	.wp-block-navigation__container {
+		.block-list-appender .block-editor-button-block-appender {
+			margin-left: $grid-unit-10 * 2;
+		}
+	}
 }
 
 /**
@@ -85,7 +79,6 @@ $colors-selector-size: 22px;
 
 	// Button container.
 	.block-library-colors-selector__icon-container {
-		width: 42px;
 		height: 30px;
 		position: relative;
 		margin: 0 auto;
@@ -93,11 +86,11 @@ $colors-selector-size: 22px;
 		display: flex;
 		align-items: center;
 		border-radius: 4px;
+	}
 
-		// Add the button arrow.
-		&::after {
-			@include dropdown-arrow();
-		}
+	.block-library-colors-selector__state-selection {
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	// colors-selector - selection status.

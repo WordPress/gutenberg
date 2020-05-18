@@ -28,6 +28,7 @@ export const settings = {
 	supports: {
 		className: false,
 		__unstablePasteTextInline: true,
+		lightBlockWrapper: true,
 	},
 	example: {
 		attributes: {

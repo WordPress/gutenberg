@@ -46,7 +46,6 @@ function selector( select ) {
 function BlockPopover( {
 	clientId,
 	rootClientId,
-	name,
 	align,
 	isValid,
 	moverDirection,
@@ -65,7 +64,7 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const [ blockNodes ] = useContext( BlockNodes );
+	const blockNodes = useContext( BlockNodes );
 
 	const showEmptyBlockSideInserter =
 		! isNavigationMode && isEmptyDefaultBlock && isValid;
@@ -112,11 +111,6 @@ function BlockPopover( {
 		return null;
 	}
 
-	// A block may specify a different target element for the toolbar.
-	if ( node.classList.contains( 'is-block-collapsed' ) ) {
-		node = node.querySelector( '.is-block-content' ) || node;
-	}
-
 	let anchorRef = node;
 
 	if ( hasMultiSelection ) {
@@ -160,6 +154,7 @@ function BlockPopover( {
 			className="block-editor-block-list__block-popover"
 			__unstableSticky={ ! showEmptyBlockSideInserter }
 			__unstableSlotName="block-toolbar"
+			__unstableBoundaryParent
 			// Allow subpixel positioning for the block movement animation.
 			__unstableAllowVerticalSubpixelPosition={
 				moverDirection !== 'horizontal' && node
@@ -169,6 +164,9 @@ function BlockPopover( {
 			}
 			onBlur={ () => setIsToolbarForced( false ) }
 			shouldAnchorIncludePadding
+			// Popover calculates the width once. Trigger a reset by remounting
+			// the component.
+			key={ shouldShowContextualToolbar }
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
 				<div
@@ -199,7 +197,6 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					data-type={ name }
 					data-align={ align }
 				/>
 			) }
@@ -309,7 +306,6 @@ export default function WrappedBlockPopover() {
 		<BlockPopover
 			clientId={ clientId }
 			rootClientId={ rootClientId }
-			name={ name }
 			align={ align }
 			isValid={ isValid }
 			moverDirection={ moverDirection }

@@ -4,6 +4,7 @@
 import memize from 'memize';
 import { size, map, without } from 'lodash';
 import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
+import { I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -45,6 +46,7 @@ class Editor extends Component {
 	) {
 		settings = {
 			...settings,
+			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
 			focusMode,
 		};
@@ -143,13 +145,18 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isFeatureActive, getEditorMode, getPreference } = select(
-			'core/edit-post'
-		);
+		const {
+			isFeatureActive,
+			getEditorMode,
+			getPreference,
+			__experimentalGetPreviewDeviceType,
+		} = select( 'core/edit-post' );
 		const { getBlockTypes } = select( 'core/blocks' );
 
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			hasFixedToolbar:
+				isFeatureActive( 'fixedToolbar' ) ||
+				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			mode: getEditorMode(),
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),

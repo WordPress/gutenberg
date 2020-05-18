@@ -1,4 +1,10 @@
 {
 	"name": "core/post-date",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"format": {
+			"type": "string"
+		}
+	},
+	"context": [ "postId" ]
 }

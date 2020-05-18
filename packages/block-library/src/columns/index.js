@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { columns as icon } from '@wordpress/icons';
-
+import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -26,6 +26,8 @@ export const settings = {
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,
+		lightBlockWrapper: true,
+		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	variations,
 	example: {

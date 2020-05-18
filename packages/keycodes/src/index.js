@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues, includes, capitalize } from 'lodash';
+import { get, mapValues, includes, capitalize, xor } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ import { isAppleOS } from './platform';
  * An object of handler functions for each of the possible modifier
  * combinations. A handler will return a value for a given key.
  *
- * @typedef {{[M in WPKeycodeModifier]:(key:string)=>any}} WPKeycodeHandlerByModifier
+ * @typedef {Record<WPKeycodeModifier, (key:string)=>any>} WPKeycodeHandlerByModifier
  */
 
 /**
@@ -95,6 +95,10 @@ export const COMMAND = 'meta';
  * Keycode for SHIFT key.
  */
 export const SHIFT = 'shift';
+/**
+ * Keycode for ZERO key.
+ */
+export const ZERO = 48;
 
 /**
  * Object that contains functions that return the available modifier
@@ -220,6 +224,20 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 } );
 
 /**
+ * From a given KeyboardEvent, returns an array of active modifier constants for
+ * the event.
+ *
+ * @param {KeyboardEvent} event Keyboard event.
+ *
+ * @return {Array<ALT|CTRL|COMMAND|SHIFT>} Active modifier constants.
+ */
+function getEventModifiers( event ) {
+	return [ ALT, CTRL, COMMAND, SHIFT ].filter(
+		( key ) => event[ `${ key }Key` ]
+	);
+}
+
+/**
  * An object that contains functions to check if a keyboard event matches a
  * predefined shortcut combination.
  * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
@@ -230,8 +248,9 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
 export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 	return ( event, character, _isApple = isAppleOS ) => {
 		const mods = getModifiers( _isApple );
+		const eventMods = getEventModifiers( event );
 
-		if ( ! mods.every( ( key ) => event[ `${ key }Key` ] ) ) {
+		if ( xor( mods, eventMods ).length ) {
 			return false;
 		}
 

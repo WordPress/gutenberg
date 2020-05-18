@@ -33,10 +33,10 @@ selectorNames.forEach( ( name ) => {
 				return state.currentPost;
 			},
 
-			getEntityRecordChangesByRecord() {
+			__experimentalGetDirtyEntityRecords() {
 				return (
-					state.getEntityRecordChangesByRecord &&
-					state.getEntityRecordChangesByRecord()
+					state.__experimentalGetDirtyEntityRecords &&
+					state.__experimentalGetDirtyEntityRecords()
 				);
 			},
 
@@ -171,6 +171,7 @@ const {
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
+	getEditedPostSlug,
 	isPostSavingLocked,
 	isPostAutosavingLocked,
 	canUserUseUnfilteredHTML,
@@ -461,8 +462,10 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: false,
 				},
-				getEntityRecordChangesByRecord() {
-					return { someKind: { someName: { someKey: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( false );
@@ -473,8 +476,10 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { someKind: { someName: { someKey: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'someKind', name: 'someName', key: 'someKey' },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -485,8 +490,8 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [ { kind: 'postType', name: 'post', key: 1 } ];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( false );
@@ -497,8 +502,11 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return { postType: { post: { 1: {}, 2: {} } } };
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'post', key: 2 },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -509,10 +517,11 @@ describe( 'selectors', () => {
 				editorSettings: {
 					__experimentalEnableFullSiteEditing: true,
 				},
-				getEntityRecordChangesByRecord() {
-					return {
-						postType: { post: { 1: {} }, wp_template: { 1: {} } },
-					};
+				__experimentalGetDirtyEntityRecords() {
+					return [
+						{ kind: 'postType', name: 'post', key: 1 },
+						{ kind: 'postType', name: 'wp_template', key: 1 },
+					];
 				},
 			};
 			expect( hasNonPostEntityChanges( state ) ).toBe( true );
@@ -2893,6 +2902,87 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getEditedPostSlug', () => {
+		it( 'should return the current post’s slug if one exists and has not been edited', () => {
+			const state = {
+				currentPost: {
+					slug: 'custom-slug',
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'custom-slug' );
+		} );
+
+		it( 'should return the edited post slug if it has been edited', () => {
+			const state = {
+				currentPost: {
+					slug: 'custom-slug',
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {
+							slug: 'edited-slug',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'edited-slug' );
+		} );
+
+		it( 'should return the cleaned title as slug if no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'sample-post' );
+		} );
+
+		it( 'should return cleaned, edited title as slug if it has been edited and no saved or edited slug exists', () => {
+			const state = {
+				currentPost: {
+					title: 'Sample Post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'edited-title' );
+		} );
+
+		it( 'should return the post ID if no slug or post title exists', () => {
+			const state = {
+				postId: 123,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 123 );
 		} );
 	} );
 

@@ -8,15 +8,11 @@
 	}
 
 	@include break-small() {
-		margin-left: 4px;
+		margin-left: 0;
 
 		.components-button {
 			padding: 0 4px;
 		}
-	}
-
-	.components-button svg {
-		transform: rotate(90deg);
 	}
 }
 

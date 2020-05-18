@@ -29,9 +29,9 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { pencil } from '@wordpress/icons';
+import { replace } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -74,7 +74,7 @@ class MediaContainer extends Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 ) {
+		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}
 	}
@@ -101,7 +101,7 @@ class MediaContainer extends Component {
 
 		if ( this.state.isUploadInProgress ) {
 			requestImageUploadCancelDialog( mediaId );
-		} else if ( mediaId && ! isURL( mediaUrl ) ) {
+		} else if ( mediaId && getProtocol( mediaUrl ) === 'file:' ) {
 			requestImageFailedRetryDialog( mediaId );
 		}
 	}
@@ -131,7 +131,7 @@ class MediaContainer extends Component {
 					<Button
 						className="components-toolbar__control"
 						label={ __( 'Edit media' ) }
-						icon={ pencil }
+						icon={ replace }
 						onClick={ open }
 					/>
 				</ToolbarGroup>

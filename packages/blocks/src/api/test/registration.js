@@ -10,6 +10,7 @@ import { noop, get, omit, pick } from 'lodash';
  */
 import { addFilter, removeAllFilters } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
+import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -34,7 +35,6 @@ import {
 	isReusableBlock,
 	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
-	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 
@@ -121,7 +121,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -173,23 +173,7 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks without category', () => {
-			const blockType = {
-					settingName: 'settingValue',
-					save: noop,
-					title: 'block title',
-				},
-				block = registerBlockType(
-					'my-plugin/fancy-block-8',
-					blockType
-				);
-			expect( console ).toHaveErroredWith(
-				'The block "my-plugin/fancy-block-8" must have a category.'
-			);
-			expect( block ).toBeUndefined();
-		} );
-
-		it( 'should reject blocks with non registered category.', () => {
+		it( 'should unset category of blocks with non registered category.', () => {
 			const blockType = {
 					save: noop,
 					category: 'custom-category-slug',
@@ -199,10 +183,11 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-9',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
-				'The block "my-plugin/fancy-block-9" must have a registered category.'
+			expect( console ).toHaveWarnedWith(
+				'The block "my-plugin/fancy-block-9" is registered with an invalid category "custom-category-slug".'
 			);
-			expect( block ).toBeUndefined();
+			expect( block ).not.toBeUndefined();
+			expect( block.category ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without title', () => {
@@ -266,7 +251,7 @@ describe( 'blocks', () => {
 				title: 'block title',
 				category: 'common',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -295,7 +280,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {
 						ok: {
@@ -506,7 +491,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -587,7 +572,10 @@ describe( 'blocks', () => {
 								...omit(
 									{
 										name,
-										...DEFAULT_BLOCK_TYPE_SETTINGS,
+										icon: blockIcon,
+										attributes: {},
+										keywords: [],
+										save: () => null,
 										...get(
 											serverSideBlockDefinitions,
 											name
@@ -630,6 +618,31 @@ describe( 'blocks', () => {
 						pick( deprecation, DEPRECATED_ENTRY_KEYS )
 					);
 				} );
+			} );
+
+			it( 'should update block attributes separately for each block when they use a default set', () => {
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/shared-defaults',
+					( settings, name ) => {
+						if ( name === 'my-plugin/test-block-1' ) {
+							settings.attributes.newlyAddedAttribute = {
+								type: String,
+							};
+						}
+						return settings;
+					}
+				);
+				const block1 = registerBlockType(
+					'my-plugin/test-block-1',
+					defaultBlockSettings
+				);
+				const block2 = registerBlockType(
+					'my-plugin/test-block-2',
+					defaultBlockSettings
+				);
+				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
+				expect( block1.attributes ).not.toEqual( block2.attributes );
 			} );
 		} );
 	} );
@@ -674,7 +687,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],
@@ -689,7 +702,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -765,7 +778,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -787,7 +800,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
 				keywords: [],
@@ -816,7 +829,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],
@@ -829,7 +842,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
 					keywords: [],

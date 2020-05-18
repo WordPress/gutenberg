@@ -29,6 +29,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
+	__experimentalBlock as Block,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
@@ -390,12 +391,6 @@ export class ImageEdit extends Component {
 			</BlockControls>
 		);
 		const src = isExternal ? url : undefined;
-		const labels = {
-			title: ! url ? __( 'Image' ) : __( 'Edit image' ),
-			instructions: __(
-				'Upload an image file, pick one from your media library, or add one with a URL.'
-			),
-		};
 		const mediaPreview = !! url && (
 			<img
 				alt={ __( 'Edit image' ) }
@@ -404,11 +399,10 @@ export class ImageEdit extends Component {
 				src={ url }
 			/>
 		);
+
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
-				className={ className }
-				labels={ labels }
 				onSelect={ this.onSelectImage }
 				onSelectURL={ this.onSelectURL }
 				notices={ noticeUI }
@@ -420,11 +414,12 @@ export class ImageEdit extends Component {
 				disableMediaButtons={ url }
 			/>
 		);
+
 		if ( ! url ) {
 			return (
 				<>
 					{ controls }
-					{ mediaPlaceholder }
+					<Block.div>{ mediaPlaceholder }</Block.div>
 				</>
 			);
 		}
@@ -446,7 +441,7 @@ export class ImageEdit extends Component {
 				<InspectorControls>
 					<PanelBody title={ __( 'Image settings' ) }>
 						<TextareaControl
-							label={ __( 'Alt Text (Alternative Text)' ) }
+							label={ __( 'Alt text (alternative text)' ) }
 							value={ alt }
 							onChange={ this.updateAlt }
 							help={
@@ -477,7 +472,7 @@ export class ImageEdit extends Component {
 				</InspectorControls>
 				<InspectorAdvancedControls>
 					<TextControl
-						label={ __( 'Title Attribute' ) }
+						label={ __( 'Title attribute' ) }
 						value={ title || '' }
 						onChange={ this.onSetTitle }
 						help={
@@ -502,7 +497,7 @@ export class ImageEdit extends Component {
 		return (
 			<>
 				{ controls }
-				<figure className={ classes }>
+				<Block.figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
 							const {
@@ -518,6 +513,7 @@ export class ImageEdit extends Component {
 								defaultedAlt = alt;
 							} else if ( filename ) {
 								defaultedAlt = sprintf(
+									/* translators: %s: file name */
 									__(
 										'This image has an empty alt attribute; its file name is %s'
 									),
@@ -626,6 +622,7 @@ export class ImageEdit extends Component {
 											width,
 											height,
 										} }
+										showHandle={ isSelected }
 										minWidth={ minWidth }
 										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
@@ -677,8 +674,9 @@ export class ImageEdit extends Component {
 							inlineToolbar
 						/>
 					) }
-				</figure>
-				{ mediaPlaceholder }
+
+					{ mediaPlaceholder }
+				</Block.figure>
 			</>
 		);
 		/* eslint-enable jsx-a11y/click-events-have-key-events */

@@ -12,7 +12,11 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { EntityProvider } from '@wordpress/core-data';
-import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
+import {
+	BlockEditorProvider,
+	BlockContextProvider,
+	__unstableEditorStyles as EditorStyles,
+} from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -25,6 +29,18 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * wordpress/editor/src/components/provider/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {Object} search
+ * @param {number} perPage
+ * @return {Promise<Object[]>} List of suggestions
+ */
 const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
@@ -47,6 +63,10 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
+			maxSize: 1,
+		} );
+
+		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
 			maxSize: 1,
 		} );
 
@@ -91,9 +111,20 @@ class EditorProvider extends Component {
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
+				'__experimentalDisableCustomUnits',
+				'__experimentalDisableCustomLineHeight',
+				'__experimentalDisableDropCap',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBase',
+				'__experimentalPreferredStyleVariations',
 				'alignWide',
 				'allowedBlockTypes',
-				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -103,24 +134,18 @@ class EditorProvider extends Component {
 				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'onUpdateDefaultBlockStyles',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalBlockDirectory',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
-				'__mobileEnablePageTemplates',
-				'showInserterHelpPanel',
-				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
@@ -132,25 +157,12 @@ class EditorProvider extends Component {
 		};
 	}
 
+	getDefaultBlockContext( postId, postType ) {
+		return { postId, postType };
+	}
+
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
-
-		if ( ! this.props.settings.styles ) {
-			return;
-		}
-
-		const updatedStyles = transformStyles(
-			this.props.settings.styles,
-			'.editor-styles-wrapper'
-		);
-
-		map( updatedStyles, ( updatedCSS ) => {
-			if ( updatedCSS ) {
-				const node = document.createElement( 'style' );
-				node.innerHTML = updatedCSS;
-				document.body.appendChild( node );
-			}
-		} );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -196,28 +208,38 @@ class EditorProvider extends Component {
 			isPostTitleSelected
 		);
 
+		const defaultBlockContext = this.getDefaultBlockContext(
+			post.id,
+			post.type
+		);
+
 		return (
-			<EntityProvider kind="root" type="site">
-				<EntityProvider
-					kind="postType"
-					type={ post.type }
-					id={ post.id }
-				>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ resetEditorBlocksWithoutUndoLevel }
-						onChange={ resetEditorBlocks }
-						selectionStart={ selectionStart }
-						selectionEnd={ selectionEnd }
-						settings={ editorSettings }
-						useSubRegistry={ false }
+			<>
+				<EditorStyles styles={ settings.styles } />
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
 					>
-						{ children }
-						<ReusableBlocksButtons />
-						<ConvertToGroupButtons />
-					</BlockEditorProvider>
+						<BlockContextProvider value={ defaultBlockContext }>
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ resetEditorBlocksWithoutUndoLevel }
+								onChange={ resetEditorBlocks }
+								selectionStart={ selectionStart }
+								selectionEnd={ selectionEnd }
+								settings={ editorSettings }
+								useSubRegistry={ false }
+							>
+								{ children }
+								<ReusableBlocksButtons />
+								<ConvertToGroupButtons />
+							</BlockEditorProvider>
+						</BlockContextProvider>
+					</EntityProvider>
 				</EntityProvider>
-			</EntityProvider>
+			</>
 		);
 	}
 }

@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import { uniqueId } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useState, createRef } from '@wordpress/element';
+import { useState, createRef, renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -11,20 +16,18 @@ import {
 	ToolbarGroup,
 	Button,
 	Dropdown,
-	withNotices,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { useSelect } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
+import { DOWN } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
-import { link, upload } from '@wordpress/icons';
+import { upload, media as mediaIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
-import LinkEditor from '../url-popover/link-editor';
-import LinkViewer from '../url-popover/link-viewer';
+import LinkControl from '../link-control';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -33,48 +36,58 @@ const MediaReplaceFlow = ( {
 	accept,
 	onSelect,
 	onSelectURL,
-	onError,
 	name = __( 'Replace' ),
+	createNotice,
+	removeNotice,
 } ) => {
-	const [ showURLInput, setShowURLInput ] = useState( false );
-	const [ showEditURLInput, setShowEditURLInput ] = useState( false );
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
+	const errorNoticeID = uniqueId(
+		'block-editor/media-replace-flow/error-notice/'
+	);
 
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if (
-			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
-				event.keyCode
-			) > -1
-		) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
-		}
+	const onError = ( message ) => {
+		const errorElement = document.createElement( 'div' );
+		errorElement.innerHTML = renderToString( message );
+		// The default error contains some HTML that,
+		// for example, makes the filename bold.
+		// The notice, by default, accepts strings only and so
+		// we need to remove the html from the error.
+		const renderMsg =
+			errorElement.textContent || errorElement.innerText || '';
+		// We need to set a timeout for showing the notice
+		// so that VoiceOver and possibly other screen readers
+		// can announce the error afer the toolbar button
+		// regains focus once the upload dialog closes.
+		// Otherwise VO simply skips over the notice and announces
+		// the focused element and the open menu.
+		setTimeout( () => {
+			createNotice( 'error', renderMsg, {
+				speak: true,
+				id: errorNoticeID,
+				isDismissible: true,
+			} );
+		}, 1000 );
 	};
 
 	const selectMedia = ( media ) => {
 		onSelect( media );
 		setMediaURLValue( media.url );
 		speak( __( 'The media file has been replaced' ) );
+		removeNotice( errorNoticeID );
 	};
 
 	const selectURL = ( newURL ) => {
 		onSelectURL( newURL );
-		setShowEditURLInput( false );
 	};
 
-	const uploadFiles = ( event, closeDropdown ) => {
+	const uploadFiles = ( event ) => {
 		const files = event.target.files;
 		const setMedia = ( [ media ] ) => {
 			selectMedia( media );
-			closeDropdown();
 		};
 		mediaUpload( {
 			allowedTypes,
@@ -92,36 +105,6 @@ const MediaReplaceFlow = ( {
 		}
 	};
 
-	let urlInputUIContent;
-	if ( showEditURLInput ) {
-		urlInputUIContent = (
-			<LinkEditor
-				onKeyDown={ stopPropagationRelevantKeys }
-				onKeyPress={ stopPropagation }
-				value={ mediaURLValue }
-				isFullWidthInput={ true }
-				hasInputBorder={ true }
-				onChangeInputValue={ ( url ) => setMediaURLValue( url ) }
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					selectURL( mediaURLValue );
-					editMediaButtonRef.current.focus();
-				} }
-			/>
-		);
-	} else {
-		urlInputUIContent = (
-			<LinkViewer
-				isFullWidth={ true }
-				className="block-editor-media-replace-flow__link-viewer"
-				url={ mediaURLValue }
-				onEditLinkClick={ () =>
-					setShowEditURLInput( ! showEditURLInput )
-				}
-			/>
-		);
-	}
-
 	return (
 		<Dropdown
 			contentClassName="block-editor-media-replace-flow__options"
@@ -134,19 +117,18 @@ const MediaReplaceFlow = ( {
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-						<span className="block-editor-media-replace-flow__indicator" />
 					</Button>
 				</ToolbarGroup>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
-					<NavigableMenu>
+					<NavigableMenu className="block-editor-media-replace-flow__media-upload-menu">
 						<MediaUpload
 							value={ mediaId }
 							onSelect={ ( media ) => selectMedia( media ) }
 							allowedTypes={ allowedTypes }
 							render={ ( { open } ) => (
-								<MenuItem icon="admin-media" onClick={ open }>
+								<MenuItem icon={ mediaIcon } onClick={ open }>
 									{ __( 'Open Media Library' ) }
 								</MenuItem>
 							) }
@@ -171,22 +153,32 @@ const MediaReplaceFlow = ( {
 								} }
 							/>
 						</MediaUploadCheck>
-						{ onSelectURL && (
-							<MenuItem
-								icon={ link }
-								onClick={ () =>
-									setShowURLInput( ! showURLInput )
-								}
-								aria-expanded={ showURLInput }
-							>
-								<div> { __( 'Insert from URL' ) } </div>
-							</MenuItem>
-						) }
 					</NavigableMenu>
-					{ showURLInput && (
-						<div className="block-editor-media-flow__url-input">
-							{ urlInputUIContent }
-						</div>
+					{ onSelectURL && (
+						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+						<form
+							className="block-editor-media-flow__url-input"
+							onKeyDown={ ( event ) => {
+								event.stopPropagation();
+							} }
+							onKeyPress={ ( event ) => {
+								event.stopPropagation();
+							} }
+						>
+							<span className="block-editor-media-replace-flow__image-url-label">
+								{ __( 'Current media URL:' ) }
+							</span>
+							<LinkControl
+								value={ { url: mediaURLValue } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( { url } ) => {
+									setMediaURLValue( url );
+									selectURL( url );
+									editMediaButtonRef.current.focus();
+								} }
+							/>
+						</form>
 					) }
 				</>
 			) }
@@ -194,4 +186,12 @@ const MediaReplaceFlow = ( {
 	);
 };
 
-export default compose( withNotices )( MediaReplaceFlow );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createNotice, removeNotice } = dispatch( 'core/notices' );
+		return {
+			createNotice,
+			removeNotice,
+		};
+	} ),
+] )( MediaReplaceFlow );

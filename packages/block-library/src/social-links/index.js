@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { share as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,11 +18,12 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Social Icons' ),
 	description: __(
-		'Create a block of links to your social media or external sites.'
+		'Display icons linking to your social media profiles or websites.'
 	),
 	keywords: [ _x( 'links', 'block keywords' ) ],
 	supports: {
 		align: [ 'left', 'center', 'right' ],
+		lightBlockWrapper: true,
 	},
 	example: {
 		innerBlocks: [
@@ -53,6 +55,7 @@ export const settings = {
 		{ name: 'logos-only', label: __( 'Logos Only' ) },
 		{ name: 'pill-shape', label: __( 'Pill Shape' ) },
 	],
+	icon,
 	edit,
 	save,
 };

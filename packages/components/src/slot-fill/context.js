@@ -14,6 +14,11 @@ import {
 	useEffect,
 } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import SlotFillBubblesVirtuallyProvider from './bubbles-virtually/slot-fill-provider';
+
 const SlotFillContext = createContext( {
 	registerSlot: () => {},
 	unregisterSlot: () => {},
@@ -140,7 +145,9 @@ class SlotFillProvider extends Component {
 	render() {
 		return (
 			<Provider value={ this.contextValue }>
-				{ this.props.children }
+				<SlotFillBubblesVirtuallyProvider>
+					{ this.props.children }
+				</SlotFillBubblesVirtuallyProvider>
 			</Provider>
 		);
 	}

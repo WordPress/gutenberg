@@ -12,6 +12,7 @@
 }
 
 .cellRowStyles {
+	flex-shrink: 1;
 	min-height: 48px;
 	align-items: center;
 	justify-content: space-between;
@@ -62,9 +63,4 @@
 
 .valueTextDark {
 	color: $light-opacity-200;
-}
-
-.plus {
-	margin-top: 4px;
-	margin-right: 1px;
 }

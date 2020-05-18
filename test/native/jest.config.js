@@ -33,7 +33,7 @@ module.exports = {
 	testMatch: [ '**/test/*.native.[jt]s?(x)' ],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'/wordpress/',
+		'<rootDir>/wordpress/',
 		'/__device-tests__/',
 	],
 	testURL: 'http://localhost/',

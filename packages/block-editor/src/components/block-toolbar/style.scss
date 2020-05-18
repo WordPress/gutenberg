@@ -1,48 +1,56 @@
+/**
+ * Block Toolbar
+ */
+
 .block-editor-block-toolbar {
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	border-left: $border-width solid $light-gray-800;
+
+	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
+	// Allow overflow on desktop.
 	@include break-small() {
-		// Allow overflow on desktop.
 		overflow: inherit;
-
-		// Show a left border on the parent container.
-		border-left: none;
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-		// Show a lighter version for dark themes.
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
 	}
 
-	// The component is born with a border, but we only need some of them.
+	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
-		border: 0;
-		border-top: $border-width solid $light-gray-800;
-		border-bottom: $border-width solid $light-gray-800;
-
-		// Add a right border to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-800;
-
+		background: none;
 		// IE11 has thick paddings without this.
 		line-height: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $light-gray-500;
 	}
 
-	// Add a left border and adjust the color for Top Toolbar mode.
-	.has-fixed-toolbar & {
-		box-shadow: none;
-		border-left: $border-width solid $light-gray-500;
+	> :last-child,
+	> :last-child .components-toolbar-group,
+	> :last-child .components-toolbar {
+		border-right: none;
+	}
+}
 
-		.components-toolbar {
-			border-color: $light-gray-500;
-		}
+.block-editor-block-toolbar,
+.block-editor-format-toolbar {
+	// Override Toolbar buttons size.
+	.components-toolbar-group,
+	.components-toolbar {
+		display: flex;
+		flex-wrap: nowrap;
 	}
 }
 
@@ -57,3 +65,51 @@
 		display: inline-flex;
 	}
 }
+
+.block-editor-block-toolbar__mover-switcher-container {
+	display: flex;
+}
+
+.block-editor-block-toolbar__block-switcher-wrapper {
+	.block-editor-block-switcher {
+		display: block;
+	}
+}
+
+.block-editor-block-toolbar.has-responsive-movers {
+	.block-editor-block-toolbar__mover-trigger-container {
+		@include break-medium() {
+			bottom: -1px;
+			left: -1px;
+			position: absolute;
+			top: -1px;
+			transform: translateX(-48px);
+			user-select: none;
+		}
+	}
+
+	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
+	.block-editor-block-toolbar__block-switcher-wrapper {
+		background: $white;
+		border-left: $border-width solid;
+		border-radius: 0 0 $radius-block-ui $radius-block-ui;
+		position: relative;
+		z-index: 1;
+		margin-left: -$border-width;
+	}
+
+	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {
+		@include break-medium() {
+			background-color: $white;
+			border: 1px solid $black;
+			border-bottom-left-radius: 2px;
+			border-top-left-radius: 2px;
+			border-right: none;
+			height: 100%;
+			transition: all 60ms linear;
+		}
+
+		@include reduce-motion("transition");
+	}
+}
+

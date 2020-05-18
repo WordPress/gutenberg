@@ -1,6 +1,6 @@
 # Add a Button to the Toolbar
 
-Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component to extend the format toolbar.
+Now that the format is available, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/rich-text#richtexttoolbarbutton) component to extend the format toolbar.
 
 Paste this code in `my-custom-format.js`:
 

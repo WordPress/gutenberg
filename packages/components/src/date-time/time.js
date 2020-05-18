@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
+import ButtonGroup from '../button-group';
 
 /**
  * Module Constants
@@ -98,6 +99,9 @@ class TimePicker extends Component {
 		const { is12Hour } = this.props;
 		const { am, hours, date } = this.state;
 		const value = parseInt( hours, 10 );
+		if ( value === date.hour() ) {
+			return;
+		}
 		if (
 			! isInteger( value ) ||
 			( is12Hour && ( value < 1 || value > 12 ) ) ||
@@ -120,6 +124,9 @@ class TimePicker extends Component {
 	updateMinutes() {
 		const { minutes, date } = this.state;
 		const value = parseInt( minutes, 10 );
+		if ( value === date.minute() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
 			this.syncState( this.props );
 			return;
@@ -131,6 +138,9 @@ class TimePicker extends Component {
 	updateDay() {
 		const { day, date } = this.state;
 		const value = parseInt( day, 10 );
+		if ( value === date.date() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 31 ) {
 			this.syncState( this.props );
 			return;
@@ -142,6 +152,9 @@ class TimePicker extends Component {
 	updateMonth() {
 		const { month, date } = this.state;
 		const value = parseInt( month, 10 );
+		if ( value === date.month() + 1 ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 1 || value > 12 ) {
 			this.syncState( this.props );
 			return;
@@ -153,6 +166,9 @@ class TimePicker extends Component {
 	updateYear() {
 		const { year, date } = this.state;
 		const value = parseInt( year, 10 );
+		if ( value === date.year() ) {
+			return;
+		}
 		if ( ! isInteger( value ) || value < 0 || value > 9999 ) {
 			this.syncState( this.props );
 			return;
@@ -318,24 +334,24 @@ class TimePicker extends Component {
 							/>
 						</div>
 						{ is12Hour && (
-							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
+							<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
 								<Button
-									isSecondary
-									className="components-datetime__time-am-button"
-									isPressed={ am === 'AM' }
+									isPrimary={ am === 'AM' }
+									isSecondary={ am !== 'AM' }
 									onClick={ this.updateAmPm( 'AM' ) }
+									className="components-datetime__time-am-button"
 								>
 									{ __( 'AM' ) }
 								</Button>
 								<Button
-									isSecondary
-									className="components-datetime__time-pm-button"
-									isPressed={ am === 'PM' }
+									isPrimary={ am === 'PM' }
+									isSecondary={ am !== 'PM' }
 									onClick={ this.updateAmPm( 'PM' ) }
+									className="components-datetime__time-pm-button"
 								>
 									{ __( 'PM' ) }
 								</Button>
-							</div>
+							</ButtonGroup>
 						) }
 					</div>
 				</fieldset>

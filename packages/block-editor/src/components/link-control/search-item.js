@@ -8,7 +8,8 @@ import classnames from 'classnames';
  */
 import { safeDecodeURI } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
-import { Button, Icon, TextHighlight } from '@wordpress/components';
+import { Button, TextHighlight } from '@wordpress/components';
+import { Icon, globe } from '@wordpress/icons';
 
 export const LinkControlSearchItem = ( {
 	itemProps,
@@ -31,7 +32,7 @@ export const LinkControlSearchItem = ( {
 			{ isURL && (
 				<Icon
 					className="block-editor-link-control__search-item-icon"
-					icon="admin-site-alt3"
+					icon={ globe }
 				/>
 			) }
 			<span className="block-editor-link-control__search-item-header">

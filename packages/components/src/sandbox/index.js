@@ -26,10 +26,31 @@ class Sandbox extends Component {
 
 	componentDidMount() {
 		this.trySandbox();
+		this.trySandboxWithoutRerender = () => {
+			this.trySandbox( false );
+		};
+		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
+		// after reordering the containing block. See these two issues for more details:
+		// https://github.com/WordPress/gutenberg/issues/6146
+		// https://github.com/facebook/react/issues/18752
+		this.iframe.current.addEventListener(
+			'load',
+			this.trySandboxWithoutRerender,
+			false
+		);
 	}
 
-	componentDidUpdate() {
-		this.trySandbox();
+	componentDidUpdate( prevProps ) {
+		const forceRerender = prevProps.html !== this.props.html;
+
+		this.trySandbox( forceRerender );
+	}
+
+	componentWillUnmount() {
+		this.iframe.current.removeEventListener(
+			'load',
+			this.trySandboxWithoutRerender
+		);
 	}
 
 	isFrameAccessible() {
@@ -69,13 +90,17 @@ class Sandbox extends Component {
 		}
 	}
 
-	trySandbox() {
+	trySandbox( forceRerender = false ) {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
 
 		const body = this.iframe.current.contentDocument.body;
-		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
+
+		if (
+			! forceRerender &&
+			null !== body.getAttribute( 'data-resizable-iframe-connected' )
+		) {
 			return;
 		}
 
@@ -227,7 +252,6 @@ class Sandbox extends Component {
 				title={ title }
 				className="components-sandbox"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
-				onLoad={ this.trySandbox }
 				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
 				height={ Math.ceil( this.state.height ) }

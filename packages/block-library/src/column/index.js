@@ -21,20 +21,9 @@ export const settings = {
 	icon,
 	description: __( 'A single column within a columns block.' ),
 	supports: {
-		inserter: false,
 		reusable: false,
 		html: false,
-	},
-	getEditWrapperProps( attributes ) {
-		const { width } = attributes;
-		if ( Number.isFinite( width ) ) {
-			return {
-				style: {
-					flexBasis: width + '%',
-				},
-				'data-has-explicit-width': true,
-			};
-		}
+		lightBlockWrapper: true,
 	},
 	edit,
 	save,

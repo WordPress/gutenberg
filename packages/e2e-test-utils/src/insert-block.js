@@ -5,19 +5,12 @@ import { searchForBlock } from './search-for-block';
 
 /**
  * Opens the inserter, searches for the given term, then selects the first
- * result that appears.
+ * result that appears. It then waits briefly for the block list to update.
  *
  * @param {string} searchTerm The text to search the inserter for.
- * @param {string} panelName  The inserter panel to open (if it's closed by default).
  */
-export async function insertBlock( searchTerm, panelName = null ) {
+export async function insertBlock( searchTerm ) {
 	await searchForBlock( searchTerm );
-	if ( panelName ) {
-		const panelButton = (
-			await page.$x( `//button[contains(text(), '${ panelName }')]` )
-		 )[ 0 ];
-		await panelButton.click();
-	}
 	const insertButton = (
 		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
 	 )[ 0 ];

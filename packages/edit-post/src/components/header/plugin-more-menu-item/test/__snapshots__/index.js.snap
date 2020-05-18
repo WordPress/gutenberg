@@ -22,17 +22,17 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-menu-items__item-icon"
-        focusable="false"
-        height={20}
+        focusable={false}
+        height={24}
         role="img"
         viewBox="0 0 24 24"
-        width={20}
+        width={24}
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M2 9v2h19V9H2zm0 6h5v-2H2v2zm7 0h5v-2H9v2zm7 0h5v-2h-5v2z"
+          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
         />
       </svg>
       My plugin button menu item

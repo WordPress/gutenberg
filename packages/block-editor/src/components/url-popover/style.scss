@@ -31,19 +31,11 @@
 		width: 30px;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		box-shadow: none;
-
-		> svg {
-			@include formatting-button-style__hover;
-		}
-	}
-
 	&:not(:disabled):focus {
 		box-shadow: none;
 
 		> svg {
-			@include formatting-button-style__focus;
+			@include block-toolbar-button-style__focus();
 		}
 	}
 }
@@ -86,7 +78,7 @@
 }
 
 .block-editor-url-popover__link-viewer-url {
-	margin: $grid-size - $border-width;
+	margin: $grid-unit-10 - $border-width;
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;

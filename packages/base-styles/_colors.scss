@@ -25,6 +25,16 @@ $light-gray-200: #f3f4f5;
 $light-gray-100: #f8f9f9;
 $white: #fff;
 
+// G2 colors.
+$dark-gray-primary: #1e1e1e;
+$medium-gray-text: #757575;		// Meets 4.6:1 text contrast.
+$light-gray-ui: #949494;		// Meets 3:1 UI contrast.
+$light-gray-secondary: #ccc;
+$light-gray-tertiary: #e7e8e9;
+$theme-color: theme(button);
+$blue-medium-focus: theme(button);
+$blue-medium-focus-dark: $white;
+
 // Dark opacities, for use with light themes.
 $dark-opacity-900: rgba(#000510, 0.9);
 $dark-opacity-800: rgba(#00000a, 0.85);
@@ -82,8 +92,6 @@ $blue-medium-300: #66c6e4;
 $blue-medium-200: #bfe7f3;
 $blue-medium-100: #e5f5fa;
 $blue-medium-highlight: #b3e7fe;
-$blue-medium-focus: #007cba;
-$blue-medium-focus-dark: #fff;
 
 // Alert colors.
 $alert-yellow: #f0b849;

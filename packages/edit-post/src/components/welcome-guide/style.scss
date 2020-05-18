@@ -10,7 +10,7 @@
 
 		@include break-small() {
 			min-height: $image-height;
-			padding-left: $image-width + $grid-size-xlarge;
+			padding-left: $image-width + $grid-unit-30;
 		}
 	}
 
@@ -18,14 +18,14 @@
 		font-family: $editor-font;
 		font-size: 21px;
 		line-height: 1.4;
-		margin: $grid-size 0;
+		margin: $grid-unit-10 0;
 	}
 
 	&__image {
 		background: #66c6e4;
 		border-radius: $radius-round-rectangle;
 		height: 200px;
-		margin: $grid-size 0;
+		margin: $grid-unit-10 0;
 
 		@include break-small() {
 			position: absolute;
@@ -40,7 +40,7 @@
 	&__text {
 		font-size: $editor-font-size;
 		line-height: 1.4;
-		margin: $grid-size 0;
+		margin: $grid-unit-10 0;
 	}
 
 	&__inserter-icon {

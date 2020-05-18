@@ -155,8 +155,8 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -329,8 +329,8 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -338,7 +338,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -503,8 +503,8 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -512,7 +512,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -677,8 +677,8 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -686,7 +686,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -851,8 +851,8 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -860,7 +860,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>
@@ -1025,8 +1025,8 @@ exports[`ColorPicker should render color picker 1`] = `
           type="button"
         >
           <svg
-            aria-hidden="true"
-            focusable="false"
+            aria-hidden={true}
+            focusable={false}
             height={24}
             role="img"
             viewBox="0 0 24 24"
@@ -1034,7 +1034,7 @@ exports[`ColorPicker should render color picker 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </svg>
         </button>

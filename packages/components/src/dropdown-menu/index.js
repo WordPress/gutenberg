@@ -37,7 +37,6 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	hasArrowIndicator = false,
 	icon = 'menu',
 	label,
 	popoverProps,
@@ -46,6 +45,7 @@ function DropdownMenu( {
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
+	noIcons,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -126,9 +126,7 @@ function DropdownMenu( {
 						label={ label }
 						showTooltip
 					>
-						{ ( ! icon || hasArrowIndicator ) && (
-							<span className="components-dropdown-menu__indicator" />
-						) }
+						{ mergedToggleProps.children }
 					</Button>
 				);
 			} }
@@ -136,7 +134,10 @@ function DropdownMenu( {
 				const mergedMenuProps = mergeProps(
 					{
 						'aria-label': menuLabel || label,
-						className: 'components-dropdown-menu__menu',
+						className: classnames(
+							'components-dropdown-menu__menu',
+							{ 'no-icons': noIcons }
+						),
 					},
 					menuProps
 				);

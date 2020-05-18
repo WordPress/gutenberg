@@ -29,7 +29,7 @@ describe( 'cpt locking', () => {
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
 		await page.type(
-			'.block-editor-rich-text__editable.wp-block-paragraph',
+			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
 		await clickBlockToolbarButton( 'More options' );
@@ -40,12 +40,16 @@ describe( 'cpt locking', () => {
 
 	const shouldAllowBlocksToBeMoved = async () => {
 		await page.click(
-			'.block-editor-rich-text__editable.wp-block-paragraph'
+			'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+		);
+		// Hover the block switcher to show the movers
+		await page.hover(
+			'.block-editor-block-toolbar .block-editor-block-toolbar__block-switcher-wrapper'
 		);
 		expect( await page.$( 'button[aria-label="Move up"]' ) ).not.toBeNull();
 		await page.click( 'button[aria-label="Move up"]' );
 		await page.type(
-			'.block-editor-rich-text__editable.wp-block-paragraph',
+			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -65,14 +69,14 @@ describe( 'cpt locking', () => {
 
 		it( 'should not allow blocks to be moved', async () => {
 			await page.click(
-				'.block-editor-rich-text__editable.wp-block-paragraph'
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
 			);
 			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
 		} );
 
 		it( 'should not error when deleting the cotents of a paragraph', async () => {
 			await page.click(
-				'.block-editor-block-list__block[data-type="core/paragraph"] p'
+				'.block-editor-block-list__block[data-type="core/paragraph"]'
 			);
 			const textToType = 'Paragraph';
 			await page.keyboard.type( 'Paragraph' );
@@ -131,7 +135,7 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be removed', async () => {
 			await page.type(
-				'.block-editor-rich-text__editable.wp-block-paragraph',
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
 			await clickBlockToolbarButton( 'More options' );

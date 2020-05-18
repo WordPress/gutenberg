@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/site-title",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "level": 1
+        },
         "innerBlocks": [],
         "originalContent": ""
     }

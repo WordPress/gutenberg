@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { remove } from '@wordpress/dom';
-
-/**
  * Removes iframes.
  *
  * @param {Node} node The node to check.
@@ -12,6 +7,7 @@ import { remove } from '@wordpress/dom';
  */
 export default function( node ) {
 	if ( node.nodeName === 'IFRAME' ) {
-		remove( node );
+		const text = node.ownerDocument.createTextNode( node.src );
+		node.parentNode.replaceChild( text, node );
 	}
 }

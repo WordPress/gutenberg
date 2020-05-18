@@ -6,55 +6,26 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	getColorClassName,
-	__experimentalGetGradientClass,
-} from '@wordpress/block-editor';
+import { RichText } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import getColorAndStyleProps from './color-props';
 
 export default function save( { attributes } ) {
-	const {
-		backgroundColor,
-		borderRadius,
-		customBackgroundColor,
-		customTextColor,
-		customGradient,
-		linkTarget,
-		gradient,
-		rel,
-		text,
-		textColor,
-		title,
-		url,
-	} = attributes;
-
-	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass =
-		! customGradient &&
-		getColorClassName( 'background-color', backgroundColor );
-	const gradientClass = __experimentalGetGradientClass( gradient );
-
-	const buttonClasses = classnames( 'wp-block-button__link', {
-		'has-text-color': textColor || customTextColor,
-		[ textClass ]: textClass,
-		'has-background':
-			backgroundColor ||
-			customBackgroundColor ||
-			customGradient ||
-			gradient,
-		[ backgroundClass ]: backgroundClass,
-		'no-border-radius': borderRadius === 0,
-		[ gradientClass ]: gradientClass,
-	} );
-
+	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
+	const colorProps = getColorAndStyleProps( attributes );
+	const buttonClasses = classnames(
+		'wp-block-button__link',
+		colorProps.className,
+		{
+			'no-border-radius': borderRadius === 0,
+		}
+	);
 	const buttonStyle = {
-		background: customGradient ? customGradient : undefined,
-		backgroundColor:
-			backgroundClass || customGradient || gradient
-				? undefined
-				: customBackgroundColor,
-		color: textClass ? undefined : customTextColor,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...colorProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied

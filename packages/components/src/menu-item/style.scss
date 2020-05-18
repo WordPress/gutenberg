@@ -1,35 +1,19 @@
 .components-menu-item__button,
 .components-menu-item__button.components-button {
 	width: 100%;
-	padding: $grid-size ($grid-size-large - $border-width);
-	text-align: left;
-	color: $dark-gray-600;
-	@include menu-style__neutral;
 
 	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
+	// @todo: is this still necessary?
 	.dashicon,
 	.components-menu-items__item-icon,
 	svg.components-menu-items__item-icon,
 	> span > svg {
-		margin-right: 4px;
+		margin-right: $grid-unit-10;
 	}
 
 	.components-menu-items__item-icon {
 		display: inline-block;
 		flex: 0 0 auto;
-	}
-
-	// This needs to be higher-specificity that the default button hover style.
-	&.components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
-		@include menu-style__hover;
-
-		.components-menu-item__shortcut {
-			color: $dark-gray-600;
-		}
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
 	}
 }
 
@@ -39,17 +23,17 @@
 }
 
 .components-menu-item__info {
-	margin-top: $grid-size-small;
+	margin-top: $grid-unit-05;
 	font-size: $default-font-size - 1px;
-	color: $dark-gray-300;
+	color: $medium-gray-text;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
-	color: $dark-gray-300;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: $grid-size;
+	padding-left: $grid-unit-15;
+	color: currentColor;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
 	// for most mobile users and it frees up screen space for any item

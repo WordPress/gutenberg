@@ -10,7 +10,10 @@ import { useState, useEffect } from '@wordpress/element';
  * @return {boolean} return value of the media query.
  */
 export default function useMediaQuery( query ) {
-	const [ match, setMatch ] = useState( false );
+	const [ match, setMatch ] = useState(
+		query && window.matchMedia( query ).matches
+	);
+
 	useEffect( () => {
 		if ( ! query ) {
 			return;

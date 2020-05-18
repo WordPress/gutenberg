@@ -24,7 +24,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
             xmlns="http://www.w3.org/2000/svg"
           >
             <Path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </SVG>
         }
@@ -60,7 +60,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] 
             xmlns="http://www.w3.org/2000/svg"
           >
             <Path
-              d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"
+              d="M17 9.4L12 14 7 9.4l-1 1.2 6 5.4 6-5.4z"
             />
           </SVG>
         }

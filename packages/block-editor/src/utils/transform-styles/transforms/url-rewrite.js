@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { parse, resolve } from 'url';
-
-/**
  * Return `true` if the given path is http/https.
  *
  * @param  {string}  filePath path
@@ -62,10 +57,7 @@ function isValidURL( meta ) {
  * @return {string}              the full path to the file
  */
 function getResourcePath( str, baseURL ) {
-	const pathname = parse( str ).pathname;
-	const filePath = resolve( baseURL, pathname );
-
-	return filePath;
+	return new URL( str, baseURL ).toString();
 }
 
 /**

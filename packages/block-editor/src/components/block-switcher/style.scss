@@ -1,100 +1,84 @@
 .block-editor-block-switcher {
 	position: relative;
-	height: $icon-button-size;
 }
+
+// Show an indicator triangle.
+.block-editor-block-switcher__no-switcher-icon,
+.block-editor-block-switcher__toggle {
+	position: relative;
+}
+
 
 .components-button.block-editor-block-switcher__toggle,
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
-	height: $icon-button-size;
-	padding: 3px;
+	height: $grid-unit-60;
+
+	.block-editor-block-icon {
+		margin: auto;
+	}
 }
 
 .components-button.block-editor-block-switcher__no-switcher-icon {
-	width: $icon-button-size + 6px + 6px;
+	width: $block-toolbar-height;
 
-	.block-editor-block-icon {
+	.block-editor-blocks-icon {
 		margin-right: auto;
 		margin-left: auto;
 	}
 }
 
-// When the block switcher does not have any transformations, we show it but as disabled.
-// The background and opacity change helps make the icon legible, despite being disabled.
+// Even when the block switcher does not have any transformations, it still serves as a block indicator.
 .components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	border-radius: 0;
-	opacity: 0.84;
+	opacity: 1;
 
-	// Also make the icon monochrome to further imply disabled state.
-	// We use !important here because icon colors are set as inline styles,
-	// and should be overridden when disabled.
+	// Since it's not clickable, though, don't show a hover state.
+	&,
 	.block-editor-block-icon.has-colors {
-		color: $dark-gray-500 !important;
-		background: $light-gray-200 !important;
+		color: $dark-gray-primary !important;
 	}
 }
 
 // Style this the same as the block buttons in the library.
 // Needs specificiity to override the icon button.
-.components-button.block-editor-block-switcher__toggle {
-	width: auto;
-	// Unset icon button styles.
-	&:active,
-	&:not(:disabled):not([aria-disabled="true"]):hover,
-	&:not([aria-disabled="true"]):focus {
-		outline: none;
-		box-shadow: none;
-		background: none;
-		border: none;
-	}
+.block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
+.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
+	padding: 0;
 
-	.block-editor-block-icon,
-	.block-editor-block-switcher__transform {
-		width: $icon-button-size + 3px + 3px;
-		height: $icon-button-size-small + 6px;
+	.block-editor-block-icon {
+		height: 100%;
 		position: relative;
 		margin: 0 auto;
-		padding: 3px;
 		display: flex;
 		align-items: center;
-		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
-		@include reduce-motion("transition");
 	}
 
-	// Add a dropdown arrow indicator.
-	.block-editor-block-icon::after {
-		@include dropdown-arrow();
-	}
-
-	.block-editor-block-switcher__transform {
-		margin-top: 6px;
-		border-radius: $radius-round-rectangle;
-	}
-
-	// Block hover and focus style.
-	&[aria-expanded="true"] .block-editor-block-icon,
-	&[aria-expanded="true"] .block-editor-block-switcher__transform,
-	&:not(:disabled):hover .block-editor-block-icon,
-	&:not(:disabled):hover .block-editor-block-switcher__transform,
-	&:not(:disabled):focus .block-editor-block-icon,
-	&:not(:disabled):focus .block-editor-block-switcher__transform {
-		transform: translateY(-$icon-button-size);
-	}
-
-	// Block focus style.
-	&:not(:disabled):focus .block-editor-block-icon,
-	&:not(:disabled):focus .block-editor-block-switcher__transform {
-		@include formatting-button-style__focus();
+	// Position the focus style correctly.
+	&::before {
+		top: $grid-unit-10;
+		right: $grid-unit-10;
+		bottom: $grid-unit-10;
+		left: $grid-unit-10;
 	}
 }
+
+
 // We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
 	max-width: calc(340px * 2);
 	display: flex;
 	background: $white;
-	box-shadow: $shadow-popover;
+	padding: 0;
+
+	.components-menu-group {
+		padding: $grid-unit-20 $grid-unit-30;
+	}
+
+	.components-menu-group + .components-menu-group {
+		border-color: $light-gray-secondary;
+	}
 }
 
 .block-editor-block-switcher__popover .components-popover__content {
@@ -102,6 +86,11 @@
 		min-width: 300px;
 		max-width: 340px;
 		width: 50%;
+	}
+
+	.block-editor-block-switcher__label {
+		margin-bottom: $grid-unit-10;
+		color: $medium-gray-text;
 	}
 
 	@include break-medium {
@@ -141,10 +130,34 @@
 }
 
 .block-editor-block-switcher__popover .block-editor-block-types-list {
-	margin: 8px -8px -8px;
+	margin: $grid-unit-15 0 0 0;
 }
 
 .block-editor-block-switcher__preview-title {
 	margin-bottom: 10px;
 	color: $dark-gray-300;
+}
+
+// The block switcher in the contextual toolbar should be bigger.
+.block-editor-block-contextual-toolbar {
+	.components-button.block-editor-block-switcher__toggle,
+	.components-button.block-editor-block-switcher__no-switcher-icon {
+		height: $grid-unit-60;
+	}
+
+	.components-button.block-editor-block-switcher__no-switcher-icon {
+		width: $grid-unit-60;
+	}
+
+	.components-button.block-editor-block-switcher__toggle {
+		.block-editor-block-icon,
+		.block-editor-block-switcher__transform {
+			width: $block-toolbar-height;
+			height: $block-toolbar-height;
+		}
+
+		.block-editor-block-switcher__transform {
+			padding: $grid-unit-15;
+		}
+	}
 }

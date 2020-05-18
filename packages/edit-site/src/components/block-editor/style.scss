@@ -1,19 +1,13 @@
-.editor-styles-wrapper {
-	-webkit-overflow-scrolling: touch;
-	background: $white;
-	height: calc(100% - #{$header-height});
-	left: 0;
-	overflow: auto;
-	position: absolute;
-	top: $header-height;
-	width: 100%;
-
-	@include break-small {
-		width: calc(100% - #{$sidebar-width});
-	}
-}
-
 .edit-site-block-editor__block-list {
-	padding-bottom: $grid-size-xlarge;
-	padding-top: $grid-size-xlarge + 5;
+	padding-bottom: $grid-unit-30;
+	padding-top: $grid-unit-30 + 5;
+
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	// Full-wide. (to account for the padddings added above)
+	.wp-block[data-align="full"] {
+		margin-left: -$block-padding;
+		margin-right: -$block-padding;
+	}
 }

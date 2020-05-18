@@ -18,7 +18,7 @@ export default function FileBlockInspector( {
 	let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
 	if ( attachmentPage ) {
 		linkDestinationOptions = [
-			{ value: href, label: __( 'Media File' ) },
+			{ value: href, label: __( 'Media file' ) },
 			{ value: attachmentPage, label: __( 'Attachment page' ) },
 		];
 	}
@@ -28,7 +28,7 @@ export default function FileBlockInspector( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Text link settings' ) }>
 					<SelectControl
-						label={ __( 'Link To' ) }
+						label={ __( 'Link to' ) }
 						value={ textLinkHref }
 						options={ linkDestinationOptions }
 						onChange={ changeLinkDestinationOption }

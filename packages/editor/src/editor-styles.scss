@@ -12,7 +12,7 @@ body {
 	font-family: $editor-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
-	color: $dark-gray-900;
+	color: $dark-gray-primary;
 }
 
 /* Headings */
@@ -130,4 +130,32 @@ ol {
 ul ul,
 ol ul {
 	list-style-type: circle;
+}
+
+.wp-align-wrapper {
+	max-width: $content-width;
+
+	> .wp-block,
+	&.wp-align-full {
+		max-width: none;
+	}
+
+	&.wp-align-wide {
+		max-width: 1100px;
+	}
+}
+
+a {
+	// This inherits the blue link color set by wp-admin, which is unfortunate.
+	// However both inherit and unset properties set the color to black.
+	transition: none;
+}
+
+code,
+kbd {
+	padding: 0;
+	margin: 0;
+	background: inherit;
+	font-size: inherit;
+	font-family: monospace;
 }

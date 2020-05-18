@@ -39,7 +39,9 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.click( ':focus [aria-label="Two columns; equal split"]' );
 		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector( ':focus.block-editor-inserter__search' );
+		await page.waitForSelector(
+			':focus.block-editor-inserter__search-input'
+		);
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -50,7 +52,9 @@ describe( 'Writing Flow', () => {
 		// is a temporary solution.
 		await page.focus( '.wp-block[data-type="core/column"]:nth-child(2)' );
 		await page.click( ':focus .block-editor-button-block-appender' );
-		await page.waitForSelector( ':focus.block-editor-inserter__search' );
+		await page.waitForSelector(
+			':focus.block-editor-inserter__search-input'
+		);
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
@@ -76,25 +80,7 @@ describe( 'Writing Flow', () => {
 		activeBlockName = await getActiveBlockName();
 		expect( activeBlockName ).toBe( 'core/column' );
 		await page.keyboard.press( 'ArrowUp' );
-		activeBlockName = await getActiveBlockName();
-		expect( activeBlockName ).toBe( 'core/paragraph' );
-		activeElementText = await page.evaluate(
-			() => document.activeElement.textContent
-		);
-		expect( activeElementText ).toBe( '1st col' );
-
-		// Arrow up from first text field in nested context focuses column and
-		// columns wrappers before escaping out.
-		let activeElementBlockType;
-		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
-			document.activeElement.getAttribute( 'data-type' )
-		);
-		expect( activeElementBlockType ).toBe( 'core/column' );
-		activeBlockName = await getActiveBlockName();
-		expect( activeBlockName ).toBe( 'core/column' );
-		await page.keyboard.press( 'ArrowUp' );
-		activeElementBlockType = await page.evaluate( () =>
+		const activeElementBlockType = await page.evaluate( () =>
 			document.activeElement.getAttribute( 'data-type' )
 		);
 		expect( activeElementBlockType ).toBe( 'core/columns' );

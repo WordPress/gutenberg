@@ -25,10 +25,11 @@ const RangeControlWithState = ( props ) => {
 
 const DefaultExample = () => {
 	const [ isRtl, setIsRtl ] = useState( false );
+	const [ value, setValue ] = useState( undefined );
 
-	const rtl = boolean( 'RTL', false );
 	const props = {
 		allowReset: boolean( 'allowReset', false ),
+		disabled: boolean( 'disabled', false ),
 		label: text( 'label', 'Range Label' ),
 		help: text( 'help', '' ),
 		min: number( 'min', 0 ),
@@ -39,7 +40,11 @@ const DefaultExample = () => {
 		beforeIcon: text( 'beforeIcon', '' ),
 		afterIcon: text( 'afterIcon', '' ),
 		withInputField: boolean( 'withInputField', true ),
+		value,
+		onChange: setValue,
 	};
+
+	const rtl = boolean( 'RTL', false );
 
 	useEffect( () => {
 		if ( rtl !== isRtl ) {
@@ -149,6 +154,17 @@ export const customMarks = () => {
 	return (
 		<Wrapper>
 			<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
+		</Wrapper>
+	);
+};
+
+export const multiple = () => {
+	return (
+		<Wrapper>
+			<RangeControlWithState />
+			<RangeControlWithState />
+			<RangeControlWithState />
+			<RangeControlWithState />
 		</Wrapper>
 	);
 };

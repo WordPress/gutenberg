@@ -1,16 +1,15 @@
-$footer-height: $icon-button-size-small;
+$footer-height: $button-size-small;
 
-@import "./components/fullscreen-mode/style.scss";
+@import "../../interface/src/style.scss";
+
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/header-toolbar/style.scss";
 @import "./components/header/more-menu/style.scss";
-@import "./components/header/pinned-plugins/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/preview-options/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -20,7 +19,6 @@ $footer-height: $icon-button-size-small;
 @import "./components/sidebar/post-status/style.scss";
 @import "./components/sidebar/post-visibility/style.scss";
 @import "./components/sidebar/settings-header/style.scss";
-@import "./components/sidebar/sidebar-header/style.scss";
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
 @import "./components/options-modal/style.scss";

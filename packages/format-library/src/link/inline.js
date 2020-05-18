@@ -10,14 +10,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
-import {
-	create,
-	insert,
-	isCollapsed,
-	applyFormat,
-	getTextContent,
-	slice,
-} from '@wordpress/rich-text';
+import { create, insert, isCollapsed, applyFormat } from '@wordpress/rich-text';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
 /**
@@ -120,23 +113,25 @@ function InlineLinkUI( {
 		}
 
 		const newUrl = prependHTTP( nextValue.url );
-		const selectedText = getTextContent( slice( value ) );
 		const format = createLinkFormat( {
 			url: newUrl,
 			opensInNewWindow: nextValue.opensInNewTab,
-			text: selectedText,
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
+			const newText = nextValue.title || newUrl;
 			const toInsert = applyFormat(
-				create( { text: newUrl } ),
+				create( { text: newText } ),
 				format,
 				0,
-				newUrl.length
+				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			onChange( applyFormat( value, format ) );
+			const newValue = applyFormat( value, format );
+			newValue.start = newValue.end;
+			newValue.activeFormats = [];
+			onChange( newValue );
 		}
 
 		// Focus should only be shifted back to the formatted segment when the

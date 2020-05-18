@@ -94,7 +94,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
   onClick={[MockFunction]}
   type="button"
 >
-  Custom Color
+  Custom color
 </button>
 `;
 
@@ -121,7 +121,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         onClick={[Function]}
         type="button"
       >
-        Custom Color
+        Custom color
       </button>
     </ForwardRef(Button)>
   </div>
@@ -145,8 +145,14 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: red"
         isSelected={true}
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#000000",
+          }
+        }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -156,8 +162,10 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: white"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -167,8 +175,10 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         aria-label="Color: blue"
         isSelected={false}
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -215,7 +225,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         />
         <ButtonAction
           onClick={[Function]}
@@ -230,8 +240,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: red"
           isSelected={true}
           onClick={[Function]}
+          selectedIconProps={
+            Object {
+              "fill": "#000000",
+            }
+          }
           style={
             Object {
+              "backgroundColor": "#f00",
               "color": "#f00",
             }
           }
@@ -241,8 +257,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: white"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#fff",
               "color": "#fff",
             }
           }
@@ -252,8 +270,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
           aria-label="Color: blue"
           isSelected={false}
           onClick={[Function]}
+          selectedIconProps={Object {}}
           style={
             Object {
+              "backgroundColor": "#00f",
               "color": "#00f",
             }
           }
@@ -270,8 +290,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={true}
         key="#f00"
         onClick={[Function]}
+        selectedIconProps={
+          Object {
+            "fill": "#000000",
+          }
+        }
         style={
           Object {
+            "backgroundColor": "#f00",
             "color": "#f00",
           }
         }
@@ -295,6 +321,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#f00",
                   "color": "#f00",
                 }
               }
@@ -311,6 +338,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#f00",
                     "color": "#f00",
                   }
                 }
@@ -319,37 +347,40 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             </ForwardRef(Button)>
           </Tooltip>
           <Icon
+            fill="#000000"
             icon={
               <SVG
-                viewBox="-2 -2 24 24"
+                viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
-                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                 />
               </SVG>
             }
           >
             <SVG
+              fill="#000000"
               height={24}
-              viewBox="-2 -2 24 24"
+              viewBox="0 0 24 24"
               width={24}
               xmlns="http://www.w3.org/2000/svg"
             >
               <svg
-                aria-hidden="true"
-                focusable="false"
+                aria-hidden={true}
+                fill="#000000"
+                focusable={false}
                 height={24}
                 role="img"
-                viewBox="-2 -2 24 24"
+                viewBox="0 0 24 24"
                 width={24}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <Path
-                  d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                  d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                 >
                   <path
-                    d="M15.3 5.3l-6.8 6.8-2.8-2.8-1.4 1.4 4.2 4.2 8.2-8.2"
+                    d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
                   />
                 </Path>
               </svg>
@@ -362,8 +393,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#fff"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#fff",
             "color": "#fff",
           }
         }
@@ -387,6 +420,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#fff",
                   "color": "#fff",
                 }
               }
@@ -403,6 +437,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#fff",
                     "color": "#fff",
                   }
                 }
@@ -417,8 +452,10 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         isSelected={false}
         key="#00f"
         onClick={[Function]}
+        selectedIconProps={Object {}}
         style={
           Object {
+            "backgroundColor": "#00f",
             "color": "#00f",
           }
         }
@@ -442,6 +479,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               onMouseLeave={[Function]}
               style={
                 Object {
+                  "backgroundColor": "#00f",
                   "color": "#00f",
                 }
               }
@@ -458,6 +496,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 onMouseLeave={[Function]}
                 style={
                   Object {
+                    "backgroundColor": "#00f",
                     "color": "#00f",
                   }
                 }
@@ -482,7 +521,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
               "renderContent": [Function],
             }
           }
-          linkText="Custom Color"
+          linkText="Custom color"
         >
           <Dropdown
             className="components-circular-option-picker__dropdown-link-action"
@@ -506,7 +545,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   onClick={[Function]}
                   type="button"
                 >
-                  Custom Color
+                  Custom color
                 </button>
               </ForwardRef(Button)>
             </div>

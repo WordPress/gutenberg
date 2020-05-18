@@ -3,6 +3,8 @@
  */
 import { createElement, cloneElement, Fragment, isValidElement } from 'react';
 
+/** @typedef {import('./react').WPElement} WPElement */
+
 let indoc, offset, output, stack;
 
 /**
@@ -23,27 +25,45 @@ let indoc, offset, output, stack;
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
+ * The stack frame tracking parse progress.
+ *
+ * @typedef Frame
+ *
+ * @property {WPElement} element            A parent element which may still have
+ * @property {number}    tokenStart         Offset at which parent element first
+ *                                          appears.
+ * @property {number}    tokenLength        Length of string marking start of parent
+ *                                          element.
+ * @property {number}    [prevOffset]       Running offset at which parsing should
+ *                                          continue.
+ * @property {number}    [leadingTextStart] Offset at which last closing element
+ *                                          finished, used for finding text between
+ *                                          elements.
+ * @property {WPElement[]} children         Children.
+ */
+
+/**
  * Tracks recursive-descent parse state.
  *
  * This is a Stack frame holding parent elements until all children have been
  * parsed.
  *
  * @private
- * @param {WPElement} element          A parent element which may still have
- *                                     nested children not yet parsed.
- * @param {number}    tokenStart       Offset at which parent element first
- *                                     appears.
- * @param {number}    tokenLength      Length of string marking start of parent
- *                                     element.
- * @param {number}    prevOffset       Running offset at which parsing should
- *                                     continue.
- * @param {number}    leadingTextStart Offset at which last closing element
- *                                     finished, used for finding text between
- *                                     elements
+ * @param {WPElement} element            A parent element which may still have
+ *                                       nested children not yet parsed.
+ * @param {number}    tokenStart         Offset at which parent element first
+ *                                       appears.
+ * @param {number}    tokenLength        Length of string marking start of parent
+ *                                       element.
+ * @param {number}    [prevOffset]       Running offset at which parsing should
+ *                                       continue.
+ * @param {number}    [leadingTextStart] Offset at which last closing element
+ *                                       finished, used for finding text between
+ *                                       elements.
  *
  * @return {Frame} The stack frame tracking parse progress.
  */
-function Frame(
+function createFrame(
 	element,
 	tokenStart,
 	tokenLength,
@@ -175,14 +195,14 @@ function proceed( conversionMap ) {
 
 			// otherwise we found an inner element
 			addChild(
-				new Frame( conversionMap[ name ], startOffset, tokenLength )
+				createFrame( conversionMap[ name ], startOffset, tokenLength )
 			);
 			offset = startOffset + tokenLength;
 			return true;
 
 		case 'opener':
 			stack.push(
-				new Frame(
+				createFrame(
 					conversionMap[ name ],
 					startOffset,
 					tokenLength,
@@ -210,7 +230,7 @@ function proceed( conversionMap ) {
 			);
 			stackTop.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
-			const frame = new Frame(
+			const frame = createFrame(
 				stackTop.element,
 				stackTop.tokenStart,
 				stackTop.tokenLength,

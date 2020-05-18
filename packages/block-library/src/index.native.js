@@ -50,6 +50,7 @@ import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
 import * as group from './group';
+import * as buttons from './buttons';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -96,6 +97,7 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	buttons,
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -148,10 +150,17 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
+		columns,
+		column,
 		group,
-		devOnly( button ),
+		button,
 		spacer,
 		shortcode,
+		buttons,
+		latestPosts,
+		devOnly( verse ),
+		cover,
+		pullquote,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );

@@ -7,33 +7,24 @@ This is done by setting the `target` on `<PluginSidebarMoreMenuItem>` to match t
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import {
-	PluginSidebar,
-	PluginSidebarMoreMenuItem
-} from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
 import { image } from '@wordpress/icons';
-
-const { Fragment } = wp.element;
-const myIcon =
+import { Fragment } from '@wordpress/element';
 
 const PluginSidebarMoreMenuItemTest = () => (
 	<Fragment>
-		<PluginSidebarMoreMenuItem
-		    target="sidebar-name"
-		    icon={ image }
-		    >
+		<PluginSidebarMoreMenuItem target="sidebar-name" icon={ image }>
 			Expanded Sidebar - More item
 		</PluginSidebarMoreMenuItem>
-		<PluginSidebar
-			name="sidebar-name"
-			icon={ image }
-			title="My Sidebar" >
+		<PluginSidebar name="sidebar-name" icon={ image } title="My Sidebar">
 			Content of the sidebar
 		</PluginSidebar>
 	</Fragment>
-)
+);
 
-registerPlugin( 'plugin-sidebar-expanded-test', { render: PluginSidebarMoreMenuItemTest } );
+registerPlugin( 'plugin-sidebar-expanded-test', {
+	render: PluginSidebarMoreMenuItemTest,
+} );
 ```
 
 ## Location

@@ -15,7 +15,7 @@
 .edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 20px;
+	bottom: 40px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
@@ -31,7 +31,7 @@
 	overflow: auto;
 
 	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel-break-medium");
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
@@ -57,37 +57,38 @@
 	}
 }
 
+.interface-interface-skeleton__sidebar > div {
+	height: 100%;
+}
+
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
 	justify-content: center;
 }
 
-.edit-post-layout__toogle-publish-panel,
-.edit-post-layout__toogle-sidebar-panel {
+
+.edit-post-layout__toggle-publish-panel,
+.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-entities-saved-states-panel {
+	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
 	background-color: $white;
-	padding: 10px 10px 10px 0;
-}
+	border: 1px dotted $light-gray-500;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
 
-.edit-post-layout__toogle-publish-panel-button,
-.edit-post-layout__toogle-sidebar-panel-button {
-	width: auto;
-	height: auto;
-	display: block;
-	font-size: 14px;
-	font-weight: 600;
-	margin: 0 0 0 auto;
-	padding: 15px 23px 14px;
-	line-height: normal;
-	text-decoration: none;
-	outline: none;
-	background: #f1f1f1;
-	color: theme(secondary);
-
-	&:focus {
-		position: fixed;
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within &,
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
-		right: 10px;
-		bottom: 10px;
-		left: auto;
+		bottom: 0;
 	}
 }
 
@@ -100,8 +101,38 @@
 		display: flex;
 		background: $white;
 		height: $footer-height;
-		padding: 0 $grid-size;
 		align-items: center;
 		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
+	}
+}
+
+.edit-post-layout .interface-interface-skeleton__content {
+	background-color: $light-gray-700;
+}
+
+.edit-post-layout__inserter-panel {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-post-layout__inserter-panel-header {
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
+	display: flex;
+	justify-content: flex-end;
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.edit-post-layout__inserter-panel-content {
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	@include break-medium() {
+		height: 100%;
 	}
 }

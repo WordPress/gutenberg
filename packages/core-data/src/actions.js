@@ -95,6 +95,20 @@ export function receiveEntityRecords(
 }
 
 /**
+ * Returns an action object used in signalling that the current theme has been received.
+ *
+ * @param {Object} currentTheme The current theme.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveCurrentTheme( currentTheme ) {
+	return {
+		type: 'RECEIVE_CURRENT_THEME',
+		currentTheme,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @param {Object} themeSupports Theme support for the current theme.

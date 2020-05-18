@@ -258,6 +258,9 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 	);
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
+		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
+			return block;
+		}
 		if ( ! preferredStyleVariations[ blockName ] ) {
 			return block;
 		}
@@ -284,12 +287,17 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  *
  * @param {(string|string[])} clientIds     Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to
- *                                          select.
+ * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {number}            initialPosition Index of caret after in the selected block after the operation.
  *
  * @yield {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
+export function* replaceBlocks(
+	clientIds,
+	blocks,
+	indexToSelect,
+	initialPosition
+) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -319,6 +327,7 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 		blocks,
 		time: Date.now(),
 		indexToSelect,
+		initialPosition,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -785,7 +794,7 @@ export function updateBlockListSettings( clientId, settings ) {
 	};
 }
 
-/*
+/**
  * Returns an action object used in signalling that the block editor settings have been updated.
  *
  * @param {Object} settings Updated settings
@@ -796,20 +805,6 @@ export function updateSettings( settings ) {
 	return {
 		type: 'UPDATE_SETTINGS',
 		settings,
-	};
-}
-
-/**
- * Returns an action object used to toggle the width of the editing canvas
- *
- * @param {string} deviceType
- *
- * @return {Object} Action object.
- */
-export function setPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
 	};
 }
 
@@ -1000,4 +995,50 @@ export function* insertAfterBlock( clientId ) {
 		rootClientId
 	);
 	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
+}
+
+/**
+ * Returns an action object that toggles the highlighted block state.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} isHighlighted The highlight state.
+ */
+export function toggleBlockHighlight( clientId, isHighlighted ) {
+	return {
+		type: 'TOGGLE_BLOCK_HIGHLIGHT',
+		clientId,
+		isHighlighted,
+	};
+}
+
+/**
+ * Yields action objects used in signalling that the block corresponding to the
+ * given clientId should appear to "flash" by rhythmically highlighting it.
+ *
+ * @param {string} clientId Target block client ID.
+ */
+export function* flashBlock( clientId ) {
+	yield toggleBlockHighlight( clientId, true );
+	yield {
+		type: 'SLEEP',
+		duration: 150,
+	};
+	yield toggleBlockHighlight( clientId, false );
+}
+
+/**
+ * Returns an action object that sets whether the block has controlled innerblocks.
+ *
+ * @param {string} clientId The block's clientId.
+ * @param {boolean} hasControlledInnerBlocks True if the block's inner blocks are controlled.
+ */
+export function setHasControlledInnerBlocks(
+	clientId,
+	hasControlledInnerBlocks
+) {
+	return {
+		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+		hasControlledInnerBlocks,
+		clientId,
+	};
 }

@@ -3,6 +3,6 @@
 	padding: 0;
 }
 
-.editor-post-last-revision__title {
+.editor-post-last-revision__title.components-button {
 	padding: #{ $panel-padding - 3px } $panel-padding;	// subtract extra height of dashicon
 }

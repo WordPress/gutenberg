@@ -1,10 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { BottomSheet } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	ColorSettings,
+	colorsUtils,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	SETTINGS_DEFAULTS as defaultSettings,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -24,7 +32,23 @@ function BottomSheetSettings( {
 			contentStyle={ styles.content }
 			{ ...props }
 		>
-			<InspectorControls.Slot />
+			<BottomSheetConsumer>
+				{ ( { currentScreen, extraProps, ...bottomSheetProps } ) => {
+					switch ( currentScreen ) {
+						case colorsUtils.subsheets.color:
+							return (
+								<ColorSettings
+									defaultSettings={ defaultSettings }
+									{ ...bottomSheetProps }
+									{ ...extraProps }
+								/>
+							);
+						case colorsUtils.subsheets.settings:
+						default:
+							return <InspectorControls.Slot />;
+					}
+				} }
+			</BottomSheetConsumer>
 		</BottomSheet>
 	);
 }

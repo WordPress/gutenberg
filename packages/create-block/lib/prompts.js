@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { upperFirst } = require( 'lodash' );
+const { isEmpty, upperFirst } = require( 'lodash' );
 
 const slug = {
 	type: 'input',
@@ -55,7 +55,7 @@ const dashicon = {
 	message:
 		'The dashicon to make it easier to identify your block (optional):',
 	validate( input ) {
-		if ( ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
+		if ( ! isEmpty( input ) && ! /^[a-z][a-z0-9\-]*$/.test( input ) ) {
 			return 'Invalid dashicon name specified. Visit https://developer.wordpress.org/resource/dashicons/ to discover available names.';
 		}
 
@@ -73,6 +73,40 @@ const category = {
 	choices: [ 'common', 'embed', 'formatting', 'layout', 'widgets' ],
 };
 
+const author = {
+	type: 'input',
+	name: 'author',
+	message:
+		'The name of the plugin author (optional). Multiple authors may be listed using commas:',
+};
+
+const license = {
+	type: 'input',
+	name: 'license',
+	message: 'The short name of the plugin’s license (optional):',
+};
+
+const licenseURI = {
+	type: 'input',
+	name: 'licenseURI',
+	message: 'A link to the full text of the license (optional):',
+};
+
+const version = {
+	type: 'input',
+	name: 'version',
+	message: 'The current version number of the plugin:',
+	validate( input ) {
+		// Regular expression was copied from https://semver.org.
+		const validSemVerPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+		if ( ! validSemVerPattern.test( input ) ) {
+			return 'Invalid Semantic Version provided. Visit https://regex101.com/r/vkijKf/1/ to discover all valid patterns.';
+		}
+
+		return true;
+	},
+};
+
 module.exports = {
 	slug,
 	namespace,
@@ -80,4 +114,8 @@ module.exports = {
 	description,
 	dashicon,
 	category,
+	author,
+	license,
+	licenseURI,
+	version,
 };

@@ -116,6 +116,20 @@ module.exports = {
 
 The output format for the generated asset file. There are two options available: 'php' or 'json'.
 
+##### `combineAssets`
+
+- Type: boolean
+- Default: `false`
+
+By default, one asset file is created for each entry point. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory.
+
+##### `combinedOutputFile`
+
+- Type: string
+- Default: `null`
+
+This option is useful only when the `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
+
 ##### `useDefaults`
 
 - Type: boolean
@@ -217,7 +231,7 @@ Enqueue your script as usual and read the script dependencies dynamically:
 $script_path       = 'path/to/script.js';
 $script_asset_path = 'path/to/script.asset.php';
 $script_asset      = file_exists( $script_asset_path )
-	? require( $script_asset_path ) 
+	? require( $script_asset_path )
 	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
 $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );

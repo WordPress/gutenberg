@@ -9,7 +9,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Heading', () => {
-	const CUSTOM_COLOR_TEXT = 'Custom Color';
+	const CUSTOM_COLOR_TEXT = 'Custom color';
 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-palette__picker .components-text-control__input';
@@ -32,6 +32,20 @@ describe( 'Heading', () => {
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( '#### ' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not work with the list input rule', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## 1. H' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should work with the format input rules', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '## `code`' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -69,7 +83,7 @@ describe( 'Heading', () => {
 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
 		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( '#7700ff' );
-		await page.click( '[data-type="core/heading"] h3' );
+		await page.click( 'h3[data-type="core/heading"]' );
 		await page.waitForSelector(
 			'.component-color-indicator[aria-label="(Color: #7700ff)"]'
 		);
@@ -87,7 +101,7 @@ describe( 'Heading', () => {
 		const colorButtonSelector = `//button[@aria-label='Color: Luminous vivid orange']`;
 		const [ colorButton ] = await page.$x( colorButtonSelector );
 		await colorButton.click();
-		await page.click( '[data-type="core/heading"] h2' );
+		await page.click( 'h2[data-type="core/heading"]' );
 		await page.waitForXPath(
 			`${ colorButtonSelector }[@aria-pressed='true']`
 		);

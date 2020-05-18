@@ -84,17 +84,20 @@ export function useEntityId( kind, type ) {
  */
 export function useEntityProp( kind, type, prop ) {
 	const id = useEntityId( kind, type );
-
-	const value = useSelect(
+	const { value, fullValue } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-			getEntityRecord( kind, type, id ); // Trigger resolver.
-			const entity = getEditedEntityRecord( kind, type, id );
-			return entity && entity[ prop ];
+			const entity = getEntityRecord( kind, type, id ); // Trigger resolver.
+			const editedEntity = getEditedEntityRecord( kind, type, id );
+			return entity && editedEntity
+				? {
+						value: editedEntity[ prop ],
+						fullValue: entity[ prop ],
+				  }
+				: {};
 		},
 		[ kind, type, id, prop ]
 	);
-
 	const { editEntityRecord } = useDispatch( 'core' );
 	const setValue = useCallback(
 		( newValue ) => {
@@ -105,7 +108,7 @@ export function useEntityProp( kind, type, prop ) {
 		[ kind, type, id, prop ]
 	);
 
-	return [ value, setValue ];
+	return [ value, setValue, fullValue ];
 }
 
 /**

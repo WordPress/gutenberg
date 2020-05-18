@@ -20,39 +20,59 @@ function render_block_core_template_part( $attributes ) {
 		// is user-customized, render the corresponding post content.
 		$content = get_post( $attributes['postId'] )->post_content;
 	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
-		// Else, if the template part was provided by the active theme,
-		// render the corresponding file content.
-		$template_part_file_path =
-				get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-		if ( file_exists( $template_part_file_path ) ) {
-			$content = file_get_contents( $template_part_file_path );
+		$template_part_query = new WP_Query(
+			array(
+				'post_type'      => 'wp_template_part',
+				'post_status'    => 'publish',
+				'name'           => $attributes['slug'],
+				'meta_key'       => 'theme',
+				'meta_value'     => $attributes['theme'],
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+			)
+		);
+		$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
+		if ( $template_part_post ) {
+			// A published post might already exist if this template part was customized elsewhere
+			// or if it's part of a customized template.
+			$content = $template_part_post->post_content;
+		} else {
+			// Else, if the template part was provided by the active theme,
+			// render the corresponding file content.
+			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
+			if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
+				$content = file_get_contents( $template_part_file_path );
+			}
 		}
 	}
 
 	if ( is_null( $content ) ) {
 		return 'Template Part Not Found';
 	}
-	return apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+
+	// Run through the actions that are typically taken on the_content.
+	$content = do_blocks( $content );
+	$content = wptexturize( $content );
+	$content = convert_smilies( $content );
+	$content = wpautop( $content );
+	$content = shortcode_unautop( $content );
+	if ( function_exists( 'wp_filter_content_tags' ) ) {
+		$content = wp_filter_content_tags( $content );
+	} else {
+		$content = wp_make_content_images_responsive( $content );
+	}
+	$content = do_shortcode( $content );
+
+	return str_replace( ']]>', ']]&gt;', $content );
 }
 
 /**
  * Registers the `core/template-part` block on the server.
  */
 function register_block_core_template_part() {
-	register_block_type(
-		'core/template-part',
+	register_block_type_from_metadata(
+		__DIR__ . '/template-part',
 		array(
-			'attributes'      => array(
-				'postId' => array(
-					'type' => 'number',
-				),
-				'slug'   => array(
-					'type' => 'string',
-				),
-				'theme'  => array(
-					'type' => 'string',
-				),
-			),
 			'render_callback' => 'render_block_core_template_part',
 		)
 	);

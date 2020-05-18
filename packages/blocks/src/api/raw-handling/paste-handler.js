@@ -126,14 +126,13 @@ function htmlToBlocks( { html, rawTransforms } ) {
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {Object}  options
- * @param {string}  [options.HTML]                     The HTML to convert.
- * @param {string}  [options.plainText]                Plain text version.
- * @param {string}  [options.mode]                     Handle content as blocks or inline content.
- *                                                     * 'AUTO': Decide based on the content passed.
- *                                                     * 'INLINE': Always handle as inline content, and return string.
- *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
- * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not the user can use unfiltered HTML.
+ * @param {string}  [options.HTML]      The HTML to convert.
+ * @param {string}  [options.plainText] Plain text version.
+ * @param {string}  [options.mode]      Handle content as blocks or inline content.
+ *                                      * 'AUTO': Decide based on the content passed.
+ *                                      * 'INLINE': Always handle as inline content, and return string.
+ *                                      * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]   The tag into which content will be inserted.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
@@ -142,7 +141,6 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
-	canUserUseUnfilteredHTML = false,
 } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
@@ -243,14 +241,10 @@ export function pasteHandler( {
 				phrasingContentReducer,
 				specialCommentConverter,
 				commentRemover,
+				iframeRemover,
 				figureContentReducer,
 				blockquoteNormaliser,
 			];
-
-			if ( ! canUserUseUnfilteredHTML ) {
-				// Should run before `figureContentReducer`.
-				filters.unshift( iframeRemover );
-			}
 
 			const schema = {
 				...blockContentSchema,

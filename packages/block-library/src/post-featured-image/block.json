@@ -1,0 +1,5 @@
+{
+	"name": "core/post-featured-image",
+	"category": "layout",
+	"context": [ "postId" ]
+}

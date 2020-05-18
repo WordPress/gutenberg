@@ -142,16 +142,6 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug to
 
 See also: [https://developer.wordpress.org/resource/dashicons/](https://developer.wordpress.org/resource/dashicons/)
 
-#### hasArrowIndicator
-
-Whether to display an arrow indicator next to the icon.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-For backward compatibility, when `icon` is explicitly set to `null` then the arrow indicator will be displayed even when this flag is set to `false`.
-
 #### label
 
 A human-readable label to present as accessibility text on the focused collapsed menu button.

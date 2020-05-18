@@ -2,7 +2,11 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import useResizeAware from 'react-resize-aware';
+
+/**
+ * WordPress dependencies
+ */
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,9 +30,9 @@ function Placeholder( {
 	isColumnLayout,
 	...additionalProps
 } ) {
-	const [ resizeListener, { width } ] = useResizeAware();
+	const [ resizeListener, { width } ] = useResizeObserver();
 
-	// Since `useResizeAware` will report a width of `null` until after the
+	// Since `useResizeObserver` will report a width of `null` until after the
 	// first render, avoid applying any modifier classes until width is known.
 	let modifierClassNames;
 	if ( typeof width === 'number' ) {

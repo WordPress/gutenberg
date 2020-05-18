@@ -1,14 +1,16 @@
-.editor-post-text-editor {
-	border: $border-width solid $light-gray-500 !important;
+.edit-post-text-editor__body textarea.editor-post-text-editor {
+	border: $border-width solid $light-gray-secondary;
 	display: block;
-	margin: 0 0 2em;
+	margin: 0;
 	width: 100%;
 	box-shadow: none;
 	resize: none;
 	overflow: hidden;
-	font-family: $editor-html-font !important;
+	font-family: $editor-html-font;
 	line-height: 150%;
-	border-radius: 0 !important;
+	border-radius: 0;
+	padding: $grid-unit-20;
+	min-height: 200px;
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: $mobile-text-min-font-size !important;
@@ -16,56 +18,11 @@
 		font-size: $text-editor-font-size !important;
 	}
 
-	&:hover,
 	&:focus {
-		border: $border-width solid $light-gray-800 !important;
-		box-shadow: none !important;
-		// Emulate the effect used on the post title.
-		outline-offset: -2px !important;
+		border: $border-width solid $dark-gray-primary;
+		box-shadow: none;
+
+		// Elevate the z-index on focus so the focus style is uncropped.
+		position: relative;
 	}
-}
-
-.editor-post-text-editor__toolbar {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-
-	button {
-		height: 30px;
-		background: none;
-		padding: 0 8px;
-		margin: 3px 4px;
-		text-align: center;
-		cursor: pointer;
-		font-family: $editor-html-font;
-		color: $dark-gray-500;
-		border: $border-width solid transparent;
-
-		&:first-child {
-			margin-left: 0;
-		}
-
-		&:hover,
-		&:focus {
-			outline: none;
-			border: $border-width solid $dark-gray-500;
-		}
-	}
-}
-
-.editor-post-text-editor__bold {
-	font-weight: 600;
-}
-
-.editor-post-text-editor__italic {
-	font-style: italic;
-}
-
-.editor-post-text-editor__link {
-	text-decoration: underline;
-	color: theme(primary);
-}
-
-.editor-post-text-editor__del {
-	text-decoration: line-through;
 }

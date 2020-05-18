@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, has, map, pick, mapValues, includes } from 'lodash';
+import { find, get, has, map, pick, mapValues, includes, some } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -30,6 +30,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import serializeBlocks from './utils/serialize-blocks';
+import { cleanForSlug } from '../utils/url';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -149,51 +150,17 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 			return false;
 		}
 
-		const entityRecordChangesByRecord = select(
+		const dirtyEntityRecords = select(
 			'core'
-		).getEntityRecordChangesByRecord();
-		const changedKinds = Object.keys( entityRecordChangesByRecord );
-		if (
-			changedKinds.length > 1 ||
-			( changedKinds.length === 1 &&
-				! entityRecordChangesByRecord.postType )
-		) {
-			// Return true if there is more than one edited entity kind
-			// or the edited entity kind is not the editor's post's kind.
-			return true;
-		} else if ( ! entityRecordChangesByRecord.postType ) {
-			// Don't continue if there are no edited entity kinds.
-			return false;
-		}
-
+		).__experimentalGetDirtyEntityRecords();
 		const { type, id } = getCurrentPost( state );
-		const changedPostTypes = Object.keys(
-			entityRecordChangesByRecord.postType
+		return some(
+			dirtyEntityRecords,
+			( entityRecord ) =>
+				entityRecord.kind !== 'postType' ||
+				entityRecord.name !== type ||
+				entityRecord.key !== id
 		);
-		if (
-			changedPostTypes.length > 1 ||
-			( changedPostTypes.length === 1 &&
-				! entityRecordChangesByRecord.postType[ type ] )
-		) {
-			// Return true if there is more than one edited post type
-			// or the edited entity's post type is not the editor's post's post type.
-			return true;
-		}
-
-		const changedPosts = Object.keys(
-			entityRecordChangesByRecord.postType[ type ]
-		);
-		if (
-			changedPosts.length > 1 ||
-			( changedPosts.length === 1 &&
-				! entityRecordChangesByRecord.postType[ type ][ id ] )
-		) {
-			// Return true if there is more than one edited post
-			// or the edited post is not the editor's post.
-			return true;
-		}
-
-		return false;
 	}
 );
 
@@ -793,7 +760,7 @@ export function isEditedPostDateFloating( state ) {
 		status === 'auto-draft' ||
 		status === 'pending'
 	) {
-		return date === modified;
+		return date === modified || date === null;
 	}
 	return false;
 }
@@ -1181,6 +1148,23 @@ export function getPermalink( state ) {
 	}
 
 	return prefix;
+}
+
+/**
+ * Returns the slug for the post being edited, preferring a manually edited
+ * value if one exists, then a sanitized version of the current post title, and
+ * finally the post ID.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} The current slug to be displayed in the editor
+ */
+export function getEditedPostSlug( state ) {
+	return (
+		getEditedPostAttribute( state, 'slug' ) ||
+		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
+		getCurrentPostId( state )
+	);
 }
 
 /**

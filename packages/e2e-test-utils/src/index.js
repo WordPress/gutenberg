@@ -22,6 +22,7 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
+export { getPageError } from './get-page-error';
 export { insertBlock } from './insert-block';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
@@ -31,9 +32,11 @@ export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,
 } from './observe-focus-loss';
-export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
-export { openGlobalBlockInserter } from './open-global-block-inserter';
+export {
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+} from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';

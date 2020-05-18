@@ -16,10 +16,10 @@ const afterArrayUnequal = [ 1, 2, 3, 4, 5, 'Unequal', 7 ];
 [
 	[
 		'@wordpress/is-shallow-equal (type specific)',
-		require( '../objects' ),
-		require( '../arrays' ),
+		require( '..' ).isShallowEqualObjects,
+		require( '..' ).isShallowEqualArrays,
 	],
-	[ '@wordpress/is-shallow-equal', require( '../' ) ],
+	[ '@wordpress/is-shallow-equal', require( '..' ) ],
 	[ 'shallowequal', require( 'shallowequal' ) ],
 	[
 		'shallow-equal (type specific)',

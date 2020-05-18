@@ -20,11 +20,10 @@ import {
 import { compose } from '@wordpress/compose';
 import {
 	PanelBody,
-	RangeControl,
 	SelectControl,
-	StepperControl,
 	ToggleControl,
 	withNotices,
+	RangeControl,
 } from '@wordpress/components';
 import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
@@ -40,7 +39,6 @@ import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
 
-const ColumnsControl = Platform.OS === 'web' ? RangeControl : StepperControl;
 const MAX_COLUMNS = 8;
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
@@ -56,15 +54,9 @@ const PLACEHOLDER_TEXT = Platform.select( {
 	native: __( 'ADD MEDIA' ),
 } );
 
-// currently this is needed for consistent controls UI on mobile
-// this can be removed after control components settle on consistent defaults
-const MOBILE_CONTROL_PROPS = Platform.select( {
+const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 	web: {},
-	native: { separatorType: 'fullWidth' },
-} );
-const MOBILE_CONTROL_PROPS_SEPARATOR_NONE = Platform.select( {
-	web: {},
-	native: { separatorType: 'none' },
+	native: { type: 'stepper' },
 } );
 
 class GalleryEdit extends Component {
@@ -73,6 +65,7 @@ class GalleryEdit extends Component {
 
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
+		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
@@ -117,6 +110,16 @@ class GalleryEdit extends Component {
 			if ( this.state.selectedImage !== index ) {
 				this.setState( {
 					selectedImage: index,
+				} );
+			}
+		};
+	}
+
+	onDeselectImage( index ) {
+		return () => {
+			if ( this.state.selectedImage === index ) {
+				this.setState( {
+					selectedImage: null,
 				} );
 			}
 		};
@@ -341,11 +344,10 @@ class GalleryEdit extends Component {
 		} = attributes;
 
 		const hasImages = !! images.length;
-		const hasImagesWithId = hasImages && some( images, ( { id } ) => id );
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
-				addToGallery={ hasImagesWithId }
+				addToGallery={ true }
 				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
@@ -358,7 +360,7 @@ class GalleryEdit extends Component {
 				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				multiple
-				value={ hasImagesWithId ? images : undefined }
+				value={ images }
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }
@@ -372,45 +374,38 @@ class GalleryEdit extends Component {
 		const imageSizeOptions = this.getImagesSizeOptions();
 		const shouldShowSizeOptions =
 			hasImages && ! isEmpty( imageSizeOptions );
-		// This is needed to fix a separator fence-post issue on mobile.
-		const mobileLinkToProps = shouldShowSizeOptions
-			? MOBILE_CONTROL_PROPS
-			: MOBILE_CONTROL_PROPS_SEPARATOR_NONE;
 
 		return (
 			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
-							<ColumnsControl
+							<RangeControl
 								label={ __( 'Columns' ) }
-								{ ...MOBILE_CONTROL_PROPS }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
 								max={ Math.min( MAX_COLUMNS, images.length ) }
+								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 								required
 							/>
 						) }
 
 						<ToggleControl
-							label={ __( 'Crop Images' ) }
-							{ ...MOBILE_CONTROL_PROPS }
+							label={ __( 'Crop images' ) }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
 							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
-							label={ __( 'Link To' ) }
-							{ ...mobileLinkToProps }
+							label={ __( 'Link to' ) }
 							value={ linkTo }
 							onChange={ this.setLinkTo }
 							options={ linkOptions }
 						/>
 						{ shouldShowSizeOptions && (
 							<SelectControl
-								label={ __( 'Images Size' ) }
-								{ ...MOBILE_CONTROL_PROPS_SEPARATOR_NONE }
+								label={ __( 'Images size' ) }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }
@@ -427,6 +422,7 @@ class GalleryEdit extends Component {
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
 					onSelectImage={ this.onSelectImage }
+					onDeselectImage={ this.onDeselectImage }
 					onSetImageAttributes={ this.setImageAttributes }
 					onFocusGalleryCaption={ this.onFocusGalleryCaption }
 				/>

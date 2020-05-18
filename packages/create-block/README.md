@@ -12,6 +12,8 @@ Visit the [Gutenberg handbook](https://developer.wordpress.org/block-editor/deve
 
 ## Quick start
 
+![Demo](https://make.wordpress.org/core/files/2020/02/74508276-f0648280-4efe-11ea-9cc0-a607b43d1bcf.gif)
+
 You just need to provide the `slug` which is the target location for scaffolded files and the internal block name.
   ```bash
   $ npm init @wordpress/block todo-list
@@ -19,7 +21,7 @@ You just need to provide the `slug` which is the target location for scaffolded 
   $ npm start
   ```
 
-  _(requires `node` version `10.0.0` or above, and `npm` version `6.1.0` or above)_
+_(requires `node` version `10.0.0` or above, and `npm` version `6.9.0` or above)_
 
 You don’t need to install or configure tools like [webpack](https://webpack.js.org), [Babel](https://babeljs.io) or [ESLint](https://eslint.org) yourself. They are preconfigured and hidden so that you can focus on the code.
 
@@ -31,13 +33,17 @@ The following command generates PHP, JS and CSS code for registering a block.
 $ npm init @wordpress/block [options] [slug]
 ```
 
-`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values.
+`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overriden with some of the options listed below.
 
 Options:
-```bash
--t, --template <name>  template type name, allowed values: "es5", "esnext" (default: "esnext")
--V, --version          output the version number
--h, --help             output usage information
+```
+-V, --version                output the version number
+-t, --template <name>        block template type name, allowed values: "es5", "esnext" (default: "esnext")
+--namespace <value>          internal namespace for the block name
+--title <value>              display title for the block
+--short-description <value>  short description for the block
+--category <name>            category name for the block
+-h, --help                   output usage information
 ```
 
 _Please note that `--version` and `--help` options don't work with `npm init`. You have to use `npx` instead, as presented in the examples._
@@ -72,6 +78,11 @@ Starts the build for development. [Learn more](/packages/scripts#start).
 $ npm run build
 ```
 Builds the code for production. [Learn more](/packages/scripts#build).
+
+```bash
+$ npm run format:js
+```
+Formats JavaScript files. [Learn more](/packages/scripts#format-js).
 
 ```bash
 $ npm run lint:css

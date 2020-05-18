@@ -63,7 +63,7 @@ const ViewportMatchWidthContext = createContext( null );
  * @example
  *
  * ```js
- * useViewportMatch( 'huge', <' );
+ * useViewportMatch( 'huge', '<' );
  * useViewportMatch( 'medium' );
  * ```
  *

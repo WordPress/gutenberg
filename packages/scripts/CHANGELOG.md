@@ -1,4 +1,66 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### New Feature
+
+- New `--webpack-no-externals` flag added to `build` and `start` scripts. It disables scripts' assets generation, and omits the list of default externals ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+- New `--webpack-bundle-analyzer` flag added to `build` and `start` scripts. It enables visualization for the size of webpack output files with an interactive zoomable treemap ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+- New `--webpack--devtool` flag added to `start` script. It controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+
+## 9.1.0 (2020-05-14)
+
+### Enhancements
+
+- Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.
+
+### Deprecations
+
+- `env` script was marked as deprecated. We recommend using `@wordpress/env` package instead that lets you easily set up a local WordPress environment for building and testing plugins and themes.
+
+## 9.0.0 (2020-04-30)
+
+### Breaking Changes
+
+- The bundled `puppeteer` (`^2.0.0`) dependency has been replaced with `puppeteer-core` in version `3.0.0`. Puppeteer uses Chromium v81 instead of Chromium v79. See the [full list of changes](https://github.com/puppeteer/puppeteer/releases/tag/v3.0.0). It also allowed preventing Chromium installation together with `@wordpress/scripts`. It happens now on-demand when running `test-e2e` script, and it re-triggers only when a new version is required.
+
+### New Features
+
+- Add support for passing [node CLI options](https://nodejs.org/api/cli.html) to scripts ([#21631](https://github.com/WordPress/gutenberg/pull/21631)).
+- Add debugging support for `test-unit-js` script ([#21631](https://github.com/WordPress/gutenberg/pull/21631)). Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) using the `--inspect-brk` option.
+- Add debugging support for `test-e2e` script ([#21861](https://github.com/WordPress/gutenberg/pull/21861)). Tests can be debugged by using the `--inspect-brk` option and a new `--puppeteer-devtools` option (or `PUPPETEER_DEVTOOLS="true"` environment variable).
+
+### Bug fix
+
+- The bundled `npm-package-json-lint` dependency has been updated from requiring `^4.0.3` to requiring `^5.0.0` ([#21597](https://github.com/WordPress/gutenberg/pull/21597)). [Breaking changes](https://npmpackagejsonlint.org/docs/en/v4-to-v5) don't break anything in this package. It fixes the abrupt shutdown when `"description"` field in `package.json` is empty.
+- Update `check-licenses` script to parse JSON dependency tree recursively so sub-dependencies of packages passed in `--ignore` flag are ignored as well.
+
+## 8.0.0 (2020-04-15)
+
+### Breaking Changes
+
+- The bundled `jest` dependency has been updated from requiring `^24.9.0` to requiring `^25.3.0` (see [Breaking Changes](https://jestjs.io/blog/2020/01/21/jest-25), [#20766](https://github.com/WordPress/gutenberg/pull/20766)).
+
+### Enhancements
+
+- The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+
+## 7.2.0 (2020-04-01)
+
+### Enhancements
+
+- Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
+- All webpack dependencies got minor version update if applicable.
+
+### Internal
+
+- Package depends now on the shared Prettier config exposed in `@wordpress/prettier-config` dependency ([#20026](https://github.com/WordPress/gutenberg/pull/20026)).
+
+## 7.1.2 (2020-02-25)
+
+### Bug Fixes
+
+- Ensure `packages-update` work when `dependencies` or `devDependencies` are missing in the `package.json` file ([#20408](https://github.com/WordPress/gutenberg/pull/20408)).
 
 ## 7.1.0 (2020-02-10)
 
@@ -16,7 +78,6 @@
 ### New Features
 
 - Add SVGR support to compile SVG files to React components using the `@svgr/webpack` plugin ([#18243](https://github.com/WordPress/gutenberg/pull/18243)).
-
 - Add `format-js` script to format JavaScript source code, it uses the [`wp-prettier`](https://github.com/Automattic/wp-prettier) – Prettier fork adjusted to WordPress coding style guidelines ([#18048](https://github.com/WordPress/gutenberg/pull/18048)).
 - Add `lint-md-js` script to lint JavaScript source code in markdown files, uses the `eslint-plugin-markdown` plugin ([#19518](https://github.com/WordPress/gutenberg/pull/19518)).
 - Add `lint-md-docs` script to lint the markup of markdown files, uses the `markdownlint` module ([#19855](https://github.com/WordPress/gutenberg/pull/19855)).

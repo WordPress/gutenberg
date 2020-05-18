@@ -6,8 +6,8 @@ import { Text, TouchableOpacity, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { Icon, minus, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,11 +41,7 @@ function Stepper( {
 				onPressOut={ onPressOut }
 				style={ [ buttonStyle, isMinValue ? { opacity: 0.4 } : null ] }
 			>
-				<Dashicon
-					icon="minus"
-					size={ 24 }
-					color={ buttonStyle.color }
-				/>
+				<Icon icon={ minus } size={ 24 } color={ buttonStyle.color } />
 			</TouchableOpacity>
 			<TouchableOpacity
 				disabled={ isMaxValue }
@@ -53,12 +49,7 @@ function Stepper( {
 				onPressOut={ onPressOut }
 				style={ [ buttonStyle, isMaxValue ? { opacity: 0.4 } : null ] }
 			>
-				<Dashicon
-					icon="plus"
-					size={ 24 }
-					color={ buttonStyle.color }
-					style={ styles.plus }
-				/>
+				<Icon icon={ plus } size={ 24 } color={ buttonStyle.color } />
 			</TouchableOpacity>
 		</View>
 	);

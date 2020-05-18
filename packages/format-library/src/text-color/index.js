@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,8 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { Dashicon } from '@wordpress/components';
+import { Icon, textColor as textColorIcon } from '@wordpress/icons';
+import { removeFormat } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -23,12 +24,18 @@ const title = __( 'Text Color' );
 const EMPTY_ARRAY = [];
 
 function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
-	const colors = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		if ( getSettings ) {
-			return get( getSettings(), [ 'colors' ], EMPTY_ARRAY );
+	const { colors, disableCustomColors } = useSelect( ( select ) => {
+		const blockEditorSelect = select( 'core/block-editor' );
+		let settings;
+		if ( blockEditorSelect && blockEditorSelect.getSettings ) {
+			settings = blockEditorSelect.getSettings();
+		} else {
+			settings = {};
 		}
-		return EMPTY_ARRAY;
+		return {
+			colors: get( settings, [ 'colors' ], EMPTY_ARRAY ),
+			disableCustomColors: settings.disableCustomColors,
+		};
 	} );
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
@@ -46,6 +53,13 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			backgroundColor: activeColor,
 		};
 	}, [ value, colors ] );
+
+	const hasColorsToChoose =
+		! isEmpty( colors ) || disableCustomColors !== true;
+	if ( ! hasColorsToChoose && ! isActive ) {
+		return null;
+	}
+
 	return (
 		<>
 			<RichTextToolbarButton
@@ -54,7 +68,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 				name={ isActive ? 'text-color' : undefined }
 				icon={
 					<>
-						<Dashicon icon="editor-textcolor" />
+						<Icon icon={ textColorIcon } />
 						{ isActive && (
 							<span
 								className="format-library-text-color-button__indicator"
@@ -64,7 +78,12 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 					</>
 				}
 				title={ title }
-				onClick={ enableIsAddingColor }
+				// If has no colors to choose but a color is active remove the color onClick
+				onClick={
+					hasColorsToChoose
+						? enableIsAddingColor
+						: () => onChange( removeFormat( value, name ) )
+				}
 			/>
 			{ isAddingColor && (
 				<InlineColorUI

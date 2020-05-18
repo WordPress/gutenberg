@@ -18,7 +18,7 @@
 	function SidebarContents( props ) {
 		return el(
 			PanelBody,
-			{},
+			{ className: 'sidebar-title-plugin-panel' },
 			el(
 				PanelRow,
 				{},

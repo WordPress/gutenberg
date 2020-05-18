@@ -1,3 +1,5 @@
+@import "../../interface/src/style.scss";
+
 @import "./components/customizer-edit-widgets-initializer/style.scss";
 @import "./components/header/style.scss";
 @import "./components/layout/style.scss";
@@ -46,6 +48,11 @@ body.gutenberg_page_gutenberg-widgets {
 	&.is-in-customizer {
 		min-height: initial;
 		position: initial;
+	}
+
+
+	.interface-interface-skeleton__content {
+		background-color: #f1f1f1;
 	}
 }
 

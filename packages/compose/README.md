@@ -126,6 +126,7 @@ Provides a unique instance ID.
 _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
+-   _prefix_ `string`: Prefix for the unique id.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
@@ -157,6 +158,30 @@ _Returns_
 
 -   `boolean`: Reduced motion preference value.
 
+<a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
+
+Hook which allows to listen the resize event of any target element when it changes sizes.
+_Note: `useResizeObserver` will report `null` until after first render_
+
+_Usage_
+
+```js
+const App = () => {
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
@@ -164,7 +189,7 @@ Returns true if the viewport matches the given query, or false otherwise.
 _Usage_
 
 ```js
-useViewportMatch( 'huge', <' );
+useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 

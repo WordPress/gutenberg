@@ -8,24 +8,59 @@ Ensure that Docker is running, then:
 
 ```sh
 $ cd /path/to/a/wordpress/plugin
-$ npx wp-env start
+$ npm -g i @wordpress/env
+$ wp-env start
 ```
 
 The local environment will be available at http://localhost:8888.
 
-## Instructions
-
-### Installation
+## Prerequisites
 
 `wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
 
-After confirming that Docker is installed, you can install `wp-env` globally like so:
+Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+
+## Installation
+
+### Installation as a global package
+
+After confirming that the prerequisites are installed, you can install `wp-env` globally like so:
 
 ```sh
 $ npm -g i @wordpress/env
 ```
 
 You're now ready to use `wp-env`!
+
+### Installation as a local package
+
+If your project already has a package.json, it's also possible to use `wp-env` as a local package. First install `wp-env` locally as a dev dependency:
+
+```sh
+$ npm i @wordpress/env --save-dev
+```
+
+Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+
+```json
+"scripts": {
+	"wp-env": "wp-env"
+}
+```
+
+When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
+
+```sh
+$ npm run wp-env start
+```
+
+instead of:
+
+```sh
+$ wp-env start
+```
+
+## Usage
 
 ### Starting the environment
 
@@ -43,7 +78,7 @@ Then, start the local environment:
 $ wp-env start
 ```
 
-Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated.
+Finally, navigate to http://localhost:8888 in your web browser to see WordPress running with the local WordPress plugin or theme running and activated. Default login credentials are username: `admin` password: `password`.
 
 ### Stopping the environment
 
@@ -137,6 +172,8 @@ $ wp-env start
 
 ## Command reference
 
+`wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
+
 ### `wp-env start [ref]`
 
 ```sh
@@ -173,31 +210,72 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
+### `wp-env run [container] [command]`
+
+```sh
+wp-env run <container> [command..]
+
+Runs an arbitrary command in one of the underlying Docker containers, for
+example it's useful for running wp cli commands.
+
+
+Positionals:
+  container  The container to run the command on.            [string] [required]
+  command    The command to run.                           [array] [default: []]
+```
+
+For example:
+
+```sh
+wp-env run cli wp user list
+⠏ Running `wp user list` in 'cli'.
+
+ID      user_login      display_name    user_email      user_registered roles
+1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
+
+✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
+### `docker logs -f [container_id] >/dev/null`
+
+```sh
+docker logs -f <container_id> >/dev/null
+
+Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
+```
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
 `.wp-env.json` supports five fields:
 
-| Field | Type | Default | Description |
-| -- | -- | -- | -- |
-| `"core"` | `string|null` | `null` | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress. |
-| `"plugins"` | `string[]` | `[]` | A list of plugins to install and activate in the environment. |
-| `"themes"` | `string[]` | `[]` | A list of themes to install in the environment. The first theme in the list will be activated. |
-| `"port"` | `string` | `"8888"` | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `string` | `"8889"` | The port number to use for the tests instance. |
+| Field         | Type           | Default                                    | Description                                                                                                               |
+| ------------- | -------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
+| `"plugins"`   | `string[]`     | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
+| `"themes"`    | `string[]`     | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
+| `"port"`      | `integer`      | `8888`                                     | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`                                     | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`       | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+| `"mappings"`  | `Object`       | `"{}"`                                     | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
-Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
+Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
-| Type | Format | Example(s) |
-| -- | -- | -- |
-| Relative path | `.<path>|~<path>` | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path | `/<path>|<letter>:\<path>` | `"/a/directory"`, `"C:\\a\\directory"` |
-| GitHub repository | `<owner>/<repo>[#<ref>]` | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"` |
+| Type              | Format                        | Example(s)                                               |
+| ----------------- | ----------------------------- | -------------------------------------------------------- |
+| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
+| ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
+
+## .wp-env.override.json
+
+Any fields here will take precedence over .wp-env.json. This file is useful, when ignored from version control, to persist local development overrides.
 
 ### Examples
 
@@ -207,10 +285,8 @@ This is useful for plugin development.
 
 ```json
 {
-  "core": null,
-  "plugins": [
-    "."
-  ]
+	"core": null,
+	"plugins": [ "." ]
 }
 ```
 
@@ -220,10 +296,8 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-  "core": "WordPress/WordPress#master",
-  "plugins": [
-    "."
-  ]
+	"core": "WordPress/WordPress#master",
+	"plugins": [ "." ]
 }
 ```
 
@@ -233,10 +307,8 @@ This is useful for working on plugins and WordPress Core at the same time.
 
 ```json
 {
-  "core": "../wordpress-develop/build",
-  "plugins": [
-    "."
-  ]
+	"core": "../wordpress-develop/build",
+	"plugins": [ "." ]
 }
 ```
 
@@ -246,14 +318,37 @@ This is useful for integration testing: that is, testing how old versions of Wor
 
 ```json
 {
-  "core": "WordPress/WordPress#5.2.0",
-  "plugins": [
-    "WordPress/wp-lazy-loading",
-    "WordPress/classic-editor",
-  ],
-  "themes": [
-    "WordPress/theme-experiments"
-  ]
+	"core": "WordPress/WordPress#5.2.0",
+	"plugins": [ "WordPress/wp-lazy-loading", "WordPress/classic-editor" ],
+	"themes": [ "WordPress/theme-experiments" ]
+}
+```
+
+#### Add mu-plugins and other mapped directories
+
+You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated, despite being the "first" mapped theme.
+
+```json
+{
+	"plugins": [ "." ],
+	"mappings": {
+		"wp-content/mu-plugins": "./path/to/local/mu-plugins",
+		"wp-content/themes": "./path/to/local/themes",
+		"wp-content/themes/specific-theme": "./path/to/local/theme-1"
+	}
+}
+```
+
+#### Avoid activating plugins or themes on the instance
+
+Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time. The same applies for a theme which should not be activated.
+
+```json
+{
+	"plugins": [ "." ],
+	"mappings": {
+		"wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
+	}
 }
 ```
 
@@ -263,11 +358,9 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 
 ```json
 {
-  "plugins": [
-    ".",
-  ],
-  "port": 4013,
-  "testsPort": 4012
+	"plugins": [ "." ],
+	"port": 4013,
+	"testsPort": 4012
 }
 ```
 

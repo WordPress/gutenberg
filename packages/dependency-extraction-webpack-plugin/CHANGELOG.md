@@ -1,3 +1,19 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.5.0 (2020-04-01)
+
+### New Features
+
+- The plugin now supports an optional `combinedOutputFile` option that is useful only when another `combineAssets` option is enabled. It allows providing a custom output file for the generated single assets file ([#20844](https://github.com/WordPress/gutenberg/pull/20844)).
+
+## 2.3.0 (2020-02-21)
+
+### New Features
+
+- The plugin now supports optional `combineAssets` option. When this flag is set to `true`, all information about assets is combined into a single `assets.(json|php)` file generated in the output directory ([#20330](https://github.com/WordPress/gutenberg/pull/20330)).
+
 ## 2.0.0 (2019-09-16)
 
 ### Breaking Changes

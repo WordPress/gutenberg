@@ -8,53 +8,31 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
 import {
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToggleControl,
-	withFallbackStyles,
 	ToolbarButton,
 	ToolbarGroup,
 	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
-	__experimentalUseGradient,
-	ContrastChecker,
 	InspectorControls,
-	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	RichText,
-	withColors,
+	__experimentalBlock as Block,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link } from '@wordpress/icons';
 
-const { getComputedStyle } = window;
-
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor } = ownProps;
-	const backgroundColorValue = backgroundColor && backgroundColor.color;
-	const textColorValue = textColor && textColor.color;
-	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode =
-		! textColorValue && node
-			? node.querySelector( '[contenteditable="true"]' )
-			: null;
-	return {
-		fallbackBackgroundColor:
-			backgroundColorValue || ! node
-				? undefined
-				: getComputedStyle( node ).backgroundColor,
-		fallbackTextColor:
-			textColorValue || ! textNode
-				? undefined
-				: getComputedStyle( textNode ).color,
-	};
-} );
+/**
+ * Internal dependencies
+ */
+import ColorEdit from './color-edit';
+import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -72,7 +50,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
 				value={ borderRadius }
-				label={ __( 'Border Radius' ) }
+				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
 				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
@@ -93,6 +71,9 @@ function URLPicker( {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
+
+		// prevents default behaviour for event
+		return false;
 	};
 	const linkControl = isURLPickerOpen && (
 		<Popover
@@ -141,18 +122,8 @@ function URLPicker( {
 	);
 }
 
-function ButtonEdit( {
-	attributes,
-	backgroundColor,
-	textColor,
-	setBackgroundColor,
-	setTextColor,
-	fallbackBackgroundColor,
-	fallbackTextColor,
-	setAttributes,
-	className,
-	isSelected,
-} ) {
+function ButtonEdit( props ) {
+	const { attributes, setAttributes, className, isSelected } = props;
 	const {
 		borderRadius,
 		linkTarget,
@@ -186,38 +157,34 @@ function ButtonEdit( {
 		},
 		[ rel, setAttributes ]
 	);
-	const {
-		gradientClass,
-		gradientValue,
-		setGradient,
-	} = __experimentalUseGradient();
+
+	const colorProps = getColorAndStyleProps( attributes );
 
 	return (
-		<div className={ className }>
-			<RichText
-				placeholder={ placeholder || __( 'Add text…' ) }
-				value={ text }
-				onChange={ ( value ) => setAttributes( { text: value } ) }
-				withoutInteractiveFormatting
-				className={ classnames( 'wp-block-button__link', {
-					'has-background': backgroundColor.color || gradientValue,
-					[ backgroundColor.class ]:
-						! gradientValue && backgroundColor.class,
-					'has-text-color': textColor.color,
-					[ textColor.class ]: textColor.class,
-					[ gradientClass ]: gradientClass,
-					'no-border-radius': borderRadius === 0,
-				} ) }
-				style={ {
-					...( ! backgroundColor.color && gradientValue
-						? { background: gradientValue }
-						: { backgroundColor: backgroundColor.color } ),
-					color: textColor.color,
-					borderRadius: borderRadius
-						? borderRadius + 'px'
-						: undefined,
-				} }
-			/>
+		<>
+			<ColorEdit { ...props } />
+			<Block.div>
+				<RichText
+					placeholder={ placeholder || __( 'Add text…' ) }
+					value={ text }
+					onChange={ ( value ) => setAttributes( { text: value } ) }
+					withoutInteractiveFormatting
+					className={ classnames(
+						className,
+						'wp-block-button__link',
+						colorProps.className,
+						{
+							'no-border-radius': borderRadius === 0,
+						}
+					) }
+					style={ {
+						borderRadius: borderRadius
+							? borderRadius + 'px'
+							: undefined,
+						...colorProps.style,
+					} }
+				/>
+			</Block.div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }
@@ -226,35 +193,6 @@ function ButtonEdit( {
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
 			/>
 			<InspectorControls>
-				<PanelColorGradientSettings
-					title={ __( 'Background & Text Color' ) }
-					settings={ [
-						{
-							colorValue: textColor.color,
-							onColorChange: setTextColor,
-							label: __( 'Text Color' ),
-						},
-						{
-							colorValue: backgroundColor.color,
-							onColorChange: setBackgroundColor,
-							gradientValue,
-							onGradientChange: setGradient,
-							label: __( 'Background' ),
-						},
-					] }
-				>
-					<ContrastChecker
-						{ ...{
-							// Text is considered large if font size is greater or equal to 18pt or 24px,
-							// currently that's not the case for button.
-							isLargeText: false,
-							textColor: textColor.color,
-							backgroundColor: backgroundColor.color,
-							fallbackBackgroundColor,
-							fallbackTextColor,
-						} }
-					/>
-				</PanelColorGradientSettings>
 				<BorderPanel
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }
@@ -272,11 +210,8 @@ function ButtonEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-		</div>
+		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-	applyFallbackStyles,
-] )( ButtonEdit );
+export default ButtonEdit;

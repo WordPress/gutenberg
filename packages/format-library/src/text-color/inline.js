@@ -39,7 +39,10 @@ export function getActiveColor( formatName, formatValue, colors ) {
 	}
 }
 
-const ColorPopoverAtLink = ( { isActive, addingColor, value, ...props } ) => {
+const ColorPopoverAtLink = ( { addingColor, ...props } ) => {
+	// There is no way to open a text formatter popover when another one is mounted.
+	// The first popover will always be dismounted when a click outside happens, so we can store the
+	// anchor Rect during the lifetime of the component.
 	const anchorRect = useMemo( () => {
 		const selection = window.getSelection();
 		const range =
@@ -65,7 +68,7 @@ const ColorPopoverAtLink = ( { isActive, addingColor, value, ...props } ) => {
 		if ( closest ) {
 			return closest.getBoundingClientRect();
 		}
-	}, [ isActive, addingColor, value.start, value.end ] );
+	}, [] );
 
 	if ( ! anchorRect ) {
 		return null;

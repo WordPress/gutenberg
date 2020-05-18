@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { last } from 'lodash';
-import { parse } from 'url';
 
 /**
  * WordPress dependencies
  */
 import {
+	activatePlugin,
 	clickOnCloseModalButton,
+	clickOnMoreMenuItem,
 	createNewPost,
 	createURL,
+	deactivatePlugin,
 	publishPost,
 	saveDraft,
-	clickOnMoreMenuItem,
-	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
@@ -22,9 +22,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.editor-post-preview__button-external' );
-	await editorPage.click( '.editor-post-preview__button-external' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -41,6 +41,21 @@ async function openPreviewPage( editorPage ) {
 }
 
 /**
+ * Given the Page instance for the editor, opens preview drodpdown, and
+ * awaits the presence of the external preview selector.
+ *
+ * @param {Page} editorPage current editor page.
+ *
+ * @return {Promise} Promise resolving once selector is visible on page.
+ */
+async function waitForPreviewDropdownOpen( editorPage ) {
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	return editorPage.waitForSelector(
+		'.edit-post-header-preview__button-external'
+	);
+}
+
+/**
  * Given a Puppeteer Page instance for a preview window, clicks Preview, and
  * awaits the window navigation.
  *
@@ -49,7 +64,7 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.editor-post-preview__button-external' );
+	await page.click( '.edit-post-header-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
 
@@ -100,7 +115,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
+			'.block-editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
@@ -133,6 +148,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', '!' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -159,6 +175,7 @@ describe( 'Preview', () => {
 		// Return to editor to change title.
 		await editorPage.bringToFront();
 		await editorPage.type( '.editor-post-title__input', ' And more.' );
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -169,9 +186,9 @@ describe( 'Preview', () => {
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
 
 		// Published preview URL should include ID and nonce parameters.
-		const { query } = parse( previewPage.url(), true );
-		expect( query ).toHaveProperty( 'preview_id' );
-		expect( query ).toHaveProperty( 'preview_nonce' );
+		const { searchParams } = new URL( previewPage.url() );
+		expect( searchParams.has( 'preview_id' ) ).toBe( true );
+		expect( searchParams.has( 'preview_nonce' ) ).toBe( true );
 
 		// Return to editor. Previewing already-autosaved preview tab should
 		// reuse the opened tab, skipping interstitial. This resolves an edge
@@ -223,6 +240,7 @@ describe( 'Preview', () => {
 		// Save draft and open the preview page right after.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
 		await saveDraft();
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.
@@ -278,15 +296,16 @@ describe( 'Preview with Custom Fields enabled', () => {
 		// Return to editor and modify the title and content.
 		await editorPage.bringToFront();
 		await editorPage.click( '.editor-post-title__input' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'title 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 		await editorPage.keyboard.press( 'Tab' );
-		await pressKeyWithModifier( 'primary', 'a' );
-		await editorPage.keyboard.press( 'Delete' );
-		await editorPage.keyboard.type( 'content 2' );
+		await editorPage.keyboard.press( 'End' );
+		await editorPage.keyboard.press( 'Backspace' );
+		await editorPage.keyboard.type( '2' );
 
 		// Open the preview page.
+		await waitForPreviewDropdownOpen( editorPage );
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match input.
@@ -303,5 +322,36 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Make sure the editor is active for the afterEach function.
 		await editorPage.bringToFront();
+	} );
+} );
+
+describe( 'Preview with private custom post type', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
+	} );
+
+	it( 'should not show the Preview Externally link', async () => {
+		await createNewPost( { postType: 'not_public' } );
+
+		// Type in the title filed.
+		await page.type( '.editor-post-title__input', 'aaaaa' );
+		await page.keyboard.press( 'Tab' );
+
+		// Open the preview menu.
+		await page.click( '.block-editor-post-preview__button-toggle' );
+
+		const previewDropdownContents = await page.$(
+			'.block-editor-post-preview__dropdown-content'
+		);
+
+		// Expect the Preview Externally link not to be present.
+		const previewExternallyLink = await previewDropdownContents.$x(
+			'//a[contains(text(), "Preview externally")]'
+		);
+		expect( previewExternallyLink.length ).toBe( 0 );
 	} );
 } );

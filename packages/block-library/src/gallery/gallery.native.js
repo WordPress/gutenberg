@@ -19,6 +19,7 @@ import Tiles from './tiles';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockCaption } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 const TILE_SPACING = 15;
 
@@ -29,6 +30,10 @@ const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	useEffect( mediaUploadSync, [] );
+
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
 
 	const {
 		clientId,
@@ -77,7 +82,7 @@ export const Gallery = ( props ) => {
 	};
 
 	return (
-		<View>
+		<View style={ { flex: 1 } }>
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }
@@ -88,8 +93,8 @@ export const Gallery = ( props ) => {
 				}
 			>
 				{ images.map( ( img, index ) => {
-					/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 					const ariaLabel = sprintf(
+						/* translators: 1: the order number of the image. 2: the total number of images. */
 						__( 'image %1$d of %2$d in gallery' ),
 						index + 1,
 						images.length
@@ -116,6 +121,7 @@ export const Gallery = ( props ) => {
 							}
 							caption={ img.caption }
 							aria-label={ ariaLabel }
+							isRTL={ isRTL }
 						/>
 					);
 				} ) }

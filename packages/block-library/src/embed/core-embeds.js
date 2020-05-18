@@ -17,6 +17,8 @@ import {
 	embedRedditIcon,
 	embedTumblrIcon,
 	embedAmazonIcon,
+	embedAnimotoIcon,
+	embedDailymotionIcon,
 } from './icons';
 
 /**
@@ -31,7 +33,7 @@ export const common = [
 		settings: {
 			title: 'Twitter',
 			icon: embedTwitterIcon,
-			keywords: [ 'tweet' ],
+			keywords: [ 'tweet', __( 'social' ) ],
 			description: __( 'Embed a tweet.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
@@ -54,6 +56,7 @@ export const common = [
 		settings: {
 			title: 'Facebook',
 			icon: embedFacebookIcon,
+			keywords: [ __( 'social' ) ],
 			description: __( 'Embed a Facebook post.' ),
 		},
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
@@ -63,7 +66,7 @@ export const common = [
 		settings: {
 			title: 'Instagram',
 			icon: embedInstagramIcon,
-			keywords: [ __( 'image' ) ],
+			keywords: [ __( 'image' ), __( 'social' ) ],
 			description: __( 'Embed an Instagram post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
@@ -128,7 +131,7 @@ export const others = [
 		name: 'core-embed/animoto',
 		settings: {
 			title: 'Animoto',
-			icon: embedVideoIcon,
+			icon: embedAnimotoIcon,
 			description: __( 'Embed an Animoto video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
@@ -160,7 +163,7 @@ export const others = [
 		settings: {
 			title: 'Crowdsignal',
 			icon: embedContentIcon,
-			keywords: [ 'polldaddy' ],
+			keywords: [ 'polldaddy', __( 'survey' ) ],
 			transform: [
 				{
 					type: 'block',
@@ -184,7 +187,8 @@ export const others = [
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
-			icon: embedVideoIcon,
+			icon: embedDailymotionIcon,
+			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a Dailymotion video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
@@ -194,6 +198,7 @@ export const others = [
 		settings: {
 			title: 'Hulu',
 			icon: embedVideoIcon,
+			keywords: [ __( 'video' ) ],
 			description: __( 'Embed Hulu content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
@@ -312,7 +317,7 @@ export const others = [
 			icon: embedPhotoIcon,
 			description: __( 'Embed SmugMug content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
 	},
 	{
 		// Deprecated in favour of the core-embed/speaker-deck block.
@@ -351,6 +356,7 @@ export const others = [
 		settings: {
 			title: 'TikTok',
 			icon: embedVideoIcon,
+			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a TikTok video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tiktok\.com\/.+/i ],
@@ -369,6 +375,7 @@ export const others = [
 		settings: {
 			title: 'Tumblr',
 			icon: embedTumblrIcon,
+			keywords: [ __( 'social' ) ],
 			description: __( 'Embed a Tumblr post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],

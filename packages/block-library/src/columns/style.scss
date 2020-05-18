@@ -31,14 +31,17 @@
 	overflow-wrap: break-word; // New standard.
 
 	// Between mobile and large viewports, allow 2 columns.
-	@include break-small() {
-		flex-basis: calc(50% - #{$grid-size-large});
+	@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+		// As with mobile styles, this must be important since the Column
+		// assigns its own width as an inline style, which should take effect
+		// starting at `break-medium`.
+		flex-basis: calc(50% - #{$grid-unit-20}) !important;
 		flex-grow: 0;
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-unit-20 * 2;
 		}
 	}
 
@@ -56,13 +59,13 @@
 
 		// Columns with an explicitly-assigned width should maintain their
 		// `flex-basis` width and not grow.
-		&[style] {
+		&[style*="flex-basis"] {
 			flex-grow: 0;
 		}
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-unit-20 * 2;
 		}
 	}
 }
@@ -98,5 +101,11 @@
 
 	&.is-vertically-aligned-bottom {
 		align-self: flex-end;
+	}
+
+	&.is-vertically-aligned-top,
+	&.is-vertically-aligned-center,
+	&.is-vertically-aligned-bottom {
+		width: 100%;
 	}
 }

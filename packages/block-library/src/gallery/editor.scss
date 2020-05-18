@@ -6,9 +6,19 @@
 		list-style-type: none;
 	}
 
-	// Override the bottom margin every block gets.
-	.is-selected & {
-		margin-bottom: 0;
+	// @todo: this deserves a refactor, by being moved to the toolbar.
+	.block-editor-media-placeholder {
+		margin-bottom: $grid-unit-15;
+		padding: $grid-unit-15;
+
+		// This element is empty here anyway.
+		.components-placeholder__label {
+			display: none;
+		}
+
+		.components-button {
+			margin-bottom: 0;
+		}
 	}
 }
 
@@ -27,12 +37,19 @@ figure.wp-block-gallery {
 .blocks-gallery-item {
 
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
-	figure:not(.is-selected):focus {
+	figure:not(.is-selected):focus,
+	img:focus {
 		outline: none;
 	}
 
 	figure.is-selected {
-		outline: 4px solid theme(primary);
+		box-shadow: 0 0 0 $border-width $white, 0 0 0 3px $theme-color;
+		border-radius: $radius-block-ui;
+		outline: 2px solid transparent;
+
+		img {
+			border-radius: $radius-block-ui;
+		}
 	}
 
 	figure.is-transient img {
@@ -42,24 +59,19 @@ figure.wp-block-gallery {
 	.is-selected .block-library-gallery-item__move-menu,
 	.is-selected .block-library-gallery-item__inline-menu {
 		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
+		border: 1px solid $dark-gray-primary;
+		border-radius: $radius-block-ui;
 		transition: box-shadow 0.2s ease-out;
 		@include reduce-motion("transition");
 
 		&:hover {
-			box-shadow: $shadow-toolbar;
+			box-shadow: $shadow-popover;
 		}
 
 		.components-button {
-			color: $dark-opacity-300;
-			padding: 2px;
-			height: $icon-button-size-small;
-
-			// Remove hover box shadows, since they clash with the container.
-			&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-				box-shadow: none;
-			}
+			color: $dark-gray-primary;
+			min-width: $grid-unit-30;
+			height: $grid-unit-30;
 
 			@include break-small() {
 				// Use smaller buttons to fit when there are many columns.
@@ -80,7 +92,7 @@ figure.wp-block-gallery {
 
 .block-library-gallery-item__move-menu,
 .block-library-gallery-item__inline-menu {
-	margin: $grid-size;
+	margin: $grid-unit-10;
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 
@@ -92,7 +104,7 @@ figure.wp-block-gallery {
 		// Use smaller buttons to fit when there are many columns.
 		.columns-7 &,
 		.columns-8 & {
-			padding: $grid-size-small / 2;
+			padding: $grid-unit-05 / 2;
 		}
 	}
 }
@@ -109,9 +121,9 @@ figure.wp-block-gallery {
 	left: -2px;
 }
 
-.blocks-gallery-item__move-backward,
-.blocks-gallery-item__move-forward,
-.blocks-gallery-item__remove {
+.blocks-gallery-item__move-backward.components-button,
+.blocks-gallery-item__move-forward.components-button,
+.blocks-gallery-item__remove.components-button {
 	padding: 0;
 }
 

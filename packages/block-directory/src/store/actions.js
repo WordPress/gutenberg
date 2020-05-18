@@ -150,3 +150,45 @@ export function removeInstalledBlockType( item ) {
 		item,
 	};
 }
+
+/**
+ * Returns an action object used to indicate install in progress
+ *
+ * @param {boolean} isInstalling Boolean value that tells state whether installation is occurring
+ *
+ */
+export function setIsInstalling( isInstalling ) {
+	return {
+		type: 'SET_INSTALLING_BLOCK',
+		isInstalling,
+	};
+}
+
+/**
+ * Sets an error notice string to be displayed to the user
+ *
+ * @param {string} blockId The ID of the block plugin. eg: my-block
+ * @param {string} noticeId The ID of the message used to determine which notice to show.
+ *
+ */
+export function setErrorNotice( blockId, noticeId ) {
+	return {
+		type: 'SET_ERROR_NOTICE_ID',
+		blockId,
+		noticeId,
+	};
+}
+
+/**
+ * Sets the error noticeId to empty for specific block
+ *
+ * @param {string} blockId The ID of the block plugin. eg: my-block
+ *
+ */
+export function clearErrorNotice( blockId ) {
+	return {
+		type: 'SET_ERROR_NOTICE_ID',
+		blockId,
+		noticeId: '',
+	};
+}

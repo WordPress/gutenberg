@@ -9,7 +9,7 @@ module.exports = {
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'/wordpress/',
+		'<rootDir>/wordpress/',
 		'e2e-tests/specs/performance/',
 	],
 };

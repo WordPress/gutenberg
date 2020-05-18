@@ -5,7 +5,7 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import { pickBy } from 'lodash';
+import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -111,13 +111,7 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { selectionStart: start, selectionEnd: end } = this.props;
-		let { value } = this.props;
-
-		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
-		// Removing leading white spaces using `trim()` should make sure this is the case.
-		if ( typeof value === 'string' || value instanceof String ) {
-			value = value.trimLeft();
-		}
+		const { value } = this.props;
 
 		const { formats, replacements, text } = this.formatToValue( value );
 		const { activeFormats } = this.state;
@@ -698,6 +692,7 @@ export class RichText extends Component {
 			minWidth,
 			maxWidth,
 			formatTypes,
+			parentBlockStyles,
 			withoutInteractiveFormatting,
 		} = this.props;
 
@@ -806,10 +801,11 @@ export class RichText extends Component {
 						}
 					} }
 					style={ {
+						backgroundColor: styles.richText.backgroundColor,
 						...style,
 						...( this.isIOS && minWidth && maxWidth
 							? { width }
-							: {} ),
+							: { maxWidth } ),
 						minHeight: this.state.height,
 					} }
 					text={ {
@@ -836,7 +832,11 @@ export class RichText extends Component {
 					}
 					onSelectionChange={ this.onSelectionChangeFromAztec }
 					blockType={ { tag: tagName } }
-					color={ ( style && style.color ) || defaultColor }
+					color={
+						( style && style.color ) ||
+						( parentBlockStyles && parentBlockStyles.color ) ||
+						defaultColor
+					}
 					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
@@ -876,8 +876,17 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-	} ) ),
+	withSelect( ( select, { clientId } ) => {
+		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const parents = getBlockParents( clientId, true );
+		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
+		const parentBlockStyles =
+			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+
+		return {
+			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			...{ parentBlockStyles },
+		};
+	} ),
 	withPreferredColorScheme,
 ] )( RichText );

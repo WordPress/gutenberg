@@ -51,18 +51,7 @@ class SlotComponent extends Component {
 	}
 
 	render() {
-		const {
-			children,
-			name,
-			bubblesVirtually = false,
-			fillProps = {},
-			getFills,
-			className,
-		} = this.props;
-
-		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } className={ className } />;
-		}
+		const { children, name, fillProps = {}, getFills } = this.props;
 
 		const fills = map( getFills( name, this ), ( fill ) => {
 			const fillKey = fill.occurrence;

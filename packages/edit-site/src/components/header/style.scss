@@ -1,37 +1,39 @@
 .edit-site-header {
 	align-items: center;
-	background: $white;
-	border-bottom: 1px solid $light-gray-500;
 	display: flex;
 	height: $header-height;
 	justify-content: space-between;
-	left: 0;
-	// Stick the toolbar to the top, because the admin bar is not fixed on mobile.
-	position: sticky;
-	right: 0;
-	top: 0;
-	z-index: z-index(".edit-site-header");
-
-	// On mobile, the main content area has to scroll,
-	// otherwise you can invoke the over-scroll bounce on the non-scrolling container.
-	@include break-small {
-		padding: $grid-size;
-		position: fixed;
-		top: $admin-bar-height-big;
-	}
-
-	@include break-medium() {
-		top: $admin-bar-height;
-	}
+	box-sizing: border-box;
 }
 
-@include editor-left(".edit-site-header");
+.edit-site-header__toolbar {
+	display: flex;
+	flex-grow: 1;
+	padding-left: $grid-unit-10;
 
-.edit-site-header__title {
-	font-size: 16px;
-	padding: 0 20px;
+	& > * {
+		margin-left: 5px;
+	}
 }
-
 .edit-site-header__actions {
-	padding: 0 20px;
+	display: flex;
+	margin-right: 8px;
+}
+
+.edit-site-header__actions-more-menu {
+	margin-left: -4px;
+
+	// The padding and margin of the more menu is intentionally non-standard.
+	.components-icon-button {
+		padding: 8px 2px;
+		width: auto;
+	}
+
+	@include break-small() {
+		margin-left: 4px;
+
+		.components-icon-button {
+			padding: 8px 4px;
+		}
+	}
 }

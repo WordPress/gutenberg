@@ -5,6 +5,8 @@
 
 // Only add styles for components that are used inside the editing canvas here:
 
+@import "./autocompleters/style.scss";
+@import "./components/block-alignment-matrix-toolbar/style.scss";
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
@@ -19,7 +21,6 @@
 @import "./components/block-settings-menu/style.scss";
 @import "./components/block-styles/style.scss";
 @import "./components/block-switcher/style.scss";
-@import "./components/block-toolbar/style.scss";
 @import "./components/block-types-list/style.scss";
 @import "./components/block-variation-picker/style.scss";
 @import "./components/button-block-appender/style.scss";
@@ -27,6 +28,7 @@
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
 @import "./components/link-control/style.scss";
+@import "./components/line-height-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inner-blocks/style.scss";
 @import "./components/inserter-list-item/style.scss";
@@ -52,5 +54,6 @@
 
 // Styles for components that are used outside of the editing canvas go here:
 
-@import "./components/editor-skeleton/style.scss";
+@import "./components/block-toolbar/style.scss";
 @import "./components/inserter/style.scss";
+@import "./components/preview-options/style.scss";
