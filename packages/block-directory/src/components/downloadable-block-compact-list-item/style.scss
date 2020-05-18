@@ -2,13 +2,22 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: 12px;
+	margin-bottom: $grid-unit-20;
 }
 
 .block-directory-downloadable-block-compact-list-item:last-child {
 	margin-bottom: 0;
 }
 
-.block-directory-downloadable-block-compact-list-item__title {
+.block-directory-downloadable-block-compact-list-item__details {
 	margin-left: 8px;
+}
+
+.block-directory-downloadable-block-compact-list-item__title {
+	font-weight: 500;
+}
+
+.block-directory-downloadable-block-compact-list-item__author {
+	color: $dark-gray-500;
+	font-size: 11px;
 }

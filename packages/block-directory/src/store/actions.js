@@ -72,24 +72,24 @@ export function* downloadBlock( item, onSuccess, onError ) {
 /**
  * Action triggered to install a block plugin.
  *
- * @param {string} item The block item returned by search.
+ * @param {string} block The block item returned by search.
  * @param {Function} onSuccess The callback function when the action has succeeded.
  * @param {Function} onError The callback function when the action has failed.
  *
  */
-export function* installBlock( { id, name }, onSuccess, onError ) {
+export function* installBlock( block, onSuccess, onError ) {
 	try {
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
-				slug: id,
+				slug: block.id,
 			},
 			method: 'POST',
 		} );
 		if ( response.success === false ) {
 			throw new Error( response.errorMessage );
 		}
-		yield addInstalledBlockType( { id, name } );
+		yield addInstalledBlockType( block );
 		onSuccess();
 	} catch ( error ) {
 		onError( error );

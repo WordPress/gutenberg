@@ -18,10 +18,7 @@ import { PluginPrePublishPanel } from '@wordpress/edit-post';
  */
 import DownloadableBlockCompactList from '../../components/downloadable-block-compact-list';
 
-const DownloadableBlockPrePublishPanel = ( {
-	usedNewBlocks,
-	unusedNewBlocks,
-} ) => {
+const DownloadableBlockPrePublishPanel = ( { usedNewBlocks } ) => {
 	if ( ! usedNewBlocks.length ) {
 		return null;
 	}
@@ -43,19 +40,6 @@ const DownloadableBlockPrePublishPanel = ( {
 				{ __( 'The following blocks have been added to your site:' ) }
 			</p>
 			<DownloadableBlockCompactList items={ usedNewBlocks } />
-			{ unusedNewBlocks.length > 0 && (
-				<p className="downloadable-block-pre-publish-panel__subcopy">
-					{ sprintf(
-						// translators: %d: number of unused blocks (number).
-						_n(
-							'Removing %d unused block',
-							'Removing %d unused blocks',
-							unusedNewBlocks.length
-						),
-						unusedNewBlocks.length
-					) }
-				</p>
-			) }
 		</PluginPrePublishPanel>
 	);
 };
@@ -78,7 +62,6 @@ export default compose( [
 				blockToUninstall,
 				'name'
 			),
-			unusedNewBlocks: blockToUninstall,
 		};
 	} ),
 ] )( DownloadableBlockPrePublishPanel );
