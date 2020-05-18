@@ -4,9 +4,9 @@ const gradients = {
 };
 
 const getGradientType = ( color ) => {
-	if ( color.includes( 'radial-gradient' ) ) {
+	if ( color?.includes( 'radial-gradient' ) ) {
 		return gradients.radial;
-	} else if ( color.includes( 'linear-gradient' ) ) {
+	} else if ( color?.includes( 'linear-gradient' ) ) {
 		return gradients.linear;
 	}
 	return false;

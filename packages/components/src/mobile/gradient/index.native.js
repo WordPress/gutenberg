@@ -10,6 +10,11 @@ import { colorsUtils } from '@wordpress/components';
 import { RadialGradient, Stop, SVG, Defs, Rect } from '@wordpress/primitives';
 import { useResizeObserver } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
 function Gradient( {
 	gradientValue,
 	style,
@@ -57,7 +62,7 @@ function Gradient( {
 	}
 
 	return (
-		<View style={ [ style, { overflow: 'hidden' } ] }>
+		<View style={ [ style, styles.overflow ] }>
 			{ resizeObserver }
 			<SVG>
 				<Defs>
