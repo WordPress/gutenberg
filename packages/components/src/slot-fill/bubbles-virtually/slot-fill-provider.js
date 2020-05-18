@@ -50,7 +50,7 @@ function useSlotRegistry() {
 				const slotFills = fills[ name ];
 				if ( slotFills ) {
 					// Force update fills
-					slotFills.map( ( fill ) => fill.current() );
+					slotFills.map( ( fill ) => fill.current.rerender() );
 				}
 			}
 		},

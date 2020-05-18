@@ -15,7 +15,7 @@ function useForceUpdate() {
 
 export default function Fill( { name, children } ) {
 	const slot = useSlot( name );
-	const ref = useRef( useForceUpdate() );
+	const ref = useRef( { rerender: useForceUpdate() } );
 
 	useEffect( () => {
 		// We register fills so we can keep track of their existance.
