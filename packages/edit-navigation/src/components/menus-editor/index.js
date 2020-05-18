@@ -35,7 +35,7 @@ export default function MenusEditor( { blockEditorSettings } ) {
 		if ( ! hasCompletedFirstLoad && hasLoadedMenus ) {
 			setHasCompletedFirstLoad( true );
 		}
-	}, [ hasCompletedFirstLoad, hasLoadedMenus ] );
+	}, [ hasLoadedMenus ] );
 
 	const [ menuId, setMenuId ] = useState();
 	const [ stateMenus, setStateMenus ] = useState();
