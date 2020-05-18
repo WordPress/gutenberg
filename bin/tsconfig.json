@@ -16,7 +16,10 @@
 	"files": [
 		"./api-docs/update-api-docs.js",
 		"./check-latest-npm.js",
-		"./changelog.js",
+		"./plugin/config.js",
+		"./plugin/commands/changelog.js",
+		"./plugin/lib/version.js",
+		"./plugin/lib/logger.js",
 		"./validate-package-lock.js",
 	]
 }

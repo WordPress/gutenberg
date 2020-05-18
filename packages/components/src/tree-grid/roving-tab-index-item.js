@@ -6,7 +6,7 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useRovingTabIndexContext } from './context';
+import { useRovingTabIndexContext } from './roving-tab-index-context';
 
 export default function RovingTabIndexItem( {
 	children,

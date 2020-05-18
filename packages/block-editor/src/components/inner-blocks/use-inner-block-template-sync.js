@@ -6,7 +6,7 @@ import { isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
@@ -44,7 +44,7 @@ export default function useInnerBlockTemplateSync(
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
 	const existingTemplate = useRef( null );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// Only synchronize innerBlocks with template if innerBlocks are empty or
 		// a locking all exists directly on the block.
 		if ( innerBlocks.length === 0 || templateLock === 'all' ) {

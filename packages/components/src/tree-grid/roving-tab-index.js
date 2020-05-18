@@ -6,7 +6,7 @@ import { useState, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { RovingTabIndexProvider } from './context';
+import { RovingTabIndexProvider } from './roving-tab-index-context';
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
@@ -28,5 +28,3 @@ export default function RovingTabIndex( { children } ) {
 		</RovingTabIndexProvider>
 	);
 }
-
-export { default as RovingTabIndexItem } from './item';
