@@ -62,7 +62,6 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
-				setIsCreatingMenu( false );
 				onCreateMenu( menu.id );
 			} catch ( error ) {
 				const message = sprintf(
@@ -71,6 +70,7 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 					error.message
 				);
 				createErrorNotice( message, { id: noticeId } );
+			} finally {
 				setIsCreatingMenu( false );
 			}
 		},
