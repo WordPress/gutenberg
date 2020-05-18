@@ -1,39 +1,28 @@
 /**
  * WordPress dependencies
  */
-import {
-	SlotFillProvider,
-	Popover,
-	navigateRegions,
-} from '@wordpress/components';
+import { navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import WidgetAreas from '../widget-areas';
-
 import './sync-customizer';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
+import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function CustomizerEditWidgetsInitializer( { settings } ) {
-	const [ selectedArea, setSelectedArea ] = useState( null );
 	return (
-		<SlotFillProvider>
+		<WidgetAreasBlockEditorProvider blockEditorSettings={ settings }>
 			<div
 				className="edit-widgets-customizer-edit-widgets-initializer__content"
 				role="region"
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				<WidgetAreas
-					selectedArea={ selectedArea }
-					setSelectedArea={ setSelectedArea }
-					blockEditorSettings={ settings }
-				/>
+				<WidgetAreasBlockEditorContent />
 			</div>
-			<Popover.Slot />
-		</SlotFillProvider>
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 
