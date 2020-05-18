@@ -88,6 +88,10 @@ $block-inserter-tabs-height: 44px;
 			background: $white;
 			box-shadow: 0 0 0 $border-width-focus $theme-color;
 		}
+
+		&::placeholder {
+			color: #6c6f75;
+		}
 	}
 }
 
