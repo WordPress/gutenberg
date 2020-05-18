@@ -350,7 +350,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 			return select( 'core/block-editor' ).getSettings();
 		}, [] );
 
-		if ( ! hasColorSupport( name ) || ! backgroundColor || ! textColor ) {
+		if ( ! hasColorSupport( name ) || ! ( backgroundColor || textColor ) ) {
 			return <BlockListBlock { ...props } />;
 		}
 		const extraStyles = {
