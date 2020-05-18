@@ -112,8 +112,8 @@ class BlockListBlock extends Component {
 
 	render() {
 		const {
-			attributes = {},
-			blockType = {},
+			attributes,
+			blockType,
 			clientId,
 			icon,
 			isSelected,
@@ -130,6 +130,10 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 		} = this.props;
+
+		if ( ! attributes || ! blockType ) {
+			return null;
+		}
 
 		const { blockWidth } = this.state;
 

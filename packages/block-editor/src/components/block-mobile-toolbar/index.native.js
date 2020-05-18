@@ -17,6 +17,9 @@ import BlockMover from '../block-mover';
 import BlockActionsMenu from './block-actions-menu';
 import { BlockSettingsButton } from '../block-settings';
 
+// Defined breakpoints are used to get a point when
+// `settings` and `mover` controls should be wrapped into `BlockActionsMenu`
+// and accessed through `BottomSheet`(Android)/`ActionSheet`(iOS).
 const BREAKPOINTS = {
 	wrapSettings: 65,
 	wrapMover: 150,

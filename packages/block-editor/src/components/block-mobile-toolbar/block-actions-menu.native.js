@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile, trash, cog } from '@wordpress/icons';
+import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -31,6 +32,7 @@ const BlockActionsMenu = ( {
 	isEmptyDefaultBlock,
 	blockMobileToolbarRef,
 } ) => {
+	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
 
 	const {
@@ -83,14 +85,20 @@ const BlockActionsMenu = ( {
 	] );
 
 	function onPickerSelect( value ) {
-		if ( value === 'deleteOption' ) {
+		if ( value === deleteOption.value ) {
 			onDelete();
-		} else if ( value === 'settingsOption' ) {
+		} else if ( value === settingsOption.value ) {
 			openGeneralSidebar();
-		} else if ( value === 'forwardButtonOption' ) {
+		} else if ( value === forwardButtonOption.value ) {
 			onMoveDown();
-		} else if ( value === 'backwardButtonOption' ) {
+		} else if ( value === backwardButtonOption.value ) {
 			onMoveUp();
+		}
+	}
+
+	function onPickerPresent() {
+		if ( pickerRef.current ) {
+			pickerRef.current.presentPicker();
 		}
 	}
 
@@ -98,28 +106,23 @@ const BlockActionsMenu = ( {
 		.map( ( option, index ) => option.disabled && index + 1 )
 		.filter( Boolean );
 
-	const accessibilityHintIOS = __(
-		'Double tap to open Action Sheet with available options'
-	);
-	const accessibilityHintAndroid = __(
-		'Double tap to open Bottom Sheet with available options'
-	);
+	const accessibilityHint =
+		Platform.OS === 'ios'
+			? __( 'Double tap to open Action Sheet with available options' )
+			: __( 'Double tap to open Bottom Sheet with available options' );
 
 	return (
 		<>
 			<ToolbarButton
 				title={ __( 'Open Block Actions Menu' ) }
-				onClick={ () => this.picker.presentPicker() }
+				onClick={ onPickerPresent }
 				icon={ moreHorizontalMobile }
 				extraProps={ {
-					hint:
-						Platform.OS === 'ios'
-							? accessibilityHintIOS
-							: accessibilityHintAndroid,
+					hint: accessibilityHint,
 				} }
 			/>
 			<Picker
-				ref={ ( instance ) => ( this.picker = instance ) }
+				ref={ pickerRef }
 				options={ options }
 				onChange={ onPickerSelect }
 				destructiveButtonIndex={ options.length }
