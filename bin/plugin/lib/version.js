@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-// @ts-ignore
-const semver = require( 'semver' );
 
 /**
  * Follow the WordPress version guidelines to compute
@@ -13,11 +11,11 @@ const semver = require( 'semver' );
  * @return {string} Next Major Version.
  */
 function getNextMajorVersion( version ) {
-	const parsedVersion = semver.parse( version );
-	if ( parsedVersion.minor === 9 ) {
-		return parsedVersion.major + 1 + '.0.0';
+	const [ major, minor ] = version.split( '.' ).map( Number );
+	if ( minor === 9 ) {
+		return major + 1 + '.0.0';
 	}
-	return parsedVersion.major + '.' + ( parsedVersion.minor + 1 ) + '.0';
+	return major + '.' + ( minor + 1 ) + '.0';
 }
 
 module.exports = {
