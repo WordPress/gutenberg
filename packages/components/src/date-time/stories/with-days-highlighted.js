@@ -24,6 +24,13 @@ const aFewDaysAfter = ( date ) => {
 	// eslint-disable-next-line no-restricted-syntax
 	return new Date( date.getTime() + ( 1 + Math.random() * 5 ) * DAY_IN_MS );
 };
+const isSameDay = ( date1, date2 ) => {
+	return (
+		date1.getFullYear() === date2.getFullYear() &&
+		date1.getMonth() === date2.getMonth() &&
+		date1.getDate() === date2.getDate()
+	);
+};
 
 const now = new Date();
 
@@ -39,7 +46,7 @@ export const WithDaysHighlighted = () => {
 
 	const isDayHighlighted = useCallback(
 		( day ) =>
-			highlights.some( ( highlight ) => day.isSame( highlight, 'day' ) ),
+			highlights.some( ( highlight ) => isSameDay( highlight, day ) ),
 		[ highlights ]
 	);
 

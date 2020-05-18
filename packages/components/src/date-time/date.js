@@ -107,7 +107,12 @@ class DatePicker extends Component {
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
-					isDayHighlighted={ isDayHighlighted }
+					isDayHighlighted={ ( date ) => {
+						return (
+							isDayHighlighted &&
+							isDayHighlighted( date.toDate() )
+						);
+					} }
 					onPrevMonthClick={ this.keepFocusInside }
 					onNextMonthClick={ this.keepFocusInside }
 				/>
