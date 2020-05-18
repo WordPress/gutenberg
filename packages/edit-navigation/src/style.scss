@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
 @import "./components/layout/style.scss";
 @import "./components/menu-editor/style.scss";
 @import "./components/menus-editor/style.scss";
