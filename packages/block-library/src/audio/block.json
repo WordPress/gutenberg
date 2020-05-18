@@ -35,7 +35,7 @@
 			"attribute": "preload"
 		}
 	},
-	"features": {
+	"supports": {
 		"align": true,
 		"lightBlockWrapper": true
 	}

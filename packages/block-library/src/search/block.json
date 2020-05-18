@@ -1,5 +1,5 @@
 {
-	"name": "core/calendar",
+	"name": "core/search",
 	"category": "widgets",
 	"attributes": {
 		"align": {
@@ -15,11 +15,17 @@
 		"className": {
 			"type": "string"
 		},
-		"month": {
-			"type": "integer"
+		"label": {
+			"type": "string",
+			"default": "// TODO: Search"
 		},
-		"year": {
-			"type": "integer"
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		},
+		"buttonText": {
+			"type": "string",
+			"default": "// TODO: Search"
 		}
 	},
 	"supports": {

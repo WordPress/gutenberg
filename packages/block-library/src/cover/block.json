@@ -45,7 +45,7 @@
 			"type": "string"
 		}
 	},
-	"features": {
+	"supports": {
 		"align": true,
 		"html": false,
 		"lightBlockWrapper": true

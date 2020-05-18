@@ -14,5 +14,10 @@
 			"default": true
 		}
 	},
-	"context": [ "postId" ]
+	"context": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
 }

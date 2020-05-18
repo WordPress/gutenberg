@@ -77,7 +77,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".message"
 		}
 	},
-	"features": {
+	"supports": {
 		"align": true,
 		"lightBlockWrapper": true
 	},
@@ -247,15 +247,16 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 
 See the [the attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
 
-### Features
+### Supports
 
-* Type: `object`
-* Optional
-* Localized: No
-* Property: `supports`
-* Alias: `features`
+ *   Type: `object`
+ *   Optional
+ *   Localized: No
+ *   Property: `supports`
 
-See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
+ It contains as set of options to control features used in the editor.
+
+ See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
 
 ### Style Variations
 
@@ -349,8 +350,8 @@ wp.blocks.registerBlockType( 'my-block/name', {
 	save: function() {
 		// Save definition goes here.
 	},
-	supports: {
-		html: false
+	getEditWrapperProps: function() {
+		// Implementation goes here.
 	}
 } );
 ```

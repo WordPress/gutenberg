@@ -1,7 +1,9 @@
 {
 	"name": "core/button",
 	"category": "layout",
-	"parent": [ "core/buttons" ],
+	"parent": [
+		"core/buttons"
+	],
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -51,7 +53,7 @@
 			"type": "string"
 		}
 	},
-	"features": {
+	"supports": {
 		"align": true,
 		"alignWide": false,
 		"reusable": false,

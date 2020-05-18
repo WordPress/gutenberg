@@ -1,0 +1,53 @@
+{
+	"name": "core/navigation",
+	"category": "layout",
+	"attributes": {
+		"orientation": {
+			"type": "string"
+		},
+		"className": {
+			"type": "string"
+		},
+		"textColor": {
+			"type": "string"
+		},
+		"customTextColor": {
+			"type": "string"
+		},
+		"rgbTextColor": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
+		},
+		"rgbBackgroundColor": {
+			"type": "string"
+		},
+		"fontSize": {
+			"type": "string"
+		},
+		"customFontSize": {
+			"type": "number"
+		},
+		"itemsJustification": {
+			"type": "string"
+		},
+		"showSubmenuIcon": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"anchor": true,
+		"html": false,
+		"inserter": true,
+		"lightBlockWrapper": true
+	}
+}

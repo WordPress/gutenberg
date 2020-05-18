@@ -1,5 +1,16 @@
 {
 	"name": "core/query-pagination",
 	"category": "layout",
-	"context": [ "queryId", "query", "queryContext" ]
+	"parent": [
+		"core/query"
+	],
+	"context": [
+		"queryId",
+		"query",
+		"queryContext"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
 }

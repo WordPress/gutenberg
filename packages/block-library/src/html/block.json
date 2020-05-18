@@ -7,7 +7,7 @@
 			"source": "html"
 		}
 	},
-	"features": {
+	"supports": {
 		"customClassName": false,
 		"className": false,
 		"html": false

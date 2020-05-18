@@ -8,7 +8,7 @@
 			"selector": "code"
 		}
 	},
-	"features": {
+	"supports": {
 		"html": false,
 		"lightBlockWrapper": true
 	}

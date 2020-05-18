@@ -2,10 +2,24 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function SearchEdit( { className, attributes, setAttributes } ) {
 	const { label, placeholder, buttonText } = attributes;
+
+	useEffect( () => {
+		const defaultAttributes = {};
+		if ( label === undefined ) {
+			defaultAttributes.label = __( 'Search' );
+		}
+		if ( buttonText === undefined ) {
+			defaultAttributes.buttonText = __( 'Search' );
+		}
+		if ( Object.keys( defaultAttributes ).length > 0 ) {
+			setAttributes( defaultAttributes );
+		}
+	}, [] );
 
 	return (
 		<div className={ className }>

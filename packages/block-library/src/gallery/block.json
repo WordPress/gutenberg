@@ -50,7 +50,7 @@
 			"type": "array",
 			"items": {
 				"type": "number"
-  			},
+			},
 			"default": []
 		},
 		"columns": {
@@ -76,7 +76,7 @@
 			"default": "large"
 		}
 	},
-	"features": {
+	"supports": {
 		"align": true
 	}
 }
