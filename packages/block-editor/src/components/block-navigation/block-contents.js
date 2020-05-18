@@ -96,51 +96,41 @@ const BlockNavigationBlockSelectButton = forwardRef( ( props, ref ) => (
 
 const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
-const BlockNavigationBlockSlot = forwardRef(
-	(
-		{ block, isSelected, onClick, position, siblingCount, level, ...props },
-		ref
-	) => {
-		const { clientId } = block;
+const noop = () => null;
+const BlockNavigationBlockSlot = forwardRef( ( props, ref ) => {
+	const { clientId } = props.block;
 
-		return (
-			<Slot name={ getSlotName( clientId ) }>
-				{ ( fills ) => {
-					if ( ! fills.length ) {
-						return (
-							<BlockNavigationBlockSelectButton
-								ref={ ref }
-								block={ block }
-								onClick={ onClick }
-								isSelected={ isSelected }
-								position={ position }
-								siblingCount={ siblingCount }
-								level={ level }
-								{ ...props }
-							/>
-						);
-					}
-
+	return (
+		<Slot name={ getSlotName( clientId ) }>
+			{ ( fills ) => {
+				if ( ! fills.length ) {
 					return (
-						<BlockNavigationBlockContentWrapper as="div">
-							{ Children.map( fills, ( fill ) =>
-								cloneElement( fill, {
-									...{
-										block,
-										isSelected,
-										onClick,
-										...props,
-									},
-									...fill.props,
-								} )
-							) }
-						</BlockNavigationBlockContentWrapper>
+						<BlockNavigationBlockSelectButton
+							ref={ ref }
+							{ ...props }
+						/>
 					);
-				} }
-			</Slot>
-		);
-	}
-);
+				}
+
+				return (
+					<BlockNavigationBlockContentWrapper
+						as="div"
+						{ ...props }
+						// Fills should implement onClick on their own
+						onClick={ noop }
+					>
+						{ Children.map( fills, ( fill ) =>
+							cloneElement( fill, {
+								...{ props },
+								...fill.props,
+							} )
+						) }
+					</BlockNavigationBlockContentWrapper>
+				);
+			} }
+		</Slot>
+	);
+} );
 
 export const BlockNavigationBlockFill = ( props ) => {
 	const { clientId } = useContext( BlockListBlockContext );

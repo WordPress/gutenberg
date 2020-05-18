@@ -11,7 +11,6 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
-import { Platform } from '@wordpress/element';
 
 const MIN_SPACER_HEIGHT = 20;
 const MAX_SPACER_HEIGHT = 500;
@@ -72,7 +71,6 @@ const SpacerEdit = ( {
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
 						value={ height }
 						onChange={ updateHeight }
-						step={ Platform.OS === 'web' ? 10 : 1 }
 					/>
 				</PanelBody>
 			</InspectorControls>
