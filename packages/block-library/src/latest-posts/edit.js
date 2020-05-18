@@ -359,8 +359,7 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
-						const currentAuthor = find(
-							authors,
+						const currentAuthor = authors.find(
 							( author ) => author.id === post.author
 						);
 
