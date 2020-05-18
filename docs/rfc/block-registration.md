@@ -77,6 +77,10 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"selector": ".message"
 		}
 	},
+	"features": {
+		"align": true,
+		"lightBlockWrapper": true
+	},
 	"styleVariations": [
 		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
@@ -243,11 +247,21 @@ Attributes provide the structured data needs of a block. They can exist in diffe
 
 See the [the attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
 
+### Features
+
+* Type: `object`
+* Optional
+* Localized: No
+* Property: `supports`
+* Alias: `features`
+
+See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
+
 ### Style Variations
 
 * Type: `array`
 * Optional
-* Localized: Yes (`label`)
+* Localized: Yes (`label` only)
 * Property: `styles`
 * Alias: `styleVariations`
 
@@ -323,7 +337,6 @@ The following properties are going to be supported for backward compatibility re
  - `save` - see the [Edit and Save](/docs/designers-developers/developers/block-api/block-edit-save.md) documentation for more details.
  - `transforms` - see the [Transforms](/docs/designers-developers/developers/block-api/block-registration.md#transforms-optional) documentation for more details.
  - `deprecated` - see the [Deprecated Blocks](/docs/designers-developers/developers/block-api/block-deprecation.md) documentation for more details.
- - `supports` - see the [block supports](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) documentation page for more details.
  - `merge` - undocumented as of today. Its role is to handle merging multiple blocks into one.
  - `getEditWrapperProps` - undocumented as well. Its role is to inject additional props to the block edit's component wrapper.
 
@@ -413,7 +426,7 @@ WordPress string discovery automatically translates these strings using the `tex
 }
 ```
 
-In JavaScript, with the help of a Babel plugin, this becomes:
+In JavaScript, with the help of a new helper function `registerBlockTypeFromMetadata`, this becomes:
 
 ```js
 const metadata = {
@@ -423,7 +436,7 @@ const metadata = {
 }
 ```
 
-In PHP, it is transformed at runtime to code roughly equivalent to:
+In PHP, it is transformed at runtime with a new helper function `register_block_from_metadata` to code roughly equivalent to:
 
 ```php
 <?php
