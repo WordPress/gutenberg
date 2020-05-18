@@ -117,7 +117,7 @@ function RichTextWrapper(
 		onRemove,
 		onMerge,
 		onSplit,
-		onSplitAtEnd,
+		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		// To do: find a better way to implicitly inherit props.
@@ -361,7 +361,7 @@ function RichTextWrapper(
 				} else {
 					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( shiftKey ) {
+			} else if ( shiftKey || ( ! canSplit && ! onSplitAtEnd ) ) {
 				if ( ! disableLineBreaks ) {
 					onChange( insert( value, '\n' ) );
 				}

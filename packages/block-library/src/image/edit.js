@@ -673,7 +673,7 @@ export class ImageEdit extends Component {
 							}
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
-							onSplitAtEnd={ () =>
+							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( 'core/paragraph' )
 								)
