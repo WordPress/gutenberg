@@ -34,7 +34,6 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 		async ( event ) => {
 			// Prevent form submission.
 			event.preventDefault();
-			setIsCreatingMenu( true );
 
 			// Remove existing notices.
 			removeNotice( noticeId );
@@ -57,6 +56,7 @@ export function CreateMenuForm( { onCancel, onCreateMenu, menus } ) {
 				return;
 			}
 			try {
+				setIsCreatingMenu( true );
 				const menu = await saveMenu( { name: menuName } );
 				createInfoNotice( __( 'Menu created' ), {
 					type: 'snackbar',
