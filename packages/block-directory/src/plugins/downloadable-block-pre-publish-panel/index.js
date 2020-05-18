@@ -40,7 +40,7 @@ const DownloadableBlockPrePublishPanel = ( {
 			initialOpen={ true }
 		>
 			<p className="downloadable-block-pre-publish-panel__copy">
-				{ __( 'The following blocks has been added to your site:' ) }
+				{ __( 'The following blocks have been added to your site:' ) }
 			</p>
 			<DownloadableBlockCompactList items={ usedNewBlocks } />
 			{ unusedNewBlocks.length > 0 && (
