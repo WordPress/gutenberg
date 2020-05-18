@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Popover, Panel } from '@wordpress/components';
-import { BlockInspector } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
+import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { InterfaceSkeleton } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
 import Header from '../header';
+import Sidebar from '../sidebar';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
@@ -24,13 +24,10 @@ function Layout( { blockEditorSettings } ) {
 				header={ <Header /> }
 				sidebar={
 					! isMobile && (
-						<div className="edit-widgets-sidebar">
-							<Panel header={ __( 'Block Areas' ) }>
-								<BlockInspector
-									showNoBlockSelectedMessage={ false }
-								/>
-							</Panel>
-						</div>
+						<>
+							<ComplementaryArea.Slot scope="core/edit-widgets" />
+							<Sidebar />
+						</>
 					)
 				}
 				content={ <WidgetAreasBlockEditorContent /> }
