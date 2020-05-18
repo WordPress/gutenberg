@@ -7,6 +7,8 @@
 
 /**
  * Class representing a parsed instance of a block.
+ *
+ * @property array $attributes
  */
 class WP_Block {
 
@@ -169,19 +171,33 @@ class WP_Block {
 	/**
 	 * Generates the render output for the block.
 	 *
+	 * @param array $options {
+	 *   Optional options object.
+	 *
+	 *   @type bool $dynamic Defaults to 'true'. Optionally set to false to avoid using the block's render_callback.
+	 * }
+	 *
 	 * @return string Rendered block output.
 	 */
-	public function render() {
+	public function render( $options = array() ) {
 		global $post;
+		$options = array_replace(
+			array(
+				'dynamic' => true,
+			),
+			$options
+		);
 
-		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
+		$is_dynamic    = $options['dynamic'] && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
 
-		$index = 0;
-		foreach ( $this->inner_content as $chunk ) {
-			$block_content .= is_string( $chunk ) ?
-				$chunk :
-				$this->inner_blocks[ $index++ ]->render();
+		if ( ! $options['dynamic'] || empty( $this->block_type->skip_inner_blocks ) ) {
+			$index = 0;
+			foreach ( $this->inner_content as $chunk ) {
+				$block_content .= is_string( $chunk ) ?
+					$chunk :
+					$this->inner_blocks[ $index++ ]->render();
+			}
 		}
 
 		if ( $is_dynamic ) {

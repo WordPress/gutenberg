@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import { omit } from 'lodash';
+
 import deepFreeze from 'deep-freeze';
 
 /**
@@ -243,6 +245,7 @@ describe( 'selectors', () => {
 		describe.each( [
 			[ 'name', name ],
 			[ 'block type', blockType ],
+			[ 'block type without category', omit( blockType, 'category' ) ],
 		] )( 'by %s', ( label, nameOrType ) => {
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(
@@ -304,15 +307,17 @@ describe( 'selectors', () => {
 				expect( result ).toBe( true );
 			} );
 
-			it( 'should return true if match using the categories', () => {
-				const result = isMatchingSearchTerm(
-					state,
-					nameOrType,
-					'COMMON'
-				);
+			if ( nameOrType.category ) {
+				it( 'should return true if match using the categories', () => {
+					const result = isMatchingSearchTerm(
+						state,
+						nameOrType,
+						'COMMON'
+					);
 
-				expect( result ).toBe( true );
-			} );
+					expect( result ).toBe( true );
+				} );
+			}
 		} );
 	} );
 

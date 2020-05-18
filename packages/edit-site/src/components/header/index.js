@@ -9,7 +9,10 @@ import {
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { PinnedItems } from '@wordpress/interface';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -20,7 +23,7 @@ import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import { CloseButton } from './main-dashboard-button';
+import FullscreenModeClose from './fullscreen-mode-close';
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -64,7 +67,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<CloseButton />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-site-header__toolbar">
 				<Inserter
 					position="bottom right"
