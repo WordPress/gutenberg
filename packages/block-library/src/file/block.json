@@ -34,5 +34,8 @@
 			"source": "html",
 			"selector": "a[download]"
 		}
+	},
+	"features": {
+		"align": true
 	}
 }

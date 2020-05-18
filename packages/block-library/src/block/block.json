@@ -5,5 +5,10 @@
 		"ref": {
 			"type": "number"
 		}
+	},
+	"features": {
+		"customClassName": false,
+		"html": false,
+		"inserter": false
 	}
 }

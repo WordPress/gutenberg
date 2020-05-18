@@ -7,5 +7,9 @@
 			"source": "text",
 			"selector": "code"
 		}
+	},
+	"features": {
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

@@ -44,5 +44,10 @@
 		"contentPosition": {
 			"type": "string"
 		}
+	},
+	"features": {
+		"align": true,
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

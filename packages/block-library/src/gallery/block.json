@@ -75,5 +75,8 @@
 			"type": "string",
 			"default": "large"
 		}
+	},
+	"features": {
+		"align": true
 	}
 }

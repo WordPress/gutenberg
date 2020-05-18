@@ -21,5 +21,9 @@
 			"type": "boolean",
 			"default": false
 		}
+	},
+	"features": {
+		"align": true,
+		"html": false
 	}
 }

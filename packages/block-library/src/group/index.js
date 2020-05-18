@@ -93,6 +93,7 @@ export const settings = {
 		anchor: true,
 		html: false,
 		lightBlockWrapper: true,
+		// TODO: Decide how to handle it.
 		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	transforms: {

@@ -15,5 +15,8 @@
 		"year": {
 			"type": "integer"
 		}
+	},
+	"features": {
+		"align": true
 	}
 }
