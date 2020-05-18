@@ -43,7 +43,7 @@ A function which is called when the guide is finished. The guide is finished whe
 
 ### pages
 
-A list of objects describining each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
+A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
 
 - Type: `array`
 - Required: Yes
