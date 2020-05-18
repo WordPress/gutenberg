@@ -16,19 +16,18 @@
 			"type": "string"
 		},
 		"label": {
-			"type": "string",
-			"default": "// TODO: Search"
+			"type": "string"
 		},
 		"placeholder": {
 			"type": "string",
 			"default": ""
 		},
 		"buttonText": {
-			"type": "string",
-			"default": "// TODO: Search"
+			"type": "string"
 		}
 	},
 	"supports": {
-		"align": true
+		"align": true,
+		"html": false
 	}
 }
