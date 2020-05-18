@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flowRight } from 'lodash';
+import { map, flowRight, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -87,10 +87,7 @@ function items( state = {}, action ) {
 				}, {} ),
 			};
 		case 'REMOVE_ITEMS':
-			const newState = { ...state };
-			for ( const id of action.items ) {
-				delete newState[ id ];
-			}
+			const newState = omit( state, action.items );
 			return newState;
 	}
 	return state;

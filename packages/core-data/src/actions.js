@@ -94,6 +94,16 @@ export function receiveEntityRecords(
 	};
 }
 
+/**
+ * Returns an action object used in signalling that entity records have been
+ * deleted and it needs to be removed from entities state.
+ *
+ * @param {string}       kind            Kind of the removed entity.
+ * @param {string}       name            Name of the removed entity.
+ * @param {Array|Object} records         Records removed.
+ *
+ * @return {Object} Action object.
+ */
 export function removeItems( kind, name, records ) {
 	return {
 		type: 'REMOVE_ITEMS',
@@ -149,6 +159,13 @@ export function receiveEmbedPreview( url, preview ) {
 	};
 }
 
+/**
+ * Action triggered to delete an entity record.
+ *
+ * @param {string} kind      Kind of the deleted entity.
+ * @param {string} name      Name of the deleted entity.
+ * @param {Object} recordId  Record to be deleted.
+ */
 export function* deleteEntityRecord( kind, name, recordId ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
@@ -162,6 +179,7 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		name,
 		recordId,
 	};
+
 	yield removeItems( kind, name, recordId );
 
 	let error;
@@ -484,7 +502,6 @@ export function* saveEntityRecord(
 				name,
 				recordId
 			);
-
 			yield receiveEntityRecords(
 				kind,
 				name,
@@ -498,7 +515,6 @@ export function* saveEntityRecord(
 				method: recordId ? 'PUT' : 'POST',
 				data,
 			} );
-
 			yield receiveEntityRecords(
 				kind,
 				name,
