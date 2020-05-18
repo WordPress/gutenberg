@@ -27,7 +27,7 @@ const aFewDaysAfter = ( date ) => {
 
 const now = new Date();
 
-const DateTimePickerWithState = () => {
+export const WithDaysHighlighted = () => {
 	const [ date, setDate ] = useState( now );
 
 	const [ highlights, setHighlights ] = useState( [ aFewDaysAfter( now ) ] );
@@ -50,8 +50,4 @@ const DateTimePickerWithState = () => {
 			isDayHighlighted={ isDayHighlighted }
 		/>
 	);
-};
-
-export const withDaysHighlighted = () => {
-	return <DateTimePickerWithState />;
 };
