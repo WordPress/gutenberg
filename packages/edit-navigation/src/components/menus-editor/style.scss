@@ -10,12 +10,15 @@
 	.edit-navigation-menus-editor__menu-select-control {
 		margin-right: 0;
 		margin-bottom: 10px;
+		align-self: normal;
 	}
 
 	@include break-large {
 		flex-direction: row;
+		align-items: center;
 
 		.edit-navigation-menus-editor__menu-select-control {
+			align-self: center;
 			margin-right: 1ch;
 			margin-bottom: 0;
 		}
