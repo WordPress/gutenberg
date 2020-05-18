@@ -6,7 +6,7 @@ import TestRenderer from 'react-test-renderer';
 /**
  * Internal dependencies
  */
-import RovingTabIndex from '../';
+import RovingTabIndex from '../roving-tab-index';
 
 describe( 'RovingTabIndex', () => {
 	it( 'does not render any elements other than its children', () => {

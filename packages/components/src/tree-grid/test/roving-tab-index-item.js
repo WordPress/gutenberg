@@ -11,8 +11,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import RovingTabIndex from '../';
-import RovingTabIndexItem from '../item';
+import RovingTabIndex from '../roving-tab-index';
+import RovingTabIndexItem from '../roving-tab-index-item';
 
 const TestButton = forwardRef( ( { ...props }, ref ) => (
 	<button { ...props } ref={ ref }></button>
