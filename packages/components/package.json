@@ -45,7 +45,7 @@
 		"classnames": "^2.2.5",
 		"clipboard": "^2.0.1",
 		"dom-scroll-into-view": "^1.2.1",
-		"downshift": "^5.0.3",
+		"downshift": "^5.4.0",
 		"gradient-parser": "^0.1.5",
 		"lodash": "^4.17.15",
 		"memize": "^1.1.0",
