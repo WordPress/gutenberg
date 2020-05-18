@@ -56,7 +56,7 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 To generate a changelog for a release, use the changelog generator tool:
 
 ```
-node bin/plugin/cli.js changelog
+npm run changelog
 ```
 
 By default, this will search for and organize all pull requests associated with the milestone for the next version of the project. 
