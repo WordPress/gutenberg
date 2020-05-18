@@ -76,6 +76,10 @@ This is how you execute the script with presented setup:
 * `npm run build` - builds the code for production.
 * `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+* `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+* `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -368,6 +372,11 @@ This is how you execute the script with presented setup:
 
 * `npm start` - starts the build for development.
 * `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
+
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+* `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+* `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+* `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
 
 #### Advanced information
 
