@@ -46,6 +46,10 @@
 		align-items: center;
 		align-content: space-between;
 
+		.editor-entities-saved-states__save-button {
+			margin: auto;
+		}
+
 		.components-button.has-icon {
 			position: absolute;
 			right: $grid-unit-10;
@@ -61,10 +65,5 @@
 			margin: 0;
 			font-size: $big-font-size;
 		}
-	}
-
-	.editor-entities-saved-states__save-button {
-		display: block;
-		margin: $grid-unit-15 auto;
 	}
 }

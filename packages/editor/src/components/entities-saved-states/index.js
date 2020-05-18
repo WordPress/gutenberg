@@ -81,6 +81,18 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
+					isPrimary
+					disabled={
+						dirtyEntityRecords.length -
+							unselectedEntities.length ===
+						0
+					}
+					onClick={ saveCheckedEntities }
+					className="editor-entities-saved-states__save-button"
+				>
+					{ __( 'Save' ) }
+				</Button>
+				<Button
 					onClick={ dismissPanel }
 					icon={ closeIcon }
 					label={ __( 'Close panel' ) }
@@ -104,17 +116,6 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 					/>
 				);
 			} ) }
-
-			<Button
-				isPrimary
-				disabled={
-					dirtyEntityRecords.length - unselectedEntities.length === 0
-				}
-				onClick={ saveCheckedEntities }
-				className="editor-entities-saved-states__save-button"
-			>
-				{ __( 'Save selected items' ) }
-			</Button>
 		</div>
 	) : null;
 }
