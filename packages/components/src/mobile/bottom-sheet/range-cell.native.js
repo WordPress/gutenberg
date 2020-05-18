@@ -30,8 +30,6 @@ class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
 		this.handleToggleFocus = this.handleToggleFocus.bind( this );
-		this.handleChange = this.handleChange.bind( this );
-		this.handleValueSave = this.handleValueSave.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
@@ -43,7 +41,6 @@ class BottomSheetRangeCell extends Component {
 
 		this.state = {
 			accessible: true,
-			sliderValue: initialValue,
 			initialValue,
 			hasFocus: false,
 			fontScale,
@@ -69,22 +66,11 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
-	handleChange( text ) {
-		if ( ! isNaN( Number( text ) ) ) {
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
-		}
-	}
-
-	handleToggleFocus( validateInput = true ) {
-		const newState = { hasFocus: ! this.state.hasFocus };
-
-		if ( validateInput ) {
-			const sliderValue = this.validateInput( this.state.sliderValue );
-			this.handleValueSave( sliderValue );
-		}
-
-		this.setState( newState );
+	handleToggleFocus() {
+		this.setState( ( state ) => ( {
+			...state,
+			hasFocus: ! state.hasFocus,
+		} ) );
 	}
 
 	validateInput( text ) {
@@ -104,14 +90,6 @@ class BottomSheetRangeCell extends Component {
 		);
 	}
 
-	handleValueSave( text ) {
-		if ( ! isNaN( Number( text ) ) ) {
-			this.onChangeValue( text );
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
-		}
-	}
-
 	onChangeValue( initialValue ) {
 		const { minimumValue, maximumValue, onChange } = this.props;
 
@@ -121,7 +99,8 @@ class BottomSheetRangeCell extends Component {
 		} else if ( sliderValue > maximumValue ) {
 			sliderValue = maximumValue;
 		}
-		onChange( sliderValue );
+		this.announceCurrentValue( `${ sliderValue }` );
+		onChange( parseInt( sliderValue ) );
 	}
 
 	onCellPress() {
@@ -158,7 +137,7 @@ class BottomSheetRangeCell extends Component {
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, sliderValue, accessible, fontScale } = this.state;
+		const { hasFocus, accessible, fontScale, initialValue } = this.state;
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
@@ -194,7 +173,7 @@ class BottomSheetRangeCell extends Component {
 			>
 				<View style={ styles.container }>
 					<Slider
-						value={ this.validateInput( sliderValue ) }
+						value={ this.validateInput( initialValue ) }
 						defaultValue={ defaultValue }
 						disabled={ disabled }
 						step={ step }
@@ -203,8 +182,7 @@ class BottomSheetRangeCell extends Component {
 						minimumTrackTintColor={ minimumTrackTintColor }
 						maximumTrackTintColor={ maximumTrackTintColor }
 						thumbTintColor={ thumbTintColor }
-						onValueChange={ this.handleChange }
-						onSlidingComplete={ this.handleValueSave }
+						onValueChange={ this.onChangeValue }
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }
@@ -218,12 +196,12 @@ class BottomSheetRangeCell extends Component {
 							hasFocus && borderStyles.isSelected,
 							{ width: 40 * fontScale },
 						] }
-						onChangeText={ this.handleChange }
+						onChangeText={ this.onChangeValue }
 						onFocus={ this.handleToggleFocus }
 						onBlur={ this.handleToggleFocus }
 						keyboardType="number-pad"
 						returnKeyType="done"
-						value={ `${ sliderValue }` }
+						value={ `${ this.props.value }` }
 					/>
 				</View>
 			</Cell>
