@@ -73,6 +73,12 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		close( entitiesToSave );
 	};
 
+	const [ isReviewing, setIsReviewing ] = useState( false );
+	const toggleIsReviewing = useCallback(
+		() => setIsReviewing( ! isReviewing ),
+		[ isReviewing ]
+	);
+
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -106,19 +112,31 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 						'Changes may exist in more than one savable entity.'
 					) }
 				</p>
+				<p>
+					<Button
+						onClick={ toggleIsReviewing }
+						isLink
+						className="entities-saved-states__review-changes-button"
+					>
+						{ isReviewing
+							? __( 'Hide changes.' )
+							: __( 'Review changes.' ) }
+					</Button>
+				</p>
 			</div>
 
-			{ partitionedSavables.map( ( list ) => {
-				return (
-					<EntityTypeList
-						key={ list[ 0 ].name }
-						list={ list }
-						closePanel={ dismissPanel }
-						unselectedEntities={ unselectedEntities }
-						setUnselectedEntities={ setUnselectedEntities }
-					/>
-				);
-			} ) }
+			{ isReviewing &&
+				partitionedSavables.map( ( list ) => {
+					return (
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							closePanel={ dismissPanel }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
+						/>
+					);
+				} ) }
 		</div>
 	) : null;
 }
