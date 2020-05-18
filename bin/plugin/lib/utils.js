@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+// @ts-ignore
 const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
@@ -14,13 +15,13 @@ const { log, formats } = require( './logger' );
  * Utility to run a child script
  *
  * @param {string} script Script to run.
- * @param {string?} cwd    Working directory.
+ * @param {string=} cwd   Working directory.
  */
 function runShellScript( script, cwd ) {
 	childProcess.execSync( script, {
 		cwd,
 		env: {
-			NO_CHECKS: true,
+			NO_CHECKS: 'true',
 			PATH: process.env.PATH,
 			HOME: process.env.HOME,
 		},
