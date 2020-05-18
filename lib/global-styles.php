@@ -165,21 +165,30 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
 		foreach ( $theme_colors as $color ) {
-			$theme_presets['global']['presets']['color'][ $color['slug'] ] = $color['color'];
+			$theme_presets['global']['presets']['color'][] = array(
+				'slug'  => $color['slug'],
+				'value' => $color['color'],
+			);
 		}
 	}
 
 	$theme_gradients = get_theme_support( 'editor-gradient-presets' )[0];
 	if ( is_array( $theme_gradients ) ) {
 		foreach ( $theme_gradients as $gradient ) {
-			$theme_presets['global']['presets']['gradient'][ $gradient['slug'] ] = $gradient['gradient'];
+			$theme_presets['global']['presets']['gradient'][] = array(
+				'slug'  => $gradient['slug'],
+				'value' => $gradient['gradient'],
+			);
 		}
 	}
 
 	$theme_font_sizes = get_theme_support( 'editor-font-sizes' )[0];
 	if ( is_array( $theme_font_sizes ) ) {
 		foreach ( $theme_font_sizes as $font_size ) {
-			$theme_presets['global']['presets']['font-size'][ $font_size['slug'] ] = $font_size['size'];
+			$theme_presets['global']['presets']['font-size'][] = array(
+				'slug'  => $font_size['slug'],
+				'value' => $font_size['size'],
+			);
 		}
 	}
 
@@ -294,6 +303,15 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 			// Skip blocks that haven't declared support,
 			// so we don't know to process.
 			continue;
+		}
+
+		// Flatten presets before converting them to variables.
+		foreach ( array_keys( $tree[ $block_name ]['presets'] ) as $preset_category ) {
+			$flattened_values = array();
+			foreach ( $tree[ $block_name ]['presets'][ $preset_category ] as $preset_value ) {
+				$flattened_values[ $preset_value['slug'] ] = $preset_value['value'];
+			}
+			$tree[ $block_name ]['presets'][ $preset_category ] = $flattened_values;
 		}
 
 		$token         = '--';
