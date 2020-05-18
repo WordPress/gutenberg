@@ -6,138 +6,16 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	CheckboxControl,
-	Button,
-	PanelBody,
-	PanelRow,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-import {
-	close as closeIcon,
-	page,
-	layout,
-	grid,
-	blockDefault,
-} from '@wordpress/icons';
+import { close as closeIcon } from '@wordpress/icons';
 
-const ENTITY_NAME_ICONS = {
-	site: layout,
-	page,
-	post: grid,
-	wp_template: grid,
-};
-
-function EntityRecordState( { record, checked, onChange, closePanel } ) {
-	const { name, kind, title, key } = record;
-	const parentBlockId = useSelect( ( select ) => {
-		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
-			kind,
-			name,
-			key
-		);
-		// Get parents of the entity's first block.
-		const parents = select( 'core/block-editor' ).getBlockParents(
-			blocks[ 0 ]?.clientId
-		);
-		// Return closest parent block's clientId.
-		return parents[ parents.length - 1 ];
-	}, [] );
-
-	const isSelected = useSelect(
-		( select ) => {
-			const selectedBlockId = select(
-				'core/block-editor'
-			).getSelectedBlockClientId();
-			return selectedBlockId === parentBlockId;
-		},
-		[ parentBlockId ]
-	);
-	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
-	const selectAndDismiss = useCallback( () => {
-		selectBlock( parentBlockId );
-		closePanel();
-	}, [ parentBlockId ] );
-
-	return (
-		<PanelRow>
-			<CheckboxControl
-				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
-				checked={ checked }
-				onChange={ onChange }
-			/>
-			{ parentBlockId ? (
-				<>
-					<Button
-						onClick={ selectParentBlock }
-						className="entities-saved-states__find-entity"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-					<Button
-						onClick={ selectAndDismiss }
-						className="entities-saved-states__find-entity-small"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-				</>
-			) : null }
-		</PanelRow>
-	);
-}
-
-function EntityTypeList( {
-	list,
-	unselectedEntities,
-	setUnselectedEntities,
-	closePanel,
-} ) {
-	const firstRecord = list[ 0 ];
-	const entity = useSelect(
-		( select ) =>
-			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
-		[ firstRecord.kind, firstRecord.name ]
-	);
-
-	// Set icon based on type of entity.
-	const { name } = firstRecord;
-	const icon = ENTITY_NAME_ICONS[ name ] || blockDefault;
-
-	return (
-		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
-			{ list.map( ( record ) => {
-				return (
-					<EntityRecordState
-						key={ record.key || 'site' }
-						record={ record }
-						checked={
-							! some(
-								unselectedEntities,
-								( elt ) =>
-									elt.kind === record.kind &&
-									elt.name === record.name &&
-									elt.key === record.key
-							)
-						}
-						onChange={ ( value ) =>
-							setUnselectedEntities( record, value )
-						}
-						closePanel={ closePanel }
-					/>
-				);
-			} ) }
-		</PanelBody>
-	);
-}
+/**
+ * Internal dependencies
+ */
+import EntityTypeList from './entity-type-list';
 
 export default function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
