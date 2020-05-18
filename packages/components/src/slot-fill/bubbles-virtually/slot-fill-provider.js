@@ -49,6 +49,7 @@ function useSlotRegistry() {
 				slot.fillProps = fillProps;
 				const slotFills = fills[ name ];
 				if ( slotFills ) {
+					// Force update fills
 					slotFills.map( ( fill ) => fill.current() );
 				}
 			}
