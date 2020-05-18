@@ -22,6 +22,7 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
+import BlockSettingsMenu from '../block-settings-menu';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -90,6 +91,9 @@ export default function BlockNavigationBlock( {
 							level={ level }
 							{ ...props }
 						/>
+
+						<BlockSettingsMenu clientIds={ [ clientId ] } />
+						{ /*<BlockToolbar />*/ }
 					</div>
 				) }
 			</TreeGridCell>
