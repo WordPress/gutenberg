@@ -473,7 +473,13 @@ _Returns_
 
 <a name="deleteEntityRecord" href="#deleteEntityRecord">#</a> **deleteEntityRecord**
 
-Undocumented declaration.
+Action triggered to delete an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the deleted entity.
+-   _name_ `string`: Name of the deleted entity.
+-   _recordId_ `Object`: Record to be deleted.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
@@ -619,7 +625,18 @@ edit to an entity record, if any.
 
 <a name="removeItems" href="#removeItems">#</a> **removeItems**
 
-Undocumented declaration.
+Returns an action object used in signalling that entity records have been
+deleted and it needs to be removed from entities state.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the removed entity.
+-   _name_ `string`: Name of the removed entity.
+-   _records_ `(Array|Object)`: Records removed.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="saveEditedEntityRecord" href="#saveEditedEntityRecord">#</a> **saveEditedEntityRecord**
 
