@@ -110,6 +110,10 @@ const placeholderStyles = ( { isFilled, isFloating, isFloatingLabel } ) => {
 		&::placeholder {
 			opacity: ${opacity};
 		}
+
+		&::-webkit-input-placeholder {
+			line-height: normal;
+		}
 	`;
 };
 
@@ -185,7 +189,7 @@ const labelFontSize = ( { isFloatingLabel, size } ) => {
 		small: '11px',
 	};
 	const fontSize = sizes[ size ];
-	const lineHeight = isFloatingLabel ? 1 : null;
+	const lineHeight = isFloatingLabel ? 1.2 : null;
 
 	return css( { fontSize, lineHeight } );
 };
@@ -198,7 +202,7 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	const isSmall = size === 'small';
 
 	const offsetTop = isSmall ? 1 : 2;
-	const offset = isSmall ? '-3px' : '-5px';
+	const offset = isSmall ? '-1px' : '-3px';
 
 	const marginTop = isFloating ? 0 : offsetTop;
 	const marginLeft = isFloatingLabel ? 8 : 0;
@@ -232,20 +236,34 @@ const labelPosition = ( { isFloatingLabel, isFloating, size } ) => {
 	);
 };
 
+const labelTruncation = ( { isFloating } ) => {
+	if ( isFloating ) return '';
+
+	return css`
+		max-width: calc( 100% - 10px );
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	`;
+};
+
 const BaseLabel = styled( Text )`
 	&&& {
 		box-sizing: border-box;
 		display: block;
 		margin: 0;
+		max-width: 100%;
 		padding: 0;
 		pointer-events: none;
 		top: 50%;
-		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear;
+		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear,
+			max-width ${FLOATING_LABEL_TRANSITION_SPEED} linear;
 		z-index: 1;
 
 		${laberColor};
 		${labelFontSize};
 		${labelPosition};
+		${labelTruncation};
 		${reduceMotion( 'transition' )};
 
 		${rtl( { left: 0 } )}
