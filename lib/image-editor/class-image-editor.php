@@ -7,6 +7,14 @@ require_once __DIR__ . '/class-image-editor-crop.php';
 class Image_Editor {
 	const META_KEY = 'richimage';
 
+	public function __construct() {
+		$this->all_modifiers = array(
+			'Image_Editor_Crop',
+			'Image_Editor_Flip',
+			'Image_Editor_Rotate',
+		);
+	}
+
 	public function modify_image( $media_id, Image_Editor_Modifier $modifier ) {
 		// Get image information.
 		$info = $this->load_image_info( $media_id );
@@ -115,18 +123,10 @@ class Image_Editor {
 		return $this->get_image_as_json( $attachment_id );
 	}
 
-	private function get_all_modifiers() {
-		return array(
-			'Image_Editor_Crop',
-			'Image_Editor_Flip',
-			'Image_Editor_Rotate',
-		);
-	}
-
 	private function get_filename( $meta ) {
 		$parts = array();
 
-		foreach ( $this->get_all_modifiers() as $modifier ) {
+		foreach ( $this->all_modifiers as $modifier ) {
 			$parts[] = $modifier::get_filename( $meta );
 		}
 
@@ -148,7 +148,7 @@ class Image_Editor {
 		}
 
 		$default_meta = array();
-		foreach ( $this->get_all_modifiers() as $modifier ) {
+		foreach ( $this->all_modifiers as $modifier ) {
 			$default_meta = array_merge( $default_meta, $modifier::get_default_meta() );
 		}
 
