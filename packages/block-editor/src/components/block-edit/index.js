@@ -9,7 +9,9 @@ import { useMemo } from '@wordpress/element';
 import Edit from './edit';
 import { BlockEditContextProvider, useBlockEditContext } from './context';
 
-function BlockEdit( props ) {
+export { useBlockEditContext };
+
+export default function BlockEdit( props ) {
 	const {
 		name,
 		isSelected,
@@ -35,6 +37,3 @@ function BlockEdit( props ) {
 		</BlockEditContextProvider>
 	);
 }
-
-export default BlockEdit;
-export { useBlockEditContext };
