@@ -36,7 +36,7 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	}
 
 	public static function get_filename( array $meta ) {
-		$parts = [];
+		$parts = array();
 
 		if ( $meta['flipH'] ) {
 			$parts[] = 'fliph';
@@ -54,9 +54,9 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	}
 
 	public static function get_default_meta() {
-		return [
+		return array(
 			'flipH' => false,
 			'flipv' => false,
-		];
+		);
 	}
 }

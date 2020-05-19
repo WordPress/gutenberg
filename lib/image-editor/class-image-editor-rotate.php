@@ -39,6 +39,6 @@ class Image_Editor_Rotate extends Image_Editor_Modifier {
 	}
 
 	public static function get_default_meta() {
-		return [ 'rotate' => 0 ];
+		return array( 'rotate' => 0 );
 	}
 }

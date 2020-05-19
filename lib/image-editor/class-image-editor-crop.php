@@ -47,6 +47,6 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	}
 
 	public static function get_default_meta() {
-		return [];
+		return array();
 	}
 }

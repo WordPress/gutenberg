@@ -10,14 +10,14 @@ include_once __DIR__ . '/image-editor/class-image-editor.php';
 class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 	private function get_rest_params( $callback, $args ) {
-		return [
-			[
+		return array(
+			array(
 				'methods' => WP_REST_Server::EDITABLE,
 				'callback' => $callback,
-				'permission_callback' => [ $this, 'permission_callback' ],
+				'permission_callback' => array( $this, 'permission_callback' ),
 				'args' => $args,
-			],
-		];
+			),
+		);
 	}
 
 	public function __construct() {
@@ -30,13 +30,13 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$this->namespace,
 			$this->rest_base . '/rotate',
 			$this->get_rest_params(
-				[ $this, 'rotate_image' ],
-				[
-					'angle' => [
+				array( $this, 'rotate_image' ),
+				array(
+					'angle' => array(
 						'type' => 'integer',
 						'required' => true,
-					],
-				]
+					),
+				)
 			)
 		);
 
@@ -44,14 +44,14 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$this->namespace,
 			$this->rest_base . '/flip',
 			$this->get_rest_params(
-				[ $this, 'flip_image' ],
-				[
-					'direction' => [
+				array( $this, 'flip_image' ),
+				array(
+					'direction' => array(
 						'type' => 'enum',
-						'enum' => [ 'vertical', 'horizontal' ],
+						'enum' => array( 'vertical', 'horizontal' ),
 						'required' => true,
-					],
-				]
+					),
+				)
 			)
 		);
 
@@ -59,29 +59,29 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$this->namespace,
 			$this->rest_base . '/crop',
 			$this->get_rest_params(
-				[ $this, 'crop_image' ],
-				[
-					'cropX' => [
+				array( $this, 'crop_image' ),
+				array(
+					'cropX' => array(
 						'type' => 'float',
 						'minimum' => 0,
 						'required' => true,
-					],
-					'cropY' => [
+					),
+					'cropY' => array(
 						'type' => 'float',
 						'minimum' => 0,
 						'required' => true,
-					],
-					'cropWidth' => [
+					),
+					'cropWidth' => array(
 						'type' => 'float',
 						'minimum' => 1,
 						'required' => true,
-					],
-					'cropHeight' => [
+					),
+					'cropHeight' => array(
 						'type' => 'float',
 						'minimum' => 1,
 						'required' => true,
-					],
-				]
+					),
+				)
 			)
 		);
 	}

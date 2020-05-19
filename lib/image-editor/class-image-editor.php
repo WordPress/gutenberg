@@ -55,17 +55,17 @@ class Image_Editor {
 			return new WP_Error( 'fileload', 'Unable to load original media file' );
 		}
 
-		return [
+		return array(
 			'editor' => $image_editor,
 			'path' => $image_path,
-		];
+		);
 	}
 
 	private function get_image_as_json( $id ) {
-		return [
+		return array(
 			'mediaID' => $id,
 			'url' => wp_get_attachment_image_url( $id, 'original' ),
-		];
+		);
 	}
 
 	private function get_existing_image( $attachment, $target_file ) {
@@ -90,13 +90,13 @@ class Image_Editor {
 		}
 
 		// Update attachment details
-		$attachment_post = [
+		$attachment_post = array(
 			'guid'           => $saved['path'],
 			'post_mime_type' => $saved['mime-type'],
 			'post_title'     => pathinfo( $target_name, PATHINFO_FILENAME ),
 			'post_content'   => '',
 			'post_status'    => 'inherit',
-		];
+		);
 
 		// Add this as an attachment
 		$attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0 );
@@ -116,15 +116,15 @@ class Image_Editor {
 	}
 
 	private function get_all_modifiers() {
-		return [
+		return array(
 			'Image_Editor_Crop',
 			'Image_Editor_Flip',
 			'Image_Editor_Rotate',
-		];
+		);
 	}
 
 	private function get_filename( $meta ) {
-		$parts = [];
+		$parts = array();
 
 		foreach ( $this->get_all_modifiers() as $modifier ) {
 			$parts[] = $modifier::get_filename( $meta );
@@ -147,19 +147,19 @@ class Image_Editor {
 			return new WP_Error( 'unknown', 'Unable to get meta information for file' );
 		}
 
-		$default_meta = [];
+		$default_meta = array();
 		foreach ( $this->get_all_modifiers() as $modifier ) {
 			$default_meta = array_merge( $default_meta, $modifier::get_default_meta() );
 		}
 
-		$info = [
+		$info = array(
 			'url' => $media_url,
 			'media_id' => $media_id,
 			'meta' => array_merge(
 				$default_meta,
-				[ 'original_name' => basename( $media_url ) ]
+				array( 'original_name' => basename( $media_url ) )
 			),
-		];
+		);
 
 		if ( isset( $attachment_info[ self::META_KEY ] ) ) {
 			$info['meta'] = array_merge( $info['meta'], $attachment_info[ self::META_KEY ] );
