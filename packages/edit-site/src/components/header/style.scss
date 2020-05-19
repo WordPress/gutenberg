@@ -15,6 +15,16 @@
 		margin-left: 5px;
 	}
 }
+
+.edit-site-header__toolbar-switchers {
+	align-items: center;
+	display: flex;
+}
+
+.edit-site-header__toolbar-switchers-separator {
+	margin: 0 -6px 0;
+}
+
 .edit-site-header__actions {
 	display: flex;
 	margin-right: 8px;
