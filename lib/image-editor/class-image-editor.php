@@ -108,7 +108,7 @@ class Image_Editor {
 
 		// Add this as an attachment.
 		$attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0 );
-		if ( $attachment_id === 0 ) {
+		if ( 0 === $attachment_id ) {
 			return new WP_Error( 'attachment', 'Unable to add image as attachment' );
 		}
 

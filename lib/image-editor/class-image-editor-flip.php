@@ -6,7 +6,7 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	public function __construct( $direction ) {
 		$this->direction = 'vertical';
 
-		if ( $direction === 'horizontal' ) {
+		if ( 'horizontal' === $direction ) {
 			$this->direction = $direction;
 		}
 	}
@@ -28,11 +28,11 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	}
 
 	private function is_vertical() {
-		return $this->direction === 'vertical';
+		return 'vertical' === $this->direction;
 	}
 
 	private function is_horizontal() {
-		return $this->direction === 'horizontal';
+		return 'horizontal' === $this->direction;
 	}
 
 	public static function get_filename( array $meta ) {
