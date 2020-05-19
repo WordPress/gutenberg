@@ -20,6 +20,11 @@ describe( 'actions', () => {
 				notice: false,
 			} );
 
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				isInstalling: true,
+			} );
+
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 			} );
@@ -44,7 +49,12 @@ describe( 'actions', () => {
 				type: 'SELECT',
 			} );
 
-			expect( generator.next( [ item ] ) ).toEqual( {
+			expect( generator.next( [ item ] ).value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
 				value: undefined,
 				done: true,
 			} );
@@ -64,6 +74,11 @@ describe( 'actions', () => {
 				blockId: item.id,
 			} );
 
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				isInstalling: false,
+			} );
+
 			expect( generator.next() ).toEqual( {
 				value: undefined,
 				done: true,
@@ -79,6 +94,11 @@ describe( 'actions', () => {
 				notice: false,
 			} );
 
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				isInstalling: true,
+			} );
+
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 			} );
@@ -91,6 +111,11 @@ describe( 'actions', () => {
 			expect( generator.next( apiError ).value ).toMatchObject( {
 				type: 'SET_ERROR_NOTICE',
 				blockId: item.id,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				isInstalling: false,
 			} );
 
 			expect( generator.next() ).toEqual( {

@@ -60,6 +60,7 @@ export function* installBlockType( { id, name, assets } ) {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
 			throw new Error( 'Block has no assets' );
 		}
+		yield setIsInstalling( true );
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
@@ -80,6 +81,7 @@ export function* installBlockType( { id, name, assets } ) {
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message );
 	}
+	yield setIsInstalling( false );
 }
 
 /**
