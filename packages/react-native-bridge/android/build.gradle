@@ -63,15 +63,12 @@ if (buildGutenbergMobileJSBundle) {
         // Set the work directory for NPM
         npmWorkDir = file("${tmpdir}/npm")
 
-        // Set the work directory for Yarn
-        yarnWorkDir = file("${tmpdir}/yarn")
-
         // Set the work directory where node_modules should be located
-        nodeModulesDir = file("${project.projectDir}/../../")
+        nodeModulesDir = file("${project.projectDir}/../../../../")
     }
 
-    yarn_install {
-        args = ['--prefer-offline', '--network-concurrency 1']
+    npm_install {
+        args = ['--prefer-offline']
     }
 }
 
@@ -87,10 +84,11 @@ apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f14
 group='com.github.wordpress-mobile.gutenberg-mobile'
 
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
-project.ext.buildGutenbergFromSource = false
+project.ext.buildGutenbergFromSource = true
 
 def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
+def buildAssetsFolder = 'build/assets'
 
 android {
     compileSdkVersion 28
@@ -109,6 +107,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+	sourceSets {
+		main {
+			assets.srcDirs += buildAssetsFolder
+		}
+	}
 }
 
 repositories {
@@ -143,17 +147,15 @@ dependencies {
         implementation project(':react-native-svg')
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
-        implementation project(':react-native-get-random-values')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../react-native-editor/bundle/";
+        //hermesPath = "../../react-native-editor/bundle/";
 
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../package.json', 'react-native-linear-gradient', 'dependencies')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../package.json', '@react-native-community/slider', 'dependencies')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../package.json', 'react-native-get-random-values', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')))
 
         // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
@@ -165,19 +167,16 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
+boolean isBundleUpToDate() {
+	return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
+}
+
 if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
-    def aarFolder = 'src/main/assets'
 
-    task buildJSBundle(type: YarnTask) {
-        args = ['bundle:android']
-    }
-
-    task ensureAssetsDirectory {
-        doLast {
-            mkdir assetsFolder
-        }
-    }
+	task buildJSBundle(type: NpmTask) {
+		args = ['run', 'bundle:android']
+	}
 
     task backupHermesDebugAAR(type: Copy) {
         def origFileName = 'hermes-debug.aar'
@@ -221,6 +220,6 @@ if (buildGutenbergMobileJSBundle) {
         backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
         backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
+        buildJSBundle.dependsOn(npm_install)
     }
 }
