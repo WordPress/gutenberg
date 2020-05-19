@@ -44,19 +44,19 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should retrieve the error notice for a block that has one', () => {
-			const errorNotices = getErrorNoticeForBlock(
+			const errorNotice = getErrorNoticeForBlock(
 				state,
 				'block/has-error'
 			);
-			expect( errorNotices ).toEqual( 'Error notice' );
+			expect( errorNotice ).toEqual( 'Error notice' );
 		} );
 
 		it( "should retrieve no error notice for a block that doesn't have one", () => {
-			const errorNotices = getErrorNoticeForBlock(
+			const errorNotice = getErrorNoticeForBlock(
 				state,
 				'block/no-error'
 			);
-			expect( errorNotices ).toEqual( false );
+			expect( errorNotice ).toEqual( false );
 		} );
 	} );
 } );
