@@ -7,7 +7,6 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { PanelBody } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { page, layout, grid, blockDefault } from '@wordpress/icons';
 
 /**
@@ -29,18 +28,17 @@ export default function EntityTypeList( {
 	closePanel,
 } ) {
 	const firstRecord = list[ 0 ];
-	const entity = useSelect(
-		( select ) =>
-			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
-		[ firstRecord.kind, firstRecord.name ]
-	);
 
 	// Set icon based on type of entity.
 	const { name } = firstRecord;
 	const icon = ENTITY_NAME_ICONS[ name ] || blockDefault;
 
 	return (
-		<PanelBody title={ entity.label } initialOpen={ true } icon={ icon }>
+		<PanelBody
+			title={ firstRecord.label }
+			initialOpen={ true }
+			icon={ icon }
+		>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
