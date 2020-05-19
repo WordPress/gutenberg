@@ -1,12 +1,29 @@
 /**
+ * External dependencies
+ */
+import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import RovingTabIndexItem from './roving-tab-index-item';
+import useTreeGridContext from './context';
 
-export default function TreeGridCell( { children, ...props } ) {
+function TreeGridCell( props, ref ) {
+	const treeGridState = useTreeGridContext();
 	return (
-		<td { ...props } role="gridcell">
-			<RovingTabIndexItem>{ children }</RovingTabIndexItem>
-		</td>
+		<CompositeItem
+			{ ...treeGridState }
+			role="gridcell"
+			as="td"
+			ref={ ref }
+			{ ...props }
+		/>
 	);
 }
+
+export default forwardRef( TreeGridCell );
