@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
-import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockAuthorInfo from '../downloadable-block-author-info';
+import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockInfo from '../downloadable-block-info';
+import DownloadableBlockNotice from '../downloadable-block-notice';
 
 function DownloadableBlockListItem( { item, onClick } ) {
 	const {
@@ -32,6 +33,10 @@ function DownloadableBlockListItem( { item, onClick } ) {
 					/>
 				</header>
 				<section className="block-directory-downloadable-block-list-item__body">
+					<DownloadableBlockNotice
+						onClick={ onClick }
+						block={ item }
+					/>
 					<DownloadableBlockInfo
 						activeInstalls={ activeInstalls }
 						description={ description }

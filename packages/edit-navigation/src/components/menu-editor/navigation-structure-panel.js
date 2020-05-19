@@ -12,6 +12,7 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 		[]
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const showNavigationStructure = !! blocks.length;
 
 	return (
 		<Panel className="edit-navigation-menu-editor__navigation-structure-panel">
@@ -19,7 +20,7 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 				title={ __( 'Navigation structure' ) }
 				initialOpen={ initialOpen }
 			>
-				{ !! blocks.length && (
+				{ showNavigationStructure && (
 					<__experimentalBlockNavigationTree
 						blocks={ blocks }
 						selectedBlockClientId={ selectedBlockClientIds[ 0 ] }

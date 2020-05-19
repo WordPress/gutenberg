@@ -978,12 +978,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "RovingTabIndex",
-		"slug": "roving-tab-index",
-		"markdown_source": "../packages/components/src/roving-tab-index/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Sandbox",
 		"slug": "sandbox",
 		"markdown_source": "../packages/components/src/sandbox/README.md",

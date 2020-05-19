@@ -14,11 +14,11 @@ import {
 } from './alignment-matrix-control-styles';
 
 const rootSize = () => {
-	const padding = 2;
+	const padding = 1.5;
 	const size = 24;
 
 	return css( {
-		gridTemplateRows: `repeat( 3, calc( ${ size - 2 }px / 3))`,
+		gridTemplateRows: `repeat( 3, calc( ${ size - padding * 2 }px / 3))`,
 		padding,
 		maxHeight: size,
 		maxWidth: size,

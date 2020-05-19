@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
+import { act } from 'react-dom/test-utils';
 
 /**
  * Internal dependencies
@@ -69,15 +69,21 @@ describe( 'AlignmentMatrixControl', () => {
 
 			const cells = getCells();
 
-			act( () => Simulate.click( cells[ 3 ] ) );
+			act( () => {
+				cells[ 3 ].focus();
+			} );
 
 			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
 
-			act( () => Simulate.click( cells[ 4 ] ) );
+			act( () => {
+				cells[ 4 ].focus();
+			} );
 
 			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
 
-			act( () => Simulate.click( cells[ 7 ] ) );
+			act( () => {
+				cells[ 7 ].focus();
+			} );
 
 			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
 		} );

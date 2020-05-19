@@ -94,10 +94,6 @@ function post_author_build_css_font_sizes( $attributes ) {
  * @return string Returns the rendered author block.
  */
 function render_block_core_post_author( $attributes, $content, $block ) {
-	if ( empty( $attributes ) ) {
-		return '';
-	}
-
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -130,7 +126,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 		: '';
 
 	return sprintf( '<div %1$s %2$s>', $class_attribute, $style_attribute ) .
-		( $attributes['showAvatar'] ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
+		( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
 		'<div class="wp-block-post-author__content">' .
 			( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .
 			'<p class="wp-block-post-author__name">' . get_the_author_meta( 'display_name', $author_id ) . '</p>' .
