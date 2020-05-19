@@ -6,7 +6,7 @@
  * @return {Promise} Promise which will resolve when the asset is loaded.
  */
 export const loadScript = ( asset ) => {
-	if ( ! asset ) {
+	if ( ! asset || ! /\.js$/.test( asset ) ) {
 		return Promise.reject( new Error( 'No script found.' ) );
 	}
 	return new Promise( ( resolve, reject ) => {
@@ -30,7 +30,7 @@ export const loadScript = ( asset ) => {
  * @return {Promise} Promise which will resolve when the asset is added.
  */
 export const loadStyle = ( asset ) => {
-	if ( ! asset ) {
+	if ( ! asset || ! /\.css$/.test( asset ) ) {
 		return Promise.reject( new Error( 'No style found.' ) );
 	}
 	return new Promise( ( resolve, reject ) => {
