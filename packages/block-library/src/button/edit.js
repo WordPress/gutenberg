@@ -191,16 +191,12 @@ function ButtonEdit( props ) {
 							: undefined,
 						...colorProps.style,
 					} }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( 'core/button' );
-						}
-
-						return createBlock( 'core/button', {
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
 							...attributes,
 							text: value,
-						} );
-					} }
+						} )
+					}
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
