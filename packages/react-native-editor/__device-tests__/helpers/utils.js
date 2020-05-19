@@ -57,6 +57,10 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
+const isMacOSEnvironment = () => {
+	return process.platform === 'darwin';
+};
+
 const IOS_RECORDINGS_DIR = './ios-screen-recordings';
 const ANDROID_RECORDINGS_DIR = './android-screen-recordings';
 
@@ -67,6 +71,10 @@ const getScreenRecordingFileNameBase = ( testPath, id ) => {
 
 jasmine.getEnv().addReporter( {
 	specStarted: ( { testPath, id } ) => {
+		if ( ! isMacOSEnvironment() ) {
+			return;
+		}
+
 		const fileName =
 			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
 
@@ -110,6 +118,10 @@ jasmine.getEnv().addReporter( {
 		);
 	},
 	specDone: ( { testPath, id, status } ) => {
+		if ( ! isMacOSEnvironment() ) {
+			return;
+		}
+
 		const fileNameBase = getScreenRecordingFileNameBase( testPath, id );
 
 		if ( isAndroid() ) {
