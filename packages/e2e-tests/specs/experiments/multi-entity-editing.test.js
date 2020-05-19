@@ -127,6 +127,13 @@ const openEntitySavePanel = async () => {
 	return true;
 };
 
+const clickBreadcrumbItem = async ( item ) => {
+	const [ breadcrumbItem ] = await page.$x(
+		`//button[contains(@class, "block-editor-block-breadcrumb__button")][contains(text(), "${ item }")]`
+	);
+	await breadcrumbItem.click();
+};
+
 const isEntityDirty = async ( name ) => {
 	const isOpen = await openEntitySavePanel();
 	if ( ! isOpen ) {
@@ -226,9 +233,11 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		} );
 
-		// Todo: Solve issue affecting test
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should only dirty the parent entity when editing the parent', async () => {
+		it( 'should only dirty the parent entity when editing the parent', async () => {
+			// Clear selection so that the block is not added to the template part.
+			await clickBreadcrumbItem( 'Document' );
+
+			// Add paragraph block to the end of the document.
 			await page.click( '.block-editor-button-block-appender' );
 			await page.waitForSelector( '.block-editor-inserter__menu' );
 			await page.click( 'button.editor-block-list-item-paragraph' );
