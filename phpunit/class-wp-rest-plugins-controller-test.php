@@ -261,7 +261,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( ! defined( 'FS_METHOD' ) ) {
 			define( 'FS_METHOD', 'direct' );
 		}
-		
+
 		$this->create_test_plugin();
 		wp_set_current_user( self::$administrator_id );
 
