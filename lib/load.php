@@ -49,7 +49,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-locations-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Image_Editor_API' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-image-editor.php';
+		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
 	}
 	/**
 	* End: Include for phase 2

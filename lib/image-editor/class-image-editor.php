@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . '/image-flip.php';
-require_once __DIR__ . '/image-rotate.php';
-require_once __DIR__ . '/image-crop.php';
+require_once __DIR__ . '/class-image-editor-flip.php';
+require_once __DIR__ . '/class-image-editor-rotate.php';
+require_once __DIR__ . '/class-image-editor-crop.php';
 
 abstract class Image_Editor_Modifier {
 	abstract public function apply_to_meta( array $meta );
