@@ -40,6 +40,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 				spinner.fail( error.message );
 				process.exit( 1 );
 			} else if (
+				typeof error === 'object' &&
 				'exitCode' in error &&
 				'err' in error &&
 				'out' in error
@@ -56,7 +57,9 @@ const withSpinner = ( command ) => ( ...args ) => {
 				process.exit( error.exitCode );
 			} else {
 				// Error is an unknown error. That means there was a bug in our code.
-				spinner.fail( error.message );
+				spinner.fail(
+					typeof error === 'string' ? error : error.message
+				);
 				// Disable reason: Using console.error() means we get a stack trace.
 				// eslint-disable-next-line no-console
 				console.error( error );
