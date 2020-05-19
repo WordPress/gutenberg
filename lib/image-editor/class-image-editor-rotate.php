@@ -9,7 +9,7 @@ class Image_Editor_Rotate extends Image_Editor_Modifier {
 
 	public function apply_to_meta( $meta ) {
 		$meta['rotate'] += $this->angle;
-		$meta['rotate'] = $this->restrict_angle( $meta['rotate'] );
+		$meta['rotate']  = $this->restrict_angle( $meta['rotate'] );
 
 		return $meta;
 	}
