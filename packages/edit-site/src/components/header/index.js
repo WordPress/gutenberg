@@ -114,7 +114,7 @@ export default function Header( {
 			</MainDashboardButton.Slot>
 			<div className="edit-site-header__toolbar">
 				<Button
-					className="edit-post-header-toolbar__inserter-toggle"
+					className="edit-site-header-toolbar__inserter-toggle"
 					isPrimary
 					isPressed={ isInserterOpen }
 					onClick={ onToggleInserter }
