@@ -451,7 +451,7 @@ To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
 ## Performance Testing
 
-To ensure that the editor stays performant as we add feature we monitor the impact PRs and releases can have on some key metrics:
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
 
 * The time it takes to load the editor.
 * The time it takes for the browser to respond when typing.
