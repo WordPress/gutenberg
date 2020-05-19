@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-const { v4: uuid } = require( 'uuid' );
 const path = require( 'path' );
-const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -13,6 +11,7 @@ const {
 	runShellScript,
 	readJSONFile,
 	askForConfirmation,
+	getRandomTemporaryPath,
 } = require( '../lib/utils' );
 const git = require( '../lib/git' );
 const config = require( '../config' );
@@ -186,7 +185,7 @@ async function runPerformanceTests( branches ) {
 
 	log( '>> Cloning the repository' );
 	const performanceTestDirectory = await git.clone( config.gitRepositoryURL );
-	const environmentDirectory = path.join( os.tmpdir(), uuid() );
+	const environmentDirectory = getRandomTemporaryPath();
 	log(
 		'>> Perf Tests Directory : ' +
 			formats.success( performanceTestDirectory )

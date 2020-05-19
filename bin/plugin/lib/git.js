@@ -1,10 +1,12 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
 const SimpleGit = require( 'simple-git/promise' );
-const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+
+/**
+ * Internal dependencies
+ */
+const { getRandomTemporaryPath } = require( './utils' );
 
 /**
  * Clones a Github repository.
@@ -14,7 +16,7 @@ const { v4: uuid } = require( 'uuid' );
  * @return {Promise<string>} Repository local Path
  */
 async function clone( repositoryUrl ) {
-	const gitWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
+	const gitWorkingDirectoryPath = getRandomTemporaryPath();
 	const simpleGit = SimpleGit();
 	await simpleGit.clone( repositoryUrl, gitWorkingDirectoryPath );
 	return gitWorkingDirectoryPath;
