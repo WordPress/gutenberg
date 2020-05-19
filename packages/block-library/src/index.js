@@ -79,6 +79,7 @@ import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
 import * as postTags from './post-tags';
+import * as postCategories from './post-categories';
 
 /**
  * Function to register an individual block.

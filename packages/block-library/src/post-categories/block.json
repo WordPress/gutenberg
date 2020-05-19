@@ -1,0 +1,20 @@
+{
+	"name": "core/post-categories",
+	"category": "layout",
+	"context": [ "postId" ],
+	"attributes": {
+		"align": {
+			"type": "string",
+			"enum": [
+				"left",
+				"center",
+				"right",
+				"wide",
+				"full"
+			]
+		},
+		"className": {
+			"type": "string"
+		}
+	}
+}
