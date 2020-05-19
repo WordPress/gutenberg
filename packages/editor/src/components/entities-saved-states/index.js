@@ -74,10 +74,7 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 	};
 
 	const [ isReviewing, setIsReviewing ] = useState( false );
-	const toggleIsReviewing = useCallback(
-		() => setIsReviewing( ! isReviewing ),
-		[ isReviewing ]
-	);
+	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
 
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
