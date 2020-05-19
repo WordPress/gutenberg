@@ -85,7 +85,7 @@ export function useEntityId( kind, type ) {
  */
 export function useEntityProp( kind, type, prop, _id ) {
 	const providerId = useEntityId( kind, type );
-	const id = _id || providerId;
+	const id = _id ?? providerId;
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
@@ -146,7 +146,7 @@ export function useEntityBlockEditor(
 	} = {}
 ) {
 	const providerId = useEntityId( kind, type );
-	const id = _id || providerId;
+	const id = _id ?? providerId;
 
 	const [ content, setContent ] = useEntityProp(
 		kind,
