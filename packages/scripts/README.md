@@ -76,6 +76,10 @@ This is how you execute the script with presented setup:
 * `npm run build` - builds the code for production.
 * `npm run build:custom` - builds the code for production with two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+* `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+* `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -123,7 +127,9 @@ _Flags_:
 - `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
 - `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
-### `env`
+### `env` (deprecated)
+
+> _This script is no longer maintained and it’s going to be removed in one of the future releases. We recommend using [`@wordpress/env`](/packages/env/README.md) package instead that lets you easily set up a local WordPress environment for building and testing plugins and themes._
 
 `env` is a family of scripts for setting up a local Docker-based development environment that plugin contributors can work in.
 
@@ -162,14 +168,14 @@ In the `wp-env` config block, each entry can be configured like so:
 #### Available Sub-Scripts
 
 - `install`: Automatically downloads, builds, and installs a copy of WordPress to work with. This will be installed in the `wordpress` folder inside your project. You should add `wordpress` to your `.gitignore` file.
-- `connect`: For contributors that have a WordPress respository already, they can define the `WP_DEVELOP_DIR` environment variable with the path to their repository, then run this command to add your plugin to it.
+- `connect`: For contributors that have a WordPress repository already, they can define the `WP_DEVELOP_DIR` environment variable with the path to their repository, then run this command to add your plugin to it.
 - `start`: Starts the Docker containers.
 - `stop`: Stops the Docker containers.
 - `update`: For contributors that used `npm run env install` to setup WordPress, running this command will update it to the latest checkout.
 - `reinstall`: Resets the database and re-configures WordPress again.
 - `cli`: Runs WP-CLI commands against the WordPress install.
 - `lint-php`: Run PHPCS linting on your plugin. You will need to have `composer.json` configured to install PHPCS, with a `lint` script that runs your linting. You will also need to have an appropriately configured `phpcs.xml.dist` file.
-- `test-php`: Runs your plugin's PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
+- `test-php`: Runs your plugin’s PHPUnit tests. You will need to have an appropriately configured `phpunit.xml.dist` file.
 - `docker-run`: For more advanced debugging, contributors may sometimes need to run commands in the Docker containers. This is the equivalent of running `docker-compose run` within the WordPress directory.
 
 ### `format-js`
@@ -367,6 +373,11 @@ This is how you execute the script with presented setup:
 * `npm start` - starts the build for development.
 * `npm run start:custom` - starts the build for development which contains two entry points and a custom output folder. Paths for custom entry points are relative to the project root.
 
+This script automatically use the optimized config but sometimes you may want to specify some custom options:
+* `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
+* `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+* `--webpack--devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.
+
 #### Advanced information
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
@@ -482,7 +493,7 @@ Debugging npm scripts is supported out of the box for Visual Studio Code as of [
 
 Make sure `wp-scripts --inspect-brk test-unit-js --runInBand --no-cache` is saved as `test:unit:debug` in your `package.json` file to run tests in Visual Studio Code.
 
-When debugging, set a breakpoint in your tests by clicking on a line in the editor's left margin by the line numbers.
+When debugging, set a breakpoint in your tests by clicking on a line in the editor’s left margin by the line numbers.
 
 Then open npm scripts in the explorer or run `Explorer: Focus on NPM Scripts View` in the command palette to see the npm scripts. To start the tests, click the debug icon next to `test:unit:debug`.
 
@@ -553,4 +564,5 @@ module.exports = {
 ```
 
 If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

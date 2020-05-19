@@ -210,7 +210,7 @@ Positionals:
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 ```
 
-### `wp-env run [container] [command]` 
+### `wp-env run [container] [command]`
 
 ```sh
 wp-env run <container> [command..]
@@ -244,12 +244,10 @@ wp-env destroy
 Destroy the WordPress environment. Delete docker containers and remove local files.
 ```
 
-
-
-### `docker logs -f [container_id] >/dev/null` 
+### `docker logs -f [container_id] >/dev/null`
 
 ```sh
-docker logs -f <container_id> >/dev/null 
+docker logs -f <container_id> >/dev/null
 
 Shows the error logs of the specified container in the terminal. The container_id is the one that is visible with `docker ps -a`
 ```
@@ -260,23 +258,24 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports five fields:
 
-| Field         | Type          | Default                                    | Description                                                                                                               |
-| ------------- | ------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Field         | Type           | Default                                    | Description                                                                                                               |
+| ------------- | -------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`   | `string[]`    | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
-| `"themes"`    | `string[]`    | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`      | `integer`      | `8888`                                   | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `integer`      | `8889`                                   | The port number to use for the tests instance.                                                                            |
-| `"config"`    | `Object`      | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+| `"plugins"`   | `string[]`     | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
+| `"themes"`    | `string[]`     | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
+| `"port"`      | `integer`      | `8888`                                     | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"testsPort"` | `integer`      | `8889`                                     | The port number to use for the tests instance.                                                                            |
+| `"config"`    | `Object`       | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
+| `"mappings"`  | `Object`       | `"{}"`                                     | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
-Several types of strings can be passed into the `core`, `plugins`, and `themes` fields:
+Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
 | Type              | Format                        | Example(s)                                               |
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`             | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`    | `"/a/directory"`, `"C:\\a\\directory"`                   |
+| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
+| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
 | GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
@@ -330,6 +329,34 @@ This is useful for integration testing: that is, testing how old versions of Wor
 	"core": "WordPress/WordPress#5.2.0",
 	"plugins": [ "WordPress/wp-lazy-loading", "WordPress/classic-editor" ],
 	"themes": [ "WordPress/theme-experiments" ]
+}
+```
+
+#### Add mu-plugins and other mapped directories
+
+You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated, despite being the "first" mapped theme.
+
+```json
+{
+	"plugins": [ "." ],
+	"mappings": {
+		"wp-content/mu-plugins": "./path/to/local/mu-plugins",
+		"wp-content/themes": "./path/to/local/themes",
+		"wp-content/themes/specific-theme": "./path/to/local/theme-1"
+	}
+}
+```
+
+#### Avoid activating plugins or themes on the instance
+
+Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time. The same applies for a theme which should not be activated.
+
+```json
+{
+	"plugins": [ "." ],
+	"mappings": {
+		"wp-content/plugins/my-test-plugin": "./path/to/test/plugin"
+	}
 }
 ```
 

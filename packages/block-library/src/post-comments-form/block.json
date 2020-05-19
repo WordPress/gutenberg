@@ -1,4 +1,5 @@
 {
 	"name": "core/post-comments-form",
-	"category": "layout"
+	"category": "layout",
+	"context": [ "postId" ]
 }

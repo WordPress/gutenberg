@@ -11,7 +11,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -243,7 +243,10 @@ export function ColorEdit( props ) {
 
 	return (
 		<ColorPanel
-			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
+			enableContrastChecking={
+				// Turn on contrast checker for web only since it's not supported on mobile yet.
+				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
+			}
 			clientId={ props.clientId }
 			settings={ [
 				{

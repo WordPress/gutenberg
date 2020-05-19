@@ -11,6 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
@@ -91,9 +92,15 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
+export {
+	default as __experimentalTreeGrid,
+	TreeGridRow as __experimentalTreeGridRow,
+	TreeGridCell as __experimentalTreeGridCell,
+} from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';

@@ -60,4 +60,29 @@ describe( 'Datepicker', () => {
 			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/
 		);
 	} );
+
+	it( 'should show the publishing date as "Immediately" if the date is cleared', async () => {
+		// Open the datepicker.
+		await page.click( '.edit-post-post-schedule__toggle' );
+
+		// Change the publishing date to a year in the future.
+		await page.click( '.components-datetime__time-field-year' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Close the datepicker.
+		await page.click( '.edit-post-post-schedule__toggle' );
+
+		// Open the datepicker.
+		await page.click( '.edit-post-post-schedule__toggle' );
+
+		// Clear the date
+		await page.click( '.components-datetime__date-reset-button' );
+
+		const publishingDate = await page.$eval(
+			'.edit-post-post-schedule__toggle',
+			( dateLabel ) => dateLabel.textContent
+		);
+
+		expect( publishingDate ).toEqual( 'Immediately' );
+	} );
 } );

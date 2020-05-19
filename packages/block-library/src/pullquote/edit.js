@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Platform } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
@@ -169,33 +169,35 @@ class PullQuoteEdit extends Component {
 						) }
 					</BlockQuote>
 				</Figure>
-				<InspectorControls>
-					<PanelColorSettings
-						title={ __( 'Color settings' ) }
-						colorSettings={ [
-							{
-								value: mainColor.color,
-								onChange: this.pullQuoteMainColorSetter,
-								label: __( 'Main color' ),
-							},
-							{
-								value: textColor.color,
-								onChange: this.pullQuoteTextColorSetter,
-								label: __( 'Text color' ),
-							},
-						] }
-					>
-						{ isSolidColorStyle && (
-							<ContrastChecker
-								{ ...{
-									textColor: textColor.color,
-									backgroundColor: mainColor.color,
-								} }
-								isLargeText={ false }
-							/>
-						) }
-					</PanelColorSettings>
-				</InspectorControls>
+				{ Platform.OS === 'web' && (
+					<InspectorControls>
+						<PanelColorSettings
+							title={ __( 'Color settings' ) }
+							colorSettings={ [
+								{
+									value: mainColor.color,
+									onChange: this.pullQuoteMainColorSetter,
+									label: __( 'Main color' ),
+								},
+								{
+									value: textColor.color,
+									onChange: this.pullQuoteTextColorSetter,
+									label: __( 'Text color' ),
+								},
+							] }
+						>
+							{ isSolidColorStyle && (
+								<ContrastChecker
+									{ ...{
+										textColor: textColor.color,
+										backgroundColor: mainColor.color,
+									} }
+									isLargeText={ false }
+								/>
+							) }
+						</PanelColorSettings>
+					</InspectorControls>
+				) }
 			</>
 		);
 	}

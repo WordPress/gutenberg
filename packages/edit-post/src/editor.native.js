@@ -4,6 +4,7 @@
 import memize from 'memize';
 import { size, map, without } from 'lodash';
 import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
+import { I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -45,6 +46,7 @@ class Editor extends Component {
 	) {
 		settings = {
 			...settings,
+			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
 			focusMode,
 		};

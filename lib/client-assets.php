@@ -42,7 +42,7 @@ function gutenberg_url( $path ) {
  *
  * @since 4.1.0
  *
- * @param WP_Scripts       $scripts   WP_Scripts instance (passed by reference).
+ * @param WP_Scripts       $scripts   WP_Scripts instance.
  * @param string           $handle    Name of the script. Should be unique.
  * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
  * @param array            $deps      Optional. An array of registered script handles this script depends on. Default empty array.
@@ -53,7 +53,7 @@ function gutenberg_url( $path ) {
  * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
  *                                    Default 'false'.
  */
-function gutenberg_override_script( &$scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
+function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
 	$script = $scripts->query( $handle, 'registered' );
 	if ( $script ) {
 		/*
@@ -174,7 +174,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
  *
  * @since 4.1.0
  *
- * @param WP_Styles        $styles WP_Styles instance (passed by reference).
+ * @param WP_Styles        $styles WP_Styles instance.
  * @param string           $handle Name of the stylesheet. Should be unique.
  * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
  * @param array            $deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
@@ -186,7 +186,7 @@ foreach ( array( 'post', 'page' ) as $post_type ) {
  *                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
  *                                 '(orientation: portrait)' and '(max-width: 640px)'.
  */
-function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
+function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
 	$style = $styles->query( $handle, 'registered' );
 	if ( $style ) {
 		$styles->remove( $handle );
@@ -203,9 +203,9 @@ function gutenberg_override_style( &$styles, $handle, $src, $deps = array(), $ve
  *
  * @since 0.1.0
  *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_register_vendor_scripts( &$scripts ) {
+function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 	/*
@@ -244,9 +244,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  *
  * @since 4.5.0
  *
- * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_register_packages_scripts( &$scripts ) {
+function gutenberg_register_packages_scripts( $scripts ) {
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
 		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
@@ -296,9 +296,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  *
  * @since 6.7.0
 
- * @param WP_Styles $styles WP_Styles instance (passed by reference).
+ * @param WP_Styles $styles WP_Styles instance.
  */
-function gutenberg_register_packages_styles( &$styles ) {
+function gutenberg_register_packages_styles( $styles ) {
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
@@ -488,7 +488,7 @@ function gutenberg_vendor_script_filename( $handle, $src ) {
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
  *
- * @param WP_Scripts       $scripts   WP_Scripts instance (passed by reference).
+ * @param WP_Scripts       $scripts   WP_Scripts instance.
  * @param string           $handle    Name of the script.
  * @param string           $src       Full URL of the external script.
  * @param array            $deps      Optional. An array of registered script handles this
@@ -502,7 +502,7 @@ function gutenberg_vendor_script_filename( $handle, $src ) {
  *
  * @since 0.1.0
  */
-function gutenberg_register_vendor_script( &$scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
+function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
 	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
 		return;
 	}
@@ -645,8 +645,17 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 	}
 
 	$settings['__experimentalBlockPatterns'] = array_merge(
-		WP_Patterns_Registry::get_instance()->get_all_registered(),
+		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 		$settings['__experimentalBlockPatterns']
+	);
+
+	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
+		$settings['__experimentalBlockPatternCategories'] = array();
+	}
+
+	$settings['__experimentalBlockPatternCategories'] = array_merge(
+		WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatternCategories']
 	);
 
 	return $settings;
@@ -683,12 +692,29 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 /*
  * Register default patterns if not registered in Core already.
  */
-if ( class_exists( 'WP_Patterns_Registry' ) && ! WP_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
-	register_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
-	register_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
-	register_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
-	register_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
-	register_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
-	register_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
-	register_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+
+if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
+	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
+	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
+	register_block_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
+	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
+	register_block_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
+	register_block_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
+	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
+	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
+	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
+	register_block_pattern( 'core/features-services', gutenberg_load_block_pattern( 'features-services' ) );
+}
+
+/*
+ * Register default pattern categories if not registered in Core already.
+ */
+if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => _x( 'Hero', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'features', array( 'label' => _x( 'Features', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'testimonials', array( 'label' => _x( 'Testimonials', 'Block pattern category', 'gutenberg' ) ) );
 }

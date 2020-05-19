@@ -7,8 +7,17 @@
 
 /**
  * Class representing a parsed instance of a block.
+ *
+ * @property array $attributes
  */
 class WP_Block {
+
+	/**
+	 * Original parsed array representation of block.
+	 *
+	 * @var array
+	 */
+	public $parsed_block;
 
 	/**
 	 * Name of block.
@@ -40,13 +49,6 @@ class WP_Block {
 	 * @access protected
 	 */
 	protected $available_context;
-
-	/**
-	 * Block attribute values.
-	 *
-	 * @var array
-	 */
-	public $attributes = array();
 
 	/**
 	 * List of inner blocks (of this same class)
@@ -94,21 +96,14 @@ class WP_Block {
 	 * @param WP_Block_Type_Registry $registry          Optional block type registry.
 	 */
 	public function __construct( $block, $available_context = array(), $registry = null ) {
-		$this->name = $block['blockName'];
+		$this->parsed_block = $block;
+		$this->name         = $block['blockName'];
 
 		if ( is_null( $registry ) ) {
 			$registry = WP_Block_Type_Registry::get_instance();
 		}
 
 		$this->block_type = $registry->get_registered( $this->name );
-
-		if ( ! empty( $block['attrs'] ) ) {
-			$this->attributes = $block['attrs'];
-		}
-
-		if ( ! is_null( $this->block_type ) ) {
-			$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
-		}
 
 		$this->available_context = $available_context;
 
@@ -133,12 +128,7 @@ class WP_Block {
 			}
 			/* phpcs:enable */
 
-			$this->inner_blocks = array_map(
-				function( $inner_block ) use ( $child_context, $registry ) {
-					return new WP_Block( $inner_block, $child_context, $registry );
-				},
-				$block['innerBlocks']
-			);
+			$this->inner_blocks = new WP_Block_List( $block['innerBlocks'], $child_context, $registry );
 		}
 
 		if ( ! empty( $block['innerHTML'] ) ) {
@@ -151,33 +141,73 @@ class WP_Block {
 	}
 
 	/**
+	 * Returns a value from an inaccessible property.
+	 *
+	 * This is used to lazily initialize the `attributes` property of a block,
+	 * such that it is only prepared with default attributes at the time that
+	 * the property is accessed. For all other inaccessible properties, a `null`
+	 * value is returned.
+	 *
+	 * @param string $name Property name.
+	 *
+	 * @return array|null Prepared attributes, or null.
+	 */
+	public function __get( $name ) {
+		if ( 'attributes' === $name ) {
+			$this->attributes = isset( $this->parsed_block['attrs'] ) ?
+				$this->parsed_block['attrs'] :
+				array();
+
+			if ( ! is_null( $this->block_type ) ) {
+				$this->attributes = $this->block_type->prepare_attributes_for_render( $this->attributes );
+			}
+
+			return $this->attributes;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Generates the render output for the block.
+	 *
+	 * @param array $options {
+	 *   Optional options object.
+	 *
+	 *   @type bool $dynamic Defaults to 'true'. Optionally set to false to avoid using the block's render_callback.
+	 * }
 	 *
 	 * @return string Rendered block output.
 	 */
-	public function render() {
-		global $post, $_experimental_block;
+	public function render( $options = array() ) {
+		global $post;
+		$options = array_replace(
+			array(
+				'dynamic' => true,
+			),
+			$options
+		);
 
-		$is_dynamic    = $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
+		$is_dynamic    = $options['dynamic'] && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 		$block_content = '';
 
-		$index = 0;
-		foreach ( $this->inner_content as $chunk ) {
-			$block_content .= is_string( $chunk ) ?
-				$chunk :
-				$this->inner_blocks[ $index++ ]->render();
+		if ( ! $options['dynamic'] || empty( $this->block_type->skip_inner_blocks ) ) {
+			$index = 0;
+			foreach ( $this->inner_content as $chunk ) {
+				$block_content .= is_string( $chunk ) ?
+					$chunk :
+					$this->inner_blocks[ $index++ ]->render();
+			}
 		}
 
 		if ( $is_dynamic ) {
-			$global_post         = $post;
-			$global_block        = $_experimental_block;
-			$_experimental_block = $this;
-			$block_content       = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content );
-			$_experimental_block = $global_block;
-			$post                = $global_post;
+			$global_post   = $post;
+			$block_content = (string) call_user_func( $this->block_type->render_callback, $this->attributes, $block_content, $this );
+			$post          = $global_post;
 		}
 
-		return $block_content;
+		/** This filter is documented in src/wp-includes/blocks.php */
+		return apply_filters( 'render_block', $block_content, $this->parsed_block );
 	}
 
 }

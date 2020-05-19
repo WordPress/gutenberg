@@ -158,9 +158,9 @@ export const registerCoreBlocks = () => {
 		shortcode,
 		buttons,
 		latestPosts,
-		devOnly( verse ),
+		verse,
 		cover,
-		devOnly( pullquote ),
+		pullquote,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
