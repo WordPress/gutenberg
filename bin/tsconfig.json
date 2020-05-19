@@ -18,8 +18,11 @@
 		"./check-latest-npm.js",
 		"./plugin/config.js",
 		"./plugin/commands/changelog.js",
+		"./plugin/commands/performance.js",
 		"./plugin/lib/version.js",
 		"./plugin/lib/logger.js",
+		"./plugin/lib/utils.js",
+		"./plugin/lib/git.js",
 		"./validate-package-lock.js",
 	]
 }

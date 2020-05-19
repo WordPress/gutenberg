@@ -95,6 +95,7 @@
 		"@types/react-dom": "16.9.5",
 		"@types/requestidlecallback": "0.3.1",
 		"@types/sprintf-js": "1.1.2",
+		"@types/uuid": "7.0.2",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
