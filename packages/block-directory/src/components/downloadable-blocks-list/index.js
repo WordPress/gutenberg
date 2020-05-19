@@ -14,7 +14,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 
-export function DownloadableBlocksList( {
+function DownloadableBlocksList( {
 	items,
 	children,
 	onHover = noop,
