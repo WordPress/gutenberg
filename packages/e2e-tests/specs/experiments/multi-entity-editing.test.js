@@ -233,8 +233,6 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		} );
 
-		// Todo: Solve issue affecting test
-		// eslint-disable-next-line jest/no-disabled-tests
 		it( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the bock is not addded to template part.
 			await clickBreadcrumbItem( 'Document' );
