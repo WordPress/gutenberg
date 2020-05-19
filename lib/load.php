@@ -48,7 +48,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-locations-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Image_Editor_API' ) ) {
+	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
 	}
 	/**

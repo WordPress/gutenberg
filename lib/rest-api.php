@@ -253,6 +253,6 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor_api() {
-	WP_REST_Image_Editor_API::init();
+	WP_REST_Image_Editor_Controller::init();
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor_api' );

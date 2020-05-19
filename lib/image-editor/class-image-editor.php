@@ -4,13 +4,6 @@ require_once __DIR__ . '/class-image-editor-flip.php';
 require_once __DIR__ . '/class-image-editor-rotate.php';
 require_once __DIR__ . '/class-image-editor-crop.php';
 
-abstract class Image_Editor_Modifier {
-	abstract public function apply_to_meta( array $meta );
-	abstract public function apply_to_image( $image, array $meta, $target_file );
-	abstract public static function get_filename( array $meta );
-	abstract public static function get_default_meta();
-}
-
 class Image_Editor {
 	const META_KEY = 'richimage';
 
@@ -174,4 +167,11 @@ class Image_Editor {
 
 		return $info;
 	}
+}
+
+abstract class Image_Editor_Modifier {
+	abstract public function apply_to_meta( array $meta );
+	abstract public function apply_to_image( $image, array $meta, $target_file );
+	abstract public static function get_filename( array $meta );
+	abstract public static function get_default_meta();
 }

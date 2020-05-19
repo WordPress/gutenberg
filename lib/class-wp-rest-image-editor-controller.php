@@ -7,7 +7,7 @@
 
 include_once __DIR__ . '/image-editor/class-image-editor.php';
 
-class WP_REST_Image_Editor_API extends WP_REST_Controller {
+class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	private static $instance = null;
 
 	const API_NAMESPACE = '__experimental';
