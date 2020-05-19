@@ -143,9 +143,15 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	public function test_create_item() {
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
+
 		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
+
+		$this->assertEquals( 'direct', get_filesystem_method() );
 
 		wp_set_current_user( self::$administrator_id );
 
@@ -252,6 +258,10 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	public function test_delete_item() {
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
+		
 		$this->create_test_plugin();
 		wp_set_current_user( self::$administrator_id );
 
@@ -352,7 +362,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  * Requires at least: 5.4.0
  */
 PHP;
-		wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' );
+		$this->assertTrue( wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' ) );
 		file_put_contents( WP_PLUGIN_DIR . '/test-plugin/test-plugin.php', $php );
 	}
 
