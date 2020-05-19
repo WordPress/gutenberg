@@ -8,35 +8,35 @@ class Image_Editor {
 	const META_KEY = 'richimage';
 
 	public function modify_image( $media_id, Image_Editor_Modifier $modifier ) {
-		// Get image information
+		// Get image information.
 		$info = $this->load_image_info( $media_id );
 		if ( is_wp_error( $info ) ) {
 			return $info;
 		}
 
-		// Update it with our modifier
+		// Update it with our modifier.
 		$info['meta'] = $modifier->apply_to_meta( $info['meta'] );
 
-		// Generate filename based on current attributes
+		// Generate filename based on current attributes.
 		$target_file = $this->get_filename( $info['meta'] );
 
 		// Does the image already exist?
 		$image = $this->get_existing_image( $info, $target_file );
 		if ( $image ) {
-			// Return the existing image
+			// Return the existing image.
 			return $image;
 		}
 
-		// Try and load the image itself
+		// Try and load the image itself.
 		$image = $this->load_image( $media_id, $info );
 		if ( is_wp_error( $image ) ) {
 			return $image;
 		}
 
-		// Finally apply the modification
+		// Finally apply the modification.
 		$info = $modifier->apply_to_image( $image['editor'], $info, $target_file );
 
-		// And save
+		// And save.
 		return $this->save_image( $image, $target_file, $info );
 	}
 
@@ -82,14 +82,14 @@ class Image_Editor {
 	private function save_image( $image, $target_name, $attachment ) {
 		$filename = rtrim( dirname( $image['path'] ), '/' ) . '/' . $target_name;
 
-		// Save to disk
+		// Save to disk.
 		$saved = $image['editor']->save( $filename );
 
 		if ( is_wp_error( $saved ) ) {
 			return $saved;
 		}
 
-		// Update attachment details
+		// Update attachment details.
 		$attachment_post = array(
 			'guid'           => $saved['path'],
 			'post_mime_type' => $saved['mime-type'],
@@ -98,16 +98,16 @@ class Image_Editor {
 			'post_status'    => 'inherit',
 		);
 
-		// Add this as an attachment
+		// Add this as an attachment.
 		$attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0 );
 		if ( $attachment_id === 0 ) {
 			return new WP_Error( 'attachment', 'Unable to add image as attachment' );
 		}
 
-		// Generate thumbnails
+		// Generate thumbnails.
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $saved['path'] );
 
-		// Store out meta data
+		// Store out meta data.
 		$metadata[ self::META_KEY ] = $attachment['meta'];
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );

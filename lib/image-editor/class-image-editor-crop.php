@@ -32,7 +32,7 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 
 		$image->crop( $crop_x, $crop_y, $width, $height );
 
-		// We need to change the original name to include the crop. This way if it's cropped again we won't clash
+		// We need to change the original name to include the crop. This way if it's cropped again we won't clash.
 		$info['meta']['original_name'] = $target_file;
 
 		return $info;
