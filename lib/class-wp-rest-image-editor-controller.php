@@ -8,18 +8,6 @@
 include_once __DIR__ . '/image-editor/class-image-editor.php';
 
 class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
-	private static $instance = null;
-
-	const API_NAMESPACE = '__experimental';
-	const API_BASE = '/richimage/(?P<mediaID>[\d]+)';
-
-	public static function init() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new WP_REST_Image_Editor_API();
-		}
-
-		return self::$instance;
-	}
 
 	private function get_rest_params( $callback, $args ) {
 		return [
@@ -33,9 +21,14 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	}
 
 	public function __construct() {
+		$this->namespace = '__experimental';
+		$this->rest_base = '/richimage/(?P<mediaID>[\d]+)';
+	}
+
+	public function register_routes() {
 		register_rest_route(
-			self::API_NAMESPACE,
-			self::API_BASE . '/rotate',
+			$this->namespace,
+			$this->rest_base . '/rotate',
 			$this->get_rest_params(
 				[ $this, 'rotate_image' ],
 				[
@@ -48,8 +41,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		);
 
 		register_rest_route(
-			self::API_NAMESPACE,
-			self::API_BASE . '/flip',
+			$this->namespace,
+			$this->rest_base . '/flip',
 			$this->get_rest_params(
 				[ $this, 'flip_image' ],
 				[
@@ -63,8 +56,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		);
 
 		register_rest_route(
-			self::API_NAMESPACE,
-			self::API_BASE . '/crop',
+			$this->namespace,
+			$this->rest_base . '/crop',
 			$this->get_rest_params(
 				[ $this, 'crop_image' ],
 				[
