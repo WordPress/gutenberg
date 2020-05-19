@@ -21,6 +21,7 @@ import {
 import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsMenu from '../block-settings-menu';
+import { useBlockNavigationContext } from './context';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -46,6 +47,9 @@ export default function BlockNavigationBlock( {
 		'block-editor-block-navigation-block__mover-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
+	const {
+		__experimentalWithEllipsisMenu: withEllipsisMenu,
+	} = useBlockNavigationContext();
 
 	return (
 		<BlockNavigationLeaf
@@ -82,7 +86,7 @@ export default function BlockNavigationBlock( {
 							{ ...props }
 						/>
 
-						{ level > 1 && (
+						{ withEllipsisMenu && level > 1 && (
 							<BlockSettingsMenu clientIds={ [ clientId ] } />
 						) }
 					</div>
