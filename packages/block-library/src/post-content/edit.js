@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { EntityProvider } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,7 +17,5 @@ export default function PostContentEdit( { context: { postId, postType } } ) {
 			</EntityProvider>
 		);
 	}
-	return (
-		<p>{ 'Try setting the active page or post via the page selector.' }</p>
-	);
+	return <p>{ __( 'This is a placeholder for post content.' ) }</p>;
 }
