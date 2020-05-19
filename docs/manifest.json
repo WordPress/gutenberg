@@ -630,6 +630,12 @@
 		"parent": null
 	},
 	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AnglePickerControl",
 		"slug": "angle-picker-control",
 		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
@@ -969,12 +975,6 @@
 		"title": "ResponsiveWrapper",
 		"slug": "responsive-wrapper",
 		"markdown_source": "../packages/components/src/responsive-wrapper/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "RovingTabIndex",
-		"slug": "roving-tab-index",
-		"markdown_source": "../packages/components/src/roving-tab-index/README.md",
 		"parent": "components"
 	},
 	{

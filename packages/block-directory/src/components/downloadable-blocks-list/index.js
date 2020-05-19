@@ -6,28 +6,29 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	getBlockMenuDefaultClassName,
-	unregisterBlockType,
-} from '@wordpress/blocks';
+import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
+import {
+	DOWNLOAD_ERROR_NOTICE_ID,
+	INSTALL_ERROR_NOTICE_ID,
+} from '../../store/constants';
 
-const DOWNLOAD_ERROR_NOTICE_ID = 'block-download-error';
-const INSTALL_ERROR_NOTICE_ID = 'block-install-error';
-
-function DownloadableBlocksList( {
+export function DownloadableBlocksList( {
 	items,
 	onHover = noop,
 	children,
-	downloadAndInstallBlock,
+	install,
 } ) {
+	if ( ! items.length ) {
+		return null;
+	}
+
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -35,14 +36,14 @@ function DownloadableBlocksList( {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="block-directory-downloadable-blocks-list">
-			{ items &&
-				items.map( ( item ) => (
+			{ items.map( ( item ) => {
+				return (
 					<DownloadableBlockListItem
 						key={ item.id }
 						className={ getBlockMenuDefaultClassName( item.id ) }
 						icons={ item.icons }
 						onClick={ () => {
-							downloadAndInstallBlock( item );
+							install( item );
 							onHover( null );
 						} }
 						onFocus={ () => onHover( item ) }
@@ -51,7 +52,8 @@ function DownloadableBlocksList( {
 						onBlur={ () => onHover( null ) }
 						item={ item }
 					/>
-				) ) }
+				);
+			} ) }
 			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
@@ -59,78 +61,62 @@ function DownloadableBlocksList( {
 }
 
 export default compose(
-	withDispatch( ( dispatch, props ) => {
-		const { installBlock, downloadBlock } = dispatch(
-			'core/block-directory'
-		);
-		const { createErrorNotice, removeNotice } = dispatch( 'core/notices' );
-		const { removeBlocks } = dispatch( 'core/block-editor' );
+	withDispatch( ( dispatch, props, { select } ) => {
+		const {
+			downloadBlock,
+			installBlock,
+			setErrorNotice,
+			clearErrorNotice,
+			setIsInstalling,
+		} = dispatch( 'core/block-directory' );
 		const { onSelect } = props;
+		const errorNotices = select( 'core/block-directory' ).getErrorNotices();
+
+		const downloadAssets = ( item ) => {
+			clearErrorNotice( item.id );
+			setIsInstalling( true );
+
+			const onDownloadError = () => {
+				setErrorNotice( item.id, DOWNLOAD_ERROR_NOTICE_ID );
+				setIsInstalling( false );
+			};
+
+			const onDownloadSuccess = () => {
+				onSelect( item );
+				setIsInstalling( false );
+			};
+
+			downloadBlock( item, onDownloadSuccess, onDownloadError );
+		};
+
+		const installPlugin = ( item, onSuccess ) => {
+			if (
+				errorNotices[ item.id ] &&
+				errorNotices[ item.id ] === DOWNLOAD_ERROR_NOTICE_ID
+			) {
+				// Install has already run & the error was in downloading the assets, so we
+				// can skip the install step to prevent re-downloading the plugin.
+				return onSuccess();
+			}
+
+			clearErrorNotice( item.id );
+			setIsInstalling( true );
+
+			const onInstallBlockError = () => {
+				setErrorNotice( item.id, INSTALL_ERROR_NOTICE_ID );
+				setIsInstalling( false );
+			};
+
+			installBlock( item, onSuccess, onInstallBlockError );
+		};
 
 		return {
-			downloadAndInstallBlock: ( item ) => {
-				const onDownloadError = () => {
-					createErrorNotice( __( 'Block previews can’t load.' ), {
-						id: DOWNLOAD_ERROR_NOTICE_ID,
-						actions: [
-							{
-								label: __( 'Retry' ),
-								onClick: () => {
-									removeNotice( DOWNLOAD_ERROR_NOTICE_ID );
-									downloadBlock(
-										item,
-										onSuccess,
-										onDownloadError
-									);
-								},
-							},
-						],
-					} );
-				};
-
+			install( item ) {
 				const onSuccess = () => {
-					const createdBlock = onSelect( item );
-
-					const onInstallBlockError = () => {
-						createErrorNotice(
-							__( "Block previews can't install." ),
-							{
-								id: INSTALL_ERROR_NOTICE_ID,
-								actions: [
-									{
-										label: __( 'Retry' ),
-										onClick: () => {
-											removeNotice(
-												INSTALL_ERROR_NOTICE_ID
-											);
-											installBlock(
-												item,
-												noop,
-												onInstallBlockError
-											);
-										},
-									},
-									{
-										label: __( 'Remove' ),
-										onClick: () => {
-											removeNotice(
-												INSTALL_ERROR_NOTICE_ID
-											);
-											removeBlocks(
-												createdBlock.clientId
-											);
-											unregisterBlockType( item.name );
-										},
-									},
-								],
-							}
-						);
-					};
-
-					installBlock( item, noop, onInstallBlockError );
+					downloadAssets( item );
 				};
 
-				downloadBlock( item, onSuccess, onDownloadError );
+				installPlugin( item, onSuccess );
 			},
 		};
 	} )

@@ -152,8 +152,7 @@ function gutenberg_edit_site_init( $hook ) {
 			continue;
 		}
 
-		$template_hierarchy = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
-		$current_template   = gutenberg_find_template_post_and_parts( $template_hierarchy );
+		$current_template = gutenberg_find_template_post_and_parts( $template_type );
 		if ( isset( $current_template ) ) {
 			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
 			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
@@ -168,6 +167,19 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['templateIds']     = array_values( $template_ids );
 	$settings['templatePartIds'] = array_values( $template_part_ids );
 	$settings['styles']          = gutenberg_get_editor_styles();
+
+	$settings['showOnFront'] = get_option( 'show_on_front' );
+	$settings['page']        = array(
+		'path'    => '/',
+		'context' => 'page' === $settings['showOnFront'] ? array(
+			'postType' => 'page',
+			'postId'   => get_option( 'page_on_front' ),
+		) : array(
+			'query' => array(
+				'categoryIds' => array(),
+			),
+		),
+	);
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.

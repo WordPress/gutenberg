@@ -11,6 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
@@ -77,10 +78,6 @@ export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
-export {
-	default as __experimentalRovingTabIndex,
-	RovingTabIndexItem as __experimentalRovingTabIndexItem,
-} from './roving-tab-index';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
