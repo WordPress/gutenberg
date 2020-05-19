@@ -11,8 +11,8 @@
  */
 class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
-	const BASE = '/__experimental/plugins';
-	const PLUGIN = 'test-plugin/test-plugin';
+	const BASE        = '/__experimental/plugins';
+	const PLUGIN      = 'test-plugin/test-plugin';
 	const PLUGIN_FILE = self::PLUGIN . '.php';
 
 	/**
@@ -316,7 +316,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 * @since 5.5.0
 	 *
-	 * @param array $data
+	 * @param array $data Prepared plugin data.
 	 */
 	protected function check_get_plugin_data( $data ) {
 		$this->assertEquals( 'test-plugin/test-plugin.php', $data['plugin'] );
@@ -360,7 +360,6 @@ PHP;
 	 * Simulate a network failure on outbound http requests to a given hostname.
 	 */
 	private function prevent_requests_to_host( $blocked_host = 'api.wordpress.org' ) {
-		// apply_filters( 'pre_http_request', false, $parsed_args, $url );
 		add_filter(
 			'pre_http_request',
 			static function ( $return, $args, $url ) use ( $blocked_host ) {

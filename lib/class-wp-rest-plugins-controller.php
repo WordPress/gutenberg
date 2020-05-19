@@ -1,12 +1,19 @@
 <?php
 /**
  * Start: Include for phase 2
- * Block Directory REST API: WP_REST_Blocks_Controller class
+ * Block Directory REST API: WP_REST_Plugins_Controller class
  *
  * @package gutenberg
  * @since   6.5.0
  */
 
+/**
+ * Core class to access plugins via the REST API.
+ *
+ * @since 5.5.0
+ *
+ * @see WP_REST_Controller
+ */
 class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 	const PATTERN = '[^.\/]+(?:\/[^.\/]+)?';
@@ -110,7 +117,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_view_plugins',
@@ -370,7 +377,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		$status = $this->get_plugin_status( $request['plugin'] );
 
-		if ( $status !== $request['status'] ) {
+		if ( $request['status'] && $status !== $request['status'] ) {
 			if ( ( 'network-active' === $status || 'network-active' === $request['status'] ) && ! current_user_can( 'manage_network_plugins' ) ) {
 				return new WP_Error(
 					'rest_cannot_manage_network_plugins',
@@ -625,7 +632,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			return true;
 		}
 
-		return new WP_Error( 'fs_unavailable', __( 'The filesystem is currently unavailable for managing plugins.' ) );
+		return new WP_Error( 'fs_unavailable', __( 'The filesystem is currently unavailable for managing plugins.', 'gutenberg' ) );
 	}
 
 	/**
