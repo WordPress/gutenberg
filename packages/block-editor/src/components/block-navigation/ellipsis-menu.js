@@ -13,6 +13,11 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { ifBlockEditSelected } from '../block-edit/context';
+
 const { Fill, Slot } = createSlotFill( 'EllipsisMenu' );
 
 function EllipsisMenuSlot( props ) {
@@ -39,7 +44,7 @@ function EllipsisMenuFill( { controls, children } ) {
 	);
 }
 
-const EllipsisMenu = EllipsisMenuFill;
+const EllipsisMenu = ifBlockEditSelected( EllipsisMenuFill );
 
 EllipsisMenu.Slot = EllipsisMenuSlot;
 
