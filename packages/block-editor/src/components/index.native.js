@@ -37,6 +37,7 @@ export { default as __experimentalPanelColorGradientSettings } from './colors-gr
 
 export { BottomSheetSettings, BlockSettingsButton } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
+export { default as ExistingContentPicker } from './existing-content-picker';
 
 // Content Related Components
 export {
