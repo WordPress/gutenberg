@@ -44,7 +44,7 @@ When creating a new package, you need to provide at least the following:
     - Package description
     - Installation details
     - Usage example
-    - API documentation, if applicable (see the "Maintaining API docs" section)
+    - API documentation, if applicable ([more info](#maintaining-api-documentation))
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 4. `CHANGELOG.md` file containing at least:
     ```
@@ -113,9 +113,9 @@ npm install glob --save-dev
 
 This commands adds the latest version of `glob` as a development dependency to the `package.json` file. It has to be executed from the root of the project.
 
-## Maintaining API docs
+## Maintaining API documentation
 
-Each API change needs to be reflected in the corresponding API documentation. To ensure that code and documentation are in sync automatically, Gutenberg has developed a few utilities.
+Each public API change needs to be reflected in the corresponding API documentation. To ensure that code and documentation are in sync automatically, Gutenberg has developed a few utilities.
 
 Packages can add the following HTML comment within their top-level `README.md`:
 
