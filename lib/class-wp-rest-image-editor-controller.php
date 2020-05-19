@@ -23,6 +23,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function __construct() {
 		$this->namespace = '__experimental';
 		$this->rest_base = '/richimage/(?P<mediaID>[\d]+)';
+		$this->editor    = new Image_Editor();
 	}
 
 	public function register_routes() {
@@ -95,27 +96,24 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function rotate_image( WP_REST_Request $request ) {
 		$params = $request->get_params();
 
-		$editor = new Image_Editor();
 		$modifier = new Image_Editor_Rotate( $params['angle'] );
 
-		return $editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['mediaID'], $modifier );
 	}
 
 	public function flip_image( WP_REST_Request $request ) {
 		$params = $request->get_params();
 
-		$editor = new Image_Editor();
 		$modifier = new Image_Editor_Flip( $params['direction'] );
 
-		return $editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['mediaID'], $modifier );
 	}
 
 	public function crop_image( WP_REST_Request $request ) {
 		$params = $request->get_params();
 
-		$editor = new Image_Editor();
 		$modifier = new Image_Editor_Crop( $params['cropX'], $params['cropY'], $params['cropWidth'], $params['cropHeight'] );
 
-		return $editor->modify_image( $params['mediaID'], $modifier );
+		return $this->editor->modify_image( $params['mediaID'], $modifier );
 	}
 }
