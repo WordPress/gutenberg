@@ -121,7 +121,7 @@ const BlockNavigationBlockSlot = forwardRef( ( props, ref ) => {
 					>
 						{ Children.map( fills, ( fill ) =>
 							cloneElement( fill, {
-								...{ props },
+								...props,
 								...fill.props,
 							} )
 						) }
