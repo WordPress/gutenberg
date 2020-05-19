@@ -20,41 +20,42 @@ const config = require( '../config' );
 /**
  * @typedef WPRawPerformanceResults
  *
- * @property {number[]} load Load Time.
+ * @property {number[]} load             Load Time.
  * @property {number[]} domcontentloaded DOM Contentloaded time.
- * @property {number[]} type Average type time.
- * @property {number[]} focus Average block selection time.
+ * @property {number[]} type             Average type time.
+ * @property {number[]} focus            Average block selection time.
  */
 
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load Load Time.
+ * @property {number} load             Load Time.
  * @property {number} domcontentloaded DOM Contentloaded time.
- * @property {number} type Average type time.
- * @property {number} minType Minium type time.
- * @property {number} maxType Maximum type time.
- * @property {number} focus Average block selection time.
- * @property {number} minFocus Min block selection time.
- * @property {number} maxFocus Max block selection time.
+ * @property {number} type             Average type time.
+ * @property {number} minType          Minium type time.
+ * @property {number} maxType          Maximum type time.
+ * @property {number} focus            Average block selection time.
+ * @property {number} minFocus         Min block selection time.
+ * @property {number} maxFocus         Max block selection time.
  */
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string} load Load Time.
+ * @property {string} load             Load Time.
  * @property {string} domcontentloaded DOM Contentloaded time.
- * @property {string} type Average type time.
- * @property {string} minType Minium type time.
- * @property {string} maxType Maximum type time.
- * @property {string} focus Average block selection time.
- * @property {string} minFocus Min block selection time.
- * @property {string} maxFocus Max block selection time.
+ * @property {string} type             Average type time.
+ * @property {string} minType          Minium type time.
+ * @property {string} maxType          Maximum type time.
+ * @property {string} focus            Average block selection time.
+ * @property {string} minFocus         Min block selection time.
+ * @property {string} maxFocus         Max block selection time.
  */
 
 /**
  * Computes the average number from an array numbers.
  *
  * @param {number[]} array
+ *
  * @return {number} Average.
  */
 function average( array ) {
@@ -65,20 +66,22 @@ function average( array ) {
  * Computes the median number from an array numbers.
  *
  * @param {number[]} array
+ *
  * @return {number} Median.
  */
-const median = ( array ) => {
+function median( array ) {
 	const mid = Math.floor( array.length / 2 ),
 		numbers = [ ...array ].sort( ( a, b ) => a - b );
 	return array.length % 2 !== 0
 		? numbers[ mid ]
 		: ( numbers[ mid - 1 ] + numbers[ mid ] ) / 2;
-};
+}
 
 /**
  * Rounds and format a time passed in milliseconds.
  *
  * @param {number} number
+ *
  * @return {string} Formatted time.
  */
 function formatTime( number ) {
@@ -90,6 +93,7 @@ function formatTime( number ) {
  * Curate the raw performance results.
  *
  * @param {WPRawPerformanceResults} results
+ *
  * @return {WPPerformanceResults} Curated Performance results.
  */
 function curateResults( results ) {
@@ -109,8 +113,8 @@ function curateResults( results ) {
  * Runs the performance tests on a given branch.
  *
  * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} environmentDirectory Path to the plugin environment's clone.
- * @param {string} branch Branch name.
+ * @param {string} environmentDirectory     Path to the plugin environment's clone.
+ * @param {string} branch                   Branch name.
  *
  * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
  */
@@ -198,15 +202,16 @@ async function runPerformanceTests( branches ) {
 		performanceTestDirectory
 	);
 	await runShellScript(
-		'cp -aR ' + performanceTestDirectory + ' ' + environmentDirectory
+		'cp --recursive ' +
+			performanceTestDirectory +
+			' ' +
+			environmentDirectory
 	);
 
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start' );
 
-	/**
-	 * @type {Object.<string, WPFormattedPerformanceResults>}
-	 */
+	/** @type {Record<string, WPFormattedPerformanceResults>} */
 	const results = {};
 	for ( const branch of branches ) {
 		results[ branch ] = await getPerformanceResultsForBranch(
