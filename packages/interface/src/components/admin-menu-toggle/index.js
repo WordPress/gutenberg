@@ -10,14 +10,36 @@ import { wordpress } from '@wordpress/icons';
 function AdminMenuToggle() {
 	const buttonRef = useRef();
 	const toggleMenu = useToggle( { ref: buttonRef } );
+	// Get the current WP Admin Post URL
+	const href = window.location.href;
+
+	const handleOnClick = ( event ) => {
+		const { button, ctrlKey, metaKey } = event;
+		const isMiddleClick = button === 2;
+
+		/**
+		 * Enables the ability to open the link in a new tab by middle clicking,
+		 * or clicking while holding Command (Mac) or Control.
+		 */
+		if ( isMiddleClick || ctrlKey || metaKey ) {
+			return;
+		}
+
+		/**
+		 * Otherwise, toggle the admin menu.
+		 */
+		event.preventDefault();
+		toggleMenu();
+	};
 
 	return (
 		<Button
 			className="interface-admin-menu-toggle"
+			href={ href }
 			icon={ wordpress }
 			iconSize={ 36 }
-			onClick={ toggleMenu }
 			label={ __( 'Show sidebar menu' ) }
+			onClick={ handleOnClick }
 			ref={ buttonRef }
 		/>
 	);
