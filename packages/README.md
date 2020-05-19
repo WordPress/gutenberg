@@ -44,7 +44,7 @@ When creating a new package, you need to provide at least the following:
     - Package description
     - Installation details
     - Usage example
-    - API Docs, if applicable. See the "Maintaining API docs" section.
+    - API documentation, if applicable (see the "Maintaining API docs" section)
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 4. `CHANGELOG.md` file containing at least:
     ```
