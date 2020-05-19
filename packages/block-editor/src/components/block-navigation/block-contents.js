@@ -27,27 +27,8 @@ import BlockIcon from '../block-icon';
 import { BlockListBlockContext } from '../block-list/block';
 import { useBlockNavigationContext } from './context';
 
-export const BlockNavigationBlockContentWrapper = forwardRef( function(
-	{
-		as: WrapperComponent,
-		className,
-		block,
-		isSelected,
-		onClick,
-		position,
-		siblingCount,
-		level,
-		children,
-		...props
-	},
-	ref
-) {
-	const { name, attributes } = block;
-	const instanceId = useInstanceId( BlockNavigationBlockContentWrapper );
-	const descriptionId = `block-navigation-block-select-button_${ instanceId }`;
-	const blockType = getBlockType( name );
-	const blockDisplayName = getBlockLabel( blockType, attributes );
-	const blockPositionDescription = sprintf(
+const getBlockPositionDescription = ( position, siblingCount, level ) =>
+	sprintf(
 		/* translators: 1: The numerical position of the block. 2: The total number of blocks. 3. The level of nesting for the block. */
 		__( 'Block %1$d of %2$d, Level %3$d' ),
 		position,
@@ -55,28 +36,55 @@ export const BlockNavigationBlockContentWrapper = forwardRef( function(
 		level
 	);
 
+const BlockNavigationBlockSelectButton = forwardRef( function(
+	{
+		block,
+		isSelected,
+		onClick,
+		position,
+		siblingCount,
+		level,
+		tabIndex,
+		onFocus,
+	},
+	ref
+) {
+	const { name, attributes } = block;
+
+	const blockType = getBlockType( name );
+	const blockDisplayName = getBlockLabel( blockType, attributes );
+
+	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
+	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
+	const blockPositionDescription = getBlockPositionDescription(
+		position,
+		siblingCount,
+		level
+	);
+
 	return (
 		<>
-			<WrapperComponent
+			<Button
 				className={ classnames(
-					'block-editor-block-navigation-block-content-wrapper',
-					className
+					'block-editor-block-navigation-block-select-button',
+					'block-editor-block-navigation-block-contents'
 				) }
 				onClick={ onClick }
 				aria-describedby={ descriptionId }
 				ref={ ref }
-				{ ...props }
+				tabIndex={ tabIndex }
+				onFocus={ onFocus }
 			>
 				<BlockIcon icon={ blockType.icon } showColors />
-				{ children ? children : blockDisplayName }
+				{ blockDisplayName }
 				{ isSelected && (
 					<VisuallyHidden>
 						{ __( '(selected block)' ) }
 					</VisuallyHidden>
 				) }
-			</WrapperComponent>
+			</Button>
 			<div
-				className="block-editor-block-navigation-block-content-wrapper__description"
+				className="block-editor-block-navigation-block-contents__description"
 				id={ descriptionId }
 			>
 				{ blockPositionDescription }
@@ -85,19 +93,8 @@ export const BlockNavigationBlockContentWrapper = forwardRef( function(
 	);
 } );
 
-const BlockNavigationBlockSelectButton = forwardRef( ( props, ref ) => (
-	<BlockNavigationBlockContentWrapper
-		ref={ ref }
-		as={ Button }
-		className="block-editor-block-navigation-block-select-button"
-		{ ...props }
-	/>
-) );
-
-const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
-
-const noop = () => null;
-const BlockNavigationBlockSlot = forwardRef( ( props, ref ) => {
+const BlockNavigationBlockSlot = forwardRef( function( props, ref ) {
+	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 	const { clientId } = props.block;
 
 	return (
@@ -112,25 +109,72 @@ const BlockNavigationBlockSlot = forwardRef( ( props, ref ) => {
 					);
 				}
 
+				const {
+					block,
+					isSelected,
+					position,
+					siblingCount,
+					level,
+					tabIndex,
+					onFocus,
+				} = props;
+
+				const { name } = block;
+				const blockType = getBlockType( name );
+
+				const descriptionId = `block-navigation-block-slot__${ instanceId }`;
+				const blockPositionDescription = getBlockPositionDescription(
+					position,
+					siblingCount,
+					level
+				);
+
+				const forwardedFillProps = {
+					// Ensure that the component in the slot can receive
+					// keyboard navigation.
+					tabIndex,
+					onFocus,
+					ref,
+					// Give the element rendered in the slot a description
+					// that describes its position.
+					'aria-describedby': descriptionId,
+				};
+
 				return (
-					<BlockNavigationBlockContentWrapper
-						as="div"
-						{ ...props }
-						// Fills should implement onClick on their own
-						onClick={ noop }
-					>
-						{ Children.map( fills, ( fill ) =>
-							cloneElement( fill, {
-								...props,
-								...fill.props,
-							} )
-						) }
-					</BlockNavigationBlockContentWrapper>
+					<>
+						<div
+							className={ classnames(
+								'block-editor-block-navigation-block-slot',
+								'block-editor-block-navigation-block-contents'
+							) }
+						>
+							<BlockIcon icon={ blockType.icon } showColors />
+							{ Children.map( fills, ( fill ) =>
+								cloneElement( fill, {
+									...fill.props,
+									...forwardedFillProps,
+								} )
+							) }
+							{ isSelected && (
+								<VisuallyHidden>
+									{ __( '(selected block)' ) }
+								</VisuallyHidden>
+							) }
+							<div
+								className="block-editor-block-navigation-block-contents__description"
+								id={ descriptionId }
+							>
+								{ blockPositionDescription }
+							</div>
+						</div>
+					</>
 				);
 			} }
 		</Slot>
 	);
 } );
+
+const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
 export const BlockNavigationBlockFill = ( props ) => {
 	const { clientId } = useContext( BlockListBlockContext );
@@ -150,7 +194,6 @@ const BlockNavigationBlockContents = forwardRef(
 			<BlockNavigationBlockSlot
 				ref={ ref }
 				block={ block }
-				onClick={ onClick }
 				isSelected={ isSelected }
 				position={ position }
 				siblingCount={ siblingCount }
