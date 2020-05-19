@@ -234,7 +234,7 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the parent entity when editing the parent', async () => {
-			// Clear selection so that the bock is not addded to template part.
+			// Clear selection so that the block is not added to the template part.
 			await clickBreadcrumbItem( 'Document' );
 
 			// Add paragraph block to the end of the document.
