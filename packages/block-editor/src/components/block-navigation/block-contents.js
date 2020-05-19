@@ -194,6 +194,7 @@ const BlockNavigationBlockContents = forwardRef(
 			<BlockNavigationBlockSlot
 				ref={ ref }
 				block={ block }
+				onClick={ onClick }
 				isSelected={ isSelected }
 				position={ position }
 				siblingCount={ siblingCount }
