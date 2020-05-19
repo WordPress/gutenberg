@@ -114,6 +114,10 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation-block__contents-container,
 	.block-editor-block-navigation-appender__container {
 		display: flex;
+
+		.components-toolbar {
+			border: 0;
+		}
 	}
 
 	.block-editor-block-navigator-descender-line {
