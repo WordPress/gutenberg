@@ -126,7 +126,9 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'destroy',
-		wpRed( 'destroy the WordPress environment.' ),
+		wpRed(
+			'Destroy the WordPress environment. Delete docker containers and remove local files.'
+		),
 		() => {},
 		withSpinner( env.destroy )
 	);

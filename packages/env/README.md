@@ -236,6 +236,16 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
+### `wp-env destroy`
+
+```sh
+wp-env destroy
+
+Destroy the WordPress environment. Delete docker containers and remove local files.
+```
+
+
+
 ### `docker logs -f [container_id] >/dev/null` 
 
 ```sh
