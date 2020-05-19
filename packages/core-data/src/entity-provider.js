@@ -74,16 +74,19 @@ export function useEntityId( kind, type ) {
  * specified property of the nearest provided
  * entity of the specified type.
  *
- * @param {string} kind The entity kind.
- * @param {string} type The entity type.
- * @param {string} prop The property name.
+ * @param {string} kind  The entity kind.
+ * @param {string} type  The entity type.
+ * @param {string} prop  The property name.
+ * @param {string} [_id] An entity ID to use instead of the context-provided one.
  *
  * @return {[*, Function]} A tuple where the first item is the
  *                          property value and the second is the
  *                          setter.
  */
-export function useEntityProp( kind, type, prop ) {
-	const id = useEntityId( kind, type );
+export function useEntityProp( kind, type, prop, _id ) {
+	const providerId = useEntityId( kind, type );
+	const id = _id ?? providerId;
+
 	const { value, fullValue } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
@@ -128,18 +131,31 @@ export function useEntityProp( kind, type, prop ) {
  * @param {Object} [options.initialEdits]          Initial edits object for the entity record.
  * @param {string} [options.blocksProp='blocks']   The name of the entity prop that holds the blocks array.
  * @param {string} [options.contentProp='content'] The name of the entity prop that holds the serialized blocks.
+ * @param {string} [options.id]                    An entity ID to use instead of the context-provided one.
  *
  * @return {[WPBlock[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor(
 	kind,
 	type,
-	{ initialEdits, blocksProp = 'blocks', contentProp = 'content' } = {}
+	{
+		initialEdits,
+		blocksProp = 'blocks',
+		contentProp = 'content',
+		id: _id,
+	} = {}
 ) {
-	const [ content, setContent ] = useEntityProp( kind, type, contentProp );
+	const providerId = useEntityId( kind, type );
+	const id = _id ?? providerId;
+
+	const [ content, setContent ] = useEntityProp(
+		kind,
+		type,
+		contentProp,
+		id
+	);
 
 	const { editEntityRecord } = useDispatch( 'core' );
-	const id = useEntityId( kind, type );
 	const initialBlocks = useMemo( () => {
 		if ( initialEdits ) {
 			editEntityRecord( kind, type, id, initialEdits, {
@@ -157,7 +173,8 @@ export function useEntityBlockEditor(
 	const [ blocks = initialBlocks, onInput ] = useEntityProp(
 		kind,
 		type,
-		blocksProp
+		blocksProp,
+		id
 	);
 
 	const onChange = useCallback(
