@@ -457,7 +457,7 @@ To ensure that the editor stays performant as we add feature we monitor the impa
 * The time it takes for the browser to respond when typing.
 * The time it takes to select a block.
 
-Performance tests are in fact end 2 end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
 
 ```
 npm run test-performance
