@@ -29,11 +29,11 @@ export default function BlockParentSelector() {
 		};
 	}, [] );
 
-	const firstParentClientID = parents[ parents.length - 1 ];
+	const firstParentClientId = parents[ parents.length - 1 ];
 
 	const { parentBlockType } = useSelect( ( select ) => {
 		const { getBlockName } = select( 'core/block-editor' );
-		const parentBlockName = getBlockName( firstParentClientID );
+		const parentBlockName = getBlockName( firstParentClientId );
 		return {
 			parentBlockType: getBlockType( parentBlockName ),
 		};
@@ -43,11 +43,11 @@ export default function BlockParentSelector() {
 		return (
 			<div
 				className="block-editor-block-parent-selector"
-				key={ firstParentClientID }
+				key={ firstParentClientId }
 			>
 				<Button
 					className="block-editor-block-parent-selector__button"
-					onClick={ () => selectBlock( firstParentClientID ) }
+					onClick={ () => selectBlock( firstParentClientId ) }
 					label={ sprintf(
 						/* translators: %s: Name of the block's parent. */
 						__( 'Select parent (%s)' ),
