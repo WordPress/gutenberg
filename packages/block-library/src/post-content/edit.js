@@ -8,8 +8,7 @@ import { EntityProvider } from '@wordpress/core-data';
  */
 import PostContentInnerBlocks from './inner-blocks';
 
-export default function PostContentEdit( { context } ) {
-	const { postId, postType } = context;
+export default function PostContentEdit( { context: { postId, postType } } ) {
 	if ( postId && postType ) {
 		return (
 			<EntityProvider kind="postType" type={ postType } id={ postId }>
