@@ -884,7 +884,8 @@ export class RichText extends Component {
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{ __DEV__ && isMentionsSupported( capabilities ) && (
+							{ // eslint-disable-next-line no-undef
+							  __DEV__ && isMentionsSupported( capabilities ) && (
 								<Toolbar>
 									<ToolbarButton
 										title={ __( 'Insert mention' ) }
