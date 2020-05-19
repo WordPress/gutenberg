@@ -154,6 +154,16 @@ function gutenberg_register_rest_customizer_nonces() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
 
+
+/**
+ * Registers the Plugins REST API routes.
+ */
+function gutenberg_register_plugins_endpoint() {
+	$plugins = new WP_REST_Plugins_Controller();
+	$plugins->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
+
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
  *
