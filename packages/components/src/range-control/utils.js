@@ -23,7 +23,7 @@ import { useControlledState } from '../utils/hooks';
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
-	if ( ! isFinite( value ) ) {
+	if ( typeof value !== 'number' ) {
 		return null;
 	}
 
@@ -35,7 +35,7 @@ export function floatClamp( value, min, max ) {
  */
 export function useControlledRangeValue( { min, max, value: valueProp } ) {
 	const [ value, setValue ] = useControlledState(
-		valueProp || valueProp === 0 ? floatClamp( valueProp, min, max ) : null
+		floatClamp( valueProp, min, max )
 	);
 
 	const setClampValue = useCallback(
