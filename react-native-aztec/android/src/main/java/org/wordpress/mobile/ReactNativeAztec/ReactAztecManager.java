@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.util.Consumer;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -53,10 +54,14 @@ import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
+import org.wordpress.aztec.spans.UnknownHtmlSpan;
 
+import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutShadowNode> {
 
@@ -76,7 +81,10 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
 
-    public ReactAztecManager() {
+    @Nullable private final Consumer<Exception> exceptionLogger;
+
+    public ReactAztecManager(@Nullable Consumer<Exception> exceptionLogger) {
+        this.exceptionLogger = exceptionLogger;
         initializeFocusAndBlurCommandCodes();
     }
 
@@ -222,7 +230,25 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         if ( selection != null ) {
             int start = selection.getInt("start");
             int end = selection.getInt("end");
-            view.setSelection(start, end);
+            int textLength = view.getText().length();
+            boolean startAndEndAreValid = start >= 0 &&
+                                          end >= 0 &&
+                                          start <= textLength &&
+                                          end <= textLength;
+            if (startAndEndAreValid) {
+                view.setSelection(start, end);
+            } else if (exceptionLogger != null) {
+                // Calling view.setSelection would have thrown an exception, so let's send information about
+                // what happened to help us figure out how we got into a bad state.
+                try {
+                    IllegalSelectionIndexException exception = new IllegalSelectionIndexException(start, end, textLength, view);
+                    exception.printStackTrace();
+                    exceptionLogger.accept(exception);
+                } catch (Exception e) {
+                    // Should never happen, but if it does don't let logging cause a crash
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

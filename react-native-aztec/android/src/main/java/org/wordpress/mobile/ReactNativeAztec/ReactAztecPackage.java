@@ -1,5 +1,6 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import androidx.core.util.Consumer;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -12,10 +13,16 @@ import java.util.List;
 
 public class ReactAztecPackage implements ReactPackage {
 
+    private final Consumer<Exception> exceptionLogger;
+
+    public ReactAztecPackage(Consumer<Exception> exceptionLogger) {
+        this.exceptionLogger = exceptionLogger;
+    }
+
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> views = new ArrayList<>();
-        views.add(new ReactAztecManager());
+        views.add(new ReactAztecManager(exceptionLogger));
         return views;
     }
 
