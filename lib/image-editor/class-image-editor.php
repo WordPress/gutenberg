@@ -57,14 +57,14 @@ class Image_Editor {
 
 		return array(
 			'editor' => $image_editor,
-			'path' => $image_path,
+			'path'   => $image_path,
 		);
 	}
 
 	private function get_image_as_json( $id ) {
 		return array(
 			'mediaID' => $id,
-			'url' => wp_get_attachment_image_url( $id, 'original' ),
+			'url'     => wp_get_attachment_image_url( $id, 'original' ),
 		);
 	}
 
@@ -153,9 +153,9 @@ class Image_Editor {
 		}
 
 		$info = array(
-			'url' => $media_url,
+			'url'      => $media_url,
 			'media_id' => $media_id,
-			'meta' => array_merge(
+			'meta'     => array_merge(
 				$default_meta,
 				array( 'original_name' => basename( $media_url ) )
 			),

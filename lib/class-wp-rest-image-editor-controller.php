@@ -12,10 +12,10 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	private function get_rest_params( $callback, $args ) {
 		return array(
 			array(
-				'methods' => WP_REST_Server::EDITABLE,
-				'callback' => $callback,
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => $callback,
 				'permission_callback' => array( $this, 'permission_callback' ),
-				'args' => $args,
+				'args'                => $args,
 			),
 		);
 	}
@@ -33,7 +33,7 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 				array( $this, 'rotate_image' ),
 				array(
 					'angle' => array(
-						'type' => 'integer',
+						'type'     => 'integer',
 						'required' => true,
 					),
 				)
@@ -47,8 +47,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 				array( $this, 'flip_image' ),
 				array(
 					'direction' => array(
-						'type' => 'enum',
-						'enum' => array( 'vertical', 'horizontal' ),
+						'type'     => 'enum',
+						'enum'     => array( 'vertical', 'horizontal' ),
 						'required' => true,
 					),
 				)
@@ -61,24 +61,24 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 			$this->get_rest_params(
 				array( $this, 'crop_image' ),
 				array(
-					'cropX' => array(
-						'type' => 'float',
-						'minimum' => 0,
+					'cropX'      => array(
+						'type'     => 'float',
+						'minimum'  => 0,
 						'required' => true,
 					),
-					'cropY' => array(
-						'type' => 'float',
-						'minimum' => 0,
+					'cropY'      => array(
+						'type'     => 'float',
+						'minimum'  => 0,
 						'required' => true,
 					),
-					'cropWidth' => array(
-						'type' => 'float',
-						'minimum' => 1,
+					'cropWidth'  => array(
+						'type'     => 'float',
+						'minimum'  => 1,
 						'required' => true,
 					),
 					'cropHeight' => array(
-						'type' => 'float',
-						'minimum' => 1,
+						'type'     => 'float',
+						'minimum'  => 1,
 						'required' => true,
 					),
 				)
