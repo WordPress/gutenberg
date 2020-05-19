@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,21 +15,17 @@ import BlockIcon from '../block-icon';
  * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
- * @return {WPElement} Block Breadcrumb.
+ * @return {WPElement} Parent Block Selector.
  */
-const BlockParentSelector = function() {
+export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { parents } = useSelect( ( select ) => {
-		const {
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getBlockParents,
-		} = select( 'core/block-editor' );
+		const { getSelectedBlockClientId, getBlockParents } = select(
+			'core/block-editor'
+		);
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			parents: getBlockParents( selectedBlockClientId ),
-			clientId: selectedBlockClientId,
-			hasSelection: !! getSelectionStart().clientId,
 		};
 	}, [] );
 
@@ -65,6 +61,4 @@ const BlockParentSelector = function() {
 	}
 
 	return null;
-};
-
-export default BlockParentSelector;
+}
