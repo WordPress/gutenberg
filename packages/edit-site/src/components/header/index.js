@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	BlockNavigationDropdown,
 	ToolSelector,
 	Inserter,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	__experimentalResolveSelect as resolveSelect,
+	useSelect,
+	useDispatch,
+} from '@wordpress/data';
 import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
@@ -19,11 +24,17 @@ import {
  */
 import { useEditorContext } from '../editor';
 import MoreMenu from './more-menu';
+import PageSwitcher from '../page-switcher';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import FullscreenModeClose from './fullscreen-mode-close';
+
+/**
+ * Browser dependencies
+ */
+const { fetch } = window;
 
 const inserterToggleProps = { isPrimary: true };
 
@@ -56,6 +67,33 @@ export default function Header( { openEntitiesSavedStates } ) {
 			} ) ),
 		[]
 	);
+	const setActivePage = useCallback( async ( newPage ) => {
+		try {
+			const { success, data } = await fetch(
+				addQueryArgs( newPage.path, { '_wp-find-template': true } )
+			).then( ( res ) => res.json() );
+			if ( success ) {
+				let newTemplateId = data.ID;
+				if ( newTemplateId === null ) {
+					newTemplateId = (
+						await resolveSelect( 'core' ).getEntityRecords(
+							'postType',
+							'wp_template',
+							{
+								resolved: true,
+								slug: data.post_name,
+							}
+						)
+					 )[ 0 ].id;
+				}
+				setSettings( ( prevSettings ) => ( {
+					...prevSettings,
+					page: newPage,
+					templateId: newTemplateId,
+				} ) );
+			}
+		} catch ( err ) {}
+	}, [] );
 
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
@@ -79,6 +117,11 @@ export default function Header( { openEntitiesSavedStates } ) {
 				<ToolSelector />
 				<UndoButton />
 				<RedoButton />
+				<PageSwitcher
+					showOnFront={ settings.showOnFront }
+					activePage={ settings.page }
+					onActivePageChange={ setActivePage }
+				/>
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }

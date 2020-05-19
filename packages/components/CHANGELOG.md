@@ -9,6 +9,11 @@
 - Fix and issue that would cause the `Popover` component to throw an error under certain
   circumstances ([#22264](https://github.com/WordPress/gutenberg/pull/22264)).
 
+### Deprecations
+
+- The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+- The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
+
 ## 9.2.0 (2020-02-10)
 
 ### Enhancements

@@ -704,6 +704,7 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
 	register_block_pattern( 'core/pricing-table', gutenberg_load_block_pattern( 'pricing-table' ) );
+	register_block_pattern( 'core/features-services', gutenberg_load_block_pattern( 'features-services' ) );
 }
 
 /*

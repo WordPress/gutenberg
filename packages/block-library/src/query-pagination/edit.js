@@ -12,10 +12,11 @@ import { useQueryContext } from '../query';
 
 export default function QueryPaginationEdit( {
 	context: {
-		query: { pages },
+		query: { pages = 1 },
+		queryContext,
 	},
 } ) {
-	const [ { page }, setQueryContext ] = useQueryContext();
+	const [ { page }, setQueryContext ] = useQueryContext() || queryContext;
 
 	let previous;
 	if ( page > 1 ) {
