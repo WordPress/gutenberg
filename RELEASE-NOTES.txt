@@ -1,3 +1,9 @@
+1.29.0
+------
+* [**] Add support for changing overlay color settings in Cover block
+* Add enter/exit animation in FloatingToolbar
+* [***] New block: Verse
+
 1.28.0
 ------
 * [***] New block: Pullquote
