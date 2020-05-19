@@ -168,6 +168,19 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['templatePartIds'] = array_values( $template_part_ids );
 	$settings['styles']          = gutenberg_get_editor_styles();
 
+	$settings['showOnFront'] = get_option( 'show_on_front' );
+	$settings['page']        = array(
+		'path'    => '/',
+		'context' => 'page' === $settings['showOnFront'] ? array(
+			'postType' => 'page',
+			'postId'   => get_option( 'page_on_front' ),
+		) : array(
+			'query' => array(
+				'categoryIds' => array(),
+			),
+		),
+	);
+
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
 	global $post;

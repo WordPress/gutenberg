@@ -17,9 +17,7 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Query Loop' ),
 	icon: loop,
-	parent: [ 'core/query' ],
 	supports: {
-		inserter: false,
 		reusable: false,
 		html: false,
 	},
