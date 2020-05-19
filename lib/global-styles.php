@@ -6,28 +6,50 @@
  */
 
 /**
- * Whether the current theme has support for Global Styles.
+ * Whether the current theme has a theme.json file.
  *
  * @return boolean
  */
-function gutenberg_experimental_global_styles_has_theme_support() {
+function gutenberg_experimental_global_styles_has_theme_json_support() {
 	return is_readable( locate_template( 'experimental-theme.json' ) );
 }
 
 /**
- * Given a styles tree, it creates a flattened one
- * whose keys are the CSS custom properties
- * and its values the CSS custom properties' values.
+ * Given a tree, it creates a flattened one
+ * by merging the keys and binding the leaf values
+ * to the new keys.
  *
- * @param array  $styles Styles object to process.
- * @param string $prefix Prefix to prepend to each variable.
- * @param string $token Token to use between levels.
+ * This is thought to be useful to generate
+ * CSS Custom Properties from a tree,
+ * although there's nothing in the implementation
+ * of this function that requires that format.
+ *
+ * For example, assuming the given prefix is '--wp'
+ * and the token is '--', for this input tree:
+ *
+ * {
+ *   'property': 'value',
+ *   'nested-property': {
+ *     'sub-property': 'value'
+ *   }
+ * }
+ *
+ * it'll return this output:
+ *
+ * {
+ *   '--wp--property': 'value',
+ *   '--wp--nested-property--sub-property': 'value'
+ * }
+ *
+ * @param array  $tree Input tree to process.
+ * @param string $prefix Prefix to prepend to each variable. '' by default.
+ * @param string $token Token to use between levels. '--' by default.
  *
  * @return array The flattened tree.
  */
-function gutenberg_experimental_global_styles_get_css_vars( $styles, $prefix = '', $token = '--' ) {
+function gutenberg_experimental_global_styles_get_css_vars( $tree, $prefix = '', $token = '--' ) {
 	$result = array();
-	foreach ( $styles as $property => $value ) {
+	foreach ( $tree as $property => $value ) {
 		$new_key = $prefix . str_replace( '/', '-', $property );
 
 		if ( is_array( $value ) ) {
@@ -66,7 +88,7 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
 }
 
 /**
- * Returns the user's preferences.
+ * Returns the user's origin config.
  *
  * @return array Config that adheres to the theme.json schema.
  */
@@ -84,15 +106,16 @@ function gutenberg_experimental_global_styles_get_user() {
 }
 
 /**
- * Returns the CPT that contains the user's preferences
+ * Returns the CPT that contains the user's origin config
  * for the current theme or a void array if none found.
+ *
  * It can also create and return a new draft CPT.
  *
- * @param array $post_status_filter Filter CPT by post status.
- *                                  By default, only fetches published posts.
- * @param bool  $should_create_draft Whether a new draft should be created
- *                                   if no CPT was found. False by default.
- * @return array Custom Post Type for the user's preferences.
+ * @param array $post_status_filter  Filter CPT by post status.
+ *                                   ['publish'] by default, so it only fetches published posts.
+ * @param bool  $should_create_draft Whether a new draft should be created if no CPT was found.
+ *                                   False by default.
+ * @return array Custom Post Type for the user's origin config.
  */
 function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter = array( 'publish' ), $should_create_draft = false ) {
 	$user_cpt         = array();
@@ -128,9 +151,9 @@ function gutenberg_experimental_global_styles_get_user_cpt( $post_status_filter 
 }
 
 /**
- * Returns the post ID of the CPT containing the user's preferences.
+ * Returns the post ID of the CPT containing the user's origin config.
  *
- * @return integer Custom Post Type ID for the user's preferences.
+ * @return integer
  */
 function gutenberg_experimental_global_styles_get_user_cpt_id() {
 	$user_cpt_id = null;
@@ -142,7 +165,7 @@ function gutenberg_experimental_global_styles_get_user_cpt_id() {
 }
 
 /**
- * Return core's preferences.
+ * Return core's origin config.
  *
  * @return array Config that adheres to the theme.json schema.
  */
@@ -157,7 +180,7 @@ function gutenberg_experimental_global_styles_get_core() {
 /**
  * Returns the theme presets registered via add_theme_support, if any.
  *
- * @return array
+ * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_theme_presets() {
 	$theme_presets = array();
@@ -196,9 +219,10 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
 }
 
 /**
- * Returns the theme's preferences. It also fetches
- * the existing presets the theme declared via add_theme_support
- * and adds them to the global presets.
+ * Returns the theme's origin config.
+ *
+ * It also fetches the existing presets the theme declared via add_theme_support
+ * and uses them if the theme hasn't declared any via theme.json.
  *
  * @return array Config that adheres to the theme.json schema.
  */
@@ -211,6 +235,15 @@ function gutenberg_experimental_global_styles_get_theme() {
 	/*
 	 * We want the presets declared in theme.json
 	 * to take precedence over the ones declared via add_theme_support.
+	 *
+	 * Note that merging happens at the preset category level. Example:
+	 *
+	 * - if the theme declares a color palette via add_theme_support &
+	 *   a set of font sizes via theme.json, both will be included in the output.
+	 *
+	 * - if the theme declares a color palette both via add_theme_support &
+	 *   via theme.json, the later takes precedence.
+	 *
 	 */
 	$theme_config = gutenberg_experimental_global_styles_merge_trees(
 		$theme_presets,
@@ -234,7 +267,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 	$block_data = array(
 		'global'          => array(
 			'selector' => ':root',
-			'supports' => array(),
+			'supports' => array(), // By being blank, the 'global' section won't output any style yet.
 		),
 		'core/paragraph'  => array(
 			'selector' => 'p',
@@ -299,11 +332,11 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 			! array_key_exists( 'supports', $block_data[ $block_name ] )
 		) {
 			// Skip blocks that haven't declared support,
-			// so we don't know to process.
+			// because we don't know to process them.
 			continue;
 		}
 
-		// Flatten presets before converting them to variables.
+		// Extract the relevant preset info before converting them to CSS Custom Properties.
 		foreach ( array_keys( $tree[ $block_name ]['presets'] ) as $preset_category ) {
 			$flattened_values = array();
 			foreach ( $tree[ $block_name ]['presets'][ $preset_category ] as $preset_value ) {
@@ -360,7 +393,7 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
  *
  * @param array $core Core origin.
  * @param array $theme Theme origin.
- * @param array $user = array() User origin.
+ * @param array $user User origin. An empty array by default.
  *
  * @return array The merged result.
  */
@@ -397,7 +430,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		'presets'  => array(),
 	);
 
-	$normalized_tree = array( 'global' => array( $block_schema ) );
+	$normalized_tree = array();
 	$block_data      = gutenberg_experimental_global_styles_get_block_data();
 	foreach ( array_keys( $block_data ) as $block_name ) {
 		$normalized_tree[ $block_name ] = $block_schema;
@@ -413,7 +446,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 
 /**
  * Returns the stylesheet resulting of merging
- * core's, theme's, and user's preferences.
+ * core's, theme's, and user's origins.
  *
  * @return string
  */
@@ -437,7 +470,7 @@ function gutenberg_experimental_global_styles_get_stylesheet() {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		return;
 	}
 
@@ -470,7 +503,7 @@ function gutenberg_experimental_global_styles_is_site_editor() {
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
 	if (
-		! gutenberg_experimental_global_styles_has_theme_support() ||
+		! gutenberg_experimental_global_styles_has_theme_json_support() ||
 		! gutenberg_experimental_global_styles_is_site_editor()
 	) {
 		return $settings;
@@ -486,7 +519,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$settings['__experimentalGlobalStylesBase'] = $global_styles;
 
 	// Add the styles for the editor via the settings
-	// so they get processed as if they were added by add_editor_styles:
+	// so they get processed as if they were added via add_editor_styles:
 	// they will get the editor wrapper class.
 	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet() );
 
@@ -494,10 +527,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
- * Registers a Custom Post Type to store the user's preferences.
+ * Registers a Custom Post Type to store the user's origin config.
  */
 function gutenberg_experimental_global_styles_register_cpt() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_support() ) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		return;
 	}
 
