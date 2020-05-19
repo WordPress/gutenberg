@@ -229,9 +229,9 @@ class BottomSheetCell extends Component {
 					placeholderTextColor={ '#87a6bc' }
 					onChangeText={ onChangeValue }
 					editable={ isValueEditable }
-					pointerEvents={
-						this.state.isEditingValue ? 'auto' : 'none'
-					}
+					// pointerEvents={
+					// 	this.state.isEditingValue ? 'auto' : 'none'
+					// }
 					onFocus={ startEditing }
 					onBlur={ finishEditing }
 					onSubmitEditing={ onSubmit }
