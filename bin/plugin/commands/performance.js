@@ -201,10 +201,7 @@ async function runPerformanceTests( branches ) {
 		performanceTestDirectory
 	);
 	await runShellScript(
-		'cp --recursive ' +
-			performanceTestDirectory +
-			' ' +
-			environmentDirectory
+		'cp -R ' + performanceTestDirectory + ' ' + environmentDirectory
 	);
 
 	log( '>> Starting the WordPress environment' );
