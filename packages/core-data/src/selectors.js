@@ -235,6 +235,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								: entity.getTitle( entityRecord ),
 							name,
 							kind,
+							label: entity.label || '',
 						} );
 					} );
 				}

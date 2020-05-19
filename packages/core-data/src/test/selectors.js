@@ -124,6 +124,7 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						kind: 'someKind',
 						name: 'someName',
 						transientEdits: { someTransientEditProperty: true },
+						label: 'someLabel',
 					},
 				],
 				data: {
@@ -154,7 +155,13 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
-			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+			{
+				kind: 'someKind',
+				name: 'someName',
+				key: 'someKey',
+				title: '',
+				label: 'someLabel',
+			},
 		] );
 	} );
 } );
