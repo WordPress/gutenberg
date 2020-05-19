@@ -22,6 +22,7 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsMenu from '../block-settings-menu';
 import { useBlockNavigationContext } from './context';
+import EllipsisMenu from './ellipsis-menu';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -118,10 +119,14 @@ export default function BlockNavigationBlock( {
 			{ withEllipsisMenu && level > 1 && (
 				<TreeGridCell className={ ellipsisMenuClassName }>
 					{ ( props ) => (
-						<BlockSettingsMenu
-							clientIds={ [ clientId ] }
-							{ ...props }
-						/>
+						<>
+							<BlockSettingsMenu
+								clientIds={ [ clientId ] }
+								{ ...props }
+							>
+								<EllipsisMenu.Slot bubblesVirtually />
+							</BlockSettingsMenu>
+						</>
 					) }
 				</TreeGridCell>
 			) }

@@ -18,6 +18,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-contents';
+export { default as __experimentalEllipsisMenu } from './block-navigation/ellipsis-menu';
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
@@ -88,6 +89,11 @@ export { default as ObserveTyping } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export { default as Typewriter } from './typewriter';
+export {
+	default as UniversalBlockControls,
+	UniversalControlsGroup,
+	UniversalControlsButton,
+} from './universal-block-controls';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 

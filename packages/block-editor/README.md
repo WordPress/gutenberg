@@ -519,6 +519,18 @@ Ensures that the text selection keeps the same vertical distance from the
 viewport during keyboard events within this component. The vertical distance
 can vary. It is the last clicked or scrolled to position.
 
+<a name="UniversalBlockControls" href="#UniversalBlockControls">#</a> **UniversalBlockControls**
+
+Undocumented declaration.
+
+<a name="UniversalControlsButton" href="#UniversalControlsButton">#</a> **UniversalControlsButton**
+
+Undocumented declaration.
+
+<a name="UniversalControlsGroup" href="#UniversalControlsGroup">#</a> **UniversalControlsGroup**
+
+Undocumented declaration.
+
 <a name="URLInput" href="#URLInput">#</a> **URLInput**
 
 _Related_

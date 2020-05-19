@@ -36,7 +36,7 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsMenu( { clientIds } ) {
+export function BlockSettingsMenu( { clientIds, children } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
@@ -86,6 +86,7 @@ export function BlockSettingsMenu( { clientIds } ) {
 							>
 								{ ( { onClose } ) => (
 									<>
+										{ children }
 										<MenuGroup>
 											<__experimentalBlockSettingsMenuFirstItem.Slot
 												fillProps={ { onClose } }

@@ -17,16 +17,16 @@ import {
 	Popover,
 	TextareaControl,
 	ToggleControl,
-	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
+	UniversalBlockControls,
+	UniversalControlsGroup,
+	UniversalControlsButton,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
 	__experimentalBlockNavigationEditor as BlockNavigationEditor,
@@ -134,8 +134,8 @@ function NavigationLinkEdit( {
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<ToolbarGroup>
+			<UniversalBlockControls>
+				<UniversalControlsGroup>
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
@@ -143,21 +143,22 @@ function NavigationLinkEdit( {
 								setIsLinkOpen( true ),
 						} }
 					/>
-					<ToolbarButton
+					<UniversalControlsButton
 						name="link"
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
-					<ToolbarButton
+					<UniversalControlsButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
-				</ToolbarGroup>
-			</BlockControls>
+				</UniversalControlsGroup>
+			</UniversalBlockControls>
+
 			<InspectorControls>
 				<PanelBody title={ __( 'SEO settings' ) }>
 					<ToggleControl
