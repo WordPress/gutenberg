@@ -448,3 +448,27 @@ To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
+
+## Performance Testing
+
+To ensure that the editor stays performant as we add feature we monitor the impact PRs and releases can have on some key metrics:
+
+* The time it takes to load the editor.
+* The time it takes for the browser to respond when typing.
+* The time it takes to select a block.
+
+Performance tests are in fact end 2 end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+
+```
+npm run test-performance
+```
+
+This gives you the result for the current branch/code on the running environment.
+
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+
+```
+./bin/plugin/cli.js perf master v8.1.0 v8.0.0
+```
+
+**Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.
