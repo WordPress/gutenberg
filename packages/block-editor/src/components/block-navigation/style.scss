@@ -57,6 +57,7 @@ $tree-item-height: 36px;
 		border-radius: $border-width;
 	}
 
+	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell {
 		width: $button-size;
 		opacity: 0;
@@ -65,6 +66,10 @@ $tree-item-height: 36px;
 		&.is-visible {
 			opacity: 1;
 			@include edit-post__fade-in-animation;
+		}
+
+		.components-toolbar {
+			border: 0;
 		}
 	}
 
@@ -106,10 +111,6 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation-block__contents-container,
 	.block-editor-block-navigation-appender__container {
 		display: flex;
-
-		.components-toolbar {
-			border: 0;
-		}
 	}
 
 	.block-editor-block-navigator-descender-line {
