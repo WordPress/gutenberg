@@ -90,7 +90,11 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 	public function permission_callback( WP_REST_Request $request ) {
 		$params = $request->get_params();
 
-		return current_user_can( 'edit_post', $params['mediaID'] );
+		if ( ! current_user_can( 'edit_post', $params['mediaID'] ) ) {
+			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to edit images.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
+		return true;
 	}
 
 	public function rotate_image( WP_REST_Request $request ) {
