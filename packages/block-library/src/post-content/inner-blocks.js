@@ -8,8 +8,7 @@ export default function PostContentInnerBlocks( { postType, postId } ) {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
-		{},
-		postId
+		{ id: postId }
 	);
 	return (
 		<InnerBlocks
