@@ -44,7 +44,8 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
-	merge: ( { text: textA = '' }, { text: textB = '' } ) => ( {
-		text: textA + textB,
+	merge: ( a, { text = '' } ) => ( {
+		...a,
+		text: a.text + text,
 	} ),
 };
