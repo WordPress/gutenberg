@@ -2,7 +2,6 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,7 +18,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { external, link, textColor } from '@wordpress/icons';
+import { external, textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,17 +39,28 @@ class ModalLinkUI extends Component {
 		);
 		this.removeLink = this.removeLink.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
+		this.onPickerOpen = this.onPickerOpen.bind( this );
+		this.onPickerResult = this.onPickerResult.bind( this );
+		this.onPickerCancel = this.onPickerCancel.bind( this );
 
 		this.state = {
 			inputValue: '',
 			text: '',
 			opensInNewWindow: false,
+			isAwaitingLink: false,
+			hasTextFromPicker: false,
 		};
+
+		this.refreshCaretFromValue();
 	}
 
 	componentDidUpdate( oldProps ) {
 		if ( oldProps === this.props ) {
 			return;
+		}
+
+		if ( ! this.state.isAwaitingLink ) {
+			this.refreshCaretFromValue();
 		}
 
 		const {
@@ -60,9 +70,18 @@ class ModalLinkUI extends Component {
 
 		this.setState( {
 			inputValue: url || '',
-			text: getTextContent( slice( this.props.value ) ),
+			text: getTextContent( slice( this.getValueWithSafeCaret() ) ),
 			opensInNewWindow,
 		} );
+	}
+
+	refreshCaretFromValue() {
+		const { start, end } = this.props.value;
+		this.caret = { start, end };
+	}
+
+	getValueWithSafeCaret() {
+		return { ...this.props.value, ...this.caret };
 	}
 
 	onChangeInputValue( inputValue ) {
@@ -70,7 +89,7 @@ class ModalLinkUI extends Component {
 	}
 
 	onChangeText( text ) {
-		this.setState( { text } );
+		this.setState( { text, hasTextFromPicker: false } );
 	}
 
 	onChangeOpensInNewWindow( opensInNewWindow ) {
@@ -78,7 +97,8 @@ class ModalLinkUI extends Component {
 	}
 
 	submitLink() {
-		const { isActive, onChange, speak, value } = this.props;
+		const { isActive, onChange, speak } = this.props;
+		const value = this.getValueWithSafeCaret();
 		const { inputValue, opensInNewWindow, text } = this.state;
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
@@ -141,6 +161,9 @@ class ModalLinkUI extends Component {
 	}
 
 	onDismiss() {
+		if ( this.state.isAwaitingLink ) {
+			return;
+		}
 		if ( this.state.inputValue === '' ) {
 			this.removeLink();
 		} else {
@@ -148,32 +171,53 @@ class ModalLinkUI extends Component {
 		}
 	}
 
+	onPickerOpen() {
+		this.setState( { isAwaitingLink: true } );
+	}
+
+	onPickerResult( { url, title } ) {
+		const { text, hasTextFromPicker } = this.state;
+
+		if ( ! text || hasTextFromPicker ) {
+			this.setState( {
+				isAwaitingLink: false,
+				inputValue: url,
+				text: title,
+				hasTextFromPicker: true,
+			} );
+		} else {
+			this.setState( {
+				isAwaitingLink: false,
+				inputValue: url,
+				text,
+			} );
+		}
+	}
+
+	onPickerCancel() {
+		this.setState( {
+			isAwaitingLink: false,
+		} );
+	}
+
 	render() {
 		const { isVisible } = this.props;
-		const { text } = this.state;
+		const { text, isAwaitingLink } = this.state;
 
 		return (
 			<BottomSheet
-				isVisible={ isVisible }
+				isVisible={ isVisible && ! isAwaitingLink }
 				onClose={ this.onDismiss }
 				hideHeader
 			>
-				{
-					/* eslint-disable jsx-a11y/no-autofocus */
-					<BottomSheet.Cell
-						icon={ link }
-						label={ __( 'URL' ) }
-						value={ this.state.inputValue }
-						placeholder={ __( 'Add URL' ) }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-						onChangeValue={ this.onChangeInputValue }
-						onSubmit={ this.onDismiss }
-						autoFocus={ Platform.OS === 'ios' }
-					/>
-					/* eslint-enable jsx-a11y/no-autofocus */
-				}
+				<BottomSheet.LinkCell
+					value={ this.state.inputValue }
+					onChangeValue={ this.onChangeInputValue }
+					onSubmit={ this.onDismiss }
+					onPickerOpen={ this.onPickerOpen }
+					onPickerResult={ this.onPickerResult }
+					onPickerCancel={ this.onPickerCancel }
+				/>
 				<BottomSheet.Cell
 					icon={ textColor }
 					label={ __( 'Link text' ) }
