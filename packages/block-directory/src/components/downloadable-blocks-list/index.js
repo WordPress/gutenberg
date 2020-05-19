@@ -6,7 +6,6 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -14,12 +13,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 
-function DownloadableBlocksList( {
-	items,
-	children,
-	onHover = noop,
-	onSelect,
-} ) {
+function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 	const { installBlockType } = useDispatch( 'core/block-directory' );
 
 	if ( ! items.length ) {
@@ -37,23 +31,16 @@ function DownloadableBlocksList( {
 				return (
 					<DownloadableBlockListItem
 						key={ item.id }
-						className={ getBlockMenuDefaultClassName( item.id ) }
-						icons={ item.icons }
 						onClick={ () => {
 							installBlockType( item ).then( () => {
 								onSelect( item );
 							} );
 							onHover( null );
 						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
 						item={ item }
 					/>
 				);
 			} ) }
-			{ children }
 		</ul>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
