@@ -10,14 +10,6 @@ describe( 'actions', () => {
 		assets: [ 'script.js' ],
 	};
 
-	afterEach( () => {
-		jest.clearAllMocks();
-	} );
-
-	afterAll( () => {
-		jest.resetAllMocks();
-	} );
-
 	describe( 'installBlockType', () => {
 		it( 'should install a block successfully', () => {
 			const generator = installBlockType( item );
