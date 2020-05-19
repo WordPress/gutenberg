@@ -11,7 +11,7 @@ import {
 	BlockList,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { parse, serialize } from '@wordpress/blocks';
+import { serialize } from '@wordpress/blocks';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -37,7 +37,10 @@ export default function ReusableBlockEdit( { attributes, isSelected } ) {
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
-			const { getSettings } = select( 'core/block-editor' );
+			const {
+				__experimentalGetParsedReusableBlock: getParsedReusableBlock,
+				getSettings,
+			} = select( 'core/block-editor' );
 			const {
 				__experimentalGetReusableBlock: getReusableBlock,
 				__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
@@ -50,7 +53,9 @@ export default function ReusableBlockEdit( { attributes, isSelected } ) {
 				isFetching: isFetchingReusableBlock( ref ),
 				isSaving: isSavingReusableBlock( ref ),
 				isTemporary: _reusableBlock?.isTemporary ?? null,
-				blocks: _reusableBlock ? parse( _reusableBlock.content ) : null,
+				blocks: _reusableBlock
+					? getParsedReusableBlock( _reusableBlock.id )
+					: null,
 				canUpdateBlock:
 					!! _reusableBlock &&
 					! _reusableBlock.isTemporary &&
