@@ -35,7 +35,6 @@ export const settings = {
 		anchor: true,
 		__unstablePasteTextInline: true,
 		lightBlockWrapper: true,
-		// TODO: Decide how to handle it.
 		__experimentalColor: Platform.OS === 'web',
 		__experimentalLineHeight: true,
 		__experimentalFontSize: true,

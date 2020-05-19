@@ -26,7 +26,6 @@ export const settings = {
 	supports: {
 		align: [ 'wide', 'full' ],
 		html: false,
-		// TODO: Decide how to handle it.
 		__experimentalColor: Platform.OS === 'web' && { gradients: true },
 	},
 	example: {
