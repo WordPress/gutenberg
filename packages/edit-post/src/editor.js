@@ -86,6 +86,7 @@ class Editor extends Component {
 			post,
 			postId,
 			initialEdits,
+			revisionNotice,
 			onError,
 			hiddenBlockTypes,
 			blockTypes,
@@ -119,12 +120,13 @@ class Editor extends Component {
 								settings={ editorSettings }
 								post={ post }
 								initialEdits={ initialEdits }
+								revisionNotice={ revisionNotice }
 								useSubRegistry={ false }
 								{ ...props }
 							>
 								<ErrorBoundary onError={ onError }>
 									<EditorInitialization postId={ postId } />
-									<Layout />
+									<Layout isRevision={ !! revisionNotice } />
 									<KeyboardShortcuts
 										shortcuts={ preventEventDiscovery }
 									/>

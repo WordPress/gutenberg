@@ -41,6 +41,13 @@ export class BrowserURL extends Component {
 		};
 	}
 
+	componentDidMount() {
+		if ( this.props.isRevision ) {
+			// Remove the revision URL parameter.
+			this.setBrowserURL( this.props.postId );
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		const { postId, postStatus, postType, isSavingPost } = this.props;
 		const { historyId } = this.state;

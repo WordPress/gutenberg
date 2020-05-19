@@ -96,6 +96,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			initialEdits,
+			revisionNotice,
 			hiddenBlockTypes,
 			blockTypes,
 			post,
@@ -133,6 +134,7 @@ class Editor extends Component {
 					settings={ editorSettings }
 					post={ normalizedPost }
 					initialEdits={ initialEdits }
+					revisionNotice={ revisionNotice }
 					useSubRegistry={ false }
 					{ ...props }
 				>

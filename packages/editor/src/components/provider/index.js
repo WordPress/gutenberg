@@ -163,6 +163,13 @@ class EditorProvider extends Component {
 
 	componentDidMount() {
 		this.props.updateEditorSettings( this.props.settings );
+
+		if ( !! this.props.revisionNotice ) {
+			this.props.createNotice( 'info', this.props.revisionNotice, {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -283,11 +290,14 @@ export default compose( [
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
+		const { createNotice, createWarningNotice } = dispatch(
+			'core/notices'
+		);
 
 		return {
 			setupEditor,
 			updatePostLock,
+			createNotice,
 			createWarningNotice,
 			resetEditorBlocks,
 			updateEditorSettings,

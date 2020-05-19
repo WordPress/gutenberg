@@ -103,4 +103,22 @@ describe( 'BrowserURL', () => {
 
 		expect( wrapper.type() ).toBeNull();
 	} );
+
+	it( 'updates URL if post is a revision', () => {
+		shallow(
+			<BrowserURL isRevision={ true } postId={ 1 } postStatus="publish" />
+		);
+
+		expect( replaceStateSpy ).toHaveBeenCalledWith(
+			{ id: 1 },
+			'Post 1',
+			'post.php?post=1&action=edit'
+		);
+	} );
+
+	it( 'does not update if post is not a revision', () => {
+		shallow( <BrowserURL postId={ 1 } postStatus="publish" /> );
+
+		expect( replaceStateSpy ).not.toHaveBeenCalled();
+	} );
 } );

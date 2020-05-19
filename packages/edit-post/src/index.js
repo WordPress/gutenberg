@@ -26,20 +26,23 @@ import Editor from './editor';
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {Element} target       DOM node in which editor is rendered.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
+ * @param {Object} postType        Post type of the post to edit.
+ * @param {Object} postId          ID of the post to edit.
+ * @param {Element} target         DOM node in which editor is rendered.
+ * @param {?Object} settings       Editor settings object.
+ * @param {Object} initialEdits    Programmatic edits to apply initially, to be
+ *                                 considered as non-user-initiated (bypass for
+ *                                 unsaved changes prompt).
+ * @param {?string} revisionNotice Message indicating post has been restored
+ *                                 from a revision.
  */
 export function reinitializeEditor(
 	postType,
 	postId,
 	target,
 	settings,
-	initialEdits
+	initialEdits,
+	revisionNotice
 ) {
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind(
@@ -48,7 +51,8 @@ export function reinitializeEditor(
 		postId,
 		target,
 		settings,
-		initialEdits
+		initialEdits,
+		revisionNotice
 	);
 
 	render(
@@ -58,6 +62,7 @@ export function reinitializeEditor(
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
+			revisionNotice={ revisionNotice }
 			recovery
 		/>,
 		target
@@ -70,20 +75,23 @@ export function reinitializeEditor(
  * The return value of this function is not necessary if we change where we
  * call initializeEditor(). This is due to metaBox timing.
  *
- * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
+ * @param {string}  id             Unique identifier for editor instance.
+ * @param {Object}  postType       Post type of the post to edit.
+ * @param {Object}  postId         ID of the post to edit.
+ * @param {?Object} settings       Editor settings object.
+ * @param {Object}  initialEdits   Programmatic edits to apply initially, to be
+ *                                 considered as non-user-initiated (bypass for
+ *                                 unsaved changes prompt).
+ * @param {?string} revisionNotice Message indicating post has been restored
+ *                                 from a revision.
  */
 export function initializeEditor(
 	id,
 	postType,
 	postId,
 	settings,
-	initialEdits
+	initialEdits,
+	revisionNotice
 ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind(
@@ -92,7 +100,8 @@ export function initializeEditor(
 		postId,
 		target,
 		settings,
-		initialEdits
+		initialEdits,
+		revisionNotice
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
@@ -142,6 +151,7 @@ export function initializeEditor(
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
+			revisionNotice={ revisionNotice }
 		/>,
 		target
 	);

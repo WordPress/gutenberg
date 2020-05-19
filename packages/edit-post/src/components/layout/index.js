@@ -55,7 +55,7 @@ const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
 };
 
-function Layout() {
+function Layout( { isRevision } ) {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
@@ -148,7 +148,7 @@ function Layout() {
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
-			<BrowserURL />
+			<BrowserURL isRevision={ isRevision } />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<LocalAutosaveMonitor />
