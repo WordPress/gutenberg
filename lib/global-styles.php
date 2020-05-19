@@ -80,7 +80,7 @@ function gutenberg_experimental_global_styles_get_user() {
 		}
 	}
 
-	return gutenberg_experimental_global_styles_normalize_schema( $config );
+	return $config;
 }
 
 /**
@@ -151,7 +151,7 @@ function gutenberg_experimental_global_styles_get_core() {
 		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
 	);
 
-	return gutenberg_experimental_global_styles_normalize_schema( $config );
+	return $config;
 }
 
 /**
@@ -160,7 +160,7 @@ function gutenberg_experimental_global_styles_get_core() {
  * @return array
  */
 function gutenberg_experimental_global_styles_get_theme_presets() {
-	$theme_presets = gutenberg_experimental_global_styles_normalize_schema( array() );
+	$theme_presets = array();
 
 	$theme_colors = get_theme_support( 'editor-color-palette' )[0];
 	if ( is_array( $theme_colors ) ) {
@@ -204,10 +204,8 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
  */
 function gutenberg_experimental_global_styles_get_theme() {
 	$theme_presets = gutenberg_experimental_global_styles_get_theme_presets();
-	$theme_config  = gutenberg_experimental_global_styles_normalize_schema(
-		gutenberg_experimental_global_styles_get_from_file(
-			locate_template( 'experimental-theme.json' )
-		)
+	$theme_config  = gutenberg_experimental_global_styles_get_from_file(
+		locate_template( 'experimental-theme.json' )
 	);
 
 	/*
@@ -360,30 +358,29 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 /**
  * Helper function that merges trees that adhere to the theme.json schema.
  *
- * @param array ...$trees List of trees to be merged.
+ * @param array $core Core origin.
+ * @param array $theme Theme origin.
+ * @param array $user = array() User origin.
  *
  * @return array The merged result.
  */
-function gutenberg_experimental_global_styles_merge_trees( ...$trees ) {
-	$accumulator = gutenberg_experimental_global_styles_normalize_schema( array() );
+function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user = array() ) {
+	$core   = gutenberg_experimental_global_styles_normalize_schema( $core );
+	$theme  = gutenberg_experimental_global_styles_normalize_schema( $theme );
+	$user   = gutenberg_experimental_global_styles_normalize_schema( $user );
+	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
-	foreach ( $trees as $tree ) {
-		foreach ( array_keys( $accumulator ) as $block_name ) {
-			// Merge styles.
-			if ( ! empty( $tree[ $block_name ]['styles'] ) ) {
-				$accumulator[ $block_name ]['styles'] = $tree[ $block_name ]['styles'];
-			}
-
-			// Merge presets.
-			foreach ( array_keys( $accumulator['global']['presets'] ) as $property ) {
-				if ( ! empty( $tree[ $block_name ]['presets'][ $property ] ) ) {
-					$accumulator[ $block_name ]['presets'][ $property ] = $tree[ $block_name ]['presets'][ $property ];
-				}
-			}
+	foreach ( array_keys( $core ) as $block_name ) {
+		foreach ( array( 'presets', 'styles', 'features' ) as $subtree ) {
+			$result[ $block_name ][ $subtree ] = array_merge(
+				$core[ $block_name ][ $subtree ],
+				$theme[ $block_name ][ $subtree ],
+				$user[ $block_name ][ $subtree ]
+			);
 		}
 	}
 
-	return $accumulator;
+	return $result;
 }
 
 /**
@@ -397,11 +394,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 	$block_schema = array(
 		'styles'   => array(),
 		'features' => array(),
-		'presets'  => array(
-			'color'     => array(),
-			'font-size' => array(),
-			'gradient'  => array(),
-		),
+		'presets'  => array(),
 	);
 
 	$normalized_tree = array( 'global' => array( $block_schema ) );
