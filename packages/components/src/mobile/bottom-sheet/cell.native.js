@@ -110,6 +110,8 @@ class BottomSheetCell extends Component {
 			customActionButton,
 			type,
 			step,
+			onFocus = () => undefined,
+			onBlur = () => undefined,
 			...valueProps
 		} = this.props;
 
@@ -160,11 +162,13 @@ class BottomSheetCell extends Component {
 
 		const finishEditing = () => {
 			this.setState( { isEditingValue: false } );
+			onBlur();
 		};
 
 		const startEditing = () => {
 			if ( this.state.isEditingValue === false ) {
 				this.setState( { isEditingValue: true } );
+				onFocus();
 			}
 		};
 
