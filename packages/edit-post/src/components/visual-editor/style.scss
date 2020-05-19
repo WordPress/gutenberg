@@ -6,6 +6,12 @@
 
 	& .components-button {
 		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary {
+			padding: 6px;
+		}
 	}
 
 	flex: 1 1 auto;
