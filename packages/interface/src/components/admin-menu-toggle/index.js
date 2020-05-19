@@ -9,7 +9,7 @@ import { wordpress } from '@wordpress/icons';
 
 function AdminMenuToggle() {
 	const buttonRef = useRef();
-	const toggleMenu = useToggle( { ref: buttonRef } );
+	const { isOpen, toggleMenu } = useToggle( { ref: buttonRef } );
 	// Get the current WP Admin Post URL
 	const href = window.location.href;
 
@@ -32,13 +32,17 @@ function AdminMenuToggle() {
 		toggleMenu();
 	};
 
+	const label = isOpen
+		? __( 'Hide sidebar menu' )
+		: __( 'Show sidebar menu' );
+
 	return (
 		<Button
 			className="interface-admin-menu-toggle"
 			href={ href }
 			icon={ wordpress }
 			iconSize={ 36 }
-			label={ __( 'Show sidebar menu' ) }
+			label={ label }
 			onClick={ handleOnClick }
 			ref={ buttonRef }
 		/>
@@ -46,7 +50,7 @@ function AdminMenuToggle() {
 }
 
 function useToggle( { ref } ) {
-	const [ isActive, setIsActive ] = useState( false );
+	const [ isOpen, setIsOpen ] = useState( false );
 	const buttonNode = ref?.current;
 
 	const adminMenuNode = document.querySelector( '#adminmenumain' );
@@ -61,8 +65,8 @@ function useToggle( { ref } ) {
 	);
 	const toggleClassName = 'is-showing-admin-menu';
 
-	const toggleAdminMenu = () => setIsActive( ! isActive );
-	const closeAdminMenu = () => setIsActive( false );
+	const toggleMenu = () => setIsOpen( ! isOpen );
+	const closeMenu = () => setIsOpen( false );
 
 	const focusFirstAdminMenuItem = () => {
 		if ( ! buttonNode ) return;
@@ -76,17 +80,17 @@ function useToggle( { ref } ) {
 
 	// Renders the open/closed UI for the admin menu
 	useEffect( () => {
-		if ( isActive ) {
+		if ( isOpen ) {
 			document.body.classList.add( toggleClassName );
 		} else {
 			document.body.classList.remove( toggleClassName );
 		}
-	}, [ isActive ] );
+	}, [ isOpen ] );
 
 	// Handles closing the admin menu when clicking outside
 	useEffect( () => {
 		const handleOnClickOutside = ( event ) => {
-			if ( ! isActive ) return;
+			if ( ! isOpen ) return;
 
 			const { target } = event;
 
@@ -94,7 +98,7 @@ function useToggle( { ref } ) {
 				! adminMenuNode.contains( target ) && target !== buttonNode;
 
 			if ( didClickOutside ) {
-				closeAdminMenu();
+				closeMenu();
 			}
 		};
 
@@ -103,17 +107,17 @@ function useToggle( { ref } ) {
 		return () => {
 			document.body.removeEventListener( 'click', handleOnClickOutside );
 		};
-	}, [ isActive, buttonNode ] );
+	}, [ isOpen, buttonNode ] );
 
 	// Handles admin menu keyboard interactions
 	useEffect( () => {
 		const handleOnKeyDown = ( event ) => {
-			if ( ! isActive ) return;
+			if ( ! isOpen ) return;
 
 			const { keyCode } = event;
 
 			if ( keyCode === ESCAPE ) {
-				closeAdminMenu();
+				closeMenu();
 			}
 
 			if ( keyCode === TAB ) {
@@ -166,9 +170,9 @@ function useToggle( { ref } ) {
 				handleOnFirstAdminMenuLinkBlur
 			);
 		};
-	}, [ isActive ] );
+	}, [ isOpen ] );
 
-	return toggleAdminMenu;
+	return { isOpen, toggleMenu };
 }
 
 export default AdminMenuToggle;
