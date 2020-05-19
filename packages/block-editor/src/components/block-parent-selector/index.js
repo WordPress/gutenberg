@@ -15,7 +15,7 @@ import BlockIcon from '../block-icon';
  * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
- * @return {WPElement} Parent Block Selector.
+ * @return {WPElement} Parent block selector.
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( 'core/block-editor' );
@@ -39,7 +39,7 @@ export default function BlockParentSelector() {
 		};
 	}, [] );
 
-	if ( parents && parents.length ) {
+	if ( parents?.length ) {
 		return (
 			<div
 				className="block-editor-block-parent-selector"
