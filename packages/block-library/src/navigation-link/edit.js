@@ -29,6 +29,7 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
+	__experimentalBlockNavigationEditor as BlockNavigationEditor,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -44,6 +45,7 @@ function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
 	isSelected,
+	isImmediateParentOfSelectedBlock,
 	isParentOfSelectedBlock,
 	setAttributes,
 	showSubmenuIcon,
@@ -53,6 +55,7 @@ function NavigationLinkEdit( {
 	rgbTextColor,
 	rgbBackgroundColor,
 	saveEntityRecord,
+	selectedBlockHasDescendants,
 	userCanCreatePages = false,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
@@ -193,6 +196,12 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<BlockNavigationEditor
+				value={ label }
+				onChange={ ( labelValue ) =>
+					setAttributes( { label: labelValue } )
+				}
+			/>
 			<Block.li
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
@@ -287,8 +296,9 @@ function NavigationLinkEdit( {
 				<InnerBlocks
 					allowedBlocks={ [ 'core/navigation-link' ] }
 					renderAppender={
-						( hasDescendants && isSelected ) ||
-						isParentOfSelectedBlock
+						( isSelected && hasDescendants ) ||
+						( isImmediateParentOfSelectedBlock &&
+							! selectedBlockHasDescendants )
 							? InnerBlocks.DefaultAppender
 							: false
 					}
@@ -336,6 +346,7 @@ export default compose( [
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getBlockParentsByBlockName,
+			getSelectedBlockClientId,
 			getSettings,
 		} = select( 'core/block-editor' );
 		const { clientId } = ownProps;
@@ -349,6 +360,14 @@ export default compose( [
 		const showSubmenuIcon =
 			!! navigationBlockAttributes.showSubmenuIcon && hasDescendants;
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			false
+		);
+		const selectedBlockId = getSelectedBlockClientId();
+		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+			selectedBlockId,
+		] )?.length;
 
 		const userCanCreatePages = select( 'core' ).canUser(
 			'create',
@@ -357,7 +376,9 @@ export default compose( [
 
 		return {
 			isParentOfSelectedBlock,
+			isImmediateParentOfSelectedBlock,
 			hasDescendants,
+			selectedBlockHasDescendants,
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,

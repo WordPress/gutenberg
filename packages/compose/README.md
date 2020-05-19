@@ -126,6 +126,7 @@ Provides a unique instance ID.
 _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
+-   _prefix_ `string`: Prefix for the unique id.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
