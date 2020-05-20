@@ -1,16 +1,17 @@
 const gradients = {
-	linear: 'linear',
-	radial: 'radial',
+	linear: 'linear-gradient',
+	radial: 'radial-gradient',
 };
 
 const getGradientType = ( color ) => {
-	if ( color?.includes( 'radial-gradient' ) ) {
+	if ( color?.includes( gradients.radial ) ) {
 		return gradients.radial;
-	} else if ( color?.includes( 'linear-gradient' ) ) {
+	} else if ( color?.includes( gradients.linear ) ) {
 		return gradients.linear;
 	}
 	return false;
 };
+
 export const colorsUtils = {
 	subsheets: {
 		settings: 'Settings',
