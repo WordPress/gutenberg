@@ -31,10 +31,10 @@ module.exports = async function destroy( { spinner, debug } ) {
 		configPath
 	);
 
-	// check installed WordPress.
-	const installed = await fs.readdir( workDirectoryPath );
-	if ( ! installed.length ) {
-		spinner.text = `Could not find any files to remove.`;
+	try {
+		await fs.readdir( workDirectoryPath );
+	} catch {
+		spinner.text = 'Could not find any files to remove.';
 		return;
 	}
 
