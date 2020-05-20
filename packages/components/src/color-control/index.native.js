@@ -10,6 +10,7 @@ function ColorControl( {
 	className,
 	onPress,
 	color,
+	withColorIndicator,
 	...props
 } ) {
 	const id = `inspector-color-control-${ instanceId }`;
@@ -23,6 +24,7 @@ function ColorControl( {
 			aria-describedby={ !! help ? id + '__help' : undefined }
 			onPress={ onPress }
 			color={ color }
+			withColorIndicator={ withColorIndicator }
 			{ ...props }
 		/>
 	);

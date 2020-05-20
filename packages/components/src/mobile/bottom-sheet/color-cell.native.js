@@ -11,7 +11,7 @@ import Cell from './cell';
 import styles from './styles.scss';
 
 export default function BottomSheetColorCell( props ) {
-	const { color, ...cellProps } = props;
+	const { color, withColorIndicator = true, ...cellProps } = props;
 
 	return (
 		<Cell
@@ -22,9 +22,9 @@ export default function BottomSheetColorCell( props ) {
 				__( 'Double tap to go to color settings' )
 			}
 			editable={ false }
-			value={ ! color && 'Default' }
+			value={ withColorIndicator && ! color && 'Default' }
 		>
-			{ color && (
+			{ withColorIndicator && color && (
 				<ColorIndicator color={ color } style={ styles.colorCircle } />
 			) }
 			<Icon icon={ chevronRight }></Icon>

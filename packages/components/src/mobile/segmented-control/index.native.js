@@ -6,7 +6,6 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	Platform,
-	LayoutAnimation,
 	Animated,
 	Easing,
 } from 'react-native';
@@ -20,6 +19,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { performLayoutAnimation } from '../utils';
 import styles from './style.scss';
 
 const ANIMATION_DURATION = 200;
@@ -89,7 +89,7 @@ const SegmentedControls = ( {
 		styles.containerDark
 	);
 
-	function performAnimation( index ) {
+	function performSwatchAnimation( index ) {
 		Animated.timing( positionAnimationValue, {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
@@ -113,16 +113,10 @@ const SegmentedControls = ( {
 	}
 
 	function onHandlePress( segment, index ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation( ANIMATION_DURATION );
 		setActiveSegmentIndex( index );
 		segmentHandler( segment );
-		performAnimation( index, segment );
+		performSwatchAnimation( index, segment );
 	}
 
 	function segmentOnLayout( event, index ) {

@@ -11,7 +11,6 @@ import {
 	Keyboard,
 	StatusBar,
 	TouchableHighlight,
-	LayoutAnimation,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -36,8 +35,7 @@ import RangeCell from './range-cell';
 import ColorCell from './color-cell';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
-
-const ANIMATION_DURATION = 300;
+import { performLayoutAnimation } from '../utils';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -248,13 +246,7 @@ class BottomSheet extends Component {
 	}
 
 	onReplaceSubsheet( destination, extraProps, callback ) {
-		LayoutAnimation.configureNext(
-			LayoutAnimation.create(
-				ANIMATION_DURATION,
-				LayoutAnimation.Types.easeInEaseOut,
-				LayoutAnimation.Properties.opacity
-			)
-		);
+		performLayoutAnimation();
 
 		this.setState(
 			{
