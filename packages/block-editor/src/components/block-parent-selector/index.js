@@ -19,25 +19,25 @@ import BlockIcon from '../block-icon';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const { parents } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParents } = select(
-			'core/block-editor'
-		);
-		const selectedBlockClientId = getSelectedBlockClientId();
-		return {
-			parents: getBlockParents( selectedBlockClientId ),
-		};
-	}, [] );
-
-	const firstParentClientId = parents[ parents.length - 1 ];
-
-	const { parentBlockType } = useSelect( ( select ) => {
-		const { getBlockName } = select( 'core/block-editor' );
-		const parentBlockName = getBlockName( firstParentClientId );
-		return {
-			parentBlockType: getBlockType( parentBlockName ),
-		};
-	}, [] );
+	const { parents, parentBlockType, firstParentClientId } = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getBlockParents,
+				getSelectedBlockClientId,
+			} = select( 'core/block-editor' );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const _parents = getBlockParents( selectedBlockClientId );
+			const _firstParentClientId = _parents[ _parents.length - 1 ];
+			const parentBlockName = getBlockName( _firstParentClientId );
+			return {
+				parents: _parents,
+				parentBlockType: getBlockType( parentBlockName ),
+				firstParentClientId: _firstParentClientId,
+			};
+		},
+		[]
+	);
 
 	if ( parents?.length ) {
 		return (
