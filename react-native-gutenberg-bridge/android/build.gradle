@@ -1,11 +1,14 @@
 buildscript {
-    def isJitPack = System.getenv('JITPACK').asBoolean()
+    def buildGutenbergMobileJSBundle =
+            System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
+            ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                    && rootProject.ext.buildGutenbergMobileJSBundle)
 
     repositories {
         jcenter()
         google()
 
-        if (isJitPack) {
+        if (buildGutenbergMobileJSBundle) {
             maven {
                 url "https://plugins.gradle.org/m2/"
             }
@@ -16,8 +19,8 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.4.2'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
-        if (isJitPack) {
-            classpath "com.moowork.gradle:gradle-node-plugin:1.2.0"
+        if (buildGutenbergMobileJSBundle) {
+            classpath "com.moowork.gradle:gradle-node-plugin:1.3.1"
         }
     }
 }
@@ -25,22 +28,25 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-def isJitPack = System.getenv('JITPACK').asBoolean()
+def buildGutenbergMobileJSBundle =
+        System.getenv('SUPPRESS_GUTENBERG_MOBILE_JS_BUNDLE_BUILD').asBoolean()
+        ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
+                && rootProject.ext.buildGutenbergMobileJSBundle)
 
-if (isJitPack) {
-    println 'Building in JitPack'
+if (buildGutenbergMobileJSBundle) {
+    println 'Building the Gutenberg Mobile JS bundle'
 
     apply plugin: 'com.moowork.node'
 
     node {
         // Version of node to use.
-        version = '12.13.1'
+        version = '12.16.1'
 
         // Version of npm to use.
-        npmVersion = '6.3.0'
+        npmVersion = '6.14.2'
 
         // Version of Yarn to use.
-        yarnVersion = '1.10.1'
+        yarnVersion = '1.22.4'
 
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
@@ -63,6 +69,10 @@ if (isJitPack) {
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../")
     }
+
+    yarn_install {
+        args = ['--prefer-offline', '--network-concurrency 1']
+    }
 }
 
 // import the `readReactNativeVersion()` function
@@ -81,6 +91,7 @@ project.ext.buildGutenbergFromSource = false
 
 def hermesOriginalPath = "../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
+def buildAssetsFolder = 'build/assets'
 
 android {
     compileSdkVersion 28
@@ -98,6 +109,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs += buildAssetsFolder
+        }
     }
 }
 
@@ -136,7 +153,7 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../bundle/";
+        hermesPath = "${projectDir}/../../bundle/android/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../package.json', 'react-native-video', 'dependencies')))
@@ -153,21 +170,89 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-if (isJitPack) {
-    def assetsFolder = 'src/main/assets'
-    def aarFolder = 'src/main/assets'
+boolean isBundleUpToDate() {
+    return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
+}
 
-    task buildJSBundle(type: YarnTask) {
-        args = ['bundle:android']
-    }
+if (buildGutenbergMobileJSBundle) {
+    def bundleName = 'index.android.bundle'
+    def jsRootDir = '../..'
 
-    task ensureAssetsDirectory { 
+    task bundleUpToDateCheck {
+        description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
+Only if they are is the isBundleUpToDate flag set to true. That flag is used by other tasks.")
+
+        def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name == 'package.json' }
+        def inputFiles = {
+            def jsFiles = []
+            def dirs = []
+            file(jsRootDir).eachDir { dir ->
+                if (dir.name != 'node_modules'
+                        && dir.name != 'bundle'
+                        && dir.name != 'gutenberg'
+                        && !dir.name.startsWith('symlinked')) {
+                    dirs << dir
+                }
+            }
+            file("$jsRootDir/gutenberg").eachDir { dir ->
+                if (dir.name != 'node_modules') {
+                    dirs << dir
+                }
+            }
+
+            dirs.forEach { dir ->
+                file(dir).eachFileRecurse {
+                    if (isRelevantFile(it)) {
+                        jsFiles << it
+                    }
+                }
+            }
+
+            def jsRootDirFiles = file(jsRootDir).listFiles().findAll {
+                isRelevantFile(it)
+            }
+            def gutenbergRootDirFiles = file("$jsRootDir/gutenberg").listFiles().findAll {
+                isRelevantFile(it)
+            }
+            return jsFiles + jsRootDirFiles + gutenbergRootDirFiles
+        }
+        inputs.files(inputFiles())
+
+        outputs.file("$buildAssetsFolder/$bundleName")
+
+        // Having this task create this file as an output because changes to
+        // the actual bundle (or even deleting the bundle file) was not triggering
+        // this task to rerun (and flip the isBundleUpToDate flag to false). Now that
+        // this second indicator file is here, which gets deleted if the project is cleaned,
+        // this task knows that it is out of date. Note that if there are changes to the
+        // bundle file though, that alone will not trigger this task to run again, so you'll
+        // need to use --rerun-tasks in that case.
+        def upToDateIndicatorFile = "$buildAssetsFolder/up-to-date-bundle-indicator"
+        outputs.file(upToDateIndicatorFile)
+
+        // set flag to true before task tries to run
+        project.ext.isBundleUpToDate = true
         doLast {
-            mkdir assetsFolder
+            // If this task runs, either the inputs or outputs have changed, so the bundle is out of date.
+            project.ext.isBundleUpToDate = false
+            file(upToDateIndicatorFile).createNewFile()
         }
     }
 
+    yarn_install.dependsOn bundleUpToDateCheck
+    yarn_install.onlyIf { !isBundleUpToDate() }
+
+    task buildJSBundle(type: YarnTask) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
+        args = ['bundle:android']
+    }
+
     task backupHermesDebugAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-debug.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -178,6 +263,9 @@ if (isJitPack) {
     }
 
     task backupHermesReleaseAAR(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'hermes-release.aar'
         def origWithPath = hermesOriginalPath + origFileName
         from origWithPath
@@ -188,27 +276,30 @@ if (isJitPack) {
     }
 
     task copyJSBundle(type: Copy) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         def origFileName = 'App.js'
         def origWithPath = "../../bundle/android/${origFileName}"
-        def target = 'index.android.bundle'
         from origWithPath
-        into assetsFolder
-        rename origFileName, target
+        into buildAssetsFolder
+        rename origFileName, bundleName
         doLast {
             println "Done copying the Android JS bundle to assets folder"
         }
     }
 
     task cleanupNodeModulesFolder(type: Delete) {
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
+
         delete '../../node_modules'
     }
 
-    if (isJitPack) {
-        preBuild.dependsOn(cleanupNodeModulesFolder)
-        cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
-        backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
-        backupHermesReleaseAAR.dependsOn(copyJSBundle)
-        copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
-    }
+    preBuild.dependsOn(cleanupNodeModulesFolder)
+    cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+    backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
+    backupHermesReleaseAAR.dependsOn(copyJSBundle)
+    copyJSBundle.dependsOn(buildJSBundle)
+    buildJSBundle.dependsOn(yarn_install)
 }

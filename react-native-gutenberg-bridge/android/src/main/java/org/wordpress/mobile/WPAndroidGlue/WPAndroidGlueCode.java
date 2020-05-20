@@ -95,6 +95,7 @@ public class WPAndroidGlueCode {
     private CountDownLatch mGetContentCountDownLatch;
     private WeakReference<View> mLastFocusedView = null;
     private RequestExecutor mRequestExecutor;
+    private AddMentionUtil mAddMentionUtil;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -102,6 +103,8 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_POST_TYPE = "postType";
     private static final String PROP_NAME_LOCALE = "locale";
     private static final String PROP_NAME_TRANSLATIONS = "translations";
+    public static final String PROP_NAME_CAPABILITIES = "capabilities";
+    public static final String PROP_NAME_CAPABILITIES_MENTIONS = "mentions";
     private static final String PROP_NAME_COLORS = "colors";
     private static final String PROP_NAME_GRADIENTS = "gradients";
 
@@ -337,6 +340,10 @@ public class WPAndroidGlueCode {
             public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
                 mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
             }
+
+            @Override public void onAddMention(Consumer<String> onSuccess) {
+                mAddMentionUtil.getMention(onSuccess);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -359,18 +366,45 @@ public class WPAndroidGlueCode {
     }
 
     @Deprecated
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
-        onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations, colorBackground, isDarkMode, null);
+    public void onCreateView(Context initContext,
+                             boolean htmlModeEnabled,
+                             Application application,
+                             boolean isDebug,
+                             boolean buildGutenbergFromSource,
+                             boolean isNewPost,
+                             String localeString,
+                             Bundle translations,
+                             int colorBackground,
+                             boolean isDarkMode) {
+        onCreateView(
+                initContext,
+                htmlModeEnabled,
+                application,
+                isDebug,
+                buildGutenbergFromSource,
+                "post",
+                isNewPost,
+                localeString,
+                translations,
+                colorBackground,
+                isDarkMode,
+                null,
+                null);
     }
 
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             String postType, boolean isNewPost, String localeString, Bundle translations,
-                             int colorBackground, boolean isDarkMode, @Nullable
-                             RNEditorTheme editorTheme) {
+    public void onCreateView(Context initContext,
+                             boolean htmlModeEnabled,
+                             Application application,
+                             boolean isDebug,
+                             boolean buildGutenbergFromSource,
+                             String postType,
+                             boolean isNewPost,
+                             String localeString,
+                             Bundle translations,
+                             int colorBackground,
+                             boolean isDarkMode,
+                             @Nullable Boolean isSiteUsingWpComRestApi,
+                             @Nullable RNEditorTheme editorTheme) {
         mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
@@ -401,6 +435,12 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_LOCALE, localeString);
         initialProps.putBundle(PROP_NAME_TRANSLATIONS, translations);
 
+        Bundle capabilities = new Bundle();
+        if (isSiteUsingWpComRestApi != null) {
+            capabilities.putBoolean(PROP_NAME_CAPABILITIES_MENTIONS, isSiteUsingWpComRestApi);
+        }
+        initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
+
         if (editorTheme != null && editorTheme.getColors() != null) {
             initialProps.putSerializable(PROP_NAME_COLORS, editorTheme.getColors());
         }
@@ -423,6 +463,7 @@ public class WPAndroidGlueCode {
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
+                                  AddMentionUtil addMentionUtil,
                                   boolean isDarkMode) {
 
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
@@ -436,6 +477,7 @@ public class WPAndroidGlueCode {
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
+        mAddMentionUtil = addMentionUtil;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

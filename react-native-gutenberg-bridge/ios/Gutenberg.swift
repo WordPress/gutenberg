@@ -66,6 +66,10 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
+        if let capabilities = dataSource.gutenbergCapabilities() {
+            initialProps["capabilities"] = capabilities
+        }
+
         let editorTheme = dataSource.gutenbergEditorTheme()
         if let colors = editorTheme?.colors {
             initialProps["colors"] = colors
