@@ -28,7 +28,7 @@ export default function useResizeCanvas( deviceType ) {
 	} );
 
 	const getCanvasWidth = ( device ) => {
-		let deviceWidth = 0;
+		let deviceWidth;
 
 		switch ( device ) {
 			case 'Tablet':
@@ -38,7 +38,7 @@ export default function useResizeCanvas( deviceType ) {
 				deviceWidth = 360;
 				break;
 			default:
-				deviceWidth = 2000;
+				return null;
 		}
 
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
