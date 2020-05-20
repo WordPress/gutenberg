@@ -3,6 +3,7 @@
 * [**] Add support for changing overlay color settings in Cover block
 * Add enter/exit animation in FloatingToolbar
 * [***] New block: Verse
+* [*] Fix merging of text blocks when text had active formatting (bold, italic, strike, link)
 
 1.28.0
 ------
