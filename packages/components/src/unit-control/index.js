@@ -121,7 +121,6 @@ function UnitControl(
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
-			className="components-unit-control__select"
 			disabled={ disabled }
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }
