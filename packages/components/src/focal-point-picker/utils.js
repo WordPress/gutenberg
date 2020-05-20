@@ -9,3 +9,7 @@ export function isVideoType( filename = '' ) {
 	if ( ! filename ) return false;
 	return VIDEO_EXTENSIONS.includes( getExtension( filename ) );
 }
+
+export function fractionToPercentage( fraction ) {
+	return Math.round( fraction * 100 );
+}
