@@ -19,13 +19,17 @@ export default function useResizeCanvas( deviceType ) {
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
 
 	useEffect( () => {
+		if ( deviceType === 'Desktop' ) {
+			return;
+		}
+
 		const resizeListener = () => updateActualWidth( window.innerWidth );
 		window.addEventListener( 'resize', resizeListener );
 
 		return () => {
 			window.removeEventListener( 'resize', resizeListener );
 		};
-	} );
+	}, [ deviceType ] );
 
 	const getCanvasWidth = ( device ) => {
 		let deviceWidth;
