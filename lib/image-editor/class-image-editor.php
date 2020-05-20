@@ -74,7 +74,10 @@ class Image_Editor {
 		}
 
 		// Finally apply the modification.
-		$info = $modifier->apply_to_image( $image['editor'], $info, $target_file );
+		$modified = $modifier->apply_to_image( $image['editor'] );
+		if ( is_wp_error( $modified ) ) {
+			return $modified;
+		}
 
 		// And save.
 		return $this->save_image( $image, $target_file, $info );
@@ -265,11 +268,9 @@ abstract class Image_Editor_Modifier {
 	 * @access public
 	 *
 	 * @param WP_Image_Editor $image Image editor.
-	 * @param array           $meta Metadata for the image.
-	 * @param string          $target_file File name to save the edited image as.
-	 * @return array Metadata for the image.
+	 * @return bool|WP_Error True on success, WP_Error object or false on failure.
 	 */
-	abstract public function apply_to_image( $image, $meta, $target_file );
+	abstract public function apply_to_image( $image );
 
 	/**
 	 * Gets the new filename based on metadata.

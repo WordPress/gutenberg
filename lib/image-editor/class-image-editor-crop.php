@@ -78,11 +78,9 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	 * @access public
 	 *
 	 * @param WP_Image_Editor $image Image editor.
-	 * @param array           $info Metadata for the image.
-	 * @param string          $target_file File name to save the edited image as.
-	 * @return array Metadata for the image.
+	 * @return bool|WP_Error True on success, WP_Error object or false on failure.
 	 */
-	public function apply_to_image( $image, $info, $target_file ) {
+	public function apply_to_image( $image ) {
 		$size = $image->get_size();
 
 		$crop_x = round( ( $size['width'] * $this->crop_x ) / 100.0 );
@@ -90,12 +88,7 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 		$width  = round( ( $size['width'] * $this->width ) / 100.0 );
 		$height = round( ( $size['height'] * $this->height ) / 100.0 );
 
-		$image->crop( $crop_x, $crop_y, $width, $height );
-
-		// We need to change the original name to include the crop. This way if it's cropped again we won't clash.
-		$info['meta']['original_name'] = $target_file;
-
-		return $info;
+		return $image->crop( $crop_x, $crop_y, $width, $height );
 	}
 
 	/**
@@ -108,7 +101,12 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 	 */
 	public static function get_filename( $meta ) {
 		if ( isset( $meta['cropWidth'] ) && $meta['cropWidth'] > 0 ) {
-			return sprintf( 'crop-%d-%d-%d-%d', round( $meta['cropX'], 2 ), round( $meta['cropY'], 2 ), round( $meta['cropWidth'], 2 ), round( $meta['cropHeight'], 2 ) );
+			$target_file = sprintf( 'crop-%d-%d-%d-%d', round( $meta['cropX'], 2 ), round( $meta['cropY'], 2 ), round( $meta['cropWidth'], 2 ), round( $meta['cropHeight'], 2 ) );
+
+			// We need to change the original name to include the crop. This way if it's cropped again we won't clash.
+			$meta['original_name'] = $target_file;
+
+			return $target_file;
 		}
 
 		return false;

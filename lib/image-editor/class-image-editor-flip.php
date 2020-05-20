@@ -56,14 +56,10 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 	 * @access public
 	 *
 	 * @param WP_Image_Editor $image Image editor.
-	 * @param array           $info Metadata for the image.
-	 * @param string          $target_file File name to save the edited image as.
-	 * @return array Metadata for the image.
+	 * @return bool|WP_Error True on success, WP_Error object or false on failure.
 	 */
-	public function apply_to_image( $image, $info, $target_file ) {
-		$image->flip( $this->is_vertical(), $this->is_horizontal() );
-
-		return $info;
+	public function apply_to_image( $image ) {
+		return $image->flip( $this->is_vertical(), $this->is_horizontal() );
 	}
 
 	/**
