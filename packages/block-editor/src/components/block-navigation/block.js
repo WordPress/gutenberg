@@ -49,6 +49,7 @@ export default function BlockNavigationBlock( {
 	);
 	const {
 		__experimentalWithEllipsisMenu: withEllipsisMenu,
+		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
 	} = useBlockNavigationContext();
 	const ellipsisMenuClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
@@ -115,7 +116,7 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withEllipsisMenu && level > 1 && (
+			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
 				<TreeGridCell className={ ellipsisMenuClassName }>
 					{ ( props ) => (
 						<BlockSettingsDropdown

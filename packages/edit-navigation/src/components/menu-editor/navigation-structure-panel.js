@@ -27,6 +27,7 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 						selectBlock={ selectBlock }
 						__experimentalWithBlockNavigationSlots={ true }
 						__experimentalWithEllipsisMenu={ true }
+						__experimentalWithEllipsisMenuMinLevel={ 2 }
 						showNestedBlocks
 						showAppender
 						showBlockMovers

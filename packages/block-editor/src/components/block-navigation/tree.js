@@ -22,16 +22,22 @@ import { BlockNavigationContext } from './context';
 export default function BlockNavigationTree( {
 	__experimentalWithBlockNavigationSlots,
 	__experimentalWithEllipsisMenu,
+	__experimentalWithEllipsisMenuMinLevel,
 	...props
 } ) {
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalWithBlockNavigationSlots,
 			__experimentalWithEllipsisMenu,
+			__experimentalWithEllipsisMenuMinLevel:
+				typeof __experimentalWithEllipsisMenuMinLevel === 'number'
+					? __experimentalWithEllipsisMenuMinLevel
+					: 0,
 		} ),
 		[
 			__experimentalWithBlockNavigationSlots,
 			__experimentalWithEllipsisMenu,
+			__experimentalWithEllipsisMenuMinLevel,
 		]
 	);
 
