@@ -81,6 +81,8 @@ If you are certain of your changes and desire to commit anyways, you should eith
  */
 async function getLocalNPMVersion() {
 	return new Promise( async ( resolve ) => {
+		// 'npm' doesn't work correctly on Windows.
+		// https://github.com/WordPress/gutenberg/issues/22484
 		const command = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 		const childProcess = spawn( command, [ '-v' ] );
 
