@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
+import {
+	__experimentalTreeGridCell as TreeGridCell,
+	__experimentalTreeGridItem as TreeGridItem,
+} from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -41,27 +44,25 @@ export default function BlockNavigationAppender( {
 				className="block-editor-block-navigation-appender__cell"
 				colSpan="3"
 			>
-				{ ( props ) => (
-					<div className="block-editor-block-navigation-appender__container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
-						<ButtonBlockAppender
-							rootClientId={ parentBlockClientId }
-							__experimentalSelectBlockOnInsert={ false }
-							aria-describedby={ descriptionId }
-							{ ...props }
-						/>
-						<div
-							className="block-editor-block-navigation-appender__description"
-							id={ descriptionId }
-						>
-							{ appenderPositionDescription }
-						</div>
+				<div className="block-editor-block-navigation-appender__container">
+					<DescenderLines
+						level={ level }
+						isLastRow={ position === rowCount }
+						terminatedLevels={ terminatedLevels }
+					/>
+					<TreeGridItem
+						as={ ButtonBlockAppender }
+						rootClientId={ parentBlockClientId }
+						__experimentalSelectBlockOnInsert={ false }
+						aria-describedby={ descriptionId }
+					/>
+					<div
+						className="block-editor-block-navigation-appender__description"
+						id={ descriptionId }
+					>
+						{ appenderPositionDescription }
 					</div>
-				) }
+				</div>
 			</TreeGridCell>
 		</BlockNavigationLeaf>
 	);

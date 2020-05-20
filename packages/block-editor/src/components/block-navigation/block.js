@@ -6,8 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
+import {
+	__experimentalTreeGridCell as TreeGridCell,
+	__experimentalTreeGridItem as TreeGridItem,
+} from '@wordpress/components';
+
 import { useState } from '@wordpress/element';
 
 /**
@@ -74,44 +78,37 @@ export default function BlockNavigationBlock( {
 				className="block-editor-block-navigation-block__contents-cell"
 				colSpan={ hasRenderedMovers ? undefined : 3 }
 			>
-				{ ( props ) => (
-					<div className="block-editor-block-navigation-block__contents-container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
-						<BlockNavigationBlockContents
-							block={ block }
-							onClick={ onClick }
-							isSelected={ isSelected }
-							position={ position }
-							siblingCount={ siblingCount }
-							level={ level }
-							{ ...props }
-						/>
-					</div>
-				) }
+				<div className="block-editor-block-navigation-block__contents-container">
+					<DescenderLines
+						level={ level }
+						isLastRow={ position === rowCount }
+						terminatedLevels={ terminatedLevels }
+					/>
+					<BlockNavigationBlockContents
+						block={ block }
+						onClick={ onClick }
+						isSelected={ isSelected }
+						position={ position }
+						siblingCount={ siblingCount }
+						level={ level }
+					/>
+				</div>
 			</TreeGridCell>
 			{ hasRenderedMovers && (
 				<>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
-							<BlockMoverUpButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
-						) }
+						<TreeGridItem
+							as={ BlockMoverUpButton }
+							__experimentalOrientation="vertical"
+							clientIds={ [ clientId ] }
+						/>
 					</TreeGridCell>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
-							<BlockMoverDownButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
-						) }
+						<TreeGridItem
+							as={ BlockMoverDownButton }
+							__experimentalOrientation="vertical"
+							clientIds={ [ clientId ] }
+						/>
 					</TreeGridCell>
 				</>
 			) }
