@@ -768,6 +768,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flex",
+		"slug": "flex",
+		"markdown_source": "../packages/components/src/flex/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
