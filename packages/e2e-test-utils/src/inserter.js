@@ -19,7 +19,7 @@ export async function openGlobalBlockInserter() {
 	const hasTabs = !! ( await page.$( '.block-editor-inserter__tabs' ) );
 	if ( hasTabs ) {
 		await page.click(
-			'.block-editor-inserter__tabs [aria-controls="0-blocks-view"]'
+			'.block-editor-inserter__tabs [aria-controls="1-blocks-view"]'
 		);
 	}
 }
