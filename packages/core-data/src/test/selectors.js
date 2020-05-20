@@ -124,7 +124,6 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 						kind: 'someKind',
 						name: 'someName',
 						transientEdits: { someTransientEditProperty: true },
-						label: 'someLabel',
 					},
 				],
 				data: {
@@ -160,7 +159,6 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 				name: 'someName',
 				key: 'someKey',
 				title: '',
-				label: 'someLabel',
 			},
 		] );
 	} );
