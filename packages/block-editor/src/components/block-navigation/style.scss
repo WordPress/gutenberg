@@ -67,9 +67,14 @@ $tree-item-height: 36px;
 			opacity: 1;
 			@include edit-post__fade-in-animation;
 		}
+	}
 
-		.components-toolbar {
-			border: 0;
+	.block-editor-block-navigation-block__menu-cell {
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
 		}
 	}
 
