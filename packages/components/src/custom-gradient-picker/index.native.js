@@ -24,7 +24,7 @@ import {
 	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
 
-function CustomGradientPicker( { currentValue, setColor } ) {
+function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
 
 	const gradientType = getGradientType( currentValue ) || gradients.linear;
@@ -68,7 +68,7 @@ function CustomGradientPicker( { currentValue, setColor } ) {
 			},
 		} );
 
-		if ( gradientColor !== currentValue ) {
+		if ( isGradientColor && gradientColor !== currentValue ) {
 			setColor( gradientColor );
 		}
 	}
