@@ -16,7 +16,7 @@ import { Path, SVG } from '@wordpress/primitives';
  */
 import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
-import { isVideoType } from './utils';
+import Media from './media';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
@@ -39,6 +39,10 @@ export class FocalPointPicker extends Component {
 			this
 		);
 		this.onLoad = this.onLoad.bind( this );
+		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
+	}
+	componentDidMount() {
+		document.addEventListener( 'mouseup', this.handleOnMouseUp );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -46,6 +50,9 @@ export class FocalPointPicker extends Component {
 				isDragging: false,
 			} );
 		}
+	}
+	componentWillUnmount() {
+		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
 	}
 	calculateBounds() {
 		const bounds = {
@@ -83,6 +90,9 @@ export class FocalPointPicker extends Component {
 		this.setState( {
 			bounds: this.calculateBounds(),
 		} );
+	}
+	handleOnMouseUp() {
+		this.setState( { isDragging: false } );
 	}
 	onMouseMove( event ) {
 		const { isDragging, bounds } = this.state;
@@ -167,7 +177,15 @@ export class FocalPointPicker extends Component {
 		} );
 	}
 	render() {
-		const { instanceId, url, value, label, help, className } = this.props;
+		const {
+			autoPlay,
+			instanceId,
+			url,
+			value,
+			label,
+			help,
+			className,
+		} = this.props;
 		const { bounds, isDragging, percentages } = this.state;
 		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
@@ -190,8 +208,6 @@ export class FocalPointPicker extends Component {
 		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
 
-		const isVideo = isVideoType( url );
-
 		return (
 			<BaseControl
 				label={ label }
@@ -208,34 +224,20 @@ export class FocalPointPicker extends Component {
 						onDragStart={ () =>
 							this.setState( { isDragging: true } )
 						}
-						onMouseUp={ () =>
-							this.setState( { isDragging: false } )
-						}
+						onMouseUp={ this.handleOnMouseUp }
 						onDrop={ () => this.setState( { isDragging: false } ) }
 						onMouseMove={ this.onMouseMove }
 						ref={ this.containerRef }
 						role="button"
 						tabIndex="-1"
 					>
-						{ isVideo ? (
-							<video
-								autoPlay
-								muted
-								loop
-								onLoadedData={ this.onLoad }
-								src={ url }
-								ref={ this.mediaRef }
-								draggable="false"
-							/>
-						) : (
-							<img
-								alt="Dimensions helper"
-								onLoad={ this.onLoad }
-								ref={ this.mediaRef }
-								src={ url }
-								draggable="false"
-							/>
-						) }
+						<Media
+							alt="Dimensions helper"
+							autoPlay={ autoPlay }
+							mediaRef={ this.mediaRef }
+							onLoad={ this.onLoad }
+							src={ url }
+						/>
 						<div
 							className={ iconContainerClasses }
 							style={ iconContainerStyle }
@@ -295,6 +297,7 @@ export class FocalPointPicker extends Component {
 }
 
 FocalPointPicker.defaultProps = {
+	autoPlay: true,
 	url: null,
 	value: {
 		x: 0.5,

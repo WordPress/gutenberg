@@ -15,11 +15,13 @@
 	position: relative;
 	width: 100%;
 
-	img {
+	img,
+	video {
 		height: auto;
 		max-height: 100%;
 		max-width: 100%;
 		width: auto;
+		pointer-events: none;
 		user-select: none;
 	}
 }
