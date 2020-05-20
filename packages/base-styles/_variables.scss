@@ -5,95 +5,95 @@
  */
 
 $default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif;
-$default-font-size: 13px;
+$default-font-size: 0.8125rem;
 $default-line-height: 1.4;
 $editor-font: "Noto Serif", serif;
 $editor-html-font: Menlo, Consolas, monaco, monospace;
-$editor-font-size: 16px;
-$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
-$text-editor-font-size: 14px;
+$editor-font-size: 1rem;
+$default-block-margin: 1.75rem; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
+$text-editor-font-size: 0.875rem;
 $editor-line-height: 1.8;
-$big-font-size: 18px;
-$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
+$big-font-size: 1.125rem;
+$mobile-text-min-font-size: 1rem; // Any font size below 1rem will cause Mobile Safari to "zoom in"
 $border-width: 1px;
 $border-width-focus: 1.5px;
-$border-width-tab: 4px;
+$border-width-tab: 0.25rem;
 
 /**
  * Grid System.
  * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
  */
 
-$grid-unit: 8px;
-$grid-unit-05: 0.5 * $grid-unit;	// 4px
-$grid-unit-10: 1 * $grid-unit;		// 8px
-$grid-unit-15: 1.5 * $grid-unit;	// 12px
-$grid-unit-20: 2 * $grid-unit;		// 16px
-$grid-unit-30: 3 * $grid-unit;		// 24px
-$grid-unit-40: 4 * $grid-unit;		// 32px
-$grid-unit-50: 5 * $grid-unit;		// 40px
-$grid-unit-60: 6 * $grid-unit;		// 48px
+$grid-unit: 0.5rem;
+$grid-unit-05: 0.5 * $grid-unit;	// 0.25rem
+$grid-unit-10: 1 * $grid-unit;		// 0.5rem
+$grid-unit-15: 1.5 * $grid-unit;	// 0.75rem
+$grid-unit-20: 2 * $grid-unit;		// 1rem
+$grid-unit-30: 3 * $grid-unit;		// 1.5rem
+$grid-unit-40: 4 * $grid-unit;		// 2rem
+$grid-unit-50: 5 * $grid-unit;		// 2.5rem
+$grid-unit-60: 6 * $grid-unit;		// 3rem
 
 /**
  * Dimensions.
  */
 
-$icon-size: 24px;
-$button-size: 36px;
-$button-size-small: 24px;
-$panel-padding: 16px;
-$header-height: 60px;
-$panel-header-height: 50px;
-$admin-bar-height: 32px;
-$admin-bar-height-big: 46px;
-$admin-sidebar-width: 160px;
-$admin-sidebar-width-big: 190px;
-$admin-sidebar-width-collapsed: 36px;
-$modal-min-width: 360px;
-$spinner-size: 18px;
-$mobile-header-toolbar-height: 44px;
-$mobile-floating-toolbar-height: 44px;
-$mobile-floating-toolbar-margin: 8px;
+$icon-size: 1.5rem;
+$button-size: 2.25rem;
+$button-size-small: 1.5rem;
+$panel-padding: 1rem;
+$header-height: 3.75rem;
+$panel-header-height: 3.125rem;
+$admin-bar-height: 2rem;
+$admin-bar-height-big: 2.875rem;
+$admin-sidebar-width: 10rem;
+$admin-sidebar-width-big: 11.875rem;
+$admin-sidebar-width-collapsed: 2.25rem;
+$modal-min-width: 22.5rem;
+$spinner-size: 1.125rem;
+$mobile-header-toolbar-height: 2.75rem;
+$mobile-floating-toolbar-height: 2.75rem;
+$mobile-floating-toolbar-margin: 0.5rem;
 
 
 /**
  * Shadows.
  */
 
-$shadow-popover: 0 2px 6px rgba($black, 0.05);
-$shadow-modal: 0 3px 30px rgba($dark-gray-900, 0.2);
+$shadow-popover: 0.125rem 0.375rem rgba($black, 0.05);
+$shadow-modal: 0 0.1875rem 1.875rem rgba($dark-gray-900, 0.2);
 
 
 /**
  * Editor widths.
  */
 
-$sidebar-width: 280px;
-$content-width: 580px; // This is optimized for 70 characters.
-$widget-area-width: 700px;
+$sidebar-width: 17.5rem;
+$content-width: 36.25rem; // This is optimized for 70 characters.
+$widget-area-width: 43.75rem;
 
 /**
  * Block UI.
  */
 
 $block-toolbar-height: $grid-unit-60;
-$mobile-block-toolbar-height: 44px;
-$block-padding: 14px; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
-$block-spacing: 4px; // Vertical space between blocks.
+$mobile-block-toolbar-height: 2.75rem;
+$block-padding: 0.875rem; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
+$block-spacing: 0.25rem; // Vertical space between blocks.
 $block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
-$block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
+$block-side-ui-clearance:0.125rem; // Space between movers/drag handle UI, and block.
 $block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance; // Total space left and right of the block footprint.
 $block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 $block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 $dimmed-opacity: 1;
 
-$block-edge-to-content: 16px;
-$solid-border-space: 12px;
-$dashed-border-space: 6px;
-$block-selected-margin: 3px;
+$block-edge-to-content: 1rem;
+$solid-border-space: 0.75rem;
+$dashed-border-space: 0.375rem;
+$block-selected-margin: 0.1875rem;
 $block-selected-border-width: 1px;
 $block-selected-padding: 0;
-$block-selected-child-margin: 5px;
+$block-selected-child-margin: 0.3125rem;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
 
 
@@ -101,6 +101,6 @@ $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $b
  * Border radii.
  */
 
-$radius-round-rectangle: 4px;
+$radius-round-rectangle: 0.25rem;
 $radius-round: 50%;
-$radius-block-ui: 2px;
+$radius-block-ui:0.125rem;
