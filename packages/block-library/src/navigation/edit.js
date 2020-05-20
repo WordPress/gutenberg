@@ -86,7 +86,6 @@ function Navigation( {
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId,
-		true,
 		true
 	);
 
