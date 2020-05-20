@@ -1,14 +1,14 @@
 .wp-block-latest-comments.has-avatars .avatar {
-	margin-right: 10px;
+	margin-right: 0.625rem;
 }
 
 .wp-block-latest-comments__comment-excerpt p {
-	font-size: 14px;
+	font-size: 0.875rem;
 	line-height: $editor-line-height;
-	margin: 5px 0 20px;
+	margin: 0.3125rem 0 1.25rem;
 	padding-top: 0;
 }
 
 .wp-block-latest-comments.has-avatars .wp-block-latest-comments__comment {
-	min-height: 36px;
+	min-height: 2.25rem;
 }

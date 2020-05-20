@@ -1,13 +1,13 @@
 .wp-block[data-align="left"] > .wp-block-pullquote,
 .wp-block[data-align="right"] > .wp-block-pullquote {
 	& p {
-		font-size: 20px;
+		font-size: 1.25rem;
 	}
 }
 
 .wp-block-pullquote {
 	& blockquote p {
-		font-size: 28px;
+		font-size: 1.75rem;
 		line-height: 1.6;
 	}
 }
@@ -17,7 +17,7 @@
 	margin-right: 0;
 
 	& blockquote p {
-		font-size: 32px;
+		font-size: 2rem;
 	}
 
 	.wp-block-pullquote__citation {

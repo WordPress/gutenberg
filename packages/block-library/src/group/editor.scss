@@ -32,14 +32,14 @@
 	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
 		// note: using position `left` causes hoz scrollbars so
 		// we opt to use margin instead
-		// the 30px matches the hoz padding applied in `theme.scss`
+		// the 1.875rem matches the hoz padding applied in `theme.scss`
 		// added when the Block has a background set
-		margin-left: -30px;
+		margin-left: -1.875rem;
 
-		// 60px here is x2 the hoz padding from `theme.scss` added when
+		// 3.75rem here is x2 the hoz padding from `theme.scss` added when
 		// the Block has a background set
 		// note: also duplicated below for full width Groups
-		width: calc(100% + 60px);
+		width: calc(100% + 3.75rem);
 	}
 }
 
@@ -61,7 +61,7 @@
 	// Full Width Blocks with a background (ie: has padding)
 	// note: also duplicated above for all Group widths
 	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
-		width: calc(100% + 60px);
+		width: calc(100% + 3.75rem);
 	}
 }
 
