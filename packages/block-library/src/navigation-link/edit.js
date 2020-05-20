@@ -13,6 +13,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	KeyboardShortcuts,
+	MenuGroup,
 	MenuItem,
 	PanelBody,
 	Popover,
@@ -31,7 +32,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
 	__experimentalBlockNavigationEditor as BlockNavigationEditor,
-	__experimentalEllipsisMenu as BlockNavigationEllipsisMenu,
+	__experimentalBlockNavigationEllipsisMenuControls as BlockNavigationEllipsisMenuControls,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -160,11 +161,13 @@ function NavigationLinkEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<BlockNavigationEllipsisMenu>
-				<MenuItem onClick={ () => {} }>
-					{ __( 'Add submenu' ) }
-				</MenuItem>
-			</BlockNavigationEllipsisMenu>
+			<BlockNavigationEllipsisMenuControls>
+				<MenuGroup>
+					<MenuItem onClick={ () => {} }>
+						{ __( 'Add submenu' ) }
+					</MenuItem>
+				</MenuGroup>
+			</BlockNavigationEllipsisMenuControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'SEO settings' ) }>
 					<ToggleControl

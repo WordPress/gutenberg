@@ -22,7 +22,7 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
-import EllipsisMenu from './ellipsis-menu';
+import EllipsisMenuControls from './ellipsis-menu-controls';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -130,7 +130,7 @@ export default function BlockNavigationBlock( {
 							} }
 							{ ...props }
 						>
-							<EllipsisMenu.Slot bubblesVirtually />
+							<EllipsisMenuControls.Slot bubblesVirtually />
 						</BlockSettingsDropdown>
 					) }
 				</TreeGridCell>
