@@ -440,12 +440,13 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			$menu_items = wp_get_nav_menu_items( $prepared_nav_item['menu-id'], array( 'post_status' => 'publish,draft' ) );
 			if ( 0 === (int) $prepared_nav_item['menu-item-position'] ) {
 				if ( $menu_items ) {
-					$last_item = array_pop( $menu_items );
+					$last_item = $menu_items[ count( $menu_items ) - 1 ];
 					if ( $last_item && isset( $last_item->menu_order ) ) {
 						$prepared_nav_item['menu-item-position'] = $last_item->menu_order + 1;
 					} else {
-						$prepared_nav_item['menu-item-position'] = count( $menu_items );
+						$prepared_nav_item['menu-item-position'] = count( $menu_items ) - 1;
 					}
+					array_push( $menu_items, $last_item );
 				} else {
 					$prepared_nav_item['menu-item-position'] = 1;
 				}

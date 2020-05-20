@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -158,48 +156,6 @@ function apiFetch( options ) {
 	} );
 }
 
-/**
- * Function that fetches data using apiFetch, and updates the status.
- *
- * @param {string} path Query path.
- */
-function useApiFetch( path ) {
-	deprecated( 'useApiFetch', {
-		version: '8.1.0',
-		alternative: 'apiFetch',
-		plugin: 'Gutenberg',
-	} );
-
-	// Indicate the fetching status
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ data, setData ] = useState( null );
-	const [ error, setError ] = useState( null );
-
-	useEffect( () => {
-		setIsLoading( true );
-		setData( null );
-		setError( null );
-
-		apiFetch( { path } )
-			.then( ( fetchedData ) => {
-				setData( fetchedData );
-				// We've stopped fetching
-				setIsLoading( false );
-			} )
-			.catch( ( err ) => {
-				setError( err );
-				// We've stopped fetching
-				setIsLoading( false );
-			} );
-	}, [ path ] );
-
-	return {
-		isLoading,
-		data,
-		error,
-	};
-}
-
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
@@ -208,7 +164,5 @@ apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
-
-apiFetch.useApiFetch = useApiFetch;
 
 export default apiFetch;

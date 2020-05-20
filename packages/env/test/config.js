@@ -219,6 +219,93 @@ describe( 'readConfig', () => {
 		}
 	} );
 
+	it( 'should parse mappings into sources', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: {
+						test: './relative',
+						test2: 'WordPress/gutenberg#master',
+					},
+				} )
+			)
+		);
+		const { mappings } = await readConfig( '.wp-env.json' );
+		expect( mappings ).toMatchObject( {
+			test: {
+				type: 'local',
+				path: expect.stringMatching( /^\/.*relative$/ ),
+				basename: 'relative',
+			},
+			test2: {
+				type: 'git',
+				path: expect.stringMatching( /^\/.*gutenberg$/ ),
+				basename: 'gutenberg',
+			},
+		} );
+	} );
+
+	it( 'should throw a validaton error if there is an invalid mapping', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { mappings: { test: 'false' } } ) )
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid or unrecognized source'
+			);
+		}
+	} );
+
+	it( 'throws an error if a mapping is badly formatted', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: { test: null },
+				} )
+			)
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "mapping.test" should be a string.'
+			);
+		}
+	} );
+
+	it( 'throws an error if mappings is not an object', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					mappings: 'not object',
+				} )
+			)
+		);
+		expect.assertions( 2 );
+		try {
+			await readConfig( '.wp-env.json' );
+		} catch ( error ) {
+			expect( error ).toBeInstanceOf( ValidationError );
+			expect( error.message ).toContain(
+				'Invalid .wp-env.json: "mappings" must be an object.'
+			);
+		}
+	} );
+
+	it( 'should return an empty mappings object if none are passed', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve( JSON.stringify( { mappings: {} } ) )
+		);
+		const { mappings } = await readConfig( '.wp-env.json' );
+		expect( mappings ).toEqual( {} );
+	} );
+
 	it( 'should throw a validaton error if the ports are not numbers', async () => {
 		expect.assertions( 10 );
 		await testPortNumberValidation( 'port', 'string' );

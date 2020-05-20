@@ -30,5 +30,5 @@
 			"type": "string"
 		}
 	},
-	"context": [ "postId" ]
+	"context": [ "postType", "postId" ]
 }

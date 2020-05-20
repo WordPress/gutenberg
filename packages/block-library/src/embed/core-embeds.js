@@ -17,6 +17,8 @@ import {
 	embedRedditIcon,
 	embedTumblrIcon,
 	embedAmazonIcon,
+	embedAnimotoIcon,
+	embedDailymotionIcon,
 } from './icons';
 
 /**
@@ -129,7 +131,7 @@ export const others = [
 		name: 'core-embed/animoto',
 		settings: {
 			title: 'Animoto',
-			icon: embedVideoIcon,
+			icon: embedAnimotoIcon,
 			description: __( 'Embed an Animoto video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
@@ -185,7 +187,7 @@ export const others = [
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
-			icon: embedVideoIcon,
+			icon: embedDailymotionIcon,
 			keywords: [ __( 'video' ) ],
 			description: __( 'Embed a Dailymotion video.' ),
 		},

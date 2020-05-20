@@ -1,54 +1,48 @@
 /**
  * External dependencies
  */
-import TestUtils, { act } from 'react-dom/test-utils';
-import ReactDOM from 'react-dom';
+import { render, fireEvent } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import InserterBlockList from '../block-list';
-import useSelect from '../../../../../data/src/components/use-select';
+import { InserterBlockList as BaseInserterBlockList } from '../block-list';
 import items, { categories, collections } from './fixtures';
 
-jest.mock( '../../../../../data/src/components/use-select', () => {
-	// This allows us to tweaak the returned value on each test
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
 	const mock = jest.fn();
 	return mock;
 } );
 
-jest.mock( '../../../../../data/src/components/use-dispatch', () => {
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	return {
 		useDispatch: () => ( {} ),
 	};
 } );
 
-const getWrapperForProps = ( propOverrides ) => {
-	let wrapper;
-	act( () => {
-		wrapper = TestUtils.renderIntoDocument(
-			<InserterBlockList { ...propOverrides } />
-		);
-	} );
+const debouncedSpeak = jest.fn();
 
-	return wrapper;
-};
+function InserterBlockList( props ) {
+	return (
+		<BaseInserterBlockList debouncedSpeak={ debouncedSpeak } { ...props } />
+	);
+}
 
-const initializeMenuDefaultStateAndReturnElement = ( propOverrides ) => {
-	const wrapper = getWrapperForProps( propOverrides );
-	// eslint-disable-next-line react/no-find-dom-node
-	return ReactDOM.findDOMNode( wrapper );
-};
-
-const initializeAllClosedMenuStateAndReturnElement = ( propOverrides ) => {
-	const element = initializeMenuDefaultStateAndReturnElement( propOverrides );
-	const activeTabs = element.querySelectorAll(
+const initializeAllClosedMenuState = ( propOverrides ) => {
+	const result = render( <InserterBlockList { ...propOverrides } /> );
+	const activeTabs = result.container.querySelectorAll(
 		'.components-panel__body.is-opened button.components-panel__body-toggle'
 	);
 	activeTabs.forEach( ( tab ) => {
-		TestUtils.Simulate.click( tab );
+		fireEvent.click( tab );
 	} );
-	return element;
+	return result;
 };
 
 const assertNoResultsMessageToBePresent = ( element ) => {
@@ -67,6 +61,8 @@ const assertNoResultsMessageNotToBePresent = ( element ) => {
 
 describe( 'InserterMenu', () => {
 	beforeEach( () => {
+		debouncedSpeak.mockClear();
+
 		useSelect.mockImplementation( () => ( {
 			categories,
 			collections,
@@ -81,21 +77,21 @@ describe( 'InserterMenu', () => {
 			collections,
 			items: noItems,
 		} ) );
-		const element = initializeMenuDefaultStateAndReturnElement( {
-			filterValue: 'random',
-		} );
-		const visibleBlocks = element.querySelector(
+		const { container } = render(
+			<InserterBlockList filterValue="random" />
+		);
+		const visibleBlocks = container.querySelector(
 			'.block-editor-block-types-list__item'
 		);
 
 		expect( visibleBlocks ).toBe( null );
 
-		assertNoResultsMessageToBePresent( element );
+		assertNoResultsMessageToBePresent( container );
 	} );
 
 	it( 'should show only high utility items in the suggested tab', () => {
-		const element = initializeMenuDefaultStateAndReturnElement();
-		const firstPanel = element.querySelector(
+		const { container } = render( <InserterBlockList /> );
+		const firstPanel = container.querySelector(
 			'.block-editor-inserter__panel-content'
 		);
 		const visibleBlocks = firstPanel.querySelectorAll(
@@ -108,11 +104,11 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
-		const element = initializeAllClosedMenuStateAndReturnElement();
-		const embedTabContent = element.querySelectorAll(
+		const { container } = initializeAllClosedMenuState();
+		const embedTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
 		)[ 4 ];
-		const embedTabTitle = element.querySelectorAll(
+		const embedTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
 		)[ 4 ];
 		const blocks = embedTabContent.querySelectorAll(
@@ -124,15 +120,15 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 0 ].textContent ).toBe( 'YouTube' );
 		expect( blocks[ 1 ].textContent ).toBe( 'A Text Embed' );
 
-		assertNoResultsMessageNotToBePresent( element );
+		assertNoResultsMessageNotToBePresent( container );
 	} );
 
 	it( 'should show reusable items in the reusable tab', () => {
-		const element = initializeAllClosedMenuStateAndReturnElement();
-		const reusableTabContent = element.querySelectorAll(
+		const { container } = initializeAllClosedMenuState();
+		const reusableTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
 		)[ 6 ];
-		const reusableTabTitle = element.querySelectorAll(
+		const reusableTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
 		)[ 6 ];
 		const blocks = reusableTabContent.querySelectorAll(
@@ -143,15 +139,15 @@ describe( 'InserterMenu', () => {
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
 
-		assertNoResultsMessageNotToBePresent( element );
+		assertNoResultsMessageNotToBePresent( container );
 	} );
 
 	it( 'should show the common category blocks', () => {
-		const element = initializeAllClosedMenuStateAndReturnElement();
-		const commonTabContent = element.querySelectorAll(
+		const { container } = initializeAllClosedMenuState();
+		const commonTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
 		)[ 1 ];
-		const commonTabTitle = element.querySelectorAll(
+		const commonTabTitle = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
 		)[ 1 ];
 		const blocks = commonTabContent.querySelectorAll(
@@ -164,12 +160,12 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( blocks[ 2 ].textContent ).toBe( 'Some Other Block' );
 
-		assertNoResultsMessageNotToBePresent( element );
+		assertNoResultsMessageNotToBePresent( container );
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
-		const element = initializeAllClosedMenuStateAndReturnElement();
-		const layoutTabContent = element.querySelectorAll(
+		const { container } = initializeAllClosedMenuState();
+		const layoutTabContent = container.querySelectorAll(
 			'.block-editor-inserter__panel-content'
 		)[ 2 ];
 		const disabledBlocks = layoutTabContent.querySelectorAll(
@@ -181,36 +177,90 @@ describe( 'InserterMenu', () => {
 	} );
 
 	it( 'should allow searching for items', () => {
-		const element = initializeMenuDefaultStateAndReturnElement( {
-			filterValue: 'text',
-		} );
+		const { container } = render(
+			<InserterBlockList filterValue="text" />
+		);
 
-		const matchingCategories = element.querySelectorAll(
+		const matchingCategories = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
 		);
 
 		expect( matchingCategories ).toHaveLength( 3 );
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
+		expect( matchingCategories[ 2 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
 
-		const blocks = element.querySelectorAll(
+		const blocks = container.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
+		// There are five buttons present for 3 total distinct results. The
+		// additional two account for the collection results (repeated).
 		expect( blocks ).toHaveLength( 5 );
+		expect( debouncedSpeak ).toHaveBeenCalledWith( '3 results found.' );
+
+		// Default block results.
 		expect( blocks[ 0 ].textContent ).toBe( 'Text' );
 		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
-		assertNoResultsMessageNotToBePresent( element );
+		// Collection results.
+		expect( blocks[ 3 ].textContent ).toBe( 'Text' );
+		expect( blocks[ 4 ].textContent ).toBe( 'Advanced Text' );
+
+		assertNoResultsMessageNotToBePresent( container );
+	} );
+
+	it( 'should allow searching for reusable blocks by title', () => {
+		const { container } = render(
+			<InserterBlockList filterValue="my reusable" />
+		);
+
+		const matchingCategories = container.querySelectorAll(
+			'.block-editor-inserter__panel-title'
+		);
+
+		expect( matchingCategories ).toHaveLength( 2 );
+		expect( matchingCategories[ 0 ].textContent ).toBe( 'Core' ); // "Core" namespace collection
+		expect( matchingCategories[ 1 ].textContent ).toBe( 'Reusable' );
+
+		const blocks = container.querySelectorAll(
+			'.block-editor-block-types-list__item-title'
+		);
+
+		// There are two buttons present for 1 total distinct result. The
+		// additional one accounts for the collection result (repeated).
+		expect( blocks ).toHaveLength( 2 );
+		expect( debouncedSpeak ).toHaveBeenCalledWith( '1 result found.' );
+		expect( blocks[ 0 ].textContent ).toBe( 'My reusable block' );
+		expect( blocks[ 1 ].textContent ).toBe( 'My reusable block' );
+
+		assertNoResultsMessageNotToBePresent( container );
+	} );
+
+	it( 'should speak after any change in search term', () => {
+		// The search result count should always be announced any time the user
+		// changes the search term, even if it results in the same count.
+		//
+		// See: https://github.com/WordPress/gutenberg/pull/22279#discussion_r423317161
+		const { rerender } = render(
+			<InserterBlockList filterValue="my reusab" />
+		);
+
+		rerender( <InserterBlockList filterValue="my reusable" /> );
+		rerender( <InserterBlockList filterValue="my reusable" /> );
+
+		expect( debouncedSpeak ).toHaveBeenCalledTimes( 2 );
+		expect( debouncedSpeak.mock.calls[ 0 ][ 0 ] ).toBe( '1 result found.' );
+		expect( debouncedSpeak.mock.calls[ 1 ][ 0 ] ).toBe( '1 result found.' );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
-		const element = initializeMenuDefaultStateAndReturnElement( {
-			filterValue: ' text',
-		} );
+		const { container } = render(
+			<InserterBlockList filterValue=" text" />
+		);
 
-		const matchingCategories = element.querySelectorAll(
+		const matchingCategories = container.querySelectorAll(
 			'.block-editor-inserter__panel-title'
 		);
 
@@ -218,7 +268,7 @@ describe( 'InserterMenu', () => {
 		expect( matchingCategories[ 0 ].textContent ).toBe( 'Common blocks' );
 		expect( matchingCategories[ 1 ].textContent ).toBe( 'Embeds' );
 
-		const blocks = element.querySelectorAll(
+		const blocks = container.querySelectorAll(
 			'.block-editor-block-types-list__item-title'
 		);
 
@@ -227,6 +277,6 @@ describe( 'InserterMenu', () => {
 		expect( blocks[ 1 ].textContent ).toBe( 'Advanced Text' );
 		expect( blocks[ 2 ].textContent ).toBe( 'A Text Embed' );
 
-		assertNoResultsMessageNotToBePresent( element );
+		assertNoResultsMessageNotToBePresent( container );
 	} );
 } );
