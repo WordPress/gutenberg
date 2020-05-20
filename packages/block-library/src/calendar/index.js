@@ -19,9 +19,6 @@ export const settings = {
 	description: __( 'A calendar of your site’s posts.' ),
 	icon,
 	keywords: [ __( 'posts' ), __( 'archive' ) ],
-	supports: {
-		align: true,
-	},
 	example: {},
 	edit,
 };
