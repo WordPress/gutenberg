@@ -1,3 +1,7 @@
+1.28.1
+------
+* [**] Avoid crash when editor state becomes invalid
+
 1.28.0
 ------
 * [***] New block: Pullquote
