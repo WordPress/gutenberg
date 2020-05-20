@@ -101,6 +101,8 @@ export {
 	default as __experimentalTreeGrid,
 	TreeGridRow as __experimentalTreeGridRow,
 	TreeGridCell as __experimentalTreeGridCell,
+	FocusableTreeGridCell as __experimentalFocusableTreeGridCell,
+	TreeGridItem as __experimentalTreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { default as __experimentalUnitControl } from './unit-control';
