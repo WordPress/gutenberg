@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { apiFetch, select } from '@wordpress/data-controls';
 
 /**
@@ -58,7 +59,7 @@ export function* installBlockType( { id, name, assets } ) {
 	yield clearErrorNotice( id );
 	try {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
-			throw new Error( 'Block has no assets' );
+			throw new Error( __( 'Block has no assets.' ) );
 		}
 		yield setIsInstalling( true );
 		const response = yield apiFetch( {
@@ -76,7 +77,7 @@ export function* installBlockType( { id, name, assets } ) {
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );
 		if ( ! registeredBlocks.length ) {
-			throw new Error( 'Unable to get block types' );
+			throw new Error( __( 'Unable to get block types.' ) );
 		}
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message );
