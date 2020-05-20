@@ -45,7 +45,7 @@
 		visibility: hidden;
 
 		> .wp-block-navigation-link {
-			font-size: 15px;
+			font-size: 0.9375rem;
 
 			> .wp-block-navigation-link__content {
 				flex-grow: 1;
@@ -116,7 +116,7 @@
 }
 
 .wp-block-navigation-link__label {
-	font-size: 17px;
+	font-size: 1.0625rem;
 	font-family: $default-font;
 
 	word-break: normal;

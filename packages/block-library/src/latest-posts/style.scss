@@ -20,7 +20,7 @@
 		padding: 0;
 
 		li {
-			margin: 0 20px 20px 0;
+			margin: 0 1.25rem 1.25rem 0;
 			width: 100%;
 		}
 	}
@@ -28,7 +28,7 @@
 	@include break-small {
 		@for $i from 2 through 6 {
 			&.columns-#{ $i } li {
-				width: calc((100% / #{ $i }) - 20px);
+				width: calc((100% / #{ $i }) - 1.25rem);
 			}
 		}
 	}
@@ -65,5 +65,5 @@
 }
 
 .edit-post-visual-editor .wp-block-latest-posts.is-grid li {
-	margin-bottom: 20px;
+	margin-bottom: 1.25rem;
 }

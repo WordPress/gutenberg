@@ -3,7 +3,7 @@
 	position: relative;
 	background-size: cover;
 	background-position: center center;
-	min-height: 430px;
+	min-height: 26.875rem;
 	height: 100%;
 	width: 100%;
 	display: flex;
@@ -92,7 +92,7 @@
 	}
 
 	.wp-block-cover__inner-container {
-		width: calc(100% - 70px);
+		width: calc(100% - 4.375rem);
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $light-gray-100;
 	}
