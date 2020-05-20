@@ -35,7 +35,7 @@ export default function BlockParentSelector() {
 		};
 	}, [] );
 
-	if ( firstParentClientId ) {
+	if ( firstParentClientId !== undefined ) {
 		return (
 			<div
 				className="block-editor-block-parent-selector"
