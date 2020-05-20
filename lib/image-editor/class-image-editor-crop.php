@@ -1,11 +1,53 @@
 <?php
+/**
+ * Image Editor: Image_Editor_Crop class
+ *
+ * @package gutenberg
+ * @since 7.x ?
+ */
 
+/**
+ * Crop image modifier.
+ */
 class Image_Editor_Crop extends Image_Editor_Modifier {
+	/**
+	 * Pixels from the left for the crop.
+	 *
+	 * @var integer
+	 */
 	private $crop_x = 0;
+
+	/**
+	 * Pixels from the top for the crop.
+	 *
+	 * @var integer
+	 */
 	private $crop_y = 0;
-	private $width  = 0;
+
+	/**
+	 * Width in pixels for the crop.
+	 *
+	 * @var integer
+	 */
+	private $width = 0;
+
+	/**
+	 * Height in pixels for the crop.
+	 *
+	 * @var integer
+	 */
 	private $height = 0;
 
+	/**
+	 * Constructor.
+	 *
+	 * Will populate object properties from the provided arguments.
+	 *
+	 * @param integer $crop_x Pixels from the left for the crop.
+	 * @param integer $crop_y Pixels from the top for the crop.
+	 * @param integer $width  Width in pixels for the crop.
+	 * @param integer $height Height in pixels for the crop.
+	 */
 	public function __construct( $crop_x, $crop_y, $width, $height ) {
 		$this->crop_x = floatval( $crop_x );
 		$this->crop_y = floatval( $crop_y );
@@ -13,7 +55,15 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 		$this->height = floatval( $height );
 	}
 
-	public function apply_to_meta( array $meta ) {
+	/**
+	 * Update the image metadata with the modifier.
+	 *
+	 * @access public
+	 *
+	 * @param array $meta Metadata to update.
+	 * @return array Updated metadata.
+	 */
+	public function apply_to_meta( $meta ) {
 		$meta['cropX']      = $this->crop_x;
 		$meta['cropY']      = $this->crop_y;
 		$meta['cropWidth']  = $this->width;
@@ -22,7 +72,17 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 		return $meta;
 	}
 
-	public function apply_to_image( $image, array $info, $target_file ) {
+	/**
+	 * Apply the modifier to the image
+	 *
+	 * @access public
+	 *
+	 * @param WP_Image_Editor $image Image editor.
+	 * @param array           $info Metadata for the image.
+	 * @param string          $target_file File name to save the edited image as.
+	 * @return array Metadata for the image.
+	 */
+	public function apply_to_image( $image, $info, $target_file ) {
 		$size = $image->get_size();
 
 		$crop_x = round( ( $size['width'] * $this->crop_x ) / 100.0 );
@@ -38,7 +98,15 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 		return $info;
 	}
 
-	public static function get_filename( array $meta ) {
+	/**
+	 * Gets the new filename based on metadata.
+	 *
+	 * @access public
+	 *
+	 * @param array $meta Image metadata.
+	 * @return string Filename for the edited image.
+	 */
+	public static function get_filename( $meta ) {
 		if ( isset( $meta['cropWidth'] ) && $meta['cropWidth'] > 0 ) {
 			return sprintf( 'crop-%d-%d-%d-%d', round( $meta['cropX'], 2 ), round( $meta['cropY'], 2 ), round( $meta['cropWidth'], 2 ), round( $meta['cropHeight'], 2 ) );
 		}
@@ -46,6 +114,13 @@ class Image_Editor_Crop extends Image_Editor_Modifier {
 		return false;
 	}
 
+	/**
+	 * Gets the default metadata for the crop modifier.
+	 *
+	 * @access public
+	 *
+	 * @return array Default metadata.
+	 */
 	public static function get_default_meta() {
 		return array();
 	}

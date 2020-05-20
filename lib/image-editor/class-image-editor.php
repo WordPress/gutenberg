@@ -1,12 +1,37 @@
 <?php
+/**
+ * Image Editor: Image_Editor class
+ *
+ * @package gutenberg
+ * @since 7.x ?
+ */
 
+/**
+ * Image flip/mirror modifier.
+ */
 require_once __DIR__ . '/class-image-editor-flip.php';
+
+/**
+ * Image rotate modifier.
+ */
 require_once __DIR__ . '/class-image-editor-rotate.php';
+
+/**
+ * Image crop modifier.
+ */
 require_once __DIR__ . '/class-image-editor-crop.php';
 
+/**
+ * Image editor.
+ *
+ * @since 7.x ?
+ */
 class Image_Editor {
 	const META_KEY = 'richimage';
 
+	/**
+	 * Constructs an Image_Editor.
+	 */
 	public function __construct() {
 		$this->all_modifiers = array(
 			'Image_Editor_Crop',
@@ -15,7 +40,14 @@ class Image_Editor {
 		);
 	}
 
-	public function modify_image( $media_id, Image_Editor_Modifier $modifier ) {
+	/**
+	 * Modifies an image.
+	 *
+	 * @param integer               $media_id Media id.
+	 * @param Image_Editor_Modifier $modifier Modifier to apply to the image.
+	 * @return array|WP_Error If successful image JSON containing the mediaId and url of modified image, otherwise WP_Error.
+	 */
+	public function modify_image( $media_id, $modifier ) {
 		// Get image information.
 		$info = $this->load_image_info( $media_id );
 		if ( is_wp_error( $info ) ) {
@@ -48,6 +80,12 @@ class Image_Editor {
 		return $this->save_image( $image, $target_file, $info );
 	}
 
+	/**
+	 * Loads an image for editing.
+	 *
+	 * @param integer $media_id Image ID.
+	 * @return array|WP_Error The WP_Image_Editor and image path if successful, WP_Error otherwise.
+	 */
 	private function load_image( $media_id ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
@@ -69,6 +107,12 @@ class Image_Editor {
 		);
 	}
 
+	/**
+	 * Gets the JSON response object for an image.
+	 *
+	 * @param integer $id Image ID.
+	 * @return array Image JSON.
+	 */
 	private function get_image_as_json( $id ) {
 		return array(
 			'mediaID' => $id,
@@ -76,6 +120,13 @@ class Image_Editor {
 		);
 	}
 
+	/**
+	 * Checks for the existence of an image and if it exists, return the image.
+	 *
+	 * @param array  $attachment Attachment with url to look up.
+	 * @param string $target_file Target file name to look up.
+	 * @return array|false Image JSON if exists, otherwise false.
+	 */
 	private function get_existing_image( $attachment, $target_file ) {
 		$url = str_replace( basename( $attachment['url'] ), $target_file, $attachment['url'] );
 
@@ -87,11 +138,19 @@ class Image_Editor {
 		return false;
 	}
 
-	private function save_image( $image, $target_name, $attachment ) {
-		$filename = rtrim( dirname( $image['path'] ), '/' ) . '/' . $target_name;
+	/**
+	 * Saves an edited image.
+	 *
+	 * @param array  $image_edit Image path and editor to save.
+	 * @param string $target_name Target file name to save as.
+	 * @param array  $attachment Attachment with metadata to apply.
+	 * @return array|WP_Error Image JSON if successful, WP_Error otherwise
+	 */
+	private function save_image( $image_edit, $target_name, $attachment ) {
+		$filename = rtrim( dirname( $image_edit['path'] ), '/' ) . '/' . $target_name;
 
 		// Save to disk.
-		$saved = $image['editor']->save( $filename );
+		$saved = $image_edit['editor']->save( $filename );
 
 		if ( is_wp_error( $saved ) ) {
 			return $saved;
@@ -123,6 +182,12 @@ class Image_Editor {
 		return $this->get_image_as_json( $attachment_id );
 	}
 
+	/**
+	 * Computes the filename based on metadata.
+	 *
+	 * @param array $meta Metadata for the image.
+	 * @return string Name of the edited file.
+	 */
 	private function get_filename( $meta ) {
 		$parts = array();
 
@@ -139,9 +204,15 @@ class Image_Editor {
 		return $meta['original_name'];
 	}
 
+	/**
+	 * Loads image info.
+	 *
+	 * @param integer $media_id Image ID.
+	 * @return array|WP_Error If successful image info, otherwise a WP_Error
+	 */
 	private function load_image_info( $media_id ) {
 		$attachment_info = wp_get_attachment_metadata( $media_id );
-		$media_url = wp_get_attachment_image_url( $media_id, 'original' );
+		$media_url       = wp_get_attachment_image_url( $media_id, 'original' );
 
 		if ( ! $attachment_info || ! $media_url ) {
 			return new WP_Error( 'unknown', 'Unable to get meta information for file' );
@@ -169,9 +240,55 @@ class Image_Editor {
 	}
 }
 
+/**
+ * Abstract class for image modifiers. Any modifier to an image should implement this.
+ *
+ * @abstract
+ */
 abstract class Image_Editor_Modifier {
-	abstract public function apply_to_meta( array $meta );
-	abstract public function apply_to_image( $image, array $meta, $target_file );
-	abstract public static function get_filename( array $meta );
+
+	/**
+	 * Update the image metadata with the modifier.
+	 *
+	 * @abstract
+	 * @access public
+	 *
+	 * @param array $meta Metadata to update.
+	 * @return array Updated metadata.
+	 */
+	abstract public function apply_to_meta( $meta );
+
+	/**
+	 * Apply the modifier to the image
+	 *
+	 * @abstract
+	 * @access public
+	 *
+	 * @param WP_Image_Editor $image Image editor.
+	 * @param array           $meta Metadata for the image.
+	 * @param string          $target_file File name to save the edited image as.
+	 * @return array Metadata for the image.
+	 */
+	abstract public function apply_to_image( $image, $meta, $target_file );
+
+	/**
+	 * Gets the new filename based on metadata.
+	 *
+	 * @abstract
+	 * @access public
+	 *
+	 * @param array $meta Image metadata.
+	 * @return string Filename for the edited image.
+	 */
+	abstract public static function get_filename( $meta );
+
+	/**
+	 * Gets the default metadata for an image modifier.
+	 *
+	 * @abstract
+	 * @access public
+	 *
+	 * @return array Default metadata.
+	 */
 	abstract public static function get_default_meta();
 }

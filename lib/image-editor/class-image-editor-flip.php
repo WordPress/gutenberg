@@ -1,8 +1,29 @@
 <?php
+/**
+ * Image Editor: Image_Editor_Flip class
+ *
+ * @package gutenberg
+ * @since 7.x ?
+ */
 
+/**
+ * Flip/mirror image modifier.
+ */
 class Image_Editor_Flip extends Image_Editor_Modifier {
+	/**
+	 * Direction to flip.
+	 *
+	 * @var string
+	 */
 	private $direction = 'vertical';
 
+	/**
+	 * Constructor.
+	 *
+	 * Will populate object properties from the provided arguments.
+	 *
+	 * @param string $direction 'vertical' or 'horizontal'.
+	 */
 	public function __construct( $direction ) {
 		$this->direction = 'vertical';
 
@@ -11,6 +32,14 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 		}
 	}
 
+	/**
+	 * Update the image metadata with the modifier.
+	 *
+	 * @access public
+	 *
+	 * @param array $meta Metadata to update.
+	 * @return array Updated metadata.
+	 */
 	public function apply_to_meta( $meta ) {
 		if ( $this->is_vertical() ) {
 			$meta['flipv'] = ! $meta['flipv'];
@@ -21,21 +50,53 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 		return $meta;
 	}
 
-	public function apply_to_image( $image, array $info, $target_file ) {
+	/**
+	 * Apply the modifier to the image
+	 *
+	 * @access public
+	 *
+	 * @param WP_Image_Editor $image Image editor.
+	 * @param array           $info Metadata for the image.
+	 * @param string          $target_file File name to save the edited image as.
+	 * @return array Metadata for the image.
+	 */
+	public function apply_to_image( $image, $info, $target_file ) {
 		$image->flip( $this->is_vertical(), $this->is_horizontal() );
 
 		return $info;
 	}
 
+	/**
+	 * Checks if the modifier is a vertical flip
+	 *
+	 * @access private
+	 *
+	 * @return boolean true if the modifier is vertical
+	 */
 	private function is_vertical() {
 		return 'vertical' === $this->direction;
 	}
 
+	/**
+	 * Checks if the modifier is a horizontal flip
+	 *
+	 * @access private
+	 *
+	 * @return boolean true if the modifier is horizontal
+	 */
 	private function is_horizontal() {
 		return 'horizontal' === $this->direction;
 	}
 
-	public static function get_filename( array $meta ) {
+	/**
+	 * Gets the new filename based on metadata.
+	 *
+	 * @access public
+	 *
+	 * @param array $meta Image metadata.
+	 * @return string Filename for the edited image.
+	 */
+	public static function get_filename( $meta ) {
 		$parts = array();
 
 		if ( $meta['flipH'] ) {
@@ -53,6 +114,13 @@ class Image_Editor_Flip extends Image_Editor_Modifier {
 		return false;
 	}
 
+	/**
+	 * Gets the default metadata for the flip modifier.
+	 *
+	 * @access public
+	 *
+	 * @return array Default metadata.
+	 */
 	public static function get_default_meta() {
 		return array(
 			'flipH' => false,

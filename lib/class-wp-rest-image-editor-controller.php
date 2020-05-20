@@ -1,20 +1,43 @@
 <?php
 /**
- * Registers the Image Editing API endpoints
+ * REST API: WP_REST_Menus_Controller class
  *
- * @since 7.x ?
+ * @package    WordPress
+ * @subpackage REST_API
  */
 
+/**
+ * Image editor
+ */
 include_once __DIR__ . '/image-editor/class-image-editor.php';
 
+/**
+ * Controller which provides REST API endpoints for image editing.
+ *
+ * @since 7.x ?
+ *
+ * @see WP_REST_Controller
+ */
 class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
+	/**
+	 * Constructs the controller.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 */
 	public function __construct() {
 		$this->namespace = '__experimental';
 		$this->rest_base = '/richimage/(?P<mediaID>[\d]+)';
 		$this->editor    = new Image_Editor();
 	}
 
+	/**
+	 * Registers the necessary REST API routes.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 */
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
@@ -88,7 +111,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		);
 	}
 
-	public function permission_callback( WP_REST_Request $request ) {
+	/**
+	 * Checks if the user has permissions to make the request.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function permission_callback( $request ) {
 		$params = $request->get_params();
 
 		if ( ! current_user_can( 'edit_post', $params['mediaID'] ) ) {
@@ -98,7 +130,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		return true;
 	}
 
-	public function rotate_image( WP_REST_Request $request ) {
+	/**
+	 * Rotates an image.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
+	 */
+	public function rotate_image( $request ) {
 		$params = $request->get_params();
 
 		$modifier = new Image_Editor_Rotate( $params['angle'] );
@@ -106,7 +147,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		return $this->editor->modify_image( $params['mediaID'], $modifier );
 	}
 
-	public function flip_image( WP_REST_Request $request ) {
+	/**
+	 * Flips/mirrors an image.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
+	 */
+	public function flip_image( $request ) {
 		$params = $request->get_params();
 
 		$modifier = new Image_Editor_Flip( $params['direction'] );
@@ -114,7 +164,16 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		return $this->editor->modify_image( $params['mediaID'], $modifier );
 	}
 
-	public function crop_image( WP_REST_Request $request ) {
+	/**
+	 * Crops an image.
+	 *
+	 * @since 7.x ?
+	 * @access public
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return array|WP_Error If successful image JSON for the modified image, otherwise a WP_Error.
+	 */
+	public function crop_image( $request ) {
 		$params = $request->get_params();
 
 		$modifier = new Image_Editor_Crop( $params['cropX'], $params['cropY'], $params['cropWidth'], $params['cropHeight'] );
