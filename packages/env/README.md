@@ -244,7 +244,7 @@ wp-env destroy
 Destroy the WordPress environment. Delete docker containers and remove local files.
 ```
 
-### `wp-env logs [environment] [watch]`
+### `wp-env logs [environment]`
 
 ````sh
 wp-env logs
@@ -383,3 +383,4 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+````
