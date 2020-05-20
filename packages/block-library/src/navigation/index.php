@@ -164,6 +164,7 @@ function render_block_core_navigation( $content, $block ) {
 		$font_sizes['css_classes'],
 		array( 'wp-block-navigation' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
+		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
 	);

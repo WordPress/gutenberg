@@ -1,89 +1,53 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withGlobalEvents } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
+import { useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { calculatePreferedImageSize } from './utils';
 
-class ImageSize extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			width: undefined,
-			height: undefined,
-		};
-		this.bindContainer = this.bindContainer.bind( this );
-		this.calculateSize = this.calculateSize.bind( this );
-	}
+export default function ImageSize( { src, dirtynessTrigger, children } ) {
+	const ref = useRef();
+	const [ state, setState ] = useState( {
+		imageWidth: null,
+		imageHeight: null,
+		containerWidth: null,
+		containerHeight: null,
+		imageWidthWithinContainer: null,
+		imageHeightWithinContainer: null,
+	} );
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
+	useEffect( () => {
+		const { defaultView } = ref.current.ownerDocument;
+		const image = new defaultView.Image();
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.src !== prevProps.src ) {
-			this.setState( {
-				width: undefined,
-				height: undefined,
+		function calculateSize() {
+			const { width, height } = calculatePreferedImageSize(
+				image,
+				ref.current
+			);
+
+			setState( {
+				imageWidth: image.width,
+				imageHeight: image.height,
+				containerWidth: ref.current.clientWidth,
+				containerHeight: ref.current.clientHeight,
+				imageWidthWithinContainer: width,
+				imageHeightWithinContainer: height,
 			} );
-			this.fetchImageSize();
 		}
 
-		if ( this.props.dirtynessTrigger !== prevProps.dirtynessTrigger ) {
-			this.calculateSize();
-		}
-	}
+		defaultView.addEventListener( 'resize', calculateSize );
+		image.addEventListener( 'load', calculateSize );
+		image.src = src;
 
-	componentDidMount() {
-		this.fetchImageSize();
-	}
-
-	componentWillUnmount() {
-		if ( this.image ) {
-			this.image.onload = noop;
-		}
-	}
-
-	fetchImageSize() {
-		this.image = new window.Image();
-		this.image.onload = this.calculateSize;
-		this.image.src = this.props.src;
-	}
-
-	calculateSize() {
-		const { width, height } = calculatePreferedImageSize(
-			this.image,
-			this.container
-		);
-		this.setState( { width, height } );
-	}
-
-	render() {
-		const sizes = {
-			imageWidth: this.image && this.image.width,
-			imageHeight: this.image && this.image.height,
-			containerWidth: this.container && this.container.clientWidth,
-			containerHeight: this.container && this.container.clientHeight,
-			imageWidthWithinContainer: this.state.width,
-			imageHeightWithinContainer: this.state.height,
+		return () => {
+			defaultView.removeEventListener( 'resize', calculateSize );
+			image.removeEventListener( 'load', calculateSize );
 		};
-		return (
-			<div ref={ this.bindContainer }>
-				{ this.props.children( sizes ) }
-			</div>
-		);
-	}
-}
+	}, [ src, dirtynessTrigger ] );
 
-export default withGlobalEvents( {
-	resize: 'calculateSize',
-} )( ImageSize );
+	return <div ref={ ref }>{ children( state ) }</div>;
+}
