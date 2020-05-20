@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -119,7 +119,7 @@
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "prettier:check": "prettier-eslint --list-different $npm_package_config_jsfiles $npm_package_config_scssfiles || { echo '\nERROR: `yarn prettier:check` found a formatting problem.\nNo files have been changed. Try running `yarn prettier` to fix any formatting issues.\n'; exit 1; }",
-    "build:gutenberg": "cd gutenberg && npm install && npm run build",
+    "build:gutenberg": "cd gutenberg && npm ci && npm run build",
     "clean": "yarn clean:build-artifacts; yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node; yarn clean:pot",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
     "clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",

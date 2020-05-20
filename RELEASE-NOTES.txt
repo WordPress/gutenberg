@@ -1,13 +1,25 @@
+1.29.0
+------
+* [**] Add support for changing overlay color settings in Cover block
+* Add enter/exit animation in FloatingToolbar
+* [***] New block: Verse
+
 1.28.0
 ------
-* New block: Pullquote
-* Add support for changing background and text color in Buttons block
-* Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
+* [***] New block: Pullquote
+* [**] Add support for changing background and text color in Buttons block
+* [*] Fix the icons and buttons in Gallery, Paragraph, List and MediaText block on RTL mode
+* [**] Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
+* [**] [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
+* [**] Update page templates to use recently added blocks
+
+1.27.1
+------
 * Remove Subscription Button from the Blog template since it didn't have an initial functionality and it is hard to configure for users.
-* [iOS] Add support for the subscript `<sub>` and superscript `<sup>`HTML elements in text blocks
 
 1.27.0
 ------
+* Block Editor: Add dialog for mentioning other users in your post
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
 * Fix bug where whitespaces at start of text blocks were being removed

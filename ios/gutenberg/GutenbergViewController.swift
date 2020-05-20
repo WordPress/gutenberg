@@ -45,6 +45,7 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
@@ -194,6 +195,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
         print("Gutenberg loged user event")
     }
+
+    func gutenbergDidRequestMention(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("matt"))
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
@@ -211,6 +216,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     
     func gutenbergInitialTitle() -> String? {
         return nil
+    }
+
+    func gutenbergCapabilities() -> [String : Bool]? {
+        return ["mentions": true]
     }
 
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {
