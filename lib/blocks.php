@@ -16,6 +16,36 @@ function gutenberg_reregister_core_block_types() {
 		return;
 	}
 
+	$block_folders = array(
+		'audio',
+		'button',
+		'buttons',
+		'file',
+		'gallery',
+		'group',
+		'heading',
+		'html',
+		'image',
+		'list',
+		'media-text',
+		'missing',
+		'more',
+		'navigation-link',
+		'nextpage',
+		'paragraph',
+		'preformatted',
+		'pullquote',
+		'quote',
+		'separator',
+		'social-links',
+		'spacer',
+		'subhead',
+		'table',
+		'text-columns',
+		'verse',
+		'video',
+	);
+
 	$block_names = array(
 		'archives.php'        => 'core/archives',
 		'block.php'           => 'core/block',
@@ -27,8 +57,8 @@ function gutenberg_reregister_core_block_types() {
 		'legacy-widget.php'   => 'core/legacy-widget',
 		'navigation.php'      => 'core/navigation',
 		'rss.php'             => 'core/rss',
-		'shortcode.php'       => 'core/shortcode',
 		'search.php'          => 'core/search',
+		'shortcode.php'       => 'core/shortcode',
 		'social-link.php'     => 'core/social-link',
 		'tag-cloud.php'       => 'core/tag-cloud',
 	);
@@ -47,16 +77,37 @@ function gutenberg_reregister_core_block_types() {
 				'post-excerpt.php'        => 'core/post-excerpt',
 				'post-featured-image.php' => 'core/post-featured-image',
 				'post-tags.php'           => 'core/post-tags',
-				'site-title.php'          => 'core/site-title',
-				'template-part.php'       => 'core/template-part',
 				'query.php'               => 'core/query',
 				'query-loop.php'          => 'core/query-loop',
 				'query-pagination.php'    => 'core/query-pagination',
+				'site-title.php'          => 'core/site-title',
+				'template-part.php'       => 'core/template-part',
 			)
 		);
 	}
 
 	$registry = WP_Block_Type_Registry::get_instance();
+
+	foreach ( $block_folders as $folder_name ) {
+		$block_json_file = $blocks_dir . '/' . $folder_name . '/block.json';
+		if ( ! file_exists( $block_json_file ) ) {
+			return;
+		}
+
+		// Ideally, all paths to block metadata files should be listed in
+		// WordPress core. In this place we should rather use filter
+		// to replace paths with overrides defined by the plugin.
+		$metadata = json_decode( file_get_contents( $block_json_file ), true );
+		if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
+			return false;
+		}
+
+		if ( $registry->is_registered( $metadata['name'] ) ) {
+			$registry->unregister( $metadata['name'] );
+		}
+
+		register_block_type_from_metadata( $block_json_file );
+	}
 
 	foreach ( $block_names as $file => $block_names ) {
 		if ( ! file_exists( $blocks_dir . $file ) ) {

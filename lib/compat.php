@@ -14,7 +14,8 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @since 7.9.0
 	 *
-	 * @param string $path Path to the folder where the `block.json` file is located.
+	 * @param string $file_or_folder Path to the JSON file with metadata definition for
+	 *     the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
 	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
 	 *     ones described below are supported by default. Default empty array.
@@ -23,8 +24,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
-	function register_block_type_from_metadata( $path, $args = array() ) {
-		$file = trailingslashit( $path ) . 'block.json';
+	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
+		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
+			trailingslashit( $file_or_folder ) . 'block.json' :
+			$file_or_folder;
 		if ( ! file_exists( $file ) ) {
 			return false;
 		}
