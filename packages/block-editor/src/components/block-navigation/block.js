@@ -123,14 +123,12 @@ export default function BlockNavigationBlock( {
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
-							onDropdownToggle={ ( isOpen ) => {
-								if ( isOpen ) {
-									onClick();
-								}
-							} }
 							{ ...props }
 						>
-							<EllipsisMenuControls.Slot bubblesVirtually />
+							<EllipsisMenuControls.Slot
+								clientId={ clientId }
+								bubblesVirtually
+							/>
 						</BlockSettingsDropdown>
 					) }
 				</TreeGridCell>

@@ -163,7 +163,7 @@ function NavigationLinkEdit( {
 			</BlockControls>
 			<BlockNavigationEllipsisMenuControls>
 				<MenuGroup>
-					<MenuItem onClick={ () => {} }>
+					<MenuItem onClick={ insertLinkBlock }>
 						{ __( 'Add submenu' ) }
 					</MenuItem>
 				</MenuGroup>
