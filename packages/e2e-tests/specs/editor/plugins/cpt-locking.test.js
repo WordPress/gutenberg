@@ -21,10 +21,15 @@ describe( 'cpt locking', () => {
 		await deactivatePlugin( 'gutenberg-test-plugin-cpt-locking' );
 	} );
 
-	const shouldRemoveTheInserter = async () => {
+	const shouldDisableTheInserter = async () => {
 		expect(
-			await page.$( '.edit-post-header [aria-label="Add block"]' )
-		).toBeNull();
+			await page.evaluate( () => {
+				const inserter = document.querySelector(
+					'.edit-post-header [aria-label="Add block"]'
+				);
+				return inserter.getAttribute( 'disabled' );
+			} )
+		).not.toBeNull();
 	};
 
 	const shouldNotAllowBlocksToBeRemoved = async () => {
@@ -60,7 +65,7 @@ describe( 'cpt locking', () => {
 			await createNewPost( { postType: 'locked-all-post' } );
 		} );
 
-		it( 'should remove the inserter', shouldRemoveTheInserter );
+		it( 'should disable the inserter', shouldDisableTheInserter );
 
 		it(
 			'should not allow blocks to be removed',
@@ -127,7 +132,7 @@ describe( 'cpt locking', () => {
 			await createNewPost( { postType: 'locked-insert-post' } );
 		} );
 
-		it( 'should remove the inserter', shouldRemoveTheInserter );
+		it( 'should disable the inserter', shouldDisableTheInserter );
 
 		it(
 			'should not allow blocks to be removed',
