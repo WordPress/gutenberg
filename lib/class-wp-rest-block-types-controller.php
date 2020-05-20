@@ -217,6 +217,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
 			'name',
+			'category',
 			'editor_script',
 			'script',
 			'editor_style',
@@ -312,6 +313,12 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'additionalProperties' => true,
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
+				),
+				'category'      => array(
+					'description' => __( 'Block category.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'is_dynamic'    => array(
 					'description' => __( 'Is the block dynamically rendered.', 'gutenberg' ),
