@@ -191,8 +191,8 @@ function gutenberg_edit_site_init( $hook ) {
 	$preload_paths = array(
 		'/',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
-		'/wp/v2/pages?per_page=-1&context=edit',
+		'/wp/v2/taxonomies?per_page=100&context=edit',
+		'/wp/v2/pages?per_page=100&context=edit',
 		'/wp/v2/themes?status=active',
 		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),
