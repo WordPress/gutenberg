@@ -147,6 +147,7 @@ dependencies {
         implementation project(':react-native-svg')
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
+		implementation project(':react-native-get-random-values')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
@@ -156,8 +157,9 @@ dependencies {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')))
+		implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')))
 
-        // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
+		// FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         def rnVersion = '0.61.5'
         implementation "com.facebook.react:react-native:${rnVersion}"
