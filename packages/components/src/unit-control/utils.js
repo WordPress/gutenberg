@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, keyBy } from 'lodash';
+import { isEmpty } from 'lodash';
 
 export const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: 0 },
@@ -61,7 +61,7 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 	unit = unit.toLowerCase();
 
 	if ( hasUnits( units ) ) {
-		const match = keyBy( units, 'value' )[ unit ];
+		const match = units.find( ( item ) => item.value === unit );
 		unit = match?.value;
 	}
 
