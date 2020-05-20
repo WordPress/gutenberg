@@ -59,9 +59,11 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 	// Get labels for text-prompt phrase.
 	const entityNamesForPrompt = [];
 	partitionedSavables.forEach( ( list ) => {
-		entityNamesForPrompt.push(
-			ENTITY_NAMES[ list[ 0 ].name ]( list.length )
-		);
+		if ( ENTITY_NAMES[ list[ 0 ].name ] ) {
+			entityNamesForPrompt.push(
+				ENTITY_NAMES[ list[ 0 ].name ]( list.length )
+			);
+		}
 	} );
 	// Get text-prompt phrase based on number of entity types changed.
 	const placeholderPhrase =
