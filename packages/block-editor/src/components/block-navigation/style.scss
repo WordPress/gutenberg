@@ -67,9 +67,7 @@ $tree-item-height: 36px;
 			opacity: 1;
 			@include edit-post__fade-in-animation;
 		}
-	}
 
-	.block-editor-block-navigation-block__menu-cell {
 		&,
 		.components-button.has-icon {
 			width: 24px;
