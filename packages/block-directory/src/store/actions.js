@@ -80,7 +80,7 @@ export function* installBlockType( { id, name, assets } ) {
 			throw new Error( __( 'Unable to get block types.' ) );
 		}
 	} catch ( error ) {
-		yield setErrorNotice( id, error.message );
+		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
 	yield setIsInstalling( false );
 }
