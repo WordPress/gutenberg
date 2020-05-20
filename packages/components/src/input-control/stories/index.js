@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, text } from '@storybook/addon-knobs';
+import { boolean, select, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -11,35 +11,42 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import NumberControl from '../';
+import InputControl from '../';
 
 export default {
-	title: 'Components/NumberControl',
-	component: NumberControl,
+	title: 'Components/InputControl',
+	component: InputControl,
 };
 
 function Example() {
-	const [ value, setValue ] = useState( '0' );
+	const [ value, setValue ] = useState( '' );
 
 	const props = {
 		disabled: boolean( 'disabled', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
-		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
-		label: text( 'label', 'Number' ),
-		min: number( 'min', 0 ),
-		max: number( 'max', 100 ),
-		placeholder: text( 'placeholder', 0 ),
-		shiftStep: number( 'shiftStep', 10 ),
-		step: number( 'step', 1 ),
+		label: text( 'label', 'Value' ),
+		placeholder: text( 'placeholder', 'Placeholder' ),
+		size: select(
+			'size',
+			{
+				default: 'default',
+				small: 'small',
+			},
+			'default'
+		),
+		suffix: text( 'suffix', '' ),
 	};
 
+	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
+
 	return (
-		<NumberControl
+		<InputControl
 			{ ...props }
-			value={ value }
 			onChange={ ( v ) => setValue( v ) }
+			suffix={ suffixMarkup }
+			value={ value }
 		/>
 	);
 }
