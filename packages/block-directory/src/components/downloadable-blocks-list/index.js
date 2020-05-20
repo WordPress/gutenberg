@@ -32,8 +32,10 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 					<DownloadableBlockListItem
 						key={ item.id }
 						onClick={ () => {
-							installBlockType( item ).then( () => {
-								onSelect( item );
+							installBlockType( item ).then( ( success ) => {
+								if ( success ) {
+									onSelect( item );
+								}
 							} );
 							onHover( null );
 						} }

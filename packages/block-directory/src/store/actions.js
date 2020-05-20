@@ -54,8 +54,11 @@ export function setInstallBlocksPermission( hasPermission ) {
  * Action triggered to install a block plugin.
  *
  * @param {Object} item The block item returned by search.
+ *
+ * @return {boolean} Whether the block was successfully installed & loaded.
  */
 export function* installBlockType( { id, name, assets } ) {
+	let success = false;
 	yield clearErrorNotice( id );
 	try {
 		if ( ! Array.isArray( assets ) || ! assets.length ) {
@@ -79,10 +82,12 @@ export function* installBlockType( { id, name, assets } ) {
 		if ( ! registeredBlocks.length ) {
 			throw new Error( __( 'Unable to get block types.' ) );
 		}
+		success = true;
 	} catch ( error ) {
 		yield setErrorNotice( id, error.message || __( 'An error occurred.' ) );
 	}
 	yield setIsInstalling( false );
+	return success;
 }
 
 /**

@@ -55,7 +55,7 @@ describe( 'actions', () => {
 			} );
 
 			expect( generator.next() ).toEqual( {
-				value: undefined,
+				value: true,
 				done: true,
 			} );
 		} );
@@ -80,7 +80,7 @@ describe( 'actions', () => {
 			} );
 
 			expect( generator.next() ).toEqual( {
-				value: undefined,
+				value: false,
 				done: true,
 			} );
 		} );
@@ -119,7 +119,7 @@ describe( 'actions', () => {
 			} );
 
 			expect( generator.next() ).toEqual( {
-				value: undefined,
+				value: false,
 				done: true,
 			} );
 		} );
