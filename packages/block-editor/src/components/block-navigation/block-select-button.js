@@ -69,7 +69,7 @@ const BlockNavigationBlockSelectButton = forwardRef( function(
 				) }
 			</Button>
 			<div
-				className="block-editor-block-navigation-block-contents__description"
+				className="block-editor-block-navigation-block-select-button__description"
 				id={ descriptionId }
 			>
 				{ blockPositionDescription }

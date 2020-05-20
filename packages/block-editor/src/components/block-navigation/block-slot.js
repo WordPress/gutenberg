@@ -95,7 +95,7 @@ const BlockNavigationBlockSlot = forwardRef( function( props, ref ) {
 								</VisuallyHidden>
 							) }
 							<div
-								className="block-editor-block-navigation-block-contents__description"
+								className="block-editor-block-navigation-block-slot__description"
 								id={ descriptionId }
 							>
 								{ blockPositionDescription }

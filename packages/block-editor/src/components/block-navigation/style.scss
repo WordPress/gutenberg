@@ -79,7 +79,8 @@ $tree-item-height: 36px;
 	}
 }
 
-.block-editor-block-navigation-block-contents__description,
+.block-editor-block-navigation-block-slot__description,
+.block-editor-block-navigation-block-select-button__description,
 .block-editor-block-navigation-appender__description {
 	display: none;
 }
