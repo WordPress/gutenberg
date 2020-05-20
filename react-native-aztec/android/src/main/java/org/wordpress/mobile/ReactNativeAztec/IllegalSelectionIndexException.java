@@ -1,8 +1,12 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import org.jetbrains.annotations.NotNull;
 import org.wordpress.aztec.spans.UnknownHtmlSpan;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,13 +27,20 @@ class IllegalSelectionIndexException extends Exception {
     @NotNull
     private static List<String> getHtmlTags(ReactAztecText view, int textLength) {
         List<String> tags = new ArrayList<>();
-        Pattern tagPattern = Pattern.compile("<([^\\\\s>/]+)>");
         for (UnknownHtmlSpan span : view.getText().getSpans(0, textLength, UnknownHtmlSpan.class)) {
             String rawHtml = span.getRawHtml().toString();
-            Matcher matcher = tagPattern.matcher(rawHtml);
-            while (matcher.find()) {
-                tags.add(matcher.group(1));
-            }
+            tags.addAll(parseTags(rawHtml));
+        }
+        return tags;
+    }
+
+    @VisibleForTesting
+    @NonNull
+    static List<String> parseTags(String html) {
+        List<String> tags = new ArrayList<>();
+        Matcher matcher = Pattern.compile("<([^\\\\s>/]+)>").matcher(html);
+        while (matcher.find()) {
+            tags.add(matcher.group(1));
         }
         return tags;
     }
