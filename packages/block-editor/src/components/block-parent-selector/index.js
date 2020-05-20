@@ -19,27 +19,23 @@ import BlockIcon from '../block-icon';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const { parents, parentBlockType, firstParentClientId } = useSelect(
-		( select ) => {
-			const {
-				getBlockName,
-				getBlockParents,
-				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const _parents = getBlockParents( selectedBlockClientId );
-			const _firstParentClientId = _parents[ _parents.length - 1 ];
-			const parentBlockName = getBlockName( _firstParentClientId );
-			return {
-				parents: _parents,
-				parentBlockType: getBlockType( parentBlockName ),
-				firstParentClientId: _firstParentClientId,
-			};
-		},
-		[]
-	);
+	const { parentBlockType, firstParentClientId } = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getBlockParents,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const _parents = getBlockParents( selectedBlockClientId );
+		const _firstParentClientId = _parents[ _parents.length - 1 ];
+		const parentBlockName = getBlockName( _firstParentClientId );
+		return {
+			parentBlockType: getBlockType( parentBlockName ),
+			firstParentClientId: _firstParentClientId,
+		};
+	}, [] );
 
-	if ( parents?.length ) {
+	if ( firstParentClientId ) {
 		return (
 			<div
 				className="block-editor-block-parent-selector"
