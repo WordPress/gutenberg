@@ -383,4 +383,3 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
-````
