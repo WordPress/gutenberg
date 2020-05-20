@@ -9,6 +9,7 @@ export { default as arrowDown } from './library/arrow-down';
 export { default as arrowLeft } from './library/arrow-left';
 export { default as arrowRight } from './library/arrow-right';
 export { default as arrowUp } from './library/arrow-up';
+export { default as atSymbol } from './library/at-symbol';
 export { default as audio } from './library/audio';
 export { default as backup } from './library/backup';
 export { default as blockDefault } from './library/block-default';

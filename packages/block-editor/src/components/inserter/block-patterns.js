@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, fromPairs } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -128,7 +128,7 @@ function BlockPatternsPerCategories( { onInsert } ) {
 			if ( ! pattern.categories || ! pattern.categories.length ) {
 				return Infinity;
 			}
-			const indexedCategories = Object.fromEntries(
+			const indexedCategories = fromPairs(
 				categories.map( ( { name }, index ) => [ name, index ] )
 			);
 			return Math.min(

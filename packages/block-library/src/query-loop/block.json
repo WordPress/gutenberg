@@ -1,5 +1,5 @@
 {
 	"name": "core/query-loop",
 	"category": "layout",
-	"context": [ "queryId", "query" ]
+	"context": [ "queryId", "query", "queryContext" ]
 }

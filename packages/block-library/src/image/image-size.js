@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { withGlobalEvents } from '@wordpress/compose';
 import { useRef, useState, useEffect } from '@wordpress/element';
 
 /**
@@ -9,7 +8,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
  */
 import { calculatePreferedImageSize } from './utils';
 
-function ImageSize( { src, dirtynessTrigger, children } ) {
+export default function ImageSize( { src, dirtynessTrigger, children } ) {
 	const ref = useRef();
 	const [ state, setState ] = useState( {
 		imageWidth: null,
@@ -21,9 +20,10 @@ function ImageSize( { src, dirtynessTrigger, children } ) {
 	} );
 
 	useEffect( () => {
-		const image = new window.Image();
+		const { defaultView } = ref.current.ownerDocument;
+		const image = new defaultView.Image();
 
-		image.onload = () => {
+		function calculateSize() {
 			const { width, height } = calculatePreferedImageSize(
 				image,
 				ref.current
@@ -37,18 +37,17 @@ function ImageSize( { src, dirtynessTrigger, children } ) {
 				imageWidthWithinContainer: width,
 				imageHeightWithinContainer: height,
 			} );
-		};
+		}
 
+		defaultView.addEventListener( 'resize', calculateSize );
+		image.addEventListener( 'load', calculateSize );
 		image.src = src;
 
 		return () => {
-			image.onload = undefined;
+			defaultView.removeEventListener( 'resize', calculateSize );
+			image.removeEventListener( 'load', calculateSize );
 		};
 	}, [ src, dirtynessTrigger ] );
 
 	return <div ref={ ref }>{ children( state ) }</div>;
 }
-
-export default withGlobalEvents( {
-	resize: 'calculateSize',
-} )( ImageSize );
