@@ -10,9 +10,9 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
 function AdminMenuToggle() {
-	const { isOpen, toggleMenu } = useToggle( { ref: buttonRef } );
 	const href = useAdminUrl();
 	const buttonRef = useRef();
+	const { isOpen, toggleMenu } = useToggle( { ref: buttonRef } );
 
 	const handleOnClick = ( event ) => {
 		const { button, ctrlKey, metaKey } = event;
@@ -114,7 +114,7 @@ function useToggle( { ref } ) {
 
 			const didClickOutside =
 				! adminMenuNode.contains( target ) &&
-				! buttonNode.contains( target ) &&
+				! buttonNode?.contains( target ) &&
 				target !== buttonNode;
 
 			if ( didClickOutside ) {
