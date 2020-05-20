@@ -37,3 +37,5 @@ function TreeGrid( { children, ...props }, ref ) {
 export default forwardRef( TreeGrid );
 export { default as TreeGridRow } from './row';
 export { default as TreeGridCell } from './cell';
+export { default as FocusableTreeGridCell } from './focusable-cell';
+export { default as TreeGridItem } from './item';
