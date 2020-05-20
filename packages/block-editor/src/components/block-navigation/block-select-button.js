@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
 import BlockIcon from '../block-icon';
 import { getBlockPositionDescription } from './utils';
 
-const BlockNavigationBlockSelectButton = forwardRef( function(
+function BlockNavigationBlockSelectButton(
 	{
 		className,
 		block,
@@ -76,4 +76,6 @@ const BlockNavigationBlockSelectButton = forwardRef( function(
 			</div>
 		</>
 	);
-} );
+}
+
+export default forwardRef( BlockNavigationBlockSelectButton );

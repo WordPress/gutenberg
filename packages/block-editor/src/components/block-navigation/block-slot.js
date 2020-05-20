@@ -27,7 +27,7 @@ import { getBlockPositionDescription } from './utils';
 
 const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
-const BlockNavigationBlockSlot = forwardRef( function( props, ref ) {
+export default forwardRef( function BlockNavigationBlockSlot( props, ref ) {
 	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 	const { clientId } = props.block;
 
