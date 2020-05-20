@@ -123,6 +123,11 @@ export default function BlockNavigationBlock( {
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
+							onDropdownToggle={ ( isOpen ) => {
+								if ( isOpen ) {
+									onClick();
+								}
+							} }
 							{ ...props }
 						>
 							<EllipsisMenu.Slot bubblesVirtually />

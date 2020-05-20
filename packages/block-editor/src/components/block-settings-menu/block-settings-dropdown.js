@@ -34,7 +34,7 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockSettingsDropdown( { clientIds, ...props } ) {
+export function BlockSettingsDropdown( { clientIds, children, ...props } ) {
 	const blockClientIds = castArray( clientIds );
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
@@ -145,6 +145,7 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 									/>
 								) }
 							</MenuGroup>
+							{ children }
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
 								clientIds={ clientIds }
