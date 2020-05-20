@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
-
+import { moreVertical } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
@@ -20,7 +20,7 @@ import {
 } from '../block-mover/button';
 import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
-import BlockSettingsMenu from '../block-settings-menu';
+import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
 
 export default function BlockNavigationBlock( {
@@ -118,8 +118,9 @@ export default function BlockNavigationBlock( {
 			{ withEllipsisMenu && level > 1 && (
 				<TreeGridCell className={ ellipsisMenuClassName }>
 					{ ( props ) => (
-						<BlockSettingsMenu
+						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
+							icon={ moreVertical }
 							{ ...props }
 						/>
 					) }
