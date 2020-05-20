@@ -147,6 +147,7 @@ export function BlockSettingsDropdown( { clientIds, ...props } ) {
 							</MenuGroup>
 							<BlockSettingsMenuControls.Slot
 								fillProps={ { onClose } }
+								clientIds={ clientIds }
 							/>
 							<MenuGroup>
 								{ ! isLocked && (

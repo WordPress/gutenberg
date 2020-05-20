@@ -13,14 +13,16 @@ const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'
 );
 
-const BlockSettingsMenuControlsSlot = ( { fillProps } ) => {
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const { selectedBlocks } = useSelect( ( select ) => {
 		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
 			'core/block-editor'
 		);
+		const ids =
+			clientIds !== null ? clientIds : getSelectedBlockClientIds();
 		return {
 			selectedBlocks: map(
-				getBlocksByClientId( getSelectedBlockClientIds() ),
+				getBlocksByClientId( ids ),
 				( block ) => block.name
 			),
 		};
