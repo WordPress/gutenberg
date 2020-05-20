@@ -64,7 +64,7 @@ if (buildGutenbergMobileJSBundle) {
         npmWorkDir = file("${tmpdir}/npm")
 
         // Set the work directory where node_modules should be located
-        nodeModulesDir = file("${project.projectDir}/../../../../")
+        nodeModulesDir = file("${project.projectDir}/../../../")
     }
 
     npm_install {
@@ -86,7 +86,7 @@ group='com.github.wordpress-mobile.gutenberg-mobile'
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
-def hermesOriginalPath = "../../../../node_modules/hermes-engine/android/";
+def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 def buildAssetsFolder = 'build/assets'
 
@@ -123,7 +123,7 @@ repositories {
 
     if (rootProject.ext.buildGutenbergFromSource) {
         // If building from source, use the local sources from node_modules
-        def nodeModulesPath = "${project.buildDir}/../../../../../node_modules/"
+        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
     } else {
         // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
@@ -151,7 +151,7 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../../../bundle/android/";
+        hermesPath = "../../react-native-editor/bundle/android/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
@@ -173,7 +173,7 @@ if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
 
     task buildJSBundle(type: NpmTask) {
-        args = ['run', 'bundle:android']
+        args = ['run', 'native', 'bundle:android']
     }
 
     task backupHermesDebugAAR(type: Copy) {
@@ -208,16 +208,10 @@ if (buildGutenbergMobileJSBundle) {
         }
     }
 
-    task cleanupNodeModulesFolder(type: Delete) {
-        delete '../../react-native-editor/node_modules'
-    }
-
     if (buildGutenbergMobileJSBundle) {
-        preBuild.dependsOn(cleanupNodeModulesFolder)
-        cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
+        preBuild.dependsOn(backupHermesDebugAAR)
         backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
         backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
-        buildJSBundle.dependsOn(npm_install)
     }
 }
