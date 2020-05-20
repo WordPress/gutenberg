@@ -19,6 +19,7 @@
 
 1.27.0
 ------
+* Block Editor: Add dialog for mentioning other users in your post
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
 * Fix bug where whitespaces at start of text blocks were being removed
