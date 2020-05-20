@@ -171,10 +171,8 @@ export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
 ) {
-	const combinedReducers = composeStateReducers( stateReducer );
-
 	const [ state, dispatch ] = useReducer(
-		inputControlStateReducer( combinedReducers ),
+		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
 
