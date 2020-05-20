@@ -26,8 +26,8 @@ export default function BlockParentSelector() {
 			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const _parents = getBlockParents( selectedBlockClientId );
-		const _firstParentClientId = _parents[ _parents.length - 1 ];
+		const parents = getBlockParents( selectedBlockClientId );
+		const _firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( _firstParentClientId );
 		return {
 			parentBlockType: getBlockType( parentBlockName ),
