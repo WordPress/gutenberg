@@ -2,16 +2,17 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { ESCAPE, TAB } from '@wordpress/keycodes';
+import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
 function AdminMenuToggle() {
-	const buttonRef = useRef();
 	const { isOpen, toggleMenu } = useToggle( { ref: buttonRef } );
-	// Get the current WP Admin Post URL
-	const href = window.location.href;
+	const href = useAdminUrl();
+	const buttonRef = useRef();
 
 	const handleOnClick = ( event ) => {
 		const { button, ctrlKey, metaKey } = event;
@@ -47,6 +48,23 @@ function AdminMenuToggle() {
 			ref={ buttonRef }
 		/>
 	);
+}
+
+function useAdminUrl() {
+	const { postType } = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+
+		return {
+			postType: getPostType( getCurrentPostType() ),
+		};
+	}, [] );
+
+	const href = addQueryArgs( 'edit.php', {
+		post_type: postType?.slug,
+	} );
+
+	return href;
 }
 
 function useToggle( { ref } ) {
@@ -95,7 +113,9 @@ function useToggle( { ref } ) {
 			const { target } = event;
 
 			const didClickOutside =
-				! adminMenuNode.contains( target ) && target !== buttonNode;
+				! adminMenuNode.contains( target ) &&
+				! buttonNode.contains( target ) &&
+				target !== buttonNode;
 
 			if ( didClickOutside ) {
 				closeMenu();

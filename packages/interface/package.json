@@ -34,6 +34,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15"
 	},
