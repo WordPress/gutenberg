@@ -112,7 +112,7 @@
 /packages/env                                   @epiqueras @noahtallen @noisysocks
 
 # PHP
-/lib                                            @timothybjacobs
+/lib                                            @timothybjacobs @spacedmonkey
 
 # Native (Unowned)
 *.native.js                                     @ghost
