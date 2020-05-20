@@ -1,5 +1,5 @@
 .wp-block-quote {
-	border-left: 4px solid $black;
+	border-left: 0.25rem solid $black;
 	margin: 0 0 $default-block-margin 0;
 	padding-left: 1em;
 
@@ -16,7 +16,7 @@
 	&.has-text-align-right,
 	&.has-text-align-right {
 		border-left: none;
-		border-right: 4px solid $black;
+		border-right: 0.25rem solid $black;
 		padding-left: 0;
 		padding-right: 1em;
 	}
