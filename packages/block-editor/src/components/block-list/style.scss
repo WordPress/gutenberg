@@ -160,6 +160,37 @@
 			}
 		}
 	}
+
+	// What if we highlighted blocks on hover while using the Select tool?
+	.is-navigate-mode & .block-editor-block-list__block:hover:not(.is-selected) {
+		// Show selection borders around every non-nested block's actual footprint.
+		&::after {
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
+		}
+
+		&::after { // Everything else.
+			// 2px outside.
+			box-shadow: 0 0 0 1px rgba($dark-gray-primary, 0.2);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+			transition: box-shadow 0.2s ease-out;
+			@include reduce-motion("transition");
+
+			// Windows High Contrast mode will show this outline.
+			outline: 2px solid transparent;
+
+			// Show a lighter color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
+			}
+		}
+	}
 }
 
 
