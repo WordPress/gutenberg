@@ -87,6 +87,7 @@ function Layout() {
 		showMostUsedBlocks,
 		isInserterOpened,
 		showIconLabels,
+		isFocusMode,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -118,6 +119,9 @@ function Layout() {
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
+			),
+			isFocusMode: select( 'core/edit-post' ).isFeatureActive(
+				'focusMode'
 			),
 		};
 	}, [] );
@@ -258,6 +262,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! isFocusMode &&
 						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
