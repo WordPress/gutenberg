@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import { isEmpty } from 'lodash';
+/**
  * WordPress dependencies
  */
 import { useReducer } from '@wordpress/element';
@@ -58,7 +62,8 @@ function mergeInitialState( initialState = initialInputControlState ) {
 export const composeStateReducers = ( ...fns ) => {
 	return ( ...args ) => {
 		return fns.reduceRight( ( state, fn ) => {
-			return { ...state, ...fn( ...args ) };
+			const fnState = fn( ...args );
+			return isEmpty( fnState ) ? state : { ...state, ...fnState };
 		}, {} );
 	};
 };
