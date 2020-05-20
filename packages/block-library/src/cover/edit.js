@@ -267,6 +267,9 @@ function CoverEdit( {
 		isDarkElement
 	);
 
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
@@ -275,9 +278,7 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {} ),
+		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
@@ -286,9 +287,13 @@ function CoverEdit( {
 		style.background = gradientValue;
 	}
 
+	let positionValue;
+
 	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y *
-			100 }%`;
+		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		if ( isImageBackground ) {
+			style.backgroundPosition = positionValue;
+		}
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
@@ -316,28 +321,36 @@ function CoverEdit( {
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						{ isImageBackground && (
 							<ToggleControl
 								label={ __( 'Fixed background' ) }
 								checked={ hasParallax }
 								onChange={ toggleParallax }
 							/>
 						) }
-						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-							! hasParallax && (
-								<FocalPointPicker
-									label={ __( 'Focal point picker' ) }
-									url={ url }
-									value={ focalPoint }
-									onChange={ ( newFocalPoint ) =>
-										setAttributes( {
-											focalPoint: newFocalPoint,
-										} )
-									}
-								/>
-							) }
-						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-							<video autoPlay muted loop src={ url } />
+						{ isImageBackground && ! hasParallax && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
+						) }
+						{ isVideoBackground && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
 						) }
 						<PanelRow>
 							<Button
@@ -483,7 +496,7 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+				{ isImageBackground && (
 					// Used only to programmatically check if the image is dark or not
 					<img
 						ref={ isDarkElement }
@@ -505,7 +518,7 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+				{ isVideoBackground && (
 					<video
 						ref={ isDarkElement }
 						className="wp-block-cover__video-background"
@@ -513,6 +526,7 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
+						style={ { objectPosition: positionValue } }
 					/>
 				) }
 				<InnerBlocks

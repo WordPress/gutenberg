@@ -16,6 +16,7 @@ import { Path, SVG } from '@wordpress/primitives';
  */
 import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
+import { isVideoType } from './utils';
 
 const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
@@ -30,7 +31,7 @@ export class FocalPointPicker extends Component {
 			percentages: props.value,
 		};
 		this.containerRef = createRef();
-		this.imageRef = createRef();
+		this.mediaRef = createRef();
 		this.horizontalPositionChanged = this.horizontalPositionChanged.bind(
 			this
 		);
@@ -55,12 +56,12 @@ export class FocalPointPicker extends Component {
 			width: 0,
 			height: 0,
 		};
-		if ( ! this.imageRef.current ) {
+		if ( ! this.mediaRef.current ) {
 			return bounds;
 		}
 		const dimensions = {
-			width: this.imageRef.current.clientWidth,
-			height: this.imageRef.current.clientHeight,
+			width: this.mediaRef.current.clientWidth,
+			height: this.mediaRef.current.clientHeight,
 		};
 		const pickerDimensions = this.pickerDimensions();
 		const widthRatio = pickerDimensions.width / dimensions.width;
@@ -188,6 +189,9 @@ export class FocalPointPicker extends Component {
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
 		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
+
+		const isVideo = isVideoType( url );
+
 		return (
 			<BaseControl
 				label={ label }
@@ -213,13 +217,25 @@ export class FocalPointPicker extends Component {
 						role="button"
 						tabIndex="-1"
 					>
-						<img
-							alt="Dimensions helper"
-							onLoad={ this.onLoad }
-							ref={ this.imageRef }
-							src={ url }
-							draggable="false"
-						/>
+						{ isVideo ? (
+							<video
+								autoPlay
+								muted
+								loop
+								onLoadedData={ this.onLoad }
+								src={ url }
+								ref={ this.mediaRef }
+								draggable="false"
+							/>
+						) : (
+							<img
+								alt="Dimensions helper"
+								onLoad={ this.onLoad }
+								ref={ this.mediaRef }
+								src={ url }
+								draggable="false"
+							/>
+						) }
 						<div
 							className={ iconContainerClasses }
 							style={ iconContainerStyle }
