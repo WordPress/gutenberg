@@ -84,9 +84,9 @@ apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f14
 group='com.github.wordpress-mobile.gutenberg-mobile'
 
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
-project.ext.buildGutenbergFromSource = true
+project.ext.buildGutenbergFromSource = false
 
-def hermesOriginalPath = "../../../node_modules/hermes-engine/android/";
+def hermesOriginalPath = "../../../../node_modules/hermes-engine/android/";
 def hermesPath = hermesOriginalPath;
 def buildAssetsFolder = 'build/assets'
 
@@ -108,11 +108,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-	sourceSets {
-		main {
-			assets.srcDirs += buildAssetsFolder
-		}
-	}
+    sourceSets {
+        main {
+            assets.srcDirs += buildAssetsFolder
+        }
+    }
 }
 
 repositories {
@@ -123,7 +123,7 @@ repositories {
 
     if (rootProject.ext.buildGutenbergFromSource) {
         // If building from source, use the local sources from node_modules
-        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
+        def nodeModulesPath = "${project.buildDir}/../../../../../node_modules/"
         maven { url "${nodeModulesPath}/react-native/android" }
     } else {
         // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
@@ -147,19 +147,19 @@ dependencies {
         implementation project(':react-native-svg')
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
-		implementation project(':react-native-get-random-values')
+        implementation project(':react-native-get-random-values')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        //hermesPath = "../../react-native-editor/bundle/";
+        hermesPath = "../../../../bundle/android/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')))
-		implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')))
 
-		// FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
+        // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         def rnVersion = '0.61.5'
         implementation "com.facebook.react:react-native:${rnVersion}"
@@ -169,16 +169,12 @@ dependencies {
     releaseImplementation files(hermesPath + "hermes-release.aar")
 }
 
-boolean isBundleUpToDate() {
-	return project.hasProperty('isBundleUpToDate') && isBundleUpToDate
-}
-
 if (buildGutenbergMobileJSBundle) {
     def assetsFolder = 'src/main/assets'
 
-	task buildJSBundle(type: NpmTask) {
-		args = ['run', 'bundle:android']
-	}
+    task buildJSBundle(type: NpmTask) {
+        args = ['run', 'bundle:android']
+    }
 
     task backupHermesDebugAAR(type: Copy) {
         def origFileName = 'hermes-debug.aar'

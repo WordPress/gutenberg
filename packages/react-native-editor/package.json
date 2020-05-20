@@ -51,7 +51,7 @@
     "node-fetch": "^2.3.0",
     "react-native": "0.61.5",
     "react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
-    "react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#788f66efc2589ac23da96f7814f8ab15daa9f5fd",
+    "react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#b02cb3c732430c7f91992e9f5db8d08d853120e2",
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
     "react-native-keyboard-aware-scroll-view": "git+https://github.com/wordpress-mobile/react-native-keyboard-aware-scroll-view.git#gb-v0.8.8",

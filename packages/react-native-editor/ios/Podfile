@@ -43,6 +43,8 @@ target 'gutenberg' do
   pod 'Gutenberg', :path => '../../react-native-bridge/Gutenberg.podspec'
 
 
+  pod 'react-native-get-random-values', :path => '../node_modules/react-native-get-random-values'
+
   target 'gutenbergTests' do
     inherit! :search_paths
     # Pods for testing
