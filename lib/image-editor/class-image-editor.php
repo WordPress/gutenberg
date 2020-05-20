@@ -92,8 +92,7 @@ class Image_Editor {
 	private function load_image( $media_id ) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		$attachment_meta = wp_get_attachment_metadata( $media_id );
-		$image_path      = get_attached_file( $media_id );
+		$image_path = get_attached_file( $media_id );
 
 		if ( empty( $image_path ) ) {
 			return new WP_Error( 'fileunknown', 'Unable to find original media file' );
