@@ -2,8 +2,10 @@
  * External dependencies
  */
 const { createHash } = require( 'crypto' );
+// @ts-ignore
 const json2php = require( 'json2php' );
 const path = require( 'path' );
+// @ts-ignore
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
@@ -15,8 +17,51 @@ const {
 	defaultRequestToHandle,
 } = require( './util' );
 
+/**
+ * Map module request to an external.
+ *
+ * @callback RequestToExternal
+ * @param {string} request Module request.
+ * @return {string|string[]|undefined} Return `undefined` to ignore the request.
+ *                                     Return `string|string[]` to map the request to an external.
+ */
+
+/**
+ * Map module request to a script handle.
+ *
+ * @callback RequestToHandle
+ * @param {string} request Module request.
+ * @return {string|undefined} Return `undefined` to use the same name as the module.
+ *                            Return `string` to map the request to a specific script handle.
+ */
+
+/**
+ * @typedef AssetData
+ *
+ * @property {string} version String representing a particular build
+ * @property {string[]} dependencies The script dependencies
+ */
+
+/**
+ * @typedef Options
+ *
+ * @property {boolean} injectPolyfill Force wp-polyfill to be included in each entry point's dependency list. This is like importing `@wordpress/polyfill` for each entry point.
+ * @property {boolean} useDefaults Set to `false` to disable the default WordPress script request handling.
+ * @property {'php'|'json'} outputFormat The output format for the generated asset file.
+ * @property {RequestToExternal|undefined} [requestToExternal] Map module requests to an external.
+ * @property {RequestToHandle|undefined} [requestToHandle] Map module requests to a script handle.
+ * @property {string|null} combinedOutputFile This option is useful only when the combineAssets option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
+ * @property {boolean|undefined} combineAssets By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
+ */
+
+// @implements Unsupported TypeScript JSDoc tag: https://github.com/microsoft/TypeScript/issues/30156
+// /** @implements {import('webpack').Plugin} */
 class DependencyExtractionWebpackPlugin {
+	/**
+	 * @param {Partial<Options>} options
+	 */
 	constructor( options ) {
+		/** @type {Options} */
 		this.options = Object.assign(
 			{
 				combineAssets: false,
@@ -28,11 +73,15 @@ class DependencyExtractionWebpackPlugin {
 			options
 		);
 
-		// Track requests that are externalized.
-		//
-		// Because we don't have a closed set of dependencies, we need to track what has
-		// been externalized so we can recognize them in a later phase when the dependency
-		// lists are generated.
+		/**
+		 * Track requests that are externalized.
+		 *
+		 * Because we don't have a closed set of dependencies, we need to track what has
+		 * been externalized so we can recognize them in a later phase when the dependency
+		 * lists are generated.
+		 *
+		 * @type {Set<string>}
+		 */
 		this.externalizedDeps = new Set();
 
 		// Offload externalization work to the ExternalsPlugin.
@@ -42,7 +91,14 @@ class DependencyExtractionWebpackPlugin {
 		);
 	}
 
-	externalizeWpDeps( context, request, callback ) {
+	/* eslint-disable jsdoc/valid-types */
+	/**
+	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[0]} _context
+	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[1]} request
+	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[2]} callback
+	 */
+	externalizeWpDeps( _context, request, callback ) {
+		/* eslint-enable jsdoc/valid-types */
 		let externalRequest;
 
 		// Handle via options.requestToExternal first
@@ -64,9 +120,14 @@ class DependencyExtractionWebpackPlugin {
 			return callback( null, { this: externalRequest } );
 		}
 
+		// @ts-ignore
 		return callback();
 	}
 
+	/**
+	 * @param {string} request
+	 * @return {string} Transformed request
+	 */
 	mapRequestToDependency( request ) {
 		// Handle via options.requestToHandle first
 		if ( typeof this.options.requestToHandle === 'function' ) {
@@ -88,6 +149,10 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
+	/**
+	 * @param {Object} asset
+	 * @return {string} Stringified asset
+	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
@@ -98,11 +163,15 @@ class DependencyExtractionWebpackPlugin {
 		return JSON.stringify( asset );
 	}
 
+	/**
+	 * @param {import('webpack').Compiler} compiler
+	 * @return {void}
+	 */
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
-		const { output } = compiler.options;
-		const { filename: outputFilename } = output;
+		const outputFilename =
+			/** @type {string} */ ( compiler.options.output?.filename );
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
@@ -111,6 +180,8 @@ class DependencyExtractionWebpackPlugin {
 				injectPolyfill,
 				outputFormat,
 			} = this.options;
+
+			/** @type {Record<string, AssetData>} */
 			const combinedAssetsData = {};
 
 			// Process each entry point independently.
@@ -118,6 +189,7 @@ class DependencyExtractionWebpackPlugin {
 				entrypointName,
 				entrypoint,
 			] of compilation.entrypoints.entries() ) {
+				/** @type {Set<string>} */
 				const entrypointExternalizedWpDeps = new Set();
 				if ( injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
@@ -139,6 +211,7 @@ class DependencyExtractionWebpackPlugin {
 
 				const runtimeChunk = entrypoint.getRuntimeChunk();
 
+				/** @type {AssetData} */
 				const assetData = {
 					// Get a sorted array so we can produce a stable, stringified representation.
 					dependencies: Array.from(
@@ -156,6 +229,8 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
+					// Webpack types don't include `contentHash` here
+					// @ts-ignore
 					contentHash: createHash( 'md4' )
 						.update( assetString )
 						.digest( 'hex' ),
@@ -179,7 +254,8 @@ class DependencyExtractionWebpackPlugin {
 			}
 
 			if ( combineAssets ) {
-				const outputFolder = compiler.options.output.path;
+				const outputFolder =
+					/** @type {string} */ ( compiler.options.output?.path );
 				const assetsFilePath = path.resolve(
 					outputFolder,
 					combinedOutputFile ||
@@ -199,6 +275,10 @@ class DependencyExtractionWebpackPlugin {
 	}
 }
 
+/**
+ * @param {string} name
+ * @return {string} Basename
+ */
 function basename( name ) {
 	if ( ! name.includes( '/' ) ) {
 		return name;
