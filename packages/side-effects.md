@@ -93,9 +93,9 @@ In order to reduce maintenance cost and minimize the chance of breakage, we opte
 
 ```json
 {
-		"sideEffects": [
-			"!((src|build|build-module)/(components|utils)/**)"
-		],
+	"sideEffects": [
+		"!((src|build|build-module)/(components|utils)/**)"
+	],
 }
 ```
 
