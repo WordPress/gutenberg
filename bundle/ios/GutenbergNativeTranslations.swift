@@ -32,7 +32,6 @@ private func dummy() {
     _ = NSLocalizedString("Blog", comment: "translators: title for \"Blog\" page template")
     _ = NSLocalizedString("Choose from device", comment: "")
     _ = NSLocalizedString("City, 10100", comment: "translators: sample content for \"Contact\" page template")
-    _ = NSLocalizedString("Clear All Settings", comment: "")
     _ = NSLocalizedString("Columns Settings", comment: "")
     _ = NSLocalizedString("Content…", comment: "")
     _ = NSLocalizedString("Current value is %s", comment: "translators: %s: current cell value.")
