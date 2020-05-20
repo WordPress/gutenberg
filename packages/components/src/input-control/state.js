@@ -49,11 +49,11 @@ function mergeInitialState( initialState = initialInputControlState ) {
 }
 
 /**
- * Combines multiple stateReducers into a single stateReducer, building
+ * Composes multiple stateReducers into a single stateReducer, building
  * the pipeline to control the flow for state and actions.
  *
  * @param  {...Function} fns State reducers.
- * @return {Function} The single combined stateReducer.
+ * @return {Function} The single composed stateReducer.
  */
 export const composeStateReducers = ( ...fns ) => {
 	return ( ...args ) => {
@@ -70,10 +70,10 @@ export const composeStateReducers = ( ...fns ) => {
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param {Function} combinedStateReducers A custom reducer that can subscribe and modify state.
+ * @param {Function} composedStateReducers A custom reducer that can subscribe and modify state.
  * @return {Function} The reducer.
  */
-function inputControlStateReducer( combinedStateReducers ) {
+function inputControlStateReducer( composedStateReducers ) {
 	return ( state, action ) => {
 		const nextState = { ...state };
 		const { type, payload } = action;
@@ -145,11 +145,11 @@ function inputControlStateReducer( combinedStateReducers ) {
 		}
 
 		/**
-		 * Send the nextState + action to the combinedReducers via
+		 * Send the nextState + action to the composedReducers via
 		 * this "bridge" mechanism. This allows external stateReducers
 		 * to hook into actions, and modify state if needed.
 		 */
-		return combinedStateReducers( nextState, action );
+		return composedStateReducers( nextState, action );
 	};
 }
 
