@@ -315,7 +315,6 @@ export class RichText extends Component {
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
-		const { activeFormats = [] } = this.state;
 		this.lastEventCount = event.nativeEvent.eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
@@ -353,7 +352,6 @@ export class RichText extends Component {
 		if (
 			! onDelete ||
 			! isCollapsed( value ) ||
-			activeFormats.length ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
 		) {
