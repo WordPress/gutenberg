@@ -65,36 +65,40 @@ function ComplementaryAreaHeader( { activeComplementaryArea } ) {
 
 export default function Sidebar() {
 	const { enableComplementaryArea } = useDispatch( 'core/interface' );
-	const { currentArea, hasBlockSelected, isGeneralSidebarOpen } = useSelect(
-		( select ) => {
-			let activeArea = select(
-				'core/interface'
-			).getActiveComplementaryArea( 'core/edit-widgets' );
-			const isSidebarOpen = !! activeArea;
-			const selectionStart = select(
-				'core/block-editor'
-			).getBlockSelectionStart();
-			if ( ! CORE_WIDGET_COMPLEMENTARY_AREAS[ activeArea ] ) {
-				if ( ! selectionStart ) {
-					activeArea = 'edit-widgets/block-areas';
-				} else {
-					activeArea = 'edit-widgets/block-inspector';
-				}
+	const {
+		currentArea,
+		hasSelectedNonAreaBlock,
+		isGeneralSidebarOpen,
+	} = useSelect( ( select ) => {
+		let activeArea = select( 'core/interface' ).getActiveComplementaryArea(
+			'core/edit-widgets'
+		);
+		const isSidebarOpen = !! activeArea;
+		const { getBlockSelectionStart, getBlockRootClientId } = select(
+			'core/block-editor'
+		);
+		const selectionStart = getBlockSelectionStart();
+		if ( ! CORE_WIDGET_COMPLEMENTARY_AREAS[ activeArea ] ) {
+			if ( ! selectionStart ) {
+				activeArea = 'edit-widgets/block-areas';
+			} else {
+				activeArea = 'edit-widgets/block-inspector';
 			}
-			return {
-				currentArea: activeArea,
-				hasBlockSelected: !! selectionStart,
-				isGeneralSidebarOpen: isSidebarOpen,
-			};
-		},
-		[]
-	);
+		}
+		return {
+			currentArea: activeArea,
+			hasSelectedNonAreaBlock: !! (
+				selectionStart && getBlockRootClientId( selectionStart )
+			),
+			isGeneralSidebarOpen: isSidebarOpen,
+		};
+	}, [] );
 
 	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
 	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
 	useEffect( () => {
 		if (
-			hasBlockSelected &&
+			hasSelectedNonAreaBlock &&
 			currentArea === 'edit-widgets/block-areas' &&
 			isGeneralSidebarOpen
 		) {
@@ -104,7 +108,7 @@ export default function Sidebar() {
 			);
 		}
 		if (
-			! hasBlockSelected &&
+			! hasSelectedNonAreaBlock &&
 			currentArea === 'edit-widgets/block-inspector' &&
 			isGeneralSidebarOpen
 		) {
@@ -113,7 +117,7 @@ export default function Sidebar() {
 				'edit-widgets/block-areas'
 			);
 		}
-	}, [ hasBlockSelected, enableComplementaryArea ] );
+	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
 
 	return (
 		<ComplementaryArea
