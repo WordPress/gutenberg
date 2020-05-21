@@ -58,6 +58,10 @@
 
 - The `prefer-const` rule included in the `recommended` and `esnext` rulesets has been relaxed to allow a `let` assignment if any of a [destructuring assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) are reassigned.
 
+### Enhancements
+
+- Added new `isInternalDependencyPatterns` option to `@wordpress/dependency-group` that allows marking aliased dependencies as internal ones.
+
 ## 4.0.0 (2020-02-10)
 
 ### Breaking Changes

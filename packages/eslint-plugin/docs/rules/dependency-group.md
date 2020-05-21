@@ -34,3 +34,9 @@ import { Component } from '@wordpress/element';
  */
 import edit from './edit';
 ```
+
+## Options
+
+This rule accepts a single option:
+
+- Set `isInternalDependencyPatterns` to specify a list of regular expressions that can be used to mark a specific dependency as internal.

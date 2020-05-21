@@ -35,6 +35,28 @@ import { Component } from '@wordpress/element';
  */
 import edit from './edit';`,
 		},
+		{
+			code: `
+/**
+ * External dependencies
+ */
+import { get } from 'lodash';
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import CoolComponent from 'my-awesome-alias';
+import edit from './edit';`,
+			options: [
+				{ isInternalDependencyPatterns: [ '^my-awesome-alias$' ] },
+			],
+		},
 	],
 	invalid: [
 		{
@@ -48,16 +70,13 @@ import { Component } from '@wordpress/element';
 import edit from './edit';`,
 			errors: [
 				{
-					message:
-						'Expected preceding "External dependencies" comment block',
+					messageId: 'expectExternal',
 				},
 				{
-					message:
-						'Expected preceding "WordPress dependencies" comment block',
+					messageId: 'expectWordPress',
 				},
 				{
-					message:
-						'Expected preceding "Internal dependencies" comment block',
+					messageId: 'expectInternal',
 				},
 			],
 			output: `

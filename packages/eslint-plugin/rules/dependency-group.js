@@ -6,8 +6,30 @@ module.exports = {
 			url:
 				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
-		schema: [],
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					isInternalDependencyPatterns: {
+						type: 'array',
+						items: {
+							type: 'string',
+						},
+						uniqueItems: true,
+					},
+				},
+				additionalProperties: false,
+			},
+		],
 		fixable: true,
+		messages: {
+			expectExternal:
+				'Expected preceding "External dependencies" comment block',
+			expectWordPress:
+				'Expected preceding "WordPress dependencies" comment block',
+			expectInternal:
+				'Expected preceding "Internal dependencies" comment block',
+		},
 	},
 	create( context ) {
 		const comments = context.getSourceCode().getAllComments();
@@ -147,6 +169,9 @@ module.exports = {
 
 		return {
 			Program( node ) {
+				const options = context.options[ 0 ] || {};
+				const { isInternalDependencyPatterns = [] } = options;
+
 				/**
 				 * The set of package localities which have been reported for
 				 * the current program. Each locality is reported at most one
@@ -184,7 +209,16 @@ module.exports = {
 						return;
 					}
 
-					const locality = getPackageLocality( source );
+					let locality = getPackageLocality( source );
+
+					const isInternalDependency = isInternalDependencyPatterns.some(
+						( pattern ) => source.match( pattern )
+					);
+
+					if ( isInternalDependency ) {
+						locality = 'Internal';
+					}
+
 					if ( verified.has( locality ) ) {
 						return;
 					}
@@ -204,7 +238,7 @@ module.exports = {
 
 					context.report( {
 						node: child,
-						message: `Expected preceding "${ locality } dependencies" comment block`,
+						messageId: `expect${ locality }`,
 						fix( fixer ) {
 							const { comment, value } = correction;
 							const text = `/*${ value }*/`;
