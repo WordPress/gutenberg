@@ -113,4 +113,36 @@ describe( 'reducer', () => {
 			queries: {},
 		} );
 	} );
+
+	it( 'deletes an item', () => {
+		const original = deepFreeze( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				3: { id: 3, name: 'ghi' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 3, 4 ],
+				's=a': [ 1, 3 ],
+			},
+		} );
+		const state = reducer( original, {
+			type: 'REMOVE_ITEMS',
+			query: [ 3 ],
+			items: [ 3 ],
+		} );
+
+		expect( state ).toEqual( {
+			items: {
+				1: { id: 1, name: 'abc' },
+				2: { id: 2, name: 'def' },
+				4: { id: 4, name: 'klm' },
+			},
+			queries: {
+				'': [ 1, 2, 4 ],
+				's=a': [ 1 ],
+			},
+		} );
+	} );
 } );
