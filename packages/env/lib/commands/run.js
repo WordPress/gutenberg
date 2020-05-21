@@ -40,7 +40,13 @@ module.exports = async function run( { container, command, spinner, debug } ) {
 		console.error(
 			process.stdout.isTTY ? `\n\n${ result.err }\n\n` : result.err
 		);
-		throw result.err;
+		// Some tools (like composer) may send messages to stderr. Those messages
+		// do not always mean that we need to abort the process. For example,
+		// composer will say "Nothing to install or update" on stderr when your
+		// local composer packages are up to date.
+		if ( result.exitCode !== 0 ) {
+			throw result.err;
+		}
 	}
 
 	spinner.text = `Ran \`${ command }\` in '${ container }'.`;

@@ -66,6 +66,10 @@ if ( ! class_exists( 'WP_Block_Patterns_Registry' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-patterns-registry.php';
 }
 
+if ( ! class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-block-pattern-categories-registry.php';
+}
+
 if ( ! class_exists( 'WP_Block' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block.php';
 }

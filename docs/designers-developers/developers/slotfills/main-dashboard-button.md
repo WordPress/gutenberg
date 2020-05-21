@@ -7,12 +7,14 @@ the editor in fullscreen mode.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { __experimentalMainDashboardButton } from '@wordpress/edit-site';
+import { 
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 
 const MainDashboardButtonTest = () => (
-    <__experimentalMainDashboardButton>
+    <MainDashboardButton>
         Custom main dashboard button content
-    </__experimentalMainDashboardButton>
+    </MainDashboardButton>
 );
 
 registerPlugin( 'main-dashboard-button-test', {
@@ -25,17 +27,19 @@ in the following way:
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { 
-	__experimentalMainDashboardButton,
-	__experimentalFullscrenModeClose
+import {
+	__experimentalFullscrenModeClose as FullscrenModeClose, 
 } from '@wordpress/edit-site';
+import { 
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 import { close } from '@wordpress/icons';	
 	
 
 const MainDashboardButtonIconTest = () => (
-    <__experimentalMainDashboardButton>
-        <__experimentalFullscrenModeClose icon={ close } />
-    </__experimentalMainDashboardButton>
+    <MainDashboardButton>
+        <FullscrenModeClose icon={ close } />
+    </MainDashboardButton>
 );
 
 registerPlugin( 'main-dashboard-button-icon-test', {

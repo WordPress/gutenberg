@@ -11,6 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
@@ -54,6 +55,7 @@ export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
+export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -95,6 +97,11 @@ export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
+export {
+	default as __experimentalTreeGrid,
+	TreeGridRow as __experimentalTreeGridRow,
+	TreeGridCell as __experimentalTreeGridCell,
+} from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';

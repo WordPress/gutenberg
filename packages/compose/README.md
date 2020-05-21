@@ -119,6 +119,20 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
+
+Copies the text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _ref_ `Object`: Reference with the element.
+-   _text_ `(string|Function)`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+
+_Returns_
+
+-   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -126,6 +140,7 @@ Provides a unique instance ID.
 _Parameters_
 
 -   _object_ `Object`: Object reference to create an id for.
+-   _prefix_ `string`: Prefix for the unique id.
 
 <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
 
