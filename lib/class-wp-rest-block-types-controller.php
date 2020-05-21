@@ -236,6 +236,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'script',
 			'editor_style',
 			'style',
+			'supports',
 		);
 		foreach ( $extra_fields as $extra_field ) {
 			if ( rest_is_field_included( $extra_field, $fields ) ) {
@@ -322,6 +323,13 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					),
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
+				),
+				'supports'      => array(
+					'description' => __( 'Block supports.', 'gutenberg' ),
+					'type'        => 'object',
+					'properties'  => array(),
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
 				),
 				'category'      => array(
 					'description' => __( 'Block category.', 'gutenberg' ),
