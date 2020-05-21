@@ -125,7 +125,7 @@ const config = {
 		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
 		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
 		// obsolete and should be removed. Related webpack issue:
-		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/151
+		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
 		new IgnoreEmitPlugin( [ 'style.js' ] ),
 		// WP_LIVE_RELOAD_PORT global variable changes port on which live reload
 		// works when running watch mode.
