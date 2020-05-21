@@ -99,11 +99,17 @@ export class FocalPointPicker extends Component {
 		}
 		return bounds;
 	}
-	updateValue( nextValue ) {
+	updateValue( nextValue = {} ) {
 		const { onChange } = this.props;
+		const { x, y } = nextValue;
 
-		this.setState( { percentages: nextValue }, () => {
-			onChange( nextValue );
+		const nextPercentage = {
+			x: parseFloat( x ).toFixed( 2 ),
+			y: parseFloat( y ).toFixed( 2 ),
+		};
+
+		this.setState( { percentages: nextPercentage }, () => {
+			onChange( nextPercentage );
 		} );
 	}
 	updateBounds() {
@@ -146,8 +152,8 @@ export class FocalPointPicker extends Component {
 		}
 
 		// Transforming values back to 0.00 percentage values
-		nextX = ( roundClamp( nextX, 0, 100, step ) / 100 ).toFixed( 2 );
-		nextY = ( roundClamp( nextY, 0, 100, step ) / 100 ).toFixed( 2 );
+		nextX = roundClamp( nextX, 0, 100, step ) / 100;
+		nextY = roundClamp( nextY, 0, 100, step ) / 100;
 
 		const percentages = {
 			x: nextX,
@@ -177,14 +183,12 @@ export class FocalPointPicker extends Component {
 		);
 
 		const percentages = {
-			x: (
+			x:
 				( left - bounds.left ) /
-				( pickerDimensions.width - bounds.left * 2 )
-			).toFixed( 2 ),
-			y: (
+				( pickerDimensions.width - bounds.left * 2 ),
+			y:
 				( top - bounds.top ) /
-				( pickerDimensions.height - bounds.top * 2 )
-			).toFixed( 2 ),
+				( pickerDimensions.height - bounds.top * 2 ),
 		};
 
 		this.updateValue( percentages );
@@ -192,29 +196,30 @@ export class FocalPointPicker extends Component {
 	positionChangeFromTextControl( axis, value ) {
 		const { percentages } = this.state;
 
-		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
-		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed(
-			2
-		);
+		percentages[ axis ] = parseInt( value ) / 100;
 
 		this.updateValue( percentages );
 	}
 	pickerDimensions() {
-		if ( this.containerRef.current ) {
+		const containerNode = this.containerRef.current;
+
+		if ( ! containerNode ) {
 			return {
-				width: this.containerRef.current.clientWidth,
-				height: this.containerRef.current.clientHeight,
-				top:
-					this.containerRef.current.getBoundingClientRect().top +
-					document.body.scrollTop,
-				left: this.containerRef.current.getBoundingClientRect().left,
+				width: 0,
+				height: 0,
+				left: 0,
+				top: 0,
 			};
 		}
+
+		const { clientHeight, clientWidth } = containerNode;
+		const { top, left } = containerNode.getBoundingClientRect();
+
 		return {
-			width: 0,
-			height: 0,
-			left: 0,
-			top: 0,
+			width: clientWidth,
+			height: clientHeight,
+			top: top + document.body.scrollTop,
+			left,
 		};
 	}
 	iconCoordinates() {

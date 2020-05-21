@@ -86,7 +86,7 @@ export const GridView = styled.div`
 	pointer-events: none;
 	position: absolute;
 	top: 50%;
-	transform: translate( -50%, -50% );
+	transform: translate3d( -50%, -50%, 0 );
 	transition: opacity 120ms linear;
 	z-index: 1;
 
@@ -103,6 +103,7 @@ export const GridLine = styled.div`
 	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
 	position: absolute;
 	opacity: 0.4;
+	transform: translateZ( 0 );
 `;
 
 export const GridLineX = styled( GridLine )`
