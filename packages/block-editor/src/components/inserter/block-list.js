@@ -49,7 +49,7 @@ const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
-const MAX_SUGGESTED_ITEMS = 9;
+const MAX_SUGGESTED_ITEMS = 6;
 
 export function InserterBlockList( {
 	rootClientId,
