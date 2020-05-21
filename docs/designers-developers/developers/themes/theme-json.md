@@ -1,4 +1,4 @@
-# Themes & Block Editor
+# Themes & Block Editor: Experimental theme.json
 
 This is intended to document the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
