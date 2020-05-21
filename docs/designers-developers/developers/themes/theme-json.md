@@ -1,6 +1,6 @@
-# Themes & Block Editor RFC
+# Themes & Block Editor
 
-This RFC is intended to document the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
+This is intended to document the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 * Rationale
 * Specification
@@ -10,7 +10,7 @@ This RFC is intended to document the current direction and work in progress abou
 
 The Block Editor surface API has evolved at different velocities, and it's now at a point where is showing some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
 
-This RFC describes the current efforts to consolidate the various APIs into a single point: a `experimental-theme.json` file.
+This describes the current efforts to consolidate the various APIs into a single point: a `experimental-theme.json` file.
 
 When this file is present and the Full Site Editing experiment is enabled, a few Block Editor mechanisms that are activated.
 
