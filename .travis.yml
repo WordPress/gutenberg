@@ -53,7 +53,7 @@ install:
   - npm run build
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
-      echo '{ "config": { "SCRIPT_DEBUG": false } }' > .wp-env.override.json
+      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php" } }' > .wp-env.override.json
       npm run wp-env start
     fi
   - |
