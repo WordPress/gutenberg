@@ -119,24 +119,22 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 } ) {
-	const selected = useSelect(
+	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
 			const { getSettings } = select( 'core/block-editor' );
-			const { mediaUpload, imageSizes, isRTL, maxWidth } = getSettings();
-			const image = id && isSelected ? getMedia( id ) : null;
-
 			return {
-				image,
-				maxWidth,
-				isRTL,
-				imageSizes,
-				mediaUpload,
+				...pick( getSettings(), [
+					'mediaUpload',
+					'imageSizes',
+					'isRTL',
+					'maxWidth',
+				] ),
+				image: id && isSelected ? getMedia( id ) : null,
 			};
 		},
 		[ id, isSelected ]
 	);
-	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = selected;
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
