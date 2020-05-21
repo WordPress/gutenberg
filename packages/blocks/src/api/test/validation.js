@@ -458,6 +458,15 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isEquivalentHTML()', () => {
+		it( 'should return true for identical markup', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello <span class="b">World!</span></div>',
+				'<div>Hello <span class="b">World!</span></div>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<div>Hello <span class="b">World!</span></div>',

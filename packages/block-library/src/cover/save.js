@@ -102,6 +102,7 @@ export default function save( { attributes } ) {
 					autoPlay
 					muted
 					loop
+					playsInline
 					src={ url }
 				/>
 			) }

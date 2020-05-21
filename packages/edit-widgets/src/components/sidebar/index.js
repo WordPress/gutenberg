@@ -1,24 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { ComplementaryArea } from '@wordpress/interface';
+import { BlockInspector } from '@wordpress/block-editor';
+import { cog } from '@wordpress/icons';
 
-export const {
-	Fill: BlockSidebarFill,
-	Slot: BlockSidebarSlot,
-} = createSlotFill( 'EditWidgetsBlockSidebar' );
-
-function Sidebar() {
+export default function Sidebar() {
 	return (
-		<div className="edit-widgets-sidebar">
-			<Panel header={ __( 'Block Areas' ) }>
-				<BlockSidebarSlot bubblesVirtually />
-			</Panel>
-		</div>
+		<ComplementaryArea
+			className="edit-widgets-sidebar"
+			smallScreenTitle={ __( 'Widget Areas' ) }
+			scope="core/edit-widgets"
+			complementaryAreaIdentifier="edit-widgets/block-inspector"
+			title={ __( 'Block' ) }
+			icon={ cog }
+		>
+			<BlockInspector showNoBlockSelectedMessage={ false } />
+		</ComplementaryArea>
 	);
 }
-
-Sidebar.Inspector = BlockSidebarFill;
-
-export default Sidebar;
