@@ -342,19 +342,19 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'script'        => array(
-					'description' => __( 'Name of script js file.', 'gutenberg' ),
+					'description' => __( 'Public facing script handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'editor_style'  => array(
-					'description' => __( 'Name of editor style css file.', 'gutenberg' ),
+					'description' => __( 'Editor style handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'style'         => array(
-					'description' => __( 'Name of style css file.', 'gutenberg' ),
+					'description' => __( 'Public facing style handle.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
