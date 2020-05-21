@@ -3,8 +3,6 @@
 > **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 >
 > Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcome to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
->
-> In order to use these features, make sure to enable the "Full Site Editing" flag from the **Experiments** page of the Gutenberg plugin.
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
@@ -18,13 +16,13 @@ The Block Editor surface API has evolved at different velocities, and it's now a
 
 This describes the current efforts to consolidate the various APIs into a single point: a `experimental-theme.json` file.
 
-When this file is present and the Full Site Editing experiment is enabled, a few Block Editor mechanisms are activated.
+When this file is present a few Block Editor mechanisms are activated.
 
 ### Presets become CSS Custom Properties
 
 Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) will be enqueued as CSS Custom Properties for themes to use.
 
-These are enqueued for both in the front-end and the site editor.
+These will be enqueued to the front-end and editor.
 
 ### Some block styles are managed
 
@@ -121,7 +119,7 @@ presets: {
 }
 ```
 
-The following stylesheet will be enqueued to the front-end and site editor:
+The following stylesheet will be enqueued to the front-end and editor:
 
 ```css
 :root {
