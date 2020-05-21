@@ -57,6 +57,7 @@ $tree-item-height: 36px;
 		border-radius: $border-width;
 	}
 
+	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell {
 		width: $button-size;
 		opacity: 0;
@@ -65,6 +66,13 @@ $tree-item-height: 36px;
 		&.is-visible {
 			opacity: 1;
 			@include edit-post__fade-in-animation;
+		}
+
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
 		}
 	}
 
