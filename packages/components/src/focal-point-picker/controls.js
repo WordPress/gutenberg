@@ -23,8 +23,7 @@ const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
 
 export default function FocalPointPickerControls( {
-	onHorizontalChange = noop,
-	onVerticalChange = noop,
+	onChange = noop,
 	percentages = {
 		x: 0.5,
 		y: 0.5,
@@ -32,6 +31,13 @@ export default function FocalPointPickerControls( {
 } ) {
 	const valueX = fractionToPercentage( percentages.x );
 	const valueY = fractionToPercentage( percentages.y );
+
+	const handleOnXChange = ( next ) => {
+		onChange( { ...percentages, x: parseInt( next ) / 100 } );
+	};
+	const handleOnYChange = ( next ) => {
+		onChange( { ...percentages, y: parseInt( next ) / 100 } );
+	};
 
 	return (
 		<ControlWrapper className="focal-point-picker__controls">
@@ -44,13 +50,13 @@ export default function FocalPointPickerControls( {
 					<UnitControl
 						label={ __( 'Left' ) }
 						value={ valueX }
-						onChange={ onHorizontalChange }
+						onChange={ handleOnXChange }
 						dragDirection="e"
 					/>
 					<UnitControl
 						label={ __( 'Top' ) }
 						value={ valueY }
-						onChange={ onVerticalChange }
+						onChange={ handleOnYChange }
 						dragDirection="s"
 					/>
 				</ControlField>

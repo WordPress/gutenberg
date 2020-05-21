@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
@@ -40,13 +42,10 @@ export class FocalPointPicker extends Component {
 
 		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
 		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
-		this.onLoad = this.onLoad.bind( this );
 		this.onMouseMove = this.onMouseMove.bind( this );
 
-		this.positionChangeFromTextControl = this.positionChangeFromTextControl.bind(
-			this
-		);
 		this.updateBounds = this.updateBounds.bind( this );
+		this.updateValue = this.updateValue.bind( this );
 	}
 	componentDidMount() {
 		document.addEventListener( 'mouseup', this.handleOnMouseUp );
@@ -116,9 +115,6 @@ export class FocalPointPicker extends Component {
 		this.setState( {
 			bounds: this.calculateBounds(),
 		} );
-	}
-	onLoad() {
-		this.updateBounds();
 	}
 	handleOnMouseUp() {
 		this.setState( { isDragging: false } );
@@ -193,13 +189,6 @@ export class FocalPointPicker extends Component {
 
 		this.updateValue( percentages );
 	}
-	positionChangeFromTextControl( axis, value ) {
-		const { percentages } = this.state;
-
-		percentages[ axis ] = parseInt( value ) / 100;
-
-		this.updateValue( percentages );
-	}
 	pickerDimensions() {
 		const containerNode = this.containerRef.current;
 
@@ -225,8 +214,8 @@ export class FocalPointPicker extends Component {
 	iconCoordinates() {
 		const { value } = this.props;
 		const { bounds } = this.state;
-
 		const pickerDimensions = this.pickerDimensions();
+
 		const iconCoordinates = {
 			left:
 				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
@@ -273,35 +262,29 @@ export class FocalPointPicker extends Component {
 				<MediaWrapper className="components-focal-point-picker-wrapper">
 					<MediaContainer
 						className="components-focal-point-picker"
+						onDragStart={ () =>
+							this.setState( { isDragging: true } )
+						}
+						onDrop={ () => this.setState( { isDragging: false } ) }
+						onKeyDown={ this.handleOnKeyDown }
 						onMouseDown={ ( event ) => {
 							event.persist();
 							this.setState( { isDragging: true }, () => {
 								this.onMouseMove( event );
 							} );
 						} }
-						onDragStart={ () =>
-							this.setState( { isDragging: true } )
-						}
-						onMouseUp={ this.handleOnMouseUp }
-						onDrop={ () => this.setState( { isDragging: false } ) }
 						onMouseMove={ this.onMouseMove }
+						onMouseUp={ this.handleOnMouseUp }
 						ref={ this.containerRef }
 						role="button"
 						tabIndex="-1"
-						onKeyDown={ this.handleOnKeyDown }
 					>
-						<Grid
-							percentages={ percentages }
-							style={ {
-								width: bounds.width,
-								height: bounds.height,
-							} }
-						/>
+						<Grid bounds={ bounds } percentages={ percentages } />
 						<Media
-							alt="Dimensions helper"
+							alt={ __( 'Media preview' ) }
 							autoPlay={ autoPlay }
 							mediaRef={ this.mediaRef }
-							onLoad={ this.onLoad }
+							onLoad={ this.updateBounds }
 							src={ url }
 						/>
 						<FocalPoint
@@ -312,12 +295,7 @@ export class FocalPointPicker extends Component {
 				</MediaWrapper>
 				<Controls
 					percentages={ percentages }
-					onHorizontalChange={ ( next ) => {
-						this.positionChangeFromTextControl( 'x', next );
-					} }
-					onVerticalChange={ ( next ) => {
-						this.positionChangeFromTextControl( 'y', next );
-					} }
+					onChange={ this.updateValue }
 				/>
 			</BaseControl>
 		);
@@ -326,12 +304,12 @@ export class FocalPointPicker extends Component {
 
 FocalPointPicker.defaultProps = {
 	autoPlay: true,
-	url: null,
+	onChange: noop,
 	value: {
 		x: 0.5,
 		y: 0.5,
 	},
-	onChange: () => {},
+	url: null,
 };
 
 export default compose( [ withInstanceId, withFocusOutside ] )(

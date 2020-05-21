@@ -13,6 +13,7 @@ import {
 } from './styles/focal-point-picker-style';
 
 export default function FocalPointPickerGrid( {
+	bounds = {},
 	percentages = {
 		x: 0.5,
 		y: 0.5,
@@ -21,9 +22,18 @@ export default function FocalPointPickerGrid( {
 } ) {
 	const percentageValue = percentages.x + percentages.y;
 	const animationProps = useRevealAnimation( percentageValue );
+	const style = {
+		width: bounds.width,
+		height: bounds.height,
+	};
 
 	return (
-		<GridView { ...props } { ...animationProps }>
+		<GridView
+			{ ...props }
+			{ ...animationProps }
+			className="components-focal-point-picker__grid"
+			style={ style }
+		>
 			<GridLineX style={ { top: '33%' } } />
 			<GridLineX style={ { top: '66%' } } />
 			<GridLineY style={ { left: '33%' } } />

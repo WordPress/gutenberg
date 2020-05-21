@@ -20,12 +20,12 @@ export default function FocalPoint( {
 } ) {
 	const classes = classnames(
 		'components-focal-point-picker__icon_container',
-		isDragging ? 'is-dragging' : null
+		isDragging && 'is-dragging'
 	);
 
 	const style = {
-		left: `${ coordinates.left }px`,
-		top: `${ coordinates.top }px`,
+		left: coordinates.left,
+		top: coordinates.top,
 	};
 
 	return (
