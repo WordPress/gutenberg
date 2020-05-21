@@ -23,6 +23,12 @@ export const settings = {
 		'Add an image or video with a text overlay — great for headers.'
 	),
 	icon,
+	supports: {
+		align: true,
+		html: false,
+		lightBlockWrapper: true,
+		__experimentalPadding: true,
+	},
 	example: {
 		attributes: {
 			customOverlayColor: '#065174',

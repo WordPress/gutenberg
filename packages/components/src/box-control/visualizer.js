@@ -20,8 +20,13 @@ export default function BoxControlVisualizer( {
 	values: valuesProp = DEFAULT_VALUES,
 	...props
 } ) {
+	const isPositionAbsolute = ! children;
 	return (
-		<Container { ...props } aria-hidden="true">
+		<Container
+			{ ...props }
+			isPositionAbsolute={ isPositionAbsolute }
+			aria-hidden="true"
+		>
 			<Sides values={ valuesProp } />
 			{ children }
 		</Container>

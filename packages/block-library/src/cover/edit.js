@@ -473,67 +473,62 @@ function CoverEdit( {
 	return (
 		<>
 			{ controls }
-			<BoxControlVisualizer values={ styleAttribute?.padding }>
-				<Block.div
-					className={ classes }
-					data-url={ url }
-					style={ style }
-				>
-					<ResizableCover
-						className="block-library-cover__resize-container"
-						onResizeStart={ () => {
-							setAttributes( { minHeightUnit: 'px' } );
-							toggleSelection( false );
+			<Block.div className={ classes } data-url={ url } style={ style }>
+				<BoxControlVisualizer values={ styleAttribute?.padding } />
+				<ResizableCover
+					className="block-library-cover__resize-container"
+					onResizeStart={ () => {
+						setAttributes( { minHeightUnit: 'px' } );
+						toggleSelection( false );
+					} }
+					onResize={ setTemporaryMinHeight }
+					onResizeStop={ ( newMinHeight ) => {
+						toggleSelection( true );
+						setAttributes( { minHeight: newMinHeight } );
+						setTemporaryMinHeight( null );
+					} }
+					showHandle={ isSelected }
+				/>
+				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					// Used only to programmatically check if the image is dark or not
+					<img
+						ref={ isDarkElement }
+						aria-hidden
+						alt=""
+						style={ {
+							display: 'none',
 						} }
-						onResize={ setTemporaryMinHeight }
-						onResizeStop={ ( newMinHeight ) => {
-							toggleSelection( true );
-							setAttributes( { minHeight: newMinHeight } );
-							setTemporaryMinHeight( null );
-						} }
-						showHandle={ isSelected }
+						src={ url }
 					/>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ isDarkElement }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ url && gradientValue && dimRatio !== 0 && (
-						<span
-							aria-hidden="true"
-							className={ classnames(
-								'wp-block-cover__gradient-background',
-								gradientClass
-							) }
-							style={ { background: gradientValue } }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ isDarkElement }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<InnerBlocks
-						__experimentalTagName="div"
-						__experimentalPassedProps={ {
-							className: 'wp-block-cover__inner-container',
-						} }
-						template={ INNER_BLOCKS_TEMPLATE }
+				) }
+				{ url && gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__gradient-background',
+							gradientClass
+						) }
+						style={ { background: gradientValue } }
 					/>
-				</Block.div>
-			</BoxControlVisualizer>
+				) }
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+					<video
+						ref={ isDarkElement }
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+					/>
+				) }
+				<InnerBlocks
+					__experimentalTagName="div"
+					__experimentalPassedProps={ {
+						className: 'wp-block-cover__inner-container',
+					} }
+					template={ INNER_BLOCKS_TEMPLATE }
+				/>
+			</Block.div>
 		</>
 	);
 }

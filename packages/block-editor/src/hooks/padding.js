@@ -61,8 +61,8 @@ export function PaddingEdit( props ) {
 }
 
 export const paddingStyleMappings = {
-	'--wp--padding-top': [ 'padding', 'top' ],
-	'--wp--padding-right': [ 'padding', 'right' ],
-	'--wp--padding-bottom': [ 'padding', 'bottom' ],
-	'--wp--padding-left': [ 'padding', 'left' ],
+	paddingTop: [ 'padding', 'top' ],
+	paddingRight: [ 'padding', 'right' ],
+	paddingBottom: [ 'padding', 'bottom' ],
+	paddingLeft: [ 'padding', 'left' ],
 };
