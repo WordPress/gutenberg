@@ -26,25 +26,26 @@ import {
 import { roundClamp } from '../number-control/utils';
 
 export class FocalPointPicker extends Component {
-	constructor( props ) {
-		super( props );
-		this.onMouseMove = this.onMouseMove.bind( this );
+	constructor( props, context ) {
+		super( props, context );
+
 		this.state = {
 			isDragging: false,
 			bounds: {},
 			percentages: props.value,
 		};
+
 		this.containerRef = createRef();
 		this.mediaRef = createRef();
-		this.horizontalPositionChanged = this.horizontalPositionChanged.bind(
-			this
-		);
-		this.verticalPositionChanged = this.verticalPositionChanged.bind(
-			this
-		);
-		this.onLoad = this.onLoad.bind( this );
+
 		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
 		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
+		this.onLoad = this.onLoad.bind( this );
+		this.onMouseMove = this.onMouseMove.bind( this );
+
+		this.positionChangeFromTextControl = this.positionChangeFromTextControl.bind(
+			this
+		);
 		this.updateBounds = this.updateBounds.bind( this );
 	}
 	componentDidMount() {
@@ -188,12 +189,6 @@ export class FocalPointPicker extends Component {
 
 		this.updateValue( percentages );
 	}
-	horizontalPositionChanged( nextValue ) {
-		this.positionChangeFromTextControl( 'x', nextValue );
-	}
-	verticalPositionChanged( nextValue ) {
-		this.positionChangeFromTextControl( 'y', nextValue );
-	}
 	positionChangeFromTextControl( axis, value ) {
 		const { percentages } = this.state;
 
@@ -222,6 +217,23 @@ export class FocalPointPicker extends Component {
 			top: 0,
 		};
 	}
+	iconCoordinates() {
+		const { value } = this.props;
+		const { bounds } = this.state;
+
+		const pickerDimensions = this.pickerDimensions();
+		const iconCoordinates = {
+			left:
+				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
+				bounds.left,
+			top:
+				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
+				bounds.top,
+		};
+
+		return iconCoordinates;
+	}
+	// Callback method for the withFocusOutside higher-order component
 	handleFocusOutside() {
 		this.setState( {
 			isDragging: false,
@@ -232,21 +244,12 @@ export class FocalPointPicker extends Component {
 			autoPlay,
 			instanceId,
 			url,
-			value,
 			label,
 			help,
 			className,
 		} = this.props;
 		const { bounds, isDragging, percentages } = this.state;
-		const pickerDimensions = this.pickerDimensions();
-		const iconCoordinates = {
-			left:
-				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
-				bounds.left,
-			top:
-				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
-				bounds.top,
-		};
+		const iconCoordinates = this.iconCoordinates();
 
 		const classes = classnames(
 			'components-focal-point-picker-control',
@@ -304,8 +307,12 @@ export class FocalPointPicker extends Component {
 				</MediaWrapper>
 				<Controls
 					percentages={ percentages }
-					onHorizontalChange={ this.horizontalPositionChanged }
-					onVerticalChange={ this.verticalPositionChanged }
+					onHorizontalChange={ ( next ) => {
+						this.positionChangeFromTextControl( 'x', next );
+					} }
+					onVerticalChange={ ( next ) => {
+						this.positionChangeFromTextControl( 'y', next );
+					} }
 				/>
 			</BaseControl>
 		);

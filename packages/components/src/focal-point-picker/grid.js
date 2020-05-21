@@ -57,7 +57,7 @@ function useRevealAnimation( value ) {
 
 			timeoutRef.current = setTimeout( () => {
 				setIsActive( false );
-			}, 400 );
+			}, 600 );
 		}
 
 		return () => clearTimer();

@@ -16,7 +16,7 @@ import { isVideoType } from './utils';
 
 export default function Media( {
 	alt,
-	autoPlay = true,
+	autoPlay,
 	src,
 	onLoad = noop,
 	mediaRef,

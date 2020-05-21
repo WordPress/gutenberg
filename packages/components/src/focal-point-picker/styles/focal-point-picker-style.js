@@ -25,10 +25,10 @@ export const MediaContainer = styled.div`
 	box-sizing: border-box;
 	cursor: pointer;
 	display: inline-flex;
-	height: 100%;
 	justify-content: center;
 	margin: auto;
 	position: relative;
+	height: 100%;
 
 	img,
 	video {
@@ -80,15 +80,14 @@ export const ControlLabel = styled.label`
 
 export const GridView = styled.div`
 	box-sizing: border-box;
-	height: 100%;
-	left: 0;
+	left: 50%;
 	opacity: 0;
 	overflow: hidden;
 	pointer-events: none;
 	position: absolute;
-	top: 0;
+	top: 50%;
+	transform: translate( -50%, -50% );
 	transition: opacity 120ms linear;
-	width: 100%;
 	z-index: 1;
 
 	${( { isActive } ) =>
