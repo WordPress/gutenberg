@@ -30,7 +30,7 @@ const BlockActionsMenu = ( {
 	isLast,
 	blockTitle,
 	isEmptyDefaultBlock,
-	anchorNodeRef,
+	blockMobileToolbarRef,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
@@ -85,14 +85,19 @@ const BlockActionsMenu = ( {
 	] );
 
 	function onPickerSelect( value ) {
-		if ( value === deleteOption.value ) {
-			onDelete();
-		} else if ( value === settingsOption.value ) {
-			openGeneralSidebar();
-		} else if ( value === forwardButtonOption.value ) {
-			onMoveDown();
-		} else if ( value === backwardButtonOption.value ) {
-			onMoveUp();
+		switch ( value ) {
+			case deleteOption.value:
+				onDelete();
+				break;
+			case settingsOption.value:
+				openGeneralSidebar();
+				break;
+			case forwardButtonOption.value:
+				onMoveDown();
+				break;
+			case backwardButtonOption.value:
+				onMoveUp();
+				break;
 		}
 	}
 
@@ -127,9 +132,11 @@ const BlockActionsMenu = ( {
 				onChange={ onPickerSelect }
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
-				hideCancelButton={ Platform !== 'ios' }
+				hideCancelButton={ Platform.OS !== 'ios' }
 				anchor={
-					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
+					blockMobileToolbarRef
+						? findNodeHandle( blockMobileToolbarRef )
+						: undefined
 				}
 			/>
 		</>
