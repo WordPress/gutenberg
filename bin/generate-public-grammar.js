@@ -104,7 +104,7 @@ function flatten( expression ) {
 }
 
 fs.writeFileSync(
-	path.join( __dirname, '..', 'docs', 'grammar.md' ),
+	path.join( __dirname, '..', 'docs', 'contributors', 'grammar.md' ),
 	`
 # Block Grammar
 

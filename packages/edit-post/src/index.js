@@ -129,8 +129,12 @@ export function initializeEditor(
 					editorScrollContainer.scrollTop =
 						editorScrollContainer.scrollTop + window.scrollY;
 				}
-				//Undo unwanted scroll on html element
-				window.scrollTo( 0, 0 );
+				// Undo unwanted scroll on html element, but only in the visual editor.
+				if (
+					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
+				) {
+					window.scrollTo( 0, 0 );
+				}
 			}
 		} );
 	}

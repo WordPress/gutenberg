@@ -11,7 +11,7 @@ export default function WidgetAreaInnerBlocks() {
 	);
 	return (
 		<InnerBlocks
-			__experimentalBlocks={ blocks }
+			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
 			templateLock={ false }

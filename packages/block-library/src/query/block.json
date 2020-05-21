@@ -18,5 +18,8 @@
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query"
+	},
+	"supports": {
+		"html": false
 	}
 }
