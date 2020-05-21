@@ -48,6 +48,8 @@ export default function save( { attributes } ) {
 		? `${ minHeightProp }${ minHeightUnit }`
 		: minHeightProp;
 
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+
 	const style =
 		backgroundType === IMAGE_BACKGROUND_TYPE
 			? backgroundImageStyles( url )
@@ -64,6 +66,15 @@ export default function save( { attributes } ) {
 		style.background = customGradient;
 	}
 	style.minHeight = minHeight || undefined;
+
+	let positionValue;
+
+	if ( focalPoint ) {
+		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		if ( isImageBackground ) {
+			style.backgroundPosition = positionValue;
+		}
+	}
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
@@ -104,6 +115,7 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
+					style={ { objectPosition: positionValue } }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">
