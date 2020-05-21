@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
