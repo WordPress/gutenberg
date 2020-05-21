@@ -25,20 +25,92 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
 	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
-		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
+		$metadata_file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
 			trailingslashit( $file_or_folder ) . 'block.json' :
 			$file_or_folder;
-		if ( ! file_exists( $file ) ) {
+		if ( ! file_exists( $metadata_file ) ) {
 			return false;
 		}
 
-		$metadata = json_decode( file_get_contents( $file ), true );
-		if ( ! is_array( $metadata ) ) {
+		$metadata = json_decode( file_get_contents( $metadata_file ), true );
+		if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
 			return false;
+		}
+
+		$block_dir           = dirname( $metadata_file );
+		$block_name          = $metadata['name'];
+		$asset_handle_prefix = str_replace( '/', '-', $block_name );
+
+		if ( isset( $metadata['editorScript'] ) ) {
+			$editor_script            = $metadata['editorScript'];
+			$editor_script_handle     = "$asset_handle_prefix-editor-script";
+			$editor_script_asset_path = realpath(
+				$block_dir . '/' . substr_replace( $editor_script, '.asset.php', -3 )
+			);
+			if ( ! file_exists( $editor_script_asset_path ) ) {
+				throw new Error(
+					"The asset file for the \"editorScript\" defined in \"$block_name\" block definition is missing."
+				);
+			}
+			$editor_script_asset  = require( $editor_script_asset_path );
+			wp_register_script(
+				$editor_script_handle,
+				plugins_url( $editor_script, $metadata_file ),
+				$editor_script_asset['dependencies'],
+				$editor_script_asset['version']
+			);
+			unset( $metadata['editorScript'] );
+			$metadata['editor_script'] = $editor_script_handle;
+		}
+
+		if ( isset( $metadata['script'] ) ) {
+			$script            = $metadata['script'];
+			$script_handle     = "$asset_handle_prefix-script";
+			$script_asset_path = realpath(
+				$block_dir . '/' . substr_replace( $script, '.asset.php', -3 )
+			);
+			if ( ! file_exists( $script_asset_path ) ) {
+				throw new Error(
+					"The asset file for the \"script\" defined in \"$block_name\" block definition is missing."
+				);
+			}
+			$script_asset  = require( $script_asset_path );
+			wp_register_script(
+				$script_handle,
+				plugins_url( $script, $metadata_file ),
+				$script_asset['dependencies'],
+				$script_asset['version']
+			);
+			$metadata['script'] = $script_handle;
+		}
+
+		if ( isset( $metadata['editorStyle'] ) ) {
+			$editor_style        = $metadata['editorStyle'];
+			$editor_style_handle = "$asset_handle_prefix-editor-style";
+			wp_register_style(
+				$editor_style_handle,
+				plugins_url( $editor_style, $metadata_file ),
+				array(),
+				filemtime( realpath( "$block_dir/$editor_style" ) )
+			);
+			unset( $metadata['editorStyle'] );
+			$metadata['editor_style'] = $editor_style_handle;
+		}
+
+		if ( isset( $metadata['style'] ) ) {
+			$style        = $metadata['style'];
+			$style_handle = "$asset_handle_prefix-style";
+			wp_register_style(
+				$style_handle,
+				plugins_url( $style, $metadata_file ),
+				array(),
+				filemtime( realpath( "$block_dir/$style" ) )
+			);
+			$metadata['style'] = $style_handle;
 		}
 
 		return register_block_type(
-			$metadata['name'],
+			$block_name,
 			array_merge(
 				$metadata,
 				$args

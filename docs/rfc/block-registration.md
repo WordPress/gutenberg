@@ -387,7 +387,7 @@ In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type is a subtype of string, where the value must represent an absolute or relative path to a JavaScript or CSS file.
+The `WPDefinedAsset` type is a subtype of string, where the value must represent a relative path to a JavaScript or CSS file.
 
 **Example:**
 
