@@ -68,6 +68,9 @@ jobs:
         description: Post to Slack when tests fail. SLACK_WEBHOOK ENV variable must be set.
         type: boolean
         default: false
+      is-canary:
+        type: string
+        default: ""
     docker:
     - image: circleci/android:api-29-node
     steps:
@@ -92,7 +95,8 @@ jobs:
             curl -u "$SAUCE_USERNAME:$SAUCE_ACCESS_KEY" -X POST -H "Content-Type: application/octet-stream" https://saucelabs.com/rest/v1/storage/automattic/Gutenberg-$SAUCE_FILENAME.apk?overwrite=true --data-binary @./android/app/build/outputs/apk/debug/app-debug.apk
       - run:
           name: Run Device Tests
-          command: yarn device-tests
+          command: yarn device-tests<<parameters.is-canary>>
+          no_output_timeout: 1200
           environment:
             JEST_JUNIT_OUTPUT: "reports/test-results/android-test-results.xml"
       - store_test_results:
@@ -111,6 +115,9 @@ jobs:
         description: Post to Slack when tests fail. SLACK_WEBHOOK ENV variable must be set.
         type: boolean
         default: false
+      is-canary:
+        type: string
+        default: ""
     macos:
       xcode: "11.2.1"
     steps:
@@ -164,7 +171,8 @@ jobs:
     - run:
         name: Run Device Tests
         command: |
-          yarn device-tests
+          yarn device-tests<<parameters.is-canary>>
+        no_output_timeout: 1200
         environment:
           JEST_JUNIT_OUTPUT: "reports/test-results/ios-test-results.xml"
     - store_test_results:
@@ -201,9 +209,23 @@ workflows:
           platform: android
           check-tests: true
       - ios-device-checks:
-          name: Test iOS on Device
+          name: Test iOS on Device - Canaries
+          is-canary: "-canary"
       - android-device-checks:
-          name: Test Android on Device
+          name: Test Android on Device - Canaries
+          is-canary: "-canary"
+      - Optional UI Tests:
+          type: approval
+          filters:
+            branches:
+              ignore:
+                - develop
+      - ios-device-checks:
+          name: Test iOS on Device - Full
+          requires: [ "Optional UI Tests" ]
+      - android-device-checks:
+          name: Test Android on Device - Full
+          requires: [ "Optional UI Tests" ]
 
   ui-tests-full-scheduled:
     jobs:
