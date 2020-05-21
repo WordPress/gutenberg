@@ -77,10 +77,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown
-				isDisabled={ isTextModeEnabled }
-				__experimentalWithEllipsisMenu
-			/>
+			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />
