@@ -44,6 +44,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import ImageSize from './image-size';
+
 /**
  * Module constants
  */
@@ -173,7 +174,7 @@ export function ImageEdit( {
 		}
 
 		// If a caption text was meanwhile written by the user,
-		// make sure the text is not overwritten by empty captions
+		// make sure the text is not overwritten by empty captions.
 		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
@@ -187,7 +188,8 @@ export function ImageEdit( {
 				sizeSlug: DEFAULT_SIZE_SLUG,
 			};
 		} else {
-			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
+			// Keep the same url when selecting the same file, so "Image Size"
+			// option is not changed.
 			additionalAttributes = { url };
 		}
 
@@ -232,7 +234,8 @@ export function ImageEdit( {
 	}
 
 	function onSetTitle( value ) {
-		// This is the HTML title attribute, separate from the media object title
+		// This is the HTML title attribute, separate from the media object
+		// title.
 		setAttributes( { title: value } );
 	}
 
@@ -460,7 +463,7 @@ export function ImageEdit( {
 		</>
 	);
 
-	// Disable reason: Each block can be selected by clicking on it
+	// Disable reason: Each block can be selected by clicking on it.
 	/* eslint-disable jsx-a11y/click-events-have-key-events */
 	return (
 		<>
