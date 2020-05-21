@@ -6,5 +6,10 @@
 			"type": "string"
 		}
 	},
-	"context": [ "postId" ]
+	"context": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
 }

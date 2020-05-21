@@ -1,13 +1,3 @@
-:root {
-	.wp-block-cover-image,
-	.wp-block-cover {
-		padding-top: var(--wp--padding-top, 1em);
-		padding-right: var(--wp--padding-right, 1em);
-		padding-bottom: var(--wp--padding-bottom, 1em);
-		padding-left: var(--wp--padding-left, 1em);
-	}
-}
-
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
@@ -19,7 +9,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	overflow: hidden;
 	padding: $grid-unit-20;
 
 	&.has-parallax {

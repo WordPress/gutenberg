@@ -128,7 +128,11 @@ module.exports = {
 				themes: [],
 				port: 8888,
 				testsPort: 8889,
-				config: { WP_DEBUG: true, SCRIPT_DEBUG: true },
+				config: {
+					WP_DEBUG: true,
+					SCRIPT_DEBUG: true,
+					WP_PHP_BINARY: 'php',
+				},
 				mappings: {},
 			},
 			config,
@@ -138,6 +142,12 @@ module.exports = {
 		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
 		config.testsPort =
 			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
+
+		// In the future, we should clean this up and integrate it with multi-
+		// environment support instead of hardcoding it to the test port.
+		if ( config.config.WP_TESTS_DOMAIN === undefined ) {
+			config.config.WP_TESTS_DOMAIN = `localhost:${ config.testsPort }`;
+		}
 
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(

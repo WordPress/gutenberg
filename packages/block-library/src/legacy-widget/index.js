@@ -18,9 +18,5 @@ export const settings = {
 	title: __( 'Legacy Widget (Experimental)' ),
 	description: __( 'Display a legacy widget.' ),
 	icon,
-	supports: {
-		html: false,
-		customClassName: false,
-	},
 	edit,
 };

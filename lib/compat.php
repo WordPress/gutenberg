@@ -193,7 +193,7 @@ function gutenberg_get_post_from_context() {
  * @return string String of rendered HTML.
  */
 function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
-	global $post;
+	global $post, $wp_query;
 
 	/*
 	 * If a non-null value is provided, a filter has run at an earlier priority
@@ -218,7 +218,15 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		 * it should be included to consistently fulfill the expectation.
 		 */
 		'postType' => $post->post_type,
+
+		'query'    => array( 'categoryIds' => array() ),
 	);
+
+	if ( isset( $wp_query->tax_query->queried_terms['category']['terms'] ) ) {
+		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_id ) {
+			$context['query']['categoryIds'][] = $category_id;
+		}
+	}
 
 	/**
 	 * Filters the default context provided to a rendered block.

@@ -2,29 +2,47 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 import {
 	BlockNavigationDropdown,
 	ToolSelector,
-	Inserter,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { PinnedItems } from '@wordpress/interface';
+import {
+	__experimentalResolveSelect as resolveSelect,
+	useSelect,
+	useDispatch,
+} from '@wordpress/data';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
+import { _x } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { useEditorContext } from '../editor';
 import MoreMenu from './more-menu';
+import PageSwitcher from '../page-switcher';
 import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import { CloseButton } from './main-dashboard-button';
+import FullscreenModeClose from './fullscreen-mode-close';
 
-const inserterToggleProps = { isPrimary: true };
+/**
+ * Browser dependencies
+ */
+const { fetch } = window;
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	openEntitiesSavedStates,
+	isInserterOpen,
+	onToggleInserter,
+} ) {
 	const { settings, setSettings } = useEditorContext();
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
@@ -53,6 +71,33 @@ export default function Header( { openEntitiesSavedStates } ) {
 			} ) ),
 		[]
 	);
+	const setActivePage = useCallback( async ( newPage ) => {
+		try {
+			const { success, data } = await fetch(
+				addQueryArgs( newPage.path, { '_wp-find-template': true } )
+			).then( ( res ) => res.json() );
+			if ( success ) {
+				let newTemplateId = data.ID;
+				if ( newTemplateId === null ) {
+					newTemplateId = (
+						await resolveSelect( 'core' ).getEntityRecords(
+							'postType',
+							'wp_template',
+							{
+								resolved: true,
+								slug: data.post_name,
+							}
+						)
+					 )[ 0 ].id;
+				}
+				setSettings( ( prevSettings ) => ( {
+					...prevSettings,
+					page: newPage,
+					templateId: newTemplateId,
+				} ) );
+			}
+		} catch ( err ) {}
+	}, [] );
 
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
@@ -64,16 +109,28 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<CloseButton />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-site-header__toolbar">
-				<Inserter
-					position="bottom right"
-					showInserterHelpPanel
-					toggleProps={ inserterToggleProps }
+				<Button
+					isPrimary
+					isPressed={ isInserterOpen }
+					onClick={ onToggleInserter }
+					icon={ plus }
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
+					) }
 				/>
 				<ToolSelector />
 				<UndoButton />
 				<RedoButton />
+				<PageSwitcher
+					showOnFront={ settings.showOnFront }
+					activePage={ settings.page }
+					onActivePageChange={ setActivePage }
+				/>
 				<TemplateSwitcher
 					ids={ settings.templateIds }
 					templatePartIds={ settings.templatePartIds }

@@ -146,7 +146,7 @@ class MediaTextEdit extends Component {
 	}
 
 	renderMediaArea() {
-		const { attributes } = this.props;
+		const { attributes, isSelected } = this.props;
 		const {
 			mediaAlt,
 			mediaId,
@@ -156,6 +156,7 @@ class MediaTextEdit extends Component {
 			mediaWidth,
 			imageFill,
 			focalPoint,
+			isStackedOnMobile,
 		} = attributes;
 		return (
 			<MediaContainer
@@ -172,6 +173,8 @@ class MediaTextEdit extends Component {
 					mediaWidth,
 					imageFill,
 					focalPoint,
+					isSelected,
+					isStackedOnMobile,
 				} }
 			/>
 		);
