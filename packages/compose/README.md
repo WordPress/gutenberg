@@ -164,6 +164,19 @@ _Returns_
 
 -   `boolean`: return value of the media query.
 
+<a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
+
+Use something's value from the previous render.
+Based on <https://usehooks.com/usePrevious/>.
+
+_Parameters_
+
+-   _value_ `any`: The value to track.
+
+_Returns_
+
+-   `any`: The value from the previous render.
+
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
 Hook returning whether the user has a preference for reduced motion.
