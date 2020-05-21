@@ -74,6 +74,8 @@
 	transition: all 60ms linear;
 	z-index: -1; // This makes it slide out from underneath the toolbar.
 
+	@include reduce-motion("transition");
+
 	.is-showing-movers & {
 		opacity: 1;
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
