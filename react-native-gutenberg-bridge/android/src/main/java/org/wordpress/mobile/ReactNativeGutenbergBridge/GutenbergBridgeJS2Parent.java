@@ -1,6 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
@@ -25,13 +26,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         String getType();
         String getCaption();
         WritableMap toMap();
-    }
-
-    interface RNEditorTheme {
-        @Nullable
-        ArrayList<Bundle> getColors();
-        @Nullable
-        ArrayList<Bundle> getGradients();
     }
 
     void responseHtml(String title, String html, boolean changed);

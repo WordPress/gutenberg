@@ -25,12 +25,9 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.ReactRootView;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableNativeArray;
-import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainPackageConfig;
@@ -45,7 +42,6 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNEditorTheme;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
@@ -96,6 +92,7 @@ public class WPAndroidGlueCode {
     private WeakReference<View> mLastFocusedView = null;
     private RequestExecutor mRequestExecutor;
     private AddMentionUtil mAddMentionUtil;
+    private @Nullable Bundle mEditorTheme = null;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -271,6 +268,7 @@ public class WPAndroidGlueCode {
                     // use mMediaUrlToAddAfterMounting
                     dispatchOneMediaToAddAtATimeIfAvailable();
                 }
+                refreshEditorTheme();
             }
 
             @Override
@@ -361,7 +359,7 @@ public class WPAndroidGlueCode {
     }
 
     private ImagePipelineConfig getImagePipelineConfig(OkHttpClient client) {
-        return  OkHttpImagePipelineConfigFactory
+        return OkHttpImagePipelineConfigFactory
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
@@ -404,7 +402,7 @@ public class WPAndroidGlueCode {
                              int colorBackground,
                              boolean isDarkMode,
                              @Nullable Boolean isSiteUsingWpComRestApi,
-                             @Nullable RNEditorTheme editorTheme) {
+                             @Nullable Bundle editorTheme) {
         mIsDarkMode = isDarkMode;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
@@ -441,12 +439,12 @@ public class WPAndroidGlueCode {
         }
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
-        if (editorTheme != null && editorTheme.getColors() != null) {
-            initialProps.putSerializable(PROP_NAME_COLORS, editorTheme.getColors());
+        if (editorTheme != null && editorTheme.getParcelableArray("colors") != null) {
+            initialProps.putSerializable(PROP_NAME_COLORS, editorTheme.getParcelableArray("colors"));
         }
 
-        if (editorTheme != null && editorTheme.getGradients() != null) {
-            initialProps.putSerializable(PROP_NAME_GRADIENTS, editorTheme.getGradients());
+        if (editorTheme != null && editorTheme.getParcelableArray("gradients") != null) {
+            initialProps.putSerializable(PROP_NAME_GRADIENTS, editorTheme.getParcelableArray("gradients"));
         }
 
         // The string here (e.g. "MyReactNativeApp") has to match
@@ -454,7 +452,8 @@ public class WPAndroidGlueCode {
         mReactRootView.setAppProperties(initialProps);
     }
 
-    public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+    public void attachToContainer(ViewGroup viewGroup,
+                                  OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachQueryListener onReattachQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
@@ -465,7 +464,6 @@ public class WPAndroidGlueCode {
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   AddMentionUtil addMentionUtil,
                                   boolean isDarkMode) {
-
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
@@ -574,6 +572,25 @@ public class WPAndroidGlueCode {
             mIsDarkMode = isDarkMode;
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                                 .setPreferredColorScheme(isDarkMode);
+        }
+    }
+
+    public void updateTheme(@Nullable Bundle editorTheme) {
+        if (mIsEditorMounted) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .updateTheme(editorTheme);
+        } else {
+            // Editor hasn't mounted yet. Save theme and load once editor loads
+            AppLog.d(AppLog.T.EDITOR, "Editor theme not applied reason: Editor not mounted");
+            mEditorTheme = editorTheme;
+        }
+    }
+
+    private void refreshEditorTheme() {
+        if (mEditorTheme != null) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+                                                .updateTheme(mEditorTheme);
+            mEditorTheme = null;
         }
     }
 

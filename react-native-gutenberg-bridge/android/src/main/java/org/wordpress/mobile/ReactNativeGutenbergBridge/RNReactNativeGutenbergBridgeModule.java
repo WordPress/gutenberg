@@ -1,5 +1,8 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import android.os.Bundle;
+import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -20,7 +23,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNEditorTheme;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
@@ -131,10 +133,18 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_PREFERRED_COLOR_SCHEME, writableMap);
     }
 
-    public void setUpdateTheme(RNEditorTheme editorTheme) {
+    public void updateTheme(@Nullable Bundle editorTheme) {
         WritableMap writableMap = new WritableNativeMap();
-        writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.makeNativeArray(editorTheme.getColors()));
-        writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.makeNativeArray(editorTheme.getGradients()));
+        ArrayList<Parcelable> colors = editorTheme.getParcelableArrayList(MAP_KEY_THEME_UPDATE_COLORS);
+        ArrayList<Parcelable> gradients = editorTheme.getParcelableArrayList(MAP_KEY_THEME_UPDATE_GRADIENTS);
+
+        if (colors != null) {
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList(colors));
+        }
+
+        if (gradients != null) {
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList(gradients));
+        }
 
         emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
     }
