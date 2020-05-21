@@ -204,7 +204,8 @@ public class ReactAztecText extends AztecText {
                 // we need to make sure that getLayout() isn't null
                 // because it will cause the NPE: https://github.com/wordpress-mobile/WordPress-Android/issues/11821
                 if (getLayout() == null) {
-                    AppLog.e(AppLog.T.EDITOR, "Layout is null");
+                    AppLog.w(AppLog.T.EDITOR,
+                            "Layout is null while trying to scroll inside a ReactAztecText block. Canceling the scroll.");
                     return;
                 }
 
