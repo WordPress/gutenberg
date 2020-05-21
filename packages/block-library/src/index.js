@@ -169,9 +169,6 @@ export const registerCoreBlocks = () => {
 	if ( group ) {
 		setGroupingBlockName( group.name );
 	}
-	// attach richImage filters
-	// where should this live?
-	richImage.registerBlock();
 };
 
 /**
@@ -220,5 +217,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						  ]
 						: [] ),
 				].forEach( registerBlock );
+
+				// Attach rich image tools to the image and cover blocks.
+				richImage.registerBlock();
 		  }
 		: undefined;

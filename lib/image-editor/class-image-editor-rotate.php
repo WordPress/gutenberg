@@ -1,5 +1,6 @@
 <?php
 /**
+ * Start: Include for phase 2
  * Image Editor: Image_Editor_Rotate class
  *
  * @package gutenberg
