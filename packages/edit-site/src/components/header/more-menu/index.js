@@ -29,6 +29,15 @@ const MoreMenu = () => (
 		{ () => (
 			<MenuGroup label={ _x( 'View', 'noun' ) }>
 				<FeatureToggle
+					feature="fixedToolbar"
+					label={ __( 'Top toolbar' ) }
+					info={ __(
+						'Access all block and document tools in a single place'
+					) }
+					messageActivated={ __( 'Top toolbar activated' ) }
+					messageDeactivated={ __( 'Top toolbar deactivated' ) }
+				/>
+				<FeatureToggle
 					feature="fullscreenMode"
 					label={ __( 'Fullscreen mode' ) }
 					info={ __( 'Work without distraction' ) }

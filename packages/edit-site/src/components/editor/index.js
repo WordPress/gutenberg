@@ -70,27 +70,30 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 
-	const { isFullscreenActive, focusMode, deviceType } = useSelect(
-		( select ) => {
-			const {
-				isFeatureActive,
-				__experimentalGetPreviewDeviceType,
-			} = select( 'core/edit-site' );
-			return {
-				isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-				focusMode: isFeatureActive( 'focusMode' ),
-				deviceType: __experimentalGetPreviewDeviceType(),
-			};
-		},
-		[]
-	);
+	const {
+		isFullscreenActive,
+		focusMode,
+		deviceType,
+		hasFixedToolbar,
+	} = useSelect( ( select ) => {
+		const { isFeatureActive, __experimentalGetPreviewDeviceType } = select(
+			'core/edit-site'
+		);
+		return {
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+			focusMode: isFeatureActive( 'focusMode' ),
+			deviceType: __experimentalGetPreviewDeviceType(),
+		};
+	}, [] );
 
 	useEffect( () => {
 		setSettings( {
 			...settings,
 			focusMode,
+			hasFixedToolbar,
 		} );
-	}, [ focusMode ] );
+	}, [ focusMode, hasFixedToolbar ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 

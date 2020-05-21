@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
 	BlockNavigationDropdown,
 	ToolSelector,
+	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import {
@@ -99,13 +101,25 @@ export default function Header( {
 		} catch ( err ) {}
 	}, [] );
 
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
-	}, [] );
+	const { deviceType, hasFixedToolbar } = useSelect(
+		( select ) => ( {
+			deviceType: select(
+				'core/edit-site'
+			).__experimentalGetPreviewDeviceType(),
+			hasFixedToolbar: select( 'core/edit-site' ).isFeatureActive(
+				'fixedToolbar'
+			),
+		} ),
+		[]
+	);
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 	} = useDispatch( 'core/edit-site' );
+
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const displayBlockToolbar =
+		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
 	return (
 		<div className="edit-site-header">
@@ -127,6 +141,11 @@ export default function Header( {
 				<UndoButton />
 				<RedoButton />
 				<BlockNavigationDropdown />
+				{ displayBlockToolbar && (
+					<div className="edit-site-header-toolbar__block-toolbar">
+						<BlockToolbar hideDragHandle />
+					</div>
+				) }
 				<div className="edit-site-header__toolbar-switchers">
 					<PageSwitcher
 						showOnFront={ settings.showOnFront }
