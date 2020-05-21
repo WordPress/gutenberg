@@ -22,7 +22,7 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
-import EllipsisMenuControls from './ellipsis-menu-controls';
+import ItemSettingsControls from './item-settings-controls';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -49,10 +49,10 @@ export default function BlockNavigationBlock( {
 		{ 'is-visible': hasVisibleMovers }
 	);
 	const {
-		__experimentalWithEllipsisMenu: withEllipsisMenu,
-		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
+		__experimentalWithItemSettings: withItemSettings,
+		__experimentalWithItemSettingsMinLevel: itemSettingsMinLevel,
 	} = useBlockNavigationContext();
-	const ellipsisMenuClassName = classnames(
+	const itemSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
@@ -117,15 +117,15 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
-				<TreeGridCell className={ ellipsisMenuClassName }>
+			{ withItemSettings && level >= itemSettingsMinLevel && (
+				<TreeGridCell className={ itemSettingsClassName }>
 					{ ( props ) => (
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
 							{ ...props }
 						>
-							<EllipsisMenuControls.Slot
+							<ItemSettingsControls.Slot
 								clientId={ clientId }
 								bubblesVirtually
 							/>

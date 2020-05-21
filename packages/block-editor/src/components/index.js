@@ -1,4 +1,5 @@
 /*
+/*
  * Block Creation Components
  */
 
@@ -18,7 +19,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-contents';
-export { default as __experimentalBlockNavigationEllipsisMenuControls } from './block-navigation/ellipsis-menu-controls';
+export { default as __experimentalBlockNavigationItemSettingsControls } from './block-navigation/item-settings-controls';
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';

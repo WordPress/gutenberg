@@ -79,7 +79,7 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
 			<BlockNavigationDropdown
 				isDisabled={ isTextModeEnabled }
-				__experimentalWithEllipsisMenu
+				__experimentalWithItemSettings
 			/>
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">

@@ -14,20 +14,20 @@ import { useContext } from '@wordpress/element';
  */
 import { BlockListBlockContext } from '../block-list/block';
 
-const getSlotName = ( clientId ) => `BlockNavigationEllipsisMenu-${ clientId }`;
-const { Fill, Slot } = createSlotFill( 'EllipsisMenu' );
+const getSlotName = ( clientId ) => `BlockNavigationItemSettings-${ clientId }`;
+const { Fill, Slot } = createSlotFill( 'ItemSettings' );
 
-const EllipsisMenuControlsSlot = ( { fillProps, clientId } ) => (
+const ItemSettingsControlsSlot = ( { fillProps, clientId } ) => (
 	<Slot name={ getSlotName( clientId ) } fillProps={ fillProps }>
 		{ ( fills ) => ! isEmpty( fills ) && <>{ fills }</> }
 	</Slot>
 );
 
-export const EllipsisMenuControls = ( props ) => {
+export const ItemSettingsControls = ( props ) => {
 	const { clientId } = useContext( BlockListBlockContext );
 	return <Fill { ...props } name={ getSlotName( clientId ) } />;
 };
 
-EllipsisMenuControls.Slot = EllipsisMenuControlsSlot;
+ItemSettingsControls.Slot = ItemSettingsControlsSlot;
 
-export default EllipsisMenuControls;
+export default ItemSettingsControls;

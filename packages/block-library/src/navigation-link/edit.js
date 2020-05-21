@@ -32,7 +32,7 @@ import {
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
 	__experimentalBlockNavigationEditor as BlockNavigationEditor,
-	__experimentalBlockNavigationEllipsisMenuControls as BlockNavigationEllipsisMenuControls,
+	__experimentalBlockNavigationItemSettingsControls as BlockNavigationItemSettingsControls,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -161,13 +161,13 @@ function NavigationLinkEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<BlockNavigationEllipsisMenuControls>
+			<BlockNavigationItemSettingsControls>
 				<MenuGroup>
 					<MenuItem onClick={ insertLinkBlock }>
 						{ __( 'Add submenu' ) }
 					</MenuItem>
 				</MenuGroup>
-			</BlockNavigationEllipsisMenuControls>
+			</BlockNavigationItemSettingsControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'SEO settings' ) }>
 					<ToggleControl
