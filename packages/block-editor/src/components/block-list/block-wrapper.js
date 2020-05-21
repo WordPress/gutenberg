@@ -7,7 +7,13 @@ import { first, last, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useContext, forwardRef } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	useContext,
+	forwardRef,
+} from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -67,6 +73,36 @@ const BlockComponent = forwardRef(
 		const fallbackRef = useRef();
 		wrapper = wrapper || fallbackRef;
 
+		// Handling isHovered
+		const [ isBlockHovered, setBlockHoveredState ] = useState( false );
+
+		/**
+		 * Sets the block state as unhovered if currently hovering. There are cases
+		 * where mouseleave may occur but the block is not hovered (multi-select),
+		 * so to avoid unnecesary renders, the state is only set if hovered.
+		 */
+		const hideHoverEffects = () => {
+			if ( isBlockHovered ) {
+				setBlockHoveredState( false );
+			}
+		};
+		/**
+		 * A mouseover event handler to apply hover effect when a pointer device is
+		 * placed within the bounds of the block. The mouseover event is preferred
+		 * over mouseenter because it may be the case that a previous mouseenter
+		 * event was blocked from being handled by a IgnoreNestedEvents component,
+		 * therefore transitioning out of a nested block to the bounds of the block
+		 * would otherwise not trigger a hover effect.
+		 *
+		 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
+		 */
+		const maybeHover = () => {
+			if ( isBlockHovered || isPartOfMultiSelection || isSelected ) {
+				return;
+			}
+			setBlockHoveredState( true );
+		};
+
 		// Provide the selected node, or the first and last nodes of a multi-
 		// selection, so it can be used to position the contextual block toolbar.
 		// We only provide what is necessary, and remove the nodes again when they
@@ -74,6 +110,7 @@ const BlockComponent = forwardRef(
 		useEffect( () => {
 			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 				const node = wrapper.current;
+				hideHoverEffects();
 				setBlockNodes( ( nodes ) => ( {
 					...nodes,
 					[ clientId ]: node,
@@ -176,6 +213,7 @@ const BlockComponent = forwardRef(
 		};
 
 		const onMouseLeave = ( { which, buttons } ) => {
+			hideHoverEffects();
 			// The primary button must be pressed to initiate selection. Fall back
 			// to `which` if the standard `buttons` property is falsy. There are
 			// cases where Firefox might always set `buttons` to `0`.
@@ -202,15 +240,19 @@ const BlockComponent = forwardRef(
 				className={ classnames(
 					className,
 					props.className,
-					wrapperProps && wrapperProps.className
+					wrapperProps && wrapperProps.className,
+					{ 'is-hovered': isBlockHovered },
+					! isAligned && 'wp-block'
 				) }
 				data-block={ clientId }
 				data-type={ name }
 				data-title={ blockTitle }
+				onMouseOver={ maybeHover }
+				onFocus={ maybeHover } // pre-commit hook requires this for now -shaun
 				// Only allow shortcuts when a blocks is selected and not locked.
 				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
-				onMouseLeave={ isSelected ? onMouseLeave : undefined }
+				onMouseLeave={ isSelected ? onMouseLeave : hideHoverEffects }
 				tabIndex="0"
 				style={ {
 					...( wrapperProps ? wrapperProps.style : {} ),
