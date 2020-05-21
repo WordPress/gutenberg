@@ -18,7 +18,7 @@ The Block Editor surface API has evolved at different velocities, and it's now a
 
 This describes the current efforts to consolidate the various APIs into a single point: a `experimental-theme.json` file.
 
-When this file is present and the Full Site Editing experiment is enabled, a few Block Editor mechanisms that are activated.
+When this file is present and the Full Site Editing experiment is enabled, a few Block Editor mechanisms are activated.
 
 ### Presets become CSS Custom Properties
 
@@ -32,7 +32,7 @@ By providing the block style properties in a structured way, the Block Editor ca
 
 ### Individual features can be controlled per block
 
-The Block Editor already allows the control of specific features such as alignment, drop cap, whether it's present in the inserter, etc. The goal is that these are also available for themes to control.
+The Block Editor already allows the control of specific features such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
 
 ## Specification
 
@@ -100,7 +100,7 @@ In the example above, we aim to encapsulate that the drop cap should be disabled
 
 ### Presets
 
-This function is only enabled for the global section.
+So far, this function is only enabled for the global section.
 
 The generated CSS Custom Properties follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
@@ -130,7 +130,7 @@ The following stylesheet will be enqueued to the front-end and site editor:
 }
 ```
 
-The goal is that presets can be defined using this format, although so far the name property (used to be shown in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. The equivalent example to above is:
+The goal is that presets can be defined using this format, although, right now, the name property (used to be shown in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. The equivalent example to above is:
 
 ```php
 add_theme_support( 'editor-color-palette', array(
