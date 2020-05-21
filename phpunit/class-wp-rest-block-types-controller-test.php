@@ -81,18 +81,18 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 *
 	 */
 	public function test_get_items() {
-		register_block_type( 'test/block-1', [] );
-		register_block_type( 'test/block-2', [] );
+		register_block_type( 'test/block-1', array() );
+		register_block_type( 'test/block-2', array() );
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/test' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$data     = array_values( $data );
 		$this->assertCount( 2, $data );
-		$names        = wp_list_pluck( $data, 'name' );
-		$this->assertEqualSets( array('test/block-1', 'test/block-2'), $names );
-		unregister_block_type('test/block-1');
-		unregister_block_type('test/block-2');
+		$names = wp_list_pluck( $data, 'name' );
+		$this->assertEqualSets( array( 'test/block-1', 'test/block-2' ), $names );
+		unregister_block_type( 'test/block-1' );
+		unregister_block_type( 'test/block-2' );
 	}
 
 	/**
