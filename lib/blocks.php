@@ -20,6 +20,10 @@ function gutenberg_reregister_core_block_types() {
 		'audio',
 		'button',
 		'buttons',
+		'classic',
+		'code',
+		'column',
+		'columns',
 		'file',
 		'gallery',
 		'group',
@@ -44,6 +48,7 @@ function gutenberg_reregister_core_block_types() {
 		'text-columns',
 		'verse',
 		'video',
+		'widget-area',
 	);
 
 	$block_names = array(
@@ -67,16 +72,16 @@ function gutenberg_reregister_core_block_types() {
 		$block_names = array_merge(
 			$block_names,
 			array(
-				'post-title.php'          => 'core/post-title',
-				'post-content.php'        => 'core/post-content',
 				'post-author.php'         => 'core/post-author',
 				'post-comments.php'       => 'core/post-comments',
 				'post-comments-count.php' => 'core/post-comments-count',
 				'post-comments-form.php'  => 'core/post-comments-form',
+				'post-content.php'        => 'core/post-content',
 				'post-date.php'           => 'core/post-date',
 				'post-excerpt.php'        => 'core/post-excerpt',
 				'post-featured-image.php' => 'core/post-featured-image',
 				'post-tags.php'           => 'core/post-tags',
+				'post-title.php'          => 'core/post-title',
 				'query.php'               => 'core/query',
 				'query-loop.php'          => 'core/query-loop',
 				'query-pagination.php'    => 'core/query-pagination',
