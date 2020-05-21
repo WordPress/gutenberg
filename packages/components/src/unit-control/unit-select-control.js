@@ -24,7 +24,14 @@ export default function UnitSelectControl( {
 	...props
 } ) {
 	if ( ! hasUnits( options ) ) {
-		return <UnitLabel size={ size }>{ value }</UnitLabel>;
+		return (
+			<UnitLabel
+				className="components-unit-control__unit-label"
+				size={ size }
+			>
+				{ value }
+			</UnitLabel>
+		);
 	}
 
 	const handleOnChange = ( event ) => {

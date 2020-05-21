@@ -50,13 +50,14 @@ export function hasUnits( units ) {
  * @return {Array<number, string>} The extracted number and unit.
  */
 export function parseUnit( initialValue, units = CSS_UNITS ) {
-	const output = [ 0, '' ];
 	const value = String( initialValue ).trim();
 
-	const num = parseFloat( value, 10 );
+	let num = parseFloat( value, 10 );
+	num = isNaN( num ) ? '' : num;
+
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
 
-	let unit = unitMatch !== 'undefined' ? unitMatch : '';
+	let unit = unitMatch !== undefined ? unitMatch : '';
 	unit = unit.toLowerCase();
 
 	if ( hasUnits( units ) ) {
@@ -64,10 +65,7 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 		unit = match?.value;
 	}
 
-	output[ 0 ] = isNaN( num ) ? '' : num;
-	output[ 1 ] = unit;
-
-	return output;
+	return [ num, unit ];
 }
 
 /**

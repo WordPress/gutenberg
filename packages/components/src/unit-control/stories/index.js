@@ -26,6 +26,7 @@ function Example() {
 		disableUnits: boolean( 'disableUnits', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+		isPressEnterToChange: boolean( 'isPressEnterToChange', true ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		isUnitSelectTabbable: boolean( 'isUnitSelectTabbable', true ),
 		label: text( 'label', 'Value' ),

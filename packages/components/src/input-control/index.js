@@ -120,7 +120,6 @@ export function InputControl(
 				) }
 				<Backdrop
 					aria-hidden="true"
-					className="components-input-control__fieldset"
 					disabled={ disabled }
 					isFloating={ isFloating }
 					isFloatingLabel={ isFloatingLabelSet }

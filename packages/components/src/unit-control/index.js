@@ -14,7 +14,7 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import {
 	inputControlActionTypes,
-	combineStateReducers,
+	composeStateReducers,
 } from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
@@ -92,13 +92,13 @@ function UnitControl(
 		const event = payload?.event;
 
 		/**
-		 * Customizes the submit interaction.
+		 * Customizes the commit interaction.
 		 *
 		 * This occurs when pressing ENTER to fire a change.
 		 * By intercepting the state change, we can parse the incoming
 		 * value to determine if the unit needs to be updated.
 		 */
-		if ( type === inputControlActionTypes.SUBMIT ) {
+		if ( type === inputControlActionTypes.COMMIT ) {
 			const valueToParse = event?.target?.value;
 
 			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
@@ -121,7 +121,6 @@ function UnitControl(
 
 	const inputSuffix = ! disableUnits ? (
 		<UnitSelectControl
-			className="components-unit-control__select"
 			disabled={ disabled }
 			isTabbable={ isUnitSelectTabbable }
 			options={ units }
@@ -148,7 +147,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				__unstableStateReducer={ combineStateReducers(
+				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
 				) }

@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-import { flattenDeep } from 'lodash';
+import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useReducer } from '@wordpress/element';
+import { useReducer } from '@wordpress/element';
 
 const initialStateReducer = ( state ) => state;
 
@@ -53,19 +53,17 @@ function mergeInitialState( initialState = initialInputControlState ) {
 }
 
 /**
- * Combines multiple stateReducers into a single stateReducer, building
+ * Composes multiple stateReducers into a single stateReducer, building
  * the pipeline to control the flow for state and actions.
  *
- * @param  {...any} fns State reducers.
- * @return {Function} The single combined stateReducer.
+ * @param  {...Function} fns State reducers.
+ * @return {Function} The single composed stateReducer.
  */
-export const combineStateReducers = ( ...fns ) => {
-	// Using lodash.flattenDeep until we have an Array.flat polyfill.
-	const reducers = flattenDeep( fns );
-
+export const composeStateReducers = ( ...fns ) => {
 	return ( ...args ) => {
-		return reducers.reduceRight( ( state, fn ) => {
-			return { ...state, ...fn( ...args ) };
+		return fns.reduceRight( ( state, fn ) => {
+			const fnState = fn( ...args );
+			return isEmpty( fnState ) ? state : { ...state, ...fnState };
 		}, {} );
 	};
 };
@@ -77,10 +75,10 @@ export const combineStateReducers = ( ...fns ) => {
  * This technique uses the "stateReducer" design pattern:
  * https://kentcdodds.com/blog/the-state-reducer-pattern/
  *
- * @param {Function} combinedStateReducers A custom reducer that can subscribe and modify state.
+ * @param {Function} composedStateReducers A custom reducer that can subscribe and modify state.
  * @return {Function} The reducer.
  */
-function inputControlStateReducer( combinedStateReducers ) {
+function inputControlStateReducer( composedStateReducers ) {
 	return ( state, action ) => {
 		const nextState = { ...state };
 		const { type, payload } = action;
@@ -152,11 +150,11 @@ function inputControlStateReducer( combinedStateReducers ) {
 		}
 
 		/**
-		 * Send the nextState + action to the combinedReducers via
+		 * Send the nextState + action to the composedReducers via
 		 * this "bridge" mechanism. This allows external stateReducers
 		 * to hook into actions, and modify state if needed.
 		 */
-		return combinedStateReducers( nextState, action );
+		return composedStateReducers( nextState, action );
 	};
 }
 
@@ -178,14 +176,8 @@ export function useInputControlStateReducer(
 	stateReducer = initialStateReducer,
 	initialState = initialInputControlState
 ) {
-	const combinedReducers = combineStateReducers( stateReducer );
-	const reducer = useMemo(
-		() => inputControlStateReducer( combinedReducers ),
-		[]
-	);
-
 	const [ state, dispatch ] = useReducer(
-		reducer,
+		inputControlStateReducer( stateReducer ),
 		mergeInitialState( initialState )
 	);
 

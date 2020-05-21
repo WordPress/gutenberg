@@ -25,6 +25,7 @@ function Example() {
 		disabled: boolean( 'disabled', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		isShiftStepEnabled: boolean( 'isShiftStepEnabled', true ),
 		label: text( 'label', 'Number' ),
 		min: number( 'min', 0 ),
