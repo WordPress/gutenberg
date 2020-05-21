@@ -284,7 +284,11 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @return array
 	 */
 	protected function prepare_links( $plugin ) {
-		$links = array();
+		$links = array(
+			'https://api.w.org/install-plugin' => array(
+				'href' => add_query_arg( 'slug', urlencode( $plugin['slug'] ), rest_url( '__experimental/plugins' ) ),
+			),
+		);
 
 		$plugin_file = $this->find_plugin_for_slug( $plugin['slug'] );
 

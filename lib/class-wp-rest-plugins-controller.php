@@ -241,10 +241,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if (
-			$request['activate'] &&
-			( ! current_user_can( 'activate_plugins' ) || ! current_user_can( 'activate_plugin', $request['slug'] ) )
-		) {
+		if ( $request['activate'] && ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_activate_plugin',
 				__( 'Sorry, you are not allowed to activate this plugin.', 'gutenberg' ),
@@ -330,6 +327,16 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$file = $upgrader->plugin_info();
 
 		if ( $request['activate'] ) {
+			if ( ! current_user_can( 'activate_plugin', $file ) ) {
+				return new WP_Error(
+					'rest_cannot_activate_plugin',
+					__( 'Sorry, you are not allowed to activate this plugin. The plugin has been installed.', 'gutenberg' ),
+					array(
+						'status' => rest_authorization_required_code(),
+					)
+				);
+			}
+
 			$activated = activate_plugin( $file );
 
 			if ( is_wp_error( $activated ) ) {
