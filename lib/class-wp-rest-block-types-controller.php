@@ -53,6 +53,20 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
+			'/' . $this->rest_base . '/(?P<namespace>[a-zA-Z0-9_-]+)',
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
 			'/' . $this->rest_base . '/(?P<namespace>[a-zA-Z0-9_-]+)/(?P<name>[a-zA-Z0-9_-]+)',
 			array(
 				'args'   => array(
@@ -87,7 +101,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to manage block types.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_block_type_cannot_view', __( 'Sorry, you are not allowed to manage block types.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
@@ -112,7 +126,6 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		}
 
 		foreach ( $block_types as $slug => $obj ) {
-			$block_type = $this->prepare_item_for_response( $obj, $request );
 			if ( $namespace ) {
 				$pieces          = explode( '/', $obj->name );
 				$block_namespace = $pieces[0];
@@ -120,7 +133,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					continue;
 				}
 			}
-			$data[ $obj->name ] = $this->prepare_response_for_collection( $block_type );
+			$block_type = $this->prepare_item_for_response( $obj, $request );
+			$data[]     = $this->prepare_response_for_collection( $block_type );
 		}
 
 		return rest_ensure_response( $data );
@@ -136,7 +150,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	public function get_item_permissions_check( $request ) {
 		$check = $this->check_read_permission();
 		if ( ! $check ) {
-			return new WP_Error( 'rest_cannot_read_block_type', __( 'Cannot view block type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_block_type_cannot_view', __( 'Cannot view block type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 		$block_name = sprintf( '%s/%s', $request['namespace'], $request['name'] );
 		$block_type = $this->get_block( $block_name );
@@ -154,7 +168,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	protected function check_read_permission() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error( 'rest_cannot_view', __( 'Sorry, you are not allowed to manage block types.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			return new WP_Error( 'rest_block_type_cannot_view', __( 'Sorry, you are not allowed to manage block types.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 		}
 
 		return true;
@@ -206,11 +220,11 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
-		if ( in_array( 'attributes', $fields, true ) ) {
+		if ( rest_is_field_included( 'attributes', $fields ) ) {
 			$data['attributes'] = $block_type->get_attributes();
 		}
 
-		if ( in_array( 'is_dynamic', $fields, true ) ) {
+		if ( rest_is_field_included( 'is_dynamic', $fields ) ) {
 			$data['is_dynamic'] = $block_type->is_dynamic();
 		}
 
@@ -224,8 +238,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'style',
 		);
 		foreach ( $extra_fields as $extra_field ) {
-			if ( in_array( $extra_field, $fields, true ) ) {
-				$field                = ( isset( $block_type->$extra_field ) ) ? $block_type->$extra_field : false;
+			if ( rest_is_field_included( $extra_field, $fields ) ) {
+				$field                = isset( $block_type->$extra_field ) ? $block_type->$extra_field : '';
 				$data[ $extra_field ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $extra_field ] );
 			}
 		}
@@ -263,16 +277,16 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'collection' => array(
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
-			'about'      => array(
+			'self'       => array(
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $block_type->name ) ),
 			),
-			'namespace'  => array(
-				'href' => add_query_arg( 'namespace', $namespace, rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ) ),
+			'up'         => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $namespace ) ),
 			),
 		);
 
 		if ( $block_type->is_dynamic() ) {
-			$links['render']['href'] = add_query_arg( 'context', 'edit', rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'block-renderer', $block_type->name ) ) );
+			$links['https://api.w.org/render-block']['href'] = add_query_arg( 'context', 'edit', rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'block-renderer', $block_type->name ) ) );
 		}
 
 		return $links;
@@ -302,15 +316,10 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				'attributes'    => array(
 					'description'          => __( 'Block attributes.', 'gutenberg' ),
 					'type'                 => 'object',
-					'properties'           => array(
-						'layout' => array(
-							'description' => __( 'Block layout.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit' ),
-							'readonly'    => true,
-						),
+					'properties'           => array(),
+					'additionalProperties' => array(
+						'type' => 'object',
 					),
-					'additionalProperties' => true,
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
@@ -333,19 +342,19 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'script'        => array(
-					'description' => __( 'URL of script js file.', 'gutenberg' ),
+					'description' => __( 'Name of script js file.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'editor_style'  => array(
-					'description' => __( 'URL of editor style css file.', 'gutenberg' ),
+					'description' => __( 'Name of editor style css file.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'style'         => array(
-					'description' => __( 'URL of style css file.', 'gutenberg' ),
+					'description' => __( 'Name of style css file.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
