@@ -15,7 +15,7 @@ import Tooltip from './tooltip';
 import {
 	logUserEvent,
 	userEvents,
-	getStarterPageTemplatesTooltipShown,
+	requestStarterPageTemplatesTooltipShown,
 	setStarterPageTemplatesTooltipShown,
 } from 'react-native-gutenberg-bridge';
 import { Animated, Dimensions, Keyboard } from 'react-native';
@@ -93,7 +93,7 @@ const __experimentalPageTemplatePicker = ( {
 	};
 
 	const shouldShowTooltip = () => {
-		getStarterPageTemplatesTooltipShown( ( tooltipShown ) => {
+		requestStarterPageTemplatesTooltipShown( ( tooltipShown ) => {
 			if ( ! tooltipShown ) {
 				setTooltipVisible( true );
 				setStarterPageTemplatesTooltipShown( true );
