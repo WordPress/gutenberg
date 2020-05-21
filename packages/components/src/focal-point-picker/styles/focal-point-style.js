@@ -14,14 +14,15 @@ import { Path, SVG } from '@wordpress/primitives';
 import { color } from '../../utils/style-mixins';
 
 export const FocalPointWrapper = styled.div`
-	box-sizing: border-box;
 	background-color: transparent;
+	box-sizing: border-box;
 	cursor: grab;
 	height: 30px;
 	opacity: 0.8;
 	position: absolute;
-	will-change: transform;
+	user-select: none;
 	width: 30px;
+	will-change: transform;
 	z-index: 10000;
 
 	&.is-dragging {

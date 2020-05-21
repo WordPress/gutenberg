@@ -23,7 +23,7 @@ import {
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
-import { roundClamp } from './utils';
+import { roundClamp } from '../number-control/utils';
 
 export class FocalPointPicker extends Component {
 	constructor( props ) {
@@ -31,7 +31,6 @@ export class FocalPointPicker extends Component {
 		this.onMouseMove = this.onMouseMove.bind( this );
 		this.state = {
 			isDragging: false,
-			isGridEnabled: false,
 			bounds: {},
 			percentages: props.value,
 		};
@@ -46,9 +45,11 @@ export class FocalPointPicker extends Component {
 		this.onLoad = this.onLoad.bind( this );
 		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
 		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
+		this.updateBounds = this.updateBounds.bind( this );
 	}
 	componentDidMount() {
 		document.addEventListener( 'mouseup', this.handleOnMouseUp );
+		window.addEventListener( 'resize', this.updateBounds );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
@@ -59,6 +60,7 @@ export class FocalPointPicker extends Component {
 	}
 	componentWillUnmount() {
 		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
+		window.removeEventListener( 'resize', this.updateBounds );
 	}
 	calculateBounds() {
 		const bounds = {
@@ -96,17 +98,20 @@ export class FocalPointPicker extends Component {
 		}
 		return bounds;
 	}
-	onLoad() {
-		this.setState( {
-			bounds: this.calculateBounds(),
-		} );
-	}
 	updateValue( nextValue ) {
 		const { onChange } = this.props;
 
 		this.setState( { percentages: nextValue }, () => {
 			onChange( nextValue );
 		} );
+	}
+	updateBounds() {
+		this.setState( {
+			bounds: this.calculateBounds(),
+		} );
+	}
+	onLoad() {
+		this.updateBounds();
 	}
 	handleOnMouseUp() {
 		this.setState( { isDragging: false } );
@@ -232,7 +237,7 @@ export class FocalPointPicker extends Component {
 			help,
 			className,
 		} = this.props;
-		const { bounds, isDragging, isGridEnabled, percentages } = this.state;
+		const { bounds, isDragging, percentages } = this.state;
 		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
 			left:
@@ -277,14 +282,13 @@ export class FocalPointPicker extends Component {
 						tabIndex="-1"
 						onKeyDown={ this.handleOnKeyDown }
 					>
-						{ isGridEnabled && (
-							<Grid
-								style={ {
-									width: bounds.width,
-									height: bounds.height,
-								} }
-							/>
-						) }
+						<Grid
+							percentages={ percentages }
+							style={ {
+								width: bounds.width,
+								height: bounds.height,
+							} }
+						/>
 						<Media
 							alt="Dimensions helper"
 							autoPlay={ autoPlay }
@@ -302,10 +306,6 @@ export class FocalPointPicker extends Component {
 					percentages={ percentages }
 					onHorizontalChange={ this.horizontalPositionChanged }
 					onVerticalChange={ this.verticalPositionChanged }
-					isGridEnabled={ isGridEnabled }
-					onToggleGrid={ ( next ) =>
-						this.setState( { isGridEnabled: next } )
-					}
 				/>
 			</BaseControl>
 		);

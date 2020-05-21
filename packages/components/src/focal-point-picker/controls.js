@@ -7,12 +7,10 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import FormToggle from '../form-toggle';
 import {
 	ControlLabel,
 	ControlField,
@@ -25,10 +23,8 @@ const TEXTCONTROL_MIN = 0;
 const TEXTCONTROL_MAX = 100;
 
 export default function FocalPointPickerControls( {
-	isGridEnabled = false,
 	onHorizontalChange = noop,
 	onVerticalChange = noop,
-	onToggleGrid = noop,
 	percentages = {
 		x: 0.5,
 		y: 0.5,
@@ -36,8 +32,6 @@ export default function FocalPointPickerControls( {
 } ) {
 	const valueX = fractionToPercentage( percentages.x );
 	const valueY = fractionToPercentage( percentages.y );
-	const instanceId = useInstanceId( FocalPointPickerControls );
-	const gridSwitchId = `focal-point-picker-grid-switch-${ instanceId }`;
 
 	return (
 		<ControlWrapper className="focal-point-picker__controls">
@@ -60,20 +54,6 @@ export default function FocalPointPickerControls( {
 						dragDirection="s"
 					/>
 				</ControlField>
-			</ControlField>
-			<ControlField
-				className="focal-point-picker__controls-grid"
-				justify="left"
-			>
-				<ControlLabel htmlFor={ gridSwitchId }>
-					{ __( 'Grid' ) }
-				</ControlLabel>
-				<FormToggle
-					className="focal-point-picker__controls-position-grid-toggle-control"
-					id={ gridSwitchId }
-					checked={ isGridEnabled }
-					onChange={ () => onToggleGrid( ! isGridEnabled ) }
-				/>
 			</ControlField>
 		</ControlWrapper>
 	);
