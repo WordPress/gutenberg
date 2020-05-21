@@ -19,16 +19,20 @@ export default function useResizeCanvas( deviceType ) {
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
 
 	useEffect( () => {
+		if ( deviceType === 'Desktop' ) {
+			return;
+		}
+
 		const resizeListener = () => updateActualWidth( window.innerWidth );
 		window.addEventListener( 'resize', resizeListener );
 
 		return () => {
 			window.removeEventListener( 'resize', resizeListener );
 		};
-	} );
+	}, [ deviceType ] );
 
 	const getCanvasWidth = ( device ) => {
-		let deviceWidth = 0;
+		let deviceWidth;
 
 		switch ( device ) {
 			case 'Tablet':
@@ -38,7 +42,7 @@ export default function useResizeCanvas( deviceType ) {
 				deviceWidth = 360;
 				break;
 			default:
-				deviceWidth = 2000;
+				return null;
 		}
 
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
