@@ -39,7 +39,7 @@ export default function MenuEditor( {
 					hasFixedToolbar: true,
 				} }
 			>
-				<EditorBody
+				<MenuEditorBody
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 					blocks={ blocks }
@@ -50,7 +50,11 @@ export default function MenuEditor( {
 	);
 }
 
-const EditorBody = ( { menuId, onDeleteMenu, blocks, saveBlocks } ) => {
+/*
+ * This has to be a separate component because core/block-editor data is only available for descendants
+ * of BlockEditorProvider
+ */
+const MenuEditorBody = ( { menuId, onDeleteMenu, blocks, saveBlocks } ) => {
 	const { setAutoFocusEnabled } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ lastInteractedSection, setLastInteractedSection ] = useState(
