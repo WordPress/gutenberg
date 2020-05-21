@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, filter, map, last, omit, pick } from 'lodash';
+import { get, filter, map, last, omit, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -140,6 +140,7 @@ export function ImageEdit( {
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
+	const isWideAligned = includes( [ 'wide', 'full' ], align );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -259,10 +260,9 @@ export function ImageEdit( {
 	}
 
 	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes =
-			[ 'wide', 'full' ].indexOf( nextAlign ) !== -1
-				? { width: undefined, height: undefined }
-				: {};
+		const extraUpdatedAttributes = isWideAligned
+			? { width: undefined, height: undefined }
+			: {};
 		setAttributes( {
 			...extraUpdatedAttributes,
 			align: nextAlign,
@@ -414,9 +414,7 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	const isResizable =
-		[ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-
+	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = getImageSizeOptions();
 
 	const getInspectorControls = ( imageWidth, imageHeight ) => (
