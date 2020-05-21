@@ -1,4 +1,14 @@
-const VIDEO_EXTENSIONS = [ 'm4v', 'avi', 'mpg', 'mp4', 'webm', 'ogg' ];
+const VIDEO_EXTENSIONS = [
+	'avi',
+	'mpg',
+	'mpeg',
+	'mov',
+	'mp4',
+	'm4v',
+	'ogg',
+	'webm',
+	'wmv',
+];
 
 export function getExtension( filename = '' ) {
 	const parts = filename.split( '.' );
