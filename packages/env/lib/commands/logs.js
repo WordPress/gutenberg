@@ -30,7 +30,7 @@ module.exports = async function logs( { environment, watch, spinner, debug } ) {
 	const servicesToWatch =
 		environment === 'all'
 			? [ 'tests-wordpress', 'wordpress' ]
-			: [ 'tests' ? 'tests-wordpress' : 'wordpress' ];
+			: [ environment === 'tests' ? 'tests-wordpress' : 'wordpress' ];
 
 	const output = await Promise.all( [
 		...servicesToWatch.map( ( service ) =>
@@ -51,9 +51,12 @@ module.exports = async function logs( { environment, watch, spinner, debug } ) {
 			if ( current.err ) {
 				acc.err = acc.err.concat( current.err );
 			}
+			if ( current.exitCode !== 0 ) {
+				acc.hasNon0ExitCode = true;
+			}
 			return acc;
 		},
-		{ out: '', err: '' }
+		{ out: '', err: '', hasNon0ExitCode: false }
 	);
 
 	if ( result.out.length ) {
@@ -66,7 +69,9 @@ module.exports = async function logs( { environment, watch, spinner, debug } ) {
 		console.error(
 			process.stdout.isTTY ? `\n\n${ result.err }\n\n` : result.err
 		);
-		throw result.err;
+		if ( result.hasNon0ExitCode ) {
+			throw result.err;
+		}
 	}
 
 	spinner.text = 'Finished showing logs.';
