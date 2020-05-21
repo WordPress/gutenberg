@@ -6,6 +6,7 @@ import {
 	useContext,
 	useState,
 	useMemo,
+	useEffect,
 	useCallback,
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -69,17 +70,27 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 
-	const { isFullscreenActive } = useSelect( ( select ) => {
-		return {
-			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
-				'fullscreenMode'
-			),
-		};
-	}, [] );
+	const { isFullscreenActive, focusMode, deviceType } = useSelect(
+		( select ) => {
+			const {
+				isFeatureActive,
+				__experimentalGetPreviewDeviceType,
+			} = select( 'core/edit-site' );
+			return {
+				isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+				focusMode: isFeatureActive( 'focusMode' ),
+				deviceType: __experimentalGetPreviewDeviceType(),
+			};
+		},
+		[]
+	);
 
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
-	}, [] );
+	useEffect( () => {
+		setSettings( {
+			...settings,
+			focusMode,
+		} );
+	}, [ focusMode ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
