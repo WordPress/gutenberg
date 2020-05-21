@@ -8,7 +8,7 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { map, uniq } from 'lodash';
+import { map, uniq, isEqual } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -20,6 +20,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
+import { getGradientBaseColors } from '../mobile/gradient';
 
 const ANIMATION_DURATION = 200;
 
@@ -62,7 +63,16 @@ function ColorPalette( {
 	}
 
 	function isSelected( color ) {
-		return ! isSelectedCustom() && activeColor === color;
+		if ( ! isSelectedCustom() ) {
+			if ( isGradientColor ) {
+				return isEqual(
+					getGradientBaseColors( activeColor ),
+					getGradientBaseColors( color )
+				);
+			}
+			return activeColor === color;
+		}
+		return false;
 	}
 
 	function timingAnimation( property, toValue ) {

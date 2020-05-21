@@ -5,11 +5,7 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	CycleSelectControl,
-	RangeControl,
-} from '@wordpress/components';
+import { PanelBody, RadioControl, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,7 +23,7 @@ import {
 function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
 
-	const gradientType = getGradientType( currentValue ) || gradients.linear;
+	const gradientType = getGradientType( currentValue );
 	const isLinearGradient = gradientType === gradients.linear;
 
 	function getGradientColor( type ) {
@@ -83,23 +79,26 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	}
 
 	return (
-		<PanelBody>
-			<CycleSelectControl
-				label={ __( 'Gradient Type' ) }
-				value={ gradientType }
-				onChangeValue={ onGradientTypeChange }
-				options={ gradientOptions }
-			/>
-			{ isLinearGradient && (
-				<RangeControl
-					label={ __( 'Angle' ) }
-					minimumValue={ 0 }
-					maximumValue={ 360 }
-					value={ getGradientAngle() }
-					onChange={ setGradientAngle }
+		<>
+			<PanelBody title={ __( 'Gradient Type' ) }>
+				<RadioControl
+					selected={ gradientType }
+					options={ gradientOptions }
+					onChange={ onGradientTypeChange }
 				/>
+			</PanelBody>
+			{ isLinearGradient && (
+				<PanelBody title={ __( 'Gradient Angle' ) }>
+					<RangeControl
+						label={ __( 'Angle' ) }
+						minimumValue={ 0 }
+						maximumValue={ 360 }
+						value={ getGradientAngle() }
+						onChange={ setGradientAngle }
+					/>
+				</PanelBody>
 			) }
-		</PanelBody>
+		</>
 	);
 }
 

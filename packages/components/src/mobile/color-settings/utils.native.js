@@ -4,8 +4,8 @@ const gradients = {
 };
 
 const gradientOptions = [
-	{ name: 'Linear', value: gradients.linear },
-	{ name: 'Radial', value: gradients.radial },
+	{ label: 'Linear', value: gradients.linear },
+	{ label: 'Radial', value: gradients.radial },
 ];
 
 const getGradientType = ( color ) => {

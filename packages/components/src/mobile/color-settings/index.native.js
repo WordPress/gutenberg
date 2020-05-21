@@ -51,6 +51,7 @@ function ColorSettings( {
 	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
+	const isCustomGadientShown = ! isSolidSegment && isGradientColor;
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
@@ -70,6 +71,10 @@ function ColorSettings( {
 			}
 		} );
 	}, [ isCustomScreen ] );
+
+	useEffect( () => {
+		performLayoutAnimation();
+	}, [ isCustomGadientShown ] );
 
 	useEffect( () => {
 		setCurrentSegment( segments[ selectedSegmentIndex ] );
@@ -190,7 +195,7 @@ function ColorSettings( {
 						}
 						defaultSettings={ defaultSettings }
 					/>
-					{ ! isSolidSegment && (
+					{ isCustomGadientShown && (
 						<>
 							<View style={ horizontalSeparatorStyle } />
 							<PanelBody>
@@ -209,7 +214,7 @@ function ColorSettings( {
 				</View>
 			) }
 			{ isCustomGradientScreen && (
-				<>
+				<View>
 					<NavigationHeader
 						screen={ __( 'Customize Gradient' ) }
 						leftButtonOnPress={ () =>
@@ -221,7 +226,7 @@ function ColorSettings( {
 						currentValue={ currentValue }
 						isGradientColor={ isGradientColor }
 					/>
-				</>
+				</View>
 			) }
 		</View>
 	);

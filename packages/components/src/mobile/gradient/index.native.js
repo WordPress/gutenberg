@@ -15,6 +15,26 @@ import { useResizeObserver } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
+function getGradientAngle( gradientValue ) {
+	const matchDeg = /(\d+)deg/g;
+
+	return Number( matchDeg.exec( gradientValue )[ 1 ] );
+}
+
+function getGradientColorGroup( gradientValue ) {
+	const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
+
+	return gradientValue
+		.match( matchColorGroup )
+		.map( ( color ) => color.split( ' ' ) );
+}
+
+function getGradientBaseColors( gradientValue ) {
+	return getGradientColorGroup( gradientValue ).map(
+		( color ) => color[ 0 ]
+	);
+}
+
 function Gradient( {
 	gradientValue,
 	style,
@@ -32,27 +52,18 @@ function Gradient( {
 	const isLinearGradient =
 		getGradientType( gradientValue ) === gradients.linear;
 
-	const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
-	const matchDeg = /(\d.+)deg/g;
+	const colorGroup = getGradientColorGroup( gradientValue );
 
-	const colorGroup = gradientValue
-		.match( matchColorGroup )
-		.map( ( color ) => color.split( ' ' ) );
-
-	const colors = colorGroup.map( ( color ) => color[ 0 ] );
 	const locations = colorGroup.map(
 		( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
 	);
 
-	const angle =
-		isLinearGradient && Number( matchDeg.exec( gradientValue )[ 1 ] );
-
 	if ( isLinearGradient ) {
 		return (
 			<RNLinearGradient
-				colors={ colors }
+				colors={ getGradientBaseColors( gradientValue ) }
 				useAngle={ true }
-				angle={ angle }
+				angle={ getGradientAngle( gradientValue ) }
 				locations={ locations }
 				angleCenter={ angleCenter }
 				style={ style }
@@ -97,3 +108,4 @@ function Gradient( {
 }
 
 export default Gradient;
+export { getGradientBaseColors };
