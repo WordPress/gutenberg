@@ -118,7 +118,10 @@ function InlineLinkUI( {
 		const format = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,
-			id: nextValue.type ?? String( nextValue.id ),
+			id:
+				nextValue.id !== undefined && nextValue.id !== null
+					? String( nextValue.id )
+					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 

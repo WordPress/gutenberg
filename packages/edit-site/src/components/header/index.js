@@ -96,6 +96,7 @@ export default function Header( {
 					...prevSettings,
 					page: newPage,
 					templateId: newTemplateId,
+					templateType: 'wp_template',
 				} ) );
 			}
 		} catch ( err ) {}

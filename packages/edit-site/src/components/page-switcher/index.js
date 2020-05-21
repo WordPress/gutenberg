@@ -9,6 +9,7 @@ import {
 	MenuItemsChoice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
 function getPathFromLink( link ) {
 	const path = getPath( link );
@@ -65,21 +66,29 @@ export default function PageSwitcher( {
 		},
 		[ showOnFront ]
 	);
+
 	const onPageSelect = ( newPath ) => {
 		const { value: path, context } = [ ...pages, ...categories ].find(
 			( choice ) => choice.value === newPath
 		);
 		onActivePageChange( { path, context } );
 	};
+	const onPostSelect = ( post ) =>
+		onActivePageChange( {
+			path: getPathFromLink( post.url ),
+			context: { postType: post.type, postId: post.id },
+		} );
 	return (
 		<DropdownMenu
 			icon={ null }
 			label={ __( 'Switch Page' ) }
 			toggleProps={ {
-				children: [ ...pages, ...categories, ...posts ].find(
-					( choice ) => choice.value === activePage.path
-				)?.label,
+				children:
+					[ ...pages, ...categories, ...posts ].find(
+						( choice ) => choice.value === activePage.path
+					)?.label || activePage.path,
 			} }
+			menuProps={ { className: 'edit-site-page-switcher__menu' } }
 		>
 			{ () => (
 				<>
@@ -102,6 +111,12 @@ export default function PageSwitcher( {
 							choices={ posts }
 							value={ activePage.path }
 							onSelect={ onPageSelect }
+						/>
+						<LinkControl
+							onChange={ onPostSelect }
+							settings={ {} }
+							noDirectEntry
+							showInitialSuggestions
 						/>
 					</MenuGroup>
 				</>
