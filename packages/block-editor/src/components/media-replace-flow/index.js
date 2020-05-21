@@ -105,8 +105,13 @@ const MediaReplaceFlow = ( {
 		}
 	};
 
+	const POPOVER_PROPS = {
+		isAlternate: true,
+	};
+
 	return (
 		<Dropdown
+			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarGroup className="media-replace-flow">
