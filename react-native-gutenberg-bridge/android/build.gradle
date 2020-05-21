@@ -180,7 +180,7 @@ if (buildGutenbergMobileJSBundle) {
 
     task bundleUpToDateCheck {
         description("Checks if the inputs to the javascript bundle and the bundle itself are unchanged. \
-Only if they are is the isBundleUpToDate flag set to true. That flag is used by other tasks.")
+If they are changed, the isBundleUpToDate flag is switched to false. That flag is used by other tasks.")
 
         def isRelevantFile = { it.name.endsWithAny('.js', '.css') || it.name == 'package.json' }
         def inputFiles = {
@@ -218,24 +218,18 @@ Only if they are is the isBundleUpToDate flag set to true. That flag is used by 
         }
         inputs.files(inputFiles())
 
-        outputs.file("$buildAssetsFolder/$bundleName")
+        // We cannot use the bundle file itself as an output because it does not yet exist when this
+        // task finishes. Nevertheless, we have to declare something as an output because only tasks
+        // with outputs are run incrementally, so we're declaring a file that does not exist as the
+        // output. Since that file never exists, that "output" will always be considered "up-to-date".
+        outputs.file("nonexistentfile")
 
-        // Having this task create this file as an output because changes to
-        // the actual bundle (or even deleting the bundle file) was not triggering
-        // this task to rerun (and flip the isBundleUpToDate flag to false). Now that
-        // this second indicator file is here, which gets deleted if the project is cleaned,
-        // this task knows that it is out of date. Note that if there are changes to the
-        // bundle file though, that alone will not trigger this task to run again, so you'll
-        // need to use --rerun-tasks in that case.
-        def upToDateIndicatorFile = "$buildAssetsFolder/up-to-date-bundle-indicator"
-        outputs.file(upToDateIndicatorFile)
-
-        // set flag to true before task tries to run
-        project.ext.isBundleUpToDate = true
+        // The bundle file can only be up-to-date if a bundle file exists. If this task runs, that
+        // means some of the inputs have changed, and the isBundleUpToDate flag is set back to false
+        // because the bundle should be rebuilt.
+        project.ext.isBundleUpToDate = file("$buildAssetsFolder/$bundleName").exists()
         doLast {
-            // If this task runs, either the inputs or outputs have changed, so the bundle is out of date.
             project.ext.isBundleUpToDate = false
-            file(upToDateIndicatorFile).createNewFile()
         }
     }
 
