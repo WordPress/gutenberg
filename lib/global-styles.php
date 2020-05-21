@@ -482,30 +482,13 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 }
 
 /**
- * Whether the loaded page is the site editor.
- *
- * @return boolean Whether the loaded page is the site editor.
- */
-function gutenberg_experimental_global_styles_is_site_editor() {
-	if ( ! function_exists( 'get_current_screen' ) ) {
-		return false;
-	}
-
-	$screen = get_current_screen();
-	return ! empty( $screen ) && gutenberg_is_edit_site_page( $screen->id );
-}
-
-/**
  * Adds the necessary data for the Global Styles client UI to the block settings.
  *
  * @param array $settings Existing block editor settings.
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	if (
-		! gutenberg_experimental_global_styles_has_theme_json_support() ||
-		! gutenberg_experimental_global_styles_is_site_editor()
-	) {
+	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
 		return $settings;
 	}
 
