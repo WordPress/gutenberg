@@ -1,6 +1,12 @@
-# Themes & Block Editor: Experimental theme.json
+# Themes & Block Editor: experimental theme.json
 
-This is intended to document the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
+> **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+>
+> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcome to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
+>
+> In order to use these features, make sure to enable the "Full Site Editing" flag from the **Experiments** page of the Gutenberg plugin.
+
+This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 * Rationale
 * Specification
