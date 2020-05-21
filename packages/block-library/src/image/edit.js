@@ -18,8 +18,8 @@ import {
 	ToolbarGroup,
 	withNotices,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -36,7 +36,6 @@ import {
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { withViewportMatch } from '@wordpress/viewport';
 import { image as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
@@ -95,25 +94,7 @@ function getFilename( url ) {
 }
 
 export function ImageEdit( {
-	attributes,
-	setAttributes,
-	isLargeViewport,
-	isSelected,
-	className,
-	maxWidth,
-	noticeUI,
-	isRTL,
-	onResizeStart,
-	onResizeStop,
-	insertBlocksAfter,
-	noticeOperations,
-	onReplace,
-	image,
-	imageSizes,
-	mediaUpload,
-} ) {
-	const [ captionFocused, setCaptionFocused ] = useState( false );
-	const {
+	attributes: {
 		url = '',
 		alt,
 		caption,
@@ -128,7 +109,41 @@ export function ImageEdit( {
 		height,
 		linkTarget,
 		sizeSlug,
-	} = attributes;
+	},
+	setAttributes,
+	isSelected,
+	className,
+	noticeUI,
+	insertBlocksAfter,
+	noticeOperations,
+	onReplace,
+} ) {
+	const selected = useSelect( ( select ) => {
+		const { getMedia } = select( 'core' );
+		const { getSettings } = select( 'core/block-editor' );
+		const { mediaUpload, imageSizes, isRTL, maxWidth } = getSettings();
+		const image = id && isSelected ? getMedia( id ) : null;
+
+		return {
+			image,
+			maxWidth,
+			isRTL,
+			imageSizes,
+			mediaUpload,
+		};
+	} );
+	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = selected;
+	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const [ captionFocused, setCaptionFocused ] = useState( false );
+
+	function onResizeStart() {
+		toggleSelection( false );
+	}
+
+	function onResizeStop() {
+		toggleSelection( true );
+	}
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -631,32 +646,4 @@ export function ImageEdit( {
 	/* eslint-enable jsx-a11y/click-events-have-key-events */
 }
 
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
-
-		return {
-			onResizeStart: () => toggleSelection( false ),
-			onResizeStop: () => toggleSelection( true ),
-		};
-	} ),
-	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
-		const {
-			attributes: { id },
-			isSelected,
-		} = props;
-		const { mediaUpload, imageSizes, isRTL, maxWidth } = getSettings();
-
-		return {
-			image: id && isSelected ? getMedia( id ) : null,
-			maxWidth,
-			isRTL,
-			imageSizes,
-			mediaUpload,
-		};
-	} ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withNotices,
-] )( ImageEdit );
+export default withNotices( ImageEdit );
