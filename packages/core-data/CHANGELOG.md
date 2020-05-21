@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.3.1 (2019-05-21)
+
+### New Feature
+
+- The `deleteEntityRecord` and `removeItems` actions have been added.
+- Entities now support a `forceDelete` attribute to allow the API to delete things that do not go to trash.
+- A `delete<entity.name>` helper is created for every registered entity.
+
 ## 2.3.0 (2019-05-21)
 
 ### New features
