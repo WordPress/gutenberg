@@ -234,7 +234,7 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Themes & Block Editor",
+		"title": "Themes & Block Editor: experimental theme.json",
 		"slug": "theme-json",
 		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
 		"parent": "themes"
