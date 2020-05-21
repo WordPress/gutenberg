@@ -2342,7 +2342,7 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should order items by descending utility and frecency', () => {
+		it( 'should order items by descending frecency', () => {
 			const state = {
 				blocks: {
 					byClientId: {},
@@ -2381,12 +2381,12 @@ describe( 'selectors', () => {
 				( item ) => item.id
 			);
 			expect( itemIDs ).toEqual( [
-				'core/post-content-child',
 				'core/block/2',
 				'core/block/1',
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
+				'core/post-content-child',
 			] );
 		} );
 
@@ -2454,9 +2454,9 @@ describe( 'selectors', () => {
 			);
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
@@ -2467,9 +2467,9 @@ describe( 'selectors', () => {
 				'block4'
 			);
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
+				'core/test-block-a',
 				'core/test-block-b',
 				'core/test-freeform',
-				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
