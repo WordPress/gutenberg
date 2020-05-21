@@ -1520,6 +1520,22 @@ export function isNavigationMode( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the automatic focus should be enabled or not.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function isAutoFocusEnabled( state = true, action ) {
+	if ( action.type === 'SET_AUTO_FOCUS_ENABLED' ) {
+		return action.isAutoFocusEnabled;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1621,6 +1637,7 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
+	isAutoFocusEnabled,
 	automaticChangeStatus,
 	highlightedBlock,
 } );

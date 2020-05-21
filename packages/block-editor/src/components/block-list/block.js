@@ -64,6 +64,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
+	isAutoFocusEnabled,
 	isNavigationMode,
 	isMultiSelecting,
 } ) {
@@ -159,6 +160,7 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		rootClientId,
+		isAutoFocusEnabled,
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
@@ -218,6 +220,7 @@ const applyWithSelect = withSelect(
 		const {
 			isBlockSelected,
 			isAncestorMultiSelected,
+			isAutoFocusEnabled,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
 			getLastMultiSelectedBlockClientId,
@@ -251,6 +254,7 @@ const applyWithSelect = withSelect(
 		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
 		return {
+			isAutoFocusEnabled: isAutoFocusEnabled(),
 			isMultiSelected: isBlockMultiSelected( clientId ),
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) ||

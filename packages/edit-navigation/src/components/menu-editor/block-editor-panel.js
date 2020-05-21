@@ -26,6 +26,7 @@ export default function BlockEditorPanel( {
 	onDeleteMenu,
 	menuId,
 	saveBlocks,
+	...props
 } ) {
 	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
@@ -48,7 +49,10 @@ export default function BlockEditorPanel( {
 	);
 
 	return (
-		<Panel className="edit-navigation-menu-editor__block-editor-panel">
+		<Panel
+			className="edit-navigation-menu-editor__block-editor-panel"
+			{ ...props }
+		>
 			<PanelBody title={ __( 'Navigation menu' ) }>
 				<div className="components-panel__header-actions">
 					<Button isPrimary onClick={ saveBlocks }>

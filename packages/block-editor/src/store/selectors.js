@@ -1628,6 +1628,17 @@ export function isNavigationMode( state ) {
 }
 
 /**
+ * Returns whether the automatic focus is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean}     Is automatic focus enabled.
+ */
+export function isAutoFocusEnabled( state ) {
+	return state.isAutoFocusEnabled;
+}
+
+/**
  * Returns true if the last change was an automatic change, false otherwise.
  *
  * @param {Object} state Global application state.

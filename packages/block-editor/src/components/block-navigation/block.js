@@ -8,7 +8,8 @@ import classnames from 'classnames';
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ export default function BlockNavigationBlock( {
 	terminatedLevels,
 	path,
 } ) {
+	const ref = useRef();
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
@@ -51,10 +53,33 @@ export default function BlockNavigationBlock( {
 		__experimentalWithEllipsisMenu: withEllipsisMenu,
 		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
 	} = useBlockNavigationContext();
+
 	const ellipsisMenuClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
+
+	const { isEditorAutoFocusEnabled } = useSelect( ( select ) => ( {
+		isEditorAutoFocusEnabled: select(
+			'core/block-editor'
+		).isAutoFocusEnabled(),
+	} ) );
+	useEffect( () => {
+		let timeout;
+		if ( ! isEditorAutoFocusEnabled && isSelected ) {
+			// Give slots time to settle down
+			timeout = setTimeout( function() {
+				// Select the new block
+				onClick();
+
+				// Move focus to the new block
+				if ( ref.current ) {
+					ref.current.focus();
+				}
+			} );
+		}
+		return () => clearTimeout( timeout );
+	}, [ isEditorAutoFocusEnabled, isSelected ] );
 
 	return (
 		<BlockNavigationLeaf
@@ -89,6 +114,7 @@ export default function BlockNavigationBlock( {
 							siblingCount={ siblingCount }
 							level={ level }
 							{ ...props }
+							ref={ ref }
 						/>
 					</div>
 				) }

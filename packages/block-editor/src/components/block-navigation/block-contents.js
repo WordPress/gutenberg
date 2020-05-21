@@ -21,7 +21,6 @@ const BlockNavigationBlockContents = forwardRef(
 
 		return withBlockNavigationSlots ? (
 			<BlockNavigationBlockSlot
-				ref={ ref }
 				className="block-editor-block-navigation-block-contents"
 				block={ block }
 				onClick={ onClick }
@@ -30,10 +29,10 @@ const BlockNavigationBlockContents = forwardRef(
 				siblingCount={ siblingCount }
 				level={ level }
 				{ ...props }
+				ref={ ref }
 			/>
 		) : (
 			<BlockNavigationBlockSelectButton
-				ref={ ref }
 				className="block-editor-block-navigation-block-contents"
 				block={ block }
 				onClick={ onClick }
@@ -42,6 +41,7 @@ const BlockNavigationBlockContents = forwardRef(
 				siblingCount={ siblingCount }
 				level={ level }
 				{ ...props }
+				ref={ ref }
 			/>
 		);
 	}

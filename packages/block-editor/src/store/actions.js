@@ -884,6 +884,18 @@ export function* setNavigationMode( isNavigationMode = true ) {
 }
 
 /**
+ * Generators that triggers an action used to enable or disable the automatic focus.
+ *
+ * @param {boolean} isAutoFocusEnabled Enable/Disable navigation mode.
+ */
+export function* setAutoFocusEnabled( isAutoFocusEnabled = true ) {
+	yield {
+		type: 'SET_AUTO_FOCUS_ENABLED',
+		isAutoFocusEnabled,
+	};
+}
+
+/**
  * Generator that triggers an action used to duplicate a list of blocks.
  *
  * @param {string[]} clientIds

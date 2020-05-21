@@ -733,6 +733,18 @@ _Returns_
 
 -   `boolean`: Whether an ancestor of the block is in multi-selection set.
 
+<a name="isAutoFocusEnabled" href="#isAutoFocusEnabled">#</a> **isAutoFocusEnabled**
+
+Returns whether the automatic focus is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `boolean`: Is automatic focus enabled.
+
 <a name="isBlockHighlighted" href="#isBlockHighlighted">#</a> **isBlockHighlighted**
 
 Returns true if the current highlighted block matches the block clientId.
@@ -1254,6 +1266,14 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setAutoFocusEnabled" href="#setAutoFocusEnabled">#</a> **setAutoFocusEnabled**
+
+Generators that triggers an action used to enable or disable the automatic focus.
+
+_Parameters_
+
+-   _isAutoFocusEnabled_ `boolean`: Enable/Disable navigation mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 

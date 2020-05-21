@@ -30,6 +30,7 @@ const BlockComponent = forwardRef(
 		const {
 			clientId,
 			rootClientId,
+			isAutoFocusEnabled,
 			isSelected,
 			isFirstMultiSelected,
 			isLastMultiSelected,
@@ -124,10 +125,20 @@ const BlockComponent = forwardRef(
 		};
 
 		useEffect( () => {
-			if ( ! isMultiSelecting && ! isNavigationMode && isSelected ) {
+			if (
+				! isMultiSelecting &&
+				! isNavigationMode &&
+				isSelected &&
+				isAutoFocusEnabled
+			) {
 				focusTabbable();
 			}
-		}, [ isSelected, isMultiSelecting, isNavigationMode ] );
+		}, [
+			isSelected,
+			isMultiSelecting,
+			isNavigationMode,
+			isAutoFocusEnabled,
+		] );
 
 		// Block Reordering animation
 		const animationStyle = useMovingAnimation(

@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,7 +23,6 @@ export default function MenuEditor( {
 	onDeleteMenu,
 } ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
-	const isLargeViewport = useViewportMatch( 'medium' );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -38,18 +39,51 @@ export default function MenuEditor( {
 					hasFixedToolbar: true,
 				} }
 			>
-				<BlockEditorKeyboardShortcuts />
-				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
-				<NavigationStructurePanel
-					blocks={ blocks }
-					initialOpen={ isLargeViewport }
-				/>
-				<BlockEditorPanel
-					saveBlocks={ saveBlocks }
+				<EditorBody
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
+					blocks={ blocks }
+					saveBlocks={ saveBlocks }
 				/>
 			</BlockEditorProvider>
 		</div>
 	);
 }
+
+const EditorBody = ( { menuId, onDeleteMenu, blocks, saveBlocks } ) => {
+	const { setAutoFocusEnabled } = useDispatch( 'core/block-editor' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const [ lastInteractedSection, setLastInteractedSection ] = useState(
+		null
+	);
+
+	useEffect( () => {
+		if ( lastInteractedSection === 'navigation' ) {
+			setAutoFocusEnabled( false );
+		} else if ( lastInteractedSection === 'editor' ) {
+			setAutoFocusEnabled( true );
+		}
+	}, [ lastInteractedSection ] );
+
+	return (
+		<>
+			<BlockEditorKeyboardShortcuts />
+			<MenuEditorShortcuts saveBlocks={ saveBlocks } />
+			<NavigationStructurePanel
+				blocks={ blocks }
+				initialOpen={ isLargeViewport }
+				onMouseDown={ () => {
+					setLastInteractedSection( 'navigation' );
+				} }
+			/>
+			<BlockEditorPanel
+				saveBlocks={ saveBlocks }
+				menuId={ menuId }
+				onDeleteMenu={ onDeleteMenu }
+				onMouseDown={ () => {
+					setLastInteractedSection( 'editor' );
+				} }
+			/>
+		</>
+	);
+};
