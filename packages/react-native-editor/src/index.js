@@ -55,24 +55,33 @@ const setupInitHooks = () => {
 	wpHooks.addFilter(
 		'native.block_editor_props',
 		'core/react-native-editor',
-		( { initialData, initialTitle, initialHtmlModeEnabled, postType } ) => {
-			const isDemo = initialData === undefined && __DEV__;
-			if ( isDemo ) {
-				return {
-					initialHtml,
-					initialHtmlModeEnabled: false,
-					initialTitle: 'Welcome to Gutenberg!',
-					postType: 'post',
-				};
+		( {
+			initialData: initialDataParam,
+			initialTitle: initialTitleParam,
+			initialHtmlModeEnabled,
+			postType: postTypeParam,
+		} ) => {
+			let initialData = initialDataParam;
+			let initialTitle = initialTitleParam;
+			let postType = postTypeParam;
+
+			if ( initialData === undefined && __DEV__ ) {
+				initialData = initialHtml;
 			}
+			if ( initialTitle === undefined ) {
+				initialTitle = 'Welcome to Gutenberg!';
+			}
+			if ( postType === undefined ) {
+				postType = 'post';
+			}
+
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled,
 				initialTitle,
 				postType,
 			};
-		},
-		5
+		}
 	);
 };
 
