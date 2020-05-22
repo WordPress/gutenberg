@@ -149,7 +149,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 403 );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 403 );
 	}
 
 	/**

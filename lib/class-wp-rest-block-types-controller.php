@@ -149,8 +149,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_permissions_check( $request ) {
 		$check = $this->check_read_permission();
-		if ( ! $check ) {
-			return new WP_Error( 'rest_block_type_cannot_view', __( 'Cannot view block type.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+		if ( is_wp_error( $check ) ) {
+			return $check;
 		}
 		$block_name = sprintf( '%s/%s', $request['namespace'], $request['name'] );
 		$block_type = $this->get_block( $block_name );
