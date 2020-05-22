@@ -27,7 +27,7 @@ Hello World
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><b>Hello</b> World!</p>
+<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:nextpage -->
@@ -226,6 +226,10 @@ else:
 <p class="has-text-color has-text-align-center has-large-font-size has-very-light-gray-color">Cool cover</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
+
+<!-- wp:verse -->
+<pre class="wp-block-verse">Come<br>Home.</pre>
+<!-- /wp:verse -->
 
 <!-- wp:latest-posts {"displayPostContent":true,"displayPostDate":true} /-->
 

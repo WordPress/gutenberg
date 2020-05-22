@@ -17,6 +17,7 @@ export default class EditorPage {
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
+	verseBlockName = 'Verse';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {

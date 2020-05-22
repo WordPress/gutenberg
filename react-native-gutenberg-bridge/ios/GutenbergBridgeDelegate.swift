@@ -164,6 +164,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor needs to log a custom event
     /// - Parameter event: The event key to be logged
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
+
+    /// Tells the delegate that the editor requested a mention
+    /// - Parameter callback: Completion handler to be called with an user mention or an error
+    func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
