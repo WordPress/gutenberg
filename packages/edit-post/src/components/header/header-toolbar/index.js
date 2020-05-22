@@ -22,27 +22,33 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 	const {
 		hasFixedToolbar,
 		isInserterEnabled,
-		isInserterVisible,
 		isTextModeEnabled,
 		previewDeviceType,
-	} = useSelect(
-		( select ) => ( {
+	} = useSelect( ( select ) => {
+		const {
+			hasInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+		} = select( 'core/block-editor' );
+		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
-				select( 'core/editor' ).getEditorSettings().richEditingEnabled,
-			isInserterVisible: select( 'core/block-editor' ).hasInserterItems(),
+				select( 'core/editor' ).getEditorSettings()
+					.richEditingEnabled &&
+				hasInserterItems(
+					getBlockRootClientId( getBlockSelectionEnd() )
+				),
 			isTextModeEnabled:
 				select( 'core/edit-post' ).getEditorMode() === 'text',
 			previewDeviceType: select(
 				'core/edit-post'
 			).__experimentalGetPreviewDeviceType(),
-		} ),
-		[]
-	);
+		};
+	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const displayBlockToolbar =
@@ -59,28 +65,23 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			{ isInserterVisible && (
-				<Button
-					className="edit-post-header-toolbar__inserter-toggle"
-					isPrimary
-					isPressed={ isInserterOpen }
-					onClick={ onToggleInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
-					) }
-				/>
-			) }
+			<Button
+				className="edit-post-header-toolbar__inserter-toggle"
+				isPrimary
+				isPressed={ isInserterOpen }
+				onClick={ onToggleInserter }
+				disabled={ ! isInserterEnabled }
+				icon={ plus }
+				label={ _x(
+					'Add block',
+					'Generic label for block inserter button'
+				) }
+			/>
 			<ToolSelector />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents hasOutlineItemsDisabled={ isTextModeEnabled } />
-			<BlockNavigationDropdown
-				isDisabled={ isTextModeEnabled }
-				__experimentalWithEllipsisMenu
-			/>
+			<BlockNavigationDropdown isDisabled={ isTextModeEnabled } />
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

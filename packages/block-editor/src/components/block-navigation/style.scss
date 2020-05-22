@@ -25,7 +25,7 @@ $tree-item-height: 36px;
 	// Use position relative for row animation.
 	position: relative;
 
-	.block-editor-block-navigation-block-content-wrapper {
+	.block-editor-block-navigation-block-contents {
 		display: flex;
 		align-items: center;
 		width: calc(100% - 0.8em);
@@ -36,14 +36,10 @@ $tree-item-height: 36px;
 		border-radius: 2px;
 	}
 
-	&.is-visible .block-editor-block-navigation-block-content-wrapper {
+	&.is-visible .block-editor-block-navigation-block-contents {
 		opacity: 1;
 		@include edit-post__fade-in-animation;
 	}
-
-	// .block-editor-block-navigation__list-item {
-	// 	position: relative;
-	// }
 
 	.block-editor-block-icon {
 		margin-right: 6px;
@@ -89,22 +85,10 @@ $tree-item-height: 36px;
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
 	}
-
-	& > li:last-child {
-		position: relative;
-		&::after {
-			position: absolute;
-			content: "";
-			background: $white;
-			top: ($tree-item-height + $tree-border-width ) / 2;
-			bottom: 0;
-			left: -$tree-border-width;
-			width: $tree-border-width;
-		}
-	}
 }
 
-.block-editor-block-navigation-block-content-wrapper__description,
+.block-editor-block-navigation-block-slot__description,
+.block-editor-block-navigation-block-select-button__description,
 .block-editor-block-navigation-appender__description {
 	display: none;
 }
