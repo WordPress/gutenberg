@@ -12,8 +12,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	ControlLabel,
-	ControlField,
 	UnitControl as BaseUnitControl,
 	ControlWrapper,
 } from './styles/focal-point-picker-style';
@@ -41,26 +39,18 @@ export default function FocalPointPickerControls( {
 
 	return (
 		<ControlWrapper className="focal-point-picker__controls">
-			<ControlField
-				className="focal-point-picker__controls-position"
-				justify="left"
-			>
-				<ControlLabel>{ __( 'Position' ) }</ControlLabel>
-				<ControlField justify="left">
-					<UnitControl
-						label={ __( 'Left' ) }
-						value={ valueX }
-						onChange={ handleOnXChange }
-						dragDirection="e"
-					/>
-					<UnitControl
-						label={ __( 'Top' ) }
-						value={ valueY }
-						onChange={ handleOnYChange }
-						dragDirection="s"
-					/>
-				</ControlField>
-			</ControlField>
+			<UnitControl
+				label={ __( 'Left' ) }
+				value={ valueX }
+				onChange={ handleOnXChange }
+				dragDirection="e"
+			/>
+			<UnitControl
+				label={ __( 'Top' ) }
+				value={ valueY }
+				onChange={ handleOnYChange }
+				dragDirection="s"
+			/>
 		</ControlWrapper>
 	);
 }
@@ -69,7 +59,7 @@ function UnitControl( props ) {
 	return (
 		<BaseUnitControl
 			className="focal-point-picker__controls-position-unit-control"
-			isFloatingLabel
+			labelPosition="side"
 			max={ TEXTCONTROL_MAX }
 			min={ TEXTCONTROL_MIN }
 			unit="%"

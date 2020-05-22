@@ -54,28 +54,12 @@ export const MediaPlaceholder = styled.div`
 `;
 
 export const UnitControl = styled( BaseUnitControl )`
-	width: 72px;
+	width: 100px;
 `;
 
-export const ControlWrapper = styled.div`
-	box-sizing: border-box;
+export const ControlWrapper = styled( Flex )`
 	max-width: 320px;
 	padding: 1em 0;
-`;
-
-export const ControlField = styled( Flex )`
-	padding-bottom: 12px;
-
-	&:last-child {
-		padding-bottom: 0;
-	}
-`;
-
-export const ControlLabel = styled.label`
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	width: 80px;
 `;
 
 export const GridView = styled.div`

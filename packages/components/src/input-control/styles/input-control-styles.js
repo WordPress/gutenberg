@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
+import Flex from '../../flex';
 import Text from '../../text';
 import { color, rtl, reduceMotion } from '../../utils/style-mixins';
 
@@ -23,16 +24,33 @@ const rootFocusedStyles = ( { isFocused } ) => {
 	return css( { zIndex: 1 } );
 };
 
-export const Root = styled.div`
-	box-sizing: border-box;
+const rootLabelPositionStyles = ( { labelPosition } ) => {
+	switch ( labelPosition ) {
+		case 'top':
+			return css`
+				align-items: flex-start;
+				flex-direction: column;
+			`;
+		case 'bottom':
+			return css`
+				align-items: flex-start;
+				flex-direction: column-reverse;
+			`;
+		default:
+			return '';
+	}
+};
+
+export const Root = styled( Flex )`
 	position: relative;
 	border-radius: 2px;
 
 	${rootFloatLabelStyles};
 	${rootFocusedStyles};
+	${rootLabelPositionStyles};
 `;
 
-const containerDisabledStyle = ( { disabled } ) => {
+const containerDisabledStyles = ( { disabled } ) => {
 	const backgroundColor = disabled
 		? color( 'ui.backgroundDisabled' )
 		: color( 'ui.background' );
@@ -40,14 +58,24 @@ const containerDisabledStyle = ( { disabled } ) => {
 	return css( { backgroundColor } );
 };
 
+const containerWidthStyles = ( { labelPosition } ) => {
+	if ( labelPosition === 'side' ) return '';
+
+	return css`
+		width: 100%;
+	`;
+};
+
 export const Container = styled.div`
 	align-items: center;
 	box-sizing: border-box;
 	border-radius: inherit;
 	display: flex;
+	flex: 1;
 	position: relative;
 
-	${containerDisabledStyle};
+	${containerDisabledStyles};
+	${containerWidthStyles};
 `;
 
 const disabledStyles = ( { disabled } ) => {
@@ -253,7 +281,8 @@ const BaseLabel = styled( Text )`
 		display: block;
 		margin: 0;
 		max-width: 100%;
-		padding: 0;
+		padding-bottom: 0;
+		padding-top: 0;
 		pointer-events: none;
 		top: 50%;
 		transition: transform ${FLOATING_LABEL_TRANSITION_SPEED} linear,
