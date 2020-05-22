@@ -62,7 +62,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 *
 	 */
 	public function test_context_param() {
-		register_block_type( 'test/block-1', array() );
+		register_block_type( 'testing/block-1', array() );
 		// Collection.
 		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types' );
 		$response = rest_get_server()->dispatch( $request );
@@ -70,12 +70,12 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 		// Single.
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types/test/block-1' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types/testing/block-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
-		unregister_block_type( 'test/block-1' );
+		unregister_block_type( 'testing/block-1' );
 	}
 
 	/**
