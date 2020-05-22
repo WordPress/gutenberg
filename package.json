@@ -241,7 +241,7 @@
 		"prestorybook:build": "npm run build:packages",
 		"storybook:build": "build-storybook -c ./storybook -o ./playground/dist",
 		"prestorybook:dev": "npm run build:packages",
-		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook\"",
+		"storybook:dev": "concurrently \"npm run dev:packages\" \"start-storybook -c ./storybook -p 50240\"",
 		"design-system:build": "echo \"Please use storybook:build instead.\"",
 		"design-system:dev": "echo \"Please use storybook:dev instead.\"",
 		"playground:build": "npm run storybook:build",
