@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-/**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
@@ -14,8 +10,6 @@ export const onSubKey = ( actionProperty ) => ( reducer ) => (
 	state = {},
 	action
 ) => {
-	const newState = { ...state };
-
 	// Retrieve subkey from action. Do not track if undefined; useful for cases
 	// where reducer is scoped by action shape.
 	const key = action[ actionProperty ];
@@ -30,25 +24,8 @@ export const onSubKey = ( actionProperty ) => ( reducer ) => (
 		return state;
 	}
 
-	if ( action.type === 'REMOVE_ITEMS' ) {
-		action.query.forEach( ( queryId ) => {
-			Object.keys( newState ).forEach( ( stateKey ) => {
-				newState[ stateKey ] = filter(
-					newState[ stateKey ],
-					( stateQueryId ) => {
-						return stateQueryId !== queryId;
-					}
-				);
-			} );
-		} );
-	}
-
-	if ( ! nextKeyState ) {
-		return newState;
-	}
-
 	return {
-		...newState,
+		...state,
 		[ key ]: nextKeyState,
 	};
 };

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flowRight, omit } from 'lodash';
+import { map, flowRight, omit, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -127,6 +127,12 @@ const queries = flowRight( [
 	onSubKey( 'stableKey' ),
 ] )( ( state = null, action ) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
+	if ( type === 'REMOVE_ITEMS' ) {
+		const newState = filter( state, ( stateQueryId ) => {
+			return ! action.items.includes( stateQueryId );
+		} );
+		return newState;
+	}
 
 	if ( type !== 'RECEIVE_ITEMS' ) {
 		return state;
