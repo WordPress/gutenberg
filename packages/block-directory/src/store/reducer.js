@@ -14,7 +14,6 @@ import { combineReducers } from '@wordpress/data';
 export const downloadableBlocks = (
 	state = {
 		results: {},
-		filterValue: undefined,
 		isRequestingDownloadableBlocks: true,
 	},
 	action

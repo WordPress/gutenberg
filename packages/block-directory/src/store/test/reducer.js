@@ -22,15 +22,17 @@ describe( 'state', () => {
 			} );
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+				filterValue: 'test',
 			} );
 
 			expect( state.isRequestingDownloadableBlocks ).toEqual( true );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
+			const query = downloadableBlock.title;
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
@@ -38,15 +40,14 @@ describe( 'state', () => {
 		} );
 
 		it( "should set user's search term and save results", () => {
+			const query = downloadableBlock.title;
 			const state = downloadableBlocks( undefined, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
-			expect( state.results ).toHaveProperty( downloadableBlock.title );
-			expect( state.results[ downloadableBlock.title ] ).toHaveLength(
-				1
-			);
+			expect( state.results ).toHaveProperty( query );
+			expect( state.results[ query ] ).toHaveLength( 1 );
 
 			// It should append to the results
 			const updatedState = downloadableBlocks( state, {
