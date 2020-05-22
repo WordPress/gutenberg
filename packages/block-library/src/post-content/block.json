@@ -1,5 +1,5 @@
 {
 	"name": "core/post-content",
 	"category": "layout",
-	"context": [ "postId" ]
+	"context": [ "postId", "postType" ]
 }

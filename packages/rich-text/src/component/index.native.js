@@ -5,19 +5,29 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
+import { addMention } from 'react-native-gutenberg-bridge';
 import { get, pickBy } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
+import {
+	Toolbar,
+	ToolbarButton,
+	withSiteCapabilities,
+	isMentionsSupported,
+} from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
+import { Icon, atSymbol } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,6 +36,7 @@ import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
+import { insert } from '../insert';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -86,6 +97,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.willTrimSpaces = this.willTrimSpaces.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.insertString = this.insertString.bind( this );
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -167,7 +179,6 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		this.getRecord( record );
 		const { start, end, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
@@ -187,6 +198,14 @@ export class RichText extends Component {
 		this.onCreateUndoLevel();
 
 		this.lastAztecEventType = 'format change';
+	}
+
+	insertString( record, string ) {
+		if ( record && string ) {
+			this.lastEventCount = undefined;
+			const toInsert = insert( record, string );
+			this.onFormatChange( toInsert );
+		}
 	}
 
 	onCreateUndoLevel() {
@@ -408,9 +427,8 @@ export class RichText extends Component {
 
 		// We know for certain that on focus, the old selection is invalid. It
 		// will be recalculated on `selectionchange`.
-		const index = undefined;
 
-		onSelectionChange( index, index );
+		onSelectionChange( this.selectionStart, this.selectionEnd );
 
 		this.lastAztecEventType = 'focus';
 	}
@@ -694,6 +712,7 @@ export class RichText extends Component {
 			formatTypes,
 			parentBlockStyles,
 			withoutInteractiveFormatting,
+			capabilities,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -854,15 +873,42 @@ export class RichText extends Component {
 					selectionColor={ this.props.selectionColor }
 				/>
 				{ isSelected && (
-					<FormatEdit
-						formatTypes={ formatTypes }
-						value={ record }
-						withoutInteractiveFormatting={
-							withoutInteractiveFormatting
-						}
-						onChange={ this.onFormatChange }
-						onFocus={ () => {} }
-					/>
+					<>
+						<FormatEdit
+							formatTypes={ formatTypes }
+							value={ record }
+							withoutInteractiveFormatting={
+								withoutInteractiveFormatting
+							}
+							onChange={ this.onFormatChange }
+							onFocus={ () => {} }
+						/>
+						<BlockFormatControls>
+							{ // eslint-disable-next-line no-undef
+							__DEV__ && isMentionsSupported( capabilities ) && (
+								<Toolbar>
+									<ToolbarButton
+										title={ __( 'Insert mention' ) }
+										icon={ <Icon icon={ atSymbol } /> }
+										onClick={ () => {
+											addMention()
+												.then( ( mentionUserId ) => {
+													let stringToInsert = `@${ mentionUserId }`;
+													if ( this.isIOS ) {
+														stringToInsert += ' ';
+													}
+													this.insertString(
+														record,
+														stringToInsert
+													);
+												} )
+												.catch( () => {} );
+										} }
+									/>
+								</Toolbar>
+							) }
+						</BlockFormatControls>
+					</>
 				) }
 			</View>
 		);
@@ -889,4 +935,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withSiteCapabilities,
 ] )( RichText );
