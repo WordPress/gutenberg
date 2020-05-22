@@ -9,7 +9,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import CopyContentMenuItem from './copy-content-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 
 registerPlugin( 'edit-site', {
@@ -25,7 +24,6 @@ registerPlugin( 'edit-site', {
 					>
 						{ __( 'Manage all reusable blocks' ) }
 					</MenuItem>
-					<CopyContentMenuItem />
 					<MenuItem
 						role="menuitem"
 						href={ __(
