@@ -37,8 +37,29 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return false;
 		}
 
+		$property_mappings = array(
+			'title'           => 'title',
+			'category'        => 'category',
+			'parent'          => 'parent',
+			'icon'            => 'icon',
+			'description'     => 'description',
+			'keywords'        => 'keywords',
+			'attributes'      => 'attributes',
+			'supports'        => 'supports',
+			'styles'          => 'styles',
+			// Alias recommended in documentation to distinguish from assets.
+			'styleVariations' => 'styles',
+		);
+		$settings          = array();
+
+		foreach ( $property_mappings as $key => $mapped_key ) {
+			if ( isset( $metadata[ $key ] ) ) {
+				$settings[ $mapped_key ] = $metadata[ $key ];
+			}
+		}
+
+		$block_name        = $metadata['name'];
 		$block_dir           = dirname( $metadata_file );
-		$block_name          = $metadata['name'];
 		$asset_handle_prefix = str_replace( '/', '-', $block_name );
 
 		if ( isset( $metadata['editorScript'] ) ) {
@@ -59,8 +80,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$editor_script_asset['dependencies'],
 				$editor_script_asset['version']
 			);
-			unset( $metadata['editorScript'] );
-			$metadata['editor_script'] = $editor_script_handle;
+			$settings['editor_script'] = $editor_script_handle;
 		}
 
 		if ( isset( $metadata['script'] ) ) {
@@ -81,7 +101,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$script_asset['dependencies'],
 				$script_asset['version']
 			);
-			$metadata['script'] = $script_handle;
+			$settings['script'] = $script_handle;
 		}
 
 		if ( isset( $metadata['editorStyle'] ) ) {
@@ -93,8 +113,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				array(),
 				filemtime( realpath( "$block_dir/$editor_style" ) )
 			);
-			unset( $metadata['editorStyle'] );
-			$metadata['editor_style'] = $editor_style_handle;
+			$settings['editor_style'] = $editor_style_handle;
 		}
 
 		if ( isset( $metadata['style'] ) ) {
@@ -106,13 +125,13 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				array(),
 				filemtime( realpath( "$block_dir/$style" ) )
 			);
-			$metadata['style'] = $style_handle;
+			$settings['style'] = $style_handle;
 		}
 
 		return register_block_type(
 			$block_name,
 			array_merge(
-				$metadata,
+				$settings,
 				$args
 			)
 		);
