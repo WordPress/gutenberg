@@ -760,7 +760,7 @@ export function isEditedPostDateFloating( state ) {
 		status === 'auto-draft' ||
 		status === 'pending'
 	) {
-		return date === modified;
+		return date === modified || date === null;
 	}
 	return false;
 }

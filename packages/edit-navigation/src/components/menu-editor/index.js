@@ -15,7 +15,11 @@ import MenuEditorShortcuts from './shortcuts';
 import BlockEditorPanel from './block-editor-panel';
 import NavigationStructurePanel from './navigation-structure-panel';
 
-export default function MenuEditor( { menuId, blockEditorSettings } ) {
+export default function MenuEditor( {
+	menuId,
+	blockEditorSettings,
+	onDeleteMenu,
+} ) {
 	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
@@ -40,7 +44,11 @@ export default function MenuEditor( { menuId, blockEditorSettings } ) {
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
-				<BlockEditorPanel saveBlocks={ saveBlocks } />
+				<BlockEditorPanel
+					saveBlocks={ saveBlocks }
+					menuId={ menuId }
+					onDeleteMenu={ onDeleteMenu }
+				/>
 			</BlockEditorProvider>
 		</div>
 	);

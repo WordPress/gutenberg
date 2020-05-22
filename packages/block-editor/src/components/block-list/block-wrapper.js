@@ -8,13 +8,7 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useEffect,
-	useLayoutEffect,
-	useContext,
-	forwardRef,
-} from '@wordpress/element';
+import { useRef, useEffect, useContext, forwardRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -24,15 +18,15 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../utils/dom';
-import useMovingAnimation from './moving-animation';
-import { Context, BlockNodes } from './root-container';
+import useMovingAnimation from '../use-moving-animation';
+import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
-import ELEMENTS from './block-elements';
+import ELEMENTS from './block-wrapper-elements';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
 		const onSelectionStart = useContext( Context );
-		const [ , setBlockNodes ] = useContext( BlockNodes );
+		const setBlockNodes = useContext( SetBlockNodes );
 		const {
 			clientId,
 			rootClientId,
@@ -76,7 +70,7 @@ const BlockComponent = forwardRef(
 		// selection, so it can be used to position the contextual block toolbar.
 		// We only provide what is necessary, and remove the nodes again when they
 		// are no longer selected.
-		useLayoutEffect( () => {
+		useEffect( () => {
 			if ( isSelected || isFirstMultiSelected || isLastMultiSelected ) {
 				const node = wrapper.current;
 				setBlockNodes( ( nodes ) => ( {

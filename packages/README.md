@@ -10,7 +10,7 @@ When creating a new package, you need to provide at least the following:
     ```json
     {
     	"name": "@wordpress/package-name",
-    	"version": "1.0.0-beta.0",
+    	"version": "1.0.0-prerelease",
     	"description": "Package description.",
     	"author": "The WordPress Contributors",
     	"license": "GPL-2.0-or-later",
@@ -45,6 +45,14 @@ When creating a new package, you need to provide at least the following:
     - Installation details
     - Usage example
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
+4. `CHANGELOG.md` file containing at least:
+    ```
+    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+	## Unreleased
+
+	Initial release.
+    ```
 
 ## Managing Dependencies
 
@@ -106,14 +114,16 @@ This commands adds the latest version of `glob` as a development dependency to t
 
 ## Maintaining Changelogs
 
-In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Master") changes, if any exist.
+In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
 
-For each pull request, you should always include relevant changes in a "Master" heading at the top of the file. You should add the heading if it doesn't already exist.
+For each pull request, you should always include relevant changes in a "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
 
 _Example:_
 
 ```md
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
 
 ### Bug Fix
 
@@ -123,7 +133,7 @@ _Example:_
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
 -   "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
--   "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor verison bump).
+-   "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
 -   "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
 -   "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
@@ -246,3 +256,40 @@ Ensure that the `build-types` directory will be included in the published packag
 
 [lerna]: https://lerna.js.org/
 [npm]: https://www.npmjs.com/
+
+## Optimizing for bundlers
+
+In order for bundlers to tree-shake packages effectively, they often need to know whether a package includes side effects in its code. This is done through the `sideEffects` field in the package's `package.json`.
+
+If your package has no side effects, simply set the field to `false`:
+
+```json
+{
+	"name": "package",
+	"sideEffects": false
+}
+```
+
+If your package includes a few files with side effects, you can list them instead:
+
+```json
+{
+	"name": "package",
+	"sideEffects": [ "file-with-side-effects.js", "another-file-with-side-effects.js" ]
+}
+```
+
+Many `@wordpress` UI-focused packages rely on side effects for registering blocks, plugins, and data stores. To reduce maintenance costs, it may be preferable to opt for an inverse glob strategy, where you instead list the paths where side effects are *not* present, leaving the bundler to assume that everything else might have them. This results in a glob with multiple roots (to match `@wordpress` package structure) and one or more excluded directories.
+
+Here is an example where we declare that the `components` and `utils` directories are side effect-free:
+
+```json
+{
+	"name": "package",
+	"sideEffects": [
+		"!((src|build|build-module)/(components|utils)/**)"
+	],
+}
+```
+
+Please consult the [side effects documentation](./side-effects.md) for more information on identifying and declaring side effects.

@@ -38,6 +38,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
 import { image as icon } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -334,6 +335,7 @@ export class ImageEdit extends Component {
 			isRTL,
 			onResizeStart,
 			onResizeStop,
+			insertBlocksAfter,
 		} = this.props;
 		const {
 			url,
@@ -622,6 +624,7 @@ export class ImageEdit extends Component {
 											width,
 											height,
 										} }
+										showHandle={ isSelected }
 										minWidth={ minWidth }
 										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
@@ -671,6 +674,11 @@ export class ImageEdit extends Component {
 							}
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
 						/>
 					) }
 

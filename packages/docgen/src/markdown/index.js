@@ -55,7 +55,7 @@ module.exports = function(
 				if ( err ) {
 					throw err;
 				}
-				fs.writeFileSync( doc, file );
+				fs.writeFileSync( doc, file.toString() );
 			} );
 	} else {
 		const output = formatter( processDir, doc, filteredIR, headingTitle );

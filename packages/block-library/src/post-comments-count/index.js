@@ -14,8 +14,5 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Post Comments Count' ),
-	supports: {
-		html: false,
-	},
 	edit,
 };

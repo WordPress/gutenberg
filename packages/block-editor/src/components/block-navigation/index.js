@@ -7,20 +7,22 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { NavigableMenu } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BlockNavigationList from './list';
+import BlockNavigationTree from './tree';
 
 function BlockNavigation( {
 	rootBlock,
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
+	__experimentalWithBlockNavigationSlots,
+	__experimentalWithEllipsisMenu,
+	__experimentalWithEllipsisMenuMinLevel,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -32,29 +34,44 @@ function BlockNavigation( {
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
-		<NavigableMenu
-			role="presentation"
-			className="block-editor-block-navigation__container"
-		>
+		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
 				{ __( 'Block navigation' ) }
 			</p>
 			{ hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalWithEllipsisMenu={
+						__experimentalWithEllipsisMenu
+					}
+					__experimentalWithEllipsisMenuMinLevel={
+						__experimentalWithEllipsisMenuMinLevel
+					}
+					__experimentalWithBlockNavigationSlots={
+						__experimentalWithBlockNavigationSlots
+					}
 					showNestedBlocks
 				/>
 			) }
 			{ ! hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalWithEllipsisMenu={
+						__experimentalWithEllipsisMenu
+					}
+					__experimentalWithEllipsisMenuMinLevel={
+						__experimentalWithEllipsisMenuMinLevel
+					}
+					__experimentalWithBlockNavigationSlots={
+						__experimentalWithBlockNavigationSlots
+					}
 				/>
 			) }
-		</NavigableMenu>
+		</div>
 	);
 }
 
