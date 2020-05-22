@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -101,7 +101,8 @@
     "test": "cross-env NODE_ENV=test jest --verbose --config jest.config.js",
     "test:inside-gb": "cross-env NODE_ENV=test jest --verbose --config jest_gb.config.js",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config jest.config.js",
-    "device-tests": "cross-env NODE_ENV=test jest --no-cache --maxWorkers=3 --reporters=default --reporters=jest-junit --verbose --config jest_ui.config.js",
+    "device-tests": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=3 --reporters=default --reporters=jest-junit --verbose --config jest_ui.config.js",
+    "device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testNamePattern=@canary --reporters=default --reporters=jest-junit --verbose --config jest_ui.config.js",
     "device-tests:local": "cross-env NODE_ENV=test jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --reporters=default --reporters=jest-junit --detectOpenHandles --verbose --config jest_ui.config.js",
     "test:e2e": "yarn test:e2e:android && yarn test:e2e:ios",
@@ -119,7 +120,7 @@
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "prettier:check": "prettier-eslint --list-different $npm_package_config_jsfiles $npm_package_config_scssfiles || { echo '\nERROR: `yarn prettier:check` found a formatting problem.\nNo files have been changed. Try running `yarn prettier` to fix any formatting issues.\n'; exit 1; }",
-    "build:gutenberg": "cd gutenberg && npm install && npm run build",
+    "build:gutenberg": "cd gutenberg && npm ci && npm run build",
     "clean": "yarn clean:build-artifacts; yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node; yarn clean:pot",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
     "clean:build-artifacts": "rm -rf ./ios/build && rm -rf ./ios/Pods",

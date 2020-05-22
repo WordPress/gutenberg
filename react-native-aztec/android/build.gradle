@@ -71,6 +71,7 @@ android {
 
     lintOptions {
         disable 'GradleCompatible'
+        abortOnError false
     }
 }
 
