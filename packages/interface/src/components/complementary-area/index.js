@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
 import { starEmpty, starFilled } from '@wordpress/icons';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,6 +33,53 @@ function ComplementaryAreaFill( { scope, children, className } ) {
 	);
 }
 
+function useAdjustComplementaryListener(
+	scope,
+	identifier,
+	activeArea,
+	isActive,
+	isSmall
+) {
+	const previousIsSmall = useRef( false );
+	const shouldOpenWhenNotSmall = useRef( false );
+	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
+		'core/interface'
+	);
+	useEffect( () => {
+		// If the complementary area is active and the editor is switching from a big to a small window size.
+		if ( isActive && isSmall && ! previousIsSmall.current ) {
+			// Disable the complementary area.
+			disableComplementaryArea( scope );
+			// Flag the complementary area to be reoppen when the window size goes from small to big.
+			shouldOpenWhenNotSmall.current = true;
+		} else if (
+			// If there is a flag indicating the complementary area should be enable when we go from small to big window size
+			// and we are going from a small to big window size.
+			shouldOpenWhenNotSmall.current &&
+			! isSmall &&
+			previousIsSmall.current
+		) {
+			// Remove the flag indicating the complementary area should be enable.
+			shouldOpenWhenNotSmall.current = false;
+			// Enable the complementary area.
+			enableComplementaryArea( scope, identifier );
+		} else if (
+			// If the is flag indicating the current complementary should be reopen but another complementary area becomes active
+			// remove the flag.
+			shouldOpenWhenNotSmall.current &&
+			activeArea &&
+			activeArea !== identifier
+		) {
+			shouldOpenWhenNotSmall.current = false;
+		}
+		if ( isSmall !== previousIsSmall.current ) {
+			previousIsSmall.current = isSmall;
+		}
+	}, [ isActive, isSmall, scope, identifier, activeArea ] );
+
+	useEffect( () => {}, [ identifier, activeArea ] );
+}
+
 function ComplementaryArea( {
 	children,
 	className,
@@ -47,17 +95,29 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 } ) {
-	const { isActive, isPinned } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
 			);
+			const _activeArea = getActiveComplementaryArea( scope );
 			return {
-				isActive: getActiveComplementaryArea( scope ) === identifier,
+				isActive: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
+				activeArea: _activeArea,
+				isSmall: select( 'core/viewport' ).isViewportMatch(
+					'< medium'
+				),
 			};
 		},
 		[ identifier, scope ]
+	);
+	useAdjustComplementaryListener(
+		scope,
+		identifier,
+		activeArea,
+		isActive,
+		isSmall
 	);
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
 		'core/interface'
@@ -77,6 +137,7 @@ function ComplementaryArea( {
 						}
 						isPressed={ isActive }
 						aria-expanded={ isActive }
+						shortcut={ toggleShortcut }
 					/>
 				</PinnedItems>
 			) }

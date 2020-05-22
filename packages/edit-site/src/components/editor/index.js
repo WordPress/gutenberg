@@ -26,7 +26,11 @@ import {
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { FullscreenMode, InterfaceSkeleton } from '@wordpress/interface';
+import {
+	FullscreenMode,
+	InterfaceSkeleton,
+	ComplementaryArea,
+} from '@wordpress/interface';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
@@ -69,15 +73,22 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 
-	const { isFullscreenActive, deviceType } = useSelect( ( select ) => {
-		const { isFeatureActive, __experimentalGetPreviewDeviceType } = select(
-			'core/edit-site'
-		);
-		return {
-			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-			deviceType: __experimentalGetPreviewDeviceType(),
-		};
-	}, [] );
+	const { isFullscreenActive, deviceType, sidebarIsOpened } = useSelect(
+		( select ) => {
+			const {
+				isFeatureActive,
+				__experimentalGetPreviewDeviceType,
+			} = select( 'core/edit-site' );
+			return {
+				isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+				deviceType: __experimentalGetPreviewDeviceType(),
+				sidebarIsOpened: !! select(
+					'core/interface'
+				).getActiveComplementaryArea( 'core/edit-site' ),
+			};
+		},
+		[]
+	);
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -135,6 +146,7 @@ function Editor( { settings: _settings } ) {
 								<Context.Provider value={ context }>
 									<FocusReturnProvider>
 										<KeyboardShortcuts.Register />
+										<Sidebar />
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											leftSidebar={
@@ -168,7 +180,9 @@ function Editor( { settings: _settings } ) {
 												)
 											}
 											sidebar={
-												! isMobile && <Sidebar />
+												sidebarIsOpened && (
+													<ComplementaryArea.Slot scope="core/edit-site" />
+												)
 											}
 											header={
 												<Header

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { BlockInspector } from '@wordpress/block-editor';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,25 +23,33 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 const SettingsSidebar = () => {
-	const sidebarName = useSelect(
-		( select ) =>
-			select( 'core/interface' ).getActiveComplementaryArea(
-				'core/edit-post'
-			),
-		[]
-	);
-	if (
-		! [ 'edit-post/document', 'edit-post/block' ].includes( sidebarName )
-	) {
-		return null;
-	}
+	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
+		let sidebar = select( 'core/interface' ).getActiveComplementaryArea(
+			'core/edit-post'
+		);
+		if (
+			! [ 'edit-post/document', 'edit-post/block' ].includes( sidebar )
+		) {
+			if ( select( 'core/block-editor' ).getBlockSelectionStart() ) {
+				sidebar = 'edit-post/block';
+			}
+			sidebar = 'edit-post/document';
+		}
+		const shortcut = select(
+			'core/keyboard-shortcuts'
+		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+		return { sidebarName: sidebar, keyboardShortcut: shortcut };
+	}, [] );
+
 	return (
 		<PluginSidebarEditPost
 			identifier={ sidebarName }
 			header={ <SettingsHeader sidebarName={ sidebarName } /> }
 			closeLabel={ __( 'Close settings' ) }
 			headerClassName="edit-post-sidebar__panel-tabs"
-			isPinnable={ false }
+			title={ __( 'Settings' ) }
+			toggleShortcut={ keyboardShortcut }
+			icon={ cog }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>

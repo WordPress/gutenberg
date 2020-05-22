@@ -12,7 +12,6 @@ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 function Sidebar() {
 	return (
 		<>
-			<ComplementaryArea.Slot scope="core/edit-site" />
 			<ComplementaryArea
 				scope="core/edit-site"
 				identifier="edit-site/block-inspector"
