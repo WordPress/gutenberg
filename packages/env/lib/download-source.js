@@ -35,10 +35,6 @@ module.exports = async function downloadSource( source, options ) {
 		await downloadGitSource( source, options );
 	} else if ( source.type === 'zip' ) {
 		await downloadZipSource( source, options );
-	} else if ( source.type === 'wporg-theme' ) {
-		await downloadZipSource( source, options );
-	} else if ( source.type === 'wporg-plugin' ) {
-		await downloadZipSource( source, options );
 	}
 };
 

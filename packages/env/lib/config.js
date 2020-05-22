@@ -294,17 +294,17 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	}
 
 	const wpOrgFields = sourceString.match(
-		/^https?:\/\/downloads\.wordpress\.org\/(plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
 	);
 	if ( wpOrgFields ) {
 		return {
-			type: 'wporg-' + wpOrgFields[ 1 ],
+			type: 'zip',
 			url: sourceString,
 			path: path.resolve(
 				workDirectoryPath,
-				encodeURIComponent( wpOrgFields[ 2 ] )
+				encodeURIComponent( wpOrgFields[ 1 ] )
 			),
-			basename: encodeURIComponent( wpOrgFields[ 2 ] ),
+			basename: encodeURIComponent( wpOrgFields[ 1 ] ),
 		};
 	}
 
