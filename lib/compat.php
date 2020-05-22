@@ -33,7 +33,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		}
 
 		$metadata = json_decode( file_get_contents( $metadata_file ), true );
-		if ( ! is_array( $metadata ) || ! $metadata['name'] ) {
+		if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 			return false;
 		}
 
