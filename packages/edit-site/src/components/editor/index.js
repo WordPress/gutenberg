@@ -6,7 +6,6 @@ import {
 	useContext,
 	useState,
 	useMemo,
-	useEffect,
 	useCallback,
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -70,30 +69,15 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 
-	const {
-		isFullscreenActive,
-		focusMode,
-		deviceType,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
+	const { isFullscreenActive, deviceType } = useSelect( ( select ) => {
 		const { isFeatureActive, __experimentalGetPreviewDeviceType } = select(
 			'core/edit-site'
 		);
 		return {
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
-			focusMode: isFeatureActive( 'focusMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 		};
 	}, [] );
-
-	useEffect( () => {
-		setSettings( {
-			...settings,
-			focusMode,
-			hasFixedToolbar,
-		} );
-	}, [ focusMode, hasFixedToolbar ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 

@@ -101,17 +101,15 @@ export default function Header( {
 		} catch ( err ) {}
 	}, [] );
 
-	const { deviceType, hasFixedToolbar } = useSelect(
-		( select ) => ( {
-			deviceType: select(
-				'core/edit-site'
-			).__experimentalGetPreviewDeviceType(),
-			hasFixedToolbar: select( 'core/edit-site' ).isFeatureActive(
-				'fixedToolbar'
-			),
-		} ),
-		[]
-	);
+	const { deviceType, hasFixedToolbar } = useSelect( ( select ) => {
+		const { __experimentalGetPreviewDeviceType, isFeatureActive } = select(
+			'core/edit-site'
+		);
+		return {
+			deviceType: __experimentalGetPreviewDeviceType(),
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+		};
+	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,

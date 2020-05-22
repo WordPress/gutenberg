@@ -38,18 +38,18 @@ const MoreMenu = () => (
 					messageDeactivated={ __( 'Top toolbar deactivated' ) }
 				/>
 				<FeatureToggle
-					feature="fullscreenMode"
-					label={ __( 'Fullscreen mode' ) }
-					info={ __( 'Work without distraction' ) }
-					messageActivated={ __( 'Fullscreen mode activated' ) }
-					messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
-				/>
-				<FeatureToggle
 					feature="focusMode"
 					label={ __( 'Spotlight mode' ) }
 					info={ __( 'Focus on one block at a time' ) }
 					messageActivated={ __( 'Spotlight mode activated' ) }
 					messageDeactivated={ __( 'Spotlight mode deactivated' ) }
+				/>
+				<FeatureToggle
+					feature="fullscreenMode"
+					label={ __( 'Fullscreen mode' ) }
+					info={ __( 'Work without distraction' ) }
+					messageActivated={ __( 'Fullscreen mode activated' ) }
+					messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
 				/>
 			</MenuGroup>
 		) }
