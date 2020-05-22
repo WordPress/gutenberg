@@ -126,3 +126,6 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Utilities
+export { useColorExtract, useControlledState } from './utils/hooks';

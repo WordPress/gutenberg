@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	useColorExtract,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -293,7 +294,24 @@ function CoverEdit( {
 		}%`;
 	}
 
-	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const hasBackgroundColor = !! ( overlayColor.color || gradientValue );
+	const hasBackground = !! ( url || hasBackgroundColor );
+
+	/**
+	 * Custom hook used for setting the initial background color.
+	 *
+	 * If a background image is set, this hook extracts the primary color from
+	 * that image and sets it as a background color (but only if there
+	 * is no background color/gradient set).
+	 */
+	useColorExtract( {
+		src: url,
+		onChange: ( nextColor ) => {
+			if ( ! hasBackgroundColor ) {
+				setOverlayColor( nextColor );
+			}
+		},
+	} );
 
 	const controls = (
 		<>

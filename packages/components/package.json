@@ -43,6 +43,7 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
+		"colorthief": "^2.3.0",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^4.0.5",
 		"gradient-parser": "^0.1.5",
