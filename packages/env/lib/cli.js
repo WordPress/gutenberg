@@ -117,6 +117,28 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
+		'logs',
+		'displays PHP and Docker logs for given WordPress environment.',
+		( args ) => {
+			args.positional( 'environment', {
+				type: 'string',
+				describe: 'Which environment to display the logs from.',
+				choices: [ 'development', 'tests', 'all' ],
+				default: 'development',
+			} );
+			args.option( 'watch', {
+				type: 'boolean',
+				default: true,
+				describe: 'Watch for logs as they happen.',
+			} );
+		},
+		withSpinner( env.logs )
+	);
+	yargs.example(
+		'$0 logs --no-watch --environment=tests',
+		'Displays the latest logs for the e2e test environment without watching.'
+	);
+	yargs.command(
 		'run <container> [command..]',
 		"Runs an arbitrary command in one of the underlying Docker containers, for example it's useful for running wp cli commands.",
 		( args ) => {
@@ -134,6 +156,14 @@ module.exports = function cli() {
 	yargs.example(
 		'$0 run cli wp user list',
 		'Runs `wp user list` wp-cli command which lists WordPress users.'
+	);
+	yargs.command(
+		'destroy',
+		wpRed(
+			'Destroy the WordPress environment. Delete docker containers and remove local files.'
+		),
+		() => {},
+		withSpinner( env.destroy )
 	);
 
 	return yargs;
