@@ -211,6 +211,8 @@ describe( 'readConfig', () => {
 					plugins: [
 						'https://downloads.wordpress.org/plugin/gutenberg.zip',
 						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
 					],
 				} )
 			)
@@ -230,6 +232,20 @@ describe( 'readConfig', () => {
 						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
 					path: expect.stringMatching( /^\/.*gutenberg$/ ),
 					basename: 'gutenberg',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
 				},
 			],
 		} );

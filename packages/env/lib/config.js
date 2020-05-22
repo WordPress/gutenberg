@@ -293,34 +293,22 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
-	const wpOrgFields = sourceString.match(
-		/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
-	);
-	if ( wpOrgFields ) {
-		return {
-			type: 'zip',
-			url: sourceString,
-			path: path.resolve(
-				workDirectoryPath,
-				encodeURIComponent( wpOrgFields[ 1 ] )
-			),
-			basename: encodeURIComponent( wpOrgFields[ 1 ] ),
-		};
-	}
-
 	const zipFields = sourceString.match(
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
 
 	if ( zipFields ) {
+		const wpOrgFields = sourceString.match(
+			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		);
+		const basename = wpOrgFields
+			? encodeURIComponent( wpOrgFields[ 1 ] )
+			: encodeURIComponent( zipFields[ 1 ] );
 		return {
 			type: 'zip',
 			url: sourceString,
-			path: path.resolve(
-				workDirectoryPath,
-				encodeURIComponent( zipFields[ 1 ] )
-			),
-			basename: encodeURIComponent( zipFields[ 1 ] ),
+			path: path.resolve( workDirectoryPath, basename ),
+			basename,
 		};
 	}
 
