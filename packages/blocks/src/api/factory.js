@@ -407,17 +407,6 @@ export function switchToBlockType( blocks, name ) {
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
 
-	// Unless it's a Grouping Block then for multi block selections
-	// check that all Blocks are of the same type otherwise
-	// we can't run a conversion
-	if (
-		! isContainerGroupBlock( name ) &&
-		isMultiBlock &&
-		! isBlockSelectionOfSameType( blocksArray )
-	) {
-		return null;
-	}
-
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
 	const transformationsFrom = getBlockTransforms( 'from', name );
