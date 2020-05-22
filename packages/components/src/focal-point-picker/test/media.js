@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import Media from '../Media';
+import Media from '../media';
 
 const getMedia = ( container ) =>
 	container.querySelector( '.components-focal-point-picker__media' );
