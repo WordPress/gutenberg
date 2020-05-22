@@ -69,12 +69,15 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$block_dir . '/' . substr_replace( $editor_script, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $editor_script_asset_path ) ) {
-				/* translators: %s: Block name. */
-				$message = sprintf( __( 'The asset file for the "editorScript" defined in "%s" block definition is missing.' ), $block_name );
+				$message = sprintf(
+					/* translators: %s: Block name. */
+					__( 'The asset file for the "editorScript" defined in "%s" block definition is missing.', 'default' ),
+					$block_name
+				);
 				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
 				return false;
 			}
-			$editor_script_asset  = require( $editor_script_asset_path );
+			$editor_script_asset = require( $editor_script_asset_path );
 			wp_register_script(
 				$editor_script_handle,
 				plugins_url( $editor_script, $metadata_file ),
@@ -91,12 +94,15 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$block_dir . '/' . substr_replace( $script, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $script_asset_path ) ) {
-				/* translators: %s: Block name. */
-				$message = sprintf( __( 'The asset file for the "script" defined in "%s" block definition is missing.' ), $block_name );
+				$message = sprintf(
+					/* translators: %s: Block name. */
+					__( 'The asset file for the "script" defined in "%s" block definition is missing.', 'default' ),
+					$block_name
+				);
 				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
 				return false;
 			}
-			$script_asset  = require( $script_asset_path );
+			$script_asset = require( $script_asset_path );
 			wp_register_script(
 				$script_handle,
 				plugins_url( $script, $metadata_file ),

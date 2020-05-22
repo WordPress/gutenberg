@@ -6,7 +6,7 @@ This RFC is intended to serve both as a specification and as documentation for t
 
 Behind any block type registration is some abstract concept of a unit of content. This content type can be described without consideration of any particular technology. In much the same way, we should be able to describe the core constructs of a block type in a way which can be interpreted in any runtime.
 
-In more practical terms, an implementation should fulfill requirements that...
+In more practical terms, an implementation should fulfill requirements that:
 
 * A block type registration should be declarative and context-agnostic. Any runtime (PHP, JS, or other) should be able to interpret the basics of a block type (see "Block API" in the sections below) and should be able to fetch or retrieve the definitions of the context-specific implementation details. The following things should be made possible:
   * Fetching the available block types through REST APIs.
@@ -16,7 +16,7 @@ In more practical terms, an implementation should fulfill requirements that...
 
 It can statically analyze the files of any plugin to retrieve blocks and their properties.
 * It should not require a build tool compilation step (e.g. Babel, Webpack) to author code which would be referenced in a block type definition.
-* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc...) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
+* There should allow the potential to dynamically load ("lazy-load") block types, or parts of block type definitions. It practical terms, it means that the editor should be able to be loaded without enqueuing all the assets (scripts and styles) of all block types. What it needs is the basic metadata (`title`, `description`, `category`, `icon`, etc…) to start with. It should be fine to defer loading all other code (`edit`, `save`, `transforms`, and other JavaScript implementations) until it is explicitly used (inserted into the post content).
 
 ## References
 
@@ -67,7 +67,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"category": "text",
 	"parent": [ "core/group" ],
 	"icon": "star",
-	"description": "Shows warning, error or success notices  ...",
+	"description": "Shows warning, error or success notices…",
 	"keywords": [ "alert", "message" ],
 	"textdomain": "my-plugin",
 	"attributes": {
