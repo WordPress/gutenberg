@@ -40,8 +40,8 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			)
 		);
 
-		$name           = 'fake/test';
-		$settings       = array(
+		$name     = 'fake/test';
+		$settings = array(
 			'icon' => 'text',
 		);
 
