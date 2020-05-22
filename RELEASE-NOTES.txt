@@ -1,6 +1,6 @@
 1.28.1
 ------
-* [**] Avoid crash when editor state becomes invalid
+* [**] Avoid crash when editor selection state becomes invalid
 
 1.28.0
 ------
