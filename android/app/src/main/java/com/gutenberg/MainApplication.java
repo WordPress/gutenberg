@@ -151,7 +151,7 @@ public class MainApplication extends Application implements ReactApplication {
                         new ReactSliderPackage(),
                         new ReactVideoPackage(),
                         new SvgPackage(),
-                        new ReactAztecPackage(null),
+                        new ReactAztecPackage(null, null),
                         new LinearGradientPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }

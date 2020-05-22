@@ -54,14 +54,10 @@ import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
-import org.wordpress.aztec.spans.UnknownHtmlSpan;
 
-import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutShadowNode> {
 
@@ -82,9 +78,11 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
 
     @Nullable private final Consumer<Exception> exceptionLogger;
+    @Nullable private final Consumer<String> breadcrumbLogger;
 
-    public ReactAztecManager(@Nullable Consumer<Exception> exceptionLogger) {
+    public ReactAztecManager(@Nullable Consumer<Exception> exceptionLogger, @Nullable Consumer<String> breadcrumbLogger) {
         this.exceptionLogger = exceptionLogger;
+        this.breadcrumbLogger = breadcrumbLogger;
         initializeFocusAndBlurCommandCodes();
     }
 
@@ -246,6 +244,9 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                     customException.printStackTrace();
                     if (exceptionLogger != null) {
                         exceptionLogger.accept(customException);
+                    }
+                    if (breadcrumbLogger != null) {
+                        breadcrumbLogger.accept(customException.getMessage());
                     }
                 } catch (Exception e) {
                     // Should never happen, but if it does don't let logging cause a crash

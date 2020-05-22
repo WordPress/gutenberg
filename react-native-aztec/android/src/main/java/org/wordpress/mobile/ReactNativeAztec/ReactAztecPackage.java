@@ -14,15 +14,17 @@ import java.util.List;
 public class ReactAztecPackage implements ReactPackage {
 
     private final Consumer<Exception> exceptionLogger;
+    private final Consumer<String> breadcrumbLogger;
 
-    public ReactAztecPackage(Consumer<Exception> exceptionLogger) {
+    public ReactAztecPackage(Consumer<Exception> exceptionLogger, Consumer<String> breadcrumbLogger) {
         this.exceptionLogger = exceptionLogger;
+        this.breadcrumbLogger = breadcrumbLogger;
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> views = new ArrayList<>();
-        views.add(new ReactAztecManager(exceptionLogger));
+        views.add(new ReactAztecManager(exceptionLogger, breadcrumbLogger));
         return views;
     }
 
