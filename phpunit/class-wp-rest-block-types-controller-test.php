@@ -114,6 +114,40 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertEquals( $block_type, $data['name'] );
 	}
 
+	public function test_get_block_invalid_name() {
+		$block_type = 'fake/block';
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_type );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_block_type_invalid', $response, 404 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_invalid() {
+		$block_type = 'fake/invalid';
+		$settings   = array(
+			'keywords'        => 'invalid_keywords',
+			'parent'          => 'invalid_parent',
+			'supports'        => 'invalid_supports',
+			'styleVariations' => 'invalid_styles',
+			'render_callback' => 'invalid_callback',
+		);
+		register_block_type( $block_type, $settings );
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_type );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( $block_type, $data['name'] );
+		$this->assertEqualSets( array( 'invalid_keywords' ), $data['keywords'] );
+		$this->assertEqualSets( array( 'invalid_parent' ), $data['parent'] );
+		$this->assertEqualSets( array(), $data['supports'] );
+		$this->assertEqualSets( array(), $data['styles'] );
+		$this->assertEqualSets( false, $data['is_dynamic'] );
+	}
+
 	/**
 	 *
 	 */
@@ -160,6 +194,26 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 403 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_items_no_permission() {
+		wp_set_current_user( 0 );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_no_permission() {
+		wp_set_current_user( 0 );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test/' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 401 );
 	}
 
 	/**
