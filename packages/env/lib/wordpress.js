@@ -94,7 +94,7 @@ async function configureWordPress( environment, config ) {
 	for ( const [ key, value ] of Object.entries( config.config ) ) {
 		if (key === 'WP_SITEURL' || key === 'WP_HOME') {
 			const url = new URL(value);
-            url.port = port;
+			url.port = port;
 			value = url.toString();
 		}
 		const command = [ 'wp', 'config', 'set', key, value ];
