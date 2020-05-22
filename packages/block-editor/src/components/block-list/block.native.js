@@ -26,6 +26,8 @@ import BlockMobileToolbar from '../block-mobile-toolbar';
 class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
@@ -78,6 +80,7 @@ class BlockListBlock extends Component {
 								setAttributes={ this.props.onChange }
 								onFocus={ this.onFocus }
 								onReplace={ this.props.onReplace }
+								insertBlocksAfter={ this.insertBlocksAfter }
 								mergeBlocks={ this.props.mergeBlocks }
 								onCaretVerticalPositionChange={
 									this.props.onCaretVerticalPositionChange
