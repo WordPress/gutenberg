@@ -5,7 +5,6 @@ import {
 	editEntityRecord,
 	saveEntityRecord,
 	deleteEntityRecord,
-	removeItems,
 	receiveEntityRecords,
 	receiveUserPermission,
 	receiveAutosaves,
@@ -29,19 +28,6 @@ describe( 'editEntityRecord', () => {
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
 		);
-	} );
-} );
-
-describe( 'removeItems', () => {
-	it( 'builds an action object', () => {
-		const postIds = [ 1, 2, 3 ];
-		expect( removeItems( 'postType', 'post', postIds ) ).toEqual( {
-			type: 'REMOVE_ITEMS',
-			items: postIds,
-			kind: 'postType',
-			name: 'post',
-			invalidateCache: false,
-		} );
 	} );
 } );
 
