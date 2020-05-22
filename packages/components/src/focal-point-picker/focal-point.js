@@ -14,7 +14,7 @@ import {
 } from './styles/focal-point-style';
 
 export default function FocalPoint( {
-	coordinates = {},
+	coordinates = { left: '50%', top: '50%' },
 	isDragging = false,
 	...props
 } ) {

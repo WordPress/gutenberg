@@ -26,6 +26,7 @@ import {
 	MediaContainer,
 } from './styles/focal-point-picker-style';
 import { roundClamp } from '../number-control/utils';
+import { INITIAL_BOUNDS } from './utils';
 
 export class FocalPointPicker extends Component {
 	constructor( props, context ) {
@@ -33,13 +34,14 @@ export class FocalPointPicker extends Component {
 
 		this.state = {
 			isDragging: false,
-			bounds: {},
+			bounds: INITIAL_BOUNDS,
 			percentages: props.value,
 		};
 
 		this.containerRef = createRef();
 		this.mediaRef = createRef();
 
+		this.handleOnClick = this.handleOnClick.bind( this );
 		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
 		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
 		this.onMouseMove = this.onMouseMove.bind( this );
@@ -63,14 +65,7 @@ export class FocalPointPicker extends Component {
 		window.removeEventListener( 'resize', this.updateBounds );
 	}
 	calculateBounds() {
-		const bounds = {
-			top: 0,
-			left: 0,
-			bottom: 0,
-			right: 0,
-			width: 0,
-			height: 0,
-		};
+		const bounds = INITIAL_BOUNDS;
 
 		if ( ! this.mediaRef.current ) {
 			return bounds;
@@ -116,6 +111,12 @@ export class FocalPointPicker extends Component {
 			bounds: this.calculateBounds(),
 		} );
 	}
+	handleOnClick( event ) {
+		event.persist();
+		this.setState( { isDragging: true }, () => {
+			this.onMouseMove( event );
+		} );
+	}
 	handleOnMouseUp() {
 		this.setState( { isDragging: false } );
 	}
@@ -128,9 +129,9 @@ export class FocalPointPicker extends Component {
 		event.preventDefault();
 
 		// Normalizing values for incrementing/decrementing based on arrow keys
-		let nextX = parseFloat( x ) * 100;
-		let nextY = parseFloat( y ) * 100;
-		const step = shiftKey ? 10 : 1;
+		let nextX = parseFloat( x );
+		let nextY = parseFloat( y );
+		const step = shiftKey ? 0.1 : 0.01;
 
 		switch ( event.keyCode ) {
 			case UP:
@@ -147,9 +148,8 @@ export class FocalPointPicker extends Component {
 				break;
 		}
 
-		// Transforming values back to 0.00 percentage values
-		nextX = roundClamp( nextX, 0, 100, step ) / 100;
-		nextY = roundClamp( nextY, 0, 100, step ) / 100;
+		nextX = roundClamp( nextX, 0, 1, step );
+		nextY = roundClamp( nextY, 0, 1, step );
 
 		const percentages = {
 			x: nextX,
@@ -163,6 +163,7 @@ export class FocalPointPicker extends Component {
 
 		if ( ! isDragging ) return;
 
+		const { shiftKey } = event;
 		const pickerDimensions = this.pickerDimensions();
 		const cursorPosition = {
 			left: event.pageX - pickerDimensions.left,
@@ -178,16 +179,24 @@ export class FocalPointPicker extends Component {
 			Math.min( cursorPosition.top, bounds.bottom )
 		);
 
-		const percentages = {
-			x:
-				( left - bounds.left ) /
-				( pickerDimensions.width - bounds.left * 2 ),
-			y:
-				( top - bounds.top ) /
-				( pickerDimensions.height - bounds.top * 2 ),
+		let nextX =
+			( left - bounds.left ) /
+			( pickerDimensions.width - bounds.left * 2 );
+		let nextY =
+			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
+
+		// Enables holding shift to jump values by 10%
+		const step = shiftKey ? 0.1 : 0.01;
+
+		nextX = roundClamp( nextX, 0, 1, step );
+		nextY = roundClamp( nextY, 0, 1, step );
+
+		const nextPercentage = {
+			x: nextX,
+			y: nextY,
 		};
 
-		this.updateValue( percentages );
+		this.updateValue( nextPercentage );
 	}
 	pickerDimensions() {
 		const containerNode = this.containerRef.current;
@@ -214,8 +223,15 @@ export class FocalPointPicker extends Component {
 	iconCoordinates() {
 		const { value } = this.props;
 		const { bounds } = this.state;
-		const pickerDimensions = this.pickerDimensions();
 
+		if ( bounds.left === undefined || bounds.top === undefined ) {
+			return {
+				left: '50%',
+				top: '50%',
+			};
+		}
+
+		const pickerDimensions = this.pickerDimensions();
 		const iconCoordinates = {
 			left:
 				value.x * ( pickerDimensions.width - bounds.left * 2 ) +
@@ -236,11 +252,13 @@ export class FocalPointPicker extends Component {
 	render() {
 		const {
 			autoPlay,
-			instanceId,
-			url,
-			label,
-			help,
 			className,
+			help,
+			instanceId,
+			label,
+			onDragStart,
+			onDragEnd,
+			url,
 		} = this.props;
 		const { bounds, isDragging, percentages } = this.state;
 		const iconCoordinates = this.iconCoordinates();
@@ -262,17 +280,16 @@ export class FocalPointPicker extends Component {
 				<MediaWrapper className="components-focal-point-picker-wrapper">
 					<MediaContainer
 						className="components-focal-point-picker"
-						onDragStart={ () =>
-							this.setState( { isDragging: true } )
-						}
-						onDrop={ () => this.setState( { isDragging: false } ) }
-						onKeyDown={ this.handleOnKeyDown }
-						onMouseDown={ ( event ) => {
-							event.persist();
-							this.setState( { isDragging: true }, () => {
-								this.onMouseMove( event );
-							} );
+						onDragStart={ ( event ) => {
+							this.setState( { isDragging: true } );
+							onDragStart( event );
 						} }
+						onDrop={ ( event ) => {
+							this.setState( { isDragging: false } );
+							onDragEnd( event );
+						} }
+						onKeyDown={ this.handleOnKeyDown }
+						onMouseDown={ this.handleOnClick }
 						onMouseMove={ this.onMouseMove }
 						onMouseUp={ this.handleOnMouseUp }
 						ref={ this.containerRef }
@@ -304,6 +321,8 @@ export class FocalPointPicker extends Component {
 
 FocalPointPicker.defaultProps = {
 	autoPlay: true,
+	onDragStart: noop,
+	onDragEnd: noop,
 	onChange: noop,
 	value: {
 		x: 0.5,
