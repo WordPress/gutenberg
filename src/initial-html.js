@@ -13,7 +13,7 @@ export default `
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.com" target="_blank" rel="noreferrer noopener">Link</a></p>
+<p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":4} -->
@@ -211,8 +211,8 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:jetpack/contact-info -->
-<div class="wp-block-jetpack-contact-info"><!-- wp:jetpack/email {"email":"me@wordpress.com"} -->
-<div class="wp-block-jetpack-email"><a href="mailto:me@wordpress.com">me@wordpress.com</a></div>
+<div class="wp-block-jetpack-contact-info"><!-- wp:jetpack/email {"email":"me@wordpress.org"} -->
+<div class="wp-block-jetpack-email"><a href="mailto:me@wordpress.org">me@wordpress.org</a></div>
 <!-- /wp:jetpack/email -->
 
 <!-- wp:jetpack/phone {"phone":"+1"} -->
