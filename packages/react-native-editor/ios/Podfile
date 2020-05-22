@@ -42,6 +42,7 @@ target 'gutenberg' do
   #pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => '29dff741f4b19435d75f21179e27766337de8e9d'
   pod 'Gutenberg', :path => '../../react-native-bridge/Gutenberg.podspec'
 
+
   target 'gutenbergTests' do
     inherit! :search_paths
     # Pods for testing
