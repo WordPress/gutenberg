@@ -30,7 +30,7 @@ import { useState, useEffect } from '@wordpress/element';
  * ```js
  * useColorExtract({
  * 		src: '/my-image.png',
- * 		onChange: onChange={ imageColor => setState(imageColor) }
+ * 		onChange: imageColor => setState(imageColor)
  * })
  * ```
  * @param {UseColorExtractProps} props Hook props
