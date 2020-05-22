@@ -69,16 +69,14 @@ function Editor( { settings: _settings } ) {
 		setSettings,
 	] );
 
-	const { isFullscreenActive } = useSelect( ( select ) => {
+	const { isFullscreenActive, deviceType } = useSelect( ( select ) => {
+		const { isFeatureActive, __experimentalGetPreviewDeviceType } = select(
+			'core/edit-site'
+		);
 		return {
-			isFullscreenActive: select( 'core/edit-site' ).isFeatureActive(
-				'fullscreenMode'
-			),
+			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+			deviceType: __experimentalGetPreviewDeviceType(),
 		};
-	}, [] );
-
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).__experimentalGetPreviewDeviceType();
 	}, [] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
