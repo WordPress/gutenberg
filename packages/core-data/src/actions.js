@@ -161,7 +161,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		recordId,
 	};
 
-	yield removeItems( kind, name, recordId, query );
+	yield removeItems( kind, name, Number( recordId ), query );
 
 	let error;
 
