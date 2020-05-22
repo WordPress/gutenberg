@@ -1,7 +1,9 @@
 /**
  * Internal dependencies
  */
+import { downloadableBlock } from './fixtures';
 import {
+	getDownloadableBlocks,
 	getErrorNotices,
 	getErrorNoticeForBlock,
 	getInstalledBlockTypes,
@@ -57,6 +59,27 @@ describe( 'selectors', () => {
 				'block/no-error'
 			);
 			expect( errorNotice ).toEqual( false );
+		} );
+	} );
+
+	describe( 'getDownloadableBlocks', () => {
+		const state = {
+			downloadableBlocks: {
+				isRequestingDownloadableBlocks: false,
+				results: {
+					boxer: [ downloadableBlock ],
+				},
+			},
+		};
+
+		it( 'should get the list of available blocks for a query', () => {
+			const blocks = getDownloadableBlocks( state, 'boxer' );
+			expect( blocks ).toHaveLength( 1 );
+		} );
+
+		it( 'should get an empty array if no matching query is found', () => {
+			const blocks = getDownloadableBlocks( state, 'not-found' );
+			expect( blocks ).toEqual( [] );
 		} );
 	} );
 } );
