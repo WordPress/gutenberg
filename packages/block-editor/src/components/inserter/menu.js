@@ -200,6 +200,11 @@ function InserterMenu( {
 								/* translators: Patterns tab title in the block inserter. */
 								title: __( 'Patterns' ),
 							},
+							{
+								name: 'template parts',
+								/* translators: Template Parts tab title in the block inserter. */
+								title: __( 'Template Parts' ),
+							},
 						] }
 					>
 						{ ( tab ) => {
