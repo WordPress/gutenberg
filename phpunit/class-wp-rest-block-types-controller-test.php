@@ -62,7 +62,6 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 *
 	 */
 	public function test_context_param() {
-		register_block_type( 'testing/block-1', array() );
 		// Collection.
 		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types' );
 		$response = rest_get_server()->dispatch( $request );
@@ -70,30 +69,25 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 		// Single.
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types/testing/block-1' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-types/fake/test' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
-		unregister_block_type( 'testing/block-1' );
 	}
 
 	/**
 	 *
 	 */
 	public function test_get_items() {
-		register_block_type( 'test/block-1', array() );
-		register_block_type( 'test/block-2', array() );
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/test' );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$data     = array_values( $data );
-		$this->assertCount( 2, $data );
+		$this->assertCount( 1, $data );
 		$names = wp_list_pluck( $data, 'name' );
 		$this->assertEqualSets( array( 'test/block-1', 'test/block-2' ), $names );
-		unregister_block_type( 'test/block-1' );
-		unregister_block_type( 'test/block-2' );
 	}
 
 	/**
