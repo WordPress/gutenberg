@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, flowRight, omit, filter } from 'lodash';
+import { map, flowRight, omit, forEach, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -102,7 +102,7 @@ function items( state = {}, action ) {
  *
  * @return {Object} Next state.
  */
-const queries = flowRight( [
+const receiveQueries = flowRight( [
 	// Limit to matching action type so we don't attempt to replace action on
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
@@ -127,12 +127,6 @@ const queries = flowRight( [
 	onSubKey( 'stableKey' ),
 ] )( ( state = null, action ) => {
 	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
-	if ( type === 'REMOVE_ITEMS' ) {
-		const newState = filter( state, ( stateQueryId ) => {
-			return ! action.items.includes( stateQueryId );
-		} );
-		return newState;
-	}
 
 	if ( type !== 'RECEIVE_ITEMS' ) {
 		return state;
@@ -145,6 +139,33 @@ const queries = flowRight( [
 		perPage
 	);
 } );
+
+/**
+ * Reducer tracking queries state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Next state.
+ */
+const queries = ( state = {}, action ) => {
+	switch ( action.type ) {
+		case 'RECEIVE_ITEMS':
+			return receiveQueries( state, action );
+		case 'REMOVE_ITEMS':
+			const newState = { ...state };
+			forEach( newState, ( queryItems, key ) => {
+				if ( newState[ key ] ) {
+					newState[ key ] = filter( queryItems, ( queryId ) => {
+						return ! action.items.includes( queryId );
+					} );
+				}
+			} );
+			return newState;
+		default:
+			return state;
+	}
+};
 
 export default combineReducers( {
 	items,
