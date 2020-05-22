@@ -20,6 +20,7 @@ import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
+import styles from './style.scss';
 
 function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	const [ gradientOrientation, setGradientOrientation ] = useState(
@@ -97,7 +98,7 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 				/>
 			</PanelBody>
 			{ isLinearGradient( gradientType ) && (
-				<PanelBody>
+				<PanelBody style={ styles.angleControl }>
 					<RangeControl
 						label={ __( 'Angle' ) }
 						minimumValue={ 0 }
