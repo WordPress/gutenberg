@@ -39,6 +39,7 @@ function Gradient( {
 	gradientValue,
 	style,
 	angleCenter = { x: 0.5, y: 0.5 },
+	children,
 	...otherProps
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
@@ -68,12 +69,15 @@ function Gradient( {
 				angleCenter={ angleCenter }
 				style={ style }
 				{ ...otherProps }
-			/>
+			>
+				{ children }
+			</RNLinearGradient>
 		);
 	}
 
 	return (
 		<View style={ [ style, styles.overflow ] }>
+			<View style={ styles.radialGradientContent }>{ children }</View>
 			{ resizeObserver }
 			<SVG>
 				<Defs>

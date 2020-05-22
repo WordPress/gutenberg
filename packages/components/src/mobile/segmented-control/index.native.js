@@ -26,7 +26,7 @@ const ANIMATION_DURATION = 200;
 
 const isIOS = Platform.OS === 'ios';
 
-const Segment = ( { isSelected, title, onPress, onLayout } ) => {
+const Segment = ( { isSelected, title, onPress, onLayout, ...props } ) => {
 	const isSelectedIOS = isIOS && isSelected;
 
 	const segmentStyle = [ styles.segment, isIOS && styles.segmentIOS ];
@@ -44,7 +44,7 @@ const Segment = ( { isSelected, title, onPress, onLayout } ) => {
 	return (
 		<View style={ isSelectedIOS && shadowStyle }>
 			<TouchableWithoutFeedback onPress={ onPress }>
-				<View style={ segmentStyle } onLayout={ onLayout }>
+				<View style={ segmentStyle } onLayout={ onLayout } { ...props }>
 					<Text
 						style={ [ textStyle, isSelected && selectedTextStyle ] }
 						maxFontSizeMultiplier={ 2 }
@@ -152,6 +152,14 @@ const SegmentedControls = ( {
 							onLayout={ ( event ) =>
 								segmentOnLayout( event, index )
 							}
+							accessibilityState={ {
+								selected: activeSegmentIndex === index,
+							} }
+							accessibilityRole={ 'button' }
+							accessibilityLabel={ segment }
+							accessibilityHint={ `${ index + 1 } on ${
+								segments.length
+							}` }
 						/>
 					);
 				} ) }

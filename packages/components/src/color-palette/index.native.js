@@ -8,10 +8,11 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { map, uniq, isEqual } from 'lodash';
+import { map, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useState, useEffect, createRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
@@ -20,7 +21,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { getGradientBaseColors } from '../mobile/gradient';
+import { performLayoutAnimation } from '../mobile/utils';
 
 const ANIMATION_DURATION = 200;
 
@@ -52,27 +53,34 @@ function ColorPalette( {
 	);
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 
+	const customIndicatorColor = isGradientSegment
+		? activeColor
+		: customSwatchGradients;
+	const shouldShowCustomIndicator =
+		! isGradientSegment || ( isGradientColor && isSelectedCustom() );
+	const accessibilityHint = isGradientSegment
+		? __( 'Navigates to customize gradient' )
+		: __( 'Navigates to custom color picker' );
+
 	useEffect( () => {
 		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 	}, [ currentSegment ] );
 
+	useEffect( () => {
+		performLayoutAnimation();
+	}, [ isGradientColor && isSelectedCustom() ] );
+
 	function isSelectedCustom() {
-		return (
-			! isGradientColor && activeColor && ! colors.includes( activeColor )
-		);
+		const isWithinColors = activeColor && colors.includes( activeColor );
+
+		if ( isGradientSegment ) {
+			return isGradientColor && ! isWithinColors;
+		}
+		return ! isGradientColor && ! isWithinColors;
 	}
 
 	function isSelected( color ) {
-		if ( ! isSelectedCustom() ) {
-			if ( isGradientColor ) {
-				return isEqual(
-					getGradientBaseColors( activeColor ),
-					getGradientBaseColors( color )
-				);
-			}
-			return activeColor === color;
-		}
-		return false;
+		return ! isSelectedCustom() && activeColor === color;
 	}
 
 	function timingAnimation( property, toValue ) {
@@ -126,6 +134,9 @@ function ColorPalette( {
 					<TouchableWithoutFeedback
 						onPress={ () => onColorPress( color ) }
 						key={ `${ color }-${ isSelected( color ) }` }
+						accessibilityRole={ 'button' }
+						accessibilityState={ { selected: isSelected( color ) } }
+						accessibilityHint={ color }
 					>
 						<Animated.View
 							style={ {
@@ -146,14 +157,19 @@ function ColorPalette( {
 					</TouchableWithoutFeedback>
 				);
 			} ) }
-			{ ! isGradientSegment && (
+			{ shouldShowCustomIndicator && (
 				<>
 					<View style={ verticalSeparatorStyle } />
-					<TouchableWithoutFeedback onPress={ onCustomPress }>
+					<TouchableWithoutFeedback
+						onPress={ onCustomPress }
+						accessibilityRole={ 'button' }
+						accessibilityState={ { selected: isSelectedCustom() } }
+						accessibilityHint={ accessibilityHint }
+					>
 						<View>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
-								color={ customSwatchGradients }
+								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
 								style={ styles.colorIndicator }
 							/>

@@ -7,6 +7,7 @@ import { get, omit } from 'lodash';
  */
 import { PanelBody, RadioControl, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,22 +22,33 @@ import {
 } from './constants';
 
 function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
-	const { getGradientType, gradients, gradientOptions } = colorsUtils;
+	const [ gradientOrientation, setGradientOrientation ] = useState(
+		HORIZONTAL_GRADIENT_ORIENTATION
+	);
 
+	const { getGradientType, gradients, gradientOptions } = colorsUtils;
+	const { gradientAST } = getGradientParsed( currentValue );
 	const gradientType = getGradientType( currentValue );
-	const isLinearGradient = gradientType === gradients.linear;
+
+	function isLinearGradient( type ) {
+		return type === gradients.linear;
+	}
 
 	function getGradientColor( type ) {
-		const { gradientAST } = getGradientParsed( currentValue );
+		const orientation = get( gradientAST, [ 'orientation' ] );
+
+		if ( orientation ) {
+			setGradientOrientation( orientation );
+		}
 
 		return serializeGradient(
-			type === gradients.linear
+			isLinearGradient( type )
 				? {
 						...gradientAST,
 						...( gradientAST.orientation
 							? {}
 							: {
-									orientation: HORIZONTAL_GRADIENT_ORIENTATION,
+									orientation: gradientOrientation,
 							  } ),
 						type,
 				  }
@@ -54,8 +66,6 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	}
 
 	function setGradientAngle( value ) {
-		const { gradientAST } = getGradientParsed( currentValue );
-
 		const gradientColor = serializeGradient( {
 			...gradientAST,
 			orientation: {
@@ -70,7 +80,6 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 	}
 
 	function getGradientAngle() {
-		const { gradientAST } = getGradientParsed( currentValue );
 		return get(
 			gradientAST,
 			[ 'orientation', 'value' ],
@@ -87,8 +96,8 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 					onChange={ onGradientTypeChange }
 				/>
 			</PanelBody>
-			{ isLinearGradient && (
-				<PanelBody title={ __( 'Gradient Angle' ) }>
+			{ isLinearGradient( gradientType ) && (
+				<PanelBody>
 					<RangeControl
 						label={ __( 'Angle' ) }
 						minimumValue={ 0 }

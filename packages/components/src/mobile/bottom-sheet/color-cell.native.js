@@ -16,7 +16,7 @@ export default function BottomSheetColorCell( props ) {
 	return (
 		<Cell
 			{ ...cellProps }
-			accessibilityRole={ 'none' }
+			accessibilityRole={ 'button' }
 			accessibilityHint={
 				/* translators: accessibility text (hint for moving to color settings) */
 				__( 'Double tap to go to color settings' )

@@ -97,6 +97,12 @@ function ColorSettings( {
 		setIsCustomGradientScreen( shouldShow );
 	}
 
+	function onCustomPress() {
+		if ( isSolidSegment ) {
+			onCustomScreenToggle( true );
+		} else onCustomGradientScreenToggle( true );
+	}
+
 	function setColor( color ) {
 		setCurrentValue( color );
 		if ( isSolidSegment && onColorChange && onGradientChange ) {
@@ -187,9 +193,7 @@ function ColorSettings( {
 						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
 						isCustomScreen={ isCustomScreen }
-						onCustomPress={ () => {
-							onCustomScreenToggle( true );
-						} }
+						onCustomPress={ onCustomPress }
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
