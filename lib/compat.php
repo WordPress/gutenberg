@@ -37,6 +37,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return false;
 		}
 
+		$settings          = array();
 		$property_mappings = array(
 			'title'           => 'title',
 			'category'        => 'category',
@@ -50,7 +51,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			// Alias recommended in documentation to distinguish from assets.
 			'styleVariations' => 'styles',
 		);
-		$settings          = array();
 
 		foreach ( $property_mappings as $key => $mapped_key ) {
 			if ( isset( $metadata[ $key ] ) ) {
@@ -58,7 +58,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			}
 		}
 
-		$block_name        = $metadata['name'];
+		$block_name          = $metadata['name'];
 		$block_dir           = dirname( $metadata_file );
 		$asset_handle_prefix = str_replace( '/', '-', $block_name );
 
@@ -69,9 +69,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$block_dir . '/' . substr_replace( $editor_script, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $editor_script_asset_path ) ) {
-				throw new Error(
-					"The asset file for the \"editorScript\" defined in \"$block_name\" block definition is missing."
-				);
+				/* translators: %s: Block name. */
+				$message = sprintf( __( 'The asset file for the "editorScript" defined in "%s" block definition is missing.' ), $block_name );
+				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
+				return false;
 			}
 			$editor_script_asset  = require( $editor_script_asset_path );
 			wp_register_script(
@@ -90,9 +91,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 				$block_dir . '/' . substr_replace( $script, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $script_asset_path ) ) {
-				throw new Error(
-					"The asset file for the \"script\" defined in \"$block_name\" block definition is missing."
-				);
+				/* translators: %s: Block name. */
+				$message = sprintf( __( 'The asset file for the "script" defined in "%s" block definition is missing.' ), $block_name );
+				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
+				return false;
 			}
 			$script_asset  = require( $script_asset_path );
 			wp_register_script(
