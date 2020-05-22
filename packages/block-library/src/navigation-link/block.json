@@ -1,6 +1,9 @@
 {
 	"name": "core/navigation-link",
 	"category": "layout",
+	"parent": [
+		"core/navigation"
+	],
 	"attributes": {
 		"label": {
 			"type": "string"
@@ -25,5 +28,10 @@
 		"url": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

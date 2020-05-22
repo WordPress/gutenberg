@@ -57,6 +57,9 @@ function NavigationLinkEdit( {
 	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
+	insertBlocksAfter,
+	mergeBlocks,
+	onReplace,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
 	const link = {
@@ -221,10 +224,18 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
+						identifier="label"
 						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) =>
 							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( 'core/navigation-link' )
+							)
 						}
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus
