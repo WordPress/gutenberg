@@ -6,7 +6,7 @@ import { castArray, get, isEqual, find } from 'lodash';
 /**
  * Internal dependencies
  */
-import { receiveItems, receiveQueriedItems } from './queried-data';
+import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { select, apiFetch } from './controls';
 
@@ -95,26 +95,6 @@ export function receiveEntityRecords(
 }
 
 /**
- * Returns an action object used in signalling that entity records have been
- * deleted and it needs to be removed from entities state.
- *
- * @param {string}       kind            Kind of the removed entity.
- * @param {string}       name            Name of the removed entity.
- * @param {Array|Object} records         Records removed.
- *
- * @return {Object} Action object.
- */
-export function removeItems( kind, name, records ) {
-	return {
-		type: 'REMOVE_ITEMS',
-		items: castArray( records ),
-		kind,
-		name,
-		invalidateCache: false,
-	};
-}
-
-/**
  * Returns an action object used in signalling that the current theme has been received.
  *
  * @param {Object} currentTheme The current theme.
@@ -165,8 +145,9 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string} kind      Kind of the deleted entity.
  * @param {string} name      Name of the deleted entity.
  * @param {Object} recordId  Record to be deleted.
+ * @param {Object} query     Original query of the deleted record.
  */
-export function* deleteEntityRecord( kind, name, recordId ) {
+export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -180,7 +161,7 @@ export function* deleteEntityRecord( kind, name, recordId ) {
 		recordId,
 	};
 
-	yield removeItems( kind, name, recordId );
+	yield removeItems( kind, name, recordId, query );
 
 	let error;
 
