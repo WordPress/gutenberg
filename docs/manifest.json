@@ -870,6 +870,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "InputControl",
+		"slug": "input-control",
+		"markdown_source": "../packages/components/src/input-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "IsolatedEventContainer",
 		"slug": "isolated-event-container",
 		"markdown_source": "../packages/components/src/isolated-event-container/README.md",
@@ -1503,6 +1509,12 @@
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

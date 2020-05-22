@@ -7,20 +7,22 @@ import { pressKeyWithModifier } from './press-key-with-modifier';
  * Opens the global block inserter.
  */
 export async function openGlobalBlockInserter() {
-	if ( ! ( await isGlobalInserterOpen() ) ) {
+	if ( await isGlobalInserterOpen() ) {
+		// If global inserter is already opened, reset to an initial state where
+		// the default (first) tab is selected.
+		const tab = await page.$(
+			'.block-editor-inserter__tabs .components-tab-panel__tabs-item:nth-of-type(1):not(.is-active)'
+		);
+
+		if ( tab ) {
+			await tab.click();
+		}
+	} else {
 		await toggleGlobalBlockInserter();
 
 		// Waiting here is necessary because sometimes the inserter takes more time to
 		// render than Puppeteer takes to complete the 'click' action
 		await page.waitForSelector( '.block-editor-inserter__menu' );
-	}
-
-	// Select the block tab by default if the tabs are visible
-	const hasTabs = !! ( await page.$( '.block-editor-inserter__tabs' ) );
-	if ( hasTabs ) {
-		await page.click(
-			'.block-editor-inserter__tabs [aria-controls="0-blocks-view"]'
-		);
 	}
 }
 
@@ -64,9 +66,10 @@ export async function searchForBlock( searchTerm ) {
 export async function searchForPattern( searchTerm ) {
 	await openGlobalBlockInserter();
 	// Select the patterns tab
-	await page.click(
-		'.block-editor-inserter__tabs [aria-controls="0-patterns-view"]'
+	const [ tab ] = await page.$x(
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
 	);
+	await tab.click();
 	await page.focus( '.block-editor-inserter__search-input' );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );

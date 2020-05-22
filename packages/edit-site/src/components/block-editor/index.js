@@ -25,19 +25,31 @@ import Sidebar from '../sidebar';
 
 export default function BlockEditor() {
 	const { settings: _settings, setSettings } = useEditorContext();
-	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser(
-			'create',
-			'media'
-		);
-		return _canUserCreateMedia || _canUserCreateMedia !== false;
-	}, [] );
+	const { canUserCreateMedia, focusMode, hasFixedToolbar } = useSelect(
+		( select ) => {
+			const { isFeatureActive } = select( 'core/edit-site' );
+			const _canUserCreateMedia = select( 'core' ).canUser(
+				'create',
+				'media'
+			);
+			return {
+				canUserCreateMedia:
+					_canUserCreateMedia || _canUserCreateMedia !== false,
+				focusMode: isFeatureActive( 'focusMode' ),
+				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			};
+		},
+		[]
+	);
+
 	const settings = useMemo( () => {
 		if ( ! canUserCreateMedia ) {
 			return _settings;
 		}
 		return {
 			..._settings,
+			focusMode,
+			hasFixedToolbar,
 			mediaUpload( { onError, ...rest } ) {
 				uploadMedia( {
 					wpAllowedMimeTypes: _settings.allowedMimeTypes,
@@ -46,11 +58,13 @@ export default function BlockEditor() {
 				} );
 			},
 		};
-	}, [ canUserCreateMedia, _settings ] );
+	}, [ canUserCreateMedia, _settings, focusMode, hasFixedToolbar ] );
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		settings.templateType
 	);
+
 	const setActiveTemplateId = useCallback(
 		( newTemplateId ) =>
 			setSettings( ( prevSettings ) => ( {
@@ -60,6 +74,7 @@ export default function BlockEditor() {
 			} ) ),
 		[]
 	);
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }

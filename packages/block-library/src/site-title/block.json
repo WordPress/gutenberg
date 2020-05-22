@@ -6,5 +6,9 @@
 			"type": "number",
 			"default": 1
 		}
+	},
+	"supports": {
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }
