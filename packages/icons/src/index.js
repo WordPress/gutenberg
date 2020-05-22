@@ -91,6 +91,7 @@ export { default as minus } from './library/minus';
 export { default as mobile } from './library/mobile';
 export { default as more } from './library/more';
 export { default as moreHorizontal } from './library/more-horizontal';
+export { default as moreHorizontalMobile } from './library/more-horizontal-mobile';
 export { default as moreVertical } from './library/more-vertical';
 export { default as navigation } from './library/navigation';
 export { default as pageBreak } from './library/page-break';

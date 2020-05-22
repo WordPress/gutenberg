@@ -6,7 +6,7 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { GlobalStylesContext } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -27,12 +27,37 @@ class BlockListBlock extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onFocus = this.onFocus.bind( this );
+		this.getBlockWidth = this.getBlockWidth.bind( this );
+
+		this.state = {
+			blockWidth: 0,
+		};
+
+		this.anchorNodeRef = createRef();
 	}
 
 	onFocus() {
 		const { firstToSelectId, isSelected, onSelect } = this.props;
 		if ( ! isSelected ) {
 			onSelect( firstToSelectId );
+		}
+	}
+
+	insertBlocksAfter( blocks ) {
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
+
+		if ( blocks[ 0 ] ) {
+			// focus on the first block inserted
+			this.props.onSelect( blocks[ 0 ].clientId );
+		}
+	}
+
+	getBlockWidth( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+
+		if ( blockWidth !== layout.width ) {
+			this.setState( { blockWidth: layout.width } );
 		}
 	}
 
@@ -66,6 +91,7 @@ class BlockListBlock extends Component {
 								contentStyle={ this.props.contentStyle }
 								onDeleteBlock={ this.props.onDeleteBlock }
 							/>
+							<View onLayout={ this.getBlockWidth } />
 						</GlobalStylesContext.Provider>
 					);
 				} }
@@ -101,6 +127,12 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 		} = this.props;
+
+		if ( ! attributes || ! blockType ) {
+			return null;
+		}
+
+		const { blockWidth } = this.state;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
@@ -158,7 +190,10 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ styles.neutralToolbar }>
+						<View
+							style={ styles.neutralToolbar }
+							ref={ this.anchorNodeRef }
+						>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
@@ -166,6 +201,8 @@ class BlockListBlock extends Component {
 									isStackedHorizontally={
 										isStackedHorizontally
 									}
+									blockWidth={ blockWidth }
+									anchorNodeRef={ this.anchorNodeRef.current }
 								/>
 							) }
 						</View>
