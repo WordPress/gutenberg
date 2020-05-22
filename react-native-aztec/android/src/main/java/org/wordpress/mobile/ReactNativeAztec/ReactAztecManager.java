@@ -237,13 +237,16 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                           end <= textLength;
             if (startAndEndAreValid) {
                 view.setSelection(start, end);
-            } else if (exceptionLogger != null) {
+            } else {
                 // Calling view.setSelection would have thrown an exception, so let's send information about
                 // what happened to help us figure out how we got into a bad state.
                 try {
-                    IllegalSelectionIndexException exception = new IllegalSelectionIndexException(start, end, textLength, view);
-                    exception.printStackTrace();
-                    exceptionLogger.accept(exception);
+                    IllegalSelectionIndexException customException =
+                            new IllegalSelectionIndexException(start, end, textLength, view);
+                    customException.printStackTrace();
+                    if (exceptionLogger != null) {
+                        exceptionLogger.accept(customException);
+                    }
                 } catch (Exception e) {
                     // Should never happen, but if it does don't let logging cause a crash
                     e.printStackTrace();
