@@ -230,18 +230,31 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
-			'name',
-			'category',
-			'editor_script',
-			'script',
-			'editor_style',
-			'style',
-			'supports',
+			'name'          => 'name',
+			'category'      => 'category',
+			'editor_script' => 'editor_script',
+			'script'        => 'script',
+			'editor_style'  => 'editor_style',
+			'style'         => 'style',
+			'supports'      => 'supports',
+			'title'         => 'title',
+			'icon'          => 'icon',
+			'description'   => 'description',
+			'keywords'      => 'keywords',
+			'parent'        => 'parent',
+			'styles'        => 'styleVariations',
+			'text_domain'   => 'textDomain',
 		);
-		foreach ( $extra_fields as $extra_field ) {
-			if ( rest_is_field_included( $extra_field, $fields ) ) {
-				$field                = isset( $block_type->$extra_field ) ? $block_type->$extra_field : '';
-				$data[ $extra_field ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $extra_field ] );
+		foreach ( $extra_fields as $key => $extra_field ) {
+			if ( rest_is_field_included( $key, $fields ) ) {
+				if ( isset( $block_type->$extra_field ) ) {
+					$field = $block_type->$extra_field;
+				} elseif ( isset( $schema['properties'][ $key ]['default'] ) ) {
+					$field = $schema['properties'][ $key ]['default'];
+				} else {
+					$field = '';
+				}
+				$data[ $key ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $key ] );
 			}
 		}
 
@@ -308,9 +321,31 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			'title'      => 'block-type',
 			'type'       => 'object',
 			'properties' => array(
+				'title'         => array(
+					'description' => __( 'Title of block type.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
 				'name'          => array(
 					'description' => __( 'Unique name identifying the block type.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'description'   => array(
+					'description' => __( 'Description of block type.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'icon'          => array(
+					'description' => __( 'Icon of block type.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
@@ -318,6 +353,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'description'          => __( 'Block attributes.', 'gutenberg' ),
 					'type'                 => 'object',
 					'properties'           => array(),
+					'default'              => array(),
 					'additionalProperties' => array(
 						'type' => 'object',
 					),
@@ -327,6 +363,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				'supports'      => array(
 					'description' => __( 'Block supports.', 'gutenberg' ),
 					'type'        => 'object',
+					'default'     => array(),
 					'properties'  => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
@@ -334,36 +371,80 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				'category'      => array(
 					'description' => __( 'Block category.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'is_dynamic'    => array(
 					'description' => __( 'Is the block dynamically rendered.', 'gutenberg' ),
 					'type'        => 'boolean',
+					'default'     => false,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'editor_script' => array(
 					'description' => __( 'Editor script handle.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'script'        => array(
 					'description' => __( 'Public facing script handle.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'editor_style'  => array(
 					'description' => __( 'Editor style handle.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'style'         => array(
 					'description' => __( 'Public facing style handle.', 'gutenberg' ),
 					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'styles'        => array(
+					'description'          => __( 'Block style variations.', 'gutenberg' ),
+					'type'                 => 'object',
+					'properties'           => array(),
+					'additionalProperties' => array(
+						'type' => 'object',
+					),
+					'default'              => array(),
+					'context'              => array( 'embed', 'view', 'edit' ),
+					'readonly'             => true,
+				),
+				'text_domain'   => array(
+					'description' => __( 'Public text domain.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'parent'        => array(
+					'description' => __( 'Parent blocks, defaults to empty it no parents', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array(
+						'type' => 'string',
+					),
+					'default'     => array(),
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'keywords'      => array(
+					'description' => __( 'Block keywords.', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array(
+						'type' => 'string',
+					),
+					'default'     => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
