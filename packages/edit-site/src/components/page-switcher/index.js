@@ -113,6 +113,7 @@ export default function PageSwitcher( {
 							onSelect={ onPageSelect }
 						/>
 						<LinkControl
+							searchInputPlaceholder={ __( 'Search for Post' ) }
 							onChange={ onPostSelect }
 							settings={ {} }
 							noDirectEntry

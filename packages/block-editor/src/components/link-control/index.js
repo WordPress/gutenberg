@@ -156,6 +156,7 @@ const makeCancelable = ( promise ) => {
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
+	searchInputPlaceholder,
 	value,
 	settings,
 	onChange = noop,
@@ -551,6 +552,7 @@ function LinkControl( {
 
 			{ ( isEditingLink || ! value ) && ! isResolvingLink && (
 				<LinkControlSearchInput
+					placeholder={ searchInputPlaceholder }
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ async ( suggestion ) => {
