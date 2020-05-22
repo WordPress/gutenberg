@@ -3,6 +3,8 @@
  */
 const dockerCompose = require( 'docker-compose' );
 const util = require( 'util' );
+const fs = require( 'fs' ).promises;
+const path = require( 'path' );
 
 /**
  * Promisified dependencies
@@ -11,6 +13,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
+ * @typedef {import('./config').WPServiceConfig} WPServiceConfig
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
@@ -73,7 +76,7 @@ async function configureWordPress( environment, config ) {
 		log: config.debug,
 	};
 
-	const port = environment === 'development' ? config.port : config.testsPort;
+	const port = config.env[ environment ].port;
 
 	// Install WordPress.
 	await dockerCompose.run(
@@ -93,13 +96,9 @@ async function configureWordPress( environment, config ) {
 	);
 
 	// Set wp-config.php values.
-	for ( let [ key, value ] of Object.entries( config.config ) ) {
-		// Ensure correct port setting from config when configure WP urls.
-		if ( key === 'WP_SITEURL' || key === 'WP_HOME' ) {
-			const url = new URL( value );
-			url.port = port;
-			value = url.toString();
-		}
+	for ( const [ key, value ] of Object.entries(
+		config.env[ environment ].config
+	) ) {
 		const command = [ 'wp', 'config', 'set', key, value ];
 		if ( typeof value !== 'string' ) {
 			command.push( '--raw' );
@@ -112,7 +111,7 @@ async function configureWordPress( environment, config ) {
 	}
 
 	// Activate all plugins.
-	for ( const pluginSource of config.pluginSources ) {
+	for ( const pluginSource of config.env[ environment ].pluginSources ) {
 		await dockerCompose.run(
 			environment === 'development' ? 'cli' : 'tests-cli',
 			`wp plugin activate ${ pluginSource.basename }`,
@@ -121,7 +120,7 @@ async function configureWordPress( environment, config ) {
 	}
 
 	// Activate the first theme.
-	const [ themeSource ] = config.themeSources;
+	const [ themeSource ] = config.env[ environment ].themeSources;
 	if ( themeSource ) {
 		await dockerCompose.run(
 			environment === 'development' ? 'cli' : 'tests-cli',
@@ -180,6 +179,64 @@ async function resetDatabase(
 	await Promise.all( tasks );
 }
 
+async function setupWordPressDirectories( config ) {
+	if ( hasSameCoreSource( [ config.env.development, config.env.tests ] ) ) {
+		await copyCoreFiles(
+			config.coreSource.path,
+			config.coreSource.testsPath
+		);
+		await createUploadsDir( config.coreSource.testsPath );
+	}
+
+	const checkedPaths = {};
+	for ( const { coreSource } in Object.values( config.env ) ) {
+		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
+			await createUploadsDir( coreSource.path );
+			checkedPaths[ coreSource.path ] = true;
+		}
+	}
+}
+
+async function createUploadsDir( corePath ) {
+	// Ensure the tests uploads folder is writeable for travis,
+	// creating the folder if necessary. @TODO move elsewhere.
+	const uploadPath = path.join( corePath, 'wp-content/uploads' );
+	await fs.mkdir( uploadPath, { recursive: true } );
+	await fs.chmod( uploadPath, 0o0767 );
+}
+
+/**
+ * Returns true if all given environment configs have the same core source.
+ *
+ * @param {WPServiceConfig} envs An array of environments to check.
+ *
+ * @return {boolean} True if all the environments have the same core source.
+ */
+function hasSameCoreSource( envs ) {
+	if ( envs.length < 2 ) {
+		return true;
+	}
+	const coreSource = envs[ 0 ].coreSource;
+	for ( const env in envs ) {
+		// If one does not have a core source but the other does.
+		if (
+			( ! env.coreSource && env.coreSource ) ||
+			( coreSource && ! env.coreSource )
+		) {
+			return false;
+		}
+		// If both have core sources but the paths are different.
+		if (
+			coreSource &&
+			env.coreSource &&
+			coreSource.path !== env.coreSource.path
+		) {
+			return false;
+		}
+	}
+	return true;
+}
+
 /**
  * Copies a WordPress installation, taking care to ignore large directories
  * (.git, node_modules) and configuration files (wp-config.php).
@@ -208,9 +265,10 @@ async function copyCoreFiles( fromPath, toPath ) {
 }
 
 module.exports = {
+	hasSameCoreSource,
 	makeContentDirectoriesWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
-	copyCoreFiles,
+	setupWordPressDirectories,
 };

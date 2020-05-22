@@ -22,7 +22,7 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * Downloads the given source if necessary. The specific action taken depends
- * on the source type.
+ * on the source type. The source is downloaded to source.path.
  *
  * @param {WPSource} source             The source to download.
  * @param {Object}   options
