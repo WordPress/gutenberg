@@ -145,9 +145,8 @@ export function receiveEmbedPreview( url, preview ) {
  * @param {string} kind      Kind of the deleted entity.
  * @param {string} name      Name of the deleted entity.
  * @param {Object} recordId  Record to be deleted.
- * @param {Object} query     Original query of the deleted record.
  */
-export function* deleteEntityRecord( kind, name, recordId, query ) {
+export function* deleteEntityRecord( kind, name, recordId ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
@@ -161,7 +160,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		recordId,
 	};
 
-	yield removeItems( kind, name, Number( recordId ), query );
+	yield removeItems( kind, name, Number( recordId ) );
 
 	let error;
 

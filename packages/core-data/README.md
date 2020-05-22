@@ -63,7 +63,6 @@ _Parameters_
 -   _kind_ `string`: Kind of the deleted entity.
 -   _name_ `string`: Name of the deleted entity.
 -   _recordId_ `Object`: Record to be deleted.
--   _query_ `Object`: Original query of the deleted record.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
