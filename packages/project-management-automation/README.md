@@ -2,9 +2,9 @@
 
 This is a [GitHub Action](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) which contains various automation to assist with managing the Gutenberg GitHub repository:
 
-- `first-time-contributor`: Adds the 'First Time Contributor' label to PRs merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if neccessary for props credit.
-- `add-milestone`: Assigns the correct milestone to PRs once merged.
-- `assign-fixed-issues`: Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
+- [First Time Contributor](./lib/tasks/first-time-contributor): Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
+- [Add Milestone](./lib/tasks/add-milestone): Assigns the plugin release milestone to a pull request once it is merged.
+- [Assign Fixed Issues](./lib/tasks/assign-fixed-issues): Adds assignee for issues which are marked to be "Fixed" by a pull request, and adds the "In Progress" label.
 
 # Installation and usage
 
