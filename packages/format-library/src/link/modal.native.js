@@ -2,7 +2,6 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,7 +18,7 @@ import {
 	getTextContent,
 	slice,
 } from '@wordpress/rich-text';
-import { external, link, textColor } from '@wordpress/icons';
+import { external, textColor } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,6 +39,7 @@ class ModalLinkUI extends Component {
 		);
 		this.removeLink = this.removeLink.bind( this );
 		this.onDismiss = this.onDismiss.bind( this );
+		this.onLinkPicked = this.onLinkPicked.bind( this );
 
 		this.state = {
 			inputValue: '',
@@ -71,6 +71,10 @@ class ModalLinkUI extends Component {
 
 	onChangeText( text ) {
 		this.setState( { text } );
+	}
+
+	onLinkPicked( { url: inputValue, title: text } ) {
+		this.setState( { inputValue, text } );
 	}
 
 	onChangeOpensInNewWindow( opensInNewWindow ) {
@@ -154,22 +158,11 @@ class ModalLinkUI extends Component {
 				onClose={ this.onDismiss }
 				hideHeader
 			>
-				{
-					/* eslint-disable jsx-a11y/no-autofocus */
-					<BottomSheet.Cell
-						icon={ link }
-						label={ __( 'URL' ) }
-						value={ this.state.inputValue }
-						placeholder={ __( 'Add URL' ) }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-						onChangeValue={ this.onChangeInputValue }
-						onSubmit={ this.onDismiss }
-						autoFocus={ Platform.OS === 'ios' }
-					/>
-					/* eslint-enable jsx-a11y/no-autofocus */
-				}
+				<BottomSheet.LinkCell
+					value={ this.state.inputValue }
+					onChangeValue={ this.onChangeInputValue }
+					onLinkPicked={ this.onLinkPicked }
+				/>
 				<BottomSheet.Cell
 					icon={ textColor }
 					label={ __( 'Link text' ) }
