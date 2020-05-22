@@ -4,6 +4,7 @@
 * Add enter/exit animation in FloatingToolbar
 * [***] New block: Verse
 * [*] Fix merging of text blocks when text had active formatting (bold, italic, strike, link)
+* Move remove option to the new menu toolbar button for regular blocks and collapse other options for narrow blocks
 
 1.28.0
 ------
