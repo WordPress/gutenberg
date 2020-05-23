@@ -5,6 +5,7 @@ import {
 	createContext,
 	useContext,
 	useCallback,
+	useEffect,
 	useMemo,
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -156,20 +157,22 @@ export function useEntityBlockEditor(
 	);
 
 	const { editEntityRecord } = useDispatch( 'core' );
-	const initialBlocks = useMemo( () => {
+	useEffect( () => {
 		if ( initialEdits ) {
 			editEntityRecord( kind, type, id, initialEdits, {
 				undoIgnore: true,
 			} );
 		}
-
+	}, [ id ] );
+	const initialBlocks = useMemo( () => {
 		// Guard against other instances that might have
 		// set content to a function already.
-		if ( typeof content !== 'function' ) {
+		if ( content && typeof content !== 'function' ) {
 			const parsedContent = parse( content );
 			return parsedContent.length ? parsedContent : [];
 		}
-	}, [ id ] ); // Reset when the provided entity record changes.
+		return [];
+	}, [ content ] );
 	const [ blocks = initialBlocks, onInput ] = useEntityProp(
 		kind,
 		type,
