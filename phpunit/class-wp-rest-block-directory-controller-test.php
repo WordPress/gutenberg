@@ -15,6 +15,10 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 				'role' => 'administrator',
 			)
 		);
+
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -87,10 +91,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 	}
 
 	public function test_create_item() {
-		if ( ! defined( 'FS_METHOD' ) ) {
-			define( 'FS_METHOD', 'direct' );
-		}
-
 		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}

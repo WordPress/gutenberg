@@ -180,8 +180,8 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$inner_request = new WP_REST_Request( 'POST', '/__experimental/plugins' );
 		$inner_request->set_body_params(
 			array(
-				'slug'     => $request['slug'],
-				'activate' => true,
+				'slug'   => $request['slug'],
+				'status' => 'active',
 			)
 		);
 

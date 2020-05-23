@@ -51,6 +51,10 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'role' => 'administrator',
 			)
 		);
+
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
 	}
 
 	/**
@@ -143,10 +147,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	public function test_create_item() {
-		if ( ! defined( 'FS_METHOD' ) ) {
-			define( 'FS_METHOD', 'direct' );
-		}
-
 		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
@@ -161,6 +161,102 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertNotWPError( $response->as_error() );
 		$this->assertEquals( 201, $response->get_status() );
 		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+	}
+
+	public function test_create_item_and_activate() {
+		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
+			delete_plugins( array( 'hello-dolly/hello.php' ) );
+		}
+
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'POST', self::BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'hello-dolly',
+				'status' => 'active',
+			)
+		);
+
+		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
+		$this->assertNotWPError( $response->as_error() );
+		$this->assertEquals( 201, $response->get_status() );
+		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+		$this->assertTrue( is_plugin_active( 'hello-dolly/hello.php' ) );
+	}
+
+	public function test_create_item_and_activate_errors_if_no_permission_to_activate_plugin() {
+		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
+			delete_plugins( array( 'hello-dolly/hello.php' ) );
+		}
+
+		wp_set_current_user( self::$administrator_id );
+		$this->disable_activate_permission( 'hello-dolly/hello.php' );
+
+		$request = new WP_REST_Request( 'POST', self::BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'hello-dolly',
+				'status' => 'active',
+			)
+		);
+
+		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
+		$this->assertErrorResponse( 'rest_cannot_activate_plugin', $response );
+		$this->assertFalse( is_plugin_active( 'hello-dolly/hello.php' ) );
+	}
+
+	/**
+	 * @group ms-excluded
+	 */
+	public function test_create_item_and_network_activate_rejected_if_not_multisite() {
+		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
+			delete_plugins( array( 'hello-dolly/hello.php' ) );
+		}
+
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'POST', self::BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'hello-dolly',
+				'status' => 'network-active',
+			)
+		);
+
+		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
+		$this->assertErrorResponse( 'rest_invalid_param', $response );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_create_item_and_network_activate() {
+		$this->markTestSkipped( "Multisite tests don't appear to be working." );
+
+		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
+			delete_plugins( array( 'hello-dolly/hello.php' ) );
+		}
+
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'POST', self::BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'hello-dolly',
+				'status' => 'network-active',
+			)
+		);
+
+		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
+		$this->assertNotWPError( $response->as_error() );
+		$this->assertEquals( 201, $response->get_status() );
+		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+		$this->assertTrue( is_plugin_active_for_network( 'hello-dolly/hello.php' ) );
 	}
 
 	public function test_create_item_logged_out() {
@@ -245,6 +341,67 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertTrue( is_plugin_active( self::PLUGIN_FILE ) );
 	}
 
+	public function test_update_item_activate_plugin_fails_if_no_activate_cap() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$administrator_id );
+		$this->disable_activate_permission( self::PLUGIN_FILE );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_activate_plugin', $response, 403 );
+	}
+
+	/**
+	 * @group ms-excluded
+	 */
+	public function test_update_item_network_activate_plugin_rejected_if_not_multisite() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_network_activate_plugin() {
+		$this->markTestSkipped( "Multisite tests don't appear to be working." );
+
+		$this->create_test_plugin();
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_active_for_network( self::PLUGIN_FILE ) );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_network_activate_plugin_that_was_active_on_single_site() {
+		$this->markTestSkipped( "Multisite tests don't appear to be working." );
+
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE );
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_active_for_network( self::PLUGIN_FILE ) );
+	}
+
 	public function test_update_item_deactivate_plugin() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
@@ -258,11 +415,38 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertTrue( is_plugin_inactive( self::PLUGIN_FILE ) );
 	}
 
-	public function test_delete_item() {
-		if ( ! defined( 'FS_METHOD' ) ) {
-			define( 'FS_METHOD', 'direct' );
-		}
+	public function test_update_item_deactivate_plugin_fails_if_no_deactivate_cap() {
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE );
+		wp_set_current_user( self::$administrator_id );
+		$this->disable_deactivate_permission( self::PLUGIN_FILE );
 
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'inactive' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_deactivate_plugin', $response, 403 );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_deactivate_network_active_plugin() {
+		$this->markTestSkipped( "Multisite tests don't appear to be working." );
+
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE, '', true );
+		wp_set_current_user( self::$administrator_id );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'inactive' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_inactive( self::PLUGIN_FILE ) );
+	}
+
+	public function test_delete_item() {
 		$this->create_test_plugin();
 		wp_set_current_user( self::$administrator_id );
 
@@ -291,6 +475,18 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
+	public function test_delete_item_active_plugin() {
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE );
+		wp_set_current_user( self::$administrator_id );
+
+		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
+		$response = rest_do_request( $request );
+
+		$this->skip_on_filesystem_error( $response );
+		$this->assertErrorResponse( 'rest_cannot_delete_active_plugin', $response );
+	}
+
 	public function test_prepare_item() {
 		$this->create_test_plugin();
 
@@ -301,6 +497,24 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $endpoint->prepare_item_for_response( $item, new WP_REST_Request( 'GET', self::BASE . '/' . self::PLUGIN ) );
 
 		$this->check_get_plugin_data( $response->get_data() );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_prepare_item_network_active() {
+		$this->markTestSkipped( "Multisite tests don't appear to be working." );
+
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE, '', true );
+
+		$item          = get_plugins()[ self::PLUGIN_FILE ];
+		$item['_file'] = self::PLUGIN_FILE;
+
+		$endpoint = new WP_REST_Plugins_Controller();
+		$response = $endpoint->prepare_item_for_response( $item, new WP_REST_Request( 'GET', self::BASE . '/' . self::PLUGIN ) );
+
+		$this->assertEquals( 'network-active', $response->get_data()['status'] );
 	}
 
 	public function test_get_item_schema() {
@@ -362,6 +576,46 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( 'fs_unavailable' === $code || false !== strpos( $code, 'mkdir_failed' ) ) {
 			$this->markTestSkipped( 'Filesystem is unavailable.' );
 		}
+	}
+
+	/**
+	 * Disables permission for activating a specific plugin.
+	 *
+	 * @param string $plugin The plugin file to disable.
+	 */
+	protected function disable_activate_permission( $plugin ) {
+		add_filter(
+			'map_meta_cap',
+			static function ( $caps, $cap, $user, $args ) use ( $plugin ) {
+				if ( 'activate_plugin' === $cap && $plugin === $args[0] ) {
+					$caps = array( 'do_not_allow' );
+				}
+
+				return $caps;
+			},
+			10,
+			4
+		);
+	}
+
+	/**
+	 * Disables permission for deactivating a specific plugin.
+	 *
+	 * @param string $plugin The plugin file to disable.
+	 */
+	protected function disable_deactivate_permission( $plugin ) {
+		add_filter(
+			'map_meta_cap',
+			static function ( $caps, $cap, $user, $args ) use ( $plugin ) {
+				if ( 'deactivate_plugin' === $cap && $plugin === $args[0] ) {
+					$caps = array( 'do_not_allow' );
+				}
+
+				return $caps;
+			},
+			10,
+			4
+		);
 	}
 
 	/**

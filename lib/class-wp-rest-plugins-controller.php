@@ -3,8 +3,8 @@
  * Start: Include for phase 2
  * Block Directory REST API: WP_REST_Plugins_Controller class
  *
- * @package gutenberg
  * @since   6.5.0
+ * @package gutenberg
  */
 
 /**
@@ -12,7 +12,7 @@
  *
  * @since 5.5.0
  *
- * @see WP_REST_Controller
+ * @see   WP_REST_Controller
  */
 class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
@@ -49,15 +49,16 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'create_item' ),
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => array(
-						'slug'     => array(
+						'slug'   => array(
 							'type'        => 'string',
 							'required'    => true,
 							'description' => __( 'WordPress.org plugin directory slug.', 'gutenberg' ),
 						),
-						'activate' => array(
-							'type'        => 'boolean',
-							'default'     => false,
-							'description' => __( 'Whether to activate the plugin after installing it.', 'gutenberg' ),
+						'status' => array(
+							'description' => __( 'The plugin activation status.', 'gutenberg' ),
+							'type'        => 'string',
+							'enum'        => is_multisite() ? array( 'inactive', 'active', 'network-active' ) : array( 'inactive', 'active' ),
+							'default'     => 'inactive',
 						),
 					),
 				),
@@ -241,7 +242,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( $request['activate'] && ! current_user_can( 'activate_plugins' ) ) {
+		if ( 'inactive' !== $request['status'] && ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_activate_plugin',
 				__( 'Sorry, you are not allowed to activate this plugin.', 'gutenberg' ),
@@ -326,21 +327,21 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 
 		$file = $upgrader->plugin_info();
 
-		if ( $request['activate'] ) {
-			if ( ! current_user_can( 'activate_plugin', $file ) ) {
-				return new WP_Error(
-					'rest_cannot_activate_plugin',
-					__( 'Sorry, you are not allowed to activate this plugin. The plugin has been installed.', 'gutenberg' ),
-					array(
-						'status' => rest_authorization_required_code(),
-					)
-				);
+		if ( ! $file ) {
+			return new WP_Error( 'unable_to_determine_installed_plugin', __( 'Unable to determine what plugin was installed.', 'gutenberg' ), array( 'status' => 500 ) );
+		}
+
+		if ( 'inactive' !== $request['status'] ) {
+			$can_change_status = $this->plugin_status_permission_check( $file, $request['status'], 'inactive' );
+
+			if ( is_wp_error( $can_change_status ) ) {
+				return $can_change_status;
 			}
 
-			$activated = activate_plugin( $file );
+			$changed_status = $this->handle_plugin_status( $file, $request['status'], 'inactive' );
 
-			if ( is_wp_error( $activated ) ) {
-				return $activated;
+			if ( is_wp_error( $changed_status ) ) {
+				return $changed_status;
 			}
 		}
 
@@ -385,28 +386,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$status = $this->get_plugin_status( $request['plugin'] );
 
 		if ( $request['status'] && $status !== $request['status'] ) {
-			if ( ( 'network-active' === $status || 'network-active' === $request['status'] ) && ! current_user_can( 'manage_network_plugins' ) ) {
-				return new WP_Error(
-					'rest_cannot_manage_network_plugins',
-					__( 'Sorry, you do not have permission to manage network plugins.', 'gutenberg' ),
-					array( 'status' => rest_authorization_required_code() )
-				);
-			}
+			$can_change_status = $this->plugin_status_permission_check( $request['plugin'], $request['status'], $status );
 
-			if ( 'active' === $request['status'] && ! current_user_can( 'activate_plugin', $request['plugin'] ) ) {
-				return new WP_Error(
-					'rest_cannot_activate_plugin',
-					__( 'Sorry, you are not allowed to activate this plugin.', 'gutenberg' ),
-					array( 'status' => rest_authorization_required_code() )
-				);
-			}
-
-			if ( 'inactive' === $request['status'] && ! current_user_can( 'deactivate_plugin', $request['plugin'] ) ) {
-				return new WP_Error(
-					'rest_cannot_deactivate_plugin',
-					__( 'Sorry, you are not allowed to deactivate this plugin.', 'gutenberg' ),
-					array( 'status' => rest_authorization_required_code() )
-				);
+			if ( is_wp_error( $can_change_status ) ) {
+				return $can_change_status;
 			}
 		}
 
@@ -459,6 +442,14 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has access to delete the item, WP_Error object otherwise.
 	 */
 	public function delete_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return new WP_Error(
+				'rest_cannot_manage_plugins',
+				__( 'Sorry, you are not allowed to manage plugins for this site.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		if ( ! current_user_can( 'delete_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_manage_plugins',
@@ -584,6 +575,45 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @param string $plugin         The plugin file to update.
 	 * @param string $new_status     The plugin's new status.
 	 * @param string $current_status The plugin's current status.
+	 *
+	 * @return true|WP_Error
+	 */
+	protected function plugin_status_permission_check( $plugin, $new_status, $current_status ) {
+		if ( ( 'network-active' === $current_status || 'network-active' === $new_status ) && ! current_user_can( 'manage_network_plugins' ) ) {
+			return new WP_Error(
+				'rest_cannot_manage_network_plugins',
+				__( 'Sorry, you do not have permission to manage network plugins.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		if ( ( 'active' === $new_status || 'network-active' === $new_status ) && ! current_user_can( 'activate_plugin', $plugin ) ) {
+			return new WP_Error(
+				'rest_cannot_activate_plugin',
+				__( 'Sorry, you are not allowed to activate this plugin.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		if ( 'inactive' === $new_status && ! current_user_can( 'deactivate_plugin', $plugin ) ) {
+			return new WP_Error(
+				'rest_cannot_deactivate_plugin',
+				__( 'Sorry, you are not allowed to deactivate this plugin.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Handle updating a plugin's status.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $plugin         The plugin file to update.
+	 * @param string $new_status     The plugin's new status.
+	 * @param string $current_status The plugin's current status.
 	 * @return true|WP_Error
 	 */
 	protected function handle_plugin_status( $plugin, $new_status, $current_status ) {
@@ -654,12 +684,6 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			return $this->add_additional_fields_schema( $this->schema );
 		}
 
-		$status = array( 'inactive', 'active' );
-
-		if ( is_multisite() ) {
-			$status[] = 'network-active';
-		}
-
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
 			'title'      => 'plugin',
@@ -675,7 +699,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 				'status'       => array(
 					'description' => __( 'The plugin activation status.', 'gutenberg' ),
 					'type'        => 'string',
-					'enum'        => $status,
+					'enum'        => is_multisite() ? array( 'inactive', 'active', 'network-active' ) : array( 'inactive', 'active' ),
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
 				'name'         => array(
