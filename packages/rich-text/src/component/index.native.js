@@ -76,6 +76,7 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
+		this.getHtmlForRecordCreation = this.getHtmlForRecordCreation.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
@@ -125,7 +126,9 @@ export class RichText extends Component {
 		const { selectionStart: start, selectionEnd: end } = this.props;
 		const { value } = this.props;
 
-		const { formats, replacements, text } = this.formatToValue( value );
+		const html = this.getHtmlForRecordCreation( value, this.multilineTag );
+
+		const { formats, replacements, text } = this.formatToValue( html );
 		const { activeFormats } = this.state;
 
 		return { formats, replacements, text, start, end, activeFormats };
@@ -140,11 +143,15 @@ export class RichText extends Component {
 	 */
 	createRecord() {
 		const { preserveWhiteSpace } = this.props;
+		const htmlForCreate = this.getHtmlForRecordCreation(
+			this.value,
+			this.multilineTag
+		);
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
 			...create( {
-				html: this.value,
+				html: htmlForCreate,
 				range: null,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -154,6 +161,14 @@ export class RichText extends Component {
 		const start = Math.min( this.selectionStart, value.text.length );
 		const end = Math.min( this.selectionEnd, value.text.length );
 		return { ...value, start, end };
+	}
+
+	getHtmlForRecordCreation( value, tag ) {
+		if ( tag === 'p' &&
+			( ! value || value.length < 3 || ! value.startsWith( '<p>' ) ) ) {
+			return '<p>' + value + '</p>';
+		}
+		return value;
 	}
 
 	valueToFormat( value ) {
@@ -679,8 +694,8 @@ export class RichText extends Component {
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
-		if ( ! this.isIOS && value === '' ) {
-			return value;
+		if ( ! this.isIOS && ( value === '' || value === '<p></p>' ) ) {
+			return '';
 		}
 
 		if ( tagName ) {
