@@ -171,6 +171,7 @@ export function useEntityBlockEditor(
 			const parsedContent = parse( content );
 			return parsedContent.length ? parsedContent : [];
 		}
+		return [];
 	}, [ content ] );
 	const [ blocks = initialBlocks, onInput ] = useEntityProp(
 		kind,
