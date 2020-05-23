@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { useControlledState } from '../hooks';
+import { useControlledState } from '../use-controlled-state';
 
 describe( 'hooks', () => {
 	const getInput = () => screen.getByTestId( 'input' );

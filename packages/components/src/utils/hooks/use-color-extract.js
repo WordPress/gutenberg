@@ -2,13 +2,17 @@
  * External dependencies
  */
 import { noop } from 'lodash';
-import ColorThief from 'colorthief';
 import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { ColorThief } from './extract-color';
 
 /**
  *
