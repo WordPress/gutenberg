@@ -9,6 +9,14 @@ figure.wp-block-image:not(.wp-block) {
 		opacity: 0.3;
 	}
 
+	&.is-uploading-multiple-images .components-spinner {
+		position: relative;
+		top: 0;
+		left: 0;
+		margin-top: 5px;
+		margin-left: 11px;
+	}
+
 	figcaption img {
 		display: inline;
 	}

@@ -140,6 +140,14 @@ Callback called when an upload error happens.
 - Required: No
 - Platform: Web
 
+### onFilesUpload
+
+Callback called when files started to be uploaded.
+
+- Type: `Function`
+- Required: No
+- Platform: Web
+
 ### onSelect
 
 Callback called when the files are selected/uploaded.
@@ -152,6 +160,15 @@ The call back receives an array with the new files. Each element of the collecti
 The argument of the callback is an object containing the following properties:
 - Web: `{ url, alt, id, link, caption, sizes, media_details }`
 - Mobile: `{ id, url }`
+
+### selectAllUploads
+
+Whether to get the entire list of selected files with `onSelect` without using `multiple` option.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+- Platform: Web
 
 ### value
 

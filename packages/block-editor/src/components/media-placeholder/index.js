@@ -114,6 +114,7 @@ export class MediaPlaceholder extends Component {
 			allowedTypes,
 			mediaUpload,
 			multiple,
+			selectAllUploads,
 			onError,
 			onSelect,
 		} = this.props;
@@ -165,8 +166,15 @@ export class MediaPlaceholder extends Component {
 				setMedia = onSelect;
 			}
 		} else {
-			setMedia = ( [ media ] ) => onSelect( media );
+			setMedia = selectAllUploads
+				? onSelect
+				: ( [ media ] ) => onSelect( media );
 		}
+
+		if ( this.props.onFilesUpload ) {
+			this.props.onFilesUpload( files );
+		}
+
 		mediaUpload( {
 			allowedTypes,
 			filesList: files,

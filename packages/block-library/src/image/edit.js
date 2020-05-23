@@ -17,6 +17,7 @@ import {
 	TextControl,
 	ToolbarGroup,
 	withNotices,
+	Placeholder,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -87,6 +88,12 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  */
 const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
+const isUploadingImages = ( media ) =>
+	media.filter( ( image ) => isBlobURL( image.url ) ).length > 0;
+
+const currentlyUploadingImage = ( media ) =>
+	media.filter( ( image ) => isBlobURL( image.url ) )[ 0 ];
+
 export class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
@@ -95,6 +102,8 @@ export class ImageEdit extends Component {
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
+		this.onFilesUpload = this.onFilesUpload.bind( this );
+		this.setupImage = this.setupImage.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateImage = this.updateImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
@@ -105,6 +114,8 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			captionFocused: false,
+			uploadingMultipleImages: false,
+			imageFileName: null,
 		};
 	}
 
@@ -159,6 +170,39 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectImage( media ) {
+		if ( ! Array.isArray( media ) ) {
+			// selected by Media library.
+			this.setupImage( media );
+		} else if ( this.state.uploadingMultipleImages ) {
+			if ( isUploadingImages( media ) ) {
+				this.setState( {
+					imageFileName: currentlyUploadingImage( media ),
+				} );
+			} else {
+				// Reset current component for undo.
+				this.props.setAttributes( {
+					url: undefined,
+					alt: undefined,
+					id: undefined,
+					title: undefined,
+					caption: undefined,
+				} );
+				this.props.replaceWithMultipleImageBlocks( media );
+			}
+		} else {
+			this.setupImage( media[ 0 ] );
+		}
+	}
+
+	onFilesUpload( files ) {
+		if ( files.length > 1 ) {
+			this.setState( {
+				uploadingMultipleImages: true,
+			} );
+		}
+	}
+
+	setupImage( media ) {
 		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
 				url: undefined,
@@ -414,6 +458,8 @@ export class ImageEdit extends Component {
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
 				disableMediaButtons={ url }
+				selectAllUploads
+				onFilesUpload={ this.onFilesUpload }
 			/>
 		);
 
@@ -423,6 +469,21 @@ export class ImageEdit extends Component {
 					{ controls }
 					<Block.div>{ mediaPlaceholder }</Block.div>
 				</>
+			);
+		}
+
+		if ( this.state.uploadingMultipleImages ) {
+			return (
+				<Block.div className="is-uploading-multiple-images">
+					<Placeholder
+						label={
+							<>
+								<Spinner />
+								{ __( 'Uploading Images. Please wait.' ) }
+							</>
+						}
+					></Placeholder>
+				</Block.div>
 			);
 		}
 
@@ -691,12 +752,35 @@ export class ImageEdit extends Component {
 }
 
 export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+	withDispatch( ( dispatch, props ) => {
+		const { toggleSelection, replaceBlocks } = dispatch(
+			'core/block-editor'
+		);
 
 		return {
 			onResizeStart: () => toggleSelection( false ),
 			onResizeStop: () => toggleSelection( true ),
+			replaceWithMultipleImageBlocks( media ) {
+				const blocks = filter(
+					media.map( ( image ) => {
+						if ( ! image || ! image.url ) {
+							return null;
+						}
+
+						const { url, caption } = pickRelevantMediaFiles(
+							image
+						);
+
+						return createBlock( 'core/image', {
+							url,
+							caption,
+						} );
+					} ),
+					( block ) => !! block
+				);
+
+				replaceBlocks( [ props.clientId ], blocks );
+			},
 		};
 	} ),
 	withSelect( ( select, props ) => {
