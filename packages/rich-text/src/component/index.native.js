@@ -76,7 +76,9 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.getHtmlForRecordCreation = this.getHtmlForRecordCreation.bind( this );
+		this.getHtmlForRecordCreation = this.getHtmlForRecordCreation.bind(
+			this
+		);
 		this.onChange = this.onChange.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
@@ -164,8 +166,10 @@ export class RichText extends Component {
 	}
 
 	getHtmlForRecordCreation( value, tag ) {
-		if ( tag === 'p' &&
-			( ! value || value.length < 3 || ! value.startsWith( '<p>' ) ) ) {
+		if (
+			tag === 'p' &&
+			( ! value || value.length < 3 || ! value.startsWith( '<p>' ) )
+		) {
 			return '<p>' + value + '</p>';
 		}
 		return value;
