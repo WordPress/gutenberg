@@ -188,9 +188,7 @@ describe( 'BlockSwitcher', () => {
 							isOpen: false,
 						} )
 				);
-				const iconButtonClosed = toggleClosed.find(
-					'ForwardRef(Button)'
-				);
+				const iconButtonClosed = toggleClosed.find( 'ToolbarButton' );
 
 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
 
@@ -206,7 +204,7 @@ describe( 'BlockSwitcher', () => {
 							isOpen: true,
 						} )
 				);
-				const iconButtonOpen = toggleOpen.find( 'ForwardRef(Button)' );
+				const iconButtonOpen = toggleOpen.find( 'ToolbarButton' );
 
 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
 

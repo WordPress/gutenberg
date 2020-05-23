@@ -18,7 +18,10 @@ function ToolbarGroupCollapsed( { controls = [], ...props } ) {
 	const renderDropdownMenu = ( toggleProps ) => (
 		<DropdownMenu
 			controls={ controls }
-			toggleProps={ toggleProps }
+			toggleProps={ {
+				...toggleProps,
+				'data-experimental-toolbar-item': true,
+			} }
 			{ ...props }
 		/>
 	);

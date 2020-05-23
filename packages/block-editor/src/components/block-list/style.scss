@@ -368,6 +368,7 @@
 		background: $dark-gray-primary;
 		border-radius: $radius-block-ui;
 		color: $white;
+		padding: 0;
 
 		// Special dimensions for this button.
 		min-width: 24px;
@@ -484,6 +485,7 @@
 	border-radius: $radius-block-ui;
 	background-color: $white;
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-right-color: $dark-gray-primary;
 	}

@@ -29,5 +29,12 @@
 		"customTextColor": {
 			"type": "string"
 		}
+	},
+	"context": [
+		"postType",
+		"postId"
+	],
+	"supports": {
+		"html": false
 	}
 }

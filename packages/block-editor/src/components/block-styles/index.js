@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, memo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
@@ -63,10 +63,24 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
 		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	list.add( 'is-style-' + newStyle.name );
+	if ( ! newStyle.isDefault ) {
+		list.add( 'is-style-' + newStyle.name );
+	}
 
 	return list.value;
 }
+
+const useGenericPreviewBlock = ( block, type ) =>
+	useMemo(
+		() =>
+			type.example
+				? getBlockFromExample( block.name, {
+						attributes: type.example.attributes,
+						innerBlocks: type.example.innerBlocks,
+				  } )
+				: cloneBlock( block ),
+		[ type.example ? block.name : block, type ]
+	);
 
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const selector = ( select ) => {
@@ -74,32 +88,20 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
 		const blockType = getBlockType( block.name );
-		const useExample = !! blockType.example;
 		return {
-			useExample,
-			blockName: block.name,
-			className: block.attributes.className || '',
-			styles: getBlockStyles( block.name ),
+			block,
 			type: blockType,
-			block: useExample ? null : block,
+			styles: getBlockStyles( block.name ),
+			className: block.attributes.className || '',
 		};
 	};
 
-	const {
-		useExample,
-		blockName,
-		className,
-		styles,
-		type,
-		block,
-	} = useSelect( selector, [ clientId ] );
+	const { styles, block, type, className } = useSelect( selector, [
+		clientId,
+	] );
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	const onChangeClassName = useCallback(
-		( newClassName ) =>
-			updateBlockAttributes( clientId, { className: newClassName } ),
-		[ updateBlockAttributes, clientId ]
-	);
+	const genericPreviewBlock = useGenericPreviewBlock( block, type );
 
 	if ( ! styles || styles.length === 0 ) {
 		return null;
@@ -114,17 +116,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
-	function updateClassName( style ) {
-		const updatedClassName = replaceActiveStyle(
-			className,
-			activeStyle,
-			style
-		);
-		onChangeClassName( updatedClassName );
-		onHoverClassName( null );
-		onSwitch();
-	}
-
 	return (
 		<div className="block-editor-block-styles">
 			{ styles.map( ( style ) => {
@@ -134,59 +125,75 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					style
 				);
 				return (
-					<div
+					<BlockStyleItem
+						genericPreviewBlock={ genericPreviewBlock }
+						className={ className }
+						isActive={ activeStyle === style }
 						key={ style.name }
-						className={ classnames(
-							'block-editor-block-styles__item',
-							{
-								'is-active': activeStyle === style,
-							}
-						) }
-						onClick={ () => updateClassName( style ) }
-						onKeyDown={ ( event ) => {
-							if (
-								ENTER === event.keyCode ||
-								SPACE === event.keyCode
-							) {
-								event.preventDefault();
-								updateClassName( style );
-							}
+						onSelect={ () => {
+							updateBlockAttributes( clientId, {
+								className: styleClassName,
+							} );
+							onHoverClassName( null );
+							onSwitch();
 						} }
-						onMouseEnter={ () =>
-							onHoverClassName( styleClassName )
-						}
-						onMouseLeave={ () => onHoverClassName( null ) }
-						role="button"
-						tabIndex="0"
-						aria-label={ style.label || style.name }
-					>
-						<div className="block-editor-block-styles__item-preview">
-							<BlockPreview
-								viewportWidth={ 500 }
-								blocks={
-									useExample
-										? getBlockFromExample( blockName, {
-												attributes: {
-													...type.example.attributes,
-													className: styleClassName,
-												},
-												innerBlocks:
-													type.example.innerBlocks,
-										  } )
-										: cloneBlock( block, {
-												className: styleClassName,
-										  } )
-								}
-							/>
-						</div>
-						<div className="block-editor-block-styles__item-label">
-							{ style.label || style.name }
-						</div>
-					</div>
+						onBlur={ () => onHoverClassName( null ) }
+						onHover={ () => onHoverClassName( styleClassName ) }
+						style={ style }
+						styleClassName={ styleClassName }
+					/>
 				);
 			} ) }
 		</div>
 	);
 }
 
-export default memo( BlockStyles );
+function BlockStyleItem( {
+	genericPreviewBlock,
+	style,
+	isActive,
+	onBlur,
+	onHover,
+	onSelect,
+	styleClassName,
+} ) {
+	const previewBlocks = useMemo( () => {
+		return {
+			...genericPreviewBlock,
+			attributes: {
+				...genericPreviewBlock.attributes,
+				className: styleClassName,
+			},
+		};
+	}, [ genericPreviewBlock, styleClassName ] );
+
+	return (
+		<div
+			key={ style.name }
+			className={ classnames( 'block-editor-block-styles__item', {
+				'is-active': isActive,
+			} ) }
+			onClick={ () => onSelect() }
+			onKeyDown={ ( event ) => {
+				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+					event.preventDefault();
+					onSelect();
+				}
+			} }
+			onMouseEnter={ onHover }
+			onMouseLeave={ onBlur }
+			role="button"
+			tabIndex="0"
+			aria-label={ style.label || style.name }
+		>
+			<div className="block-editor-block-styles__item-preview">
+				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
+			</div>
+			<div className="block-editor-block-styles__item-label">
+				{ style.label || style.name }
+			</div>
+		</div>
+	);
+}
+
+export default BlockStyles;

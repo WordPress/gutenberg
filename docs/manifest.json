@@ -234,6 +234,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Themes & Block Editor: experimental theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -630,6 +636,12 @@
 		"parent": null
 	},
 	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "AnglePickerControl",
 		"slug": "angle-picker-control",
 		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
@@ -864,6 +876,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "InputControl",
+		"slug": "input-control",
+		"markdown_source": "../packages/components/src/input-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "IsolatedEventContainer",
 		"slug": "isolated-event-container",
 		"markdown_source": "../packages/components/src/isolated-event-container/README.md",
@@ -1053,6 +1071,12 @@
 		"title": "Tooltip",
 		"slug": "tooltip",
 		"markdown_source": "../packages/components/src/tooltip/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
 		"parent": "components"
 	},
 	{
@@ -1491,6 +1515,12 @@
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

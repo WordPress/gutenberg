@@ -13,5 +13,11 @@
 			"type": "boolean",
 			"default": true
 		}
+	},
+	"context": [
+		"postId"
+	],
+	"supports": {
+		"html": false
 	}
 }

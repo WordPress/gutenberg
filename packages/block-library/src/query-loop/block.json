@@ -1,0 +1,13 @@
+{
+	"name": "core/query-loop",
+	"category": "layout",
+	"context": [
+		"queryId",
+		"query",
+		"queryContext"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

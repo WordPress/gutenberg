@@ -19,10 +19,6 @@ export const settings = {
 	description: __( 'Display entries from any RSS or Atom feed.' ),
 	icon,
 	keywords: [ __( 'atom' ), __( 'feed' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
 	example: {
 		attributes: {
 			feedURL: 'https://wordpress.org',

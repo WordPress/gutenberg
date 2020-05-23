@@ -29,10 +29,6 @@ export const settings = {
 	icon,
 	transforms,
 	deprecated,
-	supports: {
-		align: true,
-		lightBlockWrapper: true,
-	},
 	edit,
 	save,
 };

@@ -76,12 +76,19 @@ function BlockManager( {
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
 						key={ category.slug }
-						category={ category }
+						title={ category.title }
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
 						} ) }
 					/>
 				) ) }
+				<BlockManagerCategory
+					title={ __( 'Uncategorized' ) }
+					blockTypes={ filter(
+						blockTypes,
+						( { category } ) => ! category
+					) }
+				/>
 			</div>
 		</div>
 	);

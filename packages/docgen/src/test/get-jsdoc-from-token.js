@@ -1,5 +1,5 @@
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getJSDocFromToken = require( '../get-jsdoc-from-token' );
 

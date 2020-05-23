@@ -5,5 +5,11 @@
 		"format": {
 			"type": "string"
 		}
+	},
+	"context": [
+		"postId"
+	],
+	"supports": {
+		"html": false
 	}
 }

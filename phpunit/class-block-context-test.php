@@ -163,4 +163,38 @@ class Block_Context_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that default block context can be filtered.
+	 */
+	function test_default_context_is_filterable() {
+		$provided_context = array();
+
+		$this->register_block_type(
+			'gutenberg/test-context-consumer',
+			array(
+				'context'         => array( 'example' ),
+				'render_callback' => function( $attributes, $content, $block ) use ( &$provided_context ) {
+					$provided_context[] = $block->context;
+
+					return '';
+				},
+			)
+		);
+
+		$filter_block_context = function( $context ) {
+			$context['example'] = 'ok';
+			return $context;
+		};
+
+		$parsed_blocks = parse_blocks( '<!-- wp:gutenberg/test-context-consumer /-->' );
+
+		add_filter( 'render_block_context', $filter_block_context );
+
+		render_block( $parsed_blocks[0] );
+
+		remove_filter( 'render_block_context', $filter_block_context );
+
+		$this->assertEquals( array( 'example' => 'ok' ), $provided_context[0] );
+	}
+
 }

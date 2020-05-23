@@ -32,7 +32,7 @@ function gutenberg_is_edit_site_page( $page ) {
 }
 
 /**
- * Load editor styles (this is copied form edit-form-blocks.php).
+ * Load editor styles (this is copied from edit-form-blocks.php).
  * Ideally the code is extracted into a reusable function.
  *
  * @return array Editor Styles Setting.
@@ -88,9 +88,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global
-		$_wp_current_template_part_ids,
-		$current_screen;
+	global $current_screen;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -154,16 +152,11 @@ function gutenberg_edit_site_init( $hook ) {
 			continue;
 		}
 
-		$template_hierarchy    = array_merge( get_template_hierachy( $template_type ), get_template_hierachy( 'index' ) );
-		$current_template_post = gutenberg_find_template_post( $template_hierarchy );
-		if ( isset( $current_template_post ) ) {
-			$template_ids[ $current_template_post->post_name ] = $current_template_post->ID;
+		$current_template = gutenberg_find_template_post_and_parts( $template_type );
+		if ( isset( $current_template ) ) {
+			$template_ids[ $current_template['template_post']->post_name ] = $current_template['template_post']->ID;
+			$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
 		}
-		if ( isset( $_wp_current_template_part_ids ) ) {
-			$template_part_ids = $template_part_ids + $_wp_current_template_part_ids;
-		}
-
-		$_wp_current_template_part_ids = null;
 	}
 
 	$current_template_id = $template_ids['front-page'];
@@ -175,6 +168,19 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['templatePartIds'] = array_values( $template_part_ids );
 	$settings['styles']          = gutenberg_get_editor_styles();
 
+	$settings['showOnFront'] = get_option( 'show_on_front' );
+	$settings['page']        = array(
+		'path'    => '/',
+		'context' => 'page' === $settings['showOnFront'] ? array(
+			'postType' => 'page',
+			'postId'   => get_option( 'page_on_front' ),
+		) : array(
+			'query' => array(
+				'categoryIds' => array(),
+			),
+		),
+	);
+
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
 	global $post;
@@ -185,7 +191,8 @@ function gutenberg_edit_site_init( $hook ) {
 	$preload_paths = array(
 		'/',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/taxonomies?per_page=100&context=edit',
+		'/wp/v2/pages?per_page=100&context=edit',
 		'/wp/v2/themes?status=active',
 		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),

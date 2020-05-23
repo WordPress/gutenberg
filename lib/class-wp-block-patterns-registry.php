@@ -164,7 +164,7 @@ class WP_Patterns_Registry {
  * @return boolean True if the pattern was registered with success and false otherwise.
  */
 function register_pattern( $pattern_name, $pattern_properties ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 8.3.0', 'register_block_pattern()' );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 8.1.0', 'register_block_pattern()' );
 	return register_block_pattern( $pattern_name, $pattern_properties );
 }
 
@@ -176,6 +176,6 @@ function register_pattern( $pattern_name, $pattern_properties ) {
  * @return boolean True if the pattern was unregistered with success and false otherwise.
  */
 function unregister_pattern( $pattern_name ) {
-	_deprecated_function( __FUNCTION__, 'Gutenberg 8.3.0', 'unregister_block_pattern()' );
+	_deprecated_function( __FUNCTION__, 'Gutenberg 8.1.0', 'unregister_block_pattern()' );
 	return unregister_block_pattern( $pattern_name );
 }

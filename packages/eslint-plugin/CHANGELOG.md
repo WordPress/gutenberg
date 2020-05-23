@@ -1,8 +1,16 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### Bug Fixes
+
+- `@wordpress/dependency-group` will now correctly identify issues associated with CommonJS (`require`) module imports.
+
+## 6.0.0 (2020-05-14)
 
 ### Breaking Changes
 
--  The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
+- The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
 
 ### Improvements
 
