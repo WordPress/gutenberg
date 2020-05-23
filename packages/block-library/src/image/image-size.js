@@ -1,25 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { calculatePreferedImageSize } from './utils';
 
-export default function ImageSize( { src, dirtynessTrigger, children } ) {
-	const ref = useRef();
+export default function useImageSize( ref, src, dependencies ) {
 	const [ state, setState ] = useState( {
 		imageWidth: null,
 		imageHeight: null,
-		containerWidth: null,
-		containerHeight: null,
 		imageWidthWithinContainer: null,
 		imageHeightWithinContainer: null,
 	} );
 
 	useEffect( () => {
+		if ( ! src ) {
+			return;
+		}
+
 		const { defaultView } = ref.current.ownerDocument;
 		const image = new defaultView.Image();
 
@@ -32,8 +33,6 @@ export default function ImageSize( { src, dirtynessTrigger, children } ) {
 			setState( {
 				imageWidth: image.width,
 				imageHeight: image.height,
-				containerWidth: ref.current.clientWidth,
-				containerHeight: ref.current.clientHeight,
 				imageWidthWithinContainer: width,
 				imageHeightWithinContainer: height,
 			} );
@@ -47,7 +46,7 @@ export default function ImageSize( { src, dirtynessTrigger, children } ) {
 			defaultView.removeEventListener( 'resize', calculateSize );
 			image.removeEventListener( 'load', calculateSize );
 		};
-	}, [ src, dirtynessTrigger ] );
+	}, [ src, ...dependencies ] );
 
-	return <div ref={ ref }>{ children( state ) }</div>;
+	return state;
 }

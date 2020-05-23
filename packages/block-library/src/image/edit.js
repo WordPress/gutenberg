@@ -33,7 +33,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { image as icon } from '@wordpress/icons';
@@ -43,7 +43,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import ImageSize from './image-size';
+import useImageSize from './image-size';
 
 /**
  * Module constants
@@ -77,8 +77,8 @@ export const pickRelevantMediaFiles = ( image ) => {
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 /**
- * Is the url for the image hosted externally. An externally hosted image has no id
- * and is not a blob url.
+ * Is the url for the image hosted externally. An externally hosted image has no
+ * id and is not a blob url.
  *
  * @param {number=} id  The id of the image.
  * @param {string=} url The url of the image.
@@ -119,6 +119,7 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 } ) {
+	const ref = useRef();
 	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
@@ -167,8 +168,8 @@ export function ImageEdit( {
 
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
-		// If the current image is temporary but an alt text was meanwhile written by the user,
-		// make sure the text is not overwritten.
+		// If the current image is temporary but an alt text was meanwhile
+		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
 			if ( alt ) {
 				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
@@ -396,6 +397,13 @@ export function ImageEdit( {
 		/>
 	);
 
+	const {
+		imageWidthWithinContainer,
+		imageHeightWithinContainer,
+		imageWidth,
+		imageHeight,
+	} = useImageSize( ref, url, [ align ] );
+
 	if ( ! url ) {
 		return (
 			<>
@@ -415,7 +423,7 @@ export function ImageEdit( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = getImageSizeOptions();
 
-	const getInspectorControls = ( imageWidth, imageHeight ) => (
+	const inspectorControls = (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
@@ -471,168 +479,123 @@ export function ImageEdit( {
 		</>
 	);
 
-	// Disable reason: Each block can be selected by clicking on it.
-	/* eslint-disable jsx-a11y/click-events-have-key-events */
+	const filename = getFilename( url );
+	let defaultedAlt;
+
+	if ( alt ) {
+		defaultedAlt = alt;
+	} else if ( filename ) {
+		defaultedAlt = sprintf(
+			/* translators: %s: file name */
+			__( 'This image has an empty alt attribute; its file name is %s' ),
+			filename
+		);
+	} else {
+		defaultedAlt = __( 'This image has an empty alt attribute' );
+	}
+
+	let img = (
+		// Disable reason: Image itself is not meant to be interactive, but
+		// should direct focus to block.
+		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		<>
+			{ inspectorControls }
+			<img
+				src={ url }
+				alt={ defaultedAlt }
+				onClick={ onImageClick }
+				onError={ () => onImageError() }
+			/>
+			{ isBlobURL( url ) && <Spinner /> }
+		</>
+		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+	);
+
+	if ( ! isResizable || ! imageWidthWithinContainer ) {
+		img = <div style={ { width, height } }>{ img }</div>;
+	} else {
+		const currentWidth = width || imageWidthWithinContainer;
+		const currentHeight = height || imageHeightWithinContainer;
+
+		const ratio = imageWidth / imageHeight;
+		const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
+		const minHeight =
+			imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+
+		// With the current implementation of ResizableBox, an image needs an
+		// explicit pixel value for the max-width. In absence of being able to
+		// set the content-width, this max-width is currently dictated by the
+		// vanilla editor style. The following variable adds a buffer to this
+		// vanilla style, so 3rd party themes have some wiggleroom. This does,
+		// in most cases, allow you to scale the image beyond the width of the
+		// main column, though not infinitely.
+		// @todo It would be good to revisit this once a content-width variable
+		// becomes available.
+		const maxWidthBuffer = maxWidth * 2.5;
+
+		let showRightHandle = false;
+		let showLeftHandle = false;
+
+		/* eslint-disable no-lonely-if */
+		// See https://github.com/WordPress/gutenberg/issues/7584.
+		if ( align === 'center' ) {
+			// When the image is centered, show both handles.
+			showRightHandle = true;
+			showLeftHandle = true;
+		} else if ( isRTL ) {
+			// In RTL mode the image is on the right by default.
+			// Show the right handle and hide the left handle only when it is
+			// aligned left. Otherwise always show the left handle.
+			if ( align === 'left' ) {
+				showRightHandle = true;
+			} else {
+				showLeftHandle = true;
+			}
+		} else {
+			// Show the left handle and hide the right handle only when the
+			// image is aligned right. Otherwise always show the right handle.
+			if ( align === 'right' ) {
+				showLeftHandle = true;
+			} else {
+				showRightHandle = true;
+			}
+		}
+		/* eslint-enable no-lonely-if */
+
+		img = (
+			<ResizableBox
+				size={ { width, height } }
+				showHandle={ isSelected }
+				minWidth={ minWidth }
+				maxWidth={ maxWidthBuffer }
+				minHeight={ minHeight }
+				maxHeight={ maxWidthBuffer / ratio }
+				lockAspectRatio
+				enable={ {
+					top: false,
+					right: showRightHandle,
+					bottom: true,
+					left: showLeftHandle,
+				} }
+				onResizeStart={ onResizeStart }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
+					setAttributes( {
+						width: parseInt( currentWidth + delta.width, 10 ),
+						height: parseInt( currentHeight + delta.height, 10 ),
+					} );
+				} }
+			>
+				{ img }
+			</ResizableBox>
+		);
+	}
+
 	return (
 		<>
 			{ controls }
-			<Block.figure className={ classes }>
-				<ImageSize src={ url } dirtynessTrigger={ align }>
-					{ ( sizes ) => {
-						const {
-							imageWidthWithinContainer,
-							imageHeightWithinContainer,
-							imageWidth,
-							imageHeight,
-						} = sizes;
-
-						const filename = getFilename( url );
-						let defaultedAlt;
-						if ( alt ) {
-							defaultedAlt = alt;
-						} else if ( filename ) {
-							defaultedAlt = sprintf(
-								/* translators: %s: file name */
-								__(
-									'This image has an empty alt attribute; its file name is %s'
-								),
-								filename
-							);
-						} else {
-							defaultedAlt = __(
-								'This image has an empty alt attribute'
-							);
-						}
-
-						const img = (
-							// Disable reason: Image itself is not meant to be interactive, but
-							// should direct focus to block.
-							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-							<>
-								<img
-									src={ url }
-									alt={ defaultedAlt }
-									onClick={ onImageClick }
-									onError={ () => onImageError() }
-								/>
-								{ isBlobURL( url ) && <Spinner /> }
-							</>
-							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-						);
-
-						if ( ! isResizable || ! imageWidthWithinContainer ) {
-							return (
-								<>
-									{ getInspectorControls(
-										imageWidth,
-										imageHeight
-									) }
-									<div style={ { width, height } }>
-										{ img }
-									</div>
-								</>
-							);
-						}
-
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight =
-							height || imageHeightWithinContainer;
-
-						const ratio = imageWidth / imageHeight;
-						const minWidth =
-							imageWidth < imageHeight
-								? MIN_SIZE
-								: MIN_SIZE * ratio;
-						const minHeight =
-							imageHeight < imageWidth
-								? MIN_SIZE
-								: MIN_SIZE / ratio;
-
-						// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
-						// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
-						// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
-						// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
-						// @todo It would be good to revisit this once a content-width variable becomes available.
-						const maxWidthBuffer = maxWidth * 2.5;
-
-						let showRightHandle = false;
-						let showLeftHandle = false;
-
-						/* eslint-disable no-lonely-if */
-						// See https://github.com/WordPress/gutenberg/issues/7584.
-						if ( align === 'center' ) {
-							// When the image is centered, show both handles.
-							showRightHandle = true;
-							showLeftHandle = true;
-						} else if ( isRTL ) {
-							// In RTL mode the image is on the right by default.
-							// Show the right handle and hide the left handle only when it is aligned left.
-							// Otherwise always show the left handle.
-							if ( align === 'left' ) {
-								showRightHandle = true;
-							} else {
-								showLeftHandle = true;
-							}
-						} else {
-							// Show the left handle and hide the right handle only when the image is aligned right.
-							// Otherwise always show the right handle.
-							if ( align === 'right' ) {
-								showLeftHandle = true;
-							} else {
-								showRightHandle = true;
-							}
-						}
-						/* eslint-enable no-lonely-if */
-
-						return (
-							<>
-								{ getInspectorControls(
-									imageWidth,
-									imageHeight
-								) }
-								<ResizableBox
-									size={ {
-										width,
-										height,
-									} }
-									showHandle={ isSelected }
-									minWidth={ minWidth }
-									maxWidth={ maxWidthBuffer }
-									minHeight={ minHeight }
-									maxHeight={ maxWidthBuffer / ratio }
-									lockAspectRatio
-									enable={ {
-										top: false,
-										right: showRightHandle,
-										bottom: true,
-										left: showLeftHandle,
-									} }
-									onResizeStart={ onResizeStart }
-									onResizeStop={ (
-										event,
-										direction,
-										elt,
-										delta
-									) => {
-										onResizeStop();
-										setAttributes( {
-											width: parseInt(
-												currentWidth + delta.width,
-												10
-											),
-											height: parseInt(
-												currentHeight + delta.height,
-												10
-											),
-										} );
-									} }
-								>
-									{ img }
-								</ResizableBox>
-							</>
-						);
-					} }
-				</ImageSize>
+			<Block.figure ref={ ref } className={ classes }>
+				{ img }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
@@ -649,12 +612,10 @@ export function ImageEdit( {
 						}
 					/>
 				) }
-
 				{ mediaPlaceholder }
 			</Block.figure>
 		</>
 	);
-	/* eslint-enable jsx-a11y/click-events-have-key-events */
 }
 
 export default withNotices( ImageEdit );
