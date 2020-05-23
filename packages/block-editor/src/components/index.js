@@ -17,7 +17,7 @@ export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
-export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-contents';
+export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
@@ -65,7 +65,7 @@ export { default as withColorContext } from './color-palette/with-color-context'
 export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
-export { default as __experimentalUseResizeCanvas } from './resize-canvas';
+export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { Block as __experimentalBlock } from './block-list/block-wrapper';

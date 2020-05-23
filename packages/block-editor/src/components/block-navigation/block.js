@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
-
+import { moreVertical } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
@@ -20,6 +20,8 @@ import {
 } from '../block-mover/button';
 import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
+import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
+import { useBlockNavigationContext } from './context';
 
 export default function BlockNavigationBlock( {
 	block,
@@ -43,6 +45,14 @@ export default function BlockNavigationBlock( {
 	const hasVisibleMovers = isHovered || isSelected || isFocused;
 	const moverCellClassName = classnames(
 		'block-editor-block-navigation-block__mover-cell',
+		{ 'is-visible': hasVisibleMovers }
+	);
+	const {
+		__experimentalWithEllipsisMenu: withEllipsisMenu,
+		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
+	} = useBlockNavigationContext();
+	const ellipsisMenuClassName = classnames(
+		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
 
@@ -104,6 +114,18 @@ export default function BlockNavigationBlock( {
 						) }
 					</TreeGridCell>
 				</>
+			) }
+
+			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
+				<TreeGridCell className={ ellipsisMenuClassName }>
+					{ ( props ) => (
+						<BlockSettingsDropdown
+							clientIds={ [ clientId ] }
+							icon={ moreVertical }
+							{ ...props }
+						/>
+					) }
+				</TreeGridCell>
 			) }
 		</BlockNavigationLeaf>
 	);

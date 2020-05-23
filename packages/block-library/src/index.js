@@ -166,10 +166,7 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
-
-	if ( group ) {
-		setGroupingBlockName( group.name );
-	}
+	setGroupingBlockName( group.name );
 };
 
 /**

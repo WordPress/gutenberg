@@ -131,7 +131,6 @@ module.exports = {
 				config: {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
-					WP_TESTS_DOMAIN: 'example.org',
 					WP_PHP_BINARY: 'php',
 				},
 				mappings: {},
@@ -143,6 +142,12 @@ module.exports = {
 		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
 		config.testsPort =
 			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
+
+		// In the future, we should clean this up and integrate it with multi-
+		// environment support instead of hardcoding it to the test port.
+		if ( config.config.WP_TESTS_DOMAIN === undefined ) {
+			config.config.WP_TESTS_DOMAIN = `localhost:${ config.testsPort }`;
+		}
 
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(
@@ -291,15 +296,19 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	const zipFields = sourceString.match(
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
+
 	if ( zipFields ) {
+		const wpOrgFields = sourceString.match(
+			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		);
+		const basename = wpOrgFields
+			? encodeURIComponent( wpOrgFields[ 1 ] )
+			: encodeURIComponent( zipFields[ 1 ] );
 		return {
 			type: 'zip',
 			url: sourceString,
-			path: path.resolve(
-				workDirectoryPath,
-				encodeURIComponent( zipFields[ 1 ] )
-			),
-			basename: encodeURIComponent( zipFields[ 1 ] ),
+			path: path.resolve( workDirectoryPath, basename ),
+			basename,
 		};
 	}
 
