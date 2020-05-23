@@ -160,6 +160,17 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		$existing = $this->find_plugin_for_slug( $request['slug'] );
+
+		if ( $existing ) {
+			$activate = new WP_REST_Request( 'PUT', '/__experimental/plugins/' . substr( $existing, 0, - 4 ) );
+			$activate->set_body_params( array( 'status' => 'active' ) );
+
+			return rest_do_request( $activate );
+		}
+
 		$inner_request = new WP_REST_Request( 'POST', '/__experimental/plugins' );
 		$inner_request->set_body_params(
 			array(
