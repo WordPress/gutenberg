@@ -265,10 +265,11 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			'author'              => wp_strip_all_tags( $plugin['author'] ),
 			'icon'                => ( isset( $plugin['icons']['1x'] ) ? $plugin['icons']['1x'] : 'block-default' ),
 			'assets'              => array(),
+			'last_updated'        => $plugin['last_updated'],
 			'humanized_updated'   => sprintf(
 				/* translators: %s: Human-readable time difference. */
 				__( '%s ago', 'gutenberg' ),
-				human_time_diff( strtotime( $plugin['last_updated'] ), current_time( 'timestamp' ) )
+				human_time_diff( strtotime( $plugin['last_updated'] ) )
 			),
 		);
 
@@ -290,7 +291,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @since 5.5.0
 	 *
-	 * @param array $plugin
+	 * @param array $plugin The plugin data from WordPress.org.
 	 *
 	 * @return array
 	 */

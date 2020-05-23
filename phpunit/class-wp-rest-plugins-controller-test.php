@@ -151,14 +151,13 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		$this->assertEquals( 'direct', get_filesystem_method() );
-
 		wp_set_current_user( self::$administrator_id );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
 
 		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
 		$this->assertNotWPError( $response->as_error() );
 		$this->assertEquals( 201, $response->get_status() );
 		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
@@ -191,6 +190,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->expectException( 'PHPUnit_Framework_Error_Warning' );
 		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
 		$this->assertErrorResponse( 'plugins_api_failed', $response, 500 );
 	}
 
@@ -202,6 +202,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_body_params( array( 'slug' => 'alex-says-this-block-definitely-doesnt-exist' ) );
 		$response = rest_do_request( $request );
 
+		$this->skip_on_filesystem_error( $response );
 		// Is this an appropriate status?
 		$this->assertErrorResponse( 'plugins_api_failed', $response, 404 );
 	}
@@ -268,6 +269,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
 		$response = rest_do_request( $request );
 
+		$this->skip_on_filesystem_error( $response );
 		$this->assertNotWPError( $response->as_error() );
 		$this->assertEquals( 204, $response->get_status() );
 		$this->assertFileNotExists( WP_PLUGIN_DIR . '/' . self::PLUGIN_FILE );
@@ -344,6 +346,23 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Skips the test if the response is an error due to the filesystem being unavailable.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param WP_REST_Response $response The response object to inspect.
+	 */
+	protected function skip_on_filesystem_error( WP_REST_Response $response ) {
+		if ( ! $response->is_error() ) {
+			return;
+		}
+
+		if ( 'fs_unavailable' === $response->as_error()->get_error_code() ) {
+			$this->markTestSkipped( 'Filesystem is unavailable.' );
+		}
+	}
+
+	/**
 	 * Creates a test plugin.
 	 *
 	 * @since 5.5.0
@@ -362,12 +381,19 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  * Requires at least: 5.4.0
  */
 PHP;
-		$this->assertTrue( wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' ) );
+		$created = wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' );
+
+		if ( false === $created ) {
+			$this->markTestAsSkipped();
+		}
+
 		file_put_contents( WP_PLUGIN_DIR . '/test-plugin/test-plugin.php', $php );
 	}
 
 	/**
 	 * Simulate a network failure on outbound http requests to a given hostname.
+	 *
+	 * @param string $blocked_host The host to block connections to.
 	 */
 	private function prevent_requests_to_host( $blocked_host = 'api.wordpress.org' ) {
 		add_filter(
