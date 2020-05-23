@@ -12,7 +12,7 @@ import {
 	BlockList,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { serialize } from '@wordpress/blocks';
+import { parse, serialize } from '@wordpress/blocks';
 import {
 	Disabled,
 	Placeholder,
@@ -30,21 +30,18 @@ import { __ } from '@wordpress/i18n';
 import ReusableBlockEditPanel from './edit-panel';
 
 export default function ReusableBlockEdit( {
-	attributes,
+	attributes: { ref },
 	clientId,
 	isSelected,
 } ) {
-	const { ref } = attributes;
-
 	const {
 		reusableBlock,
 		isFetching,
 		isSaving,
-		isTemporary,
 		blocks,
+		title,
 		canUpdateBlock,
 		settings,
-		title,
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
@@ -59,20 +56,30 @@ export default function ReusableBlockEdit( {
 			} = select( 'core/editor' );
 			const _reusableBlock = getReusableBlock( ref );
 
+			let _blocks;
+			if ( _reusableBlock ) {
+				if ( _reusableBlock.isTemporary ) {
+					// The getParsedReusableBlock selector won't work for temporary
+					// reusable blocks.
+					_blocks = parse( _reusableBlock.content );
+				} else {
+					_blocks = getParsedReusableBlock( ref );
+				}
+			} else {
+				_blocks = null;
+			}
+
 			return {
 				reusableBlock: _reusableBlock,
 				isFetching: isFetchingReusableBlock( ref ),
 				isSaving: isSavingReusableBlock( ref ),
-				isTemporary: _reusableBlock?.isTemporary ?? null,
-				blocks: _reusableBlock
-					? getParsedReusableBlock( _reusableBlock.id )
-					: null,
+				blocks: _blocks,
+				title: _reusableBlock?.title ?? null,
 				canUpdateBlock:
 					!! _reusableBlock &&
 					! _reusableBlock.isTemporary &&
 					!! canUser( 'update', 'blocks', ref ),
 				settings: getSettings(),
-				title: _reusableBlock?.title ?? null,
 			};
 		},
 		[ ref ]
@@ -91,13 +98,18 @@ export default function ReusableBlockEdit( {
 
 	// Start in edit mode when working with a newly created reusable block.
 	// Start in preview mode when we're working with an existing reusable block.
-	const [ isEditing, setIsEditing ] = useState( isTemporary ?? false );
+	const [ isEditing, setIsEditing ] = useState(
+		reusableBlock?.isTemporary ?? false
+	);
 
-	// Local state used while editing so changes can be made to the reusable
-	// block without having to save them.
-	const [ localTitle, setLocalTitle ] = useState( isEditing ? title : null );
+	// Local state used for temporary (newly-created, unsaved) reusable blocks
+	// and reusable blocks being edited. This state is used to make changes to
+	// the block without having to save them.
+	const [ localTitle, setLocalTitle ] = useState(
+		reusableBlock && isEditing ? title : null
+	);
 	const [ localBlocks, setLocalBlocks ] = useState(
-		isEditing ? blocks : null
+		reusableBlock && isEditing ? blocks : null
 	);
 
 	useEffect( () => {
@@ -108,7 +120,7 @@ export default function ReusableBlockEdit( {
 
 	function startEditing() {
 		// Copy saved reusable block data into local state.
-		setLocalBlocks( blocks ?? [] );
+		setLocalBlocks( blocks );
 		setLocalTitle( title );
 
 		setIsEditing( true );
@@ -193,7 +205,10 @@ export default function ReusableBlockEdit( {
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
 						title={ isEditing ? localTitle : title }
-						isSaving={ isSaving && ! ( isTemporary ?? false ) }
+						isSaving={
+							isSaving &&
+							! ( reusableBlock?.isTemporary ?? false )
+						}
 						isEditDisabled={ ! canUpdateBlock }
 						onEdit={ startEditing }
 						onChangeTitle={ ( updatedTitle ) => {
