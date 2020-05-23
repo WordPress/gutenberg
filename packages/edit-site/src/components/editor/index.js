@@ -105,14 +105,15 @@ function Editor( { settings: _settings } ) {
 		[]
 	);
 
-	const blockContext = useMemo( () => {
-		if ( ! settings.page.context.queryContext )
-			return settings.page.context;
-
-		return {
+	// Set default query for misplaced Query Loop blocks, and
+	// provide the root `queryContext` for top-level Query Loop
+	// and Query Pagination blocks.
+	const blockContext = useMemo(
+		() => ( {
 			...settings.page.context,
+			query: settings.page.context.query || { categoryIds: [] },
 			queryContext: [
-				settings.page.context.queryContext,
+				settings.page.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setSettings( ( prevSettings ) => ( {
 						...prevSettings,
@@ -128,8 +129,9 @@ function Editor( { settings: _settings } ) {
 						},
 					} ) ),
 			],
-		};
-	}, [ settings.page.context ] );
+		} ),
+		[ settings.page.context ]
+	);
 	return template ? (
 		<>
 			<EditorStyles styles={ settings.styles } />

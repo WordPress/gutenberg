@@ -33,8 +33,13 @@ export default function PageSwitcher( {
 						const path = getPathFromLink( _page.link );
 						return {
 							label: _page.title.rendered,
+							type: 'page',
+							slug: _page.slug,
 							value: path,
-							context: { postType: 'page', postId: _page.id },
+							context: {
+								postType: 'page',
+								postId: _page.id,
+							},
 						};
 					}
 				),
@@ -43,6 +48,8 @@ export default function PageSwitcher( {
 						const path = getPathFromLink( category.link );
 						return {
 							label: category.name,
+							type: 'category',
+							slug: category.slug,
 							value: path,
 							context: {
 								query: { categoryIds: [ category.id ] },
@@ -68,13 +75,15 @@ export default function PageSwitcher( {
 	);
 
 	const onPageSelect = ( newPath ) => {
-		const { value: path, context } = [ ...pages, ...categories ].find(
+		const { value: path, ...rest } = [ ...pages, ...categories ].find(
 			( choice ) => choice.value === newPath
 		);
-		onActivePageChange( { path, context } );
+		onActivePageChange( { ...rest, path } );
 	};
 	const onPostSelect = ( post ) =>
 		onActivePageChange( {
+			type: 'post',
+			slug: post.slug,
 			path: getPathFromLink( post.url ),
 			context: { postType: post.type, postId: post.id },
 		} );
