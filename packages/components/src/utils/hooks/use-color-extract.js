@@ -14,6 +14,7 @@ import { useState, useEffect } from '@wordpress/element';
  *
  * @typedef  UseColorExtractProps
  *
+ * @property {boolean} disableChangeOnFirstRender Skips the onChange callback on an the initial image load.
  * @property {number} numberOfColors Amount of colors to extract.
  * @property {string} onChange Callback when colors are extracted.
  * @property {Function} src The source of the image to extract colors from.
@@ -37,14 +38,23 @@ import { useState, useEffect } from '@wordpress/element';
  * @return {string|Array<string>} Color (or collection of colors) extracted from the image.
  */
 export function useColorExtract( {
-	src,
+	disableChangeOnFirstRender = false,
 	numberOfColors = 1,
 	onChange = noop,
+	src,
 } ) {
 	const [ colors, setColors ] = useState();
+	const [ didInitialLoad, setDidInitialLoad ] = useState(
+		! disableChangeOnFirstRender
+	);
 
 	useEffect( () => {
 		if ( ! src ) return;
+
+		if ( ! didInitialLoad ) {
+			setDidInitialLoad( true );
+			return;
+		}
 
 		const imageNode = document.createElement( 'img' );
 		const isGetPalette = numberOfColors !== 1;
