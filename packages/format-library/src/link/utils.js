@@ -99,10 +99,11 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 		type: 'core/link',
 		attributes: {
 			url,
-			type,
-			id,
 		},
 	};
+
+	if ( type ) format.attributes.type = type;
+	if ( id ) format.attributes.type = id;
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
