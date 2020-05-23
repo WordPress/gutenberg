@@ -25,9 +25,6 @@ export const settings = {
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
 	],
-	supports: {
-		lightBlockWrapper: true,
-	},
 	example: {
 		attributes: {
 			sizeSlug: 'large',

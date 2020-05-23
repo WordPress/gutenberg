@@ -37,9 +37,6 @@ export const settings = {
 			],
 		},
 	},
-	supports: {
-		align: true,
-	},
 	transforms,
 	edit,
 	save,

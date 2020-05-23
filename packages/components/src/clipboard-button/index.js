@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import Clipboard from 'clipboard';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
+import { useCopyOnClick } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,41 +23,22 @@ export default function ClipboardButton( {
 	...buttonProps
 } ) {
 	const ref = useRef();
-	const clipboard = useRef();
+	const hasCopied = useCopyOnClick( ref, text );
+	const lastHasCopied = useRef( hasCopied );
 
 	useEffect( () => {
-		let timeoutId;
+		if ( lastHasCopied.current === hasCopied ) {
+			return;
+		}
 
-		clipboard.current = new Clipboard( ref.current, {
-			text: () => ( typeof text === 'function' ? text() : text ),
-			container: ref.current,
-		} );
+		if ( hasCopied ) {
+			onCopy();
+		} else {
+			onFinishCopy();
+		}
 
-		clipboard.current.on( 'success', ( { clearSelection } ) => {
-			// Clearing selection will move focus back to the triggering button,
-			// ensuring that it is not reset to the body, and further that it is
-			// kept within the rendered node.
-			clearSelection();
-
-			if ( onCopy ) {
-				onCopy();
-
-				// For convenience and consistency, ClipboardButton offers to
-				// call a secondary callback with delay. This is useful to reset
-				// consumers' state, e.g. to revert a label from "Copied" to
-				// "Copy".
-				if ( onFinishCopy ) {
-					clearTimeout( timeoutId );
-					timeoutId = setTimeout( onFinishCopy, 4000 );
-				}
-			}
-		} );
-
-		return () => {
-			clipboard.current.destroy();
-			clearTimeout( timeoutId );
-		};
-	}, [ onCopy, onFinishCopy, text ] );
+		lastHasCopied.current = hasCopied;
+	}, [ onCopy, onFinishCopy, hasCopied ] );
 
 	const classes = classnames( 'components-clipboard-button', className );
 

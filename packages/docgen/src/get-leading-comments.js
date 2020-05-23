@@ -1,5 +1,5 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const { last } = require( 'lodash' );
 

@@ -21,10 +21,6 @@ exports[`Multi-block selection should copy and paste individual blocks 2`] = `
 
 <!-- wp:paragraph -->
 <p>Here is a unique string so we can test copying.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -41,10 +37,6 @@ exports[`Multi-block selection should cut and paste individual blocks 2`] = `
 
 <!-- wp:paragraph -->
 <p>Yet another unique string.</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
 <!-- /wp:paragraph -->"
 `;
 
