@@ -381,9 +381,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  * Requires at least: 5.4.0
  */
 PHP;
-		$created = wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' );
-
-		if ( false === $created ) {
+		if ( false === wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' ) ) {
 			$this->markTestAsSkipped();
 		}
 
