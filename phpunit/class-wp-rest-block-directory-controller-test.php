@@ -6,7 +6,7 @@
  * @package Gutenberg
  * phpcs:disable
  */
-class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
+class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $admin_id;
 
 	public static function wpSetUpBeforeClass( $factory ) {
@@ -15,13 +15,6 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 				'role' => 'administrator',
 			)
 		);
-
-		// Ensure routes are registered regardless of the `gutenberg-block-directory` experimental setting.
-		// This should be removed when `gutenberg_register_rest_block_directory()` is unconditional.
-		add_filter( 'rest_api_init', function () {
-			$block_directory_controller = new WP_REST_Block_Directory_Controller();
-			$block_directory_controller->register_routes();
-		} );
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -36,22 +29,16 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( '/__experimental/block-directory/uninstall', $routes );
 	}
 
-	/**
-	 * Tests that an error is returned if the block plugin slug is not provided
-	 */
-	public function test_should_throw_no_slug_error() {
-		wp_set_current_user( self::$admin_id );
-
-		$request = new WP_REST_Request( 'POST', '/__experimental/block-directory/install', [] );
-		$result  = rest_do_request( $request );
-
-		$this->assertErrorResponse( 'rest_missing_callback_param', $result, 400 );
+	public function test_context_param() {
+		// Collection.
+		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/block-directory/search' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertEquals( array( 'view' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
-	/**
-	 * Tests that the search endpoint does not return an error
-	 */
-	public function test_simple_search() {
+	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
@@ -62,10 +49,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( 200, $result->status );
 	}
 
-	/**
-	 * Tests that the search endpoint returns WP_Error when the server is unreachable.
-	 */
-	public function test_search_unreachable() {
+	public function test_get_items_wdotorg_unavailable() {
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
@@ -78,22 +62,60 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'plugins_api_failed', $response, 500 );
 	}
 
-	/**
-	 * Should fail with a permission error if requesting user is not logged in.
-	 */
-	public function test_simple_search_no_perms() {
+	public function test_get_items_logged_out() {
 		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
 		$request->set_query_params( array( 'term' => 'foo' ) );
 		$response = rest_do_request( $request );
-		$data     = $response->get_data();
-
-		$this->assertEquals( $data['code'], 'rest_user_cannot_view' );
+		$this->assertErrorResponse( 'rest_block_directory_cannot_view', $response );
 	}
 
-	/**
-	 * Make sure a search with the right permissions returns something.
-	 */
-	public function test_simple_search_with_perms() {
+	public function test_get_items_no_results() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
+		$request->set_query_params( array( 'term' => '0c4549ee68f24eaaed46a49dc983ecde' ) );
+		$response = rest_do_request( $request );
+		$data     = $response->get_data();
+
+		// Should produce a 200 status with an empty array.
+		$this->assertEquals( 200, $response->status );
+		$this->assertEquals( array(), $data );
+	}
+
+	public function test_get_item() {
+		$this->markTestSkipped( 'Controller does not have get_item route.' );
+	}
+
+	public function test_create_item() {
+		if ( ! defined( 'FS_METHOD' ) ) {
+			define( 'FS_METHOD', 'direct' );
+		}
+
+		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
+			delete_plugins( array( 'hello-dolly/hello.php' ) );
+		}
+
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/block-directory/install' );
+		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
+
+		$response = rest_do_request( $request );
+		$this->skip_on_filesystem_error( $response );
+		$this->assertNotWPError( $response->as_error() );
+		$this->assertEquals( 201, $response->get_status() );
+		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+	}
+
+	public function test_update_item() {
+		$this->markTestSkipped( 'Controller does not have update_item route.' );
+	}
+
+	public function test_delete_item() {
+		$this->markTestSkipped( 'Covered by Plugins controller tests.' );
+	}
+
+	public function test_prepare_item() {
 		wp_set_current_user( self::$admin_id );
 
 		// This will hit the live API. We're searching for `block` which should definitely return at least one result.
@@ -116,26 +138,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 		}
 	}
 
-	/**
-	 * A search with zero results should return a 200 response.
-	 */
-	public function test_simple_search_no_results() {
-		wp_set_current_user( self::$admin_id );
-
-		$request = new WP_REST_Request( 'GET', '/__experimental/block-directory/search' );
-		$request->set_query_params( array( 'term' => '0c4549ee68f24eaaed46a49dc983ecde' ) );
-		$response = rest_do_request( $request );
-		$data     = $response->get_data();
-
-		// Should produce a 200 status with an empty array.
-		$this->assertEquals( 200, $response->status );
-		$this->assertEquals( array(), $data );
-	}
-
-	/**
-	 * Make sure the search schema is available and correct.
-	 */
-	public function test_search_schema() {
+	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
 
 		$request = new WP_REST_Request( 'OPTIONS', '/__experimental/block-directory/search' );
@@ -145,36 +148,24 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 
 		// Check endpoints
 		$this->assertEquals( [ 'GET' ], $data['endpoints'][0]['methods'] );
-		$this->assertEquals( [ 'term' => [ 'required' => true ] ], $data['endpoints'][0]['args'] );
+		$this->assertTrue( $data['endpoints'][0]['args']['term'][ 'required'] );
 
-		// Check schema
-		$this->assertEquals( [
-			'description' => __( "The block name, in namespace/block-name format." ),
-			'type'        => [ 'string' ],
-			'context'     => [ 'view' ],
-		], $data['schema']['properties']['name'] );
-		// TODO: ..etc..
-	}
+		$properties = $data['schema']['properties'];
 
-	public function test_install_item() {
-		if ( ! defined( 'FS_METHOD' ) ) {
-			define( 'FS_METHOD', 'direct' );
-		}
-
-		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
-			delete_plugins( array( 'hello-dolly/hello.php' ) );
-		}
-
-		wp_set_current_user( self::$admin_id );
-
-		$request = new WP_REST_Request( 'POST', '/__experimental/block-directory/install' );
-		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
-
-		$response = rest_do_request( $request );
-		$this->skip_on_filesystem_error( $response );
-		$this->assertNotWPError( $response->as_error() );
-		$this->assertEquals( 201, $response->get_status() );
-		$this->assertEquals( 'Hello Dolly', $response->get_data()['name'] );
+		$this->assertCount( 13, $properties );
+		$this->assertArrayHasKey( 'name', $properties );
+		$this->assertArrayHasKey( 'title', $properties );
+		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'id', $properties );
+		$this->assertArrayHasKey( 'rating', $properties );
+		$this->assertArrayHasKey( 'rating_count', $properties );
+		$this->assertArrayHasKey( 'active_installs', $properties );
+		$this->assertArrayHasKey( 'author_block_rating', $properties );
+		$this->assertArrayHasKey( 'author_block_count', $properties );
+		$this->assertArrayHasKey( 'author', $properties );
+		$this->assertArrayHasKey( 'icon', $properties );
+		$this->assertArrayHasKey( 'humanized_updated', $properties );
+		$this->assertArrayHasKey( 'assets', $properties );
 	}
 
 	/**
@@ -189,7 +180,9 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_TestCase {
 			return;
 		}
 
-		if ( 'fs_unavailable' === $response->as_error()->get_error_code() ) {
+		$code = $response->as_error()->get_error_code();
+
+		if ( 'fs_unavailable' === $code || false !== strpos( $code, 'mkdir_failed' ) ) {
 			$this->markTestSkipped( 'Filesystem is unavailable.' );
 		}
 	}

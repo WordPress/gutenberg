@@ -357,7 +357,9 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			return;
 		}
 
-		if ( 'fs_unavailable' === $response->as_error()->get_error_code() ) {
+		$code = $response->as_error()->get_error_code();
+
+		if ( 'fs_unavailable' === $code || false !== strpos( $code, 'mkdir_failed' ) ) {
 			$this->markTestSkipped( 'Filesystem is unavailable.' );
 		}
 	}
@@ -382,7 +384,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  */
 PHP;
 		if ( false === wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' ) ) {
-			$this->markTestAsSkipped();
+			$this->markTestSkipped( 'Filesystem is unavailable.' );
 		}
 
 		file_put_contents( WP_PLUGIN_DIR . '/test-plugin/test-plugin.php', $php );

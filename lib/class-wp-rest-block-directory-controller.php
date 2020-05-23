@@ -3,8 +3,8 @@
  * Start: Include for phase 2
  * Block Directory REST API: WP_REST_Block_Directory_Controller class
  *
- * @package gutenberg
  * @since   5.5.0
+ * @package gutenberg
  */
 
 /**
@@ -32,11 +32,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/search',
 			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_items' ),
-				'permission_callback' => array( $this, 'get_items_permissions_check' ),
-				'args'                => $this->get_collection_params(),
-				'schema'              => array( $this, 'get_public_item_schema' ),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 
@@ -77,13 +79,14 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
-				'rest_user_cannot_view',
-				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' )
+				'rest_block_directory_cannot_view',
+				__( 'Sorry, you are not allowed to browse the block directory.', 'gutenberg' )
 			);
 		}
 
@@ -96,6 +99,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
@@ -137,12 +141,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
-				'rest_user_cannot_view',
+				'rest_block_directory_cannot_create',
 				__( 'Sorry, you are not allowed to install blocks.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -157,6 +162,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
@@ -188,12 +194,13 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function delete_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		if ( ! current_user_can( 'delete_plugins' ) || ! current_user_can( 'deactivate_plugins' ) ) {
 			return new WP_Error(
-				'rest_user_cannot_delete',
+				'rest_block_directory_cannot_delete',
 				__( 'Sorry, you are not allowed to uninstall blocks.', 'gutenberg' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
@@ -208,6 +215,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
+	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function delete_item( $request ) {
@@ -245,6 +253,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	 *
 	 * @param array           $plugin  The plugin metadata.
 	 * @param WP_REST_Request $request Request object.
+	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function prepare_item_for_response( $plugin, $request ) {
@@ -267,7 +276,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			'assets'              => array(),
 			'last_updated'        => $plugin['last_updated'],
 			'humanized_updated'   => sprintf(
-				/* translators: %s: Human-readable time difference. */
+			/* translators: %s: Human-readable time difference. */
 				__( '%s ago', 'gutenberg' ),
 				human_time_diff( strtotime( $plugin['last_updated'] ) )
 			),
@@ -443,14 +452,12 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 	public function get_collection_params() {
 		$query_params = parent::get_collection_params();
 
+		$query_params['context']['default']  = 'view';
 		$query_params['per_page']['default'] = 3;
 
 		$query_params['term'] = array(
 			'description' => __( 'Limit result set to blocks matching the search term.', 'gutenberg' ),
-			'type'        => 'array',
-			'term'        => array(
-				'type' => 'string',
-			),
+			'type'        => 'string',
 			'required'    => true,
 			'minLength'   => 1,
 		);
