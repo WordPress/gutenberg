@@ -145,7 +145,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertEqualSets( array( 'invalid_parent' ), $data['parent'] );
 		$this->assertEqualSets( array(), $data['supports'] );
 		$this->assertEqualSets( array(), $data['styles'] );
-		$this->assertEqualSets( false, $data['is_dynamic'] );
+		$this->assertEquals( false, $data['is_dynamic'] );
 	}
 
 	/**
@@ -157,7 +157,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 16, count( $properties ) );
+		$this->assertCount( 16, $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'icon', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
@@ -211,7 +211,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test/' );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 401 );
 	}
