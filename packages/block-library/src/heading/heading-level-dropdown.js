@@ -2,11 +2,10 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	Dropdown,
 	Toolbar,
+	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
@@ -44,72 +43,61 @@ const POPOVER_PROPS = {
  */
 export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 	return (
-		<ToolbarItem>
-			{ ( itemProps ) => (
-				<Dropdown
-					popoverProps={ POPOVER_PROPS }
-					renderToggle={ ( { onToggle, isOpen } ) => {
-						const openOnArrowDown = ( event ) => {
-							if ( ! isOpen && event.keyCode === DOWN ) {
-								event.preventDefault();
-								event.stopPropagation();
-								onToggle();
-							}
-						};
+		<Dropdown
+			popoverProps={ POPOVER_PROPS }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
 
-						return (
-							<Button
-								{ ...itemProps }
-								aria-expanded={ isOpen }
-								aria-haspopup="true"
-								data-experimental-toolbar-item={ true }
-								icon={
-									<HeadingLevelIcon level={ selectedLevel } />
-								}
-								label={ __( 'Change heading level' ) }
-								onClick={ onToggle }
-								onKeyDown={ openOnArrowDown }
-								showTooltip
-							/>
-						);
-					} }
-					renderContent={ () => (
-						<Toolbar
-							className="block-library-heading-level-toolbar"
-							__experimentalAccessibilityLabel={ __(
-								'Change heading level'
-							) }
-						>
-							<ToolbarGroup
-								isCollapsed={ false }
-								controls={ HEADING_LEVELS.map(
-									( targetLevel ) => {
-										const isActive =
-											targetLevel === selectedLevel;
-										return {
-											icon: (
-												<HeadingLevelIcon
-													level={ targetLevel }
-													isPressed={ isActive }
-												/>
-											),
-											title: sprintf(
-												// translators: %s: heading level e.g: "1", "2", "3"
-												__( 'Heading %d' ),
-												targetLevel
-											),
-											isActive,
-											onClick() {
-												onChange( targetLevel );
-											},
-										};
-									}
-								) }
-							/>
-						</Toolbar>
+				return (
+					<ToolbarButton
+						aria-expanded={ isOpen }
+						aria-haspopup="true"
+						icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+						label={ __( 'Change heading level' ) }
+						onClick={ onToggle }
+						onKeyDown={ openOnArrowDown }
+						showTooltip
+					/>
+				);
+			} }
+			renderContent={ () => (
+				<Toolbar
+					className="block-library-heading-level-toolbar"
+					__experimentalAccessibilityLabel={ __(
+						'Change heading level'
 					) }
-				/>
+				>
+					<ToolbarGroup
+						isCollapsed={ false }
+						controls={ HEADING_LEVELS.map( ( targetLevel ) => {
+							const isActive = targetLevel === selectedLevel;
+							return {
+								icon: (
+									<HeadingLevelIcon
+										level={ targetLevel }
+										isPressed={ isActive }
+									/>
+								),
+								title: sprintf(
+									// translators: %s: heading level e.g: "1", "2", "3"
+									__( 'Heading %d' ),
+									targetLevel
+								),
+								isActive,
+								onClick() {
+									onChange( targetLevel );
+								},
+							};
+						} ) }
+					/>
+				</Toolbar>
 			) }
-		</ToolbarItem>
+		/>
 	);
 }
