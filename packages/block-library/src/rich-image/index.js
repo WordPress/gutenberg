@@ -11,7 +11,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import RichImage from './rich-image';
 
 export const isSupportedBlock = ( blockName ) =>
-	[ 'core/image', 'core/cover' ].includes( blockName );
+	[ 'core/image' ].includes( blockName );
 
 const addRichImage = createHigherOrderComponent( ( OriginalBlock ) => {
 	return ( props ) => {
