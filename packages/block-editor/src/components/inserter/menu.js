@@ -21,6 +21,7 @@ import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import InserterBlockList from './block-list';
 import BlockPatterns from './block-patterns';
+import TemplateParts from './template-parts';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -175,6 +176,12 @@ function InserterMenu( {
 		</div>
 	);
 
+	const templatePartsTab = (
+		<div className="block-editor-inserter__scrollable">
+			<TemplateParts />
+		</div>
+	);
+
 	const tabsToUse = [
 		{
 			name: 'blocks',
@@ -218,6 +225,8 @@ function InserterMenu( {
 						{ ( tab ) => {
 							if ( tab.name === 'blocks' ) {
 								return blocksTab;
+							} else if ( tab.name === 'template parts' ) {
+								return templatePartsTab;
 							}
 							return patternsTab;
 						} }
