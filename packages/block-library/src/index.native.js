@@ -99,7 +99,6 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
-	video,
 	classic,
 	buttons,
 ].reduce( ( accumulator, block ) => {
