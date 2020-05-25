@@ -63,7 +63,7 @@ public class MainApplication extends Application implements ReactApplication {
                 } else if (mediaType == MediaType.VIDEO) {
                     rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup" ));
                 }
-                mediaUploadCallback.onUploadMediaFileSelected(rnMediaList);                
+                mediaUploadCallback.onUploadMediaFileSelected(rnMediaList);
             }
 
 
@@ -151,7 +151,8 @@ public class MainApplication extends Application implements ReactApplication {
                         new ReactSliderPackage(),
                         new ReactVideoPackage(),
                         new SvgPackage(),
-                        new ReactAztecPackage(),
+                        // passing null because we do not need log handlers in the demo app
+                        new ReactAztecPackage(null, null),
                         new LinearGradientPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }

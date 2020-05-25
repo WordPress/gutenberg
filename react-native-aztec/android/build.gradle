@@ -109,6 +109,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    testImplementation 'junit:junit:4.12'
 
     if (rootProject.ext.buildGutenbergFromSource) {
         implementation "com.facebook.react:react-native:+" // From node_modules.
