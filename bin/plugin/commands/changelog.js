@@ -99,12 +99,39 @@ function omitMobileEntry( title, issue ) {
 }
 
 /**
+ * Map of common technical terms to a corresponding replacement term more
+ * appropriate for release notes.
+ *
+ * @type {Record<string,string>}
+ */
+const REWORD_TERMS = {
+	e2e: 'end-to-end',
+	url: 'URL',
+};
+
+/**
+ * Given a text string, replaces reworded terms.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with reworded terms.
+ */
+function reword( text ) {
+	for ( const [ term, replacement ] of Object.entries( REWORD_TERMS ) ) {
+		const pattern = new RegExp( '(^| )' + term + '( |$)', 'ig' );
+		text = text.replace( pattern, '$1' + replacement + '$2' );
+	}
+
+	return text;
+}
+
+/**
  * Array of normalizations applying to title, each returning a new string, or
  * undefined to indicate an entry which should be omitted.
  *
  * @type {Array<(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined>}
  */
-const TITLE_NORMALIZATIONS = [ omitMobileEntry, addTrailingPeriod ];
+const TITLE_NORMALIZATIONS = [ omitMobileEntry, reword, addTrailingPeriod ];
 
 /**
  * Given an issue title, returns the title with normalization transforms
@@ -318,6 +345,7 @@ async function getReleaseChangelog( options ) {
 }
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
+	reword,
 	omitMobileEntry,
 	addTrailingPeriod,
 	getNormalizedTitle,
