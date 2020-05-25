@@ -9,7 +9,7 @@ export default `
 <!-- /wp:heading -->
 
 <!-- wp:heading -->
-<h2>What is Gutenberg?</h2>
+<h2 id="this-is-an-anchor">What is Gutenberg?</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
@@ -129,7 +129,7 @@ else:
 <!-- /wp:heading -->
 
 <!-- wp:group -->
-<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:paragraph -->
+<div id="this-is-another-anchor" class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:paragraph -->
 <p>One.</p>
 <!-- /wp:paragraph -->
 
