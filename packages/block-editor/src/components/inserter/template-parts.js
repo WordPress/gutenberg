@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { parse, cloneBlock } from '@wordpress/blocks';
+import { parse, createBlock } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 /**
@@ -18,20 +13,15 @@ import InserterPanel from './panel';
 
 function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
-	const blocks = useMemo( () => parse( templatePart.content.raw ), [
-		templatePart.content.raw,
-	] );
+	const content = templatePart.content.raw || '';
+	const blocks = useMemo( () => parse( content ), [ content ] );
+	const templatePartBlock = createBlock( 'core/template-part', {
+		postId: id,
+		slug,
+		theme,
+	} );
 
-	const blocksToInsert = useMemo(
-		() =>
-			parse(
-				`<!-- wp:template-part {"postId":${ id },"slug":"${ slug }","theme":"${ theme }"} /-->`
-			),
-		[ id, slug, theme ]
-	);
-
-	const onClick = () =>
-		onInsert( map( blocksToInsert, ( block ) => cloneBlock( block ) ) );
+	const onClick = () => onInsert( templatePartBlock );
 
 	return (
 		<div
