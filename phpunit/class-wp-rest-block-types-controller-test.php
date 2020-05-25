@@ -92,14 +92,14 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 *
 	 */
 	public function test_get_items() {
+		$block_name = 'fake/test';
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$data     = array_values( $data );
 		$this->assertCount( 1, $data );
-		$names = wp_list_pluck( $data, 'name' );
-		$this->assertEqualSets( array( 'fake/test' ), $names );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		$this->check_block_type_object( $block_type, $data[0], $data[0]['_links'] );
 	}
 
 	/**
