@@ -230,23 +230,86 @@ const useDynamicMenuItemPlaceholders = (
 	return [ onFinished ];
 };
 
+async function getNonceA() {
+	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
+		response.text()
+	);
+	body = body.substr( body.indexOf( '_wpCustomizeSettings =' ) );
+	body = body.substr(
+		0,
+		body.indexOf( '_wpCustomizeSettings.initialClientTimestamp' )
+	);
+	let _wpCustomizeSettings;
+	eval( body );
+	return _wpCustomizeSettings.nonce.preview;
+}
+
+async function getNonceB() {
+	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
+		response.text()
+	);
+	body = body.substr( body.indexOf( '_wpCustomizeSettings =' ) );
+	body = body.substr(
+		0,
+		body.indexOf( '_wpCustomizeSettings.initialClientTimestamp' )
+	);
+	let _wpCustomizeSettings;
+	eval( body );
+	return _wpCustomizeSettings.nonce.save;
+	/*
+	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
+		response.text()
+	);
+	body = body.substr( body.indexOf( 'heartbeatSettings =' ) );
+	body = body.substr(
+		0,
+		body.indexOf( '</script>' )
+	);
+	let heartbeatSettings;
+	eval( body );
+	return heartbeatSettings.nonce;
+	 */
+}
+function uuidv4() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, function(
+		c
+	) {
+		const r = ( Math.random() * 16 ) | 0,
+			v = c === 'x' ? r : ( r & 0x3 ) | 0x8;
+		return v.toString( 16 );
+	} );
+}
+
 const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 	const { receiveEntityRecords } = useDispatch( 'core' );
 
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const saveBlocks = async () => {
-		const requestData = prepareRequestData( blocks[ 0 ].innerBlocks );
+		const requestData = prepareRequestMenuItems( blocks[ 0 ].innerBlocks );
+
+		const body = new FormData();
+		body.append( 'wp_customize', 'on' );
+		body.append( 'customize_theme', 'twentytwenty' );
+		body.append( 'nonce', await getNonceB() );
+		body.append( 'customize_changeset_uuid', uuidv4() );
+		body.append( 'customize_autosaved', 'on' );
+		body.append( 'customized', JSON.stringify( requestData ) );
+		body.append( 'customize_changeset_status', 'publish' );
+		body.append( 'action', 'customize_save' );
+		body.append( 'customize_preview_nonce', await getNonceA() );
 
 		const saved = await apiFetch( {
-			path: `/__experimental/menu-items/batch?menus=${ menuId }`,
-			method: 'PUT',
-			data: { tree: requestData },
+			url: '/wp-admin/admin-ajax.php',
+			method: 'POST',
+			body,
 		} );
 
 		createSuccessNotice( __( 'Navigation saved.' ), {
 			type: 'snackbar',
 		} );
+
+		return;
 
 		const kind = 'root';
 		const name = 'menuItem';
@@ -270,25 +333,41 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 		);
 	};
 
-	const prepareRequestData = ( nestedBlocks ) =>
-		nestedBlocks.map( ( block ) => ( {
-			...prepareRequestItem( block ),
-			children: prepareRequestData( block.innerBlocks ),
-		} ) );
-
-	const prepareRequestItem = ( block ) => {
-		const menuItem = omit(
-			menuItemsRef.current[ block.clientId ] || {},
-			'_links'
+	const prepareRequestMenuItems = ( nestedBlocks ) =>
+		keyBy(
+			prepareRequestMenuItemsList( nestedBlocks ),
+			( item ) => `nav_menu_item[${ item.id }]`
 		);
 
+	const prepareRequestMenuItemsList = ( nestedBlocks, parentId = 0 ) =>
+		nestedBlocks.flatMap( ( block, index ) =>
+			[ prepareRequestMenuItem( block, parentId, index + 1 ) ].concat(
+				prepareRequestMenuItemsList(
+					block.innerBlocks,
+					getMenuItemForBlock( block )?.id
+				)
+			)
+		);
+
+	const prepareRequestMenuItem = ( block, parentId, position ) => {
+		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
+		const attributes = createMenuItemAttributesFromBlock( block );
 		return {
 			...menuItem,
-			...createMenuItemAttributesFromBlock( block ),
-			clientId: block.clientId,
-			menus: menuId,
+			position,
+			title: attributes.title,
+			original_title: attributes.title,
+			classes: ( menuItem.classes || [] ).join( ' ' ),
+			xfn: ( menuItem.xfn || [] ).join( ' ' ),
+			nav_menu_term_id: menuId,
+			menu_item_parent: parentId,
+			status: 'publish',
+			_invalid: false,
 		};
 	};
+
+	const getMenuItemForBlock = ( block ) =>
+		omit( menuItemsRef.current[ block.clientId ] || {}, '_links' );
 
 	return saveBlocks;
 };
