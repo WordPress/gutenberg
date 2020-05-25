@@ -46,6 +46,7 @@ function DropdownMenu( {
 	menuLabel,
 	position,
 	noIcons,
+	toggleRef,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
@@ -124,6 +125,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						ref={ toggleRef }
 						showTooltip
 					>
 						{ mergedToggleProps.children }
