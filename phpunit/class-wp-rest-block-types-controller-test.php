@@ -313,9 +313,4 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 * The test_delete_item() method does not exist for block types.
 	 */
 	public function test_delete_item() {}
-
-	/**
-	 * The test_prepare_item() method does not exist for block types.
-	 */
-	public function test_prepare_item() {}
 }
