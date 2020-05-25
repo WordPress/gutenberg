@@ -6,6 +6,7 @@
 
 	// Apply the same height as the isSmall Reset button.
 	.components-font-size-picker__number {
+		@include input-control;
 		display: inline-block;
 		font-weight: 500;
 		height: 30px;
