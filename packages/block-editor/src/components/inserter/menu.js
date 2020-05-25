@@ -178,7 +178,10 @@ function InserterMenu( {
 
 	const templatePartsTab = (
 		<div className="block-editor-inserter__scrollable">
-			<TemplateParts />
+			<TemplateParts
+				onInsert={ onInsertBlocks }
+				filterValue={ filterValue }
+			/>
 		</div>
 	);
 
