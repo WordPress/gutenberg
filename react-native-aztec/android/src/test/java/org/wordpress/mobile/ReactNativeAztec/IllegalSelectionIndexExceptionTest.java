@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 public class IllegalSelectionIndexExceptionTest {
 
     @Test
-    public void getHtmlTag_returns_only_tag() {
+    public void parseTags_returns_only_tag() {
         List<String> actual = IllegalSelectionIndexException.parseTags("hi <mark>there Bob</mark>. How are you?");
         List<String> expected = Collections.singletonList("mark");
         assertEquals(expected, actual);
