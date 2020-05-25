@@ -126,12 +126,35 @@ function reword( text ) {
 }
 
 /**
+ * Given a text string, capitalizes the first letter of the last segment
+ * following a colon.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with capitalizes last segment.
+ */
+function capitalizeAfterColonSeparatedPrefix( text ) {
+	const parts = text.split( ':' );
+	parts[ parts.length - 1 ] = parts[ parts.length - 1 ].replace(
+		/^(\s*)([a-z])/,
+		( _match, whitespace, letter ) => whitespace + letter.toUpperCase()
+	);
+
+	return parts.join( ':' );
+}
+
+/**
  * Array of normalizations applying to title, each returning a new string, or
  * undefined to indicate an entry which should be omitted.
  *
  * @type {Array<(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined>}
  */
-const TITLE_NORMALIZATIONS = [ omitMobileEntry, reword, addTrailingPeriod ];
+const TITLE_NORMALIZATIONS = [
+	omitMobileEntry,
+	reword,
+	capitalizeAfterColonSeparatedPrefix,
+	addTrailingPeriod,
+];
 
 /**
  * Given an issue title, returns the title with normalization transforms
@@ -346,6 +369,7 @@ async function getReleaseChangelog( options ) {
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
 	reword,
+	capitalizeAfterColonSeparatedPrefix,
 	omitMobileEntry,
 	addTrailingPeriod,
 	getNormalizedTitle,

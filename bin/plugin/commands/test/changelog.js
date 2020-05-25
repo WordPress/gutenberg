@@ -6,6 +6,7 @@ import {
 	reword,
 	addTrailingPeriod,
 	omitMobileEntry,
+	capitalizeAfterColonSeparatedPrefix,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -40,6 +41,7 @@ describe( 'getNormalizedTitle', () => {
 			'Improve e2e url stability',
 			'Improve end-to-end URL stability.',
 		],
+		[ 'capitalizes', 'fix bug', 'Fix bug.' ],
 	] )( '%s', ( _label, original, expected, issue = DEFAULT_ISSUE ) => {
 		expect( getNormalizedTitle( original, issue ) ).toBe( expected );
 	} );
@@ -94,5 +96,13 @@ describe( 'reword', () => {
 		const result = reword( 'Improve e2e url stability' );
 
 		expect( result ).toBe( 'Improve end-to-end URL stability' );
+	} );
+} );
+
+describe( 'capitalizeAfterColonSeparatedPrefix', () => {
+	it( 'capitalizes the last segment after a colon', () => {
+		const result = capitalizeAfterColonSeparatedPrefix( 'blocks: fix bug' );
+
+		expect( result ).toBe( 'blocks: Fix bug' );
 	} );
 } );
