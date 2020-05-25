@@ -1,6 +1,15 @@
 1.28.1
 ------
 * [**] Avoid crash when editor selection state becomes invalid
+1.29.0
+------
+* [**] Add support for changing overlay color settings in Cover block
+* Add enter/exit animation in FloatingToolbar
+* [***] New block: Verse
+* [*] Fix merging of text blocks when text had active formatting (bold, italic, strike, link)
+* [***] Trash icon that is used to remove blocks is moved to the new menu reachable via ellipsis button in the block toolbar
+* [**] Block toolbar can now collapse when the block width is smaller than the toolbar content
+* [**] Creating undo levels less frequently
 
 1.28.0
 ------
@@ -17,6 +26,7 @@
 
 1.27.0
 ------
+* Block Editor: Add dialog for mentioning other users in your post
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
 * Fix bug where whitespaces at start of text blocks were being removed

@@ -17,6 +17,7 @@ export default class EditorPage {
 	accessibilityIdKey: string;
 	accessibilityIdXPathAttrib: string;
 	paragraphBlockName = 'Paragraph';
+	verseBlockName = 'Verse';
 	orderedListButtonName = 'Convert to ordered list';
 
 	constructor( driver: wd.PromiseChainWebdriver ) {
@@ -242,20 +243,26 @@ export default class EditorPage {
 		}
 
 		const buttonElementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
-		const removeButtonIdentifier = `Remove block at row ${ position }`;
-		const removeBlockLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeButtonIdentifier }")]`;
+		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
+		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
 
 		if ( isAndroid() ) {
 			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.elementsByXPath( removeBlockLocator );
+			let checkList = await this.driver.elementsByXPath( blockActionsMenuButtonLocator );
 			while ( checkList.length === 0 ) {
 				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom
-				checkList = await this.driver.elementsByXPath( removeBlockLocator );
+				checkList = await this.driver.elementsByXPath( blockActionsMenuButtonLocator );
 			}
 		}
 
-		const removeButton = await this.driver.elementByXPath( removeBlockLocator );
-		await removeButton.click();
+		const blockActionsMenuButton = await this.driver.elementByXPath( blockActionsMenuButtonLocator );
+		await blockActionsMenuButton.click();
+
+		const removeActionButtonIdentifier = `Remove ${ blockName }`;
+		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
+		const removeActionButton = await this.driver.elementByXPath( removeActionButtonLocator );
+
+		await removeActionButton.click();
 	}
 
 	// =========================
