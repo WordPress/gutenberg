@@ -29,10 +29,6 @@ function Header( {
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
-			deviceType: select(
-				'core/edit-post'
-			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);

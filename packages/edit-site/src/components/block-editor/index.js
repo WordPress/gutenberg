@@ -21,7 +21,7 @@ import {
  */
 import { useEditorContext } from '../editor';
 import NavigateToLink from '../navigate-to-link';
-import Sidebar from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar';
 
 export default function BlockEditor() {
 	const { settings: _settings, setSettings } = useEditorContext();
@@ -98,9 +98,9 @@ export default function BlockEditor() {
 					[ settings.page, setActivePageAndTemplateId ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
-			<Sidebar.InspectorFill>
+			<SidebarInspectorFill>
 				<BlockInspector />
-			</Sidebar.InspectorFill>
+			</SidebarInspectorFill>
 			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>

@@ -76,8 +76,6 @@ function useAdjustComplementaryListener(
 			previousIsSmall.current = isSmall;
 		}
 	}, [ isActive, isSmall, scope, identifier, activeArea ] );
-
-	useEffect( () => {}, [ identifier, activeArea ] );
 }
 
 function ComplementaryArea( {

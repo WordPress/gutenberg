@@ -7,19 +7,16 @@
 
 	.edit-widgets-header,
 	.edit-widgets-header__block-toolbar {
-		margin-right: -12px;
-		margin-left: -12px;
 		background: #fff;
+		margin-left: -12px;
+		margin-right: -12px;
 	}
 	.edit-widgets-sidebar {
+		margin-left: -12px;
+		margin-right: -12px;
 		position: absolute;
 		top: 0;
-		margin-left: -12px;
-		margin-right: -12px;
 		width: calc(100% + 24px);
-	}
-
-	.edit-widgets-sidebar {
 		z-index: z-index(".edit-widgets-sidebar");
 	}
 }

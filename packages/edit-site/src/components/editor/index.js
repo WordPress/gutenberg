@@ -41,7 +41,7 @@ import { close } from '@wordpress/icons';
  */
 import Notices from '../notices';
 import Header from '../header';
-import Sidebar from '../sidebar';
+import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
@@ -146,7 +146,7 @@ function Editor( { settings: _settings } ) {
 								<Context.Provider value={ context }>
 									<FocusReturnProvider>
 										<KeyboardShortcuts.Register />
-										<Sidebar />
+										<SidebarComplementaryAreaFills />
 										<InterfaceSkeleton
 											labels={ interfaceLabels }
 											leftSidebar={

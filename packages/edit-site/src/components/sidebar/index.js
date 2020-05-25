@@ -6,10 +6,11 @@ import { ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { cog, pencil } from '@wordpress/icons';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
+const { Slot: InspectorSlot, Fill: Fill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
-function Sidebar() {
+export const SidebarInspectorFill = Fill;
+export function SidebarComplementaryAreaFills() {
 	return (
 		<>
 			<ComplementaryArea
@@ -31,7 +32,3 @@ function Sidebar() {
 		</>
 	);
 }
-
-Sidebar.InspectorFill = InspectorFill;
-
-export default Sidebar;
