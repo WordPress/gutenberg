@@ -100,7 +100,7 @@ export class BlockSwitcher extends Component {
 					<ToolbarButton
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
-						label={ __( 'Block icon' ) }
+						title={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
 				</ToolbarGroup>
@@ -140,7 +140,7 @@ export class BlockSwitcher extends Component {
 								onClick={ onToggle }
 								aria-haspopup="true"
 								aria-expanded={ isOpen }
-								label={ label }
+								title={ label }
 								onKeyDown={ openOnArrowDown }
 								showTooltip
 								icon={ <BlockIcon icon={ icon } showColors /> }
