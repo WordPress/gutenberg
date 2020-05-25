@@ -110,7 +110,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		wp_set_current_user( self::$admin_id );
 		$request    = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
 		$response   = rest_get_server()->dispatch( $request );
-		$block_type = WP_Block_Type_Registry::get_instance()->register( $block_name );
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		$this->check_block_type_object( $block_type, $response->get_data(), $response->get_links() );
 	}
 
