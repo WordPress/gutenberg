@@ -81,26 +81,45 @@ function addTrailingPeriod( text ) {
 }
 
 /**
+ * Returns undefined if the given entry should be omitted, otherwise returns the
+ * given entry title.
+ *
+ * @param {string}                        title Original title.
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
+ *
+ * @return {string=} Title, or undefined if to be omitted.
+ */
+function omitMobileEntry( title, issue ) {
+	const hasMobileTitlePrefix = /^\[rnmobile\]/i.test( title );
+	const hasMobileLabel = issue.labels.some(
+		( label ) => label.name === 'Mobile App Compatibility'
+	);
+
+	return hasMobileTitlePrefix || hasMobileLabel ? undefined : title;
+}
+
+/**
  * Array of normalizations applying to title, each returning a new string, or
  * undefined to indicate an entry which should be omitted.
  *
- * @type {Array<(text:string)=>string|undefined>}
+ * @type {Array<(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined>}
  */
-const TITLE_NORMALIZATIONS = [ addTrailingPeriod ];
+const TITLE_NORMALIZATIONS = [ omitMobileEntry, addTrailingPeriod ];
 
 /**
  * Given an issue title, returns the title with normalization transforms
  * applied, or undefined to indicate that the entry should be omitted.
  *
- * @param {string} title Original title.
+ * @param {string}                        title Original title.
+ * @param {IssuesListForRepoResponseItem} issue Issue object.
  *
  * @return {string|undefined} Normalized title.
  */
-function getNormalizedTitle( title ) {
+function getNormalizedTitle( title, issue ) {
 	/** @type {string|undefined} */
 	let normalizedTitle = title;
 	for ( const normalize of TITLE_NORMALIZATIONS ) {
-		normalizedTitle = normalize( normalizedTitle );
+		normalizedTitle = normalize( normalizedTitle, issue );
 		if ( normalizedTitle === undefined ) {
 			break;
 		}
@@ -110,16 +129,19 @@ function getNormalizedTitle( title ) {
 }
 
 /**
- * Returns a formatted changelog entry for a given issue object.
+ * Returns a formatted changelog entry for a given issue object, or undefined
+ * if entry should be omitted.
  *
  * @param {IssuesListForRepoResponseItem} issue Issue object.
  *
- * @return {string} Formatted changelog entry.
+ * @return {string=} Formatted changelog entry, or undefined to omit.
  */
 function getEntry( issue ) {
-	const title = getNormalizedTitle( issue.title );
+	const title = getNormalizedTitle( issue.title, issue );
 
-	return `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
+	return title === undefined
+		? title
+		: `- ${ title } ([${ issue.number }](${ issue.html_url }))`;
 }
 
 /**
@@ -244,7 +266,10 @@ async function getChangelog( settings ) {
 
 		const groupPullRequests = groupedPullRequests[ group ];
 		for ( const pullRequest of groupPullRequests ) {
-			changelog += getEntry( pullRequest ) + '\n';
+			const entry = getEntry( pullRequest );
+			if ( entry ) {
+				changelog += entry + '\n';
+			}
 		}
 
 		changelog += '\n';
@@ -293,6 +318,7 @@ async function getReleaseChangelog( options ) {
 }
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
+	omitMobileEntry,
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
