@@ -17,7 +17,10 @@ import stripShortcodes from './stripShortcodes';
 import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
 
-/** @typedef {import('./defaultSettings').WPWordCountSettings}  WPWordCountSettings */
+/**
+ * @typedef {import('./defaultSettings').WPWordCountDefaultSettings}  WPWordCountSettings
+ * @typedef {import('./defaultSettings').WPWordCountUserSettings}     WPWordCountUserSettings
+ */
 
 /**
  * Possible ways of counting.
@@ -28,8 +31,8 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
 /**
  * Private function to manage the settings.
  *
- * @param {WPWordCountStrategy} type         The type of count to be done.
- * @param {WPWordCountSettings} userSettings Custom settings for the count.
+ * @param {WPWordCountStrategy}     type         The type of count to be done.
+ * @param {WPWordCountUserSettings} userSettings Custom settings for the count.
  *
  * @return {WPWordCountSettings} The combined settings object to be used.
  */
@@ -111,9 +114,9 @@ function countCharacters( text, regex, settings ) {
 /**
  * Count some words.
  *
- * @param {string}              text         The text being processed
- * @param {WPWordCountStrategy} type	     The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
- * @param {WPWordCountSettings} userSettings Custom settings object.
+ * @param {string}                  text         The text being processed
+ * @param {WPWordCountStrategy}     type	     The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {WPWordCountUserSettings} userSettings Custom settings object.
  *
  * @example
  * ```js
@@ -123,7 +126,6 @@ function countCharacters( text, regex, settings ) {
  *
  * @return {number} The word or character count.
  */
-
 export function count( text, type, userSettings ) {
 	const settings = loadSettings( type, userSettings );
 	let matchRegExp;

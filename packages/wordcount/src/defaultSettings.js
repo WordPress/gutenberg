@@ -20,15 +20,21 @@
  * @property {WPWordCountL10n}     l10n                              Object with human translations
  */
 
+// Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly: https://github.com/jsdoc/jsdoc/issues/1285
+/* eslint-disable jsdoc/valid-types */
 /**
  * Lower-level settings for word counting that can be overridden.
  *
- * @typedef {Partial<WPWordCountSettingsFields>} WPWordCountSettings
+ * @typedef {Partial<WPWordCountSettingsFields>} WPWordCountUserSettings
  */
 
 /**
- * @type {WPWordCountSettings}
+ * Word counting settings that include non-optional values we set if missing
+ *
+ * @typedef {WPWordCountUserSettings & typeof defaultSettings} WPWordCountDefaultSettings
  */
+/* eslint-enable jsdoc/valid-types */
+
 export const defaultSettings = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
 	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
