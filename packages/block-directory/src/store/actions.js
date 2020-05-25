@@ -73,7 +73,7 @@ export function* installBlockType( { id, name, assets } ) {
 			method: 'POST',
 		} );
 		if ( response.success !== true ) {
-			throw new Error( response.errorMessage );
+			throw new Error( __( 'Unable to install this block.' ) );
 		}
 		yield addInstalledBlockType( { id, name } );
 
