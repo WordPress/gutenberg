@@ -59,7 +59,7 @@ function useAdjustComplementaryListener(
 			! isSmall &&
 			previousIsSmall.current
 		) {
-			// Remove the flag indicating the complementary area should be enable.
+			// Remove the flag indicating the complementary area should be enabled.
 			shouldOpenWhenNotSmall.current = false;
 			// Enable the complementary area.
 			enableComplementaryArea( scope, identifier );
