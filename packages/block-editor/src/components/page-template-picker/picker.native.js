@@ -46,7 +46,7 @@ const __experimentalPageTemplatePicker = ( {
 
 	const [ templatePreview, setTemplatePreview ] = useState();
 	const [ pickerVisible, setPickerVisible ] = useState( visible );
-	const [ tooltip, setTooltipVisible ] = useState( false );
+	const [ tooltipVisible, setTooltipVisible ] = useState( false );
 	const contentOpacity = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
@@ -67,7 +67,7 @@ const __experimentalPageTemplatePicker = ( {
 	}, [ visible ] );
 
 	useEffect( () => {
-		if ( tooltip && templatePreview ) {
+		if ( tooltipVisible && templatePreview ) {
 			setTooltipVisible( false );
 		}
 	}, [ templatePreview ] );
@@ -134,7 +134,7 @@ const __experimentalPageTemplatePicker = ( {
 
 	return (
 		<Animated.View style={ [ { opacity: contentOpacity } ] }>
-			{ tooltip && <Tooltip onTooltipHidden={ onTooltipHidden } /> }
+			{ tooltipVisible && <Tooltip onTooltipHidden={ onTooltipHidden } /> }
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
