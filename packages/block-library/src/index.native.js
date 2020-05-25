@@ -4,6 +4,7 @@
 import {
 	registerBlockType,
 	setDefaultBlockName,
+	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 } from '@wordpress/blocks';
@@ -49,6 +50,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as classic from './classic';
 import * as group from './group';
 import * as buttons from './buttons';
 
@@ -97,6 +99,8 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	video,
+	classic,
 	buttons,
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
@@ -153,6 +157,7 @@ export const registerCoreBlocks = () => {
 		columns,
 		column,
 		group,
+		classic,
 		button,
 		spacer,
 		shortcode,
@@ -164,6 +169,7 @@ export const registerCoreBlocks = () => {
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
+	setFreeformContentHandlerName( classic.name );
 	setUnregisteredTypeHandlerName( missing.name );
 	if ( group ) {
 		setGroupingBlockName( group.name );
