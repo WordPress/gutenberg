@@ -33,20 +33,17 @@ export default function TemplateParts() {
 		);
 	}, [] );
 
-	if ( ! Array.isArray( templateParts ) ) {
-		return null;
-	}
-
 	return (
 		<div>
-			{ templateParts.map( ( templatePart ) => {
-				return (
-					<TemplatePartItem
-						key={ templatePart.id }
-						templatePart={ templatePart }
-					/>
-				);
-			} ) }
+			{ templateParts &&
+				templateParts.map( ( templatePart ) => {
+					return (
+						<TemplatePartItem
+							key={ templatePart.id }
+							templatePart={ templatePart }
+						/>
+					);
+				} ) }
 		</div>
 	);
 }
