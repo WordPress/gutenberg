@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { basename } = require( 'path' );
-const { cond } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -39,19 +38,19 @@ const hasBabelConfig = () =>
  *
  * @return {string=} Override or fallback configuration file path.
  */
-const getJestOverrideConfigFile = ( suffix ) =>
-	cond( [
-		[
-			() => hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ),
-			() => undefined,
-		],
-		[
-			() => hasProjectFile( `jest-${ suffix }.config.js` ),
-			() => fromProjectRoot( `jest-${ suffix }.config.js` ),
-		],
-		[ () => hasJestConfig(), () => undefined ],
-		[ () => true, () => fromConfigRoot( `jest-${ suffix }.config.js` ) ],
-	] )();
+function getJestOverrideConfigFile( suffix ) {
+	if ( hasArgInCLI( '-c' ) || hasArgInCLI( '--config' ) ) {
+		return;
+	}
+
+	if ( hasProjectFile( `jest-${ suffix }.config.js` ) ) {
+		return fromProjectRoot( `jest-${ suffix }.config.js` );
+	}
+
+	if ( ! hasJestConfig() ) {
+		return fromConfigRoot( `jest-${ suffix }.config.js` );
+	}
+}
 
 const hasJestConfig = () =>
 	hasProjectFile( 'jest.config.js' ) ||
