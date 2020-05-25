@@ -1,0 +1,25 @@
+{
+	"name": "core/query",
+	"category": "layout",
+	"attributes": {
+		"queryId": {
+			"type": "number"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"perPage": 3,
+				"pages": 1,
+				"offset": 0,
+				"categoryIds": []
+			}
+		}
+	},
+	"providesContext": {
+		"queryId": "queryId",
+		"query": "query"
+	},
+	"supports": {
+		"html": false
+	}
+}

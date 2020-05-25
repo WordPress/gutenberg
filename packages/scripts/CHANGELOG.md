@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### New Feature
+
+- New `--webpack-no-externals` flag added to `build` and `start` scripts. It disables scripts' assets generation, and omits the list of default externals ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+- New `--webpack-bundle-analyzer` flag added to `build` and `start` scripts. It enables visualization for the size of webpack output files with an interactive zoomable treemap ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+- New `--webpack--devtool` flag added to `start` script. It controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
+
+### Breaking Changes
+
+- The default babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled babel configuration; if a project provides its own, this change doesn't affect it. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
+
+## 9.1.0 (2020-05-14)
+
+### New Features
+
+- Add new capability to `build` and `start` scripts that automates handling CSS, SASS or SCSS files by importing them from JavaScript code ([#21730](https://github.com/WordPress/gutenberg/pull/21730)). You can find more details about CSS assets management in webpack at https://webpack.js.org/guides/asset-management/#loading-css.
+
 ### Enhancements
 
 - Bundle analysis in `build` script now runs with module concatenation disabled. This represents the size of individual modules more accurately, at the cost of not providing an exact byte-for-byte match to the final size in the production chunk.

@@ -14,14 +14,14 @@ import {
 } from '../process';
 
 jest.mock( '../package', () => {
-	const module = require.requireActual( '../package' );
+	const module = jest.requireActual( '../package' );
 
 	jest.spyOn( module, 'getPackagePath' );
 
 	return module;
 } );
 jest.mock( '../process', () => {
-	const module = require.requireActual( '../process' );
+	const module = jest.requireActual( '../process' );
 
 	jest.spyOn( module, 'exit' );
 	jest.spyOn( module, 'getArgsFromCLI' );

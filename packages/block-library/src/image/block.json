@@ -69,5 +69,8 @@
 			"selector": "figure > a",
 			"attribute": "target"
 		}
+	},
+	"supports": {
+		"lightBlockWrapper": true
 	}
 }

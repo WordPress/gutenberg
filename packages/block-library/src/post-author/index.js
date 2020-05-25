@@ -16,8 +16,5 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Post Author' ),
 	icon,
-	supports: {
-		html: false,
-	},
 	edit,
 };

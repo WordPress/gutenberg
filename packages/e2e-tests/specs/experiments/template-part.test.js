@@ -62,6 +62,10 @@ describe( 'Template Part', () => {
 
 			// Save it, without saving the front page template.
 			await page.click( '.edit-site-save-button__button' );
+			const reviewChangesButton = await page.waitForSelector(
+				'.entities-saved-states__review-changes-button'
+			);
+			await reviewChangesButton.click();
 			const [ frontPageCheckbox ] = await page.$x(
 				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
 			);

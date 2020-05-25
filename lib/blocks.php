@@ -21,6 +21,7 @@ function gutenberg_reregister_core_block_types() {
 		'block.php'           => 'core/block',
 		'calendar.php'        => 'core/calendar',
 		'categories.php'      => 'core/categories',
+		'cover.php'           => 'core/cover',
 		'latest-comments.php' => 'core/latest-comments',
 		'latest-posts.php'    => 'core/latest-posts',
 		'legacy-widget.php'   => 'core/legacy-widget',
@@ -48,6 +49,9 @@ function gutenberg_reregister_core_block_types() {
 				'post-tags.php'           => 'core/post-tags',
 				'site-title.php'          => 'core/site-title',
 				'template-part.php'       => 'core/template-part',
+				'query.php'               => 'core/query',
+				'query-loop.php'          => 'core/query-loop',
+				'query-pagination.php'    => 'core/query-pagination',
 			)
 		);
 	}

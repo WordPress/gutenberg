@@ -10,11 +10,22 @@
 	display: flex;
 	flex-grow: 1;
 	padding-left: $grid-unit-10;
+	align-items: center;
 
 	& > * {
 		margin-left: 5px;
 	}
 }
+
+.edit-site-header__toolbar-switchers {
+	align-items: center;
+	display: flex;
+}
+
+.edit-site-header__toolbar-switchers-separator {
+	margin: 0 -6px 0;
+}
+
 .edit-site-header__actions {
 	display: flex;
 	margin-right: 8px;
@@ -34,6 +45,63 @@
 
 		.components-icon-button {
 			padding: 8px 4px;
+		}
+	}
+}
+
+// Block toolbar when fixed to the top of the screen.
+.edit-site-header-toolbar__block-toolbar {
+	// Stack toolbar below Editor Bar.
+	position: absolute;
+	top: $header-height + $border-width;
+	left: 0;
+	right: 0;
+	background: $white;
+	border-bottom: $border-width solid $light-gray-500;
+
+	&:empty {
+		display: none;
+	}
+
+	.block-editor-block-toolbar .components-toolbar-group,
+	.block-editor-block-toolbar .components-toolbar {
+		border-top: none;
+		border-bottom: none;
+	}
+
+	.is-sidebar-opened & {
+		display: none;
+	}
+
+	@include break-medium {
+		.is-sidebar-opened & {
+			display: block;
+			right: $sidebar-width;
+		}
+	}
+
+	// Move toolbar into top Editor Bar.
+	@include break-wide {
+		padding-left: $grid-unit-10;
+		position: static;
+		left: auto;
+		right: auto;
+		background: none;
+		border-bottom: none;
+
+		.is-sidebar-opened & {
+			right: auto;
+		}
+
+		.block-editor-block-toolbar {
+			border-left: $border-width solid $light-gray-500;
+		}
+
+		.block-editor-block-toolbar .components-toolbar-group,
+		.block-editor-block-toolbar .components-toolbar {
+			$top-toolbar-padding: ( $header-height - $grid-unit-60 ) / 2;
+			height: $header-height;
+			padding: $top-toolbar-padding 0;
 		}
 	}
 }
