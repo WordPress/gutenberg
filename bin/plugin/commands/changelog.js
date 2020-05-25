@@ -34,6 +34,21 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
+ * Mapping of label names to grouping heading text to be used in release notes,
+ * intended to be more readable in the context of release notes. Also used in
+ * merging multiple related groupings to a single heading.
+ *
+ * @type {Record<string,string>}
+ */
+const LABEL_GROUP_TITLES = {
+	Bug: 'Bug Fixes',
+	Regression: 'Bug Fixes',
+	Feature: 'Features',
+	Enhancement: 'Enhancements',
+	'New API': 'New APIs',
+};
+
+/**
  * Given a SemVer-formatted version string, returns an assumed milestone title
  * associated with that version.
  *
@@ -62,7 +77,15 @@ function getIssueType( issue ) {
 		label.name.startsWith( '[Type] ' )
 	);
 
-	return typeLabel ? typeLabel.name.replace( /^\[Type\] /, '' ) : 'Various';
+	if ( ! typeLabel ) {
+		return 'Various';
+	}
+
+	const labelName = typeLabel.name.replace( /^\[Type\]\s*/, '' );
+
+	return LABEL_GROUP_TITLES.hasOwnProperty( labelName )
+		? LABEL_GROUP_TITLES[ labelName ]
+		: labelName;
 }
 
 /**
@@ -374,4 +397,5 @@ async function getReleaseChangelog( options ) {
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
+	getIssueType,
 };

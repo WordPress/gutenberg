@@ -7,6 +7,7 @@ import {
 	addTrailingPeriod,
 	omitMobileEntry,
 	capitalizeAfterColonSeparatedPrefix,
+	getIssueType,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -104,5 +105,27 @@ describe( 'capitalizeAfterColonSeparatedPrefix', () => {
 		const result = capitalizeAfterColonSeparatedPrefix( 'blocks: fix bug' );
 
 		expect( result ).toBe( 'blocks: Fix bug' );
+	} );
+} );
+
+describe( 'getIssueType', () => {
+	it( 'returns various if unable to find appropriate type by label', () => {
+		const result = getIssueType( { labels: [] } );
+
+		expect( result ).toBe( 'Various' );
+	} );
+
+	it( 'returns type by label', () => {
+		const result = getIssueType( {
+			labels: [ { name: '[Type] Code Quality' } ],
+		} );
+
+		expect( result ).toBe( 'Code Quality' );
+	} );
+
+	it( 'returns remapped type by label', () => {
+		const result = getIssueType( { labels: [ { name: '[Type] Bug' } ] } );
+
+		expect( result ).toBe( 'Bug Fixes' );
 	} );
 } );
