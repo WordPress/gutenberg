@@ -11,7 +11,7 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @param {T} value The value to track.
  *
- * @return {T} The value from the previous render.
+ * @return {T|undefined} The value from the previous render.
  */
 export default function usePrevious( value ) {
 	const ref = useRef();

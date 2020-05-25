@@ -175,7 +175,7 @@ _Parameters_
 
 _Returns_
 
--   `T`: The value from the previous render.
+-   `(T|undefined)`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
