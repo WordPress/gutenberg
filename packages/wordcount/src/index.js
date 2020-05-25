@@ -64,15 +64,12 @@ function loadSettings( type, userSettings ) {
  * Count the words in text
  *
  * @param {string}              text     The text being processed
- * @param {RegExp|undefined}    regex    The regular expression pattern being matched
+ * @param {RegExp}              regex    The regular expression pattern being matched
  * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} The matched string.
  */
 function countWords( text, regex, settings ) {
-	if ( typeof regex === 'undefined' ) {
-		return 0;
-	}
 	text = flow(
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),
@@ -90,15 +87,12 @@ function countWords( text, regex, settings ) {
  * Count the characters in text
  *
  * @param {string}              text     The text being processed
- * @param {RegExp|undefined}    regex    The regular expression pattern being matched
+ * @param {RegExp}              regex    The regular expression pattern being matched
  * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
  * @return {number} Count of characters.
  */
 function countCharacters( text, regex, settings ) {
-	if ( typeof regex === 'undefined' ) {
-		return 0;
-	}
 	text = flow(
 		stripTags.bind( null, settings ),
 		stripHTMLComments.bind( null, settings ),

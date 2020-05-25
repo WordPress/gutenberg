@@ -7,8 +7,5 @@
  * @return {string} The manipulated text.
  */
 export default function stripSpaces( settings, text ) {
-	if ( settings.spaceRegExp ) {
-		return text.replace( settings.spaceRegExp, ' ' );
-	}
-	return text;
+	return text.replace( settings.spaceRegExp, ' ' );
 }

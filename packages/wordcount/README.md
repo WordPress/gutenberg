@@ -31,7 +31,7 @@ _Parameters_
 
 -   _text_ `string`: The text being processed
 -   _type_ `WPWordCountStrategy`: The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
--   _userSettings_ `WPWordCountSettings`: Custom settings object.
+-   _userSettings_ `WPWordCountUserSettings`: Custom settings object.
 
 _Returns_
 
