@@ -64,7 +64,7 @@ function useAdjustComplementaryListener(
 			// Enable the complementary area.
 			enableComplementaryArea( scope, identifier );
 		} else if (
-			// If the is flag indicating the current complementary should be reopen but another complementary area becomes active
+			// If the flag is indicating the current complementary should be reopened but another complementary area becomes active,
 			// remove the flag.
 			shouldOpenWhenNotSmall.current &&
 			activeArea &&
