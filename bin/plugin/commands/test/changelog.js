@@ -8,6 +8,7 @@ import {
 	omitMobileEntry,
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
+	sortGroup,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -127,5 +128,27 @@ describe( 'getIssueType', () => {
 		const result = getIssueType( { labels: [ { name: '[Type] Bug' } ] } );
 
 		expect( result ).toBe( 'Bug Fixes' );
+	} );
+} );
+
+describe( 'sortGroup', () => {
+	it( 'returns groups in order', () => {
+		const result = [
+			'Code Quality',
+			'Bug Fixes',
+			'Various',
+			'New APIs',
+			'Enhancements',
+			'Performance',
+		].sort( sortGroup );
+
+		expect( result ).toEqual( [
+			'Enhancements',
+			'New APIs',
+			'Bug Fixes',
+			'Code Quality',
+			'Performance',
+			'Various',
+		] );
 	} );
 } );

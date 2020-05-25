@@ -49,6 +49,25 @@ const LABEL_GROUP_TITLES = {
 };
 
 /**
+ * Order in which to print group titles. A value of `undefined` is used as slot
+ * in which unrecognized headings are to be inserted.
+ *
+ * @type {Array<string|undefined>}
+ */
+const GROUP_TITLE_ORDER = [
+	'Features',
+	'Enhancements',
+	'New APIs',
+	'Bug Fixes',
+	'Experiments',
+	'Code Quality',
+	'Documentation',
+	'Project Management',
+	undefined,
+	'Various',
+];
+
+/**
  * Given a SemVer-formatted version string, returns an assumed milestone title
  * associated with that version.
  *
@@ -86,6 +105,23 @@ function getIssueType( issue ) {
 	return LABEL_GROUP_TITLES.hasOwnProperty( labelName )
 		? LABEL_GROUP_TITLES[ labelName ]
 		: labelName;
+}
+
+/**
+ * Sort comparator, comparing two group titles.
+ *
+ * @param {string} a First group title.
+ * @param {string} b Second group title.
+ *
+ * @return {number} Sort result.
+ */
+function sortGroup( a, b ) {
+	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
+		const index = GROUP_TITLE_ORDER.indexOf( title );
+		return index === -1 ? GROUP_TITLE_ORDER.indexOf( undefined ) : index;
+	} );
+
+	return aIndex - bIndex;
 }
 
 /**
@@ -334,7 +370,8 @@ async function getChangelog( settings ) {
 	let changelog = '';
 
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
-	for ( const group of Object.keys( groupedPullRequests ) ) {
+	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
+	for ( const group of sortedGroups ) {
 		changelog += '### ' + group + '\n\n';
 
 		const groupPullRequests = groupedPullRequests[ group ];
@@ -398,4 +435,5 @@ async function getReleaseChangelog( options ) {
 	getNormalizedTitle,
 	getReleaseChangelog,
 	getIssueType,
+	sortGroup,
 };
