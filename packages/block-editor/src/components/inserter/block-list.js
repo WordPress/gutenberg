@@ -124,9 +124,7 @@ export function InserterBlockList( {
 	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
-		return items
-			.filter( ( item ) => item.utility > 0 )
-			.slice( 0, MAX_SUGGESTED_ITEMS );
+		return items.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
