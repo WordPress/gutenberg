@@ -14,6 +14,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
+import InserterPanel from './panel';
 
 function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
@@ -34,6 +35,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 
 	return (
 		<div
+			className="block-editor-inserter__template-part-item"
 			role="button"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
@@ -42,9 +44,12 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 				}
 			} }
 			tabIndex={ 0 }
+			aria-label={ templatePart.slug }
 		>
 			<BlockPreview blocks={ blocks } />
-			<div>{ templatePart.slug }</div>
+			<div className="block-editor-inserter__template-part-item-title">
+				{ templatePart.slug }
+			</div>
 		</div>
 	);
 }
@@ -61,7 +66,7 @@ export default function TemplateParts( { onInsert } ) {
 	}, [] );
 
 	return (
-		<div>
+		<InserterPanel>
 			{ templateParts &&
 				templateParts.map( ( templatePart ) => {
 					return (
@@ -72,6 +77,6 @@ export default function TemplateParts( { onInsert } ) {
 						/>
 					);
 				} ) }
-		</div>
+		</InserterPanel>
 	);
 }
