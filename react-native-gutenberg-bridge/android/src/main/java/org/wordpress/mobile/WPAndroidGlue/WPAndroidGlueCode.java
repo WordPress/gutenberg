@@ -101,6 +101,8 @@ public class WPAndroidGlueCode {
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
     private boolean mIsDarkMode;
+    private Consumer<Exception> mExceptionLogger;
+    private Consumer<String> mBreadcrumbLogger;
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -336,7 +338,7 @@ public class WPAndroidGlueCode {
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
                 new LinearGradientPackage(),
-                new ReactAztecPackage(),
+                new ReactAztecPackage(mExceptionLogger, mBreadcrumbLogger),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
@@ -351,19 +353,22 @@ public class WPAndroidGlueCode {
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
-    @Deprecated
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost, String localeString, Bundle translations, int colorBackground, boolean isDarkMode) {
-        onCreateView(initContext, htmlModeEnabled, application, isDebug, buildGutenbergFromSource, "post", isNewPost
-        , localeString, translations, colorBackground, isDarkMode);
-    }
-
-    public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             String postType, boolean isNewPost, String localeString, Bundle translations,
-                             int colorBackground, boolean isDarkMode) {
+    public void onCreateView(Context initContext,
+                             boolean htmlModeEnabled,
+                             Application application,
+                             boolean isDebug,
+                             boolean buildGutenbergFromSource,
+                             String postType,
+                             boolean isNewPost,
+                             String localeString,
+                             Bundle translations,
+                             int colorBackground,
+                             boolean isDarkMode,
+                             Consumer<Exception> exceptionLogger,
+                             Consumer<String> breadcrumbLogger) {
         mIsDarkMode = isDarkMode;
+        mExceptionLogger = exceptionLogger;
+        mBreadcrumbLogger = breadcrumbLogger;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
@@ -408,7 +413,6 @@ public class WPAndroidGlueCode {
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   boolean isDarkMode) {
-
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 

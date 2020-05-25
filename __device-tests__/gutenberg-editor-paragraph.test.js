@@ -7,6 +7,7 @@
  */
 import EditorPage from './pages/editor-page';
 import {
+	backspace,
 	setupDriver,
 	isLocalEnvironment,
 	clickMiddleOfElement,
@@ -103,7 +104,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		textViewElement = await editorPage.getTextViewForParagraphBlock( paragraphBlockElement );
 		await clickBeginningOfElement( driver, textViewElement );
-		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, '\u0008' );
+		await editorPage.typeTextToParagraphBlock( paragraphBlockElement, backspace );
 
 		const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		expect( text0 + text1 ).toMatch( text );
@@ -126,6 +127,55 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			await editorPage.removeBlockAtPosition( paragraphBlockName, i );
 		}
 	} );
+
+	// Restricting these test to Android because I was not able to update the html on iOS
+	if ( isAndroid() ) {
+		it( 'should be able to merge blocks with unknown html elements', async () => {
+			await editorPage.setHtmlContentAndroid( `
+<!-- wp:paragraph -->
+<p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>E</p>
+<!-- /wp:paragraph -->` );
+
+			// // Merge paragraphs
+			const secondParagraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+			await clickBeginningOfElement( driver, secondParagraphBlockElement );
+			await editorPage.typeTextToParagraphBlock( secondParagraphBlockElement, backspace );
+
+			// verify the editor has not crashed
+			const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+			expect( text.length ).not.toEqual( 0 );
+
+			await editorPage.removeBlockAtPosition( paragraphBlockName );
+		} );
+
+		// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
+		it( 'should handle multiline paragraphs from web', async () => {
+			await editorPage.setHtmlContentAndroid( `
+	<!-- wp:paragraph -->
+	<p>multiple lines<br><br></p>
+	<!-- /wp:paragraph -->
+
+	<!-- wp:paragraph -->
+	<p></p>
+	<!-- /wp:paragraph -->`
+			);
+
+			// // Merge paragraphs
+			const secondParagraphBlockElement = await editorPage.getBlockAtPosition( paragraphBlockName, 2 );
+			await clickBeginningOfElement( driver, secondParagraphBlockElement );
+			await editorPage.typeTextToParagraphBlock( secondParagraphBlockElement, backspace );
+
+			// verify the editor has not crashed
+			const text = await editorPage.getTextForParagraphBlockAtPosition( 1 );
+			expect( text.length ).not.toEqual( 0 );
+
+			await editorPage.removeBlockAtPosition( paragraphBlockName );
+		} );
+	}
 
 	afterAll( async () => {
 		if ( ! isLocalEnvironment() ) {
