@@ -12,7 +12,7 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 
-import { useState } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,6 +26,14 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
+
+// Adapter component that makes `BlockSettingsDropdown` work with
+// `TreeGridItem` by forwarding its ref to the `toggleRef` prop.
+const BlockSettingsDropdownAdapter = forwardRef(
+	function BlockSettingsDropdownAdapter( props, ref ) {
+		return <BlockSettingsDropdown toggleRef={ ref } { ...props } />;
+	}
+);
 
 export default function BlockNavigationBlock( {
 	block,
@@ -115,13 +123,11 @@ export default function BlockNavigationBlock( {
 
 			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
 				<TreeGridCell className={ ellipsisMenuClassName }>
-					{ ( props ) => (
-						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
-							icon={ moreVertical }
-							{ ...props }
-						/>
-					) }
+					<TreeGridItem
+						as={ BlockSettingsDropdownAdapter }
+						clientIds={ [ clientId ] }
+						icon={ moreVertical }
+					/>
 				</TreeGridCell>
 			) }
 		</BlockNavigationLeaf>
