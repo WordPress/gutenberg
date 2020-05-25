@@ -266,14 +266,9 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 * @param array         $links Links to compare again.
 	 */
 	public function check_block_type_object( $block_type, $data, $links ) {
-		$this->assertEquals( rest_url( '__experimental/block-types' ), $links['collection'][0]['href'] );
-		$this->assertArrayHasKey( 'https://api.w.org/items', $links );
-
+		// Test data.
 		$this->assertEquals( $data['attributes'], $block_type->get_attributes() );
 		$this->assertEquals( $data['is_dynamic'], $block_type->is_dynamic() );
-		if ( $block_type->is_dynamic() ) {
-			$this->assertArrayHasKey( 'https://api.w.org/render-block', $links );
-		}
 
 		$extra_fields = array(
 			'name'          => 'name',
@@ -296,6 +291,13 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			if ( isset( $block_type->$extra_field ) ) {
 				$this->assertEquals( $data[ $key ], $block_type->$extra_field );
 			}
+		}
+
+		// Test links.
+		$this->assertEquals( rest_url( '__experimental/block-types' ), $links['collection'][0]['href'] );
+		$this->assertEquals( rest_url( '__experimental/block-types/' . $block_type->name ), $links['self'][0]['href'] );
+		if ( $block_type->is_dynamic() ) {
+			$this->assertArrayHasKey( 'https://api.w.org/render-block', $links );
 		}
 	}
 
