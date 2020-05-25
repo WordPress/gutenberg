@@ -56,6 +56,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
+	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-post-format-search-handler.php';
+	}
+	if ( ! class_exists( 'WP_REST_Category_Search_Handler' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-category-search-handler.php';
 	}
 	/**
 	* End: Include for phase 2

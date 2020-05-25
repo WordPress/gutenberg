@@ -275,3 +275,15 @@ function gutenberg_register_image_editor() {
 	$image_editor->register_routes();
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
+function gutenberg_post_format_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	return $search_handlers;
+}
+
+add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+
+function gutenberg_category_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Category_Search_Handler();
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_category_search_handler', 10, 5 );
