@@ -33,6 +33,11 @@ def buildGutenbergMobileJSBundle =
         ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
                 && rootProject.ext.buildGutenbergMobileJSBundle)
 
+def tempFolder = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
+def nodeFolder = file("${tempFolder}/nodejs")
+def npmFolder = file("${tempFolder}/npm")
+def yarnFolder = file("${tempFolder}/yarn")
+
 if (buildGutenbergMobileJSBundle) {
     println 'Building the Gutenberg Mobile JS bundle'
 
@@ -55,16 +60,14 @@ if (buildGutenbergMobileJSBundle) {
         // If false, it will try to use globally installed node.
         download = true
 
-        def tmpdir = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
-
         // Set the work directory for unpacking node
-        workDir = file("${tmpdir}/nodejs")
+        workDir = file(nodeFolder)
 
         // Set the work directory for NPM
-        npmWorkDir = file("${tmpdir}/npm")
+        npmWorkDir = file(npmFolder)
 
         // Set the work directory for Yarn
-        yarnWorkDir = file("${tmpdir}/yarn")
+        yarnWorkDir = file(yarnFolder)
 
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../")
@@ -290,10 +293,16 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         delete '../../node_modules'
     }
 
+    task resetExtractedRNTools(type: Delete) {
+        println "Deleting temporary folders with extracted RN tools"
+        delete nodeFolder, npmFolder, yarnFolder
+    }
+
     preBuild.dependsOn(cleanupNodeModulesFolder)
     cleanupNodeModulesFolder.dependsOn(backupHermesDebugAAR)
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
     buildJSBundle.dependsOn(yarn_install)
+    nodeSetup.dependsOn(resetExtractedRNTools)
 }
