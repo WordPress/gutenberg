@@ -2,20 +2,21 @@
  * External dependencies
  */
 import {
+	ScrollView,
 	TouchableWithoutFeedback,
 	View,
 	Animated,
 	Easing,
-	FlatList,
 	Dimensions,
 	Platform,
+	Text,
 } from 'react-native';
 import { map, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, createRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -27,6 +28,10 @@ import { performLayoutAnimation } from '../mobile/utils';
 
 const ANIMATION_DURATION = 200;
 
+let contentWidth = 0;
+let scrollPosition = 0;
+let customIndicatorWidth = 0;
+
 function ColorPalette( {
 	setColor,
 	activeColor,
@@ -35,6 +40,7 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
+	shouldScrollToEnd,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -42,7 +48,8 @@ function ColorPalette( {
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
 
-	const flatListRef = createRef();
+	const scrollViewRef = useRef();
+	const isIOS = Platform.OS === 'ios';
 
 	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
 
@@ -58,15 +65,18 @@ function ColorPalette( {
 	const customIndicatorColor = isGradientSegment
 		? activeColor
 		: customSwatchGradients;
+	const isCustomGradientColor = isGradientColor && isSelectedCustom();
 	const shouldShowCustomIndicator =
-		! isGradientSegment || ( isGradientColor && isSelectedCustom() );
+		! isGradientSegment || isCustomGradientColor;
+
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize gradient' )
 		: __( 'Navigates to custom color picker' );
+	const customText = isIOS ? __( 'Custom' ) : __( 'CUSTOM' );
 
 	useEffect( () => {
-		if ( flatListRef?.current ) {
-			flatListRef.current.scrollToOffset( { x: 0, y: 0 } );
+		if ( scrollViewRef.current ) {
+			scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 		}
 	}, [ currentSegment ] );
 
@@ -108,37 +118,51 @@ function ColorPalette( {
 		outputRange: [ 1, 0.7, 1 ],
 	} );
 
-	function deselectCustomGradient( index ) {
-		const SWATCH_SIZE = styles.colorSwatch.width;
-		const SWATCH_NUM_ON_LAYOUT = Math.ceil(
-			Dimensions.get( 'window' ).width / SWATCH_SIZE
-		);
+	function deselectCustomGradient() {
+		const { width } = Dimensions.get( 'window' );
+		const isVisible =
+			contentWidth - scrollPosition - customIndicatorWidth < width;
 
-		if ( isGradientColor && isSelectedCustom() ) {
-			if ( Platform.OS === 'android' ) {
+		if ( isCustomGradientColor ) {
+			if ( ! isIOS ) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504
-				// Workaround: Force the scroll on the last several list items visible on the layout.
+				// Workaround: Force the scroll when deselecting custom gradient color and when custom indicator is visible on layout.
 				if (
-					index > colors.length - SWATCH_NUM_ON_LAYOUT &&
-					flatListRef?.current
+					isCustomGradientColor &&
+					isVisible &&
+					scrollViewRef.current
 				) {
-					flatListRef.current.scrollToIndex( { index } );
+					scrollViewRef.current.scrollTo( {
+						x: scrollPosition - customIndicatorWidth,
+					} );
 				}
 			} else performLayoutAnimation();
 		}
 	}
 
-	function onContentSizeChange() {
-		if ( isSelectedCustom() && flatListRef?.current ) {
-			flatListRef.current.scrollToEnd();
+	function onColorPress( color ) {
+		deselectCustomGradient();
+		performAnimation( color );
+		setColor( color );
+	}
+
+	function onContentSizeChange( width ) {
+		contentWidth = width;
+		if (
+			shouldScrollToEnd &&
+			isSelectedCustom() &&
+			scrollViewRef.current
+		) {
+			scrollViewRef.current.scrollToEnd();
 		}
 	}
 
-	function onColorPress( color, index ) {
-		deselectCustomGradient( index );
-		performAnimation( color );
-		setColor( color );
+	function onCustomIndicatorLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		if ( width !== customIndicatorWidth ) {
+			customIndicatorWidth = width;
+		}
 	}
 
 	const verticalSeparatorStyle = usePreferredColorSchemeStyle(
@@ -146,29 +170,36 @@ function ColorPalette( {
 		styles.verticalSeparatorDark
 	);
 
+	const customTextStyle = usePreferredColorSchemeStyle(
+		styles.customText,
+		styles.customTextDark
+	);
+
 	return (
-		<FlatList
-			data={ colors }
+		<ScrollView
 			contentContainerStyle={ styles.contentContainer }
 			style={ styles.container }
 			horizontal
 			showsHorizontalScrollIndicator={ false }
 			keyboardShouldPersistTaps="always"
 			disableScrollViewPanResponder
+			onScroll={ ( { nativeEvent } ) =>
+				( scrollPosition = nativeEvent.contentOffset.x )
+			}
+			onContentSizeChange={ onContentSizeChange }
 			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
-			onContentSizeChange={ onContentSizeChange }
-			ref={ flatListRef }
-			keyExtractor={ ( item ) => `${ item }-${ isSelected( item ) }` }
-			renderItem={ ( { item, index } ) => {
-				const scaleValue = isSelected( item ) ? scaleInterpolation : 1;
+			ref={ scrollViewRef }
+		>
+			{ colors.map( ( color ) => {
+				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
 				return (
 					<TouchableWithoutFeedback
-						onPress={ () => onColorPress( item, index ) }
-						key={ `${ item }-${ isSelected( item ) }` }
+						onPress={ () => onColorPress( color ) }
+						key={ `${ color }-${ isSelected( color ) }` }
 						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelected( item ) } }
-						accessibilityHint={ item }
+						accessibilityState={ { selected: isSelected( color ) } }
+						accessibilityHint={ color }
 					>
 						<Animated.View
 							style={ {
@@ -180,43 +211,42 @@ function ColorPalette( {
 							} }
 						>
 							<ColorIndicator
-								color={ item }
-								isSelected={ isSelected( item ) }
+								color={ color }
+								isSelected={ isSelected( color ) }
 								opacity={ opacity }
 								style={ styles.colorIndicator }
 							/>
 						</Animated.View>
 					</TouchableWithoutFeedback>
 				);
-			} }
-			ListFooterComponent={ () => {
-				if ( shouldShowCustomIndicator ) {
-					return (
-						<View style={ styles.row }>
-							<View style={ verticalSeparatorStyle } />
-							<TouchableWithoutFeedback
-								onPress={ onCustomPress }
-								accessibilityRole={ 'button' }
-								accessibilityState={ {
-									selected: isSelectedCustom(),
-								} }
-								accessibilityHint={ accessibilityHint }
-							>
-								<View>
-									<ColorIndicator
-										withCustomPicker={ ! isGradientSegment }
-										color={ customIndicatorColor }
-										isSelected={ isSelectedCustom() }
-										style={ styles.colorIndicator }
-									/>
-								</View>
-							</TouchableWithoutFeedback>
+			} ) }
+			{ shouldShowCustomIndicator && (
+				<>
+					<View style={ verticalSeparatorStyle } />
+					<TouchableWithoutFeedback
+						onPress={ onCustomPress }
+						accessibilityRole={ 'button' }
+						accessibilityState={ { selected: isSelectedCustom() } }
+						accessibilityHint={ accessibilityHint }
+					>
+						<View
+							style={ styles.customIndicatorWrapper }
+							onLayout={ onCustomIndicatorLayout }
+						>
+							<ColorIndicator
+								withCustomPicker={ ! isGradientSegment }
+								color={ customIndicatorColor }
+								isSelected={ isSelectedCustom() }
+								style={ styles.colorIndicator }
+							/>
+							<Text style={ customTextStyle }>
+								{ customText }
+							</Text>
 						</View>
-					);
-				}
-				return null;
-			} }
-		/>
+					</TouchableWithoutFeedback>
+				</>
+			) }
+		</ScrollView>
 	);
 }
 

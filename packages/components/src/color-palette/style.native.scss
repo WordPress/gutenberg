@@ -24,10 +24,17 @@
 	margin-bottom: 12px;
 }
 
-.colorSwatch {
-	width: $panel-padding / 2 + $mobile-color-swatch;
+.customIndicatorWrapper {
+	flex-direction: row;
+	align-items: center;
 }
 
-.row {
-	flex-direction: row;
+.customText {
+	letter-spacing: 1.25;
+	font-size: 16px;
+	color: $gray-dark;
+}
+
+.customTextDark {
+	color: $white;
 }
