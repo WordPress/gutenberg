@@ -53,7 +53,7 @@ function useAdjustComplementaryListener(
 			// Flag the complementary area to be reoppen when the window size goes from small to big.
 			shouldOpenWhenNotSmall.current = true;
 		} else if (
-			// If there is a flag indicating the complementary area should be enable when we go from small to big window size
+			// If there is a flag indicating the complementary area should be enabled when we go from small to big window size
 			// and we are going from a small to big window size.
 			shouldOpenWhenNotSmall.current &&
 			! isSmall &&
