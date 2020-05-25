@@ -106,12 +106,12 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 	 *
 	 */
 	public function test_get_item() {
-		$block_type = 'fake/test';
+		$block_name = 'fake/test';
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_type );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertEquals( $block_type, $data['name'] );
+		$request    = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
+		$response   = rest_get_server()->dispatch( $request );
+		$block_type = WP_Block_Type_Registry::get_instance()->register( $block_name );
+		$this->check_block_type_object( $block_type, $response->get_data(), $response->get_links() );
 	}
 
 	public function test_get_block_invalid_name() {
@@ -214,6 +214,89 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/fake/test' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_block_type_cannot_view', $response, 401 );
+	}
+
+	/**
+	 *
+	 */
+	public function test_prepare_item() {
+		$registry = new WP_Block_Type_Registry;
+		$settings = array(
+			'icon'            => 'text',
+			'render_callback' => '__return_null',
+		);
+		$registry->register( 'fake/line', $settings );
+		$block_type = $registry->get_registered( 'fake/line' );
+		$endpoint   = new WP_REST_Block_Types_Controller;
+		$request    = new WP_REST_Request;
+		$request->set_param( 'context', 'edit' );
+		$response = $endpoint->prepare_item_for_response( $block_type, $request );
+		$this->check_block_type_object( $block_type, $response->get_data(), $response->get_links() );
+	}
+
+	/**
+	 *
+	 */
+	public function test_prepare_item_limit_fields() {
+		$registry = new WP_Block_Type_Registry;
+		$settings = array(
+			'icon'            => 'text',
+			'render_callback' => '__return_null',
+		);
+		$registry->register( 'fake/line', $settings );
+		$block_type = $registry->get_registered( 'fake/line' );
+		$request    = new WP_REST_Request;
+		$endpoint   = new WP_REST_Block_Types_Controller;
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( '_fields', 'name' );
+		$response = $endpoint->prepare_item_for_response( $block_type, $request );
+		$this->assertEquals(
+			array(
+				'name',
+			),
+			array_keys( $response->get_data() )
+		);
+	}
+
+	/**
+	 * Util check block type object against.
+	 *
+	 * @param WP_Block_Type $block_type Sample block type.
+	 * @param array         $data Data to compare against.
+	 * @param array         $links Links to compare again.
+	 */
+	public function check_block_type_object( $block_type, $data, $links ) {
+		$this->assertEquals( rest_url( '__experimental/block-types' ), $links['collection'][0]['href'] );
+		$this->assertArrayHasKey( 'https://api.w.org/items', $links );
+
+		$this->assertEquals( $data['attributes'], $block_type->get_attributes() );
+		$this->assertEquals( $data['is_dynamic'], $block_type->is_dynamic() );
+		if ( $block_type->is_dynamic() ) {
+			$this->assertArrayHasKey( 'https://api.w.org/render-block', $links );
+		}
+
+		$extra_fields = array(
+			'name'          => 'name',
+			'category'      => 'category',
+			'editor_script' => 'editor_script',
+			'script'        => 'script',
+			'editor_style'  => 'editor_style',
+			'style'         => 'style',
+			'supports'      => 'supports',
+			'title'         => 'title',
+			'icon'          => 'icon',
+			'description'   => 'description',
+			'keywords'      => 'keywords',
+			'parent'        => 'parent',
+			'styles'        => 'styleVariations',
+			'text_domain'   => 'textDomain',
+		);
+
+		foreach ( $extra_fields as $key => $extra_field ) {
+			if ( isset( $block_type->$extra_field ) ) {
+				$this->assertEquals( $data[ $key ], $block_type->$extra_field );
+			}
+		}
 	}
 
 	/**
