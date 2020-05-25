@@ -7,6 +7,8 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import LineHeightControl from '../components/line-height-control';
+import useEditorFeature from '../components/use-editor-feature';
+
 import { cleanEmptyObject } from './utils';
 
 export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
@@ -23,8 +25,15 @@ export function LineHeightEdit( props ) {
 		name: blockName,
 		attributes: { style },
 	} = props;
+	// Don't render the controls if disabled by editor settings
+	const isDisabled = useEditorFeature(
+		'__experimentalDisableCustomLineHeight'
+	);
 
-	if ( ! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) ) {
+	if (
+		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) ||
+		isDisabled
+	) {
 		return null;
 	}
 
