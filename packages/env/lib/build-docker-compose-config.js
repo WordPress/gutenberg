@@ -151,7 +151,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				],
 				environment: {
 					LOCAL_DIR: 'html',
-					WP_PHPUNIT__TESTS_CONFIG: '/var/www/html/wp-config.php',
+					WP_PHPUNIT__TESTS_CONFIG:
+						'/var/www/html/phpunit-wp-config.php',
 				},
 			},
 		},
