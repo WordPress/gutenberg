@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { groupBy } = require( 'lodash' );
+const { groupBy, escapeRegExp } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 
 /**
@@ -31,6 +31,13 @@ const manifest = require( '../../../package.json' );
  * @property {string}  repo      Repository name.
  * @property {string=} token     Optional personal access token.
  * @property {string}  milestone Milestone title.
+ */
+
+/**
+ * Changelog normalization function, returning a string to use as title, or
+ * undefined if entry should be omitted.
+ *
+ * @typedef {(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined} WPChangelogNormalization
  */
 
 /**
@@ -140,24 +147,6 @@ function addTrailingPeriod( text ) {
 }
 
 /**
- * Returns undefined if the given entry should be omitted, otherwise returns the
- * given entry title.
- *
- * @param {string}                        title Original title.
- * @param {IssuesListForRepoResponseItem} issue Issue object.
- *
- * @return {string=} Title, or undefined if to be omitted.
- */
-function omitMobileEntry( title, issue ) {
-	const hasMobileTitlePrefix = /^\[rnmobile\]/i.test( title );
-	const hasMobileLabel = issue.labels.some(
-		( label ) => label.name === 'Mobile App Compatibility'
-	);
-
-	return hasMobileTitlePrefix || hasMobileLabel ? undefined : title;
-}
-
-/**
  * Map of common technical terms to a corresponding replacement term more
  * appropriate for release notes.
  *
@@ -177,7 +166,10 @@ const REWORD_TERMS = {
  */
 function reword( text ) {
 	for ( const [ term, replacement ] of Object.entries( REWORD_TERMS ) ) {
-		const pattern = new RegExp( '(^| )' + term + '( |$)', 'ig' );
+		const pattern = new RegExp(
+			'(^| )' + escapeRegExp( term ) + '( |$)',
+			'ig'
+		);
 		text = text.replace( pattern, '$1' + replacement + '$2' );
 	}
 
@@ -203,13 +195,44 @@ function capitalizeAfterColonSeparatedPrefix( text ) {
 }
 
 /**
+ * Higher-order function which returns a normalization function to omit by title
+ * prefix matching any of the given prefixes.
+ *
+ * @param {string[]} prefixes Prefixes from which to determine if given entry
+ *                            should be omitted.
+ *
+ * @return {WPChangelogNormalization} Normalization function.
+ */
+const createOmitByTitlePrefix = ( prefixes ) => ( title ) =>
+	prefixes.some( ( prefix ) =>
+		new RegExp( '^' + escapeRegExp( prefix ), 'i' ).test( title )
+	)
+		? undefined
+		: title;
+
+/**
+ * Higher-order function which returns a normalization function to omit by issue
+ * label matching any of the given label names.
+ *
+ * @param {string[]} labels Label names from which to determine if given entry
+ *                          should be omitted.
+ *
+ * @return {WPChangelogNormalization} Normalization function.
+ */
+const createOmitByLabel = ( labels ) => ( text, issue ) =>
+	issue.labels.some( ( label ) => labels.includes( label.name ) )
+		? undefined
+		: text;
+
+/**
  * Array of normalizations applying to title, each returning a new string, or
  * undefined to indicate an entry which should be omitted.
  *
- * @type {Array<(text:string,issue:IssuesListForRepoResponseItem)=>string|undefined>}
+ * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	omitMobileEntry,
+	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
+	createOmitByLabel( [ 'Mobile App Compatibility', 'Project Management' ] ),
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	addTrailingPeriod,
@@ -430,7 +453,8 @@ async function getReleaseChangelog( options ) {
 /** @type {NodeJS.Module} */ ( module ).exports = {
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
-	omitMobileEntry,
+	createOmitByTitlePrefix,
+	createOmitByLabel,
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,

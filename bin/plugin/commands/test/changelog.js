@@ -5,7 +5,8 @@ import {
 	getNormalizedTitle,
 	reword,
 	addTrailingPeriod,
-	omitMobileEntry,
+	createOmitByTitlePrefix,
+	createOmitByLabel,
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
 	sortGroup,
@@ -31,6 +32,15 @@ describe( 'getNormalizedTitle', () => {
 			{
 				...DEFAULT_ISSUE,
 				labels: [ { name: 'Mobile App Compatibility' } ],
+			},
+		],
+		[
+			'omits project management',
+			'Add codeowner',
+			undefined,
+			{
+				...DEFAULT_ISSUE,
+				labels: [ { name: 'Project Management' } ],
 			},
 		],
 		[
@@ -63,24 +73,30 @@ describe( 'addTrailingPeriod', () => {
 	} );
 } );
 
-describe( 'omitMobileEntry', () => {
-	it( 'returns identity if not mobile', () => {
-		const result = omitMobileEntry( 'Address web concern', { labels: [] } );
+describe( 'createOmitByTitlePrefix', () => {
+	it( 'returns identity if not containing matching prefix', () => {
+		const result = createOmitByTitlePrefix( [ '[omIT]' ] )( 'Fix' );
 
-		expect( result ).toBe( 'Address web concern' );
+		expect( result ).toBe( 'Fix' );
 	} );
 
-	it( 'returns undefined if mobile by title', () => {
-		const result = omitMobileEntry( '[RNMobile] Address native concern', {
-			labels: [],
-		} );
+	it( 'returns undefined if given prefix', () => {
+		const result = createOmitByTitlePrefix( [ '[omIT]' ] )( '[omit] Fix' );
 
 		expect( result ).toBe( undefined );
 	} );
+} );
 
-	it( 'returns undefined if mobile by label', () => {
-		const result = omitMobileEntry( 'Address native concern', {
-			labels: [ { name: 'Mobile App Compatibility' } ],
+describe( 'createOmitByLabel', () => {
+	it( 'returns identity if label is not assigned to issue', () => {
+		const result = createOmitByLabel( [ 'Omit' ] )( 'Fix', { labels: [] } );
+
+		expect( result ).toBe( 'Fix' );
+	} );
+
+	it( 'returns undefined if given prefix', () => {
+		const result = createOmitByLabel( [ 'Omit' ] )( 'Fix', {
+			labels: [ { name: 'Omit' } ],
 		} );
 
 		expect( result ).toBe( undefined );
