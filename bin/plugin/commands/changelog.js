@@ -66,19 +66,47 @@ function getIssueType( issue ) {
 }
 
 /**
+ * Given a text string, appends a period if not already ending with one.
+ *
+ * @param {string} text Original text.
+ *
+ * @return {string} Text with trailing period.
+ */
+function addTrailingPeriod( text ) {
+	if ( ! text.endsWith( '.' ) ) {
+		text += '.';
+	}
+
+	return text;
+}
+
+/**
+ * Array of normalizations applying to title, each returning a new string, or
+ * undefined to indicate an entry which should be omitted.
+ *
+ * @type {Array<(text:string)=>string|undefined>}
+ */
+const TITLE_NORMALIZATIONS = [ addTrailingPeriod ];
+
+/**
  * Given an issue title, returns the title with normalization transforms
- * applied.
+ * applied, or undefined to indicate that the entry should be omitted.
  *
  * @param {string} title Original title.
  *
- * @return {string} Normalized title.
+ * @return {string|undefined} Normalized title.
  */
 function getNormalizedTitle( title ) {
-	if ( ! title.endsWith( '.' ) ) {
-		title = title + '.';
+	/** @type {string|undefined} */
+	let normalizedTitle = title;
+	for ( const normalize of TITLE_NORMALIZATIONS ) {
+		normalizedTitle = normalize( normalizedTitle );
+		if ( normalizedTitle === undefined ) {
+			break;
+		}
 	}
 
-	return title;
+	return normalizedTitle;
 }
 
 /**
@@ -265,6 +293,7 @@ async function getReleaseChangelog( options ) {
 }
 
 /** @type {NodeJS.Module} */ ( module ).exports = {
+	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
 };
