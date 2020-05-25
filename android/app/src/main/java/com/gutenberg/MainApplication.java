@@ -151,6 +151,7 @@ public class MainApplication extends Application implements ReactApplication {
                         new ReactSliderPackage(),
                         new ReactVideoPackage(),
                         new SvgPackage(),
+                        // passing null because we do not need log handlers in the demo app
                         new ReactAztecPackage(null, null),
                         new LinearGradientPackage(),
                         mRnReactNativeGutenbergBridgePackage);
