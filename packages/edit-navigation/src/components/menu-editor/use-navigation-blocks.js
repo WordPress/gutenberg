@@ -1,16 +1,21 @@
 /**
  * External dependencies
  */
-import { groupBy, omitBy, sortBy, isNil, keyBy, omit } from 'lodash';
+import { groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
+
+/**
+ * Internal dependencies
+ */
+import batchSave from './menu-items-batch-save-handler';
 
 function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
 	return createBlock(
@@ -23,17 +28,6 @@ function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
 	);
 }
 
-function createMenuItemAttributesFromBlock( block ) {
-	const attributes = {};
-	if ( block.attributes.label ) {
-		attributes.title = block.attributes.label;
-	}
-	return {
-		title: block.attributes.label,
-		url: block.attributes.url,
-	};
-}
-
 export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
@@ -42,243 +36,128 @@ export default function useNavigationBlocks( menuId ) {
 		[ menuId ]
 	);
 
-	const [ blocks, setBlocks, menuItemsRef ] = useNavigationBlocksModel(
-		menuItems
-	);
+	// Let's keep track of live menuItems and block clientId to menu item mapping
+	const [ blocks, setBlocks ] = useState( [] );
+	const menuItemsRef = useRef( {} );
 
-	const [ onFinished ] = useDynamicMenuItemPlaceholders(
-		menuId,
-		blocks,
-		menuItemsRef
+	// Refresh our model whenever menuItems change
+	useEffect( () => {
+		if ( menuItems ) {
+			const [
+				navigationBlock,
+				clientIdToMenuItemMapping,
+			] = convertMenuItemsToNavigationBlock( menuItems );
+			setBlocks( [ navigationBlock ] );
+			menuItemsRef.current = clientIdToMenuItemMapping;
+		}
+	}, [ menuItems ] );
+
+	// When a new block is added, let's create a draft menuItem for it.
+	// The batch save endpoint expects all the menu items to have a valid id already.
+	const debouncedBlocks = useDebouncedValue( blocks, 800 );
+	const promiseQueueRef = useRef( new PromiseQueue() );
+	const processedBlocksIds = useRef( [] );
+	useEffect(
+		function() {
+			for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
+				if ( clientId in menuItemsRef.current ) {
+					continue;
+				}
+				if ( processedBlocksIds.current.includes( clientId ) ) {
+					continue;
+				}
+				processedBlocksIds.current.push( clientId );
+				promiseQueueRef.current.schedule( () =>
+					createDraftMenuItem( clientId ).then(
+						async ( menuItem ) => {
+							menuItemsRef.current[ clientId ] = menuItem;
+							processedBlocksIds.current.splice(
+								processedBlocksIds.current.indexOf( clientId )
+							);
+						}
+					)
+				);
+			}
+		},
+		[ debouncedBlocks ]
 	);
 
 	const saveBlocks = useSaveBlocks( menuId, blocks, menuItemsRef, query );
 
-	return [ blocks, setBlocks, () => onFinished( saveBlocks ) ];
+	return [
+		blocks,
+		setBlocks,
+		() => promiseQueueRef.current.then( saveBlocks ),
+	];
 }
 
-const useNavigationBlocksModel = ( menuItems ) => {
-	const [ blocks, setBlocks ] = useState( [] );
-	const menuItemsRef = useRef( {} );
+class PromiseQueue {
+	constructor( concurrency = 1 ) {
+		this.concurrency = concurrency;
+		this.queue = [];
+		this.active = [];
+		this.listeners = [];
+	}
 
-	useEffect( () => {
-		if ( ! menuItems ) {
+	schedule( action ) {
+		this.queue.push( action );
+		this.run();
+	}
+
+	run() {
+		while ( this.queue.length && this.active.length <= this.concurrency ) {
+			const action = this.queue.pop();
+			const promise = action().then( () =>
+				this.onActionFinished( promise )
+			);
+			this.active.push( promise );
+		}
+	}
+
+	onActionFinished( promise ) {
+		this.active.splice( this.active.indexOf( promise ), 1 );
+		if ( this.active.length === 0 && this.queue.length === 0 ) {
+			for ( const l of this.listeners ) {
+				l();
+			}
+			this.listeners = [];
+		}
+	}
+
+	then( callback ) {
+		this.listeners.push( callback );
+	}
+}
+
+const convertMenuItemsToNavigationBlock = ( menuItems ) => {
+	const itemsByParentID = groupBy( menuItems, 'parent' );
+	const clientIdToMenuItemMapping = {};
+	const createMenuItemBlocks = ( items ) => {
+		const innerBlocks = [];
+		if ( ! items ) {
 			return;
 		}
 
-		const itemsByParentID = groupBy( menuItems, 'parent' );
-		menuItemsRef.current = {};
-		const createMenuItemBlocks = ( items ) => {
-			const innerBlocks = [];
-			if ( ! items ) {
-				return;
-			}
-
-			const sortedItems = sortBy( items, 'menu_order' );
-			for ( const item of sortedItems ) {
-				let menuItemInnerBlocks = [];
-				if ( itemsByParentID[ item.id ]?.length ) {
-					menuItemInnerBlocks = createMenuItemBlocks(
-						itemsByParentID[ item.id ]
-					);
-				}
-				const block = createBlockFromMenuItem(
-					item,
-					menuItemInnerBlocks
+		const sortedItems = sortBy( items, 'menu_order' );
+		for ( const item of sortedItems ) {
+			let menuItemInnerBlocks = [];
+			if ( itemsByParentID[ item.id ]?.length ) {
+				menuItemInnerBlocks = createMenuItemBlocks(
+					itemsByParentID[ item.id ]
 				);
-				menuItemsRef.current[ block.clientId ] = item;
-				innerBlocks.push( block );
 			}
-			return innerBlocks;
-		};
-
-		// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-		const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] || [] );
-		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
-	}, [ menuItems ] );
-
-	return [ blocks, setBlocks, menuItemsRef ];
-};
-
-// Creation and synchronization logic for creating menu items on the fly.
-// This effects creates so many functions on each re-render - it would be great to
-// refactor it it and minimize that.
-const useDynamicMenuItemPlaceholders = (
-	menuId,
-	currentBlocks,
-	menuItemsRef
-) => {
-	const blocks = useDebouncedValue( currentBlocks, 800 );
-	const blocksByIdRef = useRef( {} );
-	// This is used to ensure we will only process one menu item at a time and won't save
-	// the entire menu before all menu items are created. We could increase the concurrency
-	// quite easily too.
-	const processingRef = useRef( {
-		queue: [],
-		running: false,
-		notify: [],
-	} );
-
-	useEffect(
-		function() {
-			const blocksById = mapBlocksByClientId( blocks );
-			blocksByIdRef.current = blocksById;
-
-			const clientIdsWithoutRelatedMenuItem = Object.keys(
-				blocksById
-			).filter( ( clientId ) => ! menuItemsRef.current[ clientId ] );
-
-			for ( const clientId of clientIdsWithoutRelatedMenuItem ) {
-				schedulePlaceholderMenuItem( clientId );
-			}
-		},
-		[ blocks ]
-	);
-
-	function schedulePlaceholderMenuItem( clientId ) {
-		const queue = processingRef.current.queue;
-		if ( queue.includes( clientId ) ) {
-			return;
+			const block = createBlockFromMenuItem( item, menuItemInnerBlocks );
+			clientIdToMenuItemMapping[ block.clientId ] = item;
+			innerBlocks.push( block );
 		}
-		queue.push( clientId );
-		processQueue();
-	}
-
-	async function processQueue() {
-		const processing = processingRef.current;
-		if ( processing.running ) {
-			return;
-		}
-		processing.running = true;
-		try {
-			while ( processing.queue.length ) {
-				const [ clientIdToProcess, idx ] = getNextProcessableClientId();
-				if ( ! clientIdToProcess ) {
-					if ( processing.queue.length ) {
-						// Rudimentary assertion - suggestions welcome!
-						// eslint-disable-next-line no-console
-						console.error(
-							'getNextProcessableClientId() did not return anything even though the processing queue is not empty'
-						);
-						return;
-					}
-					break;
-				}
-				await createPlaceholderMenuItem( clientIdToProcess );
-				processing.queue.splice( idx, 1 );
-			}
-		} finally {
-			processing.running = false;
-			notify();
-		}
-	}
-
-	function notify() {
-		const listeners = processingRef.current.notify;
-		for ( let i = listeners.length - 1; i >= 0; i-- ) {
-			listeners[ i ]();
-			listeners.splice( i, 1 );
-		}
-	}
-
-	function getNextProcessableClientId() {
-		const queue = processingRef.current.queue;
-		// While loop makes it possible to safely mutate the list
-		for ( let i = queue.length - 1; i >= 0; i-- ) {
-			const clientId = queue[ i ];
-
-			// Blocks was removed before we got to process it
-			if ( ! ( clientId in blocksByIdRef.current ) ) {
-				queue.splice( i, 1 );
-				continue;
-			}
-
-			// Menu item was already created before we got here
-			if ( clientId in menuItemsRef.current ) {
-				queue.splice( i, 1 );
-				continue;
-			}
-
-			return [ clientId, i ];
-		}
-	}
-
-	async function createPlaceholderMenuItem( clientId ) {
-		const block = blocksByIdRef.current[ clientId ];
-		const createdItem = await apiFetch( {
-			path: `/__experimental/menu-items`,
-			method: 'POST',
-			data: {
-				title: 'Placeholder',
-				url: 'Placeholder',
-				...omitBy( createMenuItemAttributesFromBlock( block ), isNil ),
-				menu_order: 0,
-			},
-		} );
-		menuItemsRef.current[ clientId ] = createdItem;
-		return createdItem;
-	}
-
-	const onFinished = function( callback ) {
-		if ( ! processingRef.current.running ) {
-			callback();
-			return;
-		}
-		processingRef.current.notify.push( callback );
+		return innerBlocks;
 	};
 
-	return [ onFinished ];
+	// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+	const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] || [] );
+	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
+	return [ navigationBlock, clientIdToMenuItemMapping ];
 };
-
-async function getNonceA() {
-	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
-		response.text()
-	);
-	body = body.substr( body.indexOf( '_wpCustomizeSettings =' ) );
-	body = body.substr(
-		0,
-		body.indexOf( '_wpCustomizeSettings.initialClientTimestamp' )
-	);
-	let _wpCustomizeSettings;
-	eval( body );
-	return _wpCustomizeSettings.nonce.preview;
-}
-
-async function getNonceB() {
-	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
-		response.text()
-	);
-	body = body.substr( body.indexOf( '_wpCustomizeSettings =' ) );
-	body = body.substr(
-		0,
-		body.indexOf( '_wpCustomizeSettings.initialClientTimestamp' )
-	);
-	let _wpCustomizeSettings;
-	eval( body );
-	return _wpCustomizeSettings.nonce.save;
-	/*
-	let body = await fetch( '/wp-admin/customize.php' ).then( ( response ) =>
-		response.text()
-	);
-	body = body.substr( body.indexOf( 'heartbeatSettings =' ) );
-	body = body.substr(
-		0,
-		body.indexOf( '</script>' )
-	);
-	let heartbeatSettings;
-	eval( body );
-	return heartbeatSettings.nonce;
-	 */
-}
-function uuidv4() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, function(
-		c
-	) {
-		const r = ( Math.random() * 16 ) | 0,
-			v = c === 'x' ? r : ( r & 0x3 ) | 0x8;
-		return v.toString( 16 );
-	} );
-}
 
 const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 	const { receiveEntityRecords } = useDispatch( 'core' );
@@ -286,24 +165,11 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const saveBlocks = async () => {
-		const requestData = prepareRequestMenuItems( blocks[ 0 ].innerBlocks );
-
-		const body = new FormData();
-		body.append( 'wp_customize', 'on' );
-		body.append( 'customize_theme', 'twentytwenty' );
-		body.append( 'nonce', await getNonceB() );
-		body.append( 'customize_changeset_uuid', uuidv4() );
-		body.append( 'customize_autosaved', 'on' );
-		body.append( 'customized', JSON.stringify( requestData ) );
-		body.append( 'customize_changeset_status', 'publish' );
-		body.append( 'action', 'customize_save' );
-		body.append( 'customize_preview_nonce', await getNonceA() );
-
-		const saved = await apiFetch( {
-			url: '/wp-admin/admin-ajax.php',
-			method: 'POST',
-			body,
-		} );
+		const result = await batchSave(
+			menuId,
+			menuItemsRef,
+			blocks[ 0 ].innerBlocks
+		);
 
 		createSuccessNotice( __( 'Navigation saved.' ), {
 			type: 'snackbar',
@@ -333,44 +199,20 @@ const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
 		);
 	};
 
-	const prepareRequestMenuItems = ( nestedBlocks ) =>
-		keyBy(
-			prepareRequestMenuItemsList( nestedBlocks ),
-			( item ) => `nav_menu_item[${ item.id }]`
-		);
-
-	const prepareRequestMenuItemsList = ( nestedBlocks, parentId = 0 ) =>
-		nestedBlocks.flatMap( ( block, index ) =>
-			[ prepareRequestMenuItem( block, parentId, index + 1 ) ].concat(
-				prepareRequestMenuItemsList(
-					block.innerBlocks,
-					getMenuItemForBlock( block )?.id
-				)
-			)
-		);
-
-	const prepareRequestMenuItem = ( block, parentId, position ) => {
-		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
-		const attributes = createMenuItemAttributesFromBlock( block );
-		return {
-			...menuItem,
-			position,
-			title: attributes.title,
-			original_title: attributes.title,
-			classes: ( menuItem.classes || [] ).join( ' ' ),
-			xfn: ( menuItem.xfn || [] ).join( ' ' ),
-			nav_menu_term_id: menuId,
-			menu_item_parent: parentId,
-			status: 'publish',
-			_invalid: false,
-		};
-	};
-
-	const getMenuItemForBlock = ( block ) =>
-		omit( menuItemsRef.current[ block.clientId ] || {}, '_links' );
-
 	return saveBlocks;
 };
+
+async function createDraftMenuItem() {
+	return apiFetch( {
+		path: `/__experimental/menu-items`,
+		method: 'POST',
+		data: {
+			title: 'Placeholder',
+			url: 'Placeholder',
+			menu_order: 0,
+		},
+	} );
+}
 
 const useDebouncedValue = ( value, timeout ) => {
 	const [ state, setState ] = useState( value );
@@ -384,13 +226,7 @@ const useDebouncedValue = ( value, timeout ) => {
 	return state;
 };
 
-const mapBlocksByClientId = ( nextBlocks ) =>
-	keyBy(
-		flatten( nextBlocks[ 0 ]?.innerBlocks || [], 'innerBlocks' ),
-		'clientId'
-	);
-
-const flatten = ( recursiveArray, childrenKey ) =>
-	recursiveArray.flatMap( ( item ) =>
-		[ item ].concat( flatten( item[ childrenKey ] || [], childrenKey ) )
+const getAllClientIds = ( blocks ) =>
+	blocks.flatMap( ( item ) =>
+		[ item.clientId ].concat( getAllClientIds( item.innerBlocks || [] ) )
 	);
