@@ -171,11 +171,11 @@ Based on <https://usehooks.com/usePrevious/>.
 
 _Parameters_
 
--   _value_ `any`: The value to track.
+-   _value_ `T`: The value to track.
 
 _Returns_
 
--   `any`: The value from the previous render.
+-   `T`: The value from the previous render.
 
 <a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
 
