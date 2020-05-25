@@ -23,3 +23,11 @@
 	margin-top: 12px;
 	margin-bottom: 12px;
 }
+
+.colorSwatch {
+	width: $panel-padding / 2 + $mobile-color-swatch;
+}
+
+.row {
+	flex-direction: row;
+}

@@ -2,11 +2,13 @@
  * External dependencies
  */
 import {
-	ScrollView,
 	TouchableWithoutFeedback,
 	View,
 	Animated,
 	Easing,
+	FlatList,
+	Dimensions,
+	Platform,
 } from 'react-native';
 import { map, uniq } from 'lodash';
 /**
@@ -40,7 +42,7 @@ function ColorPalette( {
 		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
 	];
 
-	const scrollViewRef = createRef();
+	const flatListRef = createRef();
 
 	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
 
@@ -63,20 +65,20 @@ function ColorPalette( {
 		: __( 'Navigates to custom color picker' );
 
 	useEffect( () => {
-		scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+		if ( flatListRef?.current ) {
+			flatListRef.current.scrollToOffset( { x: 0, y: 0 } );
+		}
 	}, [ currentSegment ] );
-
-	useEffect( () => {
-		performLayoutAnimation();
-	}, [ isGradientColor && isSelectedCustom() ] );
 
 	function isSelectedCustom() {
 		const isWithinColors = activeColor && colors.includes( activeColor );
-
-		if ( isGradientSegment ) {
-			return isGradientColor && ! isWithinColors;
+		if ( activeColor ) {
+			if ( isGradientSegment ) {
+				return isGradientColor && ! isWithinColors;
+			}
+			return ! isGradientColor && ! isWithinColors;
 		}
-		return ! isGradientColor && ! isWithinColors;
+		return false;
 	}
 
 	function isSelected( color ) {
@@ -106,7 +108,35 @@ function ColorPalette( {
 		outputRange: [ 1, 0.7, 1 ],
 	} );
 
-	function onColorPress( color ) {
+	function deselectCustomGradient( index ) {
+		const SWATCH_SIZE = styles.colorSwatch.width;
+		const SWATCH_NUM_ON_LAYOUT = Math.ceil(
+			Dimensions.get( 'window' ).width / SWATCH_SIZE
+		);
+
+		if ( isGradientColor && isSelectedCustom() ) {
+			if ( Platform.OS === 'android' ) {
+				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
+				// https://github.com/facebook/react-native/issues/27504
+				// Workaround: Force the scroll on the last several list items visible on the layout.
+				if (
+					index > colors.length - SWATCH_NUM_ON_LAYOUT &&
+					flatListRef?.current
+				) {
+					flatListRef.current.scrollToIndex( { index } );
+				}
+			} else performLayoutAnimation();
+		}
+	}
+
+	function onContentSizeChange() {
+		if ( isSelectedCustom() && flatListRef?.current ) {
+			flatListRef.current.scrollToEnd();
+		}
+	}
+
+	function onColorPress( color, index ) {
+		deselectCustomGradient( index );
 		performAnimation( color );
 		setColor( color );
 	}
@@ -117,7 +147,8 @@ function ColorPalette( {
 	);
 
 	return (
-		<ScrollView
+		<FlatList
+			data={ colors }
 			contentContainerStyle={ styles.contentContainer }
 			style={ styles.container }
 			horizontal
@@ -126,17 +157,18 @@ function ColorPalette( {
 			disableScrollViewPanResponder
 			onScrollBeginDrag={ () => shouldEnableBottomSheetScroll( false ) }
 			onScrollEndDrag={ () => shouldEnableBottomSheetScroll( true ) }
-			ref={ scrollViewRef }
-		>
-			{ colors.map( ( color ) => {
-				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
+			onContentSizeChange={ onContentSizeChange }
+			ref={ flatListRef }
+			keyExtractor={ ( item ) => `${ item }-${ isSelected( item ) }` }
+			renderItem={ ( { item, index } ) => {
+				const scaleValue = isSelected( item ) ? scaleInterpolation : 1;
 				return (
 					<TouchableWithoutFeedback
-						onPress={ () => onColorPress( color ) }
-						key={ `${ color }-${ isSelected( color ) }` }
+						onPress={ () => onColorPress( item, index ) }
+						key={ `${ item }-${ isSelected( item ) }` }
 						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelected( color ) } }
-						accessibilityHint={ color }
+						accessibilityState={ { selected: isSelected( item ) } }
+						accessibilityHint={ item }
 					>
 						<Animated.View
 							style={ {
@@ -148,36 +180,43 @@ function ColorPalette( {
 							} }
 						>
 							<ColorIndicator
-								color={ color }
-								isSelected={ isSelected( color ) }
+								color={ item }
+								isSelected={ isSelected( item ) }
 								opacity={ opacity }
 								style={ styles.colorIndicator }
 							/>
 						</Animated.View>
 					</TouchableWithoutFeedback>
 				);
-			} ) }
-			{ shouldShowCustomIndicator && (
-				<>
-					<View style={ verticalSeparatorStyle } />
-					<TouchableWithoutFeedback
-						onPress={ onCustomPress }
-						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelectedCustom() } }
-						accessibilityHint={ accessibilityHint }
-					>
-						<View>
-							<ColorIndicator
-								withCustomPicker={ ! isGradientSegment }
-								color={ customIndicatorColor }
-								isSelected={ isSelectedCustom() }
-								style={ styles.colorIndicator }
-							/>
+			} }
+			ListFooterComponent={ () => {
+				if ( shouldShowCustomIndicator ) {
+					return (
+						<View style={ styles.row }>
+							<View style={ verticalSeparatorStyle } />
+							<TouchableWithoutFeedback
+								onPress={ onCustomPress }
+								accessibilityRole={ 'button' }
+								accessibilityState={ {
+									selected: isSelectedCustom(),
+								} }
+								accessibilityHint={ accessibilityHint }
+							>
+								<View>
+									<ColorIndicator
+										withCustomPicker={ ! isGradientSegment }
+										color={ customIndicatorColor }
+										isSelected={ isSelectedCustom() }
+										style={ styles.colorIndicator }
+									/>
+								</View>
+							</TouchableWithoutFeedback>
 						</View>
-					</TouchableWithoutFeedback>
-				</>
-			) }
-		</ScrollView>
+					);
+				}
+				return null;
+			} }
+		/>
 	);
 }
 
