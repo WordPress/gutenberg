@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.util.Consumer;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -76,7 +77,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
 
-    public ReactAztecManager() {
+    @Nullable private final Consumer<Exception> exceptionLogger;
+    @Nullable private final Consumer<String> breadcrumbLogger;
+
+    public ReactAztecManager(@Nullable Consumer<Exception> exceptionLogger, @Nullable Consumer<String> breadcrumbLogger) {
+        this.exceptionLogger = exceptionLogger;
+        this.breadcrumbLogger = breadcrumbLogger;
         initializeFocusAndBlurCommandCodes();
     }
 
@@ -222,7 +228,31 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         if ( selection != null ) {
             int start = selection.getInt("start");
             int end = selection.getInt("end");
-            view.setSelection(start, end);
+            int textLength = view.getText().length();
+            boolean startAndEndAreValid = start >= 0 &&
+                                          end >= 0 &&
+                                          start <= textLength &&
+                                          end <= textLength;
+            if (startAndEndAreValid) {
+                view.setSelection(start, end);
+            } else {
+                // Calling view.setSelection would have thrown an exception, so let's send information about
+                // what happened to help us figure out how we got into a bad state.
+                try {
+                    IllegalSelectionIndexException customException =
+                            new IllegalSelectionIndexException(start, end, textLength, view);
+                    customException.printStackTrace();
+                    if (exceptionLogger != null) {
+                        exceptionLogger.accept(customException);
+                    }
+                    if (breadcrumbLogger != null) {
+                        breadcrumbLogger.accept(customException.getMessage());
+                    }
+                } catch (Exception e) {
+                    // Should never happen, but if it does don't let logging cause a crash
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

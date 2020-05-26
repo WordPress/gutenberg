@@ -12,5 +12,12 @@
 			"type": "string",
 			"source": "html"
 		}
+	},
+	"supports": {
+		"className": false,
+		"customClassName": false,
+		"inserter": false,
+		"html": false,
+		"reusable": false
 	}
 }

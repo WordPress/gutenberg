@@ -1,3 +1,6 @@
+1.28.1
+------
+* [**] Avoid crash when editor selection state becomes invalid
 1.29.0
 ------
 * [**] Add support for changing overlay color settings in Cover block
