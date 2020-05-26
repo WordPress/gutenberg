@@ -115,8 +115,8 @@ const About = {
 		},
 		{
 			name: 'core/buttons',
-			"attributes": {
-				"align": "center"
+			'attributes': {
+				'align': 'center'
 			},
 			innerBlocks: [
 				{
