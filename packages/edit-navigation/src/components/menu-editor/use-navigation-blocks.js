@@ -32,7 +32,7 @@ export default function useNavigationBlocks( menuId ) {
 		[ menuId ]
 	);
 
-	// Let's keep track of live menuItems and block clientId to menu item mapping
+	// Data model
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
