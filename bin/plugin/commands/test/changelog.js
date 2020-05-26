@@ -10,6 +10,7 @@ import {
 	capitalizeAfterColonSeparatedPrefix,
 	getIssueType,
 	sortGroup,
+	getTypesByLabels,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -145,6 +146,14 @@ describe( 'getIssueType', () => {
 
 		expect( result ).toBe( 'Bug Fixes' );
 	} );
+
+	it( 'prioritizes by group order', () => {
+		const result = getIssueType( {
+			labels: [ { name: '[Type] Task' }, { name: '[Type] Enhancement' } ],
+		} );
+
+		expect( result ).toBe( 'Enhancements' );
+	} );
 } );
 
 describe( 'sortGroup', () => {
@@ -166,5 +175,18 @@ describe( 'sortGroup', () => {
 			'Performance',
 			'Various',
 		] );
+	} );
+} );
+
+describe( 'getTypesByLabels', () => {
+	it( 'returns all normalized type candidates by type prefix', () => {
+		const result = getTypesByLabels( [
+			'[Type] Regression',
+			'[Type] Bug',
+			'[Package] Blocks',
+			'[Type] Performance',
+		] );
+
+		expect( result ).toEqual( [ 'Bug Fixes', 'Performance' ] );
 	} );
 } );

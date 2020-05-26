@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { groupBy, escapeRegExp } = require( 'lodash' );
+const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 
 /**
@@ -47,7 +47,7 @@ const manifest = require( '../../../package.json' );
  *
  * @type {Record<string,string>}
  */
-const LABEL_GROUP_TITLES = {
+const LABEL_TYPE_MAPPING = {
 	Bug: 'Bug Fixes',
 	Regression: 'Bug Fixes',
 	Feature: 'Features',
@@ -104,6 +104,26 @@ function getMilestone( version ) {
 }
 
 /**
+ * Returns type candidates based on given issue label names.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string[]} Type candidates.
+ */
+function getTypesByLabels( labels ) {
+	return uniq(
+		labels
+			.filter( ( label ) => label.startsWith( '[Type] ' ) )
+			.map( ( label ) => label.slice( '[Type] '.length ) )
+			.map( ( label ) =>
+				LABEL_TYPE_MAPPING.hasOwnProperty( label )
+					? LABEL_TYPE_MAPPING[ label ]
+					: label
+			)
+	);
+}
+
+/**
  * Returns a type label for a given issue object, or a default if type cannot
  * be determined.
  *
@@ -112,19 +132,11 @@ function getMilestone( version ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
-	const typeLabel = issue.labels.find( ( label ) =>
-		label.name.startsWith( '[Type] ' )
+	const candidates = getTypesByLabels(
+		issue.labels.map( ( { name } ) => name )
 	);
 
-	if ( ! typeLabel ) {
-		return 'Various';
-	}
-
-	const labelName = typeLabel.name.replace( /^\[Type\]\s*/, '' );
-
-	return LABEL_GROUP_TITLES.hasOwnProperty( labelName )
-		? LABEL_GROUP_TITLES[ labelName ]
-		: labelName;
+	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
 }
 
 /**
@@ -462,4 +474,5 @@ async function getReleaseChangelog( options ) {
 	getReleaseChangelog,
 	getIssueType,
 	sortGroup,
+	getTypesByLabels,
 };
