@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { parse, createBlock } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
@@ -20,13 +21,26 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
 	const content = templatePart.content.raw || '';
 	const blocks = useMemo( () => parse( content ), [ content ] );
-	const templatePartBlock = createBlock( 'core/template-part', {
-		postId: id,
-		slug,
-		theme,
-	} );
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
-	const onClick = () => onInsert( templatePartBlock );
+	const onClick = useCallback( () => {
+		const templatePartBlock = createBlock( 'core/template-part', {
+			postId: id,
+			slug,
+			theme,
+		} );
+		onInsert( templatePartBlock );
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: template part title. */
+				__( 'Template Part "%s" inserted.' ),
+				slug
+			),
+			{
+				type: 'snackbar',
+			}
+		);
+	}, [ id, slug, theme ] );
 
 	return (
 		<div
