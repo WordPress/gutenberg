@@ -21,8 +21,8 @@ function BlockNavigation( {
 	selectedBlockClientId,
 	selectBlock,
 	__experimentalWithBlockNavigationSlots,
-	__experimentalWithEllipsisMenu,
-	__experimentalWithEllipsisMenuMinLevel,
+	__experimentalWithBlockNavigationBlockSettings,
+	__experimentalWithBlockNavigationBlockSettingsMinLevel,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -43,11 +43,11 @@ function BlockNavigation( {
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithEllipsisMenu={
-						__experimentalWithEllipsisMenu
+					__experimentalWithBlockNavigationBlockSettings={
+						__experimentalWithBlockNavigationBlockSettings
 					}
-					__experimentalWithEllipsisMenuMinLevel={
-						__experimentalWithEllipsisMenuMinLevel
+					__experimentalWithBlockNavigationBlockSettingsMinLevel={
+						__experimentalWithBlockNavigationBlockSettingsMinLevel
 					}
 					__experimentalWithBlockNavigationSlots={
 						__experimentalWithBlockNavigationSlots
@@ -60,11 +60,11 @@ function BlockNavigation( {
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithEllipsisMenu={
-						__experimentalWithEllipsisMenu
+					__experimentalWithBlockNavigationBlockSettings={
+						__experimentalWithBlockNavigationBlockSettings
 					}
-					__experimentalWithEllipsisMenuMinLevel={
-						__experimentalWithEllipsisMenuMinLevel
+					__experimentalWithBlockNavigationBlockSettingsMinLevel={
+						__experimentalWithBlockNavigationBlockSettingsMinLevel
 					}
 					__experimentalWithBlockNavigationSlots={
 						__experimentalWithBlockNavigationSlots

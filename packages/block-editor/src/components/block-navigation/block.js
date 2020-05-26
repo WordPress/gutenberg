@@ -48,10 +48,10 @@ export default function BlockNavigationBlock( {
 		{ 'is-visible': hasVisibleMovers }
 	);
 	const {
-		__experimentalWithEllipsisMenu: withEllipsisMenu,
-		__experimentalWithEllipsisMenuMinLevel: ellipsisMenuMinLevel,
+		__experimentalWithBlockNavigationBlockSettings: withBlockNavigationBlockSettings,
+		__experimentalWithBlockNavigationBlockSettingsMinLevel: BlockNavigationBlockSettingsMinLevel,
 	} = useBlockNavigationContext();
-	const ellipsisMenuClassName = classnames(
+	const BlockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
@@ -116,17 +116,20 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
-				<TreeGridCell className={ ellipsisMenuClassName }>
-					{ ( props ) => (
-						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
-							icon={ moreVertical }
-							{ ...props }
-						/>
-					) }
-				</TreeGridCell>
-			) }
+			{ withBlockNavigationBlockSettings &&
+				level >= BlockNavigationBlockSettingsMinLevel && (
+					<TreeGridCell
+						className={ BlockNavigationBlockSettingsClassName }
+					>
+						{ ( props ) => (
+							<BlockSettingsDropdown
+								clientIds={ [ clientId ] }
+								icon={ moreVertical }
+								{ ...props }
+							/>
+						) }
+					</TreeGridCell>
+				) }
 		</BlockNavigationLeaf>
 	);
 }
