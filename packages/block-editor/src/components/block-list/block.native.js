@@ -216,15 +216,29 @@ class BlockListBlock extends Component {
 	}
 }
 
+// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference
+const wrapperPropsCache = new WeakMap();
+const emptyObj = {};
+function getWrapperProps( value, getWrapperPropsFunction ) {
+	if ( ! getWrapperPropsFunction ) {
+		return emptyObj;
+	}
+	const cachedValue = wrapperPropsCache.get( value );
+	if ( ! cachedValue ) {
+		const wrapperProps = getWrapperPropsFunction( value );
+		wrapperPropsCache.set( value, wrapperProps );
+		return wrapperProps;
+	}
+	return cachedValue;
+}
+
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
-			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
@@ -243,8 +257,6 @@ export default compose( [
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
 
-		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
@@ -256,17 +268,13 @@ export default compose( [
 			: parents[ parents.length - 1 ];
 
 		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
-		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const isSelectedBlockNested = !! getBlockRootClientId(
-			selectedBlockClientId
-		);
+			// set false as a default value to prevent re-render when it's changed from null to false
+			( selectedBlockClientId || false ) &&
+			selectedBlockClientId === parentId;
 
 		const selectedParents = selectedBlockClientId
 			? getBlockParents( selectedBlockClientId )
 			: [];
-		const isDescendantSelected = selectedParents.includes( clientId );
 		const isDescendantOfParentSelected = selectedParents.includes(
 			parentId
 		);
@@ -275,13 +283,6 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-		const isDimmed =
-			! isSelected &&
-			isSelectedBlockNested &&
-			! isAncestorSelected &&
-			! isDescendantSelected &&
-			( isDescendantOfParentSelected || rootBlockId === clientId );
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -294,12 +295,11 @@ export default compose( [
 			isValid,
 			isParentSelected,
 			firstToSelectId,
-			isAncestorSelected,
 			isTouchable,
-			isDimmed,
-			wrapperProps: blockType.getEditWrapperProps
-				? blockType.getEditWrapperProps( attributes ) || {}
-				: {},
+			wrapperProps: getWrapperProps(
+				attributes,
+				blockType.getEditWrapperProps
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

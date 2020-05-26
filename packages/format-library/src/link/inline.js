@@ -80,6 +80,8 @@ function InlineLinkUI( {
 
 	const linkValue = {
 		url: activeAttributes.url,
+		type: activeAttributes.type,
+		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
 		...nextLinkValue,
 	};
@@ -115,6 +117,11 @@ function InlineLinkUI( {
 		const newUrl = prependHTTP( nextValue.url );
 		const format = createLinkFormat( {
 			url: newUrl,
+			type: nextValue.type,
+			id:
+				nextValue.id !== undefined && nextValue.id !== null
+					? String( nextValue.id )
+					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 

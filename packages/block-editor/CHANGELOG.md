@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   The block control value for `InnerBlocks` has been changed from `__experimentalBlocks` to `value` and is now considered a stable API.
+-   Removed the `utility` property from the objects returned by the `getInserterItems` selector.
 
 ## 3.7.0 (2020-02-10)
 
