@@ -109,6 +109,20 @@ jobs:
                 include_job_number_field: false
                 include_project_field: false
                 failure_message: ':red_circle: Scheduled tests failed on Android device!'
+  android-native-unit-tests:
+    parameters:
+      post-to-slack:
+        description: Post to Slack when tests fail. SLACK_WEBHOOK ENV variable must be set.
+        type: boolean
+        default: false
+    docker:
+    - image: circleci/android:api-29-node
+    steps:
+      - checkout
+      - yarn-install
+      - run:
+          name: Run Android native unit tests
+          command: cd android && ./gradlew testDebug
   ios-device-checks:
     parameters:
       post-to-slack:
@@ -226,6 +240,8 @@ workflows:
       - android-device-checks:
           name: Test Android on Device - Full
           requires: [ "Optional UI Tests" ]
+      - android-native-unit-tests:
+          name: Android Native Unit Tests
 
   ui-tests-full-scheduled:
     jobs:
