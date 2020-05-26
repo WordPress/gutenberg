@@ -27,7 +27,6 @@ function BlockList(
 	{
 		className,
 		rootClientId,
-		isDraggable,
 		renderAppender,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
@@ -96,9 +95,8 @@ function BlockList(
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							isDraggable={ isDraggable }
 							isMultiSelecting={ isMultiSelecting }
-							// This prop is explicitely computed and passed down
+							// This prop is explicitly computed and passed down
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
