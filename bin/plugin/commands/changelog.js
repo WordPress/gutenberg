@@ -53,6 +53,7 @@ const LABEL_GROUP_TITLES = {
 	Feature: 'Features',
 	Enhancement: 'Enhancements',
 	'New API': 'New APIs',
+	Experimental: 'Experiments',
 };
 
 /**
