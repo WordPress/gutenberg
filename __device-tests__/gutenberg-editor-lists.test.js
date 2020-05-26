@@ -84,8 +84,7 @@ describe( 'Gutenberg Editor tests for List block @canary', () => {
 	} );
 
 	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
-	// Commented out because it started failing. This is being tracked by https://github.com/wordpress-mobile/gutenberg-mobile/issues/2315.
-	it.skip( 'should handle spaces in a list', async () => {
+	it( 'should handle spaces in a list', async () => {
 		await editorPage.addNewBlock( listBlockName );
 		let listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
 		// Click List block on Android to force EditText focus
