@@ -157,16 +157,14 @@ $ wp-env start
 
 ### 6. Nuke everything and start again 🔥
 
-When all else fails, you can try forcibly removing all of the underlying Docker containers and volumes, the underlying WordPress directory, and starting again from scratch.
+When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers and volumes. This will allow you to start from scratch.
 
 To nuke everything:
 
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
-$ docker rm -f $(docker ps -aq)
-$ docker volume rm -f $(docker volume ls -q)
-$ rm -rf "../$(basename $(pwd))-wordpress"
+$ wp-env destroy
 $ wp-env start
 ```
 
