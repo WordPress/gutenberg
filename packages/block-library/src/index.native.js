@@ -134,15 +134,15 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
 	( settings, name ) => {
-    	if ( name === 'core/freeform' && hasBlockSupport( settings, 'inserter', true ) ) {
-    		settings.supports = {
-    			...settings.supports,
-    			inserter: false
-    		};
-    	}
+		if ( name === 'core/freeform' && hasBlockSupport( settings, 'inserter', true ) ) {
+			settings.supports = {
+				...settings.supports,
+				inserter: false
+			};
+		}
 
-    	return settings;
-    }
+		return settings;
+	}
 );
 
 /**
