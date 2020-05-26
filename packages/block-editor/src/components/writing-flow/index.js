@@ -203,6 +203,8 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -226,6 +228,8 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		blocks: getBlockOrder(),
 		isNavigationMode: isNavigationMode(),
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -266,6 +270,8 @@ export default function WritingFlow( { children } ) {
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
+		getBlockRootClientId,
+		getClientIdsOfDescendants,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
@@ -380,11 +386,28 @@ export default function WritingFlow( { children } ) {
 		if ( isNavigationMode ) {
 			const navigateUp = ( isTab && isShift ) || isUp;
 			const navigateDown = ( isTab && ! isShift ) || isDown;
-			const focusedBlockUid = navigateUp
-				? selectionBeforeEndClientId
-				: selectionAfterEndClientId;
+			// Move out of current nesting level (no effect if at root level).
+			const navigateOut = isLeft;
+			// Move into next nesting level (no effect if the current block has no innerBlocks).
+			const navigateIn = isRight;
 
-			if ( navigateDown || navigateUp ) {
+			let focusedBlockUid;
+			if ( navigateUp ) {
+				focusedBlockUid = selectionBeforeEndClientId;
+			} else if ( navigateDown ) {
+				focusedBlockUid = selectionAfterEndClientId;
+			} else if ( navigateOut ) {
+				focusedBlockUid =
+					getBlockRootClientId( selectedBlockClientId ) ||
+					selectedBlockClientId;
+			} else if ( navigateIn ) {
+				focusedBlockUid =
+					getClientIdsOfDescendants( [
+						selectedBlockClientId,
+					] )[ 0 ] || selectedBlockClientId;
+			}
+
+			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 				if ( focusedBlockUid ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
