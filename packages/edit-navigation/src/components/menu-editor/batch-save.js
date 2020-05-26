@@ -10,10 +10,14 @@ import apiFetch from '@wordpress/api-fetch';
 
 export default function batchSave( menuId, menuItemsRef, navigationBlock ) {
 	async function request() {
+		const { nonce, stylesheet } = await apiFetch( {
+			path: '/__experimental/customizer-nonces/get-save-nonce',
+		} );
+
 		const body = new FormData();
 		body.append( 'wp_customize', 'on' );
-		body.append( 'customize_theme', 'twentytwenty' );
-		body.append( 'nonce', await fetchNonce() );
+		body.append( 'customize_theme', stylesheet );
+		body.append( 'nonce', nonce );
 		body.append( 'customize_changeset_uuid', uuidv4() );
 		body.append( 'customize_autosaved', 'on' );
 		body.append(
@@ -68,13 +72,6 @@ export default function batchSave( menuId, menuItemsRef, navigationBlock ) {
 	}
 
 	return request();
-}
-
-async function fetchNonce() {
-	const response = await apiFetch( {
-		path: '/__experimental/customizer-nonces/get-save-nonce',
-	} );
-	return response.nonce;
 }
 
 function uuidv4() {

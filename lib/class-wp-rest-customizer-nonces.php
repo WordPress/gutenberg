@@ -43,6 +43,7 @@ class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 		return [
 			"success" => true,
 			"nonce" => $nonce,
+			"stylesheet" => $wp_customize->get_stylesheet()
 		];
 	}
 
