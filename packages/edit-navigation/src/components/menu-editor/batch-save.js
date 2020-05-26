@@ -17,6 +17,7 @@ export default async function batchSave(
 		path: '/__experimental/customizer-nonces/get-save-nonce',
 	} );
 
+	// eslint-disable-next-line no-undef
 	const body = new FormData();
 	body.append( 'wp_customize', 'on' );
 	body.append( 'customize_theme', stylesheet );
@@ -89,8 +90,12 @@ function uuidv4() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, function(
 		c
 	) {
-		const r = ( Math.random() * 16 ) | 0,
-			v = c === 'x' ? r : ( r & 0x3 ) | 0x8;
+		// eslint-disable-next-line no-restricted-syntax
+		const a = Math.random() * 16;
+		// eslint-disable-next-line no-bitwise
+		const r = a | 0;
+		// eslint-disable-next-line no-bitwise
+		const v = c === 'x' ? r : ( r & 0x3 ) | 0x8;
 		return v.toString( 16 );
 	} );
 }
