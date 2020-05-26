@@ -106,7 +106,8 @@ body.block-editor-page {
 		max-width: 1100px;
 	}
 
-	&[data-align="full"] {
+	&[data-align="full"],
+	&.is-reusable {
 		max-width: none;
 	}
 }
