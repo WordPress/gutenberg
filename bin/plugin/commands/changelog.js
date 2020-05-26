@@ -76,6 +76,17 @@ const GROUP_TITLE_ORDER = [
 ];
 
 /**
+ * Map of common technical terms to a corresponding replacement term more
+ * appropriate for release notes.
+ *
+ * @type {Record<string,string>}
+ */
+const REWORD_TERMS = {
+	e2e: 'end-to-end',
+	url: 'URL',
+};
+
+/**
  * Given a SemVer-formatted version string, returns an assumed milestone title
  * associated with that version.
  *
@@ -146,17 +157,6 @@ function addTrailingPeriod( text ) {
 
 	return text;
 }
-
-/**
- * Map of common technical terms to a corresponding replacement term more
- * appropriate for release notes.
- *
- * @type {Record<string,string>}
- */
-const REWORD_TERMS = {
-	e2e: 'end-to-end',
-	url: 'URL',
-};
 
 /**
  * Given a text string, replaces reworded terms.
