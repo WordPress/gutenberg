@@ -50,8 +50,10 @@ export default function TemplateSwitcher( {
 	templatePartIds,
 	page,
 	activeId,
+	activeTemplatePartId,
 	homeId,
 	isTemplatePart,
+	onActiveIdChange,
 	onActiveTemplatePartIdChange,
 	onAddTemplateId,
 	onRemoveTemplateId,
@@ -151,13 +153,21 @@ export default function TemplateSwitcher( {
 					children: ( isTemplatePart
 						? templateParts
 						: [ template ]
-					).find( ( choice ) => choice.value === activeId ).slug,
+					).find(
+						( choice ) =>
+							choice.value ===
+							( isTemplatePart ? activeTemplatePartId : activeId )
+					).slug,
 				} }
 			>
 				{ () => (
 					<>
 						<MenuGroup label={ __( 'Template' ) }>
-							<MenuItem>{ template.label }</MenuItem>
+							<MenuItem
+								onClick={ () => onActiveIdChange( activeId ) }
+							>
+								{ template.label }
+							</MenuItem>
 							{ overwriteSlug &&
 								overwriteSlug !== template.slug && (
 									<MenuItem
@@ -179,7 +189,11 @@ export default function TemplateSwitcher( {
 						<MenuGroup label={ __( 'Template Parts' ) }>
 							<MenuItemsChoice
 								choices={ templateParts }
-								value={ isTemplatePart ? activeId : undefined }
+								value={
+									isTemplatePart
+										? activeTemplatePartId
+										: undefined
+								}
 								onSelect={ onActiveTemplatePartIdChange }
 								onHover={ onHoverTemplatePart }
 							/>

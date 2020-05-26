@@ -63,9 +63,11 @@ function Editor( { settings: _settings } ) {
 			select( 'core' ).getEntityRecord(
 				'postType',
 				settings.templateType,
-				settings.templateId
+				settings.templateType === 'wp_template'
+					? settings.templateId
+					: settings.templatePartId
 			),
-		[ settings.templateType, settings.templateId ]
+		[ settings.templateType, settings.templateId, settings.templatePartId ]
 	);
 
 	const context = useMemo( () => ( { settings, setSettings } ), [
@@ -142,7 +144,11 @@ function Editor( { settings: _settings } ) {
 						<EntityProvider
 							kind="postType"
 							type={ settings.templateType }
-							id={ settings.templateId }
+							id={
+								settings.templateType === 'wp_template'
+									? settings.templateId
+									: settings.templatePartId
+							}
 						>
 							<BlockContextProvider value={ blockContext }>
 								<Context.Provider value={ context }>

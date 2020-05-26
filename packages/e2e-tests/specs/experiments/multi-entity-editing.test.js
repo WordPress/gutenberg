@@ -1,12 +1,12 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { insertBlock, visitAdminPage } from '@wordpress/e2e-test-utils';
+import {
+	insertBlock,
+	visitAdminPage,
+	createNewPost,
+	publishPost,
+} from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -40,30 +40,6 @@ const getTemplateDropdownElement = async ( itemName ) => {
 		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
 	);
 	return item;
-};
-
-const createTemplate = async ( templateName = 'Test Template' ) => {
-	// Click the "new template" button.
-	const createNewTemplateButton = await getTemplateDropdownElement( 'New' );
-	await createNewTemplateButton.click();
-	await page.waitForSelector( '.components-modal__frame' );
-
-	// Create a new template with the given name.
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( templateName );
-	const [ addTemplateButton ] = await page.$x(
-		'//div[contains(@class, "components-modal__frame")]//button[contains(., "Add")]'
-	);
-	await addTemplateButton.click();
-
-	// Wait for the site editor to load the new template.
-	await page.waitForXPath(
-		`//button[contains(@class, "components-dropdown-menu__toggle")][contains(text(), "${ kebabCase(
-			templateName
-		) }")]`,
-		{ timeout: 3000 }
-	);
 };
 
 const createTemplatePart = async (
@@ -169,8 +145,9 @@ const removeErrorMocks = () => {
 };
 
 describe( 'Multi-entity editor states', () => {
+	// Setup & Teardown.
+	const templateName = 'Front Page';
 	const templatePartName = 'Test Template Part Name Edit';
-	const templateName = 'Test Template Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
 	useExperimentalFeatures( [
@@ -215,8 +192,14 @@ describe( 'Multi-entity editor states', () => {
 
 	describe( 'Multi-entity edit', () => {
 		beforeAll( async () => {
+			await trashExistingPosts( 'wp_template' );
+			await trashExistingPosts( 'wp_template_part' );
+			await createNewPost( {
+				postType: 'wp_template',
+				title: templateName,
+			} );
+			await publishPost();
 			await visitSiteEditor();
-			await createTemplate( templateName );
 			await createTemplatePart( templatePartName );
 			await editTemplatePart( [
 				'Default template part test text.',
@@ -269,20 +252,6 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
-		} );
-
-		it( 'should not dirty any entities when hovering over template preview', async () => {
-			const mainTemplateButton = await getTemplateDropdownElement(
-				kebabCase( templateName )
-			);
-			// Hover and wait for template/template part to load.
-			await mainTemplateButton.hover();
-			await page.waitForSelector(
-				'.edit-site-template-switcher__template-preview .wp-block[data-type="core/template-part"]'
-			);
-			expect( await isEntityDirty( templateName ) ).toBe( false );
-			expect( await isEntityDirty( templatePartName ) ).toBe( false );
-			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
 		} );
 	} );
 } );

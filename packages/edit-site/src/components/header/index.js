@@ -46,11 +46,20 @@ export default function Header( {
 	onToggleInserter,
 } ) {
 	const { settings, setSettings } = useEditorContext();
+	const setActiveTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+				templateType: 'wp_template',
+			} ) ),
+		[]
+	);
 	const setActiveTemplatePartId = useCallback(
 		( newTemplatePartId ) =>
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
-				templateId: newTemplatePartId,
+				templatePartId: newTemplatePartId,
 				templateType: 'wp_template_part',
 			} ) ),
 		[]
@@ -162,10 +171,12 @@ export default function Header( {
 						templatePartIds={ settings.templatePartIds }
 						page={ settings.page }
 						activeId={ settings.templateId }
+						activeTemplatePartId={ settings.templatePartId }
 						homeId={ settings.homeTemplateId }
 						isTemplatePart={
 							settings.templateType === 'wp_template_part'
 						}
+						onActiveIdChange={ setActiveTemplateId }
 						onActiveTemplatePartIdChange={ setActiveTemplatePartId }
 						onAddTemplateId={ addTemplateId }
 						onRemoveTemplateId={ removeTemplateId }
