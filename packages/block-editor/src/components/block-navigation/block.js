@@ -49,9 +49,9 @@ export default function BlockNavigationBlock( {
 	);
 	const {
 		__experimentalWithBlockNavigationBlockSettings: withBlockNavigationBlockSettings,
-		__experimentalWithBlockNavigationBlockSettingsMinLevel: BlockNavigationBlockSettingsMinLevel,
+		__experimentalWithBlockNavigationBlockSettingsMinLevel: blockNavigationBlockSettingsMinLevel,
 	} = useBlockNavigationContext();
-	const BlockNavigationBlockSettingsClassName = classnames(
+	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
 		{ 'is-visible': hasVisibleMovers }
 	);
@@ -117,9 +117,9 @@ export default function BlockNavigationBlock( {
 			) }
 
 			{ withBlockNavigationBlockSettings &&
-				level >= BlockNavigationBlockSettingsMinLevel && (
+				level >= blockNavigationBlockSettingsMinLevel && (
 					<TreeGridCell
-						className={ BlockNavigationBlockSettingsClassName }
+						className={ blockNavigationBlockSettingsClassName }
 					>
 						{ ( props ) => (
 							<BlockSettingsDropdown
