@@ -23,6 +23,7 @@ import HeadingLevelDropdown from './heading-level-dropdown';
 
 function HeadingEdit( {
 	attributes,
+	clientId,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
@@ -36,6 +37,7 @@ function HeadingEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					<HeadingLevelDropdown
+						clientId={ clientId }
 						selectedLevel={ level }
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )

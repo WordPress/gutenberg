@@ -13,6 +13,7 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import HeadingLevelChecker from './heading-level-checker';
 import HeadingLevelIcon from './heading-level-icon';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
@@ -29,6 +30,7 @@ const POPOVER_PROPS = {
  *
  * @typedef WPHeadingLevelDropdownProps
  *
+ * @property {string}                 clientId      The current block client id.
  * @property {number}                 selectedLevel The chosen heading level.
  * @property {(newValue:number)=>any} onChange      Callback to run when
  *                                                  toolbar value is changed.
@@ -41,7 +43,11 @@ const POPOVER_PROPS = {
  *
  * @return {WPComponent} The toolbar.
  */
-export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
+export default function HeadingLevelDropdown( {
+	clientId,
+	selectedLevel,
+	onChange,
+} ) {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
@@ -67,36 +73,39 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 				);
 			} }
 			renderContent={ () => (
-				<Toolbar
-					className="block-library-heading-level-toolbar"
-					__experimentalAccessibilityLabel={ __(
-						'Change heading level'
-					) }
-				>
-					<ToolbarGroup
-						isCollapsed={ false }
-						controls={ HEADING_LEVELS.map( ( targetLevel ) => {
-							const isActive = targetLevel === selectedLevel;
-							return {
-								icon: (
-									<HeadingLevelIcon
-										level={ targetLevel }
-										isPressed={ isActive }
-									/>
-								),
-								title: sprintf(
-									// translators: %s: heading level e.g: "1", "2", "3"
-									__( 'Heading %d' ),
-									targetLevel
-								),
-								isActive,
-								onClick() {
-									onChange( targetLevel );
-								},
-							};
-						} ) }
-					/>
-				</Toolbar>
+				<>
+					<Toolbar
+						className="block-library-heading-level-toolbar"
+						__experimentalAccessibilityLabel={ __(
+							'Change heading level'
+						) }
+					>
+						<ToolbarGroup
+							isCollapsed={ false }
+							controls={ HEADING_LEVELS.map( ( targetLevel ) => {
+								const isActive = targetLevel === selectedLevel;
+								return {
+									icon: (
+										<HeadingLevelIcon
+											level={ targetLevel }
+											isPressed={ isActive }
+										/>
+									),
+									title: sprintf(
+										// translators: %s: heading level e.g: "1", "2", "3"
+										__( 'Heading %d' ),
+										targetLevel
+									),
+									isActive,
+									onClick() {
+										onChange( targetLevel );
+									},
+								};
+							} ) }
+						/>
+					</Toolbar>
+					<HeadingLevelChecker selectedHeadingId={ clientId } />
+				</>
 			) }
 		/>
 	);
