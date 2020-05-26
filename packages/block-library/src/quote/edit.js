@@ -6,14 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	AlignmentToolbar,
+	__experimentalBlock as Block,
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
-import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { BlockQuotation } from '@wordpress/primitives';
+
+const BlockWrapper = Block[ BlockQuotation ];
 
 export default function QuoteEdit( {
 	attributes,
@@ -35,7 +38,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation
+			<BlockWrapper
 				className={ classnames( className, {
 					[ `has-text-align-${ align }` ]: align,
 				} ) }
@@ -91,7 +94,7 @@ export default function QuoteEdit( {
 						textAlign={ align }
 					/>
 				) }
-			</BlockQuotation>
+			</BlockWrapper>
 		</>
 	);
 }

@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { BlockQuotation } from '@wordpress/primitives';
+
+/**
  * HTML elements that can be used as a block wrapper.
  */
 const ELEMENTS = [
@@ -21,6 +26,7 @@ const ELEMENTS = [
 	'aside',
 	'footer',
 	'main',
+	BlockQuotation,
 ];
 
 export default ELEMENTS;
