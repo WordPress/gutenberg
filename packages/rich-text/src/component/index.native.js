@@ -128,9 +128,7 @@ export class RichText extends Component {
 		const { selectionStart: start, selectionEnd: end } = this.props;
 		const { value } = this.props;
 
-		const html = this.getHtmlForRecordCreation( value, this.multilineTag );
-
-		const { formats, replacements, text } = this.formatToValue( html );
+		const { formats, replacements, text } = this.formatToValue( value );
 		const { activeFormats } = this.state;
 
 		return { formats, replacements, text, start, end, activeFormats };
@@ -145,10 +143,14 @@ export class RichText extends Component {
 	 */
 	createRecord() {
 		const { preserveWhiteSpace } = this.props;
-		const htmlForCreate = this.getHtmlForRecordCreation(
-			this.value,
-			this.multilineTag
-		);
+		let htmlForCreate = this.value;
+		if ( ! this.isIOS ) {
+			htmlForCreate = this.getHtmlForRecordCreation(
+				this.value,
+				this.multilineTag
+			);
+		}
+
 		const value = {
 			start: this.selectionStart,
 			end: this.selectionEnd,
@@ -549,8 +551,15 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
+			let htmlForCreate = value;
+			if ( ! this.isIOS ) {
+				htmlForCreate = this.getHtmlForRecordCreation(
+					value,
+					this.multilineTag
+				);
+			}
 			return create( {
-				html: value,
+				html: htmlForCreate,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 				preserveWhiteSpace,
