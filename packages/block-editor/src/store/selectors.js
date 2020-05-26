@@ -42,27 +42,6 @@ import { SVG, Rect, G, Path } from '@wordpress/components';
  */
 
 // Module constants
-
-/**
- * @private
- */
-export const INSERTER_UTILITY_HIGH = 3;
-
-/**
- * @private
- */
-export const INSERTER_UTILITY_MEDIUM = 2;
-
-/**
- * @private
- */
-export const INSERTER_UTILITY_LOW = 1;
-
-/**
- * @private
- */
-export const INSERTER_UTILITY_NONE = 0;
-
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
@@ -1261,14 +1240,6 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * Each item object contains what's necessary to display a button in the
  * inserter and handle its selection.
  *
- * The 'utility' property indicates how useful we think an item will be to the
- * user. There are 4 levels of utility:
- *
- * 1. Blocks that are contextually useful (utility = 3)
- * 2. Blocks that have been previously inserted (utility = 2)
- * 3. Blocks that are in the common category (utility = 1)
- * 4. All other blocks (utility = 0)
- *
  * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
  * that combines block usage frequenty and recency.
  *
@@ -1289,22 +1260,10 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @property {string[]} keywords          Keywords that can be searched to find this item.
  * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
  *                                        this item.
- * @property {number}   utility           How useful we think this item is, between 0 and 3.
  * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
 	( state, rootClientId = null ) => {
-		const calculateUtility = ( category, count, isContextual ) => {
-			if ( isContextual ) {
-				return INSERTER_UTILITY_HIGH;
-			} else if ( count > 0 ) {
-				return INSERTER_UTILITY_MEDIUM;
-			} else if ( category === 'common' ) {
-				return INSERTER_UTILITY_LOW;
-			}
-			return INSERTER_UTILITY_NONE;
-		};
-
 		const calculateFrecency = ( time, count ) => {
 			if ( ! time ) {
 				return count;
@@ -1342,7 +1301,6 @@ export const getInserterItems = createSelector(
 				);
 			}
 
-			const isContextual = isArray( blockType.parent );
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const inserterVariations = blockType.variations.filter(
 				( { scope } ) => ! scope || scope.includes( 'inserter' )
@@ -1360,11 +1318,7 @@ export const getInserterItems = createSelector(
 				variations: inserterVariations,
 				example: blockType.example,
 				isDisabled,
-				utility: calculateUtility(
-					blockType.category,
-					count,
-					isContextual
-				),
+				utility: 1, // deprecated
 				frecency: calculateFrecency( time, count ),
 			};
 		};
@@ -1384,7 +1338,6 @@ export const getInserterItems = createSelector(
 			}
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
-			const utility = calculateUtility( 'reusable', count, false );
 			const frecency = calculateFrecency( time, count );
 
 			return {
@@ -1398,7 +1351,7 @@ export const getInserterItems = createSelector(
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,
-				utility,
+				utility: 1, // deprecated
 				frecency,
 			};
 		};
@@ -1419,7 +1372,7 @@ export const getInserterItems = createSelector(
 
 		return orderBy(
 			[ ...blockTypeInserterItems, ...reusableBlockInserterItems ],
-			[ 'utility', 'frecency' ],
+			[ 'frecency' ],
 			[ 'desc', 'desc' ]
 		);
 	},

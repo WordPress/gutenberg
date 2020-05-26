@@ -1,10 +1,10 @@
-/*
+/**
  * External dependencies
  */
 const { groupBy } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
 
-/*
+/**
  * Internal dependencies
  */
 const { getNextMajorVersion } = require( '../lib/version' );

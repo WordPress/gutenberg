@@ -1,0 +1,16 @@
+.separator {
+	margin-top: $panel-padding / 2;
+	margin-bottom: $panel-padding / 2;
+	margin-left: -$panel-padding;
+	margin-right: -$panel-padding;
+	height: $border-width;
+	background-color: $light-gray-400;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.disabled {
+	opacity: 0.3;
+}

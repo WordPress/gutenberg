@@ -27,11 +27,12 @@ afterEach( () => {
 	container = null;
 } );
 
-const getComponent = () => container.querySelector( '.component-unit-control' );
+const getComponent = () =>
+	container.querySelector( '.components-unit-control' );
 const getInput = () =>
-	container.querySelector( '.component-unit-control__input' );
+	container.querySelector( '.components-unit-control input' );
 const getSelect = () =>
-	container.querySelector( '.component-unit-control__select' );
+	container.querySelector( '.components-unit-control select' );
 
 describe( 'UnitControl', () => {
 	describe( 'Basic rendering', () => {
@@ -86,7 +87,7 @@ describe( 'UnitControl', () => {
 				Simulate.change( input, { target: { value: 62 } } );
 			} );
 
-			expect( state ).toBe( 62 );
+			expect( state ).toBe( '62px' );
 		} );
 
 		it( 'should increment value on UP press', () => {
@@ -106,7 +107,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: UP } );
 			} );
 
-			expect( state ).toBe( '51' );
+			expect( state ).toBe( '51px' );
 		} );
 
 		it( 'should increment value on UP + SHIFT press, with step', () => {
@@ -126,7 +127,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
 			} );
 
-			expect( state ).toBe( '60' );
+			expect( state ).toBe( '60px' );
 		} );
 
 		it( 'should decrement value on DOWN press', () => {
@@ -146,7 +147,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: DOWN } );
 			} );
 
-			expect( state ).toBe( '49' );
+			expect( state ).toBe( '49px' );
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
@@ -166,7 +167,7 @@ describe( 'UnitControl', () => {
 				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
 			} );
 
-			expect( state ).toBe( '40' );
+			expect( state ).toBe( '40px' );
 		} );
 	} );
 
@@ -222,6 +223,7 @@ describe( 'UnitControl', () => {
 			act( () => {
 				render(
 					<UnitControl
+						isResetValueOnUnitChange
 						units={ units }
 						onChange={ setState }
 						value={ state }
@@ -236,13 +238,13 @@ describe( 'UnitControl', () => {
 				Simulate.change( select, { target: { value: 'vmax' } } );
 			} );
 
-			expect( state ).toBe( 75 );
+			expect( state ).toBe( '75vmax' );
 
 			act( () => {
 				Simulate.change( select, { target: { value: 'pt' } } );
 			} );
 
-			expect( state ).toBe( 25 );
+			expect( state ).toBe( '25pt' );
 		} );
 
 		it( 'should not reset value on unit change, if disabled', () => {
@@ -271,13 +273,104 @@ describe( 'UnitControl', () => {
 				Simulate.change( select, { target: { value: 'vmax' } } );
 			} );
 
-			expect( state ).toBe( 50 );
+			expect( state ).toBe( '50vmax' );
 
 			act( () => {
 				Simulate.change( select, { target: { value: 'pt' } } );
 			} );
 
-			expect( state ).toBe( 50 );
+			expect( state ).toBe( '50pt' );
+		} );
+	} );
+	describe( 'Unit Parser', () => {
+		let state = '10px';
+		const setState = ( nextState ) => ( state = nextState );
+
+		it( 'should parse unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, { target: { value: '55 em' } } );
+			} );
+
+			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse PX unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, { target: { value: '61   PX' } } );
+			} );
+
+			expect( state ).toBe( '61px' );
+		} );
+
+		it( 'should parse EM unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, { target: { value: '55 em' } } );
+			} );
+
+			expect( state ).toBe( '55em' );
+		} );
+
+		it( 'should parse % unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, { target: { value: '-10  %' } } );
+			} );
+
+			expect( state ).toBe( '-10%' );
+		} );
+
+		it( 'should parse REM unit from input', () => {
+			act( () => {
+				render(
+					<UnitControl value={ state } onChange={ setState } />,
+					container
+				);
+			} );
+
+			const input = getInput();
+
+			act( () => {
+				Simulate.change( input, {
+					target: { value: '123       rEm  ' },
+				} );
+			} );
+
+			expect( state ).toBe( '123rem' );
 		} );
 	} );
 } );

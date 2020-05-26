@@ -4,6 +4,8 @@
 
 ### New Feature
 
+-   View php and WordPress log output with the new `wp-env logs` command.
+-   Clean up your local environment with the new `wp-env destroy` command.
 -   Expose Docker service for running phpunit commands.
 -   You may now mount local directories to any location within the WordPress install. For example, you may specify `"wp-content/mu-plugins": "./path/to/mu-plugins"` to add mu-plugins.
 

@@ -41,9 +41,10 @@ _Note:_ Because the save step will automatically apply props to the element retu
 ## Props
 
 ### `allowedBlocks`
-* **Type:** `Array<String>`
+* **Type:** `Boolean|Array<String>`
+* **Default:** `true`
 
-Allowed blocks prop should contain an array of strings, each string should contain the identifier of a block. When allowedBlocks is set it is only possible to insert blocks part of the set specified in the array.
+`allowedBlocks` can contain an array of strings, each string should contain the identifier of a block. When `allowedBlocks` is set it is only possible to insert blocks part of the set specified in the array.
 
 ```jsx
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -66,6 +67,8 @@ const ALLOWED_BLOCKS = [];
 ```
 
 The previous code block restricts all blocks, so only child blocks explicitly registered as compatible with this block can be inserted. If no child blocks are available: it will be impossible to insert any inner blocks.
+
+If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
 
 ### `template`
 * **Type:** `Array<Array<Object>>`

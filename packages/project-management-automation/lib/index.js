@@ -1,5 +1,5 @@
 /**
- * GitHub dependencies
+ * External dependencies
  */
 const { setFailed, getInput } = require( '@actions/core' );
 const { context, GitHub } = require( '@actions/github' );

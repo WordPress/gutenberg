@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 const { adminColorSchemes } = require( '@wordpress/base-styles' );
 
 module.exports = [
