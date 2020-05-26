@@ -47,10 +47,18 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsRef ) {
 	const dataList = blocksList.map( ( { block, parentId, position } ) =>
 		linkBlockToRequestItem( block, parentId, position )
 	);
-	const dataObject = keyBy(
-		dataList,
-		( item ) => `nav_menu_item[${ item.id }]`
-	);
+	// Create an object like { "nav_menu_item[12]": {...}} }
+	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
+	const dataObject = keyBy( dataList, computeKey );
+
+	// Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
+	for ( const clientId in menuItemsRef.current ) {
+		const key = computeKey( menuItemsRef.current[ clientId ] );
+		if ( ! ( key in dataObject ) ) {
+			dataObject[ key ] = false;
+		}
+	}
+
 	return JSON.stringify( dataObject );
 
 	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
