@@ -63,17 +63,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 	);
 }
 
-export default function TemplateParts( { onInsert } ) {
-	const templateParts = useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
-				status: [ 'publish', 'auto-draft' ],
-			}
-		);
-	}, [] );
-
+function TemplatePartsByTheme( { templateParts, onInsert } ) {
 	// Group by Theme.
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
@@ -97,5 +87,38 @@ export default function TemplateParts( { onInsert } ) {
 					</InserterPanel>
 				) ) }
 		</>
+	);
+}
+
+function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
+	return <h1>I am the search results...</h1>;
+}
+
+export default function TemplateParts( { onInsert, filterValue } ) {
+	const templateParts = useSelect( ( select ) => {
+		return select( 'core' ).getEntityRecords(
+			'postType',
+			'wp_template_part',
+			{
+				status: [ 'publish', 'auto-draft' ],
+			}
+		);
+	}, [] );
+
+	if ( filterValue ) {
+		return (
+			<TemplatePartSearchResults
+				templateParts={ templateParts }
+				onInsert={ onInsert }
+				filterValue={ filterValue }
+			/>
+		);
+	}
+
+	return (
+		<TemplatePartsByTheme
+			templateParts={ templateParts }
+			onInsert={ onInsert }
+		/>
 	);
 }
