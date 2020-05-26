@@ -1,3 +1,6 @@
+/**
+ * A concurrency primitive that runs at most `concurrency` async tasks at once.
+ */
 export default class PromiseQueue {
 	constructor( concurrency = 1 ) {
 		this.concurrency = concurrency;
@@ -6,23 +9,24 @@ export default class PromiseQueue {
 		this.listeners = [];
 	}
 
-	schedule( action ) {
+	enqueue( action ) {
 		this.queue.push( action );
 		this.run();
 	}
 
 	run() {
 		while ( this.queue.length && this.active.length <= this.concurrency ) {
-			const action = this.queue.pop();
-			const promise = action().then( () =>
-				this.onActionFinished( promise )
-			);
+			const action = this.queue.unshift();
+			const promise = action().then( () => {
+				this.active.splice( this.active.indexOf( promise ), 1 );
+				this.run();
+				this.notifyIfEmpty();
+			} );
 			this.active.push( promise );
 		}
 	}
 
-	onActionFinished( promise ) {
-		this.active.splice( this.active.indexOf( promise ), 1 );
+	notifyIfEmpty() {
 		if ( this.active.length === 0 && this.queue.length === 0 ) {
 			for ( const l of this.listeners ) {
 				l();
@@ -31,6 +35,12 @@ export default class PromiseQueue {
 		}
 	}
 
+	/**
+	 * Calls `callback` once all async actions in the queue are finished,
+	 * or immediately if no actions are running.
+	 *
+	 * @param {Function} callback Callback to call
+	 */
 	then( callback ) {
 		if ( this.active.length ) {
 			this.listeners.push( callback );
