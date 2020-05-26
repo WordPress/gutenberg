@@ -29,6 +29,7 @@ import {
 	RichText,
 	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
+	__experimentalBlockNavigationEditor as BlockNavigationEditor,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
@@ -56,6 +57,9 @@ function NavigationLinkEdit( {
 	saveEntityRecord,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
+	insertBlocksAfter,
+	mergeBlocks,
+	onReplace,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
 	const link = {
@@ -195,6 +199,12 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
+			<BlockNavigationEditor
+				value={ label }
+				onChange={ ( labelValue ) =>
+					setAttributes( { label: labelValue } )
+				}
+			/>
 			<Block.li
 				className={ classnames( {
 					'is-editing': isSelected || isParentOfSelectedBlock,
@@ -214,10 +224,18 @@ function NavigationLinkEdit( {
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
+						identifier="label"
 						className="wp-block-navigation-link__label"
 						value={ label }
 						onChange={ ( labelValue ) =>
 							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter(
+								createBlock( 'core/navigation-link' )
+							)
 						}
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus

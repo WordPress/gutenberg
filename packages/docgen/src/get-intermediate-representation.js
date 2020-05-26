@@ -1,10 +1,10 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const { get } = require( 'lodash' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getExportEntries = require( './get-export-entries' );
 const getJSDocFromToken = require( './get-jsdoc-from-token' );

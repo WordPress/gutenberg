@@ -36,44 +36,47 @@ function InserterMenu( {
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const {
 		destinationRootClientId,
-		patterns,
+		hasPatterns,
 		getSelectedBlock,
 		getBlockIndex,
 		getBlockSelectionEnd,
 		getBlockOrder,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			getBlockRootClientId,
-			getBlockSelectionEnd: _getBlockSelectionEnd,
-		} = select( 'core/block-editor' );
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getBlockRootClientId,
+				getBlockSelectionEnd: _getBlockSelectionEnd,
+			} = select( 'core/block-editor' );
 
-		let destRootClientId = rootClientId;
-		if ( ! destRootClientId && ! clientId && ! isAppender ) {
-			const end = _getBlockSelectionEnd();
-			if ( end ) {
-				destRootClientId = getBlockRootClientId( end ) || undefined;
+			let destRootClientId = rootClientId;
+			if ( ! destRootClientId && ! clientId && ! isAppender ) {
+				const end = _getBlockSelectionEnd();
+				if ( end ) {
+					destRootClientId = getBlockRootClientId( end ) || undefined;
+				}
 			}
-		}
-		return {
-			patterns: getSettings().__experimentalBlockPatterns,
-			destinationRootClientId: destRootClientId,
-			...pick( select( 'core/block-editor' ), [
-				'getSelectedBlock',
-				'getBlockIndex',
-				'getBlockSelectionEnd',
-				'getBlockOrder',
-			] ),
-		};
-	}, [] );
+			return {
+				hasPatterns: !! getSettings().__experimentalBlockPatterns
+					?.length,
+				destinationRootClientId: destRootClientId,
+				...pick( select( 'core/block-editor' ), [
+					'getSelectedBlock',
+					'getBlockIndex',
+					'getBlockSelectionEnd',
+					'getBlockOrder',
+				] ),
+			};
+		},
+		[ isAppender, clientId, rootClientId ]
+	);
 	const {
 		replaceBlocks,
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
 	} = useDispatch( 'core/block-editor' );
-	const hasPatterns =
-		! destinationRootClientId && !! patterns && !! patterns.length;
+	const showPatterns = ! destinationRootClientId && hasPatterns;
 	const onKeyDown = ( event ) => {
 		if (
 			includes(
@@ -163,7 +166,6 @@ function InserterMenu( {
 	const patternsTab = (
 		<div className="block-editor-inserter__scrollable">
 			<BlockPatterns
-				patterns={ patterns }
 				onInsert={ onInsertBlocks }
 				filterValue={ filterValue }
 			/>
@@ -184,7 +186,7 @@ function InserterMenu( {
 		>
 			<div className="block-editor-inserter__main-area">
 				<InserterSearchForm onChange={ setFilterValue } />
-				{ hasPatterns && (
+				{ showPatterns && (
 					<TabPanel
 						className="block-editor-inserter__tabs"
 						tabs={ [
@@ -208,7 +210,7 @@ function InserterMenu( {
 						} }
 					</TabPanel>
 				) }
-				{ ! hasPatterns && blocksTab }
+				{ ! showPatterns && blocksTab }
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<div className="block-editor-inserter__preview-container">

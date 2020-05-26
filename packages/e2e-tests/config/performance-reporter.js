@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 const { readFileSync, existsSync } = require( 'fs' );
 const chalk = require( 'chalk' );
 

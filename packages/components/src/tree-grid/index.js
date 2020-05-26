@@ -13,7 +13,7 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import RovingTabIndexContainer from '../roving-tab-index';
+import RovingTabIndexContainer from './roving-tab-index';
 
 /**
  * Return focusables in a row element, excluding those from other branches

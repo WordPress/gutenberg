@@ -649,6 +649,15 @@ function gutenberg_extend_settings_block_patterns( $settings ) {
 		$settings['__experimentalBlockPatterns']
 	);
 
+	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
+		$settings['__experimentalBlockPatternCategories'] = array();
+	}
+
+	$settings['__experimentalBlockPatternCategories'] = array_merge(
+		WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
+		$settings['__experimentalBlockPatternCategories']
+	);
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
@@ -694,4 +703,18 @@ if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registr
 	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
 	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
 	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
+	register_block_pattern( 'core/features-services', gutenberg_load_block_pattern( 'features-services' ) );
+}
+
+/*
+ * Register default pattern categories if not registered in Core already.
+ */
+if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
+	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'hero', array( 'label' => _x( 'Hero', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'features', array( 'label' => _x( 'Features', 'Block pattern category', 'gutenberg' ) ) );
+	register_block_pattern_category( 'testimonials', array( 'label' => _x( 'Testimonials', 'Block pattern category', 'gutenberg' ) ) );
 }

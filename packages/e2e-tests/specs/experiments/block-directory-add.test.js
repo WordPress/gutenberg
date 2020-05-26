@@ -89,7 +89,7 @@ const MOCK_BLOCKS_RESPONSES = [
 	{
 		// Mock response for install
 		match: ( request ) => matchUrl( request.url(), INSTALL_URLS ),
-		onRequestMatch: createJSONResponse( true ),
+		onRequestMatch: createJSONResponse( { success: true } ),
 	},
 	{
 		// Mock the response for the js asset once it gets injected

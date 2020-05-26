@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "1.8.0",
+	"version": "1.9.0",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,6 +20,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -27,6 +31,7 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",

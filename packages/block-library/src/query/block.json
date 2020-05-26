@@ -8,14 +8,18 @@
 		"query": {
 			"type": "object",
 			"default": {
-				"per_page": 3,
+				"perPage": 3,
 				"pages": 1,
-				"offset": 0
+				"offset": 0,
+				"categoryIds": []
 			}
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query"
+	},
+	"supports": {
+		"html": false
 	}
 }
