@@ -75,7 +75,9 @@ function ColorPalette( {
 
 	useEffect( () => {
 		if ( scrollViewRef.current ) {
-			scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+			if ( isSelectedCustom() ) {
+				scrollViewRef.current.scrollToEnd();
+			} else scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 		}
 	}, [ currentSegment ] );
 
