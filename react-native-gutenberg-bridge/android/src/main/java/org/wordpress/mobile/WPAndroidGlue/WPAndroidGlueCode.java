@@ -79,6 +79,7 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
+    private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -164,6 +165,11 @@ public class WPAndroidGlueCode {
 
     public interface OnLogGutenbergUserEventListener {
         void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
+    }
+
+    public interface OnStarterPageTemplatesTooltipShownEventListener {
+        void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
+        boolean onRequestStarterPageTemplatesTooltipShown();
     }
 
     public void mediaSelectionCancelled() {
@@ -338,6 +344,17 @@ public class WPAndroidGlueCode {
             @Override public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
+
+            @Override
+            public void setStarterPageTemplatesTooltipShown(boolean showTooltip) {
+                mOnStarterPageTemplatesTooltipShownListener.onSetStarterPageTemplatesTooltipShown(showTooltip);
+            }
+
+            @Override
+            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
+                boolean tooltipShown = mOnStarterPageTemplatesTooltipShownListener.onRequestStarterPageTemplatesTooltipShown();
+                starterPageTemplatesTooltipShownCallback.onRequestStarterPageTemplatesTooltipShown(tooltipShown);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -448,6 +465,7 @@ public class WPAndroidGlueCode {
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   AddMentionUtil addMentionUtil,
+                                  OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   boolean isDarkMode) {
 
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
@@ -462,6 +480,7 @@ public class WPAndroidGlueCode {
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mAddMentionUtil = addMentionUtil;
+        mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
