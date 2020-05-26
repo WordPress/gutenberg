@@ -190,7 +190,7 @@ const Portfolio = {
 		},
 		{
 			name: 'core/buttons',
-			attributes: {,
+			attributes: {
 				align: 'center',
 			},
 			innerBlocks: [
