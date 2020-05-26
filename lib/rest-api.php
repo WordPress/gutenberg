@@ -144,6 +144,16 @@ function gutenberg_register_rest_menu_location() {
 	$nav_menu_location->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_menu_location' );
+
+/**
+ * Registers the menu locations area REST API routes.
+ */
+function gutenberg_register_rest_customizer_nonces() {
+	$nav_menu_location = new WP_Rest_Customizer_Nonces();
+	$nav_menu_location->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
+
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
  *

@@ -15,18 +15,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import batchSave from './menu-items-batch-save-handler';
-
-function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
-	return createBlock(
-		'core/navigation-link',
-		{
-			label: menuItem.title.rendered,
-			url: menuItem.url,
-		},
-		innerBlocks
-	);
-}
+import batchSave from './batch-save';
+import useDebouncedValue from './use-debounced-value';
+import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
@@ -46,7 +37,7 @@ export default function useNavigationBlocks( menuId ) {
 			const [
 				navigationBlock,
 				clientIdToMenuItemMapping,
-			] = convertMenuItemsToNavigationBlock( menuItems );
+			] = menuItemsToNavigationBlock( menuItems );
 			setBlocks( [ navigationBlock ] );
 			menuItemsRef.current = clientIdToMenuItemMapping;
 		}
@@ -82,7 +73,26 @@ export default function useNavigationBlocks( menuId ) {
 		[ debouncedBlocks ]
 	);
 
-	const saveBlocks = useSaveBlocks( menuId, blocks, menuItemsRef, query );
+	// Save handler
+	const { receiveEntityRecords } = useDispatch( 'core' );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+
+	const saveBlocks = async () => {
+		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
+
+		if ( result.success ) {
+			createSuccessNotice( __( 'Navigation saved.' ), {
+				type: 'snackbar',
+			} );
+			receiveEntityRecords( 'root', 'menuItem', [], query, true );
+		} else {
+			createErrorNotice( __( 'There was an error.' ), {
+				type: 'snackbar',
+			} );
+		}
+	};
 
 	return [
 		blocks,
@@ -90,117 +100,6 @@ export default function useNavigationBlocks( menuId ) {
 		() => promiseQueueRef.current.then( saveBlocks ),
 	];
 }
-
-class PromiseQueue {
-	constructor( concurrency = 1 ) {
-		this.concurrency = concurrency;
-		this.queue = [];
-		this.active = [];
-		this.listeners = [];
-	}
-
-	schedule( action ) {
-		this.queue.push( action );
-		this.run();
-	}
-
-	run() {
-		while ( this.queue.length && this.active.length <= this.concurrency ) {
-			const action = this.queue.pop();
-			const promise = action().then( () =>
-				this.onActionFinished( promise )
-			);
-			this.active.push( promise );
-		}
-	}
-
-	onActionFinished( promise ) {
-		this.active.splice( this.active.indexOf( promise ), 1 );
-		if ( this.active.length === 0 && this.queue.length === 0 ) {
-			for ( const l of this.listeners ) {
-				l();
-			}
-			this.listeners = [];
-		}
-	}
-
-	then( callback ) {
-		this.listeners.push( callback );
-	}
-}
-
-const convertMenuItemsToNavigationBlock = ( menuItems ) => {
-	const itemsByParentID = groupBy( menuItems, 'parent' );
-	const clientIdToMenuItemMapping = {};
-	const createMenuItemBlocks = ( items ) => {
-		const innerBlocks = [];
-		if ( ! items ) {
-			return;
-		}
-
-		const sortedItems = sortBy( items, 'menu_order' );
-		for ( const item of sortedItems ) {
-			let menuItemInnerBlocks = [];
-			if ( itemsByParentID[ item.id ]?.length ) {
-				menuItemInnerBlocks = createMenuItemBlocks(
-					itemsByParentID[ item.id ]
-				);
-			}
-			const block = createBlockFromMenuItem( item, menuItemInnerBlocks );
-			clientIdToMenuItemMapping[ block.clientId ] = item;
-			innerBlocks.push( block );
-		}
-		return innerBlocks;
-	};
-
-	// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] || [] );
-	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
-	return [ navigationBlock, clientIdToMenuItemMapping ];
-};
-
-const useSaveBlocks = ( menuId, blocks, menuItemsRef, query ) => {
-	const { receiveEntityRecords } = useDispatch( 'core' );
-
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
-
-	const saveBlocks = async () => {
-		const result = await batchSave(
-			menuId,
-			menuItemsRef,
-			blocks[ 0 ].innerBlocks
-		);
-
-		createSuccessNotice( __( 'Navigation saved.' ), {
-			type: 'snackbar',
-		} );
-
-		return;
-
-		const kind = 'root';
-		const name = 'menuItem';
-		// receiveEntityRecords(
-		// 	kind,
-		// 	name,
-		// 	saved,
-		// 	// {
-		// 	// 	...item.data,
-		// 	// 	title: { rendered: 'experimental' },
-		// 	// },
-		// 	undefined,
-		// 	true
-		// );
-		receiveEntityRecords(
-			'root',
-			'menuItem',
-			Object.values( saved ),
-			query,
-			false
-		);
-	};
-
-	return saveBlocks;
-};
 
 async function createDraftMenuItem() {
 	return apiFetch( {
@@ -214,17 +113,48 @@ async function createDraftMenuItem() {
 	} );
 }
 
-const useDebouncedValue = ( value, timeout ) => {
-	const [ state, setState ] = useState( value );
+const menuItemsToNavigationBlock = ( menuItems ) => {
+	const itemsByParentID = groupBy( menuItems, 'parent' );
+	const clientIdToMenuItemMapping = {};
+	const menuItemsToTreeOfLinkBlocks = ( items ) => {
+		const innerBlocks = [];
+		if ( ! items ) {
+			return;
+		}
 
-	useEffect( () => {
-		const handler = setTimeout( () => setState( value ), timeout );
+		const sortedItems = sortBy( items, 'menu_order' );
+		for ( const item of sortedItems ) {
+			let menuItemInnerBlocks = [];
+			if ( itemsByParentID[ item.id ]?.length ) {
+				menuItemInnerBlocks = menuItemsToTreeOfLinkBlocks(
+					itemsByParentID[ item.id ]
+				);
+			}
+			const linkBlock = menuItemToLinkBlock( item, menuItemInnerBlocks );
+			clientIdToMenuItemMapping[ linkBlock.clientId ] = item;
+			innerBlocks.push( linkBlock );
+		}
+		return innerBlocks;
+	};
 
-		return () => clearTimeout( handler );
-	}, [ value, timeout ] );
-
-	return state;
+	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+	const innerBlocks = menuItemsToTreeOfLinkBlocks(
+		itemsByParentID[ 0 ] || []
+	);
+	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
+	return [ navigationBlock, clientIdToMenuItemMapping ];
 };
+
+function menuItemToLinkBlock( menuItem, innerBlocks = [] ) {
+	return createBlock(
+		'core/navigation-link',
+		{
+			label: menuItem.title.rendered,
+			url: menuItem.url,
+		},
+		innerBlocks
+	);
+}
 
 const getAllClientIds = ( blocks ) =>
 	blocks.flatMap( ( item ) =>
