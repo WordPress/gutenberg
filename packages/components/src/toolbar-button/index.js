@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -27,6 +28,25 @@ function ToolbarButton( {
 	...props
 } ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
+
+	if ( extraProps ) {
+		deprecated( 'ToolbarButton extraProps prop', {
+			hint:
+				'You can pass extra Button props directly to the ToolbarButton component instead.',
+		} );
+	}
+
+	if ( title ) {
+		deprecated( 'ToolbarButton title prop', {
+			alternative: 'label',
+		} );
+	}
+
+	if ( isActive !== undefined ) {
+		deprecated( 'ToolbarButton isActive prop', {
+			alternative: 'isPressed',
+		} );
+	}
 
 	if ( ! accessibleToolbarState ) {
 		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
@@ -52,6 +72,7 @@ function ToolbarButton( {
 					disabled={ isDisabled }
 					data-experimental-toolbar-item
 					{ ...extraProps }
+					{ ...props }
 				>
 					{ children }
 				</Button>
@@ -65,6 +86,7 @@ function ToolbarButton( {
 	return (
 		<ToolbarItem
 			className={ classnames( 'components-toolbar-button', className ) }
+			{ ...extraProps }
 			{ ...props }
 		>
 			{ ( toolbarItemProps ) => (
