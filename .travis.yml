@@ -54,6 +54,7 @@ install:
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
       echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php" } }' > .wp-env.override.json
+      chmod -R 767 ./ # TODO: Possibly integrate in wp-env
       npm run wp-env start
     fi
   - |
@@ -129,12 +130,11 @@ jobs:
 
     - name: PHP unit tests
       script:
-        - chmod -R 767 ./build
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
+      env: LOCAL_PHP=5.6-fpm
       script:
-        - chmod -R 767 ./build
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)
