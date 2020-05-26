@@ -71,7 +71,6 @@ const GROUP_TITLE_ORDER = [
 	'Experiments',
 	'Documentation',
 	'Code Quality',
-	'Project Management',
 	undefined,
 	'Various',
 ];
@@ -274,7 +273,10 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
  */
 const TITLE_NORMALIZATIONS = [
 	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
-	createOmitByLabel( [ 'Mobile App Compatibility', 'Project Management' ] ),
+	createOmitByLabel( [
+		'Mobile App Compatibility',
+		'[Type] Project Management',
+	] ),
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	addTrailingPeriod,

@@ -42,7 +42,7 @@ describe( 'getNormalizedTitle', () => {
 			undefined,
 			{
 				...DEFAULT_ISSUE,
-				labels: [ { name: 'Project Management' } ],
+				labels: [ { name: '[Type] Project Management' } ],
 			},
 		],
 		[
