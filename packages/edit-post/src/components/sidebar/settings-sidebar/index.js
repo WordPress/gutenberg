@@ -24,7 +24,7 @@ import { useSelect } from '@wordpress/data';
 
 const SettingsSidebar = () => {
 	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
-		// The settings sidebar is used by edit-post/document and edit-post/block sidebars.
+		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
 		// sidebarName represents the sidebar that is active or that should be active when SettingsSidebar toggle button is pressed.
 		// If one of the two sidebars is active the component will contain the content of that sidebar.
 		// When none of the the two sidebars is not active we can not simply return null, because PluginSidebarEditPost
