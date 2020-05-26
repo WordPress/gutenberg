@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -36,16 +41,17 @@ function BlockSelectionButton( {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
+				isBlockMovingMode,
 			} = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
 			);
-			return { index, name, attributes };
+			return { index, name, attributes, isBlockMovingMode };
 		},
 		[ clientId, rootClientId ]
 	);
-	const { index, name, attributes } = selected;
+	const { index, name, attributes, isBlockMovingMode } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -73,11 +79,15 @@ function BlockSelectionButton( {
 		moverDirection
 	);
 
+	const classNames = classnames(
+		'block-editor-block-list__block-selection-button',
+		{
+			'is-navigate-mode': !! isBlockMovingMode(),
+		}
+	);
+
 	return (
-		<div
-			className="block-editor-block-list__block-selection-button"
-			{ ...props }
-		>
+		<div className={ classNames } { ...props }>
 			<Button
 				ref={ ref }
 				onClick={ () => setNavigationMode( false ) }

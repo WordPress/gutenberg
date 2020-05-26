@@ -165,6 +165,33 @@
 	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
+
+
+	.is-navigate-mode.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $blue-medium-focus;
+		}
+		&::after {
+			content: none;
+		}
+	}
+}
+
+.is-navigate-mode.block-editor-block-list__breadcrumb {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
 }
 
 /**

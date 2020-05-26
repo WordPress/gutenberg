@@ -1581,6 +1581,17 @@ export function isNavigationMode( state ) {
 }
 
 /**
+ * Returns whether block moving mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string}     Client Id of moving block.
+ */
+export function isBlockMovingMode( state ) {
+	return state.isBlockMovingMode;
+}
+
+/**
  * Returns true if the last change was an automatic change, false otherwise.
  *
  * @param {Object} state Global application state.

@@ -749,6 +749,18 @@ _Returns_
 
 -   `?boolean`: Whether the insertion point is visible or not.
 
+<a name="isBlockMovingMode" href="#isBlockMovingMode">#</a> **isBlockMovingMode**
+
+Returns whether block moving mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Client Id of moving block.
+
 <a name="isBlockMultiSelected" href="#isBlockMultiSelected">#</a> **isBlockMultiSelected**
 
 Returns true if the client ID occurs within the block multi-selection, or
@@ -1245,6 +1257,14 @@ clientId should be selected.
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
+
+<a name="setBlockMovingMode" href="#setBlockMovingMode">#</a> **setBlockMovingMode**
+
+Generators that triggers an action used to enable or disable the block moving mode.
+
+_Parameters_
+
+-   _isBlockMovingMode_ `string`: Enable/Disable block moving mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 

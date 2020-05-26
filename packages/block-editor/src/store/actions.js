@@ -885,6 +885,18 @@ export function* setNavigationMode( isNavigationMode = true ) {
 }
 
 /**
+ * Generators that triggers an action used to enable or disable the block moving mode.
+ *
+ * @param {string} isBlockMovingMode Enable/Disable block moving mode.
+ */
+export function* setBlockMovingMode( isBlockMovingMode = '' ) {
+	yield {
+		type: 'SET_BLOCK_MOVING_MODE',
+		isBlockMovingMode,
+	};
+}
+
+/**
  * Generator that triggers an action used to duplicate a list of blocks.
  *
  * @param {string[]} clientIds
