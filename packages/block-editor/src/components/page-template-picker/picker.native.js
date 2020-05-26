@@ -134,7 +134,9 @@ const __experimentalPageTemplatePicker = ( {
 
 	return (
 		<Animated.View style={ [ { opacity: contentOpacity } ] }>
-			{ tooltipVisible && <Tooltip onTooltipHidden={ onTooltipHidden } /> }
+			{ tooltipVisible && (
+				<Tooltip onTooltipHidden={ onTooltipHidden } />
+			) }
 			<Container>
 				{ templates.map( ( template ) => (
 					<Button
