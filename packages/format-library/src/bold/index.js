@@ -38,9 +38,9 @@ export const bold = {
 				<RichTextToolbarButton
 					name="bold"
 					icon={ formatBold }
-					title={ title }
+					label={ title }
 					onClick={ onClick }
-					isActive={ isActive }
+					isPressed={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="b"
 				/>

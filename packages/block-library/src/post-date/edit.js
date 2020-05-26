@@ -43,7 +43,7 @@ function PostDateEditor( { format, setAttributes } ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						icon="edit"
-						title={ __( 'Change Date' ) }
+						label={ __( 'Change Date' ) }
 						onClick={ () =>
 							setIsPickerOpen(
 								( _isPickerOpen ) => ! _isPickerOpen

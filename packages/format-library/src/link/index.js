@@ -134,9 +134,9 @@ export const link = {
 							<RichTextToolbarButton
 								name="link"
 								icon={ linkOff }
-								title={ __( 'Unlink' ) }
+								label={ __( 'Unlink' ) }
 								onClick={ this.onRemoveFormat }
-								isActive={ isActive }
+								isPressed={ isActive }
 								shortcutType="primaryShift"
 								shortcutCharacter="k"
 							/>
@@ -145,9 +145,9 @@ export const link = {
 							<RichTextToolbarButton
 								name="link"
 								icon={ linkIcon }
-								title={ title }
+								label={ title }
 								onClick={ this.addLink }
-								isActive={ isActive }
+								isPressed={ isActive }
 								shortcutType="primary"
 								shortcutCharacter="k"
 							/>

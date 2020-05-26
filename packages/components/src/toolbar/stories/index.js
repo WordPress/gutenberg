@@ -133,13 +133,13 @@ export const toolbars = () => {
 			<div style={ { padding: '20px' } }>
 				<h2>Icon-only Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={ formatBold } label="Bold" />
 					<ToolbarButton
 						icon={ formatItalic }
-						title="Italic"
+						label="Italic"
 						isActive
 					/>
-					<ToolbarButton icon={ link } title="Link" />
+					<ToolbarButton icon={ link } label="Link" />
 				</Toolbar>
 			</div>
 
@@ -155,11 +155,11 @@ export const toolbars = () => {
 			<div style={ { padding: '20px' } }>
 				<h2>Text and Icon Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={ formatBold } label="Bold" />
 					<ToolbarButton isActive>Bold Format</ToolbarButton>
-					<ToolbarButton icon={ formatItalic } title="Italic" />
+					<ToolbarButton icon={ formatItalic } label="Italic" />
 					<ToolbarButton>Italic Format</ToolbarButton>
-					<ToolbarButton icon={ link } title="Link" />
+					<ToolbarButton icon={ link } label="Link" />
 					<ToolbarButton>Link Format</ToolbarButton>
 				</Toolbar>
 			</div>
@@ -167,7 +167,7 @@ export const toolbars = () => {
 			<div style={ { padding: '20px' } }>
 				<h2>Single Icon Button Toolbar</h2>
 				<Toolbar>
-					<ToolbarButton icon={ formatBold } title="Bold" />
+					<ToolbarButton icon={ formatBold } label="Bold" />
 				</Toolbar>
 			</div>
 

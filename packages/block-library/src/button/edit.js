@@ -104,7 +104,7 @@ function URLPicker( {
 					<ToolbarButton
 						name="link"
 						icon={ link }
-						title={ __( 'Link' ) }
+						label={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ openLinkControl }
 					/>

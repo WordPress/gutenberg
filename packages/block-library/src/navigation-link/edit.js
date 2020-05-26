@@ -149,14 +149,14 @@ function NavigationLinkEdit( {
 					<ToolbarButton
 						name="link"
 						icon={ linkIcon }
-						title={ __( 'Link' ) }
+						label={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
 					<ToolbarButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
-						title={ __( 'Add submenu' ) }
+						label={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
 				</ToolbarGroup>
