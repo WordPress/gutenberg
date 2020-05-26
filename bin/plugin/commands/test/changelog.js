@@ -56,6 +56,24 @@ describe( 'getNormalizedTitle', () => {
 			'Improve end-to-end URL stability.',
 		],
 		[ 'capitalizes', 'fix bug', 'Fix bug.' ],
+		[
+			'removes redundant prefix',
+			'Code quality: Enable import/no-unresolved ESLint rule for Gutenberg',
+			'Enable import/no-unresolved ESLint rule for Gutenberg.',
+			{
+				...DEFAULT_ISSUE,
+				labels: [ { name: '[Type] Code Quality' } ],
+			},
+		],
+		[
+			'removes redundant prefix with normalized type',
+			'[Enhancement] Add ability to transform audio shortcodes to audio blocks',
+			'Add ability to transform audio shortcodes to audio blocks.',
+			{
+				...DEFAULT_ISSUE,
+				labels: [ { name: '[Type] Enhancement' } ],
+			},
+		],
 	] )( '%s', ( _label, original, expected, issue = DEFAULT_ISSUE ) => {
 		expect( getNormalizedTitle( original, issue ) ).toBe( expected );
 	} );

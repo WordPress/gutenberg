@@ -266,6 +266,32 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
 		: text;
 
 /**
+ * Given an issue title and issue, returns the title with redundant grouping
+ * type details removed. The prefix is redundant since it would already be clear
+ * enough by group assignment that the prefix would be inferred.
+ *
+ * @type {WPChangelogNormalization}
+ *
+ * @return {string} Title with redundant grouping type details removed.
+ */
+function removeRedundantTypePrefix( title, issue ) {
+	const type = getIssueType( issue );
+
+	return title.replace(
+		new RegExp(
+			`^\\[?${
+				// Naively try to convert to singular form, to match "Bug Fixes"
+				// type as either "Bug Fix" or "Bug Fixes" (technically matches
+				// "Bug Fixs" as well).
+				escapeRegExp( type.replace( /(es|s)$/, '' ) )
+			}(es|s)?\\]?:?\\s*`,
+			'i'
+		),
+		''
+	);
+}
+
+/**
  * Array of normalizations applying to title, each returning a new string, or
  * undefined to indicate an entry which should be omitted.
  *
@@ -277,6 +303,7 @@ const TITLE_NORMALIZATIONS = [
 		'Mobile App Compatibility',
 		'[Type] Project Management',
 	] ),
+	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	addTrailingPeriod,
