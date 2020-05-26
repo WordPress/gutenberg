@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, sortBy } from 'lodash';
+import { groupBy, sortBy, difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,10 +20,15 @@ import useDebouncedValue from './use-debounced-value';
 import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
+	const [ deletedMenuItemsIds, setDeletedMenuItemsIds ] = useState( [] );
+
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
 	const menuItems = useSelect(
-		( select ) => select( 'core' ).getMenuItems( query ),
+		( select ) =>
+			select( 'core' )
+				.getMenuItems( query )
+				?.filter( ( { id } ) => ! deletedMenuItemsIds.includes( id ) ),
 		[ menuId ]
 	);
 
@@ -86,6 +91,18 @@ export default function useNavigationBlocks( menuId ) {
 		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
 
 		if ( result.success ) {
+			const mapping = menuItemsRef.current;
+			const allMenuItemsIds = Object.values( menuItemsRef.current ).map(
+				( { id } ) => id
+			);
+			const savedMenuItemIds = getAllClientIds( blocks ).map(
+				( clientId ) => mapping[ clientId ].id
+			);
+			setDeletedMenuItemsIds( [
+				...deletedMenuItemsIds,
+				difference( allMenuItemsIds, savedMenuItemIds ),
+			] );
+
 			createSuccessNotice( __( 'Navigation saved.' ), {
 				type: 'snackbar',
 			} );
