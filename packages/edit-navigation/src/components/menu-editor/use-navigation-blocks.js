@@ -53,30 +53,30 @@ export default function useNavigationBlocks( menuId ) {
 	// PromiseQueue is used in order to
 	// 1) limit the amount of requests processed at the same time
 	// 2) save the menu only after all requests are finalized
+
+	// Let's debounce so that we don't call `getAllClientIds` on every keystroke
 	const debouncedBlocks = useDebouncedValue( blocks, 800 );
 	const promiseQueueRef = useRef( new PromiseQueue() );
-	const processedBlocksIds = useRef( [] );
+	const enqueuedBlocksIds = useRef( [] );
 	useEffect(
 		function() {
 			for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
-				// Already has a related menu item
+				// Menu item was already created
 				if ( clientId in menuItemsRef.current ) {
 					continue;
 				}
-				// Already being processed
-				if ( processedBlocksIds.current.includes( clientId ) ) {
+				// Already in the queue
+				if ( enqueuedBlocksIds.current.includes( clientId ) ) {
 					continue;
 				}
-				processedBlocksIds.current.push( clientId );
+				enqueuedBlocksIds.current.push( clientId );
 				promiseQueueRef.current.enqueue( () =>
-					createDraftMenuItem( clientId ).then(
-						async ( menuItem ) => {
-							menuItemsRef.current[ clientId ] = menuItem;
-							processedBlocksIds.current.splice(
-								processedBlocksIds.current.indexOf( clientId )
-							);
-						}
-					)
+					createDraftMenuItem( clientId ).then( ( menuItem ) => {
+						menuItemsRef.current[ clientId ] = menuItem;
+						enqueuedBlocksIds.current.splice(
+							enqueuedBlocksIds.current.indexOf( clientId )
+						);
+					} )
 				);
 			}
 		},
@@ -93,12 +93,11 @@ export default function useNavigationBlocks( menuId ) {
 		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
 
 		if ( result.success ) {
-			const mapping = menuItemsRef.current;
 			const allMenuItemsIds = Object.values( menuItemsRef.current ).map(
 				( { id } ) => id
 			);
 			const savedMenuItemIds = getAllClientIds( blocks ).map(
-				( clientId ) => mapping[ clientId ].id
+				( clientId ) => menuItemsRef.current[ clientId ].id
 			);
 			setDeletedMenuItemsIds( [
 				...deletedMenuItemsIds,
