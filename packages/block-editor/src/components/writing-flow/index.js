@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -209,6 +209,8 @@ function selector( select ) {
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -236,6 +238,8 @@ function selector( select ) {
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -283,6 +287,8 @@ export default function WritingFlow( { children } ) {
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
+		canInsertBlockType,
+		getBlockName,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
@@ -292,6 +298,9 @@ export default function WritingFlow( { children } ) {
 		setBlockMovingMode,
 		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
+
+	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
+
 	function onMouseDown( event ) {
 		verticalRect.current = null;
 
@@ -421,6 +430,15 @@ export default function WritingFlow( { children } ) {
 					] )[ 0 ] ?? selectedBlockClientId;
 			}
 			const startingBlockClientId = isBlockMovingMode();
+
+			if ( startingBlockClientId && focusedBlockUid ) {
+				setCanInsertMovingBlock(
+					canInsertBlockType(
+						getBlockName( startingBlockClientId ),
+						getBlockRootClientId( focusedBlockUid )
+					)
+				);
+			}
 
 			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
 				const sourceRoot = getBlockRootClientId(
@@ -652,6 +670,7 @@ export default function WritingFlow( { children } ) {
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
 		'is-block-moving-mode': !! isBlockMovingMode(),
+		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture

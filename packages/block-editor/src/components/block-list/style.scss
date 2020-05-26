@@ -166,8 +166,15 @@
 		box-shadow: 0 0 0 1px $light-gray-ui;
 	}
 
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+		outline: 2px solid $light-gray-secondary;
 
-	.is-navigate-mode.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
 		&::before {
 			content: "";
 			position: absolute;
@@ -182,9 +189,6 @@
 			top: -$default-block-margin / 2;
 			border-radius: $radius-block-ui;
 			border-top: 4px solid $blue-medium-focus;
-		}
-		&::after {
-			content: none;
 		}
 	}
 }
