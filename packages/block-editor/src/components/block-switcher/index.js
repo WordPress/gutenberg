@@ -65,10 +65,8 @@ export class BlockSwitcher extends Component {
 			return null;
 		}
 
-		const hoveredBlock = hoveredClassName ? blocks[ 0 ] : null;
-		const hoveredBlockType = hoveredClassName
-			? getBlockType( hoveredBlock.name )
-			: null;
+		const hoveredBlock = blocks[ 0 ];
+		const hoveredBlockType = getBlockType( hoveredBlock.name );
 
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(

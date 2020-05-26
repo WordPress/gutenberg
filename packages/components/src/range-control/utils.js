@@ -23,7 +23,7 @@ import { useControlledState } from '../utils/hooks';
  * @return {number} A (float) number
  */
 export function floatClamp( value, min, max ) {
-	if ( ! isFinite( value ) ) {
+	if ( typeof value !== 'number' ) {
 		return null;
 	}
 

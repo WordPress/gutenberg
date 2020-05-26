@@ -98,8 +98,8 @@ function ColorPalette( {
 		return Animated.timing( property, {
 			toValue,
 			duration: ANIMATION_DURATION,
-			useNativeDriver: true,
 			easing: Easing.ease,
+			useNativeDriver: true,
 		} );
 	}
 

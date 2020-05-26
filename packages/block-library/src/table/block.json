@@ -120,5 +120,8 @@
 				}
 			}
 		}
+	},
+	"supports": {
+		"align": true
 	}
 }

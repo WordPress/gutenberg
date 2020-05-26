@@ -16,9 +16,7 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {
-			shippedProposals: true,
-		};
+		const opts = {};
 
 		if ( isTestEnv ) {
 			opts.targets = {

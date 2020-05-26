@@ -136,8 +136,14 @@ export const ALERT = {
 // Namespaced values for raw colors hex codes
 export const UI = {
 	background: BASE.white,
+	backgroundDisabled: LIGHT_GRAY[ 200 ],
+	brand: BLUE.wordpress[ 700 ],
 	border: BASE.black,
 	borderFocus: BLUE.medium.focus,
+	borderDisabled: DARK_GRAY[ 700 ],
+	borderLight: LIGHT_GRAY[ 600 ],
+	label: DARK_GRAY[ 500 ],
+	textDisabled: DARK_GRAY[ 150 ],
 };
 
 export const COLORS = {

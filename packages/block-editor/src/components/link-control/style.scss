@@ -135,6 +135,11 @@ $block-editor-link-control-number-of-actions: 1;
 		background-color: $light-gray-300;
 	}
 
+	// The added specificity is needed to override.
+	&:focus:not(:disabled) {
+		box-shadow: 0 0 0 $border-width-focus $theme-color inset;
+	}
+
 	&.is-selected {
 		background: $light-gray-200;
 

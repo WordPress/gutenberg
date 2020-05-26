@@ -9,9 +9,9 @@ const gradientOptions = [
 ];
 
 const getGradientType = ( color ) => {
-	if ( color?.includes( 'radial-gradient' ) ) {
+	if ( color?.includes( gradients.radial ) ) {
 		return gradients.radial;
-	} else if ( color?.includes( 'linear-gradient' ) ) {
+	} else if ( color?.includes( gradients.linear ) ) {
 		return gradients.linear;
 	}
 	return false;
