@@ -140,7 +140,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Run an arbitrary command in one of the underlying Docker containers. For example, it can be useful for running wp cli commands. You can also use it to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance.',
+		'Runs an arbitrary command in one of the underlying Docker containers. For example, it can be useful for running wp cli commands. You can also use it to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',
