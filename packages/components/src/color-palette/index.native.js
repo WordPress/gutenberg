@@ -70,6 +70,7 @@ function ColorPalette( {
 			toValue,
 			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
+			useNativeDriver: true,
 		} );
 	}
 

@@ -75,7 +75,7 @@ function OverlayColorSettings( { attributes, setAttributes } ) {
 
 	return (
 		<PanelColorGradientSettings
-			title={ __( 'Color settings' ) }
+			title={ __( 'Color Settings' ) }
 			initialOpen={ false }
 			settings={ [
 				{
