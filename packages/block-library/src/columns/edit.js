@@ -44,11 +44,12 @@ const ALLOWED_BLOCKS = [ 'core/column' ];
 
 function ColumnsEditContainer( {
 	attributes,
+	setAttributes,
 	updateAlignment,
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, gap } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -87,6 +88,16 @@ function ColumnsEditContainer( {
 							) }
 						</Notice>
 					) }
+					<RangeControl
+						label={ __( 'Column gap' ) }
+						value={ gap }
+						onChange={ ( nextGap ) => {
+							setAttributes( { gap: nextGap } );
+						} }
+						min={ 0 }
+						max={ 60 }
+						step={ 1 }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks

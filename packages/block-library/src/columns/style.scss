@@ -30,44 +30,44 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
-	// Between mobile and large viewports, allow 2 columns.
-	@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
-		// As with mobile styles, this must be important since the Column
-		// assigns its own width as an inline style, which should take effect
-		// starting at `break-medium`.
-		flex-basis: calc(50% - #{$grid-unit-20}) !important;
-		flex-grow: 0;
+	// // Between mobile and large viewports, allow 2 columns.
+	// @media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+	// 	// As with mobile styles, this must be important since the Column
+	// 	// assigns its own width as an inline style, which should take effect
+	// 	// starting at `break-medium`.
+	// 	flex-basis: calc(50% - #{$grid-unit-20}) !important;
+	// 	flex-grow: 0;
 
-		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
-		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-		&:nth-child(even) {
-			margin-left: $grid-unit-20 * 2;
-		}
-	}
+	// 	// Add space between the multiple columns. Themes can customize this if they wish to work differently.
+	// 	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
+	// 	&:nth-child(even) {
+	// 		margin-left: $grid-unit-20 * 2;
+	// 	}
+	// }
 
-	// At large viewports, show all columns horizontally.
-	@include break-medium() {
-		// Available space should be divided equally amongst columns without an
-		// assigned width. This is achieved by assigning a flex basis that is
-		// consistent (equal), would not cause the sum total of column widths to
-		// exceed 100%, and which would cede to a column with an assigned width.
-		// The `flex-grow` allows columns to maximally and equally occupy space
-		// remaining after subtracting the space occupied by columns with
-		// explicit widths (if any exist).
-		flex-basis: 0;
-		flex-grow: 1;
+	// // At large viewports, show all columns horizontally.
+	// @include break-medium() {
+	// 	// Available space should be divided equally amongst columns without an
+	// 	// assigned width. This is achieved by assigning a flex basis that is
+	// 	// consistent (equal), would not cause the sum total of column widths to
+	// 	// exceed 100%, and which would cede to a column with an assigned width.
+	// 	// The `flex-grow` allows columns to maximally and equally occupy space
+	// 	// remaining after subtracting the space occupied by columns with
+	// 	// explicit widths (if any exist).
+	// 	flex-basis: 0;
+	// 	flex-grow: 1;
 
-		// Columns with an explicitly-assigned width should maintain their
-		// `flex-basis` width and not grow.
-		&[style*="flex-basis"] {
-			flex-grow: 0;
-		}
+	// 	// Columns with an explicitly-assigned width should maintain their
+	// 	// `flex-basis` width and not grow.
+	// 	&[style*="flex-basis"] {
+	// 		flex-grow: 0;
+	// 	}
 
-		// When columns are in a single row, add space before all except the first.
-		&:not(:first-child) {
-			margin-left: $grid-unit-20 * 2;
-		}
-	}
+	// 	// When columns are in a single row, add space before all except the first.
+	// 	&:not(:first-child) {
+	// 		margin-left: $grid-unit-20 * 2;
+	// 	}
+	// }
 }
 
 /**

@@ -2,6 +2,10 @@
 	"name": "core/columns",
 	"category": "layout",
 	"attributes": {
+		"gap": {
+			"type": "number",
+			"default": 20
+		},
 		"verticalAlignment": {
 			"type": "string"
 		}
