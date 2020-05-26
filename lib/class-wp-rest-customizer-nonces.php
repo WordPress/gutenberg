@@ -1,15 +1,13 @@
 <?php
 /**
- * Customizer Widget Blocks Section: WP_Customize_Widget_Blocks_Control class.
+ * WP_Rest_Customizer_Nonces class.
  *
  * @package gutenberg
- * @since 6.1.0
  */
 
 /**
- * Class that renders the Customizer control for editing widgets with Gutenberg.
- *
- * @since 6.1.0
+ * Class that returns the customizer "save" nonce that's required for the
+ * batch save operation using the customizer API endpoint.
  */
 class WP_Rest_Customizer_Nonces extends WP_REST_Controller {
 
