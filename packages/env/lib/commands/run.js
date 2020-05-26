@@ -83,6 +83,15 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 	} );
 }
 
+/**
+ * This shows a contextual tip for the command being run. Certain commands (like
+ * bash) may have weird behavior (exit with ctrl-d instead of ctrl-c or ctrl-z),
+ * so we want the user to have that information without having to ask someone.
+ *
+ * @param {string} command   The command for which to show a tip.
+ * @param {string} container The container the command will be run on.
+ * @param {Object} spinner   A spinner object to show progress.
+ */
 function showCommandTips( command, container, spinner ) {
 	if ( ! command.length ) {
 		return;
