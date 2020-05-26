@@ -1,7 +1,7 @@
-BlockDropZone
+useBlockDropZone
 ===========
 
-`BlockDropZone` is a React component that renders a container which allows a user to drag media into the editor and immediately place it.
+`useBlockDropZone` is a React hook used to specify a drop zone for a block. This drop zone supports the drag and drop of media into the editor.
 
 ## Setup
 

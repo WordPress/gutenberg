@@ -15,7 +15,7 @@ import { useRef, forwardRef } from '@wordpress/element';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
-import useBlockDropZone from '../block-drop-zone';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
