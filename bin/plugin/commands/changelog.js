@@ -94,6 +94,8 @@ const TITLE_TYPE_PATTERNS = new Map( [
 const REWORD_TERMS = {
 	e2e: 'end-to-end',
 	url: 'URL',
+	config: 'configuration',
+	docs: 'documentation',
 };
 
 /**
