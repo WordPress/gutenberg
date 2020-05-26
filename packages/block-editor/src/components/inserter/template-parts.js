@@ -11,6 +11,11 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import BlockPreview from '../block-preview';
 import InserterPanel from './panel';
 
+/**
+ * External dependencies
+ */
+import { groupBy } from 'lodash';
+
 function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
 	const content = templatePart.content.raw || '';
@@ -55,18 +60,28 @@ export default function TemplateParts( { onInsert } ) {
 		);
 	}, [] );
 
+	// Group by Theme.
+	const templatePartsByTheme = useMemo( () => {
+		return Object.values( groupBy( templateParts, 'meta.theme' ) );
+	}, [ templateParts ] );
+
 	return (
-		<InserterPanel>
-			{ templateParts &&
-				templateParts.map( ( templatePart ) => {
-					return (
-						<TemplatePartItem
-							key={ templatePart.id }
-							templatePart={ templatePart }
-							onInsert={ onInsert }
-						/>
-					);
-				} ) }
-		</InserterPanel>
+		<>
+			{ templatePartsByTheme.length &&
+				templatePartsByTheme.map( ( templatePartList ) => (
+					<InserterPanel
+						key={ templatePartList[ 0 ].meta.theme }
+						title={ templatePartList[ 0 ].meta.theme }
+					>
+						{ templatePartList.map( ( templatePart ) => (
+							<TemplatePartItem
+								key={ templatePart.id }
+								templatePart={ templatePart }
+								onInsert={ onInsert }
+							/>
+						) ) }
+					</InserterPanel>
+				) ) }
+		</>
 	);
 }
