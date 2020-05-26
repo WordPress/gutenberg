@@ -137,7 +137,7 @@ export const toolbars = () => {
 					<ToolbarButton
 						icon={ formatItalic }
 						label="Italic"
-						isActive
+						isPressed
 					/>
 					<ToolbarButton icon={ link } label="Link" />
 				</Toolbar>
@@ -147,7 +147,7 @@ export const toolbars = () => {
 				<h2>Text-only Toolbar</h2>
 				<Toolbar>
 					<ToolbarButton>Bold Format</ToolbarButton>
-					<ToolbarButton isActive>Italic Format</ToolbarButton>
+					<ToolbarButton isPressed>Italic Format</ToolbarButton>
 					<ToolbarButton>Link Format</ToolbarButton>
 				</Toolbar>
 			</div>
@@ -156,7 +156,7 @@ export const toolbars = () => {
 				<h2>Text and Icon Toolbar</h2>
 				<Toolbar>
 					<ToolbarButton icon={ formatBold } label="Bold" />
-					<ToolbarButton isActive>Bold Format</ToolbarButton>
+					<ToolbarButton isPressed>Bold Format</ToolbarButton>
 					<ToolbarButton icon={ formatItalic } label="Italic" />
 					<ToolbarButton>Italic Format</ToolbarButton>
 					<ToolbarButton icon={ link } label="Link" />
