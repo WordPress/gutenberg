@@ -22,7 +22,7 @@ const TEMPLATE = [
 	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-export const SocialLinksEdit = function() {
+export function SocialLinksEdit() {
 	return (
 		<InnerBlocks
 			allowedBlocks={ ALLOWED_BLOCKS }
@@ -33,6 +33,6 @@ export const SocialLinksEdit = function() {
 			__experimentalAppenderTagName="li"
 		/>
 	);
-};
+}
 
 export default SocialLinksEdit;

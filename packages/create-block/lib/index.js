@@ -94,7 +94,7 @@ program
 			}
 		}
 	)
-	.on( '--help', function() {
+	.on( '--help', () => {
 		log.info( '' );
 		log.info( 'Examples:' );
 		log.info( `  $ ${ commandName }` );
