@@ -21,7 +21,7 @@ import {
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { applyFilters, doAction } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
