@@ -154,7 +154,9 @@ const Services = {
 		},
 		{
 			name: 'core/buttons',
-			align: 'center',
+			"attributes": {
+				"align": "center"
+			},
 			innerBlocks: [
 				{
 					name: 'core/button',
