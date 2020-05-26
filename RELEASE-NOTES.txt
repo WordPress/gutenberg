@@ -10,6 +10,7 @@
 * [***] Trash icon that is used to remove blocks is moved to the new menu reachable via ellipsis button in the block toolbar
 * [**] Block toolbar can now collapse when the block width is smaller than the toolbar content
 * [**] Creating undo levels less frequently
+* [**] Tooltip for page template selection buttons
 
 1.28.0
 ------
