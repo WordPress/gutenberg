@@ -47,6 +47,7 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsRef ) {
 	const dataList = blocksList.map( ( { block, parentId, position } ) =>
 		linkBlockToRequestItem( block, parentId, position )
 	);
+
 	// Create an object like { "nav_menu_item[12]": {...}} }
 	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
 	const dataObject = keyBy( dataList, computeKey );
