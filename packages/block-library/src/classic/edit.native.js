@@ -1,4 +1,8 @@
 
 import MissingEdit from '../missing/edit';
 
-export default MissingEdit;
+const ClassicEdit = ( props ) => (
+	<MissingEdit { ...props } attributes={ { ...props.attributes, originalName: props.name } } />
+);
+
+export default ClassicEdit;
