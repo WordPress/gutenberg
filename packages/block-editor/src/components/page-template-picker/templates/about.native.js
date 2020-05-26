@@ -109,7 +109,7 @@ const About = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "About" page template
-				content: __( 'Let’s build something together' ),
+				content: __( 'Let’s build something together!' ),
 				level: 2,
 			},
 		},

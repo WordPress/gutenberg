@@ -148,7 +148,7 @@ const Services = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "Services" page template
-				content: __( 'Let’s Build Something Together' ),
+				content: __( 'Let’s build something together!' ),
 				level: 2,
 			},
 		},

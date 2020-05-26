@@ -184,7 +184,7 @@ const Portfolio = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "Portfolio" page template
-				content: __( "Let's build something together." ),
+				content: __( "Let's build something together!" ),
 				level: 2,
 			},
 		},
