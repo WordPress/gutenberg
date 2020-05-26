@@ -2,12 +2,14 @@
  * WordPress dependencies
  */
 import {
+	hasBlockSupport,
 	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -126,6 +128,22 @@ const registerBlock = ( block ) => {
 // only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
+
+// Hide the Classic block
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+    	if ( name === 'core/freeform' && hasBlockSupport( settings, 'inserter', true ) ) {
+    		settings.supports = {
+    			...settings.supports,
+    			inserter: false
+    		};
+    	}
+
+    	return settings;
+    }
+);
 
 /**
  * Function to register core blocks provided by the block editor.
