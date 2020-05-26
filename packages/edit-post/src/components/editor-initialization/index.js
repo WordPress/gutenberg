@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	useAdjustSidebarListener,
 	useBlockSelectionListener,
 	useUpdatePostLinkListener,
 } from './listener-hooks';
@@ -16,7 +15,6 @@ import {
  */
 export default function( { postId } ) {
 	useBlockSelectionListener( postId );
-	useAdjustSidebarListener( postId );
 	useUpdatePostLinkListener( postId );
 	return null;
 }
