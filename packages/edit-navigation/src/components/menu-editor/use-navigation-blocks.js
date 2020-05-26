@@ -51,7 +51,7 @@ export default function useNavigationBlocks( menuId ) {
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
 	// PromiseQueue is used in order to
-	// 1) limit the amount of requests processed at once
+	// 1) limit the amount of requests processed at the same time
 	// 2) save the menu only after all requests are finalized
 	const debouncedBlocks = useDebouncedValue( blocks, 800 );
 	const promiseQueueRef = useRef( new PromiseQueue() );
