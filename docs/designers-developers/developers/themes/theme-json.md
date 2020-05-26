@@ -34,7 +34,7 @@ The Block Editor already allows the control of specific features such as alignme
 
 ## Specification
 
-The specification for the `experimental-theme.json` follows the three main functions described in the section above: presets, styles, and features.
+The specification for the `experimental-theme.json` follows the three main functions described in the section above: `presets`, `styles`, and `features`.
 
 ```
 {
@@ -76,7 +76,7 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
 {
   "global": {
     "features": {
-			"typography": {
+      "typography": {
         "dropCap": false
 			}
     }
@@ -98,7 +98,7 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
 }
 ```
 
-In the example above, we aim to encapsulate that the drop cap should be disabled globally but enabled in the paragraph context. The drop cap in the image context wouldn't make sense so should be ignored.
+In the example above, we aim to encapsulate that the drop cap should be disabled globally but enabled in the paragraph context. The drop cap in the Image block context wouldn't make sense based on the current implementation so would be ignored, but it could be used by plugins that extend its functionality.
 
 ## Current Status
 
@@ -111,17 +111,19 @@ The generated CSS Custom Properties follow this naming schema: `--wp--preset--{p
 For this input:
 
 ```
-"presets": {
-  "color": [
-    {
-      "slug": "strong-magenta",
-      "value": "#a156b4"
-    },
-    {
-      "slug": "very-dark-grey",
-      "value": "#444"
-    }
-  ]
+"global": {
+  "presets": {
+    "color": [
+      {
+        "slug": "strong-magenta",
+        "value": "#a156b4"
+      },
+      {
+        "slug": "very-dark-grey",
+        "value": "#444"
+      }
+    ]
+	}
 }
 ```
 
@@ -172,7 +174,49 @@ The list of properties that are currently exposed via this method are:
 
 ### Features
 
-This is being implemented, so it's not currently available.
+So far, this function is only enabled for the `global` section in `experimental-theme.json`.
+
+```
+{
+  "global": {
+    "features": {
+      "typography": {
+        "dropCap": false
+			}
+		}
+	}
+}
+```
+
+Then each block can decide to override how they handle block editor features during their registration process (`register_block_type` or `registerBlockType` calls) using `supports` object in `block.json` file:
+
+```
+{
+  "supports": {
+    "__experimentalFeatures": {
+      "typography": {
+        "dropCap": true
+			}
+		}
+  }
+}
+```
+
+Moving forward, we plan to integrate overrides targeting individual blocks defined inside `experimental-theme.json` file that would be applied on top of features defined by block authors in `supports` property.
+
+Finally, this is how it can be used in the block's `edit` implementation:
+
+```js
+// edit.js
+
+const Edit = ( props ) => {
+    const isDisabled = ! useEditorFeature( 'typography.dropCap', false );
+    // ...
+};
+```
+
+The list of features that are currently supported are:
+- Paragraph: drop cap.
 
 ### Recap of current available functions
 
