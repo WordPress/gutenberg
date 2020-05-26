@@ -63,19 +63,22 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 			aria-label={ toolbarAriaLabel }
 		>
 			{ isInserterVisible && (
-				<ToolbarItem
-					className="edit-post-header-toolbar__inserter-toggle"
-					isPrimary
-					isPressed={ isInserterOpen }
-					onClick={ onToggleInserter }
-					disabled={ ! isInserterEnabled }
-					icon={ plus }
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
+				<ToolbarItem>
+					{ ( itemProps ) => (
+						<Button
+							{ ...itemProps }
+							className="edit-post-header-toolbar__inserter-toggle"
+							isPrimary
+							isPressed={ isInserterOpen }
+							onClick={ onToggleInserter }
+							disabled={ ! isInserterEnabled }
+							icon={ plus }
+							label={ _x(
+								'Add block',
+								'Generic label for block inserter button'
+							) }
+						/>
 					) }
-				>
-					{ ( itemProps ) => <Button { ...itemProps } /> }
 				</ToolbarItem>
 			) }
 			<ToolbarItem>
