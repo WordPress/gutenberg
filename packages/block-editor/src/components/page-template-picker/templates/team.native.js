@@ -226,6 +226,7 @@ const Team = {
 		},
 		{
 			name: 'core/buttons',
+			align: 'center',
 			innerBlocks: [
 				{
 					name: 'core/button',
