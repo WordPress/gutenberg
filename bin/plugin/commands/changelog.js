@@ -54,6 +54,7 @@ const LABEL_GROUP_TITLES = {
 	Enhancement: 'Enhancements',
 	'New API': 'New APIs',
 	Experimental: 'Experiments',
+	Task: 'Various',
 };
 
 /**
