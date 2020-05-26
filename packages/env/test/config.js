@@ -204,6 +204,53 @@ describe( 'readConfig', () => {
 		} );
 	} );
 
+	it( 'should parse wordpress.org sources', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					plugins: [
+						'https://downloads.wordpress.org/plugin/gutenberg.zip',
+						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
+					],
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			pluginSources: [
+				{
+					type: 'zip',
+					url: 'https://downloads.wordpress.org/plugin/gutenberg.zip',
+					path: expect.stringMatching( /^\/.*gutenberg$/ ),
+					basename: 'gutenberg',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
+					path: expect.stringMatching( /^\/.*gutenberg$/ ),
+					basename: 'gutenberg',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
+				},
+			],
+		} );
+	} );
+
 	it( 'should throw a validaton error if there is an unknown source', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve( JSON.stringify( { plugins: [ 'invalid' ] } ) )

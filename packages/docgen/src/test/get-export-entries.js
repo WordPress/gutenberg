@@ -1,11 +1,11 @@
 /**
- * Node dependencies.
+ * External dependencies
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getExportEntries = require( '../get-export-entries' );
 

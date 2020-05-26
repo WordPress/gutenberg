@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { RovingTabIndexItem } from '../roving-tab-index';
+import RovingTabIndexItem from './roving-tab-index-item';
 
 export default function TreeGridCell( { children, ...props } ) {
 	return (

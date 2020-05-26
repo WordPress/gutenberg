@@ -187,8 +187,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 
 		foreach ( $template_types as $template_type ) {
 			// Skip 'embed' for now because it is not a regular template type.
-			// Skip 'index' because it's a fallback that we handle differently.
-			if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
+			if ( in_array( $template_type, array( 'embed' ), true ) ) {
 				continue;
 			}
 
@@ -197,7 +196,8 @@ function filter_rest_wp_template_query( $args, $request ) {
 				$template_ids[] = $current_template['template_post']->ID;
 			}
 		}
-		$args['post__in'] = $template_ids;
+		$args['post__in']    = $template_ids;
+		$args['post_status'] = array( 'publish', 'auto-draft' );
 	}
 
 	return $args;

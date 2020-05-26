@@ -133,7 +133,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				user: cliUser,
 			},
 			'tests-cli': {
-				depends_on: [ 'wordpress' ],
+				depends_on: [ 'tests-wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
 				user: cliUser,
@@ -142,11 +142,24 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'composer',
 				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
+			phpunit: {
+				image: 'wordpressdevelop/phpunit:${LOCAL_PHP-latest}',
+				depends_on: [ 'tests-wordpress' ],
+				volumes: [
+					...testsMounts,
+					'phpunit-uploads:/var/www/html/wp-content/uploads',
+				],
+				environment: {
+					LOCAL_DIR: 'html',
+					WP_PHPUNIT__TESTS_CONFIG: '/var/www/html/wp-config.php',
+				},
+			},
 		},
 		volumes: {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
+			'phpunit-uploads': {},
 		},
 	};
 };

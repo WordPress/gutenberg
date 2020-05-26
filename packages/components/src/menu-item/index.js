@@ -7,7 +7,7 @@ import { isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { cloneElement } from '@wordpress/element';
+import { cloneElement, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,18 +18,23 @@ import Button from '../button';
 /**
  * Renders a generic menu item for use inside the more menu.
  *
+ * @param {Object} ref Ref
+ *
  * @return {WPComponent} The component to be rendered.
  */
-export function MenuItem( {
-	children,
-	info,
-	className,
-	icon,
-	shortcut,
-	isSelected,
-	role = 'menuitem',
-	...props
-} ) {
+export function MenuItem(
+	{
+		children,
+		info,
+		className,
+		icon,
+		shortcut,
+		isSelected,
+		role = 'menuitem',
+		...props
+	},
+	ref
+) {
 	className = classnames( 'components-menu-item__button', className );
 
 	if ( info ) {
@@ -49,6 +54,7 @@ export function MenuItem( {
 
 	return (
 		<Button
+			ref={ ref }
 			icon={ icon }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -69,4 +75,4 @@ export function MenuItem( {
 	);
 }
 
-export default MenuItem;
+export default forwardRef( MenuItem );
