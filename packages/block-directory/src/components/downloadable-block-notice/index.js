@@ -3,35 +3,27 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { DOWNLOAD_ERROR_NOTICE_ID } from '../../store/constants';
+export const DownloadableBlockNotice = ( { block, onClick } ) => {
+	const errorNotice = useSelect(
+		( select ) =>
+			select( 'core/block-directory' ).getErrorNoticeForBlock( block.id ),
+		[ block ]
+	);
 
-export const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
-	if ( ! errorNotices[ block.id ] ) {
+	if ( ! errorNotice ) {
 		return null;
-	}
-
-	// A Failed install is the default error as its the first step
-	let copy = __( 'Block could not be added.' );
-
-	if ( errorNotices[ block.id ] === DOWNLOAD_ERROR_NOTICE_ID ) {
-		copy = __(
-			'Block could not be added. There is a problem with the block.'
-		);
 	}
 
 	return (
 		<Notice
 			status="error"
 			isDismissible={ false }
-			className="block-directory-downloadable-blocks__notice"
+			className="block-directory-downloadable-block-notice"
 		>
-			<div className="block-directory-downloadable-blocks__notice-content">
-				{ copy }
+			<div className="block-directory-downloadable-block-notice__content">
+				{ errorNotice }
 			</div>
 			<Button
 				isSmall
@@ -46,8 +38,4 @@ export const DownloadableBlockNotice = ( { block, errorNotices, onClick } ) => {
 	);
 };
 
-export default withSelect( ( select ) => {
-	return {
-		errorNotices: select( 'core/block-directory' ).getErrorNotices(),
-	};
-} )( DownloadableBlockNotice );
+export default DownloadableBlockNotice;

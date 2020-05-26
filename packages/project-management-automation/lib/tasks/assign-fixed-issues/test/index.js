@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import assignFixedIssues from '../assign-fixed-issues';
+import assignFixedIssues from '../';
 
 describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {

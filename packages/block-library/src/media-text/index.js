@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { mediaAndText as icon } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,11 +22,6 @@ export const settings = {
 	description: __( 'Set media and words side-by-side for a richer layout.' ),
 	icon,
 	keywords: [ __( 'image' ), __( 'video' ) ],
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-		__experimentalColor: Platform.OS === 'web' && { gradients: true },
-	},
 	example: {
 		attributes: {
 			mediaType: 'image',

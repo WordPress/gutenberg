@@ -5,5 +5,16 @@
 		"verticalAlignment": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		}
 	}
 }
