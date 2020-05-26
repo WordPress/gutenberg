@@ -28,7 +28,7 @@ const SettingsSidebar = () => {
 		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
 		// If one of the two sidebars is active the component will contain the content of that sidebar.
 		// When neither of the the two sidebars is active we can not simply return null, because the PluginSidebarEditPost
-		// component besides being used to render the sidebar also renders the toggle button. In that case sidebarName
+		// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
 		// should contain the sidebar that will be active when the toggle button is pressed. If a block
 		// is selected, that should be edit-post/block otherwise it's edit-post/document.
 		let sidebar = select( 'core/interface' ).getActiveComplementaryArea(
