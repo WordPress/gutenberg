@@ -23,39 +23,43 @@ const MenuIcon = (
 	</SVG>
 );
 
-const BlockNavigationDropdownToggle = forwardRef(
-	( { isEnabled, onToggle, isOpen, ...props }, ref ) => {
-		useShortcut(
-			'core/edit-post/toggle-block-navigation',
-			useCallback( onToggle, [ onToggle ] ),
-			{
-				bindGlobal: true,
-				isDisabled: ! isEnabled,
-			}
-		);
-		const shortcut = useSelect(
-			( select ) =>
-				select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
-					'core/edit-post/toggle-block-navigation'
-				),
-			[]
-		);
+function BlockNavigationDropdownToggle( {
+	isEnabled,
+	onToggle,
+	isOpen,
+	innerRef,
+	...props
+} ) {
+	useShortcut(
+		'core/edit-post/toggle-block-navigation',
+		useCallback( onToggle, [ onToggle ] ),
+		{
+			bindGlobal: true,
+			isDisabled: ! isEnabled,
+		}
+	);
+	const shortcut = useSelect(
+		( select ) =>
+			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+				'core/edit-post/toggle-block-navigation'
+			),
+		[]
+	);
 
-		return (
-			<Button
-				{ ...props }
-				ref={ ref }
-				icon={ MenuIcon }
-				aria-expanded={ isOpen }
-				onClick={ isEnabled ? onToggle : undefined }
-				label={ __( 'Block navigation' ) }
-				className="block-editor-block-navigation"
-				shortcut={ shortcut }
-				aria-disabled={ ! isEnabled }
-			/>
-		);
-	}
-);
+	return (
+		<Button
+			{ ...props }
+			ref={ innerRef }
+			icon={ MenuIcon }
+			aria-expanded={ isOpen }
+			onClick={ isEnabled ? onToggle : undefined }
+			label={ __( 'Block navigation' ) }
+			className="block-editor-block-navigation"
+			shortcut={ shortcut }
+			aria-disabled={ ! isEnabled }
+		/>
+	);
+}
 
 function BlockNavigationDropdown(
 	{ isDisabled, __experimentalWithBlockNavigationSlots, ...props },
@@ -71,11 +75,12 @@ function BlockNavigationDropdown(
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
 			position="bottom right"
-			renderToggle={ ( toggleProps ) => (
+			renderToggle={ ( { isOpen, onToggle } ) => (
 				<BlockNavigationDropdownToggle
-					{ ...toggleProps }
 					{ ...props }
-					ref={ ref }
+					innerRef={ ref }
+					isOpen={ isOpen }
+					onToggle={ onToggle }
 					isEnabled={ isEnabled }
 				/>
 			) }
