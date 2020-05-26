@@ -8,41 +8,54 @@ import { keyBy, omit } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 
-export default function batchSave( menuId, menuItemsRef, navigationBlock ) {
-	async function request() {
-		const { nonce, stylesheet } = await apiFetch( {
-			path: '/__experimental/customizer-nonces/get-save-nonce',
-		} );
+export default async function batchSave(
+	menuId,
+	menuItemsRef,
+	navigationBlock
+) {
+	const { nonce, stylesheet } = await apiFetch( {
+		path: '/__experimental/customizer-nonces/get-save-nonce',
+	} );
 
-		const body = new FormData();
-		body.append( 'wp_customize', 'on' );
-		body.append( 'customize_theme', stylesheet );
-		body.append( 'nonce', nonce );
-		body.append( 'customize_changeset_uuid', uuidv4() );
-		body.append( 'customize_autosaved', 'on' );
-		body.append(
-			'customized',
-			JSON.stringify(
-				keyBy(
-					linkBlocksToRequestData( navigationBlock.innerBlocks ),
-					( item ) => `nav_menu_item[${ item.id }]`
-				)
-			)
-		);
-		body.append( 'customize_changeset_status', 'publish' );
-		body.append( 'action', 'customize_save' );
+	const body = new FormData();
+	body.append( 'wp_customize', 'on' );
+	body.append( 'customize_theme', stylesheet );
+	body.append( 'nonce', nonce );
+	body.append( 'customize_changeset_uuid', uuidv4() );
+	body.append( 'customize_autosaved', 'on' );
+	body.append( 'customize_changeset_status', 'publish' );
+	body.append( 'action', 'customize_save' );
+	body.append(
+		'customized',
+		computeCustomizedAttribute(
+			navigationBlock.innerBlocks,
+			menuId,
+			menuItemsRef
+		)
+	);
 
-		return await apiFetch( {
-			url: '/wp-admin/admin-ajax.php',
-			method: 'POST',
-			body,
-		} );
-	}
+	return await apiFetch( {
+		url: '/wp-admin/admin-ajax.php',
+		method: 'POST',
+		body,
+	} );
+}
 
-	function linkBlocksToRequestData( blocks, parentId = 0 ) {
-		blocks.flatMap( ( block, index ) =>
-			[ linkBlockToRequestData( block, parentId, index + 1 ) ].concat(
-				linkBlocksToRequestData(
+function computeCustomizedAttribute( blocks, menuId, menuItemsRef ) {
+	const blocksList = blocksTreeToFlatList( blocks );
+	const dataList = blocksList.map( ( { block, parentId, position } ) =>
+		linkBlockToRequestItem( block, parentId, position )
+	);
+	const dataObject = keyBy(
+		dataList,
+		( item ) => `nav_menu_item[${ item.id }]`
+	);
+	return JSON.stringify( dataObject );
+
+	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
+		return innerBlocks.flatMap( ( block, index ) =>
+			[ { block, parentId, position: index + 1 } ].concat(
+				blocksTreeToFlatList(
 					block.innerBlocks,
 					getMenuItemForBlock( block )?.id
 				)
@@ -50,7 +63,7 @@ export default function batchSave( menuId, menuItemsRef, navigationBlock ) {
 		);
 	}
 
-	function linkBlockToRequestData( block, parentId, position ) {
+	function linkBlockToRequestItem( block, parentId, position ) {
 		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
 		return {
 			...menuItem,
@@ -70,8 +83,6 @@ export default function batchSave( menuId, menuItemsRef, navigationBlock ) {
 	function getMenuItemForBlock( block ) {
 		return omit( menuItemsRef.current[ block.clientId ] || {}, '_links' );
 	}
-
-	return request();
 }
 
 function uuidv4() {
