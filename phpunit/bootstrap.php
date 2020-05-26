@@ -45,6 +45,10 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	global $wpdb;
+
+	var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->blogs}" ) );
+
 	require dirname( dirname( __FILE__ ) ) . '/lib/load.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
