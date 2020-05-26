@@ -196,8 +196,8 @@ describe( 'sortGroup', () => {
 			'Enhancements',
 			'New APIs',
 			'Bug Fixes',
-			'Code Quality',
 			'Performance',
+			'Code Quality',
 			'Various',
 		] );
 	} );
