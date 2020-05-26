@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-const debug = require( './debug' );
-const getAssociatedPullRequest = require( './get-associated-pull-request' );
+const debug = require( '../../debug' );
+const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 
 /** @typedef {import('@octokit/rest').HookError} HookError */
 /** @typedef {import('@actions/github').GitHub} GitHub */
