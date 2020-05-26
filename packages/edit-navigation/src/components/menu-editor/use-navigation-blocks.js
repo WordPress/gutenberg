@@ -59,9 +59,11 @@ export default function useNavigationBlocks( menuId ) {
 	useEffect(
 		function() {
 			for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
+				// Already has a related menu item
 				if ( clientId in menuItemsRef.current ) {
 					continue;
 				}
+				// Already being processed
 				if ( processedBlocksIds.current.includes( clientId ) ) {
 					continue;
 				}
