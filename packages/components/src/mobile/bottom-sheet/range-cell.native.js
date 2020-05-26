@@ -201,7 +201,7 @@ class BottomSheetRangeCell extends Component {
 						onBlur={ this.handleToggleFocus }
 						keyboardType="number-pad"
 						returnKeyType="done"
-						value={ `${ this.props.value }` }
+						value={ `${ value }` }
 					/>
 				</View>
 			</Cell>
