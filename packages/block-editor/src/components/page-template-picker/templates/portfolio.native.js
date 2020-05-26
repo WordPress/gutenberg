@@ -197,7 +197,7 @@ const Portfolio = {
 					attributes: {
 						url: '',
 						// translators: sample content for "Portfolio" page template
-						text: __( 'Get in touch!' ),
+						text: __( 'Get in Touch' ),
 						linkTarget: '',
 						rel: '',
 						className: 'aligncenter',

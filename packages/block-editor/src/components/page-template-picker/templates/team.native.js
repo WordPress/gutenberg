@@ -233,7 +233,7 @@ const Team = {
 					attributes: {
 						url: '',
 						// translators: sample content for "Team" page template
-						text: __( 'Get in Touch!' ),
+						text: __( 'Get in Touch' ),
 						borderRadius: 4,
 						className: 'aligncenter',
 					},
