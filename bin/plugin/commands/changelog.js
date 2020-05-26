@@ -466,16 +466,17 @@ async function getChangelog( settings ) {
 	const groupedPullRequests = groupBy( pullRequests, getIssueType );
 	const sortedGroups = Object.keys( groupedPullRequests ).sort( sortGroup );
 	for ( const group of sortedGroups ) {
-		changelog += '### ' + group + '\n\n';
-
 		const groupPullRequests = groupedPullRequests[ group ];
-		for ( const pullRequest of groupPullRequests ) {
-			const entry = getEntry( pullRequest );
-			if ( entry ) {
-				changelog += entry + '\n';
-			}
+		const groupEntries = groupPullRequests
+			.map( getEntry )
+			.filter( Boolean );
+
+		if ( ! groupEntries.length ) {
+			continue;
 		}
 
+		changelog += '### ' + group + '\n\n';
+		groupEntries.forEach( ( entry ) => ( changelog += entry + '\n' ) );
 		changelog += '\n';
 	}
 
