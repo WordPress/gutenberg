@@ -11,7 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 
 const editIcon = (
@@ -41,10 +40,6 @@ function ToolSelector( props, ref ) {
 		[]
 	);
 	const { setNavigationMode } = useDispatch( 'core/block-editor' );
-	const isMediumViewport = useViewportMatch( 'medium' );
-	if ( ! isMediumViewport ) {
-		return null;
-	}
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );

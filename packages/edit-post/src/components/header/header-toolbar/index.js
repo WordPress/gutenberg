@@ -81,9 +81,11 @@ function HeaderToolbar( { onToggleInserter, isInserterOpen } ) {
 					) }
 				</ToolbarItem>
 			) }
-			<ToolbarItem>
-				{ ( itemProps ) => <ToolSelector { ...itemProps } /> }
-			</ToolbarItem>
+			{ isLargeViewport && (
+				<ToolbarItem>
+					{ ( itemProps ) => <ToolSelector { ...itemProps } /> }
+				</ToolbarItem>
+			) }
 			<ToolbarItem>
 				{ ( itemProps ) => <EditorHistoryUndo { ...itemProps } /> }
 			</ToolbarItem>
