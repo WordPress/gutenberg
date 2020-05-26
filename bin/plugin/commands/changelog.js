@@ -77,6 +77,15 @@ const GROUP_TITLE_ORDER = [
 ];
 
 /**
+ * Mapping of patterns to match a title to a grouping type.
+ *
+ * @type {Map<RegExp,string>}
+ */
+const TITLE_TYPE_PATTERNS = new Map( [
+	[ /^(\w+:)?(bug)?\s*fix(es)?(:|\/ )?/i, 'Bug Fixes' ],
+] );
+
+/**
  * Map of common technical terms to a corresponding replacement term more
  * appropriate for release notes.
  *
@@ -124,6 +133,24 @@ function getTypesByLabels( labels ) {
 }
 
 /**
+ * Returns type candidates based on given issue title.
+ *
+ * @param {string} title Issue title.
+ *
+ * @return {string[]} Type candidates.
+ */
+function getTypesByTitle( title ) {
+	const types = [];
+	for ( const [ pattern, type ] of TITLE_TYPE_PATTERNS.entries() ) {
+		if ( pattern.test( title ) ) {
+			types.push( type );
+		}
+	}
+
+	return types;
+}
+
+/**
  * Returns a type label for a given issue object, or a default if type cannot
  * be determined.
  *
@@ -132,9 +159,10 @@ function getTypesByLabels( labels ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
-	const candidates = getTypesByLabels(
-		issue.labels.map( ( { name } ) => name )
-	);
+	const candidates = [
+		...getTypesByLabels( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByTitle( issue.title ),
+	];
 
 	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
 }
@@ -475,4 +503,5 @@ async function getReleaseChangelog( options ) {
 	getIssueType,
 	sortGroup,
 	getTypesByLabels,
+	getTypesByTitle,
 };

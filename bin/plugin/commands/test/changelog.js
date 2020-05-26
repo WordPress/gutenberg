@@ -11,6 +11,7 @@ import {
 	getIssueType,
 	sortGroup,
 	getTypesByLabels,
+	getTypesByTitle,
 } from '../changelog';
 
 describe( 'getNormalizedTitle', () => {
@@ -188,5 +189,22 @@ describe( 'getTypesByLabels', () => {
 		] );
 
 		expect( result ).toEqual( [ 'Bug Fixes', 'Performance' ] );
+	} );
+} );
+
+describe( 'getTypesByTitle', () => {
+	it.each( [
+		[ 'Fix Typography panel rendering from style hooks' ],
+		[ 'fix: unset max-width for reusable blocks' ],
+		[
+			'Bug fix "Cannot read property \'end\' of undefined" on babel-plugin-makepot #21466',
+		],
+		[ 'Editor: Fix "Attempt Recovery" error boundary handler' ],
+		[ 'Fix/Remove edit gallery from media library modal' ],
+		[ 'Fixes a broken dev doc example for plugin Sidebars' ],
+	] )( 'returns bug type by title (%s)', ( title ) => {
+		const result = getTypesByTitle( title );
+
+		expect( result ).toEqual( [ 'Bug Fixes' ] );
 	} );
 } );
