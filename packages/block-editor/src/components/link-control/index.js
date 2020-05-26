@@ -22,7 +22,6 @@ import {
 	Fragment,
 	useEffect,
 	createElement,
-	useMemo,
 } from '@wordpress/element';
 import {
 	safeDecodeURI,
@@ -143,6 +142,7 @@ const makeCancelable = ( promise ) => {
  * @property {WPLinkControlValue=}                  value                  Current link value.
  * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
  *                                                                         the user selects a new link or updates settings.
+ * @property {boolean=}                             noDirectEntry          Whether to disable direct entries or not.
  * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
  * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
  * @property {WPLinkControlCreateSuggestionProp=}   createSuggestion       Handler to manage creation of link value from suggestion.
@@ -156,9 +156,11 @@ const makeCancelable = ( promise ) => {
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
+	searchInputPlaceholder,
 	value,
 	settings,
 	onChange = noop,
+	noDirectEntry = false,
 	showSuggestions = true,
 	showInitialSuggestions,
 	forceIsEditingLink,
@@ -250,32 +252,34 @@ function LinkControl( {
 		setInputValue( val );
 	};
 
-	const handleDirectEntry = ( val ) => {
-		let type = 'URL';
+	const handleDirectEntry = noDirectEntry
+		? () => Promise.resolve( [] )
+		: ( val ) => {
+				let type = 'URL';
 
-		const protocol = getProtocol( val ) || '';
+				const protocol = getProtocol( val ) || '';
 
-		if ( protocol.includes( 'mailto' ) ) {
-			type = 'mailto';
-		}
+				if ( protocol.includes( 'mailto' ) ) {
+					type = 'mailto';
+				}
 
-		if ( protocol.includes( 'tel' ) ) {
-			type = 'tel';
-		}
+				if ( protocol.includes( 'tel' ) ) {
+					type = 'tel';
+				}
 
-		if ( startsWith( val, '#' ) ) {
-			type = 'internal';
-		}
+				if ( startsWith( val, '#' ) ) {
+					type = 'internal';
+				}
 
-		return Promise.resolve( [
-			{
-				id: val,
-				title: val,
-				url: type === 'URL' ? prependHTTP( val ) : val,
-				type,
-			},
-		] );
-	};
+				return Promise.resolve( [
+					{
+						id: val,
+						title: val,
+						url: type === 'URL' ? prependHTTP( val ) : val,
+						type,
+					},
+				] );
+		  };
 
 	const handleEntitySearch = async ( val, args ) => {
 		let results = await Promise.all( [
@@ -408,7 +412,11 @@ function LinkControl( {
 
 	const handleSelectSuggestion = ( suggestion, _value = {} ) => {
 		setIsEditingLink( false );
-		onChange( { ..._value, ...suggestion } );
+		const __value = { ..._value };
+		// Some direct entries don't have types or IDs, and we still need to clear the previous ones.
+		delete __value.type;
+		delete __value.id;
+		onChange( { ...__value, ...suggestion } );
 	};
 
 	// Render Components
@@ -530,10 +538,6 @@ function LinkControl( {
 		);
 	};
 
-	const viewerSlotFillProps = useMemo(
-		() => ( { url: value && value.url } ),
-		[ value && value.url ]
-	);
 	return (
 		<div
 			tabIndex={ -1 }
@@ -548,12 +552,16 @@ function LinkControl( {
 
 			{ ( isEditingLink || ! value ) && ! isResolvingLink && (
 				<LinkControlSearchInput
+					placeholder={ searchInputPlaceholder }
 					value={ inputValue }
 					onChange={ onInputChange }
 					onSelect={ async ( suggestion ) => {
 						if ( CREATE_TYPE === suggestion.type ) {
 							await handleOnCreate( inputValue );
-						} else {
+						} else if (
+							! noDirectEntry ||
+							Object.keys( suggestion ).length > 1
+						) {
 							handleSelectSuggestion( suggestion, value );
 							stopEditing();
 						}
@@ -600,7 +608,7 @@ function LinkControl( {
 						>
 							{ __( 'Edit' ) }
 						</Button>
-						<ViewerSlot fillProps={ viewerSlotFillProps } />
+						<ViewerSlot fillProps={ value } />
 					</div>
 				</Fragment>
 			) }

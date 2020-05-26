@@ -159,7 +159,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			return WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
 		}
 
-		return rest_ensure_response( true );
+		return rest_ensure_response( array( 'success' => true ) );
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getType = require( '../get-type-as-string' );
 

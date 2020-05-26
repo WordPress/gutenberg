@@ -64,12 +64,12 @@ export default function BlockEditor() {
 		'postType',
 		settings.templateType
 	);
-
-	const setActiveTemplateId = useCallback(
-		( newTemplateId ) =>
+	const setActivePageAndTemplateId = useCallback(
+		( { page, templateId } ) =>
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
-				templateId: newTemplateId,
+				page,
+				templateId,
 				templateType: 'wp_template',
 			} ) ),
 		[]
@@ -89,11 +89,13 @@ export default function BlockEditor() {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							activeId={ settings.templateId }
-							onActiveIdChange={ setActiveTemplateId }
+							activePage={ settings.page }
+							onActivePageAndTemplateIdChange={
+								setActivePageAndTemplateId
+							}
 						/>
 					),
-					[ settings.templateId, setActiveTemplateId ]
+					[ settings.page, setActivePageAndTemplateId ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
 			<Sidebar.InspectorFill>

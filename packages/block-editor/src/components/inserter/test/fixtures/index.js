@@ -31,7 +31,7 @@ export const withVariationsItem = {
 	title: 'With Variations',
 	category: 'widgets',
 	isDisabled: false,
-	utility: 0,
+	utility: 1,
 	variations: [
 		{
 			name: 'variation-one',
@@ -75,7 +75,7 @@ export const moreItem = {
 	title: 'More',
 	category: 'layout',
 	isDisabled: true,
-	utility: 0,
+	utility: 1,
 };
 
 export const youtubeItem = {
@@ -86,7 +86,7 @@ export const youtubeItem = {
 	category: 'embed',
 	keywords: [ 'google', 'video' ],
 	isDisabled: false,
-	utility: 0,
+	utility: 1,
 };
 
 export const textEmbedItem = {
@@ -96,7 +96,7 @@ export const textEmbedItem = {
 	title: 'A Text Embed',
 	category: 'embed',
 	isDisabled: false,
-	utility: 0,
+	utility: 1,
 };
 
 export const reusableItem = {
@@ -106,7 +106,7 @@ export const reusableItem = {
 	title: 'My reusable block',
 	category: 'reusable',
 	isDisabled: false,
-	utility: 0,
+	utility: 1,
 };
 
 export default [

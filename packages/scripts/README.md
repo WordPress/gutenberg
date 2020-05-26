@@ -425,6 +425,12 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as mentioned above) to view all of the available options. Learn more in the [Advanced Usage](#advanced-usage) section.
 
+Should there be any situation where you want to provide your own Jest config, you can do so.
+
+* the command receives a `--config` argument. Example: `wp-scripts test-e2e --config my-jest-config.js`.
+* there is a file called `jest-e2e.config.js`, `jest-e2e.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
+* a `jest` object can be provided in the `package.json` file with the test configuration.
+
 ### `test-unit-js`
 
 _Alias_: `test-unit-jest`
@@ -460,6 +466,12 @@ Jest will look for test files with any of the following popular naming conventio
 #### Advanced information
 
 It uses [Jest](https://jestjs.io/) behind the scenes and you are able to use all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:unit --help` or `npm run test:unit:help` (as mentioned above) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+Should there be any situation where you want to provide your own Jest config, you can do so.
+
+* the command receives a `--config` argument. Example: `wp-scripts test-unit --config my-jest-config.js`.
+* there is a file called `jest-unit.config.js`, `jest-unit.config.json`, `jest.config.js`, or `jest.config.json` in the top-level directory of your package (at the same level than your `package.json`).
+* a `jest` object can be provided in the `package.json` file with the test configuration.
 
 ## Passing Node.js options
 

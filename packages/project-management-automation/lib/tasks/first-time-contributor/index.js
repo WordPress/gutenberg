@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-const debug = require( './debug' );
-const getAssociatedPullRequest = require( './get-associated-pull-request' );
-const hasWordPressProfile = require( './has-wordpress-profile' );
+const debug = require( '../../debug' );
+const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
+const hasWordPressProfile = require( '../../has-wordpress-profile' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
-/** @typedef {import('./get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * Returns the message text to be used for the comment prompting contributor to

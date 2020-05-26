@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Node dependencies.
+ * External dependencies
  */
 const { extname } = require( 'path' );
 const chalk = require( 'chalk' );
