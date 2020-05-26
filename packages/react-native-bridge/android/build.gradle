@@ -151,7 +151,7 @@ dependencies {
 
         implementation 'com.facebook.react:react-native:+'
     } else {
-        hermesPath = "../../react-native-editor/bundle/android/";
+        hermesPath = "./vendor/hermes-engine/";
 
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../react-native-editor/package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-video', readHashedVersion('../../react-native-editor/package.json', 'react-native-video', 'dependencies')))
