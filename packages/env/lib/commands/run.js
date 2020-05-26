@@ -24,7 +24,6 @@ const initConfig = require( '../init-config' );
 module.exports = async function run( { container, command, spinner, debug } ) {
 	const config = await initConfig( { spinner, debug } );
 
-	spinner.info( typeof container );
 	command = command.join( ' ' );
 
 	// Shows a contextual tip for the given command.
@@ -74,7 +73,9 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 		);
 		childProc.on( 'error', reject );
 		childProc.on( 'exit', ( code ) => {
-			if ( code === 0 ) {
+			// Code 130 is set if the user tries to exit with ctrl-c before using
+			// ctrl-d (so it is not an error which should fail the script.)
+			if ( code === 0 || code === 130 ) {
 				resolve();
 			} else {
 				reject( `Command failed with exit code ${ code }` );
