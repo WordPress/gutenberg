@@ -91,6 +91,12 @@ describe( 'addTrailingPeriod', () => {
 
 		expect( result ).toBe( 'Fixes a bug.' );
 	} );
+
+	it( 'trims trailing whitespace before appending period', () => {
+		const result = addTrailingPeriod( 'Fixes a bug ' );
+
+		expect( result ).toBe( 'Fixes a bug.' );
+	} );
 } );
 
 describe( 'createOmitByTitlePrefix', () => {

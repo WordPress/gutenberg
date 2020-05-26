@@ -194,11 +194,7 @@ function sortGroup( a, b ) {
  * @return {string} Text with trailing period.
  */
 function addTrailingPeriod( text ) {
-	if ( ! text.endsWith( '.' ) ) {
-		text += '.';
-	}
-
-	return text;
+	return text.replace( /\s*\.?$/, '' ) + '.';
 }
 
 /**
