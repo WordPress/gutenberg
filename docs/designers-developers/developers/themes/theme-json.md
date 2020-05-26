@@ -14,7 +14,7 @@ This is documentation for the current direction and work in progress about how t
 
 The Block Editor surface API has evolved at different velocities, and it's now at a point where is showing some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
 
-This describes the current efforts to consolidate the various APIs into a single point: a `experimental-theme.json` file.
+This describes the current efforts to consolidate the various APIs into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
 When this file is present a few Block Editor mechanisms are activated.
 
@@ -38,13 +38,13 @@ The specification for the `experimental-theme.json` follows the three main funct
 
 ```
 {
-  presets: {
-    color: [ ... ],
-    font-size: [ ... ],
-    gradient: [ ... ],
+  "presets": {
+    "color": [ ... ],
+    "font-size": [ ... ],
+    "gradient": [ ... ],
   },
-  styles: { ... },
-  features: { ... }
+  "styles": { ... },
+  "features": {... }
 }
 ```
 
@@ -52,20 +52,20 @@ The file is divided into sections that represent different contexts: individual 
 
 ```
 {
-  global: {
-    presets: { ... },
-    styles: { ... },
-    features: { ... }
+  "global": {
+    "presets": { ... },
+    "styles": { ... },
+    "features": { ... }
   },
-  core/paragraph: {
-    presets: { ... },
-    styles: { ... },
-    features: { ... }
+  "core/paragraph": {
+    "presets": { ... },
+    "styles": { ... },
+    "features": { ... }
   },
-  core/group: {
-    presets: { ... },
-    styles: { ... },
-    features: { ... }
+  "core/group": {
+    "presets": { ... },
+    "styles": { ... },
+    "features": { ... }
   }
 }
 ```
@@ -74,19 +74,25 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
 
 ```
 {
-  global: {
-    features: {
-      dropCap: false
+  "global": {
+    "features": {
+			"typography": {
+        "dropCap": false
+			}
     }
   },
-  core/paragraph: {
-    features: {
-      dropCap: true,
+  "core/paragraph": {
+    "features": {
+      "typography": {
+        "dropCap": true
+			}
     }
   },
-  core/image: {
-    features: {
-      dropCap: true
+  "core/image": {
+    "features": {
+      "typography": {
+        "dropCap": true
+			}
     }
   }
 }
@@ -105,17 +111,17 @@ The generated CSS Custom Properties follow this naming schema: `--wp--preset--{p
 For this input:
 
 ```
-presets: {
-  color: [
+"presets": {
+  "color": [
     {
-      slug: 'strong-magenta',
-      value: #a156b4,
+      "slug": "strong-magenta",
+      "value": "#a156b4"
     },
     {
-      slug: 'very-dark-grey',
-      value: #444,
+      "slug": "very-dark-grey",
+      "value": "#444"
     }
-  ],
+  ]
 }
 ```
 
