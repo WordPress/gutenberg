@@ -94,17 +94,26 @@ function ToolbarGroup( {
 	return (
 		<ToolbarGroupContainer className={ finalClassName } { ...props }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
-				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButton
-						key={ [ indexOfSet, indexOfControl ].join() }
-						containerClassName={
-							indexOfSet > 0 && indexOfControl === 0
-								? 'has-left-divider'
-								: null
-						}
-						{ ...control }
-					/>
-				) )
+				controlSet.map( ( control, indexOfControl ) => {
+					const {
+						title: controlTitle,
+						isActive,
+						...controlProps
+					} = control;
+					return (
+						<ToolbarButton
+							key={ [ indexOfSet, indexOfControl ].join() }
+							containerClassName={
+								indexOfSet > 0 && indexOfControl === 0
+									? 'has-left-divider'
+									: null
+							}
+							label={ controlTitle }
+							isPressed={ isActive }
+							{ ...controlProps }
+						/>
+					);
+				} )
 			) }
 			{ children }
 		</ToolbarGroupContainer>
