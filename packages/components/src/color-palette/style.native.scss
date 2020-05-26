@@ -30,11 +30,14 @@
 }
 
 .customText {
-	letter-spacing: 1.25;
 	font-size: 16px;
 	color: $gray-dark;
 }
 
 .customTextDark {
 	color: $white;
+}
+
+.customTextLetterSpacing {
+	letter-spacing: 1.25;
 }

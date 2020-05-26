@@ -41,7 +41,6 @@ function ColorSettings( {
 	const [ isCustomGradientScreen, setIsCustomGradientScreen ] = useState(
 		false
 	);
-	const [ shouldScrollToEnd, setShouldScrollToEnd ] = useState( false );
 
 	const { segments, subsheets, isGradient } = colorsUtils;
 	const isGradientColor = isGradient( currentValue );
@@ -170,10 +169,7 @@ function ColorSettings( {
 						setColor={ setColor }
 						activeColor={ currentValue }
 						isGradientColor={ isGradientColor }
-						onNavigationBack={ () => {
-							setShouldScrollToEnd( true );
-							onCustomScreenToggle( false );
-						} }
+						onNavigationBack={ () => onCustomScreenToggle( false ) }
 						onCloseBottomSheet={ onCloseBottomSheet }
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
@@ -199,7 +195,6 @@ function ColorSettings( {
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
-						shouldScrollToEnd={ shouldScrollToEnd }
 						defaultSettings={ defaultSettings }
 					/>
 					{ isCustomGadientShown && (
@@ -224,10 +219,9 @@ function ColorSettings( {
 				<View>
 					<NavigationHeader
 						screen={ __( 'Customize Gradient' ) }
-						leftButtonOnPress={ () => {
-							setShouldScrollToEnd( true );
-							onCustomGradientScreenToggle( false );
-						} }
+						leftButtonOnPress={ () =>
+							onCustomGradientScreenToggle( false )
+						}
 					/>
 					<CustomGradientPicker
 						setColor={ setColor }

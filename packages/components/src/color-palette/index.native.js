@@ -40,7 +40,6 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
-	shouldScrollToEnd,
 } ) {
 	const customSwatchGradients = [
 		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
@@ -99,6 +98,7 @@ function ColorPalette( {
 		return Animated.timing( property, {
 			toValue,
 			duration: ANIMATION_DURATION,
+			useNativeDriver: true,
 			easing: Easing.ease,
 		} );
 	}
@@ -124,6 +124,7 @@ function ColorPalette( {
 			contentWidth - scrollPosition - customIndicatorWidth < width;
 
 		if ( isCustomGradientColor ) {
+			performLayoutAnimation();
 			if ( ! isIOS ) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504
@@ -137,7 +138,7 @@ function ColorPalette( {
 						x: scrollPosition - customIndicatorWidth,
 					} );
 				}
-			} else performLayoutAnimation();
+			}
 		}
 	}
 
@@ -149,12 +150,8 @@ function ColorPalette( {
 
 	function onContentSizeChange( width ) {
 		contentWidth = width;
-		if (
-			shouldScrollToEnd &&
-			isSelectedCustom() &&
-			scrollViewRef.current
-		) {
-			scrollViewRef.current.scrollToEnd();
+		if ( isSelectedCustom() && scrollViewRef.current ) {
+			scrollViewRef.current.scrollToEnd( { animated: ! isIOS } );
 		}
 	}
 
@@ -171,7 +168,7 @@ function ColorPalette( {
 	);
 
 	const customTextStyle = usePreferredColorSchemeStyle(
-		styles.customText,
+		[ styles.customText, ! isIOS && styles.customTextLetterSpacing ],
 		styles.customTextDark
 	);
 
@@ -221,7 +218,10 @@ function ColorPalette( {
 				);
 			} ) }
 			{ shouldShowCustomIndicator && (
-				<>
+				<View
+					style={ styles.customIndicatorWrapper }
+					onLayout={ onCustomIndicatorLayout }
+				>
 					<View style={ verticalSeparatorStyle } />
 					<TouchableWithoutFeedback
 						onPress={ onCustomPress }
@@ -229,10 +229,7 @@ function ColorPalette( {
 						accessibilityState={ { selected: isSelectedCustom() } }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View
-							style={ styles.customIndicatorWrapper }
-							onLayout={ onCustomIndicatorLayout }
-						>
+						<View style={ styles.customIndicatorWrapper }>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
@@ -244,7 +241,7 @@ function ColorPalette( {
 							</Text>
 						</View>
 					</TouchableWithoutFeedback>
-				</>
+				</View>
 			) }
 		</ScrollView>
 	);
