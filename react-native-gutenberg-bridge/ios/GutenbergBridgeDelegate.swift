@@ -160,7 +160,6 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
     
-    
     /// Tells the delegate that the editor needs to log a custom event
     /// - Parameter event: The event key to be logged
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
@@ -168,6 +167,13 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested a mention
     /// - Parameter callback: Completion handler to be called with an user mention or an error
     func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
+
+    /// Tells the delegate that the editor requested to show the tooltip
+    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool
+    
+    /// Tells the delegate that the editor requested to set the tooltip's visibility
+    /// - Parameter tooltipShown: Tooltip's visibility value    
+    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
