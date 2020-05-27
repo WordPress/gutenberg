@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { kebabCase } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -83,16 +88,23 @@ const openEntitySavePanel = async () => {
 	// Open the entity save panel if it is not already open.
 	try {
 		await page.waitForSelector( '.entities-saved-states__panel', {
-			timeout: 100,
+			timeout: 500,
 		} );
 	} catch {
 		try {
 			await page.click(
 				'.edit-site-save-button__button[aria-disabled=false]',
-				{ timeout: 100 }
+				{ timeout: 500 }
 			);
 		} catch {
-			return false; // Not dirty because the button is disabled.
+			try {
+				await page.click(
+					'.editor-post-publish-button__button.has-changes-dot',
+					{ timeout: 500 }
+				);
+			} catch {
+				return false; // Not dirty because the button is disabled.
+			}
 		}
 		await page.waitForSelector( '.entities-saved-states__panel' );
 	}
@@ -112,13 +124,6 @@ const openEntitySavePanel = async () => {
 	return true;
 };
 
-const clickBreadcrumbItem = async ( item ) => {
-	const [ breadcrumbItem ] = await page.$x(
-		`//button[contains(@class, "block-editor-block-breadcrumb__button")][contains(text(), "${ item }")]`
-	);
-	await breadcrumbItem.click();
-};
-
 const isEntityDirty = async ( name ) => {
 	const isOpen = await openEntitySavePanel();
 	if ( ! isOpen ) {
@@ -127,7 +132,7 @@ const isEntityDirty = async ( name ) => {
 	try {
 		await page.waitForXPath(
 			`//label[@class="components-checkbox-control__label"]//strong[contains(text(),"${ name }")]`,
-			{ timeout: 500 }
+			{ timeout: 1000 }
 		);
 		return true;
 	} catch {}
@@ -196,10 +201,9 @@ describe( 'Multi-entity editor states', () => {
 			await trashExistingPosts( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
-				title: templateName,
+				title: kebabCase( templateName ),
 			} );
 			await publishPost();
-			await visitSiteEditor();
 			await createTemplatePart( templatePartName );
 			await editTemplatePart( [
 				'Default template part test text.',
@@ -211,6 +215,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
+			await visitSiteEditor();
 			removeErrorMocks();
 		} );
 
@@ -221,7 +226,6 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the block is not added to the template part.
-			await clickBreadcrumbItem( 'Document' );
 			await insertBlock( 'Paragraph' );
 
 			// Add changes to the main parent entity.
