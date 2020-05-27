@@ -6,7 +6,7 @@ import { groupBy, sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { parse, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -99,7 +99,7 @@ function createNavigationBlock( menuItems ) {
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = convertMenuItemToLinkBlock(
+			const linkBlock = convertMenuItemToBlock(
 				item,
 				menuItemInnerBlocks
 			);
@@ -115,7 +115,19 @@ function createNavigationBlock( menuItems ) {
 	return [ navigationBlock, menuItemIdToClientId ];
 }
 
-function convertMenuItemToLinkBlock( menuItem, innerBlocks = [] ) {
+function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
+	if ( menuItem.type === 'html' ) {
+		const parsedBlocks = parse( menuItem.content.raw );
+
+		if ( parsedBlocks.length !== 1 ) {
+			return createBlock( 'core/freeform', {
+				originalContent: menuItem.content.raw,
+			} );
+		}
+
+		return parsedBlocks[ 0 ];
+	}
+
 	const attributes = {
 		label: menuItem.title.rendered,
 		url: menuItem.url,
