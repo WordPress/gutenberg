@@ -356,6 +356,36 @@ Block type editor style definition. It will only be enqueued in the context of t
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
 
+### Provides Context
+
+* Type: `object`
+* Optional
+* Localized: No
+* Property: `providesContext`
+
+Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{ "providesContext": { "my-plugin/recordId": "recordId" } }
+```
+
+### Context
+
+* Type: `string[]`
+* Optional
+* Localized: No
+* Property: `context`
+
+Array of the names of context values to inherit from an ancestor provider.
+
+See [the block context documentation](/docs/designers-developers/developers/block-api/block-context.md) for more details.
+
+```json
+{ "context": [ "my-plugin/recordId" ] }
+```
+
 ## Backward compatibility
 
 The following properties are going to be supported for backward compatibility reasons on the client-side only. Some of them might be replaced with alternative APIs in the future:
