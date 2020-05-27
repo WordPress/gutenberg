@@ -45,20 +45,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 }
 
 /**
- * Extends block editor settings to determine whether to use drop cap feature.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = false;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
-
-
-/**
  * Extends block editor settings to include a list of image dimensions per size.
  *
  * This can be removed when plugin support requires WordPress 5.4.0+.
