@@ -1,3 +1,7 @@
+1.28.2
+------
+* [***] Disable Pullquote Block on Android
+
 1.28.1
 ------
 * [**] Avoid crash when editor selection state becomes invalid
