@@ -4,7 +4,12 @@
 import classnames from 'classnames';
 import { Resizable } from 're-resizable';
 
-function ResizableBox( { className, showHandle = true, ...props } ) {
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+function ResizableBox( { className, showHandle = true, ...props }, ref ) {
 	// Removes the inline styles in the drag handles.
 	const handleStylesOverrides = {
 		width: null,
@@ -26,6 +31,7 @@ function ResizableBox( { className, showHandle = true, ...props } ) {
 				showHandle && 'has-show-handle',
 				className
 			) }
+			ref={ ref }
 			handleClasses={ {
 				top: classnames(
 					handleClassName,
@@ -87,4 +93,4 @@ function ResizableBox( { className, showHandle = true, ...props } ) {
 	);
 }
 
-export default ResizableBox;
+export default forwardRef( ResizableBox );

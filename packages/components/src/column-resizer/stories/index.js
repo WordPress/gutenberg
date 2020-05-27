@@ -13,6 +13,7 @@ import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import ResizableBox from '../../resizable-box';
+import { color } from '../../utils/style-mixins';
 
 export default { title: 'Components/ColumnResizer' };
 
@@ -20,12 +21,15 @@ const GRID_SIZE = 12;
 
 function ResizableBoxWrapper( props ) {
 	const {
+		changeValue,
 		children,
 		isGrid,
 		onResizeStart = noop,
 		onResizeStop = noop,
 		onResize = noop,
-		onChange = noop,
+		onChange,
+		size = {},
+		isLast,
 		...otherProps
 	} = props;
 	const resizableRef = useRef();
@@ -42,6 +46,12 @@ function ResizableBoxWrapper( props ) {
 	const updateShiftStep = useCallback( () => {
 		setGridSteps( getGridWidths( { ref: resizableRef } ) );
 	} );
+
+	useEffect( () => {
+		if ( size.width ) {
+			setWidth( size.width );
+		}
+	}, [ size.width ] );
 
 	useEffect( () => {
 		updateShiftStep();
@@ -67,13 +77,13 @@ function ResizableBoxWrapper( props ) {
 	};
 	const style = {
 		...props?.style,
-		flex: width !== undefined ? null : 1,
+		flex: width === undefined || isLast ? 1 : null,
 	};
 
 	const handleOnResize = ( event, direction, node, delta ) => {
 		const { shiftKey } = event;
 		const dw = delta.width;
-		const nextWidth = tempWidth + dw;
+		const nextWidth = Math.round( tempWidth + dw );
 
 		if ( isGrid ) {
 			setGrid( [ gridStep, 1 ] );
@@ -82,21 +92,35 @@ function ResizableBoxWrapper( props ) {
 		}
 
 		onResize( event, direction, node, delta );
-		if ( nextWidth !== width ) {
-			setWidth( nextWidth );
 
+		if ( nextWidth !== width ) {
 			let onChangeWidth = nextWidth;
+
 			const data = {
+				containerWidth: getContainerNodeWidth( { ref: resizableRef } ),
+				gridSteps,
 				width: nextWidth,
 			};
 
 			if ( isGrid ) {
-				const columnValue = getNearestValue( gridSteps, nextWidth );
-				const column = gridSteps.indexOf( columnValue ) + 1;
+				const column = getColumnValue( {
+					gridSteps,
+					width: nextWidth,
+				} );
+
 				data.column = column;
-				onChangeWidth = `${ ( column / GRID_SIZE ) * 100 }%`;
+
+				onChangeWidth = getGridWidthValue( {
+					gridSteps,
+					width: nextWidth,
+				} );
 			}
-			onChange( onChangeWidth, { event, ...data } );
+
+			if ( ! onChange ) {
+				setWidth( nextWidth );
+			} else {
+				onChange( onChangeWidth, { event, ...data } );
+			}
 		}
 	};
 
@@ -122,16 +146,64 @@ function ResizableBoxWrapper( props ) {
 			onResizeStop={ handleOnResizeStop }
 			onResize={ handleOnResize }
 			grid={ resizableGrid }
-			minWidth="16.6667%"
-			maxWidth="83.3334%"
+			minWidth="8.3334%"
+			maxWidth="91.6667%"
 		>
+			<ResizableVisualizer
+				changeValue={ changeValue }
+				width={ width }
+				gridSteps={ gridSteps }
+				isGrid={ isGrid }
+			/>
 			{ children }
 		</ResizableBox>
 	);
 }
 
+function ResizableVisualizer( { changeValue, isGrid, gridSteps = [] } ) {
+	const nodeRef = useRef();
+	const { isActive } = useDebouncedAnimation( changeValue );
+
+	const getWidthLabel = () => {
+		const width = nodeRef?.current?.clientWidth;
+		if ( ! width ) return;
+
+		return isGrid
+			? getGridWidthValue( {
+					gridSteps,
+					width,
+			  } )
+			: Math.round( width );
+	};
+
+	const [ widthLabel, setWidthLabel ] = useState();
+
+	useEffect( () => {
+		setWidthLabel( getWidthLabel() );
+	}, [ changeValue ] );
+
+	return (
+		<VisualizerView ref={ nodeRef } isActive={ isActive }>
+			<VizLabelView>{ widthLabel }</VizLabelView>
+		</VisualizerView>
+	);
+}
+
 export const _default = () => {
 	const [ isGrid, setIsGrid ] = useState( true );
+	const [ changeValue, setChangeValue ] = useState( 0 );
+	const [ columnWidths, setColumnWidths ] = useState( [
+		'25%',
+		'50%',
+		'25%',
+	] );
+
+	const handleOnChange = ( index ) => ( nextValue ) => {
+		const nextWidths = [ ...columnWidths ];
+		nextWidths[ index ] = nextValue;
+		setColumnWidths( nextWidths );
+		setChangeValue( changeValue + 1 );
+	};
 
 	return (
 		<>
@@ -139,16 +211,39 @@ export const _default = () => {
 				Grid ({ isGrid ? 'ON' : 'OFF' })
 			</button>
 			<hr />
+			<br />
+			<br />
+			<br />
+			<br />
 			<ContainerView>
 				<ResizableBoxWrapper
+					changeValue={ changeValue }
 					isGrid={ isGrid }
+					size={ { width: columnWidths[ 0 ] } }
+					onChange={ handleOnChange( 0 ) }
 					enable={ {
 						right: true,
 					} }
 				>
 					<BoxView />
 				</ResizableBoxWrapper>
-				<ResizableBoxWrapper isGrid={ isGrid }>
+				<ResizableBoxWrapper
+					changeValue={ changeValue }
+					isGrid={ isGrid }
+					size={ { width: columnWidths[ 1 ] } }
+					onChange={ handleOnChange( 1 ) }
+					enable={ {
+						right: true,
+					} }
+				>
+					<BoxView />
+				</ResizableBoxWrapper>
+				<ResizableBoxWrapper
+					changeValue={ changeValue }
+					isGrid={ isGrid }
+					size={ { width: columnWidths[ 2 ] } }
+					isLast
+				>
 					<BoxView />
 				</ResizableBoxWrapper>
 			</ContainerView>
@@ -166,8 +261,44 @@ const BoxView = styled.div`
 	border: 2px solid #ccc;
 `;
 
-function getContainerNodeWidth( { ref } ) {
+const VisualizerView = styled.div`
+	position: absolute;
+	filter: brightness( 2 );
+	border: 1px solid ${color( 'ui.brand' )};
+	border-bottom: none;
+	top: -7px;
+	left: 1px;
+	right: 1px;
+	pointer-events: none;
+	opacity: 0;
+	height: 5px;
+	pointer-events: none;
+	transition: opacity 120ms linear;
+	z-index: 10;
+
+	${( { isActive } ) =>
+		isActive &&
+		`
+		opacity: 1;
+	`}
+`;
+
+const VizLabelView = styled.div`
+	text-align: center;
+	color: ${color( 'ui.brand' )};
+	font-size: 11px;
+	top: -15px;
+	position: relative;
+`;
+
+function getContainerNode( { ref } ) {
 	const containerNode = ref?.current?.resizable?.parentElement;
+
+	return containerNode;
+}
+
+function getContainerNodeWidth( { ref } ) {
+	const containerNode = getContainerNode( { ref } );
 	const containerWidth = containerNode.getBoundingClientRect().width;
 
 	return containerWidth;
@@ -186,10 +317,60 @@ function getGridWidths( { ref } ) {
 	return gridWidths;
 }
 
-function getNearestValue( values, value ) {
+function getNearestValue( values = [], value = 0 ) {
 	return values.reduce( ( prev, curr ) => {
 		return Math.abs( curr - value ) < Math.abs( prev - value )
 			? curr
 			: prev;
-	} );
+	}, [] );
+}
+
+function getColumnValue( { gridSteps, width } ) {
+	const columnValue = getNearestValue( gridSteps, width );
+	return gridSteps.indexOf( columnValue ) + 1;
+}
+
+function getGridWidthValue( { gridSteps, width } ) {
+	const columnValue = getColumnValue( { gridSteps, width } );
+
+	let widthValue = ( columnValue / GRID_SIZE ) * 100;
+	widthValue = `${ widthValue.toFixed( 2 ) }%`;
+
+	return widthValue;
+}
+
+/**
+ * Custom hook that renders the "flash" animation whenever the value changes.
+ *
+ * @param {string} value Value of (box) side.
+ */
+function useDebouncedAnimation( value ) {
+	const [ isActive, setIsActive ] = useState( false );
+	const valueRef = useRef( value );
+	const timeoutRef = useRef();
+
+	const clearTimer = () => {
+		if ( timeoutRef.current ) {
+			window.clearTimeout( timeoutRef.current );
+		}
+	};
+
+	useEffect( () => {
+		if ( value !== valueRef.current ) {
+			setIsActive( true );
+			valueRef.current = value;
+
+			clearTimer();
+
+			timeoutRef.current = setTimeout( () => {
+				setIsActive( false );
+			}, 800 );
+		}
+
+		return () => clearTimer();
+	}, [ value ] );
+
+	return {
+		isActive,
+	};
 }
