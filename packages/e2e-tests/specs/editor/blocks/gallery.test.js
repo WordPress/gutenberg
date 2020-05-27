@@ -67,5 +67,8 @@ describe( 'Gallery', () => {
 
 		expect( mediaLibraryHeaderText ).toBe( 'Create Gallery' );
 		expect( mediaLibraryButtonText ).toBe( 'Create a new gallery' );
+
+		// Unfortunately the Media Library has invalid HTML.
+		await expect( page ).not.toPassAxeTests();
 	} );
 } );
