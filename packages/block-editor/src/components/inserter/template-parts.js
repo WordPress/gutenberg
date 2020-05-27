@@ -11,11 +11,18 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import BlockPreview from '../block-preview';
 import InserterPanel from './panel';
+import useAsyncList from './use-async-list';
 
 /**
  * External dependencies
  */
 import { groupBy } from 'lodash';
+
+function TemplatePartPlaceholder() {
+	return (
+		<div className="block-editor-inserter__template-part-item is-placeholder" />
+	);
+}
 
 function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
@@ -64,10 +71,11 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 }
 
 function TemplatePartsByTheme( { templateParts, onInsert } ) {
-	// Group by Theme.
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
+
+	const currentShownTPs = useAsyncList( templateParts );
 
 	return (
 		<>
@@ -77,13 +85,19 @@ function TemplatePartsByTheme( { templateParts, onInsert } ) {
 						key={ templatePartList[ 0 ].meta.theme }
 						title={ templatePartList[ 0 ].meta.theme }
 					>
-						{ templatePartList.map( ( templatePart ) => (
-							<TemplatePartItem
-								key={ templatePart.id }
-								templatePart={ templatePart }
-								onInsert={ onInsert }
-							/>
-						) ) }
+						{ templatePartList.map( ( templatePart ) => {
+							return currentShownTPs.includes( templatePart ) ? (
+								<TemplatePartItem
+									key={ templatePart.id }
+									templatePart={ templatePart }
+									onInsert={ onInsert }
+								/>
+							) : (
+								<TemplatePartPlaceholder
+									key={ templatePart.id }
+								/>
+							);
+						} ) }
 					</InserterPanel>
 				) ) }
 		</>
@@ -124,6 +138,8 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 		return thing;
 	}, [ filterValue, templateParts ] );
 
+	const currentShownTPs = useAsyncList( filteredTPs );
+
 	return (
 		<>
 			{ filteredTPs.map( ( templatePart ) => (
@@ -131,11 +147,15 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 					key={ templatePart.id }
 					title={ templatePart.meta.theme }
 				>
-					<TemplatePartItem
-						key={ templatePart.id }
-						templatePart={ templatePart }
-						onInsert={ onInsert }
-					/>
+					{ currentShownTPs.includes( templatePart ) ? (
+						<TemplatePartItem
+							key={ templatePart.id }
+							templatePart={ templatePart }
+							onInsert={ onInsert }
+						/>
+					) : (
+						<TemplatePartPlaceholder key={ templatePart.id } />
+					) }
 				</InserterPanel>
 			) ) }
 		</>
@@ -152,6 +172,10 @@ export default function TemplateParts( { onInsert, filterValue } ) {
 			}
 		);
 	}, [] );
+
+	if ( ! templateParts || ! templateParts.length ) {
+		return null;
+	}
 
 	if ( filterValue ) {
 		return (
