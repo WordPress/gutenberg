@@ -24,19 +24,10 @@ figure.wp-block-image:not(.wp-block) {
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image .components-resizable-box__container {
-	display: inline-block;
-
-	img {
-		display: block;
-		width: inherit;
-		height: inherit;
-	}
-}
-
-// Ensure the resize handles are visible when the image is focused.
-.wp-block-image.is-focused .components-resizable-box__handle {
+.wp-block-image .components-resizable-box__container img {
 	display: block;
+	width: inherit;
+	height: inherit;
 }
 
 .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {

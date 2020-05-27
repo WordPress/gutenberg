@@ -50,7 +50,7 @@
 }
 
 .edit-navigation-menu-editor__navigation-structure-panel {
-	// IE11 requires the column to be explicity declared.
+	// IE11 requires the column to be explicitly declared.
 	grid-column: 1;
 
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
@@ -59,7 +59,7 @@
 
 .edit-navigation-menu-editor__block-editor-panel {
 	@include break-medium {
-		// IE11 requires the column to be explicity declared.
+		// IE11 requires the column to be explicitly declared.
 		// Only shift this into the second column on desktop.
 		grid-column: 2;
 	}

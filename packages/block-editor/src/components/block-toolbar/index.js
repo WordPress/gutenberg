@@ -12,6 +12,7 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import BlockParentSelector from '../block-parent-selector';
 import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
@@ -88,6 +89,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
+		shouldShowMovers && 'is-showing-movers',
 		! displayHeaderToolbar && 'has-responsive-movers'
 	);
 
@@ -97,6 +99,12 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				className="block-editor-block-toolbar__mover-switcher-container"
 				ref={ nodeRef }
 			>
+				{ ! isMultiToolbar && (
+					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
+						<BlockParentSelector clientIds={ blockClientIds } />
+					</div>
+				) }
+
 				<div
 					className="block-editor-block-toolbar__mover-trigger-container"
 					{ ...showMoversGestures }
@@ -112,6 +120,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 						/>
 					</div>
 				</div>
+
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<div
 						{ ...showMoversGestures }
@@ -121,6 +130,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 					</div>
 				) }
 			</div>
+
 			{ shouldShowVisualToolbar && ! isMultiToolbar && (
 				<>
 					<BlockControls.Slot

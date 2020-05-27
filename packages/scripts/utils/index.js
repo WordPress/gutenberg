@@ -13,6 +13,7 @@ const {
 const {
 	getWebpackArgs,
 	hasBabelConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
 } = require( './config' );
@@ -36,6 +37,7 @@ module.exports = {
 	hasBabelConfig,
 	hasArgInCLI,
 	hasFileArgInCLI,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPackageProp,
 	hasPrettierConfig,

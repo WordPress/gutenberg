@@ -12,6 +12,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import { URLInput } from '../';
 
 const LinkControlSearchInput = ( {
+	placeholder,
 	value,
 	onChange,
 	onSelect,
@@ -50,7 +51,7 @@ const LinkControlSearchInput = ( {
 					className="block-editor-link-control__search-input"
 					value={ value }
 					onChange={ selectItemHandler }
-					placeholder={ __( 'Search or type url' ) }
+					placeholder={ placeholder ?? __( 'Search or type url' ) }
 					__experimentalRenderSuggestions={ renderSuggestions }
 					__experimentalFetchLinkSuggestions={ fetchSuggestions }
 					__experimentalHandleURLSuggestions={ true }

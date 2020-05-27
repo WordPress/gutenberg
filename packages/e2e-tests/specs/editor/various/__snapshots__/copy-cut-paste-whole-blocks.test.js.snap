@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Multi-block selection should copy and paste individual blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>Here is a unique string so we can test copying.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should copy and paste individual blocks 2`] = `
+"<!-- wp:paragraph -->
+<p>Here is a unique string so we can test copying.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Here is a unique string so we can test copying.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should cut and paste individual blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should cut and paste individual blocks 2`] = `
+"<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Yet another unique string.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should respect inline copy when text is selected 1`] = `
+"<!-- wp:paragraph -->
+<p>First block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second block</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should respect inline copy when text is selected 2`] = `
+"<!-- wp:paragraph -->
+<p>First block</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ck</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second block</p>
+<!-- /wp:paragraph -->"
+`;

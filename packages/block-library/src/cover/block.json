@@ -40,6 +40,14 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"contentPosition": {
+			"type": "string"
 		}
+	},
+	"supports": {
+		"align": true,
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

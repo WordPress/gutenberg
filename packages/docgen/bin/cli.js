@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/**
+ * Internal dependencies
+ */
 const docgen = require( '../src' );
 
 const optionator = require( 'optionator' )( {
