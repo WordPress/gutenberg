@@ -125,6 +125,7 @@ export default function BlockNavigationBlock( {
 							<BlockSettingsDropdown
 								clientIds={ [ clientId ] }
 								icon={ moreVertical }
+								contexts={ [ 'default', 'navigator' ] }
 								{ ...props }
 							/>
 						) }

@@ -17,8 +17,13 @@ import { BlockListBlockContext } from '../block-list/block';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const getSlotName = ( clientId ) => `BlockSettings-${ clientId }`;
-const BlockSettingsMenuControlsSlots = ( { fillProps, clientIds = null } ) => {
+const getSlotName = ( context, clientId = null ) =>
+	`BlockSettings-${ context }-${ clientId ? clientId : '' }`;
+const BlockSettingsMenuControlsSlots = ( {
+	fillProps,
+	context = 'default',
+	clientIds = null,
+} ) => {
 	const { selectedBlocks } = useSelect( ( select ) => {
 		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
 			'core/block-editor'
@@ -36,11 +41,14 @@ const BlockSettingsMenuControlsSlots = ( { fillProps, clientIds = null } ) => {
 	const slotProps = { ...fillProps, selectedBlocks };
 	return (
 		<>
-			<BlockSettingsMenuControlsSlot { ...slotProps } />
+			<BlockSettingsMenuControlsSlot
+				{ ...slotProps }
+				name={ getSlotName( context ) }
+			/>
 			{ clientIds.length === 1 && (
 				<BlockSettingsMenuControlsSlot
 					{ ...slotProps }
-					name={ getSlotName( clientIds[ 0 ] ) }
+					name={ getSlotName( context, clientIds[ 0 ] ) }
 				/>
 			) }
 		</>
@@ -55,16 +63,16 @@ const BlockSettingsMenuControlsSlot = ( props ) => (
 
 export const BlockSettingsMenuControls = ( {
 	forAllBlocks = false,
+	context = 'default',
 	...fillProps
 } ) => {
-	const context = useContext( BlockListBlockContext );
+	const blockContext = useContext( BlockListBlockContext );
+	let clientId;
 	if ( ! forAllBlocks ) {
-		// Let's use non-existent ID in case the context is missing
-		const clientId = context?.clientId || 'non-such-id';
-		fillProps.name = getSlotName( clientId );
+		// Let's use non-existent ID in case the block context is missing
+		clientId = blockContext?.clientId || 'non-such-id';
 	}
-
-	return <Fill { ...fillProps } />;
+	return <Fill { ...fillProps } name={ getSlotName( context, clientId ) } />;
 };
 
 BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlots;
