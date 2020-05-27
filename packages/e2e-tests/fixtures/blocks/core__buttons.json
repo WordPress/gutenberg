@@ -15,7 +15,7 @@
                     "text": "My button 1"
                 },
                 "innerBlocks": [],
-                "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>"
+                "originalContent": "<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 1</a>\n\t</div>"
             },
             {
                 "clientId": "_clientId_1",
@@ -25,7 +25,7 @@
                     "text": "My button 2"
                 },
                 "innerBlocks": [],
-                "originalContent": "<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>"
+                "originalContent": "<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 2</a>\n\t</div>"
             }
         ],
         "originalContent": "<div class=\"wp-block-buttons\">\n\t\n\n\t\n</div>"

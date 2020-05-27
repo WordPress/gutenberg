@@ -1,7 +1,9 @@
 [
     {
         "blockName": "core/buttons",
-        "attrs": {},
+        "attrs": {
+            "orientation": "horizontal"
+        },
         "innerBlocks": [
             {
                 "blockName": "core/button",

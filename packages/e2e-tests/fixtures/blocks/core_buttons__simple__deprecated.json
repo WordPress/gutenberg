@@ -4,8 +4,8 @@
         "name": "core/buttons",
         "isValid": true,
         "attributes": {
-			"orientation": "horizontal"
-		},
+            "orientation": "horizontal"
+        },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",

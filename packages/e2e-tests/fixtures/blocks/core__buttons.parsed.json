@@ -1,24 +1,26 @@
 [
     {
         "blockName": "core/buttons",
-        "attrs": {},
+        "attrs": {
+            "orientation": "horizontal"
+        },
         "innerBlocks": [
             {
                 "blockName": "core/button",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>\n\t",
+                "innerHTML": "\n\t<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 1</a>\n\t</div>\n\t",
                 "innerContent": [
-                    "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 1</a></div>\n\t"
+                    "\n\t<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 1</a>\n\t</div>\n\t"
                 ]
             },
             {
                 "blockName": "core/button",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>\n\t",
+                "innerHTML": "\n\t<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 2</a>\n\t</div>\n\t",
                 "innerContent": [
-                    "\n\t<div class=\"wp-block-button\"><a class=\"wp-block-button__link\">My button 2</a></div>\n\t"
+                    "\n\t<div class=\"wp-block-button\">\n\t\t<a class=\"wp-block-button__link\">My button 2</a>\n\t</div>\n\t"
                 ]
             }
         ],
