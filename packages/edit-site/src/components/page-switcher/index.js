@@ -75,9 +75,11 @@ export default function PageSwitcher( {
 	);
 
 	const onPageSelect = ( newPath ) => {
-		const { value: path, ...rest } = [ ...pages, ...categories ].find(
-			( choice ) => choice.value === newPath
-		);
+		const { value: path, ...rest } = [
+			...pages,
+			...categories,
+			...posts,
+		].find( ( choice ) => choice.value === newPath );
 		onActivePageChange( { ...rest, path } );
 	};
 	const onPostSelect = ( post ) =>
