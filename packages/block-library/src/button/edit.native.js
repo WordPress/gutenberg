@@ -187,8 +187,10 @@ class ButtonEdit extends Component {
 				).gradient
 			);
 		}
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
 		return (
-			getColorAndStyleProps( attributes ).style?.backgroundColor ||
+			colorAndStyleProps.style?.backgroundColor ||
+			colorAndStyleProps.style?.background ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
 			styles.defaultButton.backgroundColor
@@ -197,8 +199,10 @@ class ButtonEdit extends Component {
 
 	getTextColor() {
 		const { textColor, attributes } = this.props;
+		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
 		return (
-			getColorAndStyleProps( attributes ).style?.color ||
+			colorAndStyleProps.style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
 			styles.defaultButton.color

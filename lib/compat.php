@@ -14,7 +14,8 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @since 7.9.0
 	 *
-	 * @param string $path Path to the folder where the `block.json` file is located.
+	 * @param string $file_or_folder Path to the JSON file with metadata definition for
+	 *     the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
 	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
 	 *     ones described below are supported by default. Default empty array.
@@ -23,8 +24,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
-	function register_block_type_from_metadata( $path, $args = array() ) {
-		$file = trailingslashit( $path ) . 'block.json';
+	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
+		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
+			trailingslashit( $file_or_folder ) . 'block.json' :
+			$file_or_folder;
 		if ( ! file_exists( $file ) ) {
 			return false;
 		}
@@ -43,20 +46,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		);
 	}
 }
-
-/**
- * Extends block editor settings to determine whether to use drop cap feature.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = false;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
-
 
 /**
  * Extends block editor settings to include a list of image dimensions per size.

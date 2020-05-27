@@ -157,16 +157,14 @@ $ wp-env start
 
 ### 6. Nuke everything and start again 🔥
 
-When all else fails, you can try forcibly removing all of the underlying Docker containers and volumes, the underlying WordPress directory, and starting again from scratch.
+When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers and volumes. This will allow you to start from scratch.
 
 To nuke everything:
 
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
-$ docker rm -f $(docker ps -aq)
-$ docker volume rm -f $(docker volume ls -q)
-$ rm -rf "../$(basename $(pwd))-wordpress"
+$ wp-env destroy
 $ wp-env start
 ```
 
@@ -215,13 +213,20 @@ Positionals:
 ```sh
 wp-env run <container> [command..]
 
-Runs an arbitrary command in one of the underlying Docker containers, for
-example it's useful for running wp cli commands.
-
+Runs an arbitrary command in one of the underlying Docker containers. For
+example, it can be useful for running wp cli commands. You can also use it to
+open shell sessions like bash and the WordPress shell in the WordPress instance.
+For example, `wp-env run cli bash` will open bash in the development WordPress
+instance.
 
 Positionals:
   container  The container to run the command on.            [string] [required]
   command    The command to run.                           [array] [default: []]
+
+Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+  --debug    Enable debug output.                     [boolean] [default: false]
 ```
 
 For example:
@@ -234,6 +239,18 @@ ID      user_login      display_name    user_email      user_registered roles
 1       admin   admin   wordpress@example.com   2020-03-05 10:45:14     administrator
 
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
+```
+
+```sh
+wp-env run tests-cli wp shell
+ℹ Starting 'wp shell' on the tests-cli container. Exit the WordPress shell with ctrl-c.
+
+Starting 31911d623e75f345e9ed328b9f48cff6_mysql_1 ... done
+Starting 31911d623e75f345e9ed328b9f48cff6_tests-wordpress_1 ... done
+wp> echo( 'hello world!' );
+hello world!
+wp> ^C
+✔ Ran `wp shell` in 'tests-cli'. (in 16s 400ms)
 ```
 
 ### `wp-env destroy`

@@ -5,12 +5,14 @@ import { navigateRegions } from '@wordpress/components';
 import { useSimulatedMediaQuery } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { ComplementaryArea } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import './sync-customizer';
 import Header from '../header';
+import Sidebar from '../sidebar';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
@@ -35,6 +37,8 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 			>
 				<Header isCustomizer />
 				<WidgetAreasBlockEditorContent />
+				<ComplementaryArea.Slot scope="core/edit-widgets" />
+				<Sidebar />
 			</div>
 		</WidgetAreasBlockEditorProvider>
 	);
