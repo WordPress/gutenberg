@@ -7,7 +7,15 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import {
+	useState,
+	useRef,
+	useEffect,
+	useCallback,
+	createContext,
+	useContext,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,50 +27,109 @@ export default { title: 'Components/ColumnResizer' };
 
 const GRID_SIZE = 12;
 
+const ColumnResizerContext = createContext( { isGrid: true } );
+const useColumnResizerContext = () => useContext( ColumnResizerContext );
+
+const useColumnResizerContextAsItem = () => {
+	const context = useColumnResizerContext();
+	const id = useInstanceId( ColumnResizerProvider, 'column' );
+
+	return { ...context, id, 'data-column-resizer': true };
+};
+
+function ColumnResizerProvider( {
+	children,
+	isGrid,
+	onChange = noop,
+	widths: widthsProp = [],
+} ) {
+	const [ widths, setWidths ] = useState( widthsProp );
+	const containerRef = useRef();
+
+	const [ grid, setGrid ] = useState( [ 1, 1 ] );
+	const [ gridSteps, setGridSteps ] = useState(
+		getGridWidths( { ref: containerRef } )
+	);
+	const updateGridSteps = useCallback( () => {
+		setGridSteps( getGridWidths( { ref: containerRef } ) );
+	}, [] );
+
+	useEffect( () => {
+		updateGridSteps();
+	}, [] );
+
+	useEffect( () => {
+		window.addEventListener( 'resize', updateGridSteps );
+		return () => {
+			window.removeEventListener( 'resize', updateGridSteps );
+		};
+	}, [] );
+
+	const handleOnChange = ( width, eventProps ) => {
+		const nextWidths = [ ...widths ];
+
+		const containerNode = containerRef.current;
+		const nodes = containerNode.querySelectorAll( '[data-column-resizer]' );
+		const currentNode = containerNode.querySelector(
+			`#${ eventProps.id }`
+		);
+
+		const currentIndex = [ ...nodes ].indexOf( currentNode );
+		nextWidths[ currentIndex ] = width;
+
+		onChange( nextWidths );
+		setWidths( nextWidths );
+	};
+
+	const [ gridStep ] = gridSteps;
+
+	const contextValue = {
+		gridSteps,
+		gridStep,
+		isGrid,
+		grid,
+		setGrid,
+		onChange: handleOnChange,
+	};
+
+	return (
+		<ColumnResizerContext.Provider value={ contextValue }>
+			<ContainerView ref={ containerRef }>{ children }</ContainerView>
+		</ColumnResizerContext.Provider>
+	);
+}
+
 function ResizableBoxWrapper( props ) {
 	const {
 		changeValue,
 		children,
-		isGrid,
 		onResizeStart = noop,
 		onResizeStop = noop,
 		onResize = noop,
-		onChange,
 		size = {},
 		isLast,
 		...otherProps
 	} = props;
+	const {
+		isGrid,
+		onChange,
+		id,
+		gridSteps = [],
+		gridStep,
+		grid,
+		setGrid,
+		...contextProps
+	} = useColumnResizerContextAsItem();
 	const resizableRef = useRef();
 
 	const [ width, setWidth ] = useState( props?.size?.width );
 	const [ tempWidth, setTempWidth ] = useState( 0 );
-	const [ grid, setGrid ] = useState( [ 1, 1 ] );
-
-	const [ gridSteps, setGridSteps ] = useState(
-		getGridWidths( { ref: resizableRef } )
-	);
-	const [ gridStep ] = gridSteps;
-
-	const updateShiftStep = useCallback( () => {
-		setGridSteps( getGridWidths( { ref: resizableRef } ) );
-	} );
 
 	useEffect( () => {
 		if ( size.width ) {
 			setWidth( size.width );
 		}
 	}, [ size.width ] );
-
-	useEffect( () => {
-		updateShiftStep();
-	}, [] );
-
-	useEffect( () => {
-		window.addEventListener( 'resize', updateShiftStep );
-		return () => {
-			window.removeEventListener( 'resize', updateShiftStep );
-		};
-	}, [] );
 
 	const enable = {
 		top: false,
@@ -97,7 +164,6 @@ function ResizableBoxWrapper( props ) {
 			let onChangeWidth = nextWidth;
 
 			const data = {
-				containerWidth: getContainerNodeWidth( { ref: resizableRef } ),
 				gridSteps,
 				width: nextWidth,
 			};
@@ -119,7 +185,7 @@ function ResizableBoxWrapper( props ) {
 			if ( ! onChange ) {
 				setWidth( nextWidth );
 			} else {
-				onChange( onChangeWidth, { event, ...data } );
+				onChange( onChangeWidth, { event, id, ...data } );
 			}
 		}
 	};
@@ -133,7 +199,9 @@ function ResizableBoxWrapper( props ) {
 
 	return (
 		<ResizableBox
+			{ ...contextProps }
 			{ ...otherProps }
+			id={ id }
 			ref={ resizableRef }
 			enable={ enable }
 			style={ style }
@@ -198,10 +266,8 @@ export const _default = () => {
 		'25%',
 	] );
 
-	const handleOnChange = ( index ) => ( nextValue ) => {
-		const nextWidths = [ ...columnWidths ];
-		nextWidths[ index ] = nextValue;
-		setColumnWidths( nextWidths );
+	const handleOnChange = ( nextValue ) => {
+		setColumnWidths( nextValue );
 		setChangeValue( changeValue + 1 );
 	};
 
@@ -215,12 +281,14 @@ export const _default = () => {
 			<br />
 			<br />
 			<br />
-			<ContainerView>
+			<ColumnResizerProvider
+				isGrid={ isGrid }
+				widths={ columnWidths }
+				onChange={ handleOnChange }
+			>
 				<ResizableBoxWrapper
 					changeValue={ changeValue }
-					isGrid={ isGrid }
 					size={ { width: columnWidths[ 0 ] } }
-					onChange={ handleOnChange( 0 ) }
 					enable={ {
 						right: true,
 					} }
@@ -229,9 +297,7 @@ export const _default = () => {
 				</ResizableBoxWrapper>
 				<ResizableBoxWrapper
 					changeValue={ changeValue }
-					isGrid={ isGrid }
 					size={ { width: columnWidths[ 1 ] } }
-					onChange={ handleOnChange( 1 ) }
 					enable={ {
 						right: true,
 					} }
@@ -240,13 +306,12 @@ export const _default = () => {
 				</ResizableBoxWrapper>
 				<ResizableBoxWrapper
 					changeValue={ changeValue }
-					isGrid={ isGrid }
 					size={ { width: columnWidths[ 2 ] } }
 					isLast
 				>
 					<BoxView />
 				</ResizableBoxWrapper>
-			</ContainerView>
+			</ColumnResizerProvider>
 		</>
 	);
 };
@@ -292,7 +357,7 @@ const VizLabelView = styled.div`
 `;
 
 function getContainerNode( { ref } ) {
-	const containerNode = ref?.current?.resizable?.parentElement;
+	const containerNode = ref?.current;
 
 	return containerNode;
 }
