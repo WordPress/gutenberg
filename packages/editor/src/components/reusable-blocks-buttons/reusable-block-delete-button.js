@@ -18,7 +18,7 @@ export function ReusableBlockDeleteButton( {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
+		<BlockSettingsMenuControls forAllBlocks>
 			{ ( { onClose } ) => (
 				<MenuItem
 					disabled={ isDisabled }

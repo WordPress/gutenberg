@@ -7,13 +7,18 @@ import { isEmpty, map } from 'lodash';
  * WordPress dependencies
  */
 import { createSlotFill, MenuGroup } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
-const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
-	'BlockSettingsMenuControls'
-);
+/**
+ * Internal dependencies
+ */
+import { BlockListBlockContext } from '../block-list/block';
 
-const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
+
+const getSlotName = ( clientId ) => `BlockSettings-${ clientId }`;
+const BlockSettingsMenuControlsSlots = ( { fillProps, clientIds = null } ) => {
 	const { selectedBlocks } = useSelect( ( select ) => {
 		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
 			'core/block-editor'
@@ -28,16 +33,39 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		};
 	}, [] );
 
+	const slotProps = { ...fillProps, selectedBlocks };
 	return (
-		<Slot fillProps={ { ...fillProps, selectedBlocks } }>
-			{ ( fills ) =>
-				! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup>
-			}
-		</Slot>
+		<>
+			<BlockSettingsMenuControlsSlot { ...slotProps } />
+			{ clientIds.length === 1 && (
+				<BlockSettingsMenuControlsSlot
+					{ ...slotProps }
+					name={ getSlotName( clientIds[ 0 ] ) }
+				/>
+			) }
+		</>
 	);
 };
 
-BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
+const BlockSettingsMenuControlsSlot = ( props ) => (
+	<Slot { ...props }>
+		{ ( fills ) => ! isEmpty( fills ) && <MenuGroup>{ fills }</MenuGroup> }
+	</Slot>
+);
+
+export const BlockSettingsMenuControls = ( {
+	forAllBlocks = false,
+	...fillProps
+} ) => {
+	const context = useContext( BlockListBlockContext );
+	if ( ! forAllBlocks && context?.clientId ) {
+		fillProps.name = getSlotName( context.clientId );
+	}
+
+	return <Fill { ...fillProps } />;
+};
+
+BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlots;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-settings-menu-controls/README.md

@@ -24,7 +24,7 @@ export function ReusableBlockConvertButton( {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
+		<BlockSettingsMenuControls forAllBlocks>
 			{ ( { onClose } ) => (
 				<>
 					{ ! isReusable && (

@@ -19,7 +19,7 @@ export function ConvertToGroupButton( {
 	}
 
 	return (
-		<BlockSettingsMenuControls>
+		<BlockSettingsMenuControls forAllBlocks>
 			{ ( { onClose } ) => (
 				<>
 					{ isGroupable && (
