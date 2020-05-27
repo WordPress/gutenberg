@@ -122,12 +122,14 @@ async function getPerformanceResultsForBranch(
 	environmentDirectory,
 	branch
 ) {
+	await git.discardLocalChanges( environmentDirectory );
+
 	log( '>> Fetching the ' + formats.success( branch ) + ' branch' );
 	await git.checkoutRemoteBranch( environmentDirectory, branch );
 
 	log( '>> Building the ' + formats.success( branch ) + ' branch' );
 	await runShellScript(
-		'npm install && npm run build',
+		'rm -rf node_modules && npm install && npm run build',
 		environmentDirectory
 	);
 
@@ -205,7 +207,7 @@ async function runPerformanceTests( branches ) {
 	);
 
 	log( '>> Starting the WordPress environment' );
-	await runShellScript( 'npm run wp-env start' );
+	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
 	/** @type {Record<string, WPFormattedPerformanceResults>} */
 	const results = {};
@@ -218,7 +220,7 @@ async function runPerformanceTests( branches ) {
 	}
 
 	log( '>> Stopping the WordPress environment' );
-	await runShellScript( 'npm run wp-env stop' );
+	await runShellScript( 'npm run wp-env stop', environmentDirectory );
 
 	log( '\n>> 🎉 Results.\n' );
 	console.table( results );

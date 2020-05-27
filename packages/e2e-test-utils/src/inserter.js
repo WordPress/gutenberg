@@ -3,6 +3,11 @@
  */
 import { pressKeyWithModifier } from './press-key-with-modifier';
 
+// This selector is written to support the current and old inserter markup
+// because the performance tests need to be able to run across versions.
+const INSERTER_SEARCH_SELECTOR =
+	'.block-editor-inserter__search-input,input.block-editor-inserter__search';
+
 /**
  * Opens the global block inserter.
  */
@@ -53,7 +58,7 @@ async function toggleGlobalBlockInserter() {
  */
 export async function searchForBlock( searchTerm ) {
 	await openGlobalBlockInserter();
-	await page.focus( '.block-editor-inserter__search-input' );
+	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
 }
@@ -70,7 +75,7 @@ export async function searchForPattern( searchTerm ) {
 		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
 	);
 	await tab.click();
-	await page.focus( '.block-editor-inserter__search-input' );
+	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
 }
