@@ -227,7 +227,9 @@ const setupDriver = async () => {
 };
 
 const stopDriver = async ( driver ) => {
+	console.log( 'stopDriver -> stopDriver' );
 	if ( ! isLocalEnvironment() ) {
+		console.log( 'stopDriver -> ! isLocalEnvironment()' );
 		const jobID = driver.sessionID;
 
 		const hash = crypto
@@ -238,13 +240,32 @@ const stopDriver = async ( driver ) => {
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
+
+	console.log( 'stopDriver -> driver', driver );
 	if ( driver === undefined ) {
+		console.log( 'stopDriver -> driver === undefined' );
 		return;
 	}
-	await driver.quit();
+	try {
+		console.log( 'stopDriver -> driver.quit -> before' );
+		await driver.quit();
+		console.log( 'stopDriver -> driver.quit -> after' );
+	} catch ( error ) {
+		console.log( 'stopDriver -> driver.quit ->  error', error );
+	}
 
 	if ( appiumProcess !== undefined ) {
-		await AppiumLocal.stop( appiumProcess );
+		console.log( 'stopDriver -> appiumProcess !== undefined' );
+		try {
+			console.log( 'stopDriver -> await AppiumLocal.stop -> before' );
+			await AppiumLocal.stop( appiumProcess );
+			console.log( 'stopDriver -> await AppiumLocal.stop -> after' );
+		} catch ( error ) {
+			console.log(
+				'stopDriver -> await AppiumLocal.stop -> error',
+				error
+			);
+		}
 	}
 };
 
