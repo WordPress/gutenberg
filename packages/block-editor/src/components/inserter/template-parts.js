@@ -91,7 +91,55 @@ function TemplatePartsByTheme( { templateParts, onInsert } ) {
 }
 
 function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
-	return <h1>I am the search results...</h1>;
+	const filteredTPs = useMemo( () => {
+		// Filter based on value.
+		const lowerFilterValue = filterValue.toLowerCase();
+		const thing = templateParts.filter(
+			( { slug, meta: { theme } } ) =>
+				slug.toLowerCase().includes( lowerFilterValue ) ||
+				theme.toLowerCase().includes( lowerFilterValue )
+		);
+		// Order based on value location.
+		thing.sort( ( a, b ) => {
+			// First prioritize index found in slug.
+			const indexInSlugA = a.slug
+				.toLowerCase()
+				.indexOf( lowerFilterValue );
+			const indexInSlugB = b.slug
+				.toLowerCase()
+				.indexOf( lowerFilterValue );
+			if ( indexInSlugA !== -1 && indexInSlugB !== -1 ) {
+				return indexInSlugA - indexInSlugB;
+			} else if ( indexInSlugA !== -1 ) {
+				return -1;
+			} else if ( indexInSlugB !== -1 ) {
+				return 1;
+			}
+			// Second prioritize index found in theme.
+			return (
+				a.meta.theme.toLowerCase().indexOf( lowerFilterValue ) -
+				b.meta.theme.toLowerCase().indexOf( lowerFilterValue )
+			);
+		} );
+		return thing;
+	}, [ filterValue, templateParts ] );
+
+	return (
+		<>
+			{ filteredTPs.map( ( templatePart ) => (
+				<InserterPanel
+					key={ templatePart.id }
+					title={ templatePart.meta.theme }
+				>
+					<TemplatePartItem
+						key={ templatePart.id }
+						templatePart={ templatePart }
+						onInsert={ onInsert }
+					/>
+				</InserterPanel>
+			) ) }
+		</>
+	);
 }
 
 export default function TemplateParts( { onInsert, filterValue } ) {
