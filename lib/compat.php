@@ -25,8 +25,9 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
 	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
-		$metadata_file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
-			trailingslashit( $file_or_folder ) . 'block.json' :
+		$filename      = 'block.json';
+		$metadata_file = ( substr( $file_or_folder, -strlen( $filename ) ) !== $filename ) ?
+			trailingslashit( $file_or_folder ) . $filename :
 			$file_or_folder;
 		if ( ! file_exists( $metadata_file ) ) {
 			return false;
@@ -39,15 +40,15 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 
 		$settings          = array();
 		$property_mappings = array(
-			'title'           => 'title',
-			'category'        => 'category',
-			'parent'          => 'parent',
-			'icon'            => 'icon',
-			'description'     => 'description',
-			'keywords'        => 'keywords',
-			'attributes'      => 'attributes',
-			'supports'        => 'supports',
-			'styles'          => 'styles',
+			'title'       => 'title',
+			'category'    => 'category',
+			'parent'      => 'parent',
+			'icon'        => 'icon',
+			'description' => 'description',
+			'keywords'    => 'keywords',
+			'attributes'  => 'attributes',
+			'supports'    => 'supports',
+			'styles'      => 'styles',
 		);
 
 		foreach ( $property_mappings as $key => $mapped_key ) {
