@@ -489,6 +489,39 @@
 	.block-editor-block-toolbar .components-toolbar {
 		border-right-color: $dark-gray-primary;
 	}
+
+	// Adjust the mover control to fit as a unit next to the block switcher.
+	.block-editor-block-switcher {
+		.components-toolbar {
+			border-right-color: transparent;
+		}
+	}
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15;
+		width: $button-size;
+
+		// Needs specificity to override a first-child rule.
+		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
+			min-width: $button-size;
+			width: $button-size;
+
+			> svg {
+				margin-left: 2px;
+			}
+
+			&.is-up-button svg {
+				margin-top: 3px;
+			}
+
+			&.is-down-button svg {
+				margin-bottom: 3px;
+			}
+
+			&:focus::before {
+				left: 0 !important;
+			}
+		}
+	}
 }
 
 

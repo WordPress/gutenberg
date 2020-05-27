@@ -95,41 +95,9 @@
 	.block-editor-block-switcher {
 		display: block;
 	}
-}
 
-.block-editor-block-toolbar.has-responsive-movers {
-	.block-editor-block-toolbar__mover-trigger-container {
-		@include break-medium() {
-			bottom: -1px;
-			left: -1px;
-			position: absolute;
-			top: -1px;
-			transform: translateX(-48px);
-			user-select: none;
-		}
-	}
-
-	// Explicitly color the background of the switcher to "cover" the mover control as it animates out.
-	.block-editor-block-toolbar__block-switcher-wrapper {
-		background: $white;
-		border-left: $border-width solid;
-		border-radius: 0 0 $radius-block-ui $radius-block-ui;
-		position: relative;
-		z-index: 1;
-		margin-left: -$border-width;
-	}
-
-	.block-editor-block-toolbar__mover-trigger-wrapper:not(:empty) {
-		@include break-medium() {
-			background-color: $white;
-			border: 1px solid $black;
-			border-bottom-left-radius: 2px;
-			border-top-left-radius: 2px;
-			border-right: none;
-			height: 100%;
-			transition: all 60ms linear;
-		}
-
-		@include reduce-motion("transition");
+	// Show this together with the mover as one group.
+	.components-toolbar-group {
+		border-right: none;
 	}
 }
