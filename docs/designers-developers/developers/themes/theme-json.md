@@ -78,21 +78,21 @@ Some of the functions are context-dependant. Take, as an example, the drop cap:
     "features": {
       "typography": {
         "dropCap": false
-			}
+      }
     }
   },
   "core/paragraph": {
     "features": {
       "typography": {
         "dropCap": true
-			}
+      }
     }
   },
   "core/image": {
     "features": {
       "typography": {
         "dropCap": true
-			}
+      }
     }
   }
 }
@@ -174,7 +174,14 @@ The list of properties that are currently exposed via this method are:
 
 ### Features
 
-So far, this function is only enabled for the `global` section in `experimental-theme.json`.
+Via the features key we allow controlling some editor and block features according to the following rules:
+- The features within `global` override the default editor settings, which plugins can modify by hooking into the `block_editor_settings` filter on the server.
+- The features within the context of each block override the default block settings, which plugins can modify by hooking into the `blocks.registerBlockType` filter on the client.
+- Block settings take precedence over global settings.
+
+For example, if a feature is enabled for a block by default, although the theme disables it at the global level, the block keeps it enabled. If the theme wants to override a block's default, it has to target that particular block.
+
+So far, this function is enabled only for the `global` section in `lib/experimental-default-theme.json`.
 
 ```
 {
@@ -182,9 +189,9 @@ So far, this function is only enabled for the `global` section in `experimental-
     "features": {
       "typography": {
         "dropCap": false
-			}
-		}
-	}
+      }
+    }
+  }
 }
 ```
 
@@ -196,24 +203,13 @@ Then each block can decide to override how they handle block editor features dur
     "__experimentalFeatures": {
       "typography": {
         "dropCap": true
-			}
-		}
+      }
+    }
   }
 }
 ```
 
-Moving forward, we plan to integrate overrides targeting individual blocks defined inside `experimental-theme.json` file that would be applied on top of features defined by block authors in `supports` property.
-
-Finally, this is how it can be used in the block's `edit` implementation:
-
-```js
-// edit.js
-
-const Edit = ( props ) => {
-    const isDisabled = ! useEditorFeature( 'typography.dropCap' );
-    // ...
-};
-```
+Moving forward, we plan to integrate overrides targeting individual blocks defined inside a theme specific file (`experimental-theme.json`) that would be applied on top of features defined by block authors in `supports` property.
 
 The list of features that are currently supported are:
 - Paragraph: drop cap.
