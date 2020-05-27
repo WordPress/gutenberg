@@ -10,6 +10,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	verbose: true,
+	rootDir: '../../',
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
@@ -20,5 +21,4 @@ module.exports = {
 	timers: 'real',
 	setupFiles: [],
 	testMatch: [ '**/__device-tests__/**/*.test.[jt]s?(x)' ],
-	testPathIgnorePatterns: [ '/node_modules/' ],
 };
