@@ -4,6 +4,8 @@
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Version: 8.2.0-rc.1
+ * Requires at least: 5.3
+ * Requires PHP: 5.6
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
