@@ -77,7 +77,7 @@ For labeling and naming pull requests, here are guidelines to follow that make c
 - When working on experimental screens and features, apply the `[Type] Experimental` label instead of `Feature`, `Enhancement`, etc.
 - When working on new features to technical packages (scripts, create-block, adding  react hooks, etc), apply the `[Type] New API`  label instead of `Feature`, `Enhancement`, etc.
 - When fixing a bug or making an enhancement to an internal tool used in the project, apply the `[Type] Build Tooling` instead of `Bugs`, `Enhancement`, etc
-- In PR titles, instead of describing the code change done to fix an issue, consider referring to the actual bug being fixed instead. For example: instead of saying "Check for nullable object in component", it would be preferable to say "Fix editor breakage when clicking the copy block button". 
+- In pull request titles, instead of describing the code change done to fix an issue, consider referring to the actual bug being fixed instead. For example: instead of saying "Check for nullable object in component", it would be preferable to say "Fix editor breakage when clicking the copy block button". 
 
 Along with this process, there are a few important points to mention:
 
