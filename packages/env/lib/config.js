@@ -384,7 +384,7 @@ function getNumberFromEnvVariable( varName ) {
  * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
  * WP_ENV_HOME environment variable.
  *
- * @return {string} The absolute path to the `wp-env` home directory.
+ * @return {Promise<string>} The absolute path to the `wp-env` home directory.
  */
 async function getHomeDirectory() {
 	// Allow user to override download location.
