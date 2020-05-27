@@ -46,13 +46,16 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 
 		$format_search = apply_filters( 'rest_post_format_search_query', $format_search, $request );
 
-		$found_ids = [];
+		$found_ids = array();
 		foreach ( $format_fake_ids as $format_fake_id => $format_slug ) {
 			$format_title       = $formats[ $format_slug ];
 			$format_slug_match  = stripos( $format_slug, $format_search ) !== false;
 			$format_title_match = stripos( $format_title, $format_search ) !== false;
 			if ( $format_slug_match || $format_title_match ) {
-				$found_ids[] = $format_fake_id;
+				$format_index_url = get_post_format_link( $format_fake_ids[ $format_fake_id ] );
+				if ( $format_index_url ) {
+					$found_ids[] = $format_fake_id;
+				}
 			}
 		}
 
@@ -72,9 +75,10 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 	 * @return array Associative array containing all fields for the item.
 	 */
 	public function prepare_item( $id, array $fields ) {
-		$formats         = get_post_format_strings();
-		$format_fake_ids = array_keys( $formats );
-		$format          = $formats[ $format_fake_ids[ $id ] ];
+		$formats          = get_post_format_strings();
+		$format_fake_ids  = array_keys( $formats );
+		$format           = $formats[ $format_fake_ids[ $id ] ];
+		$format_index_url = get_post_format_link( $format_fake_ids[ $id ] );
 
 		$data = array();
 
@@ -87,7 +91,7 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 		}
 
 		if ( in_array( WP_REST_Search_Controller::PROP_URL, $fields, true ) ) {
-			$data[ WP_REST_Search_Controller::PROP_URL ] = get_post_format_link( $format_fake_ids[ $id ] );
+			$data[ WP_REST_Search_Controller::PROP_URL ] = $format_index_url;
 		}
 
 		if ( in_array( WP_REST_Search_Controller::PROP_TYPE, $fields, true ) ) {
@@ -97,8 +101,16 @@ class WP_REST_Post_Format_Search_Handler extends WP_REST_Search_Handler {
 		return $data;
 	}
 
+	/**
+	 * Prepares links for the search result of a given ID.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param int $id Item ID.
+	 * @return array Links for the given item.
+	 */
 	public function prepare_item_links( $id ) {
-		return [];
+		return array();
 	}
 
 }
