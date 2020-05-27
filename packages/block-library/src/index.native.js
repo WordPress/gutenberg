@@ -129,7 +129,7 @@ const registerBlock = ( block ) => {
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
-const iOSOnly = ( block ) => ( Platform.OS === 'ios' ? block : null );
+const iOSOnly = ( block ) => ( Platform.OS === 'ios' ? block : devOnly( block ) );
 /**
  * Function to register core blocks provided by the block editor.
  *
