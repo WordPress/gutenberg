@@ -4,10 +4,12 @@
 import { getPath, getQueryString } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
 import {
+	Tooltip,
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
 } from '@wordpress/components';
+import { Icon, home } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
@@ -32,7 +34,19 @@ export default function PageSwitcher( {
 					( _page ) => {
 						const path = getPathFromLink( _page.link );
 						return {
-							label: _page.title.rendered,
+							label:
+								path === '/' ? (
+									<>
+										{ _page.title.rendered }
+										<Tooltip text={ __( 'Home' ) }>
+											<div>
+												<Icon icon={ home } />
+											</div>
+										</Tooltip>
+									</>
+								) : (
+									_page.title.rendered
+								),
 							type: 'page',
 							slug: _page.slug,
 							value: path,
@@ -62,7 +76,16 @@ export default function PageSwitcher( {
 			};
 			if ( showOnFront === 'posts' )
 				pageGroups.posts.unshift( {
-					label: __( 'All Posts' ),
+					label: (
+						<>
+							{ __( 'All Posts' ) }
+							<Tooltip text={ __( 'Home' ) }>
+								<div>
+									<Icon icon={ home } />
+								</div>
+							</Tooltip>
+						</>
+					),
 					value: '/',
 					context: {
 						query: { categoryIds: [] },
