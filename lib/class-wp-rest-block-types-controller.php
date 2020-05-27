@@ -19,15 +19,23 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 *
 	 * @var WP_Block_Type_Registry
 	 */
-	protected $registry;
+	protected $block_registry;
+
+	/**
+	 * Instance of WP_Block_Styles_Registry.
+	 *
+	 * @var WP_Block_Styles_Registry
+	 */
+	protected $style_registry;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = 'block-types';
-		$this->registry  = WP_Block_Type_Registry::get_instance();
+		$this->namespace      = '__experimental';
+		$this->rest_base      = 'block-types';
+		$this->block_registry = WP_Block_Type_Registry::get_instance();
+		$this->style_registry = WP_Block_Styles_Registry::get_instance();
 	}
 
 	/**
@@ -112,7 +120,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$data        = array();
-		$block_types = $this->registry->get_all_registered();
+		$block_types = $this->block_registry->get_all_registered();
 
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
@@ -182,7 +190,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Block_Type|WP_Error Block type object if name is valid, WP_Error otherwise.
 	 */
 	protected function get_block( $name ) {
-		$block_type = $this->registry->get_registered( $name );
+		$block_type = $this->block_registry->get_registered( $name );
 		if ( empty( $block_type ) ) {
 			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -257,6 +265,11 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				}
 				$data[ $key ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $key ] );
 			}
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$styles         = $this->style_registry->get_registered_styles_for_block( $block_type->name );
+			$data['styles'] = wp_parse_args( $styles, $data['styles'] );
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
