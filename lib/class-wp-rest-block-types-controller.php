@@ -300,6 +300,34 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 			),
 		);
 
+		$scripts = array( 'editor_script', 'script' );
+		foreach ( $scripts as $script ) {
+			if ( ! isset( $block_type->$script ) ) {
+				continue;
+			}
+			$expected_handle = $block_type->$script;
+			if ( wp_script_is( $expected_handle, 'registered' ) ) {
+				$links[ 'https://api.w.org/' . $script ] = array(
+					'href'       => rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'scripts', $expected_handle ) ),
+					'embeddable' => true,
+				);
+			}
+		}
+
+		$styles = array( 'editor_style', 'style' );
+		foreach ( $styles as $style ) {
+			if ( ! isset( $block_type->$style ) ) {
+				continue;
+			}
+			$expected_handle = $block_type->$style;
+			if ( wp_style_is( $expected_handle, 'registered' ) ) {
+				$links[ 'https://api.w.org/' . $style ] = array(
+					'href'       => rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'styles', $expected_handle ) ),
+					'embeddable' => true,
+				);
+			}
+		}
+
 		if ( $block_type->is_dynamic() ) {
 			$links['https://api.w.org/render-block']['href'] = add_query_arg( 'context', 'edit', rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'block-renderer', $block_type->name ) ) );
 		}
