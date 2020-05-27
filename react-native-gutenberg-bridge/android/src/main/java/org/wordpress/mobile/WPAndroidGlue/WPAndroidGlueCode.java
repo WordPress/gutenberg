@@ -45,6 +45,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -439,12 +440,14 @@ public class WPAndroidGlueCode {
         }
         initialProps.putBundle(PROP_NAME_CAPABILITIES, capabilities);
 
-        if (editorTheme != null && editorTheme.getParcelableArray("colors") != null) {
-            initialProps.putSerializable(PROP_NAME_COLORS, editorTheme.getParcelableArray("colors"));
+        Serializable colors = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_COLORS) : null;
+        if (colors != null) {
+            initialProps.putSerializable(PROP_NAME_COLORS, colors);
         }
 
-        if (editorTheme != null && editorTheme.getParcelableArray("gradients") != null) {
-            initialProps.putSerializable(PROP_NAME_GRADIENTS, editorTheme.getParcelableArray("gradients"));
+        Serializable gradients = editorTheme != null ? editorTheme.getSerializable(PROP_NAME_GRADIENTS) : null;
+        if (gradients != null) {
+            initialProps.putSerializable(PROP_NAME_GRADIENTS, gradients);
         }
 
         // The string here (e.g. "MyReactNativeApp") has to match

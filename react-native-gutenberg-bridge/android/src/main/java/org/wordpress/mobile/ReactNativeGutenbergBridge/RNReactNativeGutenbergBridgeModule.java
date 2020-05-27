@@ -25,6 +25,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.RNMedia;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -133,16 +134,18 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     public void updateTheme(@Nullable Bundle editorTheme) {
+        if (editorTheme == null) return;
+
         WritableMap writableMap = new WritableNativeMap();
-        ArrayList<Parcelable> colors = editorTheme.getParcelableArrayList(MAP_KEY_THEME_UPDATE_COLORS);
-        ArrayList<Parcelable> gradients = editorTheme.getParcelableArrayList(MAP_KEY_THEME_UPDATE_GRADIENTS);
+        Serializable colors = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_COLORS);
+        Serializable gradients = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_GRADIENTS);
 
         if (colors != null) {
-            writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList(colors));
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList((ArrayList)colors));
         }
 
         if (gradients != null) {
-            writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList(gradients));
+            writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList((ArrayList)gradients));
         }
 
         emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
