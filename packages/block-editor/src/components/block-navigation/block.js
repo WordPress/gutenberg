@@ -6,9 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import {
+	__experimentalTreeGridCell as TreeGridCell,
+	__experimentalTreeGridItem as TreeGridItem,
+} from '@wordpress/components';
+
+import { forwardRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +26,14 @@ import DescenderLines from './descender-lines';
 import BlockNavigationBlockContents from './block-contents';
 import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
 import { useBlockNavigationContext } from './context';
+
+// Adapter component that makes `BlockSettingsDropdown` work with
+// `TreeGridItem` by forwarding its ref to the `toggleRef` prop.
+const BlockSettingsDropdownAdapter = forwardRef(
+	function BlockSettingsDropdownAdapter( props, ref ) {
+		return <BlockSettingsDropdown toggleRef={ ref } { ...props } />;
+	}
+);
 
 export default function BlockNavigationBlock( {
 	block,
@@ -74,57 +86,48 @@ export default function BlockNavigationBlock( {
 				className="block-editor-block-navigation-block__contents-cell"
 				colSpan={ hasRenderedMovers ? undefined : 3 }
 			>
-				{ ( props ) => (
-					<div className="block-editor-block-navigation-block__contents-container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
-						<BlockNavigationBlockContents
-							block={ block }
-							onClick={ onClick }
-							isSelected={ isSelected }
-							position={ position }
-							siblingCount={ siblingCount }
-							level={ level }
-							{ ...props }
-						/>
-					</div>
-				) }
+				<div className="block-editor-block-navigation-block__contents-container">
+					<DescenderLines
+						level={ level }
+						isLastRow={ position === rowCount }
+						terminatedLevels={ terminatedLevels }
+					/>
+					<BlockNavigationBlockContents
+						block={ block }
+						onClick={ onClick }
+						isSelected={ isSelected }
+						position={ position }
+						siblingCount={ siblingCount }
+						level={ level }
+					/>
+				</div>
 			</TreeGridCell>
 			{ hasRenderedMovers && (
 				<>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
-							<BlockMoverUpButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
-						) }
+						<TreeGridItem
+							as={ BlockMoverUpButton }
+							__experimentalOrientation="vertical"
+							clientIds={ [ clientId ] }
+						/>
 					</TreeGridCell>
 					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
-							<BlockMoverDownButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
-						) }
+						<TreeGridItem
+							as={ BlockMoverDownButton }
+							__experimentalOrientation="vertical"
+							clientIds={ [ clientId ] }
+						/>
 					</TreeGridCell>
 				</>
 			) }
 
 			{ withEllipsisMenu && level >= ellipsisMenuMinLevel && (
 				<TreeGridCell className={ ellipsisMenuClassName }>
-					{ ( props ) => (
-						<BlockSettingsDropdown
-							clientIds={ [ clientId ] }
-							icon={ moreVertical }
-							{ ...props }
-						/>
-					) }
+					<TreeGridItem
+						as={ BlockSettingsDropdownAdapter }
+						clientIds={ [ clientId ] }
+						icon={ moreVertical }
+					/>
 				</TreeGridCell>
 			) }
 		</BlockNavigationLeaf>

@@ -9,12 +9,7 @@ import classnames from 'classnames';
 import { getBlockType } from '@wordpress/blocks';
 import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import {
-	Children,
-	cloneElement,
-	forwardRef,
-	useContext,
-} from '@wordpress/element';
+import { Children, cloneElement, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,7 +22,7 @@ import { getBlockPositionDescription } from './utils';
 
 const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
-function BlockNavigationBlockSlot( props, ref ) {
+export default function BlockNavigationBlockSlot( props ) {
 	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 	const { clientId } = props.block;
 
@@ -35,12 +30,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 		<Slot name={ getSlotName( clientId ) }>
 			{ ( fills ) => {
 				if ( ! fills.length ) {
-					return (
-						<BlockNavigationBlockSelectButton
-							ref={ ref }
-							{ ...props }
-						/>
-					);
+					return <BlockNavigationBlockSelectButton { ...props } />;
 				}
 
 				const {
@@ -50,8 +40,6 @@ function BlockNavigationBlockSlot( props, ref ) {
 					position,
 					siblingCount,
 					level,
-					tabIndex,
-					onFocus,
 				} = props;
 
 				const { name } = block;
@@ -64,11 +52,6 @@ function BlockNavigationBlockSlot( props, ref ) {
 				);
 
 				const forwardedFillProps = {
-					// Ensure that the component in the slot can receive
-					// keyboard navigation.
-					tabIndex,
-					onFocus,
-					ref,
 					// Give the element rendered in the slot a description
 					// that describes its position.
 					'aria-describedby': descriptionId,
@@ -107,8 +90,6 @@ function BlockNavigationBlockSlot( props, ref ) {
 		</Slot>
 	);
 }
-
-export default forwardRef( BlockNavigationBlockSlot );
 
 export const BlockNavigationBlockFill = ( props ) => {
 	const { clientId } = useContext( BlockListBlockContext );
