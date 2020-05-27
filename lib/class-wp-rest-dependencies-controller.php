@@ -88,9 +88,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error|WP_REST_Response
 	 */
 	public function get_items( $request ) {
-		$data   = [];
+		$data   = array();
 		$handle = $request['dependency'];
-		$filter = [];
+		$filter = array();
 		if ( $handle ) {
 			$this->object->all_deps( $handle );
 			$filter = $this->object->to_do;
@@ -124,7 +124,7 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		if ( ! isset( $this->object->registered[ $request['handle'] ] ) ) {
-			return [];
+			return array();
 		}
 		$dependency = $this->object->registered[ $request['handle'] ];
 		$data       = $this->prepare_item_for_response( $dependency, $request );
