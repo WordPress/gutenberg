@@ -97,18 +97,10 @@ const ImageWithFocalPoint = ( { focalPoint, url } ) => {
 	return (
 		<View style={ styles.container } onLayout={ onContainerLayout }>
 			<Image
-				aspectRatio={
-					originalImageData
-						? originalImageData.aspectRatio
-						: undefined
-				}
+				aspectRatio={ originalImageData?.aspectRatio }
 				style={ [
 					styles.image,
-					{
-						height: containerSize
-							? containerSize.height
-							: undefined,
-					},
+					{ height: containerSize?.height },
 					getImageStyles(),
 				] }
 				source={ { uri: url } }

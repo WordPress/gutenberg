@@ -18,12 +18,12 @@ import BlockPreview from '../block-preview';
 function InserterPreviewPanel( { item } ) {
 	const hoveredItemBlockType = getBlockType( item.name );
 	return (
-		<div className="block-editor-inserter__menu-help-panel">
-			{ ! isReusableBlock( item ) && <BlockCard blockType={ item } /> }
+		<div className="block-editor-inserter__menu-preview-panel">
 			<div className="block-editor-inserter__preview">
 				{ isReusableBlock( item ) || hoveredItemBlockType.example ? (
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
+							__experimentalPadding={ 16 }
 							viewportWidth={ 500 }
 							blocks={
 								hoveredItemBlockType.example
@@ -50,6 +50,7 @@ function InserterPreviewPanel( { item } ) {
 					</div>
 				) }
 			</div>
+			{ ! isReusableBlock( item ) && <BlockCard blockType={ item } /> }
 		</div>
 	);
 }

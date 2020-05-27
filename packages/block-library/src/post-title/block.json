@@ -1,4 +1,11 @@
 {
 	"name": "core/post-title",
-	"category": "layout"
+	"category": "layout",
+	"context": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false
+	}
 }

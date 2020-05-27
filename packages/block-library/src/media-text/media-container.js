@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose, useViewportMatch } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 
 /**
@@ -34,6 +34,15 @@ export function imageFillStyles( url, focalPoint ) {
 		: {};
 }
 
+function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
+	const isMobile = useViewportMatch( 'small', '<' );
+	return (
+		<ResizableBox
+			showHandle={ isSelected && ( ! isMobile || ! isStackedOnMobile ) }
+			{ ...props }
+		/>
+	);
+}
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -121,6 +130,8 @@ class MediaContainer extends Component {
 			commitWidthChange,
 			onWidthChange,
 			toggleSelection,
+			isSelected,
+			isStackedOnMobile,
 		} = this.props;
 		if ( mediaType && mediaUrl ) {
 			const onResizeStart = () => {
@@ -148,7 +159,7 @@ class MediaContainer extends Component {
 					break;
 			}
 			return (
-				<ResizableBox
+				<ResizableBoxContainer
 					className="editor-media-container__resizer"
 					size={ { width: mediaWidth + '%' } }
 					minWidth="10%"
@@ -158,9 +169,11 @@ class MediaContainer extends Component {
 					onResize={ onResize }
 					onResizeStop={ onResizeStop }
 					axis="x"
+					isSelected={ isSelected }
+					isStackedOnMobile={ isStackedOnMobile }
 				>
 					{ mediaElement }
-				</ResizableBox>
+				</ResizableBoxContainer>
 			);
 		}
 		return this.renderPlaceholder();

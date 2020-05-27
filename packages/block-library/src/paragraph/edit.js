@@ -11,14 +11,13 @@ import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	FontSizePicker,
 	InspectorControls,
 	RichText,
-	withFontSizes,
 	__experimentalBlock as Block,
+	getFontSize,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-import { compose } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
@@ -57,9 +56,21 @@ function ParagraphRTLToolbar( { direction, setDirection } ) {
 	);
 }
 
-function useDropCapMinimumHeight( isDropCap, deps ) {
+function useDropCap( isDropCap, fontSize, styleFontSize ) {
+	const isDisabled = ! useEditorFeature( 'typography.dropCap' );
+
 	const [ minimumHeight, setMinimumHeight ] = useState();
+
+	const { fontSizes } = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+
+	const fontSizeObject = getFontSize( fontSizes, fontSize, styleFontSize );
 	useEffect( () => {
+		if ( isDisabled ) {
+			return;
+		}
+
 		const element = querySelector( PARAGRAPH_DROP_CAP_SELECTOR );
 		if ( isDropCap && element ) {
 			setMinimumHeight(
@@ -68,27 +79,41 @@ function useDropCapMinimumHeight( isDropCap, deps ) {
 		} else if ( minimumHeight ) {
 			setMinimumHeight( undefined );
 		}
-	}, [ isDropCap, minimumHeight, setMinimumHeight, ...deps ] );
-	return minimumHeight;
+	}, [
+		isDisabled,
+		isDropCap,
+		minimumHeight,
+		setMinimumHeight,
+		fontSizeObject.size,
+	] );
+
+	return [ ! isDisabled, minimumHeight ];
 }
 
 function ParagraphBlock( {
 	attributes,
-	fontSize,
 	mergeBlocks,
 	onReplace,
+	onRemove,
 	setAttributes,
-	setFontSize,
 } ) {
-	const { align, content, direction, dropCap, placeholder } = attributes;
-
+	const {
+		align,
+		content,
+		direction,
+		dropCap,
+		placeholder,
+		fontSize,
+		style,
+	} = attributes;
 	const ref = useRef();
-	const dropCapMinimumHeight = useDropCapMinimumHeight( dropCap, [
-		fontSize.size,
-	] );
+	const [ isDropCapEnabled, dropCapMinimumHeight ] = useDropCap(
+		dropCap,
+		fontSize,
+		style?.fontSize
+	);
 
 	const styles = {
-		fontSize: fontSize.size ? `${ fontSize.size }px` : undefined,
 		direction,
 		minHeight: dropCapMinimumHeight,
 	};
@@ -110,24 +135,24 @@ function ParagraphBlock( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
-					/>
-					<ToggleControl
-						label={ __( 'Drop cap' ) }
-						checked={ !! dropCap }
-						onChange={ () =>
-							setAttributes( { dropCap: ! dropCap } )
-						}
-						help={
-							dropCap
-								? __( 'Showing large initial letter.' )
-								: __( 'Toggle to show a large initial letter.' )
-						}
-					/>
-				</PanelBody>
+				{ isDropCapEnabled && (
+					<PanelBody title={ __( 'Text settings' ) }>
+						<ToggleControl
+							label={ __( 'Drop cap' ) }
+							checked={ !! dropCap }
+							onChange={ () =>
+								setAttributes( { dropCap: ! dropCap } )
+							}
+							help={
+								dropCap
+									? __( 'Showing large initial letter.' )
+									: __(
+											'Toggle to show a large initial letter.'
+									  )
+							}
+						/>
+					</PanelBody>
+				) }
 			</InspectorControls>
 			<RichText
 				ref={ ref }
@@ -136,7 +161,6 @@ function ParagraphBlock( {
 				className={ classnames( {
 					'has-drop-cap': dropCap,
 					[ `has-text-align-${ align }` ]: align,
-					[ fontSize.class ]: fontSize.class,
 				} ) }
 				style={ styles }
 				value={ content }
@@ -155,7 +179,7 @@ function ParagraphBlock( {
 				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
-				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+				onRemove={ onRemove }
 				aria-label={
 					content
 						? __( 'Paragraph block' )
@@ -174,8 +198,4 @@ function ParagraphBlock( {
 	);
 }
 
-const ParagraphEdit = compose( [ withFontSizes( 'fontSize' ) ] )(
-	ParagraphBlock
-);
-
-export default ParagraphEdit;
+export default ParagraphBlock;

@@ -49,12 +49,7 @@ function Stepper( {
 				onPressOut={ onPressOut }
 				style={ [ buttonStyle, isMaxValue ? { opacity: 0.4 } : null ] }
 			>
-				<Icon
-					icon={ plus }
-					size={ 24 }
-					color={ buttonStyle.color }
-					style={ styles.plus }
-				/>
+				<Icon icon={ plus } size={ 24 } color={ buttonStyle.color } />
 			</TouchableOpacity>
 		</View>
 	);

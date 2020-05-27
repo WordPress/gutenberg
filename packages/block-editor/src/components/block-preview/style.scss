@@ -38,4 +38,16 @@
 	.block-list-appender {
 		display: none;
 	}
+
+	// Reset default editor padding
+	.block-editor-block-list__layout.is-root-container {
+		padding-left: 0;
+		padding-right: 0;
+
+		> .wp-block[data-align="full"] {
+			margin-left: 0;
+			margin-right: 0;
+		}
+	}
 }
+

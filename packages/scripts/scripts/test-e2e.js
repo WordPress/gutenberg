@@ -14,18 +14,27 @@ process.on( 'unhandledRejection', ( err ) => {
  */
 /* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
+const { sync: spawn } = require( 'cross-spawn' );
 
 /**
  * Internal dependencies
  */
 const {
+	getJestOverrideConfigFile,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	hasArgInCLI,
 	hasProjectFile,
-	hasJestConfig,
 } = require( '../utils' );
+
+const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
+	stdio: 'inherit',
+} );
+
+if ( result.status > 0 ) {
+	process.exit( result.status );
+}
 
 // Provides a default config path for Puppeteer when jest-puppeteer.config.js
 // wasn't found at the root of the project or a custom path wasn't defined
@@ -37,11 +46,10 @@ if (
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
-const config = ! hasJestConfig()
-	? [
-			'--config',
-			JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ),
-	  ]
+const configFile = getJestOverrideConfigFile( 'e2e' );
+
+const config = configFile
+	? [ '--config', JSON.stringify( require( configFile ) ) ]
 	: [];
 
 const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
@@ -50,6 +58,11 @@ const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_SLOWMO = getArgFromCLI( '--puppeteer-slowmo' ) || 80;
+}
+
+if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
+	process.env.PUPPETEER_HEADLESS = 'false';
+	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
 
 const configsMapping = {

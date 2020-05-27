@@ -20,6 +20,8 @@ function ButtonBlockAppender( {
 	rootClientId,
 	getStylesFromColorScheme,
 	showSeparator,
+	isFloating = false,
+	onAddBlock,
 } ) {
 	const appenderStyle = {
 		...styles.appender,
@@ -30,7 +32,9 @@ function ButtonBlockAppender( {
 	};
 	const addBlockButtonStyle = getStylesFromColorScheme(
 		styles.addBlockButton,
-		styles.addBlockButtonDark
+		isFloating
+			? styles.floatingAddBlockButtonDark
+			: styles.addBlockButtonDark
 	);
 
 	return (
@@ -39,12 +43,17 @@ function ButtonBlockAppender( {
 				rootClientId={ rootClientId }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 					<Button
-						onClick={ onToggle }
+						onClick={ onAddBlock || onToggle }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
 						fixedRatio={ false }
 					>
-						<View style={ appenderStyle }>
+						<View
+							style={ [
+								appenderStyle,
+								isFloating && styles.floatingAppender,
+							] }
+						>
 							<Icon
 								icon={ plusCircleFilled }
 								style={ addBlockButtonStyle }

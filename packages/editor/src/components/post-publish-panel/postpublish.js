@@ -23,6 +23,26 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import PostScheduleLabel from '../post-schedule/label';
 
+const POSTNAME = '%postname%';
+
+/**
+ * Returns URL for a future post.
+ *
+ * @param {Object} post         Post object.
+ *
+ * @return {string} PostPublish URL.
+ */
+
+const getFuturePostUrl = ( post ) => {
+	const { slug } = post;
+
+	if ( post.permalink_template.includes( POSTNAME ) ) {
+		return post.permalink_template.replace( POSTNAME, slug );
+	}
+
+	return post.permalink_template;
+};
+
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
 		super( ...arguments );
@@ -65,6 +85,8 @@ class PostPublishPanelPostpublish extends Component {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const link =
+			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
@@ -78,7 +100,7 @@ class PostPublishPanelPostpublish extends Component {
 		return (
 			<div className="post-publish-panel__postpublish">
 				<PanelBody className="post-publish-panel__postpublish-header">
-					<a ref={ this.postLink } href={ post.link }>
+					<a ref={ this.postLink } href={ link }>
 						{ decodeEntities( post.title ) || __( '(no title)' ) }
 					</a>{ ' ' }
 					{ postPublishNonLinkHeader }
@@ -95,19 +117,19 @@ class PostPublishPanelPostpublish extends Component {
 							__( '%s address' ),
 							postLabel
 						) }
-						value={ safeDecodeURIComponent( post.link ) }
+						value={ safeDecodeURIComponent( link ) }
 						onFocus={ this.onSelectInput }
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button isSecondary href={ post.link }>
+							<Button isSecondary href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
 
 						<ClipboardButton
 							isSecondary
-							text={ post.link }
+							text={ link }
 							onCopy={ this.onCopy }
 						>
 							{ this.state.showCopyConfirmation

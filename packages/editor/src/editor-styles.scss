@@ -95,6 +95,7 @@ h6 {
 
 p {
 	font-size: inherit;
+	line-height: inherit;
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
 }
@@ -145,7 +146,8 @@ ol ul {
 }
 
 a {
-	color: inherit;
+	// This inherits the blue link color set by wp-admin, which is unfortunate.
+	// However both inherit and unset properties set the color to black.
 	transition: none;
 }
 

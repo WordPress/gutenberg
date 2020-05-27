@@ -25,9 +25,6 @@ export const settings = {
 		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
 	],
-	supports: {
-		lightBlockWrapper: true,
-	},
 	example: {
 		attributes: {
 			sizeSlug: 'large',
@@ -60,6 +57,11 @@ export const settings = {
 			// A period simply means a pause, no need to translate it.
 			return alt + ( caption ? '. ' + caption : '' );
 		}
+	},
+	getEditWrapperProps( attributes ) {
+		return {
+			'data-align': attributes.align,
+		};
 	},
 	transforms,
 	edit,

@@ -22,7 +22,7 @@ A RangeControl can contain the following elements:
 
 1. **Track**: The track shows the range available for user selection. For left-to-right (LTR) languages, the smallest value appears on the far left, and the largest value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the smallest value on the far right and the largest value on the far left.
 2. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
-3. **Value entry field** (optional): The value entry field displays the currently selected, specific numerical value.
+3. **Value entry field**: The value entry field displays the currently selected, specific numerical value.
 4. **Icon** (optional): An icon can be displayed before or after the slider.
 5. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
 
@@ -44,8 +44,8 @@ Possible selections may be organized through the use of tick marks, which a thum
 - **Click jump**: The slider is controlled by clicking the track.
 - **Click and arrow**: The slider is controlled by clicking the thumb, then using arrow keys to move it.
 - **Tab and arrow**: The slider is controlled by using the tab key to select the thumb of the desired slider, then using arrow keys to move it.
+- **Value entry field**: Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
 - **Tick marks** (Optional) Discrete sliders can use evenly spaced tick marks along the slider track, and the thumb will snap to them. Each tick mark should change the setting in increments that are discernible to the user.
-- **Value entry field** (Optional): Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
 
 ### Usage
 
@@ -245,6 +245,14 @@ const MyRangeControl() {
 - Required: No
 - Platform: Web
 
+#### resetFallbackValue
+
+The value to revert to if the Reset button is clicked (enabled by `allowReset`)
+
+- Type: `Number`
+- Required: No
+- Platform: Web
+
 #### showTooltip
 
 Forcing the Tooltip UI to show or hide.
@@ -291,6 +299,14 @@ Define if separator line under/above control row should be disabled or full widt
 
 - Type: `String Enum`
 - Values: `none` | `fullWidth` | `topFullWidth`
+- Required: No
+- Platform: Mobile
+
+#### type
+
+Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as  `stepper`. Defaults to slider if no option is provided.
+
+- Type: `String`
 - Required: No
 - Platform: Mobile
 

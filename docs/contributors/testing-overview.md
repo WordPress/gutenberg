@@ -344,12 +344,6 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-### StoryShots
-
-> [StoryShots](https://www.npmjs.com/package/@storybook/addon-storyshots) adds automatic Jest Snapshot Testing for [Storybook](https://storybook.js.org/).
-
-Whenever a new story is added to Storybook, `npm run test-unit` needs to be executed to generate the corresponding snapshots. In the case when the existing story gets updated or removed, please refer to [Working with snapshots](#working-with-snapshots) section.
-
 #### Troubleshooting
 
 Sometimes we need to mock refs for some stories which use them. Check the following documents to learn more:
@@ -357,6 +351,11 @@ Sometimes we need to mock refs for some stories which use them. Check the follow
 - [Using createNodeMock to mock refs](https://github.com/storybookjs/storybook/tree/master/addons/storyshots/storyshots-core#using-createnodemock-to-mock-refs) with StoryShots.
 
 In that case, you might see test failures and `TypeError` reported by Jest in the lines which try to access a property from `ref.current`. If this happens, search for `initStoryshots` method call, which contains all necessary configurations to adjust.
+
+### Debugging Jest unit tests
+
+Running `npm run test-unit:debug` will start the tests in debug mode so a [node inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) can connect to the process and inspect the execution. Instructions for using Google Chrome or Visual Studio Code as an inspector client can be found in the [wp-scripts documentation](/packages/scripts/README.md#debugging-jest-unit-tests).
+
 ## Native mobile testing
 
 Part of the unit-tests suite is a set of Jest tests run exercise native-mobile codepaths, developed in React Native. Since those tests run on Node, they can be launched locally on your development machine without the need for specific native Android or iOS dev tools or SDKs. It also means that they can be debugged using typical dev tools. Read on for instructions how to debug.
@@ -372,7 +371,9 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
-## End to end Testing
+## End-to-end Testing
+
+End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
 If you're using the built-in [local environment](/docs/contributors/getting-started.md#local-environment), you can run the e2e tests locally using this command:
 
@@ -386,16 +387,28 @@ or interactively
 npm run test-e2e:watch
 ```
 
-Sometimes it's useful to observe the browser while running tests. To do so you can use these environment variables:
+Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+npm run test-e2e:watch -- --puppeteer-interactive
+```
+
+You can control the speed of execution with `--puppeteer-slowmo`:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+```
+
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
-WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
+npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
 
 If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
@@ -419,7 +432,7 @@ Related: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-e
 
 ### Core Block Testing
 
-Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
+Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the e2e tests fixtures readme](https://github.com/wordpress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) for more information and instructions.
 
 ## PHP Testing
 
@@ -435,3 +448,27 @@ To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
+
+## Performance Testing
+
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
+
+* The time it takes to load the editor.
+* The time it takes for the browser to respond when typing.
+* The time it takes to select a block.
+
+Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+
+```
+npm run test-performance
+```
+
+This gives you the result for the current branch/code on the running environment.
+
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+
+```
+./bin/plugin/cli.js perf master v8.1.0 v8.0.0
+```
+
+**Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

@@ -1,4 +1,22 @@
 {
 	"name": "core/group",
-	"category": "layout"
+	"category": "layout",
+	"attributes": {
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"anchor": true,
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true
+		}
+	}
 }

@@ -72,9 +72,21 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Context",
+		"slug": "block-context",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-context.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Deprecated Blocks",
 		"slug": "block-deprecation",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-deprecation.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Block Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",
 		"parent": "block-api"
 	},
 	{
@@ -222,6 +234,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Themes & Block Editor: experimental theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -270,9 +288,9 @@
 		"parent": "designers"
 	},
 	{
-		"title": "Patterns",
-		"slug": "design-patterns",
-		"markdown_source": "../docs/designers-developers/designers/design-patterns.md",
+		"title": "User Interface",
+		"slug": "user-interface",
+		"markdown_source": "../docs/designers-developers/designers/user-interface.md",
 		"parent": "designers"
 	},
 	{
@@ -382,6 +400,12 @@
 		"slug": "copy-guide",
 		"markdown_source": "../docs/contributors/copy-guide.md",
 		"parent": "document"
+	},
+	{
+		"title": "Triage",
+		"slug": "triage",
+		"markdown_source": "../docs/contributors/triage.md",
+		"parent": "contributors"
 	},
 	{
 		"title": "Localizing Gutenberg Plugin",
@@ -610,6 +634,12 @@
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
 		"parent": null
+	},
+	{
+		"title": "AlignmentMatrixControl",
+		"slug": "alignment-matrix-control",
+		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
+		"parent": "components"
 	},
 	{
 		"title": "AnglePickerControl",
@@ -846,6 +876,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "InputControl",
+		"slug": "input-control",
+		"markdown_source": "../packages/components/src/input-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "IsolatedEventContainer",
 		"slug": "isolated-event-container",
 		"markdown_source": "../packages/components/src/isolated-event-container/README.md",
@@ -894,6 +930,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "NumberControl",
+		"slug": "number-control",
+		"markdown_source": "../packages/components/src/number-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Panel",
 		"slug": "panel",
 		"markdown_source": "../packages/components/src/panel/README.md",
@@ -921,6 +963,12 @@
 		"title": "RadioControl",
 		"slug": "radio-control",
 		"markdown_source": "../packages/components/src/radio-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "RadioGroup",
+		"slug": "radio-group",
+		"markdown_source": "../packages/components/src/radio-group/README.md",
 		"parent": "components"
 	},
 	{
@@ -1026,9 +1074,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "TreeGrid",
+		"slug": "tree-grid",
+		"markdown_source": "../packages/components/src/tree-grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "UnitControl",
+		"slug": "unit-control",
+		"markdown_source": "../packages/components/src/unit-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1290,6 +1350,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/edit-navigation",
+		"slug": "packages-edit-navigation",
+		"markdown_source": "../packages/edit-navigation/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "../packages/edit-post/README.md",
@@ -1368,6 +1434,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/interface",
+		"slug": "packages-interface",
+		"markdown_source": "../packages/interface/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/is-shallow-equal",
 		"slug": "packages-is-shallow-equal",
 		"markdown_source": "../packages/is-shallow-equal/README.md",
@@ -1443,6 +1515,12 @@
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

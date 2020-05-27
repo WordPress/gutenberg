@@ -4,7 +4,7 @@
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies

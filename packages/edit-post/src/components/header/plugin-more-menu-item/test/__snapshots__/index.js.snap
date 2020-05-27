@@ -22,9 +22,9 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
       type="button"
     >
       <svg
-        aria-hidden="true"
+        aria-hidden={true}
         className="components-menu-items__item-icon"
-        focusable="false"
+        focusable={false}
         height={24}
         role="img"
         viewBox="0 0 24 24"

@@ -22,13 +22,13 @@ const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
+	await pressKeyWithModifier( 'ctrl', '`' );
 };
 
 const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
-	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
@@ -38,38 +38,39 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	).toBe( paragraphText );
 
 	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Document' );
-};
-
-const tabThroughBlockMoverControl = async () => {
-	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Move up' );
-
-	await page.keyboard.press( 'Tab' );
-	await expect( await getActiveLabel() ).toBe( 'Move down' );
+	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 };
 
 const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
+	await expect( await getActiveLabel() ).toBe( 'Move up' );
+
+	await page.keyboard.press( 'ArrowRight' );
+	await expect( await getActiveLabel() ).toBe( 'Move down' );
+
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change text alignment' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Bold' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Italic' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Link' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'More rich text controls' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'More options' );
+
+	await page.keyboard.press( 'ArrowRight' );
+	await expect( await getActiveLabel() ).toBe( 'Move up' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
@@ -133,7 +134,7 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Document (selected)' );
+		await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 	} );
 
 	it( 'allows tabbing in navigation mode if no block is selected (reverse)', async () => {
@@ -149,7 +150,7 @@ describe( 'Order of block keyboard navigation', () => {
 		await page.evaluate( () => {
 			document.querySelector( '.edit-post-visual-editor' ).focus();
 			document
-				.querySelector( '.block-editor-editor-skeleton__sidebar' )
+				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();
 		} );
 
@@ -196,6 +197,6 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'More options' );
+		await expect( await getActiveLabel() ).toBe( 'Move up' );
 	} );
 } );

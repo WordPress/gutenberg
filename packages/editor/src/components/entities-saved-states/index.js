@@ -1,59 +1,85 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
+import { some, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Modal, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
+import { close as closeIcon } from '@wordpress/icons';
 
-function EntityRecordState( { record, checked, onChange } ) {
-	const entity = useSelect(
-		( select ) => select( 'core' ).getEntity( record.kind, record.name ),
-		[ record.kind, record.name ]
-	);
+/**
+ * Internal dependencies
+ */
+import EntityTypeList from './entity-type-list';
 
-	return (
-		<CheckboxControl
-			label={
-				<>
-					{ entity.label }
-					{ !! record.title && (
-						<>
-							{ ': ' }
-							<strong>
-								{ record.title || __( 'Untitled' ) }
-							</strong>
-						</>
-					) }
-				</>
-			}
-			checked={ ! checked }
-			onChange={ onChange }
-		/>
-	);
-}
+const ENTITY_NAMES = {
+	wp_template_part: ( number ) =>
+		_n( 'template part', 'template parts', number ),
+	wp_template: ( number ) => _n( 'template', 'templates', number ),
+	post: ( number ) => _n( 'post', 'posts', number ),
+	page: ( number ) => _n( 'page', 'pages', number ),
+	site: ( number ) => _n( 'site', 'sites', number ),
+};
 
-export default function EntitiesSavedStates( {
-	isOpen,
-	onRequestClose,
-	ignoredForSave = [],
-} ) {
-	const dirtyEntityRecords = useSelect(
-		( select ) => select( 'core' ).__experimentalGetDirtyEntityRecords(),
-		[]
-	);
+const PLACEHOLDER_PHRASES = {
+	// 0 is a back up, but should never be observed.
+	0: __( 'There are no changes.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	1: __( 'Changes have been made to your %s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	2: __( 'Changes have been made to your %1$s and %2$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	3: __( 'Changes have been made to your %1$s, %2$s, and %3$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	4: __( 'Changes have been made to your %1$s, %2$s, %3$s, and %4$s.' ),
+	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
+	5: __( 'Changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.' ),
+};
+
+export default function EntitiesSavedStates( { isOpen, close } ) {
+	const { dirtyEntityRecords } = useSelect( ( select ) => {
+		return {
+			dirtyEntityRecords: select(
+				'core'
+			).__experimentalGetDirtyEntityRecords(),
+		};
+	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ unsavedEntityRecords, _setUnsavedEntityRecords ] = useState( [] );
-	const setUnsavedEntityRecords = ( { kind, name, key }, checked ) => {
+	// To group entities by type.
+	const partitionedSavables = Object.values(
+		groupBy( dirtyEntityRecords, 'name' )
+	);
+
+	// Get labels for text-prompt phrase.
+	const entityNamesForPrompt = [];
+	partitionedSavables.forEach( ( list ) => {
+		if ( ENTITY_NAMES[ list[ 0 ].name ] ) {
+			entityNamesForPrompt.push(
+				ENTITY_NAMES[ list[ 0 ].name ]( list.length )
+			);
+		}
+	} );
+	// Get text-prompt phrase based on number of entity types changed.
+	const placeholderPhrase =
+		PLACEHOLDER_PHRASES[ entityNamesForPrompt.length ] ||
+		// Fallback for edge case that should not be observed (more than 5 entity types edited).
+		__( 'Changes have been made to multiple entity types.' );
+	// eslint-disable-next-line @wordpress/valid-sprintf
+	const promptPhrase = sprintf( placeholderPhrase, ...entityNamesForPrompt );
+
+	// Unchecked entities to be ignored by save function.
+	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+
+	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
 		if ( checked ) {
-			_setUnsavedEntityRecords(
-				unsavedEntityRecords.filter(
+			_setUnselectedEntities(
+				unselectedEntities.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
@@ -61,17 +87,18 @@ export default function EntitiesSavedStates( {
 				)
 			);
 		} else {
-			_setUnsavedEntityRecords( [
-				...unsavedEntityRecords,
+			_setUnselectedEntities( [
+				...unselectedEntities,
 				{ kind, name, key },
 			] );
 		}
 	};
+
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key } ) => {
 				return ! some(
-					ignoredForSave.concat( unsavedEntityRecords ),
+					unselectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
@@ -84,41 +111,24 @@ export default function EntitiesSavedStates( {
 			saveEditedEntityRecord( kind, name, key );
 		} );
 
-		onRequestClose( entitiesToSave );
+		close( entitiesToSave );
 	};
-	return (
-		isOpen && (
-			<Modal
-				title={ __( 'What do you want to save?' ) }
-				onRequestClose={ () => onRequestClose() }
-				contentLabel={ __( 'Select items to save.' ) }
-			>
-				{ dirtyEntityRecords.map( ( record ) => {
-					return (
-						<EntityRecordState
-							key={ record.key }
-							record={ record }
-							checked={
-								! some(
-									unsavedEntityRecords,
-									( elt ) =>
-										elt.kind === record.kind &&
-										elt.name === record.name &&
-										elt.key === record.key
-								)
-							}
-							onChange={ ( value ) =>
-								setUnsavedEntityRecords( record, value )
-							}
-						/>
-					);
-				} ) }
 
+	const [ isReviewing, setIsReviewing ] = useState( false );
+	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
+
+	// Explicitly define this with no argument passed.  Using `close` on
+	// its own will use the event object in place of the expected saved entities.
+	const dismissPanel = useCallback( () => close(), [ close ] );
+
+	return isOpen ? (
+		<div className="entities-saved-states__panel">
+			<div className="entities-saved-states__panel-header">
 				<Button
 					isPrimary
 					disabled={
 						dirtyEntityRecords.length -
-							unsavedEntityRecords.length ===
+							unselectedEntities.length ===
 						0
 					}
 					onClick={ saveCheckedEntities }
@@ -126,7 +136,41 @@ export default function EntitiesSavedStates( {
 				>
 					{ __( 'Save' ) }
 				</Button>
-			</Modal>
-		)
-	);
+				<Button
+					onClick={ dismissPanel }
+					icon={ closeIcon }
+					label={ __( 'Close panel' ) }
+				/>
+			</div>
+
+			<div className="entities-saved-states__text-prompt">
+				<strong>{ __( 'Are you ready to save?' ) }</strong>
+				<p>{ promptPhrase }</p>
+				<p>
+					<Button
+						onClick={ toggleIsReviewing }
+						isLink
+						className="entities-saved-states__review-changes-button"
+					>
+						{ isReviewing
+							? __( 'Hide changes.' )
+							: __( 'Review changes.' ) }
+					</Button>
+				</p>
+			</div>
+
+			{ isReviewing &&
+				partitionedSavables.map( ( list ) => {
+					return (
+						<EntityTypeList
+							key={ list[ 0 ].name }
+							list={ list }
+							closePanel={ dismissPanel }
+							unselectedEntities={ unselectedEntities }
+							setUnselectedEntities={ setUnselectedEntities }
+						/>
+					);
+				} ) }
+		</div>
+	) : null;
 }

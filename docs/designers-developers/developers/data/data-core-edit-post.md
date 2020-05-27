@@ -277,10 +277,6 @@ _Returns_
 
 Returns an action object signalling that the user closed the sidebar.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="closeModal" href="#closeModal">#</a> **closeModal**
 
 Returns an action object signalling that the user closed a modal.
@@ -325,11 +321,7 @@ Returns an action object used in signalling that the user opened an editor sideb
 
 _Parameters_
 
--   _name_ `string`: Sidebar name to be opened.
-
-_Returns_
-
--   `Object`: Action object.
+-   _name_ `?string`: Sidebar name to be opened.
 
 <a name="openModal" href="#openModal">#</a> **openModal**
 

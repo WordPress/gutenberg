@@ -80,6 +80,8 @@ function InlineLinkUI( {
 
 	const linkValue = {
 		url: activeAttributes.url,
+		type: activeAttributes.type,
+		id: activeAttributes.id,
 		opensInNewTab: activeAttributes.target === '_blank',
 		...nextLinkValue,
 	};
@@ -115,19 +117,28 @@ function InlineLinkUI( {
 		const newUrl = prependHTTP( nextValue.url );
 		const format = createLinkFormat( {
 			url: newUrl,
+			type: nextValue.type,
+			id:
+				nextValue.id !== undefined && nextValue.id !== null
+					? String( nextValue.id )
+					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
+			const newText = nextValue.title || newUrl;
 			const toInsert = applyFormat(
-				create( { text: newUrl } ),
+				create( { text: newText } ),
 				format,
 				0,
-				newUrl.length
+				newText.length
 			);
 			onChange( insert( value, toInsert ) );
 		} else {
-			onChange( applyFormat( value, format ) );
+			const newValue = applyFormat( value, format );
+			newValue.start = newValue.end;
+			newValue.activeFormats = [];
+			onChange( newValue );
 		}
 
 		// Focus should only be shifted back to the formatted segment when the

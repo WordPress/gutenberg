@@ -26,9 +26,8 @@ function ResponsiveBlockControl( props ) {
 		isResponsive = false,
 		defaultLabel = {
 			id: 'all',
-			label: __(
-				'All'
-			) /* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */,
+			/* translators: 'Label. Used to signify a layout property (eg: margin, padding) will apply uniformly to all screensizes.' */
+			label: __( 'All' ),
 		},
 		viewports = [
 			{
@@ -50,10 +49,13 @@ function ResponsiveBlockControl( props ) {
 		return null;
 	}
 
-	/* translators: 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.'. %s property value for the control (eg: margin, padding...etc) */
 	const toggleControlLabel =
 		toggleLabel ||
-		sprintf( __( 'Use the same %s on all screensizes.' ), property );
+		sprintf(
+			/* translators: 'Toggle control label. Should the property be the same across all screen sizes or unique per screen size.'. %s property value for the control (eg: margin, padding...etc) */
+			__( 'Use the same %s on all screensizes.' ),
+			property
+		);
 
 	/* translators: 'Help text for the responsive mode toggle control.' */
 	const toggleHelpText = __(

@@ -3,14 +3,7 @@
  */
 import memoize from 'memize';
 import classnames from 'classnames';
-import {
-	map,
-	kebabCase,
-	camelCase,
-	castArray,
-	startCase,
-	isFunction,
-} from 'lodash';
+import { kebabCase, camelCase, castArray, startCase, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,10 +22,9 @@ import {
 /**
  * Internal dependencies
  */
-import PanelColorSettings from '../panel-color-settings';
-import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
+import ColorPanel from './color-panel';
 
 /**
  * Browser dependencies
@@ -46,81 +38,6 @@ const COMMON_COLOR_LABELS = {
 	backgroundColor: __( 'Background Color' ),
 };
 
-const resolveContrastCheckerColor = ( color, colorSettings, detectedColor ) => {
-	if ( typeof color === 'function' ) {
-		return color( colorSettings );
-	} else if ( color === true ) {
-		return detectedColor;
-	}
-	return color;
-};
-
-const ColorPanel = ( {
-	title,
-	colorSettings,
-	colorPanelProps,
-	contrastCheckers,
-	detectedBackgroundColor,
-	detectedColor,
-	panelChildren,
-	initialOpen,
-} ) => (
-	<PanelColorSettings
-		title={ title }
-		initialOpen={ initialOpen }
-		colorSettings={ Object.values( colorSettings ) }
-		{ ...colorPanelProps }
-	>
-		{ contrastCheckers &&
-			( Array.isArray( contrastCheckers )
-				? contrastCheckers.map(
-						( { backgroundColor, textColor, ...rest } ) => {
-							backgroundColor = resolveContrastCheckerColor(
-								backgroundColor,
-								colorSettings,
-								detectedBackgroundColor
-							);
-							textColor = resolveContrastCheckerColor(
-								textColor,
-								colorSettings,
-								detectedColor
-							);
-							return (
-								<ContrastChecker
-									key={ `${ backgroundColor }-${ textColor }` }
-									backgroundColor={ backgroundColor }
-									textColor={ textColor }
-									{ ...rest }
-								/>
-							);
-						}
-				  )
-				: map( colorSettings, ( { value } ) => {
-						let { backgroundColor, textColor } = contrastCheckers;
-						backgroundColor = resolveContrastCheckerColor(
-							backgroundColor || value,
-							colorSettings,
-							detectedBackgroundColor
-						);
-						textColor = resolveContrastCheckerColor(
-							textColor || value,
-							colorSettings,
-							detectedColor
-						);
-						return (
-							<ContrastChecker
-								{ ...contrastCheckers }
-								key={ `${ backgroundColor }-${ textColor }` }
-								backgroundColor={ backgroundColor }
-								textColor={ textColor }
-							/>
-						);
-				  } ) ) }
-		{ typeof panelChildren === 'function'
-			? panelChildren( colorSettings )
-			: panelChildren }
-	</PanelColorSettings>
-);
 const InspectorControlsColorPanel = ( props ) => (
 	<InspectorControls>
 		<ColorPanel { ...props } />

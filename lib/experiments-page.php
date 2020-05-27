@@ -52,6 +52,17 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 	add_settings_field(
+		'gutenberg-navigation',
+		__( 'Navigation', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable Navigation screen', 'gutenberg' ),
+			'id'    => 'gutenberg-navigation',
+		)
+	);
+	add_settings_field(
 		'gutenberg-block-directory',
 		__( 'Block Directory', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

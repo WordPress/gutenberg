@@ -10,21 +10,20 @@
 	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	padding: $grid-unit-05 * 1.5;
 	display: flex;
 	flex-direction: column;
 
 	&:focus {
-		@include block-style__focus();
+		box-shadow: 0 0 0 $border-width-focus $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 
-	&:hover {
-		@include block-style__hover;
-
-		.block-editor-block-styles__item-preview {
-			border-color: $theme-color;
-		}
+	&:hover .block-editor-block-styles__item-preview {
+		border-color: $theme-color;
 	}
 
 	&.is-active {
@@ -43,7 +42,7 @@
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
 	border: $border-width solid rgba($dark-gray-primary, 0.2);
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
 	background: $white;

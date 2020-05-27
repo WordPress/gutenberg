@@ -29,13 +29,6 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'title' ), __( 'subtitle' ) ],
-	supports: {
-		className: false,
-		anchor: true,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-		__experimentalColor: true,
-	},
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),

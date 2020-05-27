@@ -2,16 +2,16 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isObject } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { useRef, useEffect, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,13 +21,28 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import PanelColorSettings from '../components/panel-color-settings';
-import ContrastChecker from '../components/contrast-checker';
-import InspectorControls from '../components/inspector-controls';
-import { getBlockDOMNode } from '../utils/dom';
+import {
+	__experimentalGetGradientClass,
+	getGradientValueBySlug,
+	getGradientSlugByValue,
+} from '../components/gradients';
 import { cleanEmptyObject } from './utils';
+import ColorPanel from './color-panel';
 
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
+
+const hasColorSupport = ( blockType ) =>
+	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+const hasGradientSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return isObject( colorSupport ) && !! colorSupport.gradients;
+};
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -37,7 +52,7 @@ export const COLOR_SUPPORT_KEY = '__experimentalColor';
  * @return {Object}          Filtered block settings
  */
 function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasColorSupport( settings ) ) {
 		return settings;
 	}
 
@@ -57,6 +72,14 @@ function addAttributes( settings ) {
 		} );
 	}
 
+	if ( hasGradientSupport( settings ) && ! settings.attributes.gradient ) {
+		Object.assign( settings.attributes, {
+			gradient: {
+				type: 'string',
+			},
+		} );
+	}
+
 	return settings;
 }
 
@@ -69,25 +92,35 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props applied to save element
  */
 export function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasColorSupport( blockType ) ) {
 		return props;
 	}
 
+	const hasGradient = hasGradientSupport( blockType );
+
 	// I'd have prefered to avoid the "style" attribute usage here
-	const { backgroundColor, textColor, style } = attributes;
+	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	const backgroundClass = getColorClassName(
 		'background-color',
 		backgroundColor
 	);
+	const gradientClass = __experimentalGetGradientClass( gradient );
 	const textClass = getColorClassName( 'color', textColor );
 	const newClassName = classnames(
 		props.className,
-		backgroundClass,
 		textClass,
+		gradientClass,
 		{
+			// Don't apply the background class if there's a custom gradient
+			[ backgroundClass ]:
+				( ! hasGradient || ! style?.color?.gradient ) &&
+				!! backgroundClass,
 			'has-text-color': textColor || style?.color?.text,
-			'has-background': backgroundColor || style?.color?.background,
+			'has-background':
+				backgroundColor ||
+				style?.color?.background ||
+				( hasGradient && ( gradient || style?.color?.gradient ) ),
 		}
 	);
 	props.className = newClassName ? newClassName : undefined;
@@ -103,7 +136,7 @@ export function addSaveProps( props, blockType, attributes ) {
  * @return {Object}          Filtered block settings
  */
 export function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasColorSupport( settings ) ) {
 		return settings;
 	}
 	const existingGetEditWrapperProps = settings.getEditWrapperProps;
@@ -118,118 +151,134 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
-const ColorPanel = ( { colorSettings, clientId } ) => {
-	const { getComputedStyle, Node } = window;
-
-	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
-	const [ detectedColor, setDetectedColor ] = useState();
-
-	useEffect( () => {
-		const colorsDetectionElement = getBlockDOMNode( clientId );
-		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
-
-		let backgroundColorNode = colorsDetectionElement;
-		let backgroundColor = getComputedStyle( backgroundColorNode )
-			.backgroundColor;
-		while (
-			backgroundColor === 'rgba(0, 0, 0, 0)' &&
-			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
-		) {
-			backgroundColorNode = backgroundColorNode.parentNode;
-			backgroundColor = getComputedStyle( backgroundColorNode )
-				.backgroundColor;
-		}
-
-		setDetectedBackgroundColor( backgroundColor );
-	} );
-
-	return (
-		<InspectorControls>
-			<PanelColorSettings
-				title={ __( 'Color settings' ) }
-				initialOpen={ false }
-				colorSettings={ colorSettings }
-			>
-				<ContrastChecker
-					backgroundColor={ detectedBackgroundColor }
-					textColor={ detectedColor }
-				/>
-			</PanelColorSettings>
-		</InspectorControls>
-	);
-};
-
 /**
- * Override the default edit UI to include new inspector controls for block
- * color, if block defines support.
+ * Inspector control panel containing the color related configuration
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param {Object} props
+ *
+ * @return {WPElement} Color edit element.
  */
-export const withBlockControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const colors = useSelect( ( select ) => {
-			return select( 'core/block-editor' ).getSettings().colors;
-		}, [] );
+export function ColorEdit( props ) {
+	const { name: blockName, attributes } = props;
+	const { colors, gradients } = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getSettings();
+	}, [] );
+	// Shouldn't be needed but right now the ColorGradientsPanel
+	// can trigger both onChangeColor and onChangeBackground
+	// synchronously causing our two callbacks to override changes
+	// from each other.
+	const localAttributes = useRef( attributes );
+	useEffect( () => {
+		localAttributes.current = attributes;
+	}, [ attributes ] );
 
-		if ( ! hasBlockSupport( blockName, COLOR_SUPPORT_KEY ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-		const { style, textColor, backgroundColor } = props.attributes;
+	if ( ! hasColorSupport( blockName ) ) {
+		return null;
+	}
 
-		const onChangeColor = ( name ) => ( value ) => {
-			const colorObject = getColorObjectByColorValue( colors, value );
-			const attributeName = name + 'Color';
-			const newStyle = {
-				...style,
-				color: {
-					...style?.color,
-					[ name ]: colorObject?.slug ? undefined : value,
-				},
-			};
-			const newNamedColor = colorObject?.slug
-				? colorObject.slug
-				: undefined;
-			props.setAttributes( {
-				style: cleanEmptyObject( newStyle ),
-				[ attributeName ]: newNamedColor,
-			} );
+	const hasGradient = hasGradientSupport( blockName );
+
+	const { style, textColor, backgroundColor, gradient } = attributes;
+	let gradientValue;
+	if ( hasGradient && gradient ) {
+		gradientValue = getGradientValueBySlug( gradients, gradient );
+	} else if ( hasGradient ) {
+		gradientValue = style?.color?.gradient;
+	}
+
+	const onChangeColor = ( name ) => ( value ) => {
+		const colorObject = getColorObjectByColorValue( colors, value );
+		const attributeName = name + 'Color';
+		const newStyle = {
+			...localAttributes.current.style,
+			color: {
+				...localAttributes.current?.style?.color,
+				[ name ]: colorObject?.slug ? undefined : value,
+			},
 		};
 
-		return [
-			<ColorPanel
-				key="colors"
-				clientId={ props.clientId }
-				colorSettings={ [
-					{
-						label: __( 'Text Color' ),
-						onChange: onChangeColor( 'text' ),
+		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
+		const newAttributes = {
+			style: cleanEmptyObject( newStyle ),
+			[ attributeName ]: newNamedColor,
+		};
+
+		props.setAttributes( newAttributes );
+		localAttributes.current = {
+			...localAttributes.current,
+			...newAttributes,
+		};
+	};
+
+	const onChangeGradient = ( value ) => {
+		const slug = getGradientSlugByValue( gradients, value );
+		let newAttributes;
+		if ( slug ) {
+			const newStyle = {
+				...localAttributes.current?.style,
+				color: {
+					...localAttributes.current?.style?.color,
+					gradient: undefined,
+				},
+			};
+			newAttributes = {
+				style: cleanEmptyObject( newStyle ),
+				gradient: slug,
+			};
+		} else {
+			const newStyle = {
+				...localAttributes.current?.style,
+				color: {
+					...localAttributes.current?.style?.color,
+					gradient: value,
+				},
+			};
+			newAttributes = {
+				style: cleanEmptyObject( newStyle ),
+				gradient: undefined,
+			};
+		}
+		props.setAttributes( newAttributes );
+		localAttributes.current = {
+			...localAttributes.current,
+			...newAttributes,
+		};
+	};
+
+	return (
+		<ColorPanel
+			enableContrastChecking={
+				// Turn on contrast checker for web only since it's not supported on mobile yet.
+				Platform.OS === 'web' && ! gradient && ! style?.color?.gradient
+			}
+			clientId={ props.clientId }
+			settings={ [
+				{
+					label: __( 'Text Color' ),
+					onColorChange: onChangeColor( 'text' ),
+					colorValue: getColorObjectByAttributeValues(
 						colors,
-						value: getColorObjectByAttributeValues(
-							colors,
-							textColor,
-							style?.color?.text
-						).color,
-					},
-					{
-						label: __( 'Background Color' ),
-						onChange: onChangeColor( 'background' ),
+						textColor,
+						style?.color?.text
+					).color,
+				},
+				{
+					label: __( 'Background Color' ),
+					onColorChange: onChangeColor( 'background' ),
+					colorValue: getColorObjectByAttributeValues(
 						colors,
-						value: getColorObjectByAttributeValues(
-							colors,
-							backgroundColor,
-							style?.color?.background
-						).color,
-					},
-				] }
-			/>,
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withToolbarControls'
-);
+						backgroundColor,
+						style?.color?.background
+					).color,
+					gradientValue,
+					onGradientChange: hasGradient
+						? onChangeGradient
+						: undefined,
+				},
+			] }
+		/>
+	);
+}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -247,10 +296,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/color/addEditProps',
 	addEditProps
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/color/with-block-controls',
-	withBlockControls
 );

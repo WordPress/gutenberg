@@ -7,7 +7,7 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
-function GroupEdit( { className, clientId } ) {
+function GroupEdit( { attributes, className, clientId } ) {
 	const hasInnerBlocks = useSelect(
 		( select ) => {
 			const { getBlock } = select( 'core/block-editor' );
@@ -16,19 +16,22 @@ function GroupEdit( { className, clientId } ) {
 		},
 		[ clientId ]
 	);
+	const BlockWrapper = Block[ attributes.tagName ];
 
 	return (
-		<Block.div className={ className }>
-			<div className="wp-block-group__inner-container">
-				<InnerBlocks
-					renderAppender={
-						hasInnerBlocks
-							? undefined
-							: () => <InnerBlocks.ButtonBlockAppender />
-					}
-				/>
-			</div>
-		</Block.div>
+		<BlockWrapper className={ className }>
+			<InnerBlocks
+				renderAppender={
+					hasInnerBlocks
+						? undefined
+						: () => <InnerBlocks.ButtonBlockAppender />
+				}
+				__experimentalTagName="div"
+				__experimentalPassedProps={ {
+					className: 'wp-block-group__inner-container',
+				} }
+			/>
+		</BlockWrapper>
 	);
 }
 

@@ -52,9 +52,10 @@ function BlockManager( {
 			{ !! numberOfHiddenBlocks && (
 				<div className="edit-post-manage-blocks-modal__disabled-blocks-count">
 					{ sprintf(
+						/* translators: %d: number of blocks. */
 						_n(
-							'%1$d block is disabled.',
-							'%1$d blocks are disabled.',
+							'%d block is disabled.',
+							'%d blocks are disabled.',
 							numberOfHiddenBlocks
 						),
 						numberOfHiddenBlocks
@@ -75,12 +76,19 @@ function BlockManager( {
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
 						key={ category.slug }
-						category={ category }
+						title={ category.title }
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
 						} ) }
 					/>
 				) ) }
+				<BlockManagerCategory
+					title={ __( 'Uncategorized' ) }
+					blockTypes={ filter(
+						blockTypes,
+						( { category } ) => ! category
+					) }
+				/>
 			</div>
 		</div>
 	);

@@ -3,12 +3,14 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save() {
+export default function save( { attributes } ) {
+	const { tagName: Tag } = attributes;
+
 	return (
-		<div>
+		<Tag>
 			<div className="wp-block-group__inner-container">
 				<InnerBlocks.Content />
 			</div>
-		</div>
+		</Tag>
 	);
 }

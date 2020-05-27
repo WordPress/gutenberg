@@ -14,3 +14,14 @@ import { get } from 'lodash';
 export function isFeatureActive( state, feature ) {
 	return get( state.preferences.features, [ feature ], false );
 }
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function __experimentalGetPreviewDeviceType( state ) {
+	return state.deviceType;
+}

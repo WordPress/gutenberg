@@ -4,6 +4,7 @@
 import memize from 'memize';
 import { size, map, without } from 'lodash';
 import { subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
+import { I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,10 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { SlotFillProvider } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	SiteCapabilitiesContext,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -45,6 +49,7 @@ class Editor extends Component {
 	) {
 		settings = {
 			...settings,
+			isRTL: I18nManager.isRTL,
 			hasFixedToolbar,
 			focusMode,
 		};
@@ -127,15 +132,19 @@ class Editor extends Component {
 
 		return (
 			<SlotFillProvider>
-				<EditorProvider
-					settings={ editorSettings }
-					post={ normalizedPost }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					{ ...props }
+				<SiteCapabilitiesContext.Provider
+					value={ this.props.capabilities }
 				>
-					<Layout setTitleRef={ this.setTitleRef } />
-				</EditorProvider>
+					<EditorProvider
+						settings={ editorSettings }
+						post={ normalizedPost }
+						initialEdits={ initialEdits }
+						useSubRegistry={ false }
+						{ ...props }
+					>
+						<Layout setTitleRef={ this.setTitleRef } />
+					</EditorProvider>
+				</SiteCapabilitiesContext.Provider>
 			</SlotFillProvider>
 		);
 	}

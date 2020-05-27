@@ -7,11 +7,14 @@ import { navigation as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
 
-export const name = 'core/navigation';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
 	title: __( 'Navigation' ),
@@ -22,15 +25,21 @@ export const settings = {
 
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 
-	category: 'layout',
-
-	supports: {
-		align: [ 'wide', 'full' ],
-		anchor: true,
-		html: false,
-		inserter: true,
-		lightBlockWrapper: true,
-	},
+	variations: [
+		{
+			name: 'horizontal',
+			isDefault: true,
+			title: __( 'Navigation (horizontal)' ),
+			description: __( 'Links shown in a row.' ),
+			attributes: { orientation: 'horizontal' },
+		},
+		{
+			name: 'vertical',
+			title: __( 'Navigation (vertical)' ),
+			description: __( 'Links shown in a column.' ),
+			attributes: { orientation: 'vertical' },
+		},
+	],
 
 	example: {
 		innerBlocks: [

@@ -17,6 +17,7 @@
 	height: $button-size-small;
 	line-height: $button-size-small;
 	padding: 0;
+	position: relative;
 
 	&:hover:not(:disabled) {
 		text-decoration: underline;
@@ -24,9 +25,19 @@
 	}
 
 	&:focus {
-		@include square-style__focus();
-		outline-offset: -2px;
 		box-shadow: none;
+	}
+
+	&:focus::before {
+		content: "";
+		display: block;
+		position: absolute;
+		border-radius: $radius-block-ui;
+		top: $border-width;
+		right: $border-width;
+		bottom: $border-width;
+		left: $border-width;
+		box-shadow: inset 0 0 0 $border-width-focus $theme-color;
 	}
 }
 

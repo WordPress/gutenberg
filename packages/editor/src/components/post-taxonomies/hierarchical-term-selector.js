@@ -171,6 +171,7 @@ class HierarchicalTermSelector extends Component {
 					? this.state.availableTerms
 					: [ term, ...this.state.availableTerms ];
 				const termAddedMessage = sprintf(
+					/* translators: %s: taxonomy name */
 					_x( '%s added', 'term' ),
 					get(
 						this.props.taxonomy,
@@ -319,6 +320,7 @@ class HierarchicalTermSelector extends Component {
 
 		const resultCount = getResultCount( filteredTermsTree );
 		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results */
 			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);

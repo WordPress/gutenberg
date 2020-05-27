@@ -52,7 +52,41 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 }
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
 
+/**
+ * Add fields required for site editing to the /themes endpoint.
+ *
+ * @todo Remove once https://core.trac.wordpress.org/ticket/49906 is fixed.
+ * @see https://github.com/WordPress/wordpress-develop/pull/222
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Theme         $theme    Theme object used to create response.
+ * @param WP_REST_Request  $request  Request object.
+ */
+function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
+	$data           = $response->get_data();
+	$field_mappings = array(
+		'author'      => 'Author',
+		'author_name' => 'Author Name',
+		'author_uri'  => 'Author URI',
+		'description' => 'Description',
+		'name'        => 'Name',
+		'stylesheet'  => 'Stylesheet',
+		'template'    => 'Template',
+		'theme_uri'   => 'Theme URI',
+		'version'     => 'Version',
+	);
 
+	foreach ( $field_mappings as $field => $theme_field ) {
+		$data[ $field ] = $theme[ $theme_field ];
+	}
+
+	// Using $theme->get_screenshot() with no args to get absolute URL.
+	$data['screenshot'] = $theme->get_screenshot();
+
+	$response->set_data( $data );
+	return $response;
+}
+add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
 
 /**
  * Start: Include for phase 2
@@ -94,6 +128,14 @@ function gutenberg_register_rest_block_directory() {
 }
 add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
 
+/**
+ * Registers the Block types REST API routes.
+ */
+function gutenberg_register_block_type() {
+	$block_types = new WP_REST_Block_Types_Controller();
+	$block_types->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_block_type' );
 /**
  * Registers the menu locations area REST API routes.
  */

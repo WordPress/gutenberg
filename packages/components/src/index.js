@@ -11,6 +11,7 @@ export {
 } from '@wordpress/primitives';
 
 // Components
+export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export { default as Animate } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
@@ -54,6 +55,7 @@ export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
+export { default as __experimentalInputControl } from './input-control';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuGroup } from './menu-group';
 export { default as MenuItem } from './menu-item';
@@ -62,6 +64,7 @@ export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
+export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
@@ -70,6 +73,8 @@ export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
 export { default as QueryControls } from './query-controls';
+export { default as __experimentalRadio } from './radio';
+export { default as __experimentalRadioGroup } from './radio-group';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
@@ -88,10 +93,17 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as __experimentalToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
+export {
+	default as __experimentalTreeGrid,
+	TreeGridRow as __experimentalTreeGridRow,
+	TreeGridCell as __experimentalTreeGridCell,
+} from './tree-grid';
 export { default as TreeSelect } from './tree-select';
+export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {

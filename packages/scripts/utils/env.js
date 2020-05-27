@@ -2,7 +2,7 @@
  * External dependencies
  */
 const { isPlainObject } = require( 'lodash' );
-const request = require( 'request' );
+const got = require( 'got' );
 const DecompressZip = require( 'decompress-zip' );
 const chalk = require( 'chalk' );
 const { sprintf } = require( 'sprintf-js' );
@@ -95,10 +95,9 @@ function downloadWordPressZip() {
 
 		stdout.write( 'Downloading...\n' );
 		// Download the archive.
-		request
-			.get(
-				'https://github.com/WordPress/wordpress-develop/archive/master.zip'
-			)
+		got.stream(
+			'https://github.com/WordPress/wordpress-develop/archive/master.zip'
+		)
 			.on( 'error', ( error ) => {
 				stdout.write( "ERROR: The zip file couldn't be downloaded.\n" );
 				stdout.write( error.toString() );
@@ -176,7 +175,7 @@ function buildWordPress( newInstall, fastInstall ) {
 
 		if ( env.npm_package_wp_env_welcome_build_command ) {
 			const nextStep = sprintf(
-				'\nRun %s to build the latest version of %s, then open %s to get started!\n',
+				'\nRun %1$s to build the latest version of %2$s, then open %3$s to get started!\n',
 				chalk.blue( env.npm_package_wp_env_welcome_build_command ),
 				chalk.green( env.npm_package_wp_env_plugin_name ),
 				chalk.blue( currentUrl )
@@ -191,7 +190,7 @@ function buildWordPress( newInstall, fastInstall ) {
 		);
 
 		const access = sprintf(
-			'Default username: %s, password: %s\n',
+			'Default username: %1$s, password: %2$s\n',
 			chalk.blue( 'admin' ),
 			chalk.blue( 'password' )
 		);

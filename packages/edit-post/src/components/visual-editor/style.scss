@@ -4,8 +4,17 @@
 	// Default background color so that grey .edit-post-editor-regions__content color doesn't show through.
 	background-color: $white;
 
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary {
+			padding: 6px;
+		}
 	}
 
 	flex: 1 1 auto;
@@ -34,12 +43,6 @@
 // Hide the extra space when there are metaboxes.
 .has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	height: 0;
-}
-
-// The base width of blocks
-.edit-post-visual-editor .block-editor-block-list__block {
-	margin-left: auto;
-	margin-right: auto;
 }
 
 // Ideally this wrapper div is not needed but if we waant to match the positionning of blocks

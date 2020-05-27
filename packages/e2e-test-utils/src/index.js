@@ -22,7 +22,15 @@ export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
-export { insertBlock } from './insert-block';
+export { getPageError } from './get-page-error';
+export {
+	insertBlock,
+	insertPattern,
+	searchForBlock,
+	searchForPattern,
+	openGlobalBlockInserter,
+	closeGlobalBlockInserter,
+} from './inserter';
 export { installPlugin } from './install-plugin';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
@@ -31,16 +39,13 @@ export {
 	enableFocusLossObservation,
 	disableFocusLossObservation,
 } from './observe-focus-loss';
-export { openAllBlockInserterCategories } from './open-all-block-inserter-categories';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
-export { openGlobalBlockInserter } from './open-global-block-inserter';
 export { openPublishPanel } from './open-publish-panel';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
 export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
 export { saveDraft } from './save-draft';
-export { searchForBlock } from './search-for-block';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
 export { setPostContent } from './set-post-content';

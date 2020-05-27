@@ -1,6 +1,10 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
-### Breaking change
+## Unreleased
+
+## 2.0.0 (2020-04-15)
+
+### Breaking Change
 
 - Restructure package moving source files into `lib` directory. Direct imports of
   `@wordpress/is-shallow-equal/arrays` and `@wordpress/is-shallow-equal/objects` were never

@@ -164,6 +164,7 @@ function render_block_core_navigation( $content, $block ) {
 		$font_sizes['css_classes'],
 		array( 'wp-block-navigation' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
+		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
 	);
@@ -255,6 +256,9 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 
 		$html .= '</span>';
 
+		$html .= '</a>';
+		// End anchor tag content.
+
 		// Append submenu icon to top-level item.
 		// it shows the icon as default, when 'showSubmenuIcon' is not set,
 		// or when it's set and also not False.
@@ -267,9 +271,6 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
 		) {
 			$html .= '<span class="wp-block-navigation-link__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
-
-		$html .= '</a>';
-		// End anchor tag content.
 
 		if ( $has_submenu ) {
 			$html .= block_core_navigation_build_html( $attributes, $block, $colors, $font_sizes );
@@ -287,49 +288,8 @@ function block_core_navigation_build_html( $attributes, $block, $colors, $font_s
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
-
-	register_block_type(
-		'core/navigation',
-		array(
-			'attributes' => array(
-				'className'             => array(
-					'type' => 'string',
-				),
-				'textColor'             => array(
-					'type' => 'string',
-				),
-				'customTextColor'       => array(
-					'type' => 'string',
-				),
-				// deprecated.
-				'rgbTextColor'          => array(
-					'type' => 'string',
-				),
-				'backgroundColor'       => array(
-					'type' => 'string',
-				),
-				'customBackgroundColor' => array(
-					'type' => 'string',
-				),
-				// deprecated.
-				'rgbBackgroundColor'    => array(
-					'type' => 'string',
-				),
-				'fontSize'              => array(
-					'type' => 'string',
-				),
-				'customFontSize'        => array(
-					'type' => 'number',
-				),
-				'itemsJustification'    => array(
-					'type' => 'string',
-				),
-				'showSubmenuIcon'       => array(
-					'type'    => 'boolean',
-					'default' => true,
-				),
-			),
-		)
+	register_block_type_from_metadata(
+		__DIR__ . '/navigation'
 	);
 }
 add_action( 'init', 'register_block_core_navigation' );

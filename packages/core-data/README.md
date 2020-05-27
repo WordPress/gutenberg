@@ -86,6 +86,18 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="receiveCurrentTheme" href="#receiveCurrentTheme">#</a> **receiveCurrentTheme**
+
+Returns an action object used in signalling that the current theme has been received.
+
+_Parameters_
+
+-   _currentTheme_ `Object`: The current theme.
+
+_Returns_
+
+-   `Object`: Action object.
+
 <a name="receiveCurrentUser" href="#receiveCurrentUser">#</a> **receiveCurrentUser**
 
 Returns an action used in signalling that the current user has been received.
@@ -284,6 +296,18 @@ _Returns_
 
 -   `?Array`: An array of autosaves for the post, or undefined if there is none.
 
+<a name="getCurrentTheme" href="#getCurrentTheme">#</a> **getCurrentTheme**
+
+Return the current theme.
+
+_Parameters_
+
+-   _state_ `Object`: Data state.
+
+_Returns_
+
+-   `Object`: The current theme.
+
 <a name="getCurrentUser" href="#getCurrentUser">#</a> **getCurrentUser**
 
 Returns the current user.
@@ -413,7 +437,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Records.
+-   `?Array`: Records.
 
 <a name="getLastEntitySaveError" href="#getLastEntitySaveError">#</a> **getLastEntitySaveError**
 

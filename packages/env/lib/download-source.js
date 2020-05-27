@@ -5,14 +5,13 @@
 const util = require( 'util' );
 const NodeGit = require( 'nodegit' );
 const fs = require( 'fs' );
-const requestProgress = require( 'request-progress' );
-const request = require( 'request' );
+const got = require( 'got' );
 const path = require( 'path' );
 
 /**
  * Promisified dependencies
  */
-const finished = util.promisify( require( 'stream' ).finished );
+const pipeline = util.promisify( require( 'stream' ).pipeline );
 const extractZip = util.promisify( require( 'extract-zip' ) );
 const rimraf = util.promisify( require( 'rimraf' ) );
 const copyDir = util.promisify( require( 'copy-dir' ) );
@@ -132,11 +131,12 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	log( 'Downloading zip file.' );
 	const zipName = `${ source.path }.zip`;
 	const zipFile = fs.createWriteStream( zipName );
-	await finished(
-		requestProgress( request( source.url ) )
-			.on( 'progress', ( { percent } ) => onProgress( percent ) )
-			.pipe( zipFile )
+
+	const responseStream = got.stream( source.url );
+	responseStream.on( 'downloadProgress', ( { percent } ) =>
+		onProgress( percent )
 	);
+	await pipeline( responseStream, zipFile );
 
 	log( 'Extracting to temporary folder.' );
 	const dirName = `${ source.path }.temp`;

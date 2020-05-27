@@ -9,17 +9,23 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import {
+	__experimentalToolbarItem as ToolbarItem,
+	ToolbarGroup,
+	DropdownMenu,
+	Slot,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
+	isAlternate: true,
 };
 
 const FormatToolbar = () => {
 	return (
 		<div className="block-editor-format-toolbar">
-			<Toolbar>
+			<ToolbarGroup>
 				{ [ 'bold', 'italic', 'link', 'text-color' ].map(
 					( format ) => (
 						<Slot
@@ -31,19 +37,28 @@ const FormatToolbar = () => {
 				<Slot name="RichText.ToolbarControls">
 					{ ( fills ) =>
 						fills.length !== 0 && (
-							<DropdownMenu
-								icon={ chevronDown }
-								label={ __( 'More rich text controls' ) }
-								controls={ orderBy(
-									fills.map( ( [ { props } ] ) => props ),
-									'title'
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ chevronDown }
+										label={ __(
+											'More rich text controls'
+										) }
+										toggleProps={ toggleProps }
+										controls={ orderBy(
+											fills.map(
+												( [ { props } ] ) => props
+											),
+											'title'
+										) }
+										popoverProps={ POPOVER_PROPS }
+									/>
 								) }
-								popoverProps={ POPOVER_PROPS }
-							/>
+							</ToolbarItem>
 						)
 					}
 				</Slot>
-			</Toolbar>
+			</ToolbarGroup>
 		</div>
 	);
 };

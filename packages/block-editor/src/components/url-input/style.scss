@@ -86,7 +86,7 @@ $input-size: 300px;
 	width: 100%;
 	border: none;
 	text-align: left;
-	@include menu-style__neutral();
+	box-shadow: none;
 
 	&:hover {
 		background: $light-gray-500;
@@ -101,6 +101,7 @@ $input-size: 300px;
 }
 
 // Toolbar button
+.components-toolbar-group > .block-editor-url-input__button,
 .components-toolbar > .block-editor-url-input__button {
 	position: inherit; // Let the dialog position according to parent.
 }

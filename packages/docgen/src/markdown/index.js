@@ -1,5 +1,5 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const remark = require( 'remark' );
 const unified = require( 'unified' );
@@ -8,7 +8,7 @@ const inject = require( 'mdast-util-inject' );
 const fs = require( 'fs' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const formatter = require( './formatter' );
 const embed = require( './embed' );
@@ -55,7 +55,7 @@ module.exports = function(
 				if ( err ) {
 					throw err;
 				}
-				fs.writeFileSync( doc, file );
+				fs.writeFileSync( doc, file.toString() );
 			} );
 	} else {
 		const output = formatter( processDir, doc, filteredIR, headingTitle );

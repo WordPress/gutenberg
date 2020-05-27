@@ -62,6 +62,48 @@ exports[`Multi-block selection should only trigger multi-selection when at the e
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should place the caret at the end of last pasted paragraph (paste mid-block) 1`] = `
+"<!-- wp:paragraph -->
+<p>first paragra</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>first paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>second paragrap</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>ph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>second paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should place the caret at the end of last pasted paragraph (paste to empty editor) 1`] = `
+"<!-- wp:paragraph -->
+<p>first paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>second paragrap</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection should place the caret at the end of last pasted paragraph (replace) 1`] = `
+"<!-- wp:paragraph -->
+<p>first paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>second paragrap</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should preserve dragged selection on move 1`] = `
 "<!-- wp:paragraph -->
 <p>2</p>

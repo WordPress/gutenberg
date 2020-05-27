@@ -4,7 +4,8 @@
         "name": "core/group",
         "isValid": true,
         "attributes": {
-            "textColor": "accent"
+            "textColor": "accent",
+            "tagName": "div"
         },
         "innerBlocks": [
             {

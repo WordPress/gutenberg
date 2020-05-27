@@ -11,11 +11,13 @@ $editor-font: "Noto Serif", serif;
 $editor-html-font: Menlo, Consolas, monaco, monospace;
 $editor-font-size: 16px;
 $default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
-$text-editor-font-size: 14px;
+$text-editor-font-size: 15px;
 $editor-line-height: 1.8;
 $big-font-size: 18px;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
 $border-width: 1px;
+$border-width-focus: 1.5px;
+$border-width-tab: 4px;
 
 /**
  * Grid System.
@@ -36,6 +38,7 @@ $grid-unit-60: 6 * $grid-unit;		// 48px
  * Dimensions.
  */
 
+$icon-size: 24px;
 $button-size: 36px;
 $button-size-small: 24px;
 $panel-padding: 16px;
@@ -49,6 +52,8 @@ $admin-sidebar-width-collapsed: 36px;
 $modal-min-width: 360px;
 $spinner-size: 18px;
 $mobile-header-toolbar-height: 44px;
+$mobile-floating-toolbar-height: 44px;
+$mobile-floating-toolbar-margin: 8px;
 
 
 /**

@@ -11,7 +11,7 @@ import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
 
 describe( 'persistence', () => {
-	let registry, originalRegisterStore;
+	let registry;
 
 	beforeAll( () => {
 		jest.spyOn( objectStorage, 'setItem' );
@@ -21,18 +21,8 @@ describe( 'persistence', () => {
 		objectStorage.clear();
 		objectStorage.setItem.mockClear();
 
-		// Since the exposed `registerStore` is a proxying function, mimic
-		// intercept of original call by adding an initial plugin.
 		// TODO: Remove the `use` function in favor of `registerGenericStore`
-		registry = createRegistry()
-			.use( ( originalRegistry ) => {
-				originalRegisterStore = jest.spyOn(
-					originalRegistry,
-					'registerStore'
-				);
-				return {};
-			} )
-			.use( plugin, { storage: objectStorage } );
+		registry = createRegistry().use( plugin, { storage: objectStorage } );
 	} );
 
 	it( 'should not mutate options', () => {
@@ -179,17 +169,6 @@ describe( 'persistence', () => {
 		} );
 
 		expect( registry.select( 'test' ).getState() ).toBe( 1 );
-	} );
-
-	it( 'override values passed to registerStore', () => {
-		const options = { persist: true, reducer() {} };
-
-		registry.registerStore( 'test', options );
-
-		expect( originalRegisterStore ).toHaveBeenCalledWith( 'test', {
-			persist: true,
-			reducer: expect.any( Function ),
-		} );
 	} );
 
 	it( 'should not persist if option not passed', () => {

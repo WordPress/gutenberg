@@ -64,7 +64,7 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const [ blockNodes ] = useContext( BlockNodes );
+	const blockNodes = useContext( BlockNodes );
 
 	const showEmptyBlockSideInserter =
 		! isNavigationMode && isEmptyDefaultBlock && isValid;
@@ -109,11 +109,6 @@ function BlockPopover( {
 
 	if ( ! node ) {
 		return null;
-	}
-
-	// A block may specify a different target element for the toolbar.
-	if ( node.classList.contains( 'is-block-collapsed' ) ) {
-		node = node.querySelector( '.is-block-content' ) || node;
 	}
 
 	let anchorRef = node;

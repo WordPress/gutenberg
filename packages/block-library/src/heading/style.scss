@@ -4,9 +4,6 @@ h3,
 h4,
 h5,
 h6 {
-	background-color: var(--wp--color--background);
-	color: var(--wp--color--text);
-
 	&.has-background {
 		padding: $block-bg-padding--v $block-bg-padding--h;
 	}

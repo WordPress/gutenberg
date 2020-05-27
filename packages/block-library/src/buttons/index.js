@@ -23,10 +23,6 @@ export const settings = {
 	),
 	icon,
 	keywords: [ __( 'link' ) ],
-	supports: {
-		align: true,
-		alignWide: false,
-	},
 	transforms,
 	edit,
 	save,

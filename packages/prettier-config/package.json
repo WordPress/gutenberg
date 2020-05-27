@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "0.0.1",
+	"version": "0.2.0",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,6 +25,7 @@
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
+	"types": "build-types",
 	"publishConfig": {
 		"access": "public"
 	}

@@ -52,7 +52,6 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				isSelected={ isSelected }
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt, delta ) => {
 					onResizeStop();
@@ -62,6 +61,7 @@ const SpacerEdit = ( {
 					);
 					updateHeight( spacerHeight );
 				} }
+				showHandle={ isSelected }
 			/>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
@@ -69,10 +69,8 @@ const SpacerEdit = ( {
 						label={ __( 'Height in pixels' ) }
 						min={ MIN_SPACER_HEIGHT }
 						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
-						separatorType={ 'none' }
 						value={ height }
 						onChange={ updateHeight }
-						step={ 10 }
 					/>
 				</PanelBody>
 			</InspectorControls>

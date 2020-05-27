@@ -7,13 +7,42 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useReducer, useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockEditorProvider from '../provider';
+import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
+
+export function BlockPreview( {
+	blocks,
+	__experimentalPadding = 0,
+	viewportWidth = 700,
+	__experimentalLive = false,
+	__experimentalOnClick,
+} ) {
+	const settings = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getSettings()
+	);
+	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	if ( ! blocks || blocks.length === 0 ) {
+		return null;
+	}
+	return (
+		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+			{ __experimentalLive ? (
+				<LiveBlockPreview onClick={ __experimentalOnClick } />
+			) : (
+				<AutoHeightBlockPreview
+					viewportWidth={ viewportWidth }
+					__experimentalPadding={ __experimentalPadding }
+				/>
+			) }
+		</BlockEditorProvider>
+	);
+}
 
 /**
  * BlockPreview renders a preview of a block or array of blocks.
@@ -26,27 +55,4 @@ import AutoHeightBlockPreview from './auto';
  *
  * @return {WPComponent} The component to be rendered.
  */
-export function BlockPreview( { blocks, viewportWidth = 700 } ) {
-	const settings = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
-	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
-	const [ recompute, triggerRecompute ] = useReducer(
-		( state ) => state + 1,
-		0
-	);
-	useLayoutEffect( triggerRecompute, [ blocks ] );
-	if ( ! blocks || blocks.length === 0 ) {
-		return null;
-	}
-	return (
-		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
-			<AutoHeightBlockPreview
-				key={ recompute }
-				viewportWidth={ viewportWidth }
-			/>
-		</BlockEditorProvider>
-	);
-}
-
-export default BlockPreview;
+export default memo( BlockPreview );

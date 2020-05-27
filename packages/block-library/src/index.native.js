@@ -2,11 +2,14 @@
  * WordPress dependencies
  */
 import {
+	hasBlockSupport,
 	registerBlockType,
 	setDefaultBlockName,
+	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -49,7 +52,9 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
+import * as classic from './classic';
 import * as group from './group';
+import * as buttons from './buttons';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -96,6 +101,8 @@ export const coreBlocks = [
 	textColumns,
 	verse,
 	video,
+	classic,
+	buttons,
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -121,6 +128,25 @@ const registerBlock = ( block ) => {
 // only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
+
+// Hide the Classic block
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if (
+			name === 'core/freeform' &&
+			hasBlockSupport( settings, 'inserter', true )
+		) {
+			settings.supports = {
+				...settings.supports,
+				inserter: false,
+			};
+		}
+
+		return settings;
+	}
+);
 
 /**
  * Function to register core blocks provided by the block editor.
@@ -148,16 +174,22 @@ export const registerCoreBlocks = () => {
 		mediaText,
 		preformatted,
 		gallery,
+		columns,
+		column,
 		group,
+		classic,
 		button,
 		spacer,
 		shortcode,
+		buttons,
 		latestPosts,
-		devOnly( verse ),
+		verse,
 		cover,
+		pullquote,
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
+	setFreeformContentHandlerName( classic.name );
 	setUnregisteredTypeHandlerName( missing.name );
 	if ( group ) {
 		setGroupingBlockName( group.name );

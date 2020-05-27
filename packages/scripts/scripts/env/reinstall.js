@@ -1,5 +1,5 @@
 /**
- * Node dependencies.
+ * External dependencies
  */
 const { execSync } = require( 'child_process' );
 

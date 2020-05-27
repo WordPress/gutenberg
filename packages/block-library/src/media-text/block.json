@@ -6,12 +6,6 @@
 			"type": "string",
 			"default": "wide"
 		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"customBackgroundColor": {
-			"type": "string"
-		},
 		"mediaAlt": {
 			"type": "string",
 			"source": "attribute",
@@ -81,6 +75,16 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"__experimentalColor": {
+			"gradients": true
 		}
 	}
 }

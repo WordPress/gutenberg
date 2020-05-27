@@ -11,7 +11,7 @@
 		background: #23282e; // WP-admin gray.
 		color: $white;
 		border-radius: 0;
-		height: auto;
+		height: $header-height;
 		width: $header-height;
 
 		&:hover {
@@ -23,7 +23,7 @@
 		}
 
 		&:focus {
-			box-shadow: inset 0 0 0 2px color($theme-color), inset 0 0 0 3px $white;
+			box-shadow: inset 0 0 0 $border-width-focus $theme-color, inset 0 0 0 3px $white;
 		}
 	}
 }
