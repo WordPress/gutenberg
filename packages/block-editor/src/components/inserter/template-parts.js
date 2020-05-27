@@ -26,6 +26,8 @@ function TemplatePartPlaceholder() {
 
 function TemplatePartItem( { templatePart, onInsert } ) {
 	const { id, slug, theme } = templatePart;
+	// The 'raw' property is not defined for a brief period in the save cycle.
+	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
 	const blocks = useMemo( () => parse( content ), [ content ] );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
@@ -74,7 +76,6 @@ function TemplatePartsByTheme( { templateParts, onInsert } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
-
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return (
@@ -108,13 +109,13 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
 		const lowerFilterValue = filterValue.toLowerCase();
-		const thing = templateParts.filter(
+		const searchResults = templateParts.filter(
 			( { slug, meta: { theme } } ) =>
 				slug.toLowerCase().includes( lowerFilterValue ) ||
 				theme.toLowerCase().includes( lowerFilterValue )
 		);
 		// Order based on value location.
-		thing.sort( ( a, b ) => {
+		searchResults.sort( ( a, b ) => {
 			// First prioritize index found in slug.
 			const indexInSlugA = a.slug
 				.toLowerCase()
@@ -135,7 +136,7 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 				b.meta.theme.toLowerCase().indexOf( lowerFilterValue )
 			);
 		} );
-		return thing;
+		return searchResults;
 	}, [ filterValue, templateParts ] );
 
 	const currentShownTPs = useAsyncList( filteredTPs );
