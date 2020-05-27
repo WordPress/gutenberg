@@ -398,13 +398,13 @@ export default function WritingFlow( { children } ) {
 				focusedBlockUid = selectionAfterEndClientId;
 			} else if ( navigateOut ) {
 				focusedBlockUid =
-					getBlockRootClientId( selectedBlockClientId ) ||
+					getBlockRootClientId( selectedBlockClientId ) ??
 					selectedBlockClientId;
 			} else if ( navigateIn ) {
 				focusedBlockUid =
 					getClientIdsOfDescendants( [
 						selectedBlockClientId,
-					] )[ 0 ] || selectedBlockClientId;
+					] )[ 0 ] ?? selectedBlockClientId;
 			}
 
 			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
