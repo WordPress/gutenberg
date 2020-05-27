@@ -33,5 +33,9 @@
 			"name": "other",
 			"label": "Other"
 		}
-	]
+	],
+	"editorScript": "my-plugin-notice-editor-script",
+	"script": "my-plugin-notice-script",
+	"editorStyle": "my-plugin-notice-editor-style",
+	"style": "my-plugin-notice-style"
 }

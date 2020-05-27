@@ -63,10 +63,12 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		$asset_handle_prefix = str_replace( '/', '-', $block_name );
 
 		if ( isset( $metadata['editorScript'] ) ) {
-			$editor_script            = $metadata['editorScript'];
+			$settings['editor_script'] = $metadata['editorScript'];
+		} elseif ( isset( $metadata['editorScriptPath'] ) ) {
+			$editor_script_path       = $metadata['editorScriptPath'];
 			$editor_script_handle     = "$asset_handle_prefix-editor-script";
 			$editor_script_asset_path = realpath(
-				$block_dir . '/' . substr_replace( $editor_script, '.asset.php', -3 )
+				$block_dir . '/' . substr_replace( $editor_script_path, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $editor_script_asset_path ) ) {
 				$message = sprintf(
@@ -80,7 +82,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			$editor_script_asset = require( $editor_script_asset_path );
 			wp_register_script(
 				$editor_script_handle,
-				plugins_url( $editor_script, $metadata_file ),
+				plugins_url( $editor_script_path, $metadata_file ),
 				$editor_script_asset['dependencies'],
 				$editor_script_asset['version']
 			);
@@ -88,10 +90,12 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		}
 
 		if ( isset( $metadata['script'] ) ) {
-			$script            = $metadata['script'];
+			$settings['script'] = $metadata['script'];
+		} elseif ( isset( $metadata['scriptPath'] ) ) {
+			$script_path       = $metadata['scriptPath'];
 			$script_handle     = "$asset_handle_prefix-script";
 			$script_asset_path = realpath(
-				$block_dir . '/' . substr_replace( $script, '.asset.php', -3 )
+				$block_dir . '/' . substr_replace( $script_path, '.asset.php', -3 )
 			);
 			if ( ! file_exists( $script_asset_path ) ) {
 				$message = sprintf(
@@ -105,7 +109,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			$script_asset = require( $script_asset_path );
 			wp_register_script(
 				$script_handle,
-				plugins_url( $script, $metadata_file ),
+				plugins_url( $script_path, $metadata_file ),
 				$script_asset['dependencies'],
 				$script_asset['version']
 			);
@@ -113,25 +117,29 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		}
 
 		if ( isset( $metadata['editorStyle'] ) ) {
-			$editor_style        = $metadata['editorStyle'];
+			$settings['editor_style'] = $metadata['editorStyle'];
+		} elseif ( isset( $metadata['editorStylePath'] ) ) {
+			$editor_style_path   = $metadata['editorStylePath'];
 			$editor_style_handle = "$asset_handle_prefix-editor-style";
 			wp_register_style(
 				$editor_style_handle,
-				plugins_url( $editor_style, $metadata_file ),
+				plugins_url( $editor_style_path, $metadata_file ),
 				array(),
-				filemtime( realpath( "$block_dir/$editor_style" ) )
+				filemtime( realpath( "$block_dir/$editor_style_path" ) )
 			);
 			$settings['editor_style'] = $editor_style_handle;
 		}
 
 		if ( isset( $metadata['style'] ) ) {
-			$style        = $metadata['style'];
+			$settings['style'] = $metadata['style'];
+		} elseif ( isset( $metadata['stylePath'] ) ) {
+			$style_path   = $metadata['stylePath'];
 			$style_handle = "$asset_handle_prefix-style";
 			wp_register_style(
 				$style_handle,
-				plugins_url( $style, $metadata_file ),
+				plugins_url( $style_path, $metadata_file ),
 				array(),
-				filemtime( realpath( "$block_dir/$style" ) )
+				filemtime( realpath( "$block_dir/$style_path" ) )
 			);
 			$settings['style'] = $style_handle;
 		}

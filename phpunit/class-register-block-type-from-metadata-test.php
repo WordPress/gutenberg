@@ -74,5 +74,9 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 			),
 			$result->styles
 		);
+		$this->assertEquals( 'my-plugin-notice-editor-script', $result->editor_script );
+		$this->assertEquals( 'my-plugin-notice-script', $result->script );
+		$this->assertEquals( 'my-plugin-notice-editor-style', $result->editor_style );
+		$this->assertEquals( 'my-plugin-notice-style', $result->style );
 	}
 }
