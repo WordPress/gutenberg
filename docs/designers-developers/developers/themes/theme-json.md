@@ -123,7 +123,7 @@ For this input:
         "value": "#444"
       }
     ]
-	}
+  }
 }
 ```
 
@@ -210,7 +210,7 @@ Finally, this is how it can be used in the block's `edit` implementation:
 // edit.js
 
 const Edit = ( props ) => {
-    const isDisabled = ! useEditorFeature( 'typography.dropCap', false );
+    const isDisabled = ! useEditorFeature( 'typography.dropCap' );
     // ...
 };
 ```
