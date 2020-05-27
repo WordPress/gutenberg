@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Keyboard, View } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -76,11 +76,7 @@ export default compose(
 		const { removeBlock } = dispatch( 'core/block-editor' );
 		return {
 			onDelete:
-				onDelete ||
-				( () => {
-					Keyboard.dismiss();
-					removeBlock( clientId, rootClientId );
-				} ),
+				onDelete || ( () => removeBlock( clientId, rootClientId ) ),
 		};
 	} )
 )( BlockMobileToolbar );
