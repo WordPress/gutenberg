@@ -69,6 +69,8 @@ describe( 'Gallery', () => {
 		expect( mediaLibraryButtonText ).toBe( 'Create a new gallery' );
 
 		// Unfortunately the Media Library has invalid HTML.
+		// Axe tests fail with the following error:
+		// `List element has direct children with a role that is not allowed: checkbox.`
 		await expect( page ).not.toPassAxeTests();
 	} );
 } );
