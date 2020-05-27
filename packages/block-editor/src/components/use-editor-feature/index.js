@@ -18,17 +18,15 @@ import { useBlockEditContext } from '../block-edit';
  * It works with nested objects using by finding the value at path.
  *
  * @param {string} featurePath  The path to the feature.
- * @param {*}      defaultValue Default value to return if not
- *                              explicitly defined.
  *
  * @return {any} Returns the value defined for the setting.
  *
  * @example
  * ```js
- * const isEnabled = useEditorFeature( 'typography.dropCap', false );
+ * const isEnabled = useEditorFeature( 'typography.dropCap' );
  * ```
  */
-export default function useEditorFeature( featurePath, defaultValue ) {
+export default function useEditorFeature( featurePath ) {
 	const { name: blockName } = useBlockEditContext();
 	const path = `__experimentalFeatures.${ featurePath }`;
 
@@ -43,7 +41,7 @@ export default function useEditorFeature( featurePath, defaultValue ) {
 
 			const { getSettings } = select( 'core/block-editor' );
 
-			return get( getSettings(), path, defaultValue );
+			return get( getSettings(), path );
 		},
 		[ blockName, path ]
 	);
