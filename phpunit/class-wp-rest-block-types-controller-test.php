@@ -193,7 +193,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			'keywords'        => 'invalid_keywords',
 			'parent'          => 'invalid_parent',
 			'supports'        => 'invalid_supports',
-			'styleVariations' => 'invalid_styles',
+			'styles'          => 'invalid_styles',
 			'render_callback' => 'invalid_callback',
 		);
 		register_block_type( $block_type, $settings );

@@ -48,8 +48,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			'attributes'      => 'attributes',
 			'supports'        => 'supports',
 			'styles'          => 'styles',
-			// Alias recommended in documentation to distinguish from assets.
-			'styleVariations' => 'styles',
 		);
 
 		foreach ( $property_mappings as $key => $mapped_key ) {

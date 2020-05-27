@@ -23,7 +23,7 @@
 		"align": true,
 		"lightBlockWrapper": true
 	},
-	"styleVariations": [
+	"styles": [
 		{
 			"name": "default",
 			"label": "Default",
