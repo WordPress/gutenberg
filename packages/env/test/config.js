@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-const { readFile } = require( 'fs' ).promises;
+const { readFile, stat } = require( 'fs' ).promises;
 const os = require( 'os' );
 
 /**
@@ -14,6 +14,7 @@ const detectDirectoryType = require( '../lib/detect-directory-type' );
 jest.mock( 'fs', () => ( {
 	promises: {
 		readFile: jest.fn(),
+		stat: jest.fn().mockReturnValue( Promise.resolve( false ) ),
 	},
 } ) );
 
@@ -512,20 +513,17 @@ describe( 'readConfig', () => {
 		os.platform = oldOsPlatform;
 	} );
 
-	it( 'should use a non-private folder on Linux', async () => {
+	it( 'should use a non-private folder with Snap-installed Docker', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve( JSON.stringify( {} ) )
 		);
-		const oldOsPlatform = os.platform;
-		os.platform = () => 'linux';
+		stat.mockReturnValue( Promise.resolve( true ) );
 
 		expect.assertions( 2 );
 
 		const config = await readConfig( '.wp-env.json' );
 		expect( config.workDirectoryPath.includes( '.wp-env' ) ).toBe( false );
 		expect( config.workDirectoryPath.includes( 'wp-env' ) ).toBe( true );
-
-		os.platform = oldOsPlatform;
 	} );
 } );
 

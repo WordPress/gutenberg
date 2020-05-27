@@ -212,7 +212,7 @@ module.exports = {
 		}
 
 		const workDirectoryPath = path.resolve(
-			getHomeDirectory(),
+			await getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -384,9 +384,9 @@ function getNumberFromEnvVariable( varName ) {
  * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
  * WP_ENV_HOME environment variable.
  *
- * @return {string} The absolute path to the `wp-env` home directory.
+ * @return {Promise<string>} The absolute path to the `wp-env` home directory.
  */
-function getHomeDirectory() {
+async function getHomeDirectory() {
 	// Allow user to override download location.
 	if ( process.env.WP_ENV_HOME ) {
 		return path.resolve( process.env.WP_ENV_HOME );
@@ -400,7 +400,9 @@ function getHomeDirectory() {
 	 */
 	return path.resolve(
 		os.homedir(),
-		os.platform() === 'linux' ? 'wp-env' : '.wp-env'
+		!! ( await fs.stat( '/snap' ).catch( () => false ) )
+			? 'wp-env'
+			: '.wp-env'
 	);
 }
 
