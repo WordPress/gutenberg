@@ -241,9 +241,6 @@ const stopDriver = async ( driver ) => {
 	if ( driver === undefined ) {
 		return;
 	}
-
-	// eslint-disable-next-line no-console
-	console.log( 'quitting driver' );
 	await driver.quit();
 
 	if ( appiumProcess !== undefined ) {
