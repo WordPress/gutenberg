@@ -62,6 +62,8 @@ function ColorSettings( {
 		onHardwareButtonPress( () => {
 			if ( isCustomScreen ) {
 				onCustomScreenToggle( false );
+			} else if ( isCustomGradientScreen ) {
+				onCustomGradientScreenToggle( false );
 			} else {
 				onReplaceSubsheet(
 					subsheets[ 0 ],
@@ -70,7 +72,7 @@ function ColorSettings( {
 				);
 			}
 		} );
-	}, [ isCustomScreen ] );
+	}, [ isCustomScreen, isCustomGradientScreen ] );
 
 	useEffect( () => {
 		performLayoutAnimation();
