@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set } from 'lodash';
+import { map, set, flatten } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,12 +52,30 @@ async function fetchLinkSuggestions( search, { perPage = 20 } = {} ) {
 		} ),
 	} );
 
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
+	const categories = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: perPage,
+			type: 'category',
+		} ),
+	} );
+
+	const formats = await apiFetch( {
+		path: addQueryArgs( '/wp/v2/search', {
+			search,
+			per_page: perPage,
+			type: 'post-format',
+		} ),
+	} );
+
+	return Promise.all( [ posts, categories, formats ] ).then( ( results ) => {
+		return map( flatten( results ), ( post ) => ( {
+			id: post.id,
+			url: post.url,
+			title: decodeEntities( post.title ) || __( '(no title)' ),
+			type: post.subtype || post.type,
+		} ) );
+	} );
 }
 
 export function initialize( id, settings ) {

@@ -37,20 +37,22 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 	 */
 	public function search_items( WP_REST_Request $request ) {
 
-		$categories = get_categories( array( 'get' => 'all' ) );
-
 		if ( ! empty( $request['search'] ) ) {
 			$category_search = $request['search'];
 		}
 
 		$category_search = apply_filters( 'rest_category_search_query', $category_search, $request );
 
-		$found_ids = [];
+		$categories = get_categories(
+			array(
+				'get'        => 'all',
+				'name__like' => $category_search,
+			)
+		);
+
+		$found_ids = array();
 		foreach ( $categories as $category ) {
-			$name_match = stripos( $category->name, $category_search ) !== false;
-			if ( $name_match ) {
-				$found_ids[] = $category->term_id;
-			}
+			$found_ids[] = $category->term_id;
 		}
 
 		return array(
@@ -98,7 +100,7 @@ class WP_REST_Category_Search_Handler extends WP_REST_Search_Handler {
 	 * @return array Links for the given item.
 	 */
 	public function prepare_item_links( $id ) {
-		return [];
+		return array();
 	}
 
 }
