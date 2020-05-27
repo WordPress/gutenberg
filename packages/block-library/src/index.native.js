@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { Platform } from 'react-native';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -129,6 +134,8 @@ const registerBlock = ( block ) => {
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
+const iOSOnly = ( block ) => ( Platform.OS === 'ios' ? block : null );
+
 // Hide the Classic block
 addFilter(
 	'blocks.registerBlockType',
@@ -185,7 +192,7 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		verse,
 		cover,
-		pullquote,
+		iOSOnly( pullquote ),
 	].forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
