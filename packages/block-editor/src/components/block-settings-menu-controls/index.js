@@ -58,8 +58,10 @@ export const BlockSettingsMenuControls = ( {
 	...fillProps
 } ) => {
 	const context = useContext( BlockListBlockContext );
-	if ( ! forAllBlocks && context?.clientId ) {
-		fillProps.name = getSlotName( context.clientId );
+	if ( ! forAllBlocks ) {
+		// Let's use non-existent ID in case the context is missing
+		const clientId = context?.clientId || 'non-such-id';
+		fillProps.name = getSlotName( clientId );
 	}
 
 	return <Fill { ...fillProps } />;
