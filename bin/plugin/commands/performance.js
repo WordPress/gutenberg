@@ -122,6 +122,8 @@ async function getPerformanceResultsForBranch(
 	environmentDirectory,
 	branch
 ) {
+	// Restore clean working directory (e.g. if `package-lock.json` has local
+	// changes after install).
 	await git.discardLocalChanges( environmentDirectory );
 
 	log( '>> Fetching the ' + formats.success( branch ) + ' branch' );
