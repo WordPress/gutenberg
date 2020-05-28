@@ -163,7 +163,7 @@
 		"node-watch": "0.6.0",
 		"postcss": "7.0.13",
 		"postcss-loader": "3.0.0",
-		"prettier": "npm:wp-prettier@2.0.5-beta-3",
+		"prettier": "npm:wp-prettier@2.0.5-beta-4",
 		"progress": "2.0.3",
 		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"react": "16.9.0",
