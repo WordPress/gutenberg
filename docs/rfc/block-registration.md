@@ -362,6 +362,7 @@ Block type frontend style definition. It will be enqueued both in the editor and
 * Optional
 * Localized: No
 * Property: `providesContext`
+* Default: `{}`
 
 Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
 
@@ -377,6 +378,7 @@ See [the block context documentation](/docs/designers-developers/developers/bloc
 * Optional
 * Localized: No
 * Property: `context`
+* Default: `[]`
 
 Array of the names of context values to inherit from an ancestor provider.
 
