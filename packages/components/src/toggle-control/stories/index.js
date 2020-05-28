@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { text, boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ export default { title: 'Components/ToggleControl', component: ToggleControl };
 const ToggleControlWithState = ( {
 	helpTextChecked,
 	helpTextUnchecked,
+	forceChecked,
 	...props
 } ) => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );
@@ -25,7 +26,9 @@ const ToggleControlWithState = ( {
 		<ToggleControl
 			{ ...props }
 			help={ hasFixedBackground ? helpTextChecked : helpTextUnchecked }
-			checked={ hasFixedBackground }
+			checked={
+				forceChecked === undefined ? hasFixedBackground : forceChecked
+			}
 			onChange={ setHasFixedBackground }
 		/>
 	);
@@ -53,6 +56,19 @@ export const withHelpText = () => {
 			label={ label }
 			helpTextChecked={ helpTextChecked }
 			helpTextUnchecked={ helpTextUnchecked }
+		/>
+	);
+};
+
+export const disabled = () => {
+	const label = text( 'Label', 'Does this have a fixed background?' );
+	const forceChecked = boolean( 'Checked', true );
+
+	return (
+		<ToggleControlWithState
+			disabled
+			forceChecked={ forceChecked }
+			label={ label }
 		/>
 	);
 };

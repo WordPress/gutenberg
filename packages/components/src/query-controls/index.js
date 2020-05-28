@@ -24,6 +24,7 @@ export default function QueryControls( {
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
+	disabled,
 } ) {
 	return [
 		onOrderChange && onOrderByChange && (
@@ -60,6 +61,7 @@ export default function QueryControls( {
 						onOrderByChange( newOrderBy );
 					}
 				} }
+				disabled={ disabled }
 			/>
 		),
 		onCategoryChange && (
@@ -75,6 +77,7 @@ export default function QueryControls( {
 				suggestions={ Object.keys( categorySuggestions ) }
 				onChange={ onCategoryChange }
 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
+				disabled={ disabled }
 			/>
 		),
 
@@ -87,6 +90,7 @@ export default function QueryControls( {
 				min={ minItems }
 				max={ maxItems }
 				required
+				disabled={ disabled }
 			/>
 		),
 	];
