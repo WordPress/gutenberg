@@ -130,7 +130,48 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEqualSets( array( 'fancy-quote' => $block_styles ), $data['styles'] );
+		$this->assertEqualSets( array( $block_styles ), $data['styles'] );
+
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_with_styles_merge() {
+		$block_name   = 'fake/styles2';
+		$block_styles = array(
+			'name'         => 'fancy-quote',
+			'label'        => 'Fancy Quote',
+			'style_handle' => 'myguten-style',
+		);
+		$settings     = array(
+			'styleVariations' => array(
+				array(
+					'name'         => 'blue-quote',
+					'label'        => 'Blue Quote',
+					'style_handle' => 'myguten-style',
+				),
+			),
+		);
+		register_block_type( $block_name, $settings );
+		register_block_style( $block_name, $block_styles );
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$expected = array(
+			array(
+				'name'         => 'fancy-quote',
+				'label'        => 'Fancy Quote',
+				'style_handle' => 'myguten-style',
+			),
+			array(
+				'name'         => 'blue-quote',
+				'label'        => 'Blue Quote',
+				'style_handle' => 'myguten-style',
+			),
+		);
+		$this->assertEqualSets( $expected, $data['styles'] );
 
 	}
 

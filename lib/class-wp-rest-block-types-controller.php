@@ -269,6 +269,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$styles         = $this->style_registry->get_registered_styles_for_block( $block_type->name );
+			$styles         = array_values( $styles );
 			$data['styles'] = wp_parse_args( $styles, $data['styles'] );
 		}
 
