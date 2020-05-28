@@ -7,16 +7,16 @@
  */
 import EditorPage from './pages/editor-page';
 import {
-	backspace,
 	isAndroid,
 	isLocalEnvironment,
 	setupDriver,
 	stopDriver,
 } from './helpers/utils';
+import testData from './helpers/test-data';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
-describe( 'Gutenberg Editor tests for List block', () => {
+describe( 'Gutenberg Editor tests for List block @canary', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
@@ -42,30 +42,41 @@ describe( 'Gutenberg Editor tests for List block', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	// Prevent regression of https://github.com/wordpress-mobile/gutenberg-mobile/issues/871
-	it( 'should handle spaces in a list', async () => {
+	it( 'should be able to add a new List block', async () => {
 		await editorPage.addNewBlock( listBlockName );
-		let listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
+		const listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
 		// Click List block on Android to force EditText focus
 		if ( isAndroid() ) {
 			await listBlockElement.click();
 		}
 
-		// Send the list item text
-		await editorPage.sendTextToListBlock( listBlockElement, '  a' );
+		// Send the first list item text
+		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem1 );
 
 		// send an Enter
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		// send a backspace
-		await editorPage.sendTextToListBlock( listBlockElement, backspace );
+		// Send the second list item text
+		await editorPage.sendTextToListBlock( listBlockElement, testData.listItem2 );
 
 		// switch to html and verify html
-		await editorPage.verifyHtmlContent( `<!-- wp:list -->
-<ul><li>  a</li></ul>
-<!-- /wp:list -->` );
+		await editorPage.verifyHtmlContent( testData.listHtml );
+	} );
 
-		// Remove list block to reset editor to clean state
+	// This test depends on being run immediately after 'should be able to add a new List block'
+	it( 'should update format to ordered list, using toolbar button', async () => {
+		let listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
+
+		// Click List block to force EditText focus
+		await listBlockElement.click();
+
+		// Send a click on the order list format button
+		await editorPage.clickOrderedListToolBarButton();
+
+		// switch to html and verify html
+		await editorPage.verifyHtmlContent( testData.listHtmlOrdered );
+
+		// Remove list block to return editor to empty state
 		listBlockElement = await editorPage.getBlockAtPosition( listBlockName );
 		await listBlockElement.click();
 		await editorPage.removeBlockAtPosition( listBlockName );
