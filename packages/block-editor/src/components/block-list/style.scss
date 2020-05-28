@@ -493,6 +493,7 @@
 	// Adjust the mover control to fit as a unit next to the block switcher.
 	.block-editor-block-toolbar__block-switcher-wrapper {
 		// Adjust the focus rectangle for the switcher.
+		.block-editor-block-switcher__no-switcher-icon::before,
 		.block-editor-block-switcher__toggle::before {
 			min-width: 0;
 			width: 28px;
@@ -513,11 +514,25 @@
 		margin-left: -$grid-unit-15;
 		width: $button-size;
 
+		&.is-horizontal {
+			width: $block-toolbar-height;
+		}
+
 		// Needs specificity to override a first-child rule.
 		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
 			min-width: $button-size;
 			width: $button-size;
+		}
 
+		&.is-horizontal .components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
+			min-width: $block-toolbar-height/2;
+			width: $block-toolbar-height/2;
+		}
+	}
+
+	.block-editor-block-mover:not(.is-horizontal) {
+
+		.block-editor-block-mover-button {
 			> svg {
 				margin-left: 2px;
 			}
