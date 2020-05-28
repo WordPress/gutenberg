@@ -491,11 +491,24 @@
 	}
 
 	// Adjust the mover control to fit as a unit next to the block switcher.
-	.block-editor-block-switcher {
-		.components-toolbar {
+	.block-editor-block-toolbar__block-switcher-wrapper {
+		// Adjust the focus rectangle for the switcher.
+		.block-editor-block-switcher__toggle::before {
+			min-width: 0;
+			width: 28px;
+		}
+
+		// Adjust the positioning of the icon to better balance the new unit.
+		.block-editor-block-icon svg {
+			margin-left: 10px;
+		}
+
+		.components-toolbar,
+		.components-toolbar-group {
 			border-right-color: transparent;
 		}
 	}
+
 	.block-editor-block-mover {
 		margin-left: -$grid-unit-15;
 		width: $button-size;
@@ -519,6 +532,8 @@
 
 			&:focus::before {
 				left: 0 !important;
+				min-width: 0;
+				width: 28px;
 			}
 		}
 	}
