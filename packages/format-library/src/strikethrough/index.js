@@ -23,9 +23,9 @@ export const strikethrough = {
 		return (
 			<RichTextToolbarButton
 				icon={ formatStrikethrough }
-				label={ title }
+				title={ title }
 				onClick={ onClick }
-				isPressed={ isActive }
+				isActive={ isActive }
 			/>
 		);
 	},

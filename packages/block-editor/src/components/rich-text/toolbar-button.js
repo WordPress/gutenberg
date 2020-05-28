@@ -8,6 +8,8 @@ export function RichTextToolbarButton( {
 	name,
 	shortcutType,
 	shortcutCharacter,
+	title,
+	isActive,
 	...props
 } ) {
 	let shortcut;
@@ -23,7 +25,12 @@ export function RichTextToolbarButton( {
 
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton { ...props } shortcut={ shortcut } />
+			<ToolbarButton
+				label={ title }
+				isActive={ isActive }
+				{ ...props }
+				shortcut={ shortcut }
+			/>
 		</Fill>
 	);
 }

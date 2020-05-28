@@ -38,9 +38,9 @@ export const italic = {
 				<RichTextToolbarButton
 					name="italic"
 					icon={ formatItalic }
-					label={ title }
+					title={ title }
 					onClick={ onClick }
-					isPressed={ isActive }
+					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="i"
 				/>

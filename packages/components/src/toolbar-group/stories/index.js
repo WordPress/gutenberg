@@ -24,9 +24,9 @@ export const withControlsProp = () => {
 	return (
 		<ToolbarGroup
 			controls={ [
-				{ icon: formatBold, label: 'Bold', isPressed: true },
-				{ icon: formatItalic, label: 'Italic' },
-				{ icon: link, label: 'Link' },
+				{ icon: formatBold, title: 'Bold', isActive: true },
+				{ icon: formatItalic, title: 'Italic' },
+				{ icon: link, title: 'Link' },
 			] }
 		/>
 	);

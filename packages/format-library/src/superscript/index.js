@@ -27,9 +27,9 @@ export const superscript = {
 		return (
 			<RichTextToolbarButton
 				icon={ superscriptIcon }
-				label={ title }
+				title={ title }
 				onClick={ onClick }
-				isPressed={ isActive }
+				isActive={ isActive }
 			/>
 		);
 	},

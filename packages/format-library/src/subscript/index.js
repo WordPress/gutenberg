@@ -27,9 +27,9 @@ export const subscript = {
 		return (
 			<RichTextToolbarButton
 				icon={ subscriptIcon }
-				label={ title }
+				title={ title }
 				onClick={ onClick }
-				isPressed={ isActive }
+				isActive={ isActive }
 			/>
 		);
 	},

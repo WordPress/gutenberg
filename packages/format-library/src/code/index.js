@@ -53,9 +53,9 @@ export const code = {
 		return (
 			<RichTextToolbarButton
 				icon={ codeIcon }
-				label={ title }
+				title={ title }
 				onClick={ onClick }
-				isPressed={ isActive }
+				isActive={ isActive }
 			/>
 		);
 	},

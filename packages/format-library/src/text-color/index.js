@@ -77,7 +77,7 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 						) }
 					</>
 				}
-				label={ title }
+				title={ title }
 				// If has no colors to choose but a color is active remove the color onClick
 				onClick={
 					hasColorsToChoose
