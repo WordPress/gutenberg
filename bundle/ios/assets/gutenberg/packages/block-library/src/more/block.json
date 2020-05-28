@@ -9,11 +9,5 @@
 			"type": "boolean",
 			"default": false
 		}
-	},
-	"supports": {
-		"customClassName": false,
-		"className": false,
-		"html": false,
-		"multiple": false
 	}
 }

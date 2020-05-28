@@ -60,9 +60,5 @@
 			"selector": "video",
 			"attribute": "playsinline"
 		}
-	},
-	"supports": {
-		"align": true,
-		"lightBlockWrapper": true
 	}
 }

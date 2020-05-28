@@ -9,8 +9,5 @@
 			"default": "",
 			"__unstablePreserveWhiteSpace": true
 		}
-	},
-	"supports": {
-		"lightBlockWrapper": true
 	}
 }

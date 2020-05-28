@@ -13,10 +13,7 @@
 					"source": "html"
 				}
 			},
-			"default": [
-				{},
-				{}
-			]
+			"default": [ {}, {} ]
 		},
 		"columns": {
 			"type": "number",
@@ -25,8 +22,5 @@
 		"width": {
 			"type": "string"
 		}
-	},
-	"supports": {
-		"inserter": false
 	}
 }

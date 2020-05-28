@@ -11,10 +11,7 @@
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
-			"__unstableMultilineWrapperTags": [
-				"ol",
-				"ul"
-			],
+			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": ""
 		},
 		"type": {
@@ -26,10 +23,5 @@
 		"reversed": {
 			"type": "boolean"
 		}
-	},
-	"supports": {
-		"className": false,
-		"__unstablePasteTextInline": true,
-		"lightBlockWrapper": true
 	}
 }

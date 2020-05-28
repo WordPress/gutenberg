@@ -34,9 +34,5 @@
 			"selector": "audio",
 			"attribute": "preload"
 		}
-	},
-	"supports": {
-		"align": true,
-		"lightBlockWrapper": true
 	}
 }

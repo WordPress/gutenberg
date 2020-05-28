@@ -4,13 +4,7 @@
 	"attributes": {
 		"align": {
 			"type": "string",
-			"enum": [
-				"left",
-				"center",
-				"right",
-				"wide",
-				"full"
-			]
+			"enum": [ "left", "center", "right", "wide", "full" ]
 		},
 		"className": {
 			"type": "string"
@@ -27,9 +21,5 @@
 			"type": "boolean",
 			"default": false
 		}
-	},
-	"supports": {
-		"align": true,
-		"html": false
 	}
 }

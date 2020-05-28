@@ -10,9 +10,5 @@
 			"source": "html",
 			"selector": "p"
 		}
-	},
-	"supports": {
-		"inserter": false,
-		"multiple": false
 	}
 }
