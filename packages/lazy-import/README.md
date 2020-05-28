@@ -12,6 +12,10 @@ npm install @wordpress/lazy-import --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
 
+## Requirements
+
+NPM 6.9.0 or newer is required, since it uses the [package aliases feature](https://github.com/npm/rfcs/blob/latest/implemented/0001-package-aliases.md) to maintain multiple versions of the same package.
+
 ## Usage
 
 Usage is intended to mimic the behavior of the [dynamic `import` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#Dynamic_Imports), receiving the name (and optional version specifier) of an NPM package and returning a promise which resolves to the required module.
