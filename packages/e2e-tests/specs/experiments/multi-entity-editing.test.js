@@ -12,10 +12,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 const visitSiteEditor = async () => {
@@ -172,24 +169,18 @@ const removeErrorMocks = () => {
 };
 
 describe( 'Multi-entity editor states', () => {
-	// Setup & Teardown.
-	const requiredExperiments = [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	];
-
 	const templatePartName = 'Test Template Part Name Edit';
 	const templateName = 'Test Template Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
+	useExperimentalFeatures( [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( requiredExperiments );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-	} );
-
-	afterAll( async () => {
-		await disableExperimentalFeatures( requiredExperiments );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
