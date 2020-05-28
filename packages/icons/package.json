@@ -25,7 +25,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
-		"@wordpress/element": "../element",
+		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives"
 	},
 	"publishConfig": {
