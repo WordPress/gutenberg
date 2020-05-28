@@ -22,3 +22,33 @@
 	font-weight: 600;
 	margin-bottom: 4px;
 }
+
+.block-editor-inserter__template-part-item {
+	border-radius: $radius-block-ui;
+	cursor: pointer;
+	margin-top: $grid-unit-20;
+	transition: all 0.05s ease-in-out;
+	position: relative;
+	border: $border-width solid transparent;
+
+	&:hover {
+		border: $border-width solid $theme-color;
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
+	&.is-placeholder {
+		min-height: 100px;
+	}
+}
+
+.block-editor-inserter__template-part-item-title {
+	padding: $grid-unit-05;
+	font-size: 12px;
+	text-align: center;
+}

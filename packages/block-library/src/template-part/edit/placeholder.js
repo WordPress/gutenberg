@@ -14,6 +14,12 @@ import { layout } from '@wordpress/icons';
  * Internal dependencies
  */
 import useTemplatePartPost from './use-template-part-post';
+import TemplatePartPreviews from './template-part-previews';
+
+/**
+ * External dependencies
+ */
+import { noop } from 'lodash';
 
 function TemplatePartPreview() {
 	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part' );
@@ -126,6 +132,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
+			<TemplatePartPreviews onInsert={ noop } filterValue={ '' } />
 		</Placeholder>
 	);
 }

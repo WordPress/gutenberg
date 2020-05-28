@@ -70,7 +70,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 
 	return (
 		<div
-			className="block-editor-inserter__template-part-item"
+			className="wp-block-template-part__placeholder-preview-item"
 			role="button"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
@@ -82,7 +82,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 			aria-label={ templatePart.slug }
 		>
 			<BlockPreview blocks={ blocks } />
-			<div className="block-editor-inserter__template-part-item-title">
+			<div className="wp-block-template-part__placeholder-preview-item-title">
 				{ templatePart.slug }
 			</div>
 		</div>
