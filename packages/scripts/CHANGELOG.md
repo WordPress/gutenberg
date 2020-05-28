@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2020-05-28)
+
 ### New Feature
 
 - New `--webpack-no-externals` flag added to `build` and `start` scripts. It disables scripts' assets generation, and omits the list of default externals ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).

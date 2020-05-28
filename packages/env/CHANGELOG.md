@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.0 (2020-05-28)
+
 ### New Feature
 
 -   View php and WordPress log output with the new `wp-env logs` command.
