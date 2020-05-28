@@ -86,13 +86,14 @@ class Inserter extends Component {
 			blockTitle,
 			hasSingleBlockType,
 			toggleProps,
+			hasItems,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
 		return renderToggle( {
 			onToggle,
 			isOpen,
-			disabled,
+			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
 			toggleProps,
@@ -161,11 +162,14 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
+			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		const { getBlockVariations } = select( 'core/blocks' );
 
 		rootClientId =
-			rootClientId || getBlockRootClientId( clientId ) || undefined;
+			rootClientId ||
+			getBlockRootClientId( clientId || getBlockSelectionEnd() ) ||
+			undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 
@@ -246,5 +250,10 @@ export default compose( [
 			},
 		};
 	} ),
-	ifCondition( ( { hasItems } ) => hasItems ),
+	// The global inserter should always be visible, we are using ( ! isAppender && ! rootClientId && ! clientId ) as
+	// a way to detect the global Inserter.
+	ifCondition(
+		( { hasItems, isAppender, rootClientId, clientId } ) =>
+			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
+	),
 ] )( Inserter );

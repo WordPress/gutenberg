@@ -1,10 +1,10 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const doctrine = require( 'doctrine' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const getLeadingComments = require( './get-leading-comments' );
 const getTypeAsString = require( './get-type-as-string' );

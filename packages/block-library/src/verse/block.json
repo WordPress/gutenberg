@@ -12,5 +12,8 @@
 		"textAlign": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"lightBlockWrapper": true
 	}
 }

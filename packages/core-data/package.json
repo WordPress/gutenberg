@@ -21,6 +21,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"(src|build|build-module)/index.js"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/api-fetch": "file:../api-fetch",

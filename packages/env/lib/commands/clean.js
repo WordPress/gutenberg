@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const dockerCompose = require( 'docker-compose' );
+
+/**
  * Internal dependencies
  */
 const initConfig = require( '../init-config' );
@@ -21,6 +26,13 @@ module.exports = async function clean( { environment, spinner, debug } ) {
 	spinner.text = `Cleaning ${ description }.`;
 
 	const tasks = [];
+
+	// Start the database first to avoid race conditions where all tasks create
+	// different docker networks with the same name.
+	await dockerCompose.upOne( 'mysql', {
+		config: config.dockerComposeConfigPath,
+		log: config.debug,
+	} );
 
 	if ( environment === 'all' || environment === 'development' ) {
 		tasks.push(

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, difference } from 'lodash';
+import { groupBy, isEqual, difference } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,12 +9,17 @@ import { isEqual, difference } from 'lodash';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
-function createBlockFromMenuItem( menuItem ) {
-	return createBlock( 'core/navigation-link', {
-		label: menuItem.title.raw,
-		url: menuItem.url,
-	} );
+function createBlockFromMenuItem( menuItem, innerBlocks = [] ) {
+	return createBlock(
+		'core/navigation-link',
+		{
+			label: menuItem.title.rendered,
+			url: menuItem.url,
+		},
+		innerBlocks
+	);
 }
 
 function createMenuItemAttributesFromBlock( block ) {
@@ -25,13 +30,15 @@ function createMenuItemAttributesFromBlock( block ) {
 }
 
 export default function useNavigationBlocks( menuId ) {
+	// menuItems is an array of menu item objects.
 	const menuItems = useSelect(
-		( select ) => select( 'core' ).getMenuItems( { menus: menuId } ),
+		( select ) =>
+			select( 'core' ).getMenuItems( { menus: menuId, per_page: -1 } ),
 		[ menuId ]
 	);
 
 	const { saveMenuItem } = useDispatch( 'core' );
-
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const [ blocks, setBlocks ] = useState( [] );
 
 	const menuItemsRef = useRef( {} );
@@ -41,46 +48,79 @@ export default function useNavigationBlocks( menuId ) {
 			return;
 		}
 
+		const itemsByParentID = groupBy( menuItems, 'parent' );
+
 		menuItemsRef.current = {};
 
-		const innerBlocks = [];
+		const createMenuItemBlocks = ( items ) => {
+			const innerBlocks = [];
+			if ( ! items ) {
+				return;
+			}
+			for ( const item of items ) {
+				let menuItemInnerBlocks = [];
+				if ( itemsByParentID[ item.id ]?.length ) {
+					menuItemInnerBlocks = createMenuItemBlocks(
+						itemsByParentID[ item.id ]
+					);
+				}
+				const block = createBlockFromMenuItem(
+					item,
+					menuItemInnerBlocks
+				);
+				menuItemsRef.current[ block.clientId ] = item;
+				innerBlocks.push( block );
+			}
+			return innerBlocks;
+		};
 
-		for ( const menuItem of menuItems ) {
-			const block = createBlockFromMenuItem( menuItem );
-			menuItemsRef.current[ block.clientId ] = menuItem;
-			innerBlocks.push( block );
-		}
-
+		// createMenuItemBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
+		const innerBlocks = createMenuItemBlocks( itemsByParentID[ 0 ] );
 		setBlocks( [ createBlock( 'core/navigation', {}, innerBlocks ) ] );
 	}, [ menuItems ] );
 
 	const saveBlocks = () => {
-		const { innerBlocks } = blocks[ 0 ];
+		const { clientId, innerBlocks } = blocks[ 0 ];
+		const parentItemId = menuItemsRef.current[ clientId ]?.parent;
 
-		for ( const block of innerBlocks ) {
-			const menuItem = menuItemsRef.current[ block.clientId ];
+		const saveNestedBlocks = async ( nestedBlocks, parentId = 0 ) => {
+			for ( const block of nestedBlocks ) {
+				const menuItem = menuItemsRef.current[ block.clientId ];
+				let currentItemId = menuItem?.id || 0;
 
-			if ( ! menuItem ) {
-				saveMenuItem( {
-					...createMenuItemAttributesFromBlock( block ),
-					menus: menuId,
-				} );
-				continue;
+				if ( ! menuItem ) {
+					const savedItem = await saveMenuItem( {
+						...createMenuItemAttributesFromBlock( block ),
+						menus: menuId,
+						parent: parentId,
+					} );
+					if ( block.innerBlocks.length ) {
+						currentItemId = savedItem.id;
+					}
+				}
+
+				if (
+					menuItem &&
+					! isEqual(
+						block.attributes,
+						createBlockFromMenuItem( menuItem ).attributes
+					)
+				) {
+					saveMenuItem( {
+						...menuItem,
+						...createMenuItemAttributesFromBlock( block ),
+						menus: menuId, // Gotta do this because REST API doesn't like receiving an array here. Maybe a bug in the REST API?
+						parent: parentId,
+					} );
+				}
+
+				if ( block.innerBlocks.length ) {
+					saveNestedBlocks( block.innerBlocks, currentItemId );
+				}
 			}
+		};
 
-			if (
-				! isEqual(
-					block.attributes,
-					createBlockFromMenuItem( menuItem ).attributes
-				)
-			) {
-				saveMenuItem( {
-					...menuItem,
-					...createMenuItemAttributesFromBlock( block ),
-					menus: menuId, // Gotta do this because REST API doesn't like receiving an array here. Maybe a bug in the REST API?
-				} );
-			}
-		}
+		saveNestedBlocks( innerBlocks, parentItemId );
 
 		const deletedClientIds = difference(
 			Object.keys( menuItemsRef.current ),
@@ -89,9 +129,13 @@ export default function useNavigationBlocks( menuId ) {
 
 		// Disable reason, this code will eventually be implemented.
 		// eslint-disable-next-line no-unused-vars
-		for ( const clientId of deletedClientIds ) {
+		for ( const deletedClientId of deletedClientIds ) {
 			// TODO - delete menu items.
 		}
+
+		createSuccessNotice( __( 'Navigation saved.' ), {
+			type: 'snackbar',
+		} );
 	};
 
 	return [ blocks, setBlocks, saveBlocks ];

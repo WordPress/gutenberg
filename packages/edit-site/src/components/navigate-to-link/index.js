@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { getPath, getQueryString, addQueryArgs } from '@wordpress/url';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { addQueryArgs } from '@wordpress/url';
-import { select } from '@wordpress/data';
+import { __experimentalResolveSelect as resolveSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -12,11 +12,21 @@ import { __ } from '@wordpress/i18n';
  */
 const { fetch } = window;
 
+function getPathFromLink( link ) {
+	// TODO: Explore abstracting this into `@wordpress/url`.
+	const path = getPath( link );
+	const queryString = getQueryString( link );
+	let value = '/';
+	if ( path ) value += path;
+	if ( queryString ) value += `?${ queryString }`;
+	return value;
+}
 export default function NavigateToLink( {
 	url,
-	templateIds,
-	activeId,
-	onActiveIdChange,
+	type,
+	id,
+	activePage,
+	onActivePageAndTemplateIdChange,
 } ) {
 	const [ templateId, setTemplateId ] = useState();
 	useEffect( () => {
@@ -28,14 +38,16 @@ export default function NavigateToLink( {
 				if ( success ) {
 					let newTemplateId = data.ID;
 					if ( newTemplateId === null ) {
-						const { getEntityRecord } = select( 'core' );
-						newTemplateId = templateIds
-							.map( ( id ) =>
-								getEntityRecord( 'postType', 'wp_template', id )
+						newTemplateId = (
+							await resolveSelect( 'core' ).getEntityRecords(
+								'postType',
+								'wp_template',
+								{
+									resolved: true,
+									slug: data.post_name,
+								}
 							)
-							.find(
-								( template ) => template.slug === data.post_name
-							).id;
+						 )[ 0 ].id;
 					}
 					setTemplateId( newTemplateId );
 				} else {
@@ -46,13 +58,27 @@ export default function NavigateToLink( {
 			}
 		};
 		effect();
-	}, [ url, templateIds ] );
+	}, [ url ] );
 	const onClick = useMemo( () => {
-		if ( ! templateId || templateId === activeId ) {
-			return null;
-		}
-		return () => onActiveIdChange( templateId );
-	}, [ templateId, activeId, onActiveIdChange ] );
+		if ( ! templateId || ! type || ! id || type === 'URL' ) return null;
+		const path = getPathFromLink( url );
+		if ( path === activePage.path ) return null;
+		return () =>
+			onActivePageAndTemplateIdChange( {
+				page: {
+					path,
+					context: { postType: type, postId: id },
+				},
+				templateId,
+			} );
+	}, [
+		templateId,
+		type,
+		id,
+		getPathFromLink,
+		url,
+		onActivePageAndTemplateIdChange,
+	] );
 	return (
 		onClick && (
 			<Button
