@@ -34,7 +34,7 @@ import getQueryParts from './get-query-parts';
 export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	const receivedAllIds = page === 1 && perPage === -1;
 	if ( receivedAllIds ) {
-		return [ ...nextItemIds ];
+		return nextItemIds;
 	}
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
@@ -49,6 +49,7 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	const mergedItemIds = new Array( size );
 
 	for ( let i = 0; i < size; i++ ) {
+		// Preserve existing item ID except for subset of range of next items.
 		const isInNextItemsRange =
 			i >= nextItemIdsStartIndex &&
 			i < nextItemIdsStartIndex + nextItemIds.length;
