@@ -36,13 +36,7 @@ const appendOrEmbedContents = ( { options, newContents } ) => {
 	};
 };
 
-module.exports = function(
-	options,
-	processDir,
-	doc,
-	filteredIR,
-	headingTitle
-) {
+module.exports = ( options, processDir, doc, filteredIR, headingTitle ) => {
 	if ( options.toSection || options.toToken ) {
 		const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
 		const newContents = unified()
@@ -51,7 +45,7 @@ module.exports = function(
 		remark()
 			.use( { settings: { commonmark: true } } )
 			.use( appendOrEmbedContents, { options, newContents } )
-			.process( currentReadmeFile, function( err, file ) {
+			.process( currentReadmeFile, ( err, file ) => {
 				if ( err ) {
 					throw err;
 				}
