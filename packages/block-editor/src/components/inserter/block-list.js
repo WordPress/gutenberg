@@ -4,7 +4,6 @@
 import {
 	map,
 	includes,
-	filter,
 	findIndex,
 	flow,
 	sortBy,
@@ -31,8 +30,9 @@ import { compose } from '@wordpress/compose';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 import __experimentalInserterMenuExtension from '../inserter-menu-extension';
-import { searchItems } from './search-items';
+import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
+import InserterNoResults from './no-results';
 
 // Copied over from the Columns block. It seems like it should become part of public API.
 const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
@@ -49,9 +49,9 @@ const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
-const MAX_SUGGESTED_ITEMS = 9;
+const MAX_SUGGESTED_ITEMS = 6;
 
-function InserterBlockList( {
+export function InserterBlockList( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -114,24 +114,27 @@ function InserterBlockList( {
 	};
 
 	const filteredItems = useMemo( () => {
-		return searchItems( items, categories, collections, filterValue );
+		return searchBlockItems( items, categories, collections, filterValue );
 	}, [ filterValue, items, categories, collections ] );
 
 	const childItems = useMemo( () => {
-		return filter( filteredItems, ( { name } ) =>
+		return filteredItems.filter( ( { name } ) =>
 			includes( rootChildBlocks, name )
 		);
 	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
-		return filter( items, ( item ) => item.utility > 0 ).slice(
-			0,
-			MAX_SUGGESTED_ITEMS
-		);
+		return items.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {
-		return filter( filteredItems, { category: 'reusable' } );
+		return filteredItems.filter(
+			( { category } ) => category === 'reusable'
+		);
+	}, [ filteredItems ] );
+
+	const uncategorizedItems = useMemo( () => {
+		return filteredItems.filter( ( item ) => ! item.category );
 	}, [ filteredItems ] );
 
 	const itemsPerCategory = useMemo( () => {
@@ -144,7 +147,9 @@ function InserterBlockList( {
 
 		return flow(
 			( itemList ) =>
-				filter( itemList, ( item ) => item.category !== 'reusable' ),
+				itemList.filter(
+					( item ) => item.category && item.category !== 'reusable'
+				),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -167,22 +172,13 @@ function InserterBlockList( {
 
 	// Announce search results on change
 	useEffect( () => {
-		const resultCount = Object.keys( itemsPerCategory ).reduce(
-			( accumulator, currentCategorySlug ) => {
-				return (
-					accumulator + itemsPerCategory[ currentCategorySlug ].length
-				);
-			},
-			0
-		);
-
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
+			_n( '%d result found.', '%d results found.', filteredItems.length ),
+			filteredItems.length
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ itemsPerCategory, debouncedSpeak ] );
+	}, [ filterValue, debouncedSpeak ] );
 
 	const hasItems = ! isEmpty( filteredItems );
 	const hasChildItems = childItems.length > 0;
@@ -226,6 +222,19 @@ function InserterBlockList( {
 						</InserterPanel>
 					);
 				} ) }
+
+			{ ! hasChildItems && !! uncategorizedItems.length && (
+				<InserterPanel
+					className="block-editor-inserter__uncategorized-blocks-panel"
+					title={ __( 'Uncategorized' ) }
+				>
+					<BlockTypesList
+						items={ uncategorizedItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+					/>
+				</InserterPanel>
+			) }
 
 			{ ! hasChildItems &&
 				map( collections, ( collection, namespace ) => {
@@ -281,20 +290,10 @@ function InserterBlockList( {
 			>
 				{ ( fills ) => {
 					if ( fills.length ) {
-						return (
-							<InserterPanel
-								title={ _x( 'Search Results', 'blocks' ) }
-							>
-								{ fills }
-							</InserterPanel>
-						);
+						return fills;
 					}
 					if ( ! hasItems ) {
-						return (
-							<p className="block-editor-inserter__no-results">
-								{ __( 'No blocks found.' ) }
-							</p>
-						);
+						return <InserterNoResults />;
 					}
 					return null;
 				} }

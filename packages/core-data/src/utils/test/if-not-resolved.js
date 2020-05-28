@@ -31,7 +31,9 @@ describe( 'ifNotResolved', () => {
 				selectorName === 'hasStartedResolution' ? false : undefined,
 		} ) );
 
-		const originalResolver = jest.fn().mockImplementation( function*() {} );
+		const originalResolver = jest
+			.fn()
+			.mockImplementation( function* () {} );
 
 		const resolver = ifNotResolved( originalResolver, 'originalResolver' );
 
@@ -52,7 +54,9 @@ describe( 'ifNotResolved', () => {
 				selectorName === 'hasStartedResolution' ? true : undefined,
 		} ) );
 
-		const originalResolver = jest.fn().mockImplementation( function*() {} );
+		const originalResolver = jest
+			.fn()
+			.mockImplementation( function* () {} );
 
 		const resolver = ifNotResolved( originalResolver, 'originalResolver' );
 

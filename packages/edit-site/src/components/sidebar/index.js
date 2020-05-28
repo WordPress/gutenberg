@@ -9,13 +9,13 @@ import { cog, pencil } from '@wordpress/icons';
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
-function Sidebar() {
+export const SidebarInspectorFill = InspectorFill;
+export function SidebarComplementaryAreaFills() {
 	return (
 		<>
-			<ComplementaryArea.Slot scope="core/edit-site" />
 			<ComplementaryArea
 				scope="core/edit-site"
-				complementaryAreaIdentifier="edit-site/block-inspector"
+				identifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
 			>
@@ -23,7 +23,7 @@ function Sidebar() {
 			</ComplementaryArea>
 			<ComplementaryArea
 				scope="core/edit-site"
-				complementaryAreaIdentifier="edit-site/global-styles"
+				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
 				icon={ pencil }
 			>
@@ -32,7 +32,3 @@ function Sidebar() {
 		</>
 	);
 }
-
-Sidebar.InspectorFill = InspectorFill;
-
-export default Sidebar;

@@ -31,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { menu } from '@wordpress/icons';
+import { navigation as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -42,12 +42,15 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
 function Navigation( {
+	selectedBlockHasDescendants,
 	attributes,
 	clientId,
 	fontSize,
 	hasExistingNavItems,
 	hasResolvedPages,
+	isImmediateParentOfSelectedBlock,
 	isRequestingPages,
+	isSelected,
 	pages,
 	setAttributes,
 	setFontSize,
@@ -82,7 +85,8 @@ function Navigation( {
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
-		clientId
+		clientId,
+		true
 	);
 
 	// Builds navigation links from default Pages.
@@ -141,7 +145,7 @@ function Navigation( {
 			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
+					icon={ icon }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -229,7 +233,10 @@ function Navigation( {
 			{ navigatorModal }
 			<InspectorControls>
 				<PanelBody title={ __( 'Navigation Structure' ) }>
-					<BlockNavigationList clientId={ clientId } />
+					<BlockNavigationList
+						clientId={ clientId }
+						__experimentalWithBlockNavigationSlots
+					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
@@ -263,9 +270,16 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
+							renderAppender={
+								( isImmediateParentOfSelectedBlock &&
+									! selectedBlockHasDescendants ) ||
+								isSelected
+									? InnerBlocks.DefaultAppender
+									: false
+							}
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
-								attributes.orientation
+								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
@@ -289,6 +303,11 @@ export default compose( [
 	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const {
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
 
 		const filterDefaultPages = {
 			parent: 0,
@@ -302,7 +321,18 @@ export default compose( [
 			[ 'postType', 'page', filterDefaultPages ],
 		];
 
+		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			false
+		);
+		const selectedBlockId = getSelectedBlockClientId();
+		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+			selectedBlockId,
+		] )?.length;
+
 		return {
+			isImmediateParentOfSelectedBlock,
+			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
 			pages: select( 'core' ).getEntityRecords(
 				'postType',

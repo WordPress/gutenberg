@@ -33,6 +33,7 @@ function MyEditorComponent () {
 			onInput={ updateBlocks }
 			onChange={ updateBlocks }
 		>
+			<Popover.Slot name="block-toolbar" />
 			<WritingFlow>
 				<ObserveTyping>
 					<BlockList />
@@ -48,11 +49,13 @@ function MyEditorComponent () {
 // import '@wordpress/block-editor/build-style/style.css';
 ```
 
-In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
+In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you pass the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
 In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
+
+The `Popover.Slot` with the `name="block-toolbar"` prop is used to render the toolbar for a selected block.
 
 In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
 
@@ -92,6 +95,10 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 _Returns_
 
 -   `WPElement`: Block Breadcrumb.
+
+<a name="BlockColorsStyleSelector" href="#BlockColorsStyleSelector">#</a> **BlockColorsStyleSelector**
+
+Undocumented declaration.
 
 <a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
 
@@ -536,12 +543,13 @@ Undocumented declaration.
 
 <a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
 
-Function that manipulates media queries from stylesheets to simulate a given viewport width.
+Function that manipulates media queries from stylesheets to simulate a given
+viewport width.
 
 _Parameters_
 
 -   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `number`: Viewport width to simulate.
+-   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 

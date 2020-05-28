@@ -41,28 +41,35 @@ const Portfolio = {
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/scatter-1.jpg?w=640',
+						id: '658',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/redcylinder-1.jpg?w=640',
+						id: '659',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/redbox.jpg?w=640',
+						id: '660',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/crab-1.jpg?w=640',
+						id: '661',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/cat.jpg?w=640',
+						id: '662',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/bluebox.jpg?w=640',
+						id: '663',
 					},
 				],
+				ids: [ 658, 659, 660, 661, 662, 663 ],
 				caption: '',
 				imageCrop: true,
 				linkTo: 'none',
@@ -111,28 +118,35 @@ const Portfolio = {
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/scatter-1.jpg?w=640',
+						id: '658',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/redcylinder-1.jpg?w=640',
+						id: '659',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/redbox.jpg?w=640',
+						id: '660',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/crab-1.jpg?w=640',
+						id: '661',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/cat.jpg?w=640',
+						id: '662',
 					},
 					{
 						url:
 							'https://a8ctm1.files.wordpress.com/2019/08/bluebox.jpg?w=640',
+						id: '663',
 					},
 				],
+				ids: [ 658, 659, 660, 661, 662, 663 ],
 				caption: '',
 				imageCrop: true,
 				linkTo: 'none',
@@ -170,19 +184,22 @@ const Portfolio = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "Portfolio" page template
-				content: __( "Let's build something together." ),
+				content: __( "Let's build something together!" ),
 				level: 2,
 			},
 		},
 		{
 			name: 'core/buttons',
+			attributes: {
+				align: 'center',
+			},
 			innerBlocks: [
 				{
 					name: 'core/button',
 					attributes: {
 						url: '',
 						// translators: sample content for "Portfolio" page template
-						text: __( 'Get in touch!' ),
+						text: __( 'Get in Touch' ),
 						linkTarget: '',
 						rel: '',
 						className: 'aligncenter',

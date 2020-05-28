@@ -1,12 +1,33 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### Breaking Changes
+
+- The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
+
+## 6.1.0 (2020-05-28)
+
+### Bug Fixes
+
+- `@wordpress/dependency-group` will now correctly identify issues associated with CommonJS (`require`) module imports.
+
+## 6.0.0 (2020-05-14)
+
+### Breaking Changes
+
+- The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
 
 ### Improvements
 
 - `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
 
+## 5.1.0 (2020-04-30)
+
 ### Bug Fixes
 
 - The `@wordpress/no-unused-vars-before-return` rule will now correctly identify valid usage of a variable as a JSX identifier.
+- Make `@wordpress/i18n-text-domain` rule less strict by default. When `allowedTextDomain` option is not provided it allows now skipping text domain or providing any string ([#21928](https://github.com/WordPress/gutenberg/pull/21928)).
 
 ## 5.0.1 (2020-04-15)
 

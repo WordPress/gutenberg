@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adding blocks should insert a block pattern 1`] = `
+"<!-- wp:buttons {\\"align\\":\\"center\\"} -->
+<div class=\\"wp-block-buttons aligncenter\\"><!-- wp:button {\\"borderRadius\\":0,\\"backgroundColor\\":\\"very-dark-gray\\"} -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link has-very-dark-gray-background-color has-background no-border-radius\\">Button One</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {\\"borderRadius\\":0,\\"textColor\\":\\"very-dark-gray\\",\\"className\\":\\"is-style-outline\\"} -->
+<div class=\\"wp-block-button is-style-outline\\"><a class=\\"wp-block-button__link has-very-dark-gray-color has-text-color no-border-radius\\">Button Two</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->"
+`;
