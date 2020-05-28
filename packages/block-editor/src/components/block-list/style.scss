@@ -172,9 +172,13 @@
 		&::after {
 			content: none;
 		}
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		outline: 1px dashed $blue-medium-focus;
 	}
 
-	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+		outline: 1px dashed $blue-medium-focus;
+
 		&::before {
 			content: "";
 			position: absolute;
@@ -188,10 +192,21 @@
 			left: 0;
 			top: -$default-block-margin / 2;
 			border-radius: $radius-block-ui;
-			border-top: 4px solid $blue-medium-focus;
+			border-top: 4px solid $light-gray-secondary;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: $blue-medium-focus;
 		}
 	}
 }
+
 
 .is-navigate-mode.block-editor-block-list__breadcrumb {
 	// Should be invisible but not unfocusable.
