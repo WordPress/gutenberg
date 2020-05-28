@@ -42,7 +42,8 @@
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
 		{ "docs/designers-developers/developers/themes/README.md": [
 			{ "docs/designers-developers/developers/themes/theme-support.md": [] },
-			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] }
+			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] },
+			{ "docs/designers-developers/developers/themes/theme-json.md": [] }
 		] },
 		{ "docs/designers-developers/developers/backward-compatibility/README.md": [
 			{ "docs/designers-developers/developers/backward-compatibility/deprecations.md": [] },

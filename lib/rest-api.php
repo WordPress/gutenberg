@@ -129,6 +129,14 @@ function gutenberg_register_rest_block_directory() {
 add_filter( 'rest_api_init', 'gutenberg_register_rest_block_directory' );
 
 /**
+ * Registers the Block types REST API routes.
+ */
+function gutenberg_register_block_type() {
+	$block_types = new WP_REST_Block_Types_Controller();
+	$block_types->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_block_type' );
+/**
  * Registers the menu locations area REST API routes.
  */
 function gutenberg_register_rest_menu_location() {

@@ -32,12 +32,12 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 	( state, blockClientId ) => [ get( state, blockClientId, EMPTY_ARRAY ) ]
 );
 
-export const __experimentalGetAllAnnotationsForBlock = function(
+export function __experimentalGetAllAnnotationsForBlock(
 	state,
 	blockClientId
 ) {
 	return get( state, blockClientId, EMPTY_ARRAY );
-};
+}
 
 /**
  * Returns the annotations that apply to the given RichText instance.

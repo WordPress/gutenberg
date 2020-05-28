@@ -15,3 +15,8 @@
 .edit-widgets-header__actions {
 	display: flex;
 }
+
+.edit-widgets-header__block-toolbar {
+	border-bottom: 1px solid $light-gray-500;
+	border-top: 1px solid $light-gray-500;
+}

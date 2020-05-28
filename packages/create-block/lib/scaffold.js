@@ -14,7 +14,7 @@ const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
 const { hasWPScriptsEnabled } = require( './templates' );
 
-module.exports = async function(
+module.exports = async (
 	blockTemplate,
 	{
 		namespace,
@@ -28,7 +28,7 @@ module.exports = async function(
 		licenseURI,
 		version,
 	}
-) {
+) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
 
