@@ -27,7 +27,7 @@ export function RichTextToolbarButton( {
 		<Fill name={ fillName }>
 			<ToolbarButton
 				label={ title }
-				isActive={ isActive }
+				isPressed={ isActive }
 				{ ...props }
 				shortcut={ shortcut }
 			/>
