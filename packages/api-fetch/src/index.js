@@ -132,7 +132,7 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return new Promise( function( resolve, reject ) {
+	return new Promise( ( resolve, reject ) => {
 		createRunStep( 0 )( options )
 			.then( resolve )
 			.catch( ( error ) => {

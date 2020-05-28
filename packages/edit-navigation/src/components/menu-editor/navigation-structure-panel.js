@@ -26,8 +26,10 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 						selectedBlockClientId={ selectedBlockClientIds[ 0 ] }
 						selectBlock={ selectBlock }
 						__experimentalWithBlockNavigationSlots
-						__experimentalWithEllipsisMenu
-						__experimentalWithEllipsisMenuMinLevel={ 2 }
+						__experimentalWithBlockNavigationBlockSettings
+						__experimentalWithBlockNavigationBlockSettingsMinLevel={
+							2
+						}
 						showNestedBlocks
 						showAppender
 						showBlockMovers

@@ -11,13 +11,7 @@ const writePkg = require( 'write-pkg' );
  */
 const { info } = require( './log' );
 
-module.exports = async function( {
-	author,
-	description,
-	license,
-	slug,
-	version,
-} ) {
+module.exports = async ( { author, description, license, slug, version } ) => {
 	const cwd = join( process.cwd(), slug );
 
 	info( '' );

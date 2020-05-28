@@ -3,7 +3,7 @@
  *
  * @param {Element} node Node to check.
  */
-export default function( node ) {
+export default function emptyParagraphRemover( node ) {
 	if ( node.nodeName !== 'P' ) {
 		return;
 	}
