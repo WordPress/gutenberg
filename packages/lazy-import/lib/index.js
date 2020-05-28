@@ -120,6 +120,8 @@ async function lazyImport( arg, options = {} ) {
 		throw error;
 	}
 
+	// Delete cache from prior `require` attempt.
+	delete require.cache[ require.resolve( localModule ) ];
 
 	return require( localModule );
 }
