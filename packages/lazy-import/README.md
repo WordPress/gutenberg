@@ -55,6 +55,18 @@ function onInstall() {
 lazyImport( 'is-equal-shallow@^0.1.3', { onInstall } ).then( /* ... */ );
 ```
 
+Note that `lazyImport` can throw an error when offline and unable to install the dependency using NPM. You may want to anticipate this and provide remediation steps for a failed install, such as logging a warning messsage:
+
+```js
+try {
+	await lazyImport( 'is-equal-shallow@^0.1.3' );
+} catch ( error ) {
+	if ( error.code === 'ENOTFOUND' ) {
+		console.log( 'Unable to connect to NPM registry!' );
+	}
+}
+```
+
 ### Options
 
 #### `onInstall`

@@ -104,7 +104,22 @@ async function lazyImport( arg, options = {} ) {
 	if ( options.onInstall ) {
 		options.onInstall();
 	}
-	await install( arg, localModule );
+
+	try {
+		await install( arg, localModule );
+	} catch ( error ) {
+		// Format connectivity error to one which can be easily evaluated.
+		if (
+			error.stderr &&
+			error.stderr.startsWith( 'npm ERR! code ENOTFOUND' )
+		) {
+			error = new Error( 'Unable to connect to NPM registry' );
+			error.code = 'ENOTFOUND';
+		}
+
+		throw error;
+	}
+
 
 	return require( localModule );
 }
