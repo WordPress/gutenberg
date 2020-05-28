@@ -29,7 +29,7 @@ export default function useNavigationBlocks( menuId ) {
 			select( 'core' )
 				.getMenuItems( query )
 				?.filter( ( { id } ) => ! deletedMenuItemsIds.includes( id ) ),
-		[ menuId ]
+		[ menuId, deletedMenuItemsIds ]
 	);
 
 	// Data model
@@ -101,7 +101,7 @@ export default function useNavigationBlocks( menuId ) {
 			);
 			setDeletedMenuItemsIds( [
 				...deletedMenuItemsIds,
-				difference( allMenuItemsIds, savedMenuItemIds ),
+				...difference( allMenuItemsIds, savedMenuItemIds ),
 			] );
 
 			createSuccessNotice( __( 'Navigation saved.' ), {
