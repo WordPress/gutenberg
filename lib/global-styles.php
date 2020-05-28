@@ -262,12 +262,13 @@ function gutenberg_experimental_global_styles_get_block_data() {
 	$block_data = array(
 		'global' => array(
 			'selector' => ':root',
-			'supports' => array(), // By being blank, the 'global' section won't output any style yet.
+			'supports' => array( 'background' ),
 		),
 	);
 
 	$supported_features = array(
 		'color'       => '__experimentalColor',
+		'background'  => '__experimentalColor',
 		'line-height' => '__experimentalLineHeight',
 		'font-size'   => '__experimentalFontSize',
 	);
