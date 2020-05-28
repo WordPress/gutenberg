@@ -107,14 +107,14 @@ export class BlockList extends Component {
 	}
 
 	getExtraData() {
+		const { parentWidth, renderFooterAppender } = this.props;
 		if (
-			this.extraData.parentWidth !== this.props.parentWidth ||
-			this.extraData.renderFooterAppender !==
-				this.props.renderFooterAppender
+			this.extraData.parentWidth !== parentWidth ||
+			this.extraData.renderFooterAppender !== renderFooterAppender
 		) {
 			this.extraData = {
-				parentWidth: this.props.parentWidth,
-				renderFooterAppender: this.props.renderFooterAppender,
+				parentWidth,
+				renderFooterAppender,
 			};
 		}
 		return this.extraData;
