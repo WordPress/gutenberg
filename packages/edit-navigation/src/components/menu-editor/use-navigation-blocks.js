@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, sortBy, difference } from 'lodash';
+import { groupBy, sortBy, difference, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,11 +24,18 @@ export default function useNavigationBlocks( menuId ) {
 
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
+	// @TODO: uniq() and filter() are here just to work around the bug in select() - let's follow up with a PR
+	//  		  that addresses the root cause
 	const menuItems = useSelect(
 		( select ) =>
-			select( 'core' )
-				.getMenuItems( query )
-				?.filter( ( { id } ) => ! deletedMenuItemsIds.includes( id ) ),
+			uniq(
+				select( 'core' )
+					.getMenuItems( query )
+					?.filter(
+						( { id } ) => ! deletedMenuItemsIds.includes( id )
+					) || [],
+				( { id } ) => id
+			),
 		[ menuId, deletedMenuItemsIds ]
 	);
 
