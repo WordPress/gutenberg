@@ -48,6 +48,19 @@
 	}
 }
 
+.edit-post-header-toolbar__left {
+	display: inline-flex;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	@include break-wide() {
+		padding-right: $grid-unit-10;
+	}
+}
+
 // Block toolbar when fixed to the top of the screen.
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.
@@ -72,6 +85,10 @@
 		display: none;
 	}
 
+	.block-editor-block-toolbar__block-parent-selector-wrapper {
+		display: none;
+	}
+
 	@include break-medium {
 		.is-sidebar-opened & {
 			display: block;
@@ -81,7 +98,6 @@
 
 	// Move toolbar into top Editor Bar.
 	@include break-wide {
-		padding-left: $grid-unit-10;
 		position: static;
 		left: auto;
 		right: auto;
