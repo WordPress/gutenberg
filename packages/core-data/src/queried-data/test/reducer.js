@@ -50,11 +50,18 @@ describe( 'getMergedItemIds', () => {
 		expect( result ).toEqual( [ 1, 2, 3, 4, 5, 6, 7 ] );
 	} );
 
-	it( 'should return less items if nextItemIds represent all ids (page=1 and perPage=-1)', () => {
+	it( 'should replace missing ids with undefined if nextItemIds is a subset of itemIds and represents all ids (page=1 and perPage=-1)', () => {
 		const original = deepFreeze( [ 1, 2, 3 ] );
 		const result = getMergedItemIds( original, [ 1, 3 ], 1, -1 );
 
 		expect( result ).toEqual( [ 1, 3, undefined ] );
+	} );
+
+	it( 'should replace with nextItemIds if it represents all ids (page=1 and perPage=-1)', () => {
+		const original = deepFreeze( [ 1, 2, 3 ] );
+		const result = getMergedItemIds( original, [ 1, 3, 4 ], 1, -1 );
+
+		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
 } );
 
