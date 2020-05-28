@@ -246,6 +246,7 @@ async function runAxeTestsForBlockEditor() {
 			// Ignores elements created by TinyMCE.
 			'.mce-container',
 			// Ignores elements within the media modal.
+			// Related: https://core.trac.wordpress.org/ticket/50273
 			'.media-modal',
 			// These properties were not included in the 1.1 spec
 			// through error, they should be allowed on role="row":
