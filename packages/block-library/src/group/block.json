@@ -1,6 +1,7 @@
 {
 	"name": "core/group",
 	"category": "design",
+	"selector": ".wp-block-group",
 	"attributes": {
 		"tagName": {
 			"type": "string",

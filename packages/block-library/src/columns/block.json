@@ -1,6 +1,7 @@
 {
 	"name": "core/columns",
 	"category": "design",
+	"selector": ".wp-block-columns",
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"

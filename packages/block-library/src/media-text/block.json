@@ -1,6 +1,7 @@
 {
 	"name": "core/media-text",
 	"category": "media",
+	"selector": ".wp-block-media-text",
 	"attributes": {
 		"align": {
 			"type": "string",

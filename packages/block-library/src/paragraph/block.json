@@ -1,6 +1,7 @@
 {
 	"name": "core/paragraph",
 	"category": "text",
+	"selector": "p",
 	"attributes": {
 		"align": {
 			"type": "string"

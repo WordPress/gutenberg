@@ -259,57 +259,66 @@ function gutenberg_experimental_global_styles_get_theme() {
  * @return array
  */
 function gutenberg_experimental_global_styles_get_block_data() {
-	// TODO: this data should be taken from the block registry.
-	//
-	// At the moment this array replicates the current capabilities
-	// declared by blocks via __experimentalLineHeight,
-	// __experimentalColor, and __experimentalFontSize.
 	$block_data = array(
-		'global'          => array(
+		'global' => array(
 			'selector' => ':root',
 			'supports' => array(), // By being blank, the 'global' section won't output any style yet.
 		),
-		'core/paragraph'  => array(
-			'selector' => 'p',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h1' => array(
-			'selector' => 'h1',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h2' => array(
-			'selector' => 'h2',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h3' => array(
-			'selector' => 'h3',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h4' => array(
-			'selector' => 'h4',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h5' => array(
-			'selector' => 'h5',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/heading/h6' => array(
-			'selector' => 'h6',
-			'supports' => array( 'line-height', 'font-size', 'color' ),
-		),
-		'core/columns'    => array(
-			'selector' => '.wp-block-columns',
-			'supports' => array( 'color' ),
-		),
-		'core/group'      => array(
-			'selector' => '.wp-block-group',
-			'supports' => array( 'color' ),
-		),
-		'core/media-text' => array(
-			'selector' => '.wp-block-media-text',
-			'supports' => array( 'color' ),
-		),
 	);
+
+	$supported_features = array(
+		'color'       => '__experimentalColor',
+		'line-height' => '__experimentalLineHeight',
+		'font-size'   => '__experimentalFontSize',
+	);
+
+	$registry = WP_Block_Type_Registry::get_instance();
+	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
+		if ( ! isset( $block_type->selector ) ) {
+			// Skip the blocks we don't know how to transform to CSS.
+			continue;
+		}
+
+		/*
+		 * 1. Filter out the block supports that are falsy:
+		 *    we don't want to use disabled properties such as
+		 *    __experimentalProperty: false.
+		 *
+		 * 2. From the remaining keys, find the ones
+		 *    that are also present in $supported_features.
+		 *
+		 * 3. Take the CSS property names to use from $supported_features.
+		 */
+		$supported_block_features = array_keys(
+			array_intersect(
+				$supported_features,
+				array_keys( array_filter( $block_type->supports ) )
+			)
+		);
+
+		/*
+		 * Some blocks can declare multiple selectors.
+		 * Examples of this are:
+		 *
+		 * - core/heading represents the H1-H6 HTML elements
+		 * - core/list represents the UL and OL HTML elements
+		 * - core/group is meant to represent DIV and other HTML elements
+		 *
+		 */
+		if ( is_string( $block_type->selector ) ) {
+			$block_data[ $block_name ] = array(
+				'selector' => $block_type->selector,
+				'supports' => $supported_block_features,
+			);
+		} elseif ( is_array( $block_type->selector ) ) {
+			foreach ( $block_type->selector as $key => $selector ) {
+				$block_data[ $block_name . '/' . $key ] = array(
+					'selector' => $selector,
+					'supports' => $supported_block_features,
+				);
+			}
+		}
+	}
 
 	return $block_data;
 }
