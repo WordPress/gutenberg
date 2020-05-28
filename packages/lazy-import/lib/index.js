@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const npa = require( 'npm-package-arg' );
+const npmPackageArg = require( 'npm-package-arg' );
 const semver = require( 'semver' );
 const execa = require( 'execa' );
 const { join } = require( 'path' );
@@ -63,7 +63,7 @@ async function install( arg, alias ) {
  * @return {Promise<NodeRequire>} Promise resolving to required module.
  */
 async function lazyImport( arg, options = {} ) {
-	const { rawSpec, name } = npa( arg );
+	const { rawSpec, name } = npmPackageArg( arg );
 
 	if ( ! name ) {
 		throw new TypeError(
