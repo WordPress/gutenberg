@@ -9,6 +9,7 @@ import { find, isEmpty, each, map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useCallback } from '@wordpress/element';
 import {
+	ToolbarButton,
 	Button,
 	NavigableMenu,
 	MenuItem,
@@ -258,7 +259,7 @@ const ImageURLInputUI = ( {
 
 	return (
 		<>
-			<Button
+			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
