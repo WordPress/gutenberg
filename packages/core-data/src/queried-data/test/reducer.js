@@ -56,7 +56,6 @@ describe( 'getMergedItemIds', () => {
 		const result = getMergedItemIds( original, nextItemIds, 1, -1 );
 
 		expect( result ).toEqual( [ 1, 3 ] );
-		expect( result ).not.toBe( nextItemIds );
 	} );
 
 	it( 'should return a copy of nextItemIds if it represents all ids (single id removed and another one added) (page=1 and perPage=-1)', () => {
@@ -65,7 +64,6 @@ describe( 'getMergedItemIds', () => {
 		const result = getMergedItemIds( original, nextItemIds, 1, -1 );
 
 		expect( result ).toEqual( [ 1, 3, 4 ] );
-		expect( result ).not.toBe( nextItemIds );
 	} );
 } );
 
