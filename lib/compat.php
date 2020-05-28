@@ -211,9 +211,9 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		'query'    => array( 'categoryIds' => array() ),
 	);
 
-	if ( isset( $wp_query->tax_query->queried_terms['category']['terms'] ) ) {
-		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_id ) {
-			$context['query']['categoryIds'][] = $category_id;
+	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
+			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
 		}
 	}
 
