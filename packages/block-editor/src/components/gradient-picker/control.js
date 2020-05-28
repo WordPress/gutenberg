@@ -16,7 +16,7 @@ import { useSelect } from '@wordpress/data';
  */
 import GradientPicker from './';
 
-export default function( {
+export default function GradientPickerControl( {
 	className,
 	value,
 	onChange,

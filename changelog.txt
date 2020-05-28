@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 8.2.1 =
+
+### Changelog:
+
+- Fix Image alignments.
+- Fix gallery block initial creation via media library
+
+
 = 8.2.0 =
 
 ### Features
