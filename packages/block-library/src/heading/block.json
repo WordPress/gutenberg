@@ -1,14 +1,6 @@
 {
 	"name": "core/heading",
 	"category": "text",
-	"selector": {
-		"h1": "h1",
-		"h2": "h2",
-		"h3": "h3",
-		"h4": "h4",
-		"h5": "h5",
-		"h6": "h6"
-	},
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -28,12 +20,20 @@
 		}
 	},
 	"supports": {
-		"className": false,
 		"anchor": true,
-		"__unstablePasteTextInline": true,
+		"className": false,
 		"lightBlockWrapper": true,
 		"__experimentalColor": true,
+		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true,
-		"__experimentalFontSize": true
+		"__experimentalSelector": {
+			"h1": "h1",
+			"h2": "h2",
+			"h3": "h3",
+			"h4": "h4",
+			"h5": "h5",
+			"h6": "h6"
+		},
+		"__unstablePasteTextInline": true
 	}
 }

@@ -275,12 +275,11 @@ function gutenberg_experimental_global_styles_get_block_data() {
 
 	$registry = WP_Block_Type_Registry::get_instance();
 	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
-		if ( ! isset( $block_type->selector ) ) {
-			// Skip the blocks we don't know how to transform to CSS.
-			continue;
-		}
-
 		/*
+		 * We only allow certain CSS properties to be used
+		 * within the realm of theme.json. These are taken
+		 * from the block.json of the block.
+		 *
 		 * 1. Filter out the block supports that are falsy:
 		 *    we don't want to use disabled properties such as
 		 *    __experimentalProperty: false.
@@ -290,6 +289,10 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		 *
 		 * 3. Take the CSS property names to use from $supported_features.
 		 */
+		if ( ! is_array( $block_type->supports ) ) {
+			continue;
+		}
+
 		$supported_block_features = array_keys(
 			array_intersect(
 				$supported_features,
@@ -298,26 +301,47 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		);
 
 		/*
-		 * Some blocks can declare multiple selectors.
-		 * Examples of this are:
+		 * Assign the selector for the block.
+		 *
+		 * Some blocks can declare multiple selectors:
 		 *
 		 * - core/heading represents the H1-H6 HTML elements
 		 * - core/list represents the UL and OL HTML elements
 		 * - core/group is meant to represent DIV and other HTML elements
 		 *
+		 * Some other blocks don't provide a selector,
+		 * so we generate a class for them based on their name:
+		 *
+		 * - 'core/paragraph' => '.wp-block-paragraph'
+		 * - 'my-custom-library/block-name' => '.wp-block-my-custom-library-block-name'
+		 *
+		 * Note that, for core blocks, we don't use the `core/` prefix from its name.
+		 * This is for historical reasons, as they already come with a class without that infix.
+		 *
 		 */
-		if ( is_string( $block_type->selector ) ) {
+		if (
+			isset( $block_type->supports['__experimentalSelector'] ) &&
+			is_string( $block_type->supports['__experimentalSelector'] )
+		) {
 			$block_data[ $block_name ] = array(
-				'selector' => $block_type->selector,
+				'selector' => $block_type->supports['__experimentalSelector'],
 				'supports' => $supported_block_features,
 			);
-		} elseif ( is_array( $block_type->selector ) ) {
-			foreach ( $block_type->selector as $key => $selector ) {
+		} elseif (
+			isset( $block_type->supports['__experimentalSelector'] ) &&
+			is_array( $block_type->supports['__experimentalSelector'] )
+		) {
+			foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
 				$block_data[ $block_name . '/' . $key ] = array(
 					'selector' => $selector,
 					'supports' => $supported_block_features,
 				);
 			}
+		} else {
+			$block_data[ $block_name ] = array(
+				'selector' => '.wp-block-' . preg_replace( '/\//', '-', preg_replace( '/core\//', '', $block_name ) ),
+				'supports' => $supported_block_features,
+			);
 		}
 	}
 
