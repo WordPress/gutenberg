@@ -177,7 +177,6 @@
 	}
 
 	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
-		outline: 1px dashed $blue-medium-focus;
 
 		&::before {
 			content: "";
