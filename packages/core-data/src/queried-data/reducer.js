@@ -34,7 +34,7 @@ import getQueryParts from './get-query-parts';
 export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	const receivedAllIds = page === 1 && perPage === -1;
 	if ( receivedAllIds ) {
-		return nextItemIds;
+		return [ ...nextItemIds ];
 	}
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
