@@ -23,7 +23,22 @@
 	margin-bottom: 4px;
 }
 
-.block-editor-inserter__template-part-item {
+.wp-block-template-part__preview-container {
+	display: none;
+	width: 300px;
+	background: $white;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $light-gray-500;
+	// position: absolute;
+	top: $grid-unit-20;
+	left: calc(100% + #{$grid-unit-20});
+
+	@include break-medium {
+		display: block;
+	}
+}
+
+.wp-block-template-part__placeholder-preview-item {
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
@@ -47,7 +62,7 @@
 	}
 }
 
-.block-editor-inserter__template-part-item-title {
+.wp-block-template-part__placeholder-preview-item-title {
 	padding: $grid-unit-05;
 	font-size: 12px;
 	text-align: center;

@@ -132,7 +132,9 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
-			<TemplatePartPreviews onInsert={ noop } filterValue={ '' } />
+			<div className="wp-block-template-part__preview-container">
+				<TemplatePartPreviews onInsert={ noop } filterValue={ '' } />
+			</div>
 		</Placeholder>
 	);
 }
