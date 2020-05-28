@@ -453,7 +453,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	 * replicates the behavior of `wp_nav_menu_update_menu_items`
 	 * in `src/wp-admin/includes/nav-menu.php`.
 	 *
-	 * @param int             $menu_id The menu id to update the location form.
+	 * @param int             $term The menu id to update the location form.
 	 * @param WP_REST_Request $request The request object with menu and locations data.
 	 *
 	 * @return true|WP_Error WP_Error on an error assigning any of the locations, otherwise null.
