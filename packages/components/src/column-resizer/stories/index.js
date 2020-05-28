@@ -21,6 +21,7 @@ import {
  * Internal dependencies
  */
 import ResizableBox from '../../resizable-box';
+import RangeControl from '../../range-control';
 import { color } from '../../utils/style-mixins';
 
 export default { title: 'Components/ColumnResizer' };
@@ -122,14 +123,15 @@ function ColumnResizerProvider( {
 	);
 }
 
-function ColumnGridVisualizer() {
+function ColumnGridVisualizer( { gap } ) {
 	const { changeValue, isGrid } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( changeValue );
 
 	if ( ! isGrid ) return null;
 
 	return (
-		<VisualizerGridView isActive={ isActive }>
+		<VisualizerGridView isActive={ isActive } style={ { gridGap: gap } }>
+			<VisualizerGridColumnView />
 			<VisualizerGridColumnView />
 			<VisualizerGridColumnView />
 			<VisualizerGridColumnView />
@@ -431,6 +433,11 @@ function useDebouncedAnimation( value ) {
 	};
 }
 
+const CSSGridContainerView = styled.div`
+	width: 100%;
+	position: relative;
+`;
+
 const ContainerView = styled.div`
 	display: flex;
 	position: relative;
@@ -493,9 +500,220 @@ const VisualizerGridView = styled.div`
 `;
 
 const VisualizerGridColumnView = styled.div`
+	box-sizing: border-box;
+	border-left: 1px dashed ${color( 'ui.brand' )};
 	border-right: 1px dashed ${color( 'ui.brand' )};
 	height: 100%;
 	pointer-events: none;
 	opacity: 0.3;
 	filter: brightness( 0.5 );
 `;
+
+/**
+ * Trying it out using CSS Grid
+ */
+
+const GridTestView = styled.div`
+	--gridColumn1Width: 1fr;
+	--gridColumn2Width: 1fr;
+	--gridColumn3Width: 1fr;
+	--gridColumn4Width: 1fr;
+	--gridColumn5Width: 1fr;
+	--gridColumn6Width: 1fr;
+	--gridGap: 0;
+	--gridTemplateColumns: var( --gridColumn1Width ) var( --gridColumn2Width )
+		var( --gridColumn3Width );
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: var( --gridTemplateColumns );
+	grid-gap: var( --gridGap );
+`;
+
+const CSSGridExample = () => {
+	const [ isGrid, setIsGrid ] = useState( true );
+	const [ gap, setGap ] = useState( 0 );
+
+	const ghostNode = useRef();
+	const containerNode = useRef();
+	const [ changeValue, setChangeValue ] = useState( 0 );
+	const [ columnWidths, setColumnWidths ] = useState( [
+		'25%',
+		'25%',
+		'25%',
+		'25%',
+	] );
+
+	const [ grid, setGrid ] = useState( [ 1, 1 ] );
+	const [ gridSteps, setGridSteps ] = useState(
+		getGridWidths( { ref: containerNode } )
+	);
+	const [ gridStep ] = gridSteps;
+
+	const updateGridSteps = useCallback( () => {
+		setGridSteps( getGridWidths( { ref: containerNode } ) );
+	}, [] );
+
+	useEffect( () => {
+		updateGridSteps();
+	}, [] );
+
+	useEffect( () => {
+		setGrid( [ isGrid ? gridStep : 1, 1 ] );
+	}, [ isGrid, gridStep ] );
+
+	useEffect( () => {
+		window.addEventListener( 'resize', updateGridSteps );
+		return () => {
+			window.removeEventListener( 'resize', updateGridSteps );
+		};
+	}, [] );
+
+	const createStyle = ( widths ) => {
+		return {
+			'--gridColumn1Width': `minmax(8.3334%, ${ widths[ 0 ] })`,
+			'--gridColumn2Width': `minmax(8.3334%, ${ widths[ 1 ] })`,
+			'--gridColumn3Width': `minmax(8.3334%, ${ widths[ 2 ] })`,
+			'--gridColumn4Width': `minmax(8.3334%, 1fr )`,
+			'--gridTemplateColumns': `var( --gridColumn1Width ) var( --gridColumn2Width ) var(--gridColumn3Width) var( --gridColumn4Width )`,
+			'--gridGap': `${ gap }px`,
+		};
+	};
+
+	const style = createStyle( columnWidths );
+
+	const enable = {
+		top: false,
+		right: true,
+		bottom: false,
+		left: false,
+		topRight: false,
+		bottomRight: false,
+		bottomLeft: false,
+		topLeft: false,
+	};
+
+	const updateColumns = () => {
+		const next = [ ...ghostNode.current.children ].map( ( node ) => {
+			let w = node.getBoundingClientRect().width;
+			w = isGrid
+				? getGridWidthValue( { gridSteps, width: w } )
+				: `${ w }px`;
+
+			return w;
+		} );
+
+		next.forEach( ( w, i ) => {
+			if ( i + 1 === next.length ) return;
+			containerNode.current.children[ i ].style.minWidth = '100%';
+			containerNode.current.children[ i ].style.maxWidth = '100%';
+			containerNode.current.children[ i ].style.width = w;
+		} );
+
+		setColumnWidths( next );
+		setChangeValue( changeValue + 1 );
+	};
+
+	useEffect( () => {
+		window.addEventListener( 'resize', updateColumns );
+		return () => {
+			window.removeEventListener( 'resize', updateColumns );
+		};
+	}, [ gridSteps ] );
+
+	const handleOnResizeStart = ( ...resizeProps ) => {
+		const [ , , element ] = resizeProps;
+		element.setAttribute( 'data-column-width', element.clientWidth );
+	};
+
+	const handleOnResize = ( index ) => ( ...resizeProps ) => {
+		const [ , , element, delta ] = resizeProps;
+		const currentWidth = parseInt(
+			element.getAttribute( 'data-column-width' ),
+			10
+		);
+		let nextWidth = currentWidth + delta.width;
+		nextWidth = isGrid
+			? getGridWidthValue( { gridSteps, width: nextWidth } )
+			: `${ nextWidth }px`;
+
+		const nextColumnWidths = [ ...columnWidths ];
+		nextColumnWidths[ index ] = nextWidth;
+
+		const ghostStyles = createStyle( nextColumnWidths );
+
+		Object.keys( ghostStyles ).forEach( ( key ) => {
+			ghostNode.current.style.setProperty( key, ghostStyles[ key ] );
+		} );
+
+		nextWidth = ghostNode.current.children[ index ].getBoundingClientRect()
+			.width;
+
+		updateColumns();
+	};
+
+	const contextProps = {
+		isGrid,
+		gridSteps,
+		changeValue,
+	};
+
+	return (
+		<>
+			<button onClick={ () => setIsGrid( ! isGrid ) }>
+				Grid ({ isGrid ? 'ON' : 'OFF' })
+			</button>
+			<hr />
+			<br />
+			<RangeControl
+				label="Gap"
+				value={ gap }
+				min={ 0 }
+				max={ 100 }
+				onChange={ ( next ) => setGap( next ) }
+			/>
+			<br />
+			<br />
+			<br />
+			<ColumnResizerContext.Provider value={ contextProps }>
+				<CSSGridContainerView>
+					<ColumnGridVisualizer />
+					<GridTestView style={ style } ref={ containerNode }>
+						<ResizableBox
+							grid={ grid }
+							enable={ enable }
+							onResizeStart={ handleOnResizeStart }
+							onResize={ handleOnResize( 0 ) }
+						>
+							<BoxView />
+						</ResizableBox>
+						<ResizableBox
+							grid={ grid }
+							enable={ enable }
+							onResizeStart={ handleOnResizeStart }
+							onResize={ handleOnResize( 1 ) }
+						>
+							<BoxView />
+						</ResizableBox>
+						<ResizableBox
+							grid={ grid }
+							enable={ enable }
+							onResizeStart={ handleOnResizeStart }
+							onResize={ handleOnResize( 2 ) }
+						>
+							<BoxView />
+						</ResizableBox>
+						<BoxView />
+					</GridTestView>
+					<GridTestView ref={ ghostNode } style={ { height: 0 } }>
+						{ columnWidths.map( ( width, index ) => (
+							<div key={ index } />
+						) ) }
+					</GridTestView>
+				</CSSGridContainerView>
+			</ColumnResizerContext.Provider>
+		</>
+	);
+};
+
+export const cssGrid = () => <CSSGridExample />;
