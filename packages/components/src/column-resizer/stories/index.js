@@ -43,6 +43,7 @@ function ColumnResizerProvider( {
 	onChange = noop,
 	widths: widthsProp = [],
 } ) {
+	const [ changeValue, setChangeValue ] = useState( 0 );
 	const [ widths, setWidths ] = useState( widthsProp );
 	const containerRef = useRef();
 
@@ -66,19 +67,36 @@ function ColumnResizerProvider( {
 	}, [] );
 
 	const handleOnChange = ( width, eventProps ) => {
-		const nextWidths = [ ...widths ];
-
 		const containerNode = containerRef.current;
-		const nodes = containerNode.querySelectorAll( '[data-column-resizer]' );
+		const nodes = [
+			...containerNode.querySelectorAll( '[data-column-resizer]' ),
+		];
 		const currentNode = containerNode.querySelector(
 			`#${ eventProps.id }`
 		);
 
-		const currentIndex = [ ...nodes ].indexOf( currentNode );
-		nextWidths[ currentIndex ] = width;
+		const renderColumnWidths = () => {
+			return nodes
+				.map( ( node ) => {
+					const w = node.clientWidth;
+					return getGridWidthValue( { gridSteps, width: w } );
+				} )
+				.forEach( ( w, index ) => {
+					nodes[ index ].style.width = w;
+				} );
+		};
+
+		currentNode.style.width = width;
+
+		if ( isGrid ) {
+			renderColumnWidths();
+		}
+
+		const nextWidths = nodes.map( ( node ) => node.clientWidth );
 
 		onChange( nextWidths );
 		setWidths( nextWidths );
+		setChangeValue( changeValue + 1 );
 	};
 
 	const [ gridStep ] = gridSteps;
@@ -88,20 +106,47 @@ function ColumnResizerProvider( {
 		gridStep,
 		isGrid,
 		grid,
+		widths,
 		setGrid,
 		onChange: handleOnChange,
+		changeValue,
 	};
 
 	return (
 		<ColumnResizerContext.Provider value={ contextValue }>
-			<ContainerView ref={ containerRef }>{ children }</ContainerView>
+			<ContainerView ref={ containerRef }>
+				<ColumnGridVisualizer />
+				{ children }
+			</ContainerView>
 		</ColumnResizerContext.Provider>
+	);
+}
+
+function ColumnGridVisualizer() {
+	const { changeValue, isGrid } = useColumnResizerContext();
+	const { isActive } = useDebouncedAnimation( changeValue );
+
+	if ( ! isGrid ) return null;
+
+	return (
+		<VisualizerGridView isActive={ isActive }>
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+			<VisualizerGridColumnView />
+		</VisualizerGridView>
 	);
 }
 
 function ResizableBoxWrapper( props ) {
 	const {
-		changeValue,
 		children,
 		onResizeStart = noop,
 		onResizeStop = noop,
@@ -150,7 +195,9 @@ function ResizableBoxWrapper( props ) {
 	const handleOnResize = ( event, direction, node, delta ) => {
 		const { shiftKey } = event;
 		const dw = delta.width;
-		const nextWidth = Math.round( tempWidth + dw );
+		let nextWidth = Math.round( tempWidth + dw );
+
+		onResize( event, direction, node, delta );
 
 		if ( isGrid ) {
 			setGrid( [ gridStep, 1 ] );
@@ -158,35 +205,28 @@ function ResizableBoxWrapper( props ) {
 			setGrid( [ shiftKey ? 10 : 1, 1 ] );
 		}
 
-		onResize( event, direction, node, delta );
+		const data = {
+			gridSteps,
+			width: nextWidth,
+		};
 
-		if ( nextWidth !== width ) {
-			let onChangeWidth = nextWidth;
-
-			const data = {
+		if ( isGrid ) {
+			const column = getColumnValue( {
 				gridSteps,
 				width: nextWidth,
-			};
+			} );
 
-			if ( isGrid ) {
-				const column = getColumnValue( {
-					gridSteps,
-					width: nextWidth,
-				} );
+			data.column = column;
 
-				data.column = column;
+			nextWidth = getGridWidthValue( {
+				gridSteps,
+				width: nextWidth,
+			} );
+		}
 
-				onChangeWidth = getGridWidthValue( {
-					gridSteps,
-					width: nextWidth,
-				} );
-			}
-
-			if ( ! onChange ) {
-				setWidth( nextWidth );
-			} else {
-				onChange( onChangeWidth, { event, id, ...data } );
-			}
+		if ( nextWidth !== width ) {
+			setWidth( nextWidth );
+			onChange( nextWidth, { event, id, ...data } );
 		}
 	};
 
@@ -217,19 +257,15 @@ function ResizableBoxWrapper( props ) {
 			minWidth="8.3334%"
 			maxWidth="91.6667%"
 		>
-			<ResizableVisualizer
-				changeValue={ changeValue }
-				width={ width }
-				gridSteps={ gridSteps }
-				isGrid={ isGrid }
-			/>
+			<ResizableVisualizer />
 			{ children }
 		</ResizableBox>
 	);
 }
 
-function ResizableVisualizer( { changeValue, isGrid, gridSteps = [] } ) {
+function ResizableVisualizer() {
 	const nodeRef = useRef();
+	const { changeValue, gridSteps, isGrid } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( changeValue );
 
 	const getWidthLabel = () => {
@@ -252,14 +288,13 @@ function ResizableVisualizer( { changeValue, isGrid, gridSteps = [] } ) {
 
 	return (
 		<VisualizerView ref={ nodeRef } isActive={ isActive }>
-			<VizLabelView>{ widthLabel }</VizLabelView>
+			<VisualizerLabelView>{ widthLabel }</VisualizerLabelView>
 		</VisualizerView>
 	);
 }
 
 export const _default = () => {
 	const [ isGrid, setIsGrid ] = useState( true );
-	const [ changeValue, setChangeValue ] = useState( 0 );
 	const [ columnWidths, setColumnWidths ] = useState( [
 		'25%',
 		'50%',
@@ -268,7 +303,6 @@ export const _default = () => {
 
 	const handleOnChange = ( nextValue ) => {
 		setColumnWidths( nextValue );
-		setChangeValue( changeValue + 1 );
 	};
 
 	return (
@@ -287,7 +321,6 @@ export const _default = () => {
 				onChange={ handleOnChange }
 			>
 				<ResizableBoxWrapper
-					changeValue={ changeValue }
 					size={ { width: columnWidths[ 0 ] } }
 					enable={ {
 						right: true,
@@ -296,7 +329,6 @@ export const _default = () => {
 					<BoxView />
 				</ResizableBoxWrapper>
 				<ResizableBoxWrapper
-					changeValue={ changeValue }
 					size={ { width: columnWidths[ 1 ] } }
 					enable={ {
 						right: true,
@@ -305,7 +337,6 @@ export const _default = () => {
 					<BoxView />
 				</ResizableBoxWrapper>
 				<ResizableBoxWrapper
-					changeValue={ changeValue }
 					size={ { width: columnWidths[ 2 ] } }
 					isLast
 				>
@@ -315,46 +346,6 @@ export const _default = () => {
 		</>
 	);
 };
-
-const ContainerView = styled.div`
-	display: flex;
-`;
-
-const BoxView = styled.div`
-	background: #eee;
-	padding: 20px;
-	border: 2px solid #ccc;
-`;
-
-const VisualizerView = styled.div`
-	position: absolute;
-	filter: brightness( 2 );
-	border: 1px solid ${color( 'ui.brand' )};
-	border-bottom: none;
-	top: -7px;
-	left: 1px;
-	right: 1px;
-	pointer-events: none;
-	opacity: 0;
-	height: 5px;
-	pointer-events: none;
-	transition: opacity 120ms linear;
-	z-index: 10;
-
-	${( { isActive } ) =>
-		isActive &&
-		`
-		opacity: 1;
-	`}
-`;
-
-const VizLabelView = styled.div`
-	text-align: center;
-	color: ${color( 'ui.brand' )};
-	font-size: 11px;
-	top: -15px;
-	position: relative;
-`;
 
 function getContainerNode( { ref } ) {
 	const containerNode = ref?.current;
@@ -439,3 +430,72 @@ function useDebouncedAnimation( value ) {
 		isActive,
 	};
 }
+
+const ContainerView = styled.div`
+	display: flex;
+	position: relative;
+`;
+
+const BoxView = styled.div`
+	background: #eee;
+	padding: 20px;
+	border: 2px solid #ccc;
+	height: 200px;
+`;
+
+const VisualizerView = styled.div`
+	position: absolute;
+	filter: brightness( 2 );
+	border: 1px solid ${color( 'ui.brand' )};
+	border-bottom: none;
+	top: -7px;
+	left: 1px;
+	right: 1px;
+	opacity: 0;
+	height: 5px;
+	pointer-events: none;
+	transition: opacity 120ms linear;
+	z-index: 1000;
+
+	${( { isActive } ) =>
+		isActive &&
+		`
+		opacity: 1;
+	`}
+`;
+
+const VisualizerLabelView = styled.div`
+	text-align: center;
+	color: ${color( 'ui.brand' )};
+	font-size: 11px;
+	top: -15px;
+	position: relative;
+`;
+
+const VisualizerGridView = styled.div`
+	display: grid;
+	position: absolute;
+	grid-template-columns: repeat( 12, 1fr );
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 100ms linear;
+	z-index: 1000;
+
+	${( { isActive } ) =>
+		isActive &&
+		`
+		opacity: 1;
+	`}
+`;
+
+const VisualizerGridColumnView = styled.div`
+	border-right: 1px dashed ${color( 'ui.brand' )};
+	height: 100%;
+	pointer-events: none;
+	opacity: 0.3;
+	filter: brightness( 0.5 );
+`;
