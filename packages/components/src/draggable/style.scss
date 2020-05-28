@@ -11,10 +11,32 @@ body.is-dragging-components-draggable {
 }
 
 .components-draggable__clone {
+	margin-top: -$block-toolbar-height; // This puts it closer to the drag handle.
 	position: fixed;
 	padding: 20px;
 	background: transparent;
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
-	opacity: 0.8;
+
+	> * {
+		opacity: 0.8;
+	}
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 0;
+		width: $button-size * 2;
+		height: $block-toolbar-height;
+		border-radius: $radius-block-ui;
+		background-color: $dark-gray-primary;
+		border: $border-width solid $dark-gray-primary;
+
+		// This should be reconsidered if successful.
+		background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTcgMTYuNWgxMFYxNUg3djEuNXptMC05VjloMTBWNy41SDd6IiBmaWxsPSIjZmZmIi8+PC9zdmc+);
+		background-size: $icon-size;
+		background-repeat: no-repeat;
+		background-position: center center;
+	}
 }
