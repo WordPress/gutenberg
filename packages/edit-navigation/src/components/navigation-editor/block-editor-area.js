@@ -13,9 +13,10 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
+	CheckboxControl,
 	Card,
 	CardHeader,
 	CardBody,
@@ -56,6 +57,16 @@ export default function BlockEditorArea( {
 		},
 		[]
 	);
+	const { saveMenu } = useDispatch( 'core' );
+	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
+		menuId,
+	] );
+
+	const [ autoAddPages, setAutoAddPages ] = useState( menu.auto_add );
+
+	useEffect( () => {
+		setAutoAddPages( menu.auto_add );
+	}, [ menuId ] );
 
 	// Select the navigation block when it becomes available
 	const { selectBlock } = useDispatch( 'core/block-editor' );
@@ -96,6 +107,22 @@ export default function BlockEditorArea( {
 				</WritingFlow>
 			</CardBody>
 			<CardFooter>
+				<CheckboxControl
+					label={ __(
+						'Automatically add new top-level pages to this menu'
+					) }
+					help={ __(
+						'New menu items will automatically appear in this menu as new top level pages are added to your site'
+					) }
+					onChange={ async () => {
+						setAutoAddPages( ! autoAddPages );
+						saveMenu( {
+							...menu,
+							auto_add: ! autoAddPages,
+						} );
+					} }
+					checked={ autoAddPages }
+				/>
 				<DeleteMenuButton menuId={ menuId } onDelete={ onDeleteMenu } />
 			</CardFooter>
 		</Card>
