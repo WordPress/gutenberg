@@ -43,6 +43,7 @@ export default function QuoteEdit( {
 				<RichText
 					identifier="value"
 					multiline
+					tagName="p"
 					value={ value }
 					onChange={ ( nextValue ) =>
 						setAttributes( {

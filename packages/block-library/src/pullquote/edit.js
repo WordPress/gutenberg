@@ -137,6 +137,7 @@ class PullQuoteEdit extends Component {
 						<RichText
 							identifier="value"
 							multiline
+							tagName="p"
 							value={ value }
 							onChange={ ( nextValue ) =>
 								setAttributes( {
