@@ -26,7 +26,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/element": "../element",
-		"@wordpress/primitives": "../primitives"
+		"@wordpress/primitives": "file:../primitives"
 	},
 	"publishConfig": {
 		"access": "public"
