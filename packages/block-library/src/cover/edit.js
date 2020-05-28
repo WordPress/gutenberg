@@ -288,8 +288,9 @@ function CoverEdit( {
 	}
 
 	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y *
-			100 }%`;
+		style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+			focalPoint.y * 100
+		}%`;
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );

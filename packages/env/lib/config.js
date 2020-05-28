@@ -413,8 +413,5 @@ async function getHomeDirectory() {
  * @return {string} An MD5 hash string.
  */
 function md5( data ) {
-	return crypto
-		.createHash( 'md5' )
-		.update( data )
-		.digest( 'hex' );
+	return crypto.createHash( 'md5' ).update( data ).digest( 'hex' );
 }

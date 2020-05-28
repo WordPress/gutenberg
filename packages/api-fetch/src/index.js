@@ -147,9 +147,7 @@ function apiFetch( options ) {
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {
 						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options )
-							.then( resolve )
-							.catch( reject );
+						apiFetch( options ).then( resolve ).catch( reject );
 					} )
 					.catch( reject );
 			} );
