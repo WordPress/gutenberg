@@ -10,6 +10,9 @@
 * [**] Tooltip for page template selection buttons
 * [*] Fix button alignment in page templates and make strings consistent
 * [*] Add support for displaying radial gradients in Buttons and Cover blocks
+1.28.2
+------
+* [***] Disable Pullquote Block on Android
 
 1.28.1
 ------
