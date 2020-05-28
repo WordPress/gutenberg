@@ -11,6 +11,7 @@
 
 	// Animate appearance.
 	.block-list-appender__toggle {
+		padding: 0;
 		opacity: 1;
 		transform: scale(1);
 		transition: all 0.1s ease;
