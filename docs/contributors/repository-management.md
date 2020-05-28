@@ -70,9 +70,9 @@ Gutenberg follows a feature branch pull request workflow for all code and docume
 2. Make your changes, testing thoroughly.
 3. Commit your changes when you’re happy with them, and push the branch.
 4. Open your pull request.
-5. Label and name your pull request appropriately (see below).
+5. If you are a regular contributor with proper access, label and name your pull request appropriately (see below).
 
-For labeling and naming pull requests, here are guidelines to follow that make compiling the changelog more efficient and organized:
+For labeling and naming pull requests, here are guidelines to consider that make compiling the changelog more efficient and organized. These guidelines are particularly relevant for regular contributors. Don't let getting the following right be a blocker for sharing your work - mistakes are expected and easy to fix!
 
 - When working on experimental screens and features, apply the `[Type] Experimental` label instead of `Feature`, `Enhancement`, etc.
 - When working on new features to technical packages (scripts, create-block, adding  react hooks, etc), apply the `[Type] New API`  label instead of `Feature`, `Enhancement`, etc.
