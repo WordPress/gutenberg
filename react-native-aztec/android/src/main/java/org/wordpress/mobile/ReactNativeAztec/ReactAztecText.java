@@ -30,6 +30,7 @@ import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.android.util.AppLog;
 import org.wordpress.aztec.AlignmentRendering;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
@@ -200,6 +201,14 @@ public class ReactAztecText extends AztecText {
             @Override
             public void run() {
                 // let's pinpoint the caret line to ask the system to bring that line into the viewport
+                // we need to make sure that getLayout() isn't null
+                // because it will cause the NPE: https://github.com/wordpress-mobile/WordPress-Android/issues/11821
+                if (getLayout() == null) {
+                    AppLog.w(AppLog.T.EDITOR,
+                            "Layout is null while trying to scroll inside a ReactAztecText block. Canceling the scroll.");
+                    return;
+                }
+
                 int lineNumber = getLayout().getLineForOffset(getSelectionStart());
 
                 Rect caretLineRect = new Rect();

@@ -1,3 +1,26 @@
+diff --git a/node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheetManager.m b/node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheetManager.m
+index 65fa2bb..c5f265b 100644
+--- a/node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheetManager.m
++++ b/node_modules/react-native/Libraries/ActionSheetIOS/RCTActionSheetManager.m
+@@ -66,6 +66,7 @@ - (void)presentViewController:(UIViewController *)alertController
+   NSArray<NSString *> *buttons = [RCTConvert NSStringArray:options[@"options"]];
+   NSInteger cancelButtonIndex = options[@"cancelButtonIndex"] ? [RCTConvert NSInteger:options[@"cancelButtonIndex"]] : -1;
+   NSArray<NSNumber *> *destructiveButtonIndices;
++  NSArray<NSNumber *> *disabledButtonIndices = [RCTConvert NSArray:options[@"disabledButtonIndices"]];
+   if ([options[@"destructiveButtonIndex"] isKindOfClass:[NSArray class]]) {
+     destructiveButtonIndices = [RCTConvert NSArray:options[@"destructiveButtonIndex"]];
+   } else {
+@@ -108,6 +109,10 @@ - (void)presentViewController:(UIViewController *)alertController
+       callback(@[@(localIndex)]);
+     }]];
+ 
++    if ([disabledButtonIndices containsObject:@(localIndex)]) {
++        [alertController.actions[localIndex] setEnabled:false];
++    }
++
+     index++;
+   }
+ 
 diff --git a/node_modules/react-native/React/Views/RCTShadowView.m b/node_modules/react-native/React/Views/RCTShadowView.m
 index 40c0cda..646f137 100644
 --- a/node_modules/react-native/React/Views/RCTShadowView.m

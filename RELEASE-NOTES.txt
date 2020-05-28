@@ -1,8 +1,18 @@
+1.28.1
+------
+* [**] Avoid crash when editor selection state becomes invalid
 1.29.0
 ------
 * [**] Add support for changing overlay color settings in Cover block
 * Add enter/exit animation in FloatingToolbar
 * [***] New block: Verse
+* [*] Fix merging of text blocks when text had active formatting (bold, italic, strike, link)
+* [***] Trash icon that is used to remove blocks is moved to the new menu reachable via ellipsis button in the block toolbar
+* [**] Block toolbar can now collapse when the block width is smaller than the toolbar content
+* [**] Creating undo levels less frequently
+* [**] Tooltip for page template selection buttons
+* [*] Fix button alignment in page templates and make strings consistent
+* [*] Add support for displaying radial gradients in Buttons and Cover blocks
 
 1.28.0
 ------

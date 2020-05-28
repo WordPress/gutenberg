@@ -80,6 +80,7 @@ public class WPAndroidGlueCode {
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
+    private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -109,6 +110,8 @@ public class WPAndroidGlueCode {
     private static OkHttpHeaderInterceptor sAddCookiesInterceptor = new OkHttpHeaderInterceptor();
     private static OkHttpClient sOkHttpClient = new OkHttpClient.Builder().addInterceptor(sAddCookiesInterceptor).build();
     private boolean mIsDarkMode;
+    private Consumer<Exception> mExceptionLogger;
+    private Consumer<String> mBreadcrumbLogger;
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -168,6 +171,11 @@ public class WPAndroidGlueCode {
 
     public interface OnLogGutenbergUserEventListener {
         void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
+    }
+
+    public interface OnStarterPageTemplatesTooltipShownEventListener {
+        void onSetStarterPageTemplatesTooltipShown(boolean tooltipShown);
+        boolean onRequestStarterPageTemplatesTooltipShown();
     }
 
     public void mediaSelectionCancelled() {
@@ -343,13 +351,24 @@ public class WPAndroidGlueCode {
             @Override public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
+
+            @Override
+            public void setStarterPageTemplatesTooltipShown(boolean showTooltip) {
+                mOnStarterPageTemplatesTooltipShownListener.onSetStarterPageTemplatesTooltipShown(showTooltip);
+            }
+
+            @Override
+            public void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback) {
+                boolean tooltipShown = mOnStarterPageTemplatesTooltipShownListener.onRequestStarterPageTemplatesTooltipShown();
+                starterPageTemplatesTooltipShownCallback.onRequestStarterPageTemplatesTooltipShown(tooltipShown);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
                 new MainReactPackage(getMainPackageConfig(getImagePipelineConfig(sOkHttpClient))),
                 new SvgPackage(),
                 new LinearGradientPackage(),
-                new ReactAztecPackage(),
+                new ReactAztecPackage(mExceptionLogger, mBreadcrumbLogger),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 mRnReactNativeGutenbergBridgePackage);
@@ -364,33 +383,6 @@ public class WPAndroidGlueCode {
                 .newBuilder(mReactRootView.getContext(), client).build();
     }
 
-    @Deprecated
-    public void onCreateView(Context initContext,
-                             boolean htmlModeEnabled,
-                             Application application,
-                             boolean isDebug,
-                             boolean buildGutenbergFromSource,
-                             boolean isNewPost,
-                             String localeString,
-                             Bundle translations,
-                             int colorBackground,
-                             boolean isDarkMode) {
-        onCreateView(
-                initContext,
-                htmlModeEnabled,
-                application,
-                isDebug,
-                buildGutenbergFromSource,
-                "post",
-                isNewPost,
-                localeString,
-                translations,
-                colorBackground,
-                isDarkMode,
-                null,
-                null);
-    }
-
     public void onCreateView(Context initContext,
                              boolean htmlModeEnabled,
                              Application application,
@@ -402,9 +394,13 @@ public class WPAndroidGlueCode {
                              Bundle translations,
                              int colorBackground,
                              boolean isDarkMode,
+                             Consumer<Exception> exceptionLogger,
+                             Consumer<String> breadcrumbLogger,
                              @Nullable Boolean isSiteUsingWpComRestApi,
                              @Nullable Bundle editorTheme) {
         mIsDarkMode = isDarkMode;
+        mExceptionLogger = exceptionLogger;
+        mBreadcrumbLogger = breadcrumbLogger;
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
@@ -466,6 +462,7 @@ public class WPAndroidGlueCode {
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   AddMentionUtil addMentionUtil,
+                                  OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -479,6 +476,7 @@ public class WPAndroidGlueCode {
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mAddMentionUtil = addMentionUtil;
+        mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
