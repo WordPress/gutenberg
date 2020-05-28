@@ -29,7 +29,7 @@ function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 	const {
-		isFocusMode,
+		hasReducedUI,
 		hasFixedToolbar,
 		isInserterEnabled,
 		isInserterOpened,
@@ -65,25 +65,28 @@ function HeaderToolbar() {
 				'showIconLabels'
 			),
 			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
-			isFocusMode: select( 'core/edit-post' ).isFeatureActive(
-				'focusMode'
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
 			),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 	const isSmallViewport = useViewportMatch( 'small', '<' );
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
+
+	if ( hasReducedUI && ! displayBlockToolbar ) {
+		return null;
+	}
 
 	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
-
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );
@@ -141,7 +144,7 @@ function HeaderToolbar() {
 			>
 				{ showIconLabels && __( 'Add' ) }
 			</ToolbarItem>
-			{ ! isFocusMode && ( isWideViewport || ! showIconLabels ) && (
+			{ ! hasReducedUI && ( isWideViewport || ! showIconLabels ) && (
 				<>
 					{ isLargeViewport && (
 						<ToolbarItem
@@ -164,7 +167,7 @@ function HeaderToolbar() {
 					{ overflowItems }
 				</>
 			) }
-			{ ! isFocusMode &&
+			{ ! hasReducedUI &&
 				! isWideViewport &&
 				! isSmallViewport &&
 				showIconLabels && (

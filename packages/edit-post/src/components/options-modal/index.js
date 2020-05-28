@@ -65,6 +65,20 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					label={ __( 'Contain text cursor inside active block' ) }
 				/>
 			</Section>
+			<Section title={ __( 'Writing Mode' ) }>
+				<EnableFeature
+					featureName="reducedUI"
+					label={ __( 'Reduced UI' ) }
+				/>
+				<EnableFeature
+					featureName="themeStyles"
+					label={ __( 'Theme Styles' ) }
+				/>
+				<EnableFeature
+					featureName="focusMode"
+					label={ __( 'Spotlight' ) }
+				/>
+			</Section>
 			<Section title={ __( 'Document panels' ) }>
 				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (
