@@ -444,12 +444,12 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'readonly'    => true,
 				),
 				'parent'        => array(
-					'description' => __( 'Parent blocks, defaults to empty it no parents', 'gutenberg' ),
+					'description' => __( 'Parent blocks.', 'gutenberg' ),
 					'type'        => 'array',
 					'items'       => array(
 						'type' => 'string',
 					),
-					'default'     => array(),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
