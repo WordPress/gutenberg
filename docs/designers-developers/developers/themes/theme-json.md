@@ -157,6 +157,8 @@ The list of properties that are currently exposed via this method are:
 - Paragraph and Heading: line-height, font-size, color, background-color.
 - Group, Columns, and MediaText: color, background-color, background.
 
+Note that, the heading block, represents 6 distinct HTML elements: H1-H6. It comes with selectors to target individual elements (ex: core/heading/h1 for H1) as well a selector to target all of them (core/heading).
+
 ### Features
 
 This is being implemented, so it's not currently available.
@@ -201,8 +203,49 @@ This is being implemented, so it's not currently available.
       }
     }
   },
-  /* core/heading/h1, core/heading/h2, etc */
-  core/heading/h*: {
+  core/heading: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h1: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h2: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h3: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h4: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h5: {
+    styles: {
+        line-height: <value>,
+        font-size: <value>,
+        color: <value>,
+    }
+  },
+  core/heading/h6: {
     styles: {
       typography: {
         lineHeight: <value>,
