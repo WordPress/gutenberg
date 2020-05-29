@@ -1,11 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor, EntityProvider } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { BlockPreview } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
@@ -16,18 +14,6 @@ import { layout } from '@wordpress/icons';
 import useTemplatePartPost from './use-template-part-post';
 import TemplatePartPreviews from './template-part-previews';
 
-function TemplatePartPreview() {
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part' );
-	return (
-		<div className="wp-block-template-part__placeholder-preview">
-			<div className="wp-block-template-part__placeholder-preview-title">
-				{ __( 'Preview' ) }
-			</div>
-			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
-		</div>
-	);
-}
-
 export default function TemplatePartPlaceholder( { setAttributes } ) {
 	const [ slug, _setSlug ] = useState( '' );
 	const [ theme, setTheme ] = useState( '' );
@@ -35,32 +21,6 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 
 	// Try to find an existing template part.
 	const postId = useTemplatePartPost( null, slug, theme );
-
-	// If found, get its preview.
-	const preview = useSelect(
-		( select ) => {
-			if ( ! postId ) {
-				return;
-			}
-			const templatePart = select( 'core' ).getEntityRecord(
-				'postType',
-				'wp_template_part',
-				postId
-			);
-			if ( templatePart ) {
-				return (
-					<EntityProvider
-						kind="postType"
-						type="wp_template_part"
-						id={ postId }
-					>
-						<TemplatePartPreview />
-					</EntityProvider>
-				);
-			}
-		},
-		[ postId ]
-	);
 
 	const setSlug = useCallback( ( nextSlug ) => {
 		_setSlug( nextSlug );
@@ -126,7 +86,6 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					className="wp-block-template-part__placeholder-input"
 				/>
 			</div>
-			{ preview }
 			<Button
 				isPrimary
 				disabled={ ! slug || ! theme }
