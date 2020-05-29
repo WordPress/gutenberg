@@ -99,6 +99,9 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		}
 		setAttributes( nextAttributes );
 	}, [ postId, slug, theme ] );
+
+	const [ filterValue, setFilterValue ] = useState( '' );
+
 	return (
 		<Placeholder
 			icon={ layout }
@@ -132,8 +135,20 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
+
+			<TextControl
+				label={ __( 'Search' ) }
+				placeholder={ __( 'header' ) }
+				value={ filterValue }
+				onChange={ setFilterValue }
+				className="wp-block-template-part__placholder-filter-input"
+			/>
+
 			<div className="wp-block-template-part__preview-container">
-				<TemplatePartPreviews onInsert={ noop } filterValue={ '' } />
+				<TemplatePartPreviews
+					onInsert={ noop }
+					filterValue={ filterValue }
+				/>
 			</div>
 		</Placeholder>
 	);
