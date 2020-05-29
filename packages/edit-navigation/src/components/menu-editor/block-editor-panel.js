@@ -13,8 +13,9 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,17 +28,19 @@ export default function BlockEditorPanel( {
 	menuId,
 	saveBlocks,
 } ) {
-	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
+	const { rootBlock, isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
 				isNavigationMode,
 				getBlockSelectionStart,
 				getBlock,
+				getBlocks,
 			} = select( 'core/block-editor' );
 
 			const selectionStartClientId = getBlockSelectionStart();
 
 			return {
+				rootBlock: getBlocks()[ 0 ],
 				isNavigationModeActive: isNavigationMode(),
 				hasSelectedBlock:
 					!! selectionStartClientId &&
@@ -46,6 +49,14 @@ export default function BlockEditorPanel( {
 		},
 		[]
 	);
+
+	// Select the navigation block when it becomes available
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+	useEffect( () => {
+		if ( rootBlock?.clientId ) {
+			selectBlock( rootBlock.clientId );
+		}
+	}, [ rootBlock?.clientId ] );
 
 	return (
 		<Panel className="edit-navigation-menu-editor__block-editor-panel">
