@@ -25,7 +25,9 @@
 
 .wp-block-template-part__preview-container {
 	display: none;
-	width: 300px;
+	width: inherit;
+	max-height: 600px;
+	overflow-y: scroll;
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: $border-width solid $light-gray-500;
