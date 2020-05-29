@@ -16,7 +16,7 @@ import { map, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -52,8 +52,8 @@ function ColorPalette( {
 
 	const isGradientSegment = currentSegment === colorsUtils.segments[ 1 ];
 
-	const [ scale ] = useState( new Animated.Value( 1 ) );
-	const [ opacity ] = useState( new Animated.Value( 1 ) );
+	const scale = useRef( new Animated.Value( 1 ) ).current;
+	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
 	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
 	const defaultGradientColors = uniq(
@@ -106,13 +106,17 @@ function ColorPalette( {
 	}
 
 	function performAnimation( color ) {
-		opacity.setValue( isSelected( color ) ? 1 : 0 );
-		scale.setValue( 1 );
+		if ( ! isSelected( color ) ) {
+			opacity.setValue( 0 );
+		}
 
 		Animated.parallel( [
 			timingAnimation( scale, 2 ),
 			timingAnimation( opacity, 1 ),
-		] ).start();
+		] ).start( () => {
+			opacity.setValue( 1 );
+			scale.setValue( 1 );
+		} );
 	}
 
 	const scaleInterpolation = scale.interpolate( {
