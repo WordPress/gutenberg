@@ -19,6 +19,11 @@ const {
 const git = require( '../lib/git' );
 const svn = require( '../lib/svn' );
 const { getNextMajorVersion } = require( '../lib/version' );
+const {
+	getVersionMilestoneTitle,
+	getIssuesByMilestone,
+	getMilestoneByTitle,
+} = require( '../lib/milestone' );
 const config = require( '../config' );
 const {
 	runGitRepositoryCloneStep,
@@ -625,6 +630,43 @@ async function updateThePluginStableVersion(
 }
 
 /**
+ * Checks whether the milestone associated with the release has open issues or
+ * pull requests. Returns a promise resolving to true if there are no open issue
+ * or pull requests, or false otherwise.
+ *
+ * @param {string} version Release version.
+ *
+ * @return {Promise<boolean>} Promise resolving to boolean indicating whether
+ *                            the milestone is clear of open issues.
+ */
+async function isMilestoneClear( version ) {
+	const { githubRepositoryOwner: owner, githubRepositoryName: name } = config;
+	const octokit = new Octokit();
+	const milestone = await getMilestoneByTitle(
+		octokit,
+		owner,
+		name,
+		getVersionMilestoneTitle( version )
+	);
+
+	if ( ! milestone ) {
+		// If milestone can't be found, it's not especially actionable to warn
+		// that the milestone isn't clear. `true` is the sensible fallback.
+		return true;
+	}
+
+	const issues = await getIssuesByMilestone(
+		new Octokit(),
+		owner,
+		name,
+		milestone.number,
+		'open'
+	);
+
+	return issues.length === 0;
+}
+
+/**
  * Release a new version.
  *
  * @param {boolean} isRC Whether it's an RC release or not.
@@ -660,6 +702,14 @@ async function releasePlugin( isRC = true ) {
 				gitWorkingDirectory,
 				abortMessage
 		  );
+
+	if ( ! ( await isMilestoneClear( version ) ) ) {
+		await askForConfirmation(
+			'There are still open issues in the milestone. Are you sure you want to proceed?',
+			false,
+			abortMessage
+		);
+	}
 
 	// Bumping the version and commit.
 	const commitHash = await runBumpPluginVersionUpdateChangelogAndCommitStep(
