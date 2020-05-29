@@ -108,12 +108,19 @@ describe( 'Template Part', () => {
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 		const templatePartButtonSelector = `${ templatePartSelector } button`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+		const createNewButtonSelector =
+			'//button[contains(text(), "Create new")]';
 
 		it( 'Should prompt to create when no match found', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
+			);
+			await createNewButton.click();
+			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testSlug );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testTheme );
@@ -142,6 +149,11 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
+			);
+			await createNewButton.click();
+			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testSlug );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testTheme );

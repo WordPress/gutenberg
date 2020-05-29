@@ -27,6 +27,7 @@ describe( 'Multi-entity save flow', () => {
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+	const createNewButtonSelector = '//button[contains(text(), "Create new")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -114,6 +115,11 @@ describe( 'Multi-entity save flow', () => {
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
 				await insertBlock( 'Template Part' );
+				const [ createNewButton ] = await page.$x(
+					createNewButtonSelector
+				);
+				await createNewButton.click();
+				await page.keyboard.press( 'Tab' );
 				await page.keyboard.type( 'test-template-part' );
 				await page.keyboard.press( 'Tab' );
 				await page.keyboard.type( 'test-theme' );
