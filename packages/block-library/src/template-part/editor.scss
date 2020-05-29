@@ -58,3 +58,26 @@
 .wp-block-template-part__placholder-filter-input {
 	width: inherit;
 }
+
+.wp-block-template-part__tabs {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	margin-top: -$grid-unit-10;
+
+	.components-tab-panel__tabs {
+		border-bottom: $border-width solid $light-gray-500;
+
+		.components-tab-panel__tabs-item {
+			flex-grow: 1;
+			margin-bottom: -$border-width;
+		}
+	}
+
+	.components-tab-panel__tab-content {
+		display: flex;
+		flex-grow: 1;
+		flex-direction: column;
+		position: relative;
+	}
+}

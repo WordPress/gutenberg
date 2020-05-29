@@ -117,7 +117,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 	return (
 		<Placeholder icon={ layout } label={ __( 'Template Part' ) }>
 			<TabPanel
-				className="block-editor-inserter__tabs"
+				className="wp-block-template-part__tabs"
 				tabs={ [
 					{
 						name: 'select',
