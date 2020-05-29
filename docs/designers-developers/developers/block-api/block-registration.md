@@ -188,6 +188,25 @@ example: {
 
 If `example` is not defined, the preview will not be shown. So even if no-attributes are defined, setting a empty example object `example: {}` will trigger the preview to show.
 
+It's also possible to extend the block preview with inner blocks via `innerBlocks`. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+    },
+    innerBlocks: {
+        name: 'core/paragraph',
+        attributes: {
+            /* translators: example text. */
+            content: __(
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+            ),
+        },
+    },
+},
+```
+
 #### variations (optional)
 
 - **Type:** `Object[]`

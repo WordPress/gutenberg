@@ -46,10 +46,7 @@ describe( 'LinksUI', () => {
 		// When
 
 		// Simulate user typing on the URL Cell.
-		const bottomSheet = wrapper
-			.dive()
-			.find( 'BottomSheet' )
-			.first();
+		const bottomSheet = wrapper.dive().find( 'BottomSheet' ).first();
 		const cell = bottomSheet
 			.dive()
 			.find( 'WithPreferredColorScheme(BottomSheetCell)' )

@@ -379,7 +379,6 @@ class URLInput extends Component {
 			instanceId,
 			className,
 			isFullWidth,
-			hasBorder,
 			__experimentalRenderSuggestions: renderSuggestions,
 			placeholder = __( 'Paste URL or type to search' ),
 			value = '',
@@ -422,7 +421,6 @@ class URLInput extends Component {
 				id={ id }
 				className={ classnames( 'block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
-					'has-border': hasBorder,
 				} ) }
 			>
 				<input

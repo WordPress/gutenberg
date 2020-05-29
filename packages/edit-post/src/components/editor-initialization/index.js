@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	useAdjustSidebarListener,
 	useBlockSelectionListener,
 	useUpdatePostLinkListener,
 } from './listener-hooks';
@@ -14,9 +13,8 @@ import {
  * @param {number} postId  The id of the post.
  * @return {null} This is a data component so does not render any ui.
  */
-export default function( { postId } ) {
+export default function EditorInitialization( { postId } ) {
 	useBlockSelectionListener( postId );
-	useAdjustSidebarListener( postId );
 	useUpdatePostLinkListener( postId );
 	return null;
 }

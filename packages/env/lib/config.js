@@ -131,7 +131,6 @@ module.exports = {
 				config: {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
-					WP_TESTS_DOMAIN: 'example.org',
 					WP_PHP_BINARY: 'php',
 				},
 				mappings: {},
@@ -143,6 +142,12 @@ module.exports = {
 		config.port = getNumberFromEnvVariable( 'WP_ENV_PORT' ) || config.port;
 		config.testsPort =
 			getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) || config.testsPort;
+
+		// In the future, we should clean this up and integrate it with multi-
+		// environment support instead of hardcoding it to the test port.
+		if ( config.config.WP_TESTS_DOMAIN === undefined ) {
+			config.config.WP_TESTS_DOMAIN = `localhost:${ config.testsPort }`;
+		}
 
 		if ( config.core !== null && typeof config.core !== 'string' ) {
 			throw new ValidationError(
@@ -207,7 +212,7 @@ module.exports = {
 		}
 
 		const workDirectoryPath = path.resolve(
-			getHomeDirectory(),
+			await getHomeDirectory(),
 			md5( configPath )
 		);
 
@@ -291,15 +296,19 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 	const zipFields = sourceString.match(
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
+
 	if ( zipFields ) {
+		const wpOrgFields = sourceString.match(
+			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		);
+		const basename = wpOrgFields
+			? encodeURIComponent( wpOrgFields[ 1 ] )
+			: encodeURIComponent( zipFields[ 1 ] );
 		return {
 			type: 'zip',
 			url: sourceString,
-			path: path.resolve(
-				workDirectoryPath,
-				encodeURIComponent( zipFields[ 1 ] )
-			),
-			basename: encodeURIComponent( zipFields[ 1 ] ),
+			path: path.resolve( workDirectoryPath, basename ),
+			basename,
 		};
 	}
 
@@ -375,9 +384,9 @@ function getNumberFromEnvVariable( varName ) {
  * By default, '~/.wp-env/'. On Linux, '~/wp-env/'. Can be overriden with the
  * WP_ENV_HOME environment variable.
  *
- * @return {string} The absolute path to the `wp-env` home directory.
+ * @return {Promise<string>} The absolute path to the `wp-env` home directory.
  */
-function getHomeDirectory() {
+async function getHomeDirectory() {
 	// Allow user to override download location.
 	if ( process.env.WP_ENV_HOME ) {
 		return path.resolve( process.env.WP_ENV_HOME );
@@ -391,7 +400,9 @@ function getHomeDirectory() {
 	 */
 	return path.resolve(
 		os.homedir(),
-		os.platform() === 'linux' ? 'wp-env' : '.wp-env'
+		!! ( await fs.stat( '/snap' ).catch( () => false ) )
+			? 'wp-env'
+			: '.wp-env'
 	);
 }
 
@@ -402,8 +413,5 @@ function getHomeDirectory() {
  * @return {string} An MD5 hash string.
  */
 function md5( data ) {
-	return crypto
-		.createHash( 'md5' )
-		.update( data )
-		.digest( 'hex' );
+	return crypto.createHash( 'md5' ).update( data ).digest( 'hex' );
 }

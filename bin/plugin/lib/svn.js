@@ -1,13 +1,10 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-const path = require( 'path' );
-const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
-const { runShellScript } = require( './utils' );
+const { getRandomTemporaryPath, runShellScript } = require( './utils' );
 
 function checkout( repositoryUrl ) {
-	const svnWorkingDirectoryPath = path.join( os.tmpdir(), uuid() );
+	const svnWorkingDirectoryPath = getRandomTemporaryPath();
 	runShellScript(
 		'svn checkout ' + repositoryUrl + '/trunk ' + svnWorkingDirectoryPath
 	);

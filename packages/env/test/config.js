@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-const { readFile } = require( 'fs' ).promises;
+const { readFile, stat } = require( 'fs' ).promises;
 const os = require( 'os' );
 
 /**
@@ -14,6 +14,7 @@ const detectDirectoryType = require( '../lib/detect-directory-type' );
 jest.mock( 'fs', () => ( {
 	promises: {
 		readFile: jest.fn(),
+		stat: jest.fn().mockReturnValue( Promise.resolve( false ) ),
 	},
 } ) );
 
@@ -199,6 +200,53 @@ describe( 'readConfig', () => {
 					ref: '5.0',
 					path: expect.stringMatching( /^\/.*gutenberg$/ ),
 					basename: 'gutenberg',
+				},
+			],
+		} );
+	} );
+
+	it( 'should parse wordpress.org sources', async () => {
+		readFile.mockImplementation( () =>
+			Promise.resolve(
+				JSON.stringify( {
+					plugins: [
+						'https://downloads.wordpress.org/plugin/gutenberg.zip',
+						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
+					],
+				} )
+			)
+		);
+		const config = await readConfig( '.wp-env.json' );
+		expect( config ).toMatchObject( {
+			pluginSources: [
+				{
+					type: 'zip',
+					url: 'https://downloads.wordpress.org/plugin/gutenberg.zip',
+					path: expect.stringMatching( /^\/.*gutenberg$/ ),
+					basename: 'gutenberg',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/plugin/gutenberg.8.1.0.zip',
+					path: expect.stringMatching( /^\/.*gutenberg$/ ),
+					basename: 'gutenberg',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
+				},
+				{
+					type: 'zip',
+					url:
+						'https://downloads.wordpress.org/theme/twentytwenty.1.3.zip',
+					path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+					basename: 'twentytwenty',
 				},
 			],
 		} );
@@ -465,20 +513,17 @@ describe( 'readConfig', () => {
 		os.platform = oldOsPlatform;
 	} );
 
-	it( 'should use a non-private folder on Linux', async () => {
+	it( 'should use a non-private folder with Snap-installed Docker', async () => {
 		readFile.mockImplementation( () =>
 			Promise.resolve( JSON.stringify( {} ) )
 		);
-		const oldOsPlatform = os.platform;
-		os.platform = () => 'linux';
+		stat.mockReturnValue( Promise.resolve( true ) );
 
 		expect.assertions( 2 );
 
 		const config = await readConfig( '.wp-env.json' );
 		expect( config.workDirectoryPath.includes( '.wp-env' ) ).toBe( false );
 		expect( config.workDirectoryPath.includes( 'wp-env' ) ).toBe( true );
-
-		os.platform = oldOsPlatform;
 	} );
 } );
 

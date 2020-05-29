@@ -91,10 +91,7 @@ describe( 'DropdownMenu', () => {
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
 
-			wrapper
-				.find( MenuItem )
-				.props()
-				.onClick();
+			wrapper.find( MenuItem ).props().onClick();
 			wrapper.update();
 
 			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );

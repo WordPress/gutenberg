@@ -5,9 +5,10 @@
         "isValid": true,
         "attributes": {
             "query": {
-                "per_page": 3,
+                "perPage": 3,
                 "pages": 1,
-                "offset": 0
+                "offset": 0,
+                "categoryIds": []
             }
         },
         "innerBlocks": [],

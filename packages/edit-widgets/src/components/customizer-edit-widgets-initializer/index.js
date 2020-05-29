@@ -1,39 +1,57 @@
 /**
  * WordPress dependencies
  */
+import { navigateRegions } from '@wordpress/components';
 import {
-	SlotFillProvider,
-	Popover,
-	navigateRegions,
-} from '@wordpress/components';
+	useSimulatedMediaQuery,
+	BlockInspector,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { ComplementaryArea } from '@wordpress/interface';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import WidgetAreas from '../widget-areas';
-
 import './sync-customizer';
+import Header from '../header';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
+import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
 function CustomizerEditWidgetsInitializer( { settings } ) {
-	const [ selectedArea, setSelectedArea ] = useState( null );
+	useSimulatedMediaQuery( 'resizable-editor-section', 360 );
+	const blockEditorSettings = useMemo(
+		() => ( {
+			...settings,
+			hasFixedToolbar: true,
+		} ),
+		[ settings ]
+	);
 	return (
-		<SlotFillProvider>
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
 			<div
 				className="edit-widgets-customizer-edit-widgets-initializer__content"
 				role="region"
 				aria-label={ __( 'Widgets screen content' ) }
 				tabIndex="-1"
 			>
-				<WidgetAreas
-					selectedArea={ selectedArea }
-					setSelectedArea={ setSelectedArea }
-					blockEditorSettings={ settings }
-				/>
+				<Header isCustomizer />
+				<WidgetAreasBlockEditorContent />
+				<ComplementaryArea.Slot scope="core/edit-widgets-customizer" />
+				<ComplementaryArea
+					className="edit-widgets-sidebar"
+					scope="core/edit-widgets-customizer"
+					identifier="edit-widgets-customizer/block-inspector"
+					icon={ cog }
+					title={ __( 'Block Inspector' ) }
+				>
+					<BlockInspector />
+				</ComplementaryArea>
 			</div>
-			<Popover.Slot />
-		</SlotFillProvider>
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 

@@ -21,10 +21,6 @@ export const settings = {
 		'Display icons linking to your social media profiles or websites.'
 	),
 	keywords: [ _x( 'links', 'block keywords' ) ],
-	supports: {
-		align: [ 'left', 'center', 'right' ],
-		lightBlockWrapper: true,
-	},
 	example: {
 		innerBlocks: [
 			{
