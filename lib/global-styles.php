@@ -254,6 +254,32 @@ function gutenberg_experimental_global_styles_get_theme() {
 }
 
 /**
+ * Returns the style features a particular block supports.
+ *
+ * @param array $supports The block supports array.
+ *
+ * @return array Style features supported by the block.
+ */
+function gutenberg_experimental_global_styles_get_supported_styles( $supports ) {
+	$style_features = array(
+		'color'            => array( '__experimentalColor' ),
+		'background-color' => array( '__experimentalColor' ),
+		'background'       => array( '__experimentalColor', 'gradients' ),
+		'line-height'      => array( '__experimentalLineHeight' ),
+		'font-size'        => array( '__experimentalFontSize' ),
+	);
+
+	$supported_features = array();
+	foreach ( $style_features as $style_feature => $path ) {
+		if ( gutenberg_experimental_get( $supports, $path ) ) {
+			$supported_features[] = $style_feature;
+		}
+	}
+
+	return $supported_features;
+}
+
+/**
  * Retrieves the block data (selector/supports).
  *
  * @return array
@@ -264,13 +290,6 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			'selector' => ':root',
 			'supports' => array( 'background-color' ),
 		),
-	);
-
-	$supported_features = array(
-		'color'            => '__experimentalColor',
-		'background-color' => '__experimentalColor',
-		'line-height'      => '__experimentalLineHeight',
-		'font-size'        => '__experimentalFontSize',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
@@ -293,14 +312,8 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			continue;
 		}
 
-		$supported_block_features = array_keys(
-			array_intersect(
-				$supported_features,
-				array_keys( array_filter( $block_type->supports ) )
-			)
-		);
-
-		if ( empty( $supported_block_features ) ) {
+		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
+		if ( empty( $supports ) ) {
 			continue;
 		}
 
@@ -329,7 +342,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		) {
 			$block_data[ $block_name ] = array(
 				'selector' => $block_type->supports['__experimentalSelector'],
-				'supports' => $supported_block_features,
+				'supports' => $supports,
 			);
 		} elseif (
 			isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -338,13 +351,13 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
 				$block_data[ $key ] = array(
 					'selector' => $selector,
-					'supports' => $supported_block_features,
+					'supports' => $supports,
 				);
 			}
 		} else {
 			$block_data[ $block_name ] = array(
 				'selector' => '.wp-block-' . preg_replace( '/\//', '-', preg_replace( '/core\//', '', $block_name ) ),
-				'supports' => $supported_block_features,
+				'supports' => $supports,
 			);
 		}
 	}
