@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { inRange } from 'lodash';
 import styled from '@emotion/styled';
 
 /**
@@ -37,6 +38,8 @@ const CSSGridExample = () => {
 	const [ gap, setGap ] = useState( 20 );
 	const [ gridSteps, setGridSteps ] = useState( [ 1 ] );
 	const [ __updateCount, setUpdateCount ] = useState( 0 );
+	const [ dragColumnWidth, setDragColumnWidth ] = useState( 1 );
+	const [ dragColumnIndex, setDragColumnIndex ] = useState( 0 );
 	const ghostRef = useRef( false );
 	const initialRenderRef = useRef( false );
 	const didChangeGridSettingRef = useRef( false );
@@ -76,6 +79,40 @@ const CSSGridExample = () => {
 		lastUpdateCountRef.current = nextUpdateCount;
 	}, [] );
 
+	const handleOnResizeStart = useCallback(
+		( event, direction, element ) => {
+			const nodes = [
+				...containerNode.current.querySelectorAll(
+					'.components-resizable-box__container'
+				),
+			];
+
+			const ghostNodes = [ ...ghostRef.current.children ];
+
+			if ( element ) {
+				const nodeIndex = nodes.indexOf( element );
+				const targetGhostNode = ghostNodes[ nodeIndex ];
+				if ( ! targetGhostNode ) return;
+
+				targetGhostNode.style.width = element.style.width;
+
+				const nextDragColumnWidth = getColumnValue( {
+					gridSteps: getGridSteps(),
+					width: targetGhostNode.clientWidth,
+				} );
+
+				const previousGhostNodeWidth = getColumnValue( {
+					gridSteps: getGridSteps(),
+					width: targetGhostNode.offsetLeft,
+				} );
+
+				setDragColumnIndex( previousGhostNodeWidth );
+				setDragColumnWidth( nextDragColumnWidth );
+			}
+		},
+		[ isGrid ]
+	);
+
 	const handleOnResize = useCallback(
 		( event, direction, element ) => {
 			const nodes = [
@@ -91,10 +128,16 @@ const CSSGridExample = () => {
 			if ( element ) {
 				const nodeIndex = nodes.indexOf( element );
 				const targetGhostNode = ghostNodes[ nodeIndex ];
-
 				if ( ! targetGhostNode ) return;
 
 				targetGhostNode.style.width = element.style.width;
+
+				const nextDragColumnWidth = getColumnValue( {
+					gridSteps: getGridSteps(),
+					width: targetGhostNode.clientWidth,
+				} );
+
+				setDragColumnWidth( nextDragColumnWidth );
 			}
 
 			const nextColumnWidths = ghostNodes.map( ( n, index ) => {
@@ -151,7 +194,7 @@ const CSSGridExample = () => {
 
 	useEffect( () => {
 		// eslint-disable-next-line no-console
-		console.log( columnWidths );
+		// console.log( columnWidths );
 	}, [ columnWidths ] );
 
 	const toggleGrid = () => {
@@ -169,8 +212,13 @@ const CSSGridExample = () => {
 		minWidth,
 		ghostRef,
 		columnWidths,
+		onResizeStart: handleOnResizeStart,
 		onResize: handleOnResize,
 		setGridSteps: () => {},
+		dragColumnWidth,
+		dragColumnIndex,
+		setDragColumnIndex,
+		setDragColumnWidth,
 		baseId,
 		__updateCount,
 	};
@@ -220,7 +268,7 @@ const CSSGridExample = () => {
 					<ColumnGridVisualizer />
 					<TestContainerView ref={ containerNode }>
 						<ColumnWrapper width={ columnWidths[ 0 ] } isFirst>
-							<BoxView contentEditable="true">
+							<BoxView>
 								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
@@ -234,7 +282,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 1 ] }>
-							<BoxView contentEditable="true">
+							<BoxView>
 								<h1>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit.
@@ -250,7 +298,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 2 ] }>
-							<BoxView contentEditable="true">
+							<BoxView>
 								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
@@ -260,7 +308,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 3 ] } isLast>
-							<BoxView contentEditable="true">
+							<BoxView>
 								<h2>
 									Nulla congue semper enim sed euismod. Donec
 									sed faucibus lacus, vel consectetur lorem.
@@ -293,6 +341,7 @@ const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
 		onResize,
 		isDragging,
 		setIsDragging,
+		onResizeStart,
 	} = useColumnResizerContext();
 	const lastDelta = useRef();
 	const enable = {
@@ -317,9 +366,11 @@ const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
 	return (
 		<ResizableBox
 			size={ { width } }
-			onResizeStart={ () => {
+			onResizeStart={ ( event, direction, element, delta ) => {
 				setIsDragging( true );
+				onResizeStart( event, direction, element, delta );
 			} }
+			snapGap={ 1 }
 			onResize={ ( event, direction, element, delta ) => {
 				if ( lastDelta.current === delta.width ) return;
 				lastDelta.current = delta.width;
@@ -365,7 +416,13 @@ const GhostColumns = ( { nodeRef, show = false } ) => {
 
 function ResizableVisualizer( { isFirst, isLast, width } ) {
 	const nodeRef = useRef();
-	const { __updateCount, gridSteps, isGrid, gap } = useColumnResizerContext();
+	const {
+		__updateCount,
+		gridSteps,
+		isGrid,
+		gap,
+		isDragging,
+	} = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
 	const getWidthLabel = () => {
@@ -375,7 +432,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 		return isGrid
 			? getColumnValue( {
 					gridSteps,
-					width: w,
+					width: w + gap,
 			  } )
 			: width;
 	};
@@ -389,7 +446,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 	return (
 		<VisualizerView
 			ref={ nodeRef }
-			isActive={ isActive }
+			isActive={ isActive || isDragging }
 			style={ {
 				left: isFirst ? 0 : gap / 2,
 				right: isLast ? 0 : gap / 2,
@@ -401,16 +458,35 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 }
 
 function ColumnGridVisualizer() {
-	const { isGrid, gap, __updateCount } = useColumnResizerContext();
+	const {
+		isGrid,
+		isDragging,
+		gap,
+		dragColumnIndex,
+		dragColumnWidth,
+		__updateCount,
+	} = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
 	if ( ! isGrid ) return null;
 
 	return (
-		<VisualizerGridView isActive={ isActive }>
-			{ [ ...Array( GRID_SIZE ) ].map( ( n, i ) => (
-				<VisualizerGridColumnView key={ i } gap={ gap } />
-			) ) }
+		<VisualizerGridView isActive={ isActive || isDragging }>
+			{ [ ...Array( GRID_SIZE ) ].map( ( n, i ) => {
+				const isColumnActive = inRange(
+					i,
+					dragColumnIndex,
+					dragColumnWidth + dragColumnIndex
+				);
+
+				return (
+					<VisualizerGridColumnView
+						key={ i }
+						gap={ gap }
+						isActive={ isColumnActive }
+					/>
+				);
+			} ) }
 		</VisualizerGridView>
 	);
 }
@@ -547,6 +623,17 @@ const VisualizerGridColumnView = styled.div`
 	border-right: 1px solid rgba( 80, 160, 255, 0.1 );
 	pointer-events: none;
 	filter: brightness( 1 );
+	transition: all 100ms linear;
+
+	${( { isActive } ) => {
+		if ( ! isActive ) return '';
+
+		return `
+			background: rgba( 80, 160, 255, 0.16 );
+			border-left: 1px solid rgba( 80, 160, 255, 0.2 );
+			border-right: 1px solid rgba( 80, 160, 255, 0.2 );
+		`;
+	}}
 
 	${( { gap } ) => `
 		margin: 0 ${ gap / 2 }px;
