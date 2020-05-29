@@ -13,7 +13,11 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const { getDefaultValues, getPrompts } = require( './templates' );
+const {
+	getBlockTemplate,
+	getDefaultValues,
+	getPrompts,
+} = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
@@ -30,7 +34,7 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext"',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
@@ -41,14 +45,21 @@ program
 	.action(
 		async (
 			slug,
-			{ category, namespace, shortDescription, template, title }
+			{
+				category,
+				namespace,
+				shortDescription: description,
+				template: templateName,
+				title,
+			}
 		) => {
 			await checkSystemRequirements( engines );
 			try {
-				const defaultValues = await getDefaultValues( template );
+				const blockTemplate = await getBlockTemplate( templateName );
+				const defaultValues = getDefaultValues( blockTemplate );
 				const optionsValues = pickBy( {
 					category,
-					description: shortDescription,
+					description,
 					namespace,
 					title,
 				} );
@@ -60,16 +71,14 @@ program
 						title: startCase( slug ),
 						...optionsValues,
 					};
-					await scaffold( template, answers );
+					await scaffold( blockTemplate, answers );
 				} else {
-					const prompts = await getPrompts( template );
-					const filteredPrompts = prompts.filter(
+					const prompts = getPrompts( blockTemplate ).filter(
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
-					const answers = await inquirer.prompt( filteredPrompts );
-
-					await scaffold( template, {
+					const answers = await inquirer.prompt( prompts );
+					await scaffold( blockTemplate, {
 						...defaultValues,
 						...optionsValues,
 						...answers,
@@ -85,7 +94,7 @@ program
 			}
 		}
 	)
-	.on( '--help', function() {
+	.on( '--help', () => {
 		log.info( '' );
 		log.info( 'Examples:' );
 		log.info( `  $ ${ commandName }` );

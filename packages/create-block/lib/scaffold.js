@@ -1,27 +1,21 @@
 /**
  * External dependencies
  */
-const { dirname, join } = require( 'path' );
-const makeDir = require( 'make-dir' );
-const { readFile, writeFile } = require( 'fs' ).promises;
-const { render } = require( 'mustache' );
+const { writeFile } = require( 'fs' ).promises;
 const { snakeCase } = require( 'lodash' );
-const rimraf = require( 'rimraf' ).sync;
+const makeDir = require( 'make-dir' );
+const { render } = require( 'mustache' );
+const { dirname } = require( 'path' );
 
 /**
  * Internal dependencies
  */
 const initWPScripts = require( './init-wp-scripts' );
 const { code, info, success } = require( './log' );
-const {
-	hasWPScriptsEnabled,
-	getOutputFiles,
-	isCoreTemplate,
-	tempFolder,
-} = require( './templates' );
+const { hasWPScriptsEnabled } = require( './templates' );
 
-module.exports = async function(
-	templateName,
+module.exports = async (
+	blockTemplate,
 	{
 		namespace,
 		slug,
@@ -34,13 +28,14 @@ module.exports = async function(
 		licenseURI,
 		version,
 	}
-) {
+) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
 
 	info( '' );
 	info( `Creating a new WordPress block in "${ slug }" folder.` );
 
+	const { outputTemplates } = blockTemplate;
 	const view = {
 		namespace,
 		namespaceSnakeCase: snakeCase( namespace ),
@@ -56,35 +51,30 @@ module.exports = async function(
 		licenseURI,
 		textdomain: namespace,
 	};
+	await Promise.all(
+		Object.keys( outputTemplates ).map( async ( outputFile ) => {
+			// Output files can have names that depend on the slug provided.
+			const outputFilePath = `${ slug }/${ outputFile.replace(
+				/\$slug/g,
+				slug
+			) }`;
+			await makeDir( dirname( outputFilePath ) );
+			writeFile(
+				outputFilePath,
+				render( outputTemplates[ outputFile ], view )
+			);
+		} )
+	);
 
-	const templateDirectory = isCoreTemplate( templateName )
-		? join( __dirname, 'templates' )
-		: join( tempFolder, 'node_modules' );
-
-	const outputFiles = await getOutputFiles( templateName );
-	outputFiles.map( async ( file ) => {
-		const template = await readFile(
-			join( templateDirectory, `${ templateName }/${ file }.mustache` ),
-			'utf8'
-		);
-		// Output files can have names that depend on the slug provided.
-		const outputFilePath = `${ slug }/${ file.replace( /\$slug/g, slug ) }`;
-		await makeDir( dirname( outputFilePath ) );
-		writeFile( outputFilePath, render( template, view ) );
-	} );
-
-	const wpScriptsEnabled = await hasWPScriptsEnabled( templateName );
-	if ( wpScriptsEnabled ) {
+	if ( hasWPScriptsEnabled( blockTemplate ) ) {
 		await initWPScripts( view );
 	}
-
-	rimraf( tempFolder );
 
 	info( '' );
 	success(
 		`Done: block "${ title }" bootstrapped in the "${ slug }" folder.`
 	);
-	if ( wpScriptsEnabled ) {
+	if ( hasWPScriptsEnabled( blockTemplate ) ) {
 		info( '' );
 		info( 'Inside that directory, you can run several commands:' );
 		info( '' );
