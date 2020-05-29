@@ -168,7 +168,7 @@ const CSSGridExample = () => {
 					<GridTestView ref={ containerNode }>
 						<ColumnWrapper width={ columnWidths[ 0 ] } isFirst>
 							<BoxView>
-								<p>
+								<p contentEditable="true">
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -182,11 +182,11 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 1 ] }>
 							<BoxView>
-								<h1>
+								<h1 contentEditable="true">
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit.
 								</h1>
-								<p>
+								<p contentEditable="true">
 									Aliquam et porttitor ex. Aenean sed ipsum
 									sit amet justo blandit rhoncus ac vitae
 									eros. Nulla congue semper enim sed euismod.
@@ -198,7 +198,7 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 2 ] }>
 							<BoxView>
-								<p>
+								<p contentEditable="true">
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -208,13 +208,13 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 3 ] } isLast>
 							<BoxView>
-								<h2>
+								<h2 contentEditable="true">
 									Nulla congue semper enim sed euismod. Donec
 									sed faucibus lacus, vel consectetur lorem.
 									Vivamus in pellentesque nisi. Sed hendrerit
 									tempor volutpat.
 								</h2>
-								<p>
+								<p contentEditable="true">
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -399,6 +399,11 @@ export function getGridWidthValue( { gridSteps, width } ) {
 
 const BoxView = styled.div`
 	box-sizing: border-box;
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
 `;
 
 const VisualizerGridView = styled.div`
