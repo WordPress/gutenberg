@@ -105,7 +105,7 @@
 }
 
 // Show a draggable handle when you're dragging using the toolbar component.
-.components-draggable__clone {
+.block-editor-block-toolbar__drag-clone {
 	margin-top: -$block-toolbar-height; // This puts it closer to the drag handle.
 
 	&::before {

@@ -74,7 +74,12 @@ class Draggable extends Component {
 	 * @param  {Object} event The non-custom DragEvent.
 	 */
 	onDragStart( event ) {
-		const { elementId, transferData, onDragStart = noop } = this.props;
+		const {
+			cloneClassname,
+			elementId,
+			transferData,
+			onDragStart = noop,
+		} = this.props;
 		const element = document.getElementById( elementId );
 		if ( ! element ) {
 			event.preventDefault();
@@ -106,6 +111,9 @@ class Draggable extends Component {
 		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
+		if ( cloneClassname ) {
+			this.cloneWrapper.classList.add( cloneClassname );
+		}
 		this.cloneWrapper.style.width = `${
 			elementRect.width + clonePadding * 2
 		}px`;

@@ -115,7 +115,10 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				) }
 
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<BlockDraggable clientIds={ blockClientIds }>
+					<BlockDraggable
+						clientIds={ blockClientIds }
+						cloneClassname="block-editor-block-toolbar__drag-clone"
+					>
 						{ ( {
 							isDraggable,
 							onDraggableStart,
