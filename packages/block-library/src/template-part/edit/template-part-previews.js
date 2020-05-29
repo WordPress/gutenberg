@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { parse, createBlock } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -41,7 +41,7 @@ function InserterPanel( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartItem( { templatePart, onInsert } ) {
+function TemplatePartItem( { templatePart, selectTemplate } ) {
 	const { id, slug, theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
@@ -50,12 +50,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 
 	const onClick = useCallback( () => {
-		const templatePartBlock = createBlock( 'core/template-part', {
-			postId: id,
-			slug,
-			theme,
-		} );
-		onInsert( templatePartBlock );
+		selectTemplate( { postId: id, slug, theme } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -89,7 +84,7 @@ function TemplatePartItem( { templatePart, onInsert } ) {
 	);
 }
 
-function TemplatePartsByTheme( { templateParts, onInsert } ) {
+function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
@@ -108,7 +103,7 @@ function TemplatePartsByTheme( { templateParts, onInsert } ) {
 								<TemplatePartItem
 									key={ templatePart.id }
 									templatePart={ templatePart }
-									onInsert={ onInsert }
+									selectTemplate={ selectTemplate }
 								/>
 							) : (
 								<TemplatePartPlaceholder
@@ -122,7 +117,11 @@ function TemplatePartsByTheme( { templateParts, onInsert } ) {
 	);
 }
 
-function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
+function TemplatePartSearchResults( {
+	templateParts,
+	selectTemplate,
+	filterValue,
+} ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
 		const lowerFilterValue = filterValue.toLowerCase();
@@ -169,7 +168,7 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 						<TemplatePartItem
 							key={ templatePart.id }
 							templatePart={ templatePart }
-							onInsert={ onInsert }
+							selectTemplate={ selectTemplate }
 						/>
 					) : (
 						<TemplatePartPlaceholder key={ templatePart.id } />
@@ -180,7 +179,7 @@ function TemplatePartSearchResults( { templateParts, onInsert, filterValue } ) {
 	);
 }
 
-export default function TemplateParts( { onInsert, filterValue } ) {
+export default function TemplateParts( { selectTemplate, filterValue } ) {
 	const templateParts = useSelect( ( select ) => {
 		return select( 'core' ).getEntityRecords(
 			'postType',
@@ -199,7 +198,7 @@ export default function TemplateParts( { onInsert, filterValue } ) {
 		return (
 			<TemplatePartSearchResults
 				templateParts={ templateParts }
-				onInsert={ onInsert }
+				selectTemplate={ selectTemplate }
 				filterValue={ filterValue }
 			/>
 		);
@@ -208,7 +207,7 @@ export default function TemplateParts( { onInsert, filterValue } ) {
 	return (
 		<TemplatePartsByTheme
 			templateParts={ templateParts }
-			onInsert={ onInsert }
+			selectTemplate={ selectTemplate }
 		/>
 	);
 }

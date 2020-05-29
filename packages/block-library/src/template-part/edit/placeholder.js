@@ -16,11 +16,6 @@ import { layout } from '@wordpress/icons';
 import useTemplatePartPost from './use-template-part-post';
 import TemplatePartPreviews from './template-part-previews';
 
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
-
 function TemplatePartPreview() {
 	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_template_part' );
 	return (
@@ -100,6 +95,10 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		setAttributes( nextAttributes );
 	}, [ postId, slug, theme ] );
 
+	const selectTemplate = ( selection ) => {
+		setAttributes( selection );
+	};
+
 	const [ filterValue, setFilterValue ] = useState( '' );
 
 	return (
@@ -146,7 +145,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 
 			<div className="wp-block-template-part__preview-container">
 				<TemplatePartPreviews
-					onInsert={ noop }
+					selectTemplate={ selectTemplate }
 					filterValue={ filterValue }
 				/>
 			</div>
