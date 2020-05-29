@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.0 (2020-05-28)
+
 ### New Feature
 
 -   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.

@@ -50,7 +50,10 @@ const getStyles = (
 export class BlockList extends Component {
 	constructor() {
 		super( ...arguments );
-
+		this.extraData = {
+			parentWidth: this.props.parentWidth,
+			renderFooterAppender: this.props.renderFooterAppender,
+		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
 		this.onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind(
@@ -65,6 +68,7 @@ export class BlockList extends Component {
 			this
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
+		this.getExtraData = this.getExtraData.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -102,6 +106,20 @@ export class BlockList extends Component {
 		);
 	}
 
+	getExtraData() {
+		const { parentWidth, renderFooterAppender } = this.props;
+		if (
+			this.extraData.parentWidth !== parentWidth ||
+			this.extraData.renderFooterAppender !== renderFooterAppender
+		) {
+			this.extraData = {
+				parentWidth,
+				renderFooterAppender,
+			};
+		}
+		return this.extraData;
+	}
+
 	render() {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
@@ -134,7 +152,6 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
-			parentWidth,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -180,7 +197,7 @@ export class BlockList extends Component {
 						! isRootList && styles.overflowVisible,
 					] }
 					horizontal={ horizontal }
-					extraData={ parentWidth }
+					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
 					contentContainerStyle={
 						horizontal && styles.horizontalContentContainer

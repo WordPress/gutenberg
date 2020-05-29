@@ -63,9 +63,11 @@ function Editor( { settings: _settings } ) {
 			select( 'core' ).getEntityRecord(
 				'postType',
 				settings.templateType,
-				settings.templateId
+				settings.templateType === 'wp_template'
+					? settings.templateId
+					: settings.templatePartId
 			),
-		[ settings.templateType, settings.templateId ]
+		[ settings.templateType, settings.templateId, settings.templatePartId ]
 	);
 
 	const context = useMemo( () => ( { settings, setSettings } ), [
@@ -105,14 +107,15 @@ function Editor( { settings: _settings } ) {
 		[]
 	);
 
-	const blockContext = useMemo( () => {
-		if ( ! settings.page.context.queryContext )
-			return settings.page.context;
-
-		return {
+	// Set default query for misplaced Query Loop blocks, and
+	// provide the root `queryContext` for top-level Query Loop
+	// and Query Pagination blocks.
+	const blockContext = useMemo(
+		() => ( {
 			...settings.page.context,
+			query: settings.page.context.query || { categoryIds: [] },
 			queryContext: [
-				settings.page.context.queryContext,
+				settings.page.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setSettings( ( prevSettings ) => ( {
 						...prevSettings,
@@ -128,8 +131,9 @@ function Editor( { settings: _settings } ) {
 						},
 					} ) ),
 			],
-		};
-	}, [ settings.page.context ] );
+		} ),
+		[ settings.page.context ]
+	);
 	return template ? (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -140,7 +144,11 @@ function Editor( { settings: _settings } ) {
 						<EntityProvider
 							kind="postType"
 							type={ settings.templateType }
-							id={ settings.templateId }
+							id={
+								settings.templateType === 'wp_template'
+									? settings.templateId
+									: settings.templatePartId
+							}
 						>
 							<BlockContextProvider value={ blockContext }>
 								<Context.Provider value={ context }>

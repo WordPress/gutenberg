@@ -25,7 +25,7 @@
 /packages/blocks                                @youknowriad @ellatrix @aduth
 /packages/edit-post
 /packages/editor
-/packages/list-reusable-blocks                  @youknowriad @noisysocks
+/packages/list-reusable-blocks                  @youknowriad
 /packages/shortcode
 /packages/block-directory
 /packages/interface
@@ -70,7 +70,7 @@
 /packages/compose                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
 /packages/element                               @youknowriad @ajitbohra @jaymanpandya @jorgefilipecosta
 /packages/notices                               @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
+/packages/nux                                   @ajitbohra @jaymanpandya @jorgefilipecosta
 /packages/viewport                              @ajitbohra @jaymanpandya @jorgefilipecosta
 /packages/base-styles
 /packages/icons
@@ -109,7 +109,7 @@
 /packages/project-management-automation         @aduth
 
 # wp-env
-/packages/env                                   @epiqueras @noahtallen @noisysocks
+/packages/env                                   @epiqueras @noahtallen
 
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey

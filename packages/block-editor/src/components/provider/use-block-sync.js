@@ -80,7 +80,7 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( 'core/block-editor' );
-	const { getBlocks } = registry.select( 'core/block-editor' );
+	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 
@@ -119,6 +119,16 @@ export default function useBlockSync( {
 		let previousAreBlocksDifferent = false;
 
 		const unsubscribe = registry.subscribe( () => {
+			// Sometimes, when changing block lists, lingering subscriptions
+			// might trigger before they are cleaned up. If the block for which
+			// the subscription runs is no longer in the store, this would clear
+			// its parent entity's block list. To avoid this, we bail out if
+			// the subscription is triggering for a block (`clientId !== null`)
+			// and its block name can't be found because it's not on the list.
+			// (`getBlockName( clientId ) === null`).
+			if ( clientId !== null && getBlockName( clientId ) === null )
+				return;
+
 			const newIsPersistent = isLastBlockChangePersistent();
 
 			const newBlocks = getBlocks( clientId );
