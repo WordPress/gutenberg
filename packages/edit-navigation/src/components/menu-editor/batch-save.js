@@ -96,9 +96,7 @@ function computeCustomizedAttribute( blocks, menuId, menuItemsRef ) {
 }
 
 function uuidv4() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, function(
-		c
-	) {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, ( c ) => {
 		// eslint-disable-next-line no-restricted-syntax
 		const a = Math.random() * 16;
 		// eslint-disable-next-line no-bitwise

@@ -53,30 +53,27 @@ export default function useNavigationBlocks( menuId ) {
 	const debouncedBlocks = useDebouncedValue( blocks, 800 );
 	const promiseQueueRef = useRef( new PromiseQueue() );
 	const enqueuedBlocksIds = useRef( [] );
-	useEffect(
-		function() {
-			for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
-				// Menu item was already created
-				if ( clientId in menuItemsRef.current ) {
-					continue;
-				}
-				// Already in the queue
-				if ( enqueuedBlocksIds.current.includes( clientId ) ) {
-					continue;
-				}
-				enqueuedBlocksIds.current.push( clientId );
-				promiseQueueRef.current.enqueue( () =>
-					createDraftMenuItem( clientId ).then( ( menuItem ) => {
-						menuItemsRef.current[ clientId ] = menuItem;
-						enqueuedBlocksIds.current.splice(
-							enqueuedBlocksIds.current.indexOf( clientId )
-						);
-					} )
-				);
+	useEffect( () => {
+		for ( const clientId of getAllClientIds( debouncedBlocks ) ) {
+			// Menu item was already created
+			if ( clientId in menuItemsRef.current ) {
+				continue;
 			}
-		},
-		[ debouncedBlocks ]
-	);
+			// Already in the queue
+			if ( enqueuedBlocksIds.current.includes( clientId ) ) {
+				continue;
+			}
+			enqueuedBlocksIds.current.push( clientId );
+			promiseQueueRef.current.enqueue( () =>
+				createDraftMenuItem( clientId ).then( ( menuItem ) => {
+					menuItemsRef.current[ clientId ] = menuItem;
+					enqueuedBlocksIds.current.splice(
+						enqueuedBlocksIds.current.indexOf( clientId )
+					);
+				} )
+			);
+		}
+	}, [ debouncedBlocks ] );
 
 	// Save handler
 	const { receiveEntityRecords } = useDispatch( 'core' );
