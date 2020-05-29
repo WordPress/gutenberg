@@ -47,6 +47,11 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 import createDataTree from './create-data-tree';
 
+// Constants
+const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
+const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
+const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -68,14 +73,9 @@ function Navigation( {
 	updateNavItemBlocks,
 	className,
 } ) {
-	const CREATE_EMPTY_OPTION_VALUE = '__CREATE_EMPTY__';
-	const CREATE_FROM_PAGES_OPTION_VALUE = '__CREATE_FROM_PAGES__';
-	const CREATE_PLACEHOLDER_VALUE = '__CREATE_PLACEHOLDER__';
-
 	//
 	// HOOKS
 	//
-
 	const ref = useRef();
 	const [ selectedDropDownOption, setSelectedDropDownOption ] = useState(
 		null
