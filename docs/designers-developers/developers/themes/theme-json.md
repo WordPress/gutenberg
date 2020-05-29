@@ -153,8 +153,9 @@ Each block will declare which style properties it exposes. This has been coined 
 
 The list of properties that are currently exposed via this method are:
 
-- Paragraph and Heading: line-height, font-size, color.
-- Group, Columns, and MediaText: color.
+- Global: background-color.
+- Paragraph and Heading: line-height, font-size, color, background-color.
+- Group, Columns, and MediaText: color, background-color.
 
 ### Features
 

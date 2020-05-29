@@ -262,15 +262,15 @@ function gutenberg_experimental_global_styles_get_block_data() {
 	$block_data = array(
 		'global' => array(
 			'selector' => ':root',
-			'supports' => array( 'background' ),
+			'supports' => array( 'background-color' ),
 		),
 	);
 
 	$supported_features = array(
-		'color'       => '__experimentalColor',
-		'background'  => '__experimentalColor',
-		'line-height' => '__experimentalLineHeight',
-		'font-size'   => '__experimentalFontSize',
+		'color'            => '__experimentalColor',
+		'background-color' => '__experimentalColor',
+		'line-height'      => '__experimentalLineHeight',
+		'font-size'        => '__experimentalFontSize',
 	);
 
 	$registry = WP_Block_Type_Registry::get_instance();
