@@ -80,7 +80,7 @@ export class PostPublishPanel extends Component {
 					{ isPostPublish ? (
 						<Button
 							onClick={ onClose }
-							label={ __( 'Close' ) }
+							label={ __( 'Close panel' ) }
 							className="is-secondary"
 						>
 							{ __( 'Close' ) }
