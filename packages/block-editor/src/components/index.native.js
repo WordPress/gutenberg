@@ -27,7 +27,6 @@ export {
 	MEDIA_TYPE_VIDEO,
 } from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
-export { default as MediaEdit } from './media-edit';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as BlockCaption } from './block-caption';

@@ -13,12 +13,13 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
 	withColors,
+	MEDIA_TYPE_VIDEO,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarGroup } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { pullLeft, pullRight } from '@wordpress/icons';
+import { pullLeft, pullRight, replace } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,10 +57,23 @@ class MediaTextEdit extends Component {
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.onLayoutChange = this.onLayoutChange.bind( this );
+		this.onMediaSelected = this.onMediaSelected.bind( this );
+		this.onReplaceMedia = this.onReplaceMedia.bind( this );
+		this.onSetOpenPickerRef = this.onSetOpenPickerRef.bind( this );
 
 		this.state = {
 			mediaWidth: null,
 			containerWidth: 0,
+			isMediaSelected: false,
+		};
+	}
+
+	static getDerivedStateFromProps( props, state ) {
+		return {
+			isMediaSelected:
+				state.isMediaSelected &&
+				props.isSelected &&
+				! props.isAncestorSelected,
 		};
 	}
 
@@ -143,7 +157,22 @@ class MediaTextEdit extends Component {
 		} );
 	}
 
+	onMediaSelected() {
+		this.setState( { isMediaSelected: true } );
+	}
+
+	onReplaceMedia() {
+		if ( this.openPickerRef ) {
+			this.openPickerRef();
+		}
+	}
+
+	onSetOpenPickerRef( openPicker ) {
+		this.openPickerRef = openPicker;
+	}
+
 	renderMediaArea() {
+		const { isMediaSelected } = this.state;
 		const { attributes, isSelected } = this.props;
 		const {
 			mediaAlt,
@@ -158,11 +187,14 @@ class MediaTextEdit extends Component {
 
 		return (
 			<MediaContainer
-				onSelectMedia={ this.onSelectMedia }
-				onMediaUpdate={ this.onMediaUpdate }
-				onWidthChange={ this.onWidthChange }
 				commitWidthChange={ this.commitWidthChange }
+				isMediaSelected={ isMediaSelected }
 				onFocus={ this.props.onFocus }
+				onMediaSelected={ this.onMediaSelected }
+				onMediaUpdate={ this.onMediaUpdate }
+				onSelectMedia={ this.onSelectMedia }
+				onSetOpenPickerRef={ this.onSetOpenPickerRef }
+				onWidthChange={ this.onWidthChange }
 				{ ...{
 					mediaAlt,
 					mediaId,
@@ -191,9 +223,10 @@ class MediaTextEdit extends Component {
 			isStackedOnMobile,
 			mediaPosition,
 			mediaWidth,
+			mediaType,
 			verticalAlignment,
 		} = attributes;
-		const { containerWidth } = this.state;
+		const { containerWidth, isMediaSelected } = this.state;
 
 		const isMobile = containerWidth < BREAKPOINTS.mobile;
 		const shouldStack = isStackedOnMobile && isMobile;
@@ -262,11 +295,25 @@ class MediaTextEdit extends Component {
 		return (
 			<>
 				<BlockControls>
-					<ToolbarGroup controls={ toolbarControls } />
-					<BlockVerticalAlignmentToolbar
-						onChange={ onVerticalAlignmentChange }
-						value={ verticalAlignment }
-					/>
+					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
+						<ToolbarGroup>
+							<Button
+								label={ __( 'Edit media' ) }
+								icon={ replace }
+								onClick={ this.onReplaceMedia }
+							/>
+						</ToolbarGroup>
+					) }
+					{ ( ! isMediaSelected ||
+						mediaType === MEDIA_TYPE_VIDEO ) && (
+						<>
+							<ToolbarGroup controls={ toolbarControls } />
+							<BlockVerticalAlignmentToolbar
+								onChange={ onVerticalAlignmentChange }
+								value={ verticalAlignment }
+							/>
+						</>
+					) }
 				</BlockControls>
 				<View
 					style={ containerStyles }

@@ -34,15 +34,6 @@ $media-to-text: 12px;
 	padding-bottom: 8;
 }
 
-.content {
-	flex: 1;
-}
-
-.contentCentered {
-	flex: 1;
-	align-items: center;
-}
-
 .imageContainer {
 	align-items: center;
 	background-color: $gray-lighten-30;
@@ -141,4 +132,10 @@ $media-to-text: 12px;
 
 .mediaRight {
 	padding-left: $media-to-text;
+}
+
+.imageWithFocalPoint {
+	overflow: hidden;
+	width: 100%;
+	position: relative;
 }
