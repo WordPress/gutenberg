@@ -1260,7 +1260,7 @@ _Parameters_
 
 <a name="setBlockMovingMode" href="#setBlockMovingMode">#</a> **setBlockMovingMode**
 
-Generators that triggers an action used to enable or disable the block moving mode.
+Generator that triggers an action used to enable or disable the block moving mode.
 
 _Parameters_
 
