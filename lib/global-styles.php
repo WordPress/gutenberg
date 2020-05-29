@@ -300,6 +300,10 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			)
 		);
 
+		if ( empty( $supported_block_features ) ) {
+			continue;
+		}
+
 		/*
 		 * Assign the selector for the block.
 		 *
@@ -332,7 +336,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			is_array( $block_type->supports['__experimentalSelector'] )
 		) {
 			foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
-				$block_data[ $block_name . '/' . $key ] = array(
+				$block_data[ $key ] = array(
 					'selector' => $selector,
 					'supports' => $supported_block_features,
 				);
