@@ -20,11 +20,9 @@ import useTemplatePartPost from './use-template-part-post';
 import TemplatePartPreviews from './template-part-previews';
 
 const HELP_PHRASES = {
-	initial: __(
-		'Please add a slug and theme name for your new Template Part.'
-	),
+	initial: __( 'Please add a name and theme for your new Template Part.' ),
 	unavailable: __(
-		'Slug and theme combination already in use, please try another.'
+		'Name and theme combination already in use, please try another.'
 	),
 	available: __( 'This name is available!' ),
 	error: __( 'Error adding template.' ),
@@ -101,7 +99,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		<>
 			<div className="wp-block-template-part__placeholder-input-container">
 				<TextControl
-					label={ __( 'Slug' ) }
+					label={ __( 'Name' ) }
 					placeholder={ __( 'header' ) }
 					value={ slug }
 					onChange={ setSlug }
