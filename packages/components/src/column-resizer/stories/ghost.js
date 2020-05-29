@@ -6,6 +6,7 @@ import styled from '@emotion/styled';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import {
 	useState,
 	useRef,
@@ -28,29 +29,15 @@ const GRID_SIZE = 12;
 const ColumnResizerContext = createContext( { isGrid: true } );
 const useColumnResizerContext = () => useContext( ColumnResizerContext );
 
-const CSSGridContainerView = styled.div`
-	width: 100%;
-	position: relative;
-
-	.components-resizable-box__handle {
-		opacity: 0;
-		transition: opacity 100ms linear;
-		will-change: opacity;
-
-		&:hover,
-		&:active {
-			opacity: 1;
-		}
-	}
-`;
-
 const CSSGridExample = () => {
 	const [ isGrid, setIsGrid ] = useState( true );
+	const [ isDragging, setIsDragging ] = useState( false );
 	const [ gap, setGap ] = useState( 20 );
-	// const [ gridSteps, setGridSteps ] = useState( [ 1 ] );
+	const [ gridSteps, setGridSteps ] = useState( [ 1 ] );
 	const [ __updateCount, setUpdateCount ] = useState( 0 );
+	const ghostRef = useRef( false );
 	const initialRenderRef = useRef( false );
-	const resizeTimeout = useRef();
+	const baseId = useInstanceId( CSSGridExample, 'column-resizer' );
 
 	const gapRef = useRef( gap );
 
@@ -69,38 +56,43 @@ const CSSGridExample = () => {
 
 		const containerWidth = containerNode.current.getBoundingClientRect()
 			.width;
-		const gapOffset = gap * ( GRID_SIZE - 1 );
-		const gaplessContainerWidth = containerWidth - gapOffset;
-		const columnWidth = gaplessContainerWidth / GRID_SIZE;
+		const columnWidth = containerWidth / GRID_SIZE;
 		const steps = [ ...Array( GRID_SIZE ) ].map( ( v, i ) => {
-			return parseFloat(
-				( columnWidth * ( i + 1 ) + gap * i ).toFixed( 2 )
-			);
+			return parseFloat( ( columnWidth * ( i + 1 ) ).toFixed( 2 ) );
 		} );
 		return steps;
 	};
 
-	const gridSteps = getGridSteps();
-	const grid = [ gridSteps[ 0 ], 1 ];
+	const grid = [ isGrid ? gridSteps[ 0 ] : 1, 1 ];
 	const minWidth = gridSteps[ 0 ];
 
-	const handleOnResize = () => {
+	const handleOnResize = ( event, direction, element ) => {
 		const nodes = [
 			...containerNode.current.querySelectorAll(
 				'.components-resizable-box__container'
 			),
 		];
-		nodes.forEach( ( n ) => {
-			const w = getNearestValue(
-				getGridSteps(),
-				n.getBoundingClientRect().width
-			);
-			n.style.width = `${ w }px`;
-		} );
+		const nodeIndex = nodes.indexOf( element );
+		const ghostNodes = [ ...ghostRef.current.children ];
+		const targetGhostNode = ghostNodes[ nodeIndex ];
+		const ghostNodeContainerWidth = ghostRef.current.getBoundingClientRect()
+			.width;
 
-		const nextColumnWidths = nodes.map( ( n ) => {
+		if ( ! targetGhostNode ) return;
+
+		let nextWidth = element.style.width;
+		targetGhostNode.style.width = nextWidth;
+
+		const nextColumnWidths = ghostNodes.map( ( n, index ) => {
 			const w = n.getBoundingClientRect().width;
-			return `${ w }px`;
+			nextWidth = isGrid
+				? getGridWidthValue( { gridSteps, width: w } )
+				: getPercentageWidthValue( {
+						containerWidth: ghostNodeContainerWidth,
+						width: w,
+				  } );
+			ghostNodes[ index ].style.width = nextWidth;
+			return nextWidth;
 		} );
 
 		setColumnWidths( nextColumnWidths );
@@ -109,39 +101,42 @@ const CSSGridExample = () => {
 
 	useEffect( () => {
 		if ( gap !== gapRef.current ) {
-			handleOnResize();
+			setGridSteps( getGridSteps() );
+			setUpdateCount( __updateCount + 1 );
 			gapRef.current = gap;
 		}
 	}, [ gap ] );
 
 	useEffect( () => {
 		const debouncedResize = () => {
-			if ( resizeTimeout.current ) {
-				window.clearTimeout( resizeTimeout.current );
-			}
-			resizeTimeout.current = setTimeout( handleOnResize, 100 );
+			setGridSteps( getGridSteps() );
 		};
 		window.addEventListener( 'resize', debouncedResize );
 		return () => {
 			window.removeEventListener( 'resize', debouncedResize );
 		};
-	}, [ handleOnResize ] );
+	}, [] );
 
 	useEffect( () => {
-		if ( gridSteps.length === GRID_SIZE && ! initialRenderRef.current ) {
-			handleOnResize();
+		if ( gridSteps.length !== GRID_SIZE && ! initialRenderRef.current ) {
+			setGridSteps( getGridSteps() );
 			initialRenderRef.current = true;
 		}
-	}, [ gridSteps, handleOnResize ] );
+	}, [ gridSteps ] );
 
 	const contextProps = {
-		isGrid: true,
+		isGrid,
 		grid,
 		gap,
+		isDragging,
+		setIsDragging,
 		gridSteps,
 		minWidth,
+		ghostRef,
+		columnWidths,
 		onResize: handleOnResize,
 		setGridSteps: () => {},
+		baseId,
 		__updateCount,
 	};
 
@@ -163,12 +158,13 @@ const CSSGridExample = () => {
 			<br />
 			<br />
 			<ColumnResizerContext.Provider value={ contextProps }>
+				<GhostColumns nodeRef={ ghostRef } />
 				<CSSGridContainerView>
 					<ColumnGridVisualizer />
-					<GridTestView ref={ containerNode }>
+					<TestContainerView ref={ containerNode }>
 						<ColumnWrapper width={ columnWidths[ 0 ] } isFirst>
 							<BoxView>
-								<p contentEditable="true">
+								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -182,11 +178,11 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 1 ] }>
 							<BoxView>
-								<h1 contentEditable="true">
+								<h1>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit.
 								</h1>
-								<p contentEditable="true">
+								<p>
 									Aliquam et porttitor ex. Aenean sed ipsum
 									sit amet justo blandit rhoncus ac vitae
 									eros. Nulla congue semper enim sed euismod.
@@ -198,7 +194,7 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 2 ] }>
 							<BoxView>
-								<p contentEditable="true">
+								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -208,13 +204,13 @@ const CSSGridExample = () => {
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 3 ] } isLast>
 							<BoxView>
-								<h2 contentEditable="true">
+								<h2>
 									Nulla congue semper enim sed euismod. Donec
 									sed faucibus lacus, vel consectetur lorem.
 									Vivamus in pellentesque nisi. Sed hendrerit
 									tempor volutpat.
 								</h2>
-								<p contentEditable="true">
+								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
 									Aenean sed ipsum sit amet justo blandit
@@ -226,7 +222,7 @@ const CSSGridExample = () => {
 								</p>
 							</BoxView>
 						</ColumnWrapper>
-					</GridTestView>
+					</TestContainerView>
 				</CSSGridContainerView>
 			</ColumnResizerContext.Provider>
 		</>
@@ -234,7 +230,13 @@ const CSSGridExample = () => {
 };
 
 const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
-	const { gap, minWidth, grid, onResize } = useColumnResizerContext();
+	const {
+		gap,
+		grid,
+		onResize,
+		isDragging,
+		setIsDragging,
+	} = useColumnResizerContext();
 	const lastDelta = useRef();
 	const enable = {
 		top: false,
@@ -249,58 +251,72 @@ const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
 
 	const style = {
 		flex: isLast ? 1 : null,
-		marginLeft: isFirst ? 0 : gap,
+		paddingLeft: isFirst ? 0 : gap / 2,
+		paddingRight: isLast ? 0 : gap / 2,
 		willChange: 'width',
+		userSelect: isDragging ? 'none' : null,
 	};
 
 	return (
 		<ResizableBox
 			size={ { width } }
-			onResizeStart={ ( event, direction, element ) => {
-				element.setAttribute(
-					'data-column-width',
-					`${ element.clientWidth }`
-				);
+			onResizeStart={ () => {
+				setIsDragging( true );
 			} }
 			onResize={ ( event, direction, element, delta ) => {
 				if ( lastDelta.current === delta.width ) return;
 				lastDelta.current = delta.width;
 
-				const startingWidth = parseFloat(
-					element.getAttribute( 'data-column-width' )
-				);
-				const currentWidth = element.clientWidth;
-
-				if ( startingWidth === currentWidth ) return;
-
-				onResize();
+				onResize( event, direction, element, delta );
+			} }
+			onResizeStop={ () => {
+				setIsDragging( false );
 			} }
 			enable={ enable }
 			style={ style }
 			grid={ grid }
-			minWidth={ minWidth }
+			minWidth="8.3334%"
 		>
-			<ResizableVisualizer />
+			<ResizableVisualizer width={ width } />
 			{ children }
 		</ResizableBox>
 	);
 };
 
-function ResizableVisualizer() {
+const GhostColumns = ( { nodeRef, show = false } ) => {
+	const { columnWidths } = useColumnResizerContext();
+
+	return (
+		<GhostContainerView
+			ref={ nodeRef }
+			style={ { overflow: 'hidden', height: show ? null : 0 } }
+		>
+			{ columnWidths.map( ( width, i ) => (
+				<GhostColumnView key={ i } style={ { width } }>
+					<span role="img" aria-label="ghost">
+						👻
+					</span>
+				</GhostColumnView>
+			) ) }
+		</GhostContainerView>
+	);
+};
+
+function ResizableVisualizer( { width } ) {
 	const nodeRef = useRef();
 	const { __updateCount, gridSteps, isGrid } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
 	const getWidthLabel = () => {
-		const width = nodeRef?.current?.clientWidth;
-		if ( ! width ) return;
+		const w = nodeRef?.current?.clientWidth;
+		if ( ! w ) return;
 
 		return isGrid
 			? getColumnValue( {
 					gridSteps,
-					width,
+					width: w,
 			  } )
-			: Math.round( width );
+			: width;
 	};
 
 	const [ widthLabel, setWidthLabel ] = useState();
@@ -317,23 +333,16 @@ function ResizableVisualizer() {
 }
 
 function ColumnGridVisualizer() {
-	const { gap, __updateCount } = useColumnResizerContext();
+	const { isGrid, gap, __updateCount } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
+	if ( ! isGrid ) return null;
+
 	return (
-		<VisualizerGridView isActive={ isActive } style={ { gridGap: gap } }>
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
-			<VisualizerGridColumnView />
+		<VisualizerGridView isActive={ isActive }>
+			{ [ ...Array( GRID_SIZE ) ].map( ( n, i ) => (
+				<VisualizerGridColumnView key={ i } gap={ gap } />
+			) ) }
 		</VisualizerGridView>
 	);
 }
@@ -388,7 +397,7 @@ function getColumnValue( { gridSteps, width } ) {
 	return gridSteps.indexOf( columnValue ) + 1;
 }
 
-export function getGridWidthValue( { gridSteps, width } ) {
+function getGridWidthValue( { gridSteps, width } ) {
 	const columnValue = getColumnValue( { gridSteps, width } );
 
 	let widthValue = ( columnValue / GRID_SIZE ) * 100;
@@ -397,12 +406,36 @@ export function getGridWidthValue( { gridSteps, width } ) {
 	return widthValue;
 }
 
+function getPercentageWidthValue( { containerWidth, width } ) {
+	const currentContainerWidth = parseFloat( containerWidth );
+	const currentWidth = parseFloat( width );
+	const percentage = ( currentWidth / currentContainerWidth ) * 100;
+
+	return `${ percentage.toFixed( 2 ) }%`;
+}
+
 const BoxView = styled.div`
 	box-sizing: border-box;
 
 	img {
 		max-width: 100%;
 		height: auto;
+	}
+`;
+
+const CSSGridContainerView = styled.div`
+	width: 100%;
+	position: relative;
+
+	.components-resizable-box__handle {
+		opacity: 0;
+		transition: opacity 100ms linear;
+		will-change: opacity;
+
+		&:hover,
+		&:active {
+			opacity: 1;
+		}
 	}
 `;
 
@@ -435,47 +468,49 @@ const VisualizerGridColumnView = styled.div`
 	border-right: 1px solid rgba( 80, 160, 255, 0.2 );
 	pointer-events: none;
 	filter: brightness( 1 );
+
+	${( { gap } ) => `
+		margin: 0 ${ gap / 2 }px;
+	`}
+
+	&:first-of-type {
+		margin-left: 0;
+	}
+	&:last-of-type {
+		margin-right: 0;
+	}
 `;
 
 /**
  * Trying it out using CSS Grid
  */
 
-const GridTestView = styled.div`
+const TestContainerView = styled.div`
 	box-sizing: border-box;
 	display: flex;
 `;
 
-// const ColumnSizeVisualizerView = styled.div`
-// 	display: flex;
-// 	align-items: center;
-// 	justify-content: center;
-// 	position: absolute;
-// 	top: 0;
-// 	bottom: 0;
-// 	left: 0;
-// 	right: 0;
-// 	opacity: 0;
-// 	pointer-events: none;
-// 	transition: opacity 100ms linear;
-// 	z-index: 10;
-// 	background: rgba( 0, 0, 0, 0.04 );
+const GhostContainerView = styled.div`
+	box-sizing: border-box;
+	display: flex;
+`;
 
-// 	${( { isActive } ) =>
-// 		isActive &&
-// 		`
-// 		opacity: 1;
-// 	`}
-// `;
+const GhostColumnView = styled.div`
+	box-sizing: border-box;
+	background: #f2f2f2;
+	text-align: center;
+	padding: 20px;
+	border: 1px solid #ddd;
+	border-top: none;
+	border-bottom: none;
+	min-width: 8.33334%;
+	max-width: 91.6667%;
 
-// const ColumnSizeVisualizerLabelView = styled.div`
-// 	font-size: 64px;
-// 	line-height: 1;
-// 	color: white;
-// 	text-align: center;
-// 	font-weight: 500;
-// 	text-shadow: 0 2px 4px rgba( 0, 0, 0, 0.2 ), 0 4px 10px rgba( 0, 0, 0, 0.2 );
-// `;
+	&:last-of-type {
+		flex: 1;
+		width: auto;
+	}
+`;
 
 const VisualizerView = styled.div`
 	position: absolute;
