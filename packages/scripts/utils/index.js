@@ -16,6 +16,7 @@ const {
 	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
+	hasPostCssConfig,
 } = require( './config' );
 const {
 	buildWordPress,
@@ -41,6 +42,7 @@ module.exports = {
 	hasJestConfig,
 	hasPackageProp,
 	hasPrettierConfig,
+	hasPostCssConfig,
 	hasProjectFile,
 	downloadWordPressZip,
 	mergeYAMLConfigs,

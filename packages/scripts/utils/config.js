@@ -72,6 +72,8 @@ const hasWebpackConfig = () =>
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
+const hasPostCssConfig = () => hasProjectFile( 'postcss.config.js' );
+
 /**
  * Converts CLI arguments to the format which webpack understands.
  *
@@ -132,4 +134,5 @@ module.exports = {
 	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPrettierConfig,
+	hasPostCssConfig,
 };
