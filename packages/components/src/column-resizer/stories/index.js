@@ -441,7 +441,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 		return isGrid
 			? getColumnValue( {
 					gridSteps,
-					width: w,
+					width: w + gap,
 			  } )
 			: width;
 	};
