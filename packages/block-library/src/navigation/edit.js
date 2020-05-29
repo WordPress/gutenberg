@@ -223,50 +223,34 @@ function Navigation( {
 				'Create a Navigation from all existing pages, or create an empty one.'
 		  );
 
-	const menuOptions =
-		!! menus && menus.length
+	const menuOptions = [
+		{
+			id: 'placeholder',
+			name: __( 'Select where to start from…' ),
+		},
+		...( hasMenus
 			? [
-					{
-						id: 'placeholder',
-						name: __( 'Select where to start from…' ),
-					},
 					...menus,
 					{
 						id: 'divider',
 						name: '------------------',
 						disabled: true,
 					},
-					{
-						id: CREATE_EMPTY_OPTION_VALUE,
-						name: __( 'Create empty menu' ),
-					},
-					...( hasPages
-						? [
-								{
-									id: CREATE_FROM_PAGES_OPTION_VALUE,
-									name: __( 'New from all top-level pages' ),
-								},
-						  ]
-						: [] ),
 			  ]
-			: [
+			: [] ),
+		{
+			id: CREATE_EMPTY_OPTION_VALUE,
+			name: __( 'Create empty menu' ),
+		},
+		...( hasPages
+			? [
 					{
-						id: 'placeholder',
-						name: __( 'Select where to start from…' ),
+						id: CREATE_FROM_PAGES_OPTION_VALUE,
+						name: __( 'New from all top-level pages' ),
 					},
-					{
-						id: CREATE_EMPTY_OPTION_VALUE,
-						name: __( 'Create empty menu' ),
-					},
-					...( hasPages
-						? [
-								{
-									id: CREATE_FROM_PAGES_OPTION_VALUE,
-									name: __( 'New from all top-level pages' ),
-								},
-						  ]
-						: [] ),
-			  ];
+			  ]
+			: [] ),
+	];
 
 	// If we don't have existing items then show the Placeholder
 	if ( ! hasExistingNavItems ) {
