@@ -206,6 +206,14 @@ class WP_Block {
 			$post          = $global_post;
 		}
 
+		if ( ! empty( $this->block_type->script ) ) {
+			wp_enqueue_script( $this->block_type->script );
+		}
+
+		if ( ! empty( $this->block_type->style ) ) {
+			wp_enqueue_style( $this->block_type->style );
+		}
+
 		/** This filter is documented in src/wp-includes/blocks.php */
 		return apply_filters( 'render_block', $block_content, $this->parsed_block );
 	}

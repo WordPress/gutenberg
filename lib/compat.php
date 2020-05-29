@@ -291,3 +291,12 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+/**
+ * Avoid enqueueing block assets of all registered blocks for all posts, instead
+ * deferring to block render mechanics to enqueue scripts, thereby ensuring only
+ * blocks of the content have their assets enqueued.
+ *
+ * @see WP_Block::render
+ */
+remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
