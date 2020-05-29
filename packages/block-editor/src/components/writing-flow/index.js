@@ -314,7 +314,7 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
-			setBlockMovingMode( '' );
+			setBlockMovingMode( null );
 		} else if (
 			isNavigationMode &&
 			isBlockMovingMode() &&
@@ -478,7 +478,7 @@ export default function WritingFlow( { children } ) {
 					destinationBlockIndex
 				);
 				selectBlock( startingBlockClientId );
-				setBlockMovingMode( '' );
+				setBlockMovingMode( null );
 			}
 			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 				if ( focusedBlockUid ) {

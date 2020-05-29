@@ -1264,7 +1264,7 @@ Generator that triggers an action used to enable or disable the block moving mod
 
 _Parameters_
 
--   _isBlockMovingMode_ `string`: Enable/Disable block moving mode.
+-   _isBlockMovingMode_ `(string|null)`: Enable/Disable block moving mode.
 
 <a name="setHasControlledInnerBlocks" href="#setHasControlledInnerBlocks">#</a> **setHasControlledInnerBlocks**
 

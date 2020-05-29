@@ -887,9 +887,9 @@ export function* setNavigationMode( isNavigationMode = true ) {
 /**
  * Generator that triggers an action used to enable or disable the block moving mode.
  *
- * @param {string} isBlockMovingMode Enable/Disable block moving mode.
+ * @param {string|null} isBlockMovingMode Enable/Disable block moving mode.
  */
-export function* setBlockMovingMode( isBlockMovingMode = '' ) {
+export function* setBlockMovingMode( isBlockMovingMode = null ) {
 	yield {
 		type: 'SET_BLOCK_MOVING_MODE',
 		isBlockMovingMode,

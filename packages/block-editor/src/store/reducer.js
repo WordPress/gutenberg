@@ -1534,12 +1534,12 @@ export function isNavigationMode( state = false, action ) {
 /**
  * Reducer returning whether the block moving mode is enabled or not.
  *
- * @param {string} state  Current state.
+ * @param {string|null} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|null} Updated state.
  */
-export function isBlockMovingMode( state = '', action ) {
+export function isBlockMovingMode( state = null, action ) {
 	// Let inserting block always trigger Edit mode.
 
 	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
