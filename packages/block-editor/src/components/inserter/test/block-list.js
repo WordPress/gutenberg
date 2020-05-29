@@ -89,20 +89,6 @@ describe( 'InserterMenu', () => {
 		assertNoResultsMessageToBePresent( container );
 	} );
 
-	it( 'should show only high utility items in the suggested tab', () => {
-		const { container } = render( <InserterBlockList /> );
-		const firstPanel = container.querySelector(
-			'.block-editor-inserter__panel-content'
-		);
-		const visibleBlocks = firstPanel.querySelectorAll(
-			'.block-editor-block-types-list__item-title'
-		);
-		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks[ 0 ].textContent ).toEqual( 'Text' );
-		expect( visibleBlocks[ 1 ].textContent ).toEqual( 'Advanced Text' );
-		expect( visibleBlocks[ 2 ].textContent ).toEqual( 'Some Other Block' );
-	} );
-
 	it( 'should show items from the embed category in the embed tab', () => {
 		const { container } = initializeAllClosedMenuState();
 		const embedTabContent = container.querySelectorAll(

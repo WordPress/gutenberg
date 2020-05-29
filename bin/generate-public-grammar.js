@@ -1,5 +1,13 @@
 #!/usr/bin/env node
+
+/**
+ * Internal dependencies
+ */
 const parser = require( '../node_modules/pegjs/lib/parser.js' );
+
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const grammarSource = fs.readFileSync(

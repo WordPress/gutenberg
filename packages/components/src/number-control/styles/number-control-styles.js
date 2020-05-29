@@ -21,5 +21,5 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
 };
 
 export const Input = styled( InputControl )`
-	${htmlArrowStyles};
+	${ htmlArrowStyles };
 `;

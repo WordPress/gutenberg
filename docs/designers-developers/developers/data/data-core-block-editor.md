@@ -383,14 +383,6 @@ items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
 Each item object contains what's necessary to display a button in the
 inserter and handle its selection.
 
-The 'utility' property indicates how useful we think an item will be to the
-user. There are 4 levels of utility:
-
-1.  Blocks that are contextually useful (utility = 3)
-2.  Blocks that have been previously inserted (utility = 2)
-3.  Blocks that are in the common category (utility = 1)
-4.  All other blocks (utility = 0)
-
 The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>)
 that combines block usage frequenty and recency.
 
@@ -419,7 +411,6 @@ _Properties_
 -   _category_ `string`: Block category that the item is associated with.
 -   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
--   _utility_ `number`: How useful we think this item is, between 0 and 3.
 -   _frecency_ `number`: Hueristic that combines frequency and recency.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**

@@ -20,9 +20,7 @@ function BlockNavigation( {
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
-	__experimentalWithBlockNavigationSlots,
-	__experimentalWithEllipsisMenu,
-	__experimentalWithEllipsisMenuMinLevel,
+	__experimentalFeatures,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -43,15 +41,7 @@ function BlockNavigation( {
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithEllipsisMenu={
-						__experimentalWithEllipsisMenu
-					}
-					__experimentalWithEllipsisMenuMinLevel={
-						__experimentalWithEllipsisMenuMinLevel
-					}
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
+					__experimentalFeatures={ __experimentalFeatures }
 					showNestedBlocks
 				/>
 			) }
@@ -60,15 +50,7 @@ function BlockNavigation( {
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
-					__experimentalWithEllipsisMenu={
-						__experimentalWithEllipsisMenu
-					}
-					__experimentalWithEllipsisMenuMinLevel={
-						__experimentalWithEllipsisMenuMinLevel
-					}
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
+					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }
 		</div>

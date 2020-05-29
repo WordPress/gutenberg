@@ -370,10 +370,7 @@ class MediaUpload extends Component {
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
-		const attachment = this.frame
-			.state()
-			.get( 'selection' )
-			.toJSON();
+		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect( multiple ? attachment : attachment[ 0 ] );
 	}
 

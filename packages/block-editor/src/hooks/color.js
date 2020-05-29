@@ -32,9 +32,13 @@ import ColorPanel from './color-panel';
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
 
 const hasColorSupport = ( blockType ) =>
-	hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 const hasGradientSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
