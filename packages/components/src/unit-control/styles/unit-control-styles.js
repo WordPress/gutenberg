@@ -95,8 +95,8 @@ const baseUnitLabelStyles = ( props ) => {
 
 const unitLabelPaddingStyles = ( { size } ) => {
 	const sizes = {
-		default: '6px 2px',
-		small: '4px 2px',
+		default: '10px 2px',
+		small: '8px 2px',
 	};
 
 	return css( { padding: sizes[ size ] } );

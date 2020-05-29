@@ -21,6 +21,7 @@ import {
  */
 import ResizableBox from '../../resizable-box';
 import RangeControl from '../../range-control';
+import UnitControl from '../../unit-control';
 import { color } from '../../utils/style-mixins';
 
 export default { title: 'Components/ColumnResizer' };
@@ -123,7 +124,7 @@ const CSSGridExample = () => {
 			incrementUpdateCount();
 			gapRef.current = gap;
 		}
-	}, [ gap ] );
+	}, [ gap, incrementUpdateCount ] );
 
 	useEffect( () => {
 		const debouncedResize = () => {
@@ -147,6 +148,11 @@ const CSSGridExample = () => {
 			handleOnResize();
 		}
 	}, [ isGrid, handleOnResize ] );
+
+	useEffect( () => {
+		// eslint-disable-next-line no-console
+		console.log( columnWidths );
+	}, [ columnWidths ] );
 
 	const toggleGrid = () => {
 		setIsGrid( ! isGrid );
@@ -176,6 +182,26 @@ const CSSGridExample = () => {
 			</button>
 			<hr />
 			<br />
+			<div>Column Widths</div>
+			<div style={ { display: 'flex' } }>
+				{ columnWidths.map( ( w, i ) => (
+					<UnitControl
+						key={ i }
+						value={ w }
+						units={ [ { value: '%' } ] }
+						min="8.33334"
+						max="91.6667"
+						onChange={ ( next ) => {
+							const nextColumns = [ ...columnWidths ];
+							nextColumns[ i ] = next;
+							setIsGrid( false );
+							setColumnWidths( nextColumns );
+						} }
+					/>
+				) ) }
+			</div>
+			<br />
+			<br />
 			<RangeControl
 				label="Gap"
 				value={ gap }
@@ -185,6 +211,8 @@ const CSSGridExample = () => {
 			/>
 			<br />
 			<br />
+			<hr />
+			<br />
 			<br />
 			<ColumnResizerContext.Provider value={ contextProps }>
 				<GhostColumns nodeRef={ ghostRef } />
@@ -192,7 +220,7 @@ const CSSGridExample = () => {
 					<ColumnGridVisualizer />
 					<TestContainerView ref={ containerNode }>
 						<ColumnWrapper width={ columnWidths[ 0 ] } isFirst>
-							<BoxView>
+							<BoxView contentEditable="true">
 								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
@@ -206,7 +234,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 1 ] }>
-							<BoxView>
+							<BoxView contentEditable="true">
 								<h1>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit.
@@ -222,7 +250,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 2 ] }>
-							<BoxView>
+							<BoxView contentEditable="true">
 								<p>
 									Lorem ipsum dolor sit amet, consectetur
 									adipiscing elit. Aliquam et porttitor ex.
@@ -232,7 +260,7 @@ const CSSGridExample = () => {
 							</BoxView>
 						</ColumnWrapper>
 						<ColumnWrapper width={ columnWidths[ 3 ] } isLast>
-							<BoxView>
+							<BoxView contentEditable="true">
 								<h2>
 									Nulla congue semper enim sed euismod. Donec
 									sed faucibus lacus, vel consectetur lorem.
@@ -456,6 +484,17 @@ const CSSGridContainerView = styled.div`
 	width: 100%;
 	position: relative;
 
+	.components-resizable-box__container {
+		border: 1px dashed transparent;
+		border-top: 0;
+		border-bottom: 0;
+		transition: border-color 100ms linear;
+
+		&:hover {
+			border-color: #ddd;
+		}
+	}
+
 	.components-resizable-box__handle {
 		opacity: 0;
 		transition: opacity 100ms linear;
@@ -492,9 +531,9 @@ const VisualizerGridView = styled.div`
 const VisualizerGridColumnView = styled.div`
 	box-sizing: border-box;
 	height: 100%;
-	background: rgba( 80, 160, 255, 0.06 );
-	border-left: 1px solid rgba( 80, 160, 255, 0.2 );
-	border-right: 1px solid rgba( 80, 160, 255, 0.2 );
+	background: rgba( 80, 160, 255, 0.04 );
+	border-left: 1px solid rgba( 80, 160, 255, 0.1 );
+	border-right: 1px solid rgba( 80, 160, 255, 0.1 );
 	pointer-events: none;
 	filter: brightness( 1 );
 
