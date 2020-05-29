@@ -235,16 +235,7 @@ function Navigation( {
 			id: 'placeholder',
 			name: __( 'Select where to start from…' ),
 		},
-		...( hasMenus
-			? [
-					...menus,
-					{
-						id: 'divider',
-						name: '------------------',
-						disabled: true,
-					},
-			  ]
-			: [] ),
+		...( hasMenus ? menus : [] ),
 		{
 			id: CREATE_EMPTY_OPTION_VALUE,
 			name: __( 'Create empty menu' ),
@@ -275,7 +266,12 @@ function Navigation( {
 					>
 						<>
 							<CustomSelectControl
-								label={ __( 'Create from existing Menu' ) }
+								className={ classnames( {
+									'has-menus': hasMenus,
+								} ) }
+								label={ __(
+									'Select to create from Pages, existing Menu or empty'
+								) }
 								hideLabelFromVision={ true }
 								value={
 									selectedDropDownOption ||
