@@ -245,6 +245,10 @@ async function runAxeTestsForBlockEditor() {
 			'.edit-post-layout__metaboxes',
 			// Ignores elements created by TinyMCE.
 			'.mce-container',
+			// Ignores elements within the media modal.
+			// Related: https://core.trac.wordpress.org/ticket/50273
+			'.media-modal',
+			'.media-modal .attachment',
 			// These properties were not included in the 1.1 spec
 			// through error, they should be allowed on role="row":
 			// https://github.com/w3c/aria/issues/558
