@@ -173,7 +173,8 @@
 			content: none;
 		}
 	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
-		outline: 1px dashed $blue-medium-focus;
+		box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+		outline: $border-width-focus solid transparent;
 	}
 
 	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
