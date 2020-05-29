@@ -300,9 +300,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		setAttributes( newAttributes ) {
+		setAttributes( newAttributes, options = {} ) {
 			const { clientId } = ownProps;
-			updateBlockAttributes( clientId, newAttributes );
+
+			if ( options.silent ) {
+				const attributes = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlockAttributes( clientId );
+
+				for ( const name in newAttributes ) {
+					attributes[ name ] = newAttributes[ name ];
+				}
+			} else {
+				updateBlockAttributes( clientId, newAttributes );
+			}
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;

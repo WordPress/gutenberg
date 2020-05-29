@@ -94,6 +94,11 @@ function getFilename( url ) {
 	}
 }
 
+export function useForceUpdate() {
+	const [ , setState ] = useState();
+	return () => setState( ( value ) => ! value );
+}
+
 export function ImageEdit( {
 	attributes: {
 		url = '',
@@ -119,6 +124,7 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 } ) {
+	const forceUpdate = useForceUpdate();
 	const ref = useRef();
 	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
 		( select ) => {
@@ -166,6 +172,9 @@ export function ImageEdit( {
 			return;
 		}
 
+		onSelectImage.count++;
+
+		const options = {};
 		let mediaAttributes = pickRelevantMediaFiles( media );
 
 		// If the current image is temporary but an alt text was meanwhile
@@ -208,11 +217,24 @@ export function ImageEdit( {
 			mediaAttributes.href = media.link;
 		}
 
-		setAttributes( {
-			...mediaAttributes,
-			...additionalAttributes,
-		} );
+		if ( onSelectImage.count > 1 ) {
+			options.silent = true;
+		}
+
+		setAttributes(
+			{
+				...mediaAttributes,
+				...additionalAttributes,
+			},
+			options
+		);
+
+		if ( onSelectImage.count > 1 ) {
+			forceUpdate();
+		}
 	}
+
+	onSelectImage.count = 0;
 
 	function onSelectURL( newURL ) {
 		if ( newURL !== url ) {
