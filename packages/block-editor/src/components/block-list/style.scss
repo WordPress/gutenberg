@@ -486,8 +486,14 @@
 	background-color: $white;
 
 	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
+	.block-editor-block-toolbar .components-toolbar,
+	.block-editor-block-toolbar__mover-switcher-container {
 		border-right-color: $dark-gray-primary;
+	}
+
+	.block-editor-block-toolbar__mover-switcher-container {
+		border-right-style: solid;
+		border-right-width: $border-width;
 	}
 
 	// Adjust the mover control to fit as a unit next to the block switcher.
