@@ -172,9 +172,9 @@ function gutenberg_get_post_from_context() {
  * Filters default block categories to substitute legacy category names with new
  * block categories.
  *
- * This can be removed when plugin support requires WordPress 5.4.0+.
+ * This can be removed when plugin support requires WordPress 5.5.0+.
  *
- * @see Trac Ticket TBD
+ * @see https://core.trac.wordpress.org/ticket/50278
  *
  * @param array[] $default_categories Array of block categories.
  *
