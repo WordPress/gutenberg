@@ -164,6 +164,9 @@ function Navigation( {
 		return menuBlocksTree;
 	}, [ menuItems ] );
 
+	const hasPages = !! ( hasResolvedPages && pages?.length );
+	const hasMenus = !! ( hasResolvedMenus && menus?.length );
+
 	//
 	// HANDLERS
 	//
@@ -187,25 +190,32 @@ function Navigation( {
 		selectBlock( clientId );
 	}
 
-	function handleCreateFromMenu() {
-		// Create an empty Nav Block if:
-		// i. the selected Menu has no items
-		// ii. the selected Menu is the "CREATE_EMPTY" placeholder option
-
-		if (
-			( selectedMenu && selectedMenu === CREATE_EMPTY_OPTION_VALUE ) ||
-			! navLinkBlocksFromMenuItems ||
-			! navLinkBlocksFromMenuItems.length
-		) {
-			return handleCreateEmpty();
-		}
-
+	function handleCreateFromExistingMenu() {
 		updateNavItemBlocks( navLinkBlocksFromMenuItems );
 		selectBlock( clientId );
 	}
 
-	const hasPages = hasResolvedPages && pages && pages.length;
-	const hasMenus = hasResolvedMenus && menus && menus.length;
+	function handleCreate() {
+		const { key } = selectedMenu;
+
+		// Explicity request to create empty.
+		if ( key === CREATE_EMPTY_OPTION_VALUE ) {
+			return handleCreateEmpty();
+		}
+
+		// Create from Pages.
+		if ( hasPages && key === CREATE_FROM_PAGES_OPTION_VALUE ) {
+			return handleCreateFromExistingPages();
+		}
+
+		// Create from WP Menu (if exists and not empty).
+		if ( hasMenus && selectedMenu && navLinkBlocksFromMenuItems?.length ) {
+			return handleCreateFromExistingMenu();
+		}
+
+		// Default to empty menu
+		return handleCreateEmpty();
+	}
 
 	const placeHolderInstructionText = hasMenus
 		? __( 'Create a Navigation from all existing pages, or chose a Menu.' )
@@ -217,54 +227,48 @@ function Navigation( {
 		!! menus && menus.length
 			? [
 					{
-						key: '',
+						id: 'placeholder',
 						name: __( 'Select where to start from…' ),
 					},
 					...menus,
 					{
-						key: '',
+						id: 'divider',
 						name: '------------------',
 						disabled: true,
 					},
 					{
-						key: CREATE_EMPTY_OPTION_VALUE,
+						id: CREATE_EMPTY_OPTION_VALUE,
 						name: __( 'Create empty menu' ),
 					},
 					...( hasPages
 						? [
 								{
-									key: CREATE_FROM_PAGES_OPTION_VALUE,
-									name: __(
-										'Create from all top-level pages'
-									),
+									id: CREATE_FROM_PAGES_OPTION_VALUE,
+									name: __( 'New from all top-level pages' ),
 								},
 						  ]
 						: [] ),
 			  ]
 			: [
 					{
-						key: '',
+						id: 'placeholder',
 						name: __( 'Select where to start from…' ),
 					},
 					{
-						key: CREATE_EMPTY_OPTION_VALUE,
+						id: CREATE_EMPTY_OPTION_VALUE,
 						name: __( 'Create empty menu' ),
 					},
 					...( hasPages
 						? [
 								{
-									key: CREATE_FROM_PAGES_OPTION_VALUE,
-									name: __(
-										'Create from all top-level pages'
-									),
+									id: CREATE_FROM_PAGES_OPTION_VALUE,
+									name: __( 'New from all top-level pages' ),
 								},
 						  ]
 						: [] ),
 			  ];
 
-	// If we don't have existing items or the User hasn't
-	// indicated they want to automatically add top level Pages
-	// then show the Placeholder
+	// If we don't have existing items then show the Placeholder
 	if ( ! hasExistingNavItems ) {
 		return (
 			<Block.div>
@@ -278,59 +282,36 @@ function Navigation( {
 						ref={ ref }
 						className="wp-block-navigation-placeholder__actions"
 					>
-						<Button
-							isPrimary
-							className="wp-block-navigation-placeholder__button"
-							onClick={ handleCreateFromExistingPages }
-							disabled={ ! hasPages }
-						>
-							{ __( 'Create from all top-level pages' ) }
-						</Button>
-
-						{ !! hasMenus && (
-							<>
-								<CustomSelectControl
-									label={ __( 'Create from existing Menu' ) }
-									hideLabelFromVision={ true }
-									value={ selectedMenu || menuOptions[ 0 ] }
-									onChange={ ( { selectedItem } ) => {
-										setSelectedMenu( selectedItem );
-									} }
-									options={ menuOptions.map(
-										( mappedMenu ) => {
-											return {
-												name: mappedMenu.name,
-												key: mappedMenu.id,
-												disabled: mappedMenu.disabled,
-											};
-										}
-									) }
-								/>
-								<Button
-									isSecondary
-									className="wp-block-navigation-placeholder__button"
-									onClick={ () => {
-										if ( ! selectedMenu ) {
-											return;
-										}
-										handleCreateFromMenu();
-									} }
-									disabled={ ! selectedMenu }
-								>
-									{ __( 'Create' ) }
-								</Button>
-							</>
-						) }
-
-						{ ! hasMenus && (
+						<>
+							<CustomSelectControl
+								label={ __( 'Create from existing Menu' ) }
+								hideLabelFromVision={ true }
+								value={ selectedMenu || menuOptions[ 0 ] }
+								onChange={ ( value ) => {
+									setSelectedMenu( value.selectedItem );
+								} }
+								options={ menuOptions.map( ( mappedMenu ) => {
+									return {
+										name: mappedMenu.name,
+										key: mappedMenu.id,
+										disabled: mappedMenu.disabled,
+									};
+								} ) }
+							/>
 							<Button
-								isLink
+								isSecondary
 								className="wp-block-navigation-placeholder__button"
-								onClick={ handleCreateEmpty }
+								onClick={ () => {
+									if ( ! selectedMenu ) {
+										return;
+									}
+									handleCreate();
+								} }
+								disabled={ ! selectedMenu }
 							>
-								{ __( 'Create empty' ) }
+								{ __( 'Create' ) }
 							</Button>
-						) }
+						</>
 					</div>
 				</Placeholder>
 			</Block.div>
