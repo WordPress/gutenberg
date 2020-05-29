@@ -85,17 +85,17 @@
 		text-align: center;
 	}
 
-	.wp-block-template-part__placeholder-panel-header {
+	.wp-block-template-part__placeholder-panel-group-header {
 		display: inline-flex;
 		align-items: center;
 		padding: $grid-unit-20 $grid-unit-20 0;
 	}
 
-	.wp-block-template-part__placeholder-panel-content {
+	.wp-block-template-part__placeholder-panel-group-content {
 		padding: 0 $grid-unit-20;
 	}
 
-	.wp-block-template-part__placeholder-panel-title {
+	.wp-block-template-part__placeholder-panel-group-title {
 		color: $theme-color;
 		text-transform: uppercase;
 		font-size: 11px;

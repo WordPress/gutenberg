@@ -25,22 +25,6 @@ function TemplatePartPlaceholder() {
 	);
 }
 
-function InserterPanel( { title, icon, children } ) {
-	return (
-		<>
-			<div className="wp-block-template-part__placeholder-panel-header">
-				<span className="wp-block-template-part__placeholder-panel-title">
-					{ title }
-				</span>
-				<Icon icon={ icon } />
-			</div>
-			<div className="wp-block-template-part__placeholder-panel-content">
-				{ children }
-			</div>
-		</>
-	);
-}
-
 function TemplatePartItem( { templatePart, selectTemplate } ) {
 	const { id, slug, theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
@@ -84,6 +68,22 @@ function TemplatePartItem( { templatePart, selectTemplate } ) {
 	);
 }
 
+function PanelGroup( { title, icon, children } ) {
+	return (
+		<>
+			<div className="wp-block-template-part__placeholder-panel-group-header">
+				<span className="wp-block-template-part__placeholder-panel-group-title">
+					{ title }
+				</span>
+				<Icon icon={ icon } />
+			</div>
+			<div className="wp-block-template-part__placeholder-panel-group-content">
+				{ children }
+			</div>
+		</>
+	);
+}
+
 function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
@@ -94,7 +94,7 @@ function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 		<>
 			{ templatePartsByTheme.length &&
 				templatePartsByTheme.map( ( templatePartList ) => (
-					<InserterPanel
+					<PanelGroup
 						key={ templatePartList[ 0 ].meta.theme }
 						title={ templatePartList[ 0 ].meta.theme }
 					>
@@ -111,7 +111,7 @@ function TemplatePartsByTheme( { templateParts, selectTemplate } ) {
 								/>
 							);
 						} ) }
-					</InserterPanel>
+					</PanelGroup>
 				) ) }
 		</>
 	);
@@ -160,7 +160,7 @@ function TemplatePartSearchResults( {
 	return (
 		<>
 			{ filteredTPs.map( ( templatePart ) => (
-				<InserterPanel
+				<PanelGroup
 					key={ templatePart.id }
 					title={ templatePart.meta.theme }
 				>
@@ -173,7 +173,7 @@ function TemplatePartSearchResults( {
 					) : (
 						<TemplatePartPlaceholder key={ templatePart.id } />
 					) }
-				</InserterPanel>
+				</PanelGroup>
 			) ) }
 		</>
 	);
