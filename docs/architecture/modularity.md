@@ -26,30 +26,38 @@ Third-party developers can use these production packages in two different ways:
 
 *   If you're building a JavaScript application, website, page that runs outside of the context of WordPress, you can consume these packages like any other JavaScript package in the npm registry.
 
-    npm install @wordpress/components
+```
+npm install @wordpress/components
+```
 
-    import { Button } from '@wordpress/components';
+```js
+import { Button } from '@wordpress/components';
 
-    function MyApp() {
-       return (
-          <Button>Nice looking button</Button>
-       );
-    }
+function MyApp() {
+	return (
+		<Button>Nice looking button</Button>
+	);
+}
+```
 
 *   If you're building a plugin that runs on WordPress, you'd probably prefer consuming the package that ships with WordPress itself. This allows multiple plugins to reuse the same packages and avoid code duplication. In WordPress, these packages are available as WordPress scripts with a handle following this format `wp-package-name` (e.g. `wp-components`). Once you add the script to your own WordPress plugin scripts dependencies, the package will be available on the `wp` global variable.
 
-    // myplugin.php
-    // Exemple of script registration dependending on the "components" and "element packages.
-    wp_register_script( 'myscript', 'pathtomyscript.js', array ('wp-components', "wp-element" ) );
+```php
+// myplugin.php
+// Exemple of script registration dependending on the "components" and "element packages.
+wp_register_script( 'myscript', 'pathtomyscript.js', array ('wp-components', "wp-element" ) );
+```
 
-    // Using the package in your scripts
-    const { Button } = wp.components;
+```js
+// Using the package in your scripts
+const { Button } = wp.components;
 
-    function MyApp() {
-       return (
-          <Button>Nice looking button</Button>
-       );
-    }
+function MyApp() {
+	return (
+		<Button>Nice looking button</Button>
+	);
+}
+```
 
 Script dependencies definition can be a tedious task for developers. Mistakes and oversight can happen easily. If you want to learn how you can automate this task. Check the [@wordpress/scripts](https://developer.wordpress.org/block-editor/packages/packages-scripts/#build) and [@wordpress/dependency-extraction-webpack-plugin](https://developer.wordpress.org/block-editor/packages/packages-dependency-extraction-webpack-plugin/) documentation.
 
