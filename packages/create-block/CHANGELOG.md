@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Update `esnext` (default) template to integrate with CSS import support added to `@wordpress/scripts`.
+
 ## 0.13.0 (2020-05-28)
 
 ### Internal
@@ -16,7 +20,7 @@
 
 ### Enhancements
 
-- Update `esnext` template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code.
+- Update `esnext` (default) template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code ([#21750](https://github.com/WordPress/gutenberg/pull/21750)).
 
 ## 0.10.0 (2020-04-01)
 
