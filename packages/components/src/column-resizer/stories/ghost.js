@@ -35,6 +35,7 @@ const CSSGridContainerView = styled.div`
 	.components-resizable-box__handle {
 		opacity: 0;
 		transition: opacity 100ms linear;
+		will-change: opacity;
 
 		&:hover,
 		&:active {
@@ -46,8 +47,10 @@ const CSSGridContainerView = styled.div`
 const CSSGridExample = () => {
 	const [ isGrid, setIsGrid ] = useState( true );
 	const [ gap, setGap ] = useState( 20 );
-	const [ gridSteps, setGridSteps ] = useState( [ 1 ] );
+	// const [ gridSteps, setGridSteps ] = useState( [ 1 ] );
 	const [ __updateCount, setUpdateCount ] = useState( 0 );
+	const initialRenderRef = useRef( false );
+	const resizeTimeout = useRef();
 
 	const gapRef = useRef( gap );
 
@@ -59,6 +62,25 @@ const CSSGridExample = () => {
 		'25%',
 	] );
 
+	const getGridSteps = () => {
+		if ( ! containerNode.current ) {
+			return [ 1 ];
+		}
+
+		const containerWidth = containerNode.current.getBoundingClientRect()
+			.width;
+		const gapOffset = gap * ( GRID_SIZE - 1 );
+		const gaplessContainerWidth = containerWidth - gapOffset;
+		const columnWidth = gaplessContainerWidth / GRID_SIZE;
+		const steps = [ ...Array( GRID_SIZE ) ].map( ( v, i ) => {
+			return parseFloat(
+				( columnWidth * ( i + 1 ) + gap * i ).toFixed( 2 )
+			);
+		} );
+		return steps;
+	};
+
+	const gridSteps = getGridSteps();
 	const grid = [ gridSteps[ 0 ], 1 ];
 	const minWidth = gridSteps[ 0 ];
 
@@ -70,7 +92,7 @@ const CSSGridExample = () => {
 		];
 		nodes.forEach( ( n ) => {
 			const w = getNearestValue(
-				gridSteps,
+				getGridSteps(),
 				n.getBoundingClientRect().width
 			);
 			n.style.width = `${ w }px`;
@@ -93,11 +115,24 @@ const CSSGridExample = () => {
 	}, [ gap ] );
 
 	useEffect( () => {
-		window.addEventListener( 'resize', handleOnResize );
-		return () => {
-			window.removeEventListener( 'resize', handleOnResize );
+		const debouncedResize = () => {
+			if ( resizeTimeout.current ) {
+				window.clearTimeout( resizeTimeout.current );
+			}
+			resizeTimeout.current = setTimeout( handleOnResize, 100 );
 		};
-	} );
+		window.addEventListener( 'resize', debouncedResize );
+		return () => {
+			window.removeEventListener( 'resize', debouncedResize );
+		};
+	}, [ handleOnResize ] );
+
+	useEffect( () => {
+		if ( gridSteps.length === GRID_SIZE && ! initialRenderRef.current ) {
+			handleOnResize();
+			initialRenderRef.current = true;
+		}
+	}, [ gridSteps, handleOnResize ] );
 
 	const contextProps = {
 		isGrid: true,
@@ -106,7 +141,7 @@ const CSSGridExample = () => {
 		gridSteps,
 		minWidth,
 		onResize: handleOnResize,
-		setGridSteps,
+		setGridSteps: () => {},
 		__updateCount,
 	};
 
@@ -198,9 +233,9 @@ const CSSGridExample = () => {
 	);
 };
 
-const ColumnWrapper = ( { children, isLast, width } ) => {
+const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
 	const { gap, minWidth, grid, onResize } = useColumnResizerContext();
-
+	const lastDelta = useRef();
 	const enable = {
 		top: false,
 		right: ! isLast,
@@ -214,7 +249,8 @@ const ColumnWrapper = ( { children, isLast, width } ) => {
 
 	const style = {
 		flex: isLast ? 1 : null,
-		marginRight: isLast ? 0 : gap,
+		marginLeft: isFirst ? 0 : gap,
+		willChange: 'width',
 	};
 
 	return (
@@ -223,14 +259,17 @@ const ColumnWrapper = ( { children, isLast, width } ) => {
 			onResizeStart={ ( event, direction, element ) => {
 				element.setAttribute(
 					'data-column-width',
-					`${ element.getBoundingClientRect().width }`
+					`${ element.clientWidth }`
 				);
 			} }
-			onResize={ ( event, direction, element ) => {
+			onResize={ ( event, direction, element, delta ) => {
+				if ( lastDelta.current === delta.width ) return;
+				lastDelta.current = delta.width;
+
 				const startingWidth = parseFloat(
 					element.getAttribute( 'data-column-width' )
 				);
-				const currentWidth = element.getBoundingClientRect().width;
+				const currentWidth = element.clientWidth;
 
 				if ( startingWidth === currentWidth ) return;
 
@@ -278,36 +317,11 @@ function ResizableVisualizer() {
 }
 
 function ColumnGridVisualizer() {
-	const { gap, __updateCount, setGridSteps } = useColumnResizerContext();
+	const { gap, __updateCount } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
-	const node = useRef();
-
-	const updateGridSteps = () => {
-		const columnNodes = [ ...node.current.children ];
-		const nextGridSteps = columnNodes.map(
-			( n ) =>
-				n.getBoundingClientRect().left + n.getBoundingClientRect().width
-		);
-		setGridSteps( nextGridSteps );
-	};
-
-	useEffect( () => {
-		window.addEventListener( 'resize', updateGridSteps );
-		return () => {
-			window.removeEventListener( 'resize', updateGridSteps );
-		};
-	}, [] );
-
-	useEffect( () => {
-		updateGridSteps();
-	}, [ gap ] );
 
 	return (
-		<VisualizerGridView
-			ref={ node }
-			isActive={ isActive }
-			style={ { gridGap: gap } }
-		>
+		<VisualizerGridView isActive={ isActive } style={ { gridGap: gap } }>
 			<VisualizerGridColumnView />
 			<VisualizerGridColumnView />
 			<VisualizerGridColumnView />
@@ -398,6 +412,7 @@ const VisualizerGridView = styled.div`
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 100ms linear;
+	will-change: opacity;
 	z-index: 1000;
 
 	${( { isActive } ) =>
@@ -409,9 +424,10 @@ const VisualizerGridView = styled.div`
 
 const VisualizerGridColumnView = styled.div`
 	box-sizing: border-box;
-	border-left: 1px dashed rgba( 0, 0, 0, 0.2 );
-	border-right: 1px dashed rgba( 0, 0, 0, 0.2 );
 	height: 100%;
+	background: rgba( 80, 160, 255, 0.06 );
+	border-left: 1px solid rgba( 80, 160, 255, 0.2 );
+	border-right: 1px solid rgba( 80, 160, 255, 0.2 );
 	pointer-events: none;
 	filter: brightness( 1 );
 `;
@@ -468,6 +484,7 @@ const VisualizerView = styled.div`
 	height: 5px;
 	pointer-events: none;
 	transition: opacity 120ms linear;
+	will-change: opacity;
 	z-index: 1000;
 
 	${( { isActive } ) =>
