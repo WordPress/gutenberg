@@ -210,8 +210,20 @@ function gutenberg_replace_default_block_categories( $default_categories ) {
 
 	/*
 	 * At this point, `$substitution` should contain only the categories which
-	 * could not be in-place substituted with a default category, presumably due
-	 * to earlier filtering of the default categories. These should be appended.
+	 * could not be in-place substituted with a default category, likely in the
+	 * case that core has since been updated to use the default categories.
+	 * Check to verify they exist.
+	 */
+	$default_category_slugs = wp_list_pluck( $default_categories, 'slug' );
+	foreach ( $substitution as $i => $substitute_category ) {
+		if ( in_array( $substitute_category['slug'], $default_category_slugs, true ) ) {
+			unset( $substitution[ $i ] );
+		}
+	}
+
+	/*
+	 * Any substitutes remaining should be appended, as they are not yet
+	 * assigned in the default categories array.
 	 */
 	return array_merge( $default_categories, array_values( $substitution ) );
 }
