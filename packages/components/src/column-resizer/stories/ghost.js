@@ -334,7 +334,11 @@ const ColumnWrapper = ( { children, isFirst, isLast, width } ) => {
 			grid={ grid }
 			minWidth="8.3334%"
 		>
-			<ResizableVisualizer width={ width } />
+			<ResizableVisualizer
+				width={ width }
+				isFirst={ isFirst }
+				isLast={ isLast }
+			/>
 			{ children }
 		</ResizableBox>
 	);
@@ -359,9 +363,9 @@ const GhostColumns = ( { nodeRef, show = false } ) => {
 	);
 };
 
-function ResizableVisualizer( { width } ) {
+function ResizableVisualizer( { isFirst, isLast, width } ) {
 	const nodeRef = useRef();
-	const { __updateCount, gridSteps, isGrid } = useColumnResizerContext();
+	const { __updateCount, gridSteps, isGrid, gap } = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
 	const getWidthLabel = () => {
@@ -383,7 +387,14 @@ function ResizableVisualizer( { width } ) {
 	}, [ __updateCount ] );
 
 	return (
-		<VisualizerView ref={ nodeRef } isActive={ isActive }>
+		<VisualizerView
+			ref={ nodeRef }
+			isActive={ isActive }
+			style={ {
+				left: isFirst ? 0 : gap / 2,
+				right: isLast ? 0 : gap / 2,
+			} }
+		>
 			<VisualizerLabelView>{ widthLabel }</VisualizerLabelView>
 		</VisualizerView>
 	);
