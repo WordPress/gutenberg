@@ -21,6 +21,25 @@ const { hasBabelConfig } = require( '../utils' );
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
+const cssLoaders = [
+	{
+		loader: MiniCSSExtractPlugin.loader,
+	},
+	{
+		loader: require.resolve( 'css-loader' ),
+		options: {
+			sourceMap: ! isProduction,
+		},
+	},
+	{
+		loader: require.resolve( 'postcss-loader' ),
+		options: {
+			ident: 'postcss',
+			plugins: postcssPlugins,
+		},
+	},
+];
+
 const config = {
 	mode,
 	entry: {
@@ -88,32 +107,9 @@ const config = {
 				use: [ '@svgr/webpack', 'url-loader' ],
 			},
 			{
-				test: /\.(sc|sa|c)ss$/,
+				test: /\.css$/,
 				exclude: /node_modules/,
-				use: [
-					{
-						loader: MiniCSSExtractPlugin.loader,
-					},
-					{
-						loader: require.resolve( 'css-loader' ),
-						options: {
-							sourceMap: ! isProduction,
-						},
-					},
-					{
-						loader: require.resolve( 'postcss-loader' ),
-						options: {
-							ident: 'postcss',
-							plugins: postcssPlugins,
-						},
-					},
-					{
-						loader: require.resolve( 'sass-loader' ),
-						options: {
-							sourceMap: ! isProduction,
-						},
-					},
-				],
+				use: cssLoaders,
 			},
 		],
 	},
@@ -142,6 +138,33 @@ const config = {
 		children: false,
 	},
 };
+
+// Sass is a peer dependency.
+const hasSass = () => {
+	try {
+		require.resolve( 'sass-loader' );
+		require.resolve( 'node-sass' );
+		return true;
+	} catch ( e ) {
+		return false;
+	}
+};
+
+if ( hasSass() ) {
+	config.module.rules.push( {
+		test: /\.(sc|sa)ss$/,
+		exclude: /node_modules/,
+		use: [
+			...cssLoaders,
+			{
+				loader: require.resolve( 'sass-loader' ),
+				options: {
+					sourceMap: ! isProduction,
+				},
+			},
+		],
+	} );
+}
 
 if ( ! isProduction ) {
 	// WP_DEVTOOL global variable controls how source maps are generated.
