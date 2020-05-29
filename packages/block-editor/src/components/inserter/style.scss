@@ -247,8 +247,7 @@ $block-inserter-tabs-height: 44px;
 	flex-shrink: 0;
 }
 
-.block-editor-inserter__patterns-item,
-.block-editor-inserter__template-part-item {
+.block-editor-inserter__patterns-item {
 	border-radius: $radius-block-ui;
 	cursor: pointer;
 	margin-top: $grid-unit-20;
@@ -272,8 +271,7 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-item-title,
-.block-editor-inserter__template-part-item-title {
+.block-editor-inserter__patterns-item-title {
 	padding: $grid-unit-05;
 	font-size: 12px;
 	text-align: center;
