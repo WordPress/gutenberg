@@ -106,7 +106,7 @@ const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
-			panelName: `${ context.name }/${ ownProps.name }`,
+			panelName: ownProps.name || context.name
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
