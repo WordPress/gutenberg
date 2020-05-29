@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 import {
@@ -19,43 +19,74 @@ import { layout } from '@wordpress/icons';
 import useTemplatePartPost from './use-template-part-post';
 import TemplatePartPreviews from './template-part-previews';
 
+const HELP_PHRASES = {
+	initial: __(
+		'Please add a slug and theme name for your new Template Part.'
+	),
+	unavailable: __(
+		'Slug and theme combination already in use, please try another.'
+	),
+	available: __( 'This name is available!' ),
+	error: __( 'Error adding template.' ),
+};
+
 export default function TemplatePartPlaceholder( { setAttributes } ) {
 	const [ slug, _setSlug ] = useState( '' );
-	const [ theme, setTheme ] = useState( '' );
-	const [ help, setHelp ] = useState();
+	const [ theme, _setTheme ] = useState( '' );
+	const [ help, setHelp ] = useState( '' );
 
 	// Try to find an existing template part.
 	const postId = useTemplatePartPost( null, slug, theme );
 
-	const setSlug = useCallback( ( nextSlug ) => {
-		_setSlug( nextSlug );
-		setHelp( cleanForSlug( nextSlug ) );
-	}, [] );
+	const setSlug = useCallback(
+		( nextSlug ) => {
+			_setSlug( nextSlug );
+			if ( help ) {
+				setHelp( '' );
+			}
+		},
+		[ help ]
+	);
+
+	const setTheme = useCallback(
+		( nextTheme ) => {
+			_setTheme( nextTheme );
+			if ( help ) {
+				setHelp( '' );
+			}
+		},
+		[ help ]
+	);
+
+	const helpPhrase = useMemo( () => {
+		if ( ! slug || ! theme ) {
+			return HELP_PHRASES.initial;
+		} else if ( postId ) {
+			return HELP_PHRASES.unavailable;
+		}
+
+		return HELP_PHRASES.available;
+	}, [ slug, theme, postId ] );
 
 	const { saveEntityRecord } = useDispatch( 'core' );
-	const onChooseOrCreate = useCallback( async () => {
+	const onCreate = useCallback( async () => {
 		const nextAttributes = { slug, theme };
-		if ( postId !== undefined && postId !== null ) {
-			// Existing template part found.
-			nextAttributes.postId = postId;
-		} else {
-			// Create a new template part.
-			try {
-				const cleanSlug = cleanForSlug( slug );
-				const templatePart = await saveEntityRecord(
-					'postType',
-					'wp_template_part',
-					{
-						title: cleanSlug,
-						status: 'publish',
-						slug: cleanSlug,
-						meta: { theme },
-					}
-				);
-				nextAttributes.postId = templatePart.id;
-			} catch ( err ) {
-				setHelp( __( 'Error adding template.' ) );
-			}
+		// Create a new template part.
+		try {
+			const cleanSlug = cleanForSlug( slug );
+			const templatePart = await saveEntityRecord(
+				'postType',
+				'wp_template_part',
+				{
+					title: cleanSlug,
+					status: 'publish',
+					slug: cleanSlug,
+					meta: { theme },
+				}
+			);
+			nextAttributes.postId = templatePart.id;
+		} catch ( err ) {
+			setHelp( HELP_PHRASES.error );
 		}
 		setAttributes( nextAttributes );
 	}, [ postId, slug, theme ] );
@@ -74,7 +105,6 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					placeholder={ __( 'header' ) }
 					value={ slug }
 					onChange={ setSlug }
-					help={ help }
 					className="wp-block-template-part__placeholder-input"
 				/>
 				<TextControl
@@ -85,12 +115,13 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					className="wp-block-template-part__placeholder-input"
 				/>
 			</div>
+			<div>{ help || helpPhrase }</div>
 			<Button
 				isPrimary
-				disabled={ ! slug || ! theme }
-				onClick={ onChooseOrCreate }
+				disabled={ ! slug || ! theme || postId }
+				onClick={ onCreate }
 			>
-				{ postId ? __( 'Choose' ) : __( 'Create' ) }
+				{ __( 'Create' ) }
 			</Button>
 		</>
 	);
