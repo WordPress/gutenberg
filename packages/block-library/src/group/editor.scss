@@ -16,16 +16,16 @@
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of a Group
+	> .wp-block-group__inner-container > .wp-block {
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	// Full Width Blocks
+	// specificity required to only target immediate child Blocks of a Group
 	> .wp-block-group__inner-container > [data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
-		padding-left: $block-padding*2;
-		padding-right: $block-padding*2;
-
-		@include break-small() {
-			padding-left: $block-padding*4 + $block-spacing/2; // 58px
-			padding-right: $block-padding*4 + $block-spacing/2; // 58px
-		}
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
@@ -46,7 +46,19 @@
 /**
  * Group: Full Width Alignment
  */
-[data-align="full"] .wp-block[data-type="core/group"] {
+[data-align="full"] .wp-block-group {
+
+	// Non-full Width Blocks
+	// specificity required to only target immediate child Blocks of Group
+	> .wp-block-group__inner-container > .wp-block {
+		padding-left: $block-padding;
+		padding-right: $block-padding;
+
+		@include break-small() {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Group
