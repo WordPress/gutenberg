@@ -501,8 +501,7 @@
 		// Adjust the focus rectangle for the switcher.
 		.block-editor-block-switcher__no-switcher-icon::before,
 		.block-editor-block-switcher__toggle::before {
-			min-width: 0;
-			width: 28px;
+			width: $grid-unit-60 - $grid-unit-10 - $grid-unit-15;
 		}
 
 		// Adjust the positioning of the icon to better balance the new unit.
