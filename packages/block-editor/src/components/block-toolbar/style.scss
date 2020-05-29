@@ -92,6 +92,13 @@
 }
 
 .block-editor-block-toolbar__block-switcher-wrapper {
+	display: flex;
+
+	// Drag and drop is only enabled in contextual toolbars.
+	&:not([draggable="false"]) * {
+		cursor: grab;
+	}
+
 	.block-editor-block-switcher {
 		display: block;
 	}

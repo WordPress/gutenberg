@@ -115,17 +115,4 @@
 			}
 		}
 	}
-
-	// Drag and drop is only enabled in contextual toolbars.
-	&:not([draggable="false"]) {
-		cursor: grab;
-
-		.block-editor-block-mover__control {
-			cursor: grab !important;
-
-			&:not(:disabled):not([aria-disabled="true"]):active {
-				cursor: grabbing;
-			}
-		}
-	}
 }

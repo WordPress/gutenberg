@@ -19,6 +19,7 @@ import BlockSwitcher from '../block-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
+import BlockDraggable from '../block-draggable';
 import { useShowMoversGestures, useToggleBlockHighlight } from './utils';
 
 export default function BlockToolbar( { hideDragHandle } ) {
@@ -98,7 +99,7 @@ export default function BlockToolbar( { hideDragHandle } ) {
 
 	const classes = classnames(
 		'block-editor-block-toolbar',
-		shouldShowMovers && 'is-showing-movers',
+		shouldShowMovers && 'is-showing-movers'
 	);
 
 	return (
@@ -114,19 +115,28 @@ export default function BlockToolbar( { hideDragHandle } ) {
 				) }
 
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
-					<div
-						{ ...showMoversGestures }
-						className="block-editor-block-toolbar__block-switcher-wrapper"
-					>
-						<BlockSwitcher clientIds={ blockClientIds } />
-					</div>
+					<BlockDraggable clientIds={ blockClientIds }>
+						{ ( {
+							isDraggable,
+							onDraggableStart,
+							onDraggableEnd,
+						} ) => (
+							<div
+								{ ...showMoversGestures }
+								className="block-editor-block-toolbar__block-switcher-wrapper"
+								draggable={ isDraggable && ! hideDragHandle }
+								onDragStart={ onDraggableStart }
+								onDragEnd={ onDraggableEnd }
+							>
+								<BlockSwitcher clientIds={ blockClientIds } />
+								<BlockMover
+									clientIds={ blockClientIds }
+									__experimentalOrientation={ moverDirection }
+								/>
+							</div>
+						) }
+					</BlockDraggable>
 				) }
-
-				<BlockMover
-					clientIds={ blockClientIds }
-					__experimentalOrientation={ moverDirection }
-					hideDragHandle={ hideDragHandle }
-				/>
 			</div>
 
 			{ shouldShowVisualToolbar && ! isMultiToolbar && (
