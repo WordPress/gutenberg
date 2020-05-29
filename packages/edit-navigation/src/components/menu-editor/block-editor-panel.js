@@ -28,7 +28,7 @@ export default function BlockEditorPanel( {
 	menuId,
 	saveBlocks,
 } ) {
-	const { rootBlock, isNavigationModeActive, hasSelectedBlock } = useSelect(
+	const { rootBlockId, isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
 				isNavigationMode,
@@ -40,7 +40,7 @@ export default function BlockEditorPanel( {
 			const selectionStartClientId = getBlockSelectionStart();
 
 			return {
-				rootBlock: getBlocks()[ 0 ],
+				rootBlockId: getBlocks()[ 0 ]?.clientId,
 				isNavigationModeActive: isNavigationMode(),
 				hasSelectedBlock:
 					!! selectionStartClientId &&
@@ -53,10 +53,10 @@ export default function BlockEditorPanel( {
 	// Select the navigation block when it becomes available
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	useEffect( () => {
-		if ( rootBlock?.clientId ) {
-			selectBlock( rootBlock.clientId );
+		if ( rootBlockId ) {
+			selectBlock( rootBlockId );
 		}
-	}, [ rootBlock?.clientId ] );
+	}, [ rootBlockId ] );
 
 	return (
 		<Panel className="edit-navigation-menu-editor__block-editor-panel">
