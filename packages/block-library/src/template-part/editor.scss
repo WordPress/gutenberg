@@ -9,20 +9,14 @@
 }
 
 .wp-block-template-part__preview-container {
-	display: none;
 	width: inherit;
 	max-height: 600px;
 	overflow-y: scroll;
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: $border-width solid $light-gray-500;
-	// position: absolute;
 	top: $grid-unit-20;
 	left: calc(100% + #{$grid-unit-20});
-
-	@include break-medium {
-		display: block;
-	}
 }
 
 .wp-block-template-part__placeholder-preview-item {
@@ -63,7 +57,6 @@
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
-	margin-top: -$grid-unit-10;
 
 	.components-tab-panel__tabs {
 		border-bottom: $border-width solid $light-gray-500;
@@ -75,6 +68,7 @@
 	}
 
 	.components-tab-panel__tab-content {
+		margin-top: $grid-unit-20;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
