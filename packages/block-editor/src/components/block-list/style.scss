@@ -509,9 +509,13 @@
 			margin-left: 10px;
 		}
 
+		.block-editor-block-switcher:last-child .block-editor-block-icon svg {
+			margin-left: auto;
+		}
+
 		.components-toolbar,
 		.components-toolbar-group {
-			border-right-color: transparent;
+			border-right: none;
 		}
 	}
 
