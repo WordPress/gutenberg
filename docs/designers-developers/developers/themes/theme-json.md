@@ -155,7 +155,7 @@ The list of properties that are currently exposed via this method are:
 
 - Global: background-color.
 - Paragraph and Heading: line-height, font-size, color, background-color.
-- Group, Columns, and MediaText: color, background-color.
+- Group, Columns, and MediaText: color, background-color, background.
 
 ### Features
 
@@ -192,7 +192,7 @@ This is being implemented, so it's not currently available.
   },
   core/paragraph: {
     styles: {
-      typography: { 
+      typography: {
         lineHeight: <value>,
         fontSize: <value>
       },
@@ -204,7 +204,7 @@ This is being implemented, so it's not currently available.
   /* core/heading/h1, core/heading/h2, etc */
   core/heading/h*: {
     styles: {
-      typography: { 
+      typography: {
         lineHeight: <value>,
         fontSize: <value>
       },
@@ -216,21 +216,27 @@ This is being implemented, so it's not currently available.
   core/columns: {
     styles: {
       color: {
-        text: <value>
+        text: <value>,
+        background: <value>,
+        background-color: <value>,
       }
     }
   },
   core/group: {
     styles: {
       color: {
-        text: <value>
+        text: <value>,
+        background: <value>,
+        background-color: <value>,
       }
     }
   },
   core/media-text: {
     styles: {
       color: {
-        text: <value>
+        text: <value>,
+        background: <value>,
+        background-color: <value>,
       }
     }
   },
