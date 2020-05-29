@@ -393,11 +393,7 @@ SPEC CHECKSUMS:
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
   RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-<<<<<<< HEAD
   RNTAztecView: bdbd8112013c9f9719e8501fe42134cd3b225ca6
-=======
-  RNTAztecView: e0d085385d64a0fb8ed72908c011e724f4ac6ec5
->>>>>>> origin/master
   WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
