@@ -157,6 +157,7 @@ const CSSGridExample = () => {
 			} );
 
 			setColumnWidths( nextColumnWidths );
+			incrementUpdateCount();
 		},
 		[ incrementUpdateCount, isGrid ]
 	);
@@ -430,18 +431,17 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 		isGrid,
 		gap,
 		isDragging,
-		dragColumnWidth,
 	} = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
 	const getWidthLabel = () => {
-		const w = nodeRef?.current?.clientWidth;
+		const w = nodeRef.current?.getBoundingClientRect().width;
 		if ( ! w ) return;
 
 		return isGrid
 			? getColumnValue( {
 					gridSteps,
-					width: w + gap,
+					width: w,
 			  } )
 			: width;
 	};
@@ -450,7 +450,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 
 	useEffect( () => {
 		setWidthLabel( getWidthLabel() );
-	}, [ __updateCount, dragColumnWidth ] );
+	}, [ __updateCount ] );
 
 	return (
 		<VisualizerView
