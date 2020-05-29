@@ -1,57 +1,3 @@
-.wp-block-template-part__placeholder-input-container {
-	display: flex;
-	flex-wrap: wrap;
-	width: 100%;
-}
-
-.wp-block-template-part__placeholder-input {
-	margin: 5px;
-}
-
-.wp-block-template-part__preview-container {
-	width: inherit;
-	max-height: 600px;
-	overflow-y: scroll;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $light-gray-500;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
-}
-
-.wp-block-template-part__placeholder-preview-item {
-	border-radius: $radius-block-ui;
-	cursor: pointer;
-	margin-top: $grid-unit-20;
-	transition: all 0.05s ease-in-out;
-	position: relative;
-	border: $border-width solid transparent;
-
-	&:hover {
-		border: $border-width solid $theme-color;
-	}
-
-	&:focus {
-		box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&.is-placeholder {
-		min-height: 100px;
-	}
-}
-
-.wp-block-template-part__placeholder-preview-item-title {
-	padding: $grid-unit-05;
-	font-size: 12px;
-	text-align: center;
-}
-
-.wp-block-template-part__placholder-filter-input {
-	width: inherit;
-}
 
 .wp-block-template-part__tabs {
 	display: flex;
@@ -73,5 +19,87 @@
 		flex-grow: 1;
 		flex-direction: column;
 		position: relative;
+	}
+
+	.wp-block-template-part__placeholder-input-container {
+		display: flex;
+		flex-wrap: wrap;
+		width: 100%;
+
+		.wp-block-template-part__placeholder-input {
+			margin: 5px;
+		}
+	}
+
+	.wp-block-template-part__help-phrase {
+		padding: 0 $grid-unit-15 $grid-unit-15;
+	}
+
+	.wp-block-template-part__create-button {
+		align-self: flex-start;
+	}
+
+	.wp-block-template-part__placeholder-preview-filter-input {
+		width: inherit;
+	}
+}
+
+
+.wp-block-template-part__placeholder-preview-container {
+	width: inherit;
+	max-height: 600px;
+	overflow-y: scroll;
+	background: $white;
+	border-radius: $radius-block-ui;
+	border: $border-width solid $light-gray-500;
+	top: $grid-unit-20;
+	left: calc(100% + #{$grid-unit-20});
+
+	.wp-block-template-part__placeholder-preview-item {
+		border-radius: $radius-block-ui;
+		cursor: pointer;
+		margin-top: $grid-unit-20;
+		transition: all 0.05s ease-in-out;
+		position: relative;
+		border: $border-width solid transparent;
+
+		&:hover {
+			border: $border-width solid $theme-color;
+		}
+
+		&:focus {
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus $theme-color;
+
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+
+		&.is-placeholder {
+			min-height: 100px;
+		}
+	}
+
+	.wp-block-template-part__placeholder-preview-item-title {
+		padding: $grid-unit-05;
+		font-size: 12px;
+		text-align: center;
+	}
+
+	.wp-block-template-part__placeholder-panel-header {
+		display: inline-flex;
+		align-items: center;
+		padding: $grid-unit-20 $grid-unit-20 0;
+	}
+
+	.wp-block-template-part__placeholder-panel-content {
+		padding: 0 $grid-unit-20;
+	}
+
+	.wp-block-template-part__placeholder-panel-title {
+		color: $theme-color;
+		text-transform: uppercase;
+		font-size: 11px;
+		font-weight: 500;
+		margin-right: $grid-unit-10;
 	}
 }

@@ -21,20 +21,20 @@ import { groupBy } from 'lodash';
 
 function TemplatePartPlaceholder() {
 	return (
-		<div className="block-editor-inserter__template-part-item is-placeholder" />
+		<div className="wp-block-template-part__placeholder-preview-item is-placeholder" />
 	);
 }
 
 function InserterPanel( { title, icon, children } ) {
 	return (
 		<>
-			<div className="block-editor-inserter__panel-header">
-				<span className="block-editor-inserter__panel-title">
+			<div className="wp-block-template-part__placeholder-panel-header">
+				<span className="wp-block-template-part__placeholder-panel-title">
 					{ title }
 				</span>
 				<Icon icon={ icon } />
 			</div>
-			<div className="block-editor-inserter__panel-content">
+			<div className="wp-block-template-part__placeholder-panel-content">
 				{ children }
 			</div>
 		</>

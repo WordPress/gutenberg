@@ -115,11 +115,14 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					className="wp-block-template-part__placeholder-input"
 				/>
 			</div>
-			<div>{ help || helpPhrase }</div>
+			<div className="wp-block-template-part__help-phrase">
+				{ help || helpPhrase }
+			</div>
 			<Button
 				isPrimary
 				disabled={ ! slug || ! theme || postId }
 				onClick={ onCreate }
+				className="wp-block-template-part__create-button"
 			>
 				{ __( 'Create' ) }
 			</Button>
@@ -133,10 +136,10 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 				placeholder={ __( 'header' ) }
 				value={ filterValue }
 				onChange={ setFilterValue }
-				className="wp-block-template-part__placholder-filter-input"
+				className="wp-block-template-part__placeholder-preview-filter-input"
 			/>
 
-			<div className="wp-block-template-part__preview-container">
+			<div className="wp-block-template-part__placeholder-preview-container">
 				<TemplatePartPreviews
 					selectTemplate={ selectTemplate }
 					filterValue={ filterValue }
