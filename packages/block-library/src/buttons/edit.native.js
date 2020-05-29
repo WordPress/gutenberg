@@ -12,7 +12,7 @@ import {
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,16 +45,14 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
-	function renderFooterAppender() {
-		return (
-			<View style={ styles.appenderContainer }>
-				<InnerBlocks.ButtonBlockAppender
-					isFloating={ true }
-					onAddBlock={ onAddNextButton }
-				/>
-			</View>
-		);
-	}
+	const renderFooterAppender = useRef( () => (
+		<View style={ styles.appenderContainer }>
+			<InnerBlocks.ButtonBlockAppender
+				isFloating={ true }
+				onAddBlock={ onAddNextButton }
+			/>
+		</View>
+	) );
 
 	// Inside buttons block alignment options are not supported.
 	const alignmentHooksSetting = {
@@ -68,7 +66,7 @@ function ButtonsEdit( {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				template={ BUTTONS_TEMPLATE }
 				renderFooterAppender={
-					shouldRenderFooterAppender && renderFooterAppender
+					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				__experimentalMoverDirection="horizontal"
 				horizontalAlignment={ align }
