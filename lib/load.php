@@ -79,6 +79,7 @@ if ( ! class_exists( 'WP_Block_List' ) ) {
 }
 
 require dirname( __FILE__ ) . '/compat.php';
+require dirname( __FILE__ ) . '/utils.php';
 
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/templates.php';
