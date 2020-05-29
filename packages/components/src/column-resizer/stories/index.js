@@ -430,6 +430,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 		isGrid,
 		gap,
 		isDragging,
+		dragColumnWidth,
 	} = useColumnResizerContext();
 	const { isActive } = useDebouncedAnimation( __updateCount );
 
@@ -449,7 +450,7 @@ function ResizableVisualizer( { isFirst, isLast, width } ) {
 
 	useEffect( () => {
 		setWidthLabel( getWidthLabel() );
-	}, [ __updateCount ] );
+	}, [ __updateCount, dragColumnWidth ] );
 
 	return (
 		<VisualizerView
@@ -631,7 +632,7 @@ const VisualizerGridColumnView = styled.div`
 	border-right: 1px solid rgba( 80, 160, 255, 0.1 );
 	pointer-events: none;
 	filter: brightness( 1 );
-	transition: all 100ms linear;
+	transition: background 100ms linear, border 100ms linear;
 
 	${( { isActive } ) => {
 		if ( ! isActive ) return '';
