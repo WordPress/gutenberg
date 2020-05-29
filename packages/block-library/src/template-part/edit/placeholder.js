@@ -5,7 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
-import { Placeholder, TextControl, Button } from '@wordpress/components';
+import {
+	Placeholder,
+	TextControl,
+	Button,
+	TabPanel,
+} from '@wordpress/components';
 import { layout } from '@wordpress/icons';
 
 /**
@@ -61,14 +66,8 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 
 	const [ filterValue, setFilterValue ] = useState( '' );
 
-	return (
-		<Placeholder
-			icon={ layout }
-			label={ __( 'Template Part' ) }
-			instructions={ __(
-				'Choose a template part by slug and theme, or create a new one.'
-			) }
-		>
+	const createTab = (
+		<>
 			<div className="wp-block-template-part__placeholder-input-container">
 				<TextControl
 					label={ __( 'Slug' ) }
@@ -93,7 +92,11 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 			>
 				{ postId ? __( 'Choose' ) : __( 'Create' ) }
 			</Button>
+		</>
+	);
 
+	const selectTab = (
+		<>
 			<TextControl
 				label={ __( 'Search' ) }
 				placeholder={ __( 'header' ) }
@@ -108,6 +111,33 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 					filterValue={ filterValue }
 				/>
 			</div>
+		</>
+	);
+
+	return (
+		<Placeholder icon={ layout } label={ __( 'Template Part' ) }>
+			<TabPanel
+				className="block-editor-inserter__tabs"
+				tabs={ [
+					{
+						name: 'select',
+						/* translators: Select tab of template part creation palceholder */
+						title: __( 'Select from existing' ),
+					},
+					{
+						name: 'create',
+						/* translators: Create tab of template part placeholder.  */
+						title: __( 'Create new' ),
+					},
+				] }
+			>
+				{ ( tab ) => {
+					if ( tab.name === 'create' ) {
+						return createTab;
+					}
+					return selectTab;
+				} }
+			</TabPanel>
 		</Placeholder>
 	);
 }
