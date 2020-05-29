@@ -9,7 +9,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   >
     <ForwardRef(Button)
       className="is-secondary"
-      label="Close"
+      label="Close panel"
     >
       Close
     </ForwardRef(Button)>
@@ -40,7 +40,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   >
     <ForwardRef(Button)
       className="is-secondary"
-      label="Close"
+      label="Close panel"
     >
       Close
     </ForwardRef(Button)>
