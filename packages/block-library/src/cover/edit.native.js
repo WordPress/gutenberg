@@ -204,6 +204,19 @@ const Cover = ( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
+			{ url ? (
+				<PanelBody>
+					<RangeControl
+						label={ __( 'Opacity' ) }
+						minimumValue={ 0 }
+						maximumValue={ 100 }
+						value={ dimRatio }
+						onChange={ onOpactiyChange }
+						style={ styles.rangeCellContainer }
+						separatorType={ 'topFullWidth' }
+					/>
+				</PanelBody>
+			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<RangeControl
 					label={ __( 'Minimum height in pixels' ) }
@@ -214,18 +227,6 @@ const Cover = ( {
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>
-			{ url ? (
-				<PanelBody title={ __( 'Overlay' ) }>
-					<RangeControl
-						label={ __( 'Background Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpactiyChange }
-						style={ styles.rangeCellContainer }
-					/>
-				</PanelBody>
-			) : null }
 		</InspectorControls>
 	);
 
