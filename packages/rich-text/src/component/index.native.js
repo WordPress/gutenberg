@@ -178,7 +178,7 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		const { start, end, activeFormats = [] } = record;
+		const { start = 0, end = 0, activeFormats = [] } = record;
 		const changeHandlers = pickBy( this.props, ( v, key ) =>
 			key.startsWith( 'format_on_change_functions_' )
 		);
