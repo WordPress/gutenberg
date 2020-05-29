@@ -125,6 +125,10 @@
 			{ "docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": [] }
 		] }
 	] },
+	{ "docs/architecture/index.md": [
+		{ "docs/architecture/modularity.md": [] },
+		{ "docs/architecture/performance.md": [] }
+	] },
 	{ "packages/components/README.md": "{{components}}" },
 	{ "docs/designers-developers/developers/data/README.md": [
 		{ "docs/designers-developers/developers/data/data-core.md": []},

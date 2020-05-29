@@ -630,6 +630,24 @@
 		"parent": "format-api"
 	},
 	{
+		"title": "Architecture",
+		"slug": "index",
+		"markdown_source": "../docs/architecture/index.md",
+		"parent": null
+	},
+	{
+		"title": "Modularity",
+		"slug": "modularity",
+		"markdown_source": "../docs/architecture/modularity.md",
+		"parent": "index"
+	},
+	{
+		"title": "Performance",
+		"slug": "performance",
+		"markdown_source": "../docs/architecture/performance.md",
+		"parent": "index"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
