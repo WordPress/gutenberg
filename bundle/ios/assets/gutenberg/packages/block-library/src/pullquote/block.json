@@ -26,5 +26,13 @@
 		"customTextColor": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"align": [
+			"left",
+			"right",
+			"wide",
+			"full"
+		]
 	}
 }

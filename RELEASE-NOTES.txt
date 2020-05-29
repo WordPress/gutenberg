@@ -1,3 +1,15 @@
+1.29.0
+------
+* [**] Add support for changing overlay color settings in Cover block
+* Add enter/exit animation in FloatingToolbar
+* [***] New block: Verse
+* [*] Fix merging of text blocks when text had active formatting (bold, italic, strike, link)
+* [***] Trash icon that is used to remove blocks is moved to the new menu reachable via ellipsis button in the block toolbar
+* [**] Block toolbar can now collapse when the block width is smaller than the toolbar content
+* [**] Creating undo levels less frequently
+* [**] Tooltip for page template selection buttons
+* [*] Fix button alignment in page templates and make strings consistent
+* [*] Add support for displaying radial gradients in Buttons and Cover blocks
 1.28.2
 ------
 * [***] Disable Pullquote Block on Android
@@ -21,6 +33,7 @@
 
 1.27.0
 ------
+* Block Editor: Add dialog for mentioning other users in your post
 * Prefill caption for image blocks when available on the Media library
 * New block: Buttons. From now you’ll be able to add the individual Button block only inside the Buttons block
 * Fix bug where whitespaces at start of text blocks were being removed

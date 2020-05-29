@@ -1,5 +1,7 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
+import androidx.core.util.Consumer;
+
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
@@ -35,6 +37,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
         void onMediaFileUploadFailed(int mediaId);
+    }
+
+    interface StarterPageTemplatesTooltipShownCallback {
+        void onRequestStarterPageTemplatesTooltipShown(boolean tooltipShown);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
@@ -136,4 +142,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestMediaEditor(MediaUploadCallback mediaUploadCallback, String mediaUrl);
 
     void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties);
+
+    void onAddMention(Consumer<String> onSuccess);
+    
+    void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
+
+    void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 }

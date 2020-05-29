@@ -6,7 +6,7 @@ const ios = {
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.15.0', // SauceLabs requires appiumVersion to be specified.
+	appiumVersion: '1.16.0', // SauceLabs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 	processArguments: {
 		args: [
@@ -37,6 +37,6 @@ exports.android8 = {
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.15.0',
+	appiumVersion: '1.16.0',
 	app: undefined,
 };
