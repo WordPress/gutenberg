@@ -167,121 +167,145 @@ This is being implemented, so it's not currently available.
 
 ```
 {
-  global: {
-    presets: {
-      color: [
+  "global": {
+    "presets": {
+      "color": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more colors> }
       ],
-      font-size: [
+      "font-size": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more font sizes> }
     ],
-      gradient: [
+      "gradient": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more gradients> }
       ]
     }
   },
-  core/paragraph: {
-    styles: {
-      typography: {
-        lineHeight: <value>,
-        fontSize: <value>
+  "core/paragraph": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       },
-      color: {
-        text: <value>
+      "color": {
+        "text": <value>
       }
     }
   },
-  core/heading: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h1: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h2: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h3: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h4: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h5: {
-    styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
-    }
-  },
-  core/heading/h6: {
-    styles: {
-      typography: {
-        lineHeight: <value>,
-        fontSize: <value>
+  "core/heading": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       },
-      color: {
-        text: <value>
+      "color":{
+        "text": <value>
       }
     }
   },
-  core/columns: {
-    styles: {
-      color: {
-        text: <value>,
-        background: <value>,
-        background-color: <value>,
+  "core/heading/h1": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
       }
     }
   },
-  core/group: {
-    styles: {
-      color: {
-        text: <value>,
-        background: <value>,
-        background-color: <value>,
+  "core/heading/h2": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
       }
     }
   },
-  core/media-text: {
-    styles: {
-      color: {
-        text: <value>,
-        background: <value>,
-        background-color: <value>,
+  "core/heading/h3": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
       }
     }
   },
+  "core/heading/h4": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
+      }
+    }
+  },
+  "core/heading/h5": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
+      }
+    }
+  },
+  "core/heading/h6": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color":{
+        "text": <value>
+      }
+    }
+  },
+  "core/columns": {
+    "styles": {
+      "color": {
+          "background": <value>,
+          "background-color": <value>,
+          "text": <value>
+      }
+    }
+  },
+  "core/group": {
+    "styles": {
+        "color": {
+            "background": <value>,
+            "background-color": <value>,
+            "text": <value>
+        }
+      }
+  },
+  "core/media-text": {
+    "styles": {
+        "color": {
+            "background": <value>,
+            "background-color": <value>,
+            "text": <value>
+        }
+      }
+  }
 }
 ```
