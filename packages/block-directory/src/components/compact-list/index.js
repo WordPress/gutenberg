@@ -24,8 +24,11 @@ export default function CompactList( { items } ) {
 							{ title }
 						</div>
 						<div className="block-directory-compact-list__item-author">
-							{ /* translators: %s: Name of the block author. */
-							sprintf( __( 'By %s' ), author ) }
+							{ sprintf(
+								/* translators: %s: Name of the block author. */
+								__( 'By %s' ),
+								author
+							) }
 						</div>
 					</div>
 				</li>
