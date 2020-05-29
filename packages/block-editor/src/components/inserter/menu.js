@@ -21,7 +21,6 @@ import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import InserterBlockList from './block-list';
 import BlockPatterns from './block-patterns';
-import TemplateParts from './template-parts';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -42,7 +41,6 @@ function InserterMenu( {
 		getBlockIndex,
 		getBlockSelectionEnd,
 		getBlockOrder,
-		hasTemplateParts,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -59,8 +57,6 @@ function InserterMenu( {
 				}
 			}
 			return {
-				hasTemplateParts: getSettings()
-					.__experimentalEnableFullSiteEditing,
 				hasPatterns: !! getSettings().__experimentalBlockPatterns
 					?.length,
 				destinationRootClientId: destRootClientId,
@@ -176,36 +172,6 @@ function InserterMenu( {
 		</div>
 	);
 
-	const templatePartsTab = (
-		<div className="block-editor-inserter__scrollable">
-			<TemplateParts
-				onInsert={ onInsertBlocks }
-				filterValue={ filterValue }
-			/>
-		</div>
-	);
-
-	const tabsToUse = [
-		{
-			name: 'blocks',
-			/* translators: Blocks tab title in the block inserter. */
-			title: __( 'Blocks' ),
-		},
-	];
-	if ( showPatterns ) {
-		tabsToUse.push( {
-			name: 'patterns',
-			/* translators: Patterns tab title in the block inserter. */
-			title: __( 'Patterns' ),
-		} );
-	}
-	if ( hasTemplateParts ) {
-		tabsToUse.push( {
-			name: 'template parts',
-			/* translators: Template Parts tab title in the block inserter. */
-			title: __( 'Template Parts' ),
-		} );
-	}
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
 	// Popover's focusOnMount.
@@ -220,22 +186,31 @@ function InserterMenu( {
 		>
 			<div className="block-editor-inserter__main-area">
 				<InserterSearchForm onChange={ setFilterValue } />
-				{ tabsToUse.length > 1 && (
+				{ showPatterns && (
 					<TabPanel
 						className="block-editor-inserter__tabs"
-						tabs={ tabsToUse }
+						tabs={ [
+							{
+								name: 'blocks',
+								/* translators: Blocks tab title in the block inserter. */
+								title: __( 'Blocks' ),
+							},
+							{
+								name: 'patterns',
+								/* translators: Patterns tab title in the block inserter. */
+								title: __( 'Patterns' ),
+							},
+						] }
 					>
 						{ ( tab ) => {
 							if ( tab.name === 'blocks' ) {
 								return blocksTab;
-							} else if ( tab.name === 'template parts' ) {
-								return templatePartsTab;
 							}
 							return patternsTab;
 						} }
 					</TabPanel>
 				) }
-				{ tabsToUse.length === 1 && blocksTab }
+				{ ! showPatterns && blocksTab }
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<div className="block-editor-inserter__preview-container">
