@@ -520,7 +520,7 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId } ) => {
 		return {
 			updateNavItemBlocks( blocks ) {
-				if ( ! blocks || blocks.length === 0 ) return false;
+				if ( blocks?.length === 0 ) return false;
 				dispatch( 'core/block-editor' ).replaceInnerBlocks(
 					clientId,
 					blocks
