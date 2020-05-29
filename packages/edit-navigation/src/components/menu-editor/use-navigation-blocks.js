@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, sortBy, difference, uniq } from 'lodash';
+import { groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,23 +20,11 @@ import useDebouncedValue from './use-debounced-value';
 import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
-	const [ deletedMenuItemsIds, setDeletedMenuItemsIds ] = useState( [] );
-
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
-	// @TODO: uniq() and filter() are here just to work around the bug in select() - let's follow up with a PR
-	//  		  that addresses the root cause
 	const menuItems = useSelect(
-		( select ) =>
-			uniq(
-				select( 'core' )
-					.getMenuItems( query )
-					?.filter(
-						( { id } ) => ! deletedMenuItemsIds.includes( id )
-					) || [],
-				( { id } ) => id
-			),
-		[ menuId, deletedMenuItemsIds ]
+		( select ) => select( 'core' ).getMenuItems( query ),
+		[ menuId ]
 	);
 
 	// Data model
@@ -100,17 +88,6 @@ export default function useNavigationBlocks( menuId ) {
 		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
 
 		if ( result.success ) {
-			const allMenuItemsIds = Object.values( menuItemsRef.current ).map(
-				( { id } ) => id
-			);
-			const savedMenuItemIds = getAllClientIds( blocks ).map(
-				( clientId ) => menuItemsRef.current[ clientId ].id
-			);
-			setDeletedMenuItemsIds( [
-				...deletedMenuItemsIds,
-				...difference( allMenuItemsIds, savedMenuItemIds ),
-			] );
-
 			createSuccessNotice( __( 'Navigation saved.' ), {
 				type: 'snackbar',
 			} );
