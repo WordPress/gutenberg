@@ -14,10 +14,10 @@ import { speak } from '@wordpress/a11y';
 /**
  * @typedef WPInserterConfig
  *
- * @property {string=}   rootClientId        Inserter Root Client ID.
+ * @property {string=} rootClientId        Inserter Root Client ID.
  * @property {string=} clientId            Inserter Client ID.
- * @property {boolean}   isAppender          Whether the inserter is an appender or not.
- * @property {boolean}   selectBlockOnInsert Whether the block should be selected on insert.
+ * @property {boolean} isAppender          Whether the inserter is an appender or not.
+ * @property {boolean} selectBlockOnInsert Whether the block should be selected on insert.
  */
 
 /**
@@ -50,7 +50,7 @@ function useInsertionPoint( {
 			if ( ! destRootClientId && ! clientId && ! isAppender ) {
 				const end = _getBlockSelectionEnd();
 				if ( end ) {
-					destRootClientId = getBlockRootClientId( end ) || undefined;
+					destRootClientId = getBlockRootClientId( end );
 				}
 			}
 			return {

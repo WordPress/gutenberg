@@ -48,15 +48,13 @@ export function InserterBlockList( {
 		rootClientId,
 		onInsert
 	);
-	const { rootChildBlocks } = useSelect(
+	const rootChildBlocks = useSelect(
 		( select ) => {
 			const { getBlockName } = select( 'core/block-editor' );
 			const { getChildBlockNames } = select( 'core/blocks' );
 			const rootBlockName = getBlockName( rootClientId );
 
-			return {
-				rootChildBlocks: getChildBlockNames( rootBlockName ),
-			};
+			return getChildBlockNames( rootBlockName );
 		},
 		[ rootClientId ]
 	);

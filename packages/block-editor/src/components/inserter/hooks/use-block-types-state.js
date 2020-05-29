@@ -56,8 +56,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		}
 	}, [] );
 
-	const onSelectItem = ( item ) => {
-		const { name, initialAttributes, innerBlocks } = item;
+	const onSelectItem = ( { name, initialAttributes, innerBlocks } ) => {
 		const insertedBlock = createBlock(
 			name,
 			initialAttributes,
