@@ -12,7 +12,6 @@ import {
 	ExternalLink,
 	PanelBody,
 	ResizableBox,
-	Spinner,
 	TextareaControl,
 	TextControl,
 	ToolbarGroup,
@@ -94,11 +93,6 @@ function getFilename( url ) {
 	}
 }
 
-export function useForceUpdate() {
-	const [ , setState ] = useState();
-	return () => setState( ( value ) => ! value );
-}
-
 export function ImageEdit( {
 	attributes: {
 		url = '',
@@ -124,7 +118,6 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 } ) {
-	const forceUpdate = useForceUpdate();
 	const ref = useRef();
 	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
 		( select ) => {
@@ -228,10 +221,6 @@ export function ImageEdit( {
 			},
 			options
 		);
-
-		if ( onSelectImage.count > 1 ) {
-			forceUpdate();
-		}
 	}
 
 	onSelectImage.count = 0;
@@ -436,7 +425,6 @@ export function ImageEdit( {
 	}
 
 	const classes = classnames( className, {
-		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
 		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
@@ -528,7 +516,6 @@ export function ImageEdit( {
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
 			/>
-			{ isBlobURL( url ) && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
