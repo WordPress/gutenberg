@@ -13,6 +13,7 @@ import {
 	useEffect,
 	createContext,
 	useContext,
+	useCallback,
 } from '@wordpress/element';
 
 /**
@@ -37,7 +38,9 @@ const CSSGridExample = () => {
 	const [ __updateCount, setUpdateCount ] = useState( 0 );
 	const ghostRef = useRef( false );
 	const initialRenderRef = useRef( false );
+	const didChangeGridSettingRef = useRef( false );
 	const baseId = useInstanceId( CSSGridExample, 'column-resizer' );
+	const lastUpdateCountRef = useRef( __updateCount );
 
 	const gapRef = useRef( gap );
 
@@ -66,43 +69,58 @@ const CSSGridExample = () => {
 	const grid = [ isGrid ? gridSteps[ 0 ] : 1, 1 ];
 	const minWidth = gridSteps[ 0 ];
 
-	const handleOnResize = ( event, direction, element ) => {
-		const nodes = [
-			...containerNode.current.querySelectorAll(
-				'.components-resizable-box__container'
-			),
-		];
-		const nodeIndex = nodes.indexOf( element );
-		const ghostNodes = [ ...ghostRef.current.children ];
-		const targetGhostNode = ghostNodes[ nodeIndex ];
-		const ghostNodeContainerWidth = ghostRef.current.getBoundingClientRect()
-			.width;
+	const incrementUpdateCount = useCallback( () => {
+		const nextUpdateCount = lastUpdateCountRef.current + 1;
+		setUpdateCount( nextUpdateCount );
+		lastUpdateCountRef.current = nextUpdateCount;
+	}, [] );
 
-		if ( ! targetGhostNode ) return;
+	const handleOnResize = useCallback(
+		( event, direction, element ) => {
+			const nodes = [
+				...containerNode.current.querySelectorAll(
+					'.components-resizable-box__container'
+				),
+			];
 
-		let nextWidth = element.style.width;
-		targetGhostNode.style.width = nextWidth;
+			const ghostNodeContainerWidth = ghostRef.current.getBoundingClientRect()
+				.width;
+			const ghostNodes = [ ...ghostRef.current.children ];
 
-		const nextColumnWidths = ghostNodes.map( ( n, index ) => {
-			const w = n.getBoundingClientRect().width;
-			nextWidth = isGrid
-				? getGridWidthValue( { gridSteps, width: w } )
-				: getPercentageWidthValue( {
-						containerWidth: ghostNodeContainerWidth,
-						width: w,
-				  } );
-			ghostNodes[ index ].style.width = nextWidth;
-			return nextWidth;
-		} );
+			if ( element ) {
+				const nodeIndex = nodes.indexOf( element );
+				const targetGhostNode = ghostNodes[ nodeIndex ];
 
-		setColumnWidths( nextColumnWidths );
-		setUpdateCount( __updateCount + 1 );
-	};
+				if ( ! targetGhostNode ) return;
+
+				targetGhostNode.style.width = element.style.width;
+			}
+
+			const nextColumnWidths = ghostNodes.map( ( n, index ) => {
+				const w = n.getBoundingClientRect().width;
+				const nextWidth = isGrid
+					? getGridWidthValue( {
+							gridSteps: getGridSteps(),
+							width: w,
+					  } )
+					: getPercentageWidthValue( {
+							containerWidth: ghostNodeContainerWidth,
+							width: w,
+					  } );
+				ghostNodes[ index ].style.width = nextWidth;
+				return nextWidth;
+			} );
+
+			setColumnWidths( nextColumnWidths );
+			incrementUpdateCount();
+		},
+		[ incrementUpdateCount, isGrid ]
+	);
 
 	useEffect( () => {
 		if ( gap !== gapRef.current ) {
 			setGridSteps( getGridSteps() );
-			setUpdateCount( __updateCount + 1 );
+			incrementUpdateCount();
 			gapRef.current = gap;
 		}
 	}, [ gap ] );
@@ -124,6 +142,17 @@ const CSSGridExample = () => {
 		}
 	}, [ gridSteps ] );
 
+	useEffect( () => {
+		if ( isGrid === true && didChangeGridSettingRef.current ) {
+			handleOnResize();
+		}
+	}, [ isGrid, handleOnResize ] );
+
+	const toggleGrid = () => {
+		setIsGrid( ! isGrid );
+		didChangeGridSettingRef.current = true;
+	};
+
 	const contextProps = {
 		isGrid,
 		grid,
@@ -142,7 +171,7 @@ const CSSGridExample = () => {
 
 	return (
 		<>
-			<button onClick={ () => setIsGrid( ! isGrid ) }>
+			<button onClick={ toggleGrid }>
 				Grid ({ isGrid ? 'ON' : 'OFF' })
 			</button>
 			<hr />
