@@ -1245,8 +1245,9 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
  *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object}	state	Editor state.
+ * @param {?string}	rootClientId	Optional root client ID of block list.
+ * @param {?boolean}	disableFrecency	Optional param for when you want to prevent frecency calculation
  *
  * @return {WPEditorInserterItem[]} Items that appear in inserter.
  *
@@ -1263,8 +1264,12 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
  * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
+	( state, rootClientId = null, disableFrecency = false ) => {
 		const calculateFrecency = ( time, count ) => {
+			if ( disableFrecency ) {
+				return 1;
+			}
+
 			if ( ! time ) {
 				return count;
 			}

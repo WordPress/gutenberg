@@ -82,7 +82,7 @@ export function InserterBlockList( {
 				categories: getCategories(),
 				collections: getCollections(),
 				rootChildBlocks: getChildBlockNames( rootBlockName ),
-				items: getInserterItems( rootClientId ),
+				items: getInserterItems( rootClientId, true ),
 				fetchReusableBlocks: __experimentalFetchReusableBlocks,
 			};
 		},

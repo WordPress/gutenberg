@@ -392,6 +392,7 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
+-   _disableFrecency_ `?boolean`: Optional param for when you want to prevent frecency calculation
 
 _Returns_
 
