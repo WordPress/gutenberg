@@ -16,13 +16,6 @@
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of a Group
-	> .wp-block-group__inner-container > .wp-block {
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	// Full Width Blocks
-	// specificity required to only target immediate child Blocks of a Group
 	> .wp-block-group__inner-container > [data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
