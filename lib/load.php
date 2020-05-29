@@ -51,6 +51,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menu_Locations_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-menu-locations-controller.php';
 	}
+	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-customizer-nonces.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -79,6 +82,7 @@ if ( ! class_exists( 'WP_Block_List' ) ) {
 }
 
 require dirname( __FILE__ ) . '/compat.php';
+require dirname( __FILE__ ) . '/utils.php';
 
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/templates.php';
@@ -93,4 +97,5 @@ require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/edit-site-page.php';
+require dirname( __FILE__ ) . '/editor-features.php';
 require dirname( __FILE__ ) . '/global-styles.php';

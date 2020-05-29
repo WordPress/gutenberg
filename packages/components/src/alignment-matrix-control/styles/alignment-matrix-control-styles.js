@@ -21,19 +21,19 @@ export const rootBase = () => {
 
 const rootSize = ( { size = 92 } ) => {
 	return css`
-		grid-template-rows: repeat( 3, calc( ${size}px / 3 ) );
-		width: ${size}px;
+		grid-template-rows: repeat( 3, calc( ${ size }px / 3 ) );
+		width: ${ size }px;
 	`;
 };
 
 export const Root = styled.div`
-	${rootBase};
+	${ rootBase };
 
 	border: 1px solid transparent;
 	cursor: pointer;
 	grid-template-columns: auto;
 
-	${rootSize};
+	${ rootSize };
 `;
 
 export const Row = styled.div`
@@ -50,11 +50,11 @@ const pointActive = ( { isActive } ) => {
 		: color( 'blue.medium.focus' );
 
 	return css`
-		box-shadow: ${boxShadow};
-		color: ${pointColor};
+		box-shadow: ${ boxShadow };
+		color: ${ pointColor };
 
 		*:hover > & {
-			color: ${pointColorHover};
+			color: ${ pointColorHover };
 		}
 	`;
 };
@@ -67,15 +67,15 @@ export const pointBase = ( props ) => {
 		margin: auto;
 		transition: all 120ms linear;
 
-		${reduceMotion( 'transition' )}
-		${pointActive( props )}
+		${ reduceMotion( 'transition' ) }
+		${ pointActive( props ) }
 	`;
 };
 
 export const Point = styled.span`
 	height: 6px;
 	width: 6px;
-	${pointBase}
+	${ pointBase }
 `;
 
 export const Cell = styled.span`

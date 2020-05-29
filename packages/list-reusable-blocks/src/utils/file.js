@@ -33,7 +33,7 @@ export function download( fileName, content, contentType ) {
 export function readTextFile( file ) {
 	const reader = new window.FileReader();
 	return new Promise( ( resolve ) => {
-		reader.onload = function() {
+		reader.onload = () => {
 			resolve( reader.result );
 		};
 		reader.readAsText( file );

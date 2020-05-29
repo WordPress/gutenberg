@@ -85,8 +85,7 @@ function Navigation( {
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
-		clientId,
-		true
+		clientId
 	);
 
 	// Builds navigation links from default Pages.
@@ -233,10 +232,7 @@ function Navigation( {
 			{ navigatorModal }
 			<InspectorControls>
 				<PanelBody title={ __( 'Navigation Structure' ) }>
-					<BlockNavigationList
-						clientId={ clientId }
-						__experimentalWithBlockNavigationSlots
-					/>
+					<BlockNavigationList clientId={ clientId } />
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
 					<FontSizePicker
