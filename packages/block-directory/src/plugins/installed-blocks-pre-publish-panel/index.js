@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
  */
 import CompactList from '../../components/compact-list';
 
-export default function DownloadableBlockPrePublishPanel() {
+export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect( ( select ) =>
 		select( 'core/block-directory' ).getInstalledBlockTypes()
 	);
@@ -33,7 +33,7 @@ export default function DownloadableBlockPrePublishPanel() {
 			) }
 			initialOpen={ true }
 		>
-			<p className="downloadable-block-pre-publish-panel__copy">
+			<p className="installed-blocks-pre-publish-panel__copy">
 				{ _n(
 					'The following block has been added to your site.',
 					'The following blocks have been added to your site.',
