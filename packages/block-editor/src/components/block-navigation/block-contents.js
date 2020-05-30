@@ -16,7 +16,7 @@ const BlockNavigationBlockContents = forwardRef(
 		ref
 	) => {
 		const {
-			__experimentalWithBlockNavigationSlots: withBlockNavigationSlots,
+			__experimentalFeatures: withBlockNavigationSlots,
 		} = useBlockNavigationContext();
 
 		return withBlockNavigationSlots ? (

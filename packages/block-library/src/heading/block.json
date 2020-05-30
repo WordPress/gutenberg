@@ -18,5 +18,14 @@
 		"placeholder": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"className": false,
+		"anchor": true,
+		"__unstablePasteTextInline": true,
+		"lightBlockWrapper": true,
+		"__experimentalColor": true,
+		"__experimentalLineHeight": true,
+		"__experimentalFontSize": true
 	}
 }

@@ -82,7 +82,7 @@ export default function createNamespace( key, options, registry ) {
 	// not on every dispatch.
 	const subscribe =
 		store &&
-		function( listener ) {
+		( ( listener ) => {
 			let lastState = store.__unstableOriginalGetState();
 			store.subscribe( () => {
 				const state = store.__unstableOriginalGetState();
@@ -93,7 +93,7 @@ export default function createNamespace( key, options, registry ) {
 					listener();
 				}
 			} );
-		};
+		} );
 
 	// This can be simplified to just { subscribe, getSelectors, getActions }
 	// Once we remove the use function.

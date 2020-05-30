@@ -6,7 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 
 export default function BlockNavigationList( {
 	clientId,
-	__experimentalWithBlockNavigationSlots,
+	__experimentalFeatures,
 } ) {
 	const { block, selectedBlockClientId } = useSelect(
 		( select ) => {
@@ -29,9 +29,7 @@ export default function BlockNavigationList( {
 			blocks={ [ block ] }
 			selectedBlockClientId={ selectedBlockClientId }
 			selectBlock={ selectBlock }
-			__experimentalWithBlockNavigationSlots={
-				__experimentalWithBlockNavigationSlots
-			}
+			__experimentalFeatures={ __experimentalFeatures }
 			showNestedBlocks
 			showAppender
 			showBlockMovers
