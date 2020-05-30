@@ -16,8 +16,10 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 export default function useMenuLocations() {
+	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const { saveMenu } = useDispatch( 'core' );
 	const [ menuLocations, setMenuLocations ] = useState( null );
 	const [ emptyLocations, setEmptyLocations ] = useState( [] );
@@ -114,6 +116,9 @@ export default function useMenuLocations() {
 				} );
 			}
 		}
+		createSuccessNotice( __( 'Menu locations saved.' ), {
+			type: 'snackbar',
+		} );
 	};
 
 	return [ menuLocations, saveMenuLocations, assignMenuToLocation ];
