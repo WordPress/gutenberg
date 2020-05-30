@@ -60,7 +60,12 @@ export default function BlockEditorPanel( {
 		menuId,
 	] );
 
-	const [ autoAddPages, setAutoAddPages ] = useState( menu.auto_add );
+	let autoAdd = false;
+	if ( menu ) {
+		autoAdd = menu.auto_add;
+	}
+
+	const [ autoAddPages, setAutoAddPages ] = useState( autoAdd );
 
 	useEffect( () => {
 		setAutoAddPages( menu.auto_add );
