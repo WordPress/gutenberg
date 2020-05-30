@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
+// @ts-ignore
 const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' );
+const { v4: uuid } = require( 'uuid' );
+const path = require( 'path' );
+const os = require( 'os' );
 
-/*
+/**
  * Internal dependencies
  */
 const { log, formats } = require( './logger' );
@@ -14,13 +18,13 @@ const { log, formats } = require( './logger' );
  * Utility to run a child script
  *
  * @param {string} script Script to run.
- * @param {string?} cwd    Working directory.
+ * @param {string=} cwd   Working directory.
  */
 function runShellScript( script, cwd ) {
 	childProcess.execSync( script, {
 		cwd,
 		env: {
-			NO_CHECKS: true,
+			NO_CHECKS: 'true',
 			PATH: process.env.PATH,
 			HOME: process.env.HOME,
 		},
@@ -90,9 +94,19 @@ async function askForConfirmation(
 	}
 }
 
+/**
+ * Generates a random temporary path in the OS's tmp dir.
+ *
+ * @return {string} Temporary Path.
+ */
+function getRandomTemporaryPath() {
+	return path.join( os.tmpdir(), uuid() );
+}
+
 module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
 	runShellScript,
+	getRandomTemporaryPath,
 };

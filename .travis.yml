@@ -53,44 +53,13 @@ install:
   - npm run build
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
-      # Download and unpack WordPress.
-      curl -sL https://github.com/WordPress/WordPress/archive/master.zip -o /tmp/wordpress-latest.zip
-      unzip -q /tmp/wordpress-latest.zip -d /tmp
-      mkdir -p wordpress/src
-      mv /tmp/WordPress-master/* wordpress/src
-
-      # Create the upload directory with permissions that Travis can handle.
-      mkdir -p wordpress/src/wp-content/uploads
-      chmod 767 wordpress/src/wp-content/uploads
-
-      # Grab the tools we need for WordPress' local-env.
-      curl -sL https://github.com/WordPress/wordpress-develop/archive/master.zip -o /tmp/wordpress-develop.zip
-      unzip -q /tmp/wordpress-develop.zip -d /tmp
-      mv \
-        /tmp/wordpress-develop-master/tools \
-        /tmp/wordpress-develop-master/tests \
-        /tmp/wordpress-develop-master/.env \
-        /tmp/wordpress-develop-master/docker-compose.yml \
-        /tmp/wordpress-develop-master/wp-cli.yml \
-        /tmp/wordpress-develop-master/*config-sample.php \
-        /tmp/wordpress-develop-master/package.json wordpress
-
-      # Install WordPress. The additional dependencies are required by the copied `wordpress-develop` tools.
-      cd wordpress
-      npm install dotenv wait-on
-      npm run env:start
-      sleep 10
-      npm run env:install
-      cd ..
-
-      # Connect Gutenberg to WordPress.
-      npm run env connect
-      npm run env cli plugin activate gutenberg
+      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php" } }' > .wp-env.override.json
+      npm run wp-env start
     fi
   - |
     if [[ "$E2E_ROLE" = "author" ]]; then
-      npm run env cli -- user create author author@example.com --role=author --user_pass=authpass
-      npm run env cli -- post update 1 --post_author=2
+      npm run wp-env run tests-cli "wp user create author author@example.com --role=author --user_pass=authpass"
+      npm run wp-env run tests-cli "wp post update 1 --post_author=2"
     fi
 
 jobs:
@@ -162,14 +131,12 @@ jobs:
       env: WP_ENV_TESTS_PORT=8887 WP_ENV_PORT=8886 # TODO: Remove tests port when scripts/env is replaced with wp-env.
       script:
         - chmod -R 767 ./build
-        - npm run wp-env start
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
       env: LOCAL_PHP=5.6-fpm WP_ENV_TESTS_PORT=8887 WP_ENV_PORT=8886 # TODO: Remove tests port when scripts/env is replaced with wp-env.
       script:
         - chmod -R 767 ./build
-        - npm run wp-env start
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)

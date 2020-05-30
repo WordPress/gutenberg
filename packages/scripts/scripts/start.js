@@ -23,7 +23,7 @@ if ( hasArgInCLI( '--webpack--devtool' ) ) {
 
 const { status } = spawn(
 	resolveBin( 'webpack' ),
-	getWebpackArgs().push( '--watch' ),
+	[ ...getWebpackArgs(), '--watch' ],
 	{
 		stdio: 'inherit',
 	}

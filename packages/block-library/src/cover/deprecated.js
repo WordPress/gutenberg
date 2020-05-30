@@ -209,8 +209,9 @@ const deprecated = [
 				style.backgroundColor = customOverlayColor;
 			}
 			if ( focalPoint && ! hasParallax ) {
-				style.backgroundPosition = `${ focalPoint.x *
-					100 }% ${ focalPoint.y * 100 }%`;
+				style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+					focalPoint.y * 100
+				}%`;
 			}
 			if ( customGradient && ! url ) {
 				style.background = customGradient;
@@ -302,8 +303,9 @@ const deprecated = [
 				style.backgroundColor = customOverlayColor;
 			}
 			if ( focalPoint && ! hasParallax ) {
-				style.backgroundPosition = `${ focalPoint.x *
-					100 }% ${ focalPoint.y * 100 }%`;
+				style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+					focalPoint.y * 100
+				}%`;
 			}
 
 			const classes = classnames(

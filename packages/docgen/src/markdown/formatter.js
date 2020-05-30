@@ -65,13 +65,13 @@ const getTypeOutput = ( type ) => {
 	return type ? `\`${ type }\`` : '(unknown type)';
 };
 
-module.exports = function(
+module.exports = (
 	rootDir,
 	docPath,
 	symbols,
 	headingTitle,
 	headingStartIndex
-) {
+) => {
 	const docs = [];
 	let headingIndex = headingStartIndex || 1;
 	if ( headingTitle ) {

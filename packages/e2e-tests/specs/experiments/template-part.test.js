@@ -12,28 +12,22 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Template Part', () => {
+	useExperimentalFeatures( [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-		await disableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
 	} );
 
 	describe( 'Template part block', () => {
@@ -62,6 +56,10 @@ describe( 'Template Part', () => {
 
 			// Save it, without saving the front page template.
 			await page.click( '.edit-site-save-button__button' );
+			const reviewChangesButton = await page.waitForSelector(
+				'.entities-saved-states__review-changes-button'
+			);
+			await reviewChangesButton.click();
 			const [ frontPageCheckbox ] = await page.$x(
 				'//strong[contains(text(),"Front Page")]/../preceding-sibling::span/input'
 			);

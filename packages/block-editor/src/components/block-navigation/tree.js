@@ -20,12 +20,14 @@ import { BlockNavigationContext } from './context';
  * @param {Object} props
  */
 export default function BlockNavigationTree( {
-	__experimentalWithBlockNavigationSlots,
+	__experimentalFeatures,
 	...props
 } ) {
 	const contextValue = useMemo(
-		() => ( { __experimentalWithBlockNavigationSlots } ),
-		[ __experimentalWithBlockNavigationSlots ]
+		() => ( {
+			__experimentalFeatures,
+		} ),
+		[ __experimentalFeatures ]
 	);
 
 	return (
