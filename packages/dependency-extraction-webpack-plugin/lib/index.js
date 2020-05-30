@@ -120,7 +120,6 @@ class DependencyExtractionWebpackPlugin {
 			return callback( null, { this: externalRequest } );
 		}
 
-		// @ts-ignore
 		return callback();
 	}
 
@@ -170,8 +169,8 @@ class DependencyExtractionWebpackPlugin {
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
-		const outputFilename =
-			/** @type {string} */ ( compiler.options.output?.filename );
+		const outputFilename = /** @type {string} */ ( compiler.options.output
+			?.filename );
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
@@ -229,8 +228,6 @@ class DependencyExtractionWebpackPlugin {
 					filename,
 					query,
 					basename: basename( filename ),
-					// Webpack types don't include `contentHash` here
-					// @ts-ignore
 					contentHash: createHash( 'md4' )
 						.update( assetString )
 						.digest( 'hex' ),
@@ -254,8 +251,8 @@ class DependencyExtractionWebpackPlugin {
 			}
 
 			if ( combineAssets ) {
-				const outputFolder =
-					/** @type {string} */ ( compiler.options.output?.path );
+				const outputFolder = /** @type {string} */ ( compiler.options
+					.output?.path );
 				const assetsFilePath = path.resolve(
 					outputFolder,
 					combinedOutputFile ||
