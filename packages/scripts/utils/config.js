@@ -72,7 +72,14 @@ const hasWebpackConfig = () =>
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
 
-const hasPostCssConfig = () => hasProjectFile( 'postcss.config.js' );
+const hasPostCssConfig = () =>
+	hasProjectFile( 'postcss.config.js' ) ||
+	hasProjectFile( '.postcssrc' ) ||
+	hasProjectFile( '.postcssrc.json' ) ||
+	hasProjectFile( '.postcssrc.yaml' ) ||
+	hasProjectFile( '.postcssrc.yml' ) ||
+	hasProjectFile( '.postcssrc.js' ) ||
+	hasPackageProp( 'postcss' );
 
 /**
  * Converts CLI arguments to the format which webpack understands.
