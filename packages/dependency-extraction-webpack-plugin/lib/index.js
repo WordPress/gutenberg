@@ -168,6 +168,10 @@ class DependencyExtractionWebpackPlugin {
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
+		// Assert the `string` type for output filename.
+		// The type indicates the option may be `undefined`.
+		// However, at this point in compilation, webpack has filled the options in if
+		// they were not provided.
 		const outputFilename = /** @type {string} */ ( compiler.options.output
 			?.filename );
 
