@@ -1,18 +1,13 @@
 /**
  * External dependencies
  */
-import { keyBy, groupBy, sortBy } from 'lodash';
+import { groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { flattenBlocks } from './helpers';
 
 export default function useNavigationBlocks( menuItems ) {
 	const [ blocks, setBlocks ] = useState( [] );
@@ -41,16 +36,7 @@ export default function useNavigationBlocks( menuItems ) {
 	};
 }
 
-const menuItemsToBlocks = (
-	menuItems,
-	prevBlocks = [],
-	prevClientIdToMenuItemMapping = {}
-) => {
-	const blocksByMenuId = mapBlocksByMenuId(
-		prevBlocks,
-		prevClientIdToMenuItemMapping
-	);
-
+const menuItemsToBlocks = ( menuItems ) => {
 	const itemsByParentID = groupBy( menuItems, 'parent' );
 	const clientIdToMenuItemMapping = {};
 	const menuItemsToTreeOfBlocks = ( items ) => {
@@ -67,11 +53,7 @@ const menuItemsToBlocks = (
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = menuItemToLinkBlock(
-				item,
-				menuItemInnerBlocks,
-				blocksByMenuId[ item.id ]
-			);
+			const linkBlock = menuItemToLinkBlock( item, menuItemInnerBlocks );
 			clientIdToMenuItemMapping[ linkBlock.clientId ] = item;
 			innerBlocks.push( linkBlock );
 		}
@@ -83,32 +65,13 @@ const menuItemsToBlocks = (
 	return [ blocks, clientIdToMenuItemMapping ];
 };
 
-function menuItemToLinkBlock(
-	menuItem,
-	innerBlocks = [],
-	existingBlock = null
-) {
-	const attributes = {
-		label: menuItem.title.rendered,
-		url: menuItem.url,
-	};
-
-	if ( existingBlock ) {
-		return {
-			...existingBlock,
-			attributes,
-			innerBlocks,
-		};
-	}
-	return createBlock( 'core/navigation-link', attributes, innerBlocks );
+function menuItemToLinkBlock( menuItem, innerBlocks = [] ) {
+	return createBlock(
+		'core/navigation-link',
+		{
+			label: menuItem.title.rendered,
+			url: menuItem.url,
+		},
+		innerBlocks
+	);
 }
-
-const mapBlocksByMenuId = ( blocks, menuItemsByClientId ) => {
-	const blocksByClientId = keyBy( flattenBlocks( blocks ), 'clientId' );
-	const blocksByMenuId = {};
-	for ( const clientId in menuItemsByClientId ) {
-		const menuItem = menuItemsByClientId[ clientId ];
-		blocksByMenuId[ menuItem.id ] = blocksByClientId[ clientId ];
-	}
-	return blocksByMenuId;
-};
