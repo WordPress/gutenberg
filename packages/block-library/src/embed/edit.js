@@ -36,6 +36,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			this.handleIncomingPreview = this.handleIncomingPreview.bind(
 				this
 			);
+			this.convertToLink = this.convertToLink.bind( this );
 
 			this.state = {
 				editingURL: false,
@@ -160,6 +161,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			} );
 		}
 
+		convertToLink() {}
+
 		render() {
 			const { url, editingURL } = this.state;
 			const {
@@ -222,6 +225,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						getResponsiveHelp={ this.getResponsiveHelp }
 						toggleResponsive={ this.toggleResponsive }
 						switchBackToURLInput={ this.switchBackToURLInput }
+						convertToLink={ this.convertToLink }
 					/>
 					<EmbedPreview
 						preview={ preview }
