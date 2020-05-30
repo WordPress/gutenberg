@@ -5,7 +5,6 @@ const { createHash } = require( 'crypto' );
 // @ts-ignore
 const json2php = require( 'json2php' );
 const path = require( 'path' );
-// @ts-ignore
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
 
