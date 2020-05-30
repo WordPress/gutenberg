@@ -21,10 +21,9 @@ import MenuEditor from '../menu-editor';
 export default function MenusEditor( { blockEditorSettings } ) {
 	const { menus, hasLoadedMenus } = useSelect( ( select ) => {
 		const { getMenus, hasFinishedResolution } = select( 'core' );
-		const query = { per_page: -1 };
 		return {
-			menus: getMenus( query ),
-			hasLoadedMenus: hasFinishedResolution( 'getMenus', [ query ] ),
+			menus: getMenus(),
+			hasLoadedMenus: hasFinishedResolution( 'getMenus' ),
 		};
 	}, [] );
 
