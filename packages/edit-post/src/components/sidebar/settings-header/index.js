@@ -21,7 +21,7 @@ const SettingsHeader = ( {
 		const currentPostType = select( 'core/editor' ).getCurrentPostType();
 		const postType = select( 'core' ).getPostType( currentPostType );
 
-		// translators: Default label for the Document sidebar tab, not selected.
+		// translators: Default ARIA label for the Document sidebar tab, not selected.
 		const defaultDocumentLabel = __( 'Document' );
 
 		return [ 'post', 'page' ].includes( currentPostType )
