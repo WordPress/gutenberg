@@ -689,30 +689,6 @@ function gutenberg_extend_settings_custom_units( $settings ) {
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
-/**
- * Extends block editor settings to include UI labels to be shown for elements.
- *
- * Currently experimental.
- *
- * @param  array $settings Default editor settings.
- * @return array           Modified editor settings.
- */
-function gutenberg_extend_settings_ui_labels( $settings ) {
-	$post_type        = get_post_type();
-	$post_type_object = get_post_type_object( $post_type );
-
-	$document_label = in_array( $post_type, array( 'post', 'page' ), true ) ?
-		__( 'Document', 'gutenberg' ) :
-		$post_type_object->labels->singular_name;
-
-	$settings['__experimentalLabels'] = array(
-		'document' => $document_label,
-	);
-
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_ui_labels' );
-
 /*
  * Register default patterns if not registered in Core already.
  */

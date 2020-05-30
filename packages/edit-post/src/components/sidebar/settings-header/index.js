@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -11,17 +16,26 @@ const SettingsHeader = ( {
 	sidebarName,
 } ) => {
 	const documentLabel = useSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		// translators: ARIA label for the Document sidebar tab, not selected.
-		return settings?.__experimentalLabels?.document ?? __( 'Document' );
+		const currentPostType = select( 'core/editor' ).getCurrentPostType();
+		const postType = select( 'core' ).getPostType( currentPostType );
+
+		// translators: Default ARIA label for the Document sidebar tab, not selected.
+		const defaultDocumentLabel = __( 'Document' );
+
+		return [ 'post', 'page' ].includes( currentPostType )
+			? defaultDocumentLabel
+			: get(
+					postType,
+					[ 'labels', 'singular_name' ],
+					defaultDocumentLabel
+			  );
 	} );
 
 	const [ documentAriaLabel, documentActiveClass ] =
 		sidebarName === 'edit-post/document'
 			? // translators: ARIA label for the Document sidebar tab, selected.
 			  [ sprintf( __( '%1$s (selected)' ), documentLabel ), 'is-active' ]
-			: // translators: ARIA label for the Document sidebar tab, not selected.
-			  [ documentLabel, '' ];
+			: [ documentLabel, '' ];
 
 	const blockLabel = __( 'Block' );
 	const [ blockAriaLabel, blockActiveClass ] =

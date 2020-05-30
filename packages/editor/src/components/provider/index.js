@@ -122,7 +122,6 @@ class EditorProvider extends Component {
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBase',
-				'__experimentalLabels',
 				'__experimentalPreferredStyleVariations',
 				'alignWide',
 				'allowedBlockTypes',
