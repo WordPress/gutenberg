@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "9.1.0",
+	"version": "10.0.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -65,7 +65,7 @@
 		"node-sass": "^4.13.1",
 		"npm-package-json-lint": "^5.0.0",
 		"postcss-loader": "^3.0.0",
-		"prettier": "npm:wp-prettier@1.19.1",
+		"prettier": "npm:wp-prettier@2.0.5",
 		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",

@@ -171,7 +171,7 @@ function gutenberg_experimental_global_styles_get_user_cpt_id() {
  */
 function gutenberg_experimental_global_styles_get_core() {
 	$config = gutenberg_experimental_global_styles_get_from_file(
-		dirname( dirname( __FILE__ ) ) . '/experimental-default-global-styles.json'
+		__DIR__ . '/experimental-default-theme.json'
 	);
 
 	return $config;
@@ -315,6 +315,35 @@ function gutenberg_experimental_global_styles_get_block_data() {
 }
 
 /**
+ * Given an array contain the styles shape returns the css for this styles.
+ * A similar function exists on the client at /packages/block-editor/src/hooks/style.js.
+ *
+ * @param array $styles  Array containing the styles shape from global styles.
+ *
+ * @return array Containing a set of css rules.
+ */
+function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
+	$mappings = array(
+		'line-height'      => array( 'typography', 'lineHeight' ),
+		'font-size'        => array( 'typography', 'fontSize' ),
+		'background'       => array( 'color', 'gradient' ),
+		'background-color' => array( 'color', 'background' ),
+		'color'            => array( 'color', 'text' ),
+	);
+
+	$result = array();
+
+	foreach ( $mappings as $key => $path ) {
+		$value = gutenberg_experimental_get( $styles, $path );
+		if ( null !== $value ) {
+			$result[ $key ] = $value;
+		}
+	}
+	return $result;
+
+}
+
+/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
@@ -352,7 +381,10 @@ function gutenberg_experimental_global_styles_resolver( $tree ) {
 		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
 			$block_data[ $block_name ]['selector'],
 			$block_data[ $block_name ]['supports'],
-			array_merge( $tree[ $block_name ]['styles'], $css_variables )
+			array_merge(
+				gutenberg_experimental_global_styles_flatten_styles_tree( $tree[ $block_name ]['styles'] ),
+				$css_variables
+			)
 		);
 	}
 	return $stylesheet;

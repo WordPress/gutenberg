@@ -70,9 +70,9 @@ $block-inserter-tabs-height: 44px;
 	position: relative;
 
 	input[type="search"].block-editor-inserter__search-input {
+		@include input-control;
 		display: block;
 		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		border-radius: $radius-block-ui;
 		background: $light-gray-200;
 		border: none;
 		width: 100%;

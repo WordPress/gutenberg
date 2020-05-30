@@ -7,6 +7,7 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,46 +15,44 @@ import { Button } from '@wordpress/components';
 import { DownloadableBlockNotice } from '../index';
 import { plugin } from './fixtures';
 
-import { INSTALL_ERROR_NOTICE_ID } from '../../../store/constants';
-
-const getContainer = ( { block, onClick = jest.fn(), errorNotices = {} } ) => {
-	return shallow(
-		<DownloadableBlockNotice
-			block={ block }
-			onClick={ onClick }
-			errorNotices={ errorNotices }
-		/>
-	);
-};
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test
+	const mock = jest.fn();
+	return mock;
+} );
 
 describe( 'DownloadableBlockNotice', () => {
 	describe( 'Rendering', () => {
 		it( 'should return null when there are no error notices', () => {
-			const wrapper = getContainer( { block: plugin } );
+			useSelect.mockImplementation( () => false );
+			const wrapper = shallow(
+				<DownloadableBlockNotice
+					block={ plugin }
+					onClick={ jest.fn() }
+				/>
+			);
 			expect( wrapper.isEmptyRender() ).toBe( true );
 		} );
 
 		it( 'should return something when there are error notices', () => {
-			const errorNotices = {
-				[ plugin.id ]: INSTALL_ERROR_NOTICE_ID,
-			};
-			const wrapper = getContainer( { block: plugin, errorNotices } );
-			expect( wrapper.length ).toBeGreaterThan( 0 );
+			useSelect.mockImplementation( () => 'Plugin not found.' );
+			const wrapper = shallow(
+				<DownloadableBlockNotice
+					block={ plugin }
+					onClick={ jest.fn() }
+				/>
+			);
+			expect( wrapper ).toMatchSnapshot();
 		} );
 	} );
 
 	describe( 'Behavior', () => {
 		it( 'should trigger the callback on button click', () => {
-			const errorNotices = {
-				[ plugin.id ]: INSTALL_ERROR_NOTICE_ID,
-			};
-
+			useSelect.mockImplementation( () => 'Plugin not found.' );
 			const onClick = jest.fn();
-			const wrapper = getContainer( {
-				block: plugin,
-				onClick,
-				errorNotices,
-			} );
+			const wrapper = shallow(
+				<DownloadableBlockNotice block={ plugin } onClick={ onClick } />
+			);
 
 			wrapper.find( Button ).simulate( 'click', { event: {} } );
 

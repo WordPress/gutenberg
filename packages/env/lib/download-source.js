@@ -70,6 +70,14 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 							( progress.totalObjects() * 2 )
 					);
 				},
+				certificateCheck: () => 0,
+				credentials: ( url, userName ) => {
+					try {
+						return NodeGit.Cred.sshKeyFromAgent( userName );
+					} catch {
+						return NodeGit.Cred.defaultNew();
+					}
+				},
 			},
 		},
 	};

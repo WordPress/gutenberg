@@ -64,12 +64,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapper
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapper.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
 	} );
@@ -120,12 +115,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapper
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapper.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a darker background color and/or a brighter text color.'
 		);
 	} );
@@ -142,12 +132,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapperSmallText
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapperSmallText.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
 
@@ -174,12 +159,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapperSmallFontSize
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapperSmallFontSize.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
 
@@ -219,12 +199,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapperNoLargeText
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapperNoLargeText.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
 	} );
@@ -253,12 +228,7 @@ describe( 'ContrastChecker', () => {
 		expect( speak ).toHaveBeenCalledWith(
 			'This color combination may be hard for people to read.'
 		);
-		expect(
-			wrapper
-				.find( Notice )
-				.children()
-				.text()
-		).toBe(
+		expect( wrapper.find( Notice ).children().text() ).toBe(
 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
 		);
 	} );
