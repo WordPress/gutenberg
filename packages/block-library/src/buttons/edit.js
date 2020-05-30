@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
 	__experimentalBlock as Block,
+	InnerBlocks,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { PanelBody, RadioControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,9 +28,7 @@ const alignmentHooksSetting = {
 	isEmbedButton: true,
 };
 
-function ButtonsEdit( { attributes, setAttributes } ) {
-	const { orientation } = attributes;
-
+function ButtonsEdit( { attributes: { orientation }, setAttributes } ) {
 	return (
 		<Block.div
 			className={ classnames( {

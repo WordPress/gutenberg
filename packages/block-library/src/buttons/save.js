@@ -8,8 +8,7 @@ import classnames from 'classnames';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const { orientation } = attributes;
+export default function save( { attributes: { orientation } } ) {
 	return (
 		<div
 			className={ classnames( {
