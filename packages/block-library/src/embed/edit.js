@@ -21,7 +21,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
+
+function getResponsiveHelp( checked ) {
+	return checked
+		? __(
+				'This embed will preserve its aspect ratio when the browser is resized.'
+		  )
+		: __(
+				'This embed may not preserve its aspect ratio when the browser is resized.'
+		  );
+}
 
 export function getEmbedEditComponent(
 	title,
@@ -29,95 +39,30 @@ export function getEmbedEditComponent(
 	responsive = true,
 	previewable = true
 ) {
-	return class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
-			this.setUrl = this.setUrl.bind( this );
-			this.getMergedAttributes = this.getMergedAttributes.bind( this );
-			this.setMergedAttributes = this.setMergedAttributes.bind( this );
-			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
-			this.toggleResponsive = this.toggleResponsive.bind( this );
-			this.handleIncomingPreview = this.handleIncomingPreview.bind(
-				this
-			);
+	return function EmbedEditComponent( props ) {
+		const {
+			attributes,
+			cannotEmbed,
+			fetching,
+			isSelected,
+			onReplace,
+			preview,
+			setAttributes,
+			themeSupportsResponsive,
+			tryAgain,
+			insertBlocksAfter,
+		} = props;
 
-			this.state = {
-				editingURL: false,
-				url: this.props.attributes.url,
-			};
+		const [ url, setURL ] = useState( attributes.url );
+		const [ isEditingURL, setIsEditingURL ] = useState( false );
 
-			if ( this.props.preview ) {
-				this.handleIncomingPreview();
-			}
-		}
-
-		handleIncomingPreview() {
-			this.setMergedAttributes();
-			if ( this.props.onReplace ) {
-				const upgradedBlock = createUpgradedEmbedBlock(
-					this.props,
-					this.getMergedAttributes()
-				);
-				if ( upgradedBlock ) {
-					this.props.onReplace( upgradedBlock );
-				}
-			}
-		}
-
-		componentDidUpdate( prevProps ) {
-			const hasPreview = undefined !== this.props.preview;
-			const hadPreview = undefined !== prevProps.preview;
-			const previewChanged =
-				prevProps.preview &&
-				this.props.preview &&
-				this.props.preview.html !== prevProps.preview.html;
-			const switchedPreview =
-				previewChanged || ( hasPreview && ! hadPreview );
-			const switchedURL =
-				this.props.attributes.url !== prevProps.attributes.url;
-
-			if ( switchedPreview || switchedURL ) {
-				if ( this.props.cannotEmbed ) {
-					// We either have a new preview or a new URL, but we can't embed it.
-					if ( ! this.props.fetching ) {
-						// If we're not fetching the preview, then we know it can't be embedded, so try
-						// removing any trailing slash, and resubmit.
-						this.resubmitWithoutTrailingSlash();
-					}
-					return;
-				}
-				this.handleIncomingPreview();
-			}
-		}
-
-		resubmitWithoutTrailingSlash() {
-			this.setState(
-				( prevState ) => ( {
-					url: prevState.url.replace( /\/$/, '' ),
-				} ),
-				this.setUrl
-			);
-		}
-
-		setUrl( event ) {
-			if ( event ) {
-				event.preventDefault();
-			}
-			const { url } = this.state;
-			const { setAttributes } = this.props;
-			this.setState( { editingURL: false } );
-			setAttributes( { url } );
-		}
-
-		/***
+		/**
 		 * @return {Object} Attributes derived from the preview, merged with the current attributes.
 		 */
-		getMergedAttributes() {
-			const { preview } = this.props;
-			const { className, allowResponsive } = this.props.attributes;
+		const getMergedAttributes = () => {
+			const { className, allowResponsive } = attributes;
 			return {
-				...this.props.attributes,
+				...attributes,
 				...getAttributesFromPreview(
 					preview,
 					title,
@@ -126,36 +71,28 @@ export function getEmbedEditComponent(
 					allowResponsive
 				),
 			};
-		}
+		};
 
-		/***
-		 * Sets block attributes based on the current attributes and preview data.
-		 */
-		setMergedAttributes() {
-			const { setAttributes } = this.props;
-			setAttributes( this.getMergedAttributes() );
-		}
+		const handleIncomingPreview = () => {
+			setAttributes( getMergedAttributes() );
+			if ( onReplace ) {
+				const upgradedBlock = createUpgradedEmbedBlock(
+					props,
+					getMergedAttributes()
+				);
 
-		switchBackToURLInput() {
-			this.setState( { editingURL: true } );
-		}
+				if ( upgradedBlock ) {
+					onReplace( upgradedBlock );
+				}
+			}
+		};
 
-		getResponsiveHelp( checked ) {
-			return checked
-				? __(
-						'This embed will preserve its aspect ratio when the browser is resized.'
-				  )
-				: __(
-						'This embed may not preserve its aspect ratio when the browser is resized.'
-				  );
-		}
-
-		toggleResponsive() {
-			const { allowResponsive, className } = this.props.attributes;
-			const { html } = this.props.preview;
+		const toggleResponsive = () => {
+			const { allowResponsive, className } = attributes;
+			const { html } = preview;
 			const newAllowResponsive = ! allowResponsive;
 
-			this.props.setAttributes( {
+			setAttributes( {
 				allowResponsive: newAllowResponsive,
 				className: getClassNames(
 					html,
@@ -163,89 +100,110 @@ export function getEmbedEditComponent(
 					responsive && newAllowResponsive
 				),
 			} );
-		}
+		};
 
-		render() {
-			const { url, editingURL } = this.state;
-			const {
-				fetching,
-				setAttributes,
-				isSelected,
-				preview,
-				cannotEmbed,
-				themeSupportsResponsive,
-				tryAgain,
-				insertBlocksAfter,
-			} = this.props;
+		useEffect( () => {
+			// If we can embed the url, bail early.
+			if ( ! cannotEmbed ) {
+				return;
+			}
 
+			// At this stage, we either have a new preview or a new URL, but we can't embed it.
+			// If we are already fetching the preview, bail early.
 			if ( fetching ) {
-				return <EmbedLoading />;
+				return;
 			}
 
-			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
-			const label = sprintf( __( '%s URL' ), title );
+			// At this stage, we're not fetching the preview, so we know it can't be embedded, so try
+			// removing any trailing slash, and resubmit.
+			const newURL = attributes.url.replace( /\/$/, '' );
+			setURL( newURL );
+			setIsEditingURL( false );
+			setAttributes( { url: newURL } );
+		}, [ cannotEmbed, fetching, attributes ] );
 
-			// No preview, or we can't embed the current URL, or we've clicked the edit button.
-			if ( ! preview || cannotEmbed || editingURL ) {
-				return (
-					<EmbedPlaceholder
-						icon={ icon }
-						label={ label }
-						onSubmit={ this.setUrl }
-						value={ url }
-						cannotEmbed={ cannotEmbed }
-						onChange={ ( event ) =>
-							this.setState( { url: event.target.value } )
-						}
-						fallback={ () => fallback( url, this.props.onReplace ) }
-						tryAgain={ tryAgain }
-					/>
-				);
+		useEffect( () => {
+			if ( preview && ! isEditingURL ) {
+				handleIncomingPreview();
 			}
+		}, [ preview, isEditingURL ] );
 
-			// Even though we set attributes that get derived from the preview,
-			// we don't access them directly because for the initial render,
-			// the `setAttributes` call will not have taken effect. If we're
-			// rendering responsive content, setting the responsive classes
-			// after the preview has been rendered can result in unwanted
-			// clipping or scrollbars. The `getAttributesFromPreview` function
-			// that `getMergedAttributes` uses is memoized so that we're not
-			// calculating them on every render.
-			const previewAttributes = this.getMergedAttributes();
-			const { caption, type, allowResponsive } = previewAttributes;
-			const className = classnames(
-				previewAttributes.className,
-				this.props.className
-			);
+		if ( fetching ) {
+			return <EmbedLoading />;
+		}
 
+		// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+		const label = sprintf( __( '%s URL' ), title );
+
+		// No preview, or we can't embed the current URL, or we've clicked the edit button.
+		if ( ! preview || cannotEmbed || isEditingURL ) {
 			return (
-				<>
-					<EmbedControls
-						showEditButton={ preview && ! cannotEmbed }
-						themeSupportsResponsive={ themeSupportsResponsive }
-						blockSupportsResponsive={ responsive }
-						allowResponsive={ allowResponsive }
-						getResponsiveHelp={ this.getResponsiveHelp }
-						toggleResponsive={ this.toggleResponsive }
-						switchBackToURLInput={ this.switchBackToURLInput }
-					/>
-					<EmbedPreview
-						preview={ preview }
-						previewable={ previewable }
-						className={ className }
-						url={ url }
-						type={ type }
-						caption={ caption }
-						onCaptionChange={ ( value ) =>
-							setAttributes( { caption: value } )
+				<EmbedPlaceholder
+					icon={ icon }
+					label={ label }
+					onSubmit={ ( event ) => {
+						if ( event ) {
+							event.preventDefault();
 						}
-						isSelected={ isSelected }
-						icon={ icon }
-						label={ label }
-						insertBlocksAfter={ insertBlocksAfter }
-					/>
-				</>
+
+						setIsEditingURL( false );
+						setAttributes( { url } );
+					} }
+					value={ url }
+					cannotEmbed={ cannotEmbed }
+					onChange={ ( event ) => setURL( event.target.value ) }
+					fallback={ () => fallback( url, onReplace ) }
+					tryAgain={ tryAgain }
+				/>
 			);
 		}
+
+		// Even though we set attributes that get derived from the preview,
+		// we don't access them directly because for the initial render,
+		// the `setAttributes` call will not have taken effect. If we're
+		// rendering responsive content, setting the responsive classes
+		// after the preview has been rendered can result in unwanted
+		// clipping or scrollbars. The `getAttributesFromPreview` function
+		// that `getMergedAttributes` uses is memoized so that we're not
+		// calculating them on every render.
+		const previewAttributes = getMergedAttributes(
+			props,
+			title,
+			responsive
+		);
+		const { caption, type, allowResponsive } = previewAttributes;
+		const className = classnames(
+			previewAttributes.className,
+			props.className
+		);
+
+		return (
+			<>
+				<EmbedControls
+					showEditButton={ preview && ! cannotEmbed }
+					themeSupportsResponsive={ themeSupportsResponsive }
+					blockSupportsResponsive={ responsive }
+					allowResponsive={ allowResponsive }
+					getResponsiveHelp={ getResponsiveHelp }
+					toggleResponsive={ toggleResponsive }
+					switchBackToURLInput={ () => setIsEditingURL( true ) }
+				/>
+				<EmbedPreview
+					preview={ preview }
+					previewable={ previewable }
+					className={ className }
+					url={ url }
+					type={ type }
+					caption={ caption }
+					onCaptionChange={ ( value ) =>
+						setAttributes( { caption: value } )
+					}
+					isSelected={ isSelected }
+					icon={ icon }
+					label={ label }
+					insertBlocksAfter={ insertBlocksAfter }
+				/>
+			</>
+		);
 	};
 }
