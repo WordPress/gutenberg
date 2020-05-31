@@ -1,14 +1,19 @@
-'use strict';
-
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' ),
-	config = require( '../' ),
-	stylelint = require( 'stylelint' ),
+	stylelint = require( 'stylelint' );
+
+/**
+ * Internal dependencies
+ */
+const config = require( '../' ),
 	validCss = fs.readFileSync(
-		'./__tests__/media-queries-valid.css',
+		'./packages/stylelint-config/__tests__/media-queries-valid.css',
 		'utf-8'
 	),
 	invalidCss = fs.readFileSync(
-		'./__tests__/media-queries-invalid.css',
+		'./packages/stylelint-config/__tests__/media-queries-invalid.css',
 		'utf-8'
 	);
 

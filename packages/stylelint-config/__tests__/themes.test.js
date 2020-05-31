@@ -1,9 +1,17 @@
-'use strict';
-
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' ),
-	config = require( '../' ),
-	stylelint = require( 'stylelint' ),
-	validCss = fs.readFileSync( './__tests__/themes-valid.css', 'utf-8' );
+	stylelint = require( 'stylelint' );
+
+/**
+ * Internal dependencies
+ */
+const config = require( '../' ),
+	validCss = fs.readFileSync(
+		'./packages/stylelint-config/__tests__/themes-valid.css',
+		'utf-8'
+	);
 
 describe( 'flags no warnings with valid css', () => {
 	let result;
