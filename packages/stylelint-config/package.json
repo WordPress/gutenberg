@@ -1,7 +1,7 @@
 {
-	"name": "stylelint-config-wordpress",
+	"name": "@wordpress/stylelint-config",
 	"version": "17.0.0",
-	"description": "WordPress shareable config for stylelint",
+	"description": "stylelint plugin for WordPress development.",
 	"author": "stylelint",
 	"license": "MIT",
 	"keywords": [
@@ -18,12 +18,15 @@
 		"wordpress",
 		"WordPress"
 	],
-	"homepage": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stylelint-config/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress.git"
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/stylelint-config"
 	},
-	"bugs": "https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress/issues",
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
 	"engines": {
 		"node": ">=10"
 	},
