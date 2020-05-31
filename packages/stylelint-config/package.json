@@ -19,9 +19,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"engines": {
-		"node": ">=10"
-	},
 	"files": [
 		"CHANGELOG.md",
 		"LICENSE",
