@@ -16,7 +16,7 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 /**
  * Internal dependencies
  */
-const { hasBabelConfig, hasPostCssConfig } = require( '../utils' );
+const { hasBabelConfig, hasPostCSSConfig } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
@@ -105,7 +105,7 @@ const config = {
 						options: {
 							// Provide a fallback configuration if there's not
 							// one explicitly available in the project.
-							...( ! hasPostCssConfig() && {
+							...( ! hasPostCSSConfig() && {
 								ident: 'postcss',
 								plugins: postcssPlugins,
 							} ),
