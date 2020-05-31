@@ -170,8 +170,10 @@ class DependencyExtractionWebpackPlugin {
 		// The type indicates the option may be `undefined`.
 		// However, at this point in compilation, webpack has filled the options in if
 		// they were not provided.
-		const outputFilename = /** @type {string} */ ( compiler.options.output
-			?.filename );
+		const outputFilename = /** @type {string} */ (
+			/** @type {{filename:string}} */ ( compiler.options.output )
+				.filename
+		);
 
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
