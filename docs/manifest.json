@@ -1584,6 +1584,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/stylelint-config",
+		"slug": "packages-stylelint-config",
+		"markdown_source": "../packages/stylelint-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "../packages/token-list/README.md",
