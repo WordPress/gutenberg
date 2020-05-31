@@ -1,3 +1,8 @@
+# 17.0.0
+
+-   Updated: `stylelint-scss` to `3.17.2`.
+-   Updated: `stylelint` to `13.0.0`.
+
 # 16.0.0
 
 -   Fixed: `selector-class-pattern` rule regex to account for numerals, case detection, and ensure kebab-case over snake_case.
