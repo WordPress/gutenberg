@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/stylelint-config",
 	"version": "17.0.0",
-	"description": "stylelint plugin for WordPress development.",
+	"description": "stylelint config for WordPress development.",
 	"author": "stylelint",
 	"license": "MIT",
 	"keywords": [
