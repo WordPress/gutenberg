@@ -62,15 +62,6 @@
 		"test": "npm run test:unit",
 		"watch": "jest --watch"
 	},
-	"eslintConfig": {
-		"root": true,
-		"extends": [
-			"plugin:@wordpress/eslint-plugin/recommended"
-		],
-		"rules": {
-			"linebreak-style": 0
-		}
-	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
