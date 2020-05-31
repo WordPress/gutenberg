@@ -5,18 +5,10 @@
 	"author": "stylelint",
 	"license": "MIT",
 	"keywords": [
-		"code",
-		"code style",
-		"css",
-		"lint",
-		"linter",
-		"linting",
 		"stylelint",
 		"stylelint-config",
 		"stylelint-config-wordpress",
-		"validate",
-		"wordpress",
-		"WordPress"
+		"wordpress"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stylelint-config/README.md",
 	"repository": {
