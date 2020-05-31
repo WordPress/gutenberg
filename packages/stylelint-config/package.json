@@ -32,12 +32,6 @@
 		"stylelint-config-recommended-scss": "^4.2.0",
 		"stylelint-scss": "^3.17.2"
 	},
-	"devDependencies": {
-		"@wordpress/scripts": "^10.0.0",
-		"npm-run-all": "^4.1.5",
-		"stylelint": "^13.2.0",
-		"stylelint-find-rules": "^2.2.0"
-	},
 	"peerDependencies": {
 		"stylelint": "^10.1.0 || ^11.0.0 || ^12.0.0 || ^13.0.0"
 	},
