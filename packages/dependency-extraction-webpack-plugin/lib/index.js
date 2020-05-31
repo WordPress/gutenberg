@@ -53,8 +53,6 @@ const {
  * @property {boolean|undefined} combineAssets By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
  */
 
-// @implements Unsupported TypeScript JSDoc tag: https://github.com/microsoft/TypeScript/issues/30156
-// /** @implements {import('webpack').Plugin} */
 class DependencyExtractionWebpackPlugin {
 	/**
 	 * @param {Partial<Options>} options
@@ -92,9 +90,9 @@ class DependencyExtractionWebpackPlugin {
 
 	/* eslint-disable jsdoc/valid-types */
 	/**
-	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[0]} _context
-	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[1]} request
-	 * @param {Parameters<import('webpack').ExternalsFunctionElement>[2]} callback
+	 * @param {Parameters<WebpackExternalsFunction>[0]} _context
+	 * @param {Parameters<WebpackExternalsFunction>[1]} request
+	 * @param {Parameters<WebpackExternalsFunction>[2]} callback
 	 */
 	externalizeWpDeps( _context, request, callback ) {
 		/* eslint-enable jsdoc/valid-types */
@@ -162,7 +160,7 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	/**
-	 * @param {import('webpack').Compiler} compiler
+	 * @param {WebpackCompiler} compiler
 	 * @return {void}
 	 */
 	apply( compiler ) {
@@ -287,3 +285,8 @@ function basename( name ) {
 }
 
 module.exports = DependencyExtractionWebpackPlugin;
+
+/**
+ * @typedef {import('webpack').Compiler} WebpackCompiler
+ * @typedef {import('webpack').ExternalsFunctionElement} WebpackExternalsFunction
+ */
