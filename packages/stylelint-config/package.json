@@ -38,7 +38,6 @@
 	"devDependencies": {
 		"@wordpress/scripts": "^10.0.0",
 		"npm-run-all": "^4.1.5",
-		"npmpub": "^5.0.0",
 		"remark-cli": "^8.0.0",
 		"remark-preset-lint-consistent": "^3.0.0",
 		"remark-preset-lint-recommended": "^4.0.0",
@@ -51,7 +50,6 @@
 	"scripts": {
 		"check-engines": "wp-scripts check-engines --package",
 		"check-licenses": "wp-scripts check-licenses --production",
-		"dry-release": "npmpub --dry --verbose",
 		"format:js": "wp-scripts format-js",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
@@ -59,7 +57,6 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json",
 		"lint": "npm-run-all --parallel lint:*",
 		"pretest": "npm run lint",
-		"release": "npmpub --verbose",
 		"stylelint-find-unused-rules": "stylelint-find-rules --config index.js",
 		"test:unit": "wp-scripts test-unit-js",
 		"test": "npm run test:unit",
