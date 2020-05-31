@@ -35,21 +35,6 @@
 	"peerDependencies": {
 		"stylelint": "^10.1.0 || ^11.0.0 || ^12.0.0 || ^13.0.0"
 	},
-	"scripts": {
-		"check-engines": "wp-scripts check-engines --package",
-		"check-licenses": "wp-scripts check-licenses --production",
-		"format:js": "wp-scripts format-js",
-		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
-		"lint:md": "remark . --quiet --frail",
-		"lint:pkg-json": "wp-scripts lint-pkg-json",
-		"lint": "npm-run-all --parallel lint:*",
-		"pretest": "npm run lint",
-		"stylelint-find-unused-rules": "stylelint-find-rules --config index.js",
-		"test:unit": "wp-scripts test-unit-js",
-		"test": "npm run test:unit",
-		"watch": "jest --watch"
-	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",
 		"rules": {
