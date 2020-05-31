@@ -44,8 +44,6 @@
 		"stylelint-scss": "^3.17.2"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^8.3.5",
-		"@commitlint/config-conventional": "^8.3.4",
 		"@wordpress/scripts": "^10.0.0",
 		"husky": "^4.2.3",
 		"npm-run-all": "^4.1.5",
@@ -75,11 +73,6 @@
 		"test:unit": "wp-scripts test-unit-js",
 		"test": "npm run test:unit",
 		"watch": "jest --watch"
-	},
-	"commitlint": {
-		"extends": [
-			"@commitlint/config-conventional"
-		]
 	},
 	"eslintConfig": {
 		"root": true,
