@@ -9,8 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
     - uses: preactjs/compressed-size-action@v1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
