@@ -72,11 +72,5 @@
 				]
 			]
 		}
-	},
-	"remarkConfig": {
-		"presets": [
-			"lint-recommended",
-			"lint-consistent"
-		]
 	}
 }
