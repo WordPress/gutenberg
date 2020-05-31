@@ -45,7 +45,6 @@
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^10.0.0",
-		"husky": "^4.2.3",
 		"npm-run-all": "^4.1.5",
 		"npmpub": "^5.0.0",
 		"remark-cli": "^8.0.0",
@@ -81,11 +80,6 @@
 		],
 		"rules": {
 			"linebreak-style": 0
-		}
-	},
-	"husky": {
-		"hooks": {
-			"commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
 		}
 	},
 	"npmpackagejsonlint": {
