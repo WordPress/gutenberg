@@ -89,6 +89,11 @@ const ImageComponent = ( {
 		styles.iconPlaceholderDark
 	);
 
+	const iconUploadStyles = usePreferredColorSchemeStyle(
+		styles.iconUpload,
+		styles.iconUploadDark
+	);
+
 	const imageBorderOnSelectedStyle =
 		isSelected && ! ( isUploadInProgress || isUploadFailed )
 			? styles.imageBorder
@@ -106,6 +111,9 @@ const ImageComponent = ( {
 				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = iconPlaceholderStyles;
+				break;
+			case ICON_TYPE.UPLOAD:
+				iconStyle = iconUploadStyles;
 				break;
 		}
 		return <Icon icon={ icon } { ...iconStyle } />;
