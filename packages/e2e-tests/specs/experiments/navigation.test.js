@@ -19,6 +19,10 @@ import {
  */
 import menuItemsFixture from './menu-items-response-fixture.json';
 
+function matchUrl( reqUrl, urls ) {
+	return urls.some( ( url ) => reqUrl.indexOf( url ) >= 0 );
+}
+
 async function mockPagesResponse( pages ) {
 	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
 		id: index + 1,
@@ -77,6 +81,17 @@ const menusFixture = [
 	},
 ];
 
+// Matching against variations of the same URL encoded and non-encoded
+// produces the most reliable mocking.
+const REST_MENUS_URLS = [
+	'/__experimental/menus',
+	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
+];
+const REST_MENU_ITEMS_URLS = [
+	'/__experimental/menu-items',
+	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
+];
+
 /**
  * Creates mocked REST API responses for calls to menus and menu-items
  * endpoints.
@@ -99,31 +114,12 @@ async function mockAllMenusResponses(
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => {
-				const isMenusMatch = request
-					.url()
-					.includes(
-						`rest_route=${ encodeURIComponent(
-							'/__experimental/menus'
-						) }`
-					);
-
-				return isMenusMatch;
-			},
+			match: ( request ) => matchUrl( request.url(), REST_MENUS_URLS ),
 			onRequestMatch: createJSONResponse( mappedMenus ),
 		},
 		{
-			match: ( request ) => {
-				const isMenuItemsMatch = request
-					.url()
-					.includes(
-						`rest_route=${ encodeURIComponent(
-							'/__experimental/menu-items'
-						) }`
-					);
-
-				return isMenuItemsMatch;
-			},
+			match: ( request ) =>
+				matchUrl( request.url(), REST_MENU_ITEMS_URLS ),
 			onRequestMatch: createJSONResponse( menuItems ),
 		},
 	] );
@@ -198,6 +194,17 @@ async function updateActiveNavigationLink( { url, label, type } ) {
 	}
 }
 
+async function selectDropDownOption( optionText ) {
+	const [ dropdownToggle ] = await page.$x(
+		'//button[text()="Select where to start from…"][not(@disabled)]'
+	);
+	await dropdownToggle.click();
+
+	const [ theOption ] = await page.$x( `//li[text()="${ optionText }"]` );
+
+	await theOption.click();
+}
+
 beforeEach( async () => {
 	await createNewPost();
 } );
@@ -255,29 +262,24 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			// Create an empty nav block. The UI to create from Menus is disabled until Menus are loaded,
-			// so we must wait for it to be available
-			await page.waitForXPath( '//option[text()="Test Menu 2"]' );
+			await selectDropDownOption( 'Test Menu 2' );
 
-			// Check the label is present so we can grab it's corresponding select dropdown
-			// const [ menuSelectLabel ] = await page.$x(
-			// 	'//label[text()="Create from existing Menu"]'
-			// );
-
-			// const selectElementId = await page.evaluate( ( theLabelEl ) => {
-			// 	return theLabelEl.getAttribute( 'for' );
-			// }, menuSelectLabel );
-
-			const [ createFromExistingButton ] = await page.$x(
-				'//button[text()="Create from Menu"][not(@disabled)]'
+			await page.waitForXPath(
+				'//button[text()="Create"][not(@disabled)]'
 			);
 
-			await createFromExistingButton.click();
+			const [ createNavigationButton ] = await page.$x(
+				'//button[text()="Create"][not(@disabled)]'
+			);
 
-			// Scope element selector to the "Editor content" as otherwise it picks up on
-			// Block Style live previews.
+			await createNavigationButton.click();
+
+			// await page.waitFor( 50000000 );
+
+			// Scope element selector to the Editor's "Content" region as otherwise it picks up on
+			// block previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"] li[aria-label="Block: Navigation Link"]',
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Navigation Link"]',
 				( els ) => els.length
 			);
 
@@ -286,6 +288,8 @@ describe( 'Navigation', () => {
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
+
+			await expect( page ).not.toPassAxeTests();
 		} );
 
 		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {

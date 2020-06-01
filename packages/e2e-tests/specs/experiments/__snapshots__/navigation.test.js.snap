@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Navigation Creating from existing Menus allows a navigation block to be created from existing menus 1`] = `
-"<!-- wp:navigation -->
+"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"id\\":94} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"type\\":\\"post_type\\",\\"id\\":95} -->
