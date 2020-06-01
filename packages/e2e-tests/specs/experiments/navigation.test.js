@@ -348,10 +348,10 @@ describe( 'Navigation', () => {
 
 		// Create an empty nav block.
 		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
-			'//button[text()="Create empty"]'
-		);
-		await createEmptyButton.click();
+
+		await selectDropDownOption( 'Create empty menu' );
+
+		await clickCreateButton();
 
 		// Add a link to the default Navigation Link block.
 		await updateActiveNavigationLink( {
