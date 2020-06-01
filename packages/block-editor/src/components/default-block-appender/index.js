@@ -65,6 +65,7 @@ export function DefaultBlockAppender( {
 				rootClientId={ rootClientId }
 				position="top right"
 				isAppender
+				__experimentalIsQuick
 			/>
 		</div>
 	);

@@ -184,6 +184,7 @@ function BlockPopover( {
 					<Inserter
 						clientId={ clientId }
 						rootClientId={ rootClientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }
@@ -209,6 +210,7 @@ function BlockPopover( {
 						position="top right"
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						__experimentalIsQuick
 					/>
 				</div>
 			) }

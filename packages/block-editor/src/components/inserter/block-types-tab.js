@@ -29,7 +29,7 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
-export function InserterBlockList( {
+export function BlockTypesTab( {
 	rootClientId,
 	onInsert,
 	onHover,
@@ -244,4 +244,4 @@ export function InserterBlockList( {
 	);
 }
 
-export default compose( withSpokenMessages )( InserterBlockList );
+export default compose( withSpokenMessages )( BlockTypesTab );
