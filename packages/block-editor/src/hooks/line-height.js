@@ -22,18 +22,11 @@ export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
  */
 export function LineHeightEdit( props ) {
 	const {
-		name: blockName,
 		attributes: { style },
 	} = props;
-	// Don't render the controls if disabled by editor settings
-	const isDisabled = useEditorFeature(
-		'__experimentalDisableCustomLineHeight'
-	);
+	const isDisabled = useIsLineHeightDisabled( props );
 
-	if (
-		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) ||
-		isDisabled
-	) {
+	if ( isDisabled ) {
 		return null;
 	}
 
@@ -54,5 +47,21 @@ export function LineHeightEdit( props ) {
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
 		/>
+	);
+}
+
+/**
+ * Custom hook that checks if line-height settings have been disabled.
+ *
+ * @param {string} name The name of the block.
+ * @return {boolean} Whether setting is disabled.
+ */
+export function useIsLineHeightDisabled( { name: blockName } = {} ) {
+	const isDisabled = useEditorFeature(
+		'__experimentalDisableCustomLineHeight'
+	);
+
+	return (
+		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
 	);
 }
