@@ -108,7 +108,7 @@ function validateOptions( options ) {
   with a set of helper functions.
 */
 
-const CanvasImage = function( image ) {
+const CanvasImage = function ( image ) {
 	this.canvas = document.createElement( 'canvas' );
 	this.context = this.canvas.getContext( '2d' );
 	this.width = this.canvas.width = image.width;
@@ -116,11 +116,11 @@ const CanvasImage = function( image ) {
 	this.context.drawImage( image, 0, 0, this.width, this.height );
 };
 
-CanvasImage.prototype.getImageData = function() {
+CanvasImage.prototype.getImageData = function () {
 	return this.context.getImageData( 0, 0, this.width, this.height );
 };
 
-export const ColorThief = function() {};
+export const ColorThief = function () {};
 
 /*
  * getColor(sourceImage[, quality])
@@ -135,9 +135,13 @@ export const ColorThief = function() {};
  * most dominant color.
  *
  * */
-ColorThief.prototype.getColor = function( sourceImage, quality = 10 ) {
+ColorThief.prototype.getColor = function ( sourceImage, quality = 10 ) {
 	const palette = this.getPalette( sourceImage, 5, quality );
-	const dominantColor = palette[ 0 ];
+	/**
+	 * Custom update:
+	 * The palette may be null if the image is pure white.
+	 */
+	const dominantColor = palette ? palette[ 0 ] : undefined;
 	return dominantColor;
 };
 
@@ -158,7 +162,11 @@ ColorThief.prototype.getColor = function( sourceImage, quality = 10 ) {
  *
  *
  */
-ColorThief.prototype.getPalette = function( sourceImage, colorCount, quality ) {
+ColorThief.prototype.getPalette = function (
+	sourceImage,
+	colorCount,
+	quality
+) {
 	const options = validateOptions( {
 		colorCount,
 		quality,
@@ -183,11 +191,11 @@ ColorThief.prototype.getPalette = function( sourceImage, colorCount, quality ) {
 	return palette;
 };
 
-ColorThief.prototype.getImageData = function( imageUrl, callback ) {
+ColorThief.prototype.getImageData = function ( imageUrl, callback ) {
 	const xhr = new XMLHttpRequest();
 	xhr.open( 'GET', imageUrl, true );
 	xhr.responseType = 'arraybuffer';
-	xhr.onload = function() {
+	xhr.onload = function () {
 		if ( this.status === 200 ) {
 			const uInt8Array = new Uint8Array( this.response );
 			const binaryString = new Array( uInt8Array.length );

@@ -304,7 +304,7 @@ function CoverEdit( {
 	 * that image and sets it as a background color.
 	 */
 	useColorExtract( {
-		disableChangeOnFirstRender: true,
+		color: backgroundColorValue,
 		onChange: ( nextColor ) => setOverlayColor( nextColor ),
 		src: url,
 	} );

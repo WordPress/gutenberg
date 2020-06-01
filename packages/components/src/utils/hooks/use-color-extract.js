@@ -7,7 +7,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,21 +42,35 @@ import { ColorThief } from './extract-color';
  * @return {string|Array<string>} Color (or collection of colors) extracted from the image.
  */
 export function useColorExtract( {
-	disableChangeOnFirstRender = false,
 	numberOfColors = 1,
+	color: initialColor,
 	onChange = noop,
 	src,
 } ) {
 	const [ colors, setColors ] = useState();
-	const [ didInitialLoad, setDidInitialLoad ] = useState(
-		! disableChangeOnFirstRender
-	);
+	const srcRef = useRef( src );
+	const initialColorRef = useRef( initialColor );
 
 	useEffect( () => {
-		if ( ! src ) return;
+		// Guard to quick return if the src does not change
+		if ( srcRef.current === src ) {
+			return;
+		}
+		/**
+		 * Checks to see if the src changes.
+		 * For Cover blocks, the initial src (on load) is undefined.
+		 * This tracks to see if an existing src changes to another.
+		 */
+		const didSrcChange =
+			// Initial src exists
+			srcRef.current &&
+			// Next src exists
+			src &&
+			// Next src does not match initial src (changed)
+			srcRef.current !== src;
 
-		if ( ! didInitialLoad ) {
-			setDidInitialLoad( true );
+		// Guard to handle the initial load of an image (with potential pre-existing color)
+		if ( initialColorRef.current && ! didSrcChange ) {
 			return;
 		}
 
@@ -91,6 +105,7 @@ export function useColorExtract( {
 
 				onChange( changeValue, { data, node: imageNode } );
 				setColors( changeValue );
+				srcRef.current = src;
 			} catch ( err ) {
 				// eslint-disable-next-line no-console
 				console.warn( err );
@@ -99,7 +114,7 @@ export function useColorExtract( {
 
 		// Load the image
 		imageNode.src = src;
-	}, [ src, numberOfColors ] );
+	}, [ src, initialColor, numberOfColors ] );
 
 	return colors;
 }
