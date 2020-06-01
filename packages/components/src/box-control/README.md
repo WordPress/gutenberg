@@ -59,6 +59,39 @@ const Example = () => {
 };
 ```
 
+Alternatively, the `<Visualizer>` can be nested as a sibling to the component you would like visualized. Using `<Visualizer />` in this manner will require the parent element having a `position` style.
+
+```jsx
+import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import { useState } from '@wordpress/compose';
+
+import MyComponent from './my-component';
+
+const { Visualizer } = BoxControl;
+
+const Example = () => {
+	const [ values, setValues ] = useState( {
+		top: '50px',
+		left: '10%',
+		right: '10%',
+		bottom: '50px',
+	} );
+
+	return (
+		<>
+			<BoxControl
+				value={ value }
+				onChange={ ( nextValues ) => setValues( nextValues ) }
+			/>
+			<div style={ { position: 'relative' } }>
+				<Visualizer />
+				<MyComponent />
+			</div>
+		</>
+	);
+};
+```
+
 ## Props
 
 ### inputProps
