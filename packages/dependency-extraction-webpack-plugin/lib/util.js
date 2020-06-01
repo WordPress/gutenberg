@@ -43,8 +43,6 @@ function defaultRequestToExternal( request ) {
 			camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ),
 		];
 	}
-
-	return undefined;
 }
 
 /**
@@ -69,8 +67,6 @@ function defaultRequestToHandle( request ) {
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
 		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
 	}
-
-	return undefined;
 }
 
 /**

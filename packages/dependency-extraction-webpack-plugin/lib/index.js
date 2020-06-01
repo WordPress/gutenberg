@@ -24,7 +24,7 @@ const {
  *
  * @param {string} request Module request.
  *
- * @return {string|string[]|undefined} Return `undefined` to ignore the request.
+ * @return {string|string[]|void} Return `undefined` to ignore the request.
  *                                     Return `string|string[]` to map the request to an external.
  */
 
@@ -35,7 +35,7 @@ const {
  *
  * @param {string} request Module request.
  *
- * @return {string|undefined} Return `undefined` to use the same name as the module.
+ * @return {string|void} Return `undefined` to use the same name as the module.
  *                            Return `string` to map the request to a specific script handle.
  */
 
