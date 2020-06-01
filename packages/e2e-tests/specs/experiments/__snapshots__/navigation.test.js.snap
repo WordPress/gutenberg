@@ -42,7 +42,7 @@ exports[`Navigation Creating from existing Menus creates an empty navigation blo
 <!-- /wp:navigation -->"
 `;
 
-exports[`Navigation Creating from existing Menus does not display option to create from existing menus if there are no menus 1`] = `"<!-- wp:navigation /-->"`;
+exports[`Navigation Creating from existing Menus does not display option to create from existing menus if there are no menus 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
 
 exports[`Navigation allows a navigation block to be created using existing pages 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
 

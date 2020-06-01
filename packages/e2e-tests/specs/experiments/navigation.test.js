@@ -316,12 +316,26 @@ describe( 'Navigation', () => {
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			// Attempt to find the create Menu button
-			const [ createFromExistingButton ] = await page.$x(
-				'//button[text()="Create from Menu"][not(@disabled)]'
+			const [ dropdownToggle ] = await page.$x(
+				'//button[text()="Select where to start from…"][not(@disabled)]'
+			);
+			await dropdownToggle.click();
+
+			const dropDownItemsLength = await page.$$eval(
+				'ul[role="listbox"] li[role="option"]',
+				( els ) => els.length
 			);
 
-			expect( createFromExistingButton ).toBeFalsy();
+			// Should only be showing
+			// 1. Create empty.
+			// 2. Create from Pages.
+			expect( dropDownItemsLength ).toEqual( 2 );
+
+			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+
+			await page.waitForXPath(
+				'//li[text()="New from all top-level pages"]'
+			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
