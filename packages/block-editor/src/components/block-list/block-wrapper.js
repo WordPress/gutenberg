@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last, omit } from 'lodash';
+import { first, last, omit, capitalize } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -241,19 +241,16 @@ const BlockComponent = forwardRef(
 	}
 );
 
-const withBlockWrapper = createHigherOrderComponent(
+export const block = createHigherOrderComponent(
 	( Component ) =>
 		forwardRef( ( props, ref ) => (
 			<BlockComponent { ...props } ref={ ref } tagName={ Component } />
 		) ),
-	'withBlockWrapper'
+	'block'
 );
 
-const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
-	acc[ element ] = withBlockWrapper( element );
-	return acc;
-}, BlockComponent );
-
-export const Block = ExtendedBlockComponent;
-
-Block.withBlockWrapper = withBlockWrapper;
+ELEMENTS.forEach( ( element ) => {
+	const ElementBlock = block( element );
+	block[ element ] = ElementBlock;
+	block[ capitalize( element ) ] = ElementBlock;
+} );

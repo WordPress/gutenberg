@@ -34,7 +34,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { Block } from './block-wrapper';
+import { block } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
@@ -183,31 +183,31 @@ function BlockListBlock( {
 					<>
 						{ blockEdit }
 						{ mode === 'html' && (
-							<Block.div __unstableIsHtml>
+							<block.Div __unstableIsHtml>
 								<BlockHtml clientId={ clientId } />
-							</Block.div>
+							</block.Div>
 						) }
 					</>
 				) }
 				{ isValid && ! lightBlockWrapper && (
-					<Block.div { ...wrapperProps }>
+					<block.div { ...wrapperProps }>
 						{ blockEdit }
 						{ mode === 'html' && (
 							<BlockHtml clientId={ clientId } />
 						) }
-					</Block.div>
+					</block.div>
 				) }
 				{ ! isValid && (
-					<Block.div>
+					<block.Div>
 						<BlockInvalidWarning clientId={ clientId } />
 						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</Block.div>
+					</block.Div>
 				) }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block.div>
+				<block.Div>
 					<BlockCrashWarning />
-				</Block.div>
+				</block.Div>
 			) }
 		</BlockListBlockContext.Provider>
 	);
@@ -230,7 +230,6 @@ const applyWithSelect = withSelect(
 			__unstableGetBlockWithoutInnerBlocks,
 			isNavigationMode,
 		} = select( 'core/block-editor' );
-		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { focusMode, isRTL } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
@@ -246,7 +245,8 @@ const applyWithSelect = withSelect(
 		// This function should never be called when a block is not present in
 		// the state. It happens now because the order in withSelect rendering
 		// is not correct.
-		const { name, attributes, isValid } = block || {};
+		const { name, attributes, isValid } =
+			__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 
 		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
@@ -362,6 +362,6 @@ export default compose(
 	// block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block ),
+	ifCondition( ( props ) => !! props.block ),
 	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

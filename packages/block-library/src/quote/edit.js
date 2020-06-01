@@ -11,12 +11,12 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalBlock as block,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 
-const BlockQuote = Block.withBlockWrapper( BlockQuotation );
+const BlockQuote = block( BlockQuotation );
 
 export default function QuoteEdit( {
 	attributes,
