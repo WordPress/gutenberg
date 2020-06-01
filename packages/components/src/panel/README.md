@@ -127,6 +127,14 @@ An icon to be shown next to the `PanelBody` title.
 -   Type: `String`
 -   Required: No
 
+###### collapsible
+
+If collapsible is true, then the collapse arrow is not be rendered and the `PanelBody` cannot be collapsed.
+
+-   Type: `boolean`
+-   Required: No
+-   Default: true
+
 ###### onToggle
 
 A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
