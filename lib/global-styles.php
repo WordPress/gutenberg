@@ -80,6 +80,13 @@ function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
 			file_get_contents( $file_path ),
 			true
 		);
+
+		$json_decoding_error = json_last_error_msg();
+		if ( 'No error' !== $json_decoding_error ) {
+			error_log( 'Error when decoding file schema: ' . $json_decoding_error );
+			return $config;
+		}
+
 		if ( is_array( $decoded_file ) ) {
 			$config = $decoded_file;
 		}
@@ -97,6 +104,13 @@ function gutenberg_experimental_global_styles_get_user() {
 	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt( array( 'publish' ) );
 	if ( array_key_exists( 'post_content', $user_cpt ) ) {
 		$decoded_data = json_decode( $user_cpt['post_content'], true );
+
+		$json_decoding_error = json_last_error_msg();
+		if ( 'No error' !== $json_decoding_error ) {
+			error_log( 'Error when decoding user schema: ' . $json_decoding_error );
+			return $config;
+		}
+
 		if ( is_array( $decoded_data ) ) {
 			$config = $decoded_data;
 		}
