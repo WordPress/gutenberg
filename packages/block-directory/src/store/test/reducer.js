@@ -18,20 +18,19 @@ describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
 			const initialState = deepFreeze( {
-				pendingBlockRequests: 0,
+				pendingSearchRequests: 0,
 			} );
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
-				filterValue: 'test',
 			} );
 
-			expect( state.pendingBlockRequests ).toEqual( 1 );
+			expect( state.pendingSearchRequests ).toEqual( 1 );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
 			const query = downloadableBlock.title;
 			const initialState = deepFreeze( {
-				pendingBlockRequests: 1,
+				pendingSearchRequests: 1,
 			} );
 
 			const state = downloadableBlocks( initialState, {
@@ -40,7 +39,7 @@ describe( 'state', () => {
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
-			expect( state.pendingBlockRequests ).toEqual( 0 );
+			expect( state.pendingSearchRequests ).toEqual( 0 );
 		} );
 
 		it( "should set user's search term and save results", () => {
@@ -61,6 +60,44 @@ describe( 'state', () => {
 			} );
 
 			expect( Object.keys( updatedState.results ) ).toHaveLength( 2 );
+		} );
+
+		it( 'should increment block requests', () => {
+			const initialState = {
+				pendingSearchRequests: 0,
+			};
+
+			// Simulate the first call.
+			const state = downloadableBlocks( initialState, {
+				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+			} );
+
+			// Simulate a second call.
+			const finalState = downloadableBlocks( state, {
+				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+			} );
+
+			expect( finalState.pendingSearchRequests ).toEqual( 2 );
+		} );
+		it( 'should decrement block requests', () => {
+			const initialState = {
+				pendingSearchRequests: 2,
+			};
+
+			// Simulate the first call response
+			const state = downloadableBlocks( initialState, {
+				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+				filterValue: 'Test',
+				downloadableBlocks: [],
+			} );
+
+			const finalState = downloadableBlocks( state, {
+				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+				filterValue: 'Test 1',
+				downloadableBlocks: [],
+			} );
+
+			expect( finalState.pendingSearchRequests ).toEqual( 0 );
 		} );
 	} );
 

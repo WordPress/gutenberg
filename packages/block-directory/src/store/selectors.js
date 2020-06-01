@@ -16,7 +16,7 @@ import hasBlockType from './utils/has-block-type';
  * @return {Array} Downloadable blocks
  */
 export function isRequestingDownloadableBlocks( state ) {
-	return state.downloadableBlocks.pendingBlockRequests > 0;
+	return state.downloadableBlocks.pendingSearchRequests > 0;
 }
 
 /**
