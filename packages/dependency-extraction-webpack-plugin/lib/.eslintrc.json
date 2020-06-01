@@ -1,7 +1,0 @@
-{
-	"root": true,
-	"extends": [ "plugin:@wordpress/eslint-plugin/esnext" ],
-	"env": {
-		"node": true
-	}
-}
