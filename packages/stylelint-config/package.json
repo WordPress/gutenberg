@@ -45,5 +45,8 @@
 				]
 			]
 		}
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
