@@ -127,8 +127,6 @@ const Cover = ( {
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
 		const onSelect = attributesFromMedia( setAttributes );
-		// Remove gradient attribute
-		setAttributes( { gradient: undefined, customGradient: undefined } );
 		onSelect( media );
 	};
 
