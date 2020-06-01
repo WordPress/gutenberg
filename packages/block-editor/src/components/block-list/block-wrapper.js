@@ -22,6 +22,7 @@ import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const BlockComponent = forwardRef(
 	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
@@ -240,11 +241,19 @@ const BlockComponent = forwardRef(
 	}
 );
 
+const withBlockWrapper = createHigherOrderComponent(
+	( Component ) =>
+		forwardRef( ( props, ref ) => (
+			<BlockComponent { ...props } ref={ ref } tagName={ Component } />
+		) ),
+	'withBlockWrapper'
+);
+
 const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
-	acc[ element ] = forwardRef( ( props, ref ) => {
-		return <BlockComponent { ...props } ref={ ref } tagName={ element } />;
-	} );
+	acc[ element ] = withBlockWrapper( element );
 	return acc;
 }, BlockComponent );
 
 export const Block = ExtendedBlockComponent;
+
+Block.withBlockWrapper = withBlockWrapper;

@@ -11,9 +11,12 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+
+const BlockQuote = Block.withBlockWrapper( BlockQuotation );
 
 export default function QuoteEdit( {
 	attributes,
@@ -35,7 +38,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation
+			<BlockQuote
 				className={ classnames( className, {
 					[ `has-text-align-${ align }` ]: align,
 				} ) }
@@ -91,7 +94,7 @@ export default function QuoteEdit( {
 						textAlign={ align }
 					/>
 				) }
-			</BlockQuotation>
+			</BlockQuote>
 		</>
 	);
 }
