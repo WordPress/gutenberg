@@ -174,7 +174,7 @@ class MediaContainer extends Component {
 			<View
 				style={ [
 					imageFill && {
-						height: 200,
+						height: styles.imageFill.height,
 					},
 					imageFill && styles.imageWithFocalPoint,
 				] }

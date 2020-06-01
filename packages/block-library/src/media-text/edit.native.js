@@ -12,11 +12,18 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InnerBlocks,
+	InspectorControls,
 	withColors,
+	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { Button, ToolbarGroup } from '@wordpress/components';
+import {
+	Button,
+	ToolbarGroup,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { pullLeft, pullRight, replace } from '@wordpress/icons';
@@ -221,6 +228,7 @@ class MediaTextEdit extends Component {
 		} = this.props;
 		const {
 			isStackedOnMobile,
+			imageFill,
 			mediaPosition,
 			mediaWidth,
 			mediaType,
@@ -292,8 +300,25 @@ class MediaTextEdit extends Component {
 			setAttributes( { verticalAlignment: alignment } );
 		};
 
+		const controls = (
+			<InspectorControls>
+				<PanelBody title={ __( 'Media & Text settings' ) }>
+					<ToggleControl
+						label={ __( 'Crop image to fill entire column' ) }
+						checked={ imageFill }
+						onChange={ () =>
+							setAttributes( {
+								imageFill: ! imageFill,
+							} )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+
 		return (
 			<>
+				{ mediaType === MEDIA_TYPE_IMAGE && controls }
 				<BlockControls>
 					{ ( isMediaSelected || mediaType === MEDIA_TYPE_VIDEO ) && (
 						<ToolbarGroup>
