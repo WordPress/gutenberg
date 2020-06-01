@@ -64,4 +64,80 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations: [
+		{
+			name: 'h1',
+			title: 'h1',
+			attributes: {
+				level: 1,
+				placeholder: 'I am level 1',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h1',
+			// },
+		},
+		{
+			name: 'h2',
+			title: 'h2',
+			// isDefault: true,
+			attributes: {
+				level: 2,
+				placeholder: 'I am level 2',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h2',
+			// },
+		},
+		{
+			name: 'h3',
+			title: 'h3',
+			isDefault: true,
+			attributes: {
+				level: 3,
+				placeholder: 'I am level 3',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h3',
+			// },
+		},
+		{
+			name: 'h4',
+			title: 'h4',
+			attributes: {
+				level: 4,
+				placeholder: 'I am level 4',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h4',
+			// },
+		},
+		{
+			name: 'h5',
+			title: 'h5',
+			attributes: {
+				level: 5,
+				placeholder: 'I am level 5',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h5',
+			// },
+		},
+		{
+			name: 'h6',
+			title: 'h6',
+			attributes: {
+				level: 6,
+				placeholder: 'I am level 6',
+			},
+			// scope: [],
+			// supports: {
+			// 	__experimentalSelector: 'h6',
+			// },
+		},
+	],
 };
