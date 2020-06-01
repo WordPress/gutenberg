@@ -19,7 +19,12 @@ import {
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	withSelect,
+	withDispatch,
+} from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
@@ -82,6 +87,11 @@ function Navigation( {
 			},
 		},
 		[ fontSize.size ]
+	);
+	const isNavigationManagementScreen = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getSettings()
+				.__experimentalNavigationManagementEditor
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -220,7 +230,9 @@ function Navigation( {
 						},
 					] }
 				/>
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				{ ! isNavigationManagementScreen && (
+					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				) }
 
 				<BlockColorsStyleSelector
 					TextColor={ TextColor }
