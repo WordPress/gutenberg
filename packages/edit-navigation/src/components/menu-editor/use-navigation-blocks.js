@@ -47,7 +47,7 @@ export default function useNavigationBlocks( menuId ) {
 		] = menuItemsToLinkBlocks(
 			menuItems,
 			blocks[ 0 ]?.innerBlocks,
-			clientIdToMenuItemMapping
+			menuItemsRef.current
 		);
 
 		const navigationBlock = blocks[ 0 ]
