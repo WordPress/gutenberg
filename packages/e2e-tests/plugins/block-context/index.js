@@ -1,10 +1,12 @@
-( function() {
+( function () {
 	const { createElement: el, Fragment } = wp.element;
 	const { registerBlockType } = wp.blocks;
 	const { InnerBlocks } = wp.blockEditor;
 
 	registerBlockType( 'gutenberg/test-context-provider', {
 		title: 'Test Context Provider',
+
+		icon: 'list-view',
 
 		// TODO: While redundant with server-side registration, it's required
 		// to assign this value since it is not picked in the implementation of
@@ -41,6 +43,8 @@
 
 	registerBlockType( 'gutenberg/test-context-consumer', {
 		title: 'Test Context Consumer',
+
+		icon: 'list-view',
 
 		// TODO: While redundant with server-side registration, it's required
 		// to assign this value since it is not picked in the implementation of
