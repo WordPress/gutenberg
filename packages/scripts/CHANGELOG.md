@@ -7,6 +7,9 @@
 - The default babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled babel configuration; if a project provides its own, this change doesn't affect it. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
 - The bundled `wp-prettier` dependency has been upgraded from `1.19.1` to `2.0.5`. Refer to the [Prettier 2.0 "2020" blog post](https://prettier.io/blog/2020/03/21/2.0.0.html) for full details about the major changes included in Prettier 2.0.
 
+### New Feature
+- The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
+
 ## 10.0.0 (2020-05-28)
 
 ### New Feature
