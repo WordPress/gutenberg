@@ -1,23 +1,27 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import InspectorControls from '../inspector-controls';
-import useEditorFeature from '../use-editor-feature';
 
 export default function SpacingPanelControl( { children, ...props } ) {
-	const isSpacingEnabled = useEditorFeature(
-		'__experimentalEnableCustomSpacing'
-	);
-	// TODO: Renable the proper guard
-	// This is temporarily disabled for testing purposes.
-	if ( isSpacingEnabled ) return null;
-	// if ( ! isSpacingEnabled ) return null;
+	const isSpacingEnabled = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return get( getSettings(), '__experimentalEnableCustomSpacing' );
+	} );
+
+	if ( ! isSpacingEnabled ) return null;
 
 	return (
 		<InspectorControls { ...props }>
