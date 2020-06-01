@@ -33,6 +33,11 @@ def buildGutenbergMobileJSBundle =
                 ? false : (rootProject.ext.has("buildGutenbergMobileJSBundle")
                 && rootProject.ext.buildGutenbergMobileJSBundle)
 
+def tempFolder = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
+def nodeFolder = file("${tempFolder}/nodejs")
+def npmFolder = file("${tempFolder}/npm")
+def yarnFolder = file("${tempFolder}/yarn")
+
 if (buildGutenbergMobileJSBundle) {
     println 'Building the Gutenberg Mobile JS bundle'
 
@@ -40,13 +45,13 @@ if (buildGutenbergMobileJSBundle) {
 
     node {
         // Version of node to use.
-        version = '12.13.1'
+        version = '12.16.1'
 
         // Version of npm to use.
-        npmVersion = '6.3.0'
+        npmVersion = '6.14.2'
 
         // Version of Yarn to use.
-        yarnVersion = '1.10.1'
+        yarnVersion = '1.22.4'
 
         // Base URL for fetching node distributions (change if you have a mirror).
         distBaseUrl = 'https://nodejs.org/dist'
@@ -55,13 +60,14 @@ if (buildGutenbergMobileJSBundle) {
         // If false, it will try to use globally installed node.
         download = true
 
-        def tmpdir = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
-
         // Set the work directory for unpacking node
-        workDir = file("${tmpdir}/nodejs")
+        workDir = file(nodeFolder)
 
         // Set the work directory for NPM
-        npmWorkDir = file("${tmpdir}/npm")
+        npmWorkDir = file(npmFolder)
+
+        // Set the work directory for Yarn
+        yarnWorkDir = file(yarnFolder)
 
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../../")
@@ -170,8 +176,6 @@ dependencies {
 }
 
 if (buildGutenbergMobileJSBundle) {
-    def assetsFolder = 'src/main/assets'
-
     task buildJSBundle(type: NpmTask) {
         args = ['run', 'native', 'bundle:android']
     }
@@ -198,14 +202,20 @@ if (buildGutenbergMobileJSBundle) {
 
     task copyJSBundle(type: Copy) {
         def origFileName = 'App.js'
-        def origWithPath = "../../react-native-editor/bundle/android/${origFileName}"
+        // TODO: this is specific to WPAndroid, make it more generic
+        def origWithPath = "../../../../bundle/android/${origFileName}"
         def target = 'index.android.bundle'
         from origWithPath
-        into assetsFolder
+        into buildAssetsFolder
         rename origFileName, target
         doLast {
             println "Done copying the Android JS bundle to assets folder"
         }
+    }
+
+    task resetExtractedRNTools(type: Delete) {
+        println "Deleting temporary folders with extracted RN tools"
+        delete nodeFolder, npmFolder, yarnFolder
     }
 
     if (buildGutenbergMobileJSBundle) {
@@ -213,5 +223,7 @@ if (buildGutenbergMobileJSBundle) {
         backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
         backupHermesReleaseAAR.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
+        buildJSBundle.dependsOn(npm_install)
+        nodeSetup.dependsOn(resetExtractedRNTools)
     }
 }
