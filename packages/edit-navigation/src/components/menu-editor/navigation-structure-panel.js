@@ -19,6 +19,7 @@ export default function NavigationStructurePanel( { blocks, initialOpen } ) {
 			<PanelBody
 				title={ __( 'Navigation structure' ) }
 				initialOpen={ initialOpen }
+				collapsible={ false }
 			>
 				{ showNavigationStructure && (
 					<__experimentalBlockNavigationTree

@@ -68,12 +68,13 @@
 }
 
 // Hover States
-.components-panel__body > .components-panel__body-title:hover {
+.components-panel__body.is-collapsible > .components-panel__body-title:hover {
 	// Override the default button hover style
 	background: $light-gray-200;
 	border: none;
 }
 
+.components-panel__body-title-text,
 .components-panel__body-toggle.components-button {
 	position: relative;
 	padding: 15px;

@@ -60,7 +60,7 @@ export default function BlockEditorPanel( {
 
 	return (
 		<Panel className="edit-navigation-menu-editor__block-editor-panel">
-			<PanelBody title={ __( 'Navigation menu' ) }>
+			<PanelBody title={ __( 'Navigation menu' ) } collapsible={ false }>
 				<div className="components-panel__header-actions">
 					<Button isPrimary onClick={ saveBlocks }>
 						{ __( 'Save navigation' ) }
