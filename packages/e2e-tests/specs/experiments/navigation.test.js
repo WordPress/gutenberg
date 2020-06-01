@@ -275,40 +275,34 @@ describe( 'Navigation', () => {
 				( els ) => els.length
 			);
 
-			// We expect 1 because a "placeholder" Nav Item Block is automatically inserted
+			// Assert the correct number of Nav Link blocks were inserted.
 			expect( navBlockItemsLength ).toEqual( menuItemsFixture.length );
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-
-			await expect( page ).not.toPassAxeTests();
 		} );
 
 		it( 'creates an empty navigation block when the selected existing menu is also empty', async () => {
+			// Force mock to return no Menus Items (empty menu)
 			const emptyMenuItems = [];
 			await mockAllMenusResponses( menusFixture, emptyMenuItems );
 
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
 
-			// Create an empty nav block. The UI to create from Menus is disabled until Menus are loaded,
-			// so we must wait for it to be available
-			await page.waitForXPath( '//option[text()="Test Menu 1"]' );
+			await selectDropDownOption( 'Test Menu 1' );
 
-			const [ createFromExistingButton ] = await page.$x(
-				'//button[text()="Create from Menu"][not(@disabled)]'
-			);
-
-			await createFromExistingButton.click();
+			await clickCreateButton();
 
 			// Scope element selector to the "Editor content" as otherwise it picks up on
 			// Block Style live previews.
 			const navBlockItemsLength = await page.$$eval(
-				'[aria-label="Editor content"] li[aria-label="Block: Navigation Link"]',
+				'[aria-label="Content"][role="region"] li[aria-label="Block: Navigation Link"]',
 				( els ) => els.length
 			);
 
-			// We expect 1 because a "placeholder" Nav Item Block is automatically inserted
+			// Assert an empty Nav Block is created.
+			// We expect 1 here because a "placeholder" Nav Item Block is automatically inserted
 			expect( navBlockItemsLength ).toEqual( 1 );
 
 			// Snapshot should contain the mocked menu items.

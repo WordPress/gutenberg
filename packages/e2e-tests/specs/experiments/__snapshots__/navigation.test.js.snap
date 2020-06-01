@@ -37,7 +37,7 @@ exports[`Navigation Creating from existing Menus allows a navigation block to be
 `;
 
 exports[`Navigation Creating from existing Menus creates an empty navigation block when the selected existing menu is also empty 1`] = `
-"<!-- wp:navigation -->
+"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link /-->
 <!-- /wp:navigation -->"
 `;
