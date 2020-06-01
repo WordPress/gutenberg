@@ -12,7 +12,7 @@ import { MediaPlaceholder } from '@wordpress/block-editor';
 
 ...
 
-	edit: ( { attributes, setAttributes } ) {
+	edit: ( { attributes, setAttributes } ) => {
 		const mediaPlaceholder = <MediaPlaceholder
 			onSelect = {
 				( el ) => {
