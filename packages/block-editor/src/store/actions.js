@@ -894,6 +894,14 @@ export function* setBlockMovingMode( isBlockMovingMode = null ) {
 		type: 'SET_BLOCK_MOVING_MODE',
 		isBlockMovingMode,
 	};
+
+	if ( isBlockMovingMode ) {
+		speak(
+			__(
+				'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
+			)
+		);
+	}
 }
 
 /**
