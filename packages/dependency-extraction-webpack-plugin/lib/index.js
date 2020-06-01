@@ -2,11 +2,12 @@
  * External dependencies
  */
 const { createHash } = require( 'crypto' );
-// @ts-ignore
-const json2php = require( 'json2php' );
 const path = require( 'path' );
 const { ExternalsPlugin } = require( 'webpack' );
 const { RawSource } = require( 'webpack-sources' );
+// Ignore reason: json2php is untyped
+// @ts-ignore
+const json2php = require( 'json2php' );
 
 /**
  * Internal dependencies
