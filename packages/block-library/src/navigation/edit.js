@@ -490,6 +490,13 @@ export default compose( [
 				if ( ! menuId ) {
 					return false;
 				}
+
+				// If the option is a placeholder or doesn't have a valid
+				// id then reject
+				if ( ! Number.isInteger( menuId ) ) {
+					return false;
+				}
+
 				return select( 'core' ).getEntityRecords( 'root', 'menu-item', {
 					menus: menuId,
 					per_page: -1,
