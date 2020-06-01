@@ -41,7 +41,7 @@ export default function BlockNavigationAppender( {
 				className="block-editor-block-navigation-appender__cell"
 				colSpan="3"
 			>
-				{ ( props ) => (
+				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
 						<DescenderLines
 							level={ level }
@@ -52,7 +52,7 @@ export default function BlockNavigationAppender( {
 							rootClientId={ parentBlockClientId }
 							__experimentalSelectBlockOnInsert={ false }
 							aria-describedby={ descriptionId }
-							{ ...props }
+							toggleProps={ { ref, tabIndex, onFocus } }
 						/>
 						<div
 							className="block-editor-block-navigation-appender__description"
