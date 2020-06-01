@@ -4,7 +4,13 @@
 	"attributes": {
 		"align": {
 			"type": "string",
-			"enum":  ["left", "center", "right", "wide", "full"]
+			"enum": [
+				"left",
+				"center",
+				"right",
+				"wide",
+				"full"
+			]
 		},
 		"className": {
 			"type": "string"
@@ -57,19 +63,27 @@
 		},
 		"featuredImageAlign": {
 			"type": "string",
-			"enum": ["left", "center", "right"]
+			"enum": [
+				"left",
+				"center",
+				"right"
+			]
 		},
 		"featuredImageSizeSlug": {
 			"type": "string",
-			"default":"thumbnail"
+			"default": "thumbnail"
 		},
 		"featuredImageSizeWidth": {
 			"type": "number",
-			"default":null
+			"default": null
 		},
 		"featuredImageSizeHeight": {
 			"type": "number",
-			"default":null
+			"default": null
 		}
+	},
+	"supports": {
+		"align": true,
+		"html": false
 	}
 }

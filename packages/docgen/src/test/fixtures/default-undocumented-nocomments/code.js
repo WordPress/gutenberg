@@ -1,3 +1,3 @@
-const myDeclaration = function() {};
+const myDeclaration = function () {};
 
 export default myDeclaration;

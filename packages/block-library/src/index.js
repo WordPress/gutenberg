@@ -62,6 +62,7 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
+import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
 import * as siteTitle from './site-title';
@@ -165,10 +166,7 @@ export const registerCoreBlocks = () => {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
-
-	if ( group ) {
-		setGroupingBlockName( group.name );
-	}
+	setGroupingBlockName( group.name );
 };
 
 /**
@@ -192,6 +190,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				} = settings;
 
 				[
+					widgetArea,
 					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 					navigation,
 					navigationLink,

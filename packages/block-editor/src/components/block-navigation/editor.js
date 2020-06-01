@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { RichText } from '../';
-import { BlockNavigationBlockFill } from './block-contents';
+import { BlockNavigationBlockFill } from './block-slot';
 
 export default function BlockNavigationEditor( { value, onChange } ) {
 	return (

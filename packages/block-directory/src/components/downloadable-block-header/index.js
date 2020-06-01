@@ -37,12 +37,9 @@ export function DownloadableBlockHeader( {
 			) }
 
 			<div className="block-directory-downloadable-block-header__column">
-				<span
-					role="heading"
-					className="block-directory-downloadable-block-header__title"
-				>
+				<h2 className="block-directory-downloadable-block-header__title">
 					{ title }
-				</span>
+				</h2>
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 			</div>
 			<Button

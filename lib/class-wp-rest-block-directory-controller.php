@@ -109,40 +109,46 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			)
 		);
 
-		if ( is_wp_error( $api ) ) {
-			return WP_Error( $api->get_error_code(), $api->get_error_message() );
-		}
+		// Check if the plugin is already installed.
+		$installed_plugins = get_plugins( '/' . $api->slug );
 
-		$skin     = new WP_Ajax_Upgrader_Skin();
-		$upgrader = new Plugin_Upgrader( $skin );
+		if ( empty( $installed_plugins ) ) {
 
-		$filesystem_method = get_filesystem_method();
-
-		if ( 'direct' !== $filesystem_method ) {
-			return WP_Error( null, 'Only direct FS_METHOD is supported.' );
-		}
-
-		$result = $upgrader->install( $api->download_link );
-
-		if ( is_wp_error( $result ) ) {
-			return WP_Error( $result->get_error_code(), $result->get_error_message() );
-		}
-
-		if ( is_wp_error( $skin->result ) ) {
-			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
-		}
-
-		if ( $skin->get_errors()->has_errors() ) {
-			return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
-		}
-
-		if ( is_null( $result ) ) {
-			global $wp_filesystem;
-			// Pass through the error from WP_Filesystem if one was raised.
-			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
-				return WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
+			if ( is_wp_error( $api ) ) {
+				return WP_Error( $api->get_error_code(), $api->get_error_message() );
 			}
-			return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
+
+			$skin     = new WP_Ajax_Upgrader_Skin();
+			$upgrader = new Plugin_Upgrader( $skin );
+
+			$filesystem_method = get_filesystem_method();
+
+			if ( 'direct' !== $filesystem_method ) {
+				return WP_Error( null, 'Only direct FS_METHOD is supported.' );
+			}
+
+			$result = $upgrader->install( $api->download_link );
+
+			if ( is_wp_error( $result ) ) {
+				return WP_Error( $result->get_error_code(), $result->get_error_message() );
+			}
+
+			if ( is_wp_error( $skin->result ) ) {
+				return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_message() );
+			}
+
+			if ( $skin->get_errors()->has_errors() ) {
+				return WP_Error( $skin->$result->get_error_code(), $skin->$result->get_error_messages() );
+			}
+
+			if ( is_null( $result ) ) {
+				global $wp_filesystem;
+				// Pass through the error from WP_Filesystem if one was raised.
+				if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
+					return WP_Error( 'unable_to_connect_to_filesystem', esc_html( $wp_filesystem->errors->get_error_message() ) );
+				}
+				return WP_Error( 'unable_to_connect_to_filesystem', __( 'Unable to connect to the filesystem. Please confirm your credentials.', 'gutenberg' ) );
+			}
 		}
 
 		$install_status = install_plugin_install_status( $api );
@@ -153,7 +159,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 			return WP_Error( $activate_result->get_error_code(), $activate_result->get_error_message() );
 		}
 
-		return rest_ensure_response( true );
+		return rest_ensure_response( array( 'success' => true ) );
 	}
 
 	/**
@@ -251,12 +257,7 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		$result = array();
 
 		foreach ( $response['plugins'] as $plugin ) {
-			$installed_plugins = get_plugins( '/' . $plugin['slug'] );
-
-			// Only show uninstalled blocks.
-			if ( empty( $installed_plugins ) ) {
-				$result[] = self::parse_block_metadata( $plugin );
-			}
+			$result[] = self::parse_block_metadata( $plugin );
 		}
 
 		return rest_ensure_response( $result );

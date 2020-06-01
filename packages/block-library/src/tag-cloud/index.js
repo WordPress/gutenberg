@@ -18,10 +18,6 @@ export const settings = {
 	title: __( 'Tag Cloud' ),
 	description: __( 'A cloud of your most used tags.' ),
 	icon,
-	supports: {
-		html: false,
-		align: true,
-	},
 	example: {},
 	edit,
 };

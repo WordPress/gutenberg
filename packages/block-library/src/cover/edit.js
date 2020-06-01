@@ -115,6 +115,7 @@ function CoverHeightInput( {
 		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
 			<UnitControl
 				id={ inputId }
+				isResetValueOnUnitChange
 				min={ min }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
@@ -287,8 +288,9 @@ function CoverEdit( {
 	}
 
 	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y *
-			100 }%`;
+		style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+			focalPoint.y * 100
+		}%`;
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );

@@ -17,14 +17,14 @@ const rimraf = util.promisify( require( 'rimraf' ) );
 const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
- * @typedef {import('./config').Source} Source
+ * @typedef {import('./config').WPSource} WPSource
  */
 
 /**
  * Downloads the given source if necessary. The specific action taken depends
  * on the source type.
  *
- * @param {Source}   source             The source to download.
+ * @param {WPSource} source             The source to download.
  * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
  * @param {Object}   options.spinner    A CLI spinner which indicates progress.
@@ -42,7 +42,7 @@ module.exports = async function downloadSource( source, options ) {
  * Clones the git repository at `source.url` into `source.path`. If the
  * repository already exists, it is updated instead.
  *
- * @param {Source}   source             The source to download.
+ * @param {WPSource} source             The source to download.
  * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
  * @param {Object}   options.spinner    A CLI spinner which indicates progress.
@@ -69,6 +69,14 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 							progress.indexedObjects() ) /
 							( progress.totalObjects() * 2 )
 					);
+				},
+				certificateCheck: () => 0,
+				credentials: ( url, userName ) => {
+					try {
+						return NodeGit.Cred.sshKeyFromAgent( userName );
+					} catch {
+						return NodeGit.Cred.defaultNew();
+					}
 				},
 			},
 		},
@@ -113,7 +121,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 /**
  * Downloads and extracts the zip file at `source.url` into `source.path`.
  *
- * @param {Source}   source             The source to download.
+ * @param {WPSource} source             The source to download.
  * @param {Object}   options
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
  * @param {Object}   options.spinner    A CLI spinner which indicates progress.
