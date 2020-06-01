@@ -21,7 +21,9 @@ const {
  * Map module request to an external.
  *
  * @callback RequestToExternal
+ *
  * @param {string} request Module request.
+ *
  * @return {string|string[]|undefined} Return `undefined` to ignore the request.
  *                                     Return `string|string[]` to map the request to an external.
  */
@@ -30,7 +32,9 @@ const {
  * Map module request to a script handle.
  *
  * @callback RequestToHandle
+ *
  * @param {string} request Module request.
+ *
  * @return {string|undefined} Return `undefined` to use the same name as the module.
  *                            Return `string` to map the request to a specific script handle.
  */
@@ -38,20 +42,20 @@ const {
 /**
  * @typedef AssetData
  *
- * @property {string} version String representing a particular build
+ * @property {string}   version      String representing a particular build
  * @property {string[]} dependencies The script dependencies
  */
 
 /**
  * @typedef Options
  *
- * @property {boolean} injectPolyfill Force wp-polyfill to be included in each entry point's dependency list. This is like importing `@wordpress/polyfill` for each entry point.
- * @property {boolean} useDefaults Set to `false` to disable the default WordPress script request handling.
- * @property {'php'|'json'} outputFormat The output format for the generated asset file.
+ * @property {boolean}                     injectPolyfill      Force wp-polyfill to be included in each entry point's dependency list. This is like importing `@wordpress/polyfill` for each entry point.
+ * @property {boolean}                     useDefaults         Set to `false` to disable the default WordPress script request handling.
+ * @property {'php'|'json'}                outputFormat        The output format for the generated asset file.
  * @property {RequestToExternal|undefined} [requestToExternal] Map module requests to an external.
- * @property {RequestToHandle|undefined} [requestToHandle] Map module requests to a script handle.
- * @property {string|null} combinedOutputFile This option is useful only when the combineAssets option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
- * @property {boolean|undefined} combineAssets By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
+ * @property {RequestToHandle|undefined}   [requestToHandle]   Map module requests to a script handle.
+ * @property {string|null}                 combinedOutputFile  This option is useful only when the combineAssets option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
+ * @property {boolean|undefined}           combineAssets       By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
  */
 
 class DependencyExtractionWebpackPlugin {
