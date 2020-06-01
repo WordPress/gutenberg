@@ -203,6 +203,11 @@
 		}
 	}
 
+	.components-custom-select-control__item {
+		cursor: pointer;
+	}
+
+	// Styles for when there are Menus present in the dropdown.
 	.components-custom-select-control.has-menus .components-custom-select-control__item {
 		display: list-item; // remove flex to allow pseudo element to stack
 		padding: 10px 25px;
