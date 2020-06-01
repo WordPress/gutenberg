@@ -237,7 +237,7 @@
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "wp-env run phpunit 'phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist'",
-		"test-unit-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist'",
+		"test-unit-php-multisite": "wp-env run phpunit 'WP_MULTISITE=1 WP_ENV_TESTS_PORT=8888 WP_ENV_PORT=8886 phpunit -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist'",
 		"test-unit:native": "cd test/native/ && cross-env NODE_ENV=test jest --config ./jest.config.js",
 		"test-unit:native:debug": "cd test/native/ && node --inspect-brk ../../node_modules/.bin/jest --runInBand --verbose --config ./jest.config.js",
 		"prestorybook:build": "npm run build:packages",
