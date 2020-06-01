@@ -14,7 +14,10 @@ import {
 /**
  * External dependencies
  */
-import menuItemsFixture from 'menu-items-response-fixture.json';
+/**
+ * Internal dependencies
+ */
+import menuItemsFixture from './menu-items-response-fixture.json';
 
 async function mockPagesResponse( pages ) {
 	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
@@ -227,12 +230,29 @@ describe( 'Navigation', () => {
 		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
 		// so we must wait for it to become not-disabled.
 		await page.waitForXPath(
-			'//button[text()="Create from all top-level pages"][not(@disabled)]'
+			'//button[text()="Select where to start from…"][not(@disabled)]'
 		);
-		const [ createFromExistingButton ] = await page.$x(
-			'//button[text()="Create from all top-level pages"][not(@disabled)]'
+
+		const [ dropdownToggle ] = await page.$x(
+			'//button[text()="Select where to start from…"][not(@disabled)]'
 		);
-		await createFromExistingButton.click();
+		await dropdownToggle.click();
+
+		await page.waitForXPath(
+			'//li[text()="New from all top-level pages"]'
+		);
+
+		const [ createFromExistingOption ] = await page.$x(
+			'//li[text()="New from all top-level pages"]'
+		);
+
+		await createFromExistingOption.click();
+
+		const [ createNavigationButton ] = await page.$x(
+			'//button[text()="Create"][not(@disabled)]'
+		);
+
+		await createNavigationButton.click();
 
 		// Snapshot should contain the mocked pages.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
