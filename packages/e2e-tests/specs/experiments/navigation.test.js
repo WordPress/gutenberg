@@ -227,20 +227,10 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
-		// Create an empty nav block. The 'create' button is disabled until pages are loaded,
-		// so we must wait for it to become not-disabled.
-		await page.waitForXPath(
-			'//button[text()="Select where to start from…"][not(@disabled)]'
-		);
-
 		const [ dropdownToggle ] = await page.$x(
 			'//button[text()="Select where to start from…"][not(@disabled)]'
 		);
 		await dropdownToggle.click();
-
-		await page.waitForXPath(
-			'//li[text()="New from all top-level pages"]'
-		);
 
 		const [ createFromExistingOption ] = await page.$x(
 			'//li[text()="New from all top-level pages"]'
