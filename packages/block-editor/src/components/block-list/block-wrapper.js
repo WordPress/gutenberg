@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { first, last, omit, capitalize } from 'lodash';
+import { first, last, omit, upperFirst } from 'lodash';
 import { animated } from 'react-spring/web.cjs';
 
 /**
@@ -24,8 +24,10 @@ import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const BlockComponent = forwardRef(
-	( { children, tagName = 'div', __unstableIsHtml, ...props }, wrapper ) => {
+function higherOrderComponent( Component ) {
+	Component = animated( Component );
+
+	function BlockWrapper( { children, __unstableIsHtml, ...props }, wrapper ) {
 		const onSelectionStart = useContext( Context );
 		const setBlockNodes = useContext( SetBlockNodes );
 		const {
@@ -189,10 +191,9 @@ const BlockComponent = forwardRef(
 		const htmlSuffix =
 			mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
-		const Animated = animated[ tagName ];
 
 		const blockWrapper = (
-			<Animated
+			<Component
 				// Overrideable props.
 				aria-label={ blockLabel }
 				role="group"
@@ -221,7 +222,7 @@ const BlockComponent = forwardRef(
 				} }
 			>
 				{ children }
-			</Animated>
+			</Component>
 		);
 
 		// For aligned blocks, provide a wrapper element so the block can be
@@ -239,18 +240,17 @@ const BlockComponent = forwardRef(
 
 		return blockWrapper;
 	}
-);
+
+	return forwardRef( BlockWrapper );
+}
 
 export const block = createHigherOrderComponent(
-	( Component ) =>
-		forwardRef( ( props, ref ) => (
-			<BlockComponent { ...props } ref={ ref } tagName={ Component } />
-		) ),
+	higherOrderComponent,
 	'block'
 );
 
 ELEMENTS.forEach( ( element ) => {
 	const ElementBlock = block( element );
 	block[ element ] = ElementBlock;
-	block[ capitalize( element ) ] = ElementBlock;
+	block[ upperFirst( element ) ] = ElementBlock;
 } );
