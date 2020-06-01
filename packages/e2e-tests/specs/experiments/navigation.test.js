@@ -205,6 +205,19 @@ async function selectDropDownOption( optionText ) {
 	await theOption.click();
 }
 
+async function clickCreateButton() {
+	// Wait for button to become available
+	await page.waitForXPath( '//button[text()="Create"][not(@disabled)]' );
+
+	// Then locate...
+	const [ createNavigationButton ] = await page.$x(
+		'//button[text()="Create"][not(@disabled)]'
+	);
+
+	// Then click
+	await createNavigationButton.click();
+}
+
 beforeEach( async () => {
 	await createNewPost();
 } );
@@ -234,22 +247,9 @@ describe( 'Navigation', () => {
 		// Add the navigation block.
 		await insertBlock( 'Navigation' );
 
-		const [ dropdownToggle ] = await page.$x(
-			'//button[text()="Select where to start from…"][not(@disabled)]'
-		);
-		await dropdownToggle.click();
+		await selectDropDownOption( 'New from all top-level pages' );
 
-		const [ createFromExistingOption ] = await page.$x(
-			'//li[text()="New from all top-level pages"]'
-		);
-
-		await createFromExistingOption.click();
-
-		const [ createNavigationButton ] = await page.$x(
-			'//button[text()="Create"][not(@disabled)]'
-		);
-
-		await createNavigationButton.click();
+		await clickCreateButton();
 
 		// Snapshot should contain the mocked pages.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -264,15 +264,7 @@ describe( 'Navigation', () => {
 
 			await selectDropDownOption( 'Test Menu 2' );
 
-			await page.waitForXPath(
-				'//button[text()="Create"][not(@disabled)]'
-			);
-
-			const [ createNavigationButton ] = await page.$x(
-				'//button[text()="Create"][not(@disabled)]'
-			);
-
-			await createNavigationButton.click();
+			await clickCreateButton();
 
 			// await page.waitFor( 50000000 );
 
