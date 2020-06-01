@@ -224,7 +224,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertArrayHasKey( 'styles', $properties );
-		$this->assertArrayHasKey( 'text_domain', $properties );
+		$this->assertArrayHasKey( 'textdomain', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'attributes', $properties );
 		$this->assertArrayHasKey( 'supports', $properties );
