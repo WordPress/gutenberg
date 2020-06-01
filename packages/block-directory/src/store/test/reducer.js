@@ -78,7 +78,8 @@ describe( 'state', () => {
 			} );
 
 			expect( finalState.pendingSearchRequests ).toEqual( 2 );
-		} );
+        } );
+        
 		it( 'should decrement block requests', () => {
 			const initialState = {
 				pendingSearchRequests: 2,
