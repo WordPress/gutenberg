@@ -14,7 +14,7 @@ import { combineReducers } from '@wordpress/data';
 export const downloadableBlocks = (
 	state = {
 		results: {},
-		isRequestingDownloadableBlocks: true,
+		pendingBlockRequests: 0,
 	},
 	action
 ) => {
@@ -22,7 +22,7 @@ export const downloadableBlocks = (
 		case 'FETCH_DOWNLOADABLE_BLOCKS':
 			return {
 				...state,
-				isRequestingDownloadableBlocks: true,
+				pendingBlockRequests: state.pendingBlockRequests + 1,
 			};
 		case 'RECEIVE_DOWNLOADABLE_BLOCKS':
 			return {
@@ -31,7 +31,7 @@ export const downloadableBlocks = (
 					...state.results,
 					[ action.filterValue ]: action.downloadableBlocks,
 				},
-				isRequestingDownloadableBlocks: false,
+				pendingBlockRequests: state.pendingBlockRequests - 1,
 			};
 	}
 	return state;
