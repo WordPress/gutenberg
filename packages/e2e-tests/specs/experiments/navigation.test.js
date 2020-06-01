@@ -19,53 +19,6 @@ import {
  */
 import menuItemsFixture from './menu-items-response-fixture.json';
 
-function matchUrl( reqUrl, urls ) {
-	return urls.some( ( url ) => reqUrl.indexOf( url ) >= 0 );
-}
-
-async function mockPagesResponse( pages ) {
-	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
-		id: index + 1,
-		type: 'page',
-		link: `https://this/is/a/test/page/${ slug }`,
-		title: {
-			rendered: title,
-			raw: title,
-		},
-	} ) );
-
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				request
-					.url()
-					.includes(
-						`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`
-					),
-			onRequestMatch: createJSONResponse( mappedPages ),
-		},
-	] );
-}
-
-async function mockSearchResponse( items ) {
-	const mappedItems = items.map( ( { title, slug }, index ) => ( {
-		id: index + 1,
-		subtype: 'page',
-		title,
-		type: 'post',
-		url: `https://this/is/a/test/search/${ slug }`,
-	} ) );
-
-	await setUpResponseMocking( [
-		{
-			match: ( request ) =>
-				request.url().includes( `rest_route` ) &&
-				request.url().includes( `search` ),
-			onRequestMatch: createJSONResponse( mappedItems ),
-		},
-	] );
-}
-
 const menusFixture = [
 	{
 		name: 'Test Menu 1',
@@ -91,6 +44,53 @@ const REST_MENU_ITEMS_URLS = [
 	'/__experimental/menu-items',
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
 ];
+
+const REST_PAGES_URLS = [
+	'/wp/v2/pages',
+	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
+];
+
+function matchUrl( reqUrl, urls ) {
+	return urls.some( ( url ) => reqUrl.indexOf( url ) >= 0 );
+}
+
+async function mockPagesResponse( pages ) {
+	const mappedPages = pages.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		type: 'page',
+		link: `https://this/is/a/test/page/${ slug }`,
+		title: {
+			rendered: title,
+			raw: title,
+		},
+	} ) );
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) => matchUrl( request.url(), REST_PAGES_URLS ),
+			onRequestMatch: createJSONResponse( mappedPages ),
+		},
+	] );
+}
+
+async function mockSearchResponse( items ) {
+	const mappedItems = items.map( ( { title, slug }, index ) => ( {
+		id: index + 1,
+		subtype: 'page',
+		title,
+		type: 'post',
+		url: `https://this/is/a/test/search/${ slug }`,
+	} ) );
+
+	await setUpResponseMocking( [
+		{
+			match: ( request ) =>
+				request.url().includes( `rest_route` ) &&
+				request.url().includes( `search` ),
+			onRequestMatch: createJSONResponse( mappedItems ),
+		},
+	] );
+}
 
 /**
  * Creates mocked REST API responses for calls to menus and menu-items
@@ -121,6 +121,20 @@ async function mockAllMenusResponses(
 			match: ( request ) =>
 				matchUrl( request.url(), REST_MENU_ITEMS_URLS ),
 			onRequestMatch: createJSONResponse( menuItems ),
+		},
+	] );
+}
+
+async function mockEmptyMenusAndPagesResponses() {
+	const emptyResponse = [];
+	await setUpResponseMocking( [
+		{
+			match: ( request ) => matchUrl( request.url(), REST_MENUS_URLS ),
+			onRequestMatch: createJSONResponse( emptyResponse ),
+		},
+		{
+			match: ( request ) => matchUrl( request.url(), REST_PAGES_URLS ),
+			onRequestMatch: createJSONResponse( emptyResponse ),
 		},
 	] );
 }
@@ -218,6 +232,11 @@ async function clickCreateButton() {
 	await createNavigationButton.click();
 }
 
+async function createEmptyNavBlock() {
+	await selectDropDownOption( 'Create empty menu' );
+	await clickCreateButton();
+}
+
 beforeEach( async () => {
 	await createNewPost();
 } );
@@ -226,33 +245,63 @@ afterEach( async () => {
 	await setUpResponseMocking( [] );
 } );
 describe( 'Navigation', () => {
-	it( 'allows a navigation block to be created using existing pages', async () => {
-		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
-		// consistent and to test the feature more rigorously than the single default sample page.
-		await mockPagesResponse( [
-			{
-				title: 'Home',
-				slug: 'home',
-			},
-			{
-				title: 'About',
-				slug: 'about',
-			},
-			{
-				title: 'Contact Us',
-				slug: 'contact',
-			},
-		] );
+	describe( 'Creating from existing Pages', () => {
+		it( 'allows a navigation block to be created using existing pages', async () => {
+			// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+			// consistent and to test the feature more rigorously than the single default sample page.
+			await mockPagesResponse( [
+				{
+					title: 'Home',
+					slug: 'home',
+				},
+				{
+					title: 'About',
+					slug: 'about',
+				},
+				{
+					title: 'Contact Us',
+					slug: 'contact',
+				},
+			] );
 
-		// Add the navigation block.
-		await insertBlock( 'Navigation' );
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
 
-		await selectDropDownOption( 'New from all top-level pages' );
+			await selectDropDownOption( 'New from all top-level pages' );
 
-		await clickCreateButton();
+			await clickCreateButton();
 
-		// Snapshot should contain the mocked pages.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+			// Snapshot should contain the mocked pages.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'does not display option to create from existing Pages if there are no Pages', async () => {
+			// Force no Pages or Menus to be returned by API responses.
+			await mockEmptyMenusAndPagesResponses();
+
+			// Add the navigation block.
+			await insertBlock( 'Navigation' );
+
+			const [ dropdownToggle ] = await page.$x(
+				'//button[text()="Select where to start from…"][not(@disabled)]'
+			);
+			await dropdownToggle.click();
+
+			const dropDownItemsLength = await page.$$eval(
+				'ul[role="listbox"] li[role="option"]',
+				( els ) => els.length
+			);
+
+			// Should only be showing
+			// 1. Placeholder value.
+			// 2. Create empty menu.
+			expect( dropDownItemsLength ).toEqual( 2 );
+
+			await page.waitForXPath( '//li[text()="Create empty menu"]' );
+
+			// Snapshot should contain the mocked menu items.
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
 	} );
 
 	describe( 'Creating from existing Menus', () => {
@@ -311,7 +360,7 @@ describe( 'Navigation', () => {
 
 		it( 'does not display option to create from existing menus if there are no menus', async () => {
 			// Force no Menus to be returned by API response.
-			await mockAllMenusResponses( [] );
+			await mockEmptyMenusAndPagesResponses();
 
 			// Add the navigation block.
 			await insertBlock( 'Navigation' );
@@ -327,8 +376,8 @@ describe( 'Navigation', () => {
 			);
 
 			// Should only be showing
-			// 1. Create empty.
-			// 2. Create from Pages.
+			// 1. Placeholder.
+			// 2. Create from Empty.
 			expect( dropDownItemsLength ).toEqual( 2 );
 
 			await page.waitForXPath( '//li[text()="Create empty menu"]' );
@@ -349,9 +398,7 @@ describe( 'Navigation', () => {
 		// Create an empty nav block.
 		await page.waitForSelector( '.wp-block-navigation-placeholder' );
 
-		await selectDropDownOption( 'Create empty menu' );
-
-		await clickCreateButton();
+		await createEmptyNavBlock();
 
 		// Add a link to the default Navigation Link block.
 		await updateActiveNavigationLink( {
@@ -432,11 +479,7 @@ describe( 'Navigation', () => {
 		await insertBlock( 'Navigation' );
 
 		// Create an empty nav block.
-		await page.waitForSelector( '.wp-block-navigation-placeholder' );
-		const [ createEmptyButton ] = await page.$x(
-			'//button[text()="Create empty"]'
-		);
-		await createEmptyButton.click();
+		await createEmptyNavBlock();
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(
