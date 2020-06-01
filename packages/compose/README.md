@@ -138,7 +138,7 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `Object`: Reference with the element.
+-   _ref_ (unknown type): Reference with the element.
 -   _text_ `(string|Function)`: The text to copy.
 -   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
