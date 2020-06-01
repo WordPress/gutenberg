@@ -106,12 +106,11 @@ describe( 'Template Part', () => {
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
-		const templatePartButtonSelector = `${ templatePartSelector } button`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "Create new")]';
 
-		it( 'Should prompt to create when no match found', async () => {
+		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Create new template part.
@@ -124,27 +123,22 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( testSlug );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testTheme );
-			// Should say 'Create'
-			const placeholderButton = await page.$(
-				templatePartButtonSelector
-			);
-			const text = await page.evaluate(
-				( element ) => element.textContent,
-				placeholderButton
-			);
-			expect( text ).toBe( 'Create' );
-
-			// Finish creating template part, insert some text, and save.
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForSelector( activatedTemplatePartSelector );
+
+			const newTemplatePart = await page.waitForSelector(
+				activatedTemplatePartSelector
+			);
+			expect( newTemplatePart ).toBeTruthy();
+
+			// Finish creating template part, insert some text, and save.
 			await page.click( templatePartSelector );
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
 		} );
 
-		it( 'Should prompt to Choose when match found', async () => {
+		it.skip( 'Should prompt to Choose when match found', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Try to insert the template part we created.
@@ -164,12 +158,12 @@ describe( 'Template Part', () => {
 			expect( placeholderButton ).not.toBeNull();
 		} );
 
-		it( 'Should dispaly a preview when match is found', async () => {
+		it.skip( 'Should dispaly a preview when match is found', async () => {
 			const [ preview ] = await page.$x( testContentSelector );
 			expect( preview ).toBeTruthy();
 		} );
 
-		it( 'Should insert the desired template part', async () => {
+		it.skip( 'Should insert the desired template part', async () => {
 			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
 			await placeholderButton.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
