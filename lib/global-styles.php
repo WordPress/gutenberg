@@ -308,20 +308,6 @@ function gutenberg_experimental_global_styles_get_block_data() {
 
 	$registry = WP_Block_Type_Registry::get_instance();
 	foreach ( $registry->get_all_registered() as $block_name => $block_type ) {
-		/*
-		 * We only allow certain CSS properties to be used
-		 * within the realm of theme.json. These are taken
-		 * from the block.json of the block.
-		 *
-		 * 1. Filter out the block supports that are falsy:
-		 *    we don't want to use disabled properties such as
-		 *    __experimentalProperty: false.
-		 *
-		 * 2. From the remaining keys, find the ones
-		 *    that are also present in $supported_features.
-		 *
-		 * 3. Take the CSS property names to use from $supported_features.
-		 */
 		if ( ! is_array( $block_type->supports ) ) {
 			continue;
 		}
@@ -343,11 +329,11 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		 * Some other blocks don't provide a selector,
 		 * so we generate a class for them based on their name:
 		 *
-		 * - 'core/paragraph' => '.wp-block-paragraph'
+		 * - 'core/group' => '.wp-block-group'
 		 * - 'my-custom-library/block-name' => '.wp-block-my-custom-library-block-name'
 		 *
-		 * Note that, for core blocks, we don't use the `core/` prefix from its name.
-		 * This is for historical reasons, as they already come with a class without that infix.
+		 * Note that, for core blocks, we don't add the `core/` prefix to its class name.
+		 * This is for historical reasons, as they come with a class without that infix.
 		 *
 		 */
 		if (
