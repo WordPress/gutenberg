@@ -6,5 +6,10 @@
 			"type": "string",
 			"source": "html"
 		}
+	},
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false
 	}
 }

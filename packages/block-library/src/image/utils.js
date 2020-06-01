@@ -22,7 +22,7 @@ export function removeNewTabRel( currentRel ) {
 
 	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
 		if ( ! isEmpty( newRel ) ) {
-			each( NEW_TAB_REL, function( relVal ) {
+			each( NEW_TAB_REL, ( relVal ) => {
 				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
 				newRel = newRel.replace( regExp, '' );
 			} );

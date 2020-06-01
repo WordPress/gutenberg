@@ -68,9 +68,7 @@ function Layout() {
 		mode,
 		isFullscreenActive,
 		isRichEditingEnabled,
-		editorSidebarOpened,
-		pluginSidebarOpened,
-		publishSidebarOpened,
+		sidebarIsOpened,
 		hasActiveMetaboxes,
 		hasFixedToolbar,
 		previousShortcut,
@@ -81,15 +79,11 @@ function Layout() {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
-			editorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
-			pluginSidebarOpened: select(
-				'core/edit-post'
-			).isPluginSidebarOpened(),
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
+			sidebarIsOpened: !! (
+				select( 'core/interface' ).getActiveComplementaryArea(
+					'core/edit-post'
+				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+			),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
@@ -107,8 +101,6 @@ function Layout() {
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		};
 	}, [] );
-	const sidebarIsOpened =
-		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
@@ -159,6 +151,7 @@ function Layout() {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
@@ -218,7 +211,6 @@ function Layout() {
 										</Button>
 									</div>
 								) }
-								<SettingsSidebar />
 								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)

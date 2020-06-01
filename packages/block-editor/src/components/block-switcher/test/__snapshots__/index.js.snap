@@ -20,7 +20,7 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
         showColors={true}
       />
     }
-    label="Block icon"
+    title="Block icon"
   />
 </ToolbarGroup>
 `;

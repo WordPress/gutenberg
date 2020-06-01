@@ -118,7 +118,7 @@ export function initializeEditor(
 
 	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
 	if ( isIphone ) {
-		window.addEventListener( 'scroll', function( event ) {
+		window.addEventListener( 'scroll', ( event ) => {
 			const editorScrollContainer = document.getElementsByClassName(
 				'interface-interface-skeleton__body'
 			)[ 0 ];
@@ -129,8 +129,12 @@ export function initializeEditor(
 					editorScrollContainer.scrollTop =
 						editorScrollContainer.scrollTop + window.scrollY;
 				}
-				//Undo unwanted scroll on html element
-				window.scrollTo( 0, 0 );
+				// Undo unwanted scroll on html element, but only in the visual editor.
+				if (
+					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
+				) {
+					window.scrollTo( 0, 0 );
+				}
 			}
 		} );
 	}

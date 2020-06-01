@@ -24,10 +24,6 @@ export const settings = {
 	icon,
 	keywords: [ __( 'movie' ) ],
 	transforms,
-	supports: {
-		align: true,
-		lightBlockWrapper: true,
-	},
 	edit,
 	save,
 };

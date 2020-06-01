@@ -4,6 +4,7 @@
 @import "./components/header/style.scss";
 @import "./components/header/more-menu/style.scss";
 @import "./components/notices/style.scss";
+@import "./components/page-switcher/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/template-switcher/style.scss";
 @import "./components/editor/style.scss";
@@ -53,6 +54,19 @@ body.toplevel_page_gutenberg-edit-site {
 
 	.interface-interface-skeleton__content {
 		background-color: $light-gray-700;
+	}
+
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in visual-editor.
+	& .components-button {
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary {
+			padding: 6px;
+		}
 	}
 }
 

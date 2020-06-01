@@ -85,6 +85,15 @@ module.exports = async function start( { spinner, debug } ) {
 					config.coreSource.path,
 					config.coreSource.testsPath
 				);
+
+				// Ensure the tests uploads folder is writeable for travis,
+				// creating the folder if necessary.
+				const testsUploadsPath = path.join(
+					config.coreSource.testsPath,
+					'wp-content/uploads'
+				);
+				await fs.mkdir( testsUploadsPath, { recursive: true } );
+				await fs.chmod( testsUploadsPath, 0o0767 );
 			}
 		} )(),
 
