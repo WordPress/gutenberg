@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (1.28.1):
+  - Gutenberg (1.29.0):
     - React (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
@@ -239,7 +239,7 @@ PODS:
     - React
   - RNSVG (9.13.6-gb):
     - React
-  - RNTAztecView (1.28.1):
+  - RNTAztecView (1.29.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.2)
   - WordPress-Aztec-iOS (1.19.2)
@@ -367,7 +367,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: 76149a3f98afe2ef0b0293789b26881a676b07a2
+  Gutenberg: fc13d4a3c0af0e101da39ae1a183cd7fe0ae6031
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78

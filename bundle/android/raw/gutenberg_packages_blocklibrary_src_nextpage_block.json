@@ -1,9 +1,7 @@
 {
 	"name": "core/nextpage",
 	"category": "layout",
-	"parent": [
-		"core/post-content"
-	],
+	"parent": [ "core/post-content" ],
 	"supports": {
 		"customClassName": false,
 		"className": false,
