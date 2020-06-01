@@ -36,22 +36,29 @@ const menusFixture = [
 
 // Matching against variations of the same URL encoded and non-encoded
 // produces the most reliable mocking.
-const REST_MENUS_URLS = [
+const REST_MENUS_ROUTES = [
 	'/__experimental/menus',
 	`rest_route=${ encodeURIComponent( '/__experimental/menus' ) }`,
 ];
-const REST_MENU_ITEMS_URLS = [
+const REST_MENU_ITEMS_ROUTES = [
 	'/__experimental/menu-items',
 	`rest_route=${ encodeURIComponent( '/__experimental/menu-items' ) }`,
 ];
 
-const REST_PAGES_URLS = [
+const REST_PAGES_ROUTES = [
 	'/wp/v2/pages',
 	`rest_route=${ encodeURIComponent( '/wp/v2/pages' ) }`,
 ];
 
-function matchUrl( reqUrl, urls ) {
-	return urls.some( ( url ) => reqUrl.indexOf( url ) >= 0 );
+/**
+ * Determines if a given URL matches any of a given collection of
+ * routes (extressed as substrings).
+ *
+ * @param {string} reqUrl the full URL to be tested for matches.
+ * @param {Array} routes array of strings to match against the URL.
+ */
+function matchUrlToRoute( reqUrl, routes ) {
+	return routes.some( ( route ) => reqUrl.includes( route ) );
 }
 
 async function mockPagesResponse( pages ) {
@@ -67,7 +74,8 @@ async function mockPagesResponse( pages ) {
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => matchUrl( request.url(), REST_PAGES_URLS ),
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
 			onRequestMatch: createJSONResponse( mappedPages ),
 		},
 	] );
@@ -114,12 +122,13 @@ async function mockAllMenusResponses(
 
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => matchUrl( request.url(), REST_MENUS_URLS ),
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
 			onRequestMatch: createJSONResponse( mappedMenus ),
 		},
 		{
 			match: ( request ) =>
-				matchUrl( request.url(), REST_MENU_ITEMS_URLS ),
+				matchUrlToRoute( request.url(), REST_MENU_ITEMS_ROUTES ),
 			onRequestMatch: createJSONResponse( menuItems ),
 		},
 	] );
@@ -129,11 +138,13 @@ async function mockEmptyMenusAndPagesResponses() {
 	const emptyResponse = [];
 	await setUpResponseMocking( [
 		{
-			match: ( request ) => matchUrl( request.url(), REST_MENUS_URLS ),
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_MENUS_ROUTES ),
 			onRequestMatch: createJSONResponse( emptyResponse ),
 		},
 		{
-			match: ( request ) => matchUrl( request.url(), REST_PAGES_URLS ),
+			match: ( request ) =>
+				matchUrlToRoute( request.url(), REST_PAGES_ROUTES ),
 			onRequestMatch: createJSONResponse( emptyResponse ),
 		},
 	] );
@@ -381,10 +392,6 @@ describe( 'Navigation', () => {
 			expect( dropDownItemsLength ).toEqual( 2 );
 
 			await page.waitForXPath( '//li[text()="Create empty menu"]' );
-
-			await page.waitForXPath(
-				'//li[text()="New from all top-level pages"]'
-			);
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
