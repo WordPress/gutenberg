@@ -69,7 +69,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 	"icon": "star",
 	"description": "Shows warning, error or success notices  ...",
 	"keywords": [ "alert", "message" ],
-	"textDomain": "my-plugin",
+	"textdomain": "my-plugin",
 	"attributes": {
 		"message": {
 			"type": "string",
@@ -81,10 +81,15 @@ To register a new block type, start by creating a `block.json` file. This file:
 		"align": true,
 		"lightBlockWrapper": true
 	},
-	"styleVariations": [
+	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	],
+	"example": {
+		"attributes": {
+			"message": "This is a notice!"
+		},
+	},
 	"editorScript": "build/editor.js",
 	"script": "build/main.js",
 	"editorStyle": "build/editor.css",
@@ -210,10 +215,10 @@ Sometimes a block could have aliases that help users discover it while searching
 * Type: `string`
 * Optional
 * Localized: No
-* Property: `textDomain`
+* Property: `textdomain`
 
 ```json
-{ "textDomain": "my-plugin" }
+{ "textdomain": "my-plugin" }
 ```
 
 The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/block. More information can be found in the [Text Domain](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/#text-domains) section of the [How to Internationalize your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) page.
@@ -264,11 +269,10 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 * Optional
 * Localized: Yes (`label` only)
 * Property: `styles`
-* Alias: `styleVariations`
 
 ```json
 {
-	"styleVariations": [
+	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },
 		{ "name": "other", "label": "Other" }
 	]
@@ -278,6 +282,27 @@ See the [the attributes documentation](/docs/designers-developers/developers/blo
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
 
 Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
+
+### Example
+
+ *   Type: `object`
+ *   Optional
+ *   Localized: No
+ *   Property: `example`
+
+ ```json
+{
+	"example": {
+		"attributes": {
+			"message": "This is a notice!"
+		},
+	}
+}
+ ```
+
+ It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.
+
+ See the [the example documentation](/docs/designers-developers/developers/block-api/block-registration.md#example-optional) for more details.
 
 ### Editor Script
 
@@ -414,7 +439,7 @@ return array(
 
 Localized properties are automatically wrapped in `_x` function calls on the backend and the frontend of WordPress. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle when it defines metadata definition.
 
-WordPress string discovery automatically translates these strings using the `textDomain` property specified in the `block.json` file.
+WordPress string discovery automatically translates these strings using the `textdomain` property specified in the `block.json` file.
 
 **Example:**
 
@@ -423,7 +448,7 @@ WordPress string discovery automatically translates these strings using the `tex
 	"title": "My block",
 	"description": "My block is fantastic",
 	"keywords": [ "fantastic" ],
-	"textDomain": "my-plugin"
+	"textdomain": "my-plugin"
 }
 ```
 
