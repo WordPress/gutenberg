@@ -115,7 +115,7 @@ class LatestPostsEdit extends Component {
 			order,
 			orderBy,
 			categories,
-			author,
+			selectedAuthor,
 			postsToShow,
 			excerptLength,
 			featuredImageAlign,
@@ -286,12 +286,12 @@ class LatestPostsEdit extends Component {
 						selectedCategories={ categories }
 						onAuthorChange={ ( value ) =>
 							setAttributes( {
-								author:
+								selectedAuthor:
 									'' !== value ? Number( value ) : undefined,
 							} )
 						}
 						authorList={ authorList }
-						selectedAuthorId={ author }
+						selectedAuthorId={ selectedAuthor }
 					/>
 
 					{ postLayout === 'grid' && (
@@ -378,6 +378,9 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
+						const currentAuthor = authorList.find(
+							( author ) => author.id === post.author
+						);
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
@@ -451,7 +454,7 @@ class LatestPostsEdit extends Component {
 										{ sprintf(
 											/* translators: byline. %s: current author. */
 											__( 'by %s' ),
-											post.author_info.name
+											currentAuthor.name
 										) }
 									</div>
 								) }
@@ -499,7 +502,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
-		author,
+		selectedAuthor,
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -511,7 +514,7 @@ export default withSelect( ( select, props ) => {
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
-			author,
+			author: selectedAuthor,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,

@@ -49,8 +49,8 @@ function render_block_core_latest_posts( $attributes ) {
 	if ( isset( $attributes['categories'] ) ) {
 		$args['category__in'] = array_column( $attributes['categories'], 'id' );
 	}
-	if ( isset( $attributes['author'] ) ) {
-		$args['author'] = $attributes['author'];
+	if ( isset( $attributes['selectedAuthor'] ) ) {
+		$args['author'] = $attributes['selectedAuthor'];
 	}
 
 	$recent_posts = get_posts( $args );

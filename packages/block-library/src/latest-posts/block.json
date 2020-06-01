@@ -21,7 +21,7 @@
 				"type": "object"
 			}
 		},
-		"author": {
+		"selectedAuthor": {
 			"type": "number"
 		},
 		"postsToShow": {
