@@ -1,16 +1,15 @@
 /**
  * External dependencies
  */
-import { map, fromPairs } from 'lodash';
+import { fromPairs } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useMemo, useCallback } from '@wordpress/element';
-import { parse, cloneBlock } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { parse } from '@wordpress/blocks';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,35 +19,7 @@ import useAsyncList from './use-async-list';
 import InserterPanel from './panel';
 import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
-
-const usePatternsState = ( onInsert ) => {
-	const { patternCategories, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalBlockPatternCategories,
-		} = select( 'core/block-editor' ).getSettings();
-		return {
-			patterns: __experimentalBlockPatterns,
-			patternCategories: __experimentalBlockPatternCategories,
-		};
-	}, [] );
-	const { createSuccessNotice } = useDispatch( 'core/notices' );
-	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: block pattern title. */
-				__( 'Pattern "%s" inserted.' ),
-				pattern.title
-			),
-			{
-				type: 'snackbar',
-			}
-		);
-	}, [] );
-
-	return [ patterns, patternCategories, onClickPattern ];
-};
+import usePatternsState from './hooks/use-patterns-state';
 
 function BlockPattern( { pattern, onClick } ) {
 	const { content, viewportWidth } = pattern;
