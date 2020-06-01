@@ -6,9 +6,9 @@
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
-* Rationale
-* Specification
-* Current Status
+- Rationale
+- Specification
+- Current Status
 
 ## Rationale
 
@@ -153,11 +153,16 @@ Each block will declare which style properties it exposes. This has been coined 
 
 The list of properties that are currently exposed via this method are:
 
-- Global: background-color.
-- Paragraph and Heading: line-height, font-size, color, background-color.
-- Group, Columns, and MediaText: color, background-color, background.
+| Context | Text's Color | Background's Color | Background's Gradient | Font Size | Line Height |
+| --- | --- | --- | --- | --- | --- |
+| Global | - | Yes | - | - | - |
+| Paragraph | Yes | Yes | - | Yes | Yes |
+| Heading [1] | Yes | Yes | - | Yes | Yes |
+| Group | Yes | Yes | Yes | - | - |
+| Columns | Yes | Yes | Yes | - | - |
+| Media & text | Yes | Yes | Yes | - | - |
 
-Note that, the heading block, represents 6 distinct HTML elements: H1-H6. It comes with selectors to target individual elements (ex: core/heading/h1 for H1) as well a selector to target all of them (core/heading).
+[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
 ### Features
 
@@ -190,6 +195,11 @@ This is being implemented, so it's not currently available.
         },
         { <more gradients> }
       ]
+    },
+    "styles: {
+      "color: {
+        "background": <value>
+			}
     }
   },
   "core/paragraph": {
@@ -199,17 +209,7 @@ This is being implemented, so it's not currently available.
         "lineHeight": <value>
       },
       "color": {
-        "text": <value>
-      }
-    }
-  },
-  "core/heading": {
-    "styles": {
-      "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
-      },
-      "color":{
+        "background": <value>,
         "text": <value>
       }
     }
@@ -220,7 +220,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -231,7 +232,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -242,7 +244,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -253,7 +256,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -264,7 +268,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -275,7 +280,8 @@ This is being implemented, so it's not currently available.
         "fontSize": <value>,
         "lineHeight": <value>
       },
-      "color":{
+      "color": {
+        "background": <value>,
         "text": <value>
       }
     }
@@ -283,27 +289,27 @@ This is being implemented, so it's not currently available.
   "core/columns": {
     "styles": {
       "color": {
-          "background": <value>,
-          "background-color": <value>,
-          "text": <value>
+        "background": <value>,
+        "gradient": <value>,
+        "text": <value>
       }
     }
   },
   "core/group": {
     "styles": {
         "color": {
-            "background": <value>,
-            "background-color": <value>,
-            "text": <value>
+          "background": <value>,
+          "gradient": <value>,
+          "text": <value>
         }
       }
   },
   "core/media-text": {
     "styles": {
         "color": {
-            "background": <value>,
-            "background-color": <value>,
-            "text": <value>
+          "background": <value>,
+          "gradient": <value>,
+          "text": <value>
         }
       }
   }
