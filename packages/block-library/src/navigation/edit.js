@@ -253,18 +253,26 @@ function Navigation( {
 	];
 
 	function shouldDisableCreateButton() {
+		// If there is no key at all then disable.
 		if ( ! selectedDropDownOption?.key ) {
-			return true; // disable button
+			return true;
 		}
 
-		const placeholderOptionSelected =
-			selectedDropDownOption.key === CREATE_PLACEHOLDER_VALUE;
+		// Always enable if Create Empty is selected.
+		if ( selectedDropDownOption.key === CREATE_EMPTY_OPTION_VALUE ) {
+			return false;
+		}
+
+		// Always disable if the default "placeholder" option is selected.
+		if ( selectedDropDownOption.key === CREATE_PLACEHOLDER_VALUE ) {
+			return true;
+		}
 
 		const menuItemsResolved =
 			Number.isInteger( selectedDropDownOption.key ) &&
 			checkHasResolvedMenuItems( selectedDropDownOption.key );
 
-		return placeholderOptionSelected || ! menuItemsResolved;
+		return ! menuItemsResolved;
 	}
 
 	// If we don't have existing items then show the Placeholder
