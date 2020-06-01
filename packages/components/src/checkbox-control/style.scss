@@ -2,7 +2,7 @@ $checkbox-input-size: 20px;
 $checkbox-input-size-sm: 24px; // width + height for small viewports
 
 .components-checkbox-control__input[type="checkbox"] {
-	border: 1px solid #b4b9be;
+	@include checkbox-control;
 	background: #fff;
 	color: #555;
 	clear: none;

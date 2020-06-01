@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "8.1.0",
+	"version": "8.2.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -163,7 +163,7 @@
 		"node-watch": "0.6.0",
 		"postcss": "7.0.13",
 		"postcss-loader": "3.0.0",
-		"prettier": "npm:wp-prettier@1.19.1",
+		"prettier": "npm:wp-prettier@2.0.5",
 		"progress": "2.0.3",
 		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"react": "16.9.0",

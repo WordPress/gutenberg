@@ -7,9 +7,9 @@ const { context, GitHub } = require( '@actions/github' );
 /**
  * Internal dependencies
  */
-const assignFixedIssues = require( './assign-fixed-issues' );
-const firstTimeContributor = require( './first-time-contributor' );
-const addMilestone = require( './add-milestone' );
+const assignFixedIssues = require( './tasks/assign-fixed-issues' );
+const firstTimeContributor = require( './tasks/first-time-contributor' );
+const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
 const ifNotFork = require( './if-not-fork' );
 

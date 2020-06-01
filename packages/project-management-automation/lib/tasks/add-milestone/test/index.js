@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import addMilestone from '../add-milestone';
+import addMilestone from '../';
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not master', async () => {

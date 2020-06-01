@@ -22,7 +22,7 @@ function gutenberg_examples_01_register_block() {
 
 	wp_register_script(
 		'gutenberg-examples-01-esnext',
-		plugins_url( 'build/block.js', __FILE__ ),
+		plugins_url( 'build/index.js', __FILE__ ),
 		$asset_file['dependencies'],
 		$asset_file['version']
 	);

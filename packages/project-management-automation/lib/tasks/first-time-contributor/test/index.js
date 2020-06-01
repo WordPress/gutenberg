@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import firstTimeContributor from '../first-time-contributor';
-import hasWordPressProfile from '../has-wordpress-profile';
+import firstTimeContributor from '../';
+import hasWordPressProfile from '../../../has-wordpress-profile';
 
-jest.mock( '../has-wordpress-profile', () => jest.fn() );
+jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
 
 describe( 'firstTimeContributor', () => {
 	beforeEach( () => {

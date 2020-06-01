@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const debug = require( './debug' );
+const debug = require( '../../debug' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.10.0 (2020-05-28)
+
 ### New Feature
 
 - Add `documentHasTextSelection` to inquire specifically about ranges of selected text, in addition to the existing `documentHasSelection`.

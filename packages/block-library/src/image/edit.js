@@ -259,7 +259,7 @@ export function ImageEdit( {
 	}
 
 	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = isWideAligned
+		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
 			? { width: undefined, height: undefined }
 			: {};
 		setAttributes( {
