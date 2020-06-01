@@ -191,32 +191,46 @@ This is being implemented, so it's not currently available.
   },
   core/paragraph: {
     styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
+      typography: { 
+        lineHeight: <value>,
+        fontSize: <value>
+      },
+      color: {
+        text: <value>
+      }
     }
   },
   /* core/heading/h1, core/heading/h2, etc */
   core/heading/h*: {
     styles: {
-        line-height: <value>,
-        font-size: <value>,
-        color: <value>,
+      typography: { 
+        lineHeight: <value>,
+        fontSize: <value>
+      },
+      color: {
+        text: <value>
+      }
     }
   },
   core/columns: {
     styles: {
-        color: <value>,
+      color: {
+        text: <value>
+      }
     }
   },
   core/group: {
     styles: {
-        color: <value>,
+      color: {
+        text: <value>
+      }
     }
   },
   core/media-text: {
     styles: {
-        color: <value>,
+      color: {
+        text: <value>
+      }
     }
   },
 }

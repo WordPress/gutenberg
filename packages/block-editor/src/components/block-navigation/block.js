@@ -48,8 +48,7 @@ export default function BlockNavigationBlock( {
 		{ 'is-visible': hasVisibleMovers }
 	);
 	const {
-		__experimentalWithBlockNavigationBlockSettings: withBlockNavigationBlockSettings,
-		__experimentalWithBlockNavigationBlockSettingsMinLevel: blockNavigationBlockSettingsMinLevel,
+		__experimentalFeatures: withBlockNavigationBlockSettings,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
@@ -116,20 +115,19 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withBlockNavigationBlockSettings &&
-				level >= blockNavigationBlockSettingsMinLevel && (
-					<TreeGridCell
-						className={ blockNavigationBlockSettingsClassName }
-					>
-						{ ( props ) => (
-							<BlockSettingsDropdown
-								clientIds={ [ clientId ] }
-								icon={ moreVertical }
-								{ ...props }
-							/>
-						) }
-					</TreeGridCell>
-				) }
+			{ withBlockNavigationBlockSettings && level > 1 && (
+				<TreeGridCell
+					className={ blockNavigationBlockSettingsClassName }
+				>
+					{ ( props ) => (
+						<BlockSettingsDropdown
+							clientIds={ [ clientId ] }
+							icon={ moreVertical }
+							{ ...props }
+						/>
+					) }
+				</TreeGridCell>
+			) }
 		</BlockNavigationLeaf>
 	);
 }
