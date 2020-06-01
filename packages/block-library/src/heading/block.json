@@ -27,7 +27,6 @@
 		"__experimentalFontSize": true,
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": {
-			"core/heading": "h1, h2, h3, h4, h5, h6",
 			"core/heading/h1": "h1",
 			"core/heading/h2": "h2",
 			"core/heading/h3": "h3",
