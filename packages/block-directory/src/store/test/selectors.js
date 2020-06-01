@@ -15,6 +15,7 @@ import {
 	getNewBlockTypes,
 	getUnusedBlockTypes,
 	isInstalling,
+	isRequestingDownloadableBlocks,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -31,73 +32,27 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getNewBlockTypes', () => {
-		it( 'should retrieve the block types that are installed and in the post content', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
+	describe( 'isRequestingDownloadableBlocks', () => {
+		it( 'should return false if there are no calls pending', () => {
 			const state = {
-				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+				downloadableBlocks: {
+					pendingBlockRequests: 0,
 				},
 			};
-			const blockTypes = getNewBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 1 );
-			expect( blockTypes[ 0 ] ).toEqual( blockTypeInstalled );
+			const isRequesting = isRequestingDownloadableBlocks( state );
+
+			expect( isRequesting ).toEqual( false );
 		} );
 
-		it( 'should return an empty array if no blocks are used', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
+		it( 'should return true if at least one call is pending', () => {
 			const state = {
-				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
+				downloadableBlocks: {
+					pendingBlockRequests: 1,
 				},
 			};
-			const blockTypes = getNewBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 0 );
-		} );
-	} );
+			const isRequesting = isRequestingDownloadableBlocks( state );
 
-	describe( 'getUnusedBlockTypes', () => {
-		it( 'should retrieve the block types that are installed but not used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
-			const state = {
-				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
-				},
-			};
-			const blockTypes = getUnusedBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 1 );
-			expect( blockTypes[ 0 ] ).toEqual( blockTypeUnused );
-		} );
-
-		it( 'should return all block types if no blocks are used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
-			const state = {
-				blockManagement: {
-					installedBlockTypes: [
-						blockTypeInstalled,
-						blockTypeUnused,
-					],
-				},
-			};
-			const blockTypes = getUnusedBlockTypes( state );
-			expect( blockTypes ).toHaveLength( 2 );
+			expect( isRequesting ).toEqual( true );
 		} );
 	} );
 
@@ -143,7 +98,6 @@ describe( 'selectors', () => {
 	describe( 'getDownloadableBlocks', () => {
 		const state = {
 			downloadableBlocks: {
-				isRequestingDownloadableBlocks: false,
 				results: {
 					boxer: [ downloadableBlock ],
 				},
