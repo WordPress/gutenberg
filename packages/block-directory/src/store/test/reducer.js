@@ -18,25 +18,29 @@ describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
 			const initialState = deepFreeze( {
-				isRequestingDownloadableBlocks: false,
+				pendingBlockRequests: 0,
 			} );
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
 				filterValue: 'test',
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toEqual( true );
+			expect( state.pendingBlockRequests ).toEqual( 1 );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
 			const query = downloadableBlock.title;
-			const state = downloadableBlocks( undefined, {
+			const initialState = deepFreeze( {
+				pendingBlockRequests: 1,
+			} );
+
+			const state = downloadableBlocks( initialState, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
 				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toEqual( false );
+			expect( state.pendingBlockRequests ).toEqual( 0 );
 		} );
 
 		it( "should set user's search term and save results", () => {
