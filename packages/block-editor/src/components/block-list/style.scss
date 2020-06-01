@@ -339,7 +339,8 @@
 	justify-content: center;
 
 	// Clicks on the inserter are redirected to the nearest tabbable element.
-	cursor: text;
+	//cursor: text;
+	cursor: default;
 
 	// Hide the inserter above the selected block.
 	&.is-inserter-hidden .block-editor-inserter__toggle {
@@ -369,6 +370,7 @@
 		border-radius: $radius-block-ui;
 		color: $white;
 		padding: 0;
+		outline: 10px solid $white;
 
 		// Special dimensions for this button.
 		min-width: 24px;
@@ -385,7 +387,7 @@
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
 		// Fade it in after a delay.
-		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.6s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
@@ -558,6 +560,11 @@
 		box-shadow: none;
 		overflow-y: visible;
 		margin-left: 0;
+
+		border-top: 2px solid $light-gray-secondary;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.6s ease;
+		animation-fill-mode: forwards;
+		@include reduce-motion("animation");
 	}
 }
 
