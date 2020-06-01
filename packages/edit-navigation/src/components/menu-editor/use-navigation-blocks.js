@@ -22,10 +22,14 @@ import PromiseQueue from './promise-queue';
 export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
-	const menuItems = useSelect(
-		( select ) => select( 'core' ).getMenuItems( query ),
-		[ menuId ]
-	);
+	const { menuItems, isResolving } = useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolving: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
 
 	// Data model
 	const [ blocks, setBlocks ] = useState( [] );
@@ -33,24 +37,26 @@ export default function useNavigationBlocks( menuId ) {
 
 	// Refresh our model whenever menuItems change
 	useEffect( () => {
-		if ( menuItems ) {
-			const [
-				innerBlocks,
-				clientIdToMenuItemMapping,
-			] = menuItemsToLinkBlocks(
-				menuItems,
-				innerBlocks,
-				clientIdToMenuItemMapping
-			);
-
-			const navigationBlock =
-				blocks[ 0 ] ||
-				createBlock( 'core/navigation', {}, innerBlocks );
-
-			setBlocks( [ navigationBlock ] );
-			menuItemsRef.current = clientIdToMenuItemMapping;
+		if ( isResolving || menuItems === null ) {
+			return;
 		}
-	}, [ menuItems ] );
+
+		const [
+			innerBlocks,
+			clientIdToMenuItemMapping,
+		] = menuItemsToLinkBlocks(
+			menuItems,
+			blocks[ 0 ]?.innerBlocks,
+			clientIdToMenuItemMapping
+		);
+
+		const navigationBlock = blocks[ 0 ]
+			? { ...blocks[ 0 ], innerBlocks }
+			: createBlock( 'core/navigation', {}, innerBlocks );
+
+		setBlocks( [ navigationBlock ] );
+		menuItemsRef.current = clientIdToMenuItemMapping;
+	}, [ menuId, menuItems, isResolving ] );
 
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
