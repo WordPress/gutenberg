@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useRef } from 'react';
-import { ScrollView, View } from 'react-native';
+import { I18nManager, ScrollView, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,6 @@ function HeaderToolbar( {
 	showKeyboardHideButton,
 	getStylesFromColorScheme,
 	onHideKeyboard,
-	isRTL,
 } ) {
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
@@ -65,7 +64,7 @@ function HeaderToolbar( {
 			/>,
 		];
 
-		return isRTL ? buttons.reverse() : buttons;
+		return I18nManager.isRTL ? buttons.reverse() : buttons;
 	};
 
 	return (
@@ -114,7 +113,6 @@ export default compose( [
 			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled:
 			select( 'core/edit-post' ).getEditorMode() === 'text',
-		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( 'core/block-editor' );

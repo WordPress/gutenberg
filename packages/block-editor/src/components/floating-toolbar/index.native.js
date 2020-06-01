@@ -30,7 +30,6 @@ const FloatingToolbar = ( {
 	parentId,
 	showFloatingToolbar,
 	onNavigateUp,
-	isRTL,
 } ) => {
 	// sustain old selection for proper Breacdrumb rendering when exit animation is ongoing
 	const [ previousSelection, setPreviousSelection ] = useState( {} );
@@ -87,7 +86,7 @@ const FloatingToolbar = ( {
 								! showPrevious &&
 								( () => onNavigateUp( parentId ) )
 							}
-							icon={ <NavigateUpSVG isRTL={ isRTL } /> }
+							icon={ <NavigateUpSVG /> }
 						/>
 						<View style={ styles.pipe } />
 					</Toolbar>
@@ -105,7 +104,6 @@ export default compose( [
 			getBlockHierarchyRootClientId,
 			getBlockRootClientId,
 			getBlockCount,
-			getSettings,
 		} = select( 'core/block-editor' );
 
 		const selectedClientId = getSelectedBlockClientId();
@@ -118,7 +116,6 @@ export default compose( [
 			selectedClientId,
 			showFloatingToolbar: !! getBlockCount( rootBlockId ),
 			parentId: getBlockRootClientId( selectedClientId ),
-			isRTL: getSettings().isRTL,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

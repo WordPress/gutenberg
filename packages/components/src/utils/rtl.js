@@ -4,28 +4,15 @@
 import { css } from '@emotion/core';
 import { mapKeys } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { isRTL as getRTL } from '@wordpress/i18n';
+
 const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
 const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
 const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
 const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
-
-/**
- * Checks to see whether the document is set to rtl.
- *
- * @return {boolean} Whether document is RTL.
- */
-export function getRTL() {
-	return !! ( document && document.documentElement.dir === 'rtl' );
-}
-
-/**
- * Simple hook to retrieve RTL direction value
- *
- * @return {boolean} Whether document is RTL.
- */
-export function useRTL() {
-	return getRTL();
-}
 
 /**
  * Flips a CSS property from left <-> right.

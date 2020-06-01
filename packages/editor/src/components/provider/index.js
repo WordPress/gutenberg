@@ -139,7 +139,6 @@ class EditorProvider extends Component {
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
 				'imageDimensions',
-				'isRTL',
 				'maxWidth',
 				'onUpdateDefaultBlockStyles',
 				'styles',

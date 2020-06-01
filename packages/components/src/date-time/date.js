@@ -10,12 +10,12 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
-const isRTL = () => document.documentElement.dir === 'rtl';
 
 class DatePicker extends Component {
 	constructor() {

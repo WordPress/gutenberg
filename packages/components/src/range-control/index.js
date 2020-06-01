@@ -7,7 +7,7 @@ import { clamp, isFinite, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { compose, withInstanceId } from '@wordpress/compose';
 
@@ -37,7 +37,6 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 import InputField from './input-field';
-import { useRTL } from '../utils/rtl';
 
 const BaseRangeControl = forwardRef(
 	(
@@ -71,8 +70,6 @@ const BaseRangeControl = forwardRef(
 		},
 		ref
 	) => {
-		const isRTL = useRTL();
-
 		const sliderValue =
 			valueProp !== undefined ? valueProp : initialPosition;
 
@@ -184,7 +181,7 @@ const BaseRangeControl = forwardRef(
 		} );
 
 		const offsetStyle = {
-			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
+			[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 		};
 
 		return (
@@ -194,10 +191,7 @@ const BaseRangeControl = forwardRef(
 				id={ id }
 				help={ help }
 			>
-				<Root
-					className="components-range-control__root"
-					isRTL={ isRTL }
-				>
+				<Root className="components-range-control__root">
 					{ beforeIcon && (
 						<BeforeIconWrapper>
 							<Icon icon={ beforeIcon } />

@@ -34,7 +34,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { image as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
@@ -120,7 +120,7 @@ export function ImageEdit( {
 	onReplace,
 } ) {
 	const ref = useRef();
-	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
+	const { image, maxWidth, imageSizes, mediaUpload } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
 			const { getSettings } = select( 'core/block-editor' );
@@ -128,7 +128,6 @@ export function ImageEdit( {
 				...pick( getSettings(), [
 					'mediaUpload',
 					'imageSizes',
-					'isRTL',
 					'maxWidth',
 				] ),
 				image: id && isSelected ? getMedia( id ) : null,
@@ -542,7 +541,7 @@ export function ImageEdit( {
 			// When the image is centered, show both handles.
 			showRightHandle = true;
 			showLeftHandle = true;
-		} else if ( isRTL ) {
+		} else if ( isRTL() ) {
 			// In RTL mode the image is on the right by default.
 			// Show the right handle and hide the left handle only when it is
 			// aligned left. Otherwise always show the left handle.

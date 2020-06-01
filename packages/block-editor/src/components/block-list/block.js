@@ -232,7 +232,7 @@ const applyWithSelect = withSelect(
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
-		const { focusMode, isRTL } = getSettings();
+		const { focusMode } = getSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const checkDeep = true;
 
@@ -270,7 +270,6 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			isNavigationMode: isNavigationMode(),
-			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to
 			// access the block prop.

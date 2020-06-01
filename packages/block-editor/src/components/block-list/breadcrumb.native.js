@@ -24,7 +24,6 @@ const BlockBreadcrumb = ( {
 	blockIcon,
 	rootClientId,
 	rootBlockIcon,
-	isRTL,
 } ) => {
 	return (
 		<View
@@ -51,10 +50,7 @@ const BlockBreadcrumb = ( {
 							fill={ styles.icon.color }
 						/>,
 						<View key="subdirectory-icon" style={ styles.arrow }>
-							<SubdirectorSVG
-								fill={ styles.arrow.color }
-								isRTL={ isRTL }
-							/>
+							<SubdirectorSVG fill={ styles.arrow.color } />
 						</View>,
 					] }
 				<Icon
@@ -77,7 +73,7 @@ const BlockBreadcrumb = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName, getSettings } = select(
+		const { getBlockRootClientId, getBlockName } = select(
 			'core/block-editor'
 		);
 
@@ -102,7 +98,6 @@ export default compose( [
 			blockIcon,
 			rootClientId,
 			rootBlockIcon,
-			isRTL: getSettings().isRTL,
 		};
 	} ),
 ] )( BlockBreadcrumb );

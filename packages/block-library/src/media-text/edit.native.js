@@ -7,7 +7,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL as getRTL } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -184,7 +184,6 @@ class MediaTextEdit extends Component {
 			backgroundColor,
 			setAttributes,
 			isSelected,
-			isRTL,
 			wrapperProps,
 		} = this.props;
 		const {
@@ -195,6 +194,7 @@ class MediaTextEdit extends Component {
 		} = attributes;
 		const { containerWidth } = this.state;
 
+		const isRTL = getRTL();
 		const isMobile = containerWidth < BREAKPOINTS.mobile;
 		const shouldStack = isStackedOnMobile && isMobile;
 		const temporaryMediaWidth = shouldStack
@@ -302,7 +302,6 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlockRootClientId,
 			getBlockParents,
-			getSettings,
 		} = select( 'core/block-editor' );
 
 		const parents = getBlockParents( clientId, true );
@@ -318,7 +317,6 @@ export default compose(
 			isSelected: selectedBlockClientId === clientId,
 			isParentSelected,
 			isAncestorSelected,
-			isRTL: getSettings().isRTL,
 		};
 	} )
 )( MediaTextEdit );

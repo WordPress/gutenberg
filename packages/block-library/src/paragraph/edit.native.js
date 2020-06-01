@@ -8,7 +8,6 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
@@ -20,10 +19,6 @@ function ParagraphBlock( {
 	mergedStyle,
 	style,
 } ) {
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
 	const { align, content, placeholder } = attributes;
 
 	const styles = {
@@ -36,7 +31,6 @@ function ParagraphBlock( {
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
-					isRTL={ isRTL }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }

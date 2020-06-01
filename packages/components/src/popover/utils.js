@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getScrollContainer } from '@wordpress/dom';
+import { isRTL as getRTL } from '@wordpress/i18n';
 
 /**
  * Module constants
@@ -33,7 +34,7 @@ export function computePopoverXAxisPosition(
 	boundaryElement
 ) {
 	const { width } = contentSize;
-	const isRTL = document.documentElement.dir === 'rtl';
+	const isRTL = getRTL();
 
 	// Correct xAxis for RTL support
 	if ( xAxis === 'left' && isRTL ) {

@@ -12,7 +12,7 @@ import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL as getRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +21,8 @@ import { leftArrow, rightArrow } from './icons';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 import { getBlockMoverDescription } from './mover-description';
 
-const getArrowIcon = ( direction, orientation, isRTL ) => {
+const getArrowIcon = ( direction, orientation ) => {
+	const isRTL = getRTL();
 	if ( direction === 'up' ) {
 		if ( orientation === 'horizontal' ) {
 			return isRTL ? rightArrow : leftArrow;
@@ -36,7 +37,8 @@ const getArrowIcon = ( direction, orientation, isRTL ) => {
 	return null;
 };
 
-const getMovementDirectionLabel = ( moveDirection, orientation, isRTL ) => {
+const getMovementDirectionLabel = ( moveDirection, orientation ) => {
+	const isRTL = getRTL();
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
 			return isRTL ? __( 'Move right' ) : __( 'Move left' );
@@ -71,7 +73,6 @@ const BlockMoverButton = forwardRef(
 			isFirst,
 			isLast,
 			firstIndex,
-			isRTL,
 			moverOrientation,
 		} = useSelect(
 			( select ) => {
@@ -80,7 +81,6 @@ const BlockMoverButton = forwardRef(
 					getBlockRootClientId,
 					getBlockOrder,
 					getBlock,
-					getSettings,
 					getBlockListSettings,
 				} = select( 'core/block-editor' );
 				const normalizedClientIds = castArray( clientIds );
@@ -108,7 +108,6 @@ const BlockMoverButton = forwardRef(
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
 					isLast: isLastBlock,
-					isRTL: getSettings().isRTL,
 					moverOrientation:
 						orientation || __experimentalMoverDirection,
 				};
@@ -139,11 +138,10 @@ const BlockMoverButton = forwardRef(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
-					icon={ getArrowIcon( direction, moverOrientation, isRTL ) }
+					icon={ getArrowIcon( direction, moverOrientation ) }
 					label={ getMovementDirectionLabel(
 						direction,
-						moverOrientation,
-						isRTL
+						moverOrientation
 					) }
 					aria-describedby={ descriptionId }
 					{ ...props }
@@ -161,8 +159,7 @@ const BlockMoverButton = forwardRef(
 						isFirst,
 						isLast,
 						direction === 'up' ? -1 : 1,
-						moverOrientation,
-						isRTL
+						moverOrientation
 					) }
 				</span>
 			</>

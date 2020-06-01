@@ -5,7 +5,8 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
-		{ "path": "../element" }
+		{ "path": "../element" },
+		{ "path": "../i18n" }
 	],
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in

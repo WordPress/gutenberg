@@ -12,7 +12,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useState, useEffect } from '@wordpress/element';
 
@@ -21,7 +21,6 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import Cell from './cell';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
-import { useRTL } from '../utils/rtl';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId } from './utils';
 
@@ -45,14 +44,13 @@ export default function AlignmentMatrixControl( {
 	...props
 } ) {
 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
-	const isRTL = useRTL();
 	const baseId = useBaseId( id );
 	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
 
 	const composite = useCompositeState( {
 		baseId,
 		currentId: initialCurrentId,
-		rtl: isRTL,
+		rtl: isRTL(),
 	} );
 
 	const handleOnChange = ( nextValue ) => {

@@ -3,6 +3,7 @@
  */
 import {
 	Image,
+	I18nManager,
 	StyleSheet,
 	View,
 	ScrollView,
@@ -180,7 +181,6 @@ class GalleryImage extends Component {
 			'aria-label': ariaLabel,
 			isCropped,
 			getStylesFromColorScheme,
-			isRTL,
 		} = this.props;
 
 		const { isUploadInProgress, captionSelected } = this.state;
@@ -246,7 +246,9 @@ class GalleryImage extends Component {
 										<Button
 											style={ buttonStyle }
 											icon={
-												isRTL ? arrowRight : arrowLeft
+												I18nManager.isRTL
+													? arrowRight
+													: arrowLeft
 											}
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={
@@ -264,7 +266,9 @@ class GalleryImage extends Component {
 										<Button
 											style={ buttonStyle }
 											icon={
-												isRTL ? arrowLeft : arrowRight
+												I18nManager.isRTL
+													? arrowLeft
+													: arrowRight
 											}
 											iconSize={ ICON_SIZE_ARROW }
 											onClick={

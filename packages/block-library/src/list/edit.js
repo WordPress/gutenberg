@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL as getRTL } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
@@ -29,7 +29,6 @@ import {
 	formatOutdent,
 	formatOutdentRTL,
 } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -47,9 +46,7 @@ export default function ListEdit( {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
+	const isRTL = getRTL();
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
