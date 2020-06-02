@@ -7,7 +7,7 @@ import { Image, Text, TouchableWithoutFeedback, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, ImageWithFocalPoint } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
@@ -16,6 +16,7 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { MediaEdit } from '../media-edit';
+import { getImageWithFocalPointStyles } from '../image-with-focalpoint';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import SvgIconCustomize from './icon-customize';
@@ -65,7 +66,8 @@ const ImageComponent = ( {
 			Image.getSize( url, ( imgWidth, imgHeight ) => {
 				setImageData( {
 					aspectRatio: imgWidth / imgHeight,
-					imageWidth: imgWidth,
+					width: imgWidth,
+					height: imgHeight,
 				} );
 			} );
 		}
@@ -73,7 +75,24 @@ const ImageComponent = ( {
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
-		setContainerSize( { width, height } );
+		if ( ! containerSize ) {
+			setContainerSize( { width, height } );
+		}
+	};
+
+	const getIcon = ( iconType ) => {
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = iconPlaceholderStyles;
+				break;
+			case ICON_TYPE.UPLOAD:
+				iconStyle = iconUploadStyles;
+				break;
+		}
+		return <Icon icon={ icon } { ...iconStyle } />;
 	};
 
 	const alignToFlex = {
@@ -94,37 +113,15 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
-	const imageBorderOnSelectedStyle =
-		isSelected && ! ( isUploadInProgress || isUploadFailed )
-			? styles.imageBorder
-			: '';
+	const customWidth =
+		imageData?.width < containerSize?.width ? imageData?.width : '100%';
 
-	const placeholderStyles = usePreferredColorSchemeStyle(
-		styles.imageContainerUpload,
-		styles.imageContainerUploadDark
-	);
-
-	const getIcon = ( iconType ) => {
-		let iconStyle;
-		switch ( iconType ) {
-			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
-			case ICON_TYPE.PLACEHOLDER:
-				iconStyle = iconPlaceholderStyles;
-				break;
-			case ICON_TYPE.UPLOAD:
-				iconStyle = iconUploadStyles;
-				break;
-		}
-		return <Icon icon={ icon } { ...iconStyle } />;
-	};
-
-	const getImageSize = () => {
-		const customWidth =
-			imageData?.width < containerSize?.width ? imageData?.width : '100%';
-
-		return {
-			aspectRatio: imageData?.aspectRatio,
+	const imageContainerStyles = [
+		isSelected &&
+			! ( isUploadInProgress || isUploadFailed ) &&
+			styles.imageBorder,
+		focalPoint && styles.imageWithFocalPoint,
+		{
 			width:
 				imageWidth > 0 && imageWidth < containerSize?.width
 					? imageWidth
@@ -132,19 +129,36 @@ const ImageComponent = ( {
 			height:
 				imageHeight > 0 && imageHeight < containerSize?.height
 					? imageHeight
-					: undefined,
+					: '100%',
+		},
+	];
+
+	const placeholderStyles = usePreferredColorSchemeStyle(
+		styles.imageContainerUpload,
+		styles.imageContainerUploadDark
+	);
+
+	const imageStyles = [
+		{
+			aspectRatio: imageData?.aspectRatio,
 			opacity: isUploadInProgress ? 0.3 : 1,
-		};
-	};
+		},
+		focalPoint &&
+			getImageWithFocalPointStyles(
+				focalPoint,
+				containerSize,
+				imageData
+			),
+	];
 
 	return (
 		<View
 			style={ {
 				flex: 1,
-				// only set alignSelf if an image exists because alignSelf causes the placeholder
+				// only set alignItems if an image exists because alignItems causes the placeholder
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
-				alignSelf: imageData && align && alignToFlex[ align ],
+				alignItems: imageData && align && alignToFlex[ align ],
 			} }
 			onLayout={ onContainerLayout }
 		>
@@ -155,7 +169,7 @@ const ImageComponent = ( {
 				accessibilityHint={ __( 'Double tap and hold to edit' ) }
 				accessibilityRole={ 'imagebutton' }
 				key={ url }
-				style={ imageBorderOnSelectedStyle }
+				style={ imageContainerStyles }
 			>
 				{ ! imageData && (
 					<View style={ placeholderStyles }>
@@ -164,20 +178,13 @@ const ImageComponent = ( {
 						</View>
 					</View>
 				) }
-				{ focalPoint ? (
-					<View style={ styles.imageWithFocalPoint }>
-						<ImageWithFocalPoint
-							focalPoint={ focalPoint }
-							url={ url }
-						/>
-					</View>
-				) : (
-					<Image
-						style={ containerSize && getImageSize() }
-						resizeMethod="scale"
-						source={ { uri: url } }
-					/>
-				) }
+
+				<Image
+					style={ containerSize && imageStyles }
+					resizeMethod={ ! focalPoint && 'scale' }
+					source={ { uri: url } }
+				/>
+
 				{ isUploadFailed && (
 					<View
 						style={ [

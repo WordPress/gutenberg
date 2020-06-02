@@ -2,7 +2,6 @@
 	border-color: $blue-medium;
 	border-width: 2px;
 	border-style: solid;
-	min-width: 100%;
 	flex-grow: 1;
 	overflow: hidden;
 }
@@ -106,6 +105,6 @@
 }
 
 .imageWithFocalPoint {
-	min-height: 100%;
+	height: 100%;
 	overflow: hidden;
 }
