@@ -33,7 +33,7 @@ export default function useCreateMissingMenuItems() {
 			if ( clientId in menuItemsRef.current ) {
 				continue;
 			}
-			// Already in the queue
+			// Menu item already in the queue
 			if ( enqueuedBlocksIds.current.includes( clientId ) ) {
 				continue;
 			}
