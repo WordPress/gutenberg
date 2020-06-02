@@ -20,18 +20,20 @@ import useDebouncedValue from './use-debounced-value';
 import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
-	// menuItems is an array of menu item objects.
-	const query = { menus: menuId, per_page: -1 };
-	const { menuItems, isResolving } = useSelect( ( select ) => ( {
-		menuItems: select( 'core' ).getMenuItems( query ),
-		isResolving: select( 'core/data' ).isResolving(
-			'core',
-			'getMenuItems',
-			[ query ]
-		),
-	} ) );
+	const { blocks, setBlocks, menuItemsRef, query } = useBlocks( menuId );
+	const onMenuItemsCreated = useCreateMissingMenuItems(
+		blocks,
+		menuItemsRef
+	);
+	const saveBlocks = useSaveBlocksCallback( query, menuItemsRef, blocks );
 
-	// Data model
+	return [ blocks, setBlocks, () => onMenuItemsCreated( saveBlocks ) ];
+}
+
+function useBlocks( menuId ) {
+	const query = { menus: menuId, per_page: -1 };
+	const { menuItems, isResolving } = useSelectedMenuItems( query );
+
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
@@ -58,6 +60,26 @@ export default function useNavigationBlocks( menuId ) {
 		menuItemsRef.current = clientIdToMenuItemMapping;
 	}, [ menuId, menuItems, isResolving ] );
 
+	return {
+		blocks,
+		setBlocks,
+		menuItemsRef,
+		query,
+	};
+}
+
+function useSelectedMenuItems( query ) {
+	return useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolvingMenuItems: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
+}
+
+function useCreateMissingMenuItems( blocks, menuItemsRef ) {
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
 	// PromiseQueue is used in order to
@@ -90,14 +112,33 @@ export default function useNavigationBlocks( menuId ) {
 		}
 	}, [ debouncedBlocks ] );
 
-	// Save handler
+	return ( callback ) => promiseQueueRef.current.then( callback );
+}
+
+async function createDraftMenuItem() {
+	return apiFetch( {
+		path: `/__experimental/menu-items`,
+		method: 'POST',
+		data: {
+			title: 'Placeholder',
+			url: 'Placeholder',
+			menu_order: 0,
+		},
+	} );
+}
+
+function useSaveBlocksCallback( query, menuItemsRef, blocks ) {
 	const { receiveEntityRecords } = useDispatch( 'core' );
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'
 	);
 
 	const saveBlocks = async () => {
-		const result = await batchSave( menuId, menuItemsRef, blocks[ 0 ] );
+		const result = await batchSave(
+			query.menus,
+			menuItemsRef,
+			blocks[ 0 ]
+		);
 
 		if ( result.success ) {
 			createSuccessNotice( __( 'Navigation saved.' ), {
@@ -111,23 +152,7 @@ export default function useNavigationBlocks( menuId ) {
 		}
 	};
 
-	return [
-		blocks,
-		setBlocks,
-		() => promiseQueueRef.current.then( saveBlocks ),
-	];
-}
-
-async function createDraftMenuItem() {
-	return apiFetch( {
-		path: `/__experimental/menu-items`,
-		method: 'POST',
-		data: {
-			title: 'Placeholder',
-			url: 'Placeholder',
-			menu_order: 0,
-		},
-	} );
+	return saveBlocks;
 }
 
 const menuItemsToLinkBlocks = (
