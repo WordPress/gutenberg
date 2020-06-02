@@ -282,6 +282,12 @@ describe( 'Navigation', () => {
 
 			await clickCreateButton();
 
+			// Required until fix in place for:
+			// https://github.com/WordPress/gutenberg/issues/22830
+			// Ideally we'd be more specific about the error message but it
+			// does not support partial string matches using `expect.stringContaining()`.
+			expect( console ).toHaveErrored();
+
 			// Snapshot should contain the mocked pages.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -338,6 +344,12 @@ describe( 'Navigation', () => {
 			// Assert the correct number of Nav Link blocks were inserted.
 			expect( navBlockItemsLength ).toEqual( menuItemsFixture.length );
 
+			// Required until fix in place for:
+			// https://github.com/WordPress/gutenberg/issues/22830
+			// Ideally we'd be more specific about the error message but it
+			// does not support partial string matches using `expect.stringContaining()`.
+			expect( console ).toHaveErrored();
+
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -364,6 +376,12 @@ describe( 'Navigation', () => {
 			// Assert an empty Nav Block is created.
 			// We expect 1 here because a "placeholder" Nav Item Block is automatically inserted
 			expect( navBlockItemsLength ).toEqual( 1 );
+
+			// Required until fix in place for:
+			// https://github.com/WordPress/gutenberg/issues/22830
+			// Ideally we'd be more specific about the error message but it
+			// does not support partial string matches using `expect.stringContaining()`.
+			expect( console ).toHaveErrored();
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -464,6 +482,12 @@ describe( 'Navigation', () => {
 			type: 'entity',
 		} );
 
+		// Required until fix in place for:
+		// https://github.com/WordPress/gutenberg/issues/22830
+		// Ideally we'd be more specific about the error message but it
+		// does not support partial string matches using `expect.stringContaining()`.
+		expect( console ).toHaveErrored();
+
 		// Expect a Navigation Block with two Navigation Links in the snapshot.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -539,6 +563,12 @@ describe( 'Navigation', () => {
 		);
 
 		expect( isInLinkRichText ).toBe( true );
+
+		// Required until fix in place for:
+		// https://github.com/WordPress/gutenberg/issues/22830
+		// Ideally we'd be more specific about the error message but it
+		// does not support partial string matches using `expect.stringContaining()`.
+		expect( console ).toHaveErrored();
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
