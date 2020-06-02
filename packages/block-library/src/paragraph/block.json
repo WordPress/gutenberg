@@ -1,6 +1,6 @@
 {
 	"name": "core/paragraph",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -32,6 +32,11 @@
 		"lightBlockWrapper": true,
 		"__experimentalColor": true,
 		"__experimentalLineHeight": true,
-		"__experimentalFontSize": true
+		"__experimentalFontSize": true,
+		"__experimentalFeatures": {
+			"typography": {
+				"dropCap": true
+			}
+		}
 	}
 }

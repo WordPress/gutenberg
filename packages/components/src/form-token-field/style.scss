@@ -1,24 +1,17 @@
 .components-form-token-field__input-container {
+	@include input-control();
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
 	width: 100%;
 	margin: 0 0 $grid-unit-10 0;
 	padding: $grid-unit-05;
-	background-color: $white;
-	border: $border-width solid $light-gray-700;
-	color: $dark-gray-700;
 	cursor: text;
 
-	@include input-style__neutral();
 
 	&.is-disabled {
 		background: $light-gray-500;
 		border-color: $light-gray-700;
-	}
-
-	&.is-active {
-		@include input-style__focus();
 	}
 
 	// Token input
@@ -26,7 +19,7 @@
 		display: inline-block;
 		width: 100%;
 		max-width: 100%;
-		margin: 2px 0 2px 8px;
+		margin-left: 4px;
 		padding: 0;
 		min-height: 24px;
 		background: inherit;

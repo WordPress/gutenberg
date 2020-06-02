@@ -1,6 +1,6 @@
 {
 	"name": "core/group",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"tagName": {
 			"type": "string",

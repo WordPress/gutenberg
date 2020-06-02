@@ -1,6 +1,6 @@
 {
 	"name": "core/columns",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"gap": {
 			"type": "number",

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.13.0 (2020-05-28)
+
 ### Internal
 
 - Refactored handling of predefined block templates [#22235](https://github.com/WordPress/gutenberg/pull/22235).

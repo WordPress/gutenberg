@@ -6,7 +6,7 @@
  *
  * @return {string} The manipulated text.
  */
-export default function( settings, text ) {
+export default function stripRemovables( settings, text ) {
 	if ( settings.removeRegExp ) {
 		return text.replace( settings.removeRegExp, '' );
 	}

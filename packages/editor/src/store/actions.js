@@ -722,7 +722,7 @@ export function updateEditorSettings( settings ) {
  */
 
 const getBlockEditorAction = ( name ) =>
-	function*( ...args ) {
+	function* ( ...args ) {
 		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',

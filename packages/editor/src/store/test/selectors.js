@@ -196,7 +196,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-a', {
 			save: ( props ) => props.attributes.text,
-			category: 'formatting',
+			category: 'design',
 			title: 'Test Block A',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -204,7 +204,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-b', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -215,7 +215,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-c', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block C',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -224,7 +224,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'common',
+			category: 'text',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
 			supports: {
@@ -238,7 +238,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-default', {
-			category: 'common',
+			category: 'text',
 			title: 'default',
 			attributes: {
 				modified: {
@@ -2249,7 +2249,7 @@ describe( 'selectors', () => {
 			originalDefaultBlockName = getDefaultBlockName();
 
 			registerBlockType( 'core/default', {
-				category: 'common',
+				category: 'text',
 				title: 'default',
 				attributes: {
 					modified: {

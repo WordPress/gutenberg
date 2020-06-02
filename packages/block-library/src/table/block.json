@@ -1,6 +1,6 @@
 {
 	"name": "core/table",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"hasFixedLayout": {
 			"type": "boolean",

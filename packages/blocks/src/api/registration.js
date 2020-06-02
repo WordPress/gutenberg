@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, isPlainObject, omit, pick, some } from 'lodash';
+import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -113,6 +113,18 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *                                             then no preview is shown.
  */
 
+/**
+ * Mapping of legacy category slugs to their latest normal values, used to
+ * accommodate updates of the default set of block categories.
+ *
+ * @type {Record<string,string>}
+ */
+const LEGACY_CATEGORY_MAPPING = {
+	common: 'text',
+	formatting: 'text',
+	layout: 'design',
+};
+
 export let serverSideBlockDefinitions = {};
 
 /**
@@ -203,6 +215,12 @@ export function registerBlockType( name, settings ) {
 		console.error( 'The "edit" property must be a valid function.' );
 		return;
 	}
+
+	// Canonicalize legacy categories to equivalent fallback.
+	if ( LEGACY_CATEGORY_MAPPING.hasOwnProperty( settings.category ) ) {
+		settings.category = LEGACY_CATEGORY_MAPPING[ settings.category ];
+	}
+
 	if (
 		'category' in settings &&
 		! some( select( 'core/blocks' ).getCategories(), {
@@ -218,6 +236,7 @@ export function registerBlockType( name, settings ) {
 		);
 		delete settings.category;
 	}
+
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		console.error( 'The block "' + name + '" must have a title.' );
 		return;
