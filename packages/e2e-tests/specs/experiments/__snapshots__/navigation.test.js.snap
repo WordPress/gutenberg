@@ -44,6 +44,16 @@ exports[`Navigation Creating from existing Menus creates an empty navigation blo
 
 exports[`Navigation Creating from existing Menus does not display option to create from existing menus if there are no menus 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
 
+exports[`Navigation Creating from existing Pages allows a navigation block to be created using existing pages 1`] = `
+"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/page/home\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"About\\",\\"type\\":\\"page\\",\\"id\\":2,\\"url\\":\\"https://this/is/a/test/page/about\\"} /-->
+
+<!-- wp:navigation-link {\\"label\\":\\"Contact Us\\",\\"type\\":\\"page\\",\\"id\\":3,\\"url\\":\\"https://this/is/a/test/page/contact\\"} /-->
+<!-- /wp:navigation -->"
+`;
+
 exports[`Navigation Creating from existing Pages does not display option to create from existing Pages if there are no Pages 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
 
 exports[`Navigation allows a navigation block to be created using existing pages 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
