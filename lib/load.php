@@ -54,6 +54,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-customizer-nonces.php';
 	}
+	if ( ! class_exists( 'WP_REST_Image_Editor_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-image-editor-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
