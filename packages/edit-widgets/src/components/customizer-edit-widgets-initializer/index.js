@@ -2,17 +2,20 @@
  * WordPress dependencies
  */
 import { navigateRegions } from '@wordpress/components';
-import { useSimulatedMediaQuery } from '@wordpress/block-editor';
+import {
+	useSimulatedMediaQuery,
+	BlockInspector,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { ComplementaryArea } from '@wordpress/interface';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import './sync-customizer';
 import Header from '../header';
-import Sidebar from '../sidebar';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
@@ -37,8 +40,16 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 			>
 				<Header isCustomizer />
 				<WidgetAreasBlockEditorContent />
-				<ComplementaryArea.Slot scope="core/edit-widgets" />
-				<Sidebar />
+				<ComplementaryArea.Slot scope="core/edit-widgets-customizer" />
+				<ComplementaryArea
+					className="edit-widgets-sidebar"
+					scope="core/edit-widgets-customizer"
+					identifier="edit-widgets-customizer/block-inspector"
+					icon={ cog }
+					title={ __( 'Block Inspector' ) }
+				>
+					<BlockInspector />
+				</ComplementaryArea>
 			</div>
 		</WidgetAreasBlockEditorProvider>
 	);

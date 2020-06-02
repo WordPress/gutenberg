@@ -98,6 +98,8 @@
 		"@types/requestidlecallback": "0.3.1",
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "7.0.2",
+		"@types/webpack": "4.41.16",
+		"@types/webpack-sources": "0.1.7",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",

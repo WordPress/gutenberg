@@ -22,7 +22,7 @@
 	registerBlockType( 'test/allowed-blocks-unset', {
 		title: 'Allowed Blocks Unset',
 		icon: 'carrot',
-		category: 'common',
+		category: 'text',
 
 		edit() {
 			return el( 'div', divProps, el( InnerBlocks, { template } ) );
@@ -34,7 +34,7 @@
 	registerBlockType( 'test/allowed-blocks-set', {
 		title: 'Allowed Blocks Set',
 		icon: 'carrot',
-		category: 'common',
+		category: 'text',
 
 		edit() {
 			return el(
@@ -59,7 +59,7 @@
 	registerBlockType( 'test/allowed-blocks-dynamic', {
 		title: 'Allowed Blocks Dynamic',
 		icon: 'carrot',
-		category: 'common',
+		category: 'text',
 
 		edit: withSelect( function( select, ownProps ) {
 			var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;

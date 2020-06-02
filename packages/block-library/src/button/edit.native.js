@@ -477,7 +477,7 @@ class ButtonEdit extends Component {
 						placeholderTextColor={
 							styles.placeholderTextColor.color
 						}
-						identifier="content"
+						identifier="text"
 						tagName="p"
 						minWidth={ minWidth }
 						maxWidth={ maxWidth }

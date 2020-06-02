@@ -21,7 +21,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 	registerBlockType( 'myguten/meta-block', {
 		title: 'Meta Block',
 		icon: 'smiley',
-		category: 'common',
+		category: 'text',
 
 		edit: function( props ) {
 			var className = props.className;
@@ -82,7 +82,7 @@ import { useEntityProp } from '@wordpress/core-data';
 registerBlockType( 'myguten/meta-block', {
 	title: 'Meta Block',
 	icon: 'smiley',
-	category: 'common',
+	category: 'text',
 
 	edit( { className, setAttributes, attributes } ) {
 		const postType = useSelect(

@@ -114,6 +114,67 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->check_block_type_object( $block_type, $response->get_data(), $response->get_links() );
 	}
 
+	/**
+	 *
+	 */
+	public function test_get_item_with_styles() {
+		$block_name   = 'fake/styles';
+		$block_styles = array(
+			'name'         => 'fancy-quote',
+			'label'        => 'Fancy Quote',
+			'style_handle' => 'myguten-style',
+		);
+		register_block_type( $block_name );
+		register_block_style( $block_name, $block_styles );
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEqualSets( array( $block_styles ), $data['styles'] );
+
+	}
+
+	/**
+	 *
+	 */
+	public function test_get_item_with_styles_merge() {
+		$block_name   = 'fake/styles2';
+		$block_styles = array(
+			'name'         => 'fancy-quote',
+			'label'        => 'Fancy Quote',
+			'style_handle' => 'myguten-style',
+		);
+		$settings     = array(
+			'styles' => array(
+				array(
+					'name'         => 'blue-quote',
+					'label'        => 'Blue Quote',
+					'style_handle' => 'myguten-style',
+				),
+			),
+		);
+		register_block_type( $block_name, $settings );
+		register_block_style( $block_name, $block_styles );
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/block-types/' . $block_name );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$expected = array(
+			array(
+				'name'         => 'fancy-quote',
+				'label'        => 'Fancy Quote',
+				'style_handle' => 'myguten-style',
+			),
+			array(
+				'name'         => 'blue-quote',
+				'label'        => 'Blue Quote',
+				'style_handle' => 'myguten-style',
+			),
+		);
+		$this->assertEqualSets( $expected, $data['styles'] );
+
+	}
+
 	public function test_get_block_invalid_name() {
 		$block_type = 'fake/block';
 		wp_set_current_user( self::$admin_id );
@@ -157,13 +218,13 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 16, $properties );
+		$this->assertCount( 17, $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'icon', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertArrayHasKey( 'styles', $properties );
-		$this->assertArrayHasKey( 'text_domain', $properties );
+		$this->assertArrayHasKey( 'textdomain', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'attributes', $properties );
 		$this->assertArrayHasKey( 'supports', $properties );
@@ -174,6 +235,7 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 		$this->assertArrayHasKey( 'editor_style', $properties );
 		$this->assertArrayHasKey( 'style', $properties );
 		$this->assertArrayHasKey( 'parent', $properties );
+		$this->assertArrayHasKey( 'example', $properties );
 	}
 
 	/**
@@ -283,8 +345,9 @@ class REST_WP_REST_Block_Types_Controller_Test extends WP_Test_REST_Post_Type_Co
 			'description'   => 'description',
 			'keywords'      => 'keywords',
 			'parent'        => 'parent',
-			'styles'        => 'styleVariations',
-			'text_domain'   => 'textDomain',
+			'styles'        => 'styles',
+			'textdomain'    => 'textdomain',
+			'example'       => 'example',
 		);
 
 		foreach ( $extra_fields as $key => $extra_field ) {

@@ -9,9 +9,7 @@ const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
  *   request `@wordpress/api-fetch` becomes `wp.apiFetch`
  *   request `@wordpress/i18n` becomes `wp.i18n`
  *
- * @param {string} request Requested module
- *
- * @return {(string|string[]|undefined)} Script global
+ * @type {import('.').RequestToExternal}
  */
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
@@ -55,9 +53,7 @@ function defaultRequestToExternal( request ) {
  *   request `@wordpress/i18n` becomes `wp-i18n`
  *   request `@wordpress/escape-html` becomes `wp-escape-html`
  *
- * @param {string} request Requested module
- *
- * @return {(string|undefined)} Script handle
+ * @type {import('.').RequestToHandle}
  */
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
@@ -84,9 +80,7 @@ function defaultRequestToHandle( request ) {
  * @return {string} Camel-cased string.
  */
 function camelCaseDash( string ) {
-	return string.replace( /-([a-z])/g, ( match, letter ) =>
-		letter.toUpperCase()
-	);
+	return string.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
 }
 
 module.exports = {
