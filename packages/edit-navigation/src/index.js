@@ -57,7 +57,7 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
-	settings.__experimentalNavigationManagementEditor = true;
+	settings.__experimentalNavigationScreen = true;
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

@@ -91,7 +91,7 @@ function Navigation( {
 	const isNavigationManagementScreen = useSelect(
 		( select ) =>
 			select( 'core/block-editor' ).getSettings()
-				.__experimentalNavigationManagementEditor
+				.__experimentalNavigationScreen
 	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
