@@ -11,8 +11,8 @@ import { flattenBlocks } from './helpers';
 import PromiseQueue from './promise-queue';
 
 /**
- * When a new block is added, let's create a draft menuItem for it.
- * The batch save endpoint expects all the menu items to have a valid id already.
+ * When a new Navigation child block is added, we create a draft menuItem for it because
+ * the batch save endpoint expects all the menu items to have a valid id already.
  * PromiseQueue is used in order to
  * 1) limit the amount of requests processed at the same time
  * 2) save the menu only after all requests are finalized
