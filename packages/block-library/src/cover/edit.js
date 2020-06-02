@@ -303,11 +303,16 @@ function CoverEdit( {
 	 * If a background image is set, this hook extracts the primary color from
 	 * that image and sets it as a background color.
 	 */
-	useColorExtract( {
+	const { extractColor } = useColorExtract( {
 		color: backgroundColorValue,
 		onChange: ( nextColor ) => setOverlayColor( nextColor ),
 		src: url,
 	} );
+
+	const handleOnExtractColor = async () => {
+		const [ value ] = await extractColor();
+		setOverlayColor( value );
+	};
 
 	const controls = (
 		<>
@@ -405,6 +410,15 @@ function CoverEdit( {
 								},
 							] }
 						>
+							<div className="block-library-cover__dominant-color-button-wrapper">
+								<Button
+									isSecondary
+									isSmall
+									onClick={ handleOnExtractColor }
+								>
+									{ __( 'Pick dominant' ) }
+								</Button>
+							</div>
 							{ !! url && (
 								<RangeControl
 									label={ __( 'Background opacity' ) }
