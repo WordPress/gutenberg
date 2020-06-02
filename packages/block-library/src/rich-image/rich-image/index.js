@@ -23,6 +23,8 @@ import {
 	withNotices,
 	RangeControl,
 	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -66,7 +68,6 @@ class RichImage extends Component {
 			position: { x: 0, y: 0 },
 			zoom: 1,
 			aspect: 4 / 3,
-			isPortrait: false,
 		};
 
 		this.adjustImage = this.adjustImage.bind( this );
@@ -126,7 +127,6 @@ class RichImage extends Component {
 			zoom,
 			aspect,
 			imageSize,
-			isPortrait,
 		} = this.state;
 		const { url } = attributes;
 		const isEditing = ! isCrop && isSelected && url;
@@ -169,7 +169,7 @@ class RichImage extends Component {
 									maxZoom={ MAX_ZOOM }
 									crop={ position }
 									zoom={ zoom }
-									aspect={ isPortrait ? 1 / aspect : aspect }
+									aspect={ aspect }
 									onCropChange={ ( newPosition ) => {
 										this.setState( {
 											position: newPosition,
@@ -307,62 +307,127 @@ class RichImage extends Component {
 										label={ __( 'Aspect Ratio' ) }
 										popoverProps={ POPOVER_PROPS }
 										toggleProps={ toggleProps }
-										controls={ [
-											{
-												title: __( '16:10' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 10,
-													} ),
-											},
-											{
-												title: __( '16:9' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 16 / 9,
-													} ),
-											},
-											{
-												title: __( '4:3' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 4 / 3,
-													} ),
-											},
-											{
-												title: __( '3:2' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 3 / 2,
-													} ),
-											},
-											{
-												title: __( '1:1' ),
-												isDisabled: inProgress,
-												onClick: () =>
-													this.setState( {
-														aspect: 1,
-													} ),
-											},
-										] }
-									/>
+									>
+										{ ( { onClose } ) => (
+											<Fragment>
+												<MenuGroup>
+													<div className="richimage__aspect-title">
+														{ __( 'Landscape' ) }
+													</div>
+													{ [
+														{
+															title: __(
+																'16:10'
+															),
+															aspect: 16 / 10,
+														},
+														{
+															title: __( '16:9' ),
+															aspect: 16 / 9,
+														},
+														{
+															title: __( '4:3' ),
+															aspect: 4 / 3,
+														},
+														{
+															title: __( '3:2' ),
+															aspect: 3 / 2,
+														},
+													].map(
+														( {
+															title,
+															aspect: newAspect,
+														} ) => (
+															<MenuItem
+																key={
+																	newAspect
+																}
+																isDisabled={
+																	inProgress
+																}
+																onClick={ () => {
+																	this.setState(
+																		{
+																			aspect: newAspect,
+																		}
+																	);
+																	onClose();
+																} }
+															>
+																{ title }
+															</MenuItem>
+														)
+													) }
+												</MenuGroup>
+												<MenuGroup>
+													<div className="richimage__aspect-title">
+														{ __( 'Portrait' ) }
+													</div>
+													{ [
+														{
+															title: __(
+																'10:16'
+															),
+															aspect: 10 / 16,
+														},
+														{
+															title: __( '9:16' ),
+															aspect: 9 / 16,
+														},
+														{
+															title: __( '3:4' ),
+															aspect: 3 / 4,
+														},
+														{
+															title: __( '2:3' ),
+															aspect: 2 / 3,
+														},
+													].map(
+														( {
+															title,
+															aspect: newAspect,
+														} ) => (
+															<MenuItem
+																key={
+																	newAspect
+																}
+																isDisabled={
+																	inProgress
+																}
+																onClick={ () => {
+																	this.setState(
+																		{
+																			aspect: newAspect,
+																		}
+																	);
+																	onClose();
+																} }
+															>
+																{ title }
+															</MenuItem>
+														)
+													) }
+												</MenuGroup>
+												<MenuGroup>
+													<MenuItem
+														isDisabled={
+															inProgress
+														}
+														onClick={ () => {
+															this.setState( {
+																aspect: 1,
+															} );
+															onClose();
+														} }
+													>
+														{ __( 'Square' ) }
+													</MenuItem>
+												</MenuGroup>
+											</Fragment>
+										) }
+									</DropdownMenu>
 								) }
 							</ToolbarItem>
-							<ToolbarButton
-								className="richimage-toolbar__dropdown"
-								disabled={ inProgress }
-								icon="image-rotate-right"
-								label={ __( 'Orientation' ) }
-								onClick={ () =>
-									this.setState( ( prev ) => ( {
-										isPortrait: ! prev.isPortrait,
-									} ) )
-								}
-							/>
 						</ToolbarGroup>
 						<ToolbarGroup>
 							<ToolbarButton onClick={ this.cropImage }>

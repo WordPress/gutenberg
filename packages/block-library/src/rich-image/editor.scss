@@ -85,3 +85,13 @@
 .richimage-toolbar__control {
 	padding: 6px;
 }
+
+.richimage__aspect-title {
+	display: inline-flex;
+	align-items: center;
+	text-align: left;
+	min-height: 36px;
+	height: auto;
+	padding: 6px 12px 6px 40px;
+	font-weight: bold;
+}
