@@ -62,10 +62,10 @@ export function useSaveMenuItems( query ) {
 		);
 
 		if ( result.success ) {
+			receiveEntityRecords( 'root', 'menuItem', [], query, true );
 			createSuccessNotice( __( 'Navigation saved.' ), {
 				type: 'snackbar',
 			} );
-			receiveEntityRecords( 'root', 'menuItem', [], query, true );
 		} else {
 			createErrorNotice( __( 'There was an error.' ), {
 				type: 'snackbar',
