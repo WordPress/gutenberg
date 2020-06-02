@@ -258,18 +258,31 @@ function Navigation( {
 			return true;
 		}
 
-		// Always enable if Create Empty is selected.
-		if ( selectedDropDownOption.key === CREATE_EMPTY_OPTION_VALUE ) {
-			return false;
-		}
-
 		// Always disable if the default "placeholder" option is selected.
 		if ( selectedDropDownOption.key === CREATE_PLACEHOLDER_VALUE ) {
 			return true;
 		}
 
+		// Always enable if Create Empty is selected.
+		if ( selectedDropDownOption.key === CREATE_EMPTY_OPTION_VALUE ) {
+			return false;
+		}
+
+		// Enable if Pages option selected and we have Pages available.
+		if (
+			selectedDropDownOption.key === CREATE_FROM_PAGES_OPTION_VALUE &&
+			hasResolvedPages
+		) {
+			return false;
+		}
+
+		// Only "menu" options use an integer based key.
+		const selectedOptionIsMenu = Number.isInteger(
+			selectedDropDownOption.key
+		);
+
 		const menuItemsResolved =
-			Number.isInteger( selectedDropDownOption.key ) &&
+			selectedOptionIsMenu &&
 			checkHasResolvedMenuItems( selectedDropDownOption.key );
 
 		return ! menuItemsResolved;
