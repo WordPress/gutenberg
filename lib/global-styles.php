@@ -356,7 +356,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 			}
 		} else {
 			$block_data[ $block_name ] = array(
-				'selector' => '.wp-block-' . preg_replace( '/\//', '-', preg_replace( '/core\//', '', $block_name ) ),
+				'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
 				'supports' => $supports,
 			);
 		}
