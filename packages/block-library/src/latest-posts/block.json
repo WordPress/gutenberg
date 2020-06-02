@@ -37,6 +37,10 @@
 			"type": "number",
 			"default": 55
 		},
+		"displayReadMore": {
+			"type": "boolean",
+			"default": false
+		},
 		"displayPostDate": {
 			"type": "boolean",
 			"default": false

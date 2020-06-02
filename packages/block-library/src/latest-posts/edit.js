@@ -99,6 +99,7 @@ class LatestPostsEdit extends Component {
 			categories,
 			postsToShow,
 			excerptLength,
+			displayReadMore,
 			featuredImageAlign,
 			featuredImageSizeSlug,
 			featuredImageSizeWidth,
@@ -164,15 +165,30 @@ class LatestPostsEdit extends Component {
 					) }
 					{ displayPostContent &&
 						displayPostContentRadio === 'excerpt' && (
-							<RangeControl
-								label={ __( 'Max number of words in excerpt' ) }
-								value={ excerptLength }
-								onChange={ ( value ) =>
-									setAttributes( { excerptLength: value } )
-								}
-								min={ MIN_EXCERPT_LENGTH }
-								max={ MAX_EXCERPT_LENGTH }
-							/>
+							<>
+								<RangeControl
+									label={ __(
+										'Max number of words in excerpt'
+									) }
+									value={ excerptLength }
+									onChange={ ( value ) =>
+										setAttributes( {
+											excerptLength: value,
+										} )
+									}
+									min={ MIN_EXCERPT_LENGTH }
+									max={ MAX_EXCERPT_LENGTH }
+								/>
+								<ToggleControl
+									label={ __( 'Display Read More Link' ) }
+									checked={ displayReadMore }
+									onChange={ ( value ) =>
+										setAttributes( {
+											displayReadMore: value,
+										} )
+									}
+								/>
+							</>
 						) }
 				</PanelBody>
 
@@ -372,16 +388,33 @@ class LatestPostsEdit extends Component {
 									.join( ' ' ) }
 								{ /* translators: excerpt truncation character, default …  */ }
 								{ __( ' … ' ) }
-								<a
-									href={ post.link }
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ __( 'Read more' ) }
-								</a>
+								{ displayReadMore ? (
+									<a
+										href={ post.link }
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{ __( 'Read more' ) }
+									</a>
+								) : null }
 							</>
 						) : (
-							excerpt
+							<>
+								{ displayReadMore ? (
+									<>
+										{ excerpt }
+										<a
+											href={ post.link }
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{ __( 'Read more' ) }
+										</a>
+									</>
+								) : (
+									excerpt
+								) }
+							</>
 						);
 
 						return (
