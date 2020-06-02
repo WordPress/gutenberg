@@ -34,8 +34,8 @@ function AdminMenuToggle() {
 	};
 
 	const label = isOpen
-		? __( 'Hide sidebar menu' )
-		: __( 'Show sidebar menu' );
+		? __( 'Hide navigation' )
+		: __( 'Show navigation' );
 
 	return (
 		<Button
