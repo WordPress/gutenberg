@@ -49,7 +49,7 @@ describe( 'BlockSwitcher', () => {
 
 	beforeAll( () => {
 		registerBlockType( 'core/heading', {
-			category: 'common',
+			category: 'text',
 			title: 'Heading',
 			edit: () => {},
 			save: () => {},
@@ -71,7 +71,7 @@ describe( 'BlockSwitcher', () => {
 		} );
 
 		registerBlockType( 'core/paragraph', {
-			category: 'common',
+			category: 'text',
 			title: 'Paragraph',
 			edit: () => {},
 			save: () => {},
