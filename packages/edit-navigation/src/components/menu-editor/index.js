@@ -28,15 +28,13 @@ export default function MenuEditor( {
 	] );
 	const {
 		menuItems,
-		saveMenuItems,
+		eventuallySaveMenuItems,
 		createMissingMenuItems,
-		onCreated,
 	} = useMenuItems( query );
 	const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks(
 		menuItems
 	);
-	const eventuallySaveItems = () =>
-		onCreated( () => saveMenuItems( blocks, menuItemsRef ) );
+	const saveMenuItems = () => eventuallySaveMenuItems( blocks, menuItemsRef );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -57,13 +55,13 @@ export default function MenuEditor( {
 				} }
 			>
 				<BlockEditorKeyboardShortcuts />
-				<MenuEditorShortcuts saveBlocks={ eventuallySaveItems } />
+				<MenuEditorShortcuts saveBlocks={ saveMenuItems } />
 				<NavigationStructurePanel
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorPanel
-					saveBlocks={ eventuallySaveItems }
+					saveBlocks={ saveMenuItems }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>

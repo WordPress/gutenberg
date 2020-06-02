@@ -20,7 +20,9 @@ export default function useMenuItems( query ) {
 	const menuItems = useFetchMenuItems( query );
 	const saveMenuItems = useSaveMenuItems( query );
 	const { createMissingMenuItems, onCreated } = useCreateMissingMenuItems();
-	return { menuItems, saveMenuItems, createMissingMenuItems, onCreated };
+	const eventuallySaveMenuItems = ( blocks, menuItemsRef ) =>
+		onCreated( () => saveMenuItems( blocks, menuItemsRef ) );
+	return { menuItems, eventuallySaveMenuItems, createMissingMenuItems };
 }
 
 export function useFetchMenuItems( query ) {
