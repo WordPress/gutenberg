@@ -8,7 +8,13 @@ import { animated } from 'react-spring/web.cjs';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useContext, forwardRef } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useContext,
+	forwardRef,
+	useState,
+} from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -65,6 +71,8 @@ const BlockComponent = forwardRef(
 		const fallbackRef = useRef();
 		const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 		wrapper = wrapper || fallbackRef;
+
+		const [ isHovered, setHovered ] = useState( false );
 
 		// Provide the selected node, or the first and last nodes of a multi-
 		// selection, so it can be used to position the contextual block toolbar.
@@ -190,7 +198,28 @@ const BlockComponent = forwardRef(
 		const blockElementId = `block-${ clientId }${ htmlSuffix }`;
 		const Animated = animated[ tagName ];
 
+		function onMouseOver( event ) {
+			event.stopPropagation();
+
+			if ( isHovered ) {
+				return;
+			}
+
+			setHovered( true );
+		}
+
+		function onMouseOut( event ) {
+			event.stopPropagation();
+
+			if ( ! isHovered ) {
+				return;
+			}
+
+			setHovered( false );
+		}
+
 		const blockWrapper = (
+			// eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
 			<Animated
 				// Overrideable props.
 				aria-label={ blockLabel }
@@ -203,7 +232,10 @@ const BlockComponent = forwardRef(
 					className,
 					props.className,
 					wrapperProps && wrapperProps.className,
-					! isAligned && 'wp-block'
+					{
+						'is-hovered': isHovered,
+						'wp-block': ! isAligned,
+					}
 				) }
 				data-block={ clientId }
 				data-type={ name }
@@ -212,6 +244,8 @@ const BlockComponent = forwardRef(
 				onKeyDown={ isSelected && ! isLocked ? onKeyDown : undefined }
 				// Only allow selection to be started from a selected block.
 				onMouseLeave={ isSelected ? onMouseLeave : undefined }
+				onMouseOver={ onMouseOver }
+				onMouseOut={ onMouseOut }
 				tabIndex="0"
 				style={ {
 					...( wrapperProps ? wrapperProps.style : {} ),

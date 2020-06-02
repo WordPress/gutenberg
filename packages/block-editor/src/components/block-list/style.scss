@@ -629,3 +629,8 @@
 		}
 	}
 }
+
+// Just temporary for now to make it easier to see the effect in action
+.wp-block.is-hovered {
+	outline: 4px solid #f00 !important;
+}
