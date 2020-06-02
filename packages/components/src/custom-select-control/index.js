@@ -58,7 +58,7 @@ export default function CustomSelectControl( {
 	label,
 	options: items,
 	onChange: onSelectedItemChange,
-	value: _selectedItem,
+	value,
 } ) {
 	const {
 		getLabelProps,
@@ -67,13 +67,11 @@ export default function CustomSelectControl( {
 		getItemProps,
 		isOpen,
 		highlightedIndex,
-		selectedItem,
 	} = useSelect( {
 		initialSelectedItem: items[ 0 ],
 		items,
 		itemToString,
 		onSelectedItemChange,
-		selectedItem: _selectedItem,
 		stateReducer,
 	} );
 
@@ -122,7 +120,7 @@ export default function CustomSelectControl( {
 					isSmall: true,
 				} ) }
 			>
-				{ itemToString( selectedItem ) }
+				{ itemToString( value ) }
 				<Icon
 					icon={ chevronDown }
 					className="components-custom-select-control__button-icon"
@@ -148,7 +146,7 @@ export default function CustomSelectControl( {
 								style: item.style,
 							} ) }
 						>
-							{ item === selectedItem && (
+							{ item === value && (
 								<Icon
 									icon={ check }
 									className="components-custom-select-control__item-icon"
