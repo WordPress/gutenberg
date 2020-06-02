@@ -469,6 +469,9 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'type'        => array( 'object', 'null' ),
 					'default'     => null,
 					'properties'  => array(),
+					'additionalProperties' => array(
+						'type' => 'object',
+					),
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
