@@ -99,8 +99,6 @@ describe( 'Template Part', () => {
 		const testContent = 'some words...';
 
 		// Selectors
-		const chooseButtonSelector =
-			'//div[contains(@class,"is-selected")]//button[text()="Choose"]';
 		const entitiesSaveSelector =
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
@@ -109,6 +107,8 @@ describe( 'Template Part', () => {
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "Create new")]';
+		const disabledButtonSelector =
+			'.wp-block-template-part__create-button[disabled]';
 
 		it( 'Should insert new template part on creation', async () => {
 			await createNewPost();
@@ -156,10 +156,9 @@ describe( 'Template Part', () => {
 			expect( templatePartContent ).toBeTruthy();
 		} );
 
-		it.skip( 'Should preview added template part', async () => {
+		it( 'Should disable create button for slug/theme combo', async () => {
 			await createNewPost();
-			await disablePrePublishChecks();
-			// Try to insert the template part we created.
+			// Create new template part.
 			await insertBlock( 'Template Part' );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
@@ -169,26 +168,11 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( testSlug );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( testTheme );
-			// Should say 'Choose'
-			const placeholderButton = await page.waitForXPath(
-				chooseButtonSelector
-			);
-			expect( placeholderButton ).not.toBeNull();
-		} );
 
-		it.skip( 'Should dispaly a preview when match is found', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
-			expect( preview ).toBeTruthy();
-		} );
-
-		it.skip( 'Should insert the desired template part', async () => {
-			const [ placeholderButton ] = await page.$x( chooseButtonSelector );
-			await placeholderButton.click();
-			await page.waitForSelector( activatedTemplatePartSelector );
-			const templatePartContent = await page.waitForXPath(
-				testContentSelector
+			const disabledButton = await page.waitForSelector(
+				disabledButtonSelector
 			);
-			expect( templatePartContent ).toBeTruthy();
+			expect( disabledButton ).toBeTruthy();
 		} );
 	} );
 } );
