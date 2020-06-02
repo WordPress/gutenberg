@@ -79,8 +79,8 @@ const menuItemsToBlocks = (
 	};
 
 	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const linkBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
-	return [ linkBlocks, clientIdToMenuItemMapping ];
+	const blocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
+	return [ blocks, clientIdToMenuItemMapping ];
 };
 
 function menuItemToLinkBlock(
