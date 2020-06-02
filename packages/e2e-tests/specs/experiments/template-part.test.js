@@ -138,7 +138,15 @@ describe( 'Template Part', () => {
 			await page.click( entitiesSaveSelector );
 		} );
 
-		it.skip( 'Should prompt to Choose when match found', async () => {
+		it( 'Should preview newly added template part', async () => {
+			await createNewPost();
+			// Try to insert the template part we created.
+			await insertBlock( 'Template Part' );
+			const preview = await page.waitForXPath( testContentSelector );
+			expect( preview ).toBeTruthy();
+		} );
+
+		it.skip( 'Should preview added template part', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
 			// Try to insert the template part we created.
