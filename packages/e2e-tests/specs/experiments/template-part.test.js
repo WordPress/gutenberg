@@ -146,6 +146,16 @@ describe( 'Template Part', () => {
 			expect( preview ).toBeTruthy();
 		} );
 
+		it( 'Should insert template part when preview is selected', async () => {
+			const [ preview ] = await page.$x( testContentSelector );
+			await preview.click();
+			await page.waitForSelector( activatedTemplatePartSelector );
+			const templatePartContent = await page.waitForXPath(
+				testContentSelector
+			);
+			expect( templatePartContent ).toBeTruthy();
+		} );
+
 		it.skip( 'Should preview added template part', async () => {
 			await createNewPost();
 			await disablePrePublishChecks();
