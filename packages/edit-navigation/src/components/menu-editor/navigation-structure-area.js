@@ -3,7 +3,13 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalBlockNavigationTree } from '@wordpress/block-editor';
-import { Card, CardHeader, CardBody, Panel, PanelBody } from '@wordpress/components';
+import {
+	Card,
+	CardHeader,
+	CardBody,
+	Panel,
+	PanelBody,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -38,8 +44,10 @@ export default function NavigationStructureArea( { blocks, initialOpen } ) {
 			</PanelBody>
 		</Panel>
 	) : (
-		<Card>
-			<CardHeader>{ __( 'Navigation structure' ) }</CardHeader>
+		<Card className="edit-navigation-menu-editor__navigation-structure-card">
+			<CardHeader className="edit-navigation-menu-editor__navigation-structure-header">
+				{ __( 'Navigation structure' ) }
+			</CardHeader>
 			<CardBody>{ content }</CardBody>
 		</Card>
 	);
