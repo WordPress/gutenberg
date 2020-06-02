@@ -28,7 +28,7 @@ import {
 describe( 'align', () => {
 	const blockSettings = {
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

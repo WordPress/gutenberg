@@ -1,6 +1,6 @@
 {
 	"name": "core/site-title",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"level": {
 			"type": "number",

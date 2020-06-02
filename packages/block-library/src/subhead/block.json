@@ -1,6 +1,6 @@
 {
 	"name": "core/subhead",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"
