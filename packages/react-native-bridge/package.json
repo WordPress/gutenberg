@@ -18,7 +18,7 @@
     "url": "https://github.com/WordPress/gutenberg/issues"
   },
   "main": "index.js",
-  "react-native": "src/index",
+  "react-native": "index",
   "dependencies": {
     "@wordpress/react-native-aztec": "file:../react-native-aztec"
   },
