@@ -13,6 +13,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	KeyboardShortcuts,
+	Modal,
 	PanelBody,
 	Popover,
 	TextareaControl,
@@ -31,7 +32,13 @@ import {
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useState,
+	useEffect,
+	useRef,
+	cloneElement,
+} from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 
@@ -66,6 +73,7 @@ function NavigationLinkEdit( {
 		opensInNewTab,
 	};
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const [ isLinkOpenOnMount, setIsLinkOpenOnMount ] = useState( true );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
@@ -74,7 +82,9 @@ function NavigationLinkEdit( {
 	// This can't be done in the useState call because it cconflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
-		if ( ! url ) {
+		if ( url ) {
+			setIsLinkOpenOnMount( false );
+		} else {
 			setIsLinkOpen( true );
 		}
 	}, [] );
@@ -133,6 +143,48 @@ function NavigationLinkEdit( {
 			url: page.link,
 		};
 	}
+
+	const linkControlOnChange = ( {
+		title: newTitle = '',
+		url: newURL = '',
+		opensInNewTab: newOpensInNewTab,
+		id,
+	} = {} ) =>
+		setAttributes( {
+			url: encodeURI( newURL ),
+			label: ( () => {
+				const normalizedTitle = newTitle.replace(
+					/http(s?):\/\//gi,
+					''
+				);
+				const normalizedURL = newURL.replace( /http(s?):\/\//gi, '' );
+				if (
+					newTitle !== '' &&
+					normalizedTitle !== normalizedURL &&
+					label !== newTitle
+				) {
+					return escape( newTitle );
+				} else if ( label ) {
+					return label;
+				}
+				// If there's no label, add the URL.
+				return escape( normalizedURL );
+			} )(),
+			opensInNewTab: newOpensInNewTab,
+			id,
+		} );
+
+	const linkControl = (
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			value={ link }
+			showInitialSuggestions={ true }
+			createSuggestion={
+				userCanCreatePages ? handleCreatePage : undefined
+			}
+			onChange={ linkControlOnChange }
+		/>
+	);
 
 	return (
 		<Fragment>
@@ -240,57 +292,34 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
-						<Popover
-							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} = {} ) =>
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										id,
-									} )
-								}
-							/>
-						</Popover>
-					) }
+					{ isLinkOpen &&
+						( isLinkOpenOnMount ? (
+							<Popover
+								position="bottom center"
+								onClose={ () => {
+									setIsLinkOpen( false );
+									setIsLinkOpenOnMount( false );
+								} }
+							>
+								{ linkControl }
+							</Popover>
+						) : (
+							<Modal
+								title={ __( 'Edit link' ) }
+								closeLabel={ __( 'Close' ) }
+								onRequestClose={ () => {
+									setIsLinkOpen( false );
+								} }
+							>
+								{ cloneElement( linkControl, {
+									forceIsEditingLink: true,
+									onChange: ( data ) => {
+										setIsLinkOpen( false );
+										linkControlOnChange( data );
+									},
+								} ) }
+							</Modal>
+						) ) }
 				</div>
 				{ showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">

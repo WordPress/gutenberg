@@ -94,8 +94,8 @@ function Navigation( {
 			return null;
 		}
 
-		return pages.map( ( { title, type, link: url, id } ) =>
-			createBlock( 'core/navigation-link', {
+		return pages.map( ( { title, type, link: url, id } ) => {
+			return createBlock( 'core/navigation-link', {
 				type,
 				id,
 				url,
@@ -103,8 +103,8 @@ function Navigation( {
 					? __( '(no title)' )
 					: escape( title.rendered ),
 				opensInNewTab: false,
-			} )
-		);
+			} );
+		} );
 	}, [ pages ] );
 
 	//
