@@ -199,7 +199,11 @@ const BlockComponent = forwardRef(
 		const Animated = animated[ tagName ];
 
 		function onMouseOver( event ) {
-			event.stopPropagation();
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
 
 			if ( isHovered ) {
 				return;
@@ -209,7 +213,11 @@ const BlockComponent = forwardRef(
 		}
 
 		function onMouseOut( event ) {
-			event.stopPropagation();
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			event.preventDefault();
 
 			if ( ! isHovered ) {
 				return;
