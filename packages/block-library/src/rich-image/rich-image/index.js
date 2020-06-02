@@ -102,13 +102,11 @@ class RichImage extends Component {
 	}
 
 	cropImage() {
-		const { crop } = this.state;
-
 		this.adjustImage( 'crop', {
-			cropX: crop.x,
-			cropY: crop.y,
-			cropWidth: crop.width,
-			cropHeight: crop.height,
+			cropX: this.state.crop.x,
+			cropY: this.state.crop.y,
+			cropWidth: this.state.crop.width,
+			cropHeight: this.state.crop.height,
 		} );
 	}
 
