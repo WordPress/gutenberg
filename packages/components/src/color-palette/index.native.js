@@ -174,7 +174,7 @@ function ColorPalette( {
 	);
 
 	const customTextStyle = usePreferredColorSchemeStyle(
-		[ styles.customText, ! isIOS && styles.customTextLetterSpacing ],
+		[ styles.customText, ! isIOS && styles.customTextAndroid ],
 		styles.customTextDark
 	);
 

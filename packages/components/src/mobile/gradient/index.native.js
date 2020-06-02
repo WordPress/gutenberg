@@ -95,7 +95,7 @@ function Gradient( {
 									offset={ group[ 1 ] }
 									stopColor={ group[ 0 ] }
 									stopOpacity="1"
-									key={ group[ 0 ] }
+									key={ `${ group[ 1 ] }-${ group[ 0 ] }` }
 								/>
 							);
 						} ) }
