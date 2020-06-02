@@ -56,8 +56,6 @@ exports[`Navigation Creating from existing Pages allows a navigation block to be
 
 exports[`Navigation Creating from existing Pages does not display option to create from existing Pages if there are no Pages 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
 
-exports[`Navigation allows a navigation block to be created using existing pages 1`] = `"<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} /-->"`;
-
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
