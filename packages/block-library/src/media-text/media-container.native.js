@@ -39,6 +39,11 @@ import SvgIconRetry from './icon-retry';
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 
+const ICON_TYPE = {
+	PLACEHOLDER: 'placeholder',
+	RETRY: 'retry',
+};
+
 export { imageFillStyles } from './media-container.js';
 
 class MediaContainer extends Component {
@@ -111,21 +116,18 @@ class MediaContainer extends Component {
 		}
 	}
 
-	getIcon( isRetryIcon, isVideo ) {
-		if ( isRetryIcon ) {
-			return (
-				<Icon
-					icon={ SvgIconRetry }
-					{ ...( styles.iconRetry,
-					isVideo ? styles.iconRetryVideo : {} ) }
-				/>
-			);
+	getIcon( iconType ) {
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = this.props.getStylesFromColorScheme(
+					styles.iconPlaceholder,
+					styles.iconPlaceholderDark
+				);
+				break;
 		}
-
-		const iconStyle = this.props.getStylesFromColorScheme(
-			styles.icon,
-			styles.iconDark
-		);
 		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
@@ -206,11 +208,16 @@ class MediaContainer extends Component {
 	}
 
 	renderVideo( params, openMediaOptions ) {
-		const { mediaUrl, isSelected } = this.props;
+		const { mediaUrl, isSelected, getStylesFromColorScheme } = this.props;
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
 		const showVideo =
 			isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
+
+		const videoPlaceholderStyles = getStylesFromColorScheme(
+			styles.videoPlaceholder,
+			styles.videoPlaceholderDark
+		);
 
 		return (
 			<TouchableWithoutFeedback
@@ -231,11 +238,11 @@ class MediaContainer extends Component {
 						</View>
 					) }
 					{ ! showVideo && (
-						<View style={ styles.videoPlaceholder }>
+						<View style={ videoPlaceholderStyles }>
 							<View style={ styles.modalIcon }>
 								{ isUploadFailed
-									? this.getIcon( isUploadFailed )
-									: this.getIcon( false ) }
+									? this.getIcon( ICON_TYPE.RETRY )
+									: this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 							</View>
 							{ isUploadFailed && (
 								<Text
@@ -272,7 +279,7 @@ class MediaContainer extends Component {
 	renderPlaceholder() {
 		return (
 			<MediaPlaceholder
-				icon={ this.getIcon( false ) }
+				icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 				labels={ {
 					title: __( 'Media area' ),
 				} }

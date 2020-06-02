@@ -48,13 +48,13 @@ $media-to-text: 12px;
 	align-items: center;
 }
 
-.icon {
+.iconPlaceholder {
 	fill: $gray-dark;
-	width: 24px;
-	height: 24px;
+	width: 100%;
+	height: 100%;
 }
 
-.iconDark {
+.iconPlaceholderDark {
 	fill: $white;
 }
 
@@ -62,10 +62,6 @@ $media-to-text: 12px;
 	fill: #fff;
 	width: 100%;
 	height: 100%;
-}
-
-.iconRetryVideo {
-	fill: $gray-dark;
 }
 
 .video {
@@ -82,8 +78,12 @@ $media-to-text: 12px;
 	width: 100%;
 	height: 100%;
 	align-items: center;
-	background-color: $gray-lighten-30;
+	background-color: $gray-light;
 	justify-content: center;
+}
+
+.videoPlaceholderDark {
+	background-color: $gray-90;
 }
 
 .uploadFailed {
