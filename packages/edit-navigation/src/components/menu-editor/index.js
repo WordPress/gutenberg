@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
 import useMenuItems from './use-menu-items';
 import useNavigationBlocks from './use-navigation-blocks';
 import MenuEditorShortcuts from './shortcuts';
-import BlockEditorPanel from './block-editor-panel';
+import BlockEditorArea from './block-editor-area';
 import NavigationStructureArea from './navigation-structure-area';
 
 export default function MenuEditor( {
@@ -60,8 +60,8 @@ export default function MenuEditor( {
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
-				<BlockEditorPanel
-					saveBlocks={ saveMenuItems }
+				<BlockEditorArea
+					saveBlocks={ eventuallySaveMenuItems }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>

@@ -29,7 +29,7 @@ import { __ } from '@wordpress/i18n';
  */
 import DeleteMenuButton from '../delete-menu-button';
 
-export default function BlockEditorPanel( {
+export default function BlockEditorArea( {
 	onDeleteMenu,
 	menuId,
 	saveBlocks,
