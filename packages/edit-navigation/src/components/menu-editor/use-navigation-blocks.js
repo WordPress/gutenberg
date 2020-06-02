@@ -21,10 +21,10 @@ import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
 	const { blocks, setBlocks, menuItemsRef, query } = useBlocks( menuId );
-	const onMenuItemsCreated = useCreateMenuItems( blocks, menuItemsRef );
+	const onCreated = useCreateMenuItems( blocks, menuItemsRef );
 	const saveBlocks = useSaveBlocksCallback( query, menuItemsRef, blocks );
 
-	return [ blocks, setBlocks, () => onMenuItemsCreated( saveBlocks ) ];
+	return [ blocks, setBlocks, () => onCreated( saveBlocks ) ];
 }
 
 function useBlocks( menuId ) {
@@ -77,13 +77,19 @@ function useSelectedMenuItems( query ) {
 	} ) );
 }
 
+/**
+ * When a new block is added, let's create a draft menuItem for it.
+ * The batch save endpoint expects all the menu items to have a valid id already.
+ * PromiseQueue is used in order to
+ * 1) limit the amount of requests processed at the same time
+ * 2) save the menu only after all requests are finalized
+ *
+ * @param {Object[]} blocks Current tree of blocks
+ * @param {Object} menuItemsRef Ref holding a mapping from clientId to it's related menuItem
+ * @return {function(*=): void} Function registering it's argument to be called once all
+ * 															currently processed menuItems are created.
+ */
 function useCreateMenuItems( blocks, menuItemsRef ) {
-	// When a new block is added, let's create a draft menuItem for it.
-	// The batch save endpoint expects all the menu items to have a valid id already.
-	// PromiseQueue is used in order to
-	// 1) limit the amount of requests processed at the same time
-	// 2) save the menu only after all requests are finalized
-
 	// Let's debounce so that we don't call `getAllClientIds` on every keystroke
 	const debouncedBlocks = useDebouncedValue( blocks, 800 );
 	const promiseQueueRef = useRef( new PromiseQueue() );
