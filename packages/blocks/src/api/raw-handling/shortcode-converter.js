@@ -106,7 +106,7 @@ function segmentHTMLToShortcodeBlock(
 		return [
 			...segmentHTMLToShortcodeBlock( beforeHTML ),
 			block,
-			...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ),
+			...segmentHTMLToShortcodeBlock( afterHTML ),
 		];
 	}
 
