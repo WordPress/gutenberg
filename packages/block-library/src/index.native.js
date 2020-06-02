@@ -60,6 +60,8 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as group from './group';
 import * as buttons from './buttons';
+import * as socialLink from './social-link';
+import * as socialLinks from './social-links';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -108,6 +110,8 @@ export const coreBlocks = [
 	video,
 	classic,
 	buttons,
+	socialLink,
+	socialLinks,
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -193,6 +197,8 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		verse,
 		cover,
+		socialLink,
+		socialLinks,
 		iOSOnly( pullquote ),
 	].forEach( registerBlock );
 
