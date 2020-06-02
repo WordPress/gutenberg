@@ -19,10 +19,10 @@ export function receiveItems( items ) {
 
 /**
  * Returns an action object used in signalling that entity records have been
- * deleted and it needs to be removed from entities state.
+ * deleted and they need to be removed from entities state.
  *
- * @param {string} kind            Kind of the removed entity.
- * @param {string} name            Name of the removed entity.
+ * @param {string} kind            Kind of the removed entities.
+ * @param {string} name            Name of the removed entities.
  * @param {Array|Object} records   Records removed.
  * @return {Object} Action object.
  */
