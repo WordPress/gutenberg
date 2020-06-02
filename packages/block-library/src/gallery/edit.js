@@ -405,7 +405,7 @@ class GalleryEdit extends Component {
 						/>
 						{ shouldShowSizeOptions && (
 							<SelectControl
-								label={ __( 'Images size' ) }
+								label={ __( 'Image size' ) }
 								value={ sizeSlug }
 								options={ imageSizeOptions }
 								onChange={ this.updateImagesSize }
