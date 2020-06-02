@@ -22,9 +22,15 @@ jest.mock( 'react-native-gutenberg-bridge', () => {
 	const subscribeMediaUpload = ( callback ) => {
 		this.uploadCallBack = callback;
 	};
+	const mediaSources = {
+		deviceCamera: 'DEVICE_CAMERA',
+		deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+		siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+	};
 	return {
 		subscribeMediaUpload,
 		sendMediaUpload: callUploadCallback,
+		mediaSources,
 	};
 } );
 
