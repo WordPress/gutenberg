@@ -5,7 +5,7 @@ Flex is a layout-based component, which provides a convenient way to align user-
 ## Usage
 
 ```jsx
-import { __experimentalFlex as Flex } from '@wordpress/components';
+import { Flex } from '@wordpress/components';
 import { Icon, wordpress } from '@wordpress/icons';
 
 const Example = () => {
