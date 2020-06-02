@@ -144,7 +144,7 @@ export function receiveEmbedPreview( url, preview ) {
  *
  * @param {string} kind      Kind of the deleted entity.
  * @param {string} name      Name of the deleted entity.
- * @param {Object} recordId  Record to be deleted.
+ * @param {string} recordId  Record Id of the entity to be deleted.
  */
 export function* deleteEntityRecord( kind, name, recordId ) {
 	const entities = yield getKindEntities( kind );
