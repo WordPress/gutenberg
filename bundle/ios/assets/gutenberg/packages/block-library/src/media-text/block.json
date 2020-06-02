@@ -76,5 +76,15 @@
 		"focalPoint": {
 			"type": "object"
 		}
+	},
+	"supports": {
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"__experimentalColor": {
+			"gradients": true
+		}
 	}
 }

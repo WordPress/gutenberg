@@ -105,6 +105,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    testImplementation 'junit:junit:4.12'
 
     def reactNativeVersion = reactNativeVersion()
     logger.quiet("Using react-native version: $reactNativeVersion")
