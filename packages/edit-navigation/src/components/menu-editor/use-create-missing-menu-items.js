@@ -54,7 +54,7 @@ export default function useCreateMissingMenuItems() {
 	return { createMissingMenuItems, onCreated };
 }
 
-async function createDraftMenuItem() {
+function createDraftMenuItem() {
 	return apiFetch( {
 		path: `/__experimental/menu-items`,
 		method: 'POST',
