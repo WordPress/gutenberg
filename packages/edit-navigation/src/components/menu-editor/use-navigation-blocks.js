@@ -20,20 +20,41 @@ import useDebouncedValue from './use-debounced-value';
 import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
-	const { blocks, setBlocks, menuItemsRef, query } = useBlocks( menuId );
-	const onMenuItemsCreated = useCreateMissingMenuItems(
+	const query = { menus: menuId, per_page: -1 };
+
+	const { menuItems, isResolvingMenuItems } = useSelectedMenuItems( query );
+	const { blocks, setBlocks, menuItemsRef } = useBlocks(
+		menuId,
+		menuItems,
+		isResolvingMenuItems
+	);
+
+	const promiseQueueRef = useDraftMenuItemsForNewNavigationLinks(
 		blocks,
 		menuItemsRef
 	);
+
 	const saveBlocks = useSaveBlocksCallback( query, menuItemsRef, blocks );
 
-	return [ blocks, setBlocks, () => onMenuItemsCreated( saveBlocks ) ];
+	return [
+		blocks,
+		setBlocks,
+		() => promiseQueueRef.current.then( saveBlocks ),
+	];
 }
 
-function useBlocks( menuId ) {
-	const query = { menus: menuId, per_page: -1 };
-	const { menuItems, isResolving } = useSelectedMenuItems( query );
+function useSelectedMenuItems( query ) {
+	return useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolvingMenuItems: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
+}
 
+function useBlocks( menuId, menuItems, isResolving ) {
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
@@ -64,22 +85,10 @@ function useBlocks( menuId ) {
 		blocks,
 		setBlocks,
 		menuItemsRef,
-		query,
 	};
 }
 
-function useSelectedMenuItems( query ) {
-	return useSelect( ( select ) => ( {
-		menuItems: select( 'core' ).getMenuItems( query ),
-		isResolvingMenuItems: select( 'core/data' ).isResolving(
-			'core',
-			'getMenuItems',
-			[ query ]
-		),
-	} ) );
-}
-
-function useCreateMissingMenuItems( blocks, menuItemsRef ) {
+function useDraftMenuItemsForNewNavigationLinks( blocks, menuItemsRef ) {
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
 	// PromiseQueue is used in order to
@@ -112,7 +121,7 @@ function useCreateMissingMenuItems( blocks, menuItemsRef ) {
 		}
 	}, [ debouncedBlocks ] );
 
-	return ( callback ) => promiseQueueRef.current.then( callback );
+	return promiseQueueRef;
 }
 
 async function createDraftMenuItem() {
