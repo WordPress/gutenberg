@@ -18,7 +18,7 @@ export const Root = styled.div`
 `;
 
 export const Header = styled( Flex )`
-	color: ${color( 'ui.label' )};
+	color: ${ color( 'ui.label' ) };
 	padding-bottom: 8px;
 `;
 
@@ -66,6 +66,6 @@ const unitControlMarginStyles = ( { isFirst } ) => {
 
 export const UnitControl = styled( BaseUnitControl )`
 	max-width: 60px;
-	${unitControlBorderRadiusStyles};
-	${unitControlMarginStyles};
+	${ unitControlBorderRadiusStyles };
+	${ unitControlMarginStyles };
 `;

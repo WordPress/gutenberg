@@ -13,7 +13,7 @@ import { arrowLeft } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../../button';
-import Flex from '../flex';
+import Flex from '../index';
 import FlexBlock from '../block';
 import FlexItem from '../item';
 

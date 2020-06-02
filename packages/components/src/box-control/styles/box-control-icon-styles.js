@@ -33,7 +33,7 @@ const Stroke = styled.span`
 	display: block;
 	pointer-events: none;
 	position: absolute;
-	${strokeFocus};
+	${ strokeFocus };
 `;
 
 const VerticalStroke = styled( Stroke )`

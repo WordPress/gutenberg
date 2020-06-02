@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../button';
-import { Flex } from '../flex';
+import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import BoxControlIcon from './icon';
@@ -93,15 +93,15 @@ export default function BoxControl( {
 	return (
 		<Root id={ id } role="region" aria-labelledby={ headingId }>
 			<Header className="component-box-control__header">
-				<Flex.Item>
+				<FlexItem>
 					<Text
 						id={ headingId }
 						className="component-box-control__label"
 					>
 						{ label }
 					</Text>
-				</Flex.Item>
-				<Flex.Item>
+				</FlexItem>
+				<FlexItem>
 					<Button
 						className="component-box-control__reset-button"
 						isSecondary
@@ -111,23 +111,23 @@ export default function BoxControl( {
 					>
 						Reset
 					</Button>
-				</Flex.Item>
+				</FlexItem>
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
-				<Flex.Item>
+				<FlexItem>
 					<BoxControlIcon side={ side } />
-				</Flex.Item>
+				</FlexItem>
 				{ isLinked && (
-					<Flex.Block>
+					<FlexBlock>
 						<AllInputControl { ...inputControlProps } />
-					</Flex.Block>
+					</FlexBlock>
 				) }
-				<Flex.Item>
+				<FlexItem>
 					<LinkedButton
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
-				</Flex.Item>
+				</FlexItem>
 			</HeaderControlWrapper>
 			{ ! isLinked && <InputControls { ...inputControlProps } /> }
 		</Root>
