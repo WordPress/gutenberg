@@ -20,41 +20,18 @@ import useDebouncedValue from './use-debounced-value';
 import PromiseQueue from './promise-queue';
 
 export default function useNavigationBlocks( menuId ) {
-	const query = { menus: menuId, per_page: -1 };
-
-	const { menuItems, isResolvingMenuItems } = useSelectedMenuItems( query );
-	const { blocks, setBlocks, menuItemsRef } = useBlocks(
-		menuId,
-		menuItems,
-		isResolvingMenuItems
-	);
-
-	const promiseQueueRef = useDraftMenuItemsForNewNavigationLinks(
-		blocks,
-		menuItemsRef
-	);
-
+	const { blocks, setBlocks, menuItemsRef, query } = useBlocks( menuId );
+	const onMenuItemsCreated = useCreateMenuItems( blocks, menuItemsRef );
 	const saveBlocks = useSaveBlocksCallback( query, menuItemsRef, blocks );
 
-	return [
-		blocks,
-		setBlocks,
-		() => promiseQueueRef.current.then( saveBlocks ),
-	];
+	return [ blocks, setBlocks, () => onMenuItemsCreated( saveBlocks ) ];
 }
 
-function useSelectedMenuItems( query ) {
-	return useSelect( ( select ) => ( {
-		menuItems: select( 'core' ).getMenuItems( query ),
-		isResolvingMenuItems: select( 'core/data' ).isResolving(
-			'core',
-			'getMenuItems',
-			[ query ]
-		),
-	} ) );
-}
+function useBlocks( menuId ) {
+	const query = { menus: menuId, per_page: -1 };
 
-function useBlocks( menuId, menuItems, isResolving ) {
+	const { menuItems, isResolving } = useSelectedMenuItems( query );
+
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
@@ -85,10 +62,22 @@ function useBlocks( menuId, menuItems, isResolving ) {
 		blocks,
 		setBlocks,
 		menuItemsRef,
+		query,
 	};
 }
 
-function useDraftMenuItemsForNewNavigationLinks( blocks, menuItemsRef ) {
+function useSelectedMenuItems( query ) {
+	return useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolving: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
+}
+
+function useCreateMenuItems( blocks, menuItemsRef ) {
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
 	// PromiseQueue is used in order to
@@ -121,7 +110,8 @@ function useDraftMenuItemsForNewNavigationLinks( blocks, menuItemsRef ) {
 		}
 	}, [ debouncedBlocks ] );
 
-	return promiseQueueRef;
+	const onCreated = ( callback ) => promiseQueueRef.current.then( callback );
+	return onCreated;
 }
 
 async function createDraftMenuItem() {
