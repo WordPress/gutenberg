@@ -1,6 +1,6 @@
 {
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",

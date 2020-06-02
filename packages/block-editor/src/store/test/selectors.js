@@ -84,7 +84,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-a', {
 			save: ( props ) => props.attributes.text,
-			category: 'formatting',
+			category: 'design',
 			title: 'Test Block A',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -92,7 +92,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-b', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block B',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -103,7 +103,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-block-c', {
 			save: ( props ) => props.attributes.text,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block C',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -112,7 +112,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/test-freeform', {
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'common',
+			category: 'text',
 			title: 'Test Freeform Content Handler',
 			icon: 'test',
 			attributes: {
@@ -124,7 +124,7 @@ describe( 'selectors', () => {
 
 		registerBlockType( 'core/post-content-child', {
 			save: () => null,
-			category: 'common',
+			category: 'text',
 			title: 'Test Block Post Content Child',
 			icon: 'test',
 			keywords: [ 'testing' ],
@@ -2316,7 +2316,7 @@ describe( 'selectors', () => {
 				icon: {
 					src: 'test',
 				},
-				category: 'formatting',
+				category: 'design',
 				keywords: [ 'testing' ],
 				variations: [],
 				isDisabled: false,

@@ -4,11 +4,11 @@
 import items, {
 	categories,
 	collections,
-	textItem,
-	advancedTextItem,
+	paragraphItem,
+	advancedParagraphItem,
 	moreItem,
 	youtubeItem,
-	textEmbedItem,
+	paragraphEmbedItem,
 } from './fixtures';
 import { normalizeSearchTerm, searchBlockItems } from '../search-items';
 
@@ -45,8 +45,12 @@ describe( 'searchBlockItems', () => {
 
 	it( 'should search items using the title ignoring case', () => {
 		expect(
-			searchBlockItems( items, categories, collections, 'TEXT' )
-		).toEqual( [ textItem, advancedTextItem, textEmbedItem ] );
+			searchBlockItems( items, categories, collections, 'paragraph' )
+		).toEqual( [
+			paragraphItem,
+			advancedParagraphItem,
+			paragraphEmbedItem,
+		] );
 	} );
 
 	it( 'should search items using the keywords and partial terms', () => {
@@ -57,7 +61,7 @@ describe( 'searchBlockItems', () => {
 
 	it( 'should search items using the categories', () => {
 		expect(
-			searchBlockItems( items, categories, collections, 'LAYOUT' )
+			searchBlockItems( items, categories, collections, 'DESIGN' )
 		).toEqual( [ moreItem ] );
 	} );
 

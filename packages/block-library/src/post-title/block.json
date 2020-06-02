@@ -1,6 +1,6 @@
 {
 	"name": "core/post-title",
-	"category": "layout",
+	"category": "design",
 	"context": [
 		"postId",
 		"postType"

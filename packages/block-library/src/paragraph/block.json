@@ -1,6 +1,6 @@
 {
 	"name": "core/paragraph",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"

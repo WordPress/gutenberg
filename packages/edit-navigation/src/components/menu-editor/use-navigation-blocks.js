@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, sortBy } from 'lodash';
+import { keyBy, groupBy, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,10 +22,14 @@ import PromiseQueue from './promise-queue';
 export default function useNavigationBlocks( menuId ) {
 	// menuItems is an array of menu item objects.
 	const query = { menus: menuId, per_page: -1 };
-	const menuItems = useSelect(
-		( select ) => select( 'core' ).getMenuItems( query ),
-		[ menuId ]
-	);
+	const { menuItems, isResolving } = useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolving: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
 
 	// Data model
 	const [ blocks, setBlocks ] = useState( [] );
@@ -33,15 +37,26 @@ export default function useNavigationBlocks( menuId ) {
 
 	// Refresh our model whenever menuItems change
 	useEffect( () => {
-		if ( menuItems ) {
-			const [
-				navigationBlock,
-				clientIdToMenuItemMapping,
-			] = menuItemsToNavigationBlock( menuItems );
-			setBlocks( [ navigationBlock ] );
-			menuItemsRef.current = clientIdToMenuItemMapping;
+		if ( isResolving || menuItems === null ) {
+			return;
 		}
-	}, [ menuItems ] );
+
+		const [
+			innerBlocks,
+			clientIdToMenuItemMapping,
+		] = menuItemsToLinkBlocks(
+			menuItems,
+			blocks[ 0 ]?.innerBlocks,
+			menuItemsRef.current
+		);
+
+		const navigationBlock = blocks[ 0 ]
+			? { ...blocks[ 0 ], innerBlocks }
+			: createBlock( 'core/navigation', {}, innerBlocks );
+
+		setBlocks( [ navigationBlock ] );
+		menuItemsRef.current = clientIdToMenuItemMapping;
+	}, [ menuId, menuItems, isResolving ] );
 
 	// When a new block is added, let's create a draft menuItem for it.
 	// The batch save endpoint expects all the menu items to have a valid id already.
@@ -115,7 +130,16 @@ async function createDraftMenuItem() {
 	} );
 }
 
-const menuItemsToNavigationBlock = ( menuItems ) => {
+const menuItemsToLinkBlocks = (
+	menuItems,
+	prevLinkBlocks = [],
+	prevClientIdToMenuItemMapping = {}
+) => {
+	const blocksByMenuId = mapBlocksByMenuId(
+		prevLinkBlocks,
+		prevClientIdToMenuItemMapping
+	);
+
 	const itemsByParentID = groupBy( menuItems, 'parent' );
 	const clientIdToMenuItemMapping = {};
 	const menuItemsToTreeOfLinkBlocks = ( items ) => {
@@ -132,7 +156,11 @@ const menuItemsToNavigationBlock = ( menuItems ) => {
 					itemsByParentID[ item.id ]
 				);
 			}
-			const linkBlock = menuItemToLinkBlock( item, menuItemInnerBlocks );
+			const linkBlock = menuItemToLinkBlock(
+				item,
+				menuItemInnerBlocks,
+				blocksByMenuId[ item.id ]
+			);
 			clientIdToMenuItemMapping[ linkBlock.clientId ] = item;
 			innerBlocks.push( linkBlock );
 		}
@@ -140,25 +168,46 @@ const menuItemsToNavigationBlock = ( menuItems ) => {
 	};
 
 	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const innerBlocks = menuItemsToTreeOfLinkBlocks(
+	const linkBlocks = menuItemsToTreeOfLinkBlocks(
 		itemsByParentID[ 0 ] || []
 	);
-	const navigationBlock = createBlock( 'core/navigation', {}, innerBlocks );
-	return [ navigationBlock, clientIdToMenuItemMapping ];
+	return [ linkBlocks, clientIdToMenuItemMapping ];
 };
 
-function menuItemToLinkBlock( menuItem, innerBlocks = [] ) {
-	return createBlock(
-		'core/navigation-link',
-		{
-			label: menuItem.title.rendered,
-			url: menuItem.url,
-		},
-		innerBlocks
-	);
+function menuItemToLinkBlock(
+	menuItem,
+	innerBlocks = [],
+	existingBlock = null
+) {
+	const attributes = {
+		label: menuItem.title.rendered,
+		url: menuItem.url,
+	};
+
+	if ( existingBlock ) {
+		return {
+			...existingBlock,
+			attributes,
+			innerBlocks,
+		};
+	}
+	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }
 
+const mapBlocksByMenuId = ( blocks, menuItemsByClientId ) => {
+	const blocksByClientId = keyBy( flattenBlocks( blocks ), 'clientId' );
+	const blocksByMenuId = {};
+	for ( const clientId in menuItemsByClientId ) {
+		const menuItem = menuItemsByClientId[ clientId ];
+		blocksByMenuId[ menuItem.id ] = blocksByClientId[ clientId ];
+	}
+	return blocksByMenuId;
+};
+
 const getAllClientIds = ( blocks ) =>
+	flattenBlocks( blocks ).map( ( { clientId } ) => clientId );
+
+const flattenBlocks = ( blocks ) =>
 	blocks.flatMap( ( item ) =>
-		[ item.clientId ].concat( getAllClientIds( item.innerBlocks || [] ) )
+		[ item ].concat( flattenBlocks( item.innerBlocks || [] ) )
 	);
