@@ -7,12 +7,38 @@ import { keyBy, omit } from 'lodash';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
-export default async function batchSave(
-	menuId,
-	menuItemsRef,
-	navigationBlock
-) {
+export default async function useSaveNavigationBlocks( menuItemsRef, query ) {
+	const { receiveEntityRecords } = useDispatch( 'core' );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+
+	const saveNavigation = async ( blocks ) => {
+		const result = await batchSave(
+			query.menus,
+			menuItemsRef,
+			blocks[ 0 ]
+		);
+
+		if ( result.success ) {
+			createSuccessNotice( __( 'Navigation saved.' ), {
+				type: 'snackbar',
+			} );
+			receiveEntityRecords( 'root', 'menuItem', [], query, true );
+		} else {
+			createErrorNotice( __( 'There was an error.' ), {
+				type: 'snackbar',
+			} );
+		}
+	};
+
+	return saveNavigation;
+}
+
+async function batchSave( menuId, menuItemsRef, navigationBlock ) {
 	const { nonce, stylesheet } = await apiFetch( {
 		path: '/__experimental/customizer-nonces/get-save-nonce',
 	} );
