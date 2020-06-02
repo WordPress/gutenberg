@@ -1,18 +1,24 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
-	PlainText,
+	RichText,
 	AlignmentToolbar,
 	BlockControls,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 
 export default function SiteTitleEdit( { attributes, setAttributes } ) {
-	const { align } = attributes;
+	const { level, align } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
+	const tagName = 0 === level ? 'p' : 'h' + level;
 
 	return (
 		<>
@@ -25,12 +31,15 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<PlainText
-				__experimentalVersion={ 2 }
-				tagName={ Block.h1 }
+			<RichText
+				tagName={ Block[ tagName ] }
 				placeholder={ __( 'Site Title' ) }
 				value={ title }
 				onChange={ setTitle }
+				className={ classnames( {
+					[ `has-text-align-${ align }` ]: align,
+				} ) }
+				allowedFormats={ [] }
 				disableLineBreaks
 			/>
 		</>
