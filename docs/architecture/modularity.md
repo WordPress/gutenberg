@@ -80,6 +80,24 @@ If you're using one of these stores to access and manipulate WordPress data in y
 
 These are packages used in development mode to help developers with daily tasks to develop, build and ship JavaScript applications, WordPress plugins and themes. They include tools for linting your codebase, building it, testing it...
 
+## Editor Packages
+
+### What's the difference between the different editor packages? What's the purpose of each package?
+
+It's often surprising to new contributors to discover that the post editor is constructed as a layered abstraction of three separate packages `@wordpress/edit-post`, `@wordpress/editor`, and `@wordpress/block-editor`.
+
+The above [Why?](#why) section should provide some context for how individual packages aim to satisfy specific requirements. That applies to these packages as well:
+
+- `@wordpress/block-editor` provides components for implementing a block editor, operating on a primitive value of an array of block objects. It makes no assumptions for how this value is saved, and has no awareness (or requirement) of a WordPress site.
+- `@wordpress/editor` utilizes components from `@wordpress/block-editor`, and associates the loading and saving mechanism of the blocks value to a post and post content. With the awareness of the concept of a WordPress post, it also provides various components relevant for working with a post object in the context of an editor (e.g. a post title input component). This package can support editing posts of any post type, and does not assume that it is rendered in any particular WordPress screen, or in any particular layout arrangement.
+- `@wordpress/edit-post` is the implementation of the "New Post" ("Edit Post") screen in the WordPress admin. It is responsible for the layout of the various components provided by `@wordpress/editor` and `@wordpress/block-editor`, with full awareness of how it is presented in the specific screen in the WordPress administrative dashboard.
+
+Structured this way, these packages can be used in a variety of combinations outside the use-case of the "New Post" screen:
+
+- A `@wordpress/edit-site` or `@wordpress/edit-widgets` package can serve as similar implementations of a "Site Editor" or "Widgets Editor", in much the same way as `@wordpress/edit-post`.
+- `@wordpress/editor` could be used in the implementation of the "Reusable Block" block, since it is essentially a nested block editor associated with the post type `wp_block`.
+- `@wordpress/block-editor` could be used independently from WordPress, or with a completely different save mechanism. For example, it could be used for a comments editor for posts of a site.
+
 ## Going further
 
  - [Package Reference](/docs/designers-developers/developers/packages.md)
