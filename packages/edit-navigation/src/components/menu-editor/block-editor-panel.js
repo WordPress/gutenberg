@@ -14,7 +14,13 @@ import {
 	WritingFlow,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
+import {
+	Button,
+	Card,
+	CardHeader,
+	CardBody,
+	Popover,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -59,8 +65,11 @@ export default function BlockEditorPanel( {
 	}, [ rootBlockId ] );
 
 	return (
-		<Panel className="edit-navigation-menu-editor__block-editor-panel">
-			<PanelBody title={ __( 'Navigation menu' ) }>
+		<Card className="edit-navigation-menu-editor__block-editor-panel">
+			<CardHeader className="edit-navigation-menu-editor__block-editor-panel-header">
+				{ __( 'Navigation menu' ) }
+			</CardHeader>
+			<CardBody>
 				<div className="components-panel__header-actions">
 					<Button isPrimary onClick={ saveBlocks }>
 						{ __( 'Save navigation' ) }
@@ -89,7 +98,7 @@ export default function BlockEditorPanel( {
 						onDelete={ onDeleteMenu }
 					/>
 				</div>
-			</PanelBody>
-		</Panel>
+			</CardBody>
+		</Card>
 	);
 }
