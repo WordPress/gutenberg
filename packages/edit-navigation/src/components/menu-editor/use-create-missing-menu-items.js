@@ -17,8 +17,7 @@ import PromiseQueue from './promise-queue';
  * 1) limit the amount of requests processed at the same time
  * 2) save the menu only after all requests are finalized
  *
- * @return {function(*=): void} Function registering it's argument to be called once all
- * 													    currently processed menuItems are created.
+ * @return {function(*=): void} Function registering it's argument to be called once all menuItems are created.
  */
 export default function useCreateMissingMenuItems() {
 	const promiseQueueRef = useRef( new PromiseQueue() );
