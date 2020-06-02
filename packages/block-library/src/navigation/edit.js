@@ -226,11 +226,27 @@ function Navigation( {
 		return handleCreateEmpty();
 	}
 
-	const placeHolderInstructionText = hasMenus
-		? __( 'Create a Navigation from all existing pages, or chose a Menu.' )
-		: __(
-				'Create a Navigation from all existing pages, or create an empty one.'
-		  );
+	function buildPlaceHolderInstructionText() {
+		if ( hasMenus && hasPages ) {
+			return __(
+				'Create a Navigation from all existing pages, or chose a Menu.'
+			);
+		}
+
+		if ( ! hasMenus && ! hasPages ) {
+			return __( 'Create a an empty Navigation.' );
+		}
+
+		if ( hasMenus && ! hasPages ) {
+			return __( 'Create a Navigation from a Menu or create empty.' );
+		}
+
+		if ( ! hasMenus && hasPages ) {
+			return __(
+				'Create a Navigation from all existing pages, or create empty.'
+			);
+		}
+	}
 
 	const dropDownOptions = [
 		{
@@ -296,7 +312,7 @@ function Navigation( {
 					className="wp-block-navigation-placeholder"
 					icon={ icon }
 					label={ __( 'Navigation' ) }
-					instructions={ placeHolderInstructionText }
+					instructions={ buildPlaceHolderInstructionText() }
 				>
 					<div
 						ref={ ref }
