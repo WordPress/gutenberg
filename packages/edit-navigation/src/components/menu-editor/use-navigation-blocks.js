@@ -7,30 +7,19 @@ import { keyBy, groupBy, sortBy } from 'lodash';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { useState, useRef, useMemo, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { flattenBlocks } from './helpers';
-import useMenuItems from './use-menu-items';
 
-export default function useNavigationBlocks( menuId ) {
-	const query = useMemo( () => ( { menus: menuId, per_page: -1 } ), [
-		menuId,
-	] );
-
-	const { menuItems, isResolving } = useMenuItems( query );
-
+export default function useNavigationBlocks( menuItems ) {
 	const [ blocks, setBlocks ] = useState( [] );
 	const menuItemsRef = useRef( {} );
 
 	// Refresh our model whenever menuItems change
 	useEffect( () => {
-		if ( isResolving || menuItems === null ) {
-			return;
-		}
-
 		const [ innerBlocks, clientIdToMenuItemMapping ] = menuItemsToBlocks(
 			menuItems,
 			blocks[ 0 ]?.innerBlocks,
@@ -43,13 +32,12 @@ export default function useNavigationBlocks( menuId ) {
 
 		setBlocks( [ navigationBlock ] );
 		menuItemsRef.current = clientIdToMenuItemMapping;
-	}, [ menuId, menuItems, isResolving ] );
+	}, [ menuItems ] );
 
 	return {
 		blocks,
 		setBlocks,
 		menuItemsRef,
-		query,
 	};
 }
 

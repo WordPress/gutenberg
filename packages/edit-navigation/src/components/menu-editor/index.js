@@ -10,6 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import useMenuItems, { useMenuItemsQuery } from './use-menu-items';
 import useNavigationBlocks from './use-navigation-blocks';
 import useCreateMissingMenuItems from './use-create-missing-menu-items';
 import useSaveNavigationBlocks from './use-save-navigation-blocks';
@@ -17,20 +18,33 @@ import MenuEditorShortcuts from './shortcuts';
 import BlockEditorPanel from './block-editor-panel';
 import NavigationStructurePanel from './navigation-structure-panel';
 
-export default function MenuEditor( {
-	menuId,
-	blockEditorSettings,
-	onDeleteMenu,
-} ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const { blocks, setBlocks, menuItemsRef, query } = useNavigationBlocks(
-		menuId
+const useMenuEditor = ( menuId ) => {
+	const query = useMenuItemsQuery( menuId );
+	const menuItems = useMenuItems( query );
+	const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks(
+		menuItems
 	);
 	const saveBlocks = useSaveNavigationBlocks( blocks, menuItemsRef, query );
 	const { createMissingMenuItems, onCreated } = useCreateMissingMenuItems(
 		menuItemsRef
 	);
 	const eventuallySaveBlocks = () => onCreated( () => saveBlocks() );
+
+	return [ blocks, setBlocks, eventuallySaveBlocks, createMissingMenuItems ];
+};
+
+export default function MenuEditor( {
+	menuId,
+	blockEditorSettings,
+	onDeleteMenu,
+} ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const [
+		blocks,
+		setBlocks,
+		saveBlocks,
+		createMissingMenuItems,
+	] = useMenuEditor( menuId );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -51,13 +65,13 @@ export default function MenuEditor( {
 				} }
 			>
 				<BlockEditorKeyboardShortcuts />
-				<MenuEditorShortcuts saveBlocks={ eventuallySaveBlocks } />
+				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
 				<NavigationStructurePanel
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorPanel
-					saveBlocks={ eventuallySaveBlocks }
+					saveBlocks={ saveBlocks }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>
