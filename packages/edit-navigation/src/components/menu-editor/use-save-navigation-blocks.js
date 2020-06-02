@@ -10,13 +10,13 @@ import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default async function useSaveNavigationBlocks( menuItemsRef, query ) {
+export default function useSaveNavigationBlocks( blocks, menuItemsRef, query ) {
 	const { receiveEntityRecords } = useDispatch( 'core' );
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'
 	);
 
-	const saveNavigation = async ( blocks ) => {
+	const saveBlocks = async () => {
 		const result = await batchSave(
 			query.menus,
 			menuItemsRef,
@@ -35,7 +35,7 @@ export default async function useSaveNavigationBlocks( menuItemsRef, query ) {
 		}
 	};
 
-	return saveNavigation;
+	return saveBlocks;
 }
 
 async function batchSave( menuId, menuItemsRef, navigationBlock ) {

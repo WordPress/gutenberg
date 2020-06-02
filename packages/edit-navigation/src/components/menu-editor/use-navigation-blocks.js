@@ -31,10 +31,7 @@ export default function useNavigationBlocks( menuId ) {
 			return;
 		}
 
-		const [
-			innerBlocks,
-			clientIdToMenuItemMapping,
-		] = menuItemsToBlocks(
+		const [ innerBlocks, clientIdToMenuItemMapping ] = menuItemsToBlocks(
 			menuItems,
 			blocks[ 0 ]?.innerBlocks,
 			menuItemsRef.current
@@ -94,9 +91,7 @@ const menuItemsToBlocks = (
 	};
 
 	// menuItemsToTreeOfLinkBlocks takes an array of top-level menu items and recursively creates all their innerBlocks
-	const linkBlocks = menuItemsToTreeOfBlocks(
-		itemsByParentID[ 0 ] || []
-	);
+	const linkBlocks = menuItemsToTreeOfBlocks( itemsByParentID[ 0 ] || [] );
 	return [ linkBlocks, clientIdToMenuItemMapping ];
 };
 

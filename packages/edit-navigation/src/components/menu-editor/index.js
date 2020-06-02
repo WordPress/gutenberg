@@ -26,11 +26,11 @@ export default function MenuEditor( {
 	const { blocks, setBlocks, menuItemsRef, query } = useNavigationBlocks(
 		menuId
 	);
-	const saveBlocks = useSaveNavigationBlocks( menuItemsRef, query );
+	const saveBlocks = useSaveNavigationBlocks( blocks, menuItemsRef, query );
 	const { createMissingMenuItems, onCreated } = useCreateMissingMenuItems(
 		menuItemsRef
 	);
-	const eventuallySaveBlocks = () => onCreated( () => saveBlocks( blocks ) );
+	const eventuallySaveBlocks = () => onCreated( () => saveBlocks() );
 
 	return (
 		<div className="edit-navigation-menu-editor">
