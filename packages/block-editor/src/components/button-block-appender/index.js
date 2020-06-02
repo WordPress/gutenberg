@@ -16,13 +16,6 @@ import { Icon, create } from '@wordpress/icons';
  */
 import Inserter from '../inserter';
 
-function AddTooltipForIconButton( { hasTooltip, tooltipLabel, button } ) {
-	if ( hasTooltip ) {
-		return <Tooltip text={ tooltipLabel }> { button } </Tooltip>;
-	}
-	return button;
-}
-
 function ButtonBlockAppender(
 	{
 		rootClientId,
@@ -60,7 +53,7 @@ function ButtonBlockAppender(
 				}
 				const isToggleButton = ! hasSingleBlockType;
 
-				const inserterButton = (
+				let inserterButton = (
 					<Button
 						ref={ ref }
 						onFocus={ onFocus }
@@ -79,16 +72,20 @@ function ButtonBlockAppender(
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
 						) }
 						<Icon icon={ create } />
-						{ hasSingleBlockType && <span>{ label } </span> }
+						{ hasSingleBlockType && (
+							<span className="block-editor-button-block-appender__label">
+								{ label }{ ' ' }
+							</span>
+						) }
 					</Button>
 				);
-				return (
-					<AddTooltipForIconButton
-						hasTooltip={ ! hasSingleBlockType }
-						tooltipLabel={ label }
-						button={ inserterButton }
-					/>
-				);
+
+				if ( isToggleButton ) {
+					inserterButton = (
+						<Tooltip text={ label }> { inserterButton } </Tooltip>
+					);
+				}
+				return inserterButton;
 			} }
 			isAppender
 		/>
