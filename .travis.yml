@@ -131,6 +131,7 @@ jobs:
     - name: PHP unit tests
       script:
         - npm run wp-env run composer install -- --no-interaction
+        - npm run wp-env run tests-cli "cp wp-content/plugins/gutenberg/phpunit/install.php wp-content/plugins/gutenberg/vendor/wp-phpunit/wp-phpunit/includes/install.php"
         - npm run test-unit-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
