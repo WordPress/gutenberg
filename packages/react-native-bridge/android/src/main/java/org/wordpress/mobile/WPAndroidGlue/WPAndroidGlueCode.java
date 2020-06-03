@@ -35,6 +35,7 @@ import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
+import org.linusu.RNGetRandomValuesPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -339,6 +340,7 @@ public class WPAndroidGlueCode {
                 new ReactAztecPackage(),
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
+                new RNGetRandomValuesPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
