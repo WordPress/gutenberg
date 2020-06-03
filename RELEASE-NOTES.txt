@@ -1,3 +1,7 @@
+1.30.0
+------
+* [**] Adds editor support for theme defined colors and theme defined gradients on cover and button blocks.
+
 1.29.0
 ------
 * [**] Add support for changing overlay color settings in Cover block
