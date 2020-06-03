@@ -53,7 +53,7 @@ install:
   - npm run build
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
-      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php" } }' > .wp-env.override.json
+      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
       chmod -R 767 ./ # TODO: Possibly integrate in wp-env
       npm run wp-env start
     fi
