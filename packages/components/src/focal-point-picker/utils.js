@@ -15,6 +15,7 @@ const VIDEO_EXTENSIONS = [
 	'mp4',
 	'm4v',
 	'ogg',
+	'ogv',
 	'webm',
 	'wmv',
 ];
