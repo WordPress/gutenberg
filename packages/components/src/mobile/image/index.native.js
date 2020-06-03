@@ -119,9 +119,11 @@ const ImageComponent = ( {
 		focalPoint && styles.imageWithFocalPoint,
 		{
 			width:
-				imageWidth > 0 && imageWidth < containerSize?.width
+				imageData && imageWidth > 0 && imageWidth < containerSize?.width
 					? imageWidth
 					: customWidth,
+		},
+		imageData && {
 			height:
 				imageHeight > 0 && imageHeight < containerSize?.height
 					? imageHeight
@@ -167,14 +169,6 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ ! imageData && (
-					<View style={ placeholderStyles }>
-						<View style={ styles.imageUploadingIconContainer }>
-							{ getIcon( ICON_TYPE.UPLOAD ) }
-						</View>
-					</View>
-				) }
-
 				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
 					<View
 						style={ [
@@ -184,11 +178,19 @@ const ImageComponent = ( {
 					/>
 				) }
 
-				<Image
-					style={ containerSize && imageStyles }
-					resizeMethod={ ! focalPoint && 'scale' }
-					source={ { uri: url } }
-				/>
+				{ ! imageData ? (
+					<View style={ placeholderStyles }>
+						<View style={ styles.imageUploadingIconContainer }>
+							{ getIcon( ICON_TYPE.UPLOAD ) }
+						</View>
+					</View>
+				) : (
+					<Image
+						style={ containerSize && imageStyles }
+						resizeMethod={ ! focalPoint && 'scale' }
+						source={ { uri: url } }
+					/>
+				) }
 
 				{ isUploadFailed && (
 					<View
