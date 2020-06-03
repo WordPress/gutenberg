@@ -176,7 +176,12 @@ const ImageComponent = ( {
 				) }
 
 				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
-					<View style={ styles.imageBorder } />
+					<View
+						style={ [
+							styles.imageBorder,
+							{ height: containerSize?.height },
+						] }
+					/>
 				) }
 
 				<Image
