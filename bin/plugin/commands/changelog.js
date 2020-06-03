@@ -3,13 +3,14 @@
  */
 const { groupBy, escapeRegExp, uniq } = require( 'lodash' );
 const Octokit = require( '@octokit/rest' );
+const { sprintf } = require( 'sprintf-js' );
+const semver = require( 'semver' );
 
 /**
  * Internal dependencies
  */
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
-	getVersionMilestoneTitle,
 	getMilestoneByTitle,
 	getIssuesByMilestone,
 } = require( '../lib/milestone' );
@@ -446,9 +447,16 @@ async function getReleaseChangelog( options ) {
 		token: options.token,
 		milestone:
 			options.milestone === undefined
-				? getVersionMilestoneTitle(
-						getNextMajorVersion( manifest.version )
-				  )
+				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where
+				  // strings are expected to need to be extracted, and thus variables are
+				  // not allowed. This string will not need to be extracted.
+				  // eslint-disable-next-line @wordpress/valid-sprintf
+				  sprintf( config.versionMilestoneFormat, {
+						...config,
+						...semver.parse(
+							getNextMajorVersion( manifest.version )
+						),
+				  } )
 				: options.milestone,
 	} );
 }

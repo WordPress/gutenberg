@@ -5,6 +5,7 @@ const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
 const semver = require( 'semver' );
 const Octokit = require( '@octokit/rest' );
+const { sprintf } = require( 'sprintf-js' );
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ const git = require( '../lib/git' );
 const svn = require( '../lib/svn' );
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
-	getVersionMilestoneTitle,
 	getIssuesByMilestone,
 	getMilestoneByTitle,
 } = require( '../lib/milestone' );
@@ -646,7 +646,14 @@ async function isMilestoneClear( version ) {
 		octokit,
 		owner,
 		name,
-		getVersionMilestoneTitle( version )
+		// Disable reason: valid-sprintf applies to `@wordpress/i18n` where
+		// strings are expected to need to be extracted, and thus variables are
+		// not allowed. This string will not need to be extracted.
+		// eslint-disable-next-line @wordpress/valid-sprintf
+		sprintf( config.versionMilestoneFormat, {
+			...config,
+			...semver.parse( version ),
+		} )
 	);
 
 	if ( ! milestone ) {

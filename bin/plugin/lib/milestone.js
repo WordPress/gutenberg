@@ -7,22 +7,6 @@
  */
 
 /**
- * Given a SemVer-formatted version string, returns an assumed milestone title
- * associated with that version.
- *
- * @see https://semver.org/
- *
- * @param {string} version Version string.
- *
- * @return {string} Milestone title.
- */
-function getVersionMilestoneTitle( version ) {
-	const [ major, minor ] = version.split( '.' );
-
-	return `Gutenberg ${ major }.${ minor }`;
-}
-
-/**
  * Returns a promise resolving to a milestone by a given title, if exists.
  *
  * @param {GitHub} octokit Initialized Octokit REST client.
@@ -90,7 +74,6 @@ async function getIssuesByMilestone( octokit, owner, repo, milestone, state ) {
 }
 
 module.exports = {
-	getVersionMilestoneTitle,
 	getMilestoneByTitle,
 	getIssuesByMilestone,
 };
