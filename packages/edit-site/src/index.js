@@ -16,7 +16,7 @@ import { render } from '@wordpress/element';
  */
 import './plugins';
 import './hooks';
-import './store';
+import registerEditSiteStore from './store';
 import Editor from './components/editor';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
@@ -52,12 +52,19 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
+	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+
+	const initialState = settings.editSiteInitialState;
+	delete settings.editSiteInitialState;
+	initialState.settings = settings;
+	registerEditSiteStore( initialState );
+
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
-	render( <Editor settings={ settings } />, document.getElementById( id ) );
+
+	render( <Editor />, document.getElementById( id ) );
 }
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';

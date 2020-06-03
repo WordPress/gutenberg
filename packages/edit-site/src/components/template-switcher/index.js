@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
 import {
 	Tooltip,
 	DropdownMenu,
@@ -55,8 +54,8 @@ export default function TemplateSwitcher( {
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
-	onAddTemplateId,
-	onRemoveTemplateId,
+	onAddTemplate,
+	onRemoveTemplate,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
 	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
@@ -117,29 +116,20 @@ export default function TemplateSwitcher( {
 		[ activeId, templatePartIds, homeId ]
 	);
 
-	const { saveEntityRecord } = useDispatch( 'core' );
-
 	const overwriteSlug =
 		TEMPLATE_OVERRIDES[ page.type ] &&
 		page.slug &&
 		TEMPLATE_OVERRIDES[ page.type ]( page.slug );
-	const overwriteTemplate = async () => {
-		const newTemplate = await saveEntityRecord( 'postType', 'wp_template', {
+	const overwriteTemplate = () =>
+		onAddTemplate( {
 			slug: overwriteSlug,
 			title: overwriteSlug,
 			status: 'publish',
 			content: template.content.raw,
 		} );
-		onAddTemplateId( newTemplate.id );
+	const revertToParent = async () => {
+		onRemoveTemplate( template.value );
 	};
-	const unoverwriteTemplate = async () => {
-		await apiFetch( {
-			path: `/wp/v2/templates/${ template.value }`,
-			method: 'DELETE',
-		} );
-		onRemoveTemplateId( template.value );
-	};
-
 	return (
 		<>
 			<DropdownMenu
@@ -180,7 +170,7 @@ export default function TemplateSwitcher( {
 							{ overwriteSlug === template.slug && (
 								<MenuItem
 									icon={ undo }
-									onClick={ unoverwriteTemplate }
+									onClick={ revertToParent }
 								>
 									{ __( 'Revert to Parent' ) }
 								</MenuItem>
