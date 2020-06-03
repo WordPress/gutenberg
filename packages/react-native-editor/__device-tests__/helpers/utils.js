@@ -127,7 +127,7 @@ jasmine.getEnv().addReporter( {
 		if ( isAndroid() ) {
 			androidScreenRecordingProcess.kill( 'SIGINT' );
 			// wait for kill
-			childProcess.execSync( 'sleep 2' );
+			childProcess.execSync( 'sleep 1' );
 
 			childProcess.execSync(
 				`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
