@@ -107,8 +107,15 @@ function PostAuthorEdit( {
 	const blockClassNames = classnames( 'wp-block-post-author', {
 		[ fontSize.class ]: fontSize.class,
 	} );
-	const blockInlineStyles = {
+
+	const authorInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+	};
+	const bioInlineStyles = {
+		fontSize: bioFontSize.size ? bioFontSize.size + 'px' : undefined,
+	};
+	const bylineInlineStyles = {
+		fontSize: bylineFontSize.size ? bylineFontSize.size + 'px' : undefined,
 	};
 
 	return (
@@ -201,7 +208,6 @@ function PostAuthorEdit( {
 						className={ classnames( blockClassNames, {
 							[ `has-text-align-${ align }` ]: align,
 						} ) }
-						style={ blockInlineStyles }
 					>
 						{ showAvatar && authorDetails && (
 							<div className="wp-block-post-author__avatar">
@@ -221,23 +227,24 @@ function PostAuthorEdit( {
 									className="wp-block-post-author__byline"
 									multiline={ false }
 									placeholder={ __( 'Write byline …' ) }
-									withoutInteractiveFormatting
-									allowedFormats={ [
-										'core/bold',
-										'core/italic',
-										'core/strikethrough',
-									] }
 									value={ byline }
 									onChange={ ( value ) =>
 										setAttributes( { byline: value } )
 									}
+									style={ bylineInlineStyles }
 								/>
 							) }
-							<p className="wp-block-post-author__name">
+							<p
+								className="wp-block-post-author__name"
+								style={ authorInlineStyles }
+							>
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
-								<p className={ 'wp-block-post-author__bio' }>
+								<p
+									className={ 'wp-block-post-author__bio' }
+									style={ bioInlineStyles }
+								>
 									{ authorDetails?.description }
 								</p>
 							) }
