@@ -28,6 +28,10 @@ function PostAuthorEdit( {
 	isSelected,
 	fontSize,
 	setFontSize,
+	bylineFontSize,
+	setBylineFontSize,
+	bioFontSize,
+	setBioFontSize,
 	context,
 	attributes,
 	setAttributes,
@@ -154,9 +158,20 @@ function PostAuthorEdit( {
 					/>
 				</PanelBody>
 				<PanelBody title={ __( 'Text settings' ) }>
+					<h4>{ __( 'Name Size' ) }</h4>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
+					/>
+					<h4>{ __( 'Bio Size' ) }</h4>
+					<FontSizePicker
+						value={ bioFontSize.size }
+						onChange={ setBioFontSize }
+					/>
+					<h4>{ __( 'Byline Size' ) }</h4>
+					<FontSizePicker
+						value={ bylineFontSize.size }
+						onChange={ setBylineFontSize }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -233,4 +248,8 @@ function PostAuthorEdit( {
 	);
 }
 
-export default withFontSizes( 'fontSize' )( PostAuthorEdit );
+export default withFontSizes(
+	'fontSize',
+	'bylineFontSize',
+	'bioFontSize'
+)( PostAuthorEdit );
