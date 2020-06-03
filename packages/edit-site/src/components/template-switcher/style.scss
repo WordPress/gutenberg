@@ -6,6 +6,13 @@
 	position: relative;
 }
 
+.edit-site-template-switcher__label-home-icon {
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	right: 20px;
+}
+
 .edit-site-template-switcher__label-customized-dot {
 	position: absolute;
 	right: 4px;
@@ -30,7 +37,8 @@
 	margin-bottom: -$grid-unit-15;
 }
 
-.edit-site-template-switcher__preview {
+.edit-site-template-switcher__template-preview,
+.edit-site-template-switcher__theme-preview {
 	display: none;
 	border: $border-width solid $light-gray-secondary;
 	width: 300px;
@@ -45,4 +53,15 @@
 	@include break-medium {
 		display: block;
 	}
+}
+
+.edit-site-template-switcher__theme-preview-name {
+	font-weight: 500;
+	font-size: $big-font-size;
+}
+
+.edit-site-template-switcher__theme-preview-screenshot {
+	margin-bottom: $grid-unit-15;
+	margin-top: $grid-unit-15;
+	max-width: 100%;
 }

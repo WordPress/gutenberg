@@ -291,7 +291,10 @@ describe( 'List', () => {
 
 	it( 'should change the base list type', async () => {
 		await insertBlock( 'List' );
-		await page.click( 'button[aria-label="Convert to ordered list"]' );
+		const button = await page.waitForSelector(
+			'button[aria-label="Convert to ordered list"]'
+		);
+		await button.click();
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

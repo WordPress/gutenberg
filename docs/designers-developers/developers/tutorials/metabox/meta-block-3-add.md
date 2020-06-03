@@ -2,7 +2,7 @@
 
 With the meta field registered in the previous step, next you will create a new block used to display the field value to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
 
-For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [components](/packages/components/src) and [editor](/packages/editor/src/components) packages repositories.
+For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [Component Reference](/packages/components/README.md).
 
 The hook `useEntityProp` can be used by the blocks to get or change meta values.
 
@@ -21,7 +21,7 @@ Add this code to your JavaScript file (this tutorial will call the file `myguten
 	registerBlockType( 'myguten/meta-block', {
 		title: 'Meta Block',
 		icon: 'smiley',
-		category: 'common',
+		category: 'text',
 
 		edit: function( props ) {
 			var className = props.className;
@@ -82,7 +82,7 @@ import { useEntityProp } from '@wordpress/core-data';
 registerBlockType( 'myguten/meta-block', {
 	title: 'Meta Block',
 	icon: 'smiley',
-	category: 'common',
+	category: 'text',
 
 	edit( { className, setAttributes, attributes } ) {
 		const postType = useSelect(

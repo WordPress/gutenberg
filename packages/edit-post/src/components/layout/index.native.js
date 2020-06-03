@@ -14,6 +14,7 @@ import {
 	BottomSheetSettings,
 	__experimentalPageTemplatePicker,
 	__experimentalWithPageTemplatePicker,
+	FloatingToolbar,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { HTMLTextInput, KeyboardAvoidingView } from '@wordpress/components';
@@ -131,6 +132,9 @@ class Layout extends Component {
 					) }
 				>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+					{ ! isHtmlView && Platform.OS === 'android' && (
+						<FloatingToolbar />
+					) }
 				</View>
 				<View
 					style={ {
@@ -149,6 +153,7 @@ class Layout extends Component {
 								visible={ isTemplatePickerVisible }
 							/>
 						) }
+						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView>

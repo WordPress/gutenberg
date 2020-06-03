@@ -25,16 +25,11 @@
 	bottom: 0;
 }
 
-.button {
-	border-width: $border-width;
+.defaultButton {
 	border-radius: $border-width * 4;
 	padding: $block-spacing;
-	max-width: 580px;
-	min-width: 108px;
+	border-width: $border-width;
 	margin: 2 * $panel-padding;
-}
-
-.fallbackButton {
 	background-color: $button-fallback-bg;
 	color: $white;
 }
@@ -52,4 +47,9 @@
 	min-height: 22px;
 	font-size: 16px;
 	display: none;
+}
+
+.linkSettingsPanel {
+	padding-left: 0;
+	padding-right: 0;
 }

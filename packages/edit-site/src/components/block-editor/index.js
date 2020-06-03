@@ -21,23 +21,35 @@ import {
  */
 import { useEditorContext } from '../editor';
 import NavigateToLink from '../navigate-to-link';
-import Sidebar from '../sidebar';
+import { SidebarInspectorFill } from '../sidebar';
 
 export default function BlockEditor() {
 	const { settings: _settings, setSettings } = useEditorContext();
-	const canUserCreateMedia = useSelect( ( select ) => {
-		const _canUserCreateMedia = select( 'core' ).canUser(
-			'create',
-			'media'
-		);
-		return _canUserCreateMedia || _canUserCreateMedia !== false;
-	}, [] );
+	const { canUserCreateMedia, focusMode, hasFixedToolbar } = useSelect(
+		( select ) => {
+			const { isFeatureActive } = select( 'core/edit-site' );
+			const _canUserCreateMedia = select( 'core' ).canUser(
+				'create',
+				'media'
+			);
+			return {
+				canUserCreateMedia:
+					_canUserCreateMedia || _canUserCreateMedia !== false,
+				focusMode: isFeatureActive( 'focusMode' ),
+				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			};
+		},
+		[]
+	);
+
 	const settings = useMemo( () => {
 		if ( ! canUserCreateMedia ) {
 			return _settings;
 		}
 		return {
 			..._settings,
+			focusMode,
+			hasFixedToolbar,
 			mediaUpload( { onError, ...rest } ) {
 				uploadMedia( {
 					wpAllowedMimeTypes: _settings.allowedMimeTypes,
@@ -46,20 +58,23 @@ export default function BlockEditor() {
 				} );
 			},
 		};
-	}, [ canUserCreateMedia, _settings ] );
+	}, [ canUserCreateMedia, _settings, focusMode, hasFixedToolbar ] );
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		settings.templateType
 	);
-	const setActiveTemplateId = useCallback(
-		( newTemplateId ) =>
+	const setActivePageAndTemplateId = useCallback(
+		( { page, templateId } ) =>
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
-				templateId: newTemplateId,
+				page,
+				templateId,
 				templateType: 'wp_template',
 			} ) ),
 		[]
 	);
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -74,21 +89,18 @@ export default function BlockEditor() {
 					( fillProps ) => (
 						<NavigateToLink
 							{ ...fillProps }
-							templateIds={ settings.templateIds }
-							activeId={ settings.templateId }
-							onActiveIdChange={ setActiveTemplateId }
+							activePage={ settings.page }
+							onActivePageAndTemplateIdChange={
+								setActivePageAndTemplateId
+							}
 						/>
 					),
-					[
-						settings.templateIds,
-						settings.templateId,
-						setActiveTemplateId,
-					]
+					[ settings.page, setActivePageAndTemplateId ]
 				) }
 			</__experimentalLinkControl.ViewerFill>
-			<Sidebar.InspectorFill>
+			<SidebarInspectorFill>
 				<BlockInspector />
-			</Sidebar.InspectorFill>
+			</SidebarInspectorFill>
 			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
 				<WritingFlow>
 					<ObserveTyping>

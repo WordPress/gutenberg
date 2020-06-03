@@ -14,7 +14,7 @@ const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
  *
  * @return {boolean} Whether document is RTL.
  */
-function getRtl() {
+export function getRTL() {
 	return !! ( document && document.documentElement.dir === 'rtl' );
 }
 
@@ -23,8 +23,8 @@ function getRtl() {
  *
  * @return {boolean} Whether document is RTL.
  */
-export function useRtl() {
-	return getRtl();
+export function useRTL() {
+	return getRTL();
 }
 
 /**
@@ -83,12 +83,12 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {
-		const isRtl = getRtl();
+		const isRTL = getRTL();
 
 		if ( rtlStyles ) {
-			return isRtl ? css( rtlStyles ) : css( ltrStyles );
+			return isRTL ? css( rtlStyles ) : css( ltrStyles );
 		}
 
-		return isRtl ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+		return isRTL ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
 	};
 }

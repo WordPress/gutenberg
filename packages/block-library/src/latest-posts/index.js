@@ -7,6 +7,7 @@ import { postList as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 
@@ -18,9 +19,7 @@ export const settings = {
 	description: __( 'Display a list of your most recent posts.' ),
 	icon,
 	keywords: [ __( 'recent posts' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
+	example: {},
 	edit,
+	deprecated,
 };

@@ -6,6 +6,7 @@ import domReady from '@wordpress/dom-ready';
 /**
  * Internal dependencies
  */
+import addIntroText from './add-intro-text';
 import addContainer from './add-container';
 import clear from './clear';
 import filterMessage from './filter-message';
@@ -14,14 +15,20 @@ import filterMessage from './filter-message';
  * Create the live regions.
  */
 export function setup() {
+	const introText = document.getElementById( 'a11y-speak-intro-text' );
 	const containerAssertive = document.getElementById(
 		'a11y-speak-assertive'
 	);
 	const containerPolite = document.getElementById( 'a11y-speak-polite' );
 
+	if ( introText === null ) {
+		addIntroText();
+	}
+
 	if ( containerAssertive === null ) {
 		addContainer( 'assertive' );
 	}
+
 	if ( containerPolite === null ) {
 		addContainer( 'polite' );
 	}
@@ -51,11 +58,15 @@ domReady( setup );
  * ```
  */
 export function speak( message, ariaLive ) {
-	// Clear previous messages to allow repeated strings being read out.
+	/*
+	 * Clear previous messages to allow repeated strings being read out and hide
+	 * the explanatory text from assistive technologies.
+	 */
 	clear();
 
 	message = filterMessage( message );
 
+	const introText = document.getElementById( 'a11y-speak-intro-text' );
 	const containerAssertive = document.getElementById(
 		'a11y-speak-assertive'
 	);
@@ -65,5 +76,13 @@ export function speak( message, ariaLive ) {
 		containerAssertive.textContent = message;
 	} else if ( containerPolite ) {
 		containerPolite.textContent = message;
+	}
+
+	/*
+	 * Make the explanatory text available to assistive technologies by removing
+	 * the 'hidden' HTML attribute.
+	 */
+	if ( introText ) {
+		introText.removeAttribute( 'hidden' );
 	}
 }

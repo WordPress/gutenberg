@@ -99,7 +99,7 @@ Because it is a dynamic block it doesn't need to override the default `save` imp
  * Plugin Name: Gutenberg examples dynamic
  */
 
-function gutenberg_examples_dynamic_render_callback( $block, $content ) {
+function gutenberg_examples_dynamic_render_callback( $block_attributes, $content ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => 1,
 		'post_status' => 'publish',
@@ -143,17 +143,9 @@ There are a few things to notice:
 * The built-in `save` function just returns `null` because the rendering is performed server-side.
 * The server-side rendering is a function taking the block and the block inner content as arguments, and returning the markup (quite similar to shortcodes)
 
-Note that for convenience and for backward-compatibility, the first argument of a `render_callback` function can also be referenced as an associative array of the block's attributes:
-
-```php
-function gutenberg_examples_dynamic_render_callback( $block_attributes ) {
-	return 'The record ID is: ' . esc_html( $block_attributes['recordId'] );
-}
-```
-
 ## Live rendering in the block editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
+Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
 
 *Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 

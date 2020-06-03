@@ -12,6 +12,7 @@ $z-layers: (
 	".components-form-toggle__input": 1,
 	".components-panel__header.edit-post-sidebar__panel-tabs": -1,
 	".edit-post-sidebar .components-panel": -2,
+	".edit-post-text-editor__toolbar": 1,
 	".block-editor-inserter__tabs": 1,
 	".block-editor-inserter__tab.is-active": 1,
 	".components-panel__header": 1,
@@ -46,8 +47,8 @@ $z-layers: (
 	".components-drop-zone": 40,
 	".components-drop-zone__content": 50,
 
-	// The block mover for floats should overlap the controls of adjacent blocks.
-	".block-editor-block-list__block {core/image aligned left or right}": 21,
+	// The floated blocks should be above the other blocks to allow selection.
+	"{core/image aligned left or right} .wp-block": 21,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
@@ -69,7 +70,13 @@ $z-layers: (
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
-	".edit-post-layout .edit-post-post-publish-panel-break-medium": 99998,
+	".edit-post-layout .edit-post-post-publish-panel {greater than small}": 99998,
+
+	".entities-saved-states__panel": 100001,
+	// For larger views, the wp-admin navbar dropdown should be on top of
+	// the multi-entity saving sidebar.
+	".entities-saved-states__panel {greater than small}": 99998,
+	".edit-site-editor__toggle-save-panel": 100000,
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
@@ -81,8 +88,8 @@ $z-layers: (
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
 
-	// Above the block list, under the header.
-	".block-editor-block-list__block-popover": 29,
+	// Above the block list and the header.
+	".block-editor-block-list__block-popover": 31,
 
 	// Under the block popover (block toolbar).
 	".block-editor-block-list__insertion-point-popover": 28,

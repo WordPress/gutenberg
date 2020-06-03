@@ -267,4 +267,22 @@ describe( 'Table', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'up and down arrow navigation', async () => {
+		await insertBlock( 'Table' );
+
+		// Create the table.
+		await clickButton( createButtonLabel );
+
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '4' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

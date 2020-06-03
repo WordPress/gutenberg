@@ -16,7 +16,7 @@ import '../anchor';
 describe( 'anchor', () => {
 	const blockSettings = {
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 

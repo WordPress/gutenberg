@@ -14,7 +14,7 @@ export default function TemplatePartInnerBlocks() {
 	);
 	return (
 		<InnerBlocks
-			__experimentalBlocks={ blocks }
+			value={ blocks }
 			onInput={ onInput }
 			onChange={ onChange }
 		/>

@@ -1,7 +1,7 @@
-.block-editor-block-list__block[data-type="core/table"] {
-	&[data-align="left"],
-	&[data-align="right"],
-	&[data-align="center"] {
+.wp-block-table {
+	.wp-block[data-align="left"] > &,
+	.wp-block[data-align="right"] > &,
+	.wp-block[data-align="center"] > & {
 		// Stop table block from collapsing when tables are floated.
 		height: auto;
 
@@ -16,7 +16,7 @@
 		}
 	}
 
-	&[data-align="center"] {
+	.wp-block[data-align="center"] > & {
 		text-align: initial;
 
 		table {

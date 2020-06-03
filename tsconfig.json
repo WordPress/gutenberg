@@ -5,23 +5,22 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
+		{ "path": "packages/element" },
+		{ "path": "packages/dependency-extraction-webpack-plugin" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/escape-html" },
+		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/i18n" },
+		{ "path": "packages/icons" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/prettier-config" },
+		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" }
-
-		// Temporarily disabled due to conflicts with 3rd party DefinitelyTyped types
-		// See https://github.com/WordPress/gutenberg/pull/21613
-		// { "path": "packages/element" },
-		// { "path": "packages/icons" },
-		// { "path": "packages/primitives" }
 	],
 	"files": []
 }

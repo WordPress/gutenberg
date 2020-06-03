@@ -11,7 +11,6 @@ $blocks-button__height: 56px;
 	cursor: pointer;
 	display: inline-block;
 	font-size: $big-font-size;
-	margin: 0;
 	padding: 12px 24px;
 	text-align: center;
 	text-decoration: none;
@@ -44,11 +43,11 @@ $blocks-button__height: 56px;
 // the first selector is required for old buttons markup
 
 .wp-block-button.no-border-radius,
-.wp-block-button__link.wp-block-button.no-border-radius {
+.wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
 }
 
-.wp-block-button.is-style-outline,
+.wp-block-button.is-style-outline .wp-block-button__link,
 .wp-block-button__link.is-style-outline {
 	color: $dark-gray-700;
 	background-color: transparent;

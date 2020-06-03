@@ -203,16 +203,28 @@ glob.stream( [
 		// so the tokens must be replaced in sequence to prevent the processes
 		// from overriding each other.
 		for ( const [ token, path ] of tokens ) {
-			await execa(
-				join( __dirname, '..', '..', 'node_modules', '.bin', 'docgen' ),
-				[
-					relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-					`--output ${ output }`,
-					'--to-token',
-					`--use-token "${ token }"`,
-					'--ignore "/unstable|experimental/i"',
-				],
-				{ shell: true }
-			);
+			try {
+				await execa(
+					`"${ join(
+						__dirname,
+						'..',
+						'..',
+						'node_modules',
+						'.bin',
+						'docgen'
+					) }"`,
+					[
+						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
+						`--output ${ output }`,
+						'--to-token',
+						`--use-token "${ token }"`,
+						'--ignore "/unstable|experimental/i"',
+					],
+					{ shell: true }
+				);
+			} catch ( error ) {
+				console.error( error );
+				process.exit( 1 );
+			}
 		}
 	} );

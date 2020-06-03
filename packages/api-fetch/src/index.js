@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -133,7 +132,7 @@ function apiFetch( options ) {
 		return step( workingOptions, next );
 	};
 
-	return new Promise( function( resolve, reject ) {
+	return new Promise( ( resolve, reject ) => {
 		createRunStep( 0 )( options )
 			.then( resolve )
 			.catch( ( error ) => {
@@ -148,49 +147,11 @@ function apiFetch( options ) {
 					.then( ( data ) => data.text() )
 					.then( ( text ) => {
 						apiFetch.nonceMiddleware.nonce = text;
-						apiFetch( options )
-							.then( resolve )
-							.catch( reject );
+						apiFetch( options ).then( resolve ).catch( reject );
 					} )
 					.catch( reject );
 			} );
 	} );
-}
-
-/**
- * Function that fetches data using apiFetch, and updates the status.
- *
- * @param {string} path Query path.
- */
-function useApiFetch( path ) {
-	// Indicate the fetching status
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ data, setData ] = useState( null );
-	const [ error, setError ] = useState( null );
-
-	useEffect( () => {
-		setIsLoading( true );
-		setData( null );
-		setError( null );
-
-		apiFetch( { path } )
-			.then( ( fetchedData ) => {
-				setData( fetchedData );
-				// We've stopped fetching
-				setIsLoading( false );
-			} )
-			.catch( ( err ) => {
-				setError( err );
-				// We've stopped fetching
-				setIsLoading( false );
-			} );
-	}, [ path ] );
-
-	return {
-		isLoading,
-		data,
-		error,
-	};
 }
 
 apiFetch.use = registerMiddleware;
@@ -201,7 +162,5 @@ apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
-
-apiFetch.useApiFetch = useApiFetch;
 
 export default apiFetch;

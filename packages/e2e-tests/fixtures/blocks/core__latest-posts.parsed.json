@@ -3,6 +3,7 @@
         "blockName": "core/latest-posts",
         "attrs": {
             "postsToShow": 5,
+            "displayAuthor": false,
             "displayPostDate": false
         },
         "innerBlocks": [],

@@ -15,6 +15,7 @@
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-context.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-deprecation.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-transforms.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-annotations.md": [] }
@@ -41,7 +42,8 @@
 		{ "docs/designers-developers/developers/feature-flags.md": [] },
 		{ "docs/designers-developers/developers/themes/README.md": [
 			{ "docs/designers-developers/developers/themes/theme-support.md": [] },
-			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] }
+			{ "docs/designers-developers/developers/themes/block-based-themes.md": [] },
+			{ "docs/designers-developers/developers/themes/theme-json.md": [] }
 		] },
 		{ "docs/designers-developers/developers/backward-compatibility/README.md": [
 			{ "docs/designers-developers/developers/backward-compatibility/deprecations.md": [] },

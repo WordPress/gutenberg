@@ -24,7 +24,7 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 
 	// Adjust to admin-bar going small.
-	@include break-medium() {
+	@media (min-width: #{ ($break-medium + 1) }) {
 		top: $admin-bar-height;
 
 		.is-fullscreen-mode & {

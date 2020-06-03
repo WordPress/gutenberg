@@ -19,7 +19,12 @@ import {
 } from '@wordpress/block-editor';
 
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	withSelect,
+	withDispatch,
+} from '@wordpress/data';
 import {
 	Button,
 	PanelBody,
@@ -31,9 +36,8 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { menu } from '@wordpress/icons';
-import { addQueryArgs } from '@wordpress/url';
-import { useApiFetch } from '@wordpress/api-fetch';
+import { navigation as icon } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -43,10 +47,16 @@ import BlockColorsStyleSelector from './block-colors-selector';
 import * as navIcons from './icons';
 
 function Navigation( {
+	selectedBlockHasDescendants,
 	attributes,
 	clientId,
 	fontSize,
 	hasExistingNavItems,
+	hasResolvedPages,
+	isImmediateParentOfSelectedBlock,
+	isRequestingPages,
+	isSelected,
+	pages,
 	setAttributes,
 	setFontSize,
 	updateNavItemBlocks,
@@ -55,6 +65,7 @@ function Navigation( {
 	//
 	// HOOKS
 	//
+
 	const ref = useRef();
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
@@ -77,36 +88,19 @@ function Navigation( {
 		},
 		[ fontSize.size ]
 	);
+	const isNavigationManagementScreen = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getSettings()
+				.__experimentalNavigationScreen
+	);
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
-	const baseUrl = '/wp/v2/pages';
-
-	// "view" is required to ensure Pages are returned by REST API
-	// for users with lower capabilities such as "Contributor" otherwise
-	// Pages are not returned in the request if "edit" context is set
-	const context = 'view';
-
-	const filterDefaultPages = {
-		parent: 0,
-		order: 'asc',
-		orderby: 'id',
-		context,
-	};
-
-	const queryPath = addQueryArgs( baseUrl, filterDefaultPages );
-
-	const { isLoading: isRequestingPages, data: pages } = useApiFetch(
-		queryPath
-	);
-
-	const hasPages = !! pages;
-
 	// Builds navigation links from default Pages.
 	const defaultPagesNavigationItems = useMemo( () => {
-		if ( ! hasPages ) {
+		if ( ! pages ) {
 			return null;
 		}
 
@@ -146,6 +140,8 @@ function Navigation( {
 		selectBlock( clientId );
 	}
 
+	const hasPages = hasResolvedPages && pages && pages.length;
+
 	const blockInlineStyles = {
 		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 	};
@@ -158,7 +154,7 @@ function Navigation( {
 			<Block.div>
 				<Placeholder
 					className="wp-block-navigation-placeholder"
-					icon={ menu }
+					icon={ icon }
 					label={ __( 'Navigation' ) }
 					instructions={ __(
 						'Create a Navigation from all existing pages, or create an empty one.'
@@ -234,7 +230,9 @@ function Navigation( {
 						},
 					] }
 				/>
-				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				{ ! isNavigationManagementScreen && (
+					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				) }
 
 				<BlockColorsStyleSelector
 					TextColor={ TextColor }
@@ -280,9 +278,16 @@ function Navigation( {
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [ 'core/navigation-link' ] }
+							renderAppender={
+								( isImmediateParentOfSelectedBlock &&
+									! selectedBlockHasDescendants ) ||
+								isSelected
+									? InnerBlocks.DefaultAppender
+									: false
+							}
 							templateInsertUpdatesSelection={ false }
 							__experimentalMoverDirection={
-								attributes.orientation
+								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
 							__experimentalAppenderTagName="li"
@@ -306,9 +311,48 @@ export default compose( [
 	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
 		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const {
+			getClientIdsOfDescendants,
+			hasSelectedInnerBlock,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
+
+		const filterDefaultPages = {
+			parent: 0,
+			order: 'asc',
+			orderby: 'id',
+		};
+
+		const pagesSelect = [
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'page', filterDefaultPages ],
+		];
+
+		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
+			clientId,
+			false
+		);
+		const selectedBlockId = getSelectedBlockClientId();
+		const selectedBlockHasDescendants = !! getClientIdsOfDescendants( [
+			selectedBlockId,
+		] )?.length;
 
 		return {
+			isImmediateParentOfSelectedBlock,
+			selectedBlockHasDescendants,
 			hasExistingNavItems: !! innerBlocks.length,
+			pages: select( 'core' ).getEntityRecords(
+				'postType',
+				'page',
+				filterDefaultPages
+			),
+			isRequestingPages: select( 'core/data' ).isResolving(
+				...pagesSelect
+			),
+			hasResolvedPages: select( 'core/data' ).hasFinishedResolution(
+				...pagesSelect
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

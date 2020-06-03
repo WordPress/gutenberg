@@ -29,6 +29,18 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * wordpress/editor/src/components/provider/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {Object} search
+ * @param {number} perPage
+ * @return {Promise<Object[]>} List of suggestions
+ */
 const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
 	const posts = await apiFetch( {
 		path: addQueryArgs( '/wp/v2/search', {
@@ -99,9 +111,21 @@ class EditorProvider extends Component {
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
+				'__experimentalDisableCustomUnits',
+				'__experimentalDisableCustomLineHeight',
+				'__experimentalEnableCustomSpacing',
+				'__experimentalEnableLegacyWidgetBlock',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalFeatures',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBase',
+				'__experimentalPreferredStyleVariations',
 				'alignWide',
 				'allowedBlockTypes',
-				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -111,27 +135,18 @@ class EditorProvider extends Component {
 				'disableCustomGradients',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'onUpdateDefaultBlockStyles',
-				'__experimentalDisableCustomUnits',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalBlockDirectory',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
-				'__experimentalGlobalStylesUserEntityId',
-				'__experimentalGlobalStylesBase',
-				'__experimentalDisableCustomLineHeight',
-				'__experimentalBlockPatterns',
-				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,

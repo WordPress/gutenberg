@@ -13,8 +13,8 @@
 	}
 
 	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
-		font-family: $editor-font;
-		font-size: $editor-font-size; // It should match the default paragraph size.
+		font-family: inherit;
+		font-size: inherit;
 		border: none;
 		background: none;
 		box-shadow: none;
@@ -55,7 +55,7 @@
 .block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
 .block-editor-default-block-appender .block-editor-inserter { // Empty appender.
 	position: absolute;
-	top: 2px; // Centers it in the default paragraph height.
+	top: 0;
 	height: $button-size-small + $grid-unit-10;
 
 	.block-editor-inserter__toggle {

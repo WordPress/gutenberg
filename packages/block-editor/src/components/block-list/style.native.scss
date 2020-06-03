@@ -81,6 +81,10 @@
 	height: $mobile-block-toolbar-height;
 }
 
+.floatingToolbar {
+	height: $mobile-floating-toolbar-height + 2 * $mobile-floating-toolbar-margin;
+}
+
 .horizontal {
 	flex-direction: row;
 	flex-wrap: wrap;

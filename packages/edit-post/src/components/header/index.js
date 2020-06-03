@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -15,50 +15,29 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
-	const {
-		shortcut,
-		hasActiveMetaboxes,
-		isEditorSidebarOpened,
-		isPublishSidebarOpened,
-		isSaving,
-		getBlockSelectionStart,
-	} = useSelect(
+function Header( {
+	onToggleInserter,
+	isInserterOpen,
+	setEntitiesSavedStatesCallback,
+} ) {
+	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
 		( select ) => ( {
-			shortcut: select(
-				'core/keyboard-shortcuts'
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isEditorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
-
-	const toggleGeneralSidebar = isEditorSidebarOpened
-		? closeGeneralSidebar
-		: () =>
-				openGeneralSidebar(
-					getBlockSelectionStart()
-						? 'edit-post/block'
-						: 'edit-post/document'
-				);
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
 				<HeaderToolbar
 					onToggleInserter={ onToggleInserter }
@@ -77,10 +56,7 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -88,14 +64,9 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
-				/>
-				<Button
-					icon={ cog }
-					label={ __( 'Settings' ) }
-					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcut }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
 				<PinnedItems.Slot scope="core/edit-post" />
 				<MoreMenu />

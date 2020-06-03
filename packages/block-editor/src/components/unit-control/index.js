@@ -2,12 +2,41 @@
  * WordPress dependencies
  */
 import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
-const { __defaultUnits } = BaseUnitControl;
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
-	const settings = useCustomUnitsSettings();
+	const units = useCustomUnits( unitsProp );
+
+	return <BaseUnitControl units={ units } { ...props } />;
+}
+
+/**
+ * Filters available units based on values defined by settings.
+ *
+ * @param {Array} settings Collection of preferred units.
+ * @param {Array} units Collection of available units.
+ *
+ * @return {Array} Filtered units based on settings.
+ */
+function filterUnitsWithSettings( settings = [], units = [] ) {
+	return units.filter( ( unit ) => {
+		return settings.includes( unit.value );
+	} );
+}
+
+/**
+ * Custom hook to retrieve and consolidate units setting from add_theme_support().
+ *
+ * @param {Array} unitsProp Collection of available units.
+ *
+ * @return {Array} Filtered units based on settings.
+ */
+export function useCustomUnits( unitsProp ) {
+	const settings = useEditorFeature( '__experimentalDisableCustomUnits' );
 	const isDisabled = !! settings;
 
 	// Adjust units based on add_theme_support( 'experimental-custom-units' );
@@ -28,34 +57,5 @@ export default function UnitControl( { units: unitsProp, ...props } ) {
 		units = isDisabled ? false : unitsProp;
 	}
 
-	return <BaseUnitControl units={ units } { ...props } />;
-}
-
-// Hoisting statics from the BaseUnitControl
-UnitControl.__defaultUnits = __defaultUnits;
-
-/**
- * Hook that retrieves the 'experimental-custom-units' setting from add_theme_support()
- */
-function useCustomUnitsSettings() {
-	const settings = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return getSettings().__experimentalDisableCustomUnits;
-	}, [] );
-
-	return settings;
-}
-
-/**
- * Filters available units based on values defined by settings.
- *
- * @param {Array} settings Collection of preferred units.
- * @param {Array} units Collection of available units.
- *
- * @return {Array} Filtered units based on settings.
- */
-function filterUnitsWithSettings( settings = [], units = [] ) {
-	return units.filter( ( unit ) => {
-		return settings.includes( unit.value );
-	} );
+	return units;
 }

@@ -22,11 +22,6 @@ export const settings = {
 	description: __( 'Set media and words side-by-side for a richer layout.' ),
 	icon,
 	keywords: [ __( 'image' ), __( 'video' ) ],
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-		__experimentalColor: { gradients: true },
-	},
 	example: {
 		attributes: {
 			mediaType: 'image',

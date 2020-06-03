@@ -87,13 +87,6 @@ export const settings = {
 			},
 		],
 	},
-	supports: {
-		align: [ 'wide', 'full' ],
-		anchor: true,
-		html: false,
-		lightBlockWrapper: true,
-		__experimentalColor: { gradients: true },
-	},
 	transforms: {
 		from: [
 			{
@@ -147,7 +140,6 @@ export const settings = {
 			},
 		],
 	},
-
 	edit,
 	save,
 	deprecated,

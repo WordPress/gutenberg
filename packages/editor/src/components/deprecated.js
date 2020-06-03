@@ -45,7 +45,6 @@ import {
 	MediaPlaceholder as RootMediaPlaceholder,
 	MediaUpload as RootMediaUpload,
 	MediaUploadCheck as RootMediaUploadCheck,
-	MultiBlocksSwitcher as RootMultiBlocksSwitcher,
 	MultiSelectScrollIntoView as RootMultiSelectScrollIntoView,
 	NavigableToolbar as RootNavigableToolbar,
 	ObserveTyping as RootObserveTyping,
@@ -208,10 +207,6 @@ export const MediaUpload = deprecateComponent( 'MediaUpload', RootMediaUpload );
 export const MediaUploadCheck = deprecateComponent(
 	'MediaUploadCheck',
 	RootMediaUploadCheck
-);
-export const MultiBlocksSwitcher = deprecateComponent(
-	'MultiBlocksSwitcher',
-	RootMultiBlocksSwitcher
 );
 export const MultiSelectScrollIntoView = deprecateComponent(
 	'MultiSelectScrollIntoView',

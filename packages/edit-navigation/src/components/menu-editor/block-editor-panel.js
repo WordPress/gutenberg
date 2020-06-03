@@ -13,22 +13,34 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 import { Button, Panel, PanelBody, Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export default function BlockEditorPanel( { saveBlocks } ) {
-	const { isNavigationModeActive, hasSelectedBlock } = useSelect(
+/**
+ * Internal dependencies
+ */
+import DeleteMenuButton from '../delete-menu-button';
+
+export default function BlockEditorPanel( {
+	onDeleteMenu,
+	menuId,
+	saveBlocks,
+} ) {
+	const { rootBlockId, isNavigationModeActive, hasSelectedBlock } = useSelect(
 		( select ) => {
 			const {
 				isNavigationMode,
 				getBlockSelectionStart,
 				getBlock,
+				getBlocks,
 			} = select( 'core/block-editor' );
 
 			const selectionStartClientId = getBlockSelectionStart();
 
 			return {
+				rootBlockId: getBlocks()[ 0 ]?.clientId,
 				isNavigationModeActive: isNavigationMode(),
 				hasSelectedBlock:
 					!! selectionStartClientId &&
@@ -38,16 +50,22 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 		[]
 	);
 
+	// Select the navigation block when it becomes available
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+	useEffect( () => {
+		if ( rootBlockId ) {
+			selectBlock( rootBlockId );
+		}
+	}, [ rootBlockId ] );
+
 	return (
-		<Panel
-			className="edit-navigation-menu-editor__block-editor-panel"
-			header={
-				<Button isPrimary onClick={ saveBlocks }>
-					{ __( 'Save navigation' ) }
-				</Button>
-			}
-		>
+		<Panel className="edit-navigation-menu-editor__block-editor-panel">
 			<PanelBody title={ __( 'Navigation menu' ) }>
+				<div className="components-panel__header-actions">
+					<Button isPrimary onClick={ saveBlocks }>
+						{ __( 'Save navigation' ) }
+					</Button>
+				</div>
 				<NavigableToolbar
 					className={ classnames(
 						'edit-navigation-menu-editor__block-editor-toolbar',
@@ -65,6 +83,12 @@ export default function BlockEditorPanel( { saveBlocks } ) {
 						<BlockList />
 					</ObserveTyping>
 				</WritingFlow>
+				<div className="components-panel__footer-actions">
+					<DeleteMenuButton
+						menuId={ menuId }
+						onDelete={ onDeleteMenu }
+					/>
+				</div>
 			</PanelBody>
 		</Panel>
 	);

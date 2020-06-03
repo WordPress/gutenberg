@@ -1,6 +1,5 @@
 .editor-post-title {
 	position: relative;
-	font-size: $editor-font-size;
 
 	.editor-post-title__input {
 		display: block;
@@ -8,13 +7,15 @@
 		margin: 0;
 		box-shadow: none;
 		background: transparent;
-		font-family: $editor-font;
-		line-height: $default-line-height;
-		color: $dark-gray-900;
 		transition: border 0.1s ease-out, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
 		padding: #{ $block-padding + 5px } 0;
 		word-break: keep-all;
+
+		// Inherit the styles set by the theme.
+		font-family: inherit;
+		line-height: inherit;
+		color: inherit;
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;
@@ -31,7 +32,7 @@
 
 		// Match h1 heading.
 		font-size: 2.44em;
-		font-weight: 600;
+		font-weight: bold;
 
 		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {

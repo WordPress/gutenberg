@@ -1,3 +1,13 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.10.0 (2020-05-28)
+
+### New Feature
+
+- Add `documentHasTextSelection` to inquire specifically about ranges of selected text, in addition to the existing `documentHasSelection`.
+
 ## 2.1.0 (2019-03-06)
 
 ### Bug Fix

@@ -23,16 +23,27 @@
 
 	// This variant is used in inline situations, like Buttons, Social Links, Navigation Menu.
 	&.block-list-appender__toggle {
-		background: $dark-gray-primary;
-		color: $white;
+		display: flex;
+		flex-direction: row;
+		color: $dark-gray-primary;
 		box-shadow: none;
-		width: 24px;
 		height: 24px;
 		padding: 0;
 		margin-left: $grid-unit-10;
 
 		&:active {
 			color: $white;
+		}
+
+		& > svg {
+			width: 24px;
+			background-color: $dark-gray-primary;
+			color: $white;
+		}
+
+		.block-editor-button-block-appender__label {
+			display: block;
+			margin-left: $grid-unit-10;
 		}
 	}
 }
