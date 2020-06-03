@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import { findTemplate } from './controls';
@@ -48,14 +53,21 @@ export function setTemplate( templateId ) {
 /**
  * Returns an action object used to add a template.
  *
- * @param {number} templateId The template ID.
+ * @param {Object} template The template.
  *
  * @return {Object} Action object.
  */
-export function addTemplate( templateId ) {
+export function* addTemplate( template ) {
+	const newTemplate = yield dispatch(
+		'core',
+		'saveEntityRecord',
+		'postType',
+		'wp_template',
+		template
+	);
 	return {
 		type: 'ADD_TEMPLATE',
-		templateId,
+		templateId: newTemplate.id,
 	};
 }
 
@@ -66,7 +78,16 @@ export function addTemplate( templateId ) {
  *
  * @return {Object} Action object.
  */
-export function removeTemplate( templateId ) {
+export function* removeTemplate( templateId ) {
+	yield apiFetch( {
+		path: `/wp/v2/templates/${ templateId }`,
+		method: 'DELETE',
+	} );
+	yield dispatch(
+		'core/edit-site',
+		'setPage',
+		yield select( 'core/edit-site', 'getPage' )
+	);
 	return {
 		type: 'REMOVE_TEMPLATE',
 		templateId,

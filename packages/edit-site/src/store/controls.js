@@ -23,11 +23,6 @@ export function findTemplate( path ) {
 }
 
 const controls = {
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeName, selectorName, args } ) => {
-			return registry.select( storeName )[ selectorName ]( ...args );
-		}
-	),
 	FIND_TEMPLATE: createRegistryControl( ( registry ) => ( { path } ) =>
 		findTemplateUtil(
 			path,

@@ -124,8 +124,8 @@ export default function Header( {
 						isTemplatePart={ templateType === 'wp_template_part' }
 						onActiveIdChange={ setTemplate }
 						onActiveTemplatePartIdChange={ setTemplatePart }
-						onAddTemplateId={ addTemplate }
-						onRemoveTemplateId={ removeTemplate }
+						onAddTemplate={ addTemplate }
+						onRemoveTemplate={ removeTemplate }
 					/>
 				</div>
 			</div>
