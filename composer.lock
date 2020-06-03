@@ -409,12 +409,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/TimothyBJacobs/wp-phpunit.git",
-                "reference": "4fae28a45158430e325f5ba670e661864e8a4f1d"
+                "reference": "6997d22cd84503e13bcfa0a273d9aaf3291dc8f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TimothyBJacobs/wp-phpunit/zipball/4fae28a45158430e325f5ba670e661864e8a4f1d",
-                "reference": "4fae28a45158430e325f5ba670e661864e8a4f1d",
+                "url": "https://api.github.com/repos/TimothyBJacobs/wp-phpunit/zipball/6997d22cd84503e13bcfa0a273d9aaf3291dc8f2",
+                "reference": "6997d22cd84503e13bcfa0a273d9aaf3291dc8f2",
                 "shasum": ""
             },
             "type": "library",
@@ -448,7 +448,7 @@
                 "issues": "https://github.com/wp-phpunit/issues",
                 "docs": "https://github.com/wp-phpunit/docs"
             },
-            "time": "2020-06-03T14:48:13+00:00"
+            "time": "2020-06-03T18:23:08+00:00"
         }
     ],
     "aliases": [],
