@@ -15,7 +15,7 @@ Here is the basic InnerBlocks usage.
 
 	blocks.registerBlockType( 'gutenberg-examples/example-06', {
 		title: 'Example: Inner Blocks',
-		category: 'layout',
+		category: 'design',
 
 		edit: function( props ) {
 			return el(

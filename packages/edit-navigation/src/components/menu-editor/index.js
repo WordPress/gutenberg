@@ -6,10 +6,12 @@ import {
 	BlockEditorProvider,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import useMenuItems from './use-menu-items';
 import useNavigationBlocks from './use-navigation-blocks';
 import MenuEditorShortcuts from './shortcuts';
 import BlockEditorPanel from './block-editor-panel';
@@ -20,8 +22,19 @@ export default function MenuEditor( {
 	blockEditorSettings,
 	onDeleteMenu,
 } ) {
-	const [ blocks, setBlocks, saveBlocks ] = useNavigationBlocks( menuId );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const query = useMemo( () => ( { menus: menuId, per_page: -1 } ), [
+		menuId,
+	] );
+	const {
+		menuItems,
+		eventuallySaveMenuItems,
+		createMissingMenuItems,
+	} = useMenuItems( query );
+	const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks(
+		menuItems
+	);
+	const saveMenuItems = () => eventuallySaveMenuItems( blocks, menuItemsRef );
 
 	return (
 		<div className="edit-navigation-menu-editor">
@@ -31,7 +44,10 @@ export default function MenuEditor( {
 			<BlockEditorProvider
 				value={ blocks }
 				onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
-				onChange={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
+				onChange={ ( updatedBlocks ) => {
+					createMissingMenuItems( updatedBlocks, menuItemsRef );
+					setBlocks( updatedBlocks );
+				} }
 				settings={ {
 					...blockEditorSettings,
 					templateLock: 'all',
@@ -39,13 +55,13 @@ export default function MenuEditor( {
 				} }
 			>
 				<BlockEditorKeyboardShortcuts />
-				<MenuEditorShortcuts saveBlocks={ saveBlocks } />
+				<MenuEditorShortcuts saveBlocks={ saveMenuItems } />
 				<NavigationStructureArea
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
 				<BlockEditorPanel
-					saveBlocks={ saveBlocks }
+					saveBlocks={ saveMenuItems }
 					menuId={ menuId }
 					onDeleteMenu={ onDeleteMenu }
 				/>

@@ -15,7 +15,7 @@
 			'gutenberg/recordId': 'recordId',
 		},
 
-		category: 'common',
+		category: 'text',
 
 		edit( { attributes, setAttributes } ) {
 			return el(
@@ -51,7 +51,7 @@
 		// `get_block_editor_server_block_settings`.
 		context: [ 'gutenberg/recordId' ],
 
-		category: 'common',
+		category: 'text',
 
 		edit( { context } ) {
 			return 'The record ID is: ' + context[ 'gutenberg/recordId' ];

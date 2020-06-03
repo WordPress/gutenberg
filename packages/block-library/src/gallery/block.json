@@ -1,6 +1,6 @@
 {
 	"name": "core/gallery",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"images": {
 			"type": "array",

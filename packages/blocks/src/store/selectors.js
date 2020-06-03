@@ -15,8 +15,8 @@ import {
 } from 'lodash';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
-
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -117,7 +117,7 @@ export function getDefaultBlockVariation( state, blockName, scope ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Array} Categories list.
+ * @return {WPBlockCategory[]} Categories list.
  */
 export function getCategories( state ) {
 	return state.categories;
