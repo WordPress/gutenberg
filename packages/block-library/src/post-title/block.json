@@ -5,6 +5,15 @@
 		"postId",
 		"postType"
 	],
+	"attributes": {
+		"align": {
+			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 2
+		}
+	},
 	"supports": {
 		"html": false
 	}
