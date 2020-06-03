@@ -31,7 +31,7 @@ if (
 		if ( ! is_admin() ) {
 			return $tag;
 		}
-		$tag = str_replace( '<script ', sprintf( '<script data-handle="%s" ', esc_attr ( $handle ) ), $tag );
+		$tag = str_replace( '<script ', sprintf( '<script data-handle="%s" ', esc_attr( $handle ) ), $tag );
 
 		return $tag;
 	}
