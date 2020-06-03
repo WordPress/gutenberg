@@ -36,16 +36,20 @@ function Header( { isCustomizer } ) {
 					<BlockNavigationDropdown />
 				</NavigableMenu>
 				{ ! isCustomizer && (
-					<>
-						<h1 className="edit-widgets-header__title">
-							{ __( 'Block Areas' ) } { __( '(experimental)' ) }
-						</h1>
-						<div className="edit-widgets-header__actions">
-							<SaveButton />
-							<PinnedItems.Slot scope="core/edit-widgets" />
-						</div>
-					</>
+					<h1 className="edit-widgets-header__title">
+						{ __( 'Block Areas' ) } { __( '(experimental)' ) }
+					</h1>
 				) }
+				<div className="edit-widgets-header__actions">
+					{ ! isCustomizer && <SaveButton /> }
+					<PinnedItems.Slot
+						scope={
+							isCustomizer
+								? 'core/edit-widgets-customizer'
+								: 'core/edit-widgets'
+						}
+					/>
+				</div>
 			</div>
 			{ ( ! isLargeViewport || isCustomizer ) && (
 				<div className="edit-widgets-header__block-toolbar">

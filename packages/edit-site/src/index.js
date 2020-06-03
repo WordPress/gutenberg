@@ -3,7 +3,6 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import '@wordpress/notices';
 import {
@@ -28,14 +27,23 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 			type: 'post',
 			subtype: 'post',
 		} ),
-	} ).then( ( posts ) =>
-		posts.map( ( post ) => ( {
-			url: post.url,
-			type: post.subtype || post.type,
-			id: post.id,
-			title: decodeEntities( post.title ) || __( '(no title)' ),
-		} ) )
-	);
+	} )
+		.then( ( posts ) =>
+			Promise.all(
+				posts.map( ( post ) =>
+					apiFetch( { url: post._links.self[ 0 ].href } )
+				)
+			)
+		)
+		.then( ( posts ) =>
+			posts.map( ( post ) => ( {
+				url: post.link,
+				type: post.type,
+				id: post.id,
+				slug: post.slug,
+				title: post.title.rendered || __( '(no title)' ),
+			} ) )
+		);
 
 /**
  * Initializes the site editor screen.

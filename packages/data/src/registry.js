@@ -170,7 +170,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			if ( typeof attribute !== 'function' ) {
 				return attribute;
 			}
-			return function() {
+			return function () {
 				return registry[ key ].apply( null, arguments );
 			};
 		} );

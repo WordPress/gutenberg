@@ -1,6 +1,6 @@
 {
 	"name": "core/query-loop",
-	"category": "layout",
+	"category": "design",
 	"context": [
 		"queryId",
 		"query",

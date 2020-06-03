@@ -15,8 +15,18 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
+import {
+	PADDING_SUPPORT_KEY,
+	PaddingEdit,
+	paddingStyleMappings,
+} from './padding';
+import SpacingPanelControl from '../components/spacing-panel-control';
 
-const styleSupportKeys = [ ...TYPOGRAPHY_SUPPORT_KEYS, COLOR_SUPPORT_KEY ];
+const styleSupportKeys = [
+	...TYPOGRAPHY_SUPPORT_KEYS,
+	COLOR_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
+];
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
@@ -29,6 +39,7 @@ const hasStyleSupport = ( blockType ) =>
  */
 export function getInlineStyles( styles = {} ) {
 	const mappings = {
+		...paddingStyleMappings,
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
 		background: [ 'color', 'gradient' ],
@@ -125,10 +136,22 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { name: blockName } = props;
+
+		const hasPaddingSupport = hasBlockSupport(
+			blockName,
+			PADDING_SUPPORT_KEY
+		);
+
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			hasPaddingSupport && (
+				<SpacingPanelControl key="spacing">
+					<PaddingEdit { ...props } />
+				</SpacingPanelControl>
+			),
 		];
 	},
 	'withToolbarControls'

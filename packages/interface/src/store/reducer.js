@@ -1,29 +1,12 @@
 /**
  * External dependencies
  */
-import { flow, get, isEmpty, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { DEFAULTS } from './defaults';
-
-/**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
 
 /**
  * Reducer to keep tract of the active area per scope.
@@ -41,18 +24,6 @@ export function singleEnableItems(
 		return state;
 	}
 
-	if (
-		! item &&
-		! get( DEFAULTS.enableItems.singleEnableItems, [ itemType, scope ] )
-	) {
-		const newTypeState = omit( state[ itemType ], [ scope ] );
-		return isEmpty( newTypeState )
-			? omit( state, [ itemType ] )
-			: {
-					...state,
-					[ itemType ]: newTypeState,
-			  };
-	}
 	return {
 		...state,
 		[ itemType ]: {
@@ -103,8 +74,6 @@ const enableItems = combineReducers( {
 	multipleEnableItems,
 } );
 
-export default flow( [ combineReducers, createWithInitialState( DEFAULTS ) ] )(
-	{
-		enableItems,
-	}
-);
+export default combineReducers( {
+	enableItems,
+} );

@@ -1,0 +1,14 @@
+.block-editor-block-parent-selector {
+	background: $white;
+	border: 1px solid $dark-gray-primary;
+	border-radius: $radius-block-ui;
+	padding: 8px;
+	line-height: 1;
+
+	.block-editor-block-parent-selector__button {
+		width: 32px;
+		min-width: auto;
+		height: 32px;
+		padding: 0;
+	}
+}

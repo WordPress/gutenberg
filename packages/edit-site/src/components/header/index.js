@@ -59,17 +59,8 @@ export default function Header( {
 		( newTemplatePartId ) =>
 			setSettings( ( prevSettings ) => ( {
 				...prevSettings,
-				templateId: newTemplatePartId,
+				templatePartId: newTemplatePartId,
 				templateType: 'wp_template_part',
-			} ) ),
-		[]
-	);
-	const addTemplateId = useCallback(
-		( newTemplateId ) =>
-			setSettings( ( prevSettings ) => ( {
-				...prevSettings,
-				templateId: newTemplateId,
-				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
 			} ) ),
 		[]
 	);
@@ -101,6 +92,28 @@ export default function Header( {
 			}
 		} catch ( err ) {}
 	}, [] );
+	const addTemplateId = useCallback(
+		( newTemplateId ) =>
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateId: newTemplateId,
+				templateType: 'wp_template',
+				templateIds: [ ...prevSettings.templateIds, newTemplateId ],
+			} ) ),
+		[]
+	);
+	const removeTemplateId = useCallback(
+		( oldTemplateId ) => {
+			setSettings( ( prevSettings ) => ( {
+				...prevSettings,
+				templateIds: prevSettings.templateIds.filter(
+					( templateId ) => templateId !== oldTemplateId
+				),
+			} ) );
+			setActivePage( settings.page );
+		},
+		[ settings.page ]
+	);
 
 	const { deviceType, hasFixedToolbar } = useSelect( ( select ) => {
 		const { __experimentalGetPreviewDeviceType, isFeatureActive } = select(
@@ -155,9 +168,10 @@ export default function Header( {
 						/
 					</div>
 					<TemplateSwitcher
-						ids={ settings.templateIds }
 						templatePartIds={ settings.templatePartIds }
+						page={ settings.page }
 						activeId={ settings.templateId }
+						activeTemplatePartId={ settings.templatePartId }
 						homeId={ settings.homeTemplateId }
 						isTemplatePart={
 							settings.templateType === 'wp_template_part'
@@ -165,6 +179,7 @@ export default function Header( {
 						onActiveIdChange={ setActiveTemplateId }
 						onActiveTemplatePartIdChange={ setActiveTemplatePartId }
 						onAddTemplateId={ addTemplateId }
+						onRemoveTemplateId={ removeTemplateId }
 					/>
 				</div>
 			</div>
