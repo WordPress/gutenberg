@@ -187,6 +187,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				const {
 					__experimentalEnableLegacyWidgetBlock,
 					__experimentalEnableFullSiteEditing,
+					__experimentalEnableRichImageEditing,
 				} = settings;
 
 				[
@@ -217,7 +218,9 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 						: [] ),
 				].forEach( registerBlock );
 
-				// Attach rich image tools to the image and cover blocks.
-				richImage.registerBlock();
+				if ( __experimentalEnableRichImageEditing ) {
+					// Attach rich image tools to the image and cover blocks.
+					richImage.registerBlock();
+				}
 		  }
 		: undefined;
