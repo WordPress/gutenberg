@@ -219,7 +219,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				].forEach( registerBlock );
 
 				if ( __experimentalEnableRichImageEditing ) {
-					// Attach rich image tools to the image and cover blocks.
+					// Attach rich image tools to the image block.
 					richImage.registerBlock();
 				}
 		  }
