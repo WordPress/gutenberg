@@ -15,7 +15,7 @@ import useMenuItems from './use-menu-items';
 import useNavigationBlocks from './use-navigation-blocks';
 import MenuEditorShortcuts from './shortcuts';
 import BlockEditorPanel from './block-editor-panel';
-import NavigationStructurePanel from './navigation-structure-panel';
+import NavigationStructureArea from './navigation-structure-area';
 
 export default function MenuEditor( {
 	menuId,
@@ -56,7 +56,7 @@ export default function MenuEditor( {
 			>
 				<BlockEditorKeyboardShortcuts />
 				<MenuEditorShortcuts saveBlocks={ saveMenuItems } />
-				<NavigationStructurePanel
+				<NavigationStructureArea
 					blocks={ blocks }
 					initialOpen={ isLargeViewport }
 				/>
