@@ -157,18 +157,19 @@ function PostAuthorEdit( {
 						}
 					/>
 				</PanelBody>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<h4>{ __( 'Name Size' ) }</h4>
+				<PanelBody title={ __( 'Author text settings' ) }>
 					<FontSizePicker
 						value={ fontSize.size }
 						onChange={ setFontSize }
 					/>
-					<h4>{ __( 'Bio Size' ) }</h4>
+				</PanelBody>
+				<PanelBody title={ __( 'Bio text settings' ) }>
 					<FontSizePicker
 						value={ bioFontSize.size }
 						onChange={ setBioFontSize }
 					/>
-					<h4>{ __( 'Byline Size' ) }</h4>
+				</PanelBody>
+				<PanelBody title={ __( 'Byline text settings' ) }>
 					<FontSizePicker
 						value={ bylineFontSize.size }
 						onChange={ setBylineFontSize }
