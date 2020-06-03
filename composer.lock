@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bcdce838e8354d08b1ed65eb1ebf3636",
+    "content-hash": "669bf954d1dc4876a2f73e0a40b545c6",
     "packages": [
         {
             "name": "composer/installers",
@@ -405,16 +405,16 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "5.4.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "15925e03c8594c08cf2822e24e511af8dc6f779e"
+                "url": "https://github.com/TimothyBJacobs/wp-phpunit.git",
+                "reference": "4fae28a45158430e325f5ba670e661864e8a4f1d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/15925e03c8594c08cf2822e24e511af8dc6f779e",
-                "reference": "15925e03c8594c08cf2822e24e511af8dc6f779e",
+                "url": "https://api.github.com/repos/TimothyBJacobs/wp-phpunit/zipball/4fae28a45158430e325f5ba670e661864e8a4f1d",
+                "reference": "4fae28a45158430e325f5ba670e661864e8a4f1d",
                 "shasum": ""
             },
             "type": "library",
@@ -423,7 +423,6 @@
                     "__loaded.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -444,12 +443,19 @@
                 "test",
                 "wordpress"
             ],
-            "time": "2020-04-01T14:35:27+00:00"
+            "support": {
+                "source": "https://github.com/wp-phpunit/wp-phpunit",
+                "issues": "https://github.com/wp-phpunit/issues",
+                "docs": "https://github.com/wp-phpunit/docs"
+            },
+            "time": "2020-06-03T14:48:13+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "wp-phpunit/wp-phpunit": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
