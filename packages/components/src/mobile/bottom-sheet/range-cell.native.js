@@ -33,7 +33,8 @@ class BottomSheetRangeCell extends Component {
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
-
+		this.onSubmitEditing = this.onSubmitEditing.bind( this );
+		this.onChangeText = this.onChangeText.bind( this );
 		const initialValue = this.validateInput(
 			props.value || props.defaultValue || props.minimumValue
 		);
@@ -41,9 +42,10 @@ class BottomSheetRangeCell extends Component {
 
 		this.state = {
 			accessible: true,
-			initialValue,
 			hasFocus: false,
 			fontScale,
+			inputValue: initialValue,
+			sliderValue: initialValue,
 		};
 	}
 
@@ -90,17 +92,22 @@ class BottomSheetRangeCell extends Component {
 		);
 	}
 
-	onChangeValue( initialValue ) {
-		const { minimumValue, maximumValue, onChange } = this.props;
+	updateValue( value ) {
+		const { onChange } = this.props;
+		const validValue = this.validateInput( value );
+		this.announceCurrentValue( `${ validValue }` );
+		onChange( parseInt( validValue ) );
+	}
 
-		let sliderValue = initialValue;
-		if ( sliderValue < minimumValue ) {
-			sliderValue = minimumValue;
-		} else if ( sliderValue > maximumValue ) {
-			sliderValue = maximumValue;
-		}
-		this.announceCurrentValue( `${ sliderValue }` );
-		onChange( parseInt( sliderValue ) );
+	onChangeValue( initialValue ) {
+		this.setState( { inputValue: initialValue } );
+		this.updateValue( initialValue );
+	}
+
+	onChangeText( textValue ) {
+		const value = this.validateInput( textValue );
+		this.setState( { inputValue: textValue, sliderValue: value } );
+		this.updateValue( value );
 	}
 
 	onCellPress() {
@@ -108,6 +115,16 @@ class BottomSheetRangeCell extends Component {
 		if ( this.sliderRef ) {
 			const reactTag = findNodeHandle( this.sliderRef );
 			AccessibilityInfo.setAccessibilityFocus( reactTag );
+		}
+	}
+
+	onSubmitEditing( { nativeEvent: { text } } ) {
+		const validValue = this.validateInput( text );
+
+		if ( this.state.inputValue !== validValue ) {
+			this.setState( { inputValue: validValue } );
+			this.announceCurrentValue( `${ validValue }` );
+			this.props.onChange( parseInt( validValue ) );
 		}
 	}
 
@@ -137,7 +154,13 @@ class BottomSheetRangeCell extends Component {
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, accessible, fontScale, initialValue } = this.state;
+		const {
+			hasFocus,
+			accessible,
+			fontScale,
+			inputValue,
+			sliderValue,
+		} = this.state;
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
@@ -173,7 +196,7 @@ class BottomSheetRangeCell extends Component {
 			>
 				<View style={ styles.container }>
 					<Slider
-						value={ this.validateInput( initialValue ) }
+						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
 						disabled={ disabled }
 						step={ step }
@@ -196,12 +219,13 @@ class BottomSheetRangeCell extends Component {
 							hasFocus && borderStyles.isSelected,
 							{ width: 40 * fontScale },
 						] }
-						onChangeText={ this.onChangeValue }
+						onChangeText={ this.onChangeText }
+						onSubmitEditing={ this.onSubmitEditing }
 						onFocus={ this.handleToggleFocus }
 						onBlur={ this.handleToggleFocus }
 						keyboardType="number-pad"
 						returnKeyType="done"
-						value={ `${ value }` }
+						defaultValue={ `${ inputValue }` }
 					/>
 				</View>
 			</Cell>
