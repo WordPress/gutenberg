@@ -71,7 +71,7 @@ export default function BlockNavigationBlock( {
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 3 }
+				colSpan={ hasRenderedMovers ? undefined : 2 }
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
@@ -121,7 +121,7 @@ export default function BlockNavigationBlock( {
 				</>
 			) }
 
-			{ withBlockNavigationBlockSettings && level > 1 && (
+			{ withBlockNavigationBlockSettings && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>
