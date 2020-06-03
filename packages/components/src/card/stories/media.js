@@ -122,11 +122,11 @@ const HorizontallyAlignedCard = styled( Card )`
 		flex-direction: row-reverse;
 	}
 
-	${StyledCardBody} {
+	${ StyledCardBody } {
 		flex: 1;
 	}
 
-	${StyledCardMedia} {
+	${ StyledCardMedia } {
 		&.is-left {
 			border-radius: 3px 0 0 3px;
 		}

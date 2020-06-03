@@ -49,7 +49,7 @@ describe( 'BlockSwitcher', () => {
 
 	beforeAll( () => {
 		registerBlockType( 'core/heading', {
-			category: 'common',
+			category: 'text',
 			title: 'Heading',
 			edit: () => {},
 			save: () => {},
@@ -71,7 +71,7 @@ describe( 'BlockSwitcher', () => {
 		} );
 
 		registerBlockType( 'core/paragraph', {
-			category: 'common',
+			category: 'text',
 			title: 'Paragraph',
 			edit: () => {},
 			save: () => {},
@@ -181,12 +181,10 @@ describe( 'BlockSwitcher', () => {
 
 			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
 				const toggleClosed = shallow(
-					getDropdown()
-						.props()
-						.renderToggle( {
-							onToggle: onToggleStub,
-							isOpen: false,
-						} )
+					getDropdown().props().renderToggle( {
+						onToggle: onToggleStub,
+						isOpen: false,
+					} )
 				);
 				const iconButtonClosed = toggleClosed.find( 'ToolbarButton' );
 
@@ -197,12 +195,10 @@ describe( 'BlockSwitcher', () => {
 
 			test( 'should simulate a click event, which should call onToggle.', () => {
 				const toggleOpen = shallow(
-					getDropdown()
-						.props()
-						.renderToggle( {
-							onToggle: onToggleStub,
-							isOpen: true,
-						} )
+					getDropdown().props().renderToggle( {
+						onToggle: onToggleStub,
+						isOpen: true,
+					} )
 				);
 				const iconButtonOpen = toggleOpen.find( 'ToolbarButton' );
 

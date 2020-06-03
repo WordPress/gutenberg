@@ -47,6 +47,10 @@
 	}
 }
 
+.reusable-block-edit-panel__title[type="text"] {
+	@include input-control;
+}
+
 .is-navigate-mode .is-selected .reusable-block-edit-panel {
 	box-shadow: 0 0 0 $border-width $blue-medium-focus;
 

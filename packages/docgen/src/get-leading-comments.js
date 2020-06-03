@@ -1,5 +1,5 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 const { last } = require( 'lodash' );
 
@@ -11,7 +11,7 @@ const { last } = require( 'lodash' );
  *
  * @return {?string} Leading comment or undefined if there is none.
  */
-module.exports = function( declaration ) {
+module.exports = ( declaration ) => {
 	let comments;
 	if ( declaration.leadingComments ) {
 		comments = last( declaration.leadingComments ).value;

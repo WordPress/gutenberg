@@ -14,7 +14,8 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 *
 	 * @since 7.9.0
 	 *
-	 * @param string $path Path to the folder where the `block.json` file is located.
+	 * @param string $file_or_folder Path to the JSON file with metadata definition for
+	 *     the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
 	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
 	 *     ones described below are supported by default. Default empty array.
@@ -23,8 +24,10 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * }
 	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
 	 */
-	function register_block_type_from_metadata( $path, $args = array() ) {
-		$file = trailingslashit( $path ) . 'block.json';
+	function register_block_type_from_metadata( $file_or_folder, $args = array() ) {
+		$file = ( substr( $file_or_folder, -10 ) !== 'block.json' ) ?
+			trailingslashit( $file_or_folder ) . 'block.json' :
+			$file_or_folder;
 		if ( ! file_exists( $file ) ) {
 			return false;
 		}
@@ -43,20 +46,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		);
 	}
 }
-
-/**
- * Extends block editor settings to determine whether to use drop cap feature.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_drop_cap( $settings ) {
-	$settings['__experimentalDisableDropCap'] = false;
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_drop_cap' );
-
 
 /**
  * Extends block editor settings to include a list of image dimensions per size.
@@ -180,6 +169,67 @@ function gutenberg_get_post_from_context() {
 }
 
 /**
+ * Filters default block categories to substitute legacy category names with new
+ * block categories.
+ *
+ * This can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50278
+ *
+ * @param array[] $default_categories Array of block categories.
+ *
+ * @return array[] Filtered block categories.
+ */
+function gutenberg_replace_default_block_categories( $default_categories ) {
+	$substitution = array(
+		'common'     => array(
+			'slug'  => 'text',
+			'title' => __( 'Text', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'formatting' => array(
+			'slug'  => 'media',
+			'title' => __( 'Media', 'gutenberg' ),
+			'icon'  => null,
+		),
+		'layout'     => array(
+			'slug'  => 'design',
+			'title' => __( 'Design', 'gutenberg' ),
+			'icon'  => null,
+		),
+	);
+
+	// Loop default categories to perform in-place substitution by legacy slug.
+	foreach ( $default_categories as $i => $default_category ) {
+		$slug = $default_category['slug'];
+		if ( isset( $substitution[ $slug ] ) ) {
+			$default_categories[ $i ] = $substitution[ $slug ];
+			unset( $substitution[ $slug ] );
+		}
+	}
+
+	/*
+	 * At this point, `$substitution` should contain only the categories which
+	 * could not be in-place substituted with a default category, likely in the
+	 * case that core has since been updated to use the default categories.
+	 * Check to verify they exist.
+	 */
+	$default_category_slugs = wp_list_pluck( $default_categories, 'slug' );
+	foreach ( $substitution as $i => $substitute_category ) {
+		if ( in_array( $substitute_category['slug'], $default_category_slugs, true ) ) {
+			unset( $substitution[ $i ] );
+		}
+	}
+
+	/*
+	 * Any substitutes remaining should be appended, as they are not yet
+	 * assigned in the default categories array.
+	 */
+	return array_merge( $default_categories, array_values( $substitution ) );
+}
+add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
+
+/**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *
@@ -222,9 +272,9 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		'query'    => array( 'categoryIds' => array() ),
 	);
 
-	if ( isset( $wp_query->tax_query->queried_terms['category']['terms'] ) ) {
-		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_id ) {
-			$context['query']['categoryIds'][] = $category_id;
+	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
+			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
 		}
 	}
 

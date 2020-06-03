@@ -18,8 +18,6 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 import { controlsRepeat } from '@wordpress/icons';
-import { speak } from '@wordpress/a11y';
-import { createBlock } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -33,85 +31,33 @@ import __experimentalInserterMenuExtension from '../inserter-menu-extension';
 import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
-
-// Copied over from the Columns block. It seems like it should become part of public API.
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
+import useBlockTypesState from './hooks/use-block-types-state';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
-const MAX_SUGGESTED_ITEMS = 9;
+const MAX_SUGGESTED_ITEMS = 6;
 
 export function InserterBlockList( {
 	rootClientId,
 	onInsert,
 	onHover,
-	__experimentalSelectBlockOnInsert: selectBlockOnInsert,
 	filterValue,
 	debouncedSpeak,
 } ) {
-	const {
-		categories,
-		collections,
-		items,
-		rootChildBlocks,
-		fetchReusableBlocks,
-	} = useSelect(
+	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onInsert
+	);
+	const rootChildBlocks = useSelect(
 		( select ) => {
-			const { getInserterItems, getBlockName, getSettings } = select(
-				'core/block-editor'
-			);
-			const {
-				getCategories,
-				getCollections,
-				getChildBlockNames,
-			} = select( 'core/blocks' );
+			const { getBlockName } = select( 'core/block-editor' );
+			const { getChildBlockNames } = select( 'core/blocks' );
 			const rootBlockName = getBlockName( rootClientId );
-			const { __experimentalFetchReusableBlocks } = getSettings();
 
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				rootChildBlocks: getChildBlockNames( rootBlockName ),
-				items: getInserterItems( rootClientId ),
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
-			};
+			return getChildBlockNames( rootBlockName );
 		},
 		[ rootClientId ]
 	);
-
-	// Fetch resuable blocks on mount
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
-	}, [] );
-
-	const onSelectItem = ( item ) => {
-		const { name, title, initialAttributes, innerBlocks } = item;
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
-
-		onInsert( insertedBlock );
-
-		if ( ! selectBlockOnInsert ) {
-			// translators: %s: the name of the block that has been added
-			const message = sprintf( __( '%s block added' ), title );
-			speak( message );
-		}
-	};
 
 	const filteredItems = useMemo( () => {
 		return searchBlockItems( items, categories, collections, filterValue );
@@ -124,9 +70,7 @@ export function InserterBlockList( {
 	}, [ filteredItems, rootChildBlocks ] );
 
 	const suggestedItems = useMemo( () => {
-		return items
-			.filter( ( item ) => item.utility > 0 )
-			.slice( 0, MAX_SUGGESTED_ITEMS );
+		return items.slice( 0, MAX_SUGGESTED_ITEMS );
 	}, [ items ] );
 
 	const reusableItems = useMemo( () => {

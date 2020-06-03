@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -70,6 +71,8 @@ const INNER_BLOCKS_TEMPLATE = [
 	],
 ];
 
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
+
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
@@ -115,6 +118,7 @@ function CoverHeightInput( {
 		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
 			<UnitControl
 				id={ inputId }
+				isResetValueOnUnitChange
 				min={ min }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
@@ -243,6 +247,7 @@ function CoverEdit( {
 		hasParallax,
 		minHeight,
 		minHeightUnit,
+		style: styleAttribute,
 		url,
 	} = attributes;
 	const {
@@ -482,6 +487,7 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<Block.div className={ classes } data-url={ url } style={ style }>
+				<BoxControlVisualizer values={ styleAttribute?.padding } />
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {

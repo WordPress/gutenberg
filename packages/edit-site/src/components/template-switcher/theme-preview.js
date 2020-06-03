@@ -20,8 +20,10 @@ function ThemePreview( {
 				{ 'v' + version }
 			</span>
 			<div className="edit-site-template-switcher__theme-preview-byline">
-				{ // translators: %s: theme author name.
-				sprintf( __( 'By %s' ), [ authorName ] ) }
+				{
+					// translators: %s: theme author name.
+					sprintf( __( 'By %s' ), [ authorName ] )
+				}
 			</div>
 			<img
 				className="edit-site-template-switcher__theme-preview-screenshot"

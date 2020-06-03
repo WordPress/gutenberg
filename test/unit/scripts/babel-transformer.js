@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 const fs = require( 'fs' );
 const babelJest = require( 'babel-jest' );
 const babelJestTransformer = babelJest.createTransformer();

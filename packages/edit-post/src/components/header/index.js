@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
@@ -25,47 +22,16 @@ function Header( {
 	isInserterOpen,
 	setEntitiesSavedStatesCallback,
 } ) {
-	const {
-		shortcut,
-		hasActiveMetaboxes,
-		isEditorSidebarOpened,
-		isPublishSidebarOpened,
-		isSaving,
-		getBlockSelectionStart,
-	} = useSelect(
+	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
 		( select ) => ( {
-			shortcut: select(
-				'core/keyboard-shortcuts'
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isEditorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
-			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
-			deviceType: select(
-				'core/edit-post'
-			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
-
-	const toggleGeneralSidebar = isEditorSidebarOpened
-		? closeGeneralSidebar
-		: () =>
-				openGeneralSidebar(
-					getBlockSelectionStart()
-						? 'edit-post/block'
-						: 'edit-post/document'
-				);
 
 	return (
 		<div className="edit-post-header">
@@ -101,14 +67,6 @@ function Header( {
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}
-				/>
-				<Button
-					icon={ cog }
-					label={ __( 'Settings' ) }
-					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcut }
 				/>
 				<PinnedItems.Slot scope="core/edit-post" />
 				<MoreMenu />
