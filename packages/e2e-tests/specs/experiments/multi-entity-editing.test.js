@@ -6,16 +6,18 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { insertBlock, visitAdminPage } from '@wordpress/e2e-test-utils';
+import {
+	insertBlock,
+	visitAdminPage,
+	createNewPost,
+	publishPost,
+} from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 const visitSiteEditor = async () => {
@@ -43,30 +45,6 @@ const getTemplateDropdownElement = async ( itemName ) => {
 		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
 	);
 	return item;
-};
-
-const createTemplate = async ( templateName = 'Test Template' ) => {
-	// Click the "new template" button.
-	const createNewTemplateButton = await getTemplateDropdownElement( 'New' );
-	await createNewTemplateButton.click();
-	await page.waitForSelector( '.components-modal__frame' );
-
-	// Create a new template with the given name.
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( templateName );
-	const [ addTemplateButton ] = await page.$x(
-		'//div[contains(@class, "components-modal__frame")]//button[contains(., "Add")]'
-	);
-	await addTemplateButton.click();
-
-	// Wait for the site editor to load the new template.
-	await page.waitForXPath(
-		`//button[contains(@class, "components-dropdown-menu__toggle")][contains(text(), "${ kebabCase(
-			templateName
-		) }")]`,
-		{ timeout: 3000 }
-	);
 };
 
 const createTemplatePart = async (
@@ -110,28 +88,40 @@ const openEntitySavePanel = async () => {
 	// Open the entity save panel if it is not already open.
 	try {
 		await page.waitForSelector( '.entities-saved-states__panel', {
-			timeout: 100,
+			timeout: 500,
 		} );
 	} catch {
 		try {
 			await page.click(
 				'.edit-site-save-button__button[aria-disabled=false]',
-				{ timeout: 100 }
+				{ timeout: 500 }
 			);
 		} catch {
-			return false; // Not dirty because the button is disabled.
+			try {
+				await page.click(
+					'.editor-post-publish-button__button.has-changes-dot',
+					{ timeout: 500 }
+				);
+			} catch {
+				return false; // Not dirty because the button is disabled.
+			}
 		}
 		await page.waitForSelector( '.entities-saved-states__panel' );
 	}
 	// If we made it this far, the panel is opened.
-	return true;
-};
 
-const clickBreadcrumbItem = async ( item ) => {
-	const [ breadcrumbItem ] = await page.$x(
-		`//button[contains(@class, "block-editor-block-breadcrumb__button")][contains(text(), "${ item }")]`
+	// Expand to view savable entities if necessary.
+	const reviewChangesButton = await page.$(
+		'.entities-saved-states__review-changes-button'
 	);
-	await breadcrumbItem.click();
+	const [ needsToOpen ] = await reviewChangesButton.$x(
+		'//*[contains(text(),"Review changes.")]'
+	);
+	if ( needsToOpen ) {
+		await reviewChangesButton.click();
+	}
+
+	return true;
 };
 
 const isEntityDirty = async ( name ) => {
@@ -142,7 +132,7 @@ const isEntityDirty = async ( name ) => {
 	try {
 		await page.waitForXPath(
 			`//label[@class="components-checkbox-control__label"]//strong[contains(text(),"${ name }")]`,
-			{ timeout: 500 }
+			{ timeout: 1000 }
 		);
 		return true;
 	} catch {}
@@ -161,23 +151,18 @@ const removeErrorMocks = () => {
 
 describe( 'Multi-entity editor states', () => {
 	// Setup & Teardown.
-	const requiredExperiments = [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	];
-
+	const templateName = 'Front Page';
 	const templatePartName = 'Test Template Part Name Edit';
-	const templateName = 'Test Template Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
+	useExperimentalFeatures( [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( requiredExperiments );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-	} );
-
-	afterAll( async () => {
-		await disableExperimentalFeatures( requiredExperiments );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
@@ -212,8 +197,13 @@ describe( 'Multi-entity editor states', () => {
 
 	describe( 'Multi-entity edit', () => {
 		beforeAll( async () => {
-			await visitSiteEditor();
-			await createTemplate( templateName );
+			await trashExistingPosts( 'wp_template' );
+			await trashExistingPosts( 'wp_template_part' );
+			await createNewPost( {
+				postType: 'wp_template',
+				title: kebabCase( templateName ),
+			} );
+			await publishPost();
 			await createTemplatePart( templatePartName );
 			await editTemplatePart( [
 				'Default template part test text.',
@@ -225,6 +215,7 @@ describe( 'Multi-entity editor states', () => {
 				true
 			);
 			await saveAllEntities();
+			await visitSiteEditor();
 			removeErrorMocks();
 		} );
 
@@ -235,12 +226,7 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the block is not added to the template part.
-			await clickBreadcrumbItem( 'Document' );
-
-			// Add paragraph block to the end of the document.
-			await page.click( '.block-editor-button-block-appender' );
-			await page.waitForSelector( '.block-editor-inserter__menu' );
-			await page.click( 'button.editor-block-list-item-paragraph' );
+			await insertBlock( 'Paragraph' );
 
 			// Add changes to the main parent entity.
 			await page.keyboard.type( 'Test.' );
@@ -270,20 +256,6 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
-		} );
-
-		it( 'should not dirty any entities when hovering over template preview', async () => {
-			const mainTemplateButton = await getTemplateDropdownElement(
-				kebabCase( templateName )
-			);
-			// Hover and wait for template/template part to load.
-			await mainTemplateButton.hover();
-			await page.waitForSelector(
-				'.edit-site-template-switcher__template-preview .wp-block[data-type="core/template-part"]'
-			);
-			expect( await isEntityDirty( templateName ) ).toBe( false );
-			expect( await isEntityDirty( templatePartName ) ).toBe( false );
-			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
 		} );
 	} );
 } );

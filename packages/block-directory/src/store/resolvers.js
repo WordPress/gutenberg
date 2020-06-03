@@ -4,9 +4,13 @@
 import { camelCase, mapKeys } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { apiFetch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
-import { apiFetch } from './controls';
 import {
 	fetchDownloadableBlocks,
 	receiveDownloadableBlocks,

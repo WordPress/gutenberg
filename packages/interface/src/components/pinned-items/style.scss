@@ -1,9 +1,5 @@
 .interface-pinned-items {
-	display: none;
-
-	@include break-small() {
-		display: flex;
-	}
+	display: flex;
 
 	.components-button {
 		margin-left: 4px;

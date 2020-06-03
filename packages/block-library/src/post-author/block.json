@@ -1,6 +1,6 @@
 {
 	"name": "core/post-author",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -30,5 +30,11 @@
 			"type": "string"
 		}
 	},
-	"context": [ "postType", "postId" ]
+	"context": [
+		"postType",
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
 }

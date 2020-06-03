@@ -77,9 +77,13 @@ function useMovingAnimation(
 		}
 	}, [ triggeredAnimation ] );
 	useLayoutEffect( () => {
+		if ( ! previous ) {
+			return;
+		}
+
 		scrollContainer.current = getScrollContainer( ref.current );
 		if ( prefersReducedMotion ) {
-			if ( adjustScrolling && scrollContainer.current && previous ) {
+			if ( adjustScrolling && scrollContainer.current ) {
 				// if the animation is disabled and the scroll needs to be adjusted,
 				// just move directly to the final scroll position
 				ref.current.style.transform = 'none';
@@ -95,14 +99,13 @@ function useMovingAnimation(
 		ref.current.style.transform = 'none';
 		const destination = getAbsolutePosition( ref.current );
 		const newTransform = {
-			x: previous ? previous.left - destination.left : 0,
-			y: previous ? previous.top - destination.top : 0,
-			scrollTop:
-				previous && scrollContainer.current
-					? scrollContainer.current.scrollTop -
-					  previous.top +
-					  destination.top
-					: 0,
+			x: previous.left - destination.left,
+			y: previous.top - destination.top,
+			scrollTop: scrollContainer.current
+				? scrollContainer.current.scrollTop -
+				  previous.top +
+				  destination.top
+				: 0,
 		};
 		ref.current.style.transform =
 			newTransform.x === 0 && newTransform.y === 0

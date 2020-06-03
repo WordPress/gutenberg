@@ -121,7 +121,7 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-const persistencePlugin = function( registry, pluginOptions ) {
+function persistencePlugin( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
@@ -220,7 +220,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			return store;
 		},
 	};
-};
+}
 
 /**
  * Deprecated: Remove this function and the code in WordPress Core that calls

@@ -43,9 +43,6 @@ export const settings = {
 		},
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
 	],
-	supports: {
-		align: [ 'left', 'right', 'wide', 'full' ],
-	},
 	edit,
 	save,
 	deprecated,

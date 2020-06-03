@@ -14,15 +14,9 @@
 		right: 0;
 	}
 
-	// Only applied when background is added to cancel out padding
-	> div > .wp-block-group.has-background > .wp-block-group__inner-container > .block-editor-inner-blocks {
-		margin-top: -#{$block-padding*2 + $block-spacing};
-		margin-bottom: -#{$block-padding*2 + $block-spacing};
-	}
-
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of a Group
-	> div > .wp-block-group > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	> .wp-block-group__inner-container > [data-align="full"] {
 		margin-left: auto;
 		margin-right: auto;
 		padding-left: $block-padding*2;
@@ -35,7 +29,7 @@
 	}
 
 	// Full Width Blocks with a background (ie: has padding)
-	> div > .wp-block-group.has-background > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
 		// note: using position `left` causes hoz scrollbars so
 		// we opt to use margin instead
 		// the 30px matches the hoz padding applied in `theme.scss`
@@ -52,24 +46,11 @@
 /**
  * Group: Full Width Alignment
  */
-.wp-block[data-align="full"] .wp-block-group {
-
-	// First tier of InnerBlocks must act like the container of the standard canvas
-	> div > .wp-block-group > .wp-block-group__inner-container > .block-editor-inner-blocks {
-		margin-left: auto;
-		margin-right: auto;
-		padding-left: 0;
-		padding-right: 0;
-
-		> .block-editor-block-list__layout {
-			margin-left: 0;
-			margin-right: 0;
-		}
-	}
+[data-align="full"] .wp-block[data-type="core/group"] {
 
 	// Full Width Blocks
 	// specificity required to only target immediate child Blocks of Group
-	> div > .wp-block-group > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	> .wp-block-group__inner-container > [data-align="full"] {
 		padding-right: 0;
 		padding-left: 0;
 		left: 0;
@@ -79,7 +60,7 @@
 
 	// Full Width Blocks with a background (ie: has padding)
 	// note: also duplicated above for all Group widths
-	> div > .wp-block-group.has-background > .wp-block-group__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block[data-align="full"] {
+	&.has-background > .wp-block-group__inner-container > [data-align="full"] {
 		width: calc(100% + 60px);
 	}
 }

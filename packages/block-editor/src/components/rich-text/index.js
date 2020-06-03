@@ -303,11 +303,15 @@ function RichTextWrapper(
 				blocks.push( onSplitMiddle() );
 			}
 
-			// If there's pasted blocks, append a block with the content after the
-			// caret. Otherwise, do append and empty block if there is no
-			// `onSplitMiddle` prop, but if there is and the content is empty, the
-			// middle block is enough to set focus in.
-			if ( hasPastedBlocks || ! onSplitMiddle || ! isEmpty( after ) ) {
+			// If there's pasted blocks, append a block with non empty content
+			/// after the caret. Otherwise, do append an empty block if there
+			// is no `onSplitMiddle` prop, but if there is and the content is
+			// empty, the middle block is enough to set focus in.
+			if (
+				hasPastedBlocks
+					? ! isEmpty( after )
+					: ! onSplitMiddle || ! isEmpty( after )
+			) {
 				blocks.push(
 					onSplit(
 						toHTMLString( {

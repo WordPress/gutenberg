@@ -37,7 +37,8 @@ function ColorSettings( {
 	const [ isCustomScreen, setIsCustomScreen ] = useState( false );
 
 	const { segments, subsheets, isGradient } = colorsUtils;
-	const selectedSegmentIndex = isGradient( currentValue ) ? 1 : 0;
+	const isGradientColor = isGradient( currentValue );
+	const selectedSegmentIndex = isGradientColor ? 1 : 0;
 
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
@@ -150,7 +151,7 @@ function ColorSettings( {
 						}
 						setColor={ setColor }
 						activeColor={ currentValue }
-						isGradientColor={ isGradient( currentValue ) }
+						isGradientColor={ isGradientColor }
 						onNavigationBack={ () => {
 							onCustomScreenToggle( false );
 						} }
@@ -172,7 +173,7 @@ function ColorSettings( {
 					<ColorPalette
 						setColor={ setColor }
 						activeColor={ currentValue }
-						isGradientColor={ isGradient( currentValue ) }
+						isGradientColor={ isGradientColor }
 						currentSegment={ currentSegment }
 						isCustomScreen={ isCustomScreen }
 						onCustomPress={ () => {

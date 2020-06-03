@@ -22,12 +22,6 @@ export const settings = {
 		'Content before this block will be shown in the excerpt on your archives page.'
 	),
 	icon,
-	supports: {
-		customClassName: false,
-		className: false,
-		html: false,
-		multiple: false,
-	},
 	example: {},
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {

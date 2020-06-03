@@ -5,7 +5,8 @@
 	}
 }
 
-.components-angle-picker-control__input-field {
+.components-angle-picker-control__input-field[type="number"] {
+	@include input-control;
 	width: calc(100% - #{$button-size});
 	max-width: 100px;
 }
