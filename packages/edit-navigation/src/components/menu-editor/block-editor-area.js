@@ -19,6 +19,7 @@ import {
 	Card,
 	CardHeader,
 	CardBody,
+	CardFooter,
 	Popover,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -66,16 +67,11 @@ export default function BlockEditorArea( {
 
 	return (
 		<Card className="edit-navigation-menu-editor__block-editor-panel">
-			<CardHeader className="edit-navigation-menu-editor__block-editor-panel-header">
+			<CardHeader>
 				<div className="edit-navigation-menu-editor__block-editor-panel-header-text">
 					{ __( 'Navigation menu' ) }
 				</div>
 
-				<DeleteMenuButton
-					className="edit-navigation-menu-editor__block-editor-panel-action"
-					menuId={ menuId }
-					onDelete={ onDeleteMenu }
-				/>
 				<Button
 					className="edit-navigation-menu-editor__block-editor-panel-action"
 					isPrimary
@@ -103,6 +99,16 @@ export default function BlockEditorArea( {
 					</ObserveTyping>
 				</WritingFlow>
 			</CardBody>
+			<CardFooter>
+				<DeleteMenuButton menuId={ menuId } onDelete={ onDeleteMenu } />
+				<Button
+					className="edit-navigation-menu-editor__block-editor-panel-action"
+					isPrimary
+					onClick={ saveBlocks }
+				>
+					{ __( 'Save navigation' ) }
+				</Button>
+			</CardFooter>
 		</Card>
 	);
 }

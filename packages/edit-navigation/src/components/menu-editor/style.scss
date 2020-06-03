@@ -72,21 +72,18 @@
 	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
 	-ms-grid-row-align: start;
 
-	.edit-navigation-menu-editor__block-editor-panel-header {
+	.components-card__footer,
+	.components-card__header {
 		display: flex;
 		align-items: center;
-		flex-wrap: wrap;
+		justify-content: space-between;
 	}
 
 	.edit-navigation-menu-editor__block-editor-panel-header-text {
 		flex-grow: 1;
 		font-weight: bold;
-		flex-basis: 100%;
-		@include break-medium {
-			flex-basis: auto;
-		}
 	}
-	.edit-navigation-menu-editor__block-editor-panel-action {
+	.edit-navigation-menu-editor__action {
 		margin-left: $grid-unit-20;
 	}
 }
