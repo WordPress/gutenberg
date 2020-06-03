@@ -130,7 +130,7 @@ jobs:
 
     - name: PHP unit tests
       script:
-        - npm run test-php && npm run test-unit-php-multisite
+        - npm run test-unit-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
       env: LOCAL_PHP=5.6-fpm
