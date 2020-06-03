@@ -68,6 +68,11 @@ function fail_if_died() {
 		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->blogs}" ) );
 	}
 
+	if ( $wpdb->site ) {
+		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->site}" ) );
+		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->sitemeta}" ) );
+	}
+
 	throw new Exception( 'WordPress died.' );
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
