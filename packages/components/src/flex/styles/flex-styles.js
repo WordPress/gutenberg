@@ -40,10 +40,10 @@ const gapStyle = ( { gap, isReversed } ) => {
 
 	return css`
 		> * {
-			${padding}: ${value}px;
+			${ padding }: ${ value }px;
 
 			&:last-child {
-				${padding}: 0;
+				${ padding }: 0;
 			}
 		}
 	`;
@@ -61,10 +61,10 @@ export const Flex = styled.div`
 	box-sizing: border-box;
 	display: flex;
 
-	${alignStyle};
-	${justifyStyle};
-	${gapStyle};
-	${reversedStyles};
+	${ alignStyle };
+	${ justifyStyle };
+	${ gapStyle };
+	${ reversedStyles };
 `;
 
 export const Item = styled.div`
