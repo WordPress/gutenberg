@@ -32,11 +32,20 @@
 		"fontSize": {
 			"type": "string"
 		},
+		"customFontSize": {
+			"type": "number"
+		},
 		"bioFontSize": {
 			"type": "string"
 		},
+		"customBioFontSize": {
+			"type": "number"
+		},
 		"bylineFontSize": {
 			"type": "string"
+		},
+		"customBylineFontSize": {
+			"type": "number"
 		}
 	},
 	"context": [
