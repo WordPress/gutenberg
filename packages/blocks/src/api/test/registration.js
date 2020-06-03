@@ -125,6 +125,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 				save: noop,
 				category: 'text',
 				title: 'block title',
@@ -268,6 +270,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 				save: expect.any( Function ),
 			} );
 		} );
@@ -301,8 +305,41 @@ describe( 'blocks', () => {
 						},
 					},
 					keywords: [],
+					supports: {},
+					styles: [],
 				}
 			);
+		} );
+
+		it( 'should skip null values returned from the server', () => {
+			const blockName = 'core/test-block-with-null-server-values';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					description: null,
+					icon: null,
+					category: null,
+					parent: null,
+					attributes: null,
+					example: null,
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
 		} );
 
 		it( 'should validate the icon', () => {
@@ -365,6 +402,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -391,6 +430,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -431,6 +472,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -485,6 +528,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -508,6 +553,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -588,6 +635,8 @@ describe( 'blocks', () => {
 										icon: blockIcon,
 										attributes: {},
 										keywords: [],
+										supports: {},
+										styles: [],
 										save: () => null,
 										...get(
 											serverSideBlockDefinitions,
@@ -704,6 +753,8 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					supports: {},
+					styles: [],
 					variations: [],
 				},
 			] );
@@ -719,6 +770,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -795,6 +848,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -817,6 +872,8 @@ describe( 'blocks', () => {
 				},
 				attributes: {},
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 	} );
@@ -846,6 +903,8 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					supports: {},
+					styles: [],
 					variations: [],
 				},
 				{
@@ -859,6 +918,8 @@ describe( 'blocks', () => {
 					},
 					attributes: {},
 					keywords: [],
+					supports: {},
+					styles: [],
 					variations: [],
 				},
 			] );

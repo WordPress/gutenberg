@@ -3,7 +3,16 @@
 /**
  * External dependencies
  */
-import { get, omit, pick, isFunction, isPlainObject, some } from 'lodash';
+import {
+	get,
+	isFunction,
+	isNil,
+	isPlainObject,
+	omit,
+	pick,
+	pickBy,
+	some,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -91,26 +100,26 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  *
  * @typedef {Object} WPBlock
  *
- * @property {string}             name         Block type's namespaced name.
- * @property {string}             title        Human-readable block type label.
- * @property {string}             description  A detailed block type description.
- * @property {string}             category     Block type category classification,
- *                                             used in search interfaces to arrange
- *                                             block types by category.
- * @property {WPBlockTypeIcon}    [icon]       Block type icon.
- * @property {string[]}           [keywords]   Additional keywords to produce block
- *                                             type as result in search interfaces.
- * @property {Object}             [attributes] Block type attributes.
- * @property {WPComponent}        [save]       Optional component describing
- *                                             serialized markup structure of a
- *                                             block type.
- * @property {WPComponent}        edit         Component rendering an element to
- *                                             manipulate the attributes of a block
- *                                             in the context of an editor.
- * @property {WPBlockVariation[]} [variations] The list of block variations.
- * @property {Object}             [example]    Example provides structured data for
- *                                             the block preview. When not defined
- *                                             then no preview is shown.
+ * @property {string}             name          Block type's namespaced name.
+ * @property {string}             title         Human-readable block type label.
+ * @property {string}             [description] A detailed block type description.
+ * @property {string}             [category]    Block type category classification,
+ *                                              used in search interfaces to arrange
+ *                                              block types by category.
+ * @property {WPBlockTypeIcon}    [icon]        Block type icon.
+ * @property {string[]}           [keywords]    Additional keywords to produce block
+ *                                              type as result in search interfaces.
+ * @property {Object}             [attributes]  Block type attributes.
+ * @property {WPComponent}        [save]        Optional component describing
+ *                                              serialized markup structure of a
+ *                                              block type.
+ * @property {WPComponent}        edit          Component rendering an element to
+ *                                              manipulate the attributes of a block
+ *                                              in the context of an editor.
+ * @property {WPBlockVariation[]} [variations]  The list of block variations.
+ * @property {Object}             [example]     Example provides structured data for
+ *                                              the block preview. When not defined
+ *                                              then no preview is shown.
  */
 
 /**
@@ -155,10 +164,15 @@ export function registerBlockType( name, settings ) {
 	settings = {
 		name,
 		icon: blockDefault,
-		attributes: {},
 		keywords: [],
+		attributes: {},
+		supports: {},
+		styles: [],
 		save: () => null,
-		...get( serverSideBlockDefinitions, name ),
+		...pickBy(
+			get( serverSideBlockDefinitions, name, {} ),
+			( value ) => ! isNil( value )
+		),
 		...settings,
 	};
 
