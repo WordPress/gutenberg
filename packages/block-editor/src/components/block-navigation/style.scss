@@ -209,11 +209,7 @@ $tree-item-height: 36px;
 
 		// Make the last vertical line half-height.
 		&.has-item.is-last-row {
-			height: $grid-unit-20;
-		}
-
-		&.has-item.is-last-row::after {
-			top: 100%;
+			height: 22px;
 		}
 
 		// Draw a horizontal line using border-bottom.
@@ -221,10 +217,20 @@ $tree-item-height: 36px;
 			content: "";
 			display: block;
 			position: absolute;
-			top: calc(50% - 1px);
+			top: 22px;
 			left: 100%;
 			width: 5px;
 			border-bottom: 2px solid $light-gray-900;
+		}
+	}
+}
+
+// Position the horizontal line in the middle of appender's height
+.block-editor-block-navigation-appender__cell .block-editor-block-navigator-descender-line {
+	&.has-item.is-last-row {
+		height: $grid-unit-20;
+		&::after {
+			top: 100%;
 		}
 	}
 }
