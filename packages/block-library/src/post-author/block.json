@@ -28,6 +28,15 @@
 		},
 		"customTextColor": {
 			"type": "string"
+		},
+		"fontSize": {
+			"type": "string"
+		},
+		"bioFontSize": {
+			"type": "string"
+		},
+		"bylineFontSize": {
+			"type": "string"
 		}
 	},
 	"context": [
