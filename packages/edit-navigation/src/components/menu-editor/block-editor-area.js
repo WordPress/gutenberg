@@ -66,17 +66,13 @@ export default function BlockEditorArea( {
 	}, [ rootBlockId ] );
 
 	return (
-		<Card className="edit-navigation-menu-editor__block-editor-panel">
+		<Card className="edit-navigation-menu-editor__block-editor-area">
 			<CardHeader>
-				<div className="edit-navigation-menu-editor__block-editor-panel-header-text">
+				<div className="edit-navigation-menu-editor__block-editor-area-header-text">
 					{ __( 'Navigation menu' ) }
 				</div>
 
-				<Button
-					className="edit-navigation-menu-editor__block-editor-panel-action"
-					isPrimary
-					onClick={ saveBlocks }
-				>
+				<Button isPrimary onClick={ saveBlocks }>
 					{ __( 'Save navigation' ) }
 				</Button>
 			</CardHeader>
@@ -101,11 +97,7 @@ export default function BlockEditorArea( {
 			</CardBody>
 			<CardFooter>
 				<DeleteMenuButton menuId={ menuId } onDelete={ onDeleteMenu } />
-				<Button
-					className="edit-navigation-menu-editor__block-editor-panel-action"
-					isPrimary
-					onClick={ saveBlocks }
-				>
+				<Button isPrimary onClick={ saveBlocks }>
 					{ __( 'Save navigation' ) }
 				</Button>
 			</CardFooter>

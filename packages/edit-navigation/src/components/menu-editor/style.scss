@@ -62,15 +62,12 @@
 	font-weight: bold;
 }
 
-.edit-navigation-menu-editor__block-editor-panel {
+.edit-navigation-menu-editor__block-editor-area {
 	@include break-medium {
 		// IE11 requires the column to be explicitly declared.
 		// Only shift this into the second column on desktop.
 		grid-column: 2;
 	}
-
-	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
-	-ms-grid-row-align: start;
 
 	.components-card__footer,
 	.components-card__header {
@@ -79,12 +76,9 @@
 		justify-content: space-between;
 	}
 
-	.edit-navigation-menu-editor__block-editor-panel-header-text {
+	.edit-navigation-menu-editor__block-editor-area-header-text {
 		flex-grow: 1;
 		font-weight: bold;
-	}
-	.edit-navigation-menu-editor__action {
-		margin-left: $grid-unit-20;
 	}
 }
 
