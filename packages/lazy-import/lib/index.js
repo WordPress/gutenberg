@@ -120,8 +120,18 @@ async function lazyImport( arg, options = {} ) {
 		throw error;
 	}
 
-	// Delete cache from prior `require` attempt.
-	delete require.cache[ require.resolve( localModule ) ];
+	// Note: For those familiar with the internals of module importing, the
+	// second attempt here at requiring the same package as earlier may stand
+	// out as being susceptible to conflicting with module caching.
+	//
+	// https://nodejs.org/api/modules.html#modules_require_cache
+	//
+	// Testing appears to indicate that module results are not cached if it
+	// fails to resolve, which is what we can assume would have happened in the
+	// first attempt to require the module. Thus, it's not required to reset any
+	// values from `require.cache`.
+	//
+	// See: https://github.com/WordPress/gutenberg/pull/22684#discussion_r434583858
 
 	return require( localModule );
 }
