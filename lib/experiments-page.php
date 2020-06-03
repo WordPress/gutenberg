@@ -102,7 +102,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Inline Rich Image Editing', 'gutenberg' ),
+			'label' => __( 'Enable inline rich image editing', 'gutenberg' ),
 			'id'    => 'gutenberg-rich-image-editing',
 		)
 	);
