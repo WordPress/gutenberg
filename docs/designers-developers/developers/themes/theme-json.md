@@ -6,9 +6,9 @@
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
-* Rationale
-* Specification
-* Current Status
+- Rationale
+- Specification
+- Current Status
 
 ## Rationale
 
@@ -153,8 +153,16 @@ Each block will declare which style properties it exposes. This has been coined 
 
 The list of properties that are currently exposed via this method are:
 
-- Paragraph and Heading: line-height, font-size, color.
-- Group, Columns, and MediaText: color.
+| Context | Text's Color | Background's Color | Background's Gradient | Font Size | Line Height |
+| --- | --- | --- | --- | --- | --- |
+| Global | - | Yes | - | - | - |
+| Paragraph | Yes | Yes | - | Yes | Yes |
+| Heading [1] | Yes | Yes | - | Yes | Yes |
+| Group | Yes | Yes | Yes | - | - |
+| Columns | Yes | Yes | Yes | - | - |
+| Media & text | Yes | Yes | Yes | - | - |
+
+[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
 
 ### Features
 
@@ -164,74 +172,146 @@ This is being implemented, so it's not currently available.
 
 ```
 {
-  global: {
-    presets: {
-      color: [
+  "global": {
+    "presets": {
+      "color": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more colors> }
       ],
-      font-size: [
+      "font-size": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more font sizes> }
     ],
-      gradient: [
+      "gradient": [
         {
-          slug: <preset slug>,
-          value: <preset value>,
+          "slug": <preset slug>,
+          "value": <preset value>
         },
-        { ... },
+        { <more gradients> }
       ]
+    },
+    "styles: {
+      "color: {
+        "background": <value>
+			}
     }
   },
-  core/paragraph: {
-    styles: {
-      typography: { 
-        lineHeight: <value>,
-        fontSize: <value>
+  "core/paragraph": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       },
-      color: {
-        text: <value>
+      "color": {
+        "background": <value>,
+        "text": <value>
       }
     }
   },
-  /* core/heading/h1, core/heading/h2, etc */
-  core/heading/h*: {
-    styles: {
-      typography: { 
-        lineHeight: <value>,
-        fontSize: <value>
+  "core/heading/h1": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
       },
-      color: {
-        text: <value>
+      "color": {
+        "background": <value>,
+        "text": <value>
       }
     }
   },
-  core/columns: {
-    styles: {
-      color: {
-        text: <value>
+  "core/heading/h2": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color": {
+        "background": <value>,
+        "text": <value>
       }
     }
   },
-  core/group: {
-    styles: {
-      color: {
-        text: <value>
+  "core/heading/h3": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color": {
+        "background": <value>,
+        "text": <value>
       }
     }
   },
-  core/media-text: {
-    styles: {
-      color: {
-        text: <value>
+  "core/heading/h4": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color": {
+        "background": <value>,
+        "text": <value>
       }
     }
   },
+  "core/heading/h5": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color": {
+        "background": <value>,
+        "text": <value>
+      }
+    }
+  },
+  "core/heading/h6": {
+    "styles": {
+      "typography": {
+        "fontSize": <value>,
+        "lineHeight": <value>
+      },
+      "color": {
+        "background": <value>,
+        "text": <value>
+      }
+    }
+  },
+  "core/columns": {
+    "styles": {
+      "color": {
+        "background": <value>,
+        "gradient": <value>,
+        "text": <value>
+      }
+    }
+  },
+  "core/group": {
+    "styles": {
+        "color": {
+          "background": <value>,
+          "gradient": <value>,
+          "text": <value>
+        }
+      }
+  },
+  "core/media-text": {
+    "styles": {
+        "color": {
+          "background": <value>,
+          "gradient": <value>,
+          "text": <value>
+        }
+      }
+  }
 }
 ```
