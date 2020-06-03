@@ -50,9 +50,6 @@
 }
 
 .block-editor-block-navigation-leaf {
-	transition: background 0.1s ease-out;
-	@include reduce-motion("transition");
-
 	> :first-child {
 		padding-left: $grid-unit-20;
 	}
@@ -60,14 +57,6 @@
 		padding-right: $grid-unit-20;
 	}
 
-	&:hover {
-		background: $light-gray-300;
-	}
-
-	.block-editor-block-navigation-block-contents {
-		padding-top: $grid-unit-15;
-		padding-bottom: $grid-unit-15;
-	}
 }
 
 .edit-navigation-menu-editor__navigation-structure-panel {
