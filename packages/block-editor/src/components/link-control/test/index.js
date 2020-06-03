@@ -276,6 +276,8 @@ describe( 'Searching for a link', () => {
 			fauxEntitySuggestions.length
 		);
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		// Sanity check that a search suggestion shows up corresponding to the data
 		expect( firstSearchResultItemHTML ).toEqual(
 			expect.stringContaining( firstFauxSuggestion.title )
@@ -565,6 +567,8 @@ describe( 'Default search suggestions', () => {
 
 		// it should match any url that's like ?p= and also include a URL option
 		expect( searchResultElements ).toHaveLength( 5 );
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
 
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
