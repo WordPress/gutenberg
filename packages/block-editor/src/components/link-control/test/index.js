@@ -616,6 +616,30 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
+
+	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
+		const noResults = [];
+		// Force API returning empty results for recently updated Pages.
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( noResults )
+		);
+
+		act( () => {
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		await eventLoopTick();
+
+		const searchResultElements = getSearchResults();
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel ).toBeFalsy();
+
+		expect( searchResultElements ).toHaveLength( 0 );
+	} );
 } );
 
 describe( 'Creating Entities (eg: Posts, Pages)', () => {
