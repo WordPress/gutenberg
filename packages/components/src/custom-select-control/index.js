@@ -22,6 +22,12 @@ const stateReducer = (
 	{ selectedItem },
 	{ type, changes, props: { items } }
 ) => {
+	const selectedItemIndex = items.findIndex(
+		( item ) => item.key === selectedItem.key
+	);
+	if ( changes.highlightedIndex < 0 ) {
+		changes.highlightedIndex = selectedItemIndex;
+	}
 	switch ( type ) {
 		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
 			// If we already have a selected item, try to select the next one,
@@ -31,7 +37,7 @@ const stateReducer = (
 					items[
 						selectedItem
 							? Math.min(
-									items.indexOf( selectedItem ) + 1,
+									selectedItemIndex + 1,
 									items.length - 1
 							  )
 							: 0
@@ -44,7 +50,7 @@ const stateReducer = (
 				selectedItem:
 					items[
 						selectedItem
-							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+							? Math.max( selectedItemIndex - 1, 0 )
 							: items.length - 1
 					],
 			};
@@ -60,6 +66,7 @@ export default function CustomSelectControl( {
 	onChange: onSelectedItemChange,
 	value,
 } ) {
+	const valueIndex = items.findIndex( ( item ) => item === value );
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -68,13 +75,12 @@ export default function CustomSelectControl( {
 		isOpen,
 		highlightedIndex,
 	} = useSelect( {
-		initialSelectedItem: items[ 0 ],
+		initialSelectedItem: items[ valueIndex ],
 		items,
 		itemToString,
 		onSelectedItemChange,
 		stateReducer,
 	} );
-
 	const menuProps = getMenuProps( {
 		className: 'components-custom-select-control__menu',
 		'aria-hidden': ! isOpen,
@@ -83,13 +89,11 @@ export default function CustomSelectControl( {
 	// fully ARIA compliant.
 	if (
 		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice(
-			0,
-			'downshift-null'.length
-		) === 'downshift-null'
+		menuProps[ 'aria-hidden' ] === true
 	) {
 		delete menuProps[ 'aria-activedescendant' ];
 	}
+
 	return (
 		<div
 			className={ classnames(
@@ -129,7 +133,7 @@ export default function CustomSelectControl( {
 			<ul { ...menuProps }>
 				{ isOpen &&
 					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
+						// eslint-disable-next-line react/jsx-key, jsx-a11y/role-supports-aria-props
 						<li
 							{ ...getItemProps( {
 								item,
@@ -145,6 +149,7 @@ export default function CustomSelectControl( {
 								),
 								style: item.style,
 							} ) }
+							aria-selected={ index === valueIndex }
 						>
 							{ item === value && (
 								<Icon
