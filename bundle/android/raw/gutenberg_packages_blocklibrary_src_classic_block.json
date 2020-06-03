@@ -1,8 +1,8 @@
 {
-	"name": "core/shortcode",
-	"category": "widgets",
+	"name": "core/freeform",
+	"category": "formatting",
 	"attributes": {
-		"text": {
+		"content": {
 			"type": "string",
 			"source": "html"
 		}
@@ -10,6 +10,6 @@
 	"supports": {
 		"className": false,
 		"customClassName": false,
-		"html": false
+		"reusable": false
 	}
 }
