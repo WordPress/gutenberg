@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
 import tinycolor from 'tinycolor2';
@@ -307,16 +308,11 @@ function CoverEdit( {
 	 * If a background image is set, this hook extracts the primary color from
 	 * that image and sets it as a background color.
 	 */
-	const { extractColor } = useColorExtract( {
+	const { customColors } = useCoverColorExtract( {
 		color: backgroundColorValue,
-		onChange: ( nextColor ) => setOverlayColor( nextColor ),
+		onChange: setOverlayColor,
 		src: url,
 	} );
-
-	const handleOnExtractColor = async () => {
-		const [ value ] = await extractColor();
-		setOverlayColor( value );
-	};
 
 	const controls = (
 		<>
@@ -404,6 +400,7 @@ function CoverEdit( {
 						<PanelColorGradientSettings
 							title={ __( 'Overlay' ) }
 							initialOpen={ true }
+							customColors={ customColors }
 							settings={ [
 								{
 									colorValue: overlayColor.color,
@@ -414,15 +411,6 @@ function CoverEdit( {
 								},
 							] }
 						>
-							<div className="block-library-cover__dominant-color-button-wrapper">
-								<Button
-									isSecondary
-									isSmall
-									onClick={ handleOnExtractColor }
-								>
-									{ __( 'Pick dominant' ) }
-								</Button>
-							</div>
 							{ !! url && (
 								<RangeControl
 									label={ __( 'Background opacity' ) }
@@ -560,6 +548,42 @@ function CoverEdit( {
 			</Block.div>
 		</>
 	);
+}
+
+function useCoverColorExtract( { backgroundColor, onChange = noop, src } ) {
+	const [ customExtractedColor, setCustomExtractedColor ] = useState( null );
+
+	const updateCustomOverlayColor = ( value ) => {
+		onChange( value );
+		setCustomExtractedColor( value );
+	};
+
+	const { extractColor } = useColorExtract( {
+		color: backgroundColor,
+		onChange: updateCustomOverlayColor,
+		src,
+	} );
+
+	useEffect( () => {
+		extractColor().then( ( [ value ] ) => {
+			setCustomExtractedColor( value );
+		} );
+	}, [] );
+
+	let customColors = [];
+	if ( customExtractedColor ) {
+		customColors = [
+			{
+				name: __( 'Dominant color' ),
+				slug: __( 'dominant-color' ),
+				color: customExtractedColor,
+			},
+		];
+	}
+
+	return {
+		customColors,
+	};
 }
 
 export default compose( [
