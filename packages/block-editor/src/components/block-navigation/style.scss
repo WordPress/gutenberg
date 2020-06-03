@@ -54,6 +54,13 @@ $tree-item-height: 36px;
 		border-radius: $border-width;
 	}
 
+	.block-editor-block-navigation-block__mover-cell-alignment-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+	}
+
 	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell {
 		width: $button-size;
@@ -76,7 +83,7 @@ $tree-item-height: 36px;
 
 	.block-editor-block-mover-button {
 		width: $button-size;
-		height: $button-size;
+		height: 16px;
 	}
 
 	.block-editor-button-block-appender {
