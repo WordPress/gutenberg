@@ -94,6 +94,11 @@ jasmine.getEnv().addReporter( {
 				`/sdcard/${ fileName }`,
 			] );
 
+			androidScreenRecordingProcess.stderr.on( 'data', ( data ) => {
+				// eslint-disable-next-line no-console
+				console.log( `Android screen recording error => ${ data }` );
+			} );
+
 			return;
 		}
 
@@ -129,9 +134,21 @@ jasmine.getEnv().addReporter( {
 			// wait for kill
 			childProcess.execSync( 'sleep 1' );
 
-			childProcess.execSync(
-				`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
-			);
+			try {
+				childProcess.execSync(
+					`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
+				);
+			} catch ( error ) {
+				// Some (old) Android devices don't support screen recording or
+				// sometimes the initial `should be able to see visual editor`
+				// tests are too fast and a recording is not generated. This is
+				// when `adb pull` can't find the recording file. In these cases
+				// we ignore the errors and keep running the tests.
+				// eslint-disable-next-line no-console
+				console.log(
+					`Android screen recording error => ${ error.stdout }`
+				);
+			}
 
 			const oldPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
 			const newPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;
