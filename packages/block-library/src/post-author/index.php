@@ -40,12 +40,6 @@ function post_author_build_css_colors( $attributes ) {
 	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
 	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
 
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background-color class.
-		$colors['css_classes'][] = 'has-background-color';
-	}
-
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
