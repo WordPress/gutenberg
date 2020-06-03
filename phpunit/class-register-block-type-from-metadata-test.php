@@ -6,6 +6,40 @@
  */
 
 class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
+
+	function test_does_not_remove_block_asset_path_prefix() {
+		$result = gutenberg_remove_block_asset_path_prefix( 'script-handle' );
+
+		$this->assertSame( 'script-handle', $result );
+	}
+
+	function test_removes_block_asset_path_prefix() {
+		$result = gutenberg_remove_block_asset_path_prefix( 'file://./block.js' );
+
+		$this->assertSame( './block.js', $result );
+	}
+
+	function test_generate_block_asset_handle() {
+		$block_name = 'my-namespace/my-block';
+
+		$this->assertSame(
+			'my-namespace-my-block-editor-script',
+			gutenberg_generate_block_asset_handle( $block_name, 'editorScript' )
+		);
+		$this->assertSame(
+			'my-namespace-my-block-script',
+			gutenberg_generate_block_asset_handle( $block_name, 'script' )
+		);
+		$this->assertSame(
+			'my-namespace-my-block-editor-style',
+			gutenberg_generate_block_asset_handle( $block_name, 'editorStyle' )
+		);
+		$this->assertSame(
+			'my-namespace-my-block-style',
+			gutenberg_generate_block_asset_handle( $block_name, 'style' )
+		);
+	}
+
 	/**
 	 * Tests that the function returns false when the `block.json` is not found
 	 * in the WordPress core.
@@ -36,12 +70,12 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertInstanceOf( 'WP_Block_Type', $result );
-		$this->assertEquals( 'my-plugin/notice', $result->name );
-		$this->assertEquals( 'Notice', $result->title );
-		$this->assertEquals( 'common', $result->category );
+		$this->assertSame( 'my-plugin/notice', $result->name );
+		$this->assertSame( 'Notice', $result->title );
+		$this->assertSame( 'common', $result->category );
 		$this->assertEquals( array( 'core/group' ), $result->parent );
-		$this->assertEquals( 'star', $result->icon );
-		$this->assertEquals( 'Shows warning, error or success notices…', $result->description );
+		$this->assertSame( 'star', $result->icon );
+		$this->assertSame( 'Shows warning, error or success notices…', $result->description );
 		$this->assertEquals( array( 'alert', 'message' ), $result->keywords );
 		$this->assertEquals(
 			array(
@@ -74,9 +108,9 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 			),
 			$result->styles
 		);
-		$this->assertEquals( 'my-plugin-notice-editor-script', $result->editor_script );
-		$this->assertEquals( 'my-plugin-notice-script', $result->script );
-		$this->assertEquals( 'my-plugin-notice-editor-style', $result->editor_style );
-		$this->assertEquals( 'my-plugin-notice-style', $result->style );
+		$this->assertSame( 'my-plugin-notice-editor-script', $result->editor_script );
+		$this->assertSame( 'my-plugin-notice-script', $result->script );
+		$this->assertSame( 'my-plugin-notice-editor-style', $result->editor_style );
+		$this->assertSame( 'my-plugin-notice-style', $result->style );
 	}
 }

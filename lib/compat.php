@@ -10,6 +10,124 @@
 
 if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	/**
+	 * Removes the block asset's path prefix if provided.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $asset_handle_or_path Asset handle or prefixed path.
+	 *
+	 * @return string Path without the prefix or the original value.
+	 */
+	function gutenberg_remove_block_asset_path_prefix( $asset_handle_or_path ) {
+		$path_prefix = 'file://';
+		if ( strpos( $asset_handle_or_path, $path_prefix ) !== 0 ) {
+			return $asset_handle_or_path;
+		}
+		return substr(
+			$asset_handle_or_path,
+			strlen( $path_prefix )
+		);
+	}
+
+	/**
+	 * Generates the name for an asset based on the name of the block
+	 * and the field name provided.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $block_name Name of the block.
+	 * @param string $field_name Name of the metadata field.
+	 *
+	 * @return string Generated asset name for the block's field.
+	 */
+	function gutenberg_generate_block_asset_handle( $block_name, $field_name ) {
+		$field_mappings = array(
+			'editorScript' => 'editor-script',
+			'script'       => 'script',
+			'editorStyle'  => 'editor-style',
+			'style'        => 'style',
+		);
+		return str_replace( '/', '-', $block_name ) .
+			'-' . $field_mappings[ $field_name ];
+	}
+
+	/**
+	 * Finds a script handle for the selected block metadata field. It detects
+	 * when a path to file was provided and finds a corresponding
+	 * asset file with details necessary to register the script under
+	 * automatically generated handle name. It returns unprocessed script handle
+	 * otherwise.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array  $metadata Block metadata.
+	 * @param string $field_name Field name to pick from metadata.
+	 *
+	 * @return string Script handle provided directly or created through script's registration.
+	 */
+	function gutenberg_get_script_handle( $metadata, $field_name ) {
+		$script_handle = $metadata[ $field_name ];
+		$script_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		if ( $script_handle === $script_path ) {
+			return $script_handle;
+		}
+
+		$script_handle     = gutenberg_generate_block_asset_handle( $metadata['name'], $field_name );
+		$script_asset_path = realpath(
+			dirname( $metadata['file'] ) . '/' .
+			substr_replace( $script_path, '.asset.php', - strlen( '.js' ) )
+		);
+		if ( ! file_exists( $script_asset_path ) ) {
+			$message = sprintf(
+				/* translators: %1: field name. %2: block name */
+				__( 'The asset file for the "%1$s" defined in "%2$s" block definition is missing.', 'default' ),
+				$field_name,
+				$metadata['name']
+			);
+			_doing_it_wrong( __METHOD__, $message, '5.5.0' );
+			return false;
+		}
+		$script_asset = require( $script_asset_path );
+		wp_register_script(
+			$script_handle,
+			plugins_url( $script_path, $metadata['file'] ),
+			$script_asset['dependencies'],
+			$script_asset['version']
+		);
+		return $script_handle;
+	}
+
+	/**
+	 * Finds a style handle for the block metadata field. It detects when a path
+	 * to file was provided and registers the style under automatically
+	 * generated handle name. It returns unprocessed style handle otherwise.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param array  $metadata Block metadata.
+	 * @param string $field_name Field name to pick from metadata.
+	 *
+	 * @return string Style handle provided directly or created through style's registration.
+	 */
+	function gutenberg_get_style_handle( $metadata, $field_name ) {
+		$style_handle = $metadata[ $field_name ];
+		$style_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
+		if ( $style_handle === $style_path ) {
+			return $style_handle;
+		}
+
+		$style_handle = gutenberg_generate_block_asset_handle( $metadata['name'], $field_name );
+		$block_dir    = dirname( $metadata['file'] );
+		wp_register_style(
+			$style_handle,
+			plugins_url( $style_path, $metadata['file'] ),
+			array(),
+			filemtime( realpath( "$block_dir/$style_path" ) )
+		);
+		return $style_handle;
+	}
+
+	/**
 	 * Registers a block type from metadata stored in the `block.json` file.
 	 *
 	 * @since 7.9.0
@@ -37,6 +155,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 			return false;
 		}
+		$metadata['file'] = $metadata_file;
 
 		$settings          = array();
 		$property_mappings = array(
@@ -57,94 +176,36 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			}
 		}
 
-		$block_name          = $metadata['name'];
-		$block_dir           = dirname( $metadata_file );
-		$asset_handle_prefix = str_replace( '/', '-', $block_name );
-
-		if ( isset( $metadata['editorScript'] ) ) {
-			$settings['editor_script'] = $metadata['editorScript'];
-		} elseif ( isset( $metadata['editorScriptPath'] ) ) {
-			$editor_script_path       = $metadata['editorScriptPath'];
-			$editor_script_handle     = "$asset_handle_prefix-editor-script";
-			$editor_script_asset_path = realpath(
-				$block_dir . '/' . substr_replace( $editor_script_path, '.asset.php', -3 )
+		if ( ! empty( $metadata['editorScript'] ) ) {
+			$settings['editor_script'] = gutenberg_get_script_handle(
+				$metadata,
+				'editorScript'
 			);
-			if ( ! file_exists( $editor_script_asset_path ) ) {
-				$message = sprintf(
-					/* translators: %s: Block name. */
-					__( 'The asset file for the "editorScript" defined in "%s" block definition is missing.', 'default' ),
-					$block_name
-				);
-				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
-				return false;
-			}
-			$editor_script_asset = require( $editor_script_asset_path );
-			wp_register_script(
-				$editor_script_handle,
-				plugins_url( $editor_script_path, $metadata_file ),
-				$editor_script_asset['dependencies'],
-				$editor_script_asset['version']
-			);
-			$settings['editor_script'] = $editor_script_handle;
 		}
 
-		if ( isset( $metadata['script'] ) ) {
-			$settings['script'] = $metadata['script'];
-		} elseif ( isset( $metadata['scriptPath'] ) ) {
-			$script_path       = $metadata['scriptPath'];
-			$script_handle     = "$asset_handle_prefix-script";
-			$script_asset_path = realpath(
-				$block_dir . '/' . substr_replace( $script_path, '.asset.php', -3 )
+		if ( ! empty( $metadata['script'] ) ) {
+			$settings['script'] = gutenberg_get_script_handle(
+				$metadata,
+				'script'
 			);
-			if ( ! file_exists( $script_asset_path ) ) {
-				$message = sprintf(
-					/* translators: %s: Block name. */
-					__( 'The asset file for the "script" defined in "%s" block definition is missing.', 'default' ),
-					$block_name
-				);
-				_doing_it_wrong( __METHOD__, $message, '5.5.0' );
-				return false;
-			}
-			$script_asset = require( $script_asset_path );
-			wp_register_script(
-				$script_handle,
-				plugins_url( $script_path, $metadata_file ),
-				$script_asset['dependencies'],
-				$script_asset['version']
-			);
-			$settings['script'] = $script_handle;
 		}
 
-		if ( isset( $metadata['editorStyle'] ) ) {
-			$settings['editor_style'] = $metadata['editorStyle'];
-		} elseif ( isset( $metadata['editorStylePath'] ) ) {
-			$editor_style_path   = $metadata['editorStylePath'];
-			$editor_style_handle = "$asset_handle_prefix-editor-style";
-			wp_register_style(
-				$editor_style_handle,
-				plugins_url( $editor_style_path, $metadata_file ),
-				array(),
-				filemtime( realpath( "$block_dir/$editor_style_path" ) )
+		if ( ! empty( $metadata['editorStyle'] ) ) {
+			$settings['editor_style'] = gutenberg_get_style_handle(
+				$metadata,
+				'editorStyle'
 			);
-			$settings['editor_style'] = $editor_style_handle;
 		}
 
-		if ( isset( $metadata['style'] ) ) {
-			$settings['style'] = $metadata['style'];
-		} elseif ( isset( $metadata['stylePath'] ) ) {
-			$style_path   = $metadata['stylePath'];
-			$style_handle = "$asset_handle_prefix-style";
-			wp_register_style(
-				$style_handle,
-				plugins_url( $style_path, $metadata_file ),
-				array(),
-				filemtime( realpath( "$block_dir/$style_path" ) )
+		if ( ! empty( $metadata['style'] ) ) {
+			$settings['style'] = gutenberg_get_style_handle(
+				$metadata,
+				'style'
 			);
-			$settings['style'] = $style_handle;
 		}
 
 		return register_block_type(
-			$block_name,
+			$metadata['name'],
 			array_merge(
 				$settings,
 				$args
