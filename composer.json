@@ -24,5 +24,11 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist"
-	}
+	},
+  	"repositories": [
+	  {
+		"type": "vcs",
+		"url": "git@github.com:TimothyBJacobs/wp-phpunit.git"
+	  }
+	]
 }
