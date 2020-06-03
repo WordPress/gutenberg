@@ -3,6 +3,7 @@
  */
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,6 +22,11 @@ import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../../sidebar/plugin-sidebar';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+
+const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+	web: true,
+	native: false,
+} );
 
 const SettingsSidebar = () => {
 	const { sidebarName, keyboardShortcut } = useSelect( ( select ) => {
@@ -57,6 +63,7 @@ const SettingsSidebar = () => {
 			title={ __( 'Settings' ) }
 			toggleShortcut={ keyboardShortcut }
 			icon={ cog }
+			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ sidebarName === 'edit-post/document' && (
 				<>
