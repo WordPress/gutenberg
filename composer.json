@@ -16,7 +16,7 @@
 		"phpcompatibility/php-compatibility": "^9.3",
 		"wp-coding-standards/wpcs": "^2.2",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
-		"wp-phpunit/wp-phpunit": "dev-master"
+		"wp-phpunit/wp-phpunit": "^5.4"
 	},
 	"require": {
 		"composer/installers": "~1.0"
@@ -24,11 +24,5 @@
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist"
-	},
-  	"repositories": [
-	  {
-		"type": "vcs",
-		"url": "https://github.com/TimothyBJacobs/wp-phpunit.git"
-	  }
-	]
+	}
 }

@@ -34,8 +34,6 @@ if ( ! $_tests_dir ) {
 	$_tests_dir = '/tmp/wordpress-tests-lib';
 }
 
-copy( __DIR__ . '/install.php', __DIR__ . '/../vendor/wp-phpunit/wp-phpunit/includes/install.php' );
-
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
@@ -59,23 +57,16 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
  * failed. So we throw an exception if WordPress dies during test setup. This
  * way the failure is observable.
  *
+ * @param string|WP_Error $message
+ *
  * @throws Exception When a `wp_die()` occurs.
  */
-function fail_if_died() {
-	global $wpdb;
-
-	if ( $wpdb->blogs ) {
-		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->blogs}" ) );
+function fail_if_died( $message ) {
+	if ( is_wp_error( $message ) ) {
+		$message = $message->get_error_message();
 	}
 
-	if ( $wpdb->site ) {
-		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->site}" ) );
-		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->sitemeta}" ) );
-	}
-
-	var_dump( $wpdb->get_results( 'SHOW TABLES' ) );
-
-	throw new Exception( 'WordPress died.' );
+	throw new Exception( 'WordPress died: ' . $message );
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
 
