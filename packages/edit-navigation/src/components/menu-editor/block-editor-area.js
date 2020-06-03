@@ -97,9 +97,6 @@ export default function BlockEditorArea( {
 			</CardBody>
 			<CardFooter>
 				<DeleteMenuButton menuId={ menuId } onDelete={ onDeleteMenu } />
-				<Button isPrimary onClick={ saveBlocks }>
-					{ __( 'Save navigation' ) }
-				</Button>
 			</CardFooter>
 		</Card>
 	);
