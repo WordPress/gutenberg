@@ -20,6 +20,7 @@ import {
 	ToggleControl,
 	withNotices,
 	useColorExtract,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -70,6 +71,8 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -245,6 +248,7 @@ function CoverEdit( {
 		hasParallax,
 		minHeight,
 		minHeightUnit,
+		style: styleAttribute,
 		url,
 	} = attributes;
 	const {
@@ -499,6 +503,7 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<Block.div className={ classes } data-url={ url } style={ style }>
+				<BoxControlVisualizer values={ styleAttribute?.padding } />
 				<ResizableCover
 					className="block-library-cover__resize-container"
 					onResizeStart={ () => {

@@ -28,15 +28,16 @@
 	},
 	"supports": {
 		"className": false,
-		"__unstablePasteTextInline": true,
 		"lightBlockWrapper": true,
 		"__experimentalColor": true,
-		"__experimentalLineHeight": true,
 		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true,
 		"__experimentalFeatures": {
 			"typography": {
 				"dropCap": true
 			}
-		}
+		},
+		"__experimentalSelector": "p",
+		"__unstablePasteTextInline": true
 	}
 }
