@@ -70,7 +70,7 @@ if (buildGutenbergMobileJSBundle) {
         yarnWorkDir = file(yarnFolder)
 
         // Set the work directory where node_modules should be located
-        nodeModulesDir = file("${project.projectDir}/../../../")
+        nodeModulesDir = file("${project.projectDir}/../../../../")
     }
 
     npm_install {
@@ -177,7 +177,7 @@ dependencies {
 
 if (buildGutenbergMobileJSBundle) {
     task buildJSBundle(type: NpmTask) {
-        args = ['run', 'native', 'bundle:android']
+        args = ['run', 'bundle:android']
     }
 
     task backupHermesDebugAAR(type: Copy) {
