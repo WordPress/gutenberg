@@ -400,73 +400,79 @@ export class ImageEdit extends React.Component {
 		}
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onImagePressed }
-				onLongPress={ openMediaOptions }
-				disabled={ ! isSelected }
-			>
-				<View style={ { flex: 1 } }>
-					{ getInspectorControls() }
-					{ getMediaOptions() }
-					{ ! this.state.isCaptionSelected &&
-						getToolbarEditButton( openMediaOptions ) }
-					<MediaUploadProgress
-						coverUrl={ url }
-						mediaId={ id }
-						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={
-							this.finishMediaUploadWithSuccess
-						}
-						onFinishMediaUploadWithFailure={
-							this.finishMediaUploadWithFailure
-						}
-						onMediaUploadStateReset={ this.mediaUploadStateReset }
-						renderContent={ ( {
-							isUploadInProgress,
-							isUploadFailed,
-							retryMessage,
-						} ) => {
-							return (
-								<Image
-									align={ align }
-									alt={ alt }
-									height={ height }
-									isSelected={
-										isSelected && ! isCaptionSelected
-									}
-									isUploadFailed={ isUploadFailed }
-									isUploadInProgress={ isUploadInProgress }
-									onSelectMediaUploadOption={
-										this.onSelectMediaUploadOption
-									}
-									openMediaOptions={ openMediaOptions }
-									retryMessage={ retryMessage }
-									url={ url }
-									width={ width }
-								/>
-							);
-						} }
-					/>
-					<BlockCaption
-						clientId={ this.props.clientId }
-						isSelected={ this.state.isCaptionSelected }
-						accessible={ true }
-						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption )
-								? /* translators: accessibility text. Empty image caption. */
-								  'Image caption. Empty'
-								: sprintf(
-										/* translators: accessibility text. %s: image caption. */
-										__( 'Image caption. %s' ),
-										caption
-								  )
-						}
-						onFocus={ this.onFocusCaption }
-						onBlur={ this.props.onBlur } // always assign onBlur as props
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+			<>
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onImagePressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View style={ { flex: 1 } }>
+						{ getInspectorControls() }
+						{ getMediaOptions() }
+						{ ! this.state.isCaptionSelected &&
+							getToolbarEditButton( openMediaOptions ) }
+						<MediaUploadProgress
+							coverUrl={ url }
+							mediaId={ id }
+							onUpdateMediaProgress={ this.updateMediaProgress }
+							onFinishMediaUploadWithSuccess={
+								this.finishMediaUploadWithSuccess
+							}
+							onFinishMediaUploadWithFailure={
+								this.finishMediaUploadWithFailure
+							}
+							onMediaUploadStateReset={
+								this.mediaUploadStateReset
+							}
+							renderContent={ ( {
+								isUploadInProgress,
+								isUploadFailed,
+								retryMessage,
+							} ) => {
+								return (
+									<Image
+										align={ align }
+										alt={ alt }
+										height={ height }
+										isSelected={
+											isSelected && ! isCaptionSelected
+										}
+										isUploadFailed={ isUploadFailed }
+										isUploadInProgress={
+											isUploadInProgress
+										}
+										onSelectMediaUploadOption={
+											this.onSelectMediaUploadOption
+										}
+										openMediaOptions={ openMediaOptions }
+										retryMessage={ retryMessage }
+										url={ url }
+										width={ width }
+									/>
+								);
+							} }
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+				<BlockCaption
+					clientId={ this.props.clientId }
+					isSelected={ this.state.isCaptionSelected }
+					accessible={ true }
+					accessibilityLabelCreator={ ( caption ) =>
+						isEmpty( caption )
+							? /* translators: accessibility text. Empty image caption. */
+							  'Image caption. Empty'
+							: sprintf(
+									/* translators: accessibility text. %s: image caption. */
+									__( 'Image caption. %s' ),
+									caption
+							  )
+					}
+					onFocus={ this.onFocusCaption }
+					onBlur={ this.props.onBlur } // always assign onBlur as props
+				/>
+			</>
 		);
 
 		return (
