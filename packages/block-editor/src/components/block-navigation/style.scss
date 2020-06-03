@@ -34,6 +34,11 @@ $tree-item-height: 36px;
 		text-align: left;
 		color: $dark-gray-600;
 		border-radius: 2px;
+
+		.components-modal__content & {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 
 	&.is-visible .block-editor-block-navigation-block-contents {
@@ -139,7 +144,7 @@ $tree-item-height: 36px;
 			position: absolute;
 			top: -1px;
 			bottom: -2px;
-			right: 0;
+			right: 1px;
 			border-right: 2px solid $light-gray-900;
 		}
 
@@ -153,12 +158,16 @@ $tree-item-height: 36px;
 			height: $grid-unit-20;
 		}
 
+		&.has-item.is-last-row::after {
+			top: 100%;
+		}
+
 		// Draw a horizontal line using border-bottom.
 		&.has-item::after {
 			content: "";
 			display: block;
 			position: absolute;
-			top: $grid-unit-20;
+			top: calc(50% - 1px);
 			left: 100%;
 			width: 5px;
 			border-bottom: 2px solid $light-gray-900;
