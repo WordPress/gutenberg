@@ -24,20 +24,6 @@ $tree-item-height: 36px;
 .block-editor-block-navigation-leaf {
 	// Use position relative for row animation.
 	position: relative;
-	transition: background 0.1s ease-out;
-	@include reduce-motion("transition");
-
-	// Highlight the entire row on hover
-	&:hover {
-		background: $light-gray-300;
-	}
-
-	// Do not highlight rows when inside of the popover
-	.block-editor-block-navigation__popover & {
-		&:hover {
-			background: transparent;
-		}
-	}
 
 	.block-editor-block-navigation-block-contents {
 		display: flex;
