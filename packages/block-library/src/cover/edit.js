@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
+	FilterControl,
 	FocalPointPicker,
 	PanelBody,
 	PanelRow,
@@ -239,6 +240,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		backgroundFilter,
 		contentPosition,
 		id,
 		backgroundType,
@@ -280,21 +282,12 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
 	if ( gradientValue && ! url ) {
 		style.background = gradientValue;
-	}
-
-	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${
-			focalPoint.y * 100
-		}%`;
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
@@ -412,6 +405,17 @@ function CoverEdit( {
 						</PanelColorGradientSettings>
 					</>
 				) }
+				<PanelBody
+					title={ __( 'Background filters' ) }
+					initialOpen={ false }
+				>
+					<FilterControl
+						value={ backgroundFilter }
+						onChange={ ( next ) => {
+							setAttributes( { backgroundFilter: next } );
+						} }
+					/>
+				</PanelBody>
 			</InspectorControls>
 		</>
 	);
@@ -512,16 +516,13 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-					<video
-						ref={ isDarkElement }
-						className="wp-block-cover__video-background"
-						autoPlay
-						muted
-						loop
-						src={ url }
-					/>
-				) }
+				<BackgroundMedia
+					backgroundFilter={ backgroundFilter }
+					backgroundType={ backgroundType }
+					focalPoint={ focalPoint }
+					videoRef={ isDarkElement }
+					url={ url }
+				/>
 				<InnerBlocks
 					__experimentalTagName="div"
 					__experimentalPassedProps={ {
@@ -531,6 +532,56 @@ function CoverEdit( {
 				/>
 			</Block.div>
 		</>
+	);
+}
+
+function BackgroundMedia( {
+	backgroundFilter,
+	backgroundType,
+	focalPoint,
+	videoRef,
+	url,
+} ) {
+	const isVideoBackground = backgroundType === VIDEO_BACKGROUND_TYPE;
+	const isImageBackground = backgroundType === IMAGE_BACKGROUND_TYPE;
+
+	const backgroundStyles = isImageBackground
+		? backgroundImageStyles( url )
+		: {};
+
+	if ( backgroundFilter ) {
+		backgroundStyles.filter = FilterControl.createStyles(
+			backgroundFilter
+		).filter;
+	}
+
+	if ( isImageBackground && focalPoint ) {
+		backgroundStyles.backgroundPosition = `${ focalPoint.x * 100 }% ${
+			focalPoint.y * 100
+		}%`;
+	}
+
+	const contentMarkup = isVideoBackground ? (
+		<video
+			ref={ videoRef }
+			className="wp-block-cover__video-background"
+			autoPlay
+			muted
+			loop
+			src={ url }
+			style={ backgroundStyles }
+		/>
+	) : (
+		<div
+			className="wp-block-cover__image-background-content"
+			style={ backgroundStyles }
+		/>
+	);
+
+	return (
+		<div className="wp-block-cover__image-background">
+			{ contentMarkup }
+		</div>
 	);
 }
 

@@ -158,6 +158,32 @@
 	}
 }
 
+.wp-block-cover__image-background {
+	background-position: center center;
+	background-size: cover;
+	bottom: 0;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
+	overflow: hidden;
+	z-index: z-index(".wp-block-cover__video-background");
+}
+
+.wp-block-cover__image-background-content {
+	background-position: center center;
+	background-size: cover;
+	bottom: 0;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
+}
+
 .wp-block-cover__video-background {
 	position: absolute;
 	top: 50%;

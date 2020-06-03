@@ -61,10 +61,12 @@ const BaseRangeControl = forwardRef(
 			onFocus = noop,
 			onMouseMove = noop,
 			onMouseLeave = noop,
+			railColor,
 			resetFallbackValue,
 			renderTooltipContent = ( v ) => v,
 			showTooltip: showTooltipProp,
 			step = 1,
+			trackColor,
 			value: valueProp,
 			withInputField = true,
 			...props
@@ -234,6 +236,7 @@ const BaseRangeControl = forwardRef(
 							marks={ marks }
 							max={ max }
 							min={ min }
+							railColor={ railColor }
 							step={ step }
 							value={ rangeFillValue }
 						/>
@@ -242,6 +245,7 @@ const BaseRangeControl = forwardRef(
 							className="components-range-control__track"
 							disabled={ disabled }
 							style={ { width: fillValueOffset } }
+							trackColor={ trackColor }
 						/>
 						<ThumbWrapper style={ offsetStyle }>
 							<Thumb

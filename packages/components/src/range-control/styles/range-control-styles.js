@@ -24,17 +24,22 @@ export const Root = styled.span`
 	width: 100%;
 `;
 
+const wrapperColor = ( {
+	color: colorProp = color( 'blue.medium.focus' ),
+} ) => {
+	return css( { color: colorProp } );
+};
 const wrapperMargin = ( { marks } ) =>
 	css( { marginBottom: marks ? 16 : null } );
 
 export const Wrapper = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'blue.medium.focus' ) };
 	display: block;
 	padding-top: 15px;
 	position: relative;
 	width: 100%;
 
+	${ wrapperColor };
 	${ rangeHeight };
 	${ wrapperMargin };
 
@@ -53,10 +58,15 @@ export const AfterIconWrapper = styled.span`
 	${ rtl( { marginLeft: 16 } ) }
 `;
 
-const disabledRailBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const railBackgroundColor = ( { disabled, railColor } ) => {
+	let background = railColor || null;
+
+	if ( disabled ) {
+		background = color( 'lightGray.400' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.400' ),
+		background,
 	} );
 };
 
@@ -72,13 +82,18 @@ export const Rail = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledRailBackgroundColor };
+	${ railBackgroundColor };
 `;
 
-const disabledBackgroundColor = ( { disabled } ) => {
-	if ( ! disabled ) return '';
+const trackBackgroundColor = ( { disabled, trackColor } ) => {
+	let background = trackColor || 'currentColor';
+
+	if ( disabled ) {
+		background = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: color( 'lightGray.800' ),
+		background,
 	} );
 };
 
@@ -93,7 +108,7 @@ export const Track = styled.span`
 	margin-top: 14px;
 	top: 0;
 
-	${ disabledBackgroundColor };
+	${ trackBackgroundColor };
 `;
 
 export const MarksWrapper = styled.span`
@@ -104,9 +119,15 @@ export const MarksWrapper = styled.span`
 	user-select: none;
 `;
 
-const markFill = ( { isFilled } ) => {
+const markFill = ( { disabled, isFilled } ) => {
+	let backgroundColor = isFilled ? 'currentColor' : color( 'lightGray.600' );
+
+	if ( disabled ) {
+		backgroundColor = color( 'lightGray.800' );
+	}
+
 	return css( {
-		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
+		backgroundColor,
 	} );
 };
 
@@ -119,7 +140,6 @@ export const Mark = styled.span`
 	width: 1px;
 
 	${ markFill };
-	${ disabledBackgroundColor };
 `;
 
 const markLabelFill = ( { isFilled } ) => {

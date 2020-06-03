@@ -22,6 +22,9 @@
 		"customOverlayColor": {
 			"type": "string"
 		},
+		"backgroundFilter": {
+			"type": "object"
+		},
 		"backgroundType": {
 			"type": "string",
 			"default": "image"
