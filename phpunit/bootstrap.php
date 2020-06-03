@@ -57,7 +57,7 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
  * failed. So we throw an exception if WordPress dies during test setup. This
  * way the failure is observable.
  *
- * @param string|WP_Error $message
+ * @param string|WP_Error $message The error message.
  *
  * @throws Exception When a `wp_die()` occurs.
  */
