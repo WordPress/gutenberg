@@ -45,10 +45,6 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
-	global $wpdb;
-
-	var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->blogs}" ) );
-
 	require dirname( dirname( __FILE__ ) ) . '/lib/load.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
@@ -64,6 +60,12 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
  * @throws Exception When a `wp_die()` occurs.
  */
 function fail_if_died() {
+	global $wpdb;
+
+	if ( $wpdb->blogs ) {
+		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->blogs}" ) );
+	}
+
 	throw new Exception( 'WordPress died.' );
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
