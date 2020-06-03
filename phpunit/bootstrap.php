@@ -73,6 +73,8 @@ function fail_if_died() {
 		var_dump( $wpdb->get_results( "SELECT * FROM {$wpdb->sitemeta}" ) );
 	}
 
+	var_dump( $wpdb->get_results( 'SHOW TABLES' ) );
+
 	throw new Exception( 'WordPress died.' );
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
