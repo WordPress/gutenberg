@@ -75,9 +75,7 @@ const ImageComponent = ( {
 
 	const onContainerLayout = ( event ) => {
 		const { height, width } = event.nativeEvent.layout;
-		if ( ! containerSize ) {
-			setContainerSize( { width, height } );
-		}
+		setContainerSize( { width, height } );
 	};
 
 	const getIcon = ( iconType ) => {
@@ -117,9 +115,7 @@ const ImageComponent = ( {
 		imageData?.width < containerSize?.width ? imageData?.width : '100%';
 
 	const imageContainerStyles = [
-		isSelected &&
-			! ( isUploadInProgress || isUploadFailed ) &&
-			styles.imageBorder,
+		styles.imageContent,
 		focalPoint && styles.imageWithFocalPoint,
 		{
 			width:
@@ -129,7 +125,7 @@ const ImageComponent = ( {
 			height:
 				imageHeight > 0 && imageHeight < containerSize?.height
 					? imageHeight
-					: '100%',
+					: undefined,
 		},
 	];
 
@@ -177,6 +173,10 @@ const ImageComponent = ( {
 							{ getIcon( ICON_TYPE.UPLOAD ) }
 						</View>
 					</View>
+				) }
+
+				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
+					<View style={ styles.imageBorder } />
 				) }
 
 				<Image
