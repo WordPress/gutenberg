@@ -80,8 +80,8 @@ const defaultFetchHandler = ( nextOptions ) => {
 		body = JSON.stringify( data );
 		headers[ 'Content-Type' ] = 'application/json';
 	}
-	const shimmedGlobal = getGlobal();
-	const responsePromise = shimmedGlobal.fetch( url || path, {
+
+	const responsePromise = getGlobal().fetch( url || path, {
 		...DEFAULT_OPTIONS,
 		...remainingOptions,
 		body,
