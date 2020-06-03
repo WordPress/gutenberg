@@ -1,6 +1,6 @@
 {
 	"name": "core/pullquote",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"value": {
 			"type": "string",

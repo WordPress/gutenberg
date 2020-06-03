@@ -1,6 +1,6 @@
 {
 	"name": "core/spacer",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"height": {
 			"type": "number",
