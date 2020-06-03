@@ -67,14 +67,24 @@ export default function BlockEditorArea( {
 	return (
 		<Card className="edit-navigation-menu-editor__block-editor-panel">
 			<CardHeader className="edit-navigation-menu-editor__block-editor-panel-header">
-				{ __( 'Navigation menu' ) }
+				<div className="edit-navigation-menu-editor__block-editor-panel-header-text">
+					{ __( 'Navigation menu' ) }
+				</div>
+
+				<DeleteMenuButton
+					className="edit-navigation-menu-editor__block-editor-panel-action"
+					menuId={ menuId }
+					onDelete={ onDeleteMenu }
+				/>
+				<Button
+					className="edit-navigation-menu-editor__block-editor-panel-action"
+					isPrimary
+					onClick={ saveBlocks }
+				>
+					{ __( 'Save navigation' ) }
+				</Button>
 			</CardHeader>
 			<CardBody>
-				<div className="components-panel__header-actions">
-					<Button isPrimary onClick={ saveBlocks }>
-						{ __( 'Save navigation' ) }
-					</Button>
-				</div>
 				<NavigableToolbar
 					className={ classnames(
 						'edit-navigation-menu-editor__block-editor-toolbar',
@@ -92,12 +102,6 @@ export default function BlockEditorArea( {
 						<BlockList />
 					</ObserveTyping>
 				</WritingFlow>
-				<div className="components-panel__footer-actions">
-					<DeleteMenuButton
-						menuId={ menuId }
-						onDelete={ onDeleteMenu }
-					/>
-				</div>
 			</CardBody>
 		</Card>
 	);

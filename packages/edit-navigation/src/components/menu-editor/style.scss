@@ -73,7 +73,21 @@
 	-ms-grid-row-align: start;
 
 	.edit-navigation-menu-editor__block-editor-panel-header {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.edit-navigation-menu-editor__block-editor-panel-header-text {
+		flex-grow: 1;
 		font-weight: bold;
+		flex-basis: 100%;
+		@include break-medium {
+			flex-basis: auto;
+		}
+	}
+	.edit-navigation-menu-editor__block-editor-panel-action {
+		margin-left: $grid-unit-20;
 	}
 }
 
