@@ -14,13 +14,11 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
-    # - name: Restore npm cache
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: ~/.npm
-    #     key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-npm-
+    - name: Restore npm cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
     - run: npm ci
 
