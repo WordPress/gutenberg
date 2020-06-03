@@ -1,7 +1,6 @@
 package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import androidx.annotation.Nullable;
 
