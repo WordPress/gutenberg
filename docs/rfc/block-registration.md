@@ -90,10 +90,10 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"message": "This is a notice!"
 		},
 	},
-	"editorScript": "build/editor.js",
-	"script": "build/main.js",
-	"editorStyle": "build/editor.css",
-	"style": "build/style.css"
+	"editorScript": "file://build/index.js",
+	"script": "file://build/script.js",
+	"editorStyle": "file://build/index.css",
+	"style": "file://build/style.css"
 }
 ```
 
@@ -312,7 +312,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 * Property: `editorScript`
 
 ```json
-{ "editorScript": "build/editor.js" }
+{ "editorScript": "file://build/index.js" }
 ```
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
@@ -325,7 +325,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 * Property: `script`
 
 ```json
-{ "script": "build/main.js" }
+{ "script": "file://build/script.js" }
 ```
 
 Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -338,7 +338,7 @@ Block type frontend script definition. It will be enqueued both in the editor an
 * Property: `editorStyle`
 
 ```json
-{ "editorStyle": "build/editor.css" }
+{ "editorStyle": "file://build/index.css" }
 ```
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
@@ -351,7 +351,7 @@ Block type editor style definition. It will only be enqueued in the context of t
 * Property: `style`
 
 ```json
-{ "style": "build/style.css" }
+{ "style": "file://build/style.css" }
 ```
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -387,18 +387,21 @@ In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type is a subtype of string, where the value must represent a relative path to a JavaScript or CSS file.
+The `WPDefinedAsset` type is a subtype of string, where the value must represent a relative path to a JavaScript or CSS file prefixed with `file://`. An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
 
 **Example:**
 
 In `block.json`:
 ```json
-{ "editorScript": "build/editor.js" }
+{
+	"editorScript": "file://build/index.js",
+	"editorStyle": "my-editor-style"
+}
 ```
 
 #### WordPress context
 
-In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file.
+In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file and use file paths rather than asset handles.
 
 That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
 
@@ -419,7 +422,7 @@ build/
 
 In `block.json`:
 ```json
-{ "editorScript": "build/index.js" }
+{ "editorScript": "file://build/index.js" }
 ```
 
 In `build/index.asset.php`:
@@ -480,7 +483,7 @@ Implementation should follow the existing [get_plugin_data](https://codex.wordpr
 There is also a new API method proposed `register_block_type_from_metadata` that aims to simplify the block type registration on the server from metadata stored in the `block.json` file. This function is going to handle also all necessary work to make internationalization work seamlessly for metadata defined.
 
 This function takes two params:
-- `$path` (`string`) – path to the folder where the `block.json` file is located.
+- `$path` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
 - `$args` (`array`) –  an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
   - `$render_callback` (`callable`) – callback used to render blocks of this block type.
 
