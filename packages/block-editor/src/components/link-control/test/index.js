@@ -630,6 +630,8 @@ describe( 'Default search suggestions', () => {
 
 		await eventLoopTick();
 
+		const searchInput = getURLInput();
+
 		const searchResultElements = getSearchResults();
 
 		const searchResultLabel = container.querySelector(
@@ -639,6 +641,8 @@ describe( 'Default search suggestions', () => {
 		expect( searchResultLabel ).toBeFalsy();
 
 		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
 	} );
 } );
 
