@@ -122,6 +122,7 @@
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
@@ -160,13 +161,11 @@
 			}
 		}
 	}
-}
 
-// Just temporary for now to make it easier to see the effect in action
-.wp-block.is-hovered {
-	outline: 4px solid #f00 !important;
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
+		box-shadow: 0 0 0 1px $light-gray-ui;
+	}
 }
-
 
 /**
  * Block styles and alignments
