@@ -4,7 +4,7 @@ First off, thank you for contributing! We're excited to collaborate with you! ðŸ
 
 The following is a set of guidelines for the many ways you can join our collective effort.
 
-Before anything else, please take a moment to read our [Code of Conduct](CODE-OF-CONDUCT.md). We expect all participants, from full-timers to occasional tinkerers, to uphold it.
+Before anything else, please take a moment to read our [Code of Conduct](CODE_OF_CONDUCT.md). We expect all participants, from full-timers to occasional tinkerers, to uphold it.
 
 ## Reporting Bugs, Asking Questions, and Suggesting Features
 
