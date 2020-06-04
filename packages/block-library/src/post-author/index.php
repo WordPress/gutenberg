@@ -107,8 +107,8 @@ function post_author_build_css_font_sizes( $attributes ) {
 	}
 
 	return array(
-		'name' => $name_font_sizes,
-		'bio'  => $bio_font_sizes,
+		'name'   => $name_font_sizes,
+		'bio'    => $bio_font_sizes,
 		'byline' => $byline_font_sizes,
 	);
 }
@@ -148,9 +148,7 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 	);
 
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
-	$style_attribute = $colors['inline_styles']
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) )
-		: '';
+	$style_attribute = $colors['inline_styles'] ? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) ) : '';
 
 	$name_class_attribute = sprintf( ' class="wp-block-post-author__name %s"', esc_attr( implode( ' ', $font_sizes['name']['css_classes'] ) ) );
 	$name_style_attribute = $font_sizes['name']['inline_styles'] ? sprintf( 'style="%s"', esc_attr( $font_sizes['name']['inline_styles'] ) ) : '';
