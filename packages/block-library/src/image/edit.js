@@ -416,15 +416,10 @@ export function ImageEdit( {
 		imageHeightWithinContainer,
 		imageWidth,
 		imageHeight,
-		image: imageEl,
 	} = useImageSize( ref, url, [ align ] );
 	const [ editedUrl, setEditedUrl ] = useState();
 
 	useEffect( () => {
-		if ( ! imageEl ) {
-			return;
-		}
-
 		let angle = rotate % 360;
 
 		if ( angle < 0 ) {
@@ -436,37 +431,54 @@ export function ImageEdit( {
 			return;
 		}
 
-		const canvas = document.createElement( 'canvas' );
+		function editImage( event ) {
+			const canvas = document.createElement( 'canvas' );
 
-		let translateX = 0;
-		let translateY = 0;
+			let translateX = 0;
+			let translateY = 0;
 
-		if ( angle % 180 ) {
-			canvas.width = imageEl.height;
-			canvas.height = imageEl.width;
+			if ( angle % 180 ) {
+				canvas.width = event.target.height;
+				canvas.height = event.target.width;
+			} else {
+				canvas.width = event.target.width;
+				canvas.height = event.target.height;
+			}
+
+			if ( angle === 90 || angle === 180 ) {
+				translateX = canvas.width;
+			}
+
+			if ( angle === 270 || angle === 180 ) {
+				translateY = canvas.height;
+			}
+
+			const context = canvas.getContext( '2d' );
+
+			context.translate( translateX, translateY );
+			context.rotate( ( angle * Math.PI ) / 180 );
+			context.drawImage( event.target, 0, 0 );
+
+			canvas.toBlob( ( blob ) => {
+				setEditedUrl( URL.createObjectURL( blob ) );
+			} );
+		}
+
+		if ( ! id ) {
+			window
+				.fetch( url )
+				.then( ( response ) => response.blob() )
+				.then( ( blob ) => {
+					const el = new window.Image();
+					el.src = URL.createObjectURL( blob );
+					el.onload = editImage;
+				} );
 		} else {
-			canvas.width = imageEl.width;
-			canvas.height = imageEl.height;
+			const el = new window.Image();
+			el.src = url;
+			el.onload = editImage;
 		}
-
-		if ( angle === 90 || angle === 180 ) {
-			translateX = canvas.width;
-		}
-
-		if ( angle === 270 || angle === 180 ) {
-			translateY = canvas.height;
-		}
-
-		const context = canvas.getContext( '2d' );
-
-		context.translate( translateX, translateY );
-		context.rotate( ( angle * Math.PI ) / 180 );
-		context.drawImage( imageEl, 0, 0 );
-
-		canvas.toBlob( ( blob ) => {
-			setEditedUrl( URL.createObjectURL( blob ) );
-		} );
-	}, [ rotate, imageEl ] );
+	}, [ rotate ] );
 
 	function onRotate() {
 		setAttributes( {
