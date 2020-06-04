@@ -15,7 +15,7 @@
 	}
 
 	&__bio {
-		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
 	}
 
 	&__content {
@@ -25,7 +25,7 @@
 
 	&__name {
 		font-weight: bold;
-		margin: 0;
+		margin: -$grid-unit-10 0;
 	}
 
 }

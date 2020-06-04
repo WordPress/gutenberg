@@ -24,14 +24,11 @@
 
 .block-editor__container .wp-block-post-author__name,
 .edit-site-visual-editor .wp-block-post-author__name {
-	margin: 0;
-	margin-top: -$grid-unit-20/2;
-	margin-bottom: -$grid-unit-20/2;
+	margin: -$grid-unit-10 0;
 	font-weight: bold;
 }
 
 .block-editor__container .wp-block-post-author__bio,
 .edit-site-visual-editor .wp-block-post-author__bio {
-	margin: 0;
-	margin-top: $grid-unit-20;
+	margin: 0 0 $grid-unit-10;
 }
