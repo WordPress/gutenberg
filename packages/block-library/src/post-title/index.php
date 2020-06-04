@@ -20,16 +20,18 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	}
 
 	$tag_name = 'h2';
-	$class = '';
+	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
 
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
-	if ( isset( $attributes['align'] ) ) {
-		$class = ' class="has-text-align-' . $attributes['align'] . '"';
-	}
 
-	return sprintf( '<%1$s%2$s>%3$s</%1$s>', $tag_name, $class, get_the_title( $block->context['postId'] ) );
+	return sprintf(
+		'<%1$s class="%2$s">%3$s</%1$s>',
+		$tag_name,
+		'wp-block-post-title' . esc_attr( $align_class_name ),
+		get_the_title( $block->context['postId'] )
+	);
 }
 
 /**
