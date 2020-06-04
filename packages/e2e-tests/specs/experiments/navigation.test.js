@@ -12,9 +12,6 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 /**
- * External dependencies
- */
-/**
  * Internal dependencies
  */
 import menuItemsFixture from './menu-items-response-fixture.json';
