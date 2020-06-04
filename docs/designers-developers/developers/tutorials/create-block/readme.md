@@ -3,11 +3,11 @@
 
 The goal of this tutorial is to get you started creating your first block for the WordPress Block Editor. We will create a simple block that allows the user to type a message and styles it.
 
-The tutorial includes setting up your development enviornment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
+The tutorial includes setting up your development environment, tools, and getting comfortable with the new development model. If you are already comfortable, try the quick start below, otherwise step through whatever part of the tutorial you need.
 
 ## Quick Start
 
-The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block pacakage documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development enviornment with node installed, and a WordPress site. From your plugins directory, to create your block run:
+The `@wordpress/create-block` package exists to create the necessary block scaffolding to get you started. See [create-block package documentation](https://www.npmjs.com/package/@wordpress/create-block) for additional features. This quick start assumes you have a development environment with node installed, and a WordPress site. From your plugins directory, to create your block run:
 
 ```bash
 npx @wordpress/create-block starter-block
