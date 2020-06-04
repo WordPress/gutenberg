@@ -198,7 +198,7 @@ _Usage_
 _Parameters_
 
 -   _props_ `Object`: 
--   _props.clientId_ `?string`: Block Client ID.
+-   _props.clientId_ `string`: Client ID of block.
 
 _Returns_
 

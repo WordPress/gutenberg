@@ -14,14 +14,17 @@ import { getBlockType } from '@wordpress/blocks';
  * <BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
  * ```
  *
- * @param {Object}  props
- * @param {?string} props.clientId Block Client ID.
+ * @param {Object} props
+ * @param {string} props.clientId Client ID of block.
  *
  * @return {?string} Block title.
  */
-export function BlockTitle( { clientId } ) {
+function BlockTitle( { clientId } ) {
 	const name = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return null;
+			}
 			const { getBlockName } = select( 'core/block-editor' );
 			return getBlockName( clientId );
 		},
