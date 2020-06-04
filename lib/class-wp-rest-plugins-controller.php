@@ -252,7 +252,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		if ( 'inactive' !== $request['status'] && ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_cannot_activate_plugin',
-				__( 'Sorry, you are not allowed to activate this plugin.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to activate plugins.', 'gutenberg' ),
 				array(
 					'status' => rest_authorization_required_code(),
 				)
@@ -651,7 +651,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$network_activate = 'network-active' === $new_status;
 		$activated        = activate_plugin( $plugin, '', $network_activate );
 
-		if ( ! $network_activate && is_network_only_plugin( $plugin ) ) {
+		if ( ! $network_activate && is_network_only_plugin( $plugin ) && is_multisite() ) {
 			return new WP_Error(
 				'rest_network_only_plugin',
 				__( 'Network only plugin must be network activated.', 'gutenberg' ),

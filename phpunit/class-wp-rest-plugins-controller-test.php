@@ -11,8 +11,8 @@
  */
 class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
-	const BASE        = '/__experimental/plugins';
-	const PLUGIN      = 'test-plugin/test-plugin';
+	const BASE = '/__experimental/plugins';
+	const PLUGIN = 'test-plugin/test-plugin';
 	const PLUGIN_FILE = self::PLUGIN . '.php';
 
 	/**
@@ -20,18 +20,27 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 * @since 5.5.0
 	 *
-	 * @var int $subscriber_id
+	 * @var int
 	 */
 	private static $subscriber_id;
 
 	/**
-	 * Administrator user ID.
+	 * Super administrator user ID.
 	 *
 	 * @since 5.5.0
 	 *
-	 * @var int $administrator_id
+	 * @var int
 	 */
-	private static $administrator_id;
+	private static $super_admin;
+
+	/**
+	 * Administrator user id.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @var int
+	 */
+	private static $admin;
 
 	/**
 	 * Set up class test fixtures.
@@ -41,19 +50,24 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory WordPress unit test factory.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$subscriber_id    = $factory->user->create(
+		self::$subscriber_id = $factory->user->create(
 			array(
 				'role' => 'subscriber',
 			)
 		);
-		self::$administrator_id = $factory->user->create(
+		self::$super_admin   = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+		self::$admin         = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
 
 		if ( is_multisite() ) {
-			grant_super_admin( self::$administrator_id );
+			grant_super_admin( self::$super_admin );
 		}
 
 		if ( ! defined( 'FS_METHOD' ) ) {
@@ -68,7 +82,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$subscriber_id );
-		self::delete_user( self::$administrator_id );
+		self::delete_user( self::$super_admin );
 	}
 
 	public function tearDown() {
@@ -102,7 +116,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	public function test_get_items() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$response = rest_do_request( self::BASE );
 		$this->assertEquals( 200, $response->get_status() );
@@ -124,9 +138,34 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertequals( 403, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_get_items_if_plugins_menu_not_available() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$admin );
+
+		$request  = new WP_REST_Request( 'GET', self::BASE );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_view_plugins', $response->as_error(), 403 );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_items_if_plugins_menu_available() {
+		$this->create_test_plugin();
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$admin );
+
+		$response = rest_do_request( self::BASE );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
 	public function test_get_item() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$response = rest_do_request( self::BASE . '/' . self::PLUGIN );
 		$this->assertEquals( 200, $response->get_status() );
@@ -144,8 +183,33 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_get_item_if_plugins_menu_not_available() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$admin );
+
+		$request  = new WP_REST_Request( 'GET', self::BASE . '/' . self::PLUGIN );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_view_plugin', $response->as_error(), 403 );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_get_item_if_plugins_menu_available() {
+		$this->create_test_plugin();
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$admin );
+
+		$response = rest_do_request( self::BASE . '/' . self::PLUGIN );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
 	public function test_get_item_invalid_plugin() {
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 		$response = rest_do_request( self::BASE . '/' . self::PLUGIN );
 		$this->assertEquals( 404, $response->get_status() );
 	}
@@ -155,7 +219,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
@@ -172,7 +236,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params(
@@ -195,7 +259,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 		$this->disable_activate_permission( 'hello-dolly/hello.php' );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
@@ -220,7 +284,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params(
@@ -243,7 +307,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
 
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params(
@@ -278,8 +342,22 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_create_item_if_not_super_admin() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'POST', self::BASE );
+		$request->set_body_params( array( 'slug' => 'hello-dolly' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_install_plugin', $response->as_error(), 403 );
+	}
+
 	public function test_create_item_wdotorg_unreachable() {
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'POST', self::BASE );
 		$request->set_body_params( array( 'slug' => 'foo' ) );
@@ -293,7 +371,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	public function test_create_item_unknown_plugin() {
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		// This will hit the live API.
 		$request = new WP_REST_Request( 'POST', self::BASE );
@@ -307,7 +385,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	public function test_update_item() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request  = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$response = rest_do_request( $request );
@@ -331,9 +409,22 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_update_item_if_plugins_menu_not_available() {
+		$this->create_test_plugin();
+		wp_set_current_user( self::$admin );
+
+		$request  = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_manage_plugins', $response->as_error(), 403 );
+	}
+
 	public function test_update_item_activate_plugin() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'active' ) );
@@ -345,7 +436,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	public function test_update_item_activate_plugin_fails_if_no_activate_cap() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 		$this->disable_activate_permission( self::PLUGIN_FILE );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
@@ -360,7 +451,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_update_item_network_activate_plugin_rejected_if_not_multisite() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'network-active' ) );
@@ -374,7 +465,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_update_item_network_activate_plugin() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'network-active' ) );
@@ -390,7 +481,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item_network_activate_plugin_that_was_active_on_single_site() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'network-active' ) );
@@ -400,10 +491,86 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertTrue( is_plugin_active_for_network( self::PLUGIN_FILE ) );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_activate_network_only_plugin() {
+		$this->create_test_plugin( true );
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_network_only_plugin', $response, 400 );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_network_activate_network_only_plugin() {
+		$this->create_test_plugin( true );
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_active_for_network( self::PLUGIN_FILE ) );
+	}
+
+	/**
+	 * @group ms-excluded
+	 */
+	public function test_update_item_activate_network_only_plugin_on_non_multisite() {
+		$this->create_test_plugin( true );
+		wp_set_current_user( self::$super_admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_active( self::PLUGIN_FILE ) );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_activate_plugin_for_site_if_menu_item_available() {
+		$this->create_test_plugin();
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertNotWPError( $response->as_error() );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertTrue( is_plugin_active( self::PLUGIN_FILE ) );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_network_activate_plugin_for_site_if_menu_item_available() {
+		$this->create_test_plugin();
+		$this->enable_plugins_menu_item();
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'network-active' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_manage_network_plugins', $response, 403 );
+	}
+
 	public function test_update_item_deactivate_plugin() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'inactive' ) );
@@ -416,7 +583,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item_deactivate_plugin_fails_if_no_deactivate_cap() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 		$this->disable_deactivate_permission( self::PLUGIN_FILE );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
@@ -432,7 +599,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item_deactivate_network_active_plugin() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE, '', true );
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
 		$request->set_body_params( array( 'status' => 'inactive' ) );
@@ -442,9 +609,25 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertTrue( is_plugin_inactive( self::PLUGIN_FILE ) );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_update_item_deactivate_network_active_plugin_if_not_super_admin() {
+		$this->enable_plugins_menu_item();
+		$this->create_test_plugin();
+		activate_plugin( self::PLUGIN_FILE, '', true );
+		wp_set_current_user( self::$admin );
+
+		$request = new WP_REST_Request( 'PUT', self::BASE . '/' . self::PLUGIN );
+		$request->set_body_params( array( 'status' => 'inactive' ) );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_manage_network_plugins', $response, 403 );
+	}
+
 	public function test_delete_item() {
 		$this->create_test_plugin();
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
 		$response = rest_do_request( $request );
@@ -471,10 +654,35 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 403, $response->get_status() );
 	}
 
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_delete_item_if_plugins_menu_not_available() {
+		wp_set_current_user( self::$admin );
+
+		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_manage_plugins', $response->as_error(), 403 );
+	}
+
+	/**
+	 * @group ms-required
+	 */
+	public function test_cannot_delete_item_if_plugins_menu_is_available() {
+		wp_set_current_user( self::$admin );
+		$this->enable_plugins_menu_item();
+
+		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
+		$response = rest_do_request( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_manage_plugins', $response->as_error(), 403 );
+	}
+
 	public function test_delete_item_active_plugin() {
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
-		wp_set_current_user( self::$administrator_id );
+		wp_set_current_user( self::$super_admin );
 
 		$request  = new WP_REST_Request( 'DELETE', self::BASE . '/' . self::PLUGIN );
 		$response = rest_do_request( $request );
@@ -613,12 +821,27 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * Creates a test plugin.
+	 * Enables the "plugins" as an available menu item.
 	 *
 	 * @since 5.5.0
 	 */
-	private function create_test_plugin() {
-		$php = <<<'PHP'
+	protected function enable_plugins_menu_item() {
+		$menu_perms            = get_site_option( 'menu_items', array() );
+		$menu_perms['plugins'] = true;
+		update_site_option( 'menu_items', $menu_perms );
+	}
+
+	/**
+	 * Creates a test plugin.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param bool $network_only Whether to make this a network only plugin.
+	 */
+	private function create_test_plugin( $network_only = false ) {
+		$network = $network_only ? PHP_EOL . ' * Network: true' . PHP_EOL : '';
+
+		$php = <<<PHP
 <?php
 /*
  * Plugin Name: Test Plugin
@@ -628,7 +851,7 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
  * Author: WordPress.org
  * Author URI: https://wordpress.org/
  * Requires PHP: 5.6.0
- * Requires at least: 5.4.0
+ * Requires at least: 5.4.0{$network}
  */
 PHP;
 		if ( false === wp_mkdir_p( WP_PLUGIN_DIR . '/test-plugin' ) ) {

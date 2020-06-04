@@ -13,7 +13,6 @@
 	</testsuites>
 	<groups>
 		<exclude>
-			<group>ms-files</group>
 			<group>ms-required</group>
 		</exclude>
 	</groups>
