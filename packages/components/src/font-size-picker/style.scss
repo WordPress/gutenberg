@@ -1,6 +1,7 @@
 .components-font-size-picker__controls {
 	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	margin-bottom: $grid-unit-30;
 
@@ -32,7 +33,6 @@
 	// Allow the font-size picker dropdown to grow in width.
 	.components-font-size-picker__select {
 		margin-right: $grid-unit-10;
-		flex-grow: 1;
 	}
 
 	.components-color-palette__clear {
