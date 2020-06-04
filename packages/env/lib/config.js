@@ -133,6 +133,8 @@ module.exports = {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
 					WP_PHP_BINARY: 'php',
+					WP_TESTS_EMAIL: 'admin@example.org',
+					WP_TESTS_TITLE: 'Test Blog',
 				},
 				mappings: {},
 			},

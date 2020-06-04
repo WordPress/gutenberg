@@ -19,6 +19,7 @@
 		"./plugin/config.js",
 		"./plugin/commands/changelog.js",
 		"./plugin/commands/performance.js",
+		"./plugin/lib/milestone.js",
 		"./plugin/lib/version.js",
 		"./plugin/lib/logger.js",
 		"./plugin/lib/utils.js",
