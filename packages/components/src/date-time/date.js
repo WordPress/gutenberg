@@ -26,7 +26,7 @@ function DatePicker( { currentDate, isInvalidDate, onChange } ) {
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
 	 */
-	const keepFocusInside = () => {
+	function keepFocusInside() {
 		if ( ! nodeRef.current ) {
 			return;
 		}
@@ -45,9 +45,9 @@ function DatePicker( { currentDate, isInvalidDate, onChange } ) {
 			// Keep the focus on focus region.
 			focusRegion.focus();
 		}
-	};
+	}
 
-	const onChangeMoment = ( newDate ) => {
+	function onChangeMoment( newDate ) {
 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
 		const momentDate = currentDate ? moment( currentDate ) : moment();
 		const momentTime = {
@@ -57,7 +57,7 @@ function DatePicker( { currentDate, isInvalidDate, onChange } ) {
 		};
 
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
-	};
+	}
 
 	/**
 	 * Create a Moment object from a date string. With no currentDate supplied, default to a Moment
@@ -65,12 +65,12 @@ function DatePicker( { currentDate, isInvalidDate, onChange } ) {
 	 *
 	 * @return {?moment.Moment} Moment object for selected date or null.
 	 */
-	const getMomentDate = () => {
+	function getMomentDate() {
 		if ( null === currentDate ) {
 			return null;
 		}
 		return currentDate ? moment( currentDate ) : moment();
-	};
+	}
 
 	const momentDate = getMomentDate();
 
