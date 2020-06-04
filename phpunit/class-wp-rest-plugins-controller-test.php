@@ -52,6 +52,10 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
+		if ( is_multisite() ) {
+			grant_super_admin( self::$administrator_id );
+		}
+
 		if ( ! defined( 'FS_METHOD' ) ) {
 			define( 'FS_METHOD', 'direct' );
 		}
@@ -235,8 +239,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_create_item_and_network_activate() {
-		$this->markTestSkipped( "Multisite tests don't appear to be working." );
-
 		if ( isset( get_plugins()['hello-dolly/hello.php'] ) ) {
 			delete_plugins( array( 'hello-dolly/hello.php' ) );
 		}
@@ -371,8 +373,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_item_network_activate_plugin() {
-		$this->markTestSkipped( "Multisite tests don't appear to be working." );
-
 		$this->create_test_plugin();
 		wp_set_current_user( self::$administrator_id );
 
@@ -388,8 +388,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_item_network_activate_plugin_that_was_active_on_single_site() {
-		$this->markTestSkipped( "Multisite tests don't appear to be working." );
-
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE );
 		wp_set_current_user( self::$administrator_id );
@@ -432,8 +430,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_update_item_deactivate_network_active_plugin() {
-		$this->markTestSkipped( "Multisite tests don't appear to be working." );
-
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE, '', true );
 		wp_set_current_user( self::$administrator_id );
@@ -503,8 +499,6 @@ class WP_REST_Plugins_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @group ms-required
 	 */
 	public function test_prepare_item_network_active() {
-		$this->markTestSkipped( "Multisite tests don't appear to be working." );
-
 		$this->create_test_plugin();
 		activate_plugin( self::PLUGIN_FILE, '', true );
 

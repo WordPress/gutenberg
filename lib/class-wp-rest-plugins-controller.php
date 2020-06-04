@@ -144,7 +144,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$plugins = array();
 
 		foreach ( get_plugins() as $file => $data ) {
-			if ( ! $this->check_read_permission( $file ) ) {
+			if ( is_wp_error( $this->check_read_permission( $file ) ) ) {
 				continue;
 			}
 
@@ -172,12 +172,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! $this->check_read_permission( $request['plugin'] ) ) {
-			return new WP_Error(
-				'rest_cannot_view_plugin',
-				__( 'Sorry, you are not allowed to manage this plugin.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
+		$can_read = $this->check_read_permission( $request['plugin'] );
+
+		if ( is_wp_error( $can_read ) ) {
+			return $can_read;
 		}
 
 		return true;
@@ -194,14 +192,11 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$plugins = get_plugins();
+		$data = $this->get_plugin_data( $request['plugin'] );
 
-		if ( ! isset( $plugins[ $request['plugin'] ] ) ) {
-			return new WP_Error( 'rest_plugin_not_found', __( 'Plugin not found.', 'gutenberg' ), array( 'status' => 404 ) );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
-
-		$data          = $plugins[ $request['plugin'] ];
-		$data['_file'] = $request['plugin'];
 
 		return $this->prepare_item_for_response( $data, $request );
 	}
@@ -215,14 +210,26 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 *
 	 * @param string $plugin The plugin file to check.
-	 * @return bool
+	 * @return true|WP_Error True if can read, a WP_Error instance otherwise.
 	 */
 	protected function check_read_permission( $plugin ) {
+		if ( ! $this->is_plugin_installed( $plugin ) ) {
+			return new WP_Error( 'rest_plugin_not_found', __( 'Plugin not found.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
 		if ( ! is_multisite() ) {
 			return true;
 		}
 
-		return ! is_network_only_plugin( $plugin ) || is_plugin_active( $plugin ) || current_user_can( 'manage_network_plugins' );
+		if ( ! is_network_only_plugin( $plugin ) || is_plugin_active( $plugin ) || current_user_can( 'manage_network_plugins' ) ) {
+			return true;
+		}
+
+		return new WP_Error(
+			'rest_cannot_view_plugin',
+			__( 'Sorry, you are not allowed to manage this plugin.', 'gutenberg' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
 	}
 
 	/**
@@ -375,12 +382,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! $this->check_read_permission( $request['plugin'] ) ) {
-			return new WP_Error(
-				'rest_cannot_view_plugin',
-				__( 'Sorry, you are not allowed to manage this plugin.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
+		$can_read = $this->check_read_permission( $request['plugin'] );
+
+		if ( is_wp_error( $can_read ) ) {
+			return $can_read;
 		}
 
 		$status = $this->get_plugin_status( $request['plugin'] );
@@ -407,14 +412,11 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	public function update_item( $request ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$plugins = get_plugins();
+		$data = $this->get_plugin_data( $request['plugin'] );
 
-		if ( ! isset( $plugins[ $request['plugin'] ] ) ) {
-			return new WP_Error( 'rest_plugin_not_found', __( 'Plugin not found.', 'gutenberg' ), array( 'status' => 404 ) );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
-
-		$data          = $plugins[ $request['plugin'] ];
-		$data['_file'] = $request['plugin'];
 
 		$status = $this->get_plugin_status( $request['plugin'] );
 
@@ -458,12 +460,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! $this->check_read_permission( $request['plugin'] ) ) {
-			return new WP_Error(
-				'rest_cannot_view_plugin',
-				__( 'Sorry, you are not allowed to manage this plugin.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
+		$can_read = $this->check_read_permission( $request['plugin'] );
+
+		if ( is_wp_error( $can_read ) ) {
+			return $can_read;
 		}
 
 		return true;
@@ -481,10 +481,10 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
-		$plugins = get_plugins();
+		$data = $this->get_plugin_data( $request['plugin'] );
 
-		if ( ! isset( $plugins[ $request['plugin'] ] ) ) {
-			return new WP_Error( 'rest_plugin_not_found', __( 'Plugin not found.', 'gutenberg' ), array( 'status' => 404 ) );
+		if ( is_wp_error( $data ) ) {
+			return $data;
 		}
 
 		if ( is_plugin_active( $request['plugin'] ) ) {
@@ -545,6 +545,27 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		$response->add_link( 'self', rest_url( $this->namespace . '/' . $this->rest_base . '/' . substr( $item['_file'], 0, - 4 ) ) );
 
 		return $response;
+	}
+
+	/**
+	 * Gets the plugin header data for a plugin.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $plugin The plugin file to get data for.
+	 * @return array|WP_Error The plugin data, or a WP_Error if the plugin is not installed.
+	 */
+	protected function get_plugin_data( $plugin ) {
+		$plugins = get_plugins();
+
+		if ( ! isset( $plugins[ $plugin ] ) ) {
+			return new WP_Error( 'rest_plugin_not_found', __( 'Plugin not found.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
+
+		$data          = $plugins[ $plugin ];
+		$data['_file'] = $plugin;
+
+		return $data;
 	}
 
 	/**
@@ -643,6 +664,18 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if the plugin is installed.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @param string $plugin The plugin file.
+	 * @return bool
+	 */
+	protected function is_plugin_installed( $plugin ) {
+		return file_exists( WP_PLUGIN_DIR . '/' . $plugin );
 	}
 
 	/**

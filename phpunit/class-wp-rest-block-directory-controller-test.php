@@ -16,6 +16,10 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 			)
 		);
 
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+
 		if ( ! defined( 'FS_METHOD' ) ) {
 			define( 'FS_METHOD', 'direct' );
 		}
@@ -49,7 +53,7 @@ class WP_REST_Block_Directory_Controller_Test extends WP_Test_REST_Controller_Te
 		$request->set_query_params( array( 'term' => 'foo' ) );
 
 		$result = rest_do_request( $request );
-		$this->assertNotWPError( $result );
+		$this->assertNotWPError( $result->as_error() );
 		$this->assertEquals( 200, $result->status );
 	}
 

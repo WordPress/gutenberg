@@ -86,7 +86,8 @@ class WP_REST_Block_Directory_Controller extends WP_REST_Controller {
 		if ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) {
 			return new WP_Error(
 				'rest_block_directory_cannot_view',
-				__( 'Sorry, you are not allowed to browse the block directory.', 'gutenberg' )
+				__( 'Sorry, you are not allowed to browse the block directory.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 
