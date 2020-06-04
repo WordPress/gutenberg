@@ -60,11 +60,11 @@ function post_author_build_css_colors( $attributes ) {
  */
 function post_author_build_css_font_sizes( $attributes ) {
 	// CSS classes.
-	$name_font_sizes = array(
+	$name_font_sizes   = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
-	$bio_font_sizes = array(
+	$bio_font_sizes    = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
 	);
