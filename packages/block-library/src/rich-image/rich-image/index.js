@@ -15,10 +15,10 @@ import {
 } from '@wordpress/block-editor';
 import { Fragment, Component } from '@wordpress/element';
 import {
-	Toolbar,
+	ToolbarGroup,
 	ToolbarButton,
+	__experimentalToolbarItem as ToolbarItem,
 	Icon,
-	Button,
 	Spinner,
 	withNotices,
 	RangeControl,
@@ -156,10 +156,9 @@ class RichImage extends Component {
 							<div
 								className="richimage__crop-area"
 								style={ {
-									paddingBottom: `${
-										( 100 * imageSize.naturalHeight ) /
-										imageSize.naturalWidth
-									}%`,
+									paddingBottom: `${ ( 100 *
+										imageSize.naturalHeight ) /
+										imageSize.naturalWidth }%`,
 								} }
 							>
 								<Cropper
@@ -210,57 +209,73 @@ class RichImage extends Component {
 
 				{ isEditing && (
 					<BlockControls>
-						<Toolbar>
-							<DropdownMenu
-								icon={ <RotateLeftIcon /> }
-								label={ __( 'Rotate' ) }
-								popoverProps={ POPOVER_PROPS }
-								controls={ [
-									{
-										icon: <RotateLeftIcon />,
-										title: __( 'Rotate left' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.adjustImage( 'rotate', {
-												angle: -ROTATE_STEP,
-											} ),
-									},
-									{
-										icon: <RotateRightIcon />,
-										title: __( 'Rotate right' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.adjustImage( 'rotate', {
-												angle: ROTATE_STEP,
-											} ),
-									},
-								] }
-							/>
-							<DropdownMenu
-								icon={ <FlipVerticalIcon /> }
-								label={ __( 'Flip' ) }
-								popoverProps={ POPOVER_PROPS }
-								controls={ [
-									{
-										icon: <FlipVerticalIcon />,
-										title: __( 'Flip vertical' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.adjustImage( 'flip', {
-												direction: 'vertical',
-											} ),
-									},
-									{
-										icon: <FlipHorizontalIcon />,
-										title: __( 'Flip horizontal' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.adjustImage( 'flip', {
-												direction: 'horizontal',
-											} ),
-									},
-								] }
-							/>
+						<ToolbarGroup>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ <RotateLeftIcon /> }
+										label={ __( 'Rotate' ) }
+										popoverProps={ POPOVER_PROPS }
+										toggleProps={ toggleProps }
+										controls={ [
+											{
+												icon: <RotateLeftIcon />,
+												title: __( 'Rotate left' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.adjustImage(
+														'rotate',
+														{
+															angle: -ROTATE_STEP,
+														}
+													),
+											},
+											{
+												icon: <RotateRightIcon />,
+												title: __( 'Rotate right' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.adjustImage(
+														'rotate',
+														{
+															angle: ROTATE_STEP,
+														}
+													),
+											},
+										] }
+									/>
+								) }
+							</ToolbarItem>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ <FlipVerticalIcon /> }
+										label={ __( 'Flip' ) }
+										popoverProps={ POPOVER_PROPS }
+										toggleProps={ toggleProps }
+										controls={ [
+											{
+												icon: <FlipVerticalIcon />,
+												title: __( 'Flip vertical' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.adjustImage( 'flip', {
+														direction: 'vertical',
+													} ),
+											},
+											{
+												icon: <FlipHorizontalIcon />,
+												title: __( 'Flip horizontal' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.adjustImage( 'flip', {
+														direction: 'horizontal',
+													} ),
+											},
+										] }
+									/>
+								) }
+							</ToolbarItem>
 							<ToolbarButton
 								disabled={ inProgress }
 								icon={ <CropIcon /> }
@@ -272,57 +287,70 @@ class RichImage extends Component {
 									} )
 								}
 							/>
-						</Toolbar>
+						</ToolbarGroup>
 					</BlockControls>
 				) }
 
 				{ isCrop && (
 					<BlockControls>
-						<Toolbar>
+						<ToolbarGroup>
 							<div className="richimage__crop-icon">
 								<Icon icon={ CropIcon } />
 							</div>
-						</Toolbar>
-						<Toolbar>
-							<DropdownMenu
-								icon={ <AspectIcon /> }
-								label={ __( 'Aspect Ratio' ) }
-								popoverProps={ POPOVER_PROPS }
-								controls={ [
-									{
-										title: __( '16:10' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.setState( {
-												aspect: 16 / 10,
-											} ),
-									},
-									{
-										title: __( '16:9' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.setState( { aspect: 16 / 9 } ),
-									},
-									{
-										title: __( '4:3' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.setState( { aspect: 4 / 3 } ),
-									},
-									{
-										title: __( '3:2' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.setState( { aspect: 3 / 2 } ),
-									},
-									{
-										title: __( '1:1' ),
-										isDisabled: inProgress,
-										onClick: () =>
-											this.setState( { aspect: 1 } ),
-									},
-								] }
-							/>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ <AspectIcon /> }
+										label={ __( 'Aspect Ratio' ) }
+										popoverProps={ POPOVER_PROPS }
+										toggleProps={ toggleProps }
+										controls={ [
+											{
+												title: __( '16:10' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.setState( {
+														aspect: 16 / 10,
+													} ),
+											},
+											{
+												title: __( '16:9' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.setState( {
+														aspect: 16 / 9,
+													} ),
+											},
+											{
+												title: __( '4:3' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.setState( {
+														aspect: 4 / 3,
+													} ),
+											},
+											{
+												title: __( '3:2' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.setState( {
+														aspect: 3 / 2,
+													} ),
+											},
+											{
+												title: __( '1:1' ),
+												isDisabled: inProgress,
+												onClick: () =>
+													this.setState( {
+														aspect: 1,
+													} ),
+											},
+										] }
+									/>
+								) }
+							</ToolbarItem>
 							<ToolbarButton
 								className="richimage-toolbar__dropdown"
 								disabled={ inProgress }
@@ -334,19 +362,19 @@ class RichImage extends Component {
 									} ) )
 								}
 							/>
-						</Toolbar>
-						<Toolbar>
-							<Button onClick={ this.cropImage }>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarButton onClick={ this.cropImage }>
 								{ __( 'Apply' ) }
-							</Button>
-							<Button
+							</ToolbarButton>
+							<ToolbarButton
 								onClick={ () =>
 									this.setState( { isCrop: false } )
 								}
 							>
 								{ __( 'Cancel' ) }
-							</Button>
-						</Toolbar>
+							</ToolbarButton>
+						</ToolbarGroup>
 					</BlockControls>
 				) }
 			</Fragment>
