@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRef, useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 
 /**
@@ -32,6 +32,7 @@ export default function TemplatePartEdit( {
 		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
 		[ clientId ]
 	);
+	const { editEntityRecord } = useDispatch( 'core' );
 	const blockChanges = useRef( 0 );
 	useEffect( () => {
 		if ( blockChanges.current < 4 ) blockChanges.current++;
@@ -42,8 +43,12 @@ export default function TemplatePartEdit( {
 				initialPostId.current === null ) &&
 			postId !== undefined &&
 			postId !== null
-		)
+		) {
 			setAttributes( { postId } );
+			editEntityRecord( 'postType', 'wp_template_part', postId, {
+				status: 'publish',
+			} );
+		}
 	}, [ innerBlocks ] );
 
 	if ( postId ) {
