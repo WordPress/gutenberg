@@ -3,7 +3,7 @@
 
 Attributes are the way a block stores data, they define how a block is parsed to extract data from the saved content.
 
-We will add a **message** attribute that will be the variable to hold the user message. The following code defines a **message** attribute of type string with the value derived from the source, defined as the text of a `div` tag.
+For this block tutorial, we want to allow the user to type in a message that we will display stylized in the published post. So, we need to add a **message** attribute that will hold the user message. The following code defines a **message** attribute; the attribute type is a string; the source is the text from the selector which is a `div` tag.
 
 ```js
 attributes: {
