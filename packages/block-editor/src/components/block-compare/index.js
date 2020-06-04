@@ -11,7 +11,6 @@ import { diffChars } from 'diff/lib/diff/character';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import { getSaveContent, getSaveElement } from '@wordpress/blocks';
 
 /**
@@ -19,8 +18,14 @@ import { getSaveContent, getSaveElement } from '@wordpress/blocks';
  */
 import BlockView from './block-view';
 
-class BlockCompare extends Component {
-	getDifference( originalContent, newContent ) {
+function BlockCompare( {
+	block,
+	onKeep,
+	onConvert,
+	convertor,
+	convertButtonText,
+} ) {
+	const getDifference = ( originalContent, newContent ) => {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
@@ -35,18 +40,18 @@ class BlockCompare extends Component {
 				</span>
 			);
 		} );
-	}
+	};
 
-	getOriginalContent( block ) {
+	const getOriginalContent = () => {
 		return {
 			rawContent: block.originalContent,
 			renderedContent: getSaveElement( block.name, block.attributes ),
 		};
-	}
+	};
 
-	getConvertedContent( block ) {
+	const getConvertedContent = ( convertedBlock ) => {
 		// The convertor may return an array of items or a single item
-		const newBlocks = castArray( block );
+		const newBlocks = castArray( convertedBlock );
 
 		// Get converted block details
 		const newContent = newBlocks.map( ( item ) =>
@@ -60,45 +65,36 @@ class BlockCompare extends Component {
 			rawContent: newContent.join( '' ),
 			renderedContent,
 		};
-	}
+	};
 
-	render() {
-		const {
-			block,
-			onKeep,
-			onConvert,
-			convertor,
-			convertButtonText,
-		} = this.props;
-		const original = this.getOriginalContent( block );
-		const converted = this.getConvertedContent( convertor( block ) );
-		const difference = this.getDifference(
-			original.rawContent,
-			converted.rawContent
-		);
+	const original = getOriginalContent();
+	const converted = getConvertedContent( convertor( block ) );
+	const difference = getDifference(
+		original.rawContent,
+		converted.rawContent
+	);
 
-		return (
-			<div className="block-editor-block-compare__wrapper">
-				<BlockView
-					title={ __( 'Current' ) }
-					className="block-editor-block-compare__current"
-					action={ onKeep }
-					actionText={ __( 'Convert to HTML' ) }
-					rawContent={ original.rawContent }
-					renderedContent={ original.renderedContent }
-				/>
+	return (
+		<div className="block-editor-block-compare__wrapper">
+			<BlockView
+				title={ __( 'Current' ) }
+				className="block-editor-block-compare__current"
+				action={ onKeep }
+				actionText={ __( 'Convert to HTML' ) }
+				rawContent={ original.rawContent }
+				renderedContent={ original.renderedContent }
+			/>
 
-				<BlockView
-					title={ __( 'After Conversion' ) }
-					className="block-editor-block-compare__converted"
-					action={ onConvert }
-					actionText={ convertButtonText }
-					rawContent={ difference }
-					renderedContent={ converted.renderedContent }
-				/>
-			</div>
-		);
-	}
+			<BlockView
+				title={ __( 'After Conversion' ) }
+				className="block-editor-block-compare__converted"
+				action={ onConvert }
+				actionText={ convertButtonText }
+				rawContent={ difference }
+				renderedContent={ converted.renderedContent }
+			/>
+		</div>
+	);
 }
 
 export default BlockCompare;
