@@ -16,7 +16,7 @@ import {
 import BlockTitle from '../block-title';
 
 /**
- * Block breadcrumb component, displaying the label of the block. If the block
+ * Block selection button component, displaying the label of the block. If the block
  * descends from a root block, a button is displayed enabling the user to select
  * the root block.
  *
@@ -25,7 +25,7 @@ import BlockTitle from '../block-title';
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockBreadcrumb( {
+function BlockSelectionButton( {
 	clientId,
 	rootClientId,
 	moverDirection,
@@ -74,7 +74,10 @@ function BlockBreadcrumb( {
 	);
 
 	return (
-		<div className="block-editor-block-list__breadcrumb" { ...props }>
+		<div
+			className="block-editor-block-list__block-selection-button"
+			{ ...props }
+		>
 			<Button
 				ref={ ref }
 				onClick={ () => setNavigationMode( false ) }
@@ -87,4 +90,4 @@ function BlockBreadcrumb( {
 	);
 }
 
-export default BlockBreadcrumb;
+export default BlockSelectionButton;

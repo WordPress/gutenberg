@@ -62,24 +62,30 @@
 	font-weight: bold;
 }
 
-.edit-navigation-menu-editor__block-editor-panel {
+.edit-navigation-menu-editor__block-editor-area {
 	@include break-medium {
 		// IE11 requires the column to be explicitly declared.
 		// Only shift this into the second column on desktop.
 		grid-column: 2;
 	}
 
-	// Make panels collapsible in IE. The IE analogue of align-items: self-start;.
-	-ms-grid-row-align: start;
+	.components-card__footer,
+	.components-card__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.edit-navigation-menu-editor__block-editor-area-header-text {
+		flex-grow: 1;
+		font-weight: bold;
+	}
 }
 
 .components-panel__header-actions {
-	margin-top: $grid-unit-20;
-	padding-bottom: $grid-unit-20;
 	margin-bottom: $grid-unit-60;
 	width: 100%;
 	text-align: right;
-	border-bottom: 1px solid $light-gray-300;
 }
 
 .components-panel__footer-actions {

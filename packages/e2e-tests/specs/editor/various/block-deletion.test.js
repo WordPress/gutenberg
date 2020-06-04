@@ -118,6 +118,9 @@ describe( 'block deletion -', () => {
 			await page.click(
 				'.wp-block[data-type="core/image"] .components-placeholder__label'
 			);
+			await page.click(
+				'.wp-block[data-type="core/image"] .components-placeholder__label'
+			);
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -196,6 +199,7 @@ describe( 'deleting all blocks', () => {
 
 		// Add and remove a block.
 		await insertBlock( 'Image' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.
