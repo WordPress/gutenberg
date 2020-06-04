@@ -30,17 +30,12 @@ const defaultFilters = {
 	sepia: true,
 };
 function FilterControl(
-	{
-		className,
-		filters = defaultFilters,
-		value = {},
-		onChange = noop,
-		...props
-	},
+	{ className, filters = defaultFilters, value, onChange = noop, ...props },
 	ref
 ) {
-	const [ state, setState ] = useState( value );
+	const [ __state, setState ] = useState( value || {} );
 	const filterOptions = { ...defaultFilters, ...filters };
+	const state = value || __state;
 
 	const classes = classnames( 'components-filter-control', className );
 
@@ -51,14 +46,16 @@ function FilterControl(
 		const styles = createStyles( nextState );
 
 		onChange( nextState, { styles } );
-		setState( nextState );
+
+		if ( ! value ) {
+			setState( nextState );
+		}
 	};
 
 	return (
 		<Root className={ classes } ref={ ref } { ...props }>
 			{ filterOptions.blur && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Blur' ) }
 					trackColor="transparent"
 					min={ 0 }
@@ -71,7 +68,6 @@ function FilterControl(
 			) }
 			{ filterOptions.brightness && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Brightness' ) }
 					railColor="linear-gradient(to right, black, white)"
 					trackColor="transparent"
@@ -95,7 +91,6 @@ function FilterControl(
 			) }
 			{ filterOptions.contrast && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Contrast' ) }
 					trackColor="transparent"
 					min={ -100 }
@@ -118,7 +113,6 @@ function FilterControl(
 			) }
 			{ filterOptions.grayscale && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Grayscale' ) }
 					trackColor="transparent"
 					min={ 0 }
@@ -131,7 +125,6 @@ function FilterControl(
 			) }
 			{ filterOptions.hue && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Hue' ) }
 					railColor="linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)"
 					trackColor="transparent"
@@ -145,7 +138,6 @@ function FilterControl(
 			) }
 			{ filterOptions.invert && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Invert' ) }
 					trackColor="transparent"
 					min={ 0 }
@@ -158,7 +150,6 @@ function FilterControl(
 			) }
 			{ filterOptions.opacity && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Opacity' ) }
 					trackColor="transparent"
 					min={ 0 }
@@ -171,7 +162,6 @@ function FilterControl(
 			) }
 			{ filterOptions.saturation && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Saturation' ) }
 					railColor="linear-gradient(to right, #aaa, red)"
 					trackColor="transparent"
@@ -195,7 +185,6 @@ function FilterControl(
 			) }
 			{ filterOptions.sepia && (
 				<RangeControl
-					__unstableIsControlled={ false }
 					label={ __( 'Sepia' ) }
 					trackColor="transparent"
 					min={ 0 }
@@ -217,7 +206,7 @@ function interpolateValue( value, inputRange, outputRange ) {
 		return null;
 	}
 
-	return interpolate( value, inputRange, outputRange );
+	return Math.round( interpolate( value, inputRange, outputRange ) );
 }
 
 const ForwardedComponent = forwardRef( FilterControl );

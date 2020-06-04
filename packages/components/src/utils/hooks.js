@@ -20,18 +20,13 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * be updated if a new incoming prop value is changed.
  *
  * @param {any} initialState The initial state value.
- * @param {boolean} __unstableIsControlled
  * @return {[*, Function]} The controlled value and the value setter.
  */
-export function useControlledState(
-	initialState,
-	__unstableIsControlled = true
-) {
+export function useControlledState( initialState ) {
 	const [ state, setState ] = useState( initialState );
 	const lastInitialStateRef = useRef( initialState );
 
 	useEffect( () => {
-		if ( ! __unstableIsControlled ) return;
 		// Update the internal state if the incoming value changes.
 		if ( initialState !== lastInitialStateRef.current ) {
 			lastInitialStateRef.current = initialState;
