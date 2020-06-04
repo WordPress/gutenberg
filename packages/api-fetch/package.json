@@ -24,9 +24,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/url": "file:../url",
-		"globalthis": "^1.0.1",
-		"isomorphic-fetch": "^2.2.1"
+		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
 		"access": "public"
