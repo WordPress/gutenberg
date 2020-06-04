@@ -46,10 +46,9 @@ function AudioEdit( {
 	// }
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 
-	const audioUpload = useSelect( ( select ) => {
+	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		const { mediaUpload } = getSettings();
-		return { mediaUpload };
+		return getSettings().mediaUpload;
 	} );
 
 	useEffect( () => {
@@ -57,7 +56,7 @@ function AudioEdit( {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
-				audioUpload( {
+				mediaUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ { id: mediaId, url } ] ) => {
 						setAttributes( { id: mediaId, src: url } );
