@@ -14,7 +14,7 @@ import {
 	NavigableMenu,
 	MenuItem,
 	ToolbarGroup,
-	Button,
+	ToolbarButton,
 	Dropdown,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -110,14 +110,14 @@ const MediaReplaceFlow = ( {
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarGroup className="media-replace-flow">
-					<Button
+					<ToolbarButton
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
 						{ name }
-					</Button>
+					</ToolbarButton>
 				</ToolbarGroup>
 			) }
 			renderContent={ ( { onClose } ) => (

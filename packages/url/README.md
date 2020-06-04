@@ -133,6 +133,25 @@ _Returns_
 
 -   `(string|void)`: The path part of the URL.
 
+<a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
+
+Returns the path part and query string part of the URL.
+
+_Usage_
+
+```js
+const pathAndQueryString1 = getPathAndQueryString( 'http://localhost:8080/this/is/a/test?query=true' ); // '/this/is/a/test?query=true'
+const pathAndQueryString2 = getPathAndQueryString( 'https://wordpress.org/help/faq/' ); // '/help/faq'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string`: The path part and query string part of the URL.
+
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
 Returns the protocol part of the URL.
