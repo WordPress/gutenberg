@@ -13,7 +13,6 @@ import {
 	templateId,
 	templatePartId,
 	templateType,
-	templateIds,
 	templatePartIds,
 	page,
 	showOnFront,
@@ -179,41 +178,6 @@ describe( 'state', () => {
 					type: 'SET_TEMPLATE_PART',
 				} )
 			).toEqual( 'wp_template_part' );
-		} );
-	} );
-
-	describe( 'templateIds()', () => {
-		it( 'should apply default state', () => {
-			expect( templateIds( undefined, {} ) ).toEqual( [] );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			const state = {};
-			expect( templateIds( state, {} ) ).toBe( state );
-		} );
-
-		it( 'should add template IDs', () => {
-			expect(
-				templateIds( deepFreeze( [ 1 ] ), {
-					type: 'ADD_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( [ 1, 2 ] );
-		} );
-
-		it( 'should remove template IDs', () => {
-			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 2,
-				} )
-			).toEqual( [ 1 ] );
-			expect(
-				templateIds( deepFreeze( [ 1, 2 ] ), {
-					type: 'REMOVE_TEMPLATE',
-					templateId: 1,
-				} )
-			).toEqual( [ 2 ] );
 		} );
 	} );
 

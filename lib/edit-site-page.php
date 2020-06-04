@@ -164,7 +164,6 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['editSiteInitialState'] = array();
 
 	$settings['editSiteInitialState']['templateType']    = 'wp_template';
-	$settings['editSiteInitialState']['templateIds']     = array_values( $template_ids );
 	$settings['editSiteInitialState']['templatePartIds'] = array_values( $template_part_ids );
 
 	$settings['editSiteInitialState']['showOnFront'] = get_option( 'show_on_front' );

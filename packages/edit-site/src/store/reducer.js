@@ -154,25 +154,6 @@ export function templateType( state, action ) {
 }
 
 /**
- * Reducer returning the list of template IDs.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templateIds( state = [], action ) {
-	switch ( action.type ) {
-		case 'ADD_TEMPLATE':
-			return [ ...state, action.templateId ];
-		case 'REMOVE_TEMPLATE':
-			return state.filter( ( id ) => id !== action.templateId );
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the list of template part IDs.
  *
  * @param {Object} state Current state.
@@ -219,7 +200,6 @@ export default combineReducers( {
 	templateId,
 	templatePartId,
 	templateType,
-	templateIds,
 	templatePartIds,
 	page,
 	showOnFront,
