@@ -229,7 +229,7 @@ function Navigation( {
 	function buildPlaceHolderInstructionText() {
 		if ( hasMenus && hasPages ) {
 			return __(
-				'Create a Navigation from all existing pages, or chose a Menu.'
+				'Create a navigation from all existing pages, or choose a menu.'
 			);
 		}
 
