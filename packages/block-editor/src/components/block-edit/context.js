@@ -52,24 +52,3 @@ export const withBlockEditContext = ( mapContextToProps ) =>
 			</Consumer>
 		);
 	}, 'withBlockEditContext' );
-
-/**
- * A Higher Order Component used to render conditionally the wrapped
- * component only when the BlockEdit has selected state set.
- *
- * @param {WPComponent} OriginalComponent Component to wrap.
- *
- * @return {WPComponent} Component which renders only when the BlockEdit is selected.
- */
-export const ifBlockEditSelected = createHigherOrderComponent(
-	( OriginalComponent ) => {
-		return ( props ) => (
-			<Consumer>
-				{ ( { isSelected } ) =>
-					isSelected && <OriginalComponent { ...props } />
-				}
-			</Consumer>
-		);
-	},
-	'ifBlockEditSelected'
-);
