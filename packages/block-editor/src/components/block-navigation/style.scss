@@ -30,10 +30,15 @@ $tree-item-height: 36px;
 		align-items: center;
 		width: calc(100% - 0.8em);
 		height: auto;
-		padding: 6px;
+		padding: $grid-unit-15 6px;
 		text-align: left;
 		color: $dark-gray-600;
 		border-radius: 2px;
+
+		.components-modal__content & {
+			padding-left: 0;
+			padding-right: 0;
+		}
 	}
 
 	&.is-visible .block-editor-block-navigation-block-contents {
@@ -52,6 +57,13 @@ $tree-item-height: 36px;
 		background: $dark-gray-primary;
 		box-shadow: 0 0 0 $border-width $dark-gray-primary;
 		border-radius: $border-width;
+	}
+
+	.block-editor-block-navigation-block__menu-cell,
+	.block-editor-block-navigation-block__mover-cell,
+	.block-editor-block-navigation-block__contents-cell {
+		padding-top: 0;
+		padding-bottom: 0;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -74,9 +86,73 @@ $tree-item-height: 36px;
 		}
 	}
 
+	.block-editor-block-navigation-block__mover-cell-alignment-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	// Keep the tap target large but the focus target small
 	.block-editor-block-mover-button {
+		position: relative;
 		width: $button-size;
-		height: $button-size;
+		height: $button-size-small;
+
+		// Position the icon
+		svg {
+			position: relative;
+			height: $button-size-small;
+		}
+
+		&.is-up-button {
+			align-items: flex-end;
+			svg {
+				bottom: -4px;
+			}
+		}
+
+		&.is-down-button {
+			align-items: flex-start;
+			svg {
+				top: -4px;
+			}
+		}
+
+		// Don't show the focus inherited by the Button component.
+		&:focus:enabled {
+			box-shadow: none;
+			outline: none;
+		}
+
+		// Focus style.
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus::before {
+			@include block-toolbar-button-style__focus();
+		}
+
+		// Focus and toggle pseudo elements.
+		&::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-block-ui;
+			height: 16px;
+			min-width: 100%;
+
+			// Position the focus rectangle.
+			left: 0;
+			right: 0;
+
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
 	}
 
 	.block-editor-inserter__toggle {
@@ -125,7 +201,7 @@ $tree-item-height: 36px;
 			position: absolute;
 			top: -1px;
 			bottom: -2px;
-			right: 0;
+			right: -1px;
 			border-right: 2px solid $light-gray-900;
 		}
 
@@ -136,7 +212,7 @@ $tree-item-height: 36px;
 
 		// Make the last vertical line half-height.
 		&.has-item.is-last-row {
-			height: $grid-unit-20;
+			height: 22px;
 		}
 
 		// Draw a horizontal line using border-bottom.
@@ -144,10 +220,20 @@ $tree-item-height: 36px;
 			content: "";
 			display: block;
 			position: absolute;
-			top: $grid-unit-20;
+			top: 22px;
 			left: 100%;
 			width: 5px;
 			border-bottom: 2px solid $light-gray-900;
+		}
+	}
+}
+
+// Position the horizontal line in the middle of appender's height
+.block-editor-block-navigation-appender__cell .block-editor-block-navigator-descender-line {
+	&.has-item.is-last-row {
+		height: $grid-unit-20;
+		&::after {
+			top: 100%;
 		}
 	}
 }

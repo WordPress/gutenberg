@@ -71,7 +71,7 @@ export default function BlockNavigationBlock( {
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
-				colSpan={ hasRenderedMovers ? undefined : 3 }
+				colSpan={ hasRenderedMovers ? undefined : 2 }
 			>
 				{ ( props ) => (
 					<div className="block-editor-block-navigation-block__contents-container">
@@ -96,26 +96,24 @@ export default function BlockNavigationBlock( {
 				<>
 					<TreeGridCell className={ moverCellClassName }>
 						{ ( props ) => (
-							<BlockMoverUpButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
-						) }
-					</TreeGridCell>
-					<TreeGridCell className={ moverCellClassName }>
-						{ ( props ) => (
-							<BlockMoverDownButton
-								__experimentalOrientation="vertical"
-								clientIds={ [ clientId ] }
-								{ ...props }
-							/>
+							<div className="block-editor-block-navigation-block__mover-cell-alignment-wrapper">
+								<BlockMoverUpButton
+									__experimentalOrientation="vertical"
+									clientIds={ [ clientId ] }
+									{ ...props }
+								/>
+								<BlockMoverDownButton
+									__experimentalOrientation="vertical"
+									clientIds={ [ clientId ] }
+									{ ...props }
+								/>
+							</div>
 						) }
 					</TreeGridCell>
 				</>
 			) }
 
-			{ withBlockNavigationBlockSettings && level > 1 && (
+			{ withBlockNavigationBlockSettings && (
 				<TreeGridCell
 					className={ blockNavigationBlockSettingsClassName }
 				>
