@@ -16,14 +16,13 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 	const hashTable = Object.create( null );
 	const dataTree = [];
 
-	dataset.forEach( ( data ) => {
+	for ( const data of dataset ) {
 		hashTable[ data[ id ] ] = {
 			...data,
 			children: [],
 		};
-	} );
-
-	dataset.forEach( ( data ) => {
+	}
+	for ( const data of dataset ) {
 		if ( data[ relation ] ) {
 			hashTable[ data[ relation ] ].children.push(
 				hashTable[ data[ id ] ]
@@ -31,7 +30,8 @@ function createDataTree( dataset, id = 'id', relation = 'parent' ) {
 		} else {
 			dataTree.push( hashTable[ data[ id ] ] );
 		}
-	} );
+	}
+
 	return dataTree;
 }
 
