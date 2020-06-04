@@ -121,6 +121,10 @@ module.exports = {
 					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 			},
 		],
+		// Temporarily converted to warning until all errors are resolved.
+		// See https://github.com/WordPress/gutenberg/pull/22771 for the eslint-plugin-jsdoc update.
+		'jsdoc/check-param-names': 'warn',
+		'jsdoc/require-param': 'warn',
 	},
 	overrides: [
 		{
@@ -131,6 +135,7 @@ module.exports = {
 			],
 			rules: {
 				'import/no-extraneous-dependencies': 'error',
+				'import/no-unresolved': 'error',
 			},
 		},
 		{
@@ -170,6 +175,12 @@ module.exports = {
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-e2e' ],
 			rules: {
 				'jest/expect-expect': 'off',
+			},
+		},
+		{
+			files: [ 'bin/**/*.js' ],
+			rules: {
+				'no-console': 'off',
 			},
 		},
 	],

@@ -34,7 +34,7 @@ describe( 'block factory', () => {
 			},
 		},
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -66,7 +66,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = createBlock( 'core/test-block', { align: 'left' }, [
@@ -174,7 +174,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -209,7 +209,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -241,7 +241,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -293,7 +293,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -329,7 +329,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -363,7 +363,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -401,7 +401,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -443,7 +443,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -485,7 +485,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -536,7 +536,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -578,7 +578,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/another-text-block', {
@@ -598,7 +598,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'another text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -640,7 +640,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -682,7 +682,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -719,7 +719,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -753,7 +753,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -788,7 +788,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -824,7 +824,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -859,7 +859,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -898,7 +898,7 @@ describe( 'block factory', () => {
 						],
 					},
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'A block that groups other blocks.',
 				} );
 			} );
@@ -987,7 +987,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1037,7 +1037,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text-block',
 			} );
 
@@ -1096,7 +1096,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1129,7 +1129,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1168,7 +1168,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1212,7 +1212,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1253,7 +1253,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1298,7 +1298,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1344,7 +1344,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1408,7 +1408,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1467,7 +1467,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1532,7 +1532,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
@@ -1593,7 +1593,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
@@ -1629,7 +1629,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/transform-from-text-block-2', {
@@ -1641,7 +1641,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 		} );
@@ -1811,7 +1811,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'A Block with InnerBlocks that supports grouping',
 			} );
 		} );

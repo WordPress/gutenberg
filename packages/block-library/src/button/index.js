@@ -30,14 +30,6 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	supports: {
-		align: true,
-		alignWide: false,
-		reusable: false,
-		lightBlockWrapper: true,
-		__experimentalColor: { gradients: true },
-	},
-	parent: [ 'core/buttons' ],
 	styles: [
 		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
@@ -45,4 +37,8 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	merge: ( a, { text = '' } ) => ( {
+		...a,
+		text: ( a.text || '' ) + text,
+	} ),
 };

@@ -387,16 +387,28 @@ or interactively
 npm run test-e2e:watch
 ```
 
-Sometimes it's useful to observe the browser while running tests. To do so you can use these environment variables:
+Sometimes it's useful to observe the browser while running tests. Then, use this command:
 
 ```bash
-PUPPETEER_HEADLESS=false PUPPETEER_SLOWMO=80 npm run test-e2e:watch
+npm run test-e2e:watch -- --puppeteer-interactive
+```
+
+You can control the speed of execution with `--puppeteer-slowmo`:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-interactive --puppeteer-slowmo=200
+```
+
+You can additionally have the devtools automatically open for interactive debugging in the browser:
+
+```bash
+npm run test-e2e:watch -- --puppeteer-devtools
 ```
 
 If you're using a different setup, you can provide the base URL, username and password like this:
 
 ```bash
-WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
+npm run test-e2e -- --wordpress-base-url=http://localhost:8888 --wordpress-username=admin --wordpress-password=password
 ```
 
 If you find that end-to-end tests pass when run locally, but fail in Travis, you may be able to isolate a CPU- or netowrk-bound race condition by simulating a slow CPU or network:
@@ -436,3 +448,27 @@ To run unit tests only, without the linter, use `npm run test-unit-php` instead.
 
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
+
+## Performance Testing
+
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
+
+* The time it takes to load the editor.
+* The time it takes for the browser to respond when typing.
+* The time it takes to select a block.
+
+Performance tests are end-to-end tests running the editor and capturing these measures. To run the tests, make sure you have an e2e testing environment ready and run the following command:
+
+```
+npm run test-performance
+```
+
+This gives you the result for the current branch/code on the running environment.
+
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+
+```
+./bin/plugin/cli.js perf master v8.1.0 v8.0.0
+```
+
+**Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

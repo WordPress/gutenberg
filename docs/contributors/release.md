@@ -18,7 +18,7 @@ Release candidates should be versioned incrementally, starting with `-rc.1`, the
 
 Two days after the first release candidate, the stable version is created based on the last release candidate and any necessary regression fixes.
 
-Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a performance audit should be published.
+Once the stable version is released, a post [like this](https://make.wordpress.org/core/2019/06/26/whats-new-in-gutenberg-26th-june/) describing the changes and performing a [performance audit](./testing-overview.md#performance-testing) should be published.
 
 If critical bugs are discovered on stable versions of the plugin, patch versions can be released at any time.
 
@@ -27,13 +27,13 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions: (Note that at the time of writing, the tool doesn't support releasing multiple consecutive RC releases)
 
 ```bash
-./bin/commander.js rc
+./bin/plugin/cli.js rc
 ```
 
 To release a stable version, run:
 
 ```bash
-./bin/commander.js stable
+./bin/plugin/cli.js stable
 ```
 
 It is possible to run the "stable" release CLI in a consecutive way to release patch releases following the first stable release.
@@ -53,10 +53,34 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 
 ##### Writing the Release Post and Changelog
 
-1. Open the [list of closed pull requests](https://github.com/WordPress/gutenberg/pulls?utf8=✓&q=is%3Apr+is%3Aclosed+sort%3Acreated-desc+) and filter by the current milestone.
-2. Read through each PR  to determine if it needs to be included in the blog post and/or changelog.
-3. Choose a few features to highlight in the release post; record an animation of them in use.
-4. Save the draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
+To generate a changelog for a release, use the changelog generator tool:
+
+```
+npm run changelog
+```
+
+By default, this will search for and organize all pull requests associated with the milestone for the next version of the project. 
+
+To override the default behavior, you can pass one or both of the following options:
+
+- `--milestone <milestone>`: Provide the title of the milestone for which the changelog should be generated. This should exactly match the title as shown on [the milestones page](https://github.com/WordPress/gutenberg/milestones).
+  - Example: `npm run changelog --milestone="Gutenberg 8.1"`
+- `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
+  - Example: `npm run changelog --token="..."`
+
+The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
+
+Guidelines for proof-reading include:
+
+- Fix spelling errors or clarify wording. Phrasing should be easy to understand where the intended audience are those who use the plugin or are keeping up with ongoing development.
+- Create new groupings as applicable, and move pull requests between.
+- When multiple pull requests relate to the same task (such as a follow-up pull request), try to combine them to a single entry.
+- If subtasks of a related set of pull requests are substantial, consider organizing as entries in a nested list.
+- Remove mobile app pull request entries.
+
+Once you have cleaned up the changelog, choose a few features to highlight in the release post and record an animation of them in use.
+
+Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
 ##### Creating the Release Branch
 
@@ -209,7 +233,7 @@ The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wor
 
 ### Synchronizing WordPress Trunk
 
-For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/commander npm-stable` command:
+For each Gutenberg plugin release, WordPress trunk should be synchronized with this release. This involves the following steps that are automated with `./bin/plugin/cli npm-stable` command:
 
 **Note:** The WordPress `trunk` branch can be closed or in "feature-freeze" mode. Usually, this happens between the first `beta` and the first `RC` of the WordPress release cycle. During this period, the Gutenberg plugin releases should not be synchronized with WordPress Core.
 
@@ -220,7 +244,7 @@ For each Gutenberg plugin release, WordPress trunk should be synchronized with t
 4. Check out all the files from the release branch: `git checkout release/x.x -- .`.
 5. Commit all changes to the `wp/trunk` branch with `git commit -m "Merge changes published in the Gutenberg plugin vX.X release"` and push to the repository.
 6. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch.
-Aassuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
+Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version.
 
 Now, the branch is ready to be used to publish the npm packages.
 

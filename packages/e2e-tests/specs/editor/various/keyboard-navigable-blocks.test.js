@@ -29,7 +29,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Add block' );
 
-	await tabThroughBlockMoverControl();
 	await tabThroughBlockToolbar();
 
 	await page.keyboard.press( 'Tab' );
@@ -42,35 +41,36 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
 };
 
-const tabThroughBlockMoverControl = async () => {
+const tabThroughBlockToolbar = async () => {
 	await page.keyboard.press( 'Tab' );
 	await expect( await getActiveLabel() ).toBe( 'Move up' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Move down' );
-};
 
-const tabThroughBlockToolbar = async () => {
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Change text alignment' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Bold' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Italic' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'Link' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'More rich text controls' );
 
-	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'ArrowRight' );
 	await expect( await getActiveLabel() ).toBe( 'More options' );
+
+	await page.keyboard.press( 'ArrowRight' );
+	await expect( await getActiveLabel() ).toBe( 'Move up' );
 };
 
 describe( 'Order of block keyboard navigation', () => {
@@ -197,6 +197,6 @@ describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'More options' );
+		await expect( await getActiveLabel() ).toBe( 'Move up' );
 	} );
 } );

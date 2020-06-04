@@ -4,9 +4,7 @@
         "name": "core/search",
         "isValid": true,
         "attributes": {
-            "label": "Search",
-            "placeholder": "",
-            "buttonText": "Search"
+            "placeholder": ""
         },
         "innerBlocks": [],
         "originalContent": ""

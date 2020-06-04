@@ -1,3 +1,7 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
 ## 3.8.1 (2019-04-22)
 
 - Added deprecation to `useApiFetch` hook.

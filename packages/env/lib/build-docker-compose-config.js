@@ -6,41 +6,40 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
- * @typedef {import('./config').Config} Config
+ * @typedef {import('./config').WPConfig} WPConfig
  */
 
 /**
  * Creates a docker-compose config object which, when serialized into a
  * docker-compose.yml file, tells docker-compose how to run the environment.
  *
- * @param {Config} config A wp-env config object.
+ * @param {WPConfig} config A wp-env config object.
+ *
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
-	const pluginMounts = config.pluginSources.flatMap( ( source ) => [
-		`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`,
+	// Top-level WordPress directory mounts (like wp-content/themes)
+	const directoryMounts = Object.entries( config.mappings ).map(
+		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
+	);
 
-		// If this is is the Gutenberg plugin, then mount its E2E test plugins.
-		// TODO: Implement an API that lets Gutenberg mount test plugins without this workaround.
-		...( fs.existsSync( path.resolve( source.path, 'gutenberg.php' ) )
-			? [
-					`${ source.path }/packages/e2e-tests/plugins:/var/www/html/wp-content/plugins/gutenberg-test-plugins`,
-					`${ source.path }/packages/e2e-tests/mu-plugins:/var/www/html/wp-content/mu-plugins`,
-			  ]
-			: [] ),
-	] );
+	const pluginMounts = config.pluginSources.map(
+		( source ) =>
+			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`
+	);
 
 	const themeMounts = config.themeSources.map(
 		( source ) =>
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
+	const localMounts = [ ...directoryMounts, ...pluginMounts, ...themeMounts ];
+
 	const developmentMounts = [
 		`${
 			config.coreSource ? config.coreSource.path : 'wordpress'
 		}:/var/www/html`,
-		...pluginMounts,
-		...themeMounts,
+		...localMounts,
 	];
 
 	let testsMounts;
@@ -83,15 +82,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 						)
 				: [] ),
 
-			...pluginMounts,
-			...themeMounts,
+			...localMounts,
 		];
 	} else {
-		testsMounts = [
-			'tests-wordpress:/var/www/html',
-			...pluginMounts,
-			...themeMounts,
-		];
+		testsMounts = [ 'tests-wordpress:/var/www/html', ...localMounts ];
 	}
 
 	// Set the default ports based on the config values.
@@ -140,7 +134,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				user: cliUser,
 			},
 			'tests-cli': {
-				depends_on: [ 'wordpress' ],
+				depends_on: [ 'tests-wordpress' ],
 				image: 'wordpress:cli',
 				volumes: testsMounts,
 				user: cliUser,
@@ -149,11 +143,25 @@ module.exports = function buildDockerComposeConfig( config ) {
 				image: 'composer',
 				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
+			phpunit: {
+				image: 'wordpressdevelop/phpunit:${LOCAL_PHP-latest}',
+				depends_on: [ 'tests-wordpress' ],
+				volumes: [
+					...testsMounts,
+					'phpunit-uploads:/var/www/html/wp-content/uploads',
+				],
+				environment: {
+					LOCAL_DIR: 'html',
+					WP_PHPUNIT__TESTS_CONFIG:
+						'/var/www/html/phpunit-wp-config.php',
+				},
+			},
 		},
 		volumes: {
 			...( ! config.coreSource && { wordpress: {} } ),
 			...( ! config.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
+			'phpunit-uploads': {},
 		},
 	};
 };

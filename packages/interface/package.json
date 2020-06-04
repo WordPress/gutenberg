@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interface",
-	"version": "0.1.1",
+	"version": "0.4.0",
 	"description": "Interface module for WordPress. The package contains shared functionality across the modern JavaScript-based WordPress screens.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,6 +21,10 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/components/**)"
+	],
 	"dependencies": {
 		"@babel/runtime": "^7.9.2",
 		"@wordpress/components": "file:../components",
@@ -28,7 +32,6 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/plugins": "file:../plugins",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.15"

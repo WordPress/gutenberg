@@ -11,7 +11,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,7 +32,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 
 /**
@@ -49,9 +48,8 @@ import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import ActionsPanel from './actions-panel';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
@@ -61,21 +59,15 @@ function Layout() {
 	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const {
-		closePublishSidebar,
-		openGeneralSidebar,
-		closeGeneralSidebar,
-		togglePublishSidebar,
-	} = useDispatch( 'core/edit-post' );
+	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
+		'core/edit-post'
+	);
 	const {
 		mode,
 		isFullscreenActive,
 		isRichEditingEnabled,
-		editorSidebarOpened,
-		pluginSidebarOpened,
-		publishSidebarOpened,
+		sidebarIsOpened,
 		hasActiveMetaboxes,
-		isSaving,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
@@ -85,15 +77,11 @@ function Layout() {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
-			editorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
-			pluginSidebarOpened: select(
-				'core/edit-post'
-			).isPluginSidebarOpened(),
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
+			sidebarIsOpened: !! (
+				select( 'core/interface' ).getActiveComplementaryArea(
+					'core/edit-post'
+				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+			),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
@@ -101,7 +89,6 @@ function Layout() {
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			previousShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations(
@@ -112,8 +99,6 @@ function Layout() {
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 		};
 	}, [] );
-	const sidebarIsOpened =
-		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
@@ -136,6 +121,22 @@ function Layout() {
 		}
 	}, [ isInserterOpen, isHugeViewport ] );
 
+	// Local state for save panel.
+	// Note 'thruthy' callback implies an open panel.
+	const [
+		entitiesSavedStatesCallback,
+		setEntitiesSavedStatesCallback,
+	] = useState( false );
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -145,6 +146,7 @@ function Layout() {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
@@ -154,6 +156,9 @@ function Layout() {
 							isInserterOpen={ isInserterOpen }
 							onToggleInserter={ () =>
 								setIsInserterOpen( ! isInserterOpen )
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
 							}
 						/>
 					}
@@ -201,7 +206,6 @@ function Layout() {
 										</Button>
 									</div>
 								) }
-								<SettingsSidebar />
 								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)
@@ -234,30 +238,17 @@ function Layout() {
 						)
 					}
 					actions={
-						publishSidebarOpened ? (
-							<PostPublishPanel
-								onClose={ closePublishSidebar }
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								PrePublishExtension={
-									PluginPrePublishPanel.Slot
-								}
-								PostPublishExtension={
-									PluginPostPublishPanel.Slot
-								}
-							/>
-						) : (
-							<div className="edit-post-layout__toggle-publish-panel">
-								<Button
-									isSecondary
-									className="edit-post-layout__toggle-publish-panel-button"
-									onClick={ togglePublishSidebar }
-									aria-expanded={ false }
-								>
-									{ __( 'Open publish panel' ) }
-								</Button>
-							</div>
-						)
+						<ActionsPanel
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
 					}
 					shortcuts={ {
 						previous: previousShortcut,

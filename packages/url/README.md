@@ -31,7 +31,7 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 _Parameters_
 
 -   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Object`: Query arguments to apply to URL.
+-   _args_ `[Object]`: Query arguments to apply to URL.
 
 _Returns_
 
@@ -132,6 +132,25 @@ _Parameters_
 _Returns_
 
 -   `(string|void)`: The path part of the URL.
+
+<a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
+
+Returns the path part and query string part of the URL.
+
+_Usage_
+
+```js
+const pathAndQueryString1 = getPathAndQueryString( 'http://localhost:8080/this/is/a/test?query=true' ); // '/this/is/a/test?query=true'
+const pathAndQueryString2 = getPathAndQueryString( 'https://wordpress.org/help/faq/' ); // '/help/faq'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string`: The path part and query string part of the URL.
 
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 

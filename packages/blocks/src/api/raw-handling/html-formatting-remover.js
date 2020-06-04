@@ -20,7 +20,7 @@ function isFormattingSpace( character ) {
  * @param {Node} node The node to be processed.
  * @return {void}
  */
-export default function( node ) {
+export default function htmlFormattingRemover( node ) {
 	if ( node.nodeType !== node.TEXT_NODE ) {
 		return;
 	}

@@ -19,7 +19,7 @@ const { get } = require( 'lodash' );
  *    lineEnd: 3,
  * } ]
  */
-module.exports = function( token ) {
+module.exports = ( token ) => {
 	if ( token.type === 'ExportDefaultDeclaration' ) {
 		const getLocalName = ( t ) => {
 			let name;

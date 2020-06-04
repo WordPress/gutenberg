@@ -1,0 +1,13 @@
+{
+	"name": "core/query-loop",
+	"category": "design",
+	"context": [
+		"queryId",
+		"query",
+		"queryContext"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

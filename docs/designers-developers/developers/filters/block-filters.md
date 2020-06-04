@@ -63,7 +63,7 @@ To simplify the process of registering and unregistering block styles, two serve
 
 The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
 
-The properties of the style array must include `name` and `label`: 
+The properties of the style array must include `name` and `label`:
  - `name`: The identifier of the style used to compute a CSS class.
  - `label`: A human-readable label for the style.
 
@@ -178,7 +178,11 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+_Note:_  A [block validation](/docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content ouput by the `save()` function.
+
+To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
+
+
 
 #### `blocks.getBlockDefaultClassName`
 
@@ -231,7 +235,7 @@ var withInspectorControls = wp.compose.createHigherOrderComponent( function( Blo
 				props
 			),
 			el(
-				wp.editor.InspectorControls,
+				wp.blockEditor.InspectorControls,
 				{},
 				el(
 					wp.components.PanelBody,
@@ -249,7 +253,7 @@ wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', wit
 ```js
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment } = wp.element;
-const { InspectorControls } = wp.editor;
+const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
 const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {

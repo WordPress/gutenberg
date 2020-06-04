@@ -3,7 +3,7 @@
  */
 const inquirer = require( 'inquirer' );
 const program = require( 'commander' );
-const { startCase } = require( 'lodash' );
+const { pickBy, startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -13,57 +13,94 @@ const CLIError = require( './cli-error' );
 const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
-const { getDefaultValues, getPrompts } = require( './templates' );
+const {
+	getBlockTemplate,
+	getDefaultValues,
+	getPrompts,
+} = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
 	.name( commandName )
 	.description(
 		'Generates PHP, JS and CSS code for registering a block for a WordPress plugin.\n\n' +
-			'[slug] is optional. When provided it triggers the quick mode where it is used ' +
-			'as the block slug used for its identification, the output location for scaffolded files, ' +
-			'and the name of the WordPress plugin. The rest of the configuration is set to all default values.'
+			'[slug] is optional. When provided it triggers the quick mode where ' +
+			'it is used as the block slug used for its identification, the output ' +
+			'location for scaffolded files, and the name of the WordPress plugin.' +
+			'The rest of the configuration is set to all default values unless ' +
+			'overridden with some of the options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext"',
 		'esnext'
 	)
-	.action( async ( slug, { template } ) => {
-		await checkSystemRequirements( engines );
-		try {
-			const defaultValues = getDefaultValues( template );
-			if ( slug ) {
-				const answers = {
-					...defaultValues,
-					slug,
-					// Transforms slug to title.
-					title: startCase( slug ),
-				};
-				await scaffold( template, answers );
-			} else {
-				const answers = await inquirer.prompt( getPrompts( template ) );
-				await scaffold( template, {
-					...defaultValues,
-					...answers,
-				} );
+	.option( '--namespace <value>', 'internal namespace for the block name' )
+	.option( '--title <value>', 'display title for the block' )
+	// The name "description" is used internally so it couldn't be used.
+	.option( '--short-description <value>', 'short description for the block' )
+	.option( '--category <name>', 'category name for the block' )
+	.action(
+		async (
+			slug,
+			{
+				category,
+				namespace,
+				shortDescription: description,
+				template: templateName,
+				title,
 			}
-		} catch ( error ) {
-			if ( error instanceof CLIError ) {
-				log.error( error.message );
-				process.exit( 1 );
-			} else {
-				throw error;
+		) => {
+			await checkSystemRequirements( engines );
+			try {
+				const blockTemplate = await getBlockTemplate( templateName );
+				const defaultValues = getDefaultValues( blockTemplate );
+				const optionsValues = pickBy( {
+					category,
+					description,
+					namespace,
+					title,
+				} );
+				if ( slug ) {
+					const answers = {
+						...defaultValues,
+						slug,
+						// Transforms slug to title as a fallback.
+						title: startCase( slug ),
+						...optionsValues,
+					};
+					await scaffold( blockTemplate, answers );
+				} else {
+					const prompts = getPrompts( blockTemplate ).filter(
+						( { name } ) =>
+							! Object.keys( optionsValues ).includes( name )
+					);
+					const answers = await inquirer.prompt( prompts );
+					await scaffold( blockTemplate, {
+						...defaultValues,
+						...optionsValues,
+						...answers,
+					} );
+				}
+			} catch ( error ) {
+				if ( error instanceof CLIError ) {
+					log.error( error.message );
+					process.exit( 1 );
+				} else {
+					throw error;
+				}
 			}
 		}
-	} )
-	.on( '--help', function() {
+	)
+	.on( '--help', () => {
 		log.info( '' );
 		log.info( 'Examples:' );
 		log.info( `  $ ${ commandName }` );
 		log.info( `  $ ${ commandName } todo-list` );
-		log.info( `  $ ${ commandName } --template es5 todo-list` );
+		log.info(
+			`  $ ${ commandName } todo-list --template es5 --title "TODO List"`
+		);
 	} )
 	.parse( process.argv );

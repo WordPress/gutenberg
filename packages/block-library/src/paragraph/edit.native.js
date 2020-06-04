@@ -8,6 +8,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
@@ -16,13 +17,18 @@ function ParagraphBlock( {
 	mergeBlocks,
 	onReplace,
 	setAttributes,
-	style: oldStyle,
+	mergedStyle,
+	style,
 } ) {
-	const { align, content, placeholder, style } = attributes;
+	const isRTL = useSelect( ( select ) => {
+		return !! select( 'core/block-editor' ).getSettings().isRTL;
+	}, [] );
+
+	const { align, content, placeholder } = attributes;
 
 	const styles = {
-		...oldStyle,
-		color: style && style.color && style.color.text,
+		...mergedStyle,
+		...style,
 	};
 
 	return (
@@ -30,6 +36,7 @@ function ParagraphBlock( {
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
+					isRTL={ isRTL }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
 					} }

@@ -1,69 +1,19 @@
-body.is-fullscreen-mode {
+body.js.is-fullscreen-mode {
+
 	@include break-medium {
 		// Reset the html.wp-topbar padding.
 		// Because this uses negative margins, we have to compensate for the height.
 		margin-top: -$admin-bar-height;
 		height: calc(100% + #{ $admin-bar-height });
 
-		// Hide the top adminbar toolbar.
+		#adminmenumain,
 		#wpadminbar {
 			display: none;
-		}
-
-		// Layer the sidebar above the editor's top bar and
-		// setup the transition
-		#adminmenumain {
-			z-index: 1;
-			transform: translateX(-160px);
-			transition: transform 0.12s ease-in-out;
-		}
-
-		// Display the sidebar offscreen, and then transition in when needed.
-		#adminmenumain,
-		#adminmenuback {
-			position: fixed;
-			top: 60px;
-			left: 0;
-			bottom: 0;
-		}
-
-		// Hides the admin menu
-		// This prevents keyboard navigation from accessing inner links
-		#adminmenuwrap {
-			//display: none;
-		}
-
-		.interface-interface-skeleton__body,
-		.interface-interface-skeleton__footer {
-			transition: margin-left 0.12s ease-in-out;
 		}
 
 		#wpcontent,
 		#wpfooter {
 			margin-left: 0;
 		}
-	}
-}
-
-body.is-showing-admin-menu {
-	#adminmenumain {
-		transform: translateX(0);
-	}
-
-	// Show the admin menu
-	#adminmenuwrap {
-		display: block;
-	}
-
-	.interface-interface-skeleton__body,
-	.interface-interface-skeleton__footer {
-		margin-left: 160px;
-	}
-}
-
-body.is-showing-admin-menu.folded {
-	.interface-interface-skeleton__body,
-	.interface-interface-skeleton__footer {
-		margin-left: 36px;
 	}
 }

@@ -21,5 +21,11 @@ describe( 'Fullscreen Mode', () => {
 		} );
 
 		expect( isFullscreenEnabled ).toBe( true );
+
+		const fullscreenCloseButton = await page.$(
+			'.edit-post-fullscreen-mode-close'
+		);
+
+		expect( fullscreenCloseButton ).not.toBeNull();
 	} );
 } );

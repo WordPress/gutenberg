@@ -1,4 +1,4 @@
-module.exports = function( api ) {
+module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
 		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
@@ -16,9 +16,7 @@ module.exports = function( api ) {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {
-			shippedProposals: true,
-		};
+		const opts = {};
 
 		if ( isTestEnv ) {
 			opts.targets = {

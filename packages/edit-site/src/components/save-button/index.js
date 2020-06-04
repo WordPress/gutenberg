@@ -7,37 +7,13 @@ import { some } from 'lodash';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { EntitiesSavedStates } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { useEditorContext } from '../editor';
-
-export default function SaveButton() {
-	const { settings } = useEditorContext();
-	const [ , setStatus ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'status'
-	);
-	const [ , setTitle ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'title'
-	);
-	const [ slug ] = useEntityProp( 'postType', settings.templateType, 'slug' );
-	// Publish template if not done yet.
-	useEffect( () => {
-		setStatus( 'publish' );
-		setTitle( slug );
-	}, [ slug ] );
-
-	const { isDirty, isSaving } = useSelect( ( select ) => {
+export default function SaveButton( { openEntitiesSavedStates } ) {
+	const { isDirty, isSaving, templateType } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
 			isSavingEntityRecord,
@@ -48,13 +24,21 @@ export default function SaveButton() {
 			isSaving: some( dirtyEntityRecords, ( record ) =>
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
+			templateType: select( 'core/edit-site' ).getTemplateType(),
 		};
 	} );
-	const disabled = ! isDirty || isSaving;
 
-	const [ isOpen, setIsOpen ] = useState( false );
-	const open = useCallback( () => setIsOpen( true ), [] );
-	const close = useCallback( () => setIsOpen( false ), [] );
+	const [ , setStatus ] = useEntityProp( 'postType', templateType, 'status' );
+	const [ , setTitle ] = useEntityProp( 'postType', templateType, 'title' );
+	const [ slug ] = useEntityProp( 'postType', templateType, 'slug' );
+
+	// Publish template if not done yet.
+	useEffect( () => {
+		setStatus( 'publish' );
+		setTitle( slug );
+	}, [ slug ] );
+
+	const disabled = ! isDirty || isSaving;
 	return (
 		<>
 			<Button
@@ -63,11 +47,10 @@ export default function SaveButton() {
 				aria-disabled={ disabled }
 				disabled={ disabled }
 				isBusy={ isSaving }
-				onClick={ disabled ? undefined : open }
+				onClick={ disabled ? undefined : openEntitiesSavedStates }
 			>
 				{ __( 'Update Design' ) }
 			</Button>
-			<EntitiesSavedStates isOpen={ isOpen } onRequestClose={ close } />
 		</>
 	);
 }
