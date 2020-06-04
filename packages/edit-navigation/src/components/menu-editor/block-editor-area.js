@@ -13,15 +13,18 @@ import {
 	ObserveTyping,
 	WritingFlow,
 } from '@wordpress/block-editor';
+
+import { useState, useEffect } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
-	Panel,
-	PanelBody,
+	Card,
+	CardHeader,
+	CardBody,
+	CardFooter,
 	Popover,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,7 +32,7 @@ import { __ } from '@wordpress/i18n';
  */
 import DeleteMenuButton from '../delete-menu-button';
 
-export default function BlockEditorPanel( {
+export default function BlockEditorArea( {
 	onDeleteMenu,
 	menuId,
 	saveBlocks,
@@ -80,13 +83,17 @@ export default function BlockEditorPanel( {
 	}, [ rootBlockId ] );
 
 	return (
-		<Panel className="edit-navigation-menu-editor__block-editor-panel">
-			<PanelBody title={ __( 'Navigation menu' ) }>
-				<div className="components-panel__header-actions">
-					<Button isPrimary onClick={ saveBlocks }>
-						{ __( 'Save navigation' ) }
-					</Button>
+		<Card className="edit-navigation-menu-editor__block-editor-area">
+			<CardHeader>
+				<div className="edit-navigation-menu-editor__block-editor-area-header-text">
+					{ __( 'Navigation menu' ) }
 				</div>
+
+				<Button isPrimary onClick={ saveBlocks }>
+					{ __( 'Save navigation' ) }
+				</Button>
+			</CardHeader>
+			<CardBody>
 				<NavigableToolbar
 					className={ classnames(
 						'edit-navigation-menu-editor__block-editor-toolbar',
@@ -120,13 +127,10 @@ export default function BlockEditorPanel( {
 					} }
 					checked={ autoAddPages }
 				/>
-				<div className="components-panel__footer-actions">
-					<DeleteMenuButton
-						menuId={ menuId }
-						onDelete={ onDeleteMenu }
-					/>
-				</div>
-			</PanelBody>
-		</Panel>
+			</CardBody>
+			<CardFooter>
+				<DeleteMenuButton menuId={ menuId } onDelete={ onDeleteMenu } />
+			</CardFooter>
+		</Card>
 	);
 }
