@@ -14,15 +14,18 @@
  */
 function render_block_core_site_title( $attributes ) {
 	$tag_name = 'h1';
-	$class = '';
+	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
 
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
-	if ( isset( $attributes['align'] ) ) {
-		$class = ' class="has-text-align-' . $attributes['align'] . '"';
-	}
-	return sprintf( '<%1$s%2$s>%3$s</%1$s>', $tag_name, $class, get_bloginfo( 'name' ) );
+
+	return sprintf(
+		'<%1$s class="%2$s">%3$s</%1$s>',
+		$tag_name,
+		'wp-block-site-title' . esc_attr( $align_class_name ),
+		get_bloginfo( 'name' )
+	);
 }
 
 /**
