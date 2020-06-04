@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
-import { compose } from '@wordpress/compose';
 import {
 	Disabled,
 	PanelBody,
@@ -21,7 +20,7 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 
 /**
@@ -33,7 +32,6 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
-	mediaUpload,
 	noticeOperations,
 	setAttributes,
 	onReplace,
@@ -48,12 +46,18 @@ function AudioEdit( {
 	// }
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 
+	const audioUpload = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const { mediaUpload } = getSettings();
+		return { mediaUpload };
+	} );
+
 	useEffect( () => {
 		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
-				mediaUpload( {
+				audioUpload( {
 					filesList: [ file ],
 					onFileChange: ( [ { id: mediaId, url } ] ) => {
 						setAttributes( { id: mediaId, src: url } );
@@ -199,11 +203,4 @@ function AudioEdit( {
 		</>
 	);
 }
-export default compose( [
-	withSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const { mediaUpload } = getSettings();
-		return { mediaUpload };
-	} ),
-	withNotices,
-] )( AudioEdit );
+export default withNotices( AudioEdit );
