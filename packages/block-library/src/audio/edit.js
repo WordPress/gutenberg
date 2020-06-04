@@ -65,13 +65,13 @@ function AudioEdit( {
 		}
 	}, [] );
 
-	const toggleAttribute = ( attribute ) => {
+	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
 			setAttributes( { [ attribute ]: newValue } );
 		};
-	};
+	}
 
-	const onSelectURL = ( newSrc ) => {
+	function onSelectURL( newSrc ) {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
@@ -85,23 +85,23 @@ function AudioEdit( {
 			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
-	};
+	}
 
-	const onUploadError = ( message ) => {
+	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-	};
+	}
 
-	const getAutoplayHelp = ( checked ) => {
+	function getAutoplayHelp( checked ) {
 		return checked
 			? __(
 					'Note: Autoplaying audio may cause usability issues for some visitors.'
 			  )
 			: null;
-	};
+	}
 
 	// const { setAttributes, isSelected, noticeUI } = this.props;
-	const onSelectAudio = ( media ) => {
+	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// in this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls
@@ -111,7 +111,7 @@ function AudioEdit( {
 		// sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI
 		setAttributes( { src: media.url, id: media.id } );
-	};
+	}
 	if ( ! src ) {
 		return (
 			<Block.div>
