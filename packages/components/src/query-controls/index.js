@@ -7,12 +7,15 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { RangeControl, SelectControl, FormTokenField } from '../';
+import AuthorSelect from './author-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;
 
 export default function QueryControls( {
+	authorList,
+	selectedAuthorId,
 	categorySuggestions,
 	selectedCategories,
 	numberOfItems,
@@ -21,6 +24,7 @@ export default function QueryControls( {
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
+	onAuthorChange,
 	onNumberOfItemsChange,
 	onOrderChange,
 	onOrderByChange,
@@ -77,7 +81,16 @@ export default function QueryControls( {
 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
 			/>
 		),
-
+		onAuthorChange && (
+			<AuthorSelect
+				key="query-controls-author-select"
+				authorList={ authorList }
+				label={ __( 'Author' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedAuthorId={ selectedAuthorId }
+				onChange={ onAuthorChange }
+			/>
+		),
 		onNumberOfItemsChange && (
 			<RangeControl
 				key="query-controls-range-control"

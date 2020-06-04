@@ -103,7 +103,7 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 	};
 
 	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.type = id;
+	if ( id ) format.attributes.id = id;
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';

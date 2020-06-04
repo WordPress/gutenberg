@@ -1,7 +1,7 @@
 {
 	"name": "core/text-columns",
 	"icon": "columns",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"content": {
 			"type": "array",

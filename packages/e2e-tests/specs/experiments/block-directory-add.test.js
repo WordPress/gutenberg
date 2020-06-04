@@ -11,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { enableExperimentalFeatures } from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 
 // Urls to mock
 const SEARCH_URLS = [
@@ -62,7 +62,7 @@ const block = `( function() {
 	registerBlockType( '${ MOCK_BLOCK1.name }', {
 		title: 'Test Block for Block Directory',
 		icon: 'hammer',
-		category: 'common',
+		category: 'text',
 		attributes: {},
 		edit: function( props ) {
 			return el( 'p', null, 'Test Copy' );
@@ -119,8 +119,9 @@ const matchUrl = ( reqUrl, urls ) => {
 };
 
 describe( 'adding blocks from block directory', () => {
+	useExperimentalFeatures( [ '#gutenberg-block-directory' ] );
+
 	beforeEach( async () => {
-		await enableExperimentalFeatures( [ '#gutenberg-block-directory' ] );
 		await createNewPost();
 	} );
 

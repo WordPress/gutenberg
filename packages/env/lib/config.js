@@ -27,25 +27,25 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
 /**
  * A wp-env config object.
  *
- * @typedef Config
+ * @typedef WPConfig
  * @property {string}      name                    Name of the environment.
  * @property {string}      configDirectoryPath     Path to the .wp-env.json file.
  * @property {string}      workDirectoryPath       Path to the work directory located in ~/.wp-env.
  * @property {string}      dockerComposeConfigPath Path to the docker-compose.yml file.
- * @property {Source|null} coreSource              The WordPress installation to load in the environment.
- * @property {Source[]}    pluginSources           Plugins to load in the environment.
- * @property {Source[]}    themeSources            Themes to load in the environment.
+ * @property {?WPSource}   coreSource              The WordPress installation to load in the environment.
+ * @property {WPSource[]}  pluginSources           Plugins to load in the environment.
+ * @property {WPSource[]}  themeSources            Themes to load in the environment.
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, Source>} mappings    Mapping of WordPress directories to local directories which should be mounted.
+ * @property {Object.<string, WPSource>} mappings    Mapping of WordPress directories to local directories which should be mounted.
  * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
 /**
  * A WordPress installation, plugin or theme to be loaded into the environment.
  *
- * @typedef Source
+ * @typedef WPSource
  * @property {string} type The source type. Can be 'local' or 'git'.
  * @property {string} path The path to the WordPress installation, plugin or theme.
  * @property {string} basename Name that identifies the WordPress installation, plugin or theme.
@@ -58,7 +58,8 @@ module.exports = {
 	 * Reads and parses the given .wp-env.json file into a wp-env config object.
 	 *
 	 * @param {string} configPath Path to the .wp-env.json file.
-	 * @return {Config} A wp-env config object.
+	 *
+	 * @return {WPConfig} A wp-env config object.
 	 */
 	async readConfig( configPath ) {
 		const configDirectoryPath = path.dirname( configPath );
@@ -132,6 +133,8 @@ module.exports = {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
 					WP_PHP_BINARY: 'php',
+					WP_TESTS_EMAIL: 'admin@example.org',
+					WP_TESTS_TITLE: 'Test Blog',
 				},
 				mappings: {},
 			},
@@ -260,11 +263,12 @@ module.exports = {
 /**
  * Parses a source string into a source object.
  *
- * @param {string|null} sourceString The source string. See README.md for documentation on valid source string patterns.
+ * @param {?string} sourceString The source string. See README.md for documentation on valid source string patterns.
  * @param {Object} options
  * @param {boolean} options.hasTests Whether or not a `testsPath` is required. Only the 'core' source needs this.
  * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @return {Source|null} A source object.
+ *
+ * @return {?WPSource} A source object.
  */
 function parseSourceString( sourceString, { workDirectoryPath } ) {
 	if ( sourceString === null ) {
@@ -332,10 +336,11 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
  * Given a source object, returns a new source object with the testsPath
  * property set correctly. Only the 'core' source requires a testsPath.
  *
- * @param {Source|null} source A source object.
- * @param {Object} options
- * @param {string} options.workDirectoryPath Path to the work directory located in ~/.wp-env.
- * @return {Source|null} A source object.
+ * @param {?WPSource} source                    A source object.
+ * @param {Object}  options
+ * @param {string}  options.workDirectoryPath Path to the work directory located in ~/.wp-env.
+ *
+ * @return {?WPSource} A source object.
  */
 function includeTestsPath( source, { workDirectoryPath } ) {
 	if ( source === null ) {
@@ -413,8 +418,5 @@ async function getHomeDirectory() {
  * @return {string} An MD5 hash string.
  */
 function md5( data ) {
-	return crypto
-		.createHash( 'md5' )
-		.update( data )
-		.digest( 'hex' );
+	return crypto.createHash( 'md5' ).update( data ).digest( 'hex' );
 }

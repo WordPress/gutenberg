@@ -73,14 +73,14 @@ describe( 'block', () => {
 			name: 'core/foo',
 			title: 'foo',
 			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
-			category: 'formatting',
+			category: 'design',
 		};
 		const inserterItemWithTitleAndEmptyKeywords = {
 			name: 'core/bar',
 			title: 'bar',
 			// Intentionally empty keyword list
 			keywords: [],
-			category: 'common',
+			category: 'text',
 		};
 		const inserterItemWithTitleAndUndefinedKeywords = {
 			name: 'core/baz',
@@ -91,12 +91,12 @@ describe( 'block', () => {
 
 		expect(
 			blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords )
-		).toEqual( [ 'formatting', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
+		).toEqual( [ 'design', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
 		expect(
 			blockCompleter.getOptionKeywords(
 				inserterItemWithTitleAndEmptyKeywords
 			)
-		).toEqual( [ 'common', 'bar' ] );
+		).toEqual( [ 'text', 'bar' ] );
 		expect(
 			blockCompleter.getOptionKeywords(
 				inserterItemWithTitleAndUndefinedKeywords

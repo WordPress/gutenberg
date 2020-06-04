@@ -8,6 +8,7 @@
             "displayPostContent": false,
             "displayPostContentRadio": "excerpt",
             "excerptLength": 55,
+            "displayAuthor": false,
             "displayPostDate": false,
             "postLayout": "list",
             "columns": 3,

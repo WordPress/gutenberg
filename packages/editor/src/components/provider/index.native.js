@@ -7,6 +7,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateHtml,
 	subscribeSetTitle,
 	subscribeMediaAppend,
+	subscribeUpdateTheme,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -98,6 +99,12 @@ class NativeEditorProvider extends Component {
 				this.props.insertBlock( newBlock, insertionIndex );
 			}
 		);
+
+		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
+			( theme ) => {
+				this.props.updateSettings( theme );
+			}
+		);
 	}
 
 	componentWillUnmount() {
@@ -119,6 +126,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentMediaAppend ) {
 			this.subscriptionParentMediaAppend.remove();
+		}
+
+		if ( this.subscriptionParentUpdateTheme ) {
+			this.subscriptionParentUpdateTheme.remove();
 		}
 	}
 
@@ -221,13 +232,14 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		const { clearSelectedBlock, insertBlock } = dispatch(
+		const { updateSettings, clearSelectedBlock, insertBlock } = dispatch(
 			'core/block-editor'
 		);
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
 		return {
+			updateSettings,
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,

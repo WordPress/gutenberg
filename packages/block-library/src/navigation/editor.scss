@@ -136,3 +136,12 @@ $color-control-label-height: 20px;
 		display: none;
 	}
 }
+
+// IE fix for submenu visibility on parent focus
+
+.is-editing > .wp-block-navigation__container {
+	visibility: visible;
+	opacity: 1;
+	display: flex;
+	flex-direction: column;
+}
