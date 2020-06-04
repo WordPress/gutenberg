@@ -168,6 +168,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			'attributes'  => 'attributes',
 			'supports'    => 'supports',
 			'styles'      => 'styles',
+			'example'     => 'example',
 		);
 
 		foreach ( $property_mappings as $key => $mapped_key ) {

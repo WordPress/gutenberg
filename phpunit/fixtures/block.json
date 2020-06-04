@@ -34,6 +34,11 @@
 			"label": "Other"
 		}
 	],
+	"example": {
+		"attributes": {
+			"message": "This is a notice!"
+		}
+	},
 	"editorScript": "my-plugin-notice-editor-script",
 	"script": "my-plugin-notice-script",
 	"editorStyle": "my-plugin-notice-editor-style",

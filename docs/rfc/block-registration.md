@@ -295,7 +295,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 	"example": {
 		"attributes": {
 			"message": "This is a notice!"
-		},
+		}
 	}
 }
  ```
