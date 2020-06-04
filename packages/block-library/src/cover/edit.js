@@ -574,8 +574,8 @@ function useCoverColorExtract( { backgroundColor, onChange = noop, src } ) {
 	if ( customExtractedColor ) {
 		customColors = [
 			{
-				name: __( 'Dominant color' ),
-				slug: __( 'dominant-color' ),
+				name: __( 'Image dominant color' ),
+				slug: __( 'image-dominant-color' ),
 				color: customExtractedColor,
 			},
 		];
