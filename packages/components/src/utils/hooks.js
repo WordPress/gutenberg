@@ -24,10 +24,11 @@ import { useState } from '@wordpress/element';
  */
 export function useControlledState( initialState ) {
 	const [ internalState, setInternalState ] = useState( initialState );
-	const state = initialState || internalState;
+	const hasInitialState = initialState !== undefined;
+	const state = hasInitialState ? initialState : internalState;
 
 	const setState = ( nextState ) => {
-		if ( initialState === undefined ) {
+		if ( ! hasInitialState ) {
 			setInternalState( nextState );
 		}
 	};
