@@ -147,7 +147,7 @@ export default class ClassicEdit extends Component {
 		} );
 
 		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
-		editor.on( 'init', function() {
+		editor.on( 'init', () => {
 			if (
 				editor.settings.toolbar1 &&
 				editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1

@@ -62,12 +62,7 @@ function BlockNavigationDropdownToggle( {
 }
 
 function BlockNavigationDropdown(
-	{
-		isDisabled,
-		__experimentalWithBlockNavigationSlots,
-		__experimentalWithEllipsisMenu,
-		...props
-	},
+	{ isDisabled, __experimentalFeatures, ...props },
 	ref
 ) {
 	const hasBlocks = useSelect(
@@ -92,12 +87,7 @@ function BlockNavigationDropdown(
 			renderContent={ ( { onClose } ) => (
 				<BlockNavigation
 					onSelect={ onClose }
-					__experimentalWithBlockNavigationSlots={
-						__experimentalWithBlockNavigationSlots
-					}
-					__experimentalWithEllipsisMenu={
-						__experimentalWithEllipsisMenu
-					}
+					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }
 		/>

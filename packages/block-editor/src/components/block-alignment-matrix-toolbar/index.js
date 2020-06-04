@@ -8,7 +8,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import {
-	Button,
+	ToolbarButton,
 	Dropdown,
 	ToolbarGroup,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
@@ -41,7 +41,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 
 				return (
 					<ToolbarGroup>
-						<Button
+						<ToolbarButton
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }

@@ -19,15 +19,23 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 *
 	 * @var WP_Block_Type_Registry
 	 */
-	protected $registry;
+	protected $block_registry;
+
+	/**
+	 * Instance of WP_Block_Styles_Registry.
+	 *
+	 * @var WP_Block_Styles_Registry
+	 */
+	protected $style_registry;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
-		$this->rest_base = 'block-types';
-		$this->registry  = WP_Block_Type_Registry::get_instance();
+		$this->namespace      = '__experimental';
+		$this->rest_base      = 'block-types';
+		$this->block_registry = WP_Block_Type_Registry::get_instance();
+		$this->style_registry = WP_Block_Styles_Registry::get_instance();
 	}
 
 	/**
@@ -112,7 +120,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$data        = array();
-		$block_types = $this->registry->get_all_registered();
+		$block_types = $this->block_registry->get_all_registered();
 
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
@@ -182,7 +190,7 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Block_Type|WP_Error Block type object if name is valid, WP_Error otherwise.
 	 */
 	protected function get_block( $name ) {
-		$block_type = $this->registry->get_registered( $name );
+		$block_type = $this->block_registry->get_registered( $name );
 		if ( empty( $block_type ) ) {
 			return new WP_Error( 'rest_block_type_invalid', __( 'Invalid block type.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -232,31 +240,38 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
 			'name'          => 'name',
+			'title'         => 'title',
+			'description'   => 'description',
+			'icon'          => 'icon',
 			'category'      => 'category',
+			'keywords'      => 'keywords',
+			'parent'        => 'parent',
+			'supports'      => 'supports',
+			'styles'        => 'styles',
+			'textdomain'    => 'textdomain',
+			'example'       => 'example',
 			'editor_script' => 'editor_script',
 			'script'        => 'script',
 			'editor_style'  => 'editor_style',
 			'style'         => 'style',
-			'supports'      => 'supports',
-			'title'         => 'title',
-			'icon'          => 'icon',
-			'description'   => 'description',
-			'keywords'      => 'keywords',
-			'parent'        => 'parent',
-			'styles'        => 'styleVariations',
-			'text_domain'   => 'textDomain',
 		);
 		foreach ( $extra_fields as $key => $extra_field ) {
 			if ( rest_is_field_included( $key, $fields ) ) {
 				if ( isset( $block_type->$extra_field ) ) {
 					$field = $block_type->$extra_field;
-				} elseif ( isset( $schema['properties'][ $key ]['default'] ) ) {
+				} elseif ( array_key_exists( 'default', $schema['properties'][ $key ] ) ) {
 					$field = $schema['properties'][ $key ]['default'];
 				} else {
 					$field = '';
 				}
 				$data[ $key ] = rest_sanitize_value_from_schema( $field, $schema['properties'][ $key ] );
 			}
+		}
+
+		if ( rest_is_field_included( 'styles', $fields ) ) {
+			$styles         = $this->style_registry->get_registered_styles_for_block( $block_type->name );
+			$styles         = array_values( $styles );
+			$data['styles'] = wp_parse_args( $styles, $data['styles'] );
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -345,16 +360,16 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				),
 				'icon'          => array(
 					'description' => __( 'Icon of block type.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', 'null' ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'attributes'    => array(
 					'description'          => __( 'Block attributes.', 'gutenberg' ),
-					'type'                 => 'object',
+					'type'                 => array( 'object', 'null' ),
 					'properties'           => array(),
-					'default'              => array(),
+					'default'              => null,
 					'additionalProperties' => array(
 						'type' => 'object',
 					),
@@ -371,8 +386,8 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				),
 				'category'      => array(
 					'description' => __( 'Block category.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', null ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
@@ -385,35 +400,35 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 				),
 				'editor_script' => array(
 					'description' => __( 'Editor script handle.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', null ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'script'        => array(
 					'description' => __( 'Public facing script handle.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', null ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'editor_style'  => array(
 					'description' => __( 'Editor style handle.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', null ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'style'         => array(
 					'description' => __( 'Public facing style handle.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', null ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'styles'        => array(
 					'description'          => __( 'Block style variations.', 'gutenberg' ),
-					'type'                 => 'object',
+					'type'                 => 'array',
 					'properties'           => array(),
 					'additionalProperties' => array(
 						'type' => 'object',
@@ -422,20 +437,20 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
-				'text_domain'   => array(
+				'textdomain'    => array(
 					'description' => __( 'Public text domain.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
+					'type'        => array( 'string', 'null' ),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'parent'        => array(
-					'description' => __( 'Parent blocks, defaults to empty it no parents', 'gutenberg' ),
-					'type'        => 'array',
+					'description' => __( 'Parent blocks.', 'gutenberg' ),
+					'type'        => array( 'array', 'null' ),
 					'items'       => array(
 						'type' => 'string',
 					),
-					'default'     => array(),
+					'default'     => null,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
@@ -448,6 +463,17 @@ class WP_REST_Block_Types_Controller extends WP_REST_Controller {
 					'default'     => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
+				),
+				'example'       => array(
+					'description'          => __( 'Block example.', 'gutenberg' ),
+					'type'                 => array( 'object', 'null' ),
+					'default'              => null,
+					'properties'           => array(),
+					'additionalProperties' => array(
+						'type' => 'object',
+					),
+					'context'              => array( 'embed', 'view', 'edit' ),
+					'readonly'             => true,
 				),
 			),
 		);

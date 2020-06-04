@@ -80,7 +80,7 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( 'core/block-editor' );
-	const { getBlocks } = registry.select( 'core/block-editor' );
+	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 
@@ -106,6 +106,8 @@ export default function useBlockSync( {
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
 	// waiting for React renders for changes.
+	const onInputRef = useRef( onInput );
+	const onChangeRef = useRef( onChange );
 	useEffect( () => {
 		const {
 			getSelectionStart,
@@ -118,7 +120,27 @@ export default function useBlockSync( {
 		let isPersistent = isLastBlockChangePersistent();
 		let previousAreBlocksDifferent = false;
 
+		onInputRef.current = onInput;
+		onChangeRef.current = onChange;
 		const unsubscribe = registry.subscribe( () => {
+			// Sometimes, subscriptions might trigger with stale callbacks
+			// before they are cleaned up. Avoid running them.
+			if (
+				onInputRef.current !== onInput ||
+				onChangeRef.current !== onChange
+			)
+				return;
+
+			// Sometimes, when changing block lists, lingering subscriptions
+			// might trigger before they are cleaned up. If the block for which
+			// the subscription runs is no longer in the store, this would clear
+			// its parent entity's block list. To avoid this, we bail out if
+			// the subscription is triggering for a block (`clientId !== null`)
+			// and its block name can't be found because it's not on the list.
+			// (`getBlockName( clientId ) === null`).
+			if ( clientId !== null && getBlockName( clientId ) === null )
+				return;
+
 			const newIsPersistent = isLastBlockChangePersistent();
 
 			const newBlocks = getBlocks( clientId );

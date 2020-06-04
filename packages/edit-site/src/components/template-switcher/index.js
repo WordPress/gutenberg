@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	Tooltip,
 	DropdownMenu,
@@ -11,14 +11,19 @@ import {
 	MenuItemsChoice,
 	MenuItem,
 } from '@wordpress/components';
-import { Icon, home, plus } from '@wordpress/icons';
+import { Icon, home, plus, undo } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import AddTemplate from '../add-template';
 import TemplatePreview from './template-preview';
 import ThemePreview from './theme-preview';
+
+const TEMPLATE_OVERRIDES = {
+	page: ( slug ) => `page-${ slug }`,
+	category: ( slug ) => `category-${ slug }`,
+	post: ( slug ) => `single-post-${ slug }`,
+};
 
 function TemplateLabel( { template, homeId } ) {
 	return (
@@ -41,25 +46,23 @@ function TemplateLabel( { template, homeId } ) {
 }
 
 export default function TemplateSwitcher( {
-	ids,
 	templatePartIds,
+	page,
 	activeId,
+	activeTemplatePartId,
 	homeId,
 	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
-	onAddTemplateId,
+	onAddTemplate,
+	onRemoveTemplate,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
 	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
 
-	const onHoverTemplate = ( id ) => {
-		setHoveredTemplate( { id, type: 'template' } );
-	};
 	const onHoverTemplatePart = ( id ) => {
 		setHoveredTemplate( { id, type: 'template-part' } );
 	};
-
 	const onMouseEnterTheme = () => {
 		setThemePreviewVisible( () => true );
 	};
@@ -67,51 +70,66 @@ export default function TemplateSwitcher( {
 		setThemePreviewVisible( () => false );
 	};
 
-	const { currentTheme, templates, templateParts } = useSelect(
+	const { currentTheme, template, templateParts } = useSelect(
 		( select ) => {
 			const { getCurrentTheme, getEntityRecord } = select( 'core' );
+			const _template = getEntityRecord(
+				'postType',
+				'wp_template',
+				activeId
+			);
 			return {
 				currentTheme: getCurrentTheme(),
-				templates: ids.map( ( id ) => {
-					const template = getEntityRecord(
-						'postType',
-						'wp_template',
-						id
-					);
-					return {
-						label: template ? (
-							<TemplateLabel
-								template={ template }
-								homeId={ homeId }
-							/>
-						) : (
-							__( 'Loading…' )
-						),
-						value: id,
-						slug: template ? template.slug : __( 'Loading…' ),
-					};
-				} ),
+				template: {
+					label: _template ? (
+						<TemplateLabel
+							template={ _template }
+							homeId={ homeId }
+						/>
+					) : (
+						__( 'Loading…' )
+					),
+					value: activeId,
+					slug: _template ? _template.slug : __( 'Loading…' ),
+					content: _template?.content,
+				},
 				templateParts: templatePartIds.map( ( id ) => {
-					const template = getEntityRecord(
+					const templatePart = getEntityRecord(
 						'postType',
 						'wp_template_part',
 						id
 					);
 					return {
-						label: template ? (
-							<TemplateLabel template={ template } />
+						label: templatePart ? (
+							<TemplateLabel template={ templatePart } />
 						) : (
 							__( 'Loading…' )
 						),
 						value: id,
-						slug: template ? template.slug : __( 'Loading…' ),
+						slug: templatePart
+							? templatePart.slug
+							: __( 'Loading…' ),
 					};
 				} ),
 			};
 		},
-		[ ids, templatePartIds, homeId ]
+		[ activeId, templatePartIds, homeId ]
 	);
-	const [ isAddTemplateOpen, setIsAddTemplateOpen ] = useState( false );
+
+	const overwriteSlug =
+		TEMPLATE_OVERRIDES[ page.type ] &&
+		page.slug &&
+		TEMPLATE_OVERRIDES[ page.type ]( page.slug );
+	const overwriteTemplate = () =>
+		onAddTemplate( {
+			slug: overwriteSlug,
+			title: overwriteSlug,
+			status: 'publish',
+			content: template.content.raw,
+		} );
+	const revertToParent = async () => {
+		onRemoveTemplate( template.value );
+	};
 	return (
 		<>
 			<DropdownMenu
@@ -124,35 +142,48 @@ export default function TemplateSwitcher( {
 				toggleProps={ {
 					children: ( isTemplatePart
 						? templateParts
-						: templates
-					).find( ( choice ) => choice.value === activeId ).slug,
+						: [ template ]
+					).find(
+						( choice ) =>
+							choice.value ===
+							( isTemplatePart ? activeTemplatePartId : activeId )
+					).slug,
 				} }
 			>
-				{ ( { onClose } ) => (
+				{ () => (
 					<>
-						<MenuGroup label={ __( 'Templates' ) }>
-							<MenuItemsChoice
-								choices={ templates }
-								value={
-									! isTemplatePart ? activeId : undefined
-								}
-								onSelect={ onActiveIdChange }
-								onHover={ onHoverTemplate }
-							/>
+						<MenuGroup label={ __( 'Template' ) }>
 							<MenuItem
-								icon={ plus }
-								onClick={ () => {
-									onClose();
-									setIsAddTemplateOpen( true );
-								} }
+								onClick={ () => onActiveIdChange( activeId ) }
 							>
-								{ __( 'New' ) }
+								{ template.label }
 							</MenuItem>
+							{ overwriteSlug &&
+								overwriteSlug !== template.slug && (
+									<MenuItem
+										icon={ plus }
+										onClick={ overwriteTemplate }
+									>
+										{ __( 'Overwrite Template' ) }
+									</MenuItem>
+								) }
+							{ overwriteSlug === template.slug && (
+								<MenuItem
+									icon={ undo }
+									onClick={ revertToParent }
+								>
+									{ __( 'Revert to Parent' ) }
+								</MenuItem>
+							) }
 						</MenuGroup>
 						<MenuGroup label={ __( 'Template Parts' ) }>
 							<MenuItemsChoice
 								choices={ templateParts }
-								value={ isTemplatePart ? activeId : undefined }
+								value={
+									isTemplatePart
+										? activeTemplatePartId
+										: undefined
+								}
 								onSelect={ onActiveTemplatePartIdChange }
 								onHover={ onHoverTemplatePart }
 							/>
@@ -175,15 +206,6 @@ export default function TemplateSwitcher( {
 					</>
 				) }
 			</DropdownMenu>
-			<AddTemplate
-				ids={ ids }
-				onAddTemplateId={ onAddTemplateId }
-				onRequestClose={ useCallback(
-					() => setIsAddTemplateOpen( false ),
-					[]
-				) }
-				isOpen={ isAddTemplateOpen }
-			/>
 		</>
 	);
 }

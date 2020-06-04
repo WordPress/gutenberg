@@ -31,10 +31,7 @@ describe( 'actions', () => {
 
 			expect( generator.next( { success: true } ).value ).toEqual( {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: {
-					id: item.id,
-					name: item.name,
-				},
+				item,
 			} );
 
 			expect( generator.next().value ).toEqual( {

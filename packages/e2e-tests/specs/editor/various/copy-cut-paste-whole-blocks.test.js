@@ -6,9 +6,10 @@ import {
 	createNewPost,
 	pressKeyWithModifier,
 	getEditedPostContent,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Multi-block selection', () => {
+describe( 'Copy/cut/paste of whole blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -60,6 +61,23 @@ describe( 'Multi-block selection', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'v' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should respect inline copy in places like input fields and textareas', async () => {
+		await insertBlock( 'Shortcode' );
+		await page.keyboard.type( '[my-shortcode]' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shift', 'ArrowLeft' );
+
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Pasted: ' );
 		await pressKeyWithModifier( 'primary', 'v' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

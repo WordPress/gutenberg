@@ -12,28 +12,22 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	enableExperimentalFeatures,
-	disableExperimentalFeatures,
-} from '../../experimental-features';
+import { useExperimentalFeatures } from '../../experimental-features';
 import { trashExistingPosts } from '../../config/setup-test-framework';
 
 describe( 'Template Part', () => {
+	useExperimentalFeatures( [
+		'#gutenberg-full-site-editing',
+		'#gutenberg-full-site-editing-demo',
+	] );
+
 	beforeAll( async () => {
-		await enableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await trashExistingPosts( 'wp_template' );
 		await trashExistingPosts( 'wp_template_part' );
-		await disableExperimentalFeatures( [
-			'#gutenberg-full-site-editing',
-			'#gutenberg-full-site-editing-demo',
-		] );
 	} );
 
 	describe( 'Template part block', () => {
