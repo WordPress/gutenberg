@@ -105,7 +105,19 @@ function PostAuthorEdit( {
 	}
 
 	const blockClassNames = classnames( 'wp-block-post-author', {
+		[ `has-text-align-${ align }` ]: align,
+	} );
+
+	const authorClassNames = classnames( 'wp-block-post-author__name', {
 		[ fontSize.class ]: fontSize.class,
+	} );
+
+	const bioClassNames = classnames( 'wp-block-post-author__bio', {
+		[ bioFontSize.class ]: bioFontSize.class,
+	} );
+
+	const bylineClassNames = classnames( 'wp-block-post-author__byline', {
+		[ bylineFontSize.class ]: bylineFontSize.class,
 	} );
 
 	const authorInlineStyles = {
@@ -212,12 +224,7 @@ function PostAuthorEdit( {
 
 			<TextColor>
 				<BackgroundColor>
-					<div
-						ref={ ref }
-						className={ classnames( blockClassNames, {
-							[ `has-text-align-${ align }` ]: align,
-						} ) }
-					>
+					<div ref={ ref } className={ blockClassNames }>
 						{ showAvatar && authorDetails && (
 							<div className="wp-block-post-author__avatar">
 								<img
@@ -233,7 +240,7 @@ function PostAuthorEdit( {
 							{ ( ! RichText.isEmpty( byline ) ||
 								isSelected ) && (
 								<RichText
-									className="wp-block-post-author__byline"
+									className={ bylineClassNames }
 									multiline={ false }
 									placeholder={ __( 'Write byline …' ) }
 									value={ byline }
@@ -244,14 +251,14 @@ function PostAuthorEdit( {
 								/>
 							) }
 							<p
-								className="wp-block-post-author__name"
+								className={ authorClassNames }
 								style={ authorInlineStyles }
 							>
 								{ authorDetails?.name }
 							</p>
 							{ showBio && (
 								<p
-									className={ 'wp-block-post-author__bio' }
+									className={ bioClassNames }
 									style={ bioInlineStyles }
 								>
 									{ authorDetails?.description }
