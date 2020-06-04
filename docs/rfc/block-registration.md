@@ -90,10 +90,10 @@ To register a new block type, start by creating a `block.json` file. This file:
 			"message": "This is a notice!"
 		},
 	},
-	"editorScript": "file://build/index.js",
-	"script": "file://build/script.js",
-	"editorStyle": "file://build/index.css",
-	"style": "file://build/style.css"
+	"editorScript": "file:./build/index.js",
+	"script": "file:./build/script.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style.css"
 }
 ```
 
@@ -312,7 +312,7 @@ Plugins and Themes can also register [custom block style](/docs/designers-develo
 * Property: `editorScript`
 
 ```json
-{ "editorScript": "file://build/index.js" }
+{ "editorScript": "file:./build/index.js" }
 ```
 
 Block type editor script definition. It will only be enqueued in the context of the editor.
@@ -325,7 +325,7 @@ Block type editor script definition. It will only be enqueued in the context of 
 * Property: `script`
 
 ```json
-{ "script": "file://build/script.js" }
+{ "script": "file:./build/script.js" }
 ```
 
 Block type frontend script definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -338,7 +338,7 @@ Block type frontend script definition. It will be enqueued both in the editor an
 * Property: `editorStyle`
 
 ```json
-{ "editorStyle": "file://build/index.css" }
+{ "editorStyle": "file:./build/index.css" }
 ```
 
 Block type editor style definition. It will only be enqueued in the context of the editor.
@@ -351,7 +351,7 @@ Block type editor style definition. It will only be enqueued in the context of t
 * Property: `style`
 
 ```json
-{ "style": "file://build/style.css" }
+{ "style": "file:./build/style.css" }
 ```
 
 Block type frontend style definition. It will be enqueued both in the editor and when viewing the content on the front of the site.
@@ -387,15 +387,17 @@ In the case of [dynamic blocks](/docs/designers-developers/developers/tutorials/
 
 ### `WPDefinedAsset`
 
-The `WPDefinedAsset` type is a subtype of string, where the value must represent a relative path to a JavaScript or CSS file prefixed with `file://`. An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
+The `WPDefinedAsset` type is a subtype of string, where the value represents a path to a JavaScript or CSS file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
+
+An alternative would be a script or style handle name referencing a registered asset using WordPress helpers.
 
 **Example:**
 
 In `block.json`:
 ```json
 {
-	"editorScript": "file://build/index.js",
-	"editorStyle": "my-editor-style"
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "my-editor-style-handle"
 }
 ```
 
@@ -422,7 +424,7 @@ build/
 
 In `block.json`:
 ```json
-{ "editorScript": "file://build/index.js" }
+{ "editorScript": "file:./build/index.js" }
 ```
 
 In `build/index.asset.php`:

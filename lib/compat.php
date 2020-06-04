@@ -19,7 +19,7 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @return string Path without the prefix or the original value.
 	 */
 	function gutenberg_remove_block_asset_path_prefix( $asset_handle_or_path ) {
-		$path_prefix = 'file://';
+		$path_prefix = 'file:';
 		if ( strpos( $asset_handle_or_path, $path_prefix ) !== 0 ) {
 			return $asset_handle_or_path;
 		}

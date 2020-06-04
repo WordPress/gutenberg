@@ -14,9 +14,9 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 	}
 
 	function test_removes_block_asset_path_prefix() {
-		$result = gutenberg_remove_block_asset_path_prefix( 'file://block.js' );
+		$result = gutenberg_remove_block_asset_path_prefix( 'file:./block.js' );
 
-		$this->assertSame( 'block.js', $result );
+		$this->assertSame( './block.js', $result );
 	}
 
 	function test_generate_block_asset_handle() {
