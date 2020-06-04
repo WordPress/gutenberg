@@ -5,6 +5,7 @@ import { RichText } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
+		id,
 		href,
 		fileName,
 		textLinkHref,
@@ -13,11 +14,14 @@ export default function save( { attributes } ) {
 		downloadButtonText,
 	} = attributes;
 
+	const fileId = `wp-block-file--media-${ id }`;
+
 	return (
 		href && (
 			<div>
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
+						id={ fileId }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
@@ -30,6 +34,7 @@ export default function save( { attributes } ) {
 						href={ href }
 						className="wp-block-file__button"
 						download={ true }
+						aria-describedby={ fileId }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>
