@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import Button from '../button';
 import FilterControl from '../filter-control';
 import SelectControl from '../select-control';
 
@@ -54,6 +55,7 @@ const presets = [
 function FilterPresetControl( { onChange = noop, value, ...props } ) {
 	const [ __state, setState ] = useState( value || {} );
 	const [ preset, setPreset ] = useState( 'none' );
+	const [ isControlVisible, setIsControlVisible ] = useState( false );
 	const state = value || __state;
 
 	const getPreset = ( val ) => {
@@ -77,6 +79,8 @@ function FilterPresetControl( { onChange = noop, value, ...props } ) {
 		}
 	};
 
+	const buttonLabel = isControlVisible ? 'Hide Controls' : 'Show Controls';
+
 	return (
 		<div>
 			<SelectControl
@@ -85,11 +89,20 @@ function FilterPresetControl( { onChange = noop, value, ...props } ) {
 				value={ preset }
 				onChange={ handleOnPresetChange }
 			/>
-			<FilterControl
-				{ ...props }
-				value={ state }
-				onChange={ handleOnFilterChange }
-			/>
+			<Button
+				isTertiary
+				isSmall
+				onClick={ () => setIsControlVisible( ! isControlVisible ) }
+			>
+				{ buttonLabel }
+			</Button>
+			<div style={ { display: isControlVisible ? 'block' : 'none' } }>
+				<FilterControl
+					{ ...props }
+					value={ state }
+					onChange={ handleOnFilterChange }
+				/>
+			</div>
 		</div>
 	);
 }
