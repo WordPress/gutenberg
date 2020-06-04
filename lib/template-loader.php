@@ -321,7 +321,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	if ( $current_template_post ) {
 		$template_part_ids = array();
-		if ( is_admin() ) {
+		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
 				$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $block ) );
 			}

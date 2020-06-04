@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import downloadjs from 'downloadjs';
+
+/**
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -16,6 +22,29 @@ registerPlugin( 'edit-site', {
 		return (
 			<>
 				<ToolsMoreMenuGroup>
+					<MenuItem
+						role="menuitem"
+						icon="download"
+						onClick={ () =>
+							apiFetch( {
+								path: '/edit-site/v1/export',
+								parse: false,
+							} )
+								.then( ( res ) => res.blob() )
+								.then( ( blob ) =>
+									downloadjs(
+										blob,
+										'edit-site-export.zip',
+										'application/zip'
+									)
+								)
+						}
+						info={ __(
+							'Download your templates and template parts.'
+						) }
+					>
+						{ __( 'Export' ) }
+					</MenuItem>
 					<MenuItem
 						role="menuitem"
 						href={ addQueryArgs( 'edit.php', {
