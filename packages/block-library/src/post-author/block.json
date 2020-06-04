@@ -6,10 +6,12 @@
 			"type": "string"
 		},
 		"avatarSize": {
-			"type": "number"
+			"type": "number",
+			"default": 48
 		},
 		"showAvatar": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		},
 		"showBio": {
 			"type": "boolean"

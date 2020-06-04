@@ -22,8 +22,6 @@ import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_AVATAR_SIZE = 24;
-
 function PostAuthorEdit( {
 	isSelected,
 	fontSize,
@@ -97,11 +95,6 @@ function PostAuthorEdit( {
 				label: `${ size } x ${ size }`,
 			} );
 		} );
-	}
-
-	let avatarSize = DEFAULT_AVATAR_SIZE;
-	if ( !! attributes.avatarSize ) {
-		avatarSize = attributes.avatarSize;
 	}
 
 	const classNames = useMemo( () => {
@@ -237,9 +230,11 @@ function PostAuthorEdit( {
 						{ showAvatar && authorDetails && (
 							<div className="wp-block-post-author__avatar">
 								<img
-									width={ avatarSize }
+									width={ attributes.avatarSize }
 									src={
-										authorDetails.avatar_urls[ avatarSize ]
+										authorDetails.avatar_urls[
+											attributes.avatarSize
+										]
 									}
 									alt={ authorDetails.name }
 								/>
