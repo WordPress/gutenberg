@@ -30,7 +30,8 @@
 			"type": "string"
 		},
 		"fontSize": {
-			"type": "string"
+			"type": "string",
+			"default": "large"
 		},
 		"customFontSize": {
 			"type": "number"
