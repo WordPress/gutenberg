@@ -45,7 +45,9 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes
+		blockTypes,
+		colors,
+		gradients
 	) {
 		settings = {
 			...settings,
@@ -68,6 +70,14 @@ class Editor extends Component {
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
 			);
+		}
+
+		if ( colors !== undefined ) {
+			settings.colors = colors;
+		}
+
+		if ( gradients !== undefined ) {
+			settings.gradients = gradients;
 		}
 
 		return settings;
@@ -103,6 +113,8 @@ class Editor extends Component {
 			blockTypes,
 			post,
 			postType,
+			colors,
+			gradients,
 			...props
 		} = this.props;
 
@@ -111,7 +123,9 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes
+			blockTypes,
+			colors,
+			gradients
 		);
 
 		const normalizedPost = post || {

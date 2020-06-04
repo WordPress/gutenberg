@@ -53,11 +53,12 @@ export function setInstallBlocksPermission( hasPermission ) {
 /**
  * Action triggered to install a block plugin.
  *
- * @param {Object} item The block item returned by search.
+ * @param {Object} block The block item returned by search.
  *
  * @return {boolean} Whether the block was successfully installed & loaded.
  */
-export function* installBlockType( { id, name, assets } ) {
+export function* installBlockType( block ) {
+	const { id, assets } = block;
 	let success = false;
 	yield clearErrorNotice( id );
 	try {
@@ -68,14 +69,14 @@ export function* installBlockType( { id, name, assets } ) {
 		const response = yield apiFetch( {
 			path: '__experimental/block-directory/install',
 			data: {
-				slug: id,
+				slug: block.id,
 			},
 			method: 'POST',
 		} );
 		if ( response.success !== true ) {
 			throw new Error( __( 'Unable to install this block.' ) );
 		}
-		yield addInstalledBlockType( { id, name } );
+		yield addInstalledBlockType( block );
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield select( 'core/blocks', 'getBlockTypes' );

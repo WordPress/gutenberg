@@ -17,9 +17,9 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import BlockTitle from '../block-title';
 import SubdirectorSVG from './subdirectory-icon';
 
-import styles from './breadcrumb.scss';
+import styles from './block-selection-button.scss';
 
-const BlockBreadcrumb = ( {
+const BlockSelectionButton = ( {
 	clientId,
 	blockIcon,
 	rootClientId,
@@ -29,7 +29,7 @@ const BlockBreadcrumb = ( {
 	return (
 		<View
 			style={ [
-				styles.breadcrumbContainer,
+				styles.selectionButtonContainer,
 				rootClientId && styles.densedPaddingLeft,
 			] }
 		>
@@ -66,7 +66,7 @@ const BlockBreadcrumb = ( {
 					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"
 					numberOfLines={ 1 }
-					style={ styles.breadcrumbTitle }
+					style={ styles.selectionButtonTitle }
 				>
 					<BlockTitle clientId={ clientId } />
 				</Text>
@@ -105,4 +105,4 @@ export default compose( [
 			isRTL: getSettings().isRTL,
 		};
 	} ),
-] )( BlockBreadcrumb );
+] )( BlockSelectionButton );

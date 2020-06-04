@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockIcon } from '@wordpress/block-editor';
 import BlockRatings from '../block-ratings';
+import DownloadableBlockIcon from '../downloadable-block-icon';
 
 export function DownloadableBlockHeader( {
 	icon,
@@ -21,20 +21,7 @@ export function DownloadableBlockHeader( {
 } ) {
 	return (
 		<div className="block-directory-downloadable-block-header__row">
-			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
-				<img
-					src={ icon }
-					alt={ sprintf(
-						// translators: %s: Name of the plugin e.g: "Akismet".
-						__( '%s block icon' ),
-						title
-					) }
-				/>
-			) : (
-				<span>
-					<BlockIcon icon={ icon } showColors />
-				</span>
-			) }
+			<DownloadableBlockIcon icon={ icon } title={ title } />
 
 			<div className="block-directory-downloadable-block-header__column">
 				<h2 className="block-directory-downloadable-block-header__title">
