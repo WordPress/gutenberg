@@ -51,10 +51,10 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
 	CSS_UNITS,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	BackgroundMedia,
 } from './shared';
 
 /**
@@ -406,10 +406,17 @@ function CoverEdit( {
 					</>
 				) }
 				<PanelBody
-					title={ __( 'Background filters' ) }
-					initialOpen={ false }
+					title={ __( 'Filters' ) }
+					initialOpen={ !! backgroundFilter }
 				>
 					<FilterControl
+						filters={ {
+							grayscale: false,
+							hue: false,
+							invert: false,
+							opacity: false,
+							sepia: false,
+						} }
 						value={ backgroundFilter }
 						onChange={ ( next ) => {
 							setAttributes( { backgroundFilter: next } );
@@ -520,6 +527,7 @@ function CoverEdit( {
 					backgroundFilter={ backgroundFilter }
 					backgroundType={ backgroundType }
 					focalPoint={ focalPoint }
+					hasParallax={ hasParallax }
 					videoRef={ isDarkElement }
 					url={ url }
 				/>
@@ -532,56 +540,6 @@ function CoverEdit( {
 				/>
 			</Block.div>
 		</>
-	);
-}
-
-function BackgroundMedia( {
-	backgroundFilter,
-	backgroundType,
-	focalPoint,
-	videoRef,
-	url,
-} ) {
-	const isVideoBackground = backgroundType === VIDEO_BACKGROUND_TYPE;
-	const isImageBackground = backgroundType === IMAGE_BACKGROUND_TYPE;
-
-	const backgroundStyles = isImageBackground
-		? backgroundImageStyles( url )
-		: {};
-
-	if ( backgroundFilter ) {
-		backgroundStyles.filter = FilterControl.createStyles(
-			backgroundFilter
-		).filter;
-	}
-
-	if ( isImageBackground && focalPoint ) {
-		backgroundStyles.backgroundPosition = `${ focalPoint.x * 100 }% ${
-			focalPoint.y * 100
-		}%`;
-	}
-
-	const contentMarkup = isVideoBackground ? (
-		<video
-			ref={ videoRef }
-			className="wp-block-cover__video-background"
-			autoPlay
-			muted
-			loop
-			src={ url }
-			style={ backgroundStyles }
-		/>
-	) : (
-		<div
-			className="wp-block-cover__image-background-content"
-			style={ backgroundStyles }
-		/>
-	);
-
-	return (
-		<div className="wp-block-cover__image-background">
-			{ contentMarkup }
-		</div>
 	);
 }
 

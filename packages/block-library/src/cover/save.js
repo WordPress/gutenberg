@@ -16,16 +16,15 @@ import {
  * Internal dependencies
  */
 import {
-	IMAGE_BACKGROUND_TYPE,
-	VIDEO_BACKGROUND_TYPE,
-	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
+	BackgroundMedia,
 } from './shared';
 
 export default function save( { attributes } ) {
 	const {
+		backgroundFilter,
 		backgroundType,
 		gradient,
 		contentPosition,
@@ -48,18 +47,12 @@ export default function save( { attributes } ) {
 		? `${ minHeightProp }${ minHeightUnit }`
 		: minHeightProp;
 
-	const style =
-		backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {};
+	const style = {};
+
 	if ( ! overlayColorClass ) {
 		style.backgroundColor = customOverlayColor;
 	}
-	if ( focalPoint && ! hasParallax ) {
-		style.backgroundPosition = `${ Math.round(
-			focalPoint.x * 100
-		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
-	}
+
 	if ( customGradient && ! url ) {
 		style.background = customGradient;
 	}
@@ -96,16 +89,13 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
-				<video
-					className="wp-block-cover__video-background"
-					autoPlay
-					muted
-					loop
-					playsInline
-					src={ url }
-				/>
-			) }
+			<BackgroundMedia
+				backgroundFilter={ backgroundFilter }
+				backgroundType={ backgroundType }
+				focalPoint={ focalPoint }
+				hasParallax={ hasParallax }
+				url={ url }
+			/>
 			<div className="wp-block-cover__inner-container">
 				<InnerBlocks.Content />
 			</div>

@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { FilterControl } from '@wordpress/components';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -81,5 +86,57 @@ export function isContentPositionCenter( contentPosition ) {
 		! contentPosition ||
 		contentPosition === 'center center' ||
 		contentPosition === 'center'
+	);
+}
+
+export function BackgroundMedia( {
+	backgroundFilter,
+	backgroundType,
+	focalPoint,
+	hasParallax,
+	videoRef,
+	url,
+} ) {
+	const isVideoBackground = backgroundType === VIDEO_BACKGROUND_TYPE;
+	const isImageBackground = backgroundType === IMAGE_BACKGROUND_TYPE;
+
+	const backgroundStyles = isImageBackground
+		? backgroundImageStyles( url )
+		: {};
+
+	if ( backgroundFilter ) {
+		backgroundStyles.filter = FilterControl.createStyles(
+			backgroundFilter
+		).filter;
+	}
+
+	if ( isImageBackground && focalPoint && ! hasParallax ) {
+		backgroundStyles.backgroundPosition = `${ focalPoint.x * 100 }% ${
+			focalPoint.y * 100
+		}%`;
+	}
+
+	const contentMarkup = isVideoBackground ? (
+		<video
+			autoPlay
+			className="wp-block-cover__video-background"
+			loop
+			muted
+			playsInline
+			ref={ videoRef }
+			src={ url }
+			style={ backgroundStyles }
+		/>
+	) : (
+		<div
+			className="wp-block-cover__image-background-content"
+			style={ backgroundStyles }
+		/>
+	);
+
+	return (
+		<div className="wp-block-cover__image-background">
+			{ contentMarkup }
+		</div>
 	);
 }

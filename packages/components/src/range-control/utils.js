@@ -33,9 +33,15 @@ export function floatClamp( value, min, max ) {
 /**
  * Hook to store a clamped value, derived from props.
  */
-export function useControlledRangeValue( { min, max, value: valueProp } ) {
+export function useControlledRangeValue( {
+	min,
+	max,
+	value: valueProp,
+	__unstableIsControlled,
+} ) {
 	const [ value, setValue ] = useControlledState(
-		floatClamp( valueProp, min, max )
+		floatClamp( valueProp, min, max ),
+		__unstableIsControlled
 	);
 
 	const setClampValue = useCallback(

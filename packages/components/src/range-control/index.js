@@ -69,6 +69,7 @@ const BaseRangeControl = forwardRef(
 			trackColor,
 			value: valueProp,
 			withInputField = true,
+			__unstableIsControlled = true,
 			...props
 		},
 		ref
@@ -82,6 +83,7 @@ const BaseRangeControl = forwardRef(
 			min,
 			max,
 			value: sliderValue,
+			__unstableIsControlled,
 		} );
 		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 		const [ isFocused, setIsFocused ] = useState( false );
