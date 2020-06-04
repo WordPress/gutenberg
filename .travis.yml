@@ -53,7 +53,8 @@ install:
   - npm run build
   - |
     if [[ "$INSTALL_WORDPRESS" = "true" ]]; then
-      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php" } }' > .wp-env.override.json
+      echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
+      chmod -R 767 ./ # TODO: Possibly integrate in wp-env
       npm run wp-env start
     fi
   - |
@@ -128,15 +129,12 @@ jobs:
         - npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
     - name: PHP unit tests
-      env: WP_ENV_TESTS_PORT=8887 WP_ENV_PORT=8886 # TODO: Remove tests port when scripts/env is replaced with wp-env.
       script:
-        - chmod -R 767 ./build
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: PHP unit tests (PHP 5.6)
-      env: LOCAL_PHP=5.6-fpm WP_ENV_TESTS_PORT=8887 WP_ENV_PORT=8886 # TODO: Remove tests port when scripts/env is replaced with wp-env.
+      env: LOCAL_PHP=5.6-fpm
       script:
-        - chmod -R 767 ./build
         - npm run test-php && npm run test-unit-php-multisite
 
     - name: E2E tests (Admin) (1/4)

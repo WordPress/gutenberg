@@ -92,6 +92,7 @@ function ComplementaryArea( {
 	smallScreenTitle,
 	title,
 	toggleShortcut,
+	isActiveByDefault,
 } ) {
 	const { isActive, isPinned, activeArea, isSmall } = useSelect(
 		( select ) => {
@@ -117,10 +118,19 @@ function ComplementaryArea( {
 		isActive,
 		isSmall
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
-	);
-	const { pinItem, unpinItem } = useDispatch( 'core/interface' );
+	const {
+		enableComplementaryArea,
+		disableComplementaryArea,
+		pinItem,
+		unpinItem,
+	} = useDispatch( 'core/interface' );
+
+	useEffect( () => {
+		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
+			enableComplementaryArea( scope, identifier );
+		}
+	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+
 	return (
 		<>
 			{ isPinned && isPinnable && (

@@ -6,13 +6,77 @@ import { keyBy, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
-export default async function batchSave(
-	menuId,
-	menuItemsRef,
-	navigationBlock
-) {
+/**
+ * Internal dependencies
+ */
+import useCreateMissingMenuItems from './use-create-missing-menu-items';
+
+export default function useMenuItems( query ) {
+	const menuItems = useFetchMenuItems( query );
+	const saveMenuItems = useSaveMenuItems( query );
+	const { createMissingMenuItems, onCreated } = useCreateMissingMenuItems();
+	const eventuallySaveMenuItems = ( blocks, menuItemsRef ) =>
+		onCreated( () => saveMenuItems( blocks, menuItemsRef ) );
+	return { menuItems, eventuallySaveMenuItems, createMissingMenuItems };
+}
+
+export function useFetchMenuItems( query ) {
+	const { menuItems, isResolving } = useSelect( ( select ) => ( {
+		menuItems: select( 'core' ).getMenuItems( query ),
+		isResolving: select( 'core/data' ).isResolving(
+			'core',
+			'getMenuItems',
+			[ query ]
+		),
+	} ) );
+
+	const [ resolvedMenuItems, setResolvedMenuItems ] = useState( null );
+
+	useEffect( () => {
+		if ( isResolving || menuItems === null ) {
+			return;
+		}
+
+		setResolvedMenuItems( menuItems );
+	}, [ isResolving, menuItems ] );
+
+	return resolvedMenuItems;
+}
+
+export function useSaveMenuItems( query ) {
+	const { receiveEntityRecords } = useDispatch( 'core' );
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+
+	const saveBlocks = async ( blocks, menuItemsRef ) => {
+		const result = await batchSave(
+			query.menus,
+			menuItemsRef,
+			blocks[ 0 ]
+		);
+
+		if ( result.success ) {
+			receiveEntityRecords( 'root', 'menuItem', [], query, true );
+			createSuccessNotice( __( 'Navigation saved.' ), {
+				type: 'snackbar',
+			} );
+		} else {
+			createErrorNotice( __( 'There was an error.' ), {
+				type: 'snackbar',
+			} );
+		}
+	};
+
+	return saveBlocks;
+}
+
+async function batchSave( menuId, menuItemsRef, navigationBlock ) {
 	const { nonce, stylesheet } = await apiFetch( {
 		path: '/__experimental/customizer-nonces/get-save-nonce',
 	} );

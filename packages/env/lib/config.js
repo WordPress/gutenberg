@@ -38,7 +38,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
  * @property {number}      port                    The port on which to start the development WordPress environment.
  * @property {number}      testsPort               The port on which to start the testing WordPress environment.
  * @property {Object}      config                  Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, Source>} mappings    Mapping of WordPress directories to local directories which should be mounted.
+ * @property {Object.<string, WPSource>} mappings    Mapping of WordPress directories to local directories which should be mounted.
  * @property {boolean}     debug                   True if debug mode is enabled.
  */
 
@@ -133,6 +133,8 @@ module.exports = {
 					WP_DEBUG: true,
 					SCRIPT_DEBUG: true,
 					WP_PHP_BINARY: 'php',
+					WP_TESTS_EMAIL: 'admin@example.org',
+					WP_TESTS_TITLE: 'Test Blog',
 				},
 				mappings: {},
 			},

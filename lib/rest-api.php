@@ -264,3 +264,14 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
+
+/**
+ * Registers the image editor.
+ *
+ * @since 7.x.0
+ */
+function gutenberg_register_image_editor() {
+	$image_editor = new WP_REST_Image_Editor_Controller();
+	$image_editor->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );

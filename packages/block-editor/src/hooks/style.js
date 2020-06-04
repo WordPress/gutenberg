@@ -17,14 +17,21 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import SpacingPanelControl from '../components/spacing-panel-control';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { LINE_HEIGHT_SUPPORT_KEY, LineHeightEdit } from './line-height';
 import { FONT_SIZE_SUPPORT_KEY, FontSizeEdit } from './font-size';
+import {
+	PADDING_SUPPORT_KEY,
+	PaddingEdit,
+	paddingStyleMappings,
+} from './padding';
 
 const styleSupportKeys = [
 	COLOR_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	PADDING_SUPPORT_KEY,
 ];
 
 const typographySupportKeys = [
@@ -43,6 +50,7 @@ const hasStyleSupport = ( blockType ) =>
  */
 export function getInlineStyles( styles = {} ) {
 	const mappings = {
+		...paddingStyleMappings,
 		lineHeight: [ 'typography', 'lineHeight' ],
 		fontSize: [ 'typography', 'fontSize' ],
 		background: [ 'color', 'gradient' ],
@@ -144,6 +152,11 @@ export const withBlockControls = createHigherOrderComponent(
 			hasBlockSupport( blockName, key )
 		);
 
+		const hasPaddingSupport = hasBlockSupport(
+			blockName,
+			PADDING_SUPPORT_KEY
+		);
+
 		return [
 			Platform.OS === 'web' && hasTypographySupport && (
 				<InspectorControls key="typography">
@@ -155,6 +168,11 @@ export const withBlockControls = createHigherOrderComponent(
 			),
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
+			hasPaddingSupport && (
+				<SpacingPanelControl key="spacing">
+					<PaddingEdit { ...props } />
+				</SpacingPanelControl>
+			),
 		];
 	},
 	'withToolbarControls'

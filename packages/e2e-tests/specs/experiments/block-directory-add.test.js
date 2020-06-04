@@ -62,7 +62,7 @@ const block = `( function() {
 	registerBlockType( '${ MOCK_BLOCK1.name }', {
 		title: 'Test Block for Block Directory',
 		icon: 'hammer',
-		category: 'common',
+		category: 'text',
 		attributes: {},
 		edit: function( props ) {
 			return el( 'p', null, 'Test Copy' );

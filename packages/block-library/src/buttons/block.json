@@ -1,6 +1,6 @@
 {
 	"name": "core/buttons",
-	"category": "layout",
+	"category": "design",
 	"supports": {
 		"align": true,
 		"alignWide": false,

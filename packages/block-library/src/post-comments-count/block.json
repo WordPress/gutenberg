@@ -1,6 +1,6 @@
 {
 	"name": "core/post-comments-count",
-	"category": "layout",
+	"category": "design",
 	"context": [
 		"postId"
 	],

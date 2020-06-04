@@ -9,10 +9,7 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import {
-	InspectorControls,
-	SETTINGS_DEFAULTS as defaultSettings,
-} from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,6 +19,7 @@ import styles from './container.native.scss';
 function BottomSheetSettings( {
 	editorSidebarOpened,
 	closeGeneralSidebar,
+	settings,
 	...props
 } ) {
 	return (
@@ -38,7 +36,7 @@ function BottomSheetSettings( {
 						case colorsUtils.subsheets.color:
 							return (
 								<ColorSettings
-									defaultSettings={ defaultSettings }
+									defaultSettings={ settings }
 									{ ...bottomSheetProps }
 									{ ...extraProps }
 								/>
@@ -56,8 +54,9 @@ function BottomSheetSettings( {
 export default compose( [
 	withSelect( ( select ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
+			settings: getSettings(),
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};
 	} ),
