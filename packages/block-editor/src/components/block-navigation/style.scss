@@ -25,7 +25,7 @@ $tree-item-height: 36px;
 	// Use position relative for row animation.
 	position: relative;
 
-	.block-editor-block-navigation-block-content-wrapper {
+	.block-editor-block-navigation-block-contents {
 		display: flex;
 		align-items: center;
 		width: calc(100% - 0.8em);
@@ -36,16 +36,13 @@ $tree-item-height: 36px;
 		border-radius: 2px;
 	}
 
-	&.is-visible .block-editor-block-navigation-block-content-wrapper {
+	&.is-visible .block-editor-block-navigation-block-contents {
 		opacity: 1;
 		@include edit-post__fade-in-animation;
 	}
 
-	// .block-editor-block-navigation__list-item {
-	// 	position: relative;
-	// }
-
 	.block-editor-block-icon {
+		align-self: flex-start;
 		margin-right: 6px;
 	}
 
@@ -57,14 +54,23 @@ $tree-item-height: 36px;
 		border-radius: $border-width;
 	}
 
+	.block-editor-block-navigation-block__menu-cell,
 	.block-editor-block-navigation-block__mover-cell {
 		width: $button-size;
 		opacity: 0;
+		vertical-align: top;
 		@include reduce-motion("transition");
 
 		&.is-visible {
 			opacity: 1;
 			@include edit-post__fade-in-animation;
+		}
+
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
 		}
 	}
 
@@ -73,30 +79,21 @@ $tree-item-height: 36px;
 		height: $button-size;
 	}
 
-	.block-editor-button-block-appender {
-		outline: none;
-		background: none;
-		padding: $grid-unit-10;
-		padding: 6px;
-		margin-left: 0.8em;
-		width: calc(100% - 0.8em);
-	}
+	.block-editor-inserter__toggle {
+		background: $dark-gray-primary;
+		color: $white;
+		height: $grid-unit-30;
+		margin: 6px 6px 6px 0.8em;
+		min-width: $grid-unit-30;
 
-	& > li:last-child {
-		position: relative;
-		&::after {
-			position: absolute;
-			content: "";
-			background: $white;
-			top: ($tree-item-height + $tree-border-width ) / 2;
-			bottom: 0;
-			left: -$tree-border-width;
-			width: $tree-border-width;
+		&:active {
+			color: $white;
 		}
 	}
 }
 
-.block-editor-block-navigation-block-content-wrapper__description,
+.block-editor-block-navigation-block-slot__description,
+.block-editor-block-navigation-block-select-button__description,
 .block-editor-block-navigation-appender__description {
 	display: none;
 }

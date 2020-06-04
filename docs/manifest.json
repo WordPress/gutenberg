@@ -234,6 +234,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Themes & Block Editor: experimental theme.json",
+		"slug": "theme-json",
+		"markdown_source": "../docs/designers-developers/developers/themes/theme-json.md",
+		"parent": "themes"
+	},
+	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/designers-developers/developers/backward-compatibility/README.md",
@@ -660,6 +666,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "BoxControl",
+		"slug": "box-control",
+		"markdown_source": "../packages/components/src/box-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ButtonGroup",
 		"slug": "button-group",
 		"markdown_source": "../packages/components/src/button-group/README.md",
@@ -768,6 +780,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Flex",
+		"slug": "flex",
+		"markdown_source": "../packages/components/src/flex/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocalPointPicker",
 		"slug": "focal-point-picker",
 		"markdown_source": "../packages/components/src/focal-point-picker/README.md",
@@ -867,6 +885,12 @@
 		"title": "Icon",
 		"slug": "icon",
 		"markdown_source": "../packages/components/src/icon/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "InputControl",
+		"slug": "input-control",
+		"markdown_source": "../packages/components/src/input-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1464,6 +1488,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/lazy-import",
+		"slug": "packages-lazy-import",
+		"markdown_source": "../packages/lazy-import/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/library-export-default-webpack-plugin",
 		"slug": "packages-library-export-default-webpack-plugin",
 		"markdown_source": "../packages/library-export-default-webpack-plugin/README.md",
@@ -1503,6 +1533,12 @@
 		"title": "@wordpress/plugins",
 		"slug": "packages-plugins",
 		"markdown_source": "../packages/plugins/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/postcss-plugins-preset",
+		"slug": "packages-postcss-plugins-preset",
+		"markdown_source": "../packages/postcss-plugins-preset/README.md",
 		"parent": "packages"
 	},
 	{

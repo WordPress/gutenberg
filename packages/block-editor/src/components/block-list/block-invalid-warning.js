@@ -62,8 +62,10 @@ export class BlockInvalidWarning extends Component {
 							isSecondary={ hasHTMLBlock }
 							isPrimary={ ! hasHTMLBlock }
 						>
-							{ // translators: Button to fix block content
-							_x( 'Resolve', 'imperative verb' ) }
+							{
+								// translators: Button to fix block content
+								_x( 'Resolve', 'imperative verb' )
+							}
 						</Button>,
 						hasHTMLBlock && (
 							<Button

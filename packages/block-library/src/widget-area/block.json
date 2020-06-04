@@ -8,5 +8,11 @@
 		"name": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"html": false,
+		"inserter": false,
+		"customClassName": false,
+		"__experimentalToolbar": false
 	}
 }

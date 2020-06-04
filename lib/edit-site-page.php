@@ -142,6 +142,7 @@ function gutenberg_edit_site_init( $hook ) {
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;
 	}
+	$settings['styles'] = gutenberg_get_editor_styles();
 
 	$template_ids      = array();
 	$template_part_ids = array();
@@ -161,24 +162,21 @@ function gutenberg_edit_site_init( $hook ) {
 
 	$current_template_id = $template_ids['front-page'];
 
-	$settings['templateId']      = $current_template_id;
-	$settings['homeTemplateId']  = $current_template_id;
-	$settings['templateType']    = 'wp_template';
-	$settings['templateIds']     = array_values( $template_ids );
-	$settings['templatePartIds'] = array_values( $template_part_ids );
-	$settings['styles']          = gutenberg_get_editor_styles();
+	$settings['editSiteInitialState'] = array();
 
-	$settings['showOnFront'] = get_option( 'show_on_front' );
-	$settings['page']        = array(
+	$settings['editSiteInitialState']['homeTemplateId']  = $current_template_id;
+	$settings['editSiteInitialState']['templateId']      = $current_template_id;
+	$settings['editSiteInitialState']['templateType']    = 'wp_template';
+	$settings['editSiteInitialState']['templateIds']     = array_values( $template_ids );
+	$settings['editSiteInitialState']['templatePartIds'] = array_values( $template_part_ids );
+
+	$settings['editSiteInitialState']['showOnFront'] = get_option( 'show_on_front' );
+	$settings['editSiteInitialState']['page']        = array(
 		'path'    => '/',
-		'context' => 'page' === $settings['showOnFront'] ? array(
+		'context' => 'page' === $settings['editSiteInitialState']['showOnFront'] ? array(
 			'postType' => 'page',
 			'postId'   => get_option( 'page_on_front' ),
-		) : array(
-			'query' => array(
-				'categoryIds' => array(),
-			),
-		),
+		) : array(),
 	);
 
 	// This is so other parts of the code can hook their own settings.
@@ -191,7 +189,8 @@ function gutenberg_edit_site_init( $hook ) {
 	$preload_paths = array(
 		'/',
 		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/taxonomies?per_page=100&context=edit',
+		'/wp/v2/pages?per_page=100&context=edit',
 		'/wp/v2/themes?status=active',
 		sprintf( '/wp/v2/templates/%s?context=edit', $current_template_id ),
 		array( '/wp/v2/media', 'OPTIONS' ),

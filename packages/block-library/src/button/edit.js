@@ -27,6 +27,7 @@ import {
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -123,7 +124,14 @@ function URLPicker( {
 }
 
 function ButtonEdit( props ) {
-	const { attributes, setAttributes, className, isSelected } = props;
+	const {
+		attributes,
+		setAttributes,
+		className,
+		isSelected,
+		onReplace,
+		mergeBlocks,
+	} = props;
 	const {
 		borderRadius,
 		linkTarget,
@@ -183,6 +191,15 @@ function ButtonEdit( props ) {
 							: undefined,
 						...colorProps.style,
 					} }
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
+							...attributes,
+							text: value,
+						} )
+					}
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					identifier="text"
 				/>
 			</Block.div>
 			<URLPicker

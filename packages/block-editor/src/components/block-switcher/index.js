@@ -65,10 +65,8 @@ export class BlockSwitcher extends Component {
 			return null;
 		}
 
-		const hoveredBlock = hoveredClassName ? blocks[ 0 ] : null;
-		const hoveredBlockType = hoveredClassName
-			? getBlockType( hoveredBlock.name )
-			: null;
+		const hoveredBlock = blocks[ 0 ];
+		const hoveredBlockType = getBlockType( hoveredBlock.name );
 
 		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
 		const possibleBlockTransformations = orderBy(
@@ -100,7 +98,7 @@ export class BlockSwitcher extends Component {
 					<ToolbarButton
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
-						label={ __( 'Block icon' ) }
+						title={ __( 'Block icon' ) }
 						icon={ <BlockIcon icon={ icon } showColors /> }
 					/>
 				</ToolbarGroup>
@@ -140,7 +138,7 @@ export class BlockSwitcher extends Component {
 								onClick={ onToggle }
 								aria-haspopup="true"
 								aria-expanded={ isOpen }
-								label={ label }
+								title={ label }
 								onKeyDown={ openOnArrowDown }
 								showTooltip
 								icon={ <BlockIcon icon={ icon } showColors /> }

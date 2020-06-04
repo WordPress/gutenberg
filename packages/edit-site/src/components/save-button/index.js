@@ -12,31 +12,8 @@ import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { useEditorContext } from '../editor';
-
 export default function SaveButton( { openEntitiesSavedStates } ) {
-	const { settings } = useEditorContext();
-	const [ , setStatus ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'status'
-	);
-	const [ , setTitle ] = useEntityProp(
-		'postType',
-		settings.templateType,
-		'title'
-	);
-	const [ slug ] = useEntityProp( 'postType', settings.templateType, 'slug' );
-	// Publish template if not done yet.
-	useEffect( () => {
-		setStatus( 'publish' );
-		setTitle( slug );
-	}, [ slug ] );
-
-	const { isDirty, isSaving } = useSelect( ( select ) => {
+	const { isDirty, isSaving, templateType } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
 			isSavingEntityRecord,
@@ -47,10 +24,21 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 			isSaving: some( dirtyEntityRecords, ( record ) =>
 				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
+			templateType: select( 'core/edit-site' ).getTemplateType(),
 		};
 	} );
-	const disabled = ! isDirty || isSaving;
 
+	const [ , setStatus ] = useEntityProp( 'postType', templateType, 'status' );
+	const [ , setTitle ] = useEntityProp( 'postType', templateType, 'title' );
+	const [ slug ] = useEntityProp( 'postType', templateType, 'slug' );
+
+	// Publish template if not done yet.
+	useEffect( () => {
+		setStatus( 'publish' );
+		setTitle( slug );
+	}, [ slug ] );
+
+	const disabled = ! isDirty || isSaving;
 	return (
 		<>
 			<Button

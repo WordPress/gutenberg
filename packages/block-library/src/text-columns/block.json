@@ -1,7 +1,7 @@
 {
 	"name": "core/text-columns",
 	"icon": "columns",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"content": {
 			"type": "array",
@@ -13,7 +13,10 @@
 					"source": "html"
 				}
 			},
-			"default": [ {}, {} ]
+			"default": [
+				{},
+				{}
+			]
 		},
 		"columns": {
 			"type": "number",
@@ -22,5 +25,8 @@
 		"width": {
 			"type": "string"
 		}
+	},
+	"supports": {
+		"inserter": false
 	}
 }
