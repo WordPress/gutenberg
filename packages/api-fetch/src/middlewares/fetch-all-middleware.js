@@ -19,21 +19,8 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 const parseResponse = ( response ) =>
 	response.json ? response.json() : Promise.reject( response );
 
-const parseLinkHeader = ( linkHeader ) => {
-	if ( ! linkHeader ) {
-		return {};
-	}
-	const match = linkHeader.match( /<([^>]+)>; rel="next"/ );
-	return match
-		? {
-				next: match[ 1 ],
-		  }
-		: {};
-};
-
-const getNextPageUrl = ( response ) => {
-	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
-	return next;
+const getTotalPages = ( response ) => {
+	return response.headers.get( 'x-wp-totalpages' );
 };
 
 const requestContainsUnboundedQuery = ( options ) => {
@@ -61,6 +48,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	const response = await apiFetch( {
 		...modifyQuery( options, {
 			per_page: 100,
+			page: undefined,
 		} ),
 		// Ensure headers are returned for page 1.
 		parse: false,
@@ -72,29 +60,27 @@ const fetchAllMiddleware = async ( options, next ) => {
 		// We have no reliable way of merging non-array results.
 		return results;
 	}
+	const totalPages = getTotalPages( response );
 
-	let nextPage = getNextPageUrl( response );
-
-	if ( ! nextPage ) {
+	if ( totalPages < 2 ) {
 		// There are no further pages to request.
 		return results;
 	}
 
 	// Iteratively fetch all remaining pages until no "next" header is found.
 	let mergedResults = [].concat( results );
-	while ( nextPage ) {
+	for ( let nextPage = 2; nextPage <= totalPages; nextPage++ ) {
 		const nextResponse = await apiFetch( {
-			...options,
-			// Ensure the URL for the next page is used instead of any provided path.
-			path: undefined,
-			url: nextPage,
-			// Ensure we still get headers so we can identify the next page.
+			...modifyQuery( options, {
+				per_page: 100,
+				page: nextPage,
+			} ),
 			parse: false,
 		} );
 		const nextResults = await parseResponse( nextResponse );
 		mergedResults = mergedResults.concat( nextResults );
-		nextPage = getNextPageUrl( nextResponse );
 	}
+
 	return mergedResults;
 };
 

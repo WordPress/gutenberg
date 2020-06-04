@@ -28,10 +28,14 @@ describe( 'Fetch All Middleware', () => {
 			const response = Promise.resolve( {
 				status: 200,
 				headers: {
-					get() {
-						return options.url === '/posts?per_page=100'
-							? '</posts?per_page=100&page=2>; rel="next"'
-							: '';
+					get( name ) {
+						if ( name === 'link' ) {
+							return options.url === '/posts?per_page=100'
+								? '</posts?per_page=100&page=2>; rel="next"'
+								: '';
+						} else if ( name === 'x-wp-totalpages' ) {
+							return 2;
+						}
 					},
 				},
 				json() {
