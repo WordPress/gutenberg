@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalBlock as Block,
+} from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
@@ -19,17 +22,17 @@ const TEMPLATE = [
 	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-export const SocialLinksEdit = function( { className } ) {
+export function SocialLinksEdit() {
 	return (
-		<div className={ className }>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				templateLock={ false }
-				template={ TEMPLATE }
-				__experimentalMoverDirection={ 'horizontal' }
-			/>
-		</div>
+		<InnerBlocks
+			allowedBlocks={ ALLOWED_BLOCKS }
+			templateLock={ false }
+			template={ TEMPLATE }
+			__experimentalMoverDirection={ 'horizontal' }
+			__experimentalTagName={ Block.ul }
+			__experimentalAppenderTagName="li"
+		/>
 	);
-};
+}
 
 export default SocialLinksEdit;

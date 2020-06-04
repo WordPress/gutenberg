@@ -1,4 +1,11 @@
 {
 	"name": "core/post-content",
-	"category": "layout"
+	"category": "design",
+	"context": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false
+	}
 }

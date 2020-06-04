@@ -1,8 +1,26 @@
-## Master
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
 
 ### Enhancements
 
-- Update `esnext` template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code.
+- Update `esnext` (default) template to leverage CSS import in JavaScript support added to `@wordpress/scripts` ([#22727](https://github.com/WordPress/gutenberg/pull/22727/files)).
+
+## 0.13.0 (2020-05-28)
+
+### Internal
+
+- Refactored handling of predefined block templates [#22235](https://github.com/WordPress/gutenberg/pull/22235).
+
+## 0.12.0 (2020-04-30)
+
+### New Features
+
+- Add more CLI options: `--namespace`, `--title`, `--short-description` and `--category`. The goal is to make it easier to override default values used for scaffolding ([#21751](https://github.com/WordPress/gutenberg/pull/21751)).
+
+### Enhancements
+
+- Update `esnext` (default) template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code ([#21750](https://github.com/WordPress/gutenberg/pull/21750)).
 
 ## 0.10.0 (2020-04-01)
 

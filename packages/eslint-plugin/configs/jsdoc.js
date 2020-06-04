@@ -63,6 +63,8 @@ const typescriptUtilityTypes = [
 	'unknown',
 	'never',
 	'NodeJS',
+	'AsyncIterableIterator',
+	'NodeRequire',
 ];
 
 module.exports = {
@@ -80,7 +82,7 @@ module.exports = {
 	},
 	rules: {
 		'jsdoc/no-undefined-types': [
-			'warn',
+			'error',
 			{
 				definedTypes: [
 					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
@@ -93,6 +95,7 @@ module.exports = {
 					...temporaryWordPressInternalTypes,
 					...temporaryExternalTypes,
 					'void',
+					'JSX',
 				],
 			},
 		],

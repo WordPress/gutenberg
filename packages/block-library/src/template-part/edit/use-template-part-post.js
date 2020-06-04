@@ -28,7 +28,7 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 					{
 						status: [ 'publish', 'auto-draft' ],
 						slug,
-						meta: { theme },
+						theme,
 					}
 				);
 				const foundPosts = posts?.filter(

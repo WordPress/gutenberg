@@ -17,7 +17,7 @@
 
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
-.block-editor-block-styles .editor-styles-wrapper .block-editor-block-list__block {
+.block-editor-block-styles .block-editor-block-list__block {
 	margin: 0;
 }
 
@@ -161,12 +161,6 @@
 			}
 		}
 	}
-
-	// Hide the focus indicator for collapsed blocks.
-	// These serve as only as column containers for floated blocks.
-	.block-editor-block-list__block.is-block-collapsed::after {
-		content: none;
-	}
 }
 
 
@@ -257,10 +251,13 @@
 	}
 }
 
-.wp-block {
+// Extra specificity needed to override default element margins like lists (ul).
+.block-editor-block-list__layout .wp-block {
 	margin-left: auto;
 	margin-right: auto;
+}
 
+.wp-block {
 	// Alignments.
 	&[data-align="left"],
 	&[data-align="right"] {
@@ -371,6 +368,7 @@
 		background: $dark-gray-primary;
 		border-radius: $radius-block-ui;
 		color: $white;
+		padding: 0;
 
 		// Special dimensions for this button.
 		min-width: 24px;
@@ -487,6 +485,7 @@
 	border-radius: $radius-block-ui;
 	background-color: $white;
 
+	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-right-color: $dark-gray-primary;
 	}
@@ -497,9 +496,9 @@
  * Block Label for Navigation/Selection Mode
  */
 
-.block-editor-block-list__breadcrumb {
+.block-editor-block-list__block-selection-button {
 	display: block;
-	z-index: z-index(".block-editor-block-list__breadcrumb");
+	z-index: z-index(".block-editor-block-list__block-selection-button");
 
 	// The button here has a special style to appear as a toolbar.
 	.components-button {
@@ -582,14 +581,14 @@
 		}
 
 		// Position the block toolbar.
-		.block-editor-block-list__breadcrumb,
+		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
 			margin-left: - $block-toolbar-height;
 		}
 
 		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__breadcrumb[data-align="full"] {
+		.block-editor-block-list__block-selection-button[data-align="full"] {
 			margin-left: 0;
 		}
 	}

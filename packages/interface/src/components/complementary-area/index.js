@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { withPluginContext } from '@wordpress/plugins';
 import { starEmpty, starFilled } from '@wordpress/icons';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,11 +33,56 @@ function ComplementaryAreaFill( { scope, children, className } ) {
 	);
 }
 
+function useAdjustComplementaryListener(
+	scope,
+	identifier,
+	activeArea,
+	isActive,
+	isSmall
+) {
+	const previousIsSmall = useRef( false );
+	const shouldOpenWhenNotSmall = useRef( false );
+	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
+		'core/interface'
+	);
+	useEffect( () => {
+		// If the complementary area is active and the editor is switching from a big to a small window size.
+		if ( isActive && isSmall && ! previousIsSmall.current ) {
+			// Disable the complementary area.
+			disableComplementaryArea( scope );
+			// Flag the complementary area to be reopened when the window size goes from small to big.
+			shouldOpenWhenNotSmall.current = true;
+		} else if (
+			// If there is a flag indicating the complementary area should be enabled when we go from small to big window size
+			// and we are going from a small to big window size.
+			shouldOpenWhenNotSmall.current &&
+			! isSmall &&
+			previousIsSmall.current
+		) {
+			// Remove the flag indicating the complementary area should be enabled.
+			shouldOpenWhenNotSmall.current = false;
+			// Enable the complementary area.
+			enableComplementaryArea( scope, identifier );
+		} else if (
+			// If the flag is indicating the current complementary should be reopened but another complementary area becomes active,
+			// remove the flag.
+			shouldOpenWhenNotSmall.current &&
+			activeArea &&
+			activeArea !== identifier
+		) {
+			shouldOpenWhenNotSmall.current = false;
+		}
+		if ( isSmall !== previousIsSmall.current ) {
+			previousIsSmall.current = isSmall;
+		}
+	}, [ isActive, isSmall, scope, identifier, activeArea ] );
+}
+
 function ComplementaryArea( {
 	children,
 	className,
 	closeLabel = __( 'Close plugin' ),
-	complementaryAreaIdentifier,
+	identifier,
 	header,
 	headerClassName,
 	icon,
@@ -46,25 +92,45 @@ function ComplementaryArea( {
 	smallScreenTitle,
 	title,
 	toggleShortcut,
+	isActiveByDefault,
 } ) {
-	const { isActive, isPinned } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
 			);
+			const _activeArea = getActiveComplementaryArea( scope );
 			return {
-				isActive:
-					getActiveComplementaryArea( scope ) ===
-					complementaryAreaIdentifier,
-				isPinned: isItemPinned( scope, complementaryAreaIdentifier ),
+				isActive: _activeArea === identifier,
+				isPinned: isItemPinned( scope, identifier ),
+				activeArea: _activeArea,
+				isSmall: select( 'core/viewport' ).isViewportMatch(
+					'< medium'
+				),
 			};
 		},
-		[ complementaryAreaIdentifier, scope ]
+		[ identifier, scope ]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
+	useAdjustComplementaryListener(
+		scope,
+		identifier,
+		activeArea,
+		isActive,
+		isSmall
 	);
-	const { pinItem, unpinItem } = useDispatch( 'core/interface' );
+	const {
+		enableComplementaryArea,
+		disableComplementaryArea,
+		pinItem,
+		unpinItem,
+	} = useDispatch( 'core/interface' );
+
+	useEffect( () => {
+		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
+			enableComplementaryArea( scope, identifier );
+		}
+	}, [ activeArea, isActiveByDefault, scope, identifier, isSmall ] );
+
 	return (
 		<>
 			{ isPinned && isPinnable && (
@@ -75,13 +141,11 @@ function ComplementaryArea( {
 						onClick={ () =>
 							isActive
 								? disableComplementaryArea( scope )
-								: enableComplementaryArea(
-										scope,
-										complementaryAreaIdentifier
-								  )
+								: enableComplementaryArea( scope, identifier )
 						}
 						isPressed={ isActive }
 						aria-expanded={ isActive }
+						shortcut={ toggleShortcut }
 					/>
 				</PinnedItems>
 			) }
@@ -117,7 +181,7 @@ function ComplementaryArea( {
 										onClick={ () =>
 											( isPinned ? unpinItem : pinItem )(
 												scope,
-												complementaryAreaIdentifier
+												identifier
 											)
 										}
 										isPressed={ isPinned }
@@ -137,9 +201,8 @@ function ComplementaryArea( {
 const ComplementaryAreaWrapped = withPluginContext( ( context, ownProps ) => {
 	return {
 		icon: ownProps.icon || context.icon,
-		complementaryAreaIdentifier:
-			ownProps.complementaryAreaIdentifier ||
-			`${ context.name }/${ ownProps.name }`,
+		identifier:
+			ownProps.identifier || `${ context.name }/${ ownProps.name }`,
 	};
 } )( ComplementaryArea );
 

@@ -80,7 +80,7 @@ describe( 'Block context', () => {
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 0' );
+		expect( content ).toMatch( /^0,\d+,post$/ );
 
 		// Return to editor to change context value to non-default.
 		await editorPage.bringToFront();
@@ -99,7 +99,7 @@ describe( 'Block context', () => {
 			'.entry-content',
 			( contentWrapper ) => contentWrapper.textContent.trim()
 		);
-		expect( content ).toBe( 'The record ID is: 123' );
+		expect( content ).toMatch( /^123,\d+,post$/ );
 
 		// Clean up
 		await editorPage.bringToFront();

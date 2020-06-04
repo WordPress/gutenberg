@@ -20,6 +20,7 @@
 @import "./media-text/style.scss";
 @import "./navigation/style.scss";
 @import "./paragraph/style.scss";
+@import "./post-author/style.scss";
 @import "./pullquote/style.scss";
 @import "./quote/style.scss";
 @import "./rss/style.scss";
@@ -36,6 +37,7 @@
 // to assure colors take effect over another base class color, mainly to let
 // the colors override the added specificity by link states such as :hover.
 
+:root .editor-styles-wrapper,
 :root {
 	// Background colors.
 
@@ -75,6 +77,11 @@
 		background-color: #9b51e0;
 	}
 
+	.has-white-background-color {
+		background-color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat
 	.has-very-light-gray-background-color {
 		background-color: #eee;
 	}
@@ -83,8 +90,13 @@
 		background-color: #abb8c3;
 	}
 
+	// Deprecated from UI, kept for back-compat
 	.has-very-dark-gray-background-color {
 		background-color: #313131;
+	}
+
+	.has-black-background-color {
+		background-color: #000;
 	}
 
 	// Foreground colors.
@@ -125,6 +137,11 @@
 		color: #9b51e0;
 	}
 
+	.has-white-color {
+		color: #fff;
+	}
+
+	// Deprecated from UI, kept for back-compat
 	.has-very-light-gray-color {
 		color: #eee;
 	}
@@ -133,8 +150,13 @@
 		color: #abb8c3;
 	}
 
+	// Deprecated from UI, kept for back-compat
 	.has-very-dark-gray-color {
 		color: #313131;
+	}
+
+	.has-black-color {
+		color: #000;
 	}
 
 	// Gradients
@@ -216,30 +238,36 @@
 
 
 // Font sizes.
-:root {
-	.has-small-font-size {
-		font-size: 13px;
-	}
-
-	.has-regular-font-size, // Not used now, kept because of backward compatibility.
-	.has-normal-font-size {
-		font-size: 16px;
-	}
-
-	.has-medium-font-size {
-		font-size: 20px;
-	}
-
-	.has-large-font-size {
-		font-size: 36px;
-	}
-
-	.has-larger-font-size, // Not used now, kept because of backward compatibility.
-	.has-huge-font-size {
-		font-size: 42px;
-	}
+// The reason we add the editor class wrapper here is
+// to avoid enqueing the classes twice: here and in ./editor.scss
+.editor-styles-wrapper .has-small-font-size,
+.has-small-font-size {
+	font-size: 13px;
 }
 
+.editor-styles-wrapper .has-regular-font-size,
+.editor-styles-wrapper .has-normal-font-size,
+.has-regular-font-size, // Not used now, kept because of backward compatibility.
+.has-normal-font-size {
+	font-size: 16px;
+}
+
+.editor-styles-wrapper .has-medium-font-size,
+.has-medium-font-size {
+	font-size: 20px;
+}
+
+.editor-styles-wrapper .has-large-font-size,
+.has-large-font-size {
+	font-size: 36px;
+}
+
+.editor-styles-wrapper .has-larger-font-size,
+.editor-styles-wrapper .has-huge-font-size,
+.has-larger-font-size, // Not used now, kept because of backward compatibility.
+.has-huge-font-size {
+	font-size: 42px;
+}
 
 // Text alignments.
 .has-text-align-center {

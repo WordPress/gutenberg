@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dependency-extraction-webpack-plugin",
-	"version": "2.5.0",
+	"version": "2.6.0",
 	"description": "Extract WordPress script dependencies from webpack bundles.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,10 +19,11 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"files": [
-		"index.js",
-		"util.js"
+		"lib",
+		"build-types"
 	],
-	"main": "index.js",
+	"main": "lib/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"json2php": "^0.0.4",
 		"webpack": "^4.8.3",

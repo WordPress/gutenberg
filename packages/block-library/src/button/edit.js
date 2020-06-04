@@ -27,6 +27,13 @@ import {
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import ColorEdit from './color-edit';
+import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -65,6 +72,9 @@ function URLPicker( {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const openLinkControl = () => {
 		setIsURLPickerOpen( true );
+
+		// prevents default behaviour for event
+		return false;
 	};
 	const linkControl = isURLPickerOpen && (
 		<Popover
@@ -113,7 +123,15 @@ function URLPicker( {
 	);
 }
 
-function ButtonEdit( { attributes, setAttributes, className, isSelected } ) {
+function ButtonEdit( props ) {
+	const {
+		attributes,
+		setAttributes,
+		className,
+		isSelected,
+		onReplace,
+		mergeBlocks,
+	} = props;
 	const {
 		borderRadius,
 		linkTarget,
@@ -148,23 +166,42 @@ function ButtonEdit( { attributes, setAttributes, className, isSelected } ) {
 		[ rel, setAttributes ]
 	);
 
+	const colorProps = getColorAndStyleProps( attributes );
+
 	return (
 		<>
-			<RichText
-				tagName={ Block.div }
-				placeholder={ placeholder || __( 'Add text…' ) }
-				value={ text }
-				onChange={ ( value ) => setAttributes( { text: value } ) }
-				withoutInteractiveFormatting
-				className={ classnames( className, 'wp-block-button__link', {
-					'no-border-radius': borderRadius === 0,
-				} ) }
-				style={ {
-					borderRadius: borderRadius
-						? borderRadius + 'px'
-						: undefined,
-				} }
-			/>
+			<ColorEdit { ...props } />
+			<Block.div>
+				<RichText
+					placeholder={ placeholder || __( 'Add text…' ) }
+					value={ text }
+					onChange={ ( value ) => setAttributes( { text: value } ) }
+					withoutInteractiveFormatting
+					className={ classnames(
+						className,
+						'wp-block-button__link',
+						colorProps.className,
+						{
+							'no-border-radius': borderRadius === 0,
+						}
+					) }
+					style={ {
+						borderRadius: borderRadius
+							? borderRadius + 'px'
+							: undefined,
+						...colorProps.style,
+					} }
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
+							...attributes,
+							text: value,
+						} )
+					}
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					identifier="text"
+				/>
+			</Block.div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }

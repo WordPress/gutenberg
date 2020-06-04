@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useToolbarItem } from 'reakit/Toolbar';
+import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
@@ -16,11 +16,6 @@ import ToolbarContext from '../toolbar-context';
 
 function ToolbarItem( { children, ...props }, ref ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	// https://reakit.io/docs/composition/#props-hooks
-	const itemProps = useToolbarItem( accessibleToolbarState, {
-		...props,
-		ref,
-	} );
 
 	if ( typeof children !== 'function' ) {
 		warning(
@@ -29,14 +24,17 @@ function ToolbarItem( { children, ...props }, ref ) {
 		return null;
 	}
 
+	const allProps = { ...props, ref, 'data-experimental-toolbar-item': true };
+
 	if ( ! accessibleToolbarState ) {
-		warning(
-			'`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`'
-		);
-		return null;
+		return children( allProps );
 	}
 
-	return children( itemProps );
+	return (
+		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
+			{ children }
+		</BaseToolbarItem>
+	);
 }
 
 export default forwardRef( ToolbarItem );

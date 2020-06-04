@@ -331,7 +331,7 @@ const Popover = ( {
 			if ( __unstableBoundaryParent ) {
 				boundaryElement = containerRef.current.closest(
 					'.popover-slot'
-				).parentNode;
+				)?.parentNode;
 			}
 
 			const {

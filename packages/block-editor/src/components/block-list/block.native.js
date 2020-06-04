@@ -6,7 +6,8 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
+import { GlobalStylesContext } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -28,6 +29,13 @@ class BlockListBlock extends Component {
 
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.getBlockWidth = this.getBlockWidth.bind( this );
+
+		this.state = {
+			blockWidth: 0,
+		};
+
+		this.anchorNodeRef = createRef();
 	}
 
 	onFocus() {
@@ -46,25 +54,51 @@ class BlockListBlock extends Component {
 		}
 	}
 
+	getBlockWidth( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+
+		if ( blockWidth !== layout.width ) {
+			this.setState( { blockWidth: layout.width } );
+		}
+	}
+
 	getBlockForType() {
 		return (
-			<BlockEdit
-				name={ this.props.name }
-				isSelected={ this.props.isSelected }
-				attributes={ this.props.attributes }
-				setAttributes={ this.props.onChange }
-				onFocus={ this.onFocus }
-				onReplace={ this.props.onReplace }
-				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.props.mergeBlocks }
-				onCaretVerticalPositionChange={
-					this.props.onCaretVerticalPositionChange
-				}
-				clientId={ this.props.clientId }
-				parentWidth={ this.props.parentWidth }
-				contentStyle={ this.props.contentStyle }
-				onDeleteBlock={ this.props.onDeleteBlock }
-			/>
+			<GlobalStylesContext.Consumer>
+				{ ( globalStyle ) => {
+					const mergedStyle = {
+						...globalStyle,
+						...this.props.wrapperProps.style,
+					};
+					return (
+						<GlobalStylesContext.Provider value={ mergedStyle }>
+							<BlockEdit
+								name={ this.props.name }
+								isSelected={ this.props.isSelected }
+								attributes={ this.props.attributes }
+								setAttributes={ this.props.onChange }
+								onFocus={ this.onFocus }
+								onReplace={ this.props.onReplace }
+								insertBlocksAfter={ this.insertBlocksAfter }
+								mergeBlocks={ this.props.mergeBlocks }
+								onCaretVerticalPositionChange={
+									this.props.onCaretVerticalPositionChange
+								}
+								// Block level styles
+								wrapperProps={ this.props.wrapperProps }
+								// inherited styles merged with block level styles
+								mergedStyle={ mergedStyle }
+								clientId={ this.props.clientId }
+								parentWidth={ this.props.parentWidth }
+								contentStyle={ this.props.contentStyle }
+								onDeleteBlock={ this.props.onDeleteBlock }
+							/>
+							<View onLayout={ this.getBlockWidth } />
+						</GlobalStylesContext.Provider>
+					);
+				} }
+			</GlobalStylesContext.Consumer>
 		);
 	}
 
@@ -96,6 +130,12 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 		} = this.props;
+
+		if ( ! attributes || ! blockType ) {
+			return null;
+		}
+
+		const { blockWidth } = this.state;
 
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
@@ -153,7 +193,10 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ styles.neutralToolbar }>
+						<View
+							style={ styles.neutralToolbar }
+							ref={ this.anchorNodeRef }
+						>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
@@ -161,6 +204,8 @@ class BlockListBlock extends Component {
 									isStackedHorizontally={
 										isStackedHorizontally
 									}
+									blockWidth={ blockWidth }
+									anchorNodeRef={ this.anchorNodeRef.current }
 								/>
 							) }
 						</View>
@@ -171,15 +216,29 @@ class BlockListBlock extends Component {
 	}
 }
 
+// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference
+const wrapperPropsCache = new WeakMap();
+const emptyObj = {};
+function getWrapperProps( value, getWrapperPropsFunction ) {
+	if ( ! getWrapperPropsFunction ) {
+		return emptyObj;
+	}
+	const cachedValue = wrapperPropsCache.get( value );
+	if ( ! cachedValue ) {
+		const wrapperProps = getWrapperPropsFunction( value );
+		wrapperPropsCache.set( value, wrapperProps );
+		return wrapperProps;
+	}
+	return cachedValue;
+}
+
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
-			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
@@ -198,8 +257,6 @@ export default compose( [
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
 
-		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
@@ -211,17 +268,13 @@ export default compose( [
 			: parents[ parents.length - 1 ];
 
 		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
-		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const isSelectedBlockNested = !! getBlockRootClientId(
-			selectedBlockClientId
-		);
+			// set false as a default value to prevent re-render when it's changed from null to false
+			( selectedBlockClientId || false ) &&
+			selectedBlockClientId === parentId;
 
 		const selectedParents = selectedBlockClientId
 			? getBlockParents( selectedBlockClientId )
 			: [];
-		const isDescendantSelected = selectedParents.includes( clientId );
 		const isDescendantOfParentSelected = selectedParents.includes(
 			parentId
 		);
@@ -230,13 +283,6 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-		const isDimmed =
-			! isSelected &&
-			isSelectedBlockNested &&
-			! isAncestorSelected &&
-			! isDescendantSelected &&
-			( isDescendantOfParentSelected || rootBlockId === clientId );
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -249,9 +295,11 @@ export default compose( [
 			isValid,
 			isParentSelected,
 			firstToSelectId,
-			isAncestorSelected,
 			isTouchable,
-			isDimmed,
+			wrapperProps: getWrapperProps(
+				attributes,
+				blockType.getEditWrapperProps
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

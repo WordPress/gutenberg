@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`BlockSwitcher should render disabled block switcher with multi block of different types when no transforms 1`] = `
-<Toolbar>
-  <ForwardRef(Button)
+<ToolbarGroup>
+  <ToolbarButton
     className="block-editor-block-switcher__no-switcher-icon"
     disabled={true}
     icon={
@@ -20,9 +20,9 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
         showColors={true}
       />
     }
-    label="Block icon"
+    title="Block icon"
   />
-</Toolbar>
+</ToolbarGroup>
 `;
 
 exports[`BlockSwitcher should render enabled block switcher with multi block when transforms exist 1`] = `

@@ -25,93 +25,107 @@ const Services = {
 			},
 		},
 		{
-			name: 'core/image',
-			attributes: {
-				url:
-					'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-3471423.jpg',
-				alt: '',
-				caption: '',
-				sizeSlug: 'full',
-				linkDestination: 'none',
-			},
-		},
-		{
-			name: 'core/heading',
-			attributes: {
-				// translators: sample content for "Services" page template
-				content: __( 'Inspiration' ),
-				level: 2,
-			},
-		},
-		{
-			name: 'core/paragraph',
-			attributes: {
-				// translators: sample content for "Services" page template
-				content: __( 'A short description of the services you offer.' ),
-			},
-		},
-		{
-			name: 'core/spacer',
-			attributes: {
-				height: 40,
-			},
-		},
-		{
-			name: 'core/image',
-			attributes: {
-				url:
-					'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-1595385.jpeg',
-				alt: '',
-				caption: '',
-				sizeSlug: 'full',
-				linkDestination: 'none',
-			},
-		},
-		{
-			name: 'core/heading',
-			attributes: {
-				// translators: sample content for "Services" page template
-				content: __( 'Strategy' ),
-				level: 2,
-			},
-		},
-		{
-			name: 'core/paragraph',
-			attributes: {
-				// translators: sample content for "Services" page template
-				content: __( 'A short description of the services you offer.' ),
-			},
-		},
-		{
-			name: 'core/spacer',
-			attributes: {
-				height: 40,
-			},
-		},
-		{
-			name: 'core/image',
-			attributes: {
-				url:
-					'https://mgblayoutexamples.files.wordpress.com/2020/02/pexels-photo-68562.jpg?w=1024',
-				alt: '',
-				caption: '',
-				sizeSlug: 'large',
-				linkDestination: 'none',
-			},
-		},
-		{
-			name: 'core/heading',
-			attributes: {
-				content: 'Focus',
-				level: 2,
-			},
-		},
-		{
-			name: 'core/paragraph',
-			attributes: {
-				// translators: sample content for "Services" page template
-				content: __( 'A short description of the services you offer.' ),
-			},
+			name: 'core/columns',
+			innerBlocks: [
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/image',
+							attributes: {
+								url:
+									'https://cldup.com/niJL8UbTZH-3000x3000.jpeg',
+								alt: '',
+								caption: '',
+								sizeSlug: 'full',
+								linkDestination: 'none',
+							},
+						},
+						{
+							name: 'core/heading',
+							attributes: {
+								// translators: sample content for "Services" page template
+								content: __( 'Inspiration' ),
+								level: 2,
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								// translators: sample content for "Services" page template
+								content: __(
+									'A short description of the services you offer.'
+								),
+							},
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/image',
+							attributes: {
+								url:
+									'https://cldup.com/NTV4PW_Xtw-3000x3000.jpeg',
+								alt: '',
+								caption: '',
+								sizeSlug: 'full',
+								linkDestination: 'none',
+							},
+						},
+						{
+							name: 'core/heading',
+							attributes: {
+								// translators: sample content for "Services" page template
+								content: __( 'Strategy' ),
+								level: 2,
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								// translators: sample content for "Services" page template
+								content: __(
+									'A short description of the services you offer.'
+								),
+							},
+						},
+					],
+				},
+				{
+					name: 'core/column',
+					innerBlocks: [
+						{
+							name: 'core/image',
+							attributes: {
+								url:
+									'https://cldup.com/CL1KK71EsH-1200x1200.jpeg',
+								alt: '',
+								caption: '',
+								sizeSlug: 'large',
+								linkDestination: 'none',
+							},
+						},
+						{
+							name: 'core/heading',
+							attributes: {
+								content: 'Focus',
+								level: 2,
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								// translators: sample content for "Services" page template
+								content: __(
+									'A short description of the services you offer.'
+								),
+							},
+						},
+					],
+				},
+			],
 		},
 		{
 			name: 'core/spacer',
@@ -134,16 +148,24 @@ const Services = {
 			attributes: {
 				align: 'center',
 				// translators: sample content for "Services" page template
-				content: __( 'Let’s Build Something Together' ),
+				content: __( 'Let’s build something together!' ),
 				level: 2,
 			},
 		},
 		{
-			name: 'core/button',
+			name: 'core/buttons',
 			attributes: {
-				// translators: sample content for "Services" page template
-				text: __( 'Get in Touch' ),
+				align: 'center',
 			},
+			innerBlocks: [
+				{
+					name: 'core/button',
+					attributes: {
+						// translators: sample content for "Services" page template
+						text: __( 'Get in Touch' ),
+					},
+				},
+			],
 		},
 		{
 			name: 'core/spacer',

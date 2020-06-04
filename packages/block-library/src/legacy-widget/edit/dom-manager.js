@@ -64,6 +64,7 @@ class LegacyWidgetEditDomManager extends Component {
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
 					<form
+						className="form"
 						ref={ this.formRef }
 						method="post"
 						onBlur={ () => {

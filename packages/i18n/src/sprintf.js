@@ -18,7 +18,7 @@ const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
  * original format string is returned.
  *
  * @param {string}    format The format of the string to generate.
- * @param {...string} args   Arguments to apply to the format.
+ * @param {...*} args Arguments to apply to the format.
  *
  * @see http://www.diveintojavascript.com/projects/javascript-sprintf
  *

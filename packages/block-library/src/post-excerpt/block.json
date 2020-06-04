@@ -1,6 +1,6 @@
 {
 	"name": "core/post-excerpt",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"wordCount": {
 			"type": "number",
@@ -13,5 +13,11 @@
 			"type": "boolean",
 			"default": true
 		}
+	},
+	"context": [
+		"postId"
+	],
+	"supports": {
+		"html": false
 	}
 }

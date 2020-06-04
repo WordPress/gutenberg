@@ -71,7 +71,8 @@
 	flex-direction: column;
 }
 
-.components-placeholder__input {
+.components-placeholder__input[type="url"] {
+	@include input-control;
 	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }

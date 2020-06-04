@@ -31,15 +31,10 @@ $input-size: 300px;
 		}
 	}
 
-	&.has-border input[type="text"] {
-		border: 1px solid $dark-gray-500;
-		border-radius: 4px;
-	}
-
 	&.is-full-width {
 		width: 100%;
 
-		input[type="text"] {
+		.block-editor-url-input__input[type="text"] {
 			width: 100%;
 		}
 
@@ -54,6 +49,10 @@ $input-size: 300px;
 		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
 	}
+}
+
+.block-editor-url-input__input[type="text"] {
+	@include input-control;
 }
 
 // Suggestions
@@ -101,6 +100,7 @@ $input-size: 300px;
 }
 
 // Toolbar button
+.components-toolbar-group > .block-editor-url-input__button,
 .components-toolbar > .block-editor-url-input__button {
 	position: inherit; // Let the dialog position according to parent.
 }
