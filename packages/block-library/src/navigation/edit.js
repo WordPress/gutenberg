@@ -234,7 +234,7 @@ function Navigation( {
 		}
 
 		if ( ! hasMenus && ! hasPages ) {
-			return __( 'Create a an empty Navigation.' );
+			return __( 'Create an empty Navigation.' );
 		}
 
 		if ( hasMenus && ! hasPages ) {
