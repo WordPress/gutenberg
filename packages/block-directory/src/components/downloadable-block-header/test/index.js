@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { DownloadableBlockHeader } from '../index';
+import DownloadableBlockHeader from '../index';
 import { pluginWithIcon } from './fixtures';
 
 const getContainer = (

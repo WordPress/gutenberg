@@ -11,7 +11,7 @@ import DownloadableBlockHeader from '../downloadable-block-header';
 import DownloadableBlockInfo from '../downloadable-block-info';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 
-function DownloadableBlockListItem( { item, onClick, isLoading } ) {
+export function DownloadableBlockListItem( { item, onClick, isLoading } ) {
 	const {
 		icon,
 		title,

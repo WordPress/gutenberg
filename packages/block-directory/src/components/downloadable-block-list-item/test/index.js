@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import DownloadableBlockListItem from '../index';
+import { DownloadableBlockListItem } from '../index';
 import DownloadableBlockHeader from '../../downloadable-block-header';
 import { item } from './fixtures';
 

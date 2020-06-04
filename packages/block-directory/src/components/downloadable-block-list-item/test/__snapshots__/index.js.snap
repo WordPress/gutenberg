@@ -10,7 +10,7 @@ exports[`DownloadableBlockListItem should render a block item 1`] = `
     <header
       className="block-directory-downloadable-block-list-item__header"
     >
-      <WithSelect(DownloadableBlockHeader)
+      <DownloadableBlockHeader
         icon="block-default"
         onClick={[MockFunction]}
         rating={5}
