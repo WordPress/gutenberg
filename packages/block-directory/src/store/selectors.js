@@ -50,11 +50,15 @@ export function getInstalledBlockTypes( state ) {
  * Returns true if application is calling install endpoint.
  *
  * @param {Object} state Global application state.
+ * @param {string} blockId Id of the block.
  *
  * @return {boolean} Whether its currently installing
  */
-export function isInstalling( state ) {
-	return state.blockManagement.isInstalling;
+export function isInstalling( state, blockId ) {
+	if ( ! state.blockManagement.isInstalling[ blockId ] ) {
+		return false;
+	}
+	return state.blockManagement.isInstalling[ blockId ];
 }
 
 /**
