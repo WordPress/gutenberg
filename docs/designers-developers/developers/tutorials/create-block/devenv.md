@@ -55,6 +55,8 @@ The important part is having a WordPress site installed, and know where and how 
 
 ## Code Editor
 
-[Visual Studio Code](https://code.visualstudio.com/) is a popular code editor for JavaScript development. It works quite well, open-source, actively maintained by Microsoft, and a vibrant community providing plugins and extensions; it is becoming the defacto standard for web development.
+[Visual Studio Code](https://code.visualstudio.com/) is a popular code editor for JavaScript development. It works quite well across the three major platforms (Windows, Linux, and Mac), it is open-source and actively maintained by Microsoft. Plus Visual Studio Code has a vibrant community providing plugins and extensions; it is becoming the defacto standard for web development.
+
+Alternative editors include [Sublime Text](https://www.sublimetext.com/) that is also available across platforms, though is a commercial product; or other free alternatives include [Vim](https://www.vim.org/), [Atom](https://atom.io/), and [Notepad++](https://notepad-plus-plus.org/) all support standard JavaScript style development.
 
 You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and suppport. The key is having a way to open, edit, and save text files.
