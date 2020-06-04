@@ -10,6 +10,10 @@
 ### New Feature
 - The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
 
+### Bug fix
+
+- Update webpack configuration to not run the Sass loader on CSS files. It's now limited to .scss and .sass files.
+
 ## 10.0.0 (2020-05-28)
 
 ### New Feature
