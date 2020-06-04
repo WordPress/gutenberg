@@ -17,21 +17,24 @@ import { blockTypeInstalled, downloadableBlock } from './fixtures';
 describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
-			const initialState = deepFreeze( {
-				pendingSearchRequests: 0,
-			} );
+			const initialState = {};
+			const blockName = 'Awesome Block';
+
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+				filterValue: blockName,
 			} );
 
-			expect( state.pendingSearchRequests ).toEqual( 1 );
+			expect( state[ blockName ].isRequesting ).toEqual( true );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
 			const query = downloadableBlock.title;
-			const initialState = deepFreeze( {
-				pendingSearchRequests: 1,
-			} );
+			const initialState = {
+				[ query ]: {
+					isRequesting: true,
+				},
+			};
 
 			const state = downloadableBlocks( initialState, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
@@ -39,66 +42,51 @@ describe( 'state', () => {
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
-			expect( state.pendingSearchRequests ).toEqual( 0 );
+			expect( state[ query ].isRequesting ).toEqual( false );
 		} );
 
 		it( "should set user's search term and save results", () => {
 			const query = downloadableBlock.title;
-			const state = downloadableBlocks( undefined, {
-				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: query,
-				downloadableBlocks: [ downloadableBlock ],
-			} );
-			expect( state.results ).toHaveProperty( query );
-			expect( state.results[ query ] ).toHaveLength( 1 );
-
-			// It should append to the results
-			const updatedState = downloadableBlocks( state, {
-				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: 'Test 1',
-				downloadableBlocks: [ downloadableBlock ],
-			} );
-
-			expect( Object.keys( updatedState.results ) ).toHaveLength( 2 );
+			const state = downloadableBlocks(
+				{},
+				{
+					type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+					filterValue: query,
+					downloadableBlocks: [ downloadableBlock ],
+				}
+			);
+			expect( state ).toHaveProperty( query );
+			expect( state[ query ].results ).toHaveLength( 1 );
 		} );
 
-		it( 'should increment block requests', () => {
-			const initialState = {
-				pendingSearchRequests: 0,
-			};
-
-			// Simulate the first call.
-			const state = downloadableBlocks( initialState, {
-				type: 'FETCH_DOWNLOADABLE_BLOCKS',
-			} );
+		it( 'should set query to reflect its pending status', () => {
+			const filterValue = 'Awesome Block';
 
 			// Simulate a second call.
-			const finalState = downloadableBlocks( state, {
-				type: 'FETCH_DOWNLOADABLE_BLOCKS',
-			} );
+			const stateAfterRequest = downloadableBlocks(
+				{},
+				{
+					type: 'FETCH_DOWNLOADABLE_BLOCKS',
+					filterValue,
+				}
+			);
 
-			expect( finalState.pendingSearchRequests ).toEqual( 2 );
-        } );
-        
-		it( 'should decrement block requests', () => {
-			const initialState = {
-				pendingSearchRequests: 2,
-			};
+			expect( stateAfterRequest[ filterValue ].isRequesting ).toEqual(
+				true
+			);
 
-			// Simulate the first call response
-			const state = downloadableBlocks( initialState, {
-				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: 'Test',
-				downloadableBlocks: [],
-			} );
+			const stateAfterResponse = downloadableBlocks(
+				{},
+				{
+					type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
+					filterValue,
+					downloadableBlocks: [],
+				}
+			);
 
-			const finalState = downloadableBlocks( state, {
-				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: 'Test 1',
-				downloadableBlocks: [],
-			} );
-
-			expect( finalState.pendingSearchRequests ).toEqual( 0 );
+			expect( stateAfterResponse[ filterValue ].isRequesting ).toEqual(
+				false
+			);
 		} );
 	} );
 

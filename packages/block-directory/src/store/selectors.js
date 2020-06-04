@@ -12,11 +12,19 @@ import hasBlockType from './utils/has-block-type';
  * Returns true if application is requesting for downloadable blocks.
  *
  * @param {Object} state Global application state.
+ * @param {string} filterValue Search string.
+ *
  *
  * @return {Array} Downloadable blocks
  */
-export function isRequestingDownloadableBlocks( state ) {
-	return state.downloadableBlocks.pendingSearchRequests > 0;
+export function isRequestingDownloadableBlocks( state, filterValue ) {
+	if (
+		! state.downloadableBlocks[ filterValue ] ||
+		! state.downloadableBlocks[ filterValue ].isRequesting
+	) {
+		return false;
+	}
+	return state.downloadableBlocks[ filterValue ].isRequesting;
 }
 
 /**
@@ -28,10 +36,13 @@ export function isRequestingDownloadableBlocks( state ) {
  * @return {Array} Downloadable blocks
  */
 export function getDownloadableBlocks( state, filterValue ) {
-	if ( ! state.downloadableBlocks.results[ filterValue ] ) {
+	if (
+		! state.downloadableBlocks[ filterValue ] ||
+		! state.downloadableBlocks[ filterValue ].results
+	) {
 		return [];
 	}
-	return state.downloadableBlocks.results[ filterValue ];
+	return state.downloadableBlocks[ filterValue ].results;
 }
 
 /**

@@ -34,23 +34,33 @@ describe( 'selectors', () => {
 
 	describe( 'isRequestingDownloadableBlocks', () => {
 		it( 'should return false if there are no calls pending', () => {
+			const filterValue = 'Awesome Block';
+
 			const state = {
-				downloadableBlocks: {
-					pendingSearchRequests: 0,
-				},
+				downloadableBlocks: {},
 			};
-			const isRequesting = isRequestingDownloadableBlocks( state );
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
 
 			expect( isRequesting ).toEqual( false );
 		} );
 
 		it( 'should return true if at least one call is pending', () => {
+			const filterValue = 'Awesome Block';
+
 			const state = {
 				downloadableBlocks: {
-					pendingSearchRequests: 1,
+					[ filterValue ]: {
+						isRequesting: true,
+					},
 				},
 			};
-			const isRequesting = isRequestingDownloadableBlocks( state );
+			const isRequesting = isRequestingDownloadableBlocks(
+				state,
+				filterValue
+			);
 
 			expect( isRequesting ).toEqual( true );
 		} );
@@ -98,8 +108,8 @@ describe( 'selectors', () => {
 	describe( 'getDownloadableBlocks', () => {
 		const state = {
 			downloadableBlocks: {
-				results: {
-					boxer: [ downloadableBlock ],
+				boxer: {
+					results: [ downloadableBlock ],
 				},
 			},
 		};
