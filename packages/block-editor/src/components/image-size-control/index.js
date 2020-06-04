@@ -25,10 +25,7 @@ const ImageSizeControl = ( {
 	onChange,
 	onChangeImage = noop,
 } ) => {
-	const updateDimensions = (
-		nextWidth = undefined,
-		nextHeight = undefined
-	) => {
+	const updateDimensions = ( nextWidth, nextHeight ) => {
 		return () => {
 			onChange( { width: nextWidth, height: nextHeight } );
 		};
