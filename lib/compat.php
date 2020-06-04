@@ -63,9 +63,13 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @param array  $metadata Block metadata.
 	 * @param string $field_name Field name to pick from metadata.
 	 *
-	 * @return string Script handle provided directly or created through script's registration.
+	 * @return string|boolean Script handle provided directly or created through
+	 *     script's registration, or false on failure.
 	 */
-	function gutenberg_get_script_handle( $metadata, $field_name ) {
+	function register_block_script_handle( $metadata, $field_name ) {
+		if ( empty( $metadata[ $field_name ] ) ) {
+			return false;
+		}
 		$script_handle = $metadata[ $field_name ];
 		$script_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
 		if ( $script_handle === $script_path ) {
@@ -88,13 +92,13 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 			return false;
 		}
 		$script_asset = require( $script_asset_path );
-		wp_register_script(
+		$result       = wp_register_script(
 			$script_handle,
 			plugins_url( $script_path, $metadata['file'] ),
 			$script_asset['dependencies'],
 			$script_asset['version']
 		);
-		return $script_handle;
+		return $result ? $script_handle : false;
 	}
 
 	/**
@@ -107,9 +111,13 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 	 * @param array  $metadata Block metadata.
 	 * @param string $field_name Field name to pick from metadata.
 	 *
-	 * @return string Style handle provided directly or created through style's registration.
+	 * @return string|boolean Style handle provided directly or created through
+	 *     style's registration, or false on failure.
 	 */
-	function gutenberg_get_style_handle( $metadata, $field_name ) {
+	function register_block_style_handle( $metadata, $field_name ) {
+		if ( empty( $metadata[ $field_name ] ) ) {
+			return false;
+		}
 		$style_handle = $metadata[ $field_name ];
 		$style_path   = gutenberg_remove_block_asset_path_prefix( $metadata[ $field_name ] );
 		if ( $style_handle === $style_path ) {
@@ -118,13 +126,13 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 
 		$style_handle = gutenberg_generate_block_asset_handle( $metadata['name'], $field_name );
 		$block_dir    = dirname( $metadata['file'] );
-		wp_register_style(
+		$result       = wp_register_style(
 			$style_handle,
 			plugins_url( $style_path, $metadata['file'] ),
 			array(),
 			filemtime( realpath( "$block_dir/$style_path" ) )
 		);
-		return $style_handle;
+		return $result ? $style_handle : false;
 	}
 
 	/**
@@ -178,28 +186,28 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 		}
 
 		if ( ! empty( $metadata['editorScript'] ) ) {
-			$settings['editor_script'] = gutenberg_get_script_handle(
+			$settings['editor_script'] = register_block_script_handle(
 				$metadata,
 				'editorScript'
 			);
 		}
 
 		if ( ! empty( $metadata['script'] ) ) {
-			$settings['script'] = gutenberg_get_script_handle(
+			$settings['script'] = register_block_script_handle(
 				$metadata,
 				'script'
 			);
 		}
 
 		if ( ! empty( $metadata['editorStyle'] ) ) {
-			$settings['editor_style'] = gutenberg_get_style_handle(
+			$settings['editor_style'] = register_block_style_handle(
 				$metadata,
 				'editorStyle'
 			);
 		}
 
 		if ( ! empty( $metadata['style'] ) ) {
-			$settings['style'] = gutenberg_get_style_handle(
+			$settings['style'] = register_block_style_handle(
 				$metadata,
 				'style'
 			);

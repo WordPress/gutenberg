@@ -40,6 +40,50 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		);
 	}
 
+	function test_field_not_found_register_block_script_handle() {
+		$result = register_block_script_handle( array(), 'script' );
+
+		$this->assertFalse( $result );
+	}
+
+	function test_empty_value_register_block_script_handle() {
+		$metadata = array( 'script' => '' );
+		$result   = register_block_script_handle( $metadata, 'script' );
+
+		$this->assertFalse( $result );
+	}
+
+	function test_handle_passed_register_block_script_handle() {
+		$metadata = array(
+			'editorScript' => 'test-script-handle',
+		);
+		$result   = register_block_script_handle( $metadata, 'editorScript' );
+
+		$this->assertSame( 'test-script-handle', $result );
+	}
+
+	function test_field_not_found_register_block_style_handle() {
+		$result = register_block_script_handle( array(), 'style' );
+
+		$this->assertFalse( $result );
+	}
+
+	function test_empty_value_found_register_block_style_handle() {
+		$metadata = array( 'style' => '' );
+		$result   = register_block_script_handle( $metadata, 'style' );
+
+		$this->assertFalse( $result );
+	}
+
+	function test_handle_passed_register_block_style_handle() {
+		$metadata = array(
+			'style' => 'test-style-handle',
+		);
+		$result   = register_block_script_handle( $metadata, 'style' );
+
+		$this->assertSame( 'test-style-handle', $result );
+	}
+
 	/**
 	 * Tests that the function returns false when the `block.json` is not found
 	 * in the WordPress core.
