@@ -19,7 +19,7 @@ import { getBlockType } from '@wordpress/blocks';
  *
  * @return {?string} Block title.
  */
-function BlockTitle( { clientId } ) {
+export default function BlockTitle( { clientId } ) {
 	const name = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -42,5 +42,3 @@ function BlockTitle( { clientId } ) {
 
 	return blockType.title;
 }
-
-export default BlockTitle;
