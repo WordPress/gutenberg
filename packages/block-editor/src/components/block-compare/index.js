@@ -42,13 +42,6 @@ function BlockCompare( {
 		} );
 	};
 
-	const getOriginalContent = () => {
-		return {
-			rawContent: block.originalContent,
-			renderedContent: getSaveElement( block.name, block.attributes ),
-		};
-	};
-
 	const getConvertedContent = ( convertedBlock ) => {
 		// The convertor may return an array of items or a single item
 		const newBlocks = castArray( convertedBlock );
@@ -67,7 +60,10 @@ function BlockCompare( {
 		};
 	};
 
-	const original = getOriginalContent();
+	const original = {
+		rawContent: block.originalContent,
+		renderedContent: getSaveElement( block.name, block.attributes ),
+	};
 	const converted = getConvertedContent( convertor( block ) );
 	const difference = getDifference(
 		original.rawContent,
