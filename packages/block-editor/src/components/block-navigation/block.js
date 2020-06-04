@@ -129,7 +129,12 @@ export default function BlockNavigationBlock( {
 						<BlockSettingsDropdown
 							clientIds={ [ clientId ] }
 							icon={ moreVertical }
-							toggleProps={ { ref, tabIndex, onFocus } }
+							toggleProps={ {
+								ref,
+								tabIndex,
+								onFocus,
+							} }
+							disableOpenOnArrowDown
 						/>
 					) }
 				</TreeGridCell>
